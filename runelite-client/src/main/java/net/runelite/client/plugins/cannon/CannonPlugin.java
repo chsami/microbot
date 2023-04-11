@@ -87,7 +87,7 @@ public class CannonPlugin extends Plugin
 	private boolean cannonPlaced;
 
 	@Getter
-	private WorldArea cannonPosition;
+	private static WorldArea cannonPosition;
 
 	@Getter
 	private int cannonWorld = -1;
