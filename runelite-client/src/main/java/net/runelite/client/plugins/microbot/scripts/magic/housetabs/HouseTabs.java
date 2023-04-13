@@ -4,7 +4,7 @@ import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.scripts.Scripts;
-import net.runelite.client.plugins.microbot.util.gameobject.GameObject;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -44,11 +44,11 @@ public class HouseTabs extends Scripts {
 
     private void lookForHouseAdvertisementObject() {
         Widget houseAdvertisementPanel = Microbot.getClient().getWidget(HOUSE_ADVERTISEMENT_NAME_PARENT_INTERFACE);
-        if (!hasSoftClay() || houseAdvertisementPanel != null || GameObject.findGameObject(HOUSE_PORTAL_OBJECT) != null)
+        if (!hasSoftClay() || houseAdvertisementPanel != null || Rs2GameObject.findGameObject(HOUSE_PORTAL_OBJECT) != null)
             return;
 
 
-        boolean success = GameObject
+        boolean success = Rs2GameObject
                 .interact(29091, "View");
 
 
@@ -91,18 +91,18 @@ public class HouseTabs extends Scripts {
         } else {
             Microbot.getMouse()
                     .click(enterHouseButton.getCanvasLocation());
-            sleepUntilOnClientThread(() -> GameObject.findGameObject(HOUSE_PORTAL_OBJECT) != null);
+            sleepUntilOnClientThread(() -> Rs2GameObject.findGameObject(HOUSE_PORTAL_OBJECT) != null);
         }
     }
 
     public void lookForLectern() {
-        if (!hasSoftClay() || GameObject.findGameObject(HOUSE_ADVERTISEMENT_OBJECT) != null || Microbot.isGainingExp)
+        if (!hasSoftClay() || Rs2GameObject.findGameObject(HOUSE_ADVERTISEMENT_OBJECT) != null || Microbot.isGainingExp)
             return;
 
         Widget houseTabInterface = Microbot.getClient().getWidget(HOUSE_TABLET_INTERFACE);
-        if (houseTabInterface != null || GameObject.findGameObject(HOUSE_PORTAL_OBJECT) == null) return;
+        if (houseTabInterface != null || Rs2GameObject.findGameObject(HOUSE_PORTAL_OBJECT) == null) return;
 
-        boolean success = GameObject.interact(new int[]{13647, 37349}, "Study");
+        boolean success = Rs2GameObject.interact(new int[]{13647, 37349}, "Study");
         if (success) {
             sleepUntilOnClientThread(() -> Microbot.getClient().getWidget(HOUSE_TABLET_INTERFACE) != null);
         }
@@ -111,7 +111,7 @@ public class HouseTabs extends Scripts {
     public void createHouseTablet() {
         Widget houseTabInterface = Microbot.getClient().getWidget(HOUSE_TABLET_INTERFACE);
         if (houseTabInterface == null) return;
-        if (!hasSoftClay() || GameObject.findGameObject(HOUSE_PORTAL_OBJECT) == null)
+        if (!hasSoftClay() || Rs2GameObject.findGameObject(HOUSE_PORTAL_OBJECT) == null)
             return;
 
         while (Microbot.getClient().getWidget(HOUSE_TABLET_INTERFACE) != null) {
@@ -126,16 +126,16 @@ public class HouseTabs extends Scripts {
     }
 
     public void leaveHouse() {
-        if (hasSoftClay() || GameObject.findGameObject(HOUSE_PORTAL_OBJECT) == null)
+        if (hasSoftClay() || Rs2GameObject.findGameObject(HOUSE_PORTAL_OBJECT) == null)
             return;
 
-        boolean success = GameObject.interact(HOUSE_PORTAL_OBJECT, "Enter");
+        boolean success = Rs2GameObject.interact(HOUSE_PORTAL_OBJECT, "Enter");
         if (success)
-            sleepUntil(() -> GameObject.findGameObject(HOUSE_PORTAL_OBJECT) == null);
+            sleepUntil(() -> Rs2GameObject.findGameObject(HOUSE_PORTAL_OBJECT) == null);
     }
 
     public void unnoteClay() {
-        if (hasSoftClay() || GameObject.findGameObject(HOUSE_ADVERTISEMENT_OBJECT) == null)
+        if (hasSoftClay() || Rs2GameObject.findGameObject(HOUSE_ADVERTISEMENT_OBJECT) == null)
             return;
         if (Microbot.getClient().getWidget(14352385) == null) {
             do {
@@ -161,7 +161,7 @@ public class HouseTabs extends Scripts {
                 super.run();
                 System.out.println("Main loop of your script every 600ms");
 
-                if (GameObject.findGameObject(new int[]{13647, 37349}) != null) {
+                if (Rs2GameObject.findGameObject(new int[]{13647, 37349}) != null) {
                     currentInventoryCount = Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Inventory.getInventoryItems()).count());
                     Thread.sleep(3000);
                     if (currentInventoryCount != Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Inventory.getInventoryItems()).count()))

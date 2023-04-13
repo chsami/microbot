@@ -5,7 +5,7 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.client.plugins.cannon.CannonPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.scripts.Scripts;
-import net.runelite.client.plugins.microbot.util.gameobject.GameObject;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Menu;
 
@@ -15,14 +15,14 @@ public class CannonScript extends Scripts {
     public boolean run() {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             super.run();
-            net.runelite.api.GameObject brokenCannon = GameObject.findGameObject(14916);
+            net.runelite.api.GameObject brokenCannon = Rs2GameObject.findGameObject(14916);
             if (brokenCannon != null) {
                 Menu.doAction("Repair", brokenCannon.getCanvasTilePoly(), new String[] {"Broken multicannon"});
                 return;
             }
             int cannonBallsLeft = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.CANNON_AMMO));
             if (cannonBallsLeft < Random.random(10, 15)) {
-                net.runelite.api.GameObject cannon = GameObject.findGameObject(6);
+                net.runelite.api.GameObject cannon = Rs2GameObject.findGameObject(6);
                 if (cannon == null) return;
                 WorldArea cannonLocation = new WorldArea(cannon.getWorldLocation().getX() - 1, cannon.getWorldLocation().getY() - 1, 3, 3, cannon.getWorldLocation().getPlane());
                 if (!cannonLocation.toWorldPoint().equals(CannonPlugin.getCannonPosition().toWorldPoint())) return;

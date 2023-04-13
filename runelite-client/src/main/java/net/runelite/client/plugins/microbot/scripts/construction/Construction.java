@@ -2,13 +2,17 @@ package net.runelite.client.plugins.microbot.scripts.construction;
 
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
+import net.runelite.api.SpriteID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.scripts.Scripts;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Menu;
 import net.runelite.client.plugins.microbot.util.npc.Npc;
+import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -27,10 +31,11 @@ public class Construction extends Scripts {
 
 
     public GameObject getOakLarderSpace() {
-        return net.runelite.client.plugins.microbot.util.gameobject.GameObject.findGameObject(15403);
+        return Rs2GameObject.findGameObject(15403);
     }
+
     public GameObject getOakLarder() {
-        return net.runelite.client.plugins.microbot.util.gameobject.GameObject.findGameObject(13566);
+        return Rs2GameObject.findGameObject(13566);
     }
 
     public NPC getButler() {
@@ -38,7 +43,7 @@ public class Construction extends Scripts {
     }
 
     public boolean hasDialogueOptionToUnnote() {
-        return Rs2Widget.findWidget( "Un-note", null) != null;
+        return Rs2Widget.findWidget("Un-note", null) != null;
     }
 
     public boolean hasPayButlerDialogue() {
@@ -52,6 +57,7 @@ public class Construction extends Scripts {
     public boolean hasFurnitureInterfaceOpen() {
         return Rs2Widget.findWidget("Furniture", null) != null;
     }
+
     public boolean hasRemoveLarderInterfaceOpen() {
         return Rs2Widget.findWidget("Really remove it?", null) != null;
     }
@@ -70,7 +76,7 @@ public class Construction extends Scripts {
                     butler();
                 }
                 //System.out.println(hasPayButlerDialogue());
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
@@ -86,14 +92,14 @@ public class Construction extends Scripts {
         GameObject oakLarderSpace = getOakLarderSpace();
         GameObject oakLarder = getOakLarder();
         NPC butler = getButler();
-        boolean hasRequiredPlanks = Inventory.hasItemAmount(	8778, Random.random(8, 16)); //oak plank
+        boolean hasRequiredPlanks = Inventory.hasItemAmount(8778, Random.random(8, 16)); //oak plank
         if (oakLarderSpace == null && oakLarder != null) {
             state = ConstructionState.Remove;
         } else if (oakLarderSpace != null && oakLarder == null && hasRequiredPlanks) {
             state = ConstructionState.Build;
         } else if (oakLarderSpace != null && oakLarder == null && butler != null) {
             state = ConstructionState.Butler;
-        } else if (oakLarderSpace == null && oakLarder == null){
+        } else if (oakLarderSpace == null && oakLarder == null) {
             state = ConstructionState.Idle;
             Microbot.getNotifier().notify("Looks like we are no longer in our house.");
             shutdown();
@@ -121,9 +127,26 @@ public class Construction extends Scripts {
     }
 
     private void butler() {
-        NPC demonButler = getButler();
-        if (demonButler == null) return;
-        if (Menu.doAction("Talk-to", demonButler.getCanvasTilePoly())) {
+        NPC butler = getButler();
+        boolean butlerIsToFar;
+        if (butler == null) return;
+        butlerIsToFar = Microbot.getClientThread().runOnClientThread(() -> {
+            int distance = butler.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
+            return distance > 3;
+        });
+        if (butlerIsToFar) {
+            Tab.switchToSettings();
+            sleep(800, 1800);
+            Widget houseOptionWidget = Rs2Widget.findWidget(SpriteID.OPTIONS_HOUSE_OPTIONS, null);
+            if (houseOptionWidget != null)
+                Microbot.getMouse().click(houseOptionWidget.getCanvasLocation());
+            sleep(800, 1800);
+            Widget callServantWidget = Rs2Widget.findWidget("Call Servant", null);
+            if (callServantWidget != null)
+                Microbot.getMouse().click(callServantWidget.getCanvasLocation());
+        }
+
+        if (Menu.doAction("Talk-to", butler.getCanvasTilePoly())) {
             sleep(1200, 2000);
             if (hasDialogueOptionToUnnote()) {
                 VirtualKeyboard.keyPress('1');

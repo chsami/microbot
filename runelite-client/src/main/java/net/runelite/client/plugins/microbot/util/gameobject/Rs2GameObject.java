@@ -7,9 +7,47 @@ import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.menu.Menu;
 
 import java.awt.*;
+import java.util.Arrays;
 
 
-public class GameObject {
+public class Rs2GameObject {
+
+    public static GameObject findBank() {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Scene scene = Microbot.getClient().getScene();
+            Tile[][][] tiles = scene.getTiles();
+
+            int z = Microbot.getClient().getPlane();
+
+            for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+                for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                    Tile tile = tiles[z][x][y];
+
+                    if (tile == null) {
+                        continue;
+                    }
+
+                    Player player = Microbot.getClient().getLocalPlayer();
+                    if (player == null) {
+                        continue;
+                    }
+                    net.runelite.api.GameObject[] gameObjects = tile.getGameObjects();
+                    if (gameObjects == null) return null;
+                    for (net.runelite.api.GameObject gameObject : gameObjects) {
+                        if (gameObject == null || !gameObject.getSceneMinLocation().equals(tile.getSceneLocation()))
+                            continue;
+                        if (player.getLocalLocation().distanceTo(gameObject.getLocalLocation()) > 2400) continue;
+                        ObjectComposition objComp = Microbot.getClient().getObjectDefinition(gameObject.getId());
+                        if (objComp == null) continue;
+                        if (Arrays.stream(objComp.getActions()).filter(action -> action != null).anyMatch((action) -> action.toLowerCase().contains("bank"))) {
+                            return gameObject;
+                        }
+                    }
+                }
+            }
+            return null;
+        });
+    }
 
     public static net.runelite.api.GameObject findGameObject(int id) {
         return Microbot.getClientThread().runOnClientThread(() -> {

@@ -93,7 +93,6 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setItemManager(itemManager);
         Microbot.setNotifier(notifier);
         Microbot.setNpcManager(npcManager);
-
         if (config.toggleHardwareMouse()) {
             Microbot.setMouse(new HardwareMouse());
         } else {

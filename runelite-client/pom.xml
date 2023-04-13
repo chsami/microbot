@@ -174,7 +174,6 @@
 			<classifier>macos-arm64</classifier>
 			<scope>runtime</scope>
 		</dependency>
-
 		<!-- lwjgl core -->
 		<dependency>
 			<groupId>org.lwjgl</groupId>

@@ -60,7 +60,12 @@ public class Tab {
         Microbot.getMouse().click(tab.getBounds());
         return getCurrentTab() == InterfaceTab.PRAYER;
     }
-    // ParentId	35454979
-    //mage Id	35454997
-    //range Id	35454998
+
+    public static boolean switchToSettings() {
+        if (getCurrentTab() == InterfaceTab.SETTINGS) return true;
+        Widget tab = Microbot.getClient().getWidget(10551342);
+        if (tab == null) return false;
+        Microbot.getMouse().click(tab.getBounds());
+        return getCurrentTab() == InterfaceTab.SETTINGS;
+    }
 }

@@ -2,6 +2,8 @@ package net.runelite.client.plugins.microbot.scripts;
 
 
 import net.runelite.api.*;
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -128,12 +130,6 @@ public abstract class Scripts {
 
     public void openInventory() {
         Microbot.getClientThread().runOnClientThread(() -> Tab.switchToInventoryTab());
-        sleep(300, 1200);
-        sleepUntilOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.INVENTORY);
-    }
-
-    public void openPrayerTab() {
-        Microbot.getClientThread().runOnClientThread(() -> Tab.switchToPrayerTab());
         sleep(300, 1200);
         sleepUntilOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.INVENTORY);
     }

@@ -6,6 +6,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
 import java.util.Arrays;
 import java.util.concurrent.Executors;
@@ -113,6 +114,7 @@ public class Inventory {
     }
 
     public static boolean hasItemAmount(int itemId, int amount) {
+        Tab.switchToInventoryTab();
         Widget inventoryWidget = getInventory();
         int count = 0;
         for (Widget item : inventoryWidget.getDynamicChildren()) {
