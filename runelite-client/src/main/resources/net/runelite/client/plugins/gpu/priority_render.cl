@@ -200,49 +200,46 @@ int map_face_priority(__local struct shared_data *shared, uint localId, struct m
   return 0;
 }
 
-void insert_dfs(__local struct shared_data *shared, uint localId, struct modelinfo minfo, int adjPrio, int distance, int prioIdx) {
+void insert_face(__local struct shared_data *shared, uint localId, struct modelinfo minfo, int adjPrio, int distance, int prioIdx) {
   int size = minfo.size;
 
   if (localId < size) {
-    // calculate base offset into dfs based on number of faces with a lower priority
+    // calculate base offset into renderPris based on number of faces with a lower priority
     int baseOff = count_prio_offset(shared, adjPrio);
-    // store into face array offset array by unique index
-    shared->dfs[baseOff + prioIdx] = ((int)localId << 16) | distance;
+    // the furthest faces draw first, and have the highest value
+    // if two faces have the same distance, the one with the
+    // lower id draws first
+    shared->renderPris[baseOff + prioIdx] = ((uint)(distance << 16)) | (~localId & 0xffffu);
   }
 }
 
 void sort_and_insert(__local struct shared_data *shared, __constant struct uniform *uni, __global const float4 *texb, __global const float4 *temptexb,
                      __global int4 *vout, __global float4 *uvout, uint localId, struct modelinfo minfo, int thisPriority, int thisDistance, int4 thisrvA,
                      int4 thisrvB, int4 thisrvC) {
-  /* compute face distance */
   int size = minfo.size;
 
   if (localId < size) {
     int outOffset = minfo.idx;
     int toffset = minfo.toffset;
     int flags = minfo.flags;
-    int4 pos = (int4)(minfo.x, minfo.y, minfo.z, 0);
-
-    const int priorityOffset = count_prio_offset(shared, thisPriority);
-    const int numOfPriority = shared->totalMappedNum[thisPriority];
-    int start = priorityOffset;                // index of first face with this priority
-    int end = priorityOffset + numOfPriority;  // index of last face with this priority
-    int myOffset = priorityOffset;
 
     // we only have to order faces against others of the same priority
+    const int priorityOffset = count_prio_offset(shared, thisPriority);
+    const int numOfPriority = shared->totalMappedNum[thisPriority];
+    const int start = priorityOffset;                // index of first face with this priority
+    const int end = priorityOffset + numOfPriority;  // index of last face with this priority
+    const uint renderPriority = ((uint)(thisDistance << 16)) | (~localId & 0xffffu);
+    int myOffset = priorityOffset;
+
     // calculate position this face will be in
     for (int i = start; i < end; ++i) {
-      int d1 = shared->dfs[i];
-      int theirId = d1 >> 16;
-      int theirDistance = d1 & 0xffff;
-
-      // the closest faces draw last, so have the highest index
-      // if two faces have the same distance, the one with the
-      // higher id draws last
-      if ((theirDistance > thisDistance) || (theirDistance == thisDistance && theirId < localId)) {
+      if (renderPriority < shared->renderPris[i]) {
         ++myOffset;
       }
     }
+
+    int4 pos = (int4)(minfo.x, minfo.y, minfo.z, 0);
+    int orientation = flags & 0x7ff;
 
     // position vertices in scene and write to out buffer
     vout[outOffset + myOffset * 3] = pos + thisrvA;
@@ -255,7 +252,6 @@ void sort_and_insert(__local struct shared_data *shared, __constant struct unifo
       uvout[outOffset + myOffset * 3 + 2] = (float4)(0, 0, 0, 0);
     } else {
       float4 texA, texB, texC;
-      float2 uv1, uv2, uv3;
 
       if (flags >= 0) {
         texA = temptexb[toffset + localId * 3];
@@ -267,23 +263,9 @@ void sort_and_insert(__local struct shared_data *shared, __constant struct unifo
         texC = texb[toffset + localId * 3 + 2];
       }
 
-      int orientation = flags & 0x7ff;
-
-      // rotate back to original orientation because the tex triangles
-      // are not rotated
-      int4 f1 = rotate_vertex(uni, thisrvA, (2048 - orientation) & 2047);
-      int4 f2 = rotate_vertex(uni, thisrvB, (2048 - orientation) & 2047);
-      int4 f3 = rotate_vertex(uni, thisrvC, (2048 - orientation) & 2047);
-
-      // Transform camera position to model space
-      int4 cameraPos = rotate_vertex(uni, (int4)(uni->cameraX, uni->cameraY, uni->cameraZ, 0) - pos, (2048 - orientation) & 2047);
-
-      compute_uv(convert_float3(cameraPos.xyz), convert_float3(f1.xyz), convert_float3(f2.xyz), convert_float3(f3.xyz), texA.yzw, texB.yzw, texC.yzw, &uv1,
-                 &uv2, &uv3);
-
-      uvout[outOffset + myOffset * 3] = (float4)(texA.x, uv1.xy, 0);
-      uvout[outOffset + myOffset * 3 + 1] = (float4)(texB.x, uv2.xy, 0);
-      uvout[outOffset + myOffset * 3 + 2] = (float4)(texC.x, uv3.xy, 0);
+      uvout[outOffset + myOffset * 3] = (float4)(texA.x, rotatef_vertex(texA.yzw, orientation) + convert_float3(pos.xyz));
+      uvout[outOffset + myOffset * 3 + 1] = (float4)(texB.x, rotatef_vertex(texB.yzw, orientation) + convert_float3(pos.xyz));
+      uvout[outOffset + myOffset * 3 + 2] = (float4)(texC.x, rotatef_vertex(texC.yzw, orientation) + convert_float3(pos.xyz));
     }
   }
 }

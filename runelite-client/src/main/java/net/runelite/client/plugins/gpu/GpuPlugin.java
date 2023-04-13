@@ -147,6 +147,7 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 
 	static final Shader PROGRAM = new Shader()
 		.add(GL43C.GL_VERTEX_SHADER, "vert.glsl")
+		.add(GL43C.GL_GEOMETRY_SHADER, "geom.glsl")
 		.add(GL43C.GL_FRAGMENT_SHADER, "frag.glsl");
 
 	static final Shader COMPUTE_PROGRAM = new Shader()
@@ -798,6 +799,12 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 		GL43C.glRenderbufferStorageMultisample(GL43C.GL_RENDERBUFFER, aaSamples, GL43C.GL_RGBA, width, height);
 		GL43C.glFramebufferRenderbuffer(GL43C.GL_FRAMEBUFFER, GL43C.GL_COLOR_ATTACHMENT0, GL43C.GL_RENDERBUFFER, rboSceneHandle);
 
+		int status = GL43C.glCheckFramebufferStatus(GL43C.GL_FRAMEBUFFER);
+		if (status != GL43C.GL_FRAMEBUFFER_COMPLETE)
+		{
+			throw new RuntimeException("FBO is incomplete. status: " + status);
+		}
+
 		// Reset
 		GL43C.glBindFramebuffer(GL43C.GL_FRAMEBUFFER, awtContext.getFramebuffer(false));
 		GL43C.glBindRenderbuffer(GL43C.GL_RENDERBUFFER, 0);
@@ -1029,8 +1036,8 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 		if (computeMode == ComputeMode.NONE)
 		{
 			targetBufferOffset += sceneUploader.upload(model,
-				// tile model is already positioned in the scene, so it not necessary to offset it
-				0, 0,
+				tileX, tileY,
+				tileX << Perspective.LOCAL_COORD_BITS, tileY << Perspective.LOCAL_COORD_BITS,
 				vertexBuffer, uvBuffer,
 				true);
 		}

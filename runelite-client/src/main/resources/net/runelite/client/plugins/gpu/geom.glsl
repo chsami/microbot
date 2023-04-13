@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Adam <Adam@sigterm.info>
+ * Copyright (c) 2018, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,7 +23,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-struct uniform {
+#version 330
+
+// smallest unit of the texture which can be moved per tick. textures are all
+// 128x128px - so this is equivalent to +1px
+#define TEXTURE_ANIM_UNIT (1.0f / 128.0f)
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+layout(std140) uniform uniforms {
   int cameraYaw;
   int cameraPitch;
   int centerX;
@@ -32,24 +41,55 @@ struct uniform {
   int cameraX;
   int cameraY;
   int cameraZ;
-  int4 sinCosTable[2048];
+  ivec2 sinCosTable[2048];
 };
 
-struct shared_data {
-  int totalNum[12];        // number of faces with a given priority
-  int totalDistance[12];   // sum of distances to faces of a given priority
-  int totalMappedNum[18];  // number of faces with a given adjusted priority
-  int min10;               // minimum distance to a face of priority 10
-  uint renderPris[0];      // packed distance and face id
-};
+#include "uv.glsl"
 
-struct modelinfo {
-  int offset;   // offset into vertex buffer
-  int toffset;  // offset into texture buffer
-  int size;     // length in faces
-  int idx;      // write idx in target buffer
-  int flags;    // buffer, radius, orientation
-  int x;        // scene position x
-  int y;        // scene position y
-  int z;        // scene position z
-};
+uniform vec2 textureAnimations[128];
+uniform int tick;
+uniform mat4 projectionMatrix;
+
+in ivec3 gVertex[3];
+in vec4 gColor[3];
+in float gHsl[3];
+in int gTextureId[3];
+in vec3 gTexPos[3];
+in float gFogAmount[3];
+
+out vec4 fColor;
+noperspective centroid out float fHsl;
+flat out int fTextureId;
+out vec2 fUv;
+out float fFogAmount;
+
+void main() {
+  int textureId = gTextureId[0];
+  vec2 uv[3];
+
+  if (textureId > 0) {
+    ivec3 cameraPos = ivec3(cameraX, cameraY, cameraZ);
+    compute_uv(cameraPos, gVertex[0], gVertex[1], gVertex[2], gTexPos[0], gTexPos[1], gTexPos[2], uv[0], uv[1], uv[2]);
+
+    vec2 textureAnim = textureAnimations[textureId - 1];
+    for (int i = 0; i < 3; ++i) {
+      uv[i] += tick * textureAnim * TEXTURE_ANIM_UNIT;
+    }
+  } else {
+    uv[0] = vec2(0);
+    uv[1] = vec2(0);
+    uv[2] = vec2(0);
+  }
+
+  for (int i = 0; i < 3; ++i) {
+    fColor = gColor[i];
+    fHsl = gHsl[i];
+    fTextureId = gTextureId[i];
+    fUv = uv[i];
+    fFogAmount = gFogAmount[i];
+    gl_Position = projectionMatrix * vec4(gVertex[i], 1);
+    EmitVertex();
+  }
+
+  EndPrimitive();
+}
