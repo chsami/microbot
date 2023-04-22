@@ -109,10 +109,15 @@ public class TitheFarmPlugin extends Plugin
 		TitheFarmPlant newPlant = new TitheFarmPlant(state, type, gameObject);
 		TitheFarmPlant oldPlant = getPlantFromCollection(gameObject);
 
+		if (oldPlant != null)
+			newPlant.setIndex(oldPlant.getIndex());
+
+
 		if (oldPlant == null && newPlant.getType() != TitheFarmPlantType.EMPTY)
 		{
 			log.debug("Added plant {}", newPlant);
 			if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(newPlant.getGameObject().getWorldLocation()) < 3) {
+				newPlant.setIndex(plants.size());
 				plants.add(newPlant);
 			}
 		}

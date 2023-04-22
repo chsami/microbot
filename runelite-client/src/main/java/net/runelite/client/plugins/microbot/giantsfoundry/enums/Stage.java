@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.enums;
+package net.runelite.client.plugins.microbot.giantsfoundry.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

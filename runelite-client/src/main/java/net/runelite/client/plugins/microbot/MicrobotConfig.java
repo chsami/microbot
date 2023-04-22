@@ -223,8 +223,8 @@ public interface MicrobotConfig extends Config {
         return "Yew logs";
     }
     @ConfigItem(
-            keyName = "Construction",
-            name = "Construction",
+            keyName = "ConstructionScript",
+            name = "ConstructionScript",
             description = "Train construction",
             position = 0,
             section = skills

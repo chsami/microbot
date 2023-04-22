@@ -73,7 +73,7 @@ public class SpicyStew implements Effect
 		}
 
 		/*
-		 * Orange spices: Smithing, Cooking, Crafting, Firemaking, Fletching, Runecraft, Construction
+		 * Orange spices: Smithing, Cooking, Crafting, Firemaking, Fletching, Runecraft, ConstructionScript
 		 */
 		if (orangeBoost > 0)
 		{

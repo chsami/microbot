@@ -37,6 +37,10 @@ public class TitheFarmPlant
 
 	@Getter
 	@Setter
+	private int index;
+
+	@Getter
+	@Setter
 	private Instant planted;
 
 	@Getter

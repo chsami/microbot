@@ -2,14 +2,24 @@ package net.runelite.client.plugins.microbot.scripts;
 
 
 import net.runelite.api.*;
+import net.runelite.client.Notifier;
+import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.Config;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.NPCManager;
+import net.runelite.client.game.SpriteManager;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.construction.ConstructionConfig;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
+import javax.inject.Inject;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -115,6 +125,7 @@ public abstract class Script implements IScript {
         } while (!done && System.currentTimeMillis() - startTime < time);
     }
 
+
     public void shutdown() {
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
             mainScheduledFuture.cancel(true);
@@ -124,6 +135,7 @@ public abstract class Script implements IScript {
     public boolean run() {
         if (!Microbot.isLoggedIn()) {
             shutdown();
+            return false;
         }
         if (Microbot.pauseAllScripts) return false;
         return true;

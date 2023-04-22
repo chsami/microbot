@@ -1,10 +1,11 @@
-package net.runelite.client.plugins.microbot.scripts.construction;
+package net.runelite.client.plugins.microbot.construction;
 
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
 import net.runelite.api.SpriteID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.construction.enums.ConstructionState;
 import net.runelite.client.plugins.microbot.scripts.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
@@ -18,14 +19,9 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
-enum ConstructionState {
-    Build,
-    Remove,
-    Butler,
-    Idle
-}
 
-public class Construction extends Script {
+
+public class ConstructionScript extends Script {
 
     ConstructionState state = ConstructionState.Idle;
 
@@ -62,8 +58,7 @@ public class Construction extends Script {
         return Rs2Widget.findWidget("Really remove it?", null) != null;
     }
 
-    @Override
-    public boolean run() {
+    public boolean run(ConstructionConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             super.run();
             try {

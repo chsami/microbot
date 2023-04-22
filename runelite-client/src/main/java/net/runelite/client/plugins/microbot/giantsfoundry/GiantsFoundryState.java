@@ -1,21 +1,21 @@
-package net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry;
+package net.runelite.client.plugins.microbot.giantsfoundry;
 
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.GameObject;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.enums.Heat;
-import net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.enums.Stage;
+import net.runelite.client.plugins.microbot.giantsfoundry.enums.Heat;
+import net.runelite.client.plugins.microbot.giantsfoundry.enums.Stage;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.enums.Stage.*;
+import static net.runelite.client.plugins.microbot.giantsfoundry.enums.Stage.*;
 
-public class GiantFoundryState {
+public class GiantsFoundryState {
     // heat and progress are from 0-1000
     private static final int VARBIT_HEAT = 13948;
     private static final int VARBIT_PROGRESS = 13949;
@@ -173,12 +173,12 @@ public class GiantFoundryState {
         int heat = getHeatAmount();
         if (getCurrentStage() == null) return -1;
         Heat requiredHeat = getCurrentStage().getHeat();
-        int actionsLeft = GiantFoundryState.getActionsForHeatLevel();
-        if (GiantsFoundry.isHeatingUp) {
+        int actionsLeft = GiantsFoundryState.getActionsForHeatLevel();
+        if (GiantsFoundryScript.isHeatingUp) {
             if (actionsLeft < 8)
                 return useLavaPool;
             return idle;
-        } else if (GiantsFoundry.isCoolingDown) {
+        } else if (GiantsFoundryScript.isCoolingDown) {
             if (actionsLeft < 8)
                 return useWaterFall;
             return idle;
@@ -230,9 +230,9 @@ public class GiantFoundryState {
        /* switch (requiredHeat) {
             case LOW:
                 int[] low = getLowHeatRange();
-                if (GiantsFoundry.isHeatingUp) {
+                if (GiantsFoundryScript.isHeatingUp) {
                     if (heat > (low[1] - 50) && heat < low[1] || heat > low[1] || heat < low[0]) {
-                        GiantsFoundry.isHeatingUp = false;
+                        GiantsFoundryScript.isHeatingUp = false;
                     }
                     return 1;
                 } else {
@@ -245,9 +245,9 @@ public class GiantFoundryState {
                 break;
             case MED:
                 int[] med = getMedHeatRange();
-                if (GiantsFoundry.isCoolingDown) {
+                if (GiantsFoundryScript.isCoolingDown) {
                     if (heat < (med[0] + 50) && heat > med[0] || heat < med[0] || heat > med[1]) {
-                        GiantsFoundry.isCoolingDown = false;
+                        GiantsFoundryScript.isCoolingDown = false;
                     }
                     return 0;
                 } else {
@@ -261,9 +261,9 @@ public class GiantFoundryState {
                 break;
             case HIGH:
                 int[] high = getHighHeatRange(); // 600
-                if (GiantsFoundry.isHeatingUp) {// 708 - 958
+                if (GiantsFoundryScript.isHeatingUp) {// 708 - 958
                     if (heat > (high[1] - 50) && heat < high[1] || heat > high[1] || heat < high[0]) {
-                        GiantsFoundry.isHeatingUp = false;
+                        GiantsFoundryScript.isHeatingUp = false;
                     }
                     return 1;
                 } else {

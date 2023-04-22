@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.scripts.crafting;
+package net.runelite.client.plugins.microbot.crafting;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.scripts.Script;
@@ -10,9 +10,8 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
-public class Crafting extends Script {
-    @Override
-    public boolean run() {
+public class CraftingScript extends Script {
+    public boolean run(CraftingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;

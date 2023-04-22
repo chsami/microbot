@@ -1,12 +1,12 @@
-package net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.enums;
+package net.runelite.client.plugins.microbot.giantsfoundry.enums;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 
 import java.util.Map;
 
-import static net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.enums.CommissionType.*;
-import static net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.enums.MouldType.*;
+import static net.runelite.client.plugins.microbot.giantsfoundry.enums.CommissionType.*;
+import static net.runelite.client.plugins.microbot.giantsfoundry.enums.MouldType.*;
 
 @AllArgsConstructor
 public enum Mould {

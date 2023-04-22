@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.enums;
+package net.runelite.client.plugins.microbot.giantsfoundry.enums;
 
 public enum CommissionType {
     NONE,

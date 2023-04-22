@@ -1,8 +1,12 @@
-package net.runelite.client.plugins.microbot.scripts.fletching;
+package net.runelite.client.plugins.microbot.fletching;
+
 
 import net.runelite.api.NPC;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.MicrobotConfig;
+import net.runelite.client.plugins.microbot.fletching.enums.FletchingItem;
+import net.runelite.client.plugins.microbot.fletching.enums.FletchingMaterial;
+import net.runelite.client.plugins.microbot.fletching.enums.FletchingMode;
 import net.runelite.client.plugins.microbot.scripts.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
@@ -14,27 +18,29 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
-public class Fletcher extends Script {
-    public void run(MicrobotConfig config) {
-        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            super.run();
-            try {
-                String knife = config.PrimaryFletchItem();
-                String logsToFletch = config.logsToFletch();
-                if (Random.random(1, 100) == 2)
-                    sleep(1000, 60000);
+public class FletchingScript extends Script {
 
-                boolean hasRequirementsToFletch = Inventory.hasItem(knife)
+
+
+    public void run(FletchingConfig config) {
+        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (!super.run()) return;
+            if (!configChecks(config)) return;
+            if (config.Afk() && Random.random(1, 100) == 2)
+                sleep(1000, 60000);
+            try {
+                String itemToFletchWith = config.fletchingMode().getItemName();
+                String logsToFletch = config.fletchingMaterial().getName();
+
+
+                boolean hasRequirementsToFletch = Inventory.hasItem(itemToFletchWith)
                         && Inventory.findItem(logsToFletch) != null;
-                boolean hasRequirementsToBank = Inventory.hasItem(knife)
+                boolean hasRequirementsToBank = Inventory.hasItem(itemToFletchWith)
                         && Inventory.findItem(logsToFletch) == null;
                 if (hasRequirementsToFletch) {
-                    Inventory.useItem(knife);
-                    sleep(600, 1200);
-                    Inventory.useItem(logsToFletch);
+                    Inventory.useItemOnItem(itemToFletchWith, logsToFletch);
                     sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694736) != null);
-                    VirtualKeyboard.keyHold(KeyEvent.VK_SPACE);
-                    VirtualKeyboard.keyRelease(KeyEvent.VK_SPACE);
+                    keyPress((char) config.fletchingItem().getOption());
                     sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694736) == null);
                     sleepUntilOnClientThread(() -> !Inventory.hasItem(logsToFletch), 60000);
                 }
@@ -50,6 +56,15 @@ public class Fletcher extends Script {
                 System.out.println(ex.getMessage());
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
+    }
+
+    private boolean configChecks(FletchingConfig config) {
+        if (config.fletchingMaterial() == FletchingMaterial.REDWOOD && config.fletchingItem() != FletchingItem.SHIELD) {
+            Microbot.getNotifier().notify("[Wrong Configuration] You can only make shields with redwood logs.");
+            shutdown();
+            return false;
+        }
+        return true;
     }
 
     private boolean depositAndWithdrawItems(NPC npc) {
@@ -107,3 +122,4 @@ public class Fletcher extends Script {
         super.shutdown();
     }
 }
+

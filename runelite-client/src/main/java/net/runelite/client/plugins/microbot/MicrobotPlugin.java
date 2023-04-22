@@ -12,6 +12,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.*;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryScript;
 import net.runelite.client.plugins.microbot.scripts.bosses.ZulrahOverlay;
 import net.runelite.client.plugins.microbot.scripts.bosses.ZulrahScript;
 import net.runelite.client.plugins.microbot.scripts.cannon.CannonScript;
@@ -20,16 +21,15 @@ import net.runelite.client.plugins.microbot.scripts.combat.combatpotion.CombatPo
 import net.runelite.client.plugins.microbot.scripts.combat.food.Food;
 import net.runelite.client.plugins.microbot.scripts.combat.jad.Jad;
 import net.runelite.client.plugins.microbot.scripts.combat.prayer.PrayerPotion;
-import net.runelite.client.plugins.microbot.scripts.construction.Construction;
+import net.runelite.client.plugins.microbot.construction.ConstructionScript;
 import net.runelite.client.plugins.microbot.scripts.crafting.Crafting;
-import net.runelite.client.plugins.microbot.scripts.fletching.Fletcher;
 import net.runelite.client.plugins.microbot.scripts.loot.LootScript;
 import net.runelite.client.plugins.microbot.scripts.magic.boltenchanting.BoltEnchanter;
 import net.runelite.client.plugins.microbot.scripts.magic.highalcher.HighAlcher;
 import net.runelite.client.plugins.microbot.scripts.magic.housetabs.HOUSETABS_CONFIG;
 import net.runelite.client.plugins.microbot.scripts.magic.housetabs.HouseTabs;
-import net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.GiantsFoundry;
-import net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.GiantsFoundryOverlay;
+import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryOverlay;
+import net.runelite.client.plugins.microbot.scripts.minigames.tithefarm.TitheFarmOverlay;
 import net.runelite.client.plugins.microbot.scripts.minigames.tithefarm.TitheFarmScript;
 import net.runelite.client.plugins.microbot.scripts.movie.UsernameHiderScript;
 import net.runelite.client.plugins.microbot.util.mouse.HardwareMouse;
@@ -88,6 +88,8 @@ public class MicrobotPlugin extends Plugin {
     @Inject
     private GiantsFoundryOverlay giantsFoundryOverlay;
     @Inject
+    private TitheFarmOverlay titheFarmOverlay;
+    @Inject
     private ZulrahOverlay zulrahOverlay;
     @Inject
     WorldMapPointManager worldMapPointManager;
@@ -131,6 +133,9 @@ public class MicrobotPlugin extends Plugin {
         if (overlayManager != null && config.toggleGiantsFoundry()) {
             overlayManager.add(giantsFoundryOverlay);
         }
+        if (overlayManager != null && config.toggleTitheFarming()) {
+            overlayManager.add(titheFarmOverlay);
+        }
         if (overlayManager != null && config.toggleZulrah()) {
             overlayManager.add(zulrahOverlay);
         }
@@ -168,23 +173,6 @@ public class MicrobotPlugin extends Plugin {
                     new String[]{"xGrace", "workless", "Lego Batman", "Batman 321", "Batman Chest"}));
             Microbot.getHouseTabScript().run();
         }
-        if (config.BoltEnchanterBotToggle()) {
-            Microbot.setBoltEnchanterScript(new BoltEnchanter());
-            Microbot.getBoltEnchanterScript().run();
-        }
-
-        if (config.HighAlcherBotToggle()) {
-            Microbot.setHighAlcherScript(new HighAlcher());
-            Microbot.getHighAlcherScript().run();
-        }
-        if (config.toggleFletcher()) {
-            Microbot.setFletcherScript(new Fletcher());
-            if (config.toggleBowstrings()) {
-                Microbot.getFletcherScript().runBowstrings(config);
-            } else {
-                Microbot.getFletcherScript().run(config);
-            }
-        }
         if (config.toggleCombatPotion()) {
             Microbot.setCombatPotion(new CombatPotion());
             Microbot.getCombatPotion().run();
@@ -194,19 +182,15 @@ public class MicrobotPlugin extends Plugin {
             Microbot.getJad().run();
         }
         if (config.toggleConstruction()) {
-            Microbot.setConstructionScript(new Construction());
+            Microbot.setConstructionScript(new ConstructionScript());
             Microbot.getConstructionScript().run();
         }
         if (config.toggleHideUserName()) {
             Microbot.setUsernameHiderScript(new UsernameHiderScript());
             Microbot.getUsernameHiderScript().run();
         }
-        if (config.toggleCrafting()) {
-            Microbot.setCraftingScript(new Crafting());
-            Microbot.getCraftingScript().run();
-        }
         if (config.toggleGiantsFoundry()) {
-            Microbot.setGiantsFoundryScript(new GiantsFoundry());
+            Microbot.setGiantsFoundryScript(new GiantsFoundryScript());
             Microbot.getGiantsFoundryScript().run();
         }
         if (config.toggleZulrah()) {
@@ -228,10 +212,6 @@ public class MicrobotPlugin extends Plugin {
         //shutdown scripts
         if (Microbot.getHouseTabScript() != null)
             Microbot.getHouseTabScript().shutdown();
-        if (Microbot.getBoltEnchanterScript() != null)
-            Microbot.getBoltEnchanterScript().shutdown();
-        if (Microbot.getHighAlcherScript() != null)
-            Microbot.getHighAlcherScript().shutdown();
         if (Microbot.getCannonScript() != null)
             Microbot.getCannonScript().shutdown();
         if (Microbot.getFoodScript() != null)
@@ -244,8 +224,6 @@ public class MicrobotPlugin extends Plugin {
             Microbot.getLootScript().shutdown();
         if (Microbot.getAttackNpcScript() != null)
             Microbot.getAttackNpcScript().shutdown();
-        if (Microbot.getFletcherScript() != null)
-            Microbot.getFletcherScript().shutdown();
         if (Microbot.getCombatPotion() != null)
             Microbot.getCombatPotion().shutdown();
         if (Microbot.getJad() != null)
@@ -254,8 +232,6 @@ public class MicrobotPlugin extends Plugin {
             Microbot.getConstructionScript().shutdown();
         if (Microbot.getUsernameHiderScript() != null)
             Microbot.getUsernameHiderScript().shutdown();
-        if (Microbot.getCraftingScript() != null)
-            Microbot.getCraftingScript().shutdown();
         if (Microbot.getGiantsFoundryScript() != null) {
             overlayManager.remove(giantsFoundryOverlay);
             Microbot.getGiantsFoundryScript().shutdown();
@@ -265,6 +241,7 @@ public class MicrobotPlugin extends Plugin {
             Microbot.getZulrahScript().shutdown();
         }
         if (Microbot.getTitheFarmScript() != null) {
+            overlayManager.remove(titheFarmOverlay);
             Microbot.getTitheFarmScript().shutdown();
         }
     }
@@ -275,9 +252,6 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onChatMessage(ChatMessage event) {
-        if (event.getMessage().contains("You do not have enough") && event.getType() == ChatMessageType.GAMEMESSAGE && Microbot.getHighAlcherScript() != null) {
-            Microbot.getHighAlcherScript().shutdown();
-        }
         if (event.getMessage().contains("reach that")) {
             AttackNpc.skipNpc();
         }
@@ -319,10 +293,6 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onGameStateChanged(GameStateChanged event) throws AWTException, InterruptedException {
-        // client.setUsername("sami.chkhachkhi@gmail.com");
-       /* client.setUsername("grover@langworth.name");
-        client.setPassword("test123");
-        setWorld(330);*/
     }
 
     @Subscribe

@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry;
+package net.runelite.client.plugins.microbot.giantsfoundry;
 
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;

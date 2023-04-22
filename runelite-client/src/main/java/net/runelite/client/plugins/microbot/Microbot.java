@@ -9,6 +9,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
+import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryScript;
 import net.runelite.client.plugins.microbot.scripts.bosses.ZulrahScript;
 import net.runelite.client.plugins.microbot.scripts.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.scripts.combat.attack.AttackNpc;
@@ -16,14 +17,12 @@ import net.runelite.client.plugins.microbot.scripts.combat.combatpotion.CombatPo
 import net.runelite.client.plugins.microbot.scripts.combat.food.Food;
 import net.runelite.client.plugins.microbot.scripts.combat.jad.Jad;
 import net.runelite.client.plugins.microbot.scripts.combat.prayer.PrayerPotion;
-import net.runelite.client.plugins.microbot.scripts.construction.Construction;
+import net.runelite.client.plugins.microbot.construction.ConstructionScript;
 import net.runelite.client.plugins.microbot.scripts.crafting.Crafting;
-import net.runelite.client.plugins.microbot.scripts.fletching.Fletcher;
 import net.runelite.client.plugins.microbot.scripts.loot.LootScript;
 import net.runelite.client.plugins.microbot.scripts.magic.boltenchanting.BoltEnchanter;
 import net.runelite.client.plugins.microbot.scripts.magic.highalcher.HighAlcher;
 import net.runelite.client.plugins.microbot.scripts.magic.housetabs.HouseTabs;
-import net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.GiantsFoundry;
 import net.runelite.client.plugins.microbot.scripts.minigames.tithefarm.TitheFarmScript;
 import net.runelite.client.plugins.microbot.scripts.movie.UsernameHiderScript;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
@@ -89,16 +88,13 @@ public class Microbot {
     private static NPCManager npcManager;
     @Getter
     @Setter
-    private static Fletcher fletcherScript;
-    @Getter
-    @Setter
     private static CombatPotion combatPotion;
     @Getter
     @Setter
     private static Jad jad;
     @Getter
     @Setter
-    private static Construction constructionScript;
+    private static ConstructionScript constructionScript;
     @Getter
     @Setter
     private static UsernameHiderScript usernameHiderScript;
@@ -107,7 +103,7 @@ public class Microbot {
     private static Crafting craftingScript;
     @Getter
     @Setter
-    private static GiantsFoundry giantsFoundryScript;
+    private static GiantsFoundryScript giantsFoundryScript;
     @Getter
     @Setter
     private static Walker walker;
