@@ -3,13 +3,13 @@ package net.runelite.client.plugins.microbot.scripts.magic.highalcher;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.scripts.Scripts;
+import net.runelite.client.plugins.microbot.scripts.Script;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
 import java.util.concurrent.TimeUnit;
 
-public class HighAlcher extends Scripts {
+public class HighAlcher extends Script {
 
     public boolean run() {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {

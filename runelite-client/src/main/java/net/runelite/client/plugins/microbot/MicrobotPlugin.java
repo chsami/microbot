@@ -4,7 +4,6 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import net.runelite.api.NPC;
 import net.runelite.api.events.*;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
@@ -13,6 +12,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.*;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.scripts.bosses.ZulrahOverlay;
+import net.runelite.client.plugins.microbot.scripts.bosses.ZulrahScript;
 import net.runelite.client.plugins.microbot.scripts.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.scripts.combat.attack.AttackNpc;
 import net.runelite.client.plugins.microbot.scripts.combat.combatpotion.CombatPotion;
@@ -20,15 +21,23 @@ import net.runelite.client.plugins.microbot.scripts.combat.food.Food;
 import net.runelite.client.plugins.microbot.scripts.combat.jad.Jad;
 import net.runelite.client.plugins.microbot.scripts.combat.prayer.PrayerPotion;
 import net.runelite.client.plugins.microbot.scripts.construction.Construction;
+import net.runelite.client.plugins.microbot.scripts.crafting.Crafting;
 import net.runelite.client.plugins.microbot.scripts.fletching.Fletcher;
 import net.runelite.client.plugins.microbot.scripts.loot.LootScript;
 import net.runelite.client.plugins.microbot.scripts.magic.boltenchanting.BoltEnchanter;
 import net.runelite.client.plugins.microbot.scripts.magic.highalcher.HighAlcher;
 import net.runelite.client.plugins.microbot.scripts.magic.housetabs.HOUSETABS_CONFIG;
 import net.runelite.client.plugins.microbot.scripts.magic.housetabs.HouseTabs;
+import net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.GiantsFoundry;
+import net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.GiantsFoundryOverlay;
+import net.runelite.client.plugins.microbot.scripts.minigames.tithefarm.TitheFarmScript;
 import net.runelite.client.plugins.microbot.scripts.movie.UsernameHiderScript;
 import net.runelite.client.plugins.microbot.util.mouse.HardwareMouse;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
+import net.runelite.client.plugins.microbot.util.walker.PathMapOverlay;
+import net.runelite.client.plugins.microbot.util.walker.PathMinimapOverlay;
+import net.runelite.client.plugins.microbot.util.walker.PathTileOverlay;
+import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
@@ -36,8 +45,6 @@ import net.runelite.client.util.WorldUtil;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 @PluginDescriptor(
@@ -73,6 +80,16 @@ public class MicrobotPlugin extends Plugin {
     @Inject
     private MicrobotOverlay microbotOverlay;
     @Inject
+    private PathTileOverlay pathTileOverlay;
+    @Inject
+    private PathMinimapOverlay pathMinimapOverlay;
+    @Inject
+    private PathMapOverlay pathMapOverlay;
+    @Inject
+    private GiantsFoundryOverlay giantsFoundryOverlay;
+    @Inject
+    private ZulrahOverlay zulrahOverlay;
+    @Inject
     WorldMapPointManager worldMapPointManager;
     @Inject
     SpriteManager spriteManager;
@@ -85,7 +102,7 @@ public class MicrobotPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
-        Microbot.isBussy = false;
+        Microbot.pauseAllScripts = false;
         Microbot.setClient(client);
         Microbot.setClientThread(clientThread);
         Microbot.setWorldMapPointManager(worldMapPointManager);
@@ -93,6 +110,7 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setItemManager(itemManager);
         Microbot.setNotifier(notifier);
         Microbot.setNpcManager(npcManager);
+        Microbot.setWalker(new Walker(config));
         if (config.toggleHardwareMouse()) {
             Microbot.setMouse(new HardwareMouse());
         } else {
@@ -100,6 +118,21 @@ public class MicrobotPlugin extends Plugin {
         }
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
+        }
+        if (overlayManager != null) {
+            overlayManager.add(pathTileOverlay);
+        }
+        if (overlayManager != null) {
+            overlayManager.add(pathMapOverlay);
+        }
+        if (overlayManager != null) {
+            overlayManager.add(pathMinimapOverlay);
+        }
+        if (overlayManager != null && config.toggleGiantsFoundry()) {
+            overlayManager.add(giantsFoundryOverlay);
+        }
+        if (overlayManager != null && config.toggleZulrah()) {
+            overlayManager.add(zulrahOverlay);
         }
 
 //START COMBAT SCRIPTS
@@ -168,10 +201,29 @@ public class MicrobotPlugin extends Plugin {
             Microbot.setUsernameHiderScript(new UsernameHiderScript());
             Microbot.getUsernameHiderScript().run();
         }
+        if (config.toggleCrafting()) {
+            Microbot.setCraftingScript(new Crafting());
+            Microbot.getCraftingScript().run();
+        }
+        if (config.toggleGiantsFoundry()) {
+            Microbot.setGiantsFoundryScript(new GiantsFoundry());
+            Microbot.getGiantsFoundryScript().run();
+        }
+        if (config.toggleZulrah()) {
+            Microbot.setZulrahScript(new ZulrahScript());
+            Microbot.getZulrahScript().run();
+        }
+        if (config.toggleTitheFarming()) {
+            Microbot.setTitheFarmScript(new TitheFarmScript());
+            Microbot.getTitheFarmScript().run();
+        }
     }
 
     protected void shutDown() {
         overlayManager.remove(microbotOverlay);
+        overlayManager.remove(pathTileOverlay);
+        overlayManager.remove(pathMapOverlay);
+        overlayManager.remove(pathMinimapOverlay);
 
         //shutdown scripts
         if (Microbot.getHouseTabScript() != null)
@@ -202,6 +254,19 @@ public class MicrobotPlugin extends Plugin {
             Microbot.getConstructionScript().shutdown();
         if (Microbot.getUsernameHiderScript() != null)
             Microbot.getUsernameHiderScript().shutdown();
+        if (Microbot.getCraftingScript() != null)
+            Microbot.getCraftingScript().shutdown();
+        if (Microbot.getGiantsFoundryScript() != null) {
+            overlayManager.remove(giantsFoundryOverlay);
+            Microbot.getGiantsFoundryScript().shutdown();
+        }
+        if (Microbot.getZulrahScript() != null) {
+            overlayManager.remove(zulrahOverlay);
+            Microbot.getZulrahScript().shutdown();
+        }
+        if (Microbot.getTitheFarmScript() != null) {
+            Microbot.getTitheFarmScript().shutdown();
+        }
     }
 
     @Subscribe
@@ -235,19 +300,9 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick event) {
-    }
-
-    public static final List<NPC> fishingSpots = new ArrayList<>();
-
-    @Subscribe
-    public void onNpcSpawned(NpcSpawned event) {
-        final NPC npc = event.getNpc();
-
-        if (FishingSpot.findSpot(npc.getId()) == null) {
-            return;
+        if (config.toggleZulrah()) {
+            Microbot.getZulrahScript().onGameTick(event);
         }
-
-        fishingSpots.add(npc);
     }
 
     public void setWorld(int worldNumber) {
@@ -284,8 +339,18 @@ public class MicrobotPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onNpcDespawned(NpcDespawned npcDespawned) {
+    public void onNpcSpawned(NpcSpawned npcSpawned) {
+        if (Microbot.getZulrahScript() != null) {
+            Microbot.getZulrahScript().onNpcSpawned(npcSpawned);
+        }
     }
+    @Subscribe
+    public void onNpcDespawned(NpcDespawned npcDespawned) {
+        if (Microbot.getZulrahScript() != null) {
+            Microbot.getZulrahScript().onNpcDespawned(npcDespawned);
+        }
+    }
+
 
     @Subscribe
     public void onCommandExecuted(CommandExecuted commandExecuted) {

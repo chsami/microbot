@@ -7,9 +7,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+
 public class Rs2Widget {
+
+    public static boolean clickWidget(String text) {
+        Widget widget = findWidget(text, null);
+        if (widget != null) {
+            Microbot.getMouse().click(widget.getBounds());
+            return true;
+        }
+        return false;
+    }
     public static Widget getWidget(int id) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id));
+    }
+
+    public static Widget getWidget(int id, int child) {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id, child));
     }
 
     public static boolean getWidgetChildText(int id, String matchingText) {
@@ -48,63 +63,96 @@ public class Rs2Widget {
         } while (true);
     }
 
-    public static Widget findWidget(String text, List<Widget> children) {
+    public static Widget findWidget(String text, List<Widget> children, boolean exact) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget foundWidget = null;
             if (children == null) {
                 List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> !x.isHidden()).collect(Collectors.toList());
                 for (Widget rootWidget : rootWidgets) {
-                    if (rootWidget.getText().contains(text)) {
-                        return rootWidget;
+                    if (exact) {
+                        if (rootWidget.getText().toLowerCase().equals(text.toLowerCase()) || rootWidget.getName().toLowerCase().equals(text.toLowerCase())) {
+                            return rootWidget;
+                        }
+                    } else {
+                        if (rootWidget.getText().toLowerCase().contains(text.toLowerCase()) || rootWidget.getName().toLowerCase().contains(text.toLowerCase())) {
+                            return rootWidget;
+                        }
                     }
                     if (rootWidget.getChildren() != null)
-                        return findWidget(text, Arrays.stream(rootWidget.getChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()));
+                        return findWidget(text, Arrays.stream(rootWidget.getChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()), exact);
                     if (rootWidget.getNestedChildren().length > 0)
-                        return findWidget(text, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()));
+                        return findWidget(text, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()), exact);
                     if (rootWidget.getDynamicChildren().length > 0)
-                        return findWidget(text, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()));
+                        return findWidget(text, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()), exact);
                     if (rootWidget.getStaticChildren().length > 0)
-                        return findWidget(text, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()));
+                        return findWidget(text, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()), exact);
                 }
             } else if (children.size() > 0) {
                 for (Widget child : children) {
-                    foundWidget = searchChildren(text, child);
+                    foundWidget = searchChildren(text, child, exact);
                     if (foundWidget != null) break;
                 }
             }
             return foundWidget;
         });
     }
+    public static Widget findWidget(String text) {
+        return findWidget(text, null, false);
+    }
 
-    public static Widget searchChildren(String text, Widget child) {
+    public static boolean hasWidget(String text) {
+        return findWidget(text, null, false) != null;
+    }
+
+    public static boolean sleepUntilHasWidget(String text) {
+        sleepUntil(() ->  findWidget(text, null, false) != null);
+        return true;
+    }
+
+    public static Widget findWidget(String text, List<Widget> children) {
+        return findWidget(text, children, false);
+    }
+
+    public static Widget searchChildren(String text, Widget child, boolean exact) {
         Widget found = null;
-        if (child.getText().contains(text)) {
-            return child;
+        if (exact) {
+            if (child.getText().toLowerCase().equals(text.toLowerCase()) || child.getName().toLowerCase().equals(text.toLowerCase())) {
+                return child;
+            }
+        } else {
+            if (child.getText().toLowerCase().contains(text.toLowerCase()) || child.getName().toLowerCase().contains(text.toLowerCase())) {
+                return child;
+            }
         }
+
         if (child.getChildren() != null) {
             List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
-                found = findWidget(text, visibleChildWidgets);
+                found = findWidget(text, visibleChildWidgets, exact);
         }
         if (found != null) return found;
         if (child.getNestedChildren().length > 0) {
             List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
-                found = findWidget(text, visibleChildWidgets);
+                found = findWidget(text, visibleChildWidgets, exact);
         }
         if (found != null) return found;
         if (child.getDynamicChildren().length > 0) {
             List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
-                found = findWidget(text, visibleChildWidgets);
+                found = findWidget(text, visibleChildWidgets, exact);
         }
         if (found != null) return found;
         if (child.getStaticChildren().length > 0) {
             List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
-                found = findWidget(text, visibleChildWidgets);
+                found = findWidget(text, visibleChildWidgets, exact);
         }
         return found;
+    }
+
+    public static Widget searchChildren(String text, Widget child) {
+       return searchChildren(text, child, false);
     }
 
     public static Widget findWidget(int spriteId, List<Widget> children) {

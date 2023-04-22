@@ -4,7 +4,7 @@ import net.runelite.api.Actor;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.scripts.Scripts;
+import net.runelite.client.plugins.microbot.scripts.Script;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
 
 import static net.runelite.client.plugins.microbot.util.math.Calculations.angleToTile;
 
-public class Camera extends Scripts {
+public class Camera extends Script {
 
     public static void turnTo(final Actor actor) {
         int angle = getCharacterAngle(actor);

@@ -39,7 +39,7 @@ public class Inventory {
 
     public static boolean isInventoryFull() {
         Widget inventoryWidget = getInventory();
-        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> !x.isHidden()).count() == 28;
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> x.getName().length() > 0).count() == 28);
     }
 
     public static boolean isInventoryFull(String itemName) {
@@ -56,7 +56,7 @@ public class Inventory {
 
     public static boolean hasAmountInventoryItems(int items) {
         Widget inventoryWidget = getInventory();
-        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> !x.isHidden()).count() == items;
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> !x.isHidden()).count() == items);
     }
 
     public static boolean hasItemStackable(String itemName) {
@@ -71,6 +71,15 @@ public class Inventory {
                         return false;
                     }
                 });
+    }
+
+    public static boolean hasItem(String itemName) {
+        Widget inventoryWidget = getInventory();
+
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .anyMatch(x ->
+                        !x.isHidden() && x.getName().length() > 0 && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())
+                ));
     }
 
     public static Widget getInventoryItem(String itemName) {
@@ -125,21 +134,38 @@ public class Inventory {
         return count >= amount;
     }
 
+    public static boolean hasItemAmount(String itemName, int amount) {
+        Tab.switchToInventoryTab();
+        Widget inventoryWidget = getInventory();
+        int count = 0;
+        for (Widget item : inventoryWidget.getDynamicChildren()) {
+            if (item.isSelfHidden() == false) {
+                if (item.getName().length() > 0 && item.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())) {
+                    count++;
+                }
+            }
+        }
+        return count >= amount;
+    }
+
     private static Widget getInventory() {
         return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget inventoryWidget = Microbot.getClient().getWidget(WidgetInfo.INVENTORY);
-            Widget bankInventoryWidget = Microbot.getClient().getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
-            if (inventoryWidget == null) {
+            Widget inventoryWidget = Microbot.getClient().getWidget(9764864);
+            Widget bankInventoryWidget = Microbot.getClient().getWidget(983043);
+            if (inventoryWidget == null && bankInventoryWidget == null) {
                 return null;
             }
-            if (inventoryWidget.isHidden() && bankInventoryWidget == null) {
+            if (inventoryWidget.isHidden() && bankInventoryWidget.isHidden()) {
                 return null;
             }
-            if (inventoryWidget.getDynamicChildren() == null) {
+            if (inventoryWidget.getDynamicChildren() == null && bankInventoryWidget.getDynamicChildren() == null) {
                 return null;
             }
 
-            return inventoryWidget;
+            if (inventoryWidget != null && !inventoryWidget.isHidden())
+                return inventoryWidget;
+            else
+                return bankInventoryWidget;
         });
     }
 
@@ -157,8 +183,40 @@ public class Inventory {
         });
     }
 
+    public static Widget findItemContains(String itemName) {
+        Widget inventoryWidget = getInventory();
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            for (Widget item : inventoryWidget.getDynamicChildren()) {
+                if (item.isSelfHidden() == false) {
+                    if (item.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName.toLowerCase())) {
+                        return item;
+                    }
+                }
+            }
+            return null;
+        });
+    }
+
+    public static void useItemOnItemSlot(int slot1, int slot2) {
+        useItemSlot(slot1);
+        useItemSlot(slot2);
+    }
+
+    public static void useItemOnItemSlot(int slot1, int slot2, int minWait, int maxWait) {
+        useItemSlot(slot1);
+        useItemSlot(slot2);
+        sleep(minWait, maxWait);
+    }
+
     public static boolean useItemSlot(int slot) {
         Widget item = findItemSlot(slot);
+        if (item == null) return false;
+        Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
+        return true;
+    }
+
+    public static boolean useItemContains(String itemName) {
+        Widget item = findItemContains(itemName);
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
         return true;
@@ -168,6 +226,17 @@ public class Inventory {
         Widget item = findItem(itemName);
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
+        sleep(600, 1200);
+        return true;
+    }
+
+    public static boolean useItemOnItem(String itemName1, String itemName2) {
+        Widget item1 = findItem(itemName1);
+        Widget item2 = findItem(itemName2);
+        if (item1 == null || item2 == null) return false;
+        Microbot.getMouse().click(item1.getBounds().getCenterX(), item1.getBounds().getCenterY());
+        sleep(600, 1200);
+        Microbot.getMouse().click(item2.getBounds().getCenterX(), item2.getBounds().getCenterY());
         sleep(600, 1200);
         return true;
     }

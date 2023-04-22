@@ -1,0 +1,277 @@
+# Port Sarim, Musa Point
+3029 3217 0	2956 3146 0	Pay-fare Captain Tobias 3644		30 Coins		10
+2956 3146 0	3029 3217 0	Pay-Fare Customs officer 3648		30 Coins		10
+
+# Ardougne, Brimhaven, Rimmington
+2683 3271 0	2772 3234 0	Brimhaven Captain Barnaby 9250		30 Coins		6
+2683 3271 0	2915 3225 0	Rimmington Captain Barnaby 9250		30 Coins		6
+2772 3234 0	2683 3271 0	Ardougne Captain Barnaby 8764		30 Coins		6
+2772 3234 0	2915 3225 0	Rimmington Captain Barnaby 8764		30 Coins		6
+2915 3225 0	2683 3271 0	Ardougne Captain Barnaby 8763		30 Coins		6
+2915 3225 0	2772 3234 0	Brimhaven Captain Barnaby 8763		30 Coins		6
+
+# Fishing Platform
+2720 3301 0	2782 3273 0	Travel Holgart 7789			Sea Slug	9
+2782 3273 0	2720 3301 0	Travel Holgart 5070			Sea Slug	9
+
+# Rimmington, Corsair Cove
+2909 3226 0	2578 2840 0	Travel Cabin Boy Colin 7967			The Corsair Curse	6
+2578 2840 0	2909 3226 0	Travel Cabin Boy Colin 7967			The Corsair Curse	6
+
+# Digsite, Fossil Island
+3362 3445 0	3724 3807 0	Quick-Travel Barge guard 8012			Bone Voyage	12
+3724 3807 0	3362 3445 0	Travel Rowboat 30914			Bone Voyage	12
+
+# Lady of the Waves: Cairn Isle, Port Khazard, Port Sarim
+2763 2960 1	2680 3150 0	Talk-to Captain Shanks 5364		50 Coins		10
+2763 2960 1	3050 3192 0	Talk-to Captain Shanks 5364		50 Coins		10
+2763 2960 1	3047 3235 0	Talk-to Captain Shanks 5364		50 Coins		10
+
+# Post Phasmatys, Braindeath Island
+3680 3536 0	2162 5114 1	Talk-to Pirate Pete 601			Rum Deal	9
+2162 5114 1	3680 3536 0	Talk-to Pirate Pete 602			Rum Deal	9
+
+# Port Phasmatys, Mos Le'Harmless
+3709 3496 0	3684 2953 0	Travel Bill Teach 4016			Cabin Fever	6
+3684 2953 0	3709 3496 0	Travel Bill Teach 4016			Cabin Fever	6
+
+# Port Phasmatys, Dragontooth Island
+3703 3487 0	3792 3560 0	Travel Ghost captain 3005		25 Ecto-token		6
+3792 3560 0	3703 3487 0	Travel Ghost captain 3005				6
+
+# Mort Myre, Mort'ton
+3498 3380 0	3522 3285 0	Board Swamp Boaty 6970				18
+3499 3380 0	3522 3285 0	Board Swamp Boaty 6970				18
+3500 3380 0	3522 3285 0	Board Swamp Boaty 6970				18
+3501 3378 0	3522 3285 0	Board Swamp Boaty 6970				18
+3501 3379 0	3522 3285 0	Board Swamp Boaty 6970				18
+3522 3284 0	3498 3380 0	Quick-board Swamp Boaty 6969		10 Coins		18
+3522 3285 0	3498 3380 0	Quick-board Swamp Boaty 6969		10 Coins		18
+3522 3286 0	3498 3380 0	Quick-board Swamp Boaty 6969		10 Coins		18
+
+# Rellekka, Miscellania
+2629 3693 0	2581 3847 0	Miscellania Sailor 3936			The Fremennik Trials	7
+2581 3847 0	2629 3693 0	Rellekka Sailor 3680			The Fremennik Trials	7
+
+# Rellekka, Waterbirth Island
+2621 3683 0	2544 3761 0	Waterbirth Island Jarvald 6535			The Fremennik Trials	7
+2544 3761 0	2621 3683 0	Rellekka Jarvald 10407			The Fremennik Trials	7
+
+# Rellekka, Jatizso
+2644 3709 0	2421 3781 0	Jatizso Mord Gunnars 1900			The Fremennik Trials	10
+2421 3781 0	2644 3709 0	Rellekka Mord Gunnars 1940			The Fremennik Trials	10
+
+# Rellekka, Neitiznot
+2644 3710 0	2311 3781 0	Neitiznot Maria Gunnars 1883			The Fremennik Trials	14
+2311 3781 0	2644 3710 0	Rellekka Maria Gunnars 1882			The Fremennik Trials	14
+
+# Rellekka, Pirates' Cove
+2620 3693 0	2213 3794 0	Pirate's Cove Lokar Searunner 3855			The Fremennik Trials	9
+2213 3794 0	2620 3693 0	Rellekka Lokar Searunner 9306			The Fremennik Trials	9
+
+# Pirates' Cove, Lunar Isle
+2222 3796 2	2138 3899 2	Travel Captain Bentley 6650				12
+2138 3899 2	2222 3796 2	Travel Captain Bentley 6650				12
+
+# Rellekka, Iceberg
+2707 3736 0	2660 3989 1	Iceberg Boat 21176			Cold War	9
+2658 3988 1	2706 3735 0	Travel Boat 21175			Cold War	9
+2707 3735 0	2660 3989 1	Iceberg Boat 21176			Cold War	9
+2659 3988 1	2706 3735 0	Travel Boat 21175			Cold War	9
+2711 3732 0	2660 3989 1	Iceberg Boat 21176			Cold War	9
+
+# Rellekka, Weiss
+2707 3735 0	2849 3968 0	Weiss Boat 21176			Making Friends with My Arm	12
+2707 3736 0	2849 3968 0	Weiss Boat 21176			Making Friends with My Arm	12
+2711 3732 0	2849 3968 0	Weiss Boat 21176			Making Friends with My Arm	12
+2848 3966 0	2706 3735 0	Travel Boat 21177			Making Friends with My Arm	12
+2849 3967 0	2706 3735 0	Travel Boat 21177			Making Friends with My Arm	12
+2849 3968 0	2706 3735 0	Travel Boat 21177			Making Friends with My Arm	12
+
+# Rellekka, Island of Stone
+2472 3994 0	2621 3692 0	Travel Fremennik Boat 37408			The Fremennik Exiles	6
+2473 3994 0	2621 3692 0	Travel Fremennik Boat 37408			The Fremennik Exiles	6
+2621 3690 0	2472 3994 0	Travel Fremennik Boat 37432			The Fremennik Exiles	6
+2621 3691 0	2472 3994 0	Travel Fremennik Boat 37432			The Fremennik Exiles	6
+2621 3692 0	2472 3994 0	Travel Fremennik Boat 37432			The Fremennik Exiles	6
+2621 3693 0	2472 3994 0	Travel Fremennik Boat 37432			The Fremennik Exiles	6
+2621 3694 0	2472 3994 0	Travel Fremennik Boat 37432			The Fremennik Exiles	6
+
+# Rellekka, Ungael
+2277 4034 0	2640 3697 0	Travel Fremennik Boat 31989			Dragon Slayer II	6
+2278 4034 0	2640 3697 0	Travel Fremennik Boat 31989			Dragon Slayer II	6
+2640 3696 0	2277 4034 0	Travel Fremennik Boat 29917			Dragon Slayer II	6
+2640 3697 0	2277 4034 0	Travel Fremennik Boat 29917			Dragon Slayer II	6
+2640 3698 0	2277 4034 0	Travel Fremennik Boat 29917			Dragon Slayer II	6
+2640 3699 0	2277 4034 0	Travel Fremennik Boat 29917			Dragon Slayer II	6
+
+# Fossil Island, Lithkren
+3660 3848 0	3583 3973 0	Travel Rowboat 29916			Dragon Slayer II	5
+3583 3973 0	3660 3849 0	Travel Rowboat 32079			Dragon Slayer II	5
+3660 3849 0	3583 3973 0	Travel Rowboat 29916			Dragon Slayer II	5
+3582 3973 0	3660 3849 0	Travel Rowboat 32079			Dragon Slayer II	5
+
+# Fossil Island, Underwater
+3724 3807 0	3734 3893 0	Travel Rowboat 30914				4
+3734 3893 0	3724 3807 0	Travel Rowboat 30915				3
+3734 3893 0	3768 3898 0	Travel Rowboat 30915				3
+3768 3898 0	3734 3893 0	Travel Rowboat 30919				3
+
+# Port Sarim, Port Piscarilius, Land's End
+3055 3245 0	1824 3691 0	Port Piscarilius Veos 8630				6
+3055 3245 0	1504 3399 0	Land's End Veos 8630				6
+1824 3691 0	3055 3245 0	Port Sarim Veos 10726				6
+1824 3691 0	1504 3399 0	Land's End Veos 10726				6
+1504 3399 0	3055 3245 0	Port Sarim Captain Magoro 7471				6
+1504 3399 0	1824 3691 0	Port Piscarilius Captain Magoro 7471				6
+
+# Port Sarim, Entrana
+3048 3234 0	2834 3331 1	Travel-boat Monk of Entrana 1165				15
+2834 3335 0	3048 3231 1	Travel-boat Monk of Entrana 1168				15
+
+# Hosidius, Crabclaw Isle
+1783 3458 0	1779 3417 0	Travel Sandicrahb 7483				5
+1779 3417 0	1783 3458 0	Travel Sandicrahb 7484				5
+
+# Port Sarim, Void Knights' Outpost
+3041 3202 0	2659 2676 0	Travel Squire 1770				11
+2659 2676 0	3041 3202 0	Travel Squire 1769				11
+
+# Crash Island, Ape Atoll
+2892 2724 0	2803 2706 0	Travel Lumdo 1454				5
+2803 2706 0	2892 2724 0	Travel Lumdo 1454				5
+
+# Charter ships
+2760 3238 0	2792 3414 0	Charter Trader Crewmember 1330		460 Coins		6
+2760 3238 0	2589 2851 0	Charter Trader Crewmember 1330		680 Coins		6
+2760 3238 0	2954 3158 0	Charter Trader Crewmember 1330		480 Coins		6
+2760 3238 0	3671 2931 0	Charter Trader Crewmember 1330		1950 Coins	Cabin Fever	6
+2760 3238 0	2674 3144 0	Charter Trader Crewmember 1330		400 Coins		6
+2760 3238 0	3702 3503 0	Charter Trader Crewmember 1330		2900 Coins	Priest in Peril	6
+2760 3238 0	3038 3192 0	Charter Trader Crewmember 1330		1600 Coins		6
+2760 3238 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6
+2760 3238 0	3001 3032 0	Charter Trader Crewmember 1330		400 Coins	The Grand Tree	6
+2760 3238 0	2157 3330 0	Charter Trader Crewmember 1330		3450 Coins	Song of the Elves	6
+2792 3414 0	2760 3238 0	Charter Trader Crewmember 1330		480 Coins		6
+2792 3414 0	2589 2851 0	Charter Trader Crewmember 1330		1000 Coins		6
+2792 3414 0	2954 3158 0	Charter Trader Crewmember 1330		480 Coins		6
+2792 3414 0	3671 2931 0	Charter Trader Crewmember 1330		1750 Coins	Cabin Fever	6
+2792 3414 0	2674 3144 0	Charter Trader Crewmember 1330		1600 Coins		6
+2792 3414 0	3702 3503 0	Charter Trader Crewmember 1330		3500 Coins	Priest in Peril	6
+2792 3414 0	3038 3192 0	Charter Trader Crewmember 1330		1000 Coins		6
+2792 3414 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6
+2792 3414 0	3001 3032 0	Charter Trader Crewmember 1330		1600 Coins	The Grand Tree	6
+2792 3414 0	2157 3330 0	Charter Trader Crewmember 1330		3560 Coins	Song of the Elves	6
+2589 2851 0	2760 3238 0	Charter Trader Crewmember 1330		680 Coins		6
+2589 2851 0	2792 3414 0	Charter Trader Crewmember 1330		1000 Coins		6
+2589 2851 0	2954 3158 0	Charter Trader Crewmember 1330		800 Coins		6
+2589 2851 0	3671 2931 0	Charter Trader Crewmember 1330		2040 Coins	Cabin Fever	6
+2589 2851 0	2674 3144 0	Charter Trader Crewmember 1330		600 Coins		6
+2589 2851 0	3702 3503 0	Charter Trader Crewmember 1330		4040 Coins	Priest in Peril	6
+2589 2851 0	3038 3192 0	Charter Trader Crewmember 1330		1200 Coins		6
+2589 2851 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6
+2589 2851 0	3001 3032 0	Charter Trader Crewmember 1330		800 Coins	The Grand Tree	6
+2589 2851 0	2157 3330 0	Charter Trader Crewmember 1330		1420 Coins	Song of the Elves	6
+2954 3158 0	2760 3238 0	Charter Trader Crewmember 1330		200 Coins		6
+2954 3158 0	2792 3414 0	Charter Trader Crewmember 1330		480 Coins		6
+2954 3158 0	2589 2851 0	Charter Trader Crewmember 1330		800 Coins		6
+2954 3158 0	3671 2931 0	Charter Trader Crewmember 1330		550 Coins	Cabin Fever	6
+2954 3158 0	2674 3144 0	Charter Trader Crewmember 1330		400 Coins		6
+2954 3158 0	3702 3503 0	Charter Trader Crewmember 1330		1100 Coins	Priest in Peril	6
+2954 3158 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6
+2954 3158 0	3001 3032 0	Charter Trader Crewmember 1330		200 Coins	The Grand Tree	6
+2954 3158 0	2157 3330 0	Charter Trader Crewmember 1330		4400 Coins	Song of the Elves	6
+3671 2931 0	2760 3238 0	Charter Trader Crewmember 1330		1450 Coins		6
+3671 2931 0	2792 3414 0	Charter Trader Crewmember 1330		1250 Coins		6
+3671 2931 0	2589 2851 0	Charter Trader Crewmember 1330		2040 Coins		6
+3671 2931 0	2954 3158 0	Charter Trader Crewmember 1330		2050 Coins		6
+3671 2931 0	2674 3144 0	Charter Trader Crewmember 1330		550 Coins		6
+3671 2931 0	3038 3192 0	Charter Trader Crewmember 1330		650 Coins		6
+3671 2931 0	2142 3122 0	Charter Trader Crewmember 1330		1600 Coins	Regicide	6
+3671 2931 0	3001 3032 0	Charter Trader Crewmember 1330		550 Coins	The Grand Tree	6
+3671 2931 0	2157 3330 0	Charter Trader Crewmember 1330		2475 Coins	Song of the Elves	6
+2674 3144 0	2760 3238 0	Charter Trader Crewmember 1330		1600 Coins		6
+2674 3144 0	2792 3414 0	Charter Trader Crewmember 1330		1600 Coins		6
+2674 3144 0	2589 2851 0	Charter Trader Crewmember 1330		600 Coins		6
+2674 3144 0	2954 3158 0	Charter Trader Crewmember 1330		1600 Coins		6
+2674 3144 0	3671 2931 0	Charter Trader Crewmember 1330		2050 Coins	Cabin Fever	6
+2674 3144 0	3702 3503 0	Charter Trader Crewmember 1330		4100 Coins	Priest in Peril	6
+2674 3144 0	3038 3192 0	Charter Trader Crewmember 1330		1280 Coins		6
+2674 3144 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6
+2674 3144 0	3001 3032 0	Charter Trader Crewmember 1330		1600 Coins	The Grand Tree	6
+2674 3144 0	2157 3330 0	Charter Trader Crewmember 1330		2800 Coins	Song of the Elves	6
+3702 3503 0	2760 3238 0	Charter Trader Crewmember 1330		2900 Coins		6
+3702 3503 0	2792 3414 0	Charter Trader Crewmember 1330		3500 Coins		6
+3702 3503 0	2589 2851 0	Charter Trader Crewmember 1330		4040 Coins		6
+3702 3503 0	2954 3158 0	Charter Trader Crewmember 1330		1100 Coins		6
+3702 3503 0	2674 3144 0	Charter Trader Crewmember 1330		4100 Coins		6
+3702 3503 0	3038 3192 0	Charter Trader Crewmember 1330		1300 Coins		6
+3702 3503 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6
+3702 3503 0	3001 3032 0	Charter Trader Crewmember 1330		3200 Coins	The Grand Tree	6
+3702 3503 0	2157 3330 0	Charter Trader Crewmember 1330		5200 Coins	Song of the Elves	6
+3038 3192 0	2760 3238 0	Charter Trader Crewmember 1330		1600 Coins		6
+3038 3192 0	2792 3414 0	Charter Trader Crewmember 1330		1000 Coins		6
+3038 3192 0	2589 2851 0	Charter Trader Crewmember 1330		1200 Coins		6
+3038 3192 0	3671 2931 0	Charter Trader Crewmember 1330		650 Coins	Cabin Fever	6
+3038 3192 0	2674 3144 0	Charter Trader Crewmember 1330		1280 Coins		6
+3038 3192 0	3702 3503 0	Charter Trader Crewmember 1330		1300 Coins	Priest in Peril	6
+3038 3192 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6
+3038 3192 0	3001 3032 0	Charter Trader Crewmember 1330		400 Coins	The Grand Tree	6
+3038 3192 0	2157 3330 0	Charter Trader Crewmember 1330		4800 Coins	Song of the Elves	6
+2142 3122 0	2760 3238 0	Charter Trader Crewmember 1330		3200 Coins		6
+2142 3122 0	2792 3414 0	Charter Trader Crewmember 1330		3200 Coins		6
+2142 3122 0	2589 2851 0	Charter Trader Crewmember 1330		3200 Coins		6
+2142 3122 0	2954 3158 0	Charter Trader Crewmember 1330		3200 Coins		6
+2142 3122 0	3671 2931 0	Charter Trader Crewmember 1330		1600 Coins	Cabin Fever	6
+2142 3122 0	2674 3144 0	Charter Trader Crewmember 1330		3200 Coins		6
+2142 3122 0	3702 3503 0	Charter Trader Crewmember 1330		3200 Coins	Priest in Peril	6
+2142 3122 0	3038 3192 0	Charter Trader Crewmember 1330		3200 Coins		6
+2142 3122 0	3001 3032 0	Charter Trader Crewmember 1330		3200 Coins	The Grand Tree	6
+2142 3122 0	2157 3330 0	Charter Trader Crewmember 1330		3200 Coins	Song of the Elves	6
+3001 3032 0	2760 3238 0	Charter Trader Crewmember 1330		400 Coins		6
+3001 3032 0	2792 3414 0	Charter Trader Crewmember 1330		1600 Coins		6
+3001 3032 0	2589 2851 0	Charter Trader Crewmember 1330		800 Coins		6
+3001 3032 0	2954 3158 0	Charter Trader Crewmember 1330		200 Coins		6
+3001 3032 0	3671 2931 0	Charter Trader Crewmember 1330		550 Coins	Cabin Fever	6
+3001 3032 0	2674 3144 0	Charter Trader Crewmember 1330		720 Coins		6
+3001 3032 0	3702 3503 0	Charter Trader Crewmember 1330		1100 Coins	Priest in Peril	6
+3001 3032 0	3038 3192 0	Charter Trader Crewmember 1330		400 Coins		6
+3001 3032 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6
+3001 3032 0	2157 3330 0	Charter Trader Crewmember 1330		4000 Coins	Song of the Elves	6
+2157 3330 0	2760 3238 0	Charter Trader Crewmember 1330		3450 Coins		6
+2157 3330 0	2792 3414 0	Charter Trader Crewmember 1330		3560 Coins		6
+2157 3330 0	2589 2851 0	Charter Trader Crewmember 1330		1420 Coins		6
+2157 3330 0	2954 3158 0	Charter Trader Crewmember 1330		4400 Coins		6
+2157 3330 0	3671 2931 0	Charter Trader Crewmember 1330		2475 Coins	Cabin Fever	6
+2157 3330 0	2674 3144 0	Charter Trader Crewmember 1330		2800 Coins		6
+2157 3330 0	3702 3503 0	Charter Trader Crewmember 1330		5200 Coins	Priest in Peril	6
+2157 3330 0	3038 3192 0	Charter Trader Crewmember 1330		4800 Coins		6
+2157 3330 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6
+2157 3330 0	3001 3032 0	Charter Trader Crewmember 1330		4000 Coins	The Grand Tree	6
+
+# Canoe transportation
+3132 3510 0	3109 3415 0	Paddle Canoe Canoe Station 12166	12 Woodcutting	1 Bronze axe		30
+3132 3510 0	3199 3344 0	Paddle Canoe Canoe Station 12166	27 Woodcutting	1 Bronze axe		30
+3132 3510 0	3240 3242 0	Paddle Canoe Canoe Station 12166	42 Woodcutting	1 Bronze axe		30
+3132 3510 0	3154 3638 0	Paddle Canoe Canoe Station 12166	57 Woodcutting	1 Bronze axe		20
+3132 3510 0	3141 3796 0	Paddle Canoe Canoe Station 12166	57 Woodcutting	1 Bronze axe		20
+3112 3411 0	3199 3344 0	Paddle Canoe Canoe Station 12165	12 Woodcutting	1 Bronze axe		30
+3112 3411 0	3128 3503 0	Paddle Canoe Canoe Station 12165	12 Woodcutting	1 Bronze axe		30
+3112 3411 0	3240 3242 0	Paddle Canoe Canoe Station 12165	27 Woodcutting	1 Bronze axe		30
+3112 3411 0	3154 3638 0	Paddle Canoe Canoe Station 12165	57 Woodcutting	1 Bronze axe		20
+3112 3411 0	3141 3796 0	Paddle Canoe Canoe Station 12165	57 Woodcutting	1 Bronze axe		20
+3202 3343 0	3240 3242 0	Paddle Canoe Canoe Station 12164	12 Woodcutting	1 Bronze axe		30
+3202 3343 0	3109 3415 0	Paddle Canoe Canoe Station 12164	12 Woodcutting	1 Bronze axe		30
+3202 3343 0	3128 3503 0	Paddle Canoe Canoe Station 12164	27 Woodcutting	1 Bronze axe		30
+3202 3343 0	3154 3638 0	Paddle Canoe Canoe Station 12164	57 Woodcutting	1 Bronze axe		20
+3202 3343 0	3141 3796 0	Paddle Canoe Canoe Station 12164	57 Woodcutting	1 Bronze axe		20
+3243 3237 0	3199 3344 0	Paddle Canoe Canoe Station 12163	12 Woodcutting	1 Bronze axe		30
+3243 3237 0	3109 3415 0	Paddle Canoe Canoe Station 12163	27 Woodcutting	1 Bronze axe		30
+3243 3237 0	3128 3503 0	Paddle Canoe Canoe Station 12163	42 Woodcutting	1 Bronze axe		30
+3243 3237 0	3154 3638 0	Paddle Canoe Canoe Station 12163	57 Woodcutting	1 Bronze axe		20
+3243 3237 0	3141 3796 0	Paddle Canoe Canoe Station 12163	57 Woodcutting	1 Bronze axe		20
+3154 3630 0	3128 3503 0	Paddle Canoe Canoe Station 39638	12 Woodcutting	1 Bronze axe		20
+3154 3630 0	3109 3415 0	Paddle Canoe Canoe Station 39638	27 Woodcutting	1 Bronze axe		20
+3154 3630 0	3199 3344 0	Paddle Canoe Canoe Station 39638	42 Woodcutting	1 Bronze axe		20
+3154 3630 0	3240 3242 0	Paddle Canoe Canoe Station 39638	57 Woodcutting	1 Bronze axe		20
+3154 3630 0	3141 3796 0	Paddle Canoe Canoe Station 39638	57 Woodcutting	1 Bronze axe		20

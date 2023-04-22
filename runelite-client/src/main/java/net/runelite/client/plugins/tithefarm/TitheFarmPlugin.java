@@ -39,6 +39,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
@@ -56,7 +57,7 @@ public class TitheFarmPlugin extends Plugin
 	private TitheFarmPlantOverlay titheFarmOverlay;
 
 	@Getter
-	private final Set<TitheFarmPlant> plants = new HashSet<>();
+	private static final Set<TitheFarmPlant> plants = new HashSet<>();
 
 	@Provides
 	TitheFarmPluginConfig getConfig(ConfigManager configManager)
@@ -111,7 +112,9 @@ public class TitheFarmPlugin extends Plugin
 		if (oldPlant == null && newPlant.getType() != TitheFarmPlantType.EMPTY)
 		{
 			log.debug("Added plant {}", newPlant);
-			plants.add(newPlant);
+			if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(newPlant.getGameObject().getWorldLocation()) < 3) {
+				plants.add(newPlant);
+			}
 		}
 		else if (oldPlant == null)
 		{

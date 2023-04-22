@@ -31,6 +31,22 @@ public class Global {
         }
     }
 
+    public static void sleepUntil(BooleanSupplier awaitedCondition) {
+        boolean done;
+        long startTime = System.currentTimeMillis();
+        do {
+            done = awaitedCondition.getAsBoolean();
+        } while (!done && System.currentTimeMillis() - startTime < 5000);
+    }
+
+    public static void sleepUntil(BooleanSupplier awaitedCondition, int time) {
+        boolean done;
+        long startTime = System.currentTimeMillis();
+        do {
+            done = awaitedCondition.getAsBoolean();
+        } while (!done && System.currentTimeMillis() - startTime < time);
+    }
+
     public static void sleepUntilOnClientThread(BooleanSupplier awaitedCondition) {
         sleepUntilOnClientThread(awaitedCondition, Random.random(2500, 5000));
     }

@@ -38,9 +38,14 @@ public class Menu {
         Microbot.getMouse().move(point);
         return doAction(action, point, (String[]) null);
     }
-    public static boolean doAction(String action, Polygon poly) {
-        Microbot.getMouse().move(poly.getBounds().getCenterX(), poly.getBounds().getCenterY());
-        return doAction(action, new Point((int) poly.getBounds().getCenterX(), (int) poly.getBounds().getCenterY()), (String[]) null);
+    public static boolean doAction(String action, Shape shape) {
+        Microbot.getMouse().move(shape.getBounds().getCenterX(), shape.getBounds().getCenterY());
+        return doAction(action, new Point((int) shape.getBounds().getCenterX(), (int) shape.getBounds().getCenterY()), (String[]) null);
+    }
+
+    public static boolean doAction(String action, Rectangle bounds) {
+        Microbot.getMouse().move(bounds.getCenterX(), bounds.getCenterY());
+        return doAction(action, new Point((int) bounds.getCenterX(), (int) bounds.getCenterY()), (String[]) null);
     }
 
     public static boolean doAction(String action, Polygon poly, String...targets) {

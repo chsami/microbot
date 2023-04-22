@@ -4,15 +4,15 @@ import net.runelite.api.Actor;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.scripts.Scripts;
+import net.runelite.client.plugins.microbot.scripts.Script;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.menu.Menu;
-import net.runelite.client.plugins.microbot.util.npc.Npc;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-public class AttackNpc extends Scripts {
+public class AttackNpc extends Script {
 
     String[] attackableNpcs;
 
@@ -22,7 +22,7 @@ public class AttackNpc extends Scripts {
         attackableNpcs = Arrays.stream(npcList.split(",")).map(x -> x.trim()).toArray(String[]::new);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-            NPC[] npcs = Npc.getNpcs();
+            NPC[] npcs = Rs2Npc.getNpcs();
             Player player = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer());
             if (player.isInteracting() || player.getAnimation() != -1) {
                 return;
@@ -38,11 +38,11 @@ public class AttackNpc extends Scripts {
                             Camera.turnTo(npc);
                         if (currentNpc == npc) continue;
                         Menu.doAction("Attack", npc.getCanvasTilePoly(), new String[]{npc.getName()});
-                        Microbot.isBussy = true;
+                        Microbot.pauseAllScripts = true;
                         sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().isInteracting());
                         sleep(1200, 2000);
                         currentNpc = npc;
-                        Microbot.isBussy = false;
+                        Microbot.pauseAllScripts = false;
                         break;
                     }
                 }

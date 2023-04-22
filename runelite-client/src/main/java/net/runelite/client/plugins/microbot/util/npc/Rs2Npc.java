@@ -8,12 +8,13 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.Menu;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class Npc {
+public class Rs2Npc {
 
     public static int getHealth(Actor npc) {
         int lastRatio = 0;
@@ -74,25 +75,39 @@ public class Npc {
 
     public static NPC getNpc(String name) {
         return Microbot.getClientThread().runOnClientThread(() -> {
-            List<NPC> npcs = Microbot.getClient().getNpcs();
+            List<NPC> npcs = Arrays.stream(getNpcs()).collect(Collectors.toList());
             if (npcs.isEmpty())
                 return null;
             else
                 return npcs.stream()
-                        .filter(x -> x != null && x.getName().equalsIgnoreCase(name))
+                        .filter(x -> x != null && x.getName().toLowerCase().equalsIgnoreCase(name.toLowerCase()))
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .findFirst().get();
+                        .findAny().orElse(null);
         });
     }
 
     public static List<NPC> getNpcs(String name) {
         List<NPC> npcs = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcs().stream()
-                .filter(x -> x != null && x.getName().equalsIgnoreCase(name))
+                .filter(x -> x != null && x.getName().toLowerCase().equalsIgnoreCase(name.toLowerCase()))
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList()));
 
         return npcs;
     }
+
+    public static NPC getNpc(int id) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            List<NPC> npcs = Arrays.stream(getNpcs()).collect(Collectors.toList());
+            if (npcs.isEmpty())
+                return null;
+            else
+                return npcs.stream()
+                        .filter(x -> x != null && x.getId() == id)
+                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                        .findFirst().get();
+        });
+    }
+
 
     private static boolean interact(NPC npc, String action) {
         if (npc == null) return false;

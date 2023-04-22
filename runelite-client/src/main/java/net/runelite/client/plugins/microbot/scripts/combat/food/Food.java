@@ -5,12 +5,12 @@ import net.runelite.api.ItemComposition;
 import net.runelite.api.Skill;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.scripts.Scripts;
+import net.runelite.client.plugins.microbot.scripts.Script;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 
 import java.util.concurrent.TimeUnit;
 
-public class Food extends Scripts {
+public class Food extends Script {
 
     int weaponIndex = 0;
     int bodyIndex = 0;

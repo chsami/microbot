@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.tithefarm;
 
-enum TitheFarmPlantState
+public enum TitheFarmPlantState
 {
 	UNWATERED,
 	WATERED,

@@ -1,9 +1,13 @@
 package net.runelite.client.plugins.microbot.util.math;
 
+import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+
+import java.awt.*;
 
 
 /**
@@ -113,6 +117,22 @@ public class Calculations {
 
     public static boolean canReach(WorldPoint dest, boolean isObject) {
         return pathLengthTo(dest, isObject) != -1;
+    }
+
+    public static boolean tileOnMap(WorldPoint w) {
+        return tileToMinimap(w) != null;
+    }
+
+    public static Point tileToMinimap(WorldPoint w) {
+        return worldToMinimap(w.getX(), w.getY());
+    }
+
+    public static Point worldToMinimap(double x, double y) {
+        LocalPoint test = LocalPoint.fromWorld(Microbot.getClient(), (int) x, (int) y);
+        if (test != null) {
+            return Microbot.getClientThread().runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), test, 2500));
+        }
+        return null;
     }
 
 
@@ -268,5 +288,134 @@ public class Calculations {
             }
         }
         return foundPath ? dist[curr_x][curr_y] : -1;
+    }
+
+    public static void renderValidMovement() {
+        Microbot.getClientThread().runOnClientThread(() -> {
+
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    if (dx == 0 && dy == 0) {
+                        continue;
+                    }
+                    canWalk(dx, dy);
+                }
+            }
+            return true;
+        });
+    }
+
+    public static boolean canWalk(int dx, int dy) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            WorldArea area = Microbot.getClient().getLocalPlayer().getWorldArea();
+            if (area == null) {
+                return false;
+            }
+            boolean canWalk = area.canTravelInDirection(Microbot.getClient(), dx, dy);
+            if (!canWalk) return false;
+            LocalPoint lp = Microbot.getClient().getLocalPlayer().getLocalLocation();
+            if (lp == null) {
+                return false;
+            }
+
+            lp = new LocalPoint(
+                    lp.getX() + dx * Perspective.LOCAL_TILE_SIZE + dx * Perspective.LOCAL_TILE_SIZE * (area.getWidth() - 1) / 2,
+                    lp.getY() + dy * Perspective.LOCAL_TILE_SIZE + dy * Perspective.LOCAL_TILE_SIZE * (area.getHeight() - 1) / 2);
+
+            Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), lp);
+            if (poly == null) {
+                return false;
+            }
+            return true;
+        });
+    }
+
+    public static boolean canReach(WorldArea start, WorldArea other)
+    {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Client client = Microbot.getClient();
+            int width = 0;
+            int height = 0;
+            int plane = Microbot.getClient().getPlane();
+            if (plane!= other.getPlane())
+            {
+                return false;
+            }
+
+            LocalPoint sourceLp = LocalPoint.fromWorld(client, start.getX(), start.getY());
+            LocalPoint targetLp = LocalPoint.fromWorld(client, other.getX(), other.getY());
+            if (sourceLp == null || targetLp == null)
+            {
+                return false;
+            }
+
+            int thisX = sourceLp.getSceneX();
+            int thisY = sourceLp.getSceneY();
+            int otherX = targetLp.getSceneX();
+            int otherY = targetLp.getSceneY();
+
+            int cmpThisX, cmpThisY, cmpOtherX, cmpOtherY;
+
+            // Determine which position to compare with for this NPC
+            if (otherX <= thisX)
+            {
+                cmpThisX = thisX;
+            }
+            else if (otherX >= thisX + width - 1)
+            {
+                cmpThisX = thisX + width - 1;
+            }
+            else
+            {
+                cmpThisX = otherX;
+            }
+            if (otherY <= thisY)
+            {
+                cmpThisY = thisY;
+            }
+            else if (otherY >= thisY + height - 1)
+            {
+                cmpThisY = thisY + height - 1;
+            }
+            else
+            {
+                cmpThisY = otherY;
+            }
+
+            // Determine which position to compare for the other actor
+            if (thisX <= otherX)
+            {
+                cmpOtherX = otherX;
+            }
+            else if (thisX >= otherX + other.getWidth() - 1)
+            {
+                cmpOtherX = otherX + other.getWidth() - 1;
+            }
+            else
+            {
+                cmpOtherX = thisX;
+            }
+            if (thisY <= otherY)
+            {
+                cmpOtherY = otherY;
+            }
+            else if (thisY >= otherY + other.getHeight() - 1)
+            {
+                cmpOtherY = otherY + other.getHeight() - 1;
+            }
+            else
+            {
+                cmpOtherY = thisY;
+            }
+
+            Tile[][][] tiles = client.getScene().getTiles();
+            Tile sourceTile = tiles[plane][cmpThisX][cmpThisY];
+            Tile targetTile = tiles[other.getPlane()][cmpOtherX][cmpOtherY];
+            if (sourceTile == null || targetTile == null)
+            {
+                return false;
+            }
+            return sourceTile.hasLineOfSightTo(targetTile);
+        });
     }
 }

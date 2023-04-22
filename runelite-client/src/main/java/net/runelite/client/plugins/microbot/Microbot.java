@@ -9,6 +9,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
+import net.runelite.client.plugins.microbot.scripts.bosses.ZulrahScript;
 import net.runelite.client.plugins.microbot.scripts.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.scripts.combat.attack.AttackNpc;
 import net.runelite.client.plugins.microbot.scripts.combat.combatpotion.CombatPotion;
@@ -16,17 +17,22 @@ import net.runelite.client.plugins.microbot.scripts.combat.food.Food;
 import net.runelite.client.plugins.microbot.scripts.combat.jad.Jad;
 import net.runelite.client.plugins.microbot.scripts.combat.prayer.PrayerPotion;
 import net.runelite.client.plugins.microbot.scripts.construction.Construction;
+import net.runelite.client.plugins.microbot.scripts.crafting.Crafting;
 import net.runelite.client.plugins.microbot.scripts.fletching.Fletcher;
 import net.runelite.client.plugins.microbot.scripts.loot.LootScript;
 import net.runelite.client.plugins.microbot.scripts.magic.boltenchanting.BoltEnchanter;
 import net.runelite.client.plugins.microbot.scripts.magic.highalcher.HighAlcher;
 import net.runelite.client.plugins.microbot.scripts.magic.housetabs.HouseTabs;
+import net.runelite.client.plugins.microbot.scripts.minigames.giantsfoundry.GiantsFoundry;
+import net.runelite.client.plugins.microbot.scripts.minigames.tithefarm.TitheFarmScript;
 import net.runelite.client.plugins.microbot.scripts.movie.UsernameHiderScript;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
+import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class Microbot {
@@ -96,9 +102,36 @@ public class Microbot {
     @Getter
     @Setter
     private static UsernameHiderScript usernameHiderScript;
-
+    @Getter
+    @Setter
+    private static Crafting craftingScript;
+    @Getter
+    @Setter
+    private static GiantsFoundry giantsFoundryScript;
+    @Getter
+    @Setter
+    private static Walker walker;
+    @Getter
+    @Setter
+    private static ZulrahScript zulrahScript;
+    @Getter
+    @Setter
+    private static TitheFarmScript titheFarmScript;
     public static boolean isGainingExp = false;
-    public static boolean isBussy = false;
+    public static boolean pauseAllScripts = false;
+
+    private static ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
+
+    private static ScheduledFuture<?> xpSchedulorFuture;
+
+    public static boolean isWalking() {
+        return getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808;
+    }
+
+
+    public static int getVarbitValue(int varbit) {
+        return getClientThread().runOnClientThread(() -> getClient().getVarbitValue(varbit));
+    }
 
     public static void setIsGainingExp(boolean value) {
         isGainingExp = value;
@@ -106,8 +139,9 @@ public class Microbot {
     }
 
     public static void scheduleIsGainingExp() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorService.schedule(() -> {
+        if (xpSchedulorFuture != null && !xpSchedulorFuture.isDone())
+            xpSchedulorFuture.cancel(true);
+        xpSchedulorFuture = xpSchedulor.schedule(() -> {
             isGainingExp = false;
         }, 3000, TimeUnit.MILLISECONDS);
     }

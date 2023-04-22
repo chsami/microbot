@@ -2,14 +2,14 @@ package net.runelite.client.plugins.microbot.scripts.magic.boltenchanting;
 
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.scripts.Scripts;
+import net.runelite.client.plugins.microbot.scripts.Script;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
-public class BoltEnchanter extends Scripts {
+public class BoltEnchanter extends Script {
 
     public boolean run() {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {

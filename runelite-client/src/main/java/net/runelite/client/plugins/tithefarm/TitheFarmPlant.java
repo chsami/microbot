@@ -31,7 +31,7 @@ import lombok.Setter;
 import net.runelite.api.GameObject;
 import net.runelite.api.coords.WorldPoint;
 
-class TitheFarmPlant
+public class TitheFarmPlant
 {
 	private static final Duration PLANT_TIME = Duration.ofMinutes(1);
 

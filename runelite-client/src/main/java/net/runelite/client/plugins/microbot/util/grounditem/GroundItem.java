@@ -88,7 +88,7 @@ public class GroundItem {
                 Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, rs2Item.getTile().getItemLayer().getHeight());
                 if (Camera.isTileOnScreen(rs2Item.getTile().getLocalLocation())) {
                     if (Menu.doAction("Take", poly, new String[]{lootItem.toLowerCase()})) {
-                        Microbot.isBussy = true;
+                        Microbot.pauseAllScripts = true;
                         Global.sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().equals(rs2Item.getTile().getLocalLocation()), 5000);
                         return true;
                     }

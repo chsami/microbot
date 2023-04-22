@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.mouse;
 
 import net.runelite.api.Point;
+import net.runelite.client.plugins.microbot.Microbot;
 
 import javax.inject.Inject;
 import java.awt.*;

@@ -3,12 +3,12 @@ package net.runelite.client.plugins.microbot.scripts.combat.combatpotion;
 import net.runelite.api.Skill;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.scripts.Scripts;
+import net.runelite.client.plugins.microbot.scripts.Script;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 
 import java.util.concurrent.TimeUnit;
 
-public class CombatPotion extends Scripts {
+public class CombatPotion extends Script {
 
     public boolean run() {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {

@@ -7,7 +7,7 @@ import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
 import static net.runelite.api.Varbits.PRAYER_PROTECT_FROM_MAGIC;
 
-public class Prayer {
+public class Rs2Prayer {
     public static void turnOnMagePrayer() {
         if (Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(PRAYER_PROTECT_FROM_MAGIC) == 1)) return;
         Tab.switchToPrayerTab();

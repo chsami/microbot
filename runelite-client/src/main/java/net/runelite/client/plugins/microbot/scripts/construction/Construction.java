@@ -5,13 +5,13 @@ import net.runelite.api.NPC;
 import net.runelite.api.SpriteID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.scripts.Scripts;
+import net.runelite.client.plugins.microbot.scripts.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Menu;
-import net.runelite.client.plugins.microbot.util.npc.Npc;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -25,21 +25,21 @@ enum ConstructionState {
     Idle
 }
 
-public class Construction extends Scripts {
+public class Construction extends Script {
 
     ConstructionState state = ConstructionState.Idle;
 
 
     public GameObject getOakLarderSpace() {
-        return Rs2GameObject.findGameObject(15403);
+        return Rs2GameObject.findObjectById(15403);
     }
 
     public GameObject getOakLarder() {
-        return Rs2GameObject.findGameObject(13566);
+        return Rs2GameObject.findObjectById(13566);
     }
 
     public NPC getButler() {
-        return Npc.getNpc("Demon butler");
+        return Rs2Npc.getNpc("Demon butler");
     }
 
     public boolean hasDialogueOptionToUnnote() {
