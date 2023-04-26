@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.util.inventory;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
@@ -20,8 +19,14 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class Inventory {
 
+
+
     private static ScheduledFuture<?> inventoryScheduler;
     private static ScheduledExecutorService scheduledExecutorService;
+
+    private static boolean itemExistsInInventory(Widget item) {
+        return item != null && item.getName().length() > 0 && !item.isHidden() && item.getOpacity() != 255 && !item.isSelfHidden();
+    }
 
     public static boolean clickItem(int index) {
         Widget inventoryWidget = getInventory();
@@ -39,24 +44,24 @@ public class Inventory {
 
     public static boolean isInventoryFull() {
         Widget inventoryWidget = getInventory();
-        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> x.getName().length() > 0).count() == 28);
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == 28);
     }
 
     public static boolean isInventoryFull(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget inventoryWidget = getInventory();
             if (hasItemStackable(itemName)) return false;
-            return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> !x.isHidden()).count() == 28;
+            return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == 28;
         });
     }
 
-    public static boolean isInventoryEmpty() {
+    public static boolean isEmpty() {
         return hasAmountInventoryItems(0);
     }
 
-    public static boolean hasAmountInventoryItems(int items) {
+    public static boolean hasAmountInventoryItems(int count) {
         Widget inventoryWidget = getInventory();
-        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> !x.isHidden()).count() == items);
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == count);
     }
 
     public static boolean hasItemStackable(String itemName) {
@@ -66,7 +71,7 @@ public class Inventory {
                 .anyMatch(x -> {
                     ItemComposition itemComp = Microbot.getItemManager().getItemComposition(x.getItemId());
                     if (itemComp.getNote() == 799 || itemComp.isStackable()) {
-                        return !x.isHidden() && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase());
+                        return itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase());
                     } else {
                         return false;
                     }
@@ -78,23 +83,32 @@ public class Inventory {
 
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
                 .anyMatch(x ->
-                        !x.isHidden() && x.getName().length() > 0 && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())
+                ));
+    }
+
+    public static boolean hasItemContains(String itemName) {
+        Widget inventoryWidget = getInventory();
+
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .anyMatch(x ->
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName.toLowerCase())
                 ));
     }
 
     public static Widget getInventoryItem(String itemName) {
         Widget inventoryWidget = getInventory();
-        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> !x.isHidden() && x.getName().toLowerCase().contains(itemName)).findFirst().get();
+        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getName().toLowerCase().contains(itemName)).findFirst().get();
     }
 
     public static Widget[] getInventoryItems() {
         Widget inventoryWidget = getInventory();
-        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> !x.isHidden()).toArray(Widget[]::new);
+        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
     }
 
     public static Widget[] getInventoryFood() {
         Widget inventoryWidget = getInventory();
-        Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> !x.isHidden()).toArray(Widget[]::new);
+        Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
         items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("eat"))).toArray(Widget[]::new);
         ;
         return items;
@@ -102,7 +116,7 @@ public class Inventory {
 
     public static Widget[] getPotions() {
         Widget inventoryWidget = getInventory();
-        Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> !x.isHidden()).toArray(Widget[]::new);
+        Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
         items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("drink"))).toArray(Widget[]::new);
         return items;
     }
@@ -140,7 +154,7 @@ public class Inventory {
         int count = 0;
         for (Widget item : inventoryWidget.getDynamicChildren()) {
             if (item.isSelfHidden() == false) {
-                if (item.getName().length() > 0 && item.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())) {
+                if (itemExistsInInventory(item) && item.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())) {
                     count++;
                 }
             }
@@ -152,20 +166,17 @@ public class Inventory {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget inventoryWidget = Microbot.getClient().getWidget(9764864);
             Widget bankInventoryWidget = Microbot.getClient().getWidget(983043);
-            if (inventoryWidget == null && bankInventoryWidget == null) {
-                return null;
-            }
-            if (inventoryWidget.isHidden() && bankInventoryWidget.isHidden()) {
-                return null;
-            }
-            if (inventoryWidget.getDynamicChildren() == null && bankInventoryWidget.getDynamicChildren() == null) {
-                return null;
-            }
-
-            if (inventoryWidget != null && !inventoryWidget.isHidden())
+            Widget bankPinInventoryWidget = Microbot.getClient().getWidget(17563648);
+            if (inventoryWidget != null && inventoryWidget.getDynamicChildren() != null && !inventoryWidget.isHidden()) {
                 return inventoryWidget;
-            else
+            }
+            if (bankInventoryWidget != null && bankInventoryWidget.getDynamicChildren() != null && !bankInventoryWidget.isHidden()) {
                 return bankInventoryWidget;
+            }
+            if (bankPinInventoryWidget != null && bankPinInventoryWidget.getDynamicChildren() != null && !bankPinInventoryWidget.isHidden()) {
+                return bankPinInventoryWidget;
+            }
+            return null;
         });
     }
 
@@ -174,7 +185,7 @@ public class Inventory {
         return Microbot.getClientThread().runOnClientThread(() -> {
             for (Widget item : inventoryWidget.getDynamicChildren()) {
                 if (item.isSelfHidden() == false) {
-                    if (item.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())) {
+                    if (itemExistsInInventory(item) && item.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())) {
                         return item;
                     }
                 }
@@ -188,7 +199,7 @@ public class Inventory {
         return Microbot.getClientThread().runOnClientThread(() -> {
             for (Widget item : inventoryWidget.getDynamicChildren()) {
                 if (item.isSelfHidden() == false) {
-                    if (item.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName.toLowerCase())) {
+                    if (itemExistsInInventory(item) && item.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName.toLowerCase())) {
                         return item;
                     }
                 }
@@ -266,17 +277,17 @@ public class Inventory {
             scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
             inventoryScheduler = scheduledExecutorService.scheduleWithFixedDelay(() -> {
                 Microbot.getClientThread().invokeLater(() -> {
-                    if (isInventoryEmpty()) {
+                    if (isEmpty()) {
                         inventoryScheduler.cancel(true);
                         return;
                     }
-                    Widget widget = Arrays.stream(getInventoryItems()).filter(x -> !x.isSelfHidden()).findFirst().get();
+                    Widget widget = Arrays.stream(getInventoryItems()).filter(x -> (itemExistsInInventory(x))).findFirst().get();
                     if (widget == null) return;
                     Microbot.getMouse().click(widget.getBounds());
                 });
             }, 0, random(10, 300), TimeUnit.MILLISECONDS);
         }
-        return isInventoryEmpty();
+        return isEmpty();
     }
 
     public static boolean isUsingItem() {

@@ -3,7 +3,7 @@ package net.runelite.client.plugins.microbot.magic;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.scripts.Script;
+import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;

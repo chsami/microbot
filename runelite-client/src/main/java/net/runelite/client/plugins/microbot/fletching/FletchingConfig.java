@@ -4,8 +4,6 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.gpu.GpuPluginConfig;
-import net.runelite.client.plugins.gpu.config.UIScalingMode;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingItem;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingMaterial;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingMode;
@@ -65,7 +63,7 @@ public interface FletchingConfig extends Config {
     String antibanSection = "antiban";
     @ConfigItem(
             keyName = "Afk",
-            name = "Afk",
+            name = "Afk randomly",
             description = "Randomy afks between 3 and 60 seconds",
             position = 0,
             section = antibanSection

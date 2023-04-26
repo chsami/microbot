@@ -313,7 +313,7 @@ public class Menu {
         MenuEntry[] entries = getEntries();
         action = action.toLowerCase();
         for (int i = 0; i < entries.length; i++) {
-            if (entries[i].getOption().toLowerCase().contains(action)) {
+            if (entries[i].getOption().toLowerCase().contains(action.toLowerCase())) {
                 lastIndex = i;
                 return i;
             }

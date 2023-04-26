@@ -23,6 +23,14 @@ public class Global {
         return scheduledFuture;
     }
 
+    public static void sleep(int start) {
+        if (!Microbot.getClient().isClientThread()) {
+            long startTime = System.currentTimeMillis();
+            do {
+            } while (System.currentTimeMillis() - startTime < start);
+        }
+    }
+
     public static void sleep(int start, int end) {
         if (!Microbot.getClient().isClientThread()) {
             long startTime = System.currentTimeMillis();

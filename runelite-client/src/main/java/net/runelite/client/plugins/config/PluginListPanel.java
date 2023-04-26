@@ -28,10 +28,7 @@ import com.google.common.collect.ImmutableList;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -183,7 +180,8 @@ class PluginListPanel extends PluginPanel
 
 	void rebuildPluginList()
 	{
-		final List<String> pinnedPlugins = getPinnedPluginNames();
+		//List<String> pinnedPlugins = getPinnedPluginNames();
+		List<String> pinnedPlugins = new ArrayList<>();
 
 		// populate pluginList with all non-hidden plugins
 		pluginList = Stream.concat(
@@ -198,6 +196,10 @@ class PluginListPanel extends PluginPanel
 					List<String> conflicts = pluginManager.conflictsForPlugin(plugin).stream()
 						.map(Plugin::getName)
 						.collect(Collectors.toList());
+
+					if (descriptor.name().toLowerCase().contains("micro")) {
+						pinnedPlugins.add(descriptor.name());
+					}
 
 					return new PluginConfigurationDescriptor(
 						descriptor.name(),

@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.giantsfoundry;
 
-import net.runelite.client.plugins.microbot.MicrobotPlugin;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -11,7 +10,7 @@ import java.awt.*;
 
 public class GiantsFoundryOverlay extends OverlayPanel {
     @Inject
-    GiantsFoundryOverlay(MicrobotPlugin plugin)
+    GiantsFoundryOverlay(GiantsFoundryPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);

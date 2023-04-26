@@ -17,8 +17,16 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 public class Rs2Bank {
 
     public static boolean depositAll(String itemName) {
+        if (!isBankOpen()) return false;
         if (!Inventory.hasItem(itemName)) return true;
         Widget item = Inventory.findItem(itemName);
+        return Menu.doAction("Deposit-all", item.getBounds());
+    }
+
+    public static boolean depositAllContains(String itemName) {
+        if (!isBankOpen()) return false;
+        if (!Inventory.hasItemContains(itemName)) return true;
+        Widget item = Inventory.findItemContains(itemName);
         return Menu.doAction("Deposit-all", item.getBounds());
     }
 
@@ -31,6 +39,11 @@ public class Rs2Bank {
     }
 
     public static boolean isBankOpen() {
+        if (Rs2Widget.hasWidget("Please enter your PIN")) {
+            Microbot.getNotifier().notify("[ATTENTION] Please enter your bankpin so the script can continue.");
+            sleep(5000);
+            return false;
+        }
         return Rs2Widget.findWidget("Rearrange mode", null) != null;
     }
 
@@ -43,7 +56,7 @@ public class Rs2Bank {
             if (npc == null) return false;
             boolean action = Menu.doAction("bank", npc.getCanvasTilePoly());
             if (action) {
-                sleepUntil(() -> isBankOpen(), 5000);
+                sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
                 return true;
             }
             return false;
@@ -65,7 +78,7 @@ public class Rs2Bank {
         do {
             calc = widget.getRelativeY() - mainWindow.getScrollY();
 
-            if (calc >= 0 && calc < 600) break;
+            if (calc >= 0 && calc < 640) break;
 
             point = new Point((int) mainWindow.getBounds().getCenterX(), (int) mainWindow.getBounds().getCenterY());
 
@@ -78,7 +91,7 @@ public class Rs2Bank {
             sleep(100, 300);
             mainWindow = Rs2Widget.getWidget(786445);
 
-        } while (calc <= 0 || calc > 600);
+        } while (calc <= 0 || calc > 640);
 
         return true;
     }
@@ -90,7 +103,9 @@ public class Rs2Bank {
     public static boolean withdrawItem(boolean checkInventory, String itemName) {
         if (checkInventory && Inventory.hasItem(itemName)) return true;
         if (Inventory.isInventoryFull()) return false;
-        if (!isBankOpen()) return false;
+        if (!isBankOpen()) {
+            openBank();
+        }
         Widget widget = Rs2Widget.findWidget(itemName, null);
         if (widget == null) return false;
         if (widget.getItemQuantity() <= 0) return false;
@@ -195,5 +210,9 @@ public class Rs2Bank {
             return true;
         }
         return false;
+    }
+
+    public static boolean hasItem(String itemName) {
+        return Rs2Widget.findWidget(itemName) != null && Rs2Widget.findWidget(itemName).getItemQuantity() > 0;
     }
 }

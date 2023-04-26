@@ -9,24 +9,17 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
-import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryScript;
-import net.runelite.client.plugins.microbot.scripts.bosses.ZulrahScript;
-import net.runelite.client.plugins.microbot.scripts.cannon.CannonScript;
-import net.runelite.client.plugins.microbot.scripts.combat.attack.AttackNpc;
-import net.runelite.client.plugins.microbot.scripts.combat.combatpotion.CombatPotion;
-import net.runelite.client.plugins.microbot.scripts.combat.food.Food;
-import net.runelite.client.plugins.microbot.scripts.combat.jad.Jad;
-import net.runelite.client.plugins.microbot.scripts.combat.prayer.PrayerPotion;
 import net.runelite.client.plugins.microbot.construction.ConstructionScript;
-import net.runelite.client.plugins.microbot.scripts.crafting.Crafting;
-import net.runelite.client.plugins.microbot.scripts.loot.LootScript;
-import net.runelite.client.plugins.microbot.scripts.magic.boltenchanting.BoltEnchanter;
-import net.runelite.client.plugins.microbot.scripts.magic.highalcher.HighAlcher;
-import net.runelite.client.plugins.microbot.scripts.magic.housetabs.HouseTabs;
-import net.runelite.client.plugins.microbot.scripts.minigames.tithefarm.TitheFarmScript;
-import net.runelite.client.plugins.microbot.scripts.movie.UsernameHiderScript;
+import net.runelite.client.plugins.microbot.farming.tithefarm.TitheFarmScript;
+import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryScript;
+import net.runelite.client.plugins.microbot.magic.housetab.HouseTabScript;
+import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
+import net.runelite.client.plugins.microbot.playerassist.combat.AttackNpcScript;
+import net.runelite.client.plugins.microbot.playerassist.combat.CombatPotionScript;
+import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
+import net.runelite.client.plugins.microbot.playerassist.combat.PrayerPotionScript;
+import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
-import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
 import java.util.concurrent.Executors;
@@ -57,62 +50,9 @@ public class Microbot {
     @Getter
     @Setter
     private static Notifier notifier;
-
-    //scripts
-    @Getter
-    @Setter
-    private static HouseTabs houseTabScript;
-    @Getter
-    @Setter
-    private static BoltEnchanter boltEnchanterScript;
-    @Getter
-    @Setter
-    private static HighAlcher highAlcherScript;
-    @Getter
-    @Setter
-    private static LootScript lootScript;
-    @Getter
-    @Setter
-    private static CannonScript cannonScript;
-    @Getter
-    @Setter
-    private static Food foodScript;
-    @Getter
-    @Setter
-    private static PrayerPotion prayerPotionScript;
-    @Getter
-    @Setter
-    private static AttackNpc attackNpcScript;
     @Getter
     @Setter
     private static NPCManager npcManager;
-    @Getter
-    @Setter
-    private static CombatPotion combatPotion;
-    @Getter
-    @Setter
-    private static Jad jad;
-    @Getter
-    @Setter
-    private static ConstructionScript constructionScript;
-    @Getter
-    @Setter
-    private static UsernameHiderScript usernameHiderScript;
-    @Getter
-    @Setter
-    private static Crafting craftingScript;
-    @Getter
-    @Setter
-    private static GiantsFoundryScript giantsFoundryScript;
-    @Getter
-    @Setter
-    private static Walker walker;
-    @Getter
-    @Setter
-    private static ZulrahScript zulrahScript;
-    @Getter
-    @Setter
-    private static TitheFarmScript titheFarmScript;
     public static boolean isGainingExp = false;
     public static boolean pauseAllScripts = false;
 
@@ -143,6 +83,7 @@ public class Microbot {
     }
 
     public static boolean isLoggedIn() {
+        if (client == null) return false;
         GameState idx = client.getGameState();
         return idx == GameState.LOGGED_IN;
     }
