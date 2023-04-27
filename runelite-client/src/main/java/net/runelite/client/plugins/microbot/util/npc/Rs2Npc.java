@@ -5,7 +5,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -120,7 +120,7 @@ public class Rs2Npc {
         Point point = new Point((int) screenLoc.getBounds().getCenterX(), (int) screenLoc.getBounds().getCenterY());
         Microbot.getMouse().move(point);
 
-        return Menu.doAction(action, point, npc.getName());
+        return Rs2Menu.doAction(action, point, npc.getName());
     }
 
     public static boolean interact(int npcId) {

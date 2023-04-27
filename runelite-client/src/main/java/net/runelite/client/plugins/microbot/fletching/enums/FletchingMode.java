@@ -7,12 +7,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum FletchingMode
 {
-    UNSTRUNG("Cutting", 0, "knife"),
-    STRUNG("Stringing", 1, "bow string");
+    UNSTRUNG("Cutting", 0, "knife", 1),
+    STRUNG("Stringing", 1, "bow string", 14);
 
     private final String name;
     private final int mode;
     private final String itemName;
+    private final int amount;
 
     @Override
     public String toString()

@@ -15,7 +15,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 /**
  * Context menu related operations.
  */
-public class Menu {
+public class Rs2Menu {
     private static final Pattern HTML_TAG = Pattern
             .compile("(^[^<]+>|<[^>]+>|<[^>]+$)");
 
@@ -155,7 +155,7 @@ public class Menu {
         Point menu = getLocation();
         FontMetrics fm = ((Applet) Microbot.getClient()).getGraphics().getFontMetrics(FontManager.getRunescapeBoldFont());
         int xOff = random(1, (fm.stringWidth(item) + MENU_SIDE_BORDER) - 1);
-        int yOff = TOP_OF_MENU_BAR + (((MENU_ENTRY_LENGTH * i) + random(2, MENU_ENTRY_LENGTH - 2)));
+        int yOff = TOP_OF_MENU_BAR + (((MENU_ENTRY_LENGTH * i) + random(2, MENU_ENTRY_LENGTH - 10)));
         if (isOpen()) {
             Microbot.getMouse().click(new Point(menu.getX() + xOff, menu.getY() + yOff));
             return true;

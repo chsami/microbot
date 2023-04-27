@@ -2,7 +2,7 @@ package net.runelite.client.plugins.microbot.util.gameobject;
 
 import net.runelite.api.*;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -258,7 +258,7 @@ public class Rs2GameObject {
     private static boolean clickObject(GameObject object, String optionName) {
         if (object != null) {
             if (optionName != null && optionName.length() > 0) {
-                return Menu.doAction(optionName, object.getClickbox());
+                return Rs2Menu.doAction(optionName, object.getClickbox());
             } else {
                 Microbot.getMouse().click(object.getClickbox().getBounds());
                 return true;

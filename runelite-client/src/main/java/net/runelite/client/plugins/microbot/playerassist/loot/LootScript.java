@@ -13,7 +13,7 @@ import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.grounditem.GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
-import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ public class LootScript extends Script {
                     LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), itemSpawned.getTile().getWorldLocation());
                     Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, itemSpawned.getTile().getItemLayer().getHeight());
                     if (Camera.isTileOnScreen(itemLocation)) {
-                        if (Menu.doAction("Take", poly, new String[]{item.toLowerCase()})) {
+                        if (Rs2Menu.doAction("Take", poly, new String[]{item.toLowerCase()})) {
                             Microbot.pauseAllScripts = true;
                             sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation() == itemSpawned.getTile().getWorldLocation(), 5000);
                             Microbot.pauseAllScripts = false;

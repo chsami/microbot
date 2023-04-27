@@ -9,7 +9,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 
 import java.awt.*;
@@ -87,7 +87,7 @@ public class GroundItem {
                 LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), rs2Item.getTile().getWorldLocation());
                 Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, rs2Item.getTile().getItemLayer().getHeight());
                 if (Camera.isTileOnScreen(rs2Item.getTile().getLocalLocation())) {
-                    if (Menu.doAction("Take", poly, new String[]{lootItem.toLowerCase()})) {
+                    if (Rs2Menu.doAction("Take", poly, new String[]{lootItem.toLowerCase()})) {
                         Microbot.pauseAllScripts = true;
                         Global.sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().equals(rs2Item.getTile().getLocalLocation()), 5000);
                         return true;

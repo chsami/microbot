@@ -7,7 +7,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
-import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.Arrays;
@@ -38,7 +38,7 @@ public class AttackNpcScript extends Script {
                         if (!Camera.isTileOnScreen(npc.getLocalLocation()))
                             Camera.turnTo(npc);
                         if (currentNpc == npc) continue;
-                        Menu.doAction("Attack", npc.getCanvasTilePoly(), new String[]{npc.getName()});
+                        Rs2Menu.doAction("Attack", npc.getCanvasTilePoly(), new String[]{npc.getName()});
                         Microbot.pauseAllScripts = true;
                         sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().isInteracting());
                         sleep(1200, 2000);

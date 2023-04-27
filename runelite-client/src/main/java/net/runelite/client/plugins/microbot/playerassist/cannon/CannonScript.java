@@ -8,7 +8,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +19,7 @@ public class CannonScript extends Script {
             if (!config.toggleCannon()) return;
             net.runelite.api.GameObject brokenCannon = Rs2GameObject.findObjectById(14916);
             if (brokenCannon != null) {
-                Menu.doAction("Repair", brokenCannon.getCanvasTilePoly(), new String[] {"Broken multicannon"});
+                Rs2Menu.doAction("Repair", brokenCannon.getCanvasTilePoly(), new String[] {"Broken multicannon"});
                 return;
             }
             int cannonBallsLeft = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.CANNON_AMMO));
@@ -28,7 +28,7 @@ public class CannonScript extends Script {
                 if (cannon == null) return;
                 WorldArea cannonLocation = new WorldArea(cannon.getWorldLocation().getX() - 1, cannon.getWorldLocation().getY() - 1, 3, 3, cannon.getWorldLocation().getPlane());
                 if (!cannonLocation.toWorldPoint().equals(CannonPlugin.getCannonPosition().toWorldPoint())) return;
-                Menu.doAction("Fire", cannon.getCanvasTilePoly(), new String[] {"Dwarf multicannon"});
+                Rs2Menu.doAction("Fire", cannon.getCanvasTilePoly(), new String[] {"Dwarf multicannon"});
                 sleep(2000, 4000);
             }
         }, 0, 2000, TimeUnit.MILLISECONDS);

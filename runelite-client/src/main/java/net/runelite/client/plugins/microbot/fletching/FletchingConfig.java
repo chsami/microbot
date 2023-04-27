@@ -17,7 +17,7 @@ public interface FletchingConfig extends Config {
             name = "General",
             description = "General",
             position = 0,
-            closedByDefault = true
+            closedByDefault = false
     )
     String generalSection = "general";
 
@@ -58,7 +58,7 @@ public interface FletchingConfig extends Config {
             name = "Antiban",
             description = "Configure antiban measures",
             position = 1,
-            closedByDefault = true
+            closedByDefault = false
     )
     String antibanSection = "antiban";
     @ConfigItem(

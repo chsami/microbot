@@ -5,7 +5,7 @@ import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
 import java.util.Arrays;
@@ -156,31 +156,23 @@ public class Inventory {
     }
 
     public static boolean hasItemAmount(int itemId, int amount) {
-        Microbot.status = "Has inventory item: " + itemId + " with amount: " + amount;
+        Microbot.status = "Check if inventory has item: " + itemId + " with amount: " + amount;
         Tab.switchToInventoryTab();
         Widget inventoryWidget = getInventory();
-        int count = 0;
-        for (Widget item : inventoryWidget.getDynamicChildren()) {
-            if (item.getItemId() == itemId) {
-                count++;
-            }
-        }
-        return count >= amount;
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .filter(x ->
+                        itemExistsInInventory(x) && x.getItemId() == itemId
+                ).count() >= amount);
     }
 
     public static boolean hasItemAmount(String itemName, int amount) {
-        Microbot.status = "Has inventory item: " + itemName + " with amount: " + amount;
+        Microbot.status = "Check if inventory has item: " + itemName + " with amount: " + amount;
         Tab.switchToInventoryTab();
         Widget inventoryWidget = getInventory();
-        int count = 0;
-        for (Widget item : inventoryWidget.getDynamicChildren()) {
-            if (item.isSelfHidden() == false) {
-                if (itemExistsInInventory(item) && item.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())) {
-                    count++;
-                }
-            }
-        }
-        return count >= amount;
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .filter(x ->
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())
+                ).count() >= amount);
     }
 
     private static Widget getInventory() {
@@ -293,13 +285,13 @@ public class Inventory {
     public static boolean useItemAction(String itemName, String actionName) {
         Microbot.status = "Use inventory item " + itemName + " with action " + actionName;
         Widget item = findItem(itemName);
-        return Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
+        return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
 
     public static boolean useItemAction(String itemName, String[] actionNames) {
         Microbot.status = "Use inventory item " + itemName + " with actions " + Arrays.toString(actionNames);
         Widget item = findItem(itemName);
-        return Menu.doAction(actionNames, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
+        return Rs2Menu.doAction(actionNames, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
 
     public static boolean dropAll() {
@@ -322,7 +314,7 @@ public class Inventory {
     }
 
     public static boolean isUsingItem() {
-        return Arrays.stream(Menu.getTargets()).anyMatch(x -> x.contains("->"));
+        return Arrays.stream(Rs2Menu.getTargets()).anyMatch(x -> x.contains("->"));
     }
 
     public static boolean equipItem(String itemName) {

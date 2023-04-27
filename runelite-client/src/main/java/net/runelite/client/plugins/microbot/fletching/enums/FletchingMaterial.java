@@ -8,12 +8,12 @@ import lombok.RequiredArgsConstructor;
 public enum FletchingMaterial
 {
     LOG("Log"),
-    OAK("Oak logs"),
-    WILLOW("Willow logs"),
-    MAPLE("Maple logs"),
-    YEW("Yew logs"),
-    MAGIC("Magic logs"),
-    REDWOOD("Redwood logs");
+    OAK("Oak"),
+    WILLOW("Willow"),
+    MAPLE("Maple"),
+    YEW("Yew"),
+    MAGIC("Magic"),
+    REDWOOD("Redwood");
 
     private final String name;
 

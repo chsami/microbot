@@ -8,7 +8,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -21,7 +21,7 @@ public class Rs2Bank {
         if (!isBankOpen()) return false;
         if (!Inventory.hasItem(itemName)) return true;
         Widget item = Inventory.findItem(itemName);
-        return Menu.doAction("Deposit-all", item.getBounds());
+        return Rs2Menu.doAction("Deposit-all", item.getBounds());
     }
 
     public static boolean depositAllContains(String itemName) {
@@ -29,7 +29,7 @@ public class Rs2Bank {
         if (!isBankOpen()) return false;
         if (!Inventory.hasItemContains(itemName)) return true;
         Widget item = Inventory.findItemContains(itemName);
-        return Menu.doAction("Deposit-all", item.getBounds());
+        return Rs2Menu.doAction("Deposit-all", item.getBounds());
     }
 
     public static boolean closeBank() {
@@ -59,7 +59,7 @@ public class Rs2Bank {
             if (isBankOpen()) return true;
             NPC npc = Rs2Npc.getNpc("banker");
             if (npc == null) return false;
-            boolean action = Menu.doAction("bank", npc.getCanvasTilePoly());
+            boolean action = Rs2Menu.doAction("bank", npc.getCanvasTilePoly());
             if (action) {
                 sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
                 return true;
@@ -117,7 +117,7 @@ public class Rs2Bank {
         if (widget == null) return false;
         if (widget.getItemQuantity() <= 0) return false;
         if (scrollTo(widget)) {
-            Menu.doAction("Withdraw-1", widget.getBounds());
+            Rs2Menu.doAction("Withdraw-1", widget.getBounds());
             sleep(100, 1000);
             return true;
         }
@@ -127,12 +127,14 @@ public class Rs2Bank {
     public static boolean withdrawItemX(boolean checkInventory, String itemName, int amount) {
         Microbot.status = "Withdrawing " + amount + " " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
-        if (!isBankOpen()) return false;
+        if (!isBankOpen()) {
+            openBank();
+        }
         Widget widget = Rs2Widget.findWidget(itemName, null);
         if (widget == null) return false;
         if (widget.getItemQuantity() <= 0) return false;
         if (scrollTo(widget)) {
-            Menu.doAction("Withdraw-" + amount, widget.getBounds());
+            Rs2Menu.doAction("Withdraw-" + amount, widget.getBounds());
             sleep(600, 1000);
             return true;
         }
@@ -148,7 +150,7 @@ public class Rs2Bank {
         if (widget == null) return false;
         if (widget.getItemQuantity() <= 0) return false;
         if (scrollTo(widget)) {
-            Menu.doAction("Withdraw-All", widget.getBounds());
+            Rs2Menu.doAction("Withdraw-All", widget.getBounds());
             sleep(100, 1000);
             return true;
         }
@@ -192,9 +194,9 @@ public class Rs2Bank {
     public static boolean useBank() {
         GameObject bank = Rs2GameObject.findBank();
         if (bank == null) return false;
-        if (Menu.doAction("Bank", bank.getCanvasTilePoly())) {
+        if (Rs2Menu.doAction("Bank", bank.getCanvasTilePoly())) {
             sleepUntil(() -> isBankOpen() == true, 5000);
-        } else if (Menu.doAction("Use", bank.getCanvasTilePoly())) { //for chests
+        } else if (Rs2Menu.doAction("Use", bank.getCanvasTilePoly())) { //for chests
             sleepUntil(() -> isBankOpen() == true, 5000);
         }
         return false;
@@ -204,9 +206,9 @@ public class Rs2Bank {
         Microbot.status = "Banking";
         GameObject bank = Rs2GameObject.findBank(action);
         if (bank == null) return false;
-        if (Menu.doAction("Bank", bank.getCanvasTilePoly())) {
+        if (Rs2Menu.doAction("Bank", bank.getCanvasTilePoly())) {
             sleepUntil(() -> isBankOpen() == true, 5000);
-        } else if (Menu.doAction("Use", bank.getCanvasTilePoly())) { //for chests
+        } else if (Rs2Menu.doAction("Use", bank.getCanvasTilePoly())) { //for chests
             sleepUntil(() -> isBankOpen() == true, 5000);
         }
         return false;

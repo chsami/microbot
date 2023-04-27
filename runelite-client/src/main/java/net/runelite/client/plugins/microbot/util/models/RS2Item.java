@@ -8,7 +8,7 @@ import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
-import net.runelite.client.plugins.microbot.util.menu.Menu;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 
 import java.awt.*;
 
@@ -30,7 +30,7 @@ public class RS2Item {
         LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), getTile().getWorldLocation());
         Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, getTile().getItemLayer().getHeight());
         if (Camera.isTileOnScreen(getTile().getLocalLocation())) {
-            return Menu.doAction("Take", poly, new String[]{lootItem.toLowerCase()});
+            return Rs2Menu.doAction("Take", poly, new String[]{lootItem.toLowerCase()});
         } else {
             Camera.turnTo(getTile().getLocalLocation());
         }
