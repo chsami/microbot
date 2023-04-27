@@ -17,6 +17,7 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 public class Rs2Bank {
 
     public static boolean depositAll(String itemName) {
+        Microbot.status = "Deposit all " + itemName;
         if (!isBankOpen()) return false;
         if (!Inventory.hasItem(itemName)) return true;
         Widget item = Inventory.findItem(itemName);
@@ -24,6 +25,7 @@ public class Rs2Bank {
     }
 
     public static boolean depositAllContains(String itemName) {
+        Microbot.status = "Deposit all " + itemName;
         if (!isBankOpen()) return false;
         if (!Inventory.hasItemContains(itemName)) return true;
         Widget item = Inventory.findItemContains(itemName);
@@ -31,6 +33,7 @@ public class Rs2Bank {
     }
 
     public static boolean closeBank() {
+        Microbot.status = "Closing bank";
         if (!isBankOpen()) return true;
         int closeWidget = 786434;
         Rs2Widget.clickChildWidget(closeWidget, 11);
@@ -39,6 +42,7 @@ public class Rs2Bank {
     }
 
     public static boolean isBankOpen() {
+        Microbot.status = "Checking if bank is open";
         if (Rs2Widget.hasWidget("Please enter your PIN")) {
             Microbot.getNotifier().notify("[ATTENTION] Please enter your bankpin so the script can continue.");
             sleep(5000);
@@ -48,6 +52,7 @@ public class Rs2Bank {
     }
 
     public static boolean openBank() {
+        Microbot.status = "Opening bank";
         try {
             if (Inventory.isUsingItem())
                 Microbot.getMouse().click();
@@ -67,6 +72,7 @@ public class Rs2Bank {
     }
 
     public static boolean scrollTo(Widget widget) {
+        Microbot.status = "Searching for item";
         if (Microbot.getClient().isClientThread()) {
             Microbot.getNotifier().notify("Could not scrollTo item because the code is ran on the main thread!");
             return false;
@@ -101,6 +107,7 @@ public class Rs2Bank {
     }
 
     public static boolean withdrawItem(boolean checkInventory, String itemName) {
+        Microbot.status = "Withdrawing one " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
         if (Inventory.isInventoryFull()) return false;
         if (!isBankOpen()) {
@@ -118,6 +125,7 @@ public class Rs2Bank {
     }
 
     public static boolean withdrawItemX(boolean checkInventory, String itemName, int amount) {
+        Microbot.status = "Withdrawing " + amount + " " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
         if (!isBankOpen()) return false;
         Widget widget = Rs2Widget.findWidget(itemName, null);
@@ -132,6 +140,7 @@ public class Rs2Bank {
     }
 
     public static boolean withdrawItemAll(boolean checkInventory, String itemName) {
+        Microbot.status = "Withdrawing All " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
         if (Inventory.isInventoryFull()) return false;
         if (!isBankOpen()) return false;
@@ -192,6 +201,7 @@ public class Rs2Bank {
     }
 
     public static boolean useBank(String action) {
+        Microbot.status = "Banking";
         GameObject bank = Rs2GameObject.findBank(action);
         if (bank == null) return false;
         if (Menu.doAction("Bank", bank.getCanvasTilePoly())) {
@@ -203,6 +213,7 @@ public class Rs2Bank {
     }
 
     public static boolean depositAll() {
+        Microbot.status = "Deposit all";
         Widget widget = Rs2Widget.findWidget(SpriteID.BANK_DEPOSIT_INVENTORY, null);
         if (widget != null) {
             Microbot.getMouse().click(widget.getBounds());
@@ -213,6 +224,7 @@ public class Rs2Bank {
     }
 
     public static boolean hasItem(String itemName) {
+        Microbot.status = "Looking for " + itemName + " in the bank";
         return Rs2Widget.findWidget(itemName) != null && Rs2Widget.findWidget(itemName).getItemQuantity() > 0;
     }
 }

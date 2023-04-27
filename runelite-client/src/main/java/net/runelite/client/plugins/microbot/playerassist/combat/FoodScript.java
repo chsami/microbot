@@ -26,7 +26,7 @@ public class FoodScript extends Script {
                 unEquipGuthans();
                 return;
             }
-            openInventory();
+            Inventory.open();
             Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
             if (foods == null || foods.length == 0) {
                 if (!equipFullGuthans()) {
@@ -74,7 +74,7 @@ public class FoodScript extends Script {
         boolean hasGuthanLegs = legs.getName().toLowerCase().contains("guthan's chainskirt");
         boolean hasGuthanHelm = helm.getName().toLowerCase().contains("guthan's helm");
 
-        openInventory();
+        Inventory.open();
 
         if (!hasGuthanSpear) {
             Widget spearWidget = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryItem("guthan's warspear"));

@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.tithefarm.TitheFarmPlant;
 import net.runelite.client.plugins.tithefarm.TitheFarmPlantState;
 import net.runelite.client.plugins.tithefarm.TitheFarmPlugin;
@@ -45,7 +46,7 @@ public class TitheFarmScript extends Script {
                         takeSeeds();
                     }
                 }
-                if (hasItem(seed) && !isInMinigame) {
+                if (Inventory.hasItem(seed) && !isInMinigame) {
                     enter();
                 }
                 if (isInMinigame) {
@@ -158,7 +159,7 @@ public class TitheFarmScript extends Script {
     public void takeSeeds() {
         GameObject seedTable = Rs2GameObject.findObject("Seed table");
         click(seedTable);
-        sleepUntilHasWidget("level 74");
+        Rs2Widget.sleepUntilHasWidget("level 74");
         keyPress('3');
         sleep(3000);
     }

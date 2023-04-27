@@ -10,10 +10,11 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
-import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
 
 public class FletchingScript extends Script {
+
+    public static double version = 1.0;
 
     public void run(FletchingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {

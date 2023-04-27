@@ -18,7 +18,7 @@ public class PrayerPotionScript extends Script {
             if (!super.run()) return;
             if (!config.togglePrayerPotions()) return;
             if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) > 40) return;
-            openInventory();
+            Inventory.open();
             Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> inventory.getPotions());
             if (potions == null || potions.length == 0) {
                     Microbot.getNotifier().notify("No more prayer potions left");

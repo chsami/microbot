@@ -55,6 +55,7 @@ public class Microbot {
     private static NPCManager npcManager;
     public static boolean isGainingExp = false;
     public static boolean pauseAllScripts = false;
+    public static String status = "IDLE";
 
     private static ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
 

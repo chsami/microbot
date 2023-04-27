@@ -4,6 +4,7 @@ import net.runelite.api.ItemComposition;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.menu.Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
@@ -14,12 +15,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 
 public class Inventory {
-
-
 
     private static ScheduledFuture<?> inventoryScheduler;
     private static ScheduledExecutorService scheduledExecutorService;
@@ -28,10 +28,18 @@ public class Inventory {
         return item != null && item.getName().length() > 0 && !item.isHidden() && item.getOpacity() != 255 && !item.isSelfHidden();
     }
 
-    public static boolean clickItem(int index) {
+    public static void open() {
+        Microbot.status = "Open inventory";
+        Microbot.getClientThread().runOnClientThread(() -> Tab.switchToInventoryTab());
+        sleep(300, 1200);
+        sleepUntilOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.INVENTORY);
+    }
+
+    public static boolean clickItem(int slot) {
+        Microbot.status = "Checking inventory slot " + slot;
         Widget inventoryWidget = getInventory();
         return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget item = inventoryWidget.getChild(index);
+            Widget item = inventoryWidget.getChild(slot);
             if (item == null || item.isHidden()) return false;
 
             Microbot.getMouse().click(item.getBounds());
@@ -43,6 +51,7 @@ public class Inventory {
     }
 
     public static boolean isInventoryFull() {
+        Microbot.status = "Checking if inventory is full";
         Widget inventoryWidget = getInventory();
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == 28);
     }
@@ -60,11 +69,13 @@ public class Inventory {
     }
 
     public static boolean hasAmountInventoryItems(int count) {
+        Microbot.status = "Checking if player has " + count + " items in their inventory";
         Widget inventoryWidget = getInventory();
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == count);
     }
 
     public static boolean hasItemStackable(String itemName) {
+        Microbot.status = "Checking inventory has stackable item " + itemName;
         Widget inventoryWidget = getInventory();
 
         return Arrays.stream(inventoryWidget.getDynamicChildren())
@@ -79,6 +90,7 @@ public class Inventory {
     }
 
     public static boolean hasItem(String itemName) {
+        Microbot.status = "Looking for item: " + itemName;
         Widget inventoryWidget = getInventory();
 
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
@@ -88,6 +100,7 @@ public class Inventory {
     }
 
     public static boolean hasItemContains(String itemName) {
+        Microbot.status = "Looking for item: " + itemName;
         Widget inventoryWidget = getInventory();
 
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
@@ -97,16 +110,19 @@ public class Inventory {
     }
 
     public static Widget getInventoryItem(String itemName) {
+        Microbot.status = "Searching inventory item:" + itemName;
         Widget inventoryWidget = getInventory();
         return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getName().toLowerCase().contains(itemName)).findFirst().get();
     }
 
     public static Widget[] getInventoryItems() {
+        Microbot.status = "Fetching inventory items";
         Widget inventoryWidget = getInventory();
         return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
     }
 
     public static Widget[] getInventoryFood() {
+        Microbot.status = "Fetching inventory food";
         Widget inventoryWidget = getInventory();
         Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
         items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("eat"))).toArray(Widget[]::new);
@@ -115,6 +131,7 @@ public class Inventory {
     }
 
     public static Widget[] getPotions() {
+        Microbot.status = "Fetching inventory potions";
         Widget inventoryWidget = getInventory();
         Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
         items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("drink"))).toArray(Widget[]::new);
@@ -122,11 +139,13 @@ public class Inventory {
     }
 
     public static Widget findItemSlot(int index) {
+        Microbot.status = "Searching inventory slot " + index;
         Widget inventoryWidget = getInventory();
         return inventoryWidget.getChild(index);
     }
 
     public static Widget findItem(int itemId) {
+        Microbot.status = "Searching inventory item with id " + itemId;
         Widget inventoryWidget = getInventory();
         for (Widget item : inventoryWidget.getDynamicChildren()) {
             if (item.getItemId() == itemId) {
@@ -137,6 +156,7 @@ public class Inventory {
     }
 
     public static boolean hasItemAmount(int itemId, int amount) {
+        Microbot.status = "Has inventory item: " + itemId + " with amount: " + amount;
         Tab.switchToInventoryTab();
         Widget inventoryWidget = getInventory();
         int count = 0;
@@ -149,6 +169,7 @@ public class Inventory {
     }
 
     public static boolean hasItemAmount(String itemName, int amount) {
+        Microbot.status = "Has inventory item: " + itemName + " with amount: " + amount;
         Tab.switchToInventoryTab();
         Widget inventoryWidget = getInventory();
         int count = 0;
@@ -181,6 +202,7 @@ public class Inventory {
     }
 
     public static Widget findItem(String itemName) {
+        Microbot.status = "Searching inventory for item: " + itemName;
         Widget inventoryWidget = getInventory();
         return Microbot.getClientThread().runOnClientThread(() -> {
             for (Widget item : inventoryWidget.getDynamicChildren()) {
@@ -195,6 +217,7 @@ public class Inventory {
     }
 
     public static Widget findItemContains(String itemName) {
+        Microbot.status = "Searching inventory for item that contains: " + itemName;
         Widget inventoryWidget = getInventory();
         return Microbot.getClientThread().runOnClientThread(() -> {
             for (Widget item : inventoryWidget.getDynamicChildren()) {
@@ -214,12 +237,14 @@ public class Inventory {
     }
 
     public static void useItemOnItemSlot(int slot1, int slot2, int minWait, int maxWait) {
+        Microbot.status = "Use inventory slot " + slot1 + " with slot " + slot2;
         useItemSlot(slot1);
         useItemSlot(slot2);
         sleep(minWait, maxWait);
     }
 
     public static boolean useItemSlot(int slot) {
+        Microbot.status = "Use inventory slot " + slot;
         Widget item = findItemSlot(slot);
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
@@ -227,6 +252,7 @@ public class Inventory {
     }
 
     public static boolean useItemContains(String itemName) {
+        Microbot.status = "Use inventory item containing " + itemName;
         Widget item = findItemContains(itemName);
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
@@ -234,6 +260,7 @@ public class Inventory {
     }
 
     public static boolean useItem(String itemName) {
+        Microbot.status = "Use inventory item " + itemName;
         Widget item = findItem(itemName);
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
@@ -242,6 +269,7 @@ public class Inventory {
     }
 
     public static boolean useItemOnItem(String itemName1, String itemName2) {
+        Microbot.status = "Use inventory item " + itemName1 + " with " + itemName2;
         Widget item1 = findItem(itemName1);
         Widget item2 = findItem(itemName2);
         if (item1 == null || item2 == null) return false;
@@ -253,6 +281,7 @@ public class Inventory {
     }
 
     public static boolean useItemSafe(String itemName) {
+        Microbot.status = "Use inventory item safe " + itemName;
         if (isUsingItem())
             Microbot.getMouse().click();
 
@@ -262,13 +291,15 @@ public class Inventory {
     }
 
     public static boolean useItemAction(String itemName, String actionName) {
+        Microbot.status = "Use inventory item " + itemName + " with action " + actionName;
         Widget item = findItem(itemName);
         return Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
 
-    public static boolean useItemAction(String itemName, String[] actionName) {
+    public static boolean useItemAction(String itemName, String[] actionNames) {
+        Microbot.status = "Use inventory item " + itemName + " with actions " + Arrays.toString(actionNames);
         Widget item = findItem(itemName);
-        return Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
+        return Menu.doAction(actionNames, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
 
     public static boolean dropAll() {
