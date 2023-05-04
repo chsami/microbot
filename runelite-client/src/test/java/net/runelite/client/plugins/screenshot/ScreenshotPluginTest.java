@@ -477,7 +477,7 @@ public class ScreenshotPluginTest
 		screenshotPlugin.onScriptPreFired(notificationStart);
 
 		when(client.getVarcStrValue(VarClientStr.NOTIFICATION_TOP_TEXT)).thenReturn("Combat Task Completed!");
-		when(client.getVarcStrValue(VarClientStr.NOTIFICATION_BOTTOM_TEXT)).thenReturn("Task Completed: <col=ffffff>Handyman</col>");
+		when(client.getVarcStrValue(VarClientStr.NOTIFICATION_BOTTOM_TEXT)).thenReturn("Task Completed: <col=ffffff>Handyman</col> (6 points)");
 
 		ScriptPreFired notificationDelay = new ScriptPreFired(ScriptID.NOTIFICATION_DELAY);
 		screenshotPlugin.onScriptPreFired(notificationDelay);
@@ -493,10 +493,10 @@ public class ScreenshotPluginTest
 		when(client.getVarbitValue(Varbits.COMBAT_ACHIEVEMENTS_POPUP)).thenReturn(1);
 
 		ChatMessage chatMessageEvent = new ChatMessage(null, GAMEMESSAGE, "",
-			"Congratulations, you've completed an easy combat task: <col=06600c>Handyman</col>.", null, 0);
+			"Congratulations, you've completed a grandmaster combat task: <col=06600c>Egniol Diet II</col> (6 points).", null, 0);
 		screenshotPlugin.onChatMessage(chatMessageEvent);
 
-		verify(screenshotPlugin).takeScreenshot("Combat task (Handyman)", "Combat Achievements");
+		verify(screenshotPlugin).takeScreenshot("Combat task (Egniol Diet II)", "Combat Achievements");
 	}
 
 	@Test
