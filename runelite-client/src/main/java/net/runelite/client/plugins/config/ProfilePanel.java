@@ -26,8 +26,8 @@
 package net.runelite.client.plugins.config;
 
 import com.google.common.base.CharMatcher;
-import java.awt.BorderLayout;
-import java.awt.Component;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -44,18 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
-import javax.swing.AbstractAction;
-import javax.swing.GroupLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -73,6 +62,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ProfileChanged;
 import net.runelite.client.events.SessionClose;
 import net.runelite.client.events.SessionOpen;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.screenmarkers.ScreenMarkerPlugin;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.DynamicGridLayout;
@@ -234,7 +225,11 @@ class ProfilePanel extends PluginPanel
 				reload();
 				return;
 			}
-
+			try {
+				new Login();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 			card.setActive(true);
 		});
 	}
@@ -309,6 +304,8 @@ class ProfilePanel extends PluginPanel
 		private final ConfigProfile profile;
 		private final JButton delete;
 		private final JTextField name;
+		private final JTextField password;
+
 		private final JButton activate;
 		private final JPanel expand;
 		private final JToggleButton rename;
@@ -337,6 +334,24 @@ class ProfilePanel extends PluginPanel
 					if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
 					{
 						stopRenaming(false);
+					}
+				}
+			});
+			password = new JPasswordField();
+			password.setText(profile.getPassword());
+			password.setEditable(false);
+			password.setEnabled(false);
+			password.setOpaque(false);
+			password.setBorder(null);
+			password.addActionListener(ev -> stopRenamingPassword(true));
+			password.addKeyListener(new KeyAdapter()
+			{
+				@Override
+				public void keyPressed(KeyEvent e)
+				{
+					if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+					{
+						stopRenamingPassword(true);
 					}
 				}
 			});
@@ -461,6 +476,7 @@ class ProfilePanel extends PluginPanel
 				layout.setVerticalGroup(layout.createParallelGroup()
 					.addGroup(layout.createSequentialGroup()
 						.addComponent(name, 24, 24, 24)
+							.addComponent(password, 24, 24, 24)
 						.addComponent(expand))
 					.addComponent(activate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
@@ -468,6 +484,7 @@ class ProfilePanel extends PluginPanel
 					.addGap(4)
 					.addGroup(layout.createParallelGroup()
 						.addComponent(name, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
+							.addComponent(password, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
 						.addComponent(expand))
 					.addComponent(activate));
 			}
@@ -481,10 +498,10 @@ class ProfilePanel extends PluginPanel
 					{
 						if (ev.getClickCount() == 2)
 						{
-							if (!active)
-							{
+							//if (!active)
+							//{
 								switchToProfile(profile.getId());
-							}
+							//}
 						}
 						else
 						{
@@ -529,6 +546,8 @@ class ProfilePanel extends PluginPanel
 			addMouseMotionListener(expandListener);
 			name.addMouseListener(expandListener);
 			name.addMouseMotionListener(expandListener);
+			password.addMouseListener(expandListener);
+			password.addMouseMotionListener(expandListener);
 			activate.addMouseListener(expandListener);
 			activate.addMouseMotionListener(expandListener);
 
@@ -565,6 +584,7 @@ class ProfilePanel extends PluginPanel
 			name.setOpaque(true);
 			name.requestFocusInWindow();
 			name.selectAll();
+			startRenamingPassword();
 		}
 
 		private void stopRenaming(boolean save)
@@ -582,6 +602,40 @@ class ProfilePanel extends PluginPanel
 			else
 			{
 				name.setText(profile.getName());
+			}
+			stopRenamingPassword(save);
+		}
+
+		private void startRenamingPassword()
+		{
+			password.setEnabled(true);
+			password.setEditable(true);
+			password.setOpaque(true);
+			password.requestFocusInWindow();
+			password.selectAll();
+		}
+
+		private void stopRenamingPassword(boolean save)
+		{
+			password.setEditable(false);
+			password.setEnabled(false);
+			password.setOpaque(false);
+
+			rename.setSelected(false);
+
+			try {
+				configManager.setPassword(profile, net.runelite.client.plugins.microbot.util.security.Encryption.encrypt(password.getText()));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+
+			if (save)
+			{
+				renameProfile(profile.getId(), name.getText().trim());
+			}
+			else
+			{
+				password.setText(profile.getPassword());
 			}
 		}
 	}

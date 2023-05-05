@@ -1,8 +1,8 @@
 package net.runelite.client.plugins.microbot.construction;
 
-import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
 import net.runelite.api.SpriteID;
+import net.runelite.api.TileObject;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -26,11 +26,11 @@ public class ConstructionScript extends Script {
     ConstructionState state = ConstructionState.Idle;
 
 
-    public GameObject getOakLarderSpace() {
+    public TileObject getOakLarderSpace() {
         return Rs2GameObject.findObjectById(15403);
     }
 
-    public GameObject getOakLarder() {
+    public TileObject getOakLarder() {
         return Rs2GameObject.findObjectById(13566);
     }
 
@@ -84,8 +84,8 @@ public class ConstructionScript extends Script {
     }
 
     private void calculateState() {
-        GameObject oakLarderSpace = getOakLarderSpace();
-        GameObject oakLarder = getOakLarder();
+        TileObject oakLarderSpace = getOakLarderSpace();
+        TileObject oakLarder = getOakLarder();
         NPC butler = getButler();
         boolean hasRequiredPlanks = Inventory.hasItemAmount(8778, Random.random(8, 16)); //oak plank
         if (oakLarderSpace == null && oakLarder != null) {
@@ -102,7 +102,7 @@ public class ConstructionScript extends Script {
     }
 
     private void build() {
-        GameObject oakLarderSpace = getOakLarderSpace();
+        TileObject oakLarderSpace = getOakLarderSpace();
         if (oakLarderSpace == null) return;
         if (Rs2Menu.doAction("Build", oakLarderSpace.getCanvasTilePoly())) {
             sleepUntilOnClientThread(() -> hasFurnitureInterfaceOpen(), 5000);
@@ -112,7 +112,7 @@ public class ConstructionScript extends Script {
     }
 
     private void remove() {
-        GameObject oaklarder = getOakLarder();
+        TileObject oaklarder = getOakLarder();
         if (oaklarder == null) return;
         if (Rs2Menu.doAction("Remove", oaklarder.getCanvasTilePoly())) {
             sleepUntilOnClientThread(() -> hasRemoveLarderInterfaceOpen(), 5000);

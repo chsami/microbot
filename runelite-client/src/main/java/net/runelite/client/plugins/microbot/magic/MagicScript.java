@@ -4,27 +4,32 @@ import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.tanner.enums.Location;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MagicScript extends Script {
 
 
     public boolean run(MagicConfig config) {
-        if (!super.run()) return false;
-        try {
-            if (config.boltEnchanting()) {
-                boltEnchanting();
-            } else if (config.highAlchemy()) {
-                highAlch();
+        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (!super.run()) return;
+            try {
+                if (config.boltEnchanting()) {
+                    boltEnchanting();
+                } else if (config.highAlchemy()) {
+                    highAlch();
+                }
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
             }
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+        }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
     }
 

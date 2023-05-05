@@ -5,6 +5,9 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.VarcIntValues;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class Tab {
     public static InterfaceTab getCurrentTab() {
@@ -47,9 +50,10 @@ public class Tab {
 
     public static boolean switchToInventoryTab() {
         if (getCurrentTab() == InterfaceTab.INVENTORY) return true;
-        Widget inventory = Microbot.getClient().getWidget(10551357);
+        Widget inventory = Rs2Widget.getWidget(10551357);
         if (inventory == null) return false;
         Microbot.getMouse().click(inventory.getBounds());
+        sleep(600, 1000);
         return getCurrentTab() == InterfaceTab.INVENTORY;
     }
 
@@ -58,6 +62,7 @@ public class Tab {
         Widget tab = Microbot.getClient().getWidget(10551359);
         if (tab == null) return false;
         Microbot.getMouse().click(tab.getBounds());
+        sleep(600, 1000);
         return getCurrentTab() == InterfaceTab.PRAYER;
     }
 
@@ -66,6 +71,24 @@ public class Tab {
         Widget tab = Microbot.getClient().getWidget(10551342);
         if (tab == null) return false;
         Microbot.getMouse().click(tab.getBounds());
+        sleep(600, 1000);
         return getCurrentTab() == InterfaceTab.SETTINGS;
+    }
+    public static boolean switchToLogout() {
+        if (getCurrentTab() == InterfaceTab.LOGOUT) return true;
+        Widget tab = Microbot.getClient().getWidget(	10551341);
+        if (tab == null) return false;
+        Microbot.getMouse().click(tab.getBounds());
+        sleep(600, 1000);
+        return getCurrentTab() == InterfaceTab.LOGOUT;
+    }
+
+    public static boolean switchToMagicTab() {
+        if (getCurrentTab() == InterfaceTab.MAGIC) return true;
+        Widget inventory = Microbot.getClient().getWidget(10551360);
+        if (inventory == null) return false;
+        Microbot.getMouse().click(inventory.getBounds());
+        sleep(600, 1000);
+        return getCurrentTab() == InterfaceTab.MAGIC;
     }
 }

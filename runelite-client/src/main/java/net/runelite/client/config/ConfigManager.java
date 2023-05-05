@@ -155,11 +155,11 @@ public class ConfigManager
 
 	public void switchProfile(ConfigProfile newProfile)
 	{
-		if (newProfile.getId() == profile.getId())
+		/*if (newProfile.getId() == profile.getId())
 		{
 			log.warn("switching to existing profile!");
 			return;
-		}
+		}*/
 
 		// Ensure existing config is saved
 		sendConfig();
@@ -290,6 +290,25 @@ public class ConfigManager
 				profile.setRev(-1L);
 			}
 
+			lock.dirty();
+		}
+	}
+
+	public void setPassword(ConfigProfile profile, String password) {
+
+		// flush pending config changes first in the event the profile being
+		// synced is the active profile.
+		sendConfig();
+
+		try (ProfileManager.Lock lock = profileManager.lock())
+		{
+			profile = lock.findProfile(profile.getId());
+			if (profile == null || profile.getPassword() == password)
+			{
+				return;
+			}
+
+			profile.setPassword(password);
 			lock.dirty();
 		}
 	}

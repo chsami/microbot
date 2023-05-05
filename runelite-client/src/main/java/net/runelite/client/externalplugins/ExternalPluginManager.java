@@ -183,10 +183,10 @@ public class ExternalPluginManager
 
 			RuneLite.PLUGINS_DIR.mkdirs();
 
-			List<ExternalPluginManifest> manifestList;
+			List<ExternalPluginManifest> manifestList = new ArrayList<>();
 			try
 			{
-				manifestList = externalPluginClient.downloadManifest();
+				//manifestList = externalPluginClient.downloadManifest();
 				Map<String, ExternalPluginManifest> manifests = manifestList
 					.stream().collect(ImmutableMap.toImmutableMap(ExternalPluginManifest::getInternalName, Function.identity()));
 
@@ -263,7 +263,7 @@ public class ExternalPluginManager
 					}
 				}
 			}
-			catch (IOException | VerificationException e)
+			catch (Exception e)
 			{
 				log.error("Unable to download external plugins", e);
 				return;

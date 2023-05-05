@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.mouse;
 
 import net.runelite.api.Point;
+import net.runelite.client.plugins.microbot.Microbot;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -8,8 +9,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class VirtualMouse extends Mouse {
@@ -24,31 +27,14 @@ public class VirtualMouse extends Mouse {
     }
 
     public Mouse click(Point point, boolean rightClick) {
-        if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();
 
-        long time = System.currentTimeMillis();
+        mouseEvent(MouseEvent.MOUSE_MOVED, point, rightClick);
+        sleep(200, 300);
+        mouseEvent(MouseEvent.MOUSE_PRESSED, point, rightClick);
+        mouseEvent(MouseEvent.MOUSE_RELEASED, point, rightClick);
+        mouseEvent(MouseEvent.MOUSE_CLICKED, point, rightClick);
 
-        final Point randomizedPoint = new Point(point.getX(), point.getY());
-
-        move(randomizedPoint);
-
-        net.runelite.client.plugins.microbot.util.Global.sleep(40, 100);
-
-        int clickType = rightClick ? MouseEvent.BUTTON3 : MouseEvent.BUTTON1;
-
-        MouseEvent press = new MouseEvent(getCanvas(), MouseEvent.MOUSE_PRESSED, time, 0, randomizedPoint.getX(), randomizedPoint.getY(),
-                1, false, clickType);
-        MouseEvent release = new MouseEvent(getCanvas(), MouseEvent.MOUSE_RELEASED, time, 0, randomizedPoint.getX(), randomizedPoint.getY(),
-                1, false, clickType);
-        MouseEvent click = new MouseEvent(getCanvas(), MouseEvent.MOUSE_CLICKED, time, 0, randomizedPoint.getX(), randomizedPoint.getY(),
-                1, false, clickType);
-
-        getCanvas().dispatchEvent(press);
-        getCanvas().dispatchEvent(release);
-        getCanvas().dispatchEvent(click);
-
-        mousePositions.add(randomizedPoint);
+        mousePositions.add(point);
         return this;
     }
 
@@ -85,9 +71,6 @@ public class VirtualMouse extends Mouse {
     }
 
     public Mouse move(Point point) {
-        if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();
-
         long time = System.currentTimeMillis();
 
         MouseEvent mouseMove = new MouseEvent(getCanvas(), MouseEvent.MOUSE_MOVED, time, 0, point.getX(), point.getY(), 1, false, MouseEvent.BUTTON1);
@@ -98,9 +81,6 @@ public class VirtualMouse extends Mouse {
     }
 
     public Mouse scrollDown(Point point) {
-        if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();
-
         long time = System.currentTimeMillis();
 
         move(point);
@@ -117,9 +97,6 @@ public class VirtualMouse extends Mouse {
     }
 
     public Mouse scrollUp(Point point) {
-        if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();
-
         long time = System.currentTimeMillis();
 
         MouseEvent mouseScroll = new MouseWheelEvent(getCanvas(), MouseEvent.MOUSE_WHEEL, time, 0, point.getX(), point.getY(), 0, false,
@@ -139,5 +116,19 @@ public class VirtualMouse extends Mouse {
     @Override
     public Mouse move(double x, double y) {
         return move(new Point((int) x, (int) y));
+    }
+
+    private void mouseEvent(int id, Point point, boolean rightClick)
+    {
+        int button = rightClick ? MouseEvent.BUTTON3 : MouseEvent.BUTTON1;
+
+        MouseEvent e = new MouseEvent(
+                getCanvas(), id,
+                System.currentTimeMillis(),
+                0, point.getX(), point.getY(),
+                1, false, button
+        );
+
+        getCanvas().dispatchEvent(e);
     }
 }

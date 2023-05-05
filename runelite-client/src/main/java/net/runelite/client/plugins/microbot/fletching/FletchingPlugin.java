@@ -3,9 +3,11 @@ package net.runelite.client.plugins.microbot.fletching;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.events.WidgetLoaded;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
@@ -18,6 +20,8 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
 import javax.inject.Inject;
 import java.awt.*;
+
+import static net.runelite.api.widgets.WidgetID.LEVEL_UP_GROUP_ID;
 
 @PluginDescriptor(
         name = "Micro Fletcher",
@@ -64,5 +68,10 @@ public class FletchingPlugin extends Plugin {
     protected void shutDown() {
         fletchingScript.shutdown();
         overlayManager.remove(fletchingOverlay);
+    }
+
+    @Subscribe
+    public void onWidgetLoaded(WidgetLoaded event) {
+        fletchingScript.onWidgetLoaded(event);
     }
 }

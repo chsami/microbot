@@ -74,7 +74,7 @@ public interface PlayerAssistConfig extends Config {
             keyName = "Loot items",
             name = "auto loot items",
             description = "Enable/disable loot items",
-            position = 2
+            position = 4
     )
     default boolean toggleLootItems()
     {
@@ -84,7 +84,7 @@ public interface PlayerAssistConfig extends Config {
             keyName = "Items to loot",
             name = "Items to loot",
             description = "Items to loot comma seperated",
-            position = 3
+            position = 5
     )
     default String itemsToLoot()
     {

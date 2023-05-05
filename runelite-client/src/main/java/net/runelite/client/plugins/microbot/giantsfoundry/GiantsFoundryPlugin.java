@@ -3,9 +3,12 @@ package net.runelite.client.plugins.microbot.giantsfoundry;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.events.StatChanged;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -38,6 +41,8 @@ public class GiantsFoundryPlugin extends Plugin {
     @Inject
     private Notifier notifier;
     @Inject
+    private ItemManager itemManager;
+    @Inject
     private OverlayManager overlayManager;
     @Inject
     private GiantsFoundryOverlay giantsFoundryOverlay;
@@ -50,6 +55,7 @@ public class GiantsFoundryPlugin extends Plugin {
         Microbot.setClient(client);
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
+        Microbot.setItemManager(itemManager);
         Microbot.setMouse(new VirtualMouse());
         if (overlayManager != null) {
             overlayManager.add(giantsFoundryOverlay);
@@ -60,5 +66,10 @@ public class GiantsFoundryPlugin extends Plugin {
     protected void shutDown() {
         giantsFoundryScript.shutdown();
         overlayManager.remove(giantsFoundryOverlay);
+    }
+
+    @Subscribe
+    public void onStatChanged(StatChanged statChanged) {
+        Microbot.setIsGainingExp(true);
     }
 }

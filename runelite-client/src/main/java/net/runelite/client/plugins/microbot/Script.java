@@ -1,8 +1,15 @@
 package net.runelite.client.plugins.microbot;
 
 import net.runelite.api.*;
+import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.security.Login;
+import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
 import java.util.concurrent.Executors;
@@ -11,11 +18,15 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
+import static net.runelite.api.widgets.WidgetID.LEVEL_UP_GROUP_ID;
+
 public abstract class Script implements IScript {
 
     protected ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(100);
     protected ScheduledFuture<?> scheduledFuture;
     public ScheduledFuture<?> mainScheduledFuture;
+    public static boolean hasLeveledUp = false;
+
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
     }
@@ -67,21 +78,41 @@ public abstract class Script implements IScript {
         long startTime = System.currentTimeMillis();
         do {
             Microbot.status = "[ConditionalSleep] for " + time / 1000 + " seconds";
-            done = Microbot.getClientThread().runOnClientThread(() -> awaitedCondition.getAsBoolean());
+            done = Microbot.getClientThread().runOnClientThread(() -> awaitedCondition.getAsBoolean() || hasLeveledUp);
         } while (!done && System.currentTimeMillis() - startTime < time);
     }
 
 
     public void shutdown() {
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
+            Microbot.getNotifier().notify("Shutdown script");
             mainScheduledFuture.cancel(true);
         }
     }
     public boolean run() {
+        hasLeveledUp = false;
+
+        if (Rs2Widget.hasWidget("Report Abuse")) {
+            Point p = Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation());
+            Microbot.getMouse().click(p);
+        }
+
+        if (Rs2Widget.hasWidget("Collection Box")) {
+            Point p = Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation());
+            Microbot.getMouse().click(p);
+        }
+
         if (!Microbot.isLoggedIn()) {
+            new Login();
             return false;
         }
-        if (Microbot.pauseAllScripts) return false;
+
+        if (Microbot.pauseAllScripts)
+            return false;
+
+        if (Microbot.getWalker() != null && Microbot.getWalker().getPathfinder() != null && !Microbot.getWalker().getPathfinder().isDone())
+            return false;
+
         return true;
     }
 
@@ -94,7 +125,7 @@ public abstract class Script implements IScript {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(itemSlot.getId()));
     }
 
-    public IScript click(GameObject gameObject) {
+    public IScript click(TileObject gameObject) {
         if (gameObject != null)
             Microbot.getMouse().click(gameObject.getClickbox().getBounds());
         else
@@ -112,5 +143,31 @@ public abstract class Script implements IScript {
 
     public void keyPress(char c) {
         VirtualKeyboard.keyPress(c);
+    }
+
+    public void logout() {
+        Tab.switchToLogout();
+        sleepUntil(() -> Tab.getCurrentTab() == InterfaceTab.LOGOUT);
+        sleep(600, 1000);
+        Rs2Widget.clickWidget("Click here to logout");
+    }
+
+    public static boolean toggleRunEnergy(boolean toggle) {
+        if (Microbot.getVarbitPlayerValue(173) == 0 && !toggle) return true;
+        if (Microbot.getVarbitPlayerValue(173) == 1 && toggle) return true;
+        Widget widget = Rs2Widget.getWidget(WidgetInfo.MINIMAP_TOGGLE_RUN_ORB.getId());
+        if (widget == null) return false;
+        Microbot.getMouse().click(widget.getCanvasLocation());
+        return true;
+    }
+
+    public void onWidgetLoaded(WidgetLoaded event) {
+        int groupId = event.getGroupId();
+
+        switch (groupId) {
+            case LEVEL_UP_GROUP_ID:
+                hasLeveledUp = true;
+                break;
+        }
     }
 }

@@ -4,6 +4,7 @@ import net.runelite.api.ItemComposition;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
@@ -30,7 +31,7 @@ public class Inventory {
 
     public static void open() {
         Microbot.status = "Open inventory";
-        Microbot.getClientThread().runOnClientThread(() -> Tab.switchToInventoryTab());
+       Tab.switchToInventoryTab();
         sleep(300, 1200);
         sleepUntilOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.INVENTORY);
     }
@@ -97,6 +98,15 @@ public class Inventory {
                 .anyMatch(x ->
                         itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())
                 ));
+    }
+
+    public static boolean hasItem(int id) {
+        Microbot.status = "Looking for item: " + id;
+        Widget inventoryWidget = getInventory();
+
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .anyMatch(x ->
+                        itemExistsInInventory(x) && x.getItemId() == id));
     }
 
     public static boolean hasItemContains(String itemName) {
@@ -175,6 +185,22 @@ public class Inventory {
                 ).count() >= amount);
     }
 
+    public static boolean hasItemAmountStackable(String itemName, int amount) {
+        Microbot.status = "Check if inventory has item: " + itemName + " with amount: " + amount;
+        Tab.switchToInventoryTab();
+        Widget inventoryWidget = getInventory();
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .anyMatch(x ->
+                        itemExistsInInventory(x) &&
+                                x.getName()
+                                        .split(">")[1]
+                                        .split("</")[0]
+                                        .toLowerCase()
+                                        .equals(itemName.toLowerCase()) &&
+                                x.getItemQuantity() > amount
+                ));
+    }
+
     private static Widget getInventory() {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget inventoryWidget = Microbot.getClient().getWidget(9764864);
@@ -195,6 +221,7 @@ public class Inventory {
 
     public static Widget findItem(String itemName) {
         Microbot.status = "Searching inventory for item: " + itemName;
+        Tab.switchToInventoryTab();
         Widget inventoryWidget = getInventory();
         return Microbot.getClientThread().runOnClientThread(() -> {
             for (Widget item : inventoryWidget.getDynamicChildren()) {
@@ -236,6 +263,7 @@ public class Inventory {
     }
 
     public static boolean useItemSlot(int slot) {
+        if (Rs2Bank.isBankOpen()) return false;
         Microbot.status = "Use inventory slot " + slot;
         Widget item = findItemSlot(slot);
         if (item == null) return false;
@@ -244,6 +272,7 @@ public class Inventory {
     }
 
     public static boolean useItemContains(String itemName) {
+        if (Rs2Bank.isBankOpen()) return false;
         Microbot.status = "Use inventory item containing " + itemName;
         Widget item = findItemContains(itemName);
         if (item == null) return false;
@@ -252,6 +281,7 @@ public class Inventory {
     }
 
     public static boolean useItem(String itemName) {
+        if (Rs2Bank.isBankOpen()) return false;
         Microbot.status = "Use inventory item " + itemName;
         Widget item = findItem(itemName);
         if (item == null) return false;
@@ -261,6 +291,7 @@ public class Inventory {
     }
 
     public static boolean useItemOnItem(String itemName1, String itemName2) {
+        if (Rs2Bank.isBankOpen()) return false;
         Microbot.status = "Use inventory item " + itemName1 + " with " + itemName2;
         Widget item1 = findItem(itemName1);
         Widget item2 = findItem(itemName2);
@@ -273,7 +304,9 @@ public class Inventory {
     }
 
     public static boolean useItemSafe(String itemName) {
+        if (Rs2Bank.isBankOpen()) return false;
         Microbot.status = "Use inventory item safe " + itemName;
+        Tab.switchToInventoryTab();
         if (isUsingItem())
             Microbot.getMouse().click();
 

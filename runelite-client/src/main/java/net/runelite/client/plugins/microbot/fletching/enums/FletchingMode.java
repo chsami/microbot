@@ -5,19 +5,18 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum FletchingMode
-{
-    UNSTRUNG("Cutting", 0, "knife", 1),
-    STRUNG("Stringing", 1, "bow string", 14);
+public enum FletchingMode {
+    UNSTRUNG("Cutting", "knife", 1),
+    STRUNG("Stringing", "bow string", 14),
+    PROGRESSIVE("Progressive Logs Cutting", "knife", 1);
+
 
     private final String name;
-    private final int mode;
     private final String itemName;
     private final int amount;
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return name;
     }
 }

@@ -16,12 +16,24 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2Bank {
 
+    public static boolean depositXContains(String itemName, int amount) {
+        Microbot.status = "Deposit " + amount + " -> " + itemName;
+        if (!isBankOpen()) return false;
+        if (!Inventory.hasItemContains(itemName)) return true;
+        Widget item = Inventory.findItemContains(itemName);
+        boolean action = Rs2Menu.doAction("Deposit-" + amount, item.getBounds());
+        sleep(600, 1000);
+        return action;
+    }
+
     public static boolean depositAll(String itemName) {
         Microbot.status = "Deposit all " + itemName;
         if (!isBankOpen()) return false;
         if (!Inventory.hasItem(itemName)) return true;
         Widget item = Inventory.findItem(itemName);
-        return Rs2Menu.doAction("Deposit-all", item.getBounds());
+        boolean action = Rs2Menu.doAction("Deposit-all", item.getBounds());
+        sleep(600, 1000);
+        return action;
     }
 
     public static boolean depositAllContains(String itemName) {
@@ -29,7 +41,9 @@ public class Rs2Bank {
         if (!isBankOpen()) return false;
         if (!Inventory.hasItemContains(itemName)) return true;
         Widget item = Inventory.findItemContains(itemName);
-        return Rs2Menu.doAction("Deposit-all", item.getBounds());
+        boolean action = Rs2Menu.doAction("Deposit-all", item.getBounds());
+        sleep(600, 1000);
+        return action;
     }
 
     public static boolean closeBank() {
@@ -62,6 +76,7 @@ public class Rs2Bank {
             boolean action = Rs2Menu.doAction("bank", npc.getCanvasTilePoly());
             if (action) {
                 sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleep(600, 1000);
                 return true;
             }
             return false;
@@ -151,7 +166,7 @@ public class Rs2Bank {
         if (widget.getItemQuantity() <= 0) return false;
         if (scrollTo(widget)) {
             Rs2Menu.doAction("Withdraw-All", widget.getBounds());
-            sleep(100, 1000);
+            sleep(600, 1000);
             return true;
         }
         return false;

@@ -2,12 +2,14 @@ package net.runelite.client.plugins.microbot.fletching.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.runelite.api.Skill;
+import net.runelite.client.plugins.microbot.Microbot;
 
 @Getter
 @RequiredArgsConstructor
 public enum FletchingMaterial
 {
-    LOG("Log"),
+    LOG(""),
     OAK("Oak"),
     WILLOW("Willow"),
     MAPLE("Maple"),
@@ -16,6 +18,7 @@ public enum FletchingMaterial
     REDWOOD("Redwood");
 
     private final String name;
+
 
     @Override
     public String toString()

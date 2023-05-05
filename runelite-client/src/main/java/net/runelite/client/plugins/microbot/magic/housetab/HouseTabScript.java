@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.magic.housetab;
 
+import net.runelite.api.ItemID;
+import net.runelite.api.ObjectID;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -10,13 +12,16 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class HouseTabScript extends Script {
+    public static String version = "1.0";
     private final int RIMMINGTON_PORTAL_OBJECT = 15478;
     private final int HOUSE_PORTAL_OBJECT = 4525;
 
@@ -33,8 +38,15 @@ public class HouseTabScript extends Script {
 
 
     private boolean hasSoftClay() {
-        boolean f = Microbot.getClientThread().runOnClientThread(() -> Inventory.findItem(1761) != null);
-        return f;
+        return Inventory.hasItem(1761);
+    }
+
+    private boolean hasSoftClayNoted() {
+        return Inventory.hasItem(1762);
+    }
+
+    private boolean hasLawRune() {
+        return Inventory.hasItem(ItemID.LAW_RUNE);
     }
 
     public HouseTabScript(HOUSETABS_CONFIG houseTabConfig, String[] playerHouses) {
@@ -160,6 +172,10 @@ public class HouseTabScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
+                if (!hasSoftClayNoted() || !hasLawRune()) {
+                    shutdown();
+                    return;
+                }
                 if (Rs2GameObject.findObject(new int[]{13647, 37349}) != null) {
                     currentInventoryCount = Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Inventory.getInventoryItems()).count());
                     Thread.sleep(3000);
@@ -167,13 +183,53 @@ public class HouseTabScript extends Script {
                         return;
                 }
 
-                if (houseTabConfig == HOUSETABS_CONFIG.HOUSE_ADVERTISEMENT) {
+                toggleRunEnergy(true);
+                if (Microbot.getClient().getEnergy() < 3000) {
+                    Rs2GameObject.interact(ObjectID.FROZEN_ORNATE_POOL_OF_REJUVENATION);
+                    return;
+                }
+
+                if (config.HouseConfig() == HOUSETABS_CONFIG.HOUSE_ADVERTISEMENT) {
                     lookForHouseAdvertisementObject();
                     lookForPlayerHouse();
                     lookForLectern();
                     createHouseTablet();
                     leaveHouse();
                     unnoteClay();
+                } else if (config.HouseConfig() == HOUSETABS_CONFIG.FRIENDS_HOUSE) {
+                    boolean isInHouse = Rs2GameObject.findObject(new int[] {ObjectID.LECTERN_37349}) != null;
+                    if (isInHouse) {
+                        if (hasSoftClay()) {
+                            Rs2GameObject.interact("lectern");
+                            sleepUntil(() -> Rs2Widget.hasWidget("house teleport"), 3000);
+                            if (!Rs2Widget.hasWidget("house teleport")) return;
+                            Rs2Widget.clickWidget("house teleport");
+                            sleepUntil(() -> !hasSoftClay() && !Microbot.isGainingExp, 60000);
+                        } else {
+                            Rs2GameObject.interact(ObjectID.PORTAL_4525, "enter");
+                            sleepUntil(() -> Rs2GameObject.findObjectById(ObjectID.LECTERN_37349) == null);
+                        }
+
+                    } else {
+                        if (!Inventory.isInventoryFull()) {
+                            Inventory.useItemSafe("soft clay");
+                            if (Rs2Npc.interact("phials", "use"))
+                                sleepUntil(() -> Rs2Widget.hasWidget("select an option"));
+                            Rs2Widget.clickWidget("exchange all");
+                        } else {
+                            if (Rs2GameObject.interact(ObjectID.PORTAL_15478, "Friend's house")) {
+                                sleepUntil(() -> Rs2Widget.hasWidget("Enter name"));
+                                if (Rs2Widget.hasWidget("last name")) {
+                                    Rs2Widget.clickWidget(config.housePlayerName());
+                                } else {
+                                    if (Rs2Widget.hasWidget("Enter name")) {
+                                        VirtualKeyboard.typeString(config.housePlayerName());
+                                        VirtualKeyboard.enter();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());

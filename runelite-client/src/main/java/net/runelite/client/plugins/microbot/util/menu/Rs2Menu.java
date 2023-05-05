@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.menu;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.ui.FontManager;
 
@@ -10,6 +11,7 @@ import java.applet.Applet;
 import java.awt.*;
 import java.util.regex.Pattern;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 /**
@@ -22,9 +24,20 @@ public class Rs2Menu {
     protected static final int TOP_OF_MENU_BAR = 18;
     protected static final int MENU_ENTRY_LENGTH = 15;
     protected static final int MENU_SIDE_BORDER = 7;
-    protected static final int MAX_DISPLAYABLE_ENTRIES = 32;
+    protected static final int MAX_DISPLAYABLE_ENTRIES = 40;
 
     protected static int lastIndex = -1;
+
+
+    public static boolean hasAction(Point point, String... actions) {
+        sleep(200, 400);
+        Microbot.getMouse().move(point);
+        for (String action : actions) {
+            if (getIndex(action) != -1)
+                return true;
+        }
+        return false;
+    }
 
     /**
      * Clicks the menu target. Will left-click if the menu item is the first,
@@ -38,6 +51,7 @@ public class Rs2Menu {
         Microbot.getMouse().move(point);
         return doAction(action, point, (String[]) null);
     }
+
     public static boolean doAction(String action, Shape shape) {
         Microbot.getMouse().move(shape.getBounds().getCenterX(), shape.getBounds().getCenterY());
         return doAction(action, new Point((int) shape.getBounds().getCenterX(), (int) shape.getBounds().getCenterY()), (String[]) null);
@@ -48,7 +62,7 @@ public class Rs2Menu {
         return doAction(action, new Point((int) bounds.getCenterX(), (int) bounds.getCenterY()), (String[]) null);
     }
 
-    public static boolean doAction(String action, Polygon poly, String...targets) {
+    public static boolean doAction(String action, Polygon poly, String... targets) {
         Microbot.getMouse().move(poly.getBounds().getCenterX(), poly.getBounds().getCenterY());
         return doAction(action, new Point((int) poly.getBounds().getCenterX(), (int) poly.getBounds().getCenterY()), targets);
     }
@@ -56,7 +70,7 @@ public class Rs2Menu {
     public static boolean doAction(String[] actions, Point point) {
         Microbot.getMouse().move(point);
         boolean result = false;
-        for (String action: actions) {
+        for (String action : actions) {
             result = doAction(action, point, (String[]) null);
             if (result) break;
         }
@@ -73,11 +87,7 @@ public class Rs2Menu {
      * <code>false</code>.
      */
     public static boolean doAction(final String action, Point point, final String... target) {
-        try {
-            Thread.sleep(Random.random(200, 400));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        sleep(200, 300);
         int idx = getIndex(action, target);
 
         if (!isOpen()) {
@@ -87,16 +97,12 @@ public class Rs2Menu {
             if (idx > MAX_DISPLAYABLE_ENTRIES) {
                 return false;
             }
-            if (idx == 0 && Random.random(1, 50) != 7) { // extra randomizer added, so we right click from time to time
+            if (idx == 0) {
                 Microbot.getMouse().click(point);
                 return true;
             }
             Microbot.getMouse().rightClick();
-            try {
-                Thread.sleep(Random.random(400, 1000));
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            sleep(random(250,400));
             return Microbot.getClientThread().runOnClientThread(() -> clickIndex(idx));
         } else if (idx == -1) {
             Microbot.getMouse().move(new Point(Microbot.getMouse().getLastMousePosition().getX() + random(-100, 100), Microbot.getMouse().getLastMousePosition().getY() + random(-100, 100)));
@@ -155,7 +161,8 @@ public class Rs2Menu {
         Point menu = getLocation();
         FontMetrics fm = ((Applet) Microbot.getClient()).getGraphics().getFontMetrics(FontManager.getRunescapeBoldFont());
         int xOff = random(1, (fm.stringWidth(item) + MENU_SIDE_BORDER) - 1);
-        int yOff = TOP_OF_MENU_BAR + (((MENU_ENTRY_LENGTH * i) + random(2, MENU_ENTRY_LENGTH - 10)));
+        int yOff = TOP_OF_MENU_BAR + (((MENU_ENTRY_LENGTH * i) + 7));
+        sleep(random(100, 200));
         if (isOpen()) {
             Microbot.getMouse().click(new Point(menu.getX() + xOff, menu.getY() + yOff));
             return true;
@@ -250,7 +257,7 @@ public class Rs2Menu {
             MenuEntry[] entries = getEntries();
             int offset = CANVAS_LENGTH - (Microbot.getMouse().getLastMousePosition().getY() + calculateHeight());
             if (offset < 0 && entries.length >= MAX_DISPLAYABLE_ENTRIES) {
-                return 0;
+                return Microbot.getMouse().getLastMousePosition().getY() + offset;
             }
             if (offset < 0) {
                 return Microbot.getMouse().getLastMousePosition().getY() + offset;
@@ -313,7 +320,7 @@ public class Rs2Menu {
         MenuEntry[] entries = getEntries();
         action = action.toLowerCase();
         for (int i = 0; i < entries.length; i++) {
-            if (entries[i].getOption().toLowerCase().contains(action.toLowerCase())) {
+            if (entries[i].getOption().toLowerCase().equals(action.toLowerCase())) {
                 lastIndex = i;
                 return i;
             }

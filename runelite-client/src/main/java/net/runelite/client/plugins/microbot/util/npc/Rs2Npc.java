@@ -104,7 +104,7 @@ public class Rs2Npc {
                 return npcs.stream()
                         .filter(x -> x != null && x.getId() == id)
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .findFirst().get();
+                        .findFirst().orElse(null);
         });
     }
 

@@ -77,7 +77,7 @@ public class TitheFarmScript extends Script {
         while (TitheFarmPlugin.getPlants().size() < TOTAL_PLANTS) {
             if (!Inventory.hasItem(seed)) break;
             Inventory.useItem(seed);
-            GameObject gameObject = Rs2GameObject.interactAndGetObject(ObjectID.TITHE_PATCH);
+            TileObject gameObject = Rs2GameObject.interactAndGetObject(ObjectID.TITHE_PATCH);
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(gameObject.getWorldLocation()) < 3);
             sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getAnimation() != -1);
             sleep(Random.random(1000, 1200));

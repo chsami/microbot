@@ -800,6 +800,7 @@
 3082 3513 0	3082 3513 1	Climb-up Ladder 16683
 3082 3513 1	3082 3513 0	Climb-down Ladder 16679
 3096 3468 0	3096 9867 0	Climb-down Trapdoor 1581
+3096 3468 0	3096 3468 0	Open Trapdoor 1579
 3096 9867 0	3096 3468 0	Climb-up Ladder 17385
 3097 9868 0	3096 3468 0	Climb-up Ladder 17385
 3094 9895 0	3093 9895 0	Push Odd looking wall 1736
@@ -818,6 +819,8 @@
 3154 9905 0	3149 9906 0	Squeeze-through Obstacle pipe 16511	51 Agility
 3122 3488 0	3122 3487 0	Open Door 102
 3122 3487 0	3122 3488 0	Open Door 102
+3103 9909 0	3103 9909 0	Open Gate 1569
+3103 9910 0	3103 9910 0	Open Gate 1568
 
 # Varrock
 3149 3363 0	3150 3363 0	Jump-onto Stepping stone 16533	31 Agility				Need to click stone in right direction
@@ -1044,6 +1047,7 @@
 3286 3191 1	3286 3191 2	Climb-up Ladder 16684
 3286 3191 2	3286 3191 1	Climb-down Ladder 16679
 3287 3192 1	3287 3192 2	Climb-up Ladder 16684
+3277 3191 0	3277 3191 0	Open Door 1535
 
 # Citharede Abbey
 3420 3185 0	3420 3185 1	Climb-up Ladder 10493				2

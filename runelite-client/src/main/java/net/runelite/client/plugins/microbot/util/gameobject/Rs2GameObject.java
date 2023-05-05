@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.gameobject;
 import net.runelite.api.*;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
+import net.runelite.client.plugins.microbot.util.walker.Walker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,17 +19,17 @@ public class Rs2GameObject {
     }
 
     public static boolean interact(int id) {
-        GameObject object = findObjectById(id);
+        TileObject object = findObjectById(id);
         return clickObject(object);
     }
 
     public static boolean interact(int id, String action) {
-        GameObject object = findObjectById(id);
+        TileObject object = findObjectById(id);
         return clickObject(object, action);
     }
 
-    public static GameObject interactAndGetObject(int id) {
-        GameObject object = findObjectById(id);
+    public static TileObject interactAndGetObject(int id) {
+        TileObject object = findObjectById(id);
         clickObject(object);
         return object;
     }
@@ -44,6 +45,11 @@ public class Rs2GameObject {
     public static boolean interact(String objectName) {
         GameObject object = findObject(objectName, true);
         return clickObject(object);
+    }
+
+    public static boolean interact(String objectName, String action) {
+        GameObject object = findObject(objectName, true);
+        return Rs2Menu.doAction(action, object.getClickbox().getBounds());
     }
 
     public static boolean interactByOptionName(String action) {
@@ -65,7 +71,7 @@ public class Rs2GameObject {
         return findObject(objectName, true);
     }
 
-    public static GameObject findObjectById(int id) {
+    public static TileObject findObjectById(int id) {
 
         List<GameObject> gameObjects = getGameObjects();
 
@@ -74,6 +80,21 @@ public class Rs2GameObject {
         for (net.runelite.api.GameObject gameObject : gameObjects) {
             if (gameObject.getId() == id)
                 return gameObject;
+        }
+
+        List<GroundObject> groundObjects = getGroundObjects();
+
+        for (GroundObject groundObject : groundObjects) {
+            if (groundObject.getId() == id)
+                return groundObject;
+        }
+
+        List<WallObject> wallObjects = getWallObjects();
+
+
+        for (WallObject wallObject : wallObjects) {
+            if (wallObject.getId() == id && wallObject.getConfig() == 128)
+                return wallObject;
         }
 
         return null;
@@ -178,13 +199,13 @@ public class Rs2GameObject {
         return bank;
     }
 
-    public static GameObject findObject(int[] ids) {
-        net.runelite.api.GameObject gameObject = null;
+    public static TileObject findObject(int[] ids) {
+        TileObject tileObject = null;
         for (int id :
                 ids) {
-            gameObject = findObjectById(id);
+            tileObject = findObjectById(id);
         }
-        return gameObject;
+        return tileObject;
     }
 
     public static ObjectComposition convertGameObjectToObjectComposition(GameObject gameObject) {
@@ -247,16 +268,70 @@ public class Rs2GameObject {
         return gameObjects;
     }
 
-    private static boolean clickObject(GameObject object) {
-        if (object != null) {
+    private static List<GroundObject> getGroundObjects() {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        int z = Microbot.getClient().getPlane();
+        List<GroundObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+
+                tileObjects.add(tile.getGroundObject());
+            }
+        }
+
+
+        List<GroundObject> groundObjects = Arrays.stream(tileObjects.toArray(new GroundObject[tileObjects.size()]))
+                .filter(value -> value != null)
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toList());
+
+        return groundObjects;
+    }
+
+    private static List<WallObject> getWallObjects() {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        int z = Microbot.getClient().getPlane();
+        List<WallObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+
+                tileObjects.add(tile.getWallObject());
+            }
+        }
+
+
+        List<WallObject> wallObjects = Arrays.stream(tileObjects.toArray(new WallObject[tileObjects.size()]))
+                .filter(value -> value != null)
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toList());
+
+        return wallObjects;
+    }
+
+    private static boolean clickObject(TileObject object) {
+        if (object != null && object.getClickbox() != null) {
             Microbot.getMouse().click(object.getClickbox().getBounds());
             return true;
         }
         return false;
     }
 
-    private static boolean clickObject(GameObject object, String optionName) {
-        if (object != null) {
+    private static boolean clickObject(TileObject object, String optionName) {
+        if (object != null && object.getClickbox() != null) {
             if (optionName != null && optionName.length() > 0) {
                 return Rs2Menu.doAction(optionName, object.getClickbox());
             } else {

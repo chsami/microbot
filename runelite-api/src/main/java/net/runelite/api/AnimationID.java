@@ -34,6 +34,8 @@ public final class AnimationID
 {
 	public static final int IDLE = -1;
 	public static final int HERBLORE_PESTLE_AND_MORTAR = 364;
+	public static final int MODERN_SPELLBOOK_TELEPORT = 714;
+
 	public static final int WOODCUTTING_BRONZE = 879;
 	public static final int WOODCUTTING_IRON = 877;
 	public static final int WOODCUTTING_STEEL = 875;
@@ -174,6 +176,8 @@ public final class AnimationID
 	public static final int HERBLORE_POTIONMAKING = 363; //used for both herb and secondary
 	public static final int MAGIC_CHARGING_ORBS = 726;
 	public static final int MAGIC_MAKE_TABLET = 4068;
+	public static final int MAGIC_TELEPORT_TABLET = 4069;
+
 	public static final int MAGIC_ENCHANTING_JEWELRY = 931;
 	public static final int MAGIC_ENCHANTING_AMULET_1 = 719; // sapphire, opal, diamond
 	public static final int MAGIC_ENCHANTING_AMULET_2 = 720; // emerald, jade, dragonstone
