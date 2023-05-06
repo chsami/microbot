@@ -74,7 +74,6 @@ public class AccountSelectorPlugin extends Plugin {
         Microbot.setClient(client);
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
-        Microbot.setWalker(new Walker());
         Microbot.setMouse(new VirtualMouse());
         Microbot.setProfileManager(profileManager);
         Microbot.setWorldService(worldService);

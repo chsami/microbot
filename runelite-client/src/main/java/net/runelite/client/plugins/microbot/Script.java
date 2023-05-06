@@ -92,13 +92,15 @@ public abstract class Script implements IScript {
     public boolean run() {
         hasLeveledUp = false;
 
-        if (Rs2Widget.hasWidget("Report Abuse")) {
-            Point p = Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation());
+        if (Rs2Widget.getWidget(36241409) != null) {
+            Point p = Microbot.getClientThread()
+                    .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
             Microbot.getMouse().click(p);
         }
 
-        if (Rs2Widget.hasWidget("Collection Box")) {
-            Point p = Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation());
+        if (Rs2Widget.getWidget(26345473) != null) {
+            Point p = Microbot.getClientThread()
+                    .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
             Microbot.getMouse().click(p);
         }
 
