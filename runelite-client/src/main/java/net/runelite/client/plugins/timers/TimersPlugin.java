@@ -27,6 +27,23 @@
 package net.runelite.client.plugins.timers;
 
 import com.google.inject.Provides;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.*;
+import net.runelite.api.annotations.Varp;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.*;
+import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.SpriteManager;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
+import net.runelite.client.util.RSTimeUnit;
+import org.apache.commons.lang3.ArrayUtils;
+
+import javax.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.EnumMap;
@@ -35,48 +52,13 @@ import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Actor;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.api.InventoryID;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
-import net.runelite.api.ItemID;
+
 import static net.runelite.api.ItemID.FIRE_CAPE;
 import static net.runelite.api.ItemID.INFERNAL_CAPE;
-import net.runelite.api.NPC;
-import net.runelite.api.NpcID;
-import net.runelite.api.Player;
-import net.runelite.api.Skill;
-import net.runelite.api.VarPlayer;
 import static net.runelite.api.VarPlayer.LAST_HOME_TELEPORT;
 import static net.runelite.api.VarPlayer.LAST_MINIGAME_TELEPORT;
-import net.runelite.api.Varbits;
-import net.runelite.api.annotations.Varp;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ActorDeath;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.GraphicChanged;
-import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.events.NpcDespawned;
-import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.game.SpriteManager;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDescriptor;
 import static net.runelite.client.plugins.timers.GameIndicator.VENGEANCE_ACTIVE;
 import static net.runelite.client.plugins.timers.GameTimer.*;
-import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
-import net.runelite.client.util.RSTimeUnit;
-import org.apache.commons.lang3.ArrayUtils;
 
 @PluginDescriptor(
 	name = "Timers",
@@ -132,6 +114,8 @@ public class TimersPlugin extends Plugin
 	private int nextSuperAntifireTick;
 	private WorldPoint lastPoint;
 	private ElapsedTimer tzhaarTimer;
+
+	public static TimerTimer t;
 
 	@Inject
 	private ItemManager itemManager;
@@ -1153,7 +1137,7 @@ public class TimersPlugin extends Plugin
 	{
 		removeGameTimer(timer);
 
-		TimerTimer t = new TimerTimer(timer, duration, this);
+		t = new TimerTimer(timer, duration, this);
 		switch (timer.getImageType())
 		{
 			case SPRITE:

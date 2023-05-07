@@ -25,6 +25,11 @@ public class Inventory {
     private static ScheduledFuture<?> inventoryScheduler;
     private static ScheduledExecutorService scheduledExecutorService;
 
+    public static void eat(Widget widget) {
+        Microbot.getMouse().click(widget.getBounds());
+        sleep(1200, 2000);
+    }
+
     private static boolean itemExistsInInventory(Widget item) {
         return item != null && item.getName().length() > 0 && !item.isHidden() && item.getOpacity() != 255 && !item.isSelfHidden();
     }
@@ -133,6 +138,7 @@ public class Inventory {
 
     public static Widget[] getInventoryFood() {
         Microbot.status = "Fetching inventory food";
+        Inventory.open();
         Widget inventoryWidget = getInventory();
         Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
         items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("eat"))).toArray(Widget[]::new);
@@ -197,7 +203,7 @@ public class Inventory {
                                         .split("</")[0]
                                         .toLowerCase()
                                         .equals(itemName.toLowerCase()) &&
-                                x.getItemQuantity() > amount
+                                x.getItemQuantity() >= amount
                 ));
     }
 
@@ -287,6 +293,11 @@ public class Inventory {
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
         sleep(600, 1200);
+        return true;
+    }
+
+    public static boolean interact(String itemName) {
+        useItem(itemName);
         return true;
     }
 

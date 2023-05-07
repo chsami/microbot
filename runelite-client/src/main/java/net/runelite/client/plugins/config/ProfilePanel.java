@@ -26,33 +26,6 @@
 package net.runelite.client.plugins.config;
 
 import com.google.common.base.CharMatcher;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import javax.inject.Inject;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
-
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
 import net.runelite.client.account.SessionManager;
@@ -63,7 +36,6 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ProfileChanged;
 import net.runelite.client.events.SessionClose;
 import net.runelite.client.events.SessionOpen;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.screenmarkers.ScreenMarkerPlugin;
 import net.runelite.client.ui.ColorScheme;
@@ -73,6 +45,28 @@ import net.runelite.client.ui.components.DragAndDropReorderPane;
 import net.runelite.client.ui.components.MouseDragEventForwarder;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.SwingUtil;
+
+import javax.inject.Inject;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Slf4j
 class ProfilePanel extends PluginPanel {
@@ -455,18 +449,15 @@ class ProfilePanel extends PluginPanel {
                 public void mouseClicked(MouseEvent ev) {
                     if (disabled(ev)) {
                         if (ev.getClickCount() == 2) {
-                            //if (!active)
-                            //{
-                            for (ProfileCard card : cards.values()) {
-                                if (card.active) {
-                                    if (card.profile.getName().equals(profile.getName())) {
-                                        switchToProfile(card.profile.getId());
-                                        break;
-                                    }
+                            if (!active) {
+                                switchToProfile(profile.getId());
+                            } else {
+                                try {
+                                    new Login();
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
                                 }
-
                             }
-                            //}
                         } else {
                             setExpanded(!expanded);
                         }
