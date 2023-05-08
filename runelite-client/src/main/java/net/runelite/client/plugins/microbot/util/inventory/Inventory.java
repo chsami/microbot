@@ -6,6 +6,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
@@ -339,20 +340,23 @@ public class Inventory {
     }
 
     public static boolean dropAll() {
+        Microbot.pauseAllScripts = true;
         if (inventoryScheduler == null || inventoryScheduler.isDone()) {
             inventoryScheduler = null;
             scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
             inventoryScheduler = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+                VirtualKeyboard.holdShift();
                 Microbot.getClientThread().invokeLater(() -> {
                     if (isEmpty()) {
                         inventoryScheduler.cancel(true);
+                        Microbot.pauseAllScripts = false;
                         return;
                     }
                     Widget widget = Arrays.stream(getInventoryItems()).filter(x -> (itemExistsInInventory(x))).findFirst().get();
                     if (widget == null) return;
                     Microbot.getMouse().click(widget.getBounds());
                 });
-            }, 0, random(10, 300), TimeUnit.MILLISECONDS);
+            }, 0, random(150, 300), TimeUnit.MILLISECONDS);
         }
         return isEmpty();
     }

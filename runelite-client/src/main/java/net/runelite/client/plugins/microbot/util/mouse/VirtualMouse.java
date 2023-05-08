@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class VirtualMouse extends Mouse {
@@ -26,6 +27,7 @@ public class VirtualMouse extends Mouse {
     public Mouse click(Point point, boolean rightClick) {
 
         mouseEvent(MouseEvent.MOUSE_MOVED, point, rightClick);
+        sleep(200, 300);
         mouseEvent(MouseEvent.MOUSE_PRESSED, point, rightClick);
         mouseEvent(MouseEvent.MOUSE_RELEASED, point, rightClick);
         mouseEvent(MouseEvent.MOUSE_CLICKED, point, rightClick);
