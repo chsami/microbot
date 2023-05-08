@@ -11,7 +11,6 @@ import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
-import java.awt.event.KeyEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -91,6 +90,7 @@ public abstract class Script implements IScript {
     }
     public boolean run() {
         hasLeveledUp = false;
+        toggleRunEnergy(true);
 
         if (Rs2Widget.getWidget(36241409) != null) {
             Point p = Microbot.getClientThread()

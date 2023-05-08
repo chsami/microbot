@@ -24,13 +24,14 @@
  */
 package net.runelite.client.plugins.timers;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.ui.overlay.infobox.InfoBoxPriority;
 import net.runelite.client.ui.overlay.infobox.Timer;
 
-class TimerTimer extends Timer
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
+public class TimerTimer extends Timer
 {
 	private final GameTimer timer;
 	int ticks;

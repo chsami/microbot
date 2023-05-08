@@ -6,6 +6,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
@@ -24,6 +25,11 @@ public class Inventory {
 
     private static ScheduledFuture<?> inventoryScheduler;
     private static ScheduledExecutorService scheduledExecutorService;
+
+    public static void eat(Widget widget) {
+        Microbot.getMouse().click(widget.getBounds());
+        sleep(1200, 2000);
+    }
 
     private static boolean itemExistsInInventory(Widget item) {
         return item != null && item.getName().length() > 0 && !item.isHidden() && item.getOpacity() != 255 && !item.isSelfHidden();
@@ -133,6 +139,7 @@ public class Inventory {
 
     public static Widget[] getInventoryFood() {
         Microbot.status = "Fetching inventory food";
+        Inventory.open();
         Widget inventoryWidget = getInventory();
         Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
         items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("eat"))).toArray(Widget[]::new);
@@ -197,7 +204,7 @@ public class Inventory {
                                         .split("</")[0]
                                         .toLowerCase()
                                         .equals(itemName.toLowerCase()) &&
-                                x.getItemQuantity() > amount
+                                x.getItemQuantity() >= amount
                 ));
     }
 
@@ -290,6 +297,11 @@ public class Inventory {
         return true;
     }
 
+    public static boolean interact(String itemName) {
+        useItem(itemName);
+        return true;
+    }
+
     public static boolean useItemOnItem(String itemName1, String itemName2) {
         if (Rs2Bank.isBankOpen()) return false;
         Microbot.status = "Use inventory item " + itemName1 + " with " + itemName2;
@@ -328,20 +340,23 @@ public class Inventory {
     }
 
     public static boolean dropAll() {
+        Microbot.pauseAllScripts = true;
         if (inventoryScheduler == null || inventoryScheduler.isDone()) {
             inventoryScheduler = null;
             scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
             inventoryScheduler = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+                VirtualKeyboard.holdShift();
                 Microbot.getClientThread().invokeLater(() -> {
                     if (isEmpty()) {
                         inventoryScheduler.cancel(true);
+                        Microbot.pauseAllScripts = false;
                         return;
                     }
                     Widget widget = Arrays.stream(getInventoryItems()).filter(x -> (itemExistsInInventory(x))).findFirst().get();
                     if (widget == null) return;
                     Microbot.getMouse().click(widget.getBounds());
                 });
-            }, 0, random(10, 300), TimeUnit.MILLISECONDS);
+            }, 0, random(150, 300), TimeUnit.MILLISECONDS);
         }
         return isEmpty();
     }

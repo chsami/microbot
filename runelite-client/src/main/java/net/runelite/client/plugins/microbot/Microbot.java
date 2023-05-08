@@ -4,38 +4,21 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ProfileManager;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
-import net.runelite.client.plugins.microbot.construction.ConstructionScript;
-import net.runelite.client.plugins.microbot.farming.tithefarm.TitheFarmScript;
-import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryScript;
-import net.runelite.client.plugins.microbot.magic.housetab.HouseTabScript;
-import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
-import net.runelite.client.plugins.microbot.playerassist.combat.AttackNpcScript;
-import net.runelite.client.plugins.microbot.playerassist.combat.CombatPotionScript;
-import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
-import net.runelite.client.plugins.microbot.playerassist.combat.PrayerPotionScript;
-import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import static net.runelite.api.widgets.WidgetID.*;
 
 public class Microbot {
 
@@ -82,6 +65,10 @@ public class Microbot {
 
     public static boolean isWalking() {
         return getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808;
+    }
+
+    public static boolean isAnimating() {
+        return getClient().getLocalPlayer().getAnimation() != -1;
     }
 
 

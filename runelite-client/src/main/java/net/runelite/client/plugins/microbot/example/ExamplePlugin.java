@@ -37,6 +37,7 @@ public class ExamplePlugin extends Plugin {
     ExampleConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(ExampleConfig.class);
     }
+
     @Inject
     private OverlayManager overlayManager;
     @Inject

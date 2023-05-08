@@ -26,7 +26,6 @@ public class FoodScript extends Script {
                 unEquipGuthans();
                 return;
             }
-            Inventory.open();
             Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
             if (foods == null || foods.length == 0) {
                 if (!equipFullGuthans()) {

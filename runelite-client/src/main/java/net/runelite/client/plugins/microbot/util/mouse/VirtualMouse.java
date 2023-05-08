@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.util.mouse;
 
 import net.runelite.api.Point;
-import net.runelite.client.plugins.microbot.Microbot;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -9,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
