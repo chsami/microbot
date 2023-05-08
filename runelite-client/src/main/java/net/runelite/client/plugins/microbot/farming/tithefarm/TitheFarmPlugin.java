@@ -19,7 +19,8 @@ import java.awt.*;
 @PluginDescriptor(
         name = "Micro TitheFarm",
         description = "Microbot TitheFarm plugin",
-        tags = {"farming", "microbot", "skills", "minigame"}
+        tags = {"farming", "microbot", "skills", "minigame"},
+        enabledByDefault = false
 )
 @Slf4j
 public class TitheFarmPlugin extends Plugin {

@@ -26,6 +26,7 @@ public class Login {
         try (ProfileManager.Lock lock = Microbot.getProfileManager().lock()) {
             return lock.getProfiles().stream().filter(x -> x.isActive()).findFirst().get();
         }
+
     }
 
     public Login() {

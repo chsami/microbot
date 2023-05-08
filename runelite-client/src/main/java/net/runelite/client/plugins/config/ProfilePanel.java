@@ -611,8 +611,6 @@ class ProfilePanel extends PluginPanel
 			password.setEnabled(true);
 			password.setEditable(true);
 			password.setOpaque(true);
-			password.requestFocusInWindow();
-			password.selectAll();
 		}
 
 		private void stopRenamingPassword(boolean save)

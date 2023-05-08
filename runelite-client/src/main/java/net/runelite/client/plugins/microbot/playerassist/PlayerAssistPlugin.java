@@ -24,7 +24,8 @@ import java.awt.*;
 @PluginDescriptor(
         name = "Micro PlayerAssistant",
         description = "Microbot playerassistant plugin",
-        tags = {"assist", "microbot", "misc", "combat"}
+        tags = {"assist", "microbot", "misc", "combat"},
+        enabledByDefault = false
 )
 public class PlayerAssistPlugin extends Plugin {
     @Inject

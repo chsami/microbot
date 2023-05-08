@@ -21,7 +21,8 @@ import java.awt.*;
 @PluginDescriptor(
         name = "Micro GiantsFoundry",
         description = "Microbot giants foundry plugin",
-        tags = {"minigame", "microbot", "smithing"}
+        tags = {"minigame", "microbot", "smithing"},
+        enabledByDefault = false
 )
 @Slf4j
 public class GiantsFoundryPlugin extends Plugin {

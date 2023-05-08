@@ -21,7 +21,8 @@ import java.awt.*;
 @PluginDescriptor(
         name = "Micro Magic",
         description = "Microbot Magic plugin",
-        tags = {"magic", "microbot", "skills", "Mage"}
+        tags = {"magic", "microbot", "skills", "Mage"},
+        enabledByDefault = false
 )
 @Slf4j
 public class MagicPlugin extends Plugin {

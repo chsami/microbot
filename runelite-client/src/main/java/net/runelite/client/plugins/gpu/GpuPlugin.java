@@ -83,7 +83,7 @@ import org.lwjgl.system.Configuration;
 @PluginDescriptor(
 	name = "GPU",
 	description = "Utilizes the GPU",
-	enabledByDefault = false,
+	enabledByDefault = true,
 	tags = {"fog", "draw distance"},
 	loadInSafeMode = false
 )

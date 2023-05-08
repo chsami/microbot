@@ -19,7 +19,8 @@ import java.awt.*;
 @PluginDescriptor(
         name = "Micro Example",
         description = "Microbot example plugin",
-        tags = {"example", "microbot"}
+        tags = {"example", "microbot"},
+        enabledByDefault = false
 )
 @Slf4j
 public class ExamplePlugin extends Plugin {

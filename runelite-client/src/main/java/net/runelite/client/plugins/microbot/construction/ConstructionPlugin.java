@@ -18,7 +18,8 @@ import java.awt.*;
 @PluginDescriptor(
         name = "Micro Construction",
         description = "Microbot construction plugin",
-        tags = {"skilling", "microbot", "construction"}
+        tags = {"skilling", "microbot", "construction"},
+        enabledByDefault = false
 )
 @Slf4j
 public class ConstructionPlugin extends Plugin {

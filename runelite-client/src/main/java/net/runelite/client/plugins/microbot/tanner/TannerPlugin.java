@@ -19,7 +19,8 @@ import java.awt.*;
 @PluginDescriptor(
         name = "Micro Tanner",
         description = "Microbot tanner plugin",
-        tags = {"tanner", "microbot", "moneymaking"}
+        tags = {"tanner", "microbot", "moneymaking"},
+        enabledByDefault = false
 )
 @Slf4j
 public class TannerPlugin extends Plugin {

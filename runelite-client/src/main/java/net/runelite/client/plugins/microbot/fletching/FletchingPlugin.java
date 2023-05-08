@@ -26,7 +26,8 @@ import static net.runelite.api.widgets.WidgetID.LEVEL_UP_GROUP_ID;
 @PluginDescriptor(
         name = "Micro Fletcher",
         description = "Microbot fletching plugin",
-        tags = {"fletching", "microbot", "skills"}
+        tags = {"fletching", "microbot", "skills"},
+        enabledByDefault = false
 )
 @Slf4j
 public class FletchingPlugin extends Plugin {

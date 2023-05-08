@@ -87,7 +87,7 @@ import net.runelite.client.util.Text;
 	name = "Menu Entry Swapper",
 	description = "Change the default option that is displayed when hovering over objects",
 	tags = {"npcs", "inventory", "items", "objects"},
-	enabledByDefault = false
+	enabledByDefault = true
 )
 @Slf4j
 public class MenuEntrySwapperPlugin extends Plugin
