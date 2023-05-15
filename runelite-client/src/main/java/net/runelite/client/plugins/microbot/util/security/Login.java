@@ -48,6 +48,44 @@ public class Login {
         }
     }
 
+    public Login(String username, String password) {
+        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        sleep(300, 600);
+        try {
+            setWorld(360);
+        }catch(Exception e) {
+            System.out.println("Changing world failed");
+        } finally {
+            Microbot.getClient().setUsername(username);
+            try {
+                Microbot.getClient().setPassword(Encryption.decrypt(password));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            sleep(300, 600);
+            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        }
+    }
+
+    public Login(int world) {
+        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        sleep(300, 600);
+        try {
+            setWorld(world);
+        }catch(Exception e) {
+            System.out.println("Changing world failed");
+        } finally {
+            Microbot.getClient().setUsername(getProfile().getName());
+            try {
+                Microbot.getClient().setPassword(Encryption.decrypt(getProfile().getPassword()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            sleep(300, 600);
+            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        }
+    }
+
     //TODO: this should be elsewhere
     private static final int INTERFACE_MAIN = 905;
     private static final int INTERFACE_MAIN_CHILD = 59;

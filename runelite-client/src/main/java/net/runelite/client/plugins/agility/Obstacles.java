@@ -34,9 +34,9 @@ import static net.runelite.api.NullObjectID.*;
 import static net.runelite.api.ObjectID.*;
 import net.runelite.client.game.AgilityShortcut;
 
-class Obstacles
+public class Obstacles
 {
-	static final Set<Integer> OBSTACLE_IDS = ImmutableSet.of(
+	public static final Set<Integer> OBSTACLE_IDS = ImmutableSet.of(
 		// Gnome
 		OBSTACLE_NET_23134, TREE_BRANCH_23559, TREE_BRANCH_23560, OBSTACLE_NET_23135, OBSTACLE_PIPE_23138,
 		OBSTACLE_PIPE_23139, LOG_BALANCE_23145, BALANCING_ROPE_23557,
@@ -109,19 +109,19 @@ class Obstacles
 		NULL_44595
 	);
 
-	static final Set<Integer> PORTAL_OBSTACLE_IDS = ImmutableSet.of(
+	public static final Set<Integer> PORTAL_OBSTACLE_IDS = ImmutableSet.of(
 		// Prifddinas portals
 		NULL_36241, NULL_36242, NULL_36243, NULL_36244, NULL_36245, NULL_36246
 	);
 
-	static final Multimap<Integer, AgilityShortcut> SHORTCUT_OBSTACLE_IDS;
+	public static final Multimap<Integer, AgilityShortcut> SHORTCUT_OBSTACLE_IDS;
 
-	static final Set<Integer> TRAP_OBSTACLE_IDS = ImmutableSet.of(
+	public static final Set<Integer> TRAP_OBSTACLE_IDS = ImmutableSet.of(
 		// Agility pyramid
 		NULL_3550, NULL_10872, NULL_10873
 	);
 
-	static final List<Integer> TRAP_OBSTACLE_REGIONS = ImmutableList.of(12105, 13356);
+	public static final List<Integer> TRAP_OBSTACLE_REGIONS = ImmutableList.of(12105, 13356);
 
 	static
 	{
@@ -136,7 +136,7 @@ class Obstacles
 		SHORTCUT_OBSTACLE_IDS = builder.build();
 	}
 
-	static final Set<Integer> SEPULCHRE_OBSTACLE_IDS = ImmutableSet.of(
+	public static final Set<Integer> SEPULCHRE_OBSTACLE_IDS = ImmutableSet.of(
 		// Stairs and Platforms (and one Gate)
 		GATE_38460, PLATFORM_38455, PLATFORM_38456, PLATFORM_38457, PLATFORM_38458, PLATFORM_38459,
 		PLATFORM_38470, PLATFORM_38477, STAIRS_38462, STAIRS_38463, STAIRS_38464, STAIRS_38465,
@@ -144,7 +144,7 @@ class Obstacles
 		STAIRS_38473, STAIRS_38474, STAIRS_38475, STAIRS_38476
 	);
 
-	static final Set<Integer> SEPULCHRE_SKILL_OBSTACLE_IDS = ImmutableSet.of(
+	public static final Set<Integer> SEPULCHRE_SKILL_OBSTACLE_IDS = ImmutableSet.of(
 		// Grapple, Portal, and Bridge skill obstacles
 		// They are multilocs, thus we use the NullObjectID
 		NULL_39524, NULL_39525, NULL_39526, NULL_39527, NULL_39528, NULL_39533

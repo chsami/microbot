@@ -15,9 +15,13 @@ public class WoodcuttingScript  extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                if (Microbot.isAnimating() || Microbot.pauseAllScripts) return;
+                if (Microbot.isWalking() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
                 if (Inventory.isInventoryFull()) {
-                    Inventory.dropAll();
+                    if (config.hasAxeInventory()) {
+                        Inventory.dropAllStartingFrom(1);
+                    } else {
+                        Inventory.dropAll();
+                    }
                     return;
                 }
                 Rs2GameObject.interact(config.TREE().getName());

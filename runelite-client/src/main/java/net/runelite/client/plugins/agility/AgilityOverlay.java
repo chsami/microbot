@@ -39,6 +39,7 @@ import net.runelite.api.Point;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.game.AgilityShortcut;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -132,6 +133,8 @@ class AgilityOverlay extends Overlay
 					graphics.draw(objectClickbox);
 					graphics.setColor(ColorUtil.colorWithAlpha(configColor, configColor.getAlpha() / 5));
 					graphics.fill(objectClickbox);
+					graphics.setColor(Color.RED);
+					graphics.drawString(Integer.toString(object.getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())), (int) object.getCanvasTilePoly().getBounds().getCenterX(), (int) object.getCanvasTilePoly().getBounds().getCenterY());
 				}
 			}
 		});

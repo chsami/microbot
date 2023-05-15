@@ -1,9 +1,13 @@
 package net.runelite.client.plugins.microbot.thieving;
 
+import net.runelite.api.EquipmentInventorySlot;
+import net.runelite.api.ItemComposition;
+import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.timers.TimersPlugin;
@@ -23,15 +27,33 @@ public class ThievingScript extends Script {
             try {
                 Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
                 if (foods.length == 0) {
-                    shutdown();
+
+                    if (Inventory.count() > 2) {
+                        Inventory.dropAllStartingFrom(2);
+                        return;
+                    }
+                    if (Rs2Bank.walkToBank()) {
+                        Rs2Bank.useBank();
+                        Rs2Bank.withdrawItemX(true, "monkfish", 5);
+                        final ItemComposition amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
+                        if (amulet == null) {
+                            Rs2Bank.withdrawItem(true, "dodgy necklace");
+                        }
+                        Rs2Bank.closeBank();
+                        sleep(1000, 2000);
+                        Inventory.useItem(ItemID.DODGY_NECKLACE);
+                    }
                     return;
+                }
+                if (Inventory.isInventoryFull()) {
+                    Inventory.dropAllStartingFrom(8);
                 }
                 if (Inventory.hasItemAmountStackable("coin pouch", 28)) {
                     Inventory.interact("coin pouch");
                 }
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > config.hitpoints()) {
                     if (random(1, 10) == 2)
-                        sleepUntil(() -> !TimersPlugin.t.render());
+                        sleepUntil(() -> TimersPlugin.t == null || !TimersPlugin.t.render());
                     if (Rs2Npc.interact(config.THIEVING_NPC().getName(), "pickpocket")) {
                         sleep(300, 600);
                     }

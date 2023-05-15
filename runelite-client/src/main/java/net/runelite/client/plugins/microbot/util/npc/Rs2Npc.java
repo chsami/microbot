@@ -3,18 +3,21 @@ package net.runelite.client.plugins.microbot.util.npc;
 import net.runelite.api.Actor;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
-import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+
 
 public class Rs2Npc {
+
+    public static NPC npcInteraction = null;
+    public static String npcAction = null;
+
 
     public static int getHealth(Actor npc) {
         int lastRatio = 0;
@@ -73,6 +76,33 @@ public class Rs2Npc {
         return npcs.toArray(new NPC[npcs.size()]);
     }
 
+    public static NPC[] getAttackableNpcs() {
+        List<NPC> npcs = Microbot.getClient().getNpcs().stream()
+                .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead())
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toList());
+
+        return npcs.toArray(new NPC[npcs.size()]);
+    }
+
+    public static NPC[] getAttackableNpcs(String name) {
+        List<NPC> npcs = Microbot.getClient().getNpcs().stream()
+                .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead() && npc.getName().toLowerCase().equals(name))
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toList());
+
+        return npcs.toArray(new NPC[npcs.size()]);
+    }
+
+    public static NPC[] getPestControlPortals() {
+        List<NPC> npcs = Microbot.getClient().getNpcs().stream()
+                .filter((npc) -> !npc.isDead() && npc.getHealthRatio() > 0 && npc.getName().toLowerCase().equals("portal"))
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toList());
+
+        return npcs.toArray(new NPC[npcs.size()]);
+    }
+
     public static NPC getNpc(String name) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             List<NPC> npcs = Arrays.stream(getNpcs()).collect(Collectors.toList());
@@ -109,32 +139,41 @@ public class Rs2Npc {
     }
 
 
-    private static boolean interact(NPC npc, String action) {
+    public static boolean interact(NPC npc, String action) {
         if (npc == null) return false;
 
-        Polygon screenLoc = npc.getCanvasTilePoly();
+        try {
+            npcInteraction = npc;
+            npcAction = action;
+            sleep(100);
+            Microbot.getMouse().click(npc.getCanvasTilePoly().getBounds());
+            sleep(200);
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            npcInteraction = null;
+            npcAction = null;
+        }
 
-        if (screenLoc == null || screenLoc.getBounds().getCenterY() == 0 && screenLoc.getBounds().getCenterY() == 0)
-            return false;
-
-        Point point = new Point((int) screenLoc.getBounds().getCenterX(), (int) screenLoc.getBounds().getCenterY());
-        Microbot.getMouse().move(point);
-
-        return Rs2Menu.doAction(action, point, npc.getName());
-    }
-
-    public static boolean interact(int npcId) {
-        return interact(npcId, "");
-    }
-
-    public static boolean interact(String npcName) {
-        return interact(npcName, "");
+        return true;
     }
 
     public static boolean interact(int npcId, String action) {
-        NPC npc = Microbot.getClient().getNpcs().stream().filter(x -> x.getId() == npcId).findFirst().get();
+        NPC npc = Microbot.getClient().getNpcs().stream().filter(x -> x.getId() == npcId).findFirst().orElse(null);
 
         return interact(npc, action);
+    }
+
+    public static boolean attack(int npcId) {
+        NPC npc = getNpc(npcId);
+
+        return interact(npc, "attack");
+    }
+
+    public static boolean attack(String npcName) {
+        NPC npc = getNpc(npcName);
+
+        return interact(npc, "attack");
     }
 
     public static boolean interact(String npcName, String action) {

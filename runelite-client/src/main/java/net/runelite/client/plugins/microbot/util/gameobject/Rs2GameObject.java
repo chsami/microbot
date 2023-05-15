@@ -11,11 +11,20 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+
 
 public class Rs2GameObject {
 
+    public static TileObject objectToInteract = null;
+    public static String objectAction = null;
+
     public static boolean interact(GameObject gameObject) {
         return clickObject(gameObject);
+    }
+
+    public static boolean interact(Tile tile) {
+        return clickObject(tile);
     }
 
     public static boolean interact(int id) {
@@ -97,7 +106,42 @@ public class Rs2GameObject {
                 return wallObject;
         }
 
+        List<DecorativeObject> decorationObjects = getDecorationObjects();
+
+
+        for (DecorativeObject decorativeObject : decorationObjects) {
+            if (decorativeObject.getId() == id)
+                return decorativeObject;
+        }
+
         return null;
+    }
+
+    private static List<DecorativeObject> getDecorationObjects() {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        int z = Microbot.getClient().getPlane();
+        List<DecorativeObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+
+                tileObjects.add(tile.getDecorativeObject());
+            }
+        }
+
+
+        List<DecorativeObject> decorativeObjects = Arrays.stream(tileObjects.toArray(new DecorativeObject[tileObjects.size()]))
+                .filter(value -> value != null)
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toList());
+
+        return decorativeObjects;
     }
 
     public static GameObject findObjectById(int id, int x) {
@@ -330,15 +374,23 @@ public class Rs2GameObject {
         return false;
     }
 
-    private static boolean clickObject(TileObject object, String optionName) {
-        if (object != null && object.getClickbox() != null) {
-            if (optionName != null && optionName.length() > 0) {
-                return Rs2Menu.doAction(optionName, object.getClickbox());
-            } else {
-                Microbot.getMouse().click(object.getClickbox().getBounds());
-                return true;
-            }
+    private static boolean clickObject(Tile tile) {
+        if (tile != null) {
+            Point p = Perspective.localToCanvas(Microbot.getClient(), tile.getLocalLocation(), Microbot.getClient().getPlane());
+            Microbot.getMouse().click(p);
+            return true;
         }
         return false;
+    }
+
+    private static boolean clickObject(TileObject object, String optionName) {
+        if (object == null) return false;
+        objectToInteract = object;
+        objectAction = optionName;
+        Microbot.getMouse().click(object.getClickbox().getBounds());
+        sleep(200, 300);
+        objectToInteract = null;
+        objectAction = "";
+        return true;
     }
 }

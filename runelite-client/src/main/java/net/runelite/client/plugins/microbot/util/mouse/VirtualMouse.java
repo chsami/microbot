@@ -1,6 +1,9 @@
 package net.runelite.client.plugins.microbot.util.mouse;
 
 import net.runelite.api.Point;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -70,6 +73,17 @@ public class VirtualMouse extends Mouse {
 
     public Mouse move(Point point) {
         long time = System.currentTimeMillis();
+
+        MouseEvent mouseMove = new MouseEvent(getCanvas(), MouseEvent.MOUSE_MOVED, time, 0, point.getX(), point.getY(), 1, false, MouseEvent.BUTTON1);
+        getCanvas().dispatchEvent(mouseMove);
+
+        mousePositions.add(point);
+        return this;
+    }
+
+    public Mouse move(Polygon polygon) {
+        long time = System.currentTimeMillis();
+        Point point = new Point((int) polygon.getBounds().getCenterX(), (int) polygon.getBounds().getCenterY());
 
         MouseEvent mouseMove = new MouseEvent(getCanvas(), MouseEvent.MOUSE_MOVED, time, 0, point.getX(), point.getY(), 1, false, MouseEvent.BUTTON1);
         getCanvas().dispatchEvent(mouseMove);

@@ -110,7 +110,7 @@ public class GiantsFoundryScript extends Script {
             sleep(600, 1200);
             MouldHelper.selectBest();
         }
-        Widget setMould = Rs2Widget.findWidget("set mould", null, true);
+        Widget setMould = Rs2Widget.getWidget(47054854);
         if (setMould != null) {
             Microbot.getMouse().click(setMould.getBounds());
         }
@@ -181,6 +181,12 @@ public class GiantsFoundryScript extends Script {
     public static boolean isHeatingUp = false;
 
     public void handleTemperature() {
+        int actionsLeft = GiantsFoundryState.getActionsForHeatLevel();
+        if (actionsLeft > 8) {
+            GiantsFoundryScript.isHeatingUp = false;
+            GiantsFoundryScript.isCoolingDown = false;
+            return;
+        }
         int heat = GiantsFoundryState.getHeatAmount();
         if (GiantsFoundryScript.isHeatingUp || GiantsFoundryScript.isCoolingDown) {
             if (heat == 1000 || heat == 0) {
@@ -192,11 +198,11 @@ public class GiantsFoundryScript extends Script {
         if (change == 0 && !isCoolingDown) {
             Rs2GameObject.interact(WATERFALL, "Cool-preform");
             isCoolingDown = true;
-            sleepUntil(() -> GiantsFoundryState.getHeatChangeNeeded() == -1, 5000);
+            sleepUntil(() -> GiantsFoundryState.getHeatChangeNeeded() == -1 ||  GiantsFoundryState.getActionsForHeatLevel() > 8);
         } else if (change == 1 && !isHeatingUp) {
             Rs2GameObject.interact(LAVA_POOL, "Heat-preform");
             isHeatingUp = true;
-            sleepUntil(() -> GiantsFoundryState.getHeatChangeNeeded() == -1, 5000);
+            sleepUntil(() -> GiantsFoundryState.getHeatChangeNeeded() == -1||  GiantsFoundryState.getActionsForHeatLevel() > 8);
         }
     }
 

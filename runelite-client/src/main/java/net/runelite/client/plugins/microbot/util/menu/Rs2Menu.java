@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.util.menu;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -28,10 +30,42 @@ public class Rs2Menu {
 
     protected static int lastIndex = -1;
 
+    @Getter
+    @Setter
+    private static String option = "";
+
+
+    public static boolean hasAction(String... actions) {
+        for (String action : actions) {
+            if (getIndex(action) != -1)
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean hasAction(Rectangle rect, String... actions) {
+        sleep(200, 400);
+        Microbot.getMouse().move(new Point((int) rect.getCenterX(), (int) rect.getCenterY()));
+        for (String action : actions) {
+            if (getIndex(action) != -1)
+                return true;
+        }
+        return false;
+    }
 
     public static boolean hasAction(Point point, String... actions) {
         sleep(200, 400);
         Microbot.getMouse().move(point);
+        for (String action : actions) {
+            if (getIndex(action) != -1)
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean hasAction(Polygon poly, String... actions) {
+        sleep(200, 400);
+        Microbot.getMouse().move(poly);
         for (String action : actions) {
             if (getIndex(action) != -1)
                 return true;
@@ -71,8 +105,10 @@ public class Rs2Menu {
         Microbot.getMouse().move(point);
         boolean result = false;
         for (String action : actions) {
-            result = doAction(action, point, (String[]) null);
-            if (result) break;
+            if (hasAction(point, action)) {
+                result = doAction(action, point, (String[]) null);
+                if (result) break;
+            }
         }
         return result;
     }
@@ -87,28 +123,11 @@ public class Rs2Menu {
      * <code>false</code>.
      */
     public static boolean doAction(final String action, Point point, final String... target) {
-        sleep(200, 300);
-        int idx = getIndex(action, target);
-
-        if (!isOpen()) {
-            if (idx == -1) {
-                return false;
-            }
-            if (idx > MAX_DISPLAYABLE_ENTRIES) {
-                return false;
-            }
-            if (idx == 0) {
-                Microbot.getMouse().click(point);
-                return true;
-            }
-            Microbot.getMouse().rightClick();
-            sleep(random(250,400));
-            return Microbot.getClientThread().runOnClientThread(() -> clickIndex(idx));
-        } else if (idx == -1) {
-            Microbot.getMouse().move(new Point(Microbot.getMouse().getLastMousePosition().getX() + random(-100, 100), Microbot.getMouse().getLastMousePosition().getY() + random(-100, 100)));
-            return false;
-        }
-        return clickIndex(idx);
+        setOption(action);
+        Microbot.getMouse().click(point);
+        sleep(300);
+        setOption("");
+        return true;
     }
 
     /**

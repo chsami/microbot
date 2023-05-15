@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util;
 
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.math.Random;
 

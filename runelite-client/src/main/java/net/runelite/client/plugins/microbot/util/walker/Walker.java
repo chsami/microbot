@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.walker;
 
 import lombok.Getter;
 import net.runelite.api.AnimationID;
+import net.runelite.api.Perspective;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
@@ -24,10 +25,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static org.apache.commons.lang3.tuple.Pair.of;
 
 public class Walker {
@@ -57,7 +60,7 @@ public class Walker {
         for (Teleport teleport : Teleport.values()) {
             boolean hasTablet = Inventory.hasItem(teleport.getTabletName());
             boolean hasRunes = true;
-            for (Pair itemRequired: teleport.getItemsRequired()) {
+            for (Pair itemRequired : teleport.getItemsRequired()) {
                 if (!Inventory.hasItemAmountStackable(itemRequired.getLeft().toString(), (int) itemRequired.getRight()))
                     hasRunes = false;
             }
@@ -66,7 +69,7 @@ public class Walker {
                 teleportsAvaible.add(teleport);
             }
         }
-        for (Teleport teleportAvailble: teleportsAvaible) {
+        for (Teleport teleportAvailble : teleportsAvaible) {
             final Pathfinder p = new Pathfinder(pathfinderConfig, teleportAvailble.getDestination(), target, false);
             sleepUntil(() -> p.isDone(), 10000);
             if (currentPath.getTotalCost() > p.getTotalCost()) {
@@ -77,6 +80,30 @@ public class Walker {
         return Pair.of(currentPath, currentTeleport);
     }
 
+    public WorldPoint walkFastRegion(int regionX, int regionY) {
+        WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
+                regionX,
+                regionY,
+                Microbot.getClient().getPlane());
+
+        Point point = Calculations.worldToMinimap(worldPoint.getX(), worldPoint.getY());
+
+        if (point == null) return null;
+
+        Microbot.getMouse().click(point);
+
+        return worldPoint;
+    }
+
+    public boolean isCloseToRegion(int distance, int regionX, int regionY) {
+        WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
+                regionX,
+                regionY,
+                Microbot.getClient().getPlane());
+
+        return worldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < distance;
+    }
+
     public boolean walkTo(WorldPoint target) {
         return walkTo(target, false, true);
     }
@@ -84,9 +111,11 @@ public class Walker {
     public boolean walkTo(WorldPoint target, boolean memorizePath, boolean useTransport) {
         System.out.println(useTransport);
 
+        if (pathfinder != null && !pathfinder.isDone()) return false;
+
         if (useTransport && pathfinder == null) {
             Pair<Pathfinder, Teleport> p = walkToWithTeleports(Microbot.getClient().getLocalPlayer().getWorldLocation(), target);
-            if (p != null) {
+            if (p != null && p.getRight() != null) {
                 pathfinder = p.getLeft();
                 if (p.getRight() != null) {
                     if (Inventory.hasItem(p.getRight().getTabletName())) {
@@ -128,17 +157,15 @@ public class Walker {
                 if (pathfinder != null) {
                     start = pathfinder.getStart();
                 }
-                pathfinder = new Pathfinder(pathfinderConfig, start, target);
+                pathfinder = new Pathfinder(pathfinderConfig, start, target, useTransport);
                 currentDestination = null;
                 ignoreTransport = new ArrayList<>();
                 pathOrigin = new ArrayList<>();
                 return false;
             }
 
-            if (!pathfinder.isDone()) return false;
-
-            if (currentDestination != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentDestination) > Random.random(7, 12)) {
-                sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentDestination) > Random.random(7, 12));
+            if (currentDestination != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentDestination) > random(7, 12)) {
+                sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentDestination) > random(7, 12));
                 currentDestination = null;
                 return false;
             }

@@ -68,9 +68,4 @@ public class GiantsFoundryPlugin extends Plugin {
         giantsFoundryScript.shutdown();
         overlayManager.remove(giantsFoundryOverlay);
     }
-
-    @Subscribe
-    public void onStatChanged(StatChanged statChanged) {
-        Microbot.setIsGainingExp(true);
-    }
 }

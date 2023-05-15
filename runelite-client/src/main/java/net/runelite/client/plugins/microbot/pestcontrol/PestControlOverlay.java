@@ -1,7 +1,10 @@
-package net.runelite.client.plugins.microbot.woodcutting;
+package net.runelite.client.plugins.microbot.pestcontrol;
 
+import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.thieving.ThievingScript;
+import net.runelite.client.plugins.microbot.example.ExamplePlugin;
+import net.runelite.client.plugins.microbot.example.ExampleScript;
+import net.runelite.client.plugins.microbot.util.walker.PathTileOverlay;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -10,9 +13,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class WoodcuttingOverlay extends OverlayPanel {
+public class PestControlOverlay  extends OverlayPanel {
     @Inject
-    WoodcuttingOverlay(WoodcuttingPlugin plugin)
+    PestControlOverlay(PestControlPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -22,7 +25,7 @@ public class WoodcuttingOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Woodcutting V" + WoodcuttingScript.version)
+                    .text("Micro PestControl V" + ExampleScript.version)
                     .color(Color.GREEN)
                     .build());
 
@@ -32,6 +35,12 @@ public class WoodcuttingOverlay extends OverlayPanel {
                     .left(Microbot.status)
                     .build());
 
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Games played")
+                    .right(Integer.toString(PestControlScript.games))
+                    .build());
+
+            PathTileOverlay.render(graphics);
 
         } catch(Exception ex) {
             System.out.println(ex.getMessage());

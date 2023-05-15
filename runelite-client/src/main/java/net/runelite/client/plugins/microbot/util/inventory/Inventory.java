@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,7 +24,6 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class Inventory {
 
-    private static ScheduledFuture<?> inventoryScheduler;
     private static ScheduledExecutorService scheduledExecutorService;
 
     public static void eat(Widget widget) {
@@ -37,7 +37,7 @@ public class Inventory {
 
     public static void open() {
         Microbot.status = "Open inventory";
-       Tab.switchToInventoryTab();
+        Tab.switchToInventoryTab();
         sleep(300, 1200);
         sleepUntilOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.INVENTORY);
     }
@@ -61,6 +61,12 @@ public class Inventory {
         Microbot.status = "Checking if inventory is full";
         Widget inventoryWidget = getInventory();
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == 28);
+    }
+
+    public static long count() {
+        Microbot.status = "Counting inventory items";
+        Widget inventoryWidget = getInventory();
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count());
     }
 
     public static boolean isInventoryFull(String itemName) {
@@ -296,7 +302,15 @@ public class Inventory {
         sleep(600, 1200);
         return true;
     }
-
+    public static boolean useItem(int id) {
+        if (Rs2Bank.isBankOpen()) return false;
+        Microbot.status = "Use inventory item " + id;
+        Widget item = findItem(id);
+        if (item == null) return false;
+        Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
+        sleep(600, 1200);
+        return true;
+    }
     public static boolean interact(String itemName) {
         useItem(itemName);
         return true;
@@ -341,24 +355,29 @@ public class Inventory {
 
     public static boolean dropAll() {
         Microbot.pauseAllScripts = true;
-        if (inventoryScheduler == null || inventoryScheduler.isDone()) {
-            inventoryScheduler = null;
-            scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-            inventoryScheduler = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+        for (int i = 0; i < 28; i++) {
+            if (!VirtualKeyboard.isKeyPressed(KeyEvent.VK_SHIFT) || !Rs2Menu.hasAction("drop"))
                 VirtualKeyboard.holdShift();
-                Microbot.getClientThread().invokeLater(() -> {
-                    if (isEmpty()) {
-                        inventoryScheduler.cancel(true);
-                        Microbot.pauseAllScripts = false;
-                        return;
-                    }
-                    Widget widget = Arrays.stream(getInventoryItems()).filter(x -> (itemExistsInInventory(x))).findFirst().get();
-                    if (widget == null) return;
-                    Microbot.getMouse().click(widget.getBounds());
-                });
-            }, 0, random(150, 300), TimeUnit.MILLISECONDS);
+            Inventory.useItemSlot(i);
+            sleep(150, 300);
         }
+        Microbot.pauseAllScripts = false;
+        VirtualKeyboard.releaseShift();
         return isEmpty();
+    }
+
+    // First inventory slot is 0
+    public static boolean dropAllStartingFrom(int slot) {
+        Microbot.pauseAllScripts = true;
+        for (int i = slot; i < 28; i++) {
+            if (!VirtualKeyboard.isKeyPressed(KeyEvent.VK_SHIFT) || !Rs2Menu.hasAction("drop"))
+                VirtualKeyboard.holdShift();
+            Inventory.useItemSlot(i);
+            sleep(150, 300);
+        }
+        Microbot.pauseAllScripts = false;
+        VirtualKeyboard.releaseShift();
+        return true;
     }
 
     public static boolean isUsingItem() {

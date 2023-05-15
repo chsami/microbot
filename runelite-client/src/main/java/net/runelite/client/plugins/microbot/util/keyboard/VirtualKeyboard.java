@@ -5,6 +5,8 @@ import net.runelite.client.plugins.microbot.util.Global;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.awt.event.KeyEvent.CHAR_UNDEFINED;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
@@ -96,5 +98,21 @@ public class VirtualKeyboard {
 
         keyHold(KeyEvent.VK_ENTER);
         keyRelease(KeyEvent.VK_ENTER);
+    }
+
+    private static final Map<Integer, Boolean> pressedKeys = new HashMap<>();
+
+    static {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(event -> {
+            synchronized (VirtualKeyboard.class) {
+                if (event.getID() == KeyEvent.KEY_PRESSED) pressedKeys.put(event.getKeyCode(), true);
+                else if (event.getID() == KeyEvent.KEY_RELEASED) pressedKeys.put(event.getKeyCode(), false);
+                return false;
+            }
+        });
+    }
+
+    public static boolean isKeyPressed(int keyCode) { // Any key code from the KeyEvent class
+        return pressedKeys.getOrDefault(keyCode, false);
     }
 }

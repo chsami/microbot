@@ -90,7 +90,7 @@ public class Microbot {
             xpSchedulorFuture.cancel(true);
         xpSchedulorFuture = xpSchedulor.schedule(() -> {
             isGainingExp = false;
-        }, 3000, TimeUnit.MILLISECONDS);
+        }, 4000, TimeUnit.MILLISECONDS);
     }
 
     public static boolean isLoggedIn() {

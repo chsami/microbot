@@ -31,7 +31,7 @@ import net.runelite.api.widgets.WidgetInfo;
 @AllArgsConstructor
 @Getter
 @ToString
-enum Portal
+public enum Portal
 {
 	PURPLE(WidgetInfo.PEST_CONTROL_PURPLE_SHIELD, WidgetInfo.PEST_CONTROL_PURPLE_HEALTH, WidgetInfo.PEST_CONTROL_PURPLE_ICON),
 	BLUE(WidgetInfo.PEST_CONTROL_BLUE_SHIELD, WidgetInfo.PEST_CONTROL_BLUE_HEALTH, WidgetInfo.PEST_CONTROL_BLUE_ICON),

@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.widget;
 
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 
 import java.util.Arrays;
@@ -18,6 +19,9 @@ public class Rs2Widget {
             return true;
         }
         return false;
+    }
+    public static Widget getWidget(WidgetInfo wiget) {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(wiget));
     }
     public static Widget getWidget(int id) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id));
@@ -70,7 +74,7 @@ public class Rs2Widget {
                 List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> !x.isHidden()).collect(Collectors.toList());
                 for (Widget rootWidget : rootWidgets) {
                     if (exact) {
-                        if (rootWidget.getText().toLowerCase().equals(text.toLowerCase()) || rootWidget.getName().toLowerCase().equals(text.toLowerCase())) {
+                        if (rootWidget.getText().toLowerCase().contains(text.toLowerCase()) || rootWidget.getName().toLowerCase().contains(">" + text.toLowerCase() + "<")) {
                             return rootWidget;
                         }
                     } else {
@@ -100,6 +104,10 @@ public class Rs2Widget {
         return findWidget(text, null, false);
     }
 
+    public static Widget findWidgetExact(String text) {
+        return findWidget(text, null, true);
+    }
+
     public static boolean hasWidget(String text) {
         return findWidget(text, null, false) != null;
     }
@@ -113,10 +121,11 @@ public class Rs2Widget {
         return findWidget(text, children, false);
     }
 
+
     public static Widget searchChildren(String text, Widget child, boolean exact) {
         Widget found = null;
         if (exact) {
-            if (child.getText().toLowerCase().equals(text.toLowerCase()) || child.getName().toLowerCase().equals(text.toLowerCase())) {
+            if (child.getText().toLowerCase().contains(text.toLowerCase()) || child.getName().toLowerCase().contains(">" + text.toLowerCase() + "<")) {
                 return child;
             }
         } else {

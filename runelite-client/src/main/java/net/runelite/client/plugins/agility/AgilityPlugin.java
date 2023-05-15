@@ -94,10 +94,10 @@ public class AgilityPlugin extends Plugin
 	);
 
 	@Getter
-	private final Map<TileObject, Obstacle> obstacles = new HashMap<>();
+	private static final Map<TileObject, Obstacle> obstacles = new HashMap<>();
 
 	@Getter
-	private final List<Tile> marksOfGrace = new ArrayList<>();
+	private static final List<Tile> marksOfGrace = new ArrayList<>();
 
 	@Getter
 	private final Set<NPC> npcs = new HashSet<>();

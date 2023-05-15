@@ -42,6 +42,8 @@ import static net.runelite.client.plugins.pestcontrol.Portal.BLUE;
 import static net.runelite.client.plugins.pestcontrol.Portal.PURPLE;
 import static net.runelite.client.plugins.pestcontrol.Portal.RED;
 import static net.runelite.client.plugins.pestcontrol.Portal.YELLOW;
+
+import net.runelite.client.plugins.microbot.pestcontrol.PestControlScript;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
@@ -73,6 +75,7 @@ public class PestControlOverlay extends Overlay
 			if (game != null)
 			{
 				log.debug("Pest control game has ended");
+				PestControlScript.games++;
 				game = null;
 			}
 

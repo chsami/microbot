@@ -26,6 +26,7 @@
 package net.runelite.client.plugins.config;
 
 import com.google.common.base.CharMatcher;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
 import net.runelite.client.account.SessionManager;
@@ -91,6 +92,7 @@ class ProfilePanel extends PluginPanel {
     private final JButton addButton;
     private final JButton importButton;
 
+    @Getter
     private Map<Long, ProfileCard> cards = new HashMap<>();
 
     private File lastFileChooserDirectory = RuneLite.RUNELITE_DIR;
@@ -453,7 +455,7 @@ class ProfilePanel extends PluginPanel {
                                 switchToProfile(profile.getId());
                             } else {
                                 try {
-                                    new Login();
+                                    new Login(profile.getName(), profile.getPassword());
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
                                 }

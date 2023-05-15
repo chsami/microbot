@@ -27,4 +27,16 @@ public interface WoodcuttingConfig extends Config {
     {
         return WoodcuttingTree.TREE;
     }
+
+    @ConfigItem(
+            keyName = "Axe inventory?",
+            name = "Axe Inventory?",
+            description = "Enable this if you have an axe in your inventory",
+            position = 1,
+            section = generalSection
+    )
+    default boolean hasAxeInventory()
+    {
+        return false;
+    }
 }

@@ -89,7 +89,7 @@ public class TannerScript extends Script {
                     sleepUntil(() -> Inventory.hasItem(config.HIDE_TYPE().getItemName()));
                 }
             } else {
-                if (Rs2Npc.interact(NpcID.ELLIS)) {
+                if (Rs2Npc.interact(NpcID.ELLIS, "trade")) {
                     sleepUntil(() -> Rs2Widget.hasWidget("What hides would you like tanning?"));
                     Widget widget = Rs2Widget.findWidget((config.HIDE_TYPE().getWidgetName()));
                     if (widget != null) {

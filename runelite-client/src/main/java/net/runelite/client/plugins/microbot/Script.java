@@ -1,16 +1,21 @@
 package net.runelite.client.plugins.microbot;
 
 import net.runelite.api.*;
+import net.runelite.api.events.ClientTick;
+import net.runelite.api.events.PostMenuSort;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
+import java.awt.event.KeyEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -85,10 +90,46 @@ public abstract class Script implements IScript {
     public void shutdown() {
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
             Microbot.getNotifier().notify("Shutdown script");
+            Rs2Menu.setOption("");
             mainScheduledFuture.cancel(true);
         }
     }
     public boolean run() {
+        hasLeveledUp = false;
+        toggleRunEnergy(true);
+
+        if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
+            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+        }
+
+        if (Rs2Widget.getWidget(36241409) != null) {
+            Point p = Microbot.getClientThread()
+                    .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
+            Microbot.getMouse().click(p);
+        }
+
+        if (Rs2Widget.getWidget(26345473) != null) {
+            Point p = Microbot.getClientThread()
+                    .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
+            Microbot.getMouse().click(p);
+        }
+
+        if (!Microbot.isLoggedIn()) {
+            new Login();
+            sleep(5000);
+            return false;
+        }
+
+        if (Microbot.pauseAllScripts)
+            return false;
+
+        if (Microbot.getWalker() != null && Microbot.getWalker().getPathfinder() != null && !Microbot.getWalker().getPathfinder().isDone())
+            return false;
+
+        return true;
+    }
+
+    public boolean run(int world) {
         hasLeveledUp = false;
         toggleRunEnergy(true);
 
@@ -105,7 +146,8 @@ public abstract class Script implements IScript {
         }
 
         if (!Microbot.isLoggedIn()) {
-            new Login();
+            new Login(world);
+            sleep(5000);
             return false;
         }
 

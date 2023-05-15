@@ -62,7 +62,7 @@ public class HouseTabScript extends Script {
 
 
         boolean success = Rs2GameObject
-                .interact(29091, "View");
+                .interact(HOUSE_ADVERTISEMENT_OBJECT, "View");
 
 
         if (success) {
@@ -74,6 +74,8 @@ public class HouseTabScript extends Script {
         Widget houseAdvertisementNameWidget = Microbot.getClient().getWidget(HOUSE_ADVERTISEMENT_NAME_PARENT_INTERFACE);
         if (houseAdvertisementNameWidget == null || houseAdvertisementNameWidget.getChildren() == null) return;
         if (!hasSoftClay())
+            return;
+        if (Rs2GameObject.findObjectById(HOUSE_PORTAL_OBJECT) != null)
             return;
 
         int enterHouseButtonHeight = 21;
@@ -105,6 +107,7 @@ public class HouseTabScript extends Script {
             Microbot.getMouse()
                     .click(enterHouseButton.getCanvasLocation());
             sleepUntilOnClientThread(() -> Rs2GameObject.findObjectById(HOUSE_PORTAL_OBJECT) != null);
+            sleep(2000, 3000);
         }
     }
 
@@ -130,12 +133,12 @@ public class HouseTabScript extends Script {
         while (Microbot.getClient().getWidget(HOUSE_TABLET_INTERFACE) != null) {
             Microbot.getMouse()
                     .click(houseTabInterface.getCanvasLocation());
-            sleep(200, 400);
+            sleep(1000, 2000);
         }
 
         sleepUntilOnClientThread(() -> !hasSoftClay()
                 || Microbot.getClient().getWidget(HOUSE_TABLET_INTERFACE) != null
-                || Microbot.isGainingExp, 35000);
+                || !Microbot.isGainingExp, 55000);
     }
 
     public void leaveHouse() {
@@ -176,12 +179,7 @@ public class HouseTabScript extends Script {
                     shutdown();
                     return;
                 }
-                if (Rs2GameObject.findObject(new int[]{13647, 37349}) != null) {
-                    currentInventoryCount = Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Inventory.getInventoryItems()).count());
-                    Thread.sleep(3000);
-                    if (currentInventoryCount != Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Inventory.getInventoryItems()).count()))
-                        return;
-                }
+                if (Microbot.isGainingExp) return;
 
                 toggleRunEnergy(true);
                 if (Microbot.getClient().getEnergy() < 3000) {

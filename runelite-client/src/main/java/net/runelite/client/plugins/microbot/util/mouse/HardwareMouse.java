@@ -116,4 +116,9 @@ public class HardwareMouse extends Mouse {
     public Mouse move(double x, double y) {
         return move(new Point((int) x, (int) y));
     }
+
+    @Override
+    public Mouse move(Polygon polygon) {
+        return null;
+    }
 }

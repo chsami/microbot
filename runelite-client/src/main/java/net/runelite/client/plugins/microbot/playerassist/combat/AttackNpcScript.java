@@ -6,47 +6,53 @@ import net.runelite.api.Player;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class AttackNpcScript extends Script {
 
-    String[] attackableNpcs;
+    String[] configAttackableNpcs;
 
     public static Actor currentNpc = null;
 
+    public static List<NPC> attackableNpcs = new ArrayList();
+
+    boolean clicked = false;
+
     public void run(PlayerAssistConfig config) {
-        attackableNpcs = Arrays.stream(config.attackableNpcs().split(",")).map(x -> x.trim()).toArray(String[]::new);
+        String npcToAttack = Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(x -> x.trim()).toArray(String[]::new)).findFirst().get();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            NPC[] npcs = Rs2Npc.getNpcs();
-            Player player = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer());
-            if (player.isInteracting() || player.getAnimation() != -1) {
-                return;
-            }
-            for (String npcToAttack : attackableNpcs) {
-                for (NPC npc : npcs) {
-                    if ((npc.getInteracting() == player && npc.getCombatLevel() > 0) || npc.getName().toLowerCase().equals(npcToAttack.toLowerCase())) {
-                        if (player.isInteracting() == true && npc.getInteracting() == player)
-                            break;
-                        if (npc.isInteracting() && npc.getInteracting() != player)
-                            continue;
-                        if (!Camera.isTileOnScreen(npc.getLocalLocation()))
-                            Camera.turnTo(npc);
-                        if (currentNpc == npc) continue;
-                        Rs2Menu.doAction("Attack", npc.getCanvasTilePoly(), new String[]{npc.getName()});
-                        Microbot.pauseAllScripts = true;
-                        sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().isInteracting());
-                        sleep(1200, 2000);
-                        currentNpc = npc;
-                        Microbot.pauseAllScripts = false;
-                        break;
-                    }
+            try {
+                if (!super.run()) return;
+                 attackableNpcs =  Microbot.getClient().getNpcs().stream()
+                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                        .filter(x -> !x.isDead() &&
+                                !x.isInteracting()
+                                && x.getInteracting() == null
+                                && x.getAnimation() == -1 && npcToAttack.toLowerCase().equals(x.getName().toLowerCase())).collect(Collectors.toList());
+                Player player = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer());
+                if (player.isInteracting() || player.getAnimation() != -1) {
+                    return;
                 }
+                for (NPC npc : attackableNpcs) {
+                    if (npc == null || npc.getAnimation() != -1 || npc.isDead() || npc.getInteracting() != null || npc.isInteracting() || !npc.getName().toLowerCase().equals(npcToAttack.toLowerCase()))
+                        break;
+                    if (!Camera.isTileOnScreen(npc.getLocalLocation()))
+                        Camera.turnTo(npc);
+                    Rs2Npc.interact(npc, "attack");
+                    sleep(600, 1000);
+                    break;
+                }
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
     }
@@ -57,6 +63,7 @@ public class AttackNpcScript extends Script {
 
     public void shutdown() {
         super.shutdown();
-        attackableNpcs = null;
+        configAttackableNpcs = null;
+        clicked = false;
     }
 }

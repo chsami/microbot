@@ -81,6 +81,8 @@ public class ProfileManager {
         }
 
         private List<ConfigProfile> load() {
+            if (getProfiles() != null) return getProfiles(); //if we already have profiles loaded, return the profiles
+
             try (FileInputStream in = new FileInputStream(PROFILES)) {
                 return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), Profiles.class)
                         .getProfiles();

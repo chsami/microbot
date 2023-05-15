@@ -48,7 +48,7 @@ public abstract class Mouse {
 
     public abstract Mouse move(int x, int y);
     public abstract Mouse move(double x, double y);
-
+    public abstract Mouse move(Polygon polygon);
     public abstract Mouse scrollDown(Point point);
     public abstract Mouse scrollUp(Point point);
 

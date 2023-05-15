@@ -130,7 +130,7 @@ public class Calculations {
     public static Point worldToMinimap(double x, double y) {
         LocalPoint test = LocalPoint.fromWorld(Microbot.getClient(), (int) x, (int) y);
         if (test != null) {
-            return Microbot.getClientThread().runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), test, 2500));
+            return Microbot.getClientThread().runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), test, 2500 * (int) Microbot.getClient().getMinimapZoom()));
         }
         return null;
     }
