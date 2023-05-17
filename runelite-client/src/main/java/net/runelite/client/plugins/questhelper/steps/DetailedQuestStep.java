@@ -27,6 +27,7 @@ package net.runelite.client.plugins.questhelper.steps;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.questhelper.QuestBank;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.QuestHelperWorldMapPoint;
@@ -168,6 +169,7 @@ public class DetailedQuestStep extends QuestStep
 		worldMapPointManager.removeIf(QuestHelperWorldMapPoint.class::isInstance);
 		tileHighlights.clear();
 		started = false;
+		Microbot.getWalkSchedulorFuture().cancel(true);
 	}
 
 	public void addRequirement(Requirement requirement)

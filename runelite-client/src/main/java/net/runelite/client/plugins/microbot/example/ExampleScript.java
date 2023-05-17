@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.example;
 
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.NPC;
-import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
@@ -39,7 +36,7 @@ public class ExampleScript extends Script {
 
               //  Rs2Npc.interact("kovac", "Hand-in");
                 System.out.println(Arrays.deepToString(Arrays.stream(Microbot.getClient().getMenuEntries()).toArray(MenuEntry[]::new)));
-                Rs2GameObject.interact(TALL_TREE_14843);
+                Rs2GameObject.interact(ObjectID.OVERLOAD_POTION, "Take");
 
                 //System.out.println(Microbot.getClient().getLocalPlayer().getWorldArea().canTravelInDirection(Microbot.getClient(), 0, -3));
                 //Rs2Menu.setOption("Set custom quantity");

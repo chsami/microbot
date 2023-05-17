@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.agility;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
@@ -54,6 +55,7 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.canafisCourse.add(new AgilityObstacleModel(GAP_14847));
         agilityScript.canafisCourse.add(new AgilityObstacleModel(GAP_14897));
 
+        agilityScript.faladorCourse.add(new AgilityObstacleModel(ROUGH_WALL_14898));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(TIGHTROPE_14899));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(HAND_HOLDS_14901));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(GAP_14903));
@@ -66,6 +68,14 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.faladorCourse.add(new AgilityObstacleModel(LEDGE_14922));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(LEDGE_14924));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(EDGE_14925));
+
+        agilityScript.seersCourse.add(new AgilityObstacleModel(WALL_14927));
+        agilityScript.seersCourse.add(new AgilityObstacleModel(GAP_14928));
+        agilityScript.seersCourse.add(new AgilityObstacleModel(TIGHTROPE_14932));
+        agilityScript.seersCourse.add(new AgilityObstacleModel(GAP_14929));
+        agilityScript.seersCourse.add(new AgilityObstacleModel(GAP_14930));
+        agilityScript.seersCourse.add(new AgilityObstacleModel(EDGE_14931));
+
         agilityScript.run(config);}
 
     protected void shutDown() {

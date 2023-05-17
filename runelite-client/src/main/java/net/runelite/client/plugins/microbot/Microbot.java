@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ProfileManager;
@@ -60,15 +61,19 @@ public class Microbot {
     public static String status = "IDLE";
 
     private static ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledExecutorService walkerSchedulor = Executors.newSingleThreadScheduledExecutor();
 
     private static ScheduledFuture<?> xpSchedulorFuture;
+    @Getter
+    private static ScheduledFuture<?> walkSchedulorFuture;
+
 
     public static boolean isWalking() {
-        return getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808;
+        return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808);
     }
 
     public static boolean isAnimating() {
-        return getClient().getLocalPlayer().getAnimation() != -1;
+        return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
     }
 
 
@@ -97,5 +102,15 @@ public class Microbot {
         if (client == null) return false;
         GameState idx = client.getGameState();
         return idx != GameState.LOGIN_SCREEN;
+    }
+
+    public static void walkToProcess(WorldPoint worldPoint) {
+        walkSchedulorFuture = walkerSchedulor.scheduleWithFixedDelay(() -> {
+            try {
+                getWalker().walkTo(worldPoint, false, true);
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }, 0, 1000, TimeUnit.MILLISECONDS);
     }
 }

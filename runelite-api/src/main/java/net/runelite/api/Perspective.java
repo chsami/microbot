@@ -359,7 +359,7 @@ public class Perspective
 				return null;
 			}
 
-			final double zoom = client.getMinimapZoom() / LOCAL_TILE_SIZE;
+			final double zoom = (client.getMinimapZoom() - 0.5) / LOCAL_TILE_SIZE;
 			final int x = (int) (dx * zoom);
 			final int y = (int) (dy * zoom);
 

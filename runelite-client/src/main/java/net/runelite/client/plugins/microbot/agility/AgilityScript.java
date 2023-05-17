@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.agility.models.AgilityObstacleModel;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.worldmap.AgilityCourseLocation;
 
 import java.awt.*;
@@ -24,6 +25,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.CANIFIS_ROOFTOP_COURSE;
+import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.FALADOR_ROOFTOP_COURSE;
+
 public class AgilityScript extends Script {
 
     public static double version = 1.0;
@@ -31,6 +35,8 @@ public class AgilityScript extends Script {
 
     public List<AgilityObstacleModel> canafisCourse = new ArrayList<>();
     public List<AgilityObstacleModel> faladorCourse = new ArrayList<>();
+    public List<AgilityObstacleModel> seersCourse = new ArrayList<>();
+
 
     WorldPoint startCourse = new WorldPoint(0, 0, 0);
 
@@ -39,18 +45,33 @@ public class AgilityScript extends Script {
     private List<AgilityObstacleModel> getCurrentCourse(MicroAgilityConfig config) {
         switch (config.agilityCourse()) {
             case CANIFIS_ROOFTOP_COURSE:
-                startCourse = new WorldPoint(3507, 3489, 0);
                 return canafisCourse;
             case FALADOR_ROOFTOP_COURSE:
-                startCourse = new WorldPoint(3036, 3341, 0);
                 return faladorCourse;
-
+            case SEERS_VILLAGE_ROOFTOP_COURSE:
+                return seersCourse;
             default:
                 return canafisCourse;
         }
     }
 
+    private void init(MicroAgilityConfig config) {
+        switch (config.agilityCourse()) {
+            case CANIFIS_ROOFTOP_COURSE:
+                startCourse = new WorldPoint(3507, 3489, 0);
+                break;
+            case FALADOR_ROOFTOP_COURSE:
+                startCourse = new WorldPoint(3036, 3341, 0);
+                break;
+            case SEERS_VILLAGE_ROOFTOP_COURSE:
+                startCourse = new WorldPoint(2729, 3486, 0);
+                break;
+        }
+    }
+
     public boolean run(MicroAgilityConfig config) {
+        currentObstacle = 0;
+        init(config);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
@@ -63,7 +84,9 @@ public class AgilityScript extends Script {
 
                 if (Microbot.getClient().getPlane() == 0 && playerWorldLocation.distanceTo(startCourse) > 6) {
                     currentObstacle = 0;
-                    if (!Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), startCourse))) {
+                    LocalPoint startCourseLocal = LocalPoint.fromWorld(Microbot.getClient(), startCourse);
+                    if (!Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), startCourse))
+                            || playerLocation.distanceTo(startCourseLocal) >= MAX_DISTANCE) {
                         Microbot.getWalker().walkTo(startCourse, true, false);
                         return;
                     }
@@ -72,10 +95,15 @@ public class AgilityScript extends Script {
                 if (!marksOfGrace.isEmpty()) {
                     for (Tile markOfGraceTile : marksOfGrace) {
                         if (Microbot.getClient().getPlane() != markOfGraceTile.getPlane()) continue;
-                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(markOfGraceTile.getWorldLocation()) > 5)
+                        //seers needs 7, falador needs 5 for the distance to
+                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(markOfGraceTile.getWorldLocation()) > 7)
                             continue;
                         Rs2GameObject.interact(markOfGraceTile);
                         sleepUntil(() -> marksOfGrace.isEmpty());
+                        if (!marksOfGrace.isEmpty()) {
+                            Rs2GameObject.interact(markOfGraceTile);
+                            sleepUntil(() -> marksOfGrace.isEmpty());
+                        }
                         break;
                     }
                 }
@@ -112,7 +140,6 @@ public class AgilityScript extends Script {
                                     break;
                                 }
                             }
-
 
 
                             if (Obstacles.PORTAL_OBSTACLE_IDS.contains(object.getId())) {

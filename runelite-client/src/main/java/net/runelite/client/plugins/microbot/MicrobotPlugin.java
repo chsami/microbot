@@ -16,6 +16,7 @@ import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -88,6 +89,13 @@ public class MicrobotPlugin extends Plugin {
             client.setMenuEntries(new MenuEntry[]{});
             if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals("bank".toLowerCase()))) {
                 client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals("bank".toLowerCase())).toArray(MenuEntry[]::new));
+            }
+        }
+        if (Rs2GameObject.objectToInteract != null) {
+            final MenuEntry[] menuEntries = client.getMenuEntries();
+            client.setMenuEntries(new MenuEntry[]{});
+            if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals(Rs2GameObject.objectAction.toLowerCase()))) {
+                client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals(Rs2GameObject.objectAction.toLowerCase())).toArray(MenuEntry[]::new));
             }
         }
     }

@@ -25,6 +25,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
@@ -52,6 +53,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.questhelper.overlays.QuestHelperWorldOverlay.IMAGE_Z_OFFSET;
 
@@ -90,6 +94,7 @@ public class NpcStep extends DetailedQuestStep
 	{
 		super(questHelper, worldPoint, text, requirements);
 		this.npcID = npcID;
+		Microbot.walkToProcess(worldPoint);
 	}
 
 	public NpcStep(QuestHelper questHelper, int npcID, WorldPoint worldPoint, String text, List<Requirement> requirements, List<Requirement> optionalRequirements)

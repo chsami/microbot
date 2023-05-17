@@ -104,6 +104,7 @@ public class Inventory {
 
     public static boolean hasItem(String itemName) {
         Microbot.status = "Looking for item: " + itemName;
+        Tab.switchToInventoryTab();
         Widget inventoryWidget = getInventory();
 
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
@@ -313,6 +314,18 @@ public class Inventory {
     }
     public static boolean interact(String itemName) {
         useItem(itemName);
+        return true;
+    }
+
+    public static boolean interact(String...itemNames) {
+        for (String itemName: itemNames) {
+            Widget item = findItem(itemName);
+            if (item != null) {
+                Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
+                sleep(600, 1200);
+                break;
+            }
+        }
         return true;
     }
 

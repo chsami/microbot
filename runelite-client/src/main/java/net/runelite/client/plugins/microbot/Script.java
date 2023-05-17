@@ -97,6 +97,8 @@ public abstract class Script implements IScript {
     public boolean run() {
         hasLeveledUp = false;
         toggleRunEnergy(true);
+        if (Microbot.getClient().getMinimapZoom() > 2)
+            Microbot.getClient().setMinimapZoom(2);
 
         if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
             VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
