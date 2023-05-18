@@ -13,6 +13,7 @@ import java.awt.event.InputEvent;
 
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
+@Deprecated
 public class HardwareMouse extends Mouse {
 
     MouseMotionFactory factory;
@@ -97,6 +98,11 @@ public class HardwareMouse extends Mouse {
         } finally {
             return this;
         }
+    }
+
+    @Override
+    public Mouse move(Rectangle rect) {
+        return null;
     }
 
     @Override

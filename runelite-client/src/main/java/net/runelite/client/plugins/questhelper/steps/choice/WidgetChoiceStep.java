@@ -24,6 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps.choice;
 
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -220,6 +221,8 @@ public class WidgetChoiceStep
 		{
 			text.setText("[" + option + "] " + text.getText());
 		}
+
+		Microbot.getMouse().click(text.getCanvasLocation());
 
 		text.setTextColor(config.textHighlightColor().getRGB());
 		text.setOnMouseLeaveListener((JavaScriptCallback) ev -> text.setTextColor(config.textHighlightColor().getRGB()));

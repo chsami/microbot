@@ -6,12 +6,17 @@ import net.runelite.api.Point;
 import net.runelite.api.SpriteID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.globval.VarbitIndices.BANK_WITHDRAW_QUANTITY;
@@ -156,10 +161,11 @@ public class Rs2Bank {
         Widget widget = Rs2Widget.findWidgetExact(itemName);
         if (widget == null) return false;
         if (widget.getItemQuantity() <= 0) return false;
-        if (Microbot.getVarbitValue(BANK_WITHDRAW_QUANTITY) != 3) {
+        if (Microbot.getVarbitValue(BANK_WITHDRAW_QUANTITY) != 3 || Microbot.getVarbitValue(3960) != amount) {
             Widget withdrawX = Rs2Widget.getWidget(786466);
             if (withdrawX != null) {
                 Rs2Menu.setOption("Set custom quantity");
+                Microbot.getMouse().move(withdrawX.getBounds());
                 sleep(150, 250);
                 Microbot.getMouse().click(withdrawX.getBounds());
                 sleep(1000);
@@ -231,13 +237,11 @@ public class Rs2Bank {
     }
 
     public static boolean useBank() {
-        GameObject bank = Rs2GameObject.findBank();
         if (isBankOpen()) return true;
+        GameObject bank = Rs2GameObject.findBank();
         if (bank == null) return false;
-        objectToBank = bank;
         Microbot.getMouse().click(bank.getClickbox().getBounds());
         sleep(200, 300);
-        objectToBank = null;
         sleepUntil(() -> isBankOpen());
         return true;
     }
@@ -280,5 +284,30 @@ public class Rs2Bank {
             return false;
         }
         return true;
+    }
+
+    public static boolean withdrawItemsRequired(List<ItemRequirement> itemsRequired) {
+        List<ItemRequirement> itemsMissing = new ArrayList<>();
+        for (ItemRequirement item: itemsRequired) {
+            if (!Inventory.hasItemAmount(item.getId(), item.getQuantity()) && !Inventory.hasItemAmountStackable(item.getName(), item.getQuantity())) {
+                itemsMissing.add(item);
+            }
+        }
+        if (itemsMissing.size() > 0) {
+            for (ItemRequirement item : itemsMissing) {
+                Rs2Bank.withdrawItemX(true, item.getName(), item.getQuantity());
+            }
+        }
+        return Inventory.hasItemsAmount(itemsRequired);
+    }
+
+    public static boolean hasItems(List<ItemRequirement> itemsRequired) {
+        List<ItemRequirement> itemsMissing = new ArrayList<>();
+        for (ItemRequirement item: itemsRequired) {
+            if (!Inventory.hasItemAmount(item.getId(), item.getQuantity()) && !Inventory.hasItemAmountStackable(item.getName(), item.getQuantity())) {
+                itemsMissing.add(item);
+            }
+        }
+        return itemsMissing.size() == 0;
     }
 }

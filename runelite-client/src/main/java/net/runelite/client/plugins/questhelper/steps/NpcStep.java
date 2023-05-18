@@ -26,6 +26,7 @@
 package net.runelite.client.plugins.questhelper.steps;
 
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
@@ -64,7 +65,7 @@ public class NpcStep extends DetailedQuestStep
 	@Inject
 	protected Client client;
 
-	private final int npcID;
+	public final int npcID;
 	private final List<Integer> alternateNpcIDs = new ArrayList<>();
 
 	private boolean allowMultipleHighlights;
@@ -94,7 +95,6 @@ public class NpcStep extends DetailedQuestStep
 	{
 		super(questHelper, worldPoint, text, requirements);
 		this.npcID = npcID;
-		Microbot.walkToProcess(worldPoint);
 	}
 
 	public NpcStep(QuestHelper questHelper, int npcID, WorldPoint worldPoint, String text, List<Requirement> requirements, List<Requirement> optionalRequirements)

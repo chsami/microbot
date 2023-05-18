@@ -4,6 +4,7 @@ import net.runelite.api.Actor;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.camera.Camera;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -141,7 +142,7 @@ public class Rs2Npc {
 
     public static boolean interact(NPC npc, String action) {
         if (npc == null) return false;
-
+        if (!Camera.isTileOnScreen(npc.getLocalLocation())) return false;
         try {
             npcInteraction = npc;
             npcAction = action;

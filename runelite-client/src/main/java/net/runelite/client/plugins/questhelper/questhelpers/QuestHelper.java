@@ -79,7 +79,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 	private EventBus eventBus;
 
 	@Getter
-	private QuestStep currentStep;
+	private static QuestStep currentStep;
 
 	@Getter
 	@Setter
@@ -212,6 +212,9 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 		);
 	}
 
+	public QuestStep getCurrentStep()  {
+		return currentStep;
+	}
 	public int getVar()
 	{
 		return quest.getVar(client);

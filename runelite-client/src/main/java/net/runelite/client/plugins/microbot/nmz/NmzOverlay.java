@@ -38,8 +38,6 @@ public class NmzOverlay extends OverlayPanel {
                 graphics.drawString("x", point.getX(), point.getY());
             }
 
-            PathTileOverlay.render(graphics);
-
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }

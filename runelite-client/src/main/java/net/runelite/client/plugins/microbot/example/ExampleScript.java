@@ -36,8 +36,6 @@ public class ExampleScript extends Script {
 
               //  Rs2Npc.interact("kovac", "Hand-in");
                 System.out.println(Arrays.deepToString(Arrays.stream(Microbot.getClient().getMenuEntries()).toArray(MenuEntry[]::new)));
-                Rs2GameObject.interact(ObjectID.OVERLOAD_POTION, "Take");
-
                 //System.out.println(Microbot.getClient().getLocalPlayer().getWorldArea().canTravelInDirection(Microbot.getClient(), 0, -3));
                 //Rs2Menu.setOption("Set custom quantity");
 

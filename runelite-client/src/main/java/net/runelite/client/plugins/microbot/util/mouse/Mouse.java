@@ -45,6 +45,7 @@ public abstract class Mouse {
 
 
     public abstract Mouse move(Point point);
+    public abstract Mouse move(Rectangle rect);
 
     public abstract Mouse move(int x, int y);
     public abstract Mouse move(double x, double y);

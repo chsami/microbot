@@ -23,6 +23,10 @@ public class Rs2GameObject {
         return clickObject(gameObject);
     }
 
+    public static boolean interact(GameObject gameObject, String action) {
+        return clickObject(gameObject, action);
+    }
+
     public static boolean interact(Tile tile) {
         return clickObject(tile);
     }

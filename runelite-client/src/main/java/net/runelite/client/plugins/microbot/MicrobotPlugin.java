@@ -15,12 +15,14 @@ import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -49,6 +51,12 @@ public class MicrobotPlugin extends Plugin {
     ItemManager itemManager;
     @Inject
     NPCManager npcManager;
+    @Inject
+    private MicrobotOverlay microbotOverlay;
+    @Inject
+    private OverlayManager overlayManager;
+
+    QuestScript questScript;
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -61,9 +69,13 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setNpcManager(npcManager);
         Microbot.setWalker(new Walker());
         Microbot.setMouse(new VirtualMouse());
+        if (overlayManager != null) {
+            overlayManager.add(microbotOverlay);
+        }
     }
 
     protected void shutDown() {
+        overlayManager.remove(microbotOverlay);
     }
 
 

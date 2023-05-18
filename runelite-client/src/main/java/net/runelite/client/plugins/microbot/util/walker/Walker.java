@@ -113,6 +113,10 @@ public class Walker {
 
         if (pathfinder != null && !pathfinder.isDone()) return false;
 
+        if (pathfinder != null && pathfinder.isDone() && (pathfinder.getTarget() == null || !pathfinder.getTarget().equals(target))) {
+            pathfinder = null;
+        }
+
         if (useTransport && pathfinder == null) {
             Pair<Pathfinder, Teleport> p = walkToWithTeleports(Microbot.getClient().getLocalPlayer().getWorldLocation(), target);
             if (p != null && p.getRight() != null) {
@@ -142,7 +146,7 @@ public class Walker {
             pathfinder = null;
         } else {
             if (memorizePath && pathOrigin.size() > 0 && pathfinder == null) {
-                pathfinder = new Pathfinder(pathfinderConfig);
+                pathfinder = new Pathfinder(pathfinderConfig, target);
                 pathfinder.setPath(pathOrigin);
                 reverse = pathOrigin.get(pathOrigin.size() - 1).distanceTo(target) < 4;
                 if (reverse)

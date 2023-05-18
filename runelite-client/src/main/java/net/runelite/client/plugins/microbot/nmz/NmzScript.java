@@ -56,7 +56,7 @@ public class NmzScript extends Script {
                     }
                 } else {
                     if (isOutsideNmz) {
-                        if (!Inventory.hasItemAmount("overload (4)", 8)) {
+                        if (!Inventory.hasItemAmountExact("overload (4)", 8)) {
                             Rs2GameObject.interact(ObjectID.OVERLOAD_POTION, "Store");
                             sleep(1000);
                             if (Rs2Widget.hasWidget("Store all your overload potion?")) {
@@ -70,13 +70,15 @@ public class NmzScript extends Script {
                                 VirtualKeyboard.enter();
                             }
                         }
-                        if (!Inventory.hasItemAmount("absorption (4)", 20)) {
+                        if (!Inventory.hasItemAmountExact("absorption (4)", 20)) {
                             Rs2GameObject.interact(ObjectID.ABSORPTION_POTION, "Store");
+                            sleep(1000);
                             if (Rs2Widget.hasWidget("Store all your absorption potion?")) {
                                 VirtualKeyboard.typeString("1");
                                 VirtualKeyboard.enter();
                             }
                             Rs2GameObject.interact(ObjectID.ABSORPTION_POTION, "Take");
+                            sleep(1000);
                             if (Rs2Widget.hasWidget("How many doses of absorption")) {
                                 VirtualKeyboard.typeString("80");
                                 VirtualKeyboard.enter();

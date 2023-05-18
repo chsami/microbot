@@ -32,8 +32,6 @@ public class ThievingOverlay extends OverlayPanel {
                     .left(Microbot.status)
                     .build());
 
-            PathTileOverlay.render(graphics);
-
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }

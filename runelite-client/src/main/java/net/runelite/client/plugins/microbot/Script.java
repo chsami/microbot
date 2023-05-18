@@ -94,6 +94,7 @@ public abstract class Script implements IScript {
             mainScheduledFuture.cancel(true);
         }
     }
+
     public boolean run() {
         hasLeveledUp = false;
         toggleRunEnergy(true);
@@ -199,12 +200,19 @@ public abstract class Script implements IScript {
     }
 
     public static boolean toggleRunEnergy(boolean toggle) {
+
         if (Microbot.getVarbitPlayerValue(173) == 0 && !toggle) return true;
         if (Microbot.getVarbitPlayerValue(173) == 1 && toggle) return true;
         Widget widget = Rs2Widget.getWidget(WidgetInfo.MINIMAP_TOGGLE_RUN_ORB.getId());
         if (widget == null) return false;
-        Microbot.getMouse().click(widget.getCanvasLocation());
-        return true;
+        if (Microbot.getClient().getEnergy() > 1000 && toggle) {
+            Microbot.getMouse().click(widget.getCanvasLocation());
+            return true;
+        } else if (!toggle) {
+            Microbot.getMouse().click(widget.getCanvasLocation());
+            return true;
+        }
+        return false;
     }
 
     public void onWidgetLoaded(WidgetLoaded event) {

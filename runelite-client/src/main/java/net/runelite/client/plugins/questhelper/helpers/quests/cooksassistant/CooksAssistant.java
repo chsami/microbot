@@ -24,6 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.cooksassistant;
 
+import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.questhelper.QuestDescriptor;
 import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
@@ -60,6 +61,7 @@ public class CooksAssistant extends BasicQuestHelper
 		doQuest = new NpcStep(this, NpcID.COOK_4626, new WorldPoint(3206, 3214, 0),
 			"Give the Cook in Lumbridge Castle's kitchen the required items to finish the quest.",
 			egg, milk, flour);
+		doQuest.addDialogStep("Yes.");
 		doQuest.addDialogStep("I'll get right on it.");
 
 		steps.put(0, doQuest);

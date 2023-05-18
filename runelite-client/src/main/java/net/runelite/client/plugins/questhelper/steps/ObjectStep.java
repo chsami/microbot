@@ -50,7 +50,7 @@ import static net.runelite.client.plugins.questhelper.QuestHelperConfig.ObjectHi
 
 public class ObjectStep extends DetailedQuestStep
 {
-	private final int objectID;
+	public final int objectID;
 	private final ArrayList<Integer> alternateObjectIDs = new ArrayList<>();
 	private TileObject closestObject = null;
 	private boolean showAllInArea;

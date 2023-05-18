@@ -1,8 +1,8 @@
-package net.runelite.client.plugins.microbot.example;
+package net.runelite.client.plugins.microbot.quest;
 
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.walker.PathTileOverlay;
+import net.runelite.client.plugins.microbot.example.ExampleScript;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -11,9 +11,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class ExampleOverlay extends OverlayPanel {
+public class QuestOverlay extends OverlayPanel {
     @Inject
-    ExampleOverlay(ExamplePlugin plugin)
+    QuestOverlay(QuestPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);

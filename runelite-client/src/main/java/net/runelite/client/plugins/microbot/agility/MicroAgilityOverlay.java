@@ -35,8 +35,6 @@ public class MicroAgilityOverlay extends OverlayPanel {
                     .right(Integer.toString(Microbot.getClient().getSkillExperience(Skill.AGILITY)))
                     .build());
 
-            PathTileOverlay.render(graphics);
-
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }

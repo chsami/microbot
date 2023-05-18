@@ -33,7 +33,7 @@ public class Login {
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
         sleep(300, 600);
         try {
-            setWorld(383);
+            setWorld(360);
         }catch(Exception e) {
             System.out.println("Changing world failed");
         } finally {
@@ -52,7 +52,7 @@ public class Login {
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
         sleep(300, 600);
         try {
-            setWorld(383);
+            setWorld(360);
         }catch(Exception e) {
             System.out.println("Changing world failed");
         } finally {

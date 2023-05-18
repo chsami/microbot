@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
+import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.Notifier;
@@ -12,10 +13,18 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
+import net.runelite.client.plugins.microbot.quest.QuestScript;
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
+import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
+import java.awt.event.KeyEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -61,12 +70,7 @@ public class Microbot {
     public static String status = "IDLE";
 
     private static ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
-    private static ScheduledExecutorService walkerSchedulor = Executors.newSingleThreadScheduledExecutor();
-
     private static ScheduledFuture<?> xpSchedulorFuture;
-    @Getter
-    private static ScheduledFuture<?> walkSchedulorFuture;
-
 
     public static boolean isWalking() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808);
@@ -102,15 +106,5 @@ public class Microbot {
         if (client == null) return false;
         GameState idx = client.getGameState();
         return idx != GameState.LOGIN_SCREEN;
-    }
-
-    public static void walkToProcess(WorldPoint worldPoint) {
-        walkSchedulorFuture = walkerSchedulor.scheduleWithFixedDelay(() -> {
-            try {
-                getWalker().walkTo(worldPoint, false, true);
-            } catch(Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
     }
 }

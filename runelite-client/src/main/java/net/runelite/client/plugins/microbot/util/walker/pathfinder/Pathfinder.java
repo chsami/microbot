@@ -63,11 +63,11 @@ public class Pathfinder implements Runnable {
         new Thread(this).start();
     }
 
-    public Pathfinder(PathfinderConfig config) {
+    public Pathfinder(PathfinderConfig config, WorldPoint target) {
         this.config = config;
         this.config.refresh();
+        this.target = target;
         start = null;
-        target = null;
         done = true;
     }
 

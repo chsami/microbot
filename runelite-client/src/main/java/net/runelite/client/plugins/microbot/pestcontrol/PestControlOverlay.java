@@ -40,8 +40,6 @@ public class PestControlOverlay  extends OverlayPanel {
                     .right(Integer.toString(PestControlScript.games))
                     .build());
 
-            PathTileOverlay.render(graphics);
-
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }

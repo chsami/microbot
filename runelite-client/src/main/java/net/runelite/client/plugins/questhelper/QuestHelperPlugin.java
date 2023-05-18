@@ -30,6 +30,7 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provides;
+import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.questhelper.banktab.QuestBankTab;
 import net.runelite.client.plugins.questhelper.banktab.QuestHelperBankTagService;
 import net.runelite.client.plugins.questhelper.overlays.*;
@@ -188,7 +189,7 @@ public class QuestHelperPlugin extends Plugin
 	private QuestHelperConfig config;
 
 	@Getter
-	private QuestHelper selectedQuest = null;
+	private static QuestHelper selectedQuest = null;
 
 	@Getter
 	@Inject

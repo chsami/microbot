@@ -33,6 +33,7 @@ import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
+import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.questhelper.ItemCollections;
 import net.runelite.client.plugins.questhelper.QuestBank;
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;

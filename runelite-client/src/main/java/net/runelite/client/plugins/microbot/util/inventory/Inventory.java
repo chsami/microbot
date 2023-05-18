@@ -9,9 +9,11 @@ import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -179,6 +181,22 @@ public class Inventory {
         return null;
     }
 
+    public static boolean hasItemsAmount(List<ItemRequirement> itemRequirements) {
+        Microbot.status = "Check if inventory has multiple items required";
+        Tab.switchToInventoryTab();
+        Widget inventoryWidget = getInventory();
+        boolean hasItems = true;
+        for (ItemRequirement item : itemRequirements) {
+            hasItems = Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                    .filter(x ->
+                            itemExistsInInventory(x) && x.getItemId() == item.getId()
+                    ).count() >= item.getQuantity());
+            if (!hasItems)
+                break;
+        }
+        return hasItems;
+    }
+
     public static boolean hasItemAmount(int itemId, int amount) {
         Microbot.status = "Check if inventory has item: " + itemId + " with amount: " + amount;
         Tab.switchToInventoryTab();
@@ -198,6 +216,17 @@ public class Inventory {
                         itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())
                 ).count() >= amount);
     }
+
+    public static boolean hasItemAmountExact(String itemName, int amount) {
+        Microbot.status = "Check if inventory has item: " + itemName + " with amount: " + amount;
+        Tab.switchToInventoryTab();
+        Widget inventoryWidget = getInventory();
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .filter(x ->
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase())
+                ).count() == amount);
+    }
+
 
     public static boolean hasItemAmountStackable(String itemName, int amount) {
         Microbot.status = "Check if inventory has item: " + itemName + " with amount: " + amount;
@@ -303,6 +332,7 @@ public class Inventory {
         sleep(600, 1200);
         return true;
     }
+
     public static boolean useItem(int id) {
         if (Rs2Bank.isBankOpen()) return false;
         Microbot.status = "Use inventory item " + id;
@@ -312,13 +342,14 @@ public class Inventory {
         sleep(600, 1200);
         return true;
     }
+
     public static boolean interact(String itemName) {
         useItem(itemName);
         return true;
     }
 
-    public static boolean interact(String...itemNames) {
-        for (String itemName: itemNames) {
+    public static boolean interact(String... itemNames) {
+        for (String itemName : itemNames) {
             Widget item = findItem(itemName);
             if (item != null) {
                 Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
