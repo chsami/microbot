@@ -4,9 +4,11 @@ import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
 import net.runelite.api.Point;
 import net.runelite.api.SpriteID;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
+import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -278,7 +280,10 @@ public class Rs2Bank {
 
     public static boolean walkToBank() {
         NPC npc = Rs2Npc.getNpc("banker");
-        if (npc == null) return false;
+        if (npc == null) {
+            BankLocation bankLocation = getNearestBank();
+            Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), true, false);
+        }
         if (npc.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 4) {
             Microbot.getWalker().walkTo(npc.getWorldLocation(), true, false);
             return false;
@@ -298,7 +303,7 @@ public class Rs2Bank {
                 Rs2Bank.withdrawItemX(true, item.getName(), item.getQuantity());
             }
         }
-        return Inventory.hasItemsAmount(itemsRequired);
+        return itemsMissing.size() == 0;
     }
 
     public static boolean hasItems(List<ItemRequirement> itemsRequired) {
@@ -309,5 +314,21 @@ public class Rs2Bank {
             }
         }
         return itemsMissing.size() == 0;
+    }
+
+    public static BankLocation getNearestBank() {
+        BankLocation nearest = null;
+        double dist = Double.MAX_VALUE;
+        WorldPoint local = Microbot.getClient().getLocalPlayer().getWorldLocation();
+        for (BankLocation bankLocation : BankLocation.values())
+        {
+            double currDist = local.distanceTo(bankLocation.getWorldPoint());
+            if (nearest == null || currDist < dist)
+            {
+                dist = currDist;
+                nearest = bankLocation;
+            }
+        }
+        return nearest;
     }
 }

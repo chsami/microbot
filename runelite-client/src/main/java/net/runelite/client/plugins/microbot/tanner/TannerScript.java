@@ -6,7 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.tanner.enums.Location;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.bank.eunms.BankLocation;
+import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -14,7 +14,6 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.api.*;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class TannerScript extends Script {

@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -32,10 +33,11 @@ public class ExampleScript extends Script {
             if (!super.run()) return;
             try {
 
-
-
               //  Rs2Npc.interact("kovac", "Hand-in");
                 System.out.println(Arrays.deepToString(Arrays.stream(Microbot.getClient().getMenuEntries()).toArray(MenuEntry[]::new)));
+               // Inventory.drop("weeds");
+                Rs2Npc.interact(NpcID.PRISSY_SCILLA, "pay");
+                sleepUntil(() -> Inventory.hasItemAmountStackable("tomatoes(5)", 4));
                 //System.out.println(Microbot.getClient().getLocalPlayer().getWorldArea().canTravelInDirection(Microbot.getClient(), 0, -3));
                 //Rs2Menu.setOption("Set custom quantity");
 

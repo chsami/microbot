@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum FarmingMaterial {
-    OAK_TREE("Oak trees", "oak sapling", "tomatoes(5)"),
-    WILLOW_TREE("Willow trees", "willow sapling", "dunno"),
-    MAPLE_TREE("Maple trees", "maple sapling", "dunno");
+    OAK_TREE("Oak", "oak sapling", "tomatoes(5)"),
+    WILLOW_TREE("Willow", "willow sapling", "dunno"),
+    MAPLE_TREE("Maple", "maple sapling", "dunno");
 
 
     private final String name;

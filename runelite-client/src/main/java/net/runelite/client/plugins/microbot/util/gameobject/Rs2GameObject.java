@@ -84,6 +84,11 @@ public class Rs2GameObject {
         return findObject(objectName, true);
     }
 
+    public static ObjectComposition findObject(int id) {
+        ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
+        return objComp;
+    }
+
     public static TileObject findObjectById(int id) {
 
         List<GameObject> gameObjects = getGameObjects();
@@ -198,6 +203,80 @@ public class Rs2GameObject {
                 if (objComp.getName().toLowerCase().contains(objectName.toLowerCase())) {
                     return gameObject;
                 }
+            }
+        }
+
+        return null;
+    }
+
+    public static boolean hasAction(ObjectComposition objComp, String action) {
+        boolean result = false;
+
+        result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
+        if (!result) {
+            try {
+                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.toLowerCase().equals(action.toLowerCase()));
+            } catch (Exception ex) {
+                //do nothing
+            }
+        }
+        return result;
+    }
+
+    public static boolean hasAction(GameObject gameObject, String action) {
+        boolean result = false;
+        ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
+
+        result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
+        if (!result) {
+            try {
+                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.toLowerCase().equals(action.toLowerCase()));
+            } catch (Exception ex) {
+                //do nothing
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Imposter objects are objects that have their menu action changed but still remain the same object.
+     * for example: farming patches
+     *
+     * @param action
+     * @return
+     */
+    public static GameObject findObjectByImposter(int id, String action) {
+        return findObjectByImposter(id, action, true);
+    }
+
+    public static GameObject findObjectByImposter(int id, String optionName, boolean exact) {
+        List<GameObject> gameObjects = getGameObjects();
+
+        if (gameObjects == null) return null;
+
+        for (net.runelite.api.GameObject gameObject : gameObjects) {
+
+            if (gameObject.getId() != id) continue;
+
+            ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
+
+            if (objComp == null) continue;
+
+            try {
+                if (objComp.getImpostor() == null) continue;
+                if (exact) {
+                    if (Arrays.stream(objComp.getImpostor().getActions()).filter(action -> action != null)
+                            .anyMatch((action) -> action.toLowerCase().equals(optionName.toLowerCase()))) {
+                        return gameObject;
+                    }
+                } else {
+                    if (Arrays.stream(objComp.getImpostor().getActions()).filter(action -> action != null)
+                            .anyMatch((action) -> action.toLowerCase().contains(optionName.toLowerCase()))) {
+                        return gameObject;
+                    }
+                }
+            } catch (Exception ex) {
+                // do nothing
             }
         }
 

@@ -8,6 +8,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -128,6 +129,12 @@ public abstract class Script implements IScript {
 
         if (Microbot.getWalker() != null && Microbot.getWalker().getPathfinder() != null && !Microbot.getWalker().getPathfinder().isDone())
             return false;
+
+        boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
+
+        if (!hasRunEnergy) {
+            Inventory.useItemContains("Stamina potion");
+        }
 
         return true;
     }

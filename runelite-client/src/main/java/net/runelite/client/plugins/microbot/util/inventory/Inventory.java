@@ -181,22 +181,6 @@ public class Inventory {
         return null;
     }
 
-    public static boolean hasItemsAmount(List<ItemRequirement> itemRequirements) {
-        Microbot.status = "Check if inventory has multiple items required";
-        Tab.switchToInventoryTab();
-        Widget inventoryWidget = getInventory();
-        boolean hasItems = true;
-        for (ItemRequirement item : itemRequirements) {
-            hasItems = Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
-                    .filter(x ->
-                            itemExistsInInventory(x) && x.getItemId() == item.getId()
-                    ).count() >= item.getQuantity());
-            if (!hasItems)
-                break;
-        }
-        return hasItems;
-    }
-
     public static boolean hasItemAmount(int itemId, int amount) {
         Microbot.status = "Check if inventory has item: " + itemId + " with amount: " + amount;
         Tab.switchToInventoryTab();
@@ -388,6 +372,7 @@ public class Inventory {
     public static boolean useItemAction(String itemName, String actionName) {
         Microbot.status = "Use inventory item " + itemName + " with action " + actionName;
         Widget item = findItem(itemName);
+        if (item == null) return false;
         return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
 
@@ -422,6 +407,29 @@ public class Inventory {
         Microbot.pauseAllScripts = false;
         VirtualKeyboard.releaseShift();
         return true;
+    }
+
+    public static boolean drop(String itemName) {
+        if (!VirtualKeyboard.isKeyPressed(KeyEvent.VK_SHIFT) || !Rs2Menu.hasAction("drop"))
+            VirtualKeyboard.holdShift();
+
+        boolean result = useItemAction(itemName, "drop");
+
+        VirtualKeyboard.releaseShift();
+
+        return result;
+    }
+
+    public static boolean dropAll(String itemName) {
+        while (hasItem(itemName)) {
+            if (!VirtualKeyboard.isKeyPressed(KeyEvent.VK_SHIFT) || !Rs2Menu.hasAction("drop"))
+                VirtualKeyboard.holdShift();
+            useItemAction(itemName, "drop");
+            sleep(150, 300);
+        }
+        VirtualKeyboard.releaseShift();
+
+        return !hasItem(itemName);
     }
 
     public static boolean isUsingItem() {
