@@ -29,7 +29,7 @@ public class FarmingScript extends Script {
 
     public List<ItemRequirement> itemsRequired = new ArrayList();
 
-    public static FarmingState state = FarmingState.FARMING_VARROCK;
+    public static FarmingState state = FarmingState.RESET;
 
     WorldPoint TREE_RUN_GNOME_STRONDHOLD = new WorldPoint(2437, 3418, 0);
     WorldPoint SPIRIT_TREE_GRAND_EXCHANGE = new WorldPoint(3185, 3507, 0);
@@ -175,10 +175,10 @@ public class FarmingScript extends Script {
                     int currentFarmingExp = Microbot.getClient().getSkillExperience(Skill.FARMING);
                     sleepUntilOnClientThread(() -> currentFarmingExp != Microbot.getClient().getSkillExperience(Skill.FARMING));
                 } else if (Rs2GameObject.hasAction(tree, "chop down")) {
-                    Rs2Npc.interact(NpcID.PRISSY_SCILLA, "pay");
+                    Rs2Npc.interact(npcId, "pay");
                     sleepUntil(() -> Rs2Widget.hasWidget("pay 200 coins"));
                     VirtualKeyboard.typeString("1");
-                    sleepUntil(() -> !Rs2GameObject.hasAction(tree, "chop down"));
+                   // sleepUntil(() -> !Rs2GameObject.hasAction(tree, "chop down")); -> this crashes the client for some reason
                 } else {
                     //pay protect tree
 
@@ -231,6 +231,6 @@ public class FarmingScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
-        state = FarmingState.FARMING_VARROCK;
+        state = FarmingState.RESET;
     }
 }
