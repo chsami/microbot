@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
@@ -106,5 +107,9 @@ public class Microbot {
         if (client == null) return false;
         GameState idx = client.getGameState();
         return idx != GameState.LOGIN_SCREEN;
+    }
+
+    public static boolean hasLevel(int levelRequired, Skill skill) {
+        return Microbot.getClient().getRealSkillLevel(skill) >= levelRequired;
     }
 }

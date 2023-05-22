@@ -9,6 +9,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.crafting.enums.Gems;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 
@@ -44,6 +45,7 @@ public class CraftingPlugin extends Plugin {
     private CraftingOverlay constructionOverlay;
 
     private CraftingScript craftingScript = new CraftingScript();
+    private GemCraftingScript gemCraftingScript = new GemCraftingScript();
 
     @Override
     protected void startUp() throws AWTException {
@@ -55,10 +57,15 @@ public class CraftingPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(constructionOverlay);
         }
-        craftingScript.run(config);
+        if (config.gemType() != Gems.NONE) {
+            gemCraftingScript.run(config);
+        } else { //add config for hides
+            craftingScript.run(config);
+        }
     }
 
     protected void shutDown() {
+        gemCraftingScript.shutdown();
         craftingScript.shutdown();
         overlayManager.remove(constructionOverlay);
     }

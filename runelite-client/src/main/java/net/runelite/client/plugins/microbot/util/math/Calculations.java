@@ -135,6 +135,14 @@ public class Calculations {
         return null;
     }
 
+    public static Point worldToCanvas(double x, double y) {
+        LocalPoint test = LocalPoint.fromWorld(Microbot.getClient(), (int) x, (int) y);
+        if (test != null) {
+            return Microbot.getClientThread().runOnClientThread(() -> Perspective.localToCanvas(Microbot.getClient(), test, Microbot.getClient().getPlane()));
+        }
+        return null;
+    }
+
 
     /**
      * Returns the length of the path generated to a given RSTile.

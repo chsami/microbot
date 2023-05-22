@@ -1,10 +1,6 @@
 package net.runelite.client.plugins.microbot.pestcontrol;
 
-import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.example.ExamplePlugin;
-import net.runelite.client.plugins.microbot.example.ExampleScript;
-import net.runelite.client.plugins.microbot.util.walker.PathTileOverlay;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -25,7 +21,7 @@ public class PestControlOverlay  extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro PestControl V" + ExampleScript.version)
+                    .text("Micro PestControl V" + PestControlScript.version)
                     .color(Color.GREEN)
                     .build());
 

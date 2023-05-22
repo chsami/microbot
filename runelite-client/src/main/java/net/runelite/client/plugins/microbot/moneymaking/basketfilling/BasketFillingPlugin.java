@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.quest;
+package net.runelite.client.plugins.microbot.moneymaking.basketfilling;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -11,27 +11,27 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Quester",
-        description = "Microbot quest plugin",
-        tags = {"example", "microbot"},
+        name = "Micro Basket filling",
+        description = "Microbot basket filling plugin",
+        tags = {"moneymaking", "microbot", "basket filling"},
         enabledByDefault = false
 )
 @Slf4j
-public class QuestPlugin extends Plugin {
+public class BasketFillingPlugin extends Plugin {
     @Inject
-    private QuestConfig config;
+    private BasketFillingConfig config;
     @Provides
-    QuestConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(QuestConfig.class);
+    BasketFillingConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(BasketFillingConfig.class);
     }
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private QuestOverlay exampleOverlay;
+    private BasketFillingOverlay exampleOverlay;
 
     @Inject
-    QuestScript questScript;
+    BasketFillingScript basketFillingScript;
 
 
     @Override
@@ -39,11 +39,11 @@ public class QuestPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(exampleOverlay);
         }
-        questScript.run(config);
+        basketFillingScript.run(config);
     }
 
     protected void shutDown() {
-        questScript.shutdown();
+        basketFillingScript.shutdown();
         overlayManager.remove(exampleOverlay);
     }
 }

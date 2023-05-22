@@ -183,7 +183,7 @@ public class HouseTabScript extends Script {
 
                 toggleRunEnergy(true);
                 if (Microbot.getClient().getEnergy() < 3000) {
-                    Rs2GameObject.interact(ObjectID.FROZEN_ORNATE_POOL_OF_REJUVENATION);
+                    Rs2GameObject.interact(new int[] {ObjectID.FROZEN_ORNATE_POOL_OF_REJUVENATION, ObjectID.POOL_OF_REJUVENATION}, "drink");
                     return;
                 }
 
@@ -198,11 +198,13 @@ public class HouseTabScript extends Script {
                     boolean isInHouse = Rs2GameObject.findObject(new int[] {ObjectID.LECTERN_37349}) != null;
                     if (isInHouse) {
                         if (hasSoftClay()) {
-                            Rs2GameObject.interact("lectern");
-                            sleepUntil(() -> Rs2Widget.hasWidget("house teleport"), 3000);
+                            if (!Rs2Widget.hasWidget("house teleport"))
+                                Rs2GameObject.interact("lectern");
+                            sleepUntil(() -> Rs2Widget.hasWidget("house teleport"));
                             if (!Rs2Widget.hasWidget("house teleport")) return;
                             Rs2Widget.clickWidget("house teleport");
-                            sleepUntil(() -> !hasSoftClay() && !Microbot.isGainingExp, 60000);
+                            sleep(4000);
+                            sleepUntil(() -> !hasSoftClay() || !Microbot.isGainingExp, 60000);
                         } else {
                             Rs2GameObject.interact(ObjectID.PORTAL_4525, "enter");
                             sleepUntil(() -> Rs2GameObject.findObjectById(ObjectID.LECTERN_37349) == null);

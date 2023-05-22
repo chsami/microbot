@@ -84,6 +84,27 @@ public class Rs2GameObject {
         return findObject(objectName, true);
     }
 
+    public static TileObject findObjectBetween(int startId, int endId) {
+        for (int i = startId; i < endId; i++) {
+            TileObject object = findObjectById(i);
+            if (object == null) continue;
+            return object;
+        }
+        return null;
+    }
+
+    public static int countObjectBetween(int startId, int endId) {
+        int count = 0;
+        for (int i = startId; i < endId; i++) {
+            TileObject object = findObjectById(i);
+            if (object == null) continue;
+            count++;
+        }
+        return count;
+    }
+
+
+
     public static ObjectComposition findObject(int id) {
         ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
         return objComp;

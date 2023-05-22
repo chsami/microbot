@@ -313,7 +313,7 @@ public class Inventory {
         Widget item = findItem(itemName);
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
-        sleep(600, 1200);
+        sleep(600, 800);
         return true;
     }
 

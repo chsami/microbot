@@ -2,67 +2,80 @@ package net.runelite.client.plugins.microbot.farming.tithefarm;
 
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmMaterial;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.tithefarm.TitheFarmPlant;
 import net.runelite.client.plugins.tithefarm.TitheFarmPlantState;
 import net.runelite.client.plugins.tithefarm.TitheFarmPlugin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class TitheFarmScript extends Script {
 
     final int FARM_DOOR = 27445;
-    final String seed = "Logavano seed";
-    final String LOGAVANO_SEEDLING = "Logavano seedling";
-    final String LOGAVANO_FRUIT = "Logavano fruit";
-
     final String FERTILISER = "gricoller's fertiliser";
     static int currentPlant = 0;
 
     final int TOTAL_PLANTS = 14;
 
+    public List<WorldPoint> regions = new ArrayList<>(Arrays.asList(new WorldPoint(68, 37, 0), new WorldPoint(66, 41, 0)));
+
+
     public boolean run(TitheFarmConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
-                boolean isInMinigame = Inventory.hasItem("gricoller's fertiliser");
-                if (!Inventory.hasItem("Logavano seed") && TitheFarmPlugin.getPlants().size() == 0) {
-                    if (Inventory.hasItem(LOGAVANO_FRUIT)) {
-                        Rs2GameObject.interact("sack");
-                        sleepUntil(() -> !Inventory.hasItem(LOGAVANO_FRUIT));
-                        if (!Inventory.hasItem(LOGAVANO_FRUIT)) {
-                            leave();
-                        }
-                    } else if (isInMinigame) {
-                        leave();
-                    } else {
-                        takeSeeds();
-                    }
-                }
-                if (Inventory.hasItem(seed) && !isInMinigame) {
-                    enter();
-                }
+                final String seed = TitheFarmMaterial.getSeedForLevel().getName();
+                boolean isInMinigame = Rs2Widget.getWidget(15794178) != null;
+                int amountOfPlants = Rs2GameObject.countObjectBetween(27384, 27248);
+
                 if (isInMinigame) {
-                    if (TitheFarmPlugin.getPlants().isEmpty()) {
-                        fillWaterCans();
-                        plantSeeds();
-                    } else {
-                        waterSeeds();
+                    DropFertiliser();
+                    if (!Inventory.hasItem(seed) && TitheFarmPlugin.getPlants().size() == 0) {
+                        leave();
+                        return;
+                    }
+                    if (amountOfPlants == 0) {
+                        //fillWaterCans();
+                        for (WorldPoint worldPoint : regions) {
+                            Microbot.getWalker().walkFastRegionCanvas(worldPoint.getX(), worldPoint.getY());
+                            sleep(600);
+                            sleepUntil(() -> Microbot.isWalking());
+                            sleepUntil(() -> !Microbot.isWalking());
+                            sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionX() == worldPoint.getX()
+                                    && Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionY() == worldPoint.getY());
+                        }
+                    }
+                } else {
+                    takeSeeds();
+                    if (Inventory.hasItem(seed)) {
+                        enter();
                     }
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
 
-        }, 0, 600, TimeUnit.MILLISECONDS);
+        }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    private static void DropFertiliser() {
+        if (Inventory.hasItem("Gricoller's fertiliser")) {
+            Inventory.drop("Gricoller's fertiliser");
+        }
     }
 
     public void plantSeeds() {
@@ -75,8 +88,8 @@ public class TitheFarmScript extends Script {
             return;
         }
         while (TitheFarmPlugin.getPlants().size() < TOTAL_PLANTS) {
-            if (!Inventory.hasItem(seed)) break;
-            Inventory.useItem(seed);
+            if (!Inventory.hasItem(TitheFarmMaterial.getSeedForLevel().getName())) break;
+            Inventory.useItem(TitheFarmMaterial.getSeedForLevel().getName());
             TileObject gameObject = Rs2GameObject.interactAndGetObject(ObjectID.TITHE_PATCH);
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(gameObject.getWorldLocation()) < 3);
             sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getAnimation() != -1);
@@ -146,10 +159,15 @@ public class TitheFarmScript extends Script {
     }
 
     public void fillWaterCans() {
-        if (Inventory.hasItemAmount("Watering can(8)", 8)) return;
-        Inventory.useItemSlot(0);
-        Rs2GameObject.interact("Water barrel");
-        sleepUntil(() -> Inventory.hasItemAmount("Watering can(8)", 8), 60000);
+        if (Inventory.hasItem("Gricoller's can")) {
+            Inventory.useItemSlot(0);
+            Rs2GameObject.interact("Water barrel");
+            sleepUntil(() -> Microbot.isAnimating());
+        } else if (!Inventory.hasItemAmount("Watering can(8)", 8)) {
+            Inventory.useItemSlot(0);
+            Rs2GameObject.interact("Water barrel");
+            sleepUntil(() -> Inventory.hasItemAmount("Watering can(8)", 8), 60000);
+        }
     }
 
     public void shutDown() {
@@ -159,9 +177,13 @@ public class TitheFarmScript extends Script {
     public void takeSeeds() {
         GameObject seedTable = Rs2GameObject.findObject("Seed table");
         click(seedTable);
-        Rs2Widget.sleepUntilHasWidget("level 74");
-        keyPress('3');
-        sleep(3000);
+        Rs2Widget.sleepUntilHasWidget(TitheFarmMaterial.getSeedForLevel().getName());
+        keyPress(TitheFarmMaterial.getSeedForLevel().getOption());
+        sleep(1000);
+        VirtualKeyboard.typeString("10000");
+        sleep(600);
+        VirtualKeyboard.enter();
+        sleepUntil(() -> Inventory.hasItem(TitheFarmMaterial.getSeedForLevel().getName()));
     }
 
     public void enter() {

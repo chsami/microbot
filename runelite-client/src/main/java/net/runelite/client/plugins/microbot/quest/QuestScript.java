@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class QuestScript extends Script {
+    public static double version = 1.0;
+
 
     public static List<ItemRequirement> itemRequirements = new ArrayList<>();
 

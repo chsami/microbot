@@ -33,12 +33,13 @@ public class ExampleScript extends Script {
             if (!super.run()) return;
             try {
 
+              //  Rs2Menu.setOption("Deposit-all");
               //  Rs2Npc.interact("kovac", "Hand-in");
                 System.out.println(Arrays.deepToString(Arrays.stream(Microbot.getClient().getMenuEntries()).toArray(MenuEntry[]::new)));
                // Inventory.drop("weeds");
-                Rs2Npc.interact(NpcID.PRISSY_SCILLA, "pay");
-                sleepUntil(() -> Inventory.hasItemAmountStackable("tomatoes(5)", 4));
-                //System.out.println(Microbot.getClient().getLocalPlayer().getWorldArea().canTravelInDirection(Microbot.getClient(), 0, -3));
+               // Rs2Npc.interact(NpcID.PRISSY_SCILLA, "pay");
+             //   sleepUntil(() -> Inventory.hasItemAmountStackable("tomatoes(5)", 4));
+            //    //System.out.println(Microbot.getClient().getLocalPlayer().getWorldArea().canTravelInDirection(Microbot.getClient(), 0, -3));
                 //Rs2Menu.setOption("Set custom quantity");
 
                 //Rs2Bank.useBank();

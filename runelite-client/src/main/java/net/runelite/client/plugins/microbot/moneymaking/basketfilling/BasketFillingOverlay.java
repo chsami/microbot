@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.quest;
+package net.runelite.client.plugins.microbot.moneymaking.basketfilling;
 
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -10,9 +10,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class QuestOverlay extends OverlayPanel {
+public class BasketFillingOverlay extends OverlayPanel {
     @Inject
-    QuestOverlay(QuestPlugin plugin)
+    BasketFillingOverlay(BasketFillingPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -22,7 +22,7 @@ public class QuestOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + QuestScript.version)
+                    .text("Micro BasketFilling V" + BasketFillingScript.version)
                     .color(Color.GREEN)
                     .build());
 
@@ -32,10 +32,6 @@ public class QuestOverlay extends OverlayPanel {
                     .left(Microbot.status)
                     .build());
 
-            for (Point point: Microbot.getMouse().mousePositions) {
-                graphics.setColor(Color.RED);
-                graphics.drawString("x", point.getX(), point.getY());
-            }
 
         } catch(Exception ex) {
             System.out.println(ex.getMessage());

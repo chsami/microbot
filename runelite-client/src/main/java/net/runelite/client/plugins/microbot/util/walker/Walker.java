@@ -95,6 +95,21 @@ public class Walker {
         return worldPoint;
     }
 
+    public WorldPoint walkFastRegionCanvas(int regionX, int regionY) {
+        WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
+                regionX,
+                regionY,
+                Microbot.getClient().getPlane());
+
+        Point point = Calculations.worldToCanvas(worldPoint.getX(), worldPoint.getY());
+
+        if (point == null) return null;
+
+        Microbot.getMouse().click(point);
+
+        return worldPoint;
+    }
+
     public boolean isCloseToRegion(int distance, int regionX, int regionY) {
         WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
                 regionX,
