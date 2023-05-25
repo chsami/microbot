@@ -182,7 +182,7 @@ public class HouseTabScript extends Script {
                 if (Microbot.isGainingExp) return;
 
                 toggleRunEnergy(true);
-                if (Microbot.getClient().getEnergy() < 3000) {
+                if (Microbot.getClient().getEnergy() < 3000 && !Rs2Widget.hasWidget("house teleport") && Rs2GameObject.findObject(new int[] {ObjectID.FROZEN_ORNATE_POOL_OF_REJUVENATION, ObjectID.POOL_OF_REJUVENATION}) != null) {
                     Rs2GameObject.interact(new int[] {ObjectID.FROZEN_ORNATE_POOL_OF_REJUVENATION, ObjectID.POOL_OF_REJUVENATION}, "drink");
                     return;
                 }

@@ -28,8 +28,8 @@ public class ThievingScript extends Script {
                 Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
                 if (foods.length == 0) {
 
-                    if (Inventory.count() > 2) {
-                        Inventory.dropAllStartingFrom(2);
+                    if (Inventory.count() > 3) {
+                        Inventory.dropAllStartingFrom(3);
                         return;
                     }
                     if (Rs2Bank.walkToBank()) {

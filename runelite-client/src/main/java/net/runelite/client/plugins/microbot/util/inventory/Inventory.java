@@ -317,6 +317,15 @@ public class Inventory {
         return true;
     }
 
+    public static boolean useItemUnsafe(String itemName) {
+        if (Rs2Bank.isBankOpen()) return false;
+        Microbot.status = "Use inventory item " + itemName;
+        Widget item = findItem(itemName);
+        if (item == null) return false;
+        Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
+        return true;
+    }
+
     public static boolean useItem(int id) {
         if (Rs2Bank.isBankOpen()) return false;
         Microbot.status = "Use inventory item " + id;

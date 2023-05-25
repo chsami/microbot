@@ -25,139 +25,115 @@
 package net.runelite.client.plugins.tithefarm;
 
 import com.google.inject.Provides;
-import java.util.HashSet;
-import java.util.Set;
-import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameObject;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayManager;
+
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Tithe Farm",
-	description = "Show timers for the farming patches within the Tithe Farm minigame",
-	tags = {"farming", "minigame", "overlay", "skilling", "timers"}
+        name = "Tithe Farm",
+        description = "Show timers for the farming patches within the Tithe Farm minigame",
+        tags = {"farming", "minigame", "overlay", "skilling", "timers"}
 )
-public class TitheFarmPlugin extends Plugin
-{
-	@Inject
-	private OverlayManager overlayManager;
+public class TitheFarmPlugin extends Plugin {
+    @Inject
+    private OverlayManager overlayManager;
 
-	@Inject
-	private TitheFarmPlantOverlay titheFarmOverlay;
+    @Inject
+    private TitheFarmPlantOverlay titheFarmOverlay;
 
-	@Getter
-	private static final Set<TitheFarmPlant> plants = new HashSet<>();
+    @Getter
+    private static final Set<TitheFarmPlant> plants = new HashSet<>();
 
-	@Provides
-	TitheFarmPluginConfig getConfig(ConfigManager configManager)
-	{
-		return configManager.getConfig(TitheFarmPluginConfig.class);
-	}
+    @Provides
+    TitheFarmPluginConfig getConfig(ConfigManager configManager) {
+        return configManager.getConfig(TitheFarmPluginConfig.class);
+    }
 
-	@Override
-	protected void startUp() throws Exception
-	{
-		overlayManager.add(titheFarmOverlay);
-		titheFarmOverlay.updateConfig();
-	}
+    @Override
+    protected void startUp() throws Exception {
+        overlayManager.add(titheFarmOverlay);
+        titheFarmOverlay.updateConfig();
+    }
 
-	@Override
-	protected void shutDown() throws Exception
-	{
-		overlayManager.remove(titheFarmOverlay);
-	}
+    @Override
+    protected void shutDown() throws Exception {
+        overlayManager.remove(titheFarmOverlay);
+    }
 
-	@Subscribe
-	public void onConfigChanged(ConfigChanged event)
-	{
-		if (event.getGroup().equals("tithefarmplugin"))
-		{
-			titheFarmOverlay.updateConfig();
-		}
-	}
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event) {
+        if (event.getGroup().equals("tithefarmplugin")) {
+            titheFarmOverlay.updateConfig();
+        }
+    }
 
-	@Subscribe
-	public void onGameTick(final GameTick event)
-	{
-		plants.removeIf(plant -> plant.getPlantTimeRelative() == 1);
-	}
+    @Subscribe
+    public void onGameTick(final GameTick event) {
+        plants.removeIf(plant -> plant.getPlantTimeRelative() == 1);
+    }
 
-	@Subscribe
-	public void onGameObjectSpawned(GameObjectSpawned event)
-	{
-		GameObject gameObject = event.getGameObject();
+    @Subscribe
+    public void onGameObjectSpawned(GameObjectSpawned event) {
+        GameObject gameObject = event.getGameObject();
 
-		TitheFarmPlantType type = TitheFarmPlantType.getPlantType(gameObject.getId());
-		if (type == null)
-		{
-			return;
-		}
+        TitheFarmPlantType type = TitheFarmPlantType.getPlantType(gameObject.getId());
+        if (type == null) {
+            return;
+        }
 
-		TitheFarmPlantState state = TitheFarmPlantState.getState(gameObject.getId());
+        TitheFarmPlantState state = TitheFarmPlantState.getState(gameObject.getId());
 
-		TitheFarmPlant newPlant = new TitheFarmPlant(state, type, gameObject);
-		TitheFarmPlant oldPlant = getPlantFromCollection(gameObject);
+        TitheFarmPlant newPlant = new TitheFarmPlant(state, type, gameObject);
+        TitheFarmPlant oldPlant = getPlantFromCollection(gameObject);
 
-		if (oldPlant != null)
-			newPlant.setIndex(oldPlant.getIndex());
+        if (oldPlant != null)
+            newPlant.setIndex(oldPlant.getIndex());
 
 
-		if (oldPlant == null && newPlant.getType() != TitheFarmPlantType.EMPTY)
-		{
-			log.debug("Added plant {}", newPlant);
-			if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(newPlant.getGameObject().getWorldLocation()) < 3) {
-				newPlant.setIndex(plants.size());
-				plants.add(newPlant);
-			}
-		}
-		else if (oldPlant == null)
-		{
-			return;
-		}
-		else if (newPlant.getType() == TitheFarmPlantType.EMPTY)
-		{
-			log.debug("Removed plant {}", oldPlant);
-			plants.remove(oldPlant);
-		}
-		else if (oldPlant.getGameObject().getId() != newPlant.getGameObject().getId())
-		{
-			if (oldPlant.getState() != TitheFarmPlantState.WATERED && newPlant.getState() == TitheFarmPlantState.WATERED)
-			{
-				log.debug("Updated plant (watered)");
-				newPlant.setPlanted(oldPlant.getPlanted());
-				plants.remove(oldPlant);
-				plants.add(newPlant);
-			}
-			else
-			{
-				log.debug("Updated plant");
-				plants.remove(oldPlant);
-				plants.add(newPlant);
-			}
-		}
-	}
+        if (oldPlant == null && newPlant.getType() != TitheFarmPlantType.EMPTY) {
+            log.debug("Added plant {}", newPlant);
+            newPlant.setIndex(plants.size());
+            plants.add(newPlant);
+        } else if (oldPlant == null) {
+            return;
+        } else if (newPlant.getType() == TitheFarmPlantType.EMPTY) {
+            log.debug("Removed plant {}", oldPlant);
+            plants.remove(oldPlant);
+        } else if (oldPlant.getGameObject().getId() != newPlant.getGameObject().getId()) {
+            if (oldPlant.getState() != TitheFarmPlantState.WATERED && newPlant.getState() == TitheFarmPlantState.WATERED) {
+                log.debug("Updated plant (watered)");
+                newPlant.setPlanted(oldPlant.getPlanted());
+                plants.remove(oldPlant);
+                plants.add(newPlant);
+            } else {
+                log.debug("Updated plant");
+                plants.remove(oldPlant);
+                plants.add(newPlant);
+            }
+        }
+    }
 
-	private TitheFarmPlant getPlantFromCollection(GameObject gameObject)
-	{
-		WorldPoint gameObjectLocation = gameObject.getWorldLocation();
-		for (TitheFarmPlant plant : plants)
-		{
-			if (gameObjectLocation.equals(plant.getWorldLocation()))
-			{
-				return plant;
-			}
-		}
-		return null;
-	}
+    private TitheFarmPlant getPlantFromCollection(GameObject gameObject) {
+        WorldPoint gameObjectLocation = gameObject.getWorldLocation();
+        for (TitheFarmPlant plant : plants) {
+            if (gameObjectLocation.equals(plant.getWorldLocation())) {
+                return plant;
+            }
+        }
+        return null;
+    }
 }

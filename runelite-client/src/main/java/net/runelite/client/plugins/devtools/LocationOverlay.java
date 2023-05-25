@@ -100,6 +100,12 @@ public class LocationOverlay extends OverlayPanel
 				.build());
 
 		panelComponent.getChildren().add(LineComponent.builder()
+				.left("Region")
+				.right(localWorld.getRegionX() + ", " + localWorld.getRegionY())
+				.build());
+
+
+		panelComponent.getChildren().add(LineComponent.builder()
 			.left("Tile")
 			.right(localWorld.getX() + ", " + localWorld.getY() + ", " + client.getPlane())
 			.build());

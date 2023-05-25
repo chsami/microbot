@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.microbot.util.gameobject;
 
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
@@ -21,6 +23,10 @@ public class Rs2GameObject {
 
     public static boolean interact(GameObject gameObject) {
         return clickObject(gameObject);
+    }
+
+    public static boolean interact(TileObject tileObject) {
+        return clickObject(tileObject);
     }
 
     public static boolean interact(GameObject gameObject, String action) {
@@ -83,27 +89,6 @@ public class Rs2GameObject {
     public static GameObject findObject(String objectName) {
         return findObject(objectName, true);
     }
-
-    public static TileObject findObjectBetween(int startId, int endId) {
-        for (int i = startId; i < endId; i++) {
-            TileObject object = findObjectById(i);
-            if (object == null) continue;
-            return object;
-        }
-        return null;
-    }
-
-    public static int countObjectBetween(int startId, int endId) {
-        int count = 0;
-        for (int i = startId; i < endId; i++) {
-            TileObject object = findObjectById(i);
-            if (object == null) continue;
-            count++;
-        }
-        return count;
-    }
-
-
 
     public static ObjectComposition findObject(int id) {
         ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
@@ -385,6 +370,24 @@ public class Rs2GameObject {
 
 
     //private methods
+    public static GameObject getGameObject(LocalPoint localPoint) {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        int z = Microbot.getClient().getPlane();
+        List<GameObject> tileObjects = new ArrayList<>();
+        Tile tile = tiles[z][localPoint.getSceneX()][localPoint.getSceneY()];
+
+        for (GameObject tileObject :
+                tile.getGameObjects()) {
+            if (tileObject != null
+                    && tileObject.getSceneMinLocation().equals(tile.getSceneLocation()))
+                tileObjects.add(tileObject);
+        }
+
+        return Arrays.stream(tile.getGameObjects()).findFirst().orElse(null);
+    }
+
     private static List<GameObject> getGameObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
