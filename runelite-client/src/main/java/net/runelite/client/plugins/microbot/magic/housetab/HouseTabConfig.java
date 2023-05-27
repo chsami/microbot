@@ -30,6 +30,6 @@ public interface HouseTabConfig extends Config {
     )
     default String housePlayerName()
     {
-        return "valeron xiii";
+        return "";
     }
 }
