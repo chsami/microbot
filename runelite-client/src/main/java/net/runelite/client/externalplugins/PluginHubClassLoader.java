@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019 Abex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,27 +22,46 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.ui;
+package net.runelite.client.externalplugins;
 
-import com.apple.eawt.Application;
-import com.apple.eawt.QuitStrategy;
+import com.google.gson.Gson;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.invoke.MethodHandles;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import lombok.Getter;
+import lombok.Setter;
+import net.runelite.client.util.ReflectUtil;
 
-class MacOSQuitStrategy
+class PluginHubClassLoader extends URLClassLoader implements ReflectUtil.PrivateLookupableClassLoader
 {
-	public static void setup()
+	@Getter
+	private final PluginHubManifest.JarData jarData;
+
+	@Getter
+	private final PluginHubManifest.Stub stub;
+
+	@Getter
+	@Setter
+	private MethodHandles.Lookup lookup;
+
+	PluginHubClassLoader(PluginHubManifest.JarData jarData, URL[] urls, Gson gson) throws IOException
 	{
-		try
+		super(urls, PluginHubClassLoader.class.getClassLoader());
+		this.jarData = jarData;
+		try (InputStream is = getResourceAsStream("runelite_plugin.json"))
 		{
-			// com.apple.eawt.QuitStrategy was moved to java.desktop in Java 9,
-			// but our OrangeExtensions API targets 1.6, so this code is only valid
-			// on 8 below.
-			Application.getApplication()
-				.setQuitStrategy(QuitStrategy.CLOSE_ALL_WINDOWS);
+			this.stub = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), PluginHubManifest.Stub.class);
 		}
-		catch (NoClassDefFoundError ex)
-		{
-			// IntelliJ doesn't handle our multi-release Maven setup well, and will run
-			// this class on 11+. Ignore the error so the client can launch.
-		}
+		ReflectUtil.installLookupHelper(this);
+	}
+
+	@Override
+	public Class<?> defineClass0(String name, byte[] b, int off, int len) throws ClassFormatError
+	{
+		return super.defineClass(name, b, off, len);
 	}
 }
