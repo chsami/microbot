@@ -61,6 +61,7 @@ public class Inventory {
 
     public static boolean isInventoryFull() {
         Microbot.status = "Checking if inventory is full";
+        Tab.switchToInventoryTab();
         Widget inventoryWidget = getInventory();
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == 28);
     }

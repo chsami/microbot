@@ -36,7 +36,7 @@ public class Counter extends InfoBox
 {
 	@Getter
 	@Setter
-	private int count;
+	private static int count;
 
 	public Counter(BufferedImage image, Plugin plugin, int count)
 	{

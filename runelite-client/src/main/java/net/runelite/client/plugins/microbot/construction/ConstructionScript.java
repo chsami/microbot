@@ -39,7 +39,7 @@ public class ConstructionScript extends Script {
     }
 
     public boolean hasDialogueOptionToUnnote() {
-        return Rs2Widget.findWidget("Un-note", null) != null;
+        return Rs2Widget.findWidget("Fetch", null) != null;
     }
 
     public boolean hasPayButlerDialogue() {

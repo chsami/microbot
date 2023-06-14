@@ -173,6 +173,20 @@ public class Rs2GameObject {
         return null;
     }
 
+    public static GameObject findObject(int id, WorldPoint worldPoint) {
+
+        List<GameObject> gameObjects = getGameObjects();
+
+        if (gameObjects == null) return null;
+
+        for (net.runelite.api.GameObject gameObject : gameObjects) {
+            if (gameObject.getId() == id && gameObject.getWorldLocation().equals(worldPoint))
+                return gameObject;
+        }
+
+        return null;
+    }
+
     public static ObjectComposition findObjectComposition(int id) {
 
         List<GameObject> gameObjects = getGameObjects();

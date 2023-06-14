@@ -2,10 +2,7 @@ package net.runelite.client.plugins.microbot;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.GameState;
-import net.runelite.api.Skill;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
@@ -30,6 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class Microbot {
 
@@ -111,5 +110,15 @@ public class Microbot {
 
     public static boolean hasLevel(int levelRequired, Skill skill) {
         return Microbot.getClient().getRealSkillLevel(skill) >= levelRequired;
+    }
+
+    public static void toggleSpecialAttack(int energyRequired) {
+        int currentSpecEnergy = client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
+        if (currentSpecEnergy >= 999 && (client.getVarpValue(VarPlayer.SPECIAL_ATTACK_ENABLED) == 0)) {
+            for (int i = 0; i < 3; i++) {
+                Rs2Widget.clickWidget("special attack");
+                sleep(5000);
+            }
+        }
     }
 }

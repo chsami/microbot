@@ -85,9 +85,9 @@ public class Tab {
 
     public static boolean switchToMagicTab() {
         if (getCurrentTab() == InterfaceTab.MAGIC) return true;
-        Widget inventory = Microbot.getClient().getWidget(10551360);
-        if (inventory == null) return false;
-        Microbot.getMouse().click(inventory.getBounds());
+        Widget magicTab = Microbot.getClient().getWidget(10551360);
+        if (magicTab == null) return false;
+        Microbot.getMouse().click(magicTab.getBounds());
         sleep(600, 1000);
         return getCurrentTab() == InterfaceTab.MAGIC;
     }

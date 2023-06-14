@@ -61,6 +61,7 @@ import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WallObjectSpawned;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.mta.MTAConfig;
 import net.runelite.client.plugins.mta.MTARoom;
 
@@ -75,11 +76,11 @@ public class TelekineticRoom extends MTARoom
 
 	private final List<WallObject> telekineticWalls = new ArrayList<>();
 
-	private Stack<Direction> moves = new Stack<>();
+	private static Stack<Direction> moves = new Stack<>();
 	private LocalPoint destination;
 	private WorldPoint location;
 	private WorldPoint finishLocation;
-	private Rectangle bounds;
+	private static Rectangle bounds;
 	private NPC guardian;
 	private Maze maze;
 
@@ -255,9 +256,9 @@ public class TelekineticRoom extends MTARoom
 		}
 	}
 
-	private WorldPoint optimal()
+	public static WorldPoint optimal()
 	{
-		WorldPoint current = client.getLocalPlayer().getWorldLocation();
+		WorldPoint current = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
 		Direction next = moves.pop();
 		WorldArea areaNext = getIndicatorLine(next);
@@ -283,7 +284,7 @@ public class TelekineticRoom extends MTARoom
 		return Math.abs(point1.getX() - point2.getX()) + Math.abs(point2.getY() - point1.getY());
 	}
 
-	private WorldPoint nearest(WorldArea area, WorldPoint worldPoint)
+	private static WorldPoint nearest(WorldArea area, WorldPoint worldPoint)
 	{
 		int dist = Integer.MAX_VALUE;
 		WorldPoint nearest = null;
@@ -508,7 +509,7 @@ public class TelekineticRoom extends MTARoom
 		return null;
 	}
 
-	private WorldArea getIndicatorLine(Direction direction)
+	private static WorldArea getIndicatorLine(Direction direction)
 	{
 		switch (direction)
 		{

@@ -5,20 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
-import net.runelite.api.Point;
-import net.runelite.api.World;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.example.ExampleConfig;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.pestcontrol.Game;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -26,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import static net.runelite.api.Varbits.QUICK_PRAYER;
 import static net.runelite.client.plugins.microbot.util.globval.VarbitValues.QUICK_PRAYER_DISABLED;
-import static net.runelite.client.plugins.microbot.util.globval.VarbitValues.QUICK_PRAYER_ENABLED;
 import static net.runelite.client.plugins.pestcontrol.Portal.*;
 import static net.runelite.client.plugins.pestcontrol.Portal.RED;
 

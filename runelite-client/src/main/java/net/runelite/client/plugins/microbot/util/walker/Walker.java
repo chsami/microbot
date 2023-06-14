@@ -110,6 +110,26 @@ public class Walker {
         return worldPoint;
     }
 
+    public WorldPoint walkFastMinimap(WorldPoint worldPoint) {
+        Point point = Calculations.worldToMinimap(worldPoint.getX(), worldPoint.getY());
+
+        if (point == null) return null;
+
+        Microbot.getMouse().click(point);
+
+        return worldPoint;
+    }
+
+    public WorldPoint walkFastCanvas(WorldPoint worldPoint) {
+        Point point = Calculations.worldToCanvas(worldPoint.getX(), worldPoint.getY());
+
+        if (point == null) return null;
+
+        Microbot.getMouse().click(point);
+
+        return worldPoint;
+    }
+
     public boolean isCloseToRegion(int distance, int regionX, int regionY) {
         WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
                 regionX,

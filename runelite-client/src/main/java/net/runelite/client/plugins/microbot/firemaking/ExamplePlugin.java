@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.example;
+package net.runelite.client.plugins.microbot.firemaking;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class ExamplePlugin extends Plugin {
     private ExampleOverlay exampleOverlay;
 
     @Inject
-    net.runelite.client.plugins.microbot.example.ExampleScript exampleScript;
+    ExampleScript exampleScript;
 
 
     @Override
