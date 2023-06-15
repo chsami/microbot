@@ -30,7 +30,6 @@ public class NmzScript extends Script {
             try {
                 boolean isOutsideNmz = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2602, 3116, 0)) < 20;
                 boolean hasStartedNmz = Microbot.getVarbitValue(3946) > 0;
-                Microbot.toggleSpecialAttack(25);
                 if (hasStartedNmz == false) {
                     if (isOutsideNmz) {
                         Rs2Npc.interact(NpcID.DOMINIC_ONION, "Dream");
@@ -43,6 +42,9 @@ public class NmzScript extends Script {
                         VirtualKeyboard.enter();
                     } else {
                         //inside nmz
+                        if (Microbot.getClient().getLocalPlayer().isInteracting()) {
+                            Microbot.toggleSpecialAttack(25);
+                        }
                         if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) == Microbot.getClient().getRealSkillLevel(Skill.ATTACK)
                                 && Inventory.hasItemContains("overload")) {
                             Inventory.interact(new String[] {"overload (4)", "overload (3)", "overload (2)", "overload (1)"});

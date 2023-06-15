@@ -45,10 +45,11 @@ public class FiremakingScript extends Script {
                 // Walk to bank
 
                 boolean hasTinderbox = Inventory.hasItem("tinderbox");
-                String logs = "logs";
+                String logs = "Oak logs";
+                boolean hasLogs = Inventory.hasItem(logs);
 
                 if (firemakingStatus == FiremakingStatus.FETCH_LOGS) {
-                    if (Inventory.isInventoryFull())
+                    if (hasLogs)
                     {
                         firemakingStatus = FiremakingStatus.FIND_EMPTY_SPOT;
                         return;
@@ -59,7 +60,7 @@ public class FiremakingScript extends Script {
                         if (!hasTinderbox) {
                             Rs2Bank.withdrawItem("tinderbox");
                         }
-                        Rs2Bank.withdrawItemAll(true, "logs");
+                        Rs2Bank.withdrawItemAll(true, logs);
                     }
                 }
 
@@ -91,13 +92,28 @@ public class FiremakingScript extends Script {
                     if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(currentFiremakingSpot)) {
                         firemakingStatus = FiremakingStatus.FIREMAKING;
                     }
+                }
 
-                    Rs2GameObject.findObject(ObjectID.FIRE_26185, startingPositions[Random.random(0, startingPositions.length)]);
+                if (firemakingStatus == FiremakingStatus.FIREMAKING) {
+                    if (Rs2GameObject.findObject(ObjectID.FIRE_26185, Microbot.getClient().getLocalPlayer().getWorldLocation()) != null)
+                    {
+                        firemakingStatus = FiremakingStatus.FIND_EMPTY_SPOT;
+                        return;
+                    }
+                    final WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
+                    Inventory.useItem("tinderbox");
+                    Inventory.useItem(logs);
+                    sleep(1800);
+                    sleepUntilOnClientThread(() -> !Microbot.isAnimating() ||  !start.equals( Microbot.getClient().getLocalPlayer().getWorldLocation()) , 30000);
+                    boolean didNotMove = start.equals( Microbot.getClient().getLocalPlayer().getWorldLocation());
+                    if (didNotMove) {
+                        firemakingStatus = FiremakingStatus.FIND_EMPTY_SPOT;
+                    }
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 600, TimeUnit.MILLISECONDS);
+        }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
     }
 }
