@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.playerassist.combat.AttackNpcScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.CombatPotionScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.PrayerPotionScript;
+import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 
@@ -52,6 +53,7 @@ public class PlayerAssistPlugin extends Plugin {
     private CombatPotionScript combatPotion = new CombatPotionScript();
     private FoodScript foodScript = new FoodScript();
     private PrayerPotionScript prayerPotionScript = new PrayerPotionScript();
+    private LootScript lootScript = new LootScript();
 
 
     @Override
@@ -64,6 +66,7 @@ public class PlayerAssistPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(playerAssistOverlay);
         }
+        lootScript.run(config);
         cannonScript.run(config);
         attackNpc.run(config);
         combatPotion.run(config);
@@ -73,6 +76,7 @@ public class PlayerAssistPlugin extends Plugin {
     }
 
     protected void shutDown() {
+        lootScript.shutdown();
         cannonScript.shutdown();
         attackNpc.shutdown();
         combatPotion.shutdown();
