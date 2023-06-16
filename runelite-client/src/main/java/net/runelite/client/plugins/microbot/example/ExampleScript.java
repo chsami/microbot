@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.firemaking;
+package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;

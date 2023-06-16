@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.example.enums;
+package net.runelite.client.plugins.microbot.firemaking.enums;
 
 public enum FiremakingStatus {
     FETCH_LOGS,

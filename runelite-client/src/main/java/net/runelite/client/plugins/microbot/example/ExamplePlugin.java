@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.firemaking;
+package net.runelite.client.plugins.microbot.example;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;

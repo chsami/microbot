@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.example;
+package net.runelite.client.plugins.microbot.firemaking;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import java.awt.*;
 
 @PluginDescriptor(
         name = "Micro Firemaking",
-        description = "Microbot Firemaking plugin",
+        description = "Microbot firemaking plugin",
         tags = {"firemaking", "microbot"},
         enabledByDefault = false
 )
@@ -28,22 +28,22 @@ public class FiremakingPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private FiremakingOverlay exampleOverlay;
+    private FiremakingOverlay firemakingOverlay;
 
     @Inject
-    FiremakingScript exampleScript;
+    FiremakingScript firemakingScript;
 
 
     @Override
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
-            overlayManager.add(exampleOverlay);
+            overlayManager.add(firemakingOverlay);
         }
-        exampleScript.run(config);
+        firemakingScript.run(config);
     }
 
     protected void shutDown() {
-        exampleScript.shutdown();
-        overlayManager.remove(exampleOverlay);
+        firemakingScript.shutdown();
+        overlayManager.remove(firemakingOverlay);
     }
 }

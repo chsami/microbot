@@ -1093,12 +1093,12 @@ public class ClientUI
 
 			if (player != null && player.getName() != null)
 			{
-				frame.setTitle(title + " - " + player.getName());
+				frame.setTitle("Microbot by Mocrosoft");
 			}
 		}
 		else
 		{
-			frame.setTitle(title);
+			frame.setTitle("Microbot by Mocrosoft");
 		}
 
 		if (frame.isAlwaysOnTopSupported())

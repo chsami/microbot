@@ -10,9 +10,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class ExampleOverlay extends OverlayPanel {
+public class FiremakingOverlay extends OverlayPanel {
     @Inject
-    ExampleOverlay(ExamplePlugin plugin)
+    FiremakingOverlay(FiremakingPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -22,7 +22,7 @@ public class ExampleOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + ExampleScript.version)
+                    .text("Micro Example V" + FiremakingScript.version)
                     .color(Color.GREEN)
                     .build());
 
