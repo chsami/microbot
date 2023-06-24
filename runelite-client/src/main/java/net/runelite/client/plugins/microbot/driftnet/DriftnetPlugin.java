@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.walking;
+package net.runelite.client.plugins.microbot.driftnet;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -11,39 +11,39 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Walker",
-        description = "Microbot example plugin",
-        tags = {"walker", "microbot"},
+        name = "Micro Drifnet",
+        description = "Microbot drifnet plugin",
+        tags = {"fishing", "microbot"},
         enabledByDefault = false
 )
 @Slf4j
-public class WalkingPlugin extends Plugin {
+public class DriftnetPlugin extends Plugin {
     @Inject
-    private WalkingConfig config;
+    private DriftnetConfig config;
     @Provides
-    WalkingConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(WalkingConfig.class);
+    DriftnetConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(DriftnetConfig.class);
     }
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private WalkingOverlay exampleOverlay;
+    private DriftnetOverlay driftnetOverlay;
 
     @Inject
-    WalkingScript exampleScript;
+    DriftnetScript driftnetScript;
 
 
     @Override
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
-            overlayManager.add(exampleOverlay);
+            overlayManager.add(driftnetOverlay);
         }
-        exampleScript.run(config);
+        driftnetScript.run(config);
     }
 
     protected void shutDown() {
-        exampleScript.shutdown();
-        overlayManager.remove(exampleOverlay);
+        driftnetScript.shutdown();
+        overlayManager.remove(driftnetOverlay);
     }
 }

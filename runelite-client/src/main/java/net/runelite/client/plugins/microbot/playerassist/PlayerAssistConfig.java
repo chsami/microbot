@@ -90,5 +90,26 @@ public interface PlayerAssistConfig extends Config {
     {
         return "";
     }
+
+    @ConfigItem(
+            keyName = "SafeSpot",
+            name = "SafeSpot",
+            description = "Start at your safespot",
+            position = 5
+    )
+    default boolean safeSpot()
+    {
+        return false;
+    }
+    @ConfigItem(
+            keyName = "PrayFlick",
+            name = "PrayFlick",
+            description = "PrayFlick",
+            position = 6
+    )
+    default boolean prayFlick()
+    {
+        return false;
+    }
 }
 

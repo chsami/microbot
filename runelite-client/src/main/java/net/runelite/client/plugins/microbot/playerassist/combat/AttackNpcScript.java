@@ -34,16 +34,24 @@ public class AttackNpcScript extends Script {
                 if (!super.run()) return;
                  attackableNpcs =  Microbot.getClient().getNpcs().stream()
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .filter(x -> !x.isDead() &&
-                                !x.isInteracting()
-                                && x.getInteracting() == null
+                        .filter(x -> !x.isDead()
+                                && x.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 7
+                                && (!x.isInteracting() || x.getInteracting() == Microbot.getClient().getLocalPlayer())
+                                && (x.getInteracting() == null  || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && x.getAnimation() == -1 && npcToAttack.toLowerCase().equals(x.getName().toLowerCase())).collect(Collectors.toList());
                 Player player = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer());
                 if (player.isInteracting() || player.getAnimation() != -1) {
                     return;
                 }
                 for (NPC npc : attackableNpcs) {
-                    if (npc == null || npc.getAnimation() != -1 || npc.isDead() || npc.getInteracting() != null || npc.isInteracting() || !npc.getName().toLowerCase().equals(npcToAttack.toLowerCase()))
+                    if (npc == null
+                            || npc.getAnimation() != -1
+                            || npc.isDead()
+                            || (npc.getInteracting() != null && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
+                            || (npc.isInteracting()  && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
+                            || !npc.getName().toLowerCase().equals(npcToAttack.toLowerCase()))
+                        break;
+                    if (npc.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 10)
                         break;
                     if (!Camera.isTileOnScreen(npc.getLocalLocation()))
                         Camera.turnTo(npc);

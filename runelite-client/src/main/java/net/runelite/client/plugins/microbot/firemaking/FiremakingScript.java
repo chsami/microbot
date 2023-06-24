@@ -28,7 +28,7 @@ public class FiremakingScript extends Script {
 
     public static double version = 1.0;
 
-    public static String logs = "logs";
+    public static String logs = "Willow logs";
 
     public FiremakingStatus firemakingStatus = net.runelite.client.plugins.microbot.firemaking.enums.FiremakingStatus.FETCH_LOGS;
 
@@ -117,6 +117,11 @@ public class FiremakingScript extends Script {
             while (firemakingStatus == FiremakingStatus.FIREMAKING) {
                 if (!Inventory.hasItem(logs))
                     break;
+
+                if (Rs2GameObject.findObject(ObjectID.FIRE_26185, Microbot.getClient().getLocalPlayer().getWorldLocation()) != null) {
+                    firemakingStatus = FiremakingStatus.FIND_EMPTY_SPOT;
+                    return false;
+                }
 
                 Inventory.useItemUnsafe("tinderbox");
                 Inventory.useItemUnsafe(logs);

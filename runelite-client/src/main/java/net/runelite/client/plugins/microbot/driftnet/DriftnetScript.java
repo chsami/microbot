@@ -1,5 +1,7 @@
-package net.runelite.client.plugins.microbot.example;
+package net.runelite.client.plugins.microbot.driftnet;
 
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
@@ -18,70 +20,38 @@ import net.runelite.client.plugins.mta.telekinetic.TelekineticRoom;
 import net.runelite.client.ui.overlay.infobox.Counter;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ExampleScript extends Script {
+public class DriftnetScript extends Script {
 
     public static double version = 1.0;
 
-    public boolean run(ExampleConfig config) {
+    List<Integer> alreadyInteractedIndex = new ArrayList<Integer>();
+
+    public boolean run(DriftnetConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
 
-                Microbot.getWalker().walkTo(BankLocation.GRAND_EXCHANGE.getWorldPoint());
+                net.runelite.api.NPC fish = Rs2Npc.getNpc(NpcID.FISH_SHOAL, alreadyInteractedIndex);
 
-               /* if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < 10) {
-                    Tab.switchToInventoryTab();
-                    Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
-                    for (Widget potion: potions) {
-                        if (potion.getName().toLowerCase().contains("saradomin")) {
-                            Microbot.getMouse().click(potion.getBounds());
-                            sleep(1200, 1500);
-                            break;
-                        }
-                    }
-                }*/
+                if (fish != null) {
+                    Rs2Npc.interact(fish, "chase");
+                    alreadyInteractedIndex.add(fish.getIndex());
+                    sleep(1000, 4000);
+                }
 
-
-               /* if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) == 0) {
-                    Tab.switchToInventoryTab();
-                    Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
-                    if (potions == null || potions.length == 0) {
-                        Microbot.getNotifier().notify("No more prayer potions left");
-                        return;
-                    }
-                    for (Widget potion: potions) {
-                        if (potion.getName().toLowerCase().contains("prayer")) {
-                            Microbot.getMouse().click(potion.getBounds());
-                            sleep(2400, 2600);
-                            break;
-                        }
-                    }
-                    if (Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_DISABLED.getValue()) {
-                        final Widget prayerOrb = Rs2Widget.getWidget(WidgetInfo.MINIMAP_QUICK_PRAYER_ORB);
-                        if (prayerOrb != null) {
-                            Microbot.getMouse().click(prayerOrb.getCanvasLocation());
-                            sleep(1000, 1500);
-                        }
-                    }
-                }*/
-
-                if (Counter.getCount() >= 16 || Inventory.isInventoryFull()) {
-                    Tab.switchToMagicTab();
-                    Rs2Widget.clickWidget("Bones to bananas");
-                    sleep(1200);
-                    Rs2GameObject.interact(10735, "deposit");
-
-                } else {
-                    Point p = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(3352, 9637, 1)), 1);
-                    Microbot.getMouse().click(p);
+                if (alreadyInteractedIndex.size() > 6) {
+                    alreadyInteractedIndex = new ArrayList<>();
                 }
 
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
+
         return true;
     }
 
@@ -134,24 +104,4 @@ public class ExampleScript extends Script {
             sleepUntil(() -> Rs2Npc.getNpc(6777) != null);
         }
     }
-
-
-    /**
-     *
-     * try {
-     *                 net.runelite.api.NPC npc = Npc.getNpc("Jaltok-jad");
-     *                 Field field = npc.getClass().getSuperclass().getDeclaredField("cf");
-     *                 field.setAccessible(true);
-     *                 int value = (int) field.get(npc);
-     *                 int realAnimation = value * -2121799935;
-     *                 if (realAnimation == 7592) { //magic
-     *                     Prayer.turnOnMagePrayer();
-     *                 } else if (realAnimation == 7593) { //range
-     *                     Prayer.turnOnRangePrayer();
-     *                 }
-     *             } catch (IllegalAccessException e) {
-     *             } catch (NoSuchFieldException e) {
-     *             }
-     *
-     */
 }

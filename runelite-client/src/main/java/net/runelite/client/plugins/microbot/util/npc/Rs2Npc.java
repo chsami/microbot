@@ -6,6 +6,7 @@ import net.runelite.api.NPCComposition;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -19,6 +20,15 @@ public class Rs2Npc {
     public static NPC npcInteraction = null;
     public static String npcAction = null;
 
+
+    public static List<NPC> getNpcsForActor(Actor actor) {
+        List<NPC> npcs = Microbot.getClient().getNpcs().stream()
+                .filter(x -> x.getInteracting() == actor)
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        return npcs;
+    }
 
     public static int getHealth(Actor npc) {
         int lastRatio = 0;
@@ -134,6 +144,19 @@ public class Rs2Npc {
             else
                 return npcs.stream()
                         .filter(x -> x != null && x.getId() == id)
+                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                        .findFirst().orElse(null);
+        });
+    }
+
+    public static NPC getNpc(int id, List<Integer> excludedIndexes) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            List<NPC> npcs = Arrays.stream(getNpcs()).collect(Collectors.toList());
+            if (npcs.isEmpty())
+                return null;
+            else
+                return npcs.stream()
+                        .filter(x -> x != null && x.getId() == id && !excludedIndexes.contains(x.getIndex()))
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                         .findFirst().orElse(null);
         });

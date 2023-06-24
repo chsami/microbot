@@ -43,7 +43,7 @@ public class NmzScript extends Script {
                     } else {
                         //inside nmz
                         if (Microbot.getClient().getLocalPlayer().isInteracting()) {
-                            Microbot.toggleSpecialAttack(25);
+                           // Microbot.toggleSpecialAttack(25);
                         }
                         if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) == Microbot.getClient().getRealSkillLevel(Skill.ATTACK)
                                 && Inventory.hasItemContains("overload")) {
