@@ -57,7 +57,6 @@ public class PlayerAssistPlugin extends Plugin {
     private SafeSpot safeSpotScript = new SafeSpot();
     private FlickerScript flickerScript = new FlickerScript();
 
-
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -98,15 +97,8 @@ public class PlayerAssistPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onHitsplatApplied(HitsplatApplied hitsplatApplied)
-    {
-        flickerScript.onHitsplatApplied(hitsplatApplied);
-    }
-
-    @Subscribe
-    public void onGameTick(GameTick event)
-    {
-        flickerScript.onGameTick(event);
+    public void onGameTick(GameTick gameTick) {
+        flickerScript.onGameTick(gameTick);
     }
 
     @Subscribe

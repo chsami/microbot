@@ -21,11 +21,14 @@ public class Rs2Npc {
     public static String npcAction = null;
 
 
-    public static List<NPC> getNpcsForActor(Actor actor) {
+    public static List<NPC> getNpcsForPlayer() {
         List<NPC> npcs = Microbot.getClient().getNpcs().stream()
-                .filter(x -> x.getInteracting() == actor)
-                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .filter(x -> x.getInteracting() == Microbot.getClient().getLocalPlayer())
+                .sorted(Comparator
+                        .comparingInt(value -> value
+                                .getLocalLocation()
+                                .distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toList());
 
         return npcs;
     }

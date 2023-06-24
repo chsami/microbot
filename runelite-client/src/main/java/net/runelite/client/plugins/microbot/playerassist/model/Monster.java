@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.playerassist.models;
+package net.runelite.client.plugins.microbot.playerassist.model;
 
 import net.runelite.api.NPC;
 import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyle;
@@ -15,11 +15,12 @@ public class Monster {
 
     public boolean delete;
 
+
     public Monster(int id, int attackSpeed, int attackAnimation, AttackStyle attackStyle) {
         this.id = id;
         this.attackSpeed = attackSpeed;
+        this.adjustableAttackSpeed = attackSpeed;
         this.attackAnimation = attackAnimation;
         this.attackStyle = attackStyle;
     }
-
 }

@@ -9,27 +9,33 @@ import static net.runelite.api.Varbits.PRAYER_PROTECT_FROM_MAGIC;
 
 public class Rs2Prayer {
     public static void turnOffMagePrayer() {
-        if (Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(PRAYER_PROTECT_FROM_MAGIC) == 0)) return;
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(PRAYER_PROTECT_FROM_MAGIC) == 0)) return;
         clickMagePrayer();
     }
     public static void turnOffMeleePrayer() {
-        if (Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MELEE) == 0)) return;
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MELEE) == 0)) return;
         clickMeleePrayer();
     }
     public static void turnOffRangedPrayer() {
-        if (Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 0)) return;
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 0)) return;
         clickRangePrayer();
     }
     public static void turnOnMagePrayer() {
-        if (Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(PRAYER_PROTECT_FROM_MAGIC) == 1)) return;
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(PRAYER_PROTECT_FROM_MAGIC) == 1)) return;
         clickMagePrayer();
     }
     public static void turnOnMeleePrayer() {
-        if (Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MELEE) == 1)) return;
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MELEE) == 1)) return;
         clickMeleePrayer();
     }
-    public static void turnOnRangePrayer() {
-        if (Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 1)) return;
+    public static void turnOnRangedPrayer() {
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 1)) return;
         clickRangePrayer();
     }
     public static void clickMagePrayer() {

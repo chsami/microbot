@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.microbot.playerassist;
 
 import net.runelite.api.NPC;
-import net.runelite.client.plugins.microbot.playerassist.models.Monster;
+import net.runelite.client.plugins.microbot.playerassist.model.Monster;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 import static net.runelite.client.plugins.microbot.playerassist.combat.AttackNpcScript.attackableNpcs;
-import static net.runelite.client.plugins.microbot.playerassist.combat.FlickerScript.currentMonsters;
+import static net.runelite.client.plugins.microbot.playerassist.combat.FlickerScript.currentMonstersAttackingUs;
 
 public class PlayerAssistOverlay extends Overlay {
 
@@ -44,18 +44,21 @@ public class PlayerAssistOverlay extends Overlay {
             }
         }
 
-        for (Monster currentMonster : currentMonsters) {
+        for (Monster currentMonster: currentMonstersAttackingUs) {
             if (currentMonster != null && currentMonster.npc != null) {
                 try {
                     graphics.setColor(Color.CYAN);
                     modelOutlineRenderer.drawOutline((NPC) currentMonster.npc, 2, Color.RED, 4);
                     graphics.draw(currentMonster.npc.getCanvasTilePoly());
-                    graphics.drawString("" + currentMonster.adjustableAttackSpeed, (int) currentMonster.npc.getCanvasTilePoly().getBounds().getCenterX(), (int) currentMonster.npc.getCanvasTilePoly().getBounds().getCenterY());
-                } catch (Exception ex) {
+                    graphics.drawString("" + currentMonster.adjustableAttackSpeed,
+                            (int) currentMonster.npc.getCanvasTilePoly().getBounds().getCenterX(),
+                            (int) currentMonster.npc.getCanvasTilePoly().getBounds().getCenterY());
+                } catch(Exception ex) {
                     System.out.println(ex.getMessage());
                 }
             }
         }
+
         return null;
     }
 }
