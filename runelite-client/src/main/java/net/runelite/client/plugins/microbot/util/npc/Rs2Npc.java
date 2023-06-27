@@ -21,6 +21,13 @@ public class Rs2Npc {
     public static String npcAction = null;
 
 
+    public static NPC getNpcByIndex(int index) {
+        return Microbot.getClient().getNpcs().stream()
+                .filter(x -> x.getIndex() == index)
+                .findFirst()
+                .orElse(null);
+    }
+
     public static List<NPC> getNpcsForPlayer() {
         List<NPC> npcs = Microbot.getClient().getNpcs().stream()
                 .filter(x -> x.getInteracting() == Microbot.getClient().getLocalPlayer())

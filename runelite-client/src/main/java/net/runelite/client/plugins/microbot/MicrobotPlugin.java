@@ -5,6 +5,7 @@ import net.runelite.api.Client;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.MenuOpened;
 import net.runelite.api.events.StatChanged;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
@@ -16,6 +17,7 @@ import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
+import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -25,8 +27,12 @@ import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
-import java.awt.*;
+
+import java.awt.AWTException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -55,6 +61,8 @@ public class MicrobotPlugin extends Plugin {
     private MicrobotOverlay microbotOverlay;
     @Inject
     private OverlayManager overlayManager;
+
+    ThievingScript thievingScript;
 
     QuestScript questScript;
     @Override
@@ -116,5 +124,33 @@ public class MicrobotPlugin extends Plugin {
     public void onStatChanged(StatChanged statChanged) {
         Microbot.setIsGainingExp(true);
     }
+
+    private Consumer<MenuEntry> menuActionNpcConsumer(boolean shift, net.runelite.api.NPC npc) {
+        return e ->
+        {
+            if (thievingScript == null) {
+                thievingScript = new ThievingScript();
+                thievingScript.run(npc);
+            } else {
+                thievingScript.shutdown();
+                thievingScript = null;
+            }
+        };
+    }
+
+    @Subscribe
+    public void onMenuOpened(MenuOpened event) {
+        MenuEntry[] entries = event.getMenuEntries();
+        MenuEntry entry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_NPC).findFirst().orElse(null);
+        if (entry != null) {
+            net.runelite.api.NPC npc = Rs2Npc.getNpcByIndex(entry.getIdentifier());
+
+            List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
+
+            leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
+                    .setOption(thievingScript == null ? "Start AutoThiever" : "Stop AutoThiever")
+                    .setType(MenuAction.RUNELITE)
+                    .onClick(menuActionNpcConsumer(false, npc)));
+        }
+    }
 }
-// MenuEntryImpl(getOption=Pickpocket, getTarget=<col=ffff00>Master Farmer, getIdentifier=1859, getType=NPC_THIRD_OPTION, getParam0=0, getParam1=0, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)
