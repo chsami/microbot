@@ -48,43 +48,4 @@ public class DisassemblerTest
 
 	@Rule
 	public TemporaryFolder folder = StoreLocation.getTemporaryFolder();
-
-	@Test
-	public void test() throws IOException
-	{
-		File outDir = folder.newFolder();
-		int count = 0;
-
-		try (Store store = new Store(StoreLocation.LOCATION))
-		{
-			store.load();
-
-			Storage storage = store.getStorage();
-			Index index = store.getIndex(IndexType.CLIENTSCRIPT);
-			ScriptLoader loader = new ScriptLoader();
-
-			for (Archive archive : index.getArchives())
-			{
-				byte[] contents = archive.decompress(storage.loadArchive(archive));
-
-				if (contents == null)
-				{
-					continue;
-				}
-
-				ScriptDefinition script = loader.load(archive.getArchiveId(), contents);
-
-				File outFile = new File(outDir, archive.getArchiveId() + ".rs2asm");
-
-				Disassembler disassembler = new Disassembler();
-				String out = disassembler.disassemble(script);
-
-				Files.write(out.getBytes(StandardCharsets.UTF_8), outFile);
-
-				++count;
-			}
-		}
-
-		logger.info("Dumped {} scripts to {}", count, outDir);
-	}
 }

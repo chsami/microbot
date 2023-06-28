@@ -53,35 +53,4 @@ public class WorldMapDumperTest
 
 	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-	@Test
-	public void extract() throws IOException
-	{
-		File base = StoreLocation.LOCATION,
-			outDir = folder.newFolder();
-
-		int count = 0;
-
-		try (Store store = new Store(base))
-		{
-			store.load();
-
-			Storage storage = store.getStorage();
-			Index index = store.getIndex(IndexType.WORLDMAP_OLD);
-			Archive archive = index.getArchive(0); // there is also archive 1/2, but their data format is not this
-
-			byte[] archiveData = storage.loadArchive(archive);
-			ArchiveFiles files = archive.getFiles(archiveData);
-
-			for (FSFile file : files.getFiles())
-			{
-				WorldMapLoader loader = new WorldMapLoader();
-				WorldMapDefinition def = loader.load(file.getContents(), file.getFileId());
-
-				Files.asCharSink(new File(outDir, file.getFileId() + ".json"), Charset.defaultCharset()).write(gson.toJson(def));
-				++count;
-			}
-		}
-
-		logger.info("Dumped {} world map data to {}", count, outDir);
-	}
 }

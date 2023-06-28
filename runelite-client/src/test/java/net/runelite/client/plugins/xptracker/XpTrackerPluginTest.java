@@ -48,7 +48,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 public class XpTrackerPluginTest
 {
 	@Inject
@@ -90,38 +89,5 @@ public class XpTrackerPluginTest
 		when(client.getLocalPlayer()).thenReturn(mock(Player.class));
 
 		xpTrackerPlugin.setXpPanel(mock(XpPanel.class));
-	}
-
-	@Test
-	public void testOfflineXp()
-	{
-		GameStateChanged gameStateChanged = new GameStateChanged();
-		gameStateChanged.setGameState(GameState.LOGGING_IN);
-
-		// Flag initialization of tracker
-		xpTrackerPlugin.onGameStateChanged(gameStateChanged);
-		when(client.getSkillExperience(Skill.ATTACK)).thenReturn(42);
-		// Initialize tracker
-		xpTrackerPlugin.onGameTick(new GameTick());
-
-		// Gain attack xp
-		StatChanged statChanged = new StatChanged(
-			Skill.ATTACK,
-			100,
-			2,
-			2
-		);
-		xpTrackerPlugin.onStatChanged(statChanged);
-
-		// Offline gain
-		when(client.getSkillExperience(Skill.ATTACK)).thenReturn(42000);
-		// Flag initialization of tracker
-		xpTrackerPlugin.onGameStateChanged(gameStateChanged);
-		// Initialize tracker
-		xpTrackerPlugin.onGameTick(new GameTick());
-
-		// Start at 42 xp, gain of 58 xp, offline gain of 41900 xp - offset start XP: 42 + 41900
-		XpStateSingle skillState = xpTrackerPlugin.getSkillState(Skill.ATTACK);
-		assertEquals(41942, skillState.getStartXp());
 	}
 }

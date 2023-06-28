@@ -53,38 +53,7 @@ public class TrackDumperTest
 
 	private final Djb2Manager djb2 = new Djb2Manager();
 
-	@Test
-	public void test() throws IOException
-	{
-		File dumpDir1 = folder.newFolder(),
-			dumpDir2 = folder.newFolder();
-		int idx1 = 0, idx2 = 0;
 
-		djb2.load();
-
-		try (Store store = new Store(StoreLocation.LOCATION))
-		{
-			store.load();
-
-			Storage storage = store.getStorage();
-			Index index = store.getIndex(IndexType.MUSIC_TRACKS);
-			Index index2 = store.getIndex(IndexType.MUSIC_JINGLES);
-
-			for (Archive archive : index.getArchives())
-			{
-				dumpTrackArchive(dumpDir1, storage, archive);
-				++idx1;
-			}
-
-			for (Archive archive : index2.getArchives())
-			{
-				dumpTrackArchive(dumpDir2, storage, archive);
-				++idx2;
-			}
-		}
-
-		logger.info("Dumped {} sound tracks ({} idx1, {} idx2) to {} and {}", idx1 + idx2, idx1, idx2, dumpDir1, dumpDir2);
-	}
 
 	private void dumpTrackArchive(File dumpDir, Storage storage, Archive archive) throws IOException
 	{

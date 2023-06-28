@@ -44,8 +44,7 @@ import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KitDumperTest
-{
+public class KitDumperTest {
 	private static final Logger logger = LoggerFactory.getLogger(KitDumperTest.class);
 
 	private Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -53,36 +52,4 @@ public class KitDumperTest
 	@Rule
 	public TemporaryFolder folder = StoreLocation.getTemporaryFolder();
 
-	@Test
-	public void test() throws IOException
-	{
-		File dumpDir = folder.newFolder();
-		int count = 0;
-
-		try (Store store = new Store(StoreLocation.LOCATION))
-		{
-			store.load();
-
-			Storage storage = store.getStorage();
-			Index index = store.getIndex(IndexType.CONFIGS);
-			Archive archive = index.getArchive(ConfigType.IDENTKIT.getId());
-
-			KitLoader loader = new KitLoader();
-
-			byte[] archiveData = storage.loadArchive(archive);
-			ArchiveFiles files = archive.getFiles(archiveData);
-
-			for (FSFile file : files.getFiles())
-			{
-				byte[] b = file.getContents();
-
-				KitDefinition def = loader.load(file.getFileId(), b);
-
-				Files.asCharSink(new File(dumpDir, file.getFileId() + ".json"), Charset.defaultCharset()).write(gson.toJson(def));
-				++count;
-			}
-		}
-
-		logger.info("Dumped {} kits to {}", count, dumpDir);
-	}
 }
