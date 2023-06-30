@@ -59,6 +59,14 @@ public class Inventory {
         });
     }
 
+    public static boolean isFull() {
+        Microbot.status = "Checking if inventory is full";
+        Tab.switchToInventoryTab();
+        Widget inventoryWidget = getInventory();
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == 28);
+    }
+
+    @Deprecated(since = "Use isFull method instead",forRemoval = true)
     public static boolean isInventoryFull() {
         Microbot.status = "Checking if inventory is full";
         Tab.switchToInventoryTab();
@@ -452,5 +460,15 @@ public class Inventory {
 
     public static boolean eatItem(String itemName) {
         return useItemAction(itemName, "eat");
+    }
+
+    public static long getAmountForItem(String itemName) {
+        Microbot.status = "getAmountForItem: " + itemName;
+        Tab.switchToInventoryTab();
+        Widget inventoryWidget = getInventory();
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .filter(x ->
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName.toLowerCase())
+                ).count());
     }
 }

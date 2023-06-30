@@ -1,11 +1,12 @@
 package net.runelite.client.plugins.microbot.cooking;
 
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.cooking.enums.CookingEnum;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -18,64 +19,61 @@ import net.runelite.client.plugins.mta.telekinetic.TelekineticRoom;
 import net.runelite.client.ui.overlay.infobox.Counter;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.Math.random;
+import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class CookingScript extends Script {
 
     public static double version = 1.0;
 
-    public boolean run(CookingConfig config) {
+    public boolean run(int gameObjectId) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
 
-                Microbot.getWalker().walkTo(BankLocation.GRAND_EXCHANGE.getWorldPoint());
+                String itemToCook = getItemToCook();
 
-               /* if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < 10) {
-                    Tab.switchToInventoryTab();
-                    Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
-                    for (Widget potion: potions) {
-                        if (potion.getName().toLowerCase().contains("saradomin")) {
-                            Microbot.getMouse().click(potion.getBounds());
-                            sleep(1200, 1500);
-                            break;
+                if (!Inventory.isFull() || !Inventory.hasItem(itemToCook)) {
+                    if (!Rs2Bank.isOpen()) {
+                        boolean bankIsOnScreen = Rs2Bank.useBank();
+                        if (!bankIsOnScreen) {
+                            Rs2Bank.walkToBank();
+                        }
+                        Rs2Bank.depositAll();
+                        Rs2Bank.withdrawItemAll(true, itemToCook);
+                    }
+                }
+
+                if (Inventory.hasItem(itemToCook)) {
+                    Microbot.getWalker().walkFastMinimap(new WorldPoint(3273 + random(-2, 2), 3180+ random(-2, 2), 0));
+
+                    TileObject cookingRange = Rs2GameObject.findObjectById(gameObjectId);
+                    if (cookingRange != null) {
+                        if (!Camera.isTileOnScreen(cookingRange.getLocalLocation())) {
+                            Camera.turnTo(cookingRange.getLocalLocation());
+                            return;
+                        }
+                        if (Rs2Widget.getWidget(17694734) == null)
+                        {
+                            Rs2GameObject.interact(cookingRange);
+                            sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694734) != null);
+                            sleep(1200, 1600);
+                        }
+                        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                        sleep(5000);
+                        while (true) {
+                            long rawFoodCount = Inventory.getAmountForItem(itemToCook);
+                            sleep(3000);
+                            if (rawFoodCount == Inventory.getAmountForItem(itemToCook))
+                                break;
                         }
                     }
-                }*/
-
-
-               /* if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) == 0) {
-                    Tab.switchToInventoryTab();
-                    Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
-                    if (potions == null || potions.length == 0) {
-                        Microbot.getNotifier().notify("No more prayer potions left");
-                        return;
-                    }
-                    for (Widget potion: potions) {
-                        if (potion.getName().toLowerCase().contains("prayer")) {
-                            Microbot.getMouse().click(potion.getBounds());
-                            sleep(2400, 2600);
-                            break;
-                        }
-                    }
-                    if (Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_DISABLED.getValue()) {
-                        final Widget prayerOrb = Rs2Widget.getWidget(WidgetInfo.MINIMAP_QUICK_PRAYER_ORB);
-                        if (prayerOrb != null) {
-                            Microbot.getMouse().click(prayerOrb.getCanvasLocation());
-                            sleep(1000, 1500);
-                        }
-                    }
-                }*/
-
-                if (Counter.getCount() >= 16 || Inventory.isInventoryFull()) {
-                    Tab.switchToMagicTab();
-                    Rs2Widget.clickWidget("Bones to bananas");
-                    sleep(1200);
-                    Rs2GameObject.interact(10735, "deposit");
-
-                } else {
-                    Point p = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(3352, 9637, 1)), 1);
-                    Microbot.getMouse().click(p);
                 }
 
             } catch (Exception ex) {
@@ -85,53 +83,18 @@ public class CookingScript extends Script {
         return true;
     }
 
-    private void telekneticGrab() {
-        if (Rs2Widget.hasWidget("select an option")) {
-            VirtualKeyboard.typeString("1");
-            return;
+
+    private String getItemToCook() {
+        for (CookingEnum cookingEnum: CookingEnum.values()) {
+            if (Microbot.getClient().getRealSkillLevel(Skill.COOKING) >= cookingEnum.getLevelRequired()) {
+                return cookingEnum.getRawFoodName();
+            }
         }
+        return "";
+    }
 
-        if (Rs2Widget.hasWidget("click here to continue")) {
-            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
-            return;
-        }
-
-        if (Rs2Npc.getNpc(6777) == null) {
-            Microbot.getMouse().click(50, 50);
-            boolean result = Rs2Npc.interact(6779, "Talk-to");
-                  /*  if (!result) {
-                        Microbot.getWalker()
-                                .walkFastRegion(
-                                        Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionX() - 10,
-                                        Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionY());
-                        sleep(3000);
-                        Microbot.getWalker()
-                                .walkFastRegion(
-                                        Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionX(),
-                                        Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionY() -10);
-                        sleep(3000);
-                    }*/
-            return;
-        }
-
-        if (Microbot.isWalking()) return;
-
-        WorldPoint w = TelekineticRoom.optimal();
-
-        if (!Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), w))) {
-            Microbot.getWalker().walkFastRegion(w.getX(), w.getY());
-        }
-
-        if (!Microbot.getClient().getLocalPlayer().getWorldLocation().equals(w)) {
-            Microbot.getWalker().walkFastRegionCanvas(w.getRegionX(), w.getRegionY());
-        } else {
-            Tab.switchToMagicTab();
-            sleep(300, 600);
-            Rs2Widget.clickWidget("grab");
-            sleep(300, 600);
-            Rs2Npc.interact(6777, "cast");
-            sleepUntil(() -> Rs2Npc.getNpc(6777) == null);
-            sleepUntil(() -> Rs2Npc.getNpc(6777) != null);
-        }
+    @Override
+    public void shutdown() {
+        super.shutdown();
     }
 }

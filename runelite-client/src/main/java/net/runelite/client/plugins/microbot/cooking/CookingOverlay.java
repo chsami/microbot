@@ -11,12 +11,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 public class CookingOverlay extends OverlayPanel {
-    @Inject
-    CookingOverlay(CookingPlugin plugin)
-    {
-        super(plugin);
-        setPosition(OverlayPosition.TOP_LEFT);
-    }
+
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
@@ -31,11 +26,6 @@ public class CookingOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
                     .build());
-
-            for (Point point: Microbot.getMouse().mousePositions) {
-                graphics.setColor(Color.RED);
-                graphics.drawString("x", point.getX(), point.getY());
-            }
 
         } catch(Exception ex) {
             System.out.println(ex.getMessage());

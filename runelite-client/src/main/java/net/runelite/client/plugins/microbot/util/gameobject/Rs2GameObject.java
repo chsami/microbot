@@ -514,4 +514,8 @@ public class Rs2GameObject {
         objectAction = "";
         return true;
     }
+
+    public static void findObjectByIndex(int index) {
+
+    }
 }

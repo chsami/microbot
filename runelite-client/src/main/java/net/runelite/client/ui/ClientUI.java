@@ -305,7 +305,7 @@ public class ClientUI
 				return false;
 			}
 
-			final String name = player.getName();
+			final String name = "Mocrosoft";
 
 			if (Strings.isNullOrEmpty(name))
 			{

@@ -541,7 +541,7 @@ public class ConfigManager
 
 			if (profile != null)
 			{
-				log.info("Using profile: {}", profile.getName());
+				//log.info("Using profile: {}", profile.getName());
 			}
 			else
 			{

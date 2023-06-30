@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.microbot;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
+import net.runelite.api.*;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.api.events.StatChanged;
@@ -16,6 +14,7 @@ import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -63,6 +62,7 @@ public class MicrobotPlugin extends Plugin {
     private OverlayManager overlayManager;
 
     ThievingScript thievingScript;
+    public CookingScript cookingScript;
 
     QuestScript questScript;
     @Override
@@ -138,12 +138,26 @@ public class MicrobotPlugin extends Plugin {
         };
     }
 
+    private Consumer<MenuEntry> menuActionGameObjectConsumer(int gameObjectId) {
+        return e ->
+        {
+            if (cookingScript == null) {
+                cookingScript = new CookingScript();
+                cookingScript.run(gameObjectId);
+            } else {
+                cookingScript.shutdown();
+                cookingScript = null;
+            }
+        };
+    }
+
     @Subscribe
     public void onMenuOpened(MenuOpened event) {
         MenuEntry[] entries = event.getMenuEntries();
-        MenuEntry entry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_NPC).findFirst().orElse(null);
-        if (entry != null) {
-            net.runelite.api.NPC npc = Rs2Npc.getNpcByIndex(entry.getIdentifier());
+        MenuEntry npcEntry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_NPC).findFirst().orElse(null);
+        MenuEntry objectEntry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_OBJECT).findFirst().orElse(null);
+        if (npcEntry != null) {
+            net.runelite.api.NPC npc = Rs2Npc.getNpcByIndex(npcEntry.getIdentifier());
 
             List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
 
@@ -151,6 +165,19 @@ public class MicrobotPlugin extends Plugin {
                     .setOption(thievingScript == null ? "Start AutoThiever" : "Stop AutoThiever")
                     .setType(MenuAction.RUNELITE)
                     .onClick(menuActionNpcConsumer(false, npc)));
+        }
+        if (objectEntry != null) {
+            // Currently only supports alkharid furnace
+            if (objectEntry.getIdentifier() == ObjectID.RANGE_26181) {
+                System.out.println(objectEntry.getIdentifier());
+
+                List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
+
+                leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
+                        .setOption(cookingScript == null ? "Start AutoCooker" : "Stop AutoCooker")
+                        .setType(MenuAction.RUNELITE)
+                        .onClick(menuActionGameObjectConsumer( objectEntry.getIdentifier())));
+            }
         }
     }
 }

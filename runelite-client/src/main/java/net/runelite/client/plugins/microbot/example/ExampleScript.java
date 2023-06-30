@@ -29,8 +29,7 @@ public class ExampleScript extends Script {
             if (!super.run()) return;
             try {
 
-                Microbot.getWalker().walkTo(BankLocation.GRAND_EXCHANGE.getWorldPoint());
-
+                long rawFoodCount = Inventory.getAmountForItem("raw shrimps");
                /* if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < 10) {
                     Tab.switchToInventoryTab();
                     Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());

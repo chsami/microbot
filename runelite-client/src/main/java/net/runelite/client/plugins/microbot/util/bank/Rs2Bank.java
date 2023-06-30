@@ -66,6 +66,17 @@ public class Rs2Bank {
         return true;
     }
 
+    public static boolean isOpen() {
+        Microbot.status = "Checking if bank is open";
+        if (Rs2Widget.hasWidget("Please enter your PIN")) {
+            Microbot.getNotifier().notify("[ATTENTION] Please enter your bankpin so the script can continue.");
+            sleep(5000);
+            return false;
+        }
+        return Rs2Widget.findWidget("Rearrange mode", null) != null;
+    }
+
+    @Deprecated(since = "Use isOpen instead", forRemoval = true)
     public static boolean isBankOpen() {
         Microbot.status = "Checking if bank is open";
         if (Rs2Widget.hasWidget("Please enter your PIN")) {
@@ -187,7 +198,7 @@ public class Rs2Bank {
     public static boolean withdrawItemAll(boolean checkInventory, String itemName) {
         Microbot.status = "Withdrawing All " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
-        if (Inventory.isInventoryFull()) return false;
+        if (Inventory.isFull()) return false;
         if (!isBankOpen()) return false;
         Widget widget = Rs2Widget.findWidgetExact(itemName);
         if (widget == null) return false;
@@ -264,6 +275,7 @@ public class Rs2Bank {
 
     public static boolean depositAll() {
         Microbot.status = "Deposit all";
+        if (Inventory.count() == 0) return true;
         Widget widget = Rs2Widget.findWidget(SpriteID.BANK_DEPOSIT_INVENTORY, null);
         if (widget != null) {
             Microbot.getMouse().click(widget.getBounds());
