@@ -32,6 +32,8 @@ public class CookingScript extends Script {
 
     public static double version = 1.0;
 
+    List<String> missingItemsInBank = new ArrayList<>(Arrays.asList());
+
     public boolean run(int gameObjectId) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
@@ -44,6 +46,12 @@ public class CookingScript extends Script {
                         boolean bankIsOnScreen = Rs2Bank.useBank();
                         if (!bankIsOnScreen) {
                             Rs2Bank.walkToBank();
+                        }
+                    }
+                    if (Rs2Bank.isOpen()) {
+                        if (!Rs2Bank.hasItem(getItemToCook())) {
+                            missingItemsInBank.add(getItemToCook());
+                            return;
                         }
                         Rs2Bank.depositAll();
                         Rs2Bank.withdrawItemAll(true, itemToCook);
@@ -62,8 +70,9 @@ public class CookingScript extends Script {
                         if (Rs2Widget.getWidget(17694734) == null)
                         {
                             Rs2GameObject.interact(cookingRange);
+                            sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(cookingRange.getWorldLocation()) < 2, 10000);
                             sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694734) != null);
-                            sleep(1200, 1600);
+                            sleep(600, 1600);
                         }
                         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
                         sleep(5000);
@@ -86,7 +95,8 @@ public class CookingScript extends Script {
 
     private String getItemToCook() {
         for (CookingEnum cookingEnum: CookingEnum.values()) {
-            if (Microbot.getClient().getRealSkillLevel(Skill.COOKING) >= cookingEnum.getLevelRequired()) {
+            if (Microbot.getClient().getRealSkillLevel(Skill.COOKING) >= cookingEnum.getLevelRequired()
+                    && !missingItemsInBank.contains(cookingEnum.getRawFoodName())) {
                 return cookingEnum.getRawFoodName();
             }
         }

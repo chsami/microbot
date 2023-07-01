@@ -6,6 +6,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -29,7 +30,6 @@ public class ExampleScript extends Script {
             if (!super.run()) return;
             try {
 
-                long rawFoodCount = Inventory.getAmountForItem("raw shrimps");
                /* if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < 10) {
                     Tab.switchToInventoryTab();
                     Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());

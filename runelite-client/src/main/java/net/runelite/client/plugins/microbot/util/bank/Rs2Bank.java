@@ -291,13 +291,10 @@ public class Rs2Bank {
     }
 
     public static boolean walkToBank() {
-        NPC npc = Rs2Npc.getNpc("banker");
-        if (npc == null) {
-            BankLocation bankLocation = getNearestBank();
-            Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), true, false);
-        }
-        if (npc.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 4) {
-            Microbot.getWalker().walkTo(npc.getWorldLocation(), true, false);
+        BankLocation bankLocation = getNearestBank();
+        Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), true, false);
+        if (bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 4) {
+            Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), false, false);
             return false;
         }
         return true;

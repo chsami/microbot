@@ -140,7 +140,7 @@ public class Walker {
     }
 
     public boolean walkTo(WorldPoint target) {
-        return walkTo(target, false, true);
+        return walkTo(target, false, false);
     }
 
     public boolean walkTo(WorldPoint target, boolean memorizePath, boolean useTransport) {

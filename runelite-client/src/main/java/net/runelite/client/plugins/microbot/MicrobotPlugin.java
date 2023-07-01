@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.api.events.StatChanged;
@@ -11,6 +12,7 @@ import net.runelite.client.config.ProfileManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
+import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -19,6 +21,7 @@ import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -60,8 +63,10 @@ public class MicrobotPlugin extends Plugin {
     private MicrobotOverlay microbotOverlay;
     @Inject
     private OverlayManager overlayManager;
+    @Inject
+    private SpriteManager spriteManager;
 
-    ThievingScript thievingScript;
+    public ThievingScript thievingScript;
     public CookingScript cookingScript;
 
     QuestScript questScript;
@@ -77,6 +82,7 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setNpcManager(npcManager);
         Microbot.setWalker(new Walker());
         Microbot.setMouse(new VirtualMouse());
+        Microbot.setSpriteManager(spriteManager);
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }
@@ -84,6 +90,15 @@ public class MicrobotPlugin extends Plugin {
 
     protected void shutDown() {
         overlayManager.remove(microbotOverlay);
+        Microbot.setWalker(null);
+        if (cookingScript != null) {
+            cookingScript.shutdown();
+            cookingScript = null;
+        }
+        if (thievingScript != null) {
+            thievingScript.shutdown();
+            thievingScript = null;
+        }
     }
 
 
@@ -169,7 +184,6 @@ public class MicrobotPlugin extends Plugin {
         if (objectEntry != null) {
             // Currently only supports alkharid furnace
             if (objectEntry.getIdentifier() == ObjectID.RANGE_26181) {
-                System.out.println(objectEntry.getIdentifier());
 
                 List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
 

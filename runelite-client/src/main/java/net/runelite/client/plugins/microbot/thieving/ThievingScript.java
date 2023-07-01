@@ -111,7 +111,7 @@ public class ThievingScript extends Script {
                     }
                     return;
                 }
-                if (Inventory.isInventoryFull()) {
+                if (Inventory.isFull()) {
                     Inventory.dropAllStartingFrom(8);
                 }
                 if (Inventory.hasItemAmountStackable("coin pouch", 28)) {
