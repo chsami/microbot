@@ -32,6 +32,9 @@ public class AgilityScript extends Script {
     public static double version = 1.0;
     final int MAX_DISTANCE = 2350;
 
+    public List<AgilityObstacleModel> draynorCourse = new ArrayList<>();
+    public List<AgilityObstacleModel> alkharidCourse = new ArrayList<>();
+    public List<AgilityObstacleModel> varrockCourse = new ArrayList<>();
     public List<AgilityObstacleModel> gnomeStrongholdCourse = new ArrayList<>();
     public List<AgilityObstacleModel> canafisCourse = new ArrayList<>();
     public List<AgilityObstacleModel> faladorCourse = new ArrayList<>();
@@ -44,6 +47,12 @@ public class AgilityScript extends Script {
 
     private List<AgilityObstacleModel> getCurrentCourse(MicroAgilityConfig config) {
         switch (config.agilityCourse()) {
+            case DRAYNOR_VILLAGE_ROOFTOP_COURSE:
+                return draynorCourse;
+            case AL_KHARID_ROOFTOP_COURSE:
+                return alkharidCourse;
+            case VARROCK_ROOFTOP_COURSE:
+                return varrockCourse;
             case GNOME_STRONGHOLD_AGILITY_COURSE:
                 return gnomeStrongholdCourse;
             case CANIFIS_ROOFTOP_COURSE:
@@ -61,6 +70,17 @@ public class AgilityScript extends Script {
         switch (config.agilityCourse()) {
             case GNOME_STRONGHOLD_AGILITY_COURSE:
                 startCourse = new WorldPoint(2474, 3436, 0);
+            case DRAYNOR_VILLAGE_ROOFTOP_COURSE:
+                startCourse = new WorldPoint(3103, 3279, 0);
+                break;
+            case AL_KHARID_ROOFTOP_COURSE:
+                startCourse = new WorldPoint(3273, 3195, 0);
+                break;
+            case VARROCK_ROOFTOP_COURSE:
+                startCourse = new WorldPoint(3221, 3414, 0);
+                break;
+            case CANIFIS_ROOFTOP_COURSE:
+                startCourse = new WorldPoint(3507, 3489, 0);
                 break;
             case FALADOR_ROOFTOP_COURSE:
                 startCourse = new WorldPoint(3036, 3341, 0);
