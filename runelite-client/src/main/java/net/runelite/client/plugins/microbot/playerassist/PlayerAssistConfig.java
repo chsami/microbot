@@ -90,6 +90,16 @@ public interface PlayerAssistConfig extends Config {
     {
         return "";
     }
+    @ConfigItem(
+            keyName = "Loot arrows",
+            name = "auto loot arrows",
+            description = "Enable/disable loot arrows",
+            position = 5
+    )
+    default boolean toggleLootArrows()
+    {
+        return true;
+    }
 
     @ConfigItem(
             keyName = "SafeSpot",

@@ -13,18 +13,21 @@ public class CombatPotionScript extends Script {
 
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!config.toggleCombatPotion()) return;
-            if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) > 99) return;
-            Widget[] widgets = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
-            for (Widget widget: widgets
-                 ) {
-                if (widget.getName().contains("combat")) {
-                    Microbot.getMouse().click(widget.getBounds());
-                    sleep(600, 1200);
+            try {
+                if (!super.run()) return;
+                if (!config.toggleCombatPotion()) return;
+                if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) > 99) return;
+                Widget[] widgets = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
+                for (Widget widget: widgets
+                ) {
+                    if (widget.getName().contains("combat")) {
+                        Microbot.getMouse().click(widget.getBounds());
+                        sleep(600, 1200);
+                    }
                 }
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
             }
-
         }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
     }

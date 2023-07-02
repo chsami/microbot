@@ -20,23 +20,27 @@ public class FoodScript extends Script {
 
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!config.toggleFood()) return;
-            if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > 60) {
-                unEquipGuthans();
-                return;
-            }
-            Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
-            if (foods == null || foods.length == 0) {
-                if (!equipFullGuthans()) {
-                    Microbot.getNotifier().notify("No more food left & no guthans available. Please teleport");
+            try {
+                if (!super.run()) return;
+                if (!config.toggleFood()) return;
+                if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > 60) {
+                    unEquipGuthans();
+                    return;
                 }
-                return;
-            }
-            for (Widget food : foods) {
-                Microbot.getMouse().click(food.getBounds());
-                sleep(1200, 2000);
-                break;
+                Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
+                if (foods == null || foods.length == 0) {
+                    if (!equipFullGuthans()) {
+                        Microbot.getNotifier().notify("No more food left & no guthans available. Please teleport");
+                    }
+                    return;
+                }
+                for (Widget food : foods) {
+                    Microbot.getMouse().click(food.getBounds());
+                    sleep(1200, 2000);
+                    break;
+                }
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
         return true;

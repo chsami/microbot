@@ -31,6 +31,11 @@ public class WalkingScript extends Script {
 
                 Microbot.getWalker().walkTo(config.locations().getWorldPoint());
 
+                if (Microbot.getWalker() == null || Microbot.getWalker().getPathfinder() == null)
+                {
+                    shutdown();
+                }
+
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
@@ -38,53 +43,22 @@ public class WalkingScript extends Script {
         return true;
     }
 
-    private void telekneticGrab() {
-        if (Rs2Widget.hasWidget("select an option")) {
-            VirtualKeyboard.typeString("1");
-            return;
-        }
+    public boolean run(WorldPoint worldPoint) {
+        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (!super.run()) return;
+            try {
 
-        if (Rs2Widget.hasWidget("click here to continue")) {
-            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
-            return;
-        }
+                Microbot.getWalker().walkTo(worldPoint, true);
 
-        if (Rs2Npc.getNpc(6777) == null) {
-            Microbot.getMouse().click(50, 50);
-            boolean result = Rs2Npc.interact(6779, "Talk-to");
-                  /*  if (!result) {
-                        Microbot.getWalker()
-                                .walkFastRegion(
-                                        Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionX() - 10,
-                                        Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionY());
-                        sleep(3000);
-                        Microbot.getWalker()
-                                .walkFastRegion(
-                                        Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionX(),
-                                        Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionY() -10);
-                        sleep(3000);
-                    }*/
-            return;
-        }
+                if (Microbot.getWalker() == null || Microbot.getWalker().getPathfinder() == null)
+                {
+                    shutdown();
+                }
 
-        if (Microbot.isWalking()) return;
-
-        WorldPoint w = TelekineticRoom.optimal();
-
-        if (!Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), w))) {
-            Microbot.getWalker().walkFastRegion(w.getX(), w.getY());
-        }
-
-        if (!Microbot.getClient().getLocalPlayer().getWorldLocation().equals(w)) {
-            Microbot.getWalker().walkFastRegionCanvas(w.getRegionX(), w.getRegionY());
-        } else {
-            Tab.switchToMagicTab();
-            sleep(300, 600);
-            Rs2Widget.clickWidget("grab");
-            sleep(300, 600);
-            Rs2Npc.interact(6777, "cast");
-            sleepUntil(() -> Rs2Npc.getNpc(6777) == null);
-            sleepUntil(() -> Rs2Npc.getNpc(6777) != null);
-        }
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }, 0, 600, TimeUnit.MILLISECONDS);
+        return true;
     }
 }

@@ -78,12 +78,16 @@ public class GroundItem {
     }
 
     public static boolean loot(String lootItem, int range) {
+        return loot(lootItem, 1, range);
+    }
+
+    public static boolean loot(String lootItem, int quantity, int range) {
         if (Inventory.isInventoryFull(lootItem)) return false;
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
                 GroundItem.getAll(range)
         );
         for (RS2Item rs2Item : groundItems) {
-            if (rs2Item.getItem().getName().toLowerCase().equals(lootItem.toLowerCase())) {
+            if (rs2Item.getItem().getName().toLowerCase().equals(lootItem.toLowerCase()) && rs2Item.getTileItem().getQuantity() >= quantity) {
                 LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), rs2Item.getTile().getWorldLocation());
                 Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, rs2Item.getTile().getItemLayer().getHeight());
                 if (Camera.isTileOnScreen(rs2Item.getTile().getLocalLocation())) {

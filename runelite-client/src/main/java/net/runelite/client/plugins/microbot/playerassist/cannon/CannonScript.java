@@ -16,21 +16,25 @@ import java.util.concurrent.TimeUnit;
 public class CannonScript extends Script {
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!config.toggleCannon()) return;
-            TileObject brokenCannon = Rs2GameObject.findObjectById(14916);
-            if (brokenCannon != null) {
-                Rs2Menu.doAction("Repair", brokenCannon.getCanvasTilePoly(), new String[]{"Broken multicannon"});
-                return;
-            }
-            int cannonBallsLeft = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.CANNON_AMMO));
-            if (cannonBallsLeft < Random.random(10, 15)) {
-                TileObject cannon = Rs2GameObject.findObjectById(6);
-                if (cannon == null) return;
-                WorldArea cannonLocation = new WorldArea(cannon.getWorldLocation().getX() - 1, cannon.getWorldLocation().getY() - 1, 3, 3, cannon.getWorldLocation().getPlane());
-                if (!cannonLocation.toWorldPoint().equals(CannonPlugin.getCannonPosition().toWorldPoint())) return;
-                Rs2Menu.doAction("Fire", cannon.getCanvasTilePoly(), new String[]{"Dwarf multicannon"});
-                sleep(2000, 4000);
+            try {
+                if (!super.run()) return;
+                if (!config.toggleCannon()) return;
+                TileObject brokenCannon = Rs2GameObject.findObjectById(14916);
+                if (brokenCannon != null) {
+                    Rs2Menu.doAction("Repair", brokenCannon.getCanvasTilePoly(), new String[]{"Broken multicannon"});
+                    return;
+                }
+                int cannonBallsLeft = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.CANNON_AMMO));
+                if (cannonBallsLeft < Random.random(10, 15)) {
+                    TileObject cannon = Rs2GameObject.findObjectById(6);
+                    if (cannon == null) return;
+                    WorldArea cannonLocation = new WorldArea(cannon.getWorldLocation().getX() - 1, cannon.getWorldLocation().getY() - 1, 3, 3, cannon.getWorldLocation().getPlane());
+                    if (!cannonLocation.toWorldPoint().equals(CannonPlugin.getCannonPosition().toWorldPoint())) return;
+                    Rs2Menu.doAction("Fire", cannon.getCanvasTilePoly(), new String[]{"Dwarf multicannon"});
+                    sleep(2000, 4000);
+                }
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
             }
         }, 0, 2000, TimeUnit.MILLISECONDS);
         return true;

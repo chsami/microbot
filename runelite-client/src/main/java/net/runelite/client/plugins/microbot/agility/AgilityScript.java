@@ -25,14 +25,14 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.CANIFIS_ROOFTOP_COURSE;
-import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.FALADOR_ROOFTOP_COURSE;
+import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.*;
 
 public class AgilityScript extends Script {
 
     public static double version = 1.0;
     final int MAX_DISTANCE = 2350;
 
+    public List<AgilityObstacleModel> gnomeStrongholdCourse = new ArrayList<>();
     public List<AgilityObstacleModel> canafisCourse = new ArrayList<>();
     public List<AgilityObstacleModel> faladorCourse = new ArrayList<>();
     public List<AgilityObstacleModel> seersCourse = new ArrayList<>();
@@ -44,6 +44,8 @@ public class AgilityScript extends Script {
 
     private List<AgilityObstacleModel> getCurrentCourse(MicroAgilityConfig config) {
         switch (config.agilityCourse()) {
+            case GNOME_STRONGHOLD_AGILITY_COURSE:
+                return gnomeStrongholdCourse;
             case CANIFIS_ROOFTOP_COURSE:
                 return canafisCourse;
             case FALADOR_ROOFTOP_COURSE:
@@ -57,8 +59,8 @@ public class AgilityScript extends Script {
 
     private void init(MicroAgilityConfig config) {
         switch (config.agilityCourse()) {
-            case CANIFIS_ROOFTOP_COURSE:
-                startCourse = new WorldPoint(3507, 3489, 0);
+            case GNOME_STRONGHOLD_AGILITY_COURSE:
+                startCourse = new WorldPoint(2474, 3436, 0);
                 break;
             case FALADOR_ROOFTOP_COURSE:
                 startCourse = new WorldPoint(3036, 3341, 0);
@@ -82,7 +84,11 @@ public class AgilityScript extends Script {
                 if (Microbot.isWalking()) return;
                 if (Microbot.isAnimating()) return;
 
-                if (Microbot.getClient().getPlane() == 0 && playerWorldLocation.distanceTo(startCourse) > 6) {
+                if (currentObstacle >= getCurrentCourse(config).size()) {
+                    currentObstacle = 0;
+                }
+
+                if (Microbot.getClient().getPlane() == 0 && playerWorldLocation.distanceTo(startCourse) > 6 && config.agilityCourse() != GNOME_STRONGHOLD_AGILITY_COURSE) {
                     currentObstacle = 0;
                     LocalPoint startCourseLocal = LocalPoint.fromWorld(Microbot.getClient(), startCourse);
                     if (!Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), startCourse))
@@ -128,8 +134,8 @@ public class AgilityScript extends Script {
                         Shape objectClickbox = object.getClickbox();
                         if (objectClickbox != null) {
                             AgilityObstacleModel courseObstacle = getCurrentCourse(config).get(currentObstacle);
+                            final int agilityExp = Microbot.getClient().getSkillExperience(Skill.AGILITY);
                             if (Rs2GameObject.interact(courseObstacle.getObjectID())) {
-                                final int agilityExp = Microbot.getClient().getSkillExperience(Skill.AGILITY);
                                 sleepUntilOnClientThread(() -> agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY)
                                         || (Microbot.getClient().getPlane() == 0 && currentObstacle != 0), 10000);
                                 sleepUntilOnClientThread(() -> !Microbot.isWalking() && !Microbot.isAnimating(), 10000);
@@ -137,6 +143,7 @@ public class AgilityScript extends Script {
 
                                 if (agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY)) {
                                     currentObstacle++;
+                                    sleep(400, 800);
                                     break;
                                 }
                             }

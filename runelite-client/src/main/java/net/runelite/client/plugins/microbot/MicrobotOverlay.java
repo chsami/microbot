@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot;
 
 import net.runelite.client.plugins.microbot.cooking.CookingScript;
+import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.util.walker.PathTileOverlay;
 import net.runelite.client.ui.overlay.OverlayPanel;
@@ -33,6 +34,10 @@ public class MicrobotOverlay extends OverlayPanel {
                 drawCookingOverlay();
             }
 
+            if (plugin.miningScript != null) {
+                drawMiningOverlay();
+            }
+
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -56,7 +61,7 @@ public class MicrobotOverlay extends OverlayPanel {
     private void drawCookingOverlay() {
         panelComponent.setPreferredSize(new Dimension(200, 300));
         panelComponent.getChildren().add(TitleComponent.builder()
-                .text("Micro Example V" + CookingScript.version)
+                .text("Micro Cooking V" + CookingScript.version)
                 .color(Color.GREEN)
                 .build());
 
@@ -66,5 +71,19 @@ public class MicrobotOverlay extends OverlayPanel {
                 .left(Microbot.status)
                 .build());
     }
+    private void drawMiningOverlay() {
+        panelComponent.setPreferredSize(new Dimension(200, 300));
+        panelComponent.getChildren().add(TitleComponent.builder()
+                .text("Micro Mining V" + MiningScript.version)
+                .color(Color.GREEN)
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder().build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left(Microbot.status)
+                .build());
+    }
+
 }
 

@@ -143,6 +143,10 @@ public class Walker {
         return walkTo(target, false, false);
     }
 
+    public boolean walkTo(WorldPoint target, boolean useTransport) {
+        return walkTo(target, false, useTransport);
+    }
+
     public boolean walkTo(WorldPoint target, boolean memorizePath, boolean useTransport) {
         System.out.println(useTransport);
 
@@ -203,11 +207,6 @@ public class Walker {
                 return false;
             }
 
-            if (currentDestination != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentDestination) > random(7, 12)) {
-                sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentDestination) > random(7, 12));
-                currentDestination = null;
-                return false;
-            }
             if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(pathfinder.getPath().stream().findFirst().get()) < 3) {
                 pathfinder = null;
                 currentDestination = null;

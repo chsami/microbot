@@ -30,7 +30,7 @@ public class LootScript extends Script {
     public void run(ItemSpawned itemSpawned) {
         mainScheduledFuture = scheduledExecutorService.schedule((() -> {
             if (!super.run()) return;
-            if (Microbot.getClientThread().runOnClientThread(() -> Inventory.isInventoryFull())) return;
+            if (Microbot.getClientThread().runOnClientThread(() -> Inventory.isFull())) return;
             final ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemSpawned.getItem().getId()));
             for (String item : lootItems) {
                 LocalPoint itemLocation = itemSpawned.getTile().getLocalLocation();
@@ -59,6 +59,12 @@ public class LootScript extends Script {
         lootItems = Arrays.stream(config.itemsToLoot().split(",")).map(x -> x.trim()).toArray(String[]::new);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay((() -> {
             if (!super.run()) return;
+            if (config.toggleLootArrows()) {
+                for (String lootItem : Arrays.asList("bronze arrow", "iron arrow", "steel arrow", "mithril arrow", "adamant arrow", "rune arrow", "dragon arrow")) {
+                    if (GroundItem.loot(lootItem, 15, 14))
+                        break;
+                }
+            }
             if (!config.toggleLootItems()) return;
             for (String lootItem : lootItems) {
                 if (GroundItem.loot(lootItem, 14))

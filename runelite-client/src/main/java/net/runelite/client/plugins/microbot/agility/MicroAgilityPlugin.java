@@ -45,6 +45,17 @@ public class MicroAgilityPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(agilityOverlay);
         }
+
+        //gnome stronghold
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(LOG_BALANCE_23145));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_NET_23134));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(TREE_BRANCH_23559));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(BALANCING_ROPE_23557));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(TREE_BRANCH_23560));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_NET_23135));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_PIPE_23138));
+
+
         //canafis
         agilityScript.canafisCourse.add(new AgilityObstacleModel(TALL_TREE_14843));
         agilityScript.canafisCourse.add(new AgilityObstacleModel(GAP_14844));
