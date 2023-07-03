@@ -148,8 +148,6 @@ public class Walker {
     }
 
     public boolean walkTo(WorldPoint target, boolean memorizePath, boolean useTransport) {
-        System.out.println(useTransport);
-
         if (pathfinder != null && !pathfinder.isDone()) return false;
 
         if (pathfinder != null && pathfinder.isDone() && (pathfinder.getTarget() == null || !pathfinder.getTarget().equals(target))) {

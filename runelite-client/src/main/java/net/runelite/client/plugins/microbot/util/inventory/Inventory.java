@@ -2,13 +2,16 @@ package net.runelite.client.plugins.microbot.util.inventory;
 
 import net.runelite.api.ItemComposition;
 import net.runelite.api.Point;
+import net.runelite.api.Varbits;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
+import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 
 import java.awt.event.KeyEvent;
@@ -25,8 +28,6 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 
 public class Inventory {
-
-    private static ScheduledExecutorService scheduledExecutorService;
 
     public static void eat(Widget widget) {
         Microbot.getMouse().click(widget.getBounds());
@@ -401,6 +402,8 @@ public class Inventory {
     }
 
     public static boolean dropAll() {
+        if (!Rs2Settings.enableDropShiftSetting()) return false;
+        if (Inventory.isEmpty()) return true;
         Microbot.pauseAllScripts = true;
         for (int i = 0; i < 28; i++) {
             if (!VirtualKeyboard.isKeyPressed(KeyEvent.VK_SHIFT) || !Rs2Menu.hasAction("drop"))
@@ -415,6 +418,8 @@ public class Inventory {
 
     // First inventory slot is 0
     public static boolean dropAllStartingFrom(int slot) {
+        if (!Rs2Settings.enableDropShiftSetting()) return false;
+        if (Inventory.isEmpty()) return true;
         Microbot.pauseAllScripts = true;
         for (int i = slot; i < 28; i++) {
             if (!VirtualKeyboard.isKeyPressed(KeyEvent.VK_SHIFT) || !Rs2Menu.hasAction("drop"))
@@ -428,6 +433,8 @@ public class Inventory {
     }
 
     public static boolean drop(String itemName) {
+        if (!Rs2Settings.enableDropShiftSetting()) return false;
+        if (Inventory.isEmpty()) return true;
         if (!VirtualKeyboard.isKeyPressed(KeyEvent.VK_SHIFT) || !Rs2Menu.hasAction("drop"))
             VirtualKeyboard.holdShift();
 
@@ -439,6 +446,8 @@ public class Inventory {
     }
 
     public static boolean dropAll(String itemName) {
+        if (!Rs2Settings.enableDropShiftSetting()) return false;
+        if (Inventory.isEmpty()) return true;
         while (hasItem(itemName)) {
             if (!VirtualKeyboard.isKeyPressed(KeyEvent.VK_SHIFT) || !Rs2Menu.hasAction("drop"))
                 VirtualKeyboard.holdShift();
