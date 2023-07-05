@@ -9,14 +9,14 @@ import java.util.concurrent.TimeUnit;
 
 public class WoodcuttingScript  extends Script {
 
-    public static double version = 1.0;
+    public static double version = 1.1;
 
     public boolean run(WoodcuttingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
                 if (Microbot.isWalking() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
-                if (Inventory.isInventoryFull()) {
+                if (Inventory.isFull()) {
                     if (config.hasAxeInventory()) {
                         Inventory.dropAllStartingFrom(1);
                     } else {

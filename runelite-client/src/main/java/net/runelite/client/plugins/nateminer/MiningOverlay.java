@@ -2,6 +2,7 @@ package net.runelite.client.plugins.nateminer;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.natepainthelper.PaintFormat;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -11,29 +12,11 @@ import javax.inject.Inject;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.nateminer.Info.*;
+import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 public class MiningOverlay extends OverlayPanel {
 
-    private String ft(long duration)
-    {
-        String res = "";
-        long days = TimeUnit.MILLISECONDS.toDays(duration);
-        long hours = TimeUnit.MILLISECONDS.toHours(duration)
-                - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(duration));
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(duration)
-                - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
-                .toHours(duration));
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(duration)
-                - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
-                .toMinutes(duration));
-        if (days == 0) {
-            res = (hours + ":" + minutes + ":" + seconds);
-        } else {
-            res = (days + ":" + hours + ":" + minutes + ":" + seconds);
-        }
-        return res;
-    }
+
     @Inject
     MiningOverlay(MiningPlugin plugin)
     {
@@ -64,7 +47,7 @@ public class MiningOverlay extends OverlayPanel {
                     .left("Mining Levels Gained: " + ( Microbot.getClient().getRealSkillLevel(Skill.MINING) - startinglevel))
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Time till next level: " + ft(timeTNL))
+                    .left("Time till next level: " + PaintFormat.ft(timeTNL))
                     .build());
 
             panelComponent.getChildren().add(LineComponent.builder()
