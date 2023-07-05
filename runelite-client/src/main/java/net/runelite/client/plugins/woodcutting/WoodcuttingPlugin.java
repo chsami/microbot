@@ -39,13 +39,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.AnimationID;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
-import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.AnimationChanged;
@@ -54,6 +54,7 @@ import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.InteractingChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
@@ -61,10 +62,8 @@ import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.woodcutting.config.ClueNestTier;
-import net.runelite.client.plugins.xptracker.XpTrackerPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @PluginDescriptor(
@@ -73,11 +72,11 @@ import net.runelite.client.ui.overlay.OverlayManager;
 	tags = {"birds", "nest", "notifications", "overlay", "skilling", "wc", "forestry"},
 	enabledByDefault = false
 )
-@PluginDependency(XpTrackerPlugin.class)
 @Slf4j
 public class WoodcuttingPlugin extends Plugin
 {
 	private static final Pattern WOOD_CUT_PATTERN = Pattern.compile("You get (?:some|an)[\\w ]+(?:logs?|mushrooms)\\.");
+	private static final Pattern ANIMA_BARK_PATTERN = Pattern.compile("You've been awarded <col=[0-9a-f]+>(\\d+) Anima-infused bark</col>\\.");
 
 	@Inject
 	private Notifier notifier;
@@ -109,9 +108,14 @@ public class WoodcuttingPlugin extends Plugin
 	@Getter
 	private final Set<GameObject> treeObjects = new HashSet<>();
 
+	// Forestry
 	@Getter(AccessLevel.PACKAGE)
 	private final List<GameObject> roots = new ArrayList<>();
+	@Getter(AccessLevel.PACKAGE)
 	private final List<NPC> flowers = new ArrayList<>();
+	private NPC lastInteractFlower;
+	@Getter(AccessLevel.PACKAGE)
+	private final List<NPC> activeFlowers = new ArrayList<>(2);
 	@Getter(AccessLevel.PACKAGE)
 	private final List<GameObject> saplingIngredients = new ArrayList<>(5);
 	@Getter(AccessLevel.PACKAGE)
@@ -177,7 +181,7 @@ public class WoodcuttingPlugin extends Plugin
 
 		if (sinceCut.compareTo(statTimeout) >= 0)
 		{
-			session = null;
+			session.setActive(false);
 			axe = null;
 		}
 	}
@@ -185,12 +189,16 @@ public class WoodcuttingPlugin extends Plugin
 	@Subscribe
 	public void onChatMessage(ChatMessage event)
 	{
-		if (event.getType() != ChatMessageType.SPAM && event.getType() != ChatMessageType.GAMEMESSAGE)
+		if (event.getType() != ChatMessageType.SPAM
+			&& event.getType() != ChatMessageType.GAMEMESSAGE
+			&& event.getType() != ChatMessageType.MESBOX)
 		{
 			return;
 		}
 
-		if (WOOD_CUT_PATTERN.matcher(event.getMessage()).matches())
+		final var msg = event.getMessage();
+
+		if (WOOD_CUT_PATTERN.matcher(msg).matches())
 		{
 			if (session == null)
 			{
@@ -198,9 +206,23 @@ public class WoodcuttingPlugin extends Plugin
 			}
 
 			session.setLastChopping();
+			session.incrementLogsCut();
 		}
 
-		var msg = event.getMessage();
+		var matcher = ANIMA_BARK_PATTERN.matcher(msg);
+		if (matcher.matches())
+		{
+			if (session == null)
+			{
+				session = new WoodcuttingSession();
+			}
+
+			session.setLastChopping();
+
+			int num = Integer.parseInt(matcher.group(1));
+			session.incrementBark(num);
+		}
+
 		if (msg.contains("A bird's nest falls out of the tree") && config.showNestNotification())
 		{
 			if (clueTierSpawned == null || clueTierSpawned.ordinal() >= config.clueNestNotifyTier().ordinal())
@@ -231,6 +253,17 @@ public class WoodcuttingPlugin extends Plugin
 			}
 
 			saplingOrder[ingredientNum - 1] = ingredientObj;
+		}
+
+		if (msg.equals("There are no open, unpollinated flowers on this bush yet.")
+			|| msg.equals("The flowers on this bush have not yet opened enough to harvest pollen.")
+			|| msg.equals("<col=06600c>The bush is already fruiting and won't benefit from <col=06600c>any more pollen.</col>"))
+		{
+			if (activeFlowers.contains(lastInteractFlower))
+			{
+				log.debug("Flowers reset");
+				activeFlowers.clear();
+			}
 		}
 	}
 
@@ -362,18 +395,31 @@ public class WoodcuttingPlugin extends Plugin
 	@Subscribe
 	public void onAnimationChanged(final AnimationChanged event)
 	{
-		Player local = client.getLocalPlayer();
-
-		if (event.getActor() != local)
+		var actor = event.getActor();
+		if (client.getLocalPlayer() == actor)
 		{
-			return;
+			int animId = actor.getAnimation();
+			Axe axe = Axe.findAxeByAnimId(animId);
+			if (axe != null)
+			{
+				this.axe = axe;
+			}
 		}
 
-		int animId = local.getAnimation();
-		Axe axe = Axe.findAxeByAnimId(animId);
-		if (axe != null)
+		if (actor.getAnimation() == AnimationID.LOOKING_INTO && flowers.contains(actor.getInteracting()))
 		{
-			this.axe = axe;
+			var flower = (NPC) actor.getInteracting();
+			if (!activeFlowers.contains(flower))
+			{
+				if (activeFlowers.size() == 2)
+				{
+					log.debug("Flowers reset");
+					activeFlowers.clear();
+				}
+
+				log.debug("Tracked flower {}", flower);
+				activeFlowers.add(flower);
+			}
 		}
 	}
 
@@ -400,6 +446,29 @@ public class WoodcuttingPlugin extends Plugin
 	public void onNpcDespawned(NpcDespawned event)
 	{
 		NPC npc = event.getNpc();
-		flowers.remove(npc);
+		if (flowers.remove(npc))
+		{
+			if (activeFlowers.remove(npc))
+			{
+				activeFlowers.clear();
+			}
+			if (npc == lastInteractFlower)
+			{
+				lastInteractFlower = null;
+			}
+		}
+	}
+
+	@Subscribe
+	public void onInteractingChanged(InteractingChanged event)
+	{
+		if (event.getSource() != client.getLocalPlayer()
+			|| !(event.getTarget() instanceof NPC)
+			|| ((NPC) event.getTarget()).getId() != NpcID.FLOWERING_BUSH)
+		{
+			return;
+		}
+
+		lastInteractFlower = (NPC) event.getTarget();
 	}
 }
