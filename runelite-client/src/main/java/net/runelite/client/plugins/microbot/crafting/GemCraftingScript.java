@@ -1,19 +1,15 @@
 package net.runelite.client.plugins.microbot.crafting;
 
-import net.runelite.api.*;
+import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.Microbot.hasLevel;
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class GemCraftingScript extends Script {
 
@@ -31,13 +27,18 @@ public class GemCraftingScript extends Script {
                 final String uncutGemName = "uncut " + config.gemType().getName();
                 if (!Inventory.hasItem("uncut " + config.gemType().getName()) || !Inventory.hasItem("chisel")) {
                     Rs2Bank.openBank();
-                    if (Rs2Bank.isBankOpen()) {
+                    if (Rs2Bank.isOpen()) {
                         Rs2Bank.depositAll("crushed gem");
                         Rs2Bank.depositAll(config.gemType().getName());
-                        Rs2Bank.withdrawItem(true,"chisel");
-                        Rs2Bank.withdrawItemAll(true, uncutGemName);
+                        if(Rs2Bank.hasItem(uncutGemName)) {
+                            Rs2Bank.withdrawItem(true, "chisel");
+                            Rs2Bank.withdrawItemAll(true, uncutGemName);
+                        } else{
+                            Microbot.getNotifier().notify("Run out of Materials");
+                            shutdown();
+                        }
                         Rs2Bank.closeBank();
-                        sleepUntil(() -> !Rs2Bank.isBankOpen());
+                        sleepUntil(() -> !Rs2Bank.isOpen());
                     }
                 } else {
                     Inventory.useItem("chisel");

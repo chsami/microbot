@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.crafting;
+package net.runelite.client.plugins.nategoldrings;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -11,10 +11,10 @@ import javax.inject.Inject;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.crafting.Info.*;
+import static net.runelite.client.plugins.nategoldrings.Info.*;
 
-public class CraftingOverlay extends OverlayPanel {
 
+public class GoldOverlay extends OverlayPanel {
     private String ft(long duration)
     {
         String res = "";
@@ -35,7 +35,7 @@ public class CraftingOverlay extends OverlayPanel {
         return res;
     }
     @Inject
-    CraftingOverlay(CraftingPlugin plugin)
+    GoldOverlay(GoldPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -43,7 +43,7 @@ public class CraftingOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            xpGained = Microbot.getClient().getSkillExperience(Skill.CRAFTING) - expstarted;
+            xpGained = Microbot.getClient().getSkillExperience(Skill.CRAFTING) - expstarted;;
             int xpPerHour = (int)( xpGained / ((System.currentTimeMillis() - timeBegan) / 3600000.0D));
             nextLevelXp = XP_TABLE[Microbot.getClient().getRealSkillLevel(Skill.CRAFTING) + 1];
             xpTillNextLevel = nextLevelXp - Microbot.getClient().getSkillExperience(Skill.CRAFTING);
@@ -53,7 +53,7 @@ public class CraftingOverlay extends OverlayPanel {
             }
             panelComponent.setPreferredSize(new Dimension(275, 700));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Crafter")
+                    .text("Nate's Gold Ring Maker")
                     .color(Color.ORANGE)
                     .build());
 

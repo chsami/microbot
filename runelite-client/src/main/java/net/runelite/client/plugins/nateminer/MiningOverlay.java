@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.crafting;
+package net.runelite.client.plugins.nateminer;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -11,9 +11,9 @@ import javax.inject.Inject;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.crafting.Info.*;
+import static net.runelite.client.plugins.nateminer.Info.*;
 
-public class CraftingOverlay extends OverlayPanel {
+public class MiningOverlay extends OverlayPanel {
 
     private String ft(long duration)
     {
@@ -35,7 +35,7 @@ public class CraftingOverlay extends OverlayPanel {
         return res;
     }
     @Inject
-    CraftingOverlay(CraftingPlugin plugin)
+    MiningOverlay(MiningPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -43,25 +43,25 @@ public class CraftingOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            xpGained = Microbot.getClient().getSkillExperience(Skill.CRAFTING) - expstarted;
+            xpGained = Microbot.getClient().getSkillExperience(Skill.MINING) - expstarted;
             int xpPerHour = (int)( xpGained / ((System.currentTimeMillis() - timeBegan) / 3600000.0D));
-            nextLevelXp = XP_TABLE[Microbot.getClient().getRealSkillLevel(Skill.CRAFTING) + 1];
-            xpTillNextLevel = nextLevelXp - Microbot.getClient().getSkillExperience(Skill.CRAFTING);
+            nextLevelXp = XP_TABLE[Microbot.getClient().getRealSkillLevel(Skill.MINING) + 1];
+            xpTillNextLevel = nextLevelXp - Microbot.getClient().getSkillExperience(Skill.MINING);
             if (xpGained >= 1)
             {
                 timeTNL = (long) ((xpTillNextLevel / xpPerHour) * 3600000);
             }
             panelComponent.setPreferredSize(new Dimension(275, 700));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Crafter")
-                    .color(Color.ORANGE)
+                    .text("Nate's Power Miner")
+                    .color(Color.darkGray)
                     .build());
 
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Crafting Exp Gained (hr): " + (xpGained)  + " ("+xpPerHour+")")
+                    .left("Mining Exp Gained (hr): " + (xpGained)  + " ("+xpPerHour+")")
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Crafting Levels Gained: " + ( Microbot.getClient().getRealSkillLevel(Skill.CRAFTING) - startinglevel))
+                    .left("Mining Levels Gained: " + ( Microbot.getClient().getRealSkillLevel(Skill.MINING) - startinglevel))
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Time till next level: " + ft(timeTNL))
