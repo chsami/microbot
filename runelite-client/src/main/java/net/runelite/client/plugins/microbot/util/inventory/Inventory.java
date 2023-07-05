@@ -397,7 +397,16 @@ public class Inventory {
 
     public static boolean useItemAction(String itemName, String[] actionNames) {
         Microbot.status = "Use inventory item " + itemName + " with actions " + Arrays.toString(actionNames);
+        Tab.switchToInventoryTab();
         Widget item = findItem(itemName);
+        return Rs2Menu.doAction(actionNames, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
+    }
+
+    public static boolean useItemAction(int id, String[] actionNames) {
+        Microbot.status = "Use inventory item " + id + " with actions " + Arrays.toString(actionNames);
+        Tab.switchToInventoryTab();
+        Widget item = findItem(id);
+        if (item == null) return false;
         return Rs2Menu.doAction(actionNames, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
 
@@ -465,6 +474,10 @@ public class Inventory {
 
     public static boolean equipItem(String itemName) {
         return useItemAction(itemName, new String[]{"wield", "wear"});
+    }
+
+    public static boolean equipItem(int id) {
+        return useItemAction(id, new String[]{"wield", "wear"});
     }
 
     public static boolean eatItem(String itemName) {

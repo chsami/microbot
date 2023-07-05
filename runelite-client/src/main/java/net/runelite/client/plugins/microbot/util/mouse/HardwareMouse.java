@@ -53,6 +53,11 @@ public class HardwareMouse extends Mouse {
     }
 
     @Override
+    public Mouse clickFast(Point point) {
+        throw new NotImplementedException("not implemented");
+    }
+
+    @Override
     public Mouse click(Point point, boolean rightClick) {
         Robot robot;
         try {

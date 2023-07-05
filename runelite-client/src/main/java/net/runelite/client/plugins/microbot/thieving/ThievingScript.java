@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.getEquippedItem;
 import static net.runelite.client.plugins.microbot.util.inventory.Inventory.eat;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
@@ -49,7 +50,7 @@ public class ThievingScript extends Script {
                     }
                     return;
                 }
-                if (Inventory.isInventoryFull()) {
+                if (Inventory.isFull()) {
                     Inventory.dropAllStartingFrom(8);
                 }
                 if (Inventory.hasItemAmountStackable("coin pouch", 28)) {

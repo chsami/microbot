@@ -11,6 +11,8 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 
 import java.util.concurrent.TimeUnit;
 
+import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.getEquippedItem;
+
 public class FoodScript extends Script {
 
     int weaponIndex = 0;
@@ -23,7 +25,7 @@ public class FoodScript extends Script {
             try {
                 if (!super.run()) return;
                 if (!config.toggleFood()) return;
-                if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > 60) {
+                if ((Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS)) < 20) {
                     unEquipGuthans();
                     return;
                 }

@@ -36,6 +36,17 @@ public class VirtualMouse extends Mouse {
         return this;
     }
 
+    public Mouse clickFast(Point point, boolean rightClick) {
+
+        mouseEvent(MouseEvent.MOUSE_MOVED, point, rightClick);
+        mouseEvent(MouseEvent.MOUSE_PRESSED, point, rightClick);
+        mouseEvent(MouseEvent.MOUSE_RELEASED, point, rightClick);
+        mouseEvent(MouseEvent.MOUSE_CLICKED, point, rightClick);
+
+        mousePositions.add(point);
+        return this;
+    }
+
     public Mouse click(int x, int y) {
         return click(new Point(x, y), false);
     }
@@ -51,6 +62,11 @@ public class VirtualMouse extends Mouse {
     @Override
     public Mouse click(Point point) {
         return click(point, false);
+    }
+
+    @Override
+    public Mouse clickFast(Point point) {
+        return clickFast(point, false);
     }
 
     @Override

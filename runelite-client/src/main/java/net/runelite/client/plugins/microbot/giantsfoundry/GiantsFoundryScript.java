@@ -20,6 +20,8 @@ import javax.inject.Inject;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
+import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.getEquippedItem;
+
 public class GiantsFoundryScript extends Script {
 
     @Inject

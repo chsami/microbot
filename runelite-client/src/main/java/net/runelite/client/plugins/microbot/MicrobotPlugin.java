@@ -22,6 +22,7 @@ import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
+import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
@@ -78,6 +79,8 @@ public class MicrobotPlugin extends Plugin {
     public CookingScript cookingScript;
     public MiningScript miningScript;
     public WalkingScript walkingScript;
+    public SummerGardenScript summerGardenScript;
+
 
     QuestScript questScript;
     @Override
@@ -197,6 +200,19 @@ public class MicrobotPlugin extends Plugin {
         };
     }
 
+    private Consumer<MenuEntry> menuActionSummerGarden() {
+        return e ->
+        {
+            if (summerGardenScript == null) {
+                summerGardenScript = new SummerGardenScript();
+                summerGardenScript.run();
+            } else {
+                summerGardenScript.shutdown();
+                summerGardenScript = null;
+            }
+        };
+    }
+
     private WorldPoint calculateMapPoint(Point point) {
         float zoom = client.getRenderOverview().getWorldMapZoom();
         RenderOverview renderOverview = client.getRenderOverview();
@@ -248,6 +264,13 @@ public class MicrobotPlugin extends Plugin {
                         .setOption(cookingScript == null ? "Start AutoCooker" : "Stop AutoCooker")
                         .setType(MenuAction.RUNELITE)
                         .onClick(menuActionCookingConsumer( objectEntry.getIdentifier())));
+            } else if(objectEntry.getIdentifier() == ObjectID.SQIRK_TREE) {
+                List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
+
+                leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
+                        .setOption(summerGardenScript == null ? "Start SummerGarden" : "Stop SummerGarden")
+                        .setType(MenuAction.RUNELITE)
+                        .onClick(menuActionSummerGarden()));
             } else {
 
                 List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);

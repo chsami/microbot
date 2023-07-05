@@ -117,7 +117,7 @@ public class Rs2GameObject {
 
 
         for (WallObject wallObject : wallObjects) {
-            if (wallObject.getId() == id && wallObject.getConfig() == 128)
+            if (wallObject.getId() == id)
                 return wallObject;
         }
 
@@ -480,7 +480,7 @@ public class Rs2GameObject {
 
 
         List<WallObject> wallObjects = Arrays.stream(tileObjects.toArray(new WallObject[tileObjects.size()]))
-                .filter(value -> value != null)
+                .filter(value -> value != null && value.getConfig() > 127)
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
 

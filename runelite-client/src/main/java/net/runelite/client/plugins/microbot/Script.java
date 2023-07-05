@@ -170,15 +170,6 @@ public abstract class Script implements IScript {
         return true;
     }
 
-    //getEquippedItem should be moved to a propper class
-    public ItemComposition getEquippedItem(EquipmentInventorySlot slot) {
-        final ItemContainer container = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT));
-        if (container == null) return null;
-        Item itemSlot = container.getItem(slot.getSlotIdx());
-        if (itemSlot == null) return null;
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(itemSlot.getId()));
-    }
-
     public IScript click(TileObject gameObject) {
         if (gameObject != null)
             Microbot.getMouse().click(gameObject.getClickbox().getBounds());

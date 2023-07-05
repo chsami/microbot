@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.example;
 
+import net.runelite.api.EquipmentInventorySlot;
+import net.runelite.api.ItemID;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
@@ -9,6 +11,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -29,6 +32,11 @@ public class ExampleScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
+
+                Rs2Equipment.equipItem(ItemID.ADAMANT_PLATEBODY_G);
+                Rs2Equipment.equipItem(ItemID.ADAMANT_PLATESKIRT_G);
+                Rs2Equipment.equipItem(ItemID.ADAMANT_FULL_HELM_G);
+                Rs2Equipment.equipItem(ItemID.ADAMANT_KITESHIELD_G);
 
                /* if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < 10) {
                     Tab.switchToInventoryTab();
@@ -66,21 +74,10 @@ public class ExampleScript extends Script {
                     }
                 }*/
 
-                if (Counter.getCount() >= 16 || Inventory.isInventoryFull()) {
-                    Tab.switchToMagicTab();
-                    Rs2Widget.clickWidget("Bones to bananas");
-                    sleep(1200);
-                    Rs2GameObject.interact(10735, "deposit");
-
-                } else {
-                    Point p = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(3352, 9637, 1)), 1);
-                    Microbot.getMouse().click(p);
-                }
-
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 600, TimeUnit.MILLISECONDS);
+        }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
     }
 
