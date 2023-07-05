@@ -61,7 +61,7 @@ public class LootScript extends Script {
             if (!super.run()) return;
             if (config.toggleLootArrows()) {
                 for (String lootItem : Arrays.asList("bronze arrow", "iron arrow", "steel arrow", "mithril arrow", "adamant arrow", "rune arrow", "dragon arrow")) {
-                    if (GroundItem.loot(lootItem, 15, 14))
+                    if (GroundItem.loot(lootItem, 13, 14))
                         break;
                 }
             }
