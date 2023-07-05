@@ -5,7 +5,6 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.crafting.enums.Gems;
-import net.runelite.client.plugins.microbot.fletching.enums.FletchingMode;
 
 @ConfigGroup(CraftingConfig.GROUP)
 public interface CraftingConfig extends Config {

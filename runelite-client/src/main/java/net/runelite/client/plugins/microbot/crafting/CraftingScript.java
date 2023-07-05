@@ -21,10 +21,10 @@ public class CraftingScript extends Script {
                 String craftedItem = "green d'hide body";
                 if (Microbot.isGainingExp) return;
                 if (!Inventory.hasItem(craftedItem)) {
-                    if (!Inventory.isInventoryFull()) {
+                    if (!Inventory.isFull()) {
                         Rs2Bank.openBank();
-                        sleepUntil(() -> Rs2Bank.isBankOpen(), 5000);
-                        if (!Rs2Bank.isBankOpen()) return;
+                        sleepUntil(() -> Rs2Bank.isOpen(), 5000);
+                        if (!Rs2Bank.isOpen()) return;
                         Rs2Bank.withdrawItem(true, "needle");
                         Rs2Bank.withdrawItemsAll(true, "thread");
                         if (!Inventory.hasItem("needle") || !Inventory.hasItem("thread")) return;
