@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.nategoldrings;
+package net.runelite.client.plugins.natepainthelper;
 
 public class Info {
     public static int expstarted = 0;
