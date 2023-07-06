@@ -19,6 +19,7 @@ import java.awt.*;
 
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
+
 @PluginDescriptor(
         name = "Micro Crafting",
         description = "Microbot crafting plugin",

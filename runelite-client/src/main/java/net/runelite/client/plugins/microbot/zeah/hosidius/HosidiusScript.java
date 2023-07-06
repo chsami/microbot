@@ -87,19 +87,19 @@ public class HosidiusScript extends Script {
         String compost = "compost";
         if (!Inventory.hasItem(saltpetre) || !Inventory.hasItem(compost)) {
             Rs2Bank.openBank();
-            if (Rs2Bank.isBankOpen()) {
+            if (Rs2Bank.isOpen()) {
                 Rs2Bank.depositAll();
                 Rs2Bank.withdrawItemX(false, "saltpetre", 14);
                 Rs2Bank.withdrawItemX(false, "compost", 14);
                 Rs2Bank.closeBank();
             }
         } else {
-            if (!Inventory.isInventoryFull()) {
+            if (!Inventory.isFull()) {
                 Microbot.getNotifier().notify("Hosidius script has finished");
                 shutDown();
                 return;
             }
-            if (!Rs2Bank.isBankOpen()) {
+            if (!Rs2Bank.isOpen()) {
                 while (Inventory.hasItem(saltpetre) && Inventory.hasItem(compost)) {
                     for (int i = 0; i < 14; i++) {
                         Inventory.useItemOnItemSlot(i, i + 14, 300, 600);

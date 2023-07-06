@@ -61,7 +61,7 @@ public class FiremakingScript extends Script {
                 firemakingStatus = FiremakingStatus.FIND_EMPTY_SPOT;
                 return false;
             }
-            if (!Rs2Bank.isBankOpen()) {
+            if (!Rs2Bank.isOpen()) {
                 Rs2Bank.useBank();
                 if (!hasTinderbox) {
                     Rs2Bank.withdrawItem("tinderbox");

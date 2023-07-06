@@ -300,7 +300,7 @@ public class Inventory {
     }
 
     public static boolean useItemSlot(int slot) {
-        if (Rs2Bank.isBankOpen()) return false;
+        if (Rs2Bank.isOpen()) return false;
         Microbot.status = "Use inventory slot " + slot;
         Widget item = findItemSlot(slot);
         if (item == null) return false;
@@ -309,7 +309,7 @@ public class Inventory {
     }
 
     public static boolean useItemContains(String itemName) {
-        if (Rs2Bank.isBankOpen()) return false;
+        if (Rs2Bank.isOpen()) return false;
         Microbot.status = "Use inventory item containing " + itemName;
         Widget item = findItemContains(itemName);
         if (item == null) return false;
@@ -318,7 +318,7 @@ public class Inventory {
     }
 
     public static boolean useItem(String itemName) {
-        if (Rs2Bank.isBankOpen()) return false;
+        if (Rs2Bank.isOpen()) return false;
         Microbot.status = "Use inventory item " + itemName;
         Widget item = findItem(itemName);
         if (item == null) return false;
@@ -328,7 +328,7 @@ public class Inventory {
     }
 
     public static boolean useItemUnsafe(String itemName) {
-        if (Rs2Bank.isBankOpen()) return false;
+        if (Rs2Bank.isOpen()) return false;
         Microbot.status = "Use inventory item " + itemName;
         Widget item = findItem(itemName);
         if (item == null) return false;
@@ -337,7 +337,7 @@ public class Inventory {
     }
 
     public static boolean useItem(int id) {
-        if (Rs2Bank.isBankOpen()) return false;
+        if (Rs2Bank.isOpen()) return false;
         Microbot.status = "Use inventory item " + id;
         Widget item = findItem(id);
         if (item == null) return false;
@@ -364,7 +364,7 @@ public class Inventory {
     }
 
     public static boolean useItemOnItem(String itemName1, String itemName2) {
-        if (Rs2Bank.isBankOpen()) return false;
+        if (Rs2Bank.isOpen()) return false;
         Microbot.status = "Use inventory item " + itemName1 + " with " + itemName2;
         Widget item1 = findItem(itemName1);
         Widget item2 = findItem(itemName2);
@@ -377,7 +377,7 @@ public class Inventory {
     }
 
     public static boolean useItemSafe(String itemName) {
-        if (Rs2Bank.isBankOpen()) return false;
+        if (Rs2Bank.isOpen()) return false;
         Microbot.status = "Use inventory item safe " + itemName;
         Tab.switchToInventoryTab();
         if (isUsingItem())
