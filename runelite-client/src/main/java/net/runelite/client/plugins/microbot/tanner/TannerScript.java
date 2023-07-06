@@ -52,7 +52,7 @@ public class TannerScript extends Script {
                 Rs2Bank.openBank();
             }
 
-            if (Rs2Bank.isBankOpen()) {
+            if (Rs2Bank.isOpen()) {
 
                 if (!hasMoney) {
                     Rs2Bank.withdrawItemAll(false,"Coins");

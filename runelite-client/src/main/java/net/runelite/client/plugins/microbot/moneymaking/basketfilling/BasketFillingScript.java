@@ -19,14 +19,14 @@ public class BasketFillingScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                if (!Inventory.isInventoryFull() || !Inventory.hasItem("basket")) {
+                if (!Inventory.isFull() || !Inventory.hasItem("basket")) {
                     Rs2Bank.openBank();
-                    if (Rs2Bank.isBankOpen()) {
+                    if (Rs2Bank.isOpen()) {
                         Rs2Bank.depositAll();
                         Rs2Bank.withdrawItemX(true, "tomato", 24);
                         Rs2Bank.withdrawItemX(true, "basket", 24);
                         Rs2Bank.closeBank();
-                        sleepUntil(() -> !Rs2Bank.isBankOpen());
+                        sleepUntil(() -> !Rs2Bank.isOpen());
                     }
                 } else {
                     for (int i = 24; i < 28; i++) {
