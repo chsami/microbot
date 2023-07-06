@@ -462,17 +462,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<configuration>
-					<sourceDirectories>
-						<!-- exclude generated sources from checkstyle https://stackoverflow.com/a/30406454/7189686 -->
-						<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-						<sourceDirectory>${project.basedir}/src/main/java11</sourceDirectory>
-					</sourceDirectories>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
 				<version>3.16.0</version>
 				<dependencies>
