@@ -472,14 +472,6 @@ public class Inventory {
         return Arrays.stream(Rs2Menu.getTargets()).anyMatch(x -> x.contains("->"));
     }
 
-    public static boolean equipItem(String itemName) {
-        return useItemAction(itemName, new String[]{"wield", "wear"});
-    }
-
-    public static boolean equipItem(int id) {
-        return useItemAction(id, new String[]{"wield", "wear"});
-    }
-
     public static boolean eatItem(String itemName) {
         return useItemAction(itemName, "eat");
     }
