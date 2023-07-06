@@ -17,7 +17,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.microbot.crafting.Info.*;
+import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
         name = "Micro Crafting",
