@@ -82,7 +82,7 @@ public class Rs2Widget {
                 List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> !x.isHidden()).collect(Collectors.toList());
                 for (Widget rootWidget : rootWidgets) {
                     if (exact) {
-                        if (rootWidget.getText().toLowerCase().equals(text.toLowerCase()) || rootWidget.getName().toLowerCase().equals(">" + text.toLowerCase() + "<")) {
+                        if (rootWidget.getText().toLowerCase().contains(text.toLowerCase()) || rootWidget.getName().toLowerCase().contains(">" + text.toLowerCase() + "<")) {
                             return rootWidget;
                         }
                     } else {
@@ -133,7 +133,7 @@ public class Rs2Widget {
     public static Widget searchChildren(String text, Widget child, boolean exact) {
         Widget found = null;
         if (exact) {
-            if (child.getText().toLowerCase().equals(text.toLowerCase()) || child.getName().toLowerCase().equals(">" + text.toLowerCase() + "<")) {
+            if (child.getText().toLowerCase().contains(text.toLowerCase()) || child.getName().toLowerCase().contains(">" + text.toLowerCase() + "<")) {
                 return child;
             }
         } else {
