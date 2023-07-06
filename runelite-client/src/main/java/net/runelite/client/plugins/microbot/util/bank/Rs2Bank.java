@@ -164,7 +164,7 @@ public class Rs2Bank {
         }
         return false;
     }
-    //comment
+
     public static boolean withdrawItemX(boolean checkInventory, String itemName, int amount) {
         Microbot.status = "Withdrawing " + amount + " " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
