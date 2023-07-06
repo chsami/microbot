@@ -12,7 +12,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
-import static net.runelite.client.plugins.nateminer.Info.*;
+import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 import javax.inject.Inject;
 import java.awt.*;
