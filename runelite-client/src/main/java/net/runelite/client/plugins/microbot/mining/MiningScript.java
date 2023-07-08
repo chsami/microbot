@@ -26,11 +26,12 @@ public class MiningScript extends Script {
                     return;
                 }
 
-                Rs2GameObject.interact(objectId);
-                sleepUntil(() -> Microbot.isAnimating());
-                sleepUntil(() -> !Microbot.isAnimating());
-
-
+                if (Rs2GameObject.interact(objectId)) {
+                    Microbot.status = "Wait for animation";
+                    sleepUntil(() -> Microbot.isAnimating());
+                    Microbot.status = "Wait for animation to stop";
+                    sleepUntil(() -> !Microbot.isAnimating());
+                }
 
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());

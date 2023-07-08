@@ -2,6 +2,8 @@ package net.runelite.client.plugins.microbot.util.walker;
 
 import com.google.common.base.Strings;
 import lombok.Getter;
+import lombok.Setter;
+import net.runelite.api.ItemID;
 import net.runelite.api.Quest;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
@@ -20,79 +22,86 @@ public class Transport {
      * The starting point of this transport
      */
     @Getter
-    private final WorldPoint origin;
+    public WorldPoint origin = null;
 
     /**
      * The ending point of this transport
      */
     @Getter
-    private final WorldPoint destination;
+    public WorldPoint destination = null;
 
     /**
      * The action of the object
      */
     @Getter
-    private String action;
+    public String action;
 
     /**
      * The id of the object
      */
     @Getter
-    private int objectId;
+    public int objectId;
 
     /**
      * The linked transport
      */
     @Getter
-    private Transport linkedTransport;
+    public Transport linkedTransport;
 
 
     /**
      * The skill levels required to use this transport
      */
-    private final int[] skillLevels = new int[Skill.values().length];
+    public final int[] skillLevels = new int[Skill.values().length];
 
     /**
      * The quest required to use this transport
      */
     @Getter
-    private Quest quest;
+    public Quest quest;
 
     /**
      * Whether the transport is an agility shortcut
      */
     @Getter
-    private boolean isAgilityShortcut;
+    public boolean isAgilityShortcut;
 
     /**
      * Whether the transport is a crossbow grapple shortcut
      */
     @Getter
-    private boolean isGrappleShortcut;
+    public boolean isGrappleShortcut;
 
     /**
      * Whether the transport is a boat
      */
     @Getter
-    private boolean isBoat;
+    public boolean isBoat;
 
     /**
      * Whether the transport is a fairy ring
      */
     @Getter
-    private boolean isFairyRing;
+    public boolean isFairyRing;
 
     /**
      * Whether the transport is a teleport
      */
     @Getter
-    private boolean isTeleport;
+    public boolean isTeleport;
 
     /**
      * The additional travel time
      */
     @Getter
-    private int wait;
+    public int wait;
+
+    @Getter
+    public int itemRequired;
+
+    Transport() {
+
+    }
 
     Transport(final WorldPoint origin, final WorldPoint destination) {
         this.origin = origin;
@@ -247,6 +256,37 @@ public class Transport {
         addTransports(transports, "/fairy_rings.txt", TransportType.FAIRY_RING);
 
         addTransports(transports, "/teleports.txt", TransportType.TELEPORT);
+
+        Transport varrock_hillgiant_door = new Transport();
+
+        varrock_hillgiant_door.origin = new WorldPoint(3115, 3449, 0);
+        varrock_hillgiant_door.destination =  new WorldPoint(3115, 3450, 0);
+        varrock_hillgiant_door.objectId = 1804;
+        varrock_hillgiant_door.action = "open";
+        varrock_hillgiant_door.itemRequired = ItemID.BRASS_KEY;
+        varrock_hillgiant_door.wait = 2000;
+
+
+        Transport varrock_hillgiant_ladder = new Transport();
+
+        varrock_hillgiant_ladder.origin = new WorldPoint(3116, 3452, 0);
+        varrock_hillgiant_ladder.destination =  new WorldPoint(3116, 9851, 0);
+        varrock_hillgiant_ladder.objectId = 17384;
+        varrock_hillgiant_ladder.action = "climb-down";
+
+
+        Transport varrock_hillgiant_ladder_dungeon = new Transport();
+
+        varrock_hillgiant_ladder_dungeon.origin = new WorldPoint(3116, 9852, 0);
+        varrock_hillgiant_ladder_dungeon.destination =  new WorldPoint(3116, 3451, 0);
+        varrock_hillgiant_ladder_dungeon.objectId = 17385;
+        varrock_hillgiant_ladder_dungeon.action = "climb-up";
+
+
+        transports.computeIfAbsent(varrock_hillgiant_door.origin, k -> new ArrayList<>()).add(varrock_hillgiant_door);
+        transports.computeIfAbsent(varrock_hillgiant_ladder.origin, k -> new ArrayList<>()).add(varrock_hillgiant_ladder);
+        transports.computeIfAbsent(varrock_hillgiant_ladder_dungeon.origin, k -> new ArrayList<>()).add(varrock_hillgiant_ladder_dungeon);
+
 
         return transports;
     }

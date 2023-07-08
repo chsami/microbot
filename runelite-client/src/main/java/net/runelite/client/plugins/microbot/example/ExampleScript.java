@@ -5,6 +5,7 @@ import net.runelite.api.ItemID;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -15,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -31,53 +33,16 @@ public class ExampleScript extends Script {
     public boolean run(ExampleConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
+
             try {
+                Microbot.getWalker().walkTo(new WorldPoint(3116, 9851, 0), true);
+              //  WorldArea area = Microbot.getClient().getLocalPlayer().getWorldArea();
 
-                Rs2Equipment.equipItem(ItemID.ADAMANT_PLATEBODY_G);
-                Rs2Equipment.equipItem(ItemID.ADAMANT_PLATESKIRT_G);
-                Rs2Equipment.equipItem(ItemID.ADAMANT_FULL_HELM_G);
-                Rs2Equipment.equipItem(ItemID.ADAMANT_KITESHIELD_G);
-
-               /* if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < 10) {
-                    Tab.switchToInventoryTab();
-                    Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
-                    for (Widget potion: potions) {
-                        if (potion.getName().toLowerCase().contains("saradomin")) {
-                            Microbot.getMouse().click(potion.getBounds());
-                            sleep(1200, 1500);
-                            break;
-                        }
-                    }
-                }*/
-
-
-               /* if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) == 0) {
-                    Tab.switchToInventoryTab();
-                    Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
-                    if (potions == null || potions.length == 0) {
-                        Microbot.getNotifier().notify("No more prayer potions left");
-                        return;
-                    }
-                    for (Widget potion: potions) {
-                        if (potion.getName().toLowerCase().contains("prayer")) {
-                            Microbot.getMouse().click(potion.getBounds());
-                            sleep(2400, 2600);
-                            break;
-                        }
-                    }
-                    if (Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_DISABLED.getValue()) {
-                        final Widget prayerOrb = Rs2Widget.getWidget(WidgetInfo.MINIMAP_QUICK_PRAYER_ORB);
-                        if (prayerOrb != null) {
-                            Microbot.getMouse().click(prayerOrb.getCanvasLocation());
-                            sleep(1000, 1500);
-                        }
-                    }
-                }*/
-
+                //System.out.println(area.canTravelInDirection(Microbot.getClient(), 0, 2));
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 100, TimeUnit.MILLISECONDS);
+        }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
     }
 

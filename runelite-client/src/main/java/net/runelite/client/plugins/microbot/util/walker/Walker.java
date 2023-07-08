@@ -28,8 +28,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static org.apache.commons.lang3.tuple.Pair.of;
 
@@ -212,14 +211,27 @@ public class Walker {
                 return true;
             }
 
+            List<WorldPoint> transportDestinations = pathfinder.getPath().stream().filter(x -> pathfinderConfig.getTransports().get(x) != null).collect(Collectors.toList());
+
+            Collections.reverse(transportDestinations);
+
             if (useTransport) {
+                for (WorldPoint worldPoint : transportDestinations) {
+                    if (ignoreTransport.stream().anyMatch(x -> x.getOrigin().equals(worldPoint))) continue;
+                    if (Calculations.tileOnMap(worldPoint) && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(worldPoint) < 6) {
+                        if (useTransport(worldPoint)) return false;
+                    }
+                }
+            }
+
+            /*if (useTransport) {
                 for (WorldPoint worldPoint : pathfinder.getPath()) {
                     if (ignoreTransport.stream().anyMatch(x -> x.getOrigin().equals(worldPoint))) continue;
                     if (Calculations.tileOnMap(worldPoint)) {
                         if (useTransport(worldPoint)) return false;
                     }
                 }
-            }
+            }*/
 
 
             for (WorldPoint worldPoint : pathfinder.getPath()) {
@@ -244,15 +256,25 @@ public class Walker {
         List<Transport> matchingTransports = transportWorldPoints.stream().filter(x -> x.getOrigin().equals(destinationWorldPoint)).collect(Collectors.toList());
         for (Transport transport : matchingTransports) {
             if (transport != null) {
+                if (transport.itemRequired > 0 && !Inventory.hasItem(transport.itemRequired)) {
+                    Microbot.getNotifier().notify("You are missing the following item ID: " + transport.itemRequired);
+                    continue;
+                }
                 if (Calculations.tileOnScreen(localPoint)) {
+                    sleepUntilOnClientThread(() -> !Microbot.isWalking());
                     if (Rs2GameObject.interact(transport.getObjectId())) {
+                        sleepUntilOnClientThread(() -> !Microbot.isWalking());
+                        sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(transport.getDestination()), 10000);
                         if (!transport.getAction().toLowerCase().contains("open")) {
                             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(transport.getDestination()) < 3, 10000);
-                            for (Transport transportToIgnore : pathfinderConfig.getTransports().get(transport.getDestination()).stream().collect(Collectors.toList())) {
-                                ignoreTransport.add(transportToIgnore);
-                            }
                         } else {
                             sleep(2000, 3000);
+                        }
+                        if ( Microbot.getClient().getLocalPlayer().getWorldLocation().equals(transport.getDestination())) {
+                            List<Transport> transportsToIgnore = pathfinderConfig.getTransports().get(transport.getOrigin()).stream().collect(Collectors.toList());
+                            for (Transport transportToIgnore : transportsToIgnore) {
+                                ignoreTransport.add(transportToIgnore);
+                            }
                         }
                         currentDestination = null;
                         return true;
