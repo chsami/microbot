@@ -28,6 +28,15 @@ public class Rs2Npc {
                 .orElse(null);
     }
 
+    public static NPC validateInteractable(NPC npc) {
+        if(npc != null) {
+            Microbot.getWalker().walkTo(npc.getWorldLocation());
+            Camera.turnTo(npc);
+            return npc;
+        }
+        return null;
+    }
+
     public static List<NPC> getNpcsForPlayer() {
         List<NPC> npcs = Microbot.getClient().getNpcs().stream()
                 .filter(x -> x.getInteracting() == Microbot.getClient().getLocalPlayer())

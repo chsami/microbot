@@ -42,7 +42,7 @@ public class PieScript extends Script {
                 Rs2Bank.withdrawItemX(true, "pie dish", 14);
                 sleepUntilOnClientThread(() -> Inventory.hasItem("pie dish"));
                 Rs2Bank.withdrawItemX(true, "pastry dough", 14);
-                sleepUntilOnClientThread(() -> !Inventory.hasItem("pastry dough"));
+                sleepUntilOnClientThread(() -> Inventory.hasItem("pastry dough"));
             } else {
                 Microbot.getNotifier().notify("Run out of Materials");
                 shutdown();
