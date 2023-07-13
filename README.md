@@ -1,9 +1,9 @@
-![](https://runelite.net/img/logo.png)
-# runelite [![CI](https://github.com/runelite/runelite/workflows/CI/badge.svg)](https://github.com/runelite/runelite/actions?query=workflow%3ACI+branch%3Amaster) [![Discord](https://img.shields.io/discord/301497432909414422.svg)](https://discord.gg/ArdAhnN)
+# Microbot
+Microbot is an opensource automated oldschool runescape client based on runelite. It uses a plugin system to enable scripting. Here is a youtube channel showing off some of the scripts
 
-RuneLite is a free, open source OldSchool RuneScape client.
-
-If you have any questions, please join our IRC channel on [irc.rizon.net #runelite](http://qchat.rizon.net/?channels=runelite&uio=d4) or alternatively our [Discord](https://discord.gg/ArdAhnN) server.
+[Youtube Channel](https://www.youtube.com/channel/UCEj_7N5OPJkdDi0VTMOJOpw)
+ 
+If you have any questions, please join our [Discord](https://discord.gg/zaGrfqFEWE) server.
 
 ## Project Layout
 
@@ -20,6 +20,3 @@ For more information visit the [RuneLite Wiki](https://github.com/runelite/runel
 
 RuneLite is licensed under the BSD 2-clause license. See the license header in the respective file to be sure.
 
-## Contribute and Develop
-
-We've set up a separate document for our [contribution guidelines](https://github.com/runelite/runelite/blob/master/.github/CONTRIBUTING.md).
