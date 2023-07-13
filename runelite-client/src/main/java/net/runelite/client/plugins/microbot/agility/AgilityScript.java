@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.microbot.agility;
 
-import net.runelite.api.Skill;
-import net.runelite.api.Tile;
-import net.runelite.api.TileObject;
-import net.runelite.api.World;
+import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.agility.AgilityPlugin;
@@ -43,7 +41,7 @@ public class AgilityScript extends Script {
 
     WorldPoint startCourse = new WorldPoint(0, 0, 0);
 
-    int currentObstacle = 0;
+    public static int currentObstacle = 0;
 
     private List<AgilityObstacleModel> getCurrentCourse(MicroAgilityConfig config) {
         switch (config.agilityCourse()) {
@@ -155,19 +153,18 @@ public class AgilityScript extends Script {
                         if (objectClickbox != null) {
                             AgilityObstacleModel courseObstacle = getCurrentCourse(config).get(currentObstacle);
                             final int agilityExp = Microbot.getClient().getSkillExperience(Skill.AGILITY);
-                            if (Rs2GameObject.interact(courseObstacle.getObjectID())) {
-                                sleepUntilOnClientThread(() -> agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY)
-                                        || (Microbot.getClient().getPlane() == 0 && currentObstacle != 0), 10000);
-                                sleepUntilOnClientThread(() -> !Microbot.isWalking() && !Microbot.isAnimating(), 10000);
-
-
-                                if (agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY)) {
-                                    currentObstacle++;
-                                    sleep(400, 800);
+                            //exception for weird objects
+                            if (courseObstacle.getObjectID() == ObjectID.TALL_TREE_14843) {
+                                WorldPoint worldPoint = new WorldPoint(3508, 3489, 0);
+                                LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+                                Point point = Perspective.localToCanvas(Microbot.getClient(), localPoint, 0);
+                                Microbot.getMouse().click(point);
+                                if (waitForAgilityObstabcleToFinish(agilityExp))
                                     break;
-                                }
+                            } else if (Rs2GameObject.interact(courseObstacle.getObjectID())) {
+                                if (waitForAgilityObstabcleToFinish(agilityExp))
+                                    break;
                             }
-
 
                             if (Obstacles.PORTAL_OBSTACLE_IDS.contains(object.getId())) {
                                 //empty for now
@@ -185,5 +182,19 @@ public class AgilityScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
+    }
+
+    private boolean waitForAgilityObstabcleToFinish(int agilityExp) {
+        sleepUntilOnClientThread(() -> agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY)
+                || (Microbot.getClient().getPlane() == 0 && currentObstacle != 0), 15000);
+        sleepUntilOnClientThread(() -> !Microbot.isWalking() && !Microbot.isAnimating(), 10000);
+
+
+        if (agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY) || Microbot.getClient().getPlane() == 0) {
+            currentObstacle++;
+            sleep(400, 800);
+            return true;
+        }
+        return false;
     }
 }
