@@ -39,12 +39,14 @@ public class Login {
         } finally {
             Microbot.getClient().setUsername(getProfile().getName());
             try {
-                Microbot.getClient().setPassword(Encryption.decrypt(getProfile().getPassword()));
+                if (Encryption.decrypt(getProfile().getPassword()) != null && Encryption.decrypt(getProfile().getPassword()).length() > 0) {
+                    Microbot.getClient().setPassword(Encryption.decrypt(getProfile().getPassword()));
+                    sleep(300, 600);
+                    VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            sleep(300, 600);
-            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
         }
     }
 
