@@ -76,8 +76,6 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.varrockCourse.add(new AgilityObstacleModel(LEDGE_14836));
         agilityScript.varrockCourse.add(new AgilityObstacleModel(EDGE));
 
-        // Canifis
-
         //gnome stronghold
         agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(LOG_BALANCE_23145));
         agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_NET_23134));
