@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CookingEnum {
+    RAW_LOBSTER("raw lobster", 40, "lobster"),
     RAW_TUNA("raw tuna", 30, "tuna"),
     RAW_SALMON("raw salmon", 25, "salmon"),
     RAW_TROUT("raw trout", 15, "trout"),
