@@ -47,6 +47,11 @@ public class Rs2GameObject {
         return clickObject(object, action);
     }
 
+    public static boolean interact(int id, String action, int distance) {
+        TileObject object = findObjectByIdAndDistance(id, distance);
+        return clickObject(object, action);
+    }
+
     public static TileObject interactAndGetObject(int id) {
         TileObject object = findObjectById(id);
         clickObject(object);
@@ -123,6 +128,51 @@ public class Rs2GameObject {
 
         List<DecorativeObject> decorationObjects = getDecorationObjects();
 
+
+        for (DecorativeObject decorativeObject : decorationObjects) {
+            if (decorativeObject.getId() == id)
+                return decorativeObject;
+        }
+
+        return null;
+    }
+
+    public static TileObject findObjectByIdAndDistance(int id, int distance) {
+
+        List<GameObject> gameObjects = getGameObjects();
+
+        gameObjects = gameObjects.stream().filter(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation()) < distance).collect(Collectors.toList());
+
+        if (gameObjects == null) return null;
+
+        for (net.runelite.api.GameObject gameObject : gameObjects) {
+            if (gameObject.getId() == id)
+                return gameObject;
+        }
+
+        List<GroundObject> groundObjects = getGroundObjects();
+
+        groundObjects = groundObjects.stream().filter(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation()) < distance).collect(Collectors.toList());
+
+
+        for (GroundObject groundObject : groundObjects) {
+            if (groundObject.getId() == id)
+                return groundObject;
+        }
+
+        List<WallObject> wallObjects = getWallObjects();
+
+        wallObjects = wallObjects.stream().filter(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation()) < distance).collect(Collectors.toList());
+
+
+        for (WallObject wallObject : wallObjects) {
+            if (wallObject.getId() == id)
+                return wallObject;
+        }
+
+        List<DecorativeObject> decorationObjects = getDecorationObjects();
+
+        decorationObjects = decorationObjects.stream().filter(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation()) < distance).collect(Collectors.toList());
 
         for (DecorativeObject decorativeObject : decorationObjects) {
             if (decorativeObject.getId() == id)
@@ -480,7 +530,7 @@ public class Rs2GameObject {
 
 
         List<WallObject> wallObjects = Arrays.stream(tileObjects.toArray(new WallObject[tileObjects.size()]))
-                .filter(value -> value != null && value.getConfig() > 127)
+                .filter(value -> value != null && value.getConfig() > 63)
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
 
@@ -505,7 +555,7 @@ public class Rs2GameObject {
     }
 
     private static boolean clickObject(TileObject object, String optionName) {
-        if (object == null) return false;
+        if (object == null || object.getClickbox() == null) return false;
         objectToInteract = object;
         objectAction = optionName;
         Microbot.getMouse().click(object.getClickbox().getBounds());
