@@ -119,13 +119,12 @@ public class MicrobotPlugin extends Plugin {
     public void onMenuEntryAdded(MenuEntryAdded event) {
         final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
 
-        if (map == null) {
-            return;
+        if (map != null) {
+            if (map.getBounds().contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY())) {
+                addMapMenuEntries(event);
+            }
         }
 
-        if (map.getBounds().contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY())) {
-            addMapMenuEntries(event);
-        }
         if (Rs2Menu.getOption().length() > 0) {
             final MenuEntry[] menuEntries = client.getMenuEntries();
             client.setMenuEntries(new MenuEntry[]{});
