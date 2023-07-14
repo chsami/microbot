@@ -16,7 +16,7 @@ public class CombatPotionScript extends Script {
             try {
                 if (!super.run()) return;
                 if (!config.toggleCombatPotion()) return;
-                if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) > 99) return;
+                if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) - Microbot.getClient().getRealSkillLevel(Skill.ATTACK) > 5) return;
                 Widget[] widgets = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
                 for (Widget widget: widgets
                 ) {
