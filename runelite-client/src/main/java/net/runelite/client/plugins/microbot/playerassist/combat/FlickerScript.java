@@ -41,6 +41,11 @@ public class FlickerScript extends Script {
         monsters = new ArrayList<>();
         monsters.add(new Monster(NpcID.GUARD_11947, 6, 426, AttackStyle.RANGED));
         monsters.add(new Monster(NpcID.GUARD_3271, 6, 395, AttackStyle.MELEE));
+        monsters.add(new Monster(NpcID.FIRE_GIANT_2081, 5, 4667, AttackStyle.MELEE));
+        monsters.add(new Monster(NpcID.FIRE_GIANT_2082, 5, 4667, AttackStyle.MELEE));
+        monsters.add(new Monster(NpcID.FIRE_GIANT_2083, 5, 4666, AttackStyle.MELEE));
+        monsters.add(new Monster(NpcID.FIRE_GIANT_2084, 5, 4667, AttackStyle.MELEE));
+
     }
 
     public boolean run(PlayerAssistConfig config) {
@@ -135,6 +140,7 @@ public class FlickerScript extends Script {
                 .findFirst().orElse(null);
 
         if (monster != null) {
+            prayFlickAttackStyle = monster.attackStyle;
             currentMonstersAttackingUs.remove(monster);
         }
     }
