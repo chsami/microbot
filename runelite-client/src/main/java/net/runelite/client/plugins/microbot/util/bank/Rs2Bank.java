@@ -32,9 +32,27 @@ public class Rs2Bank {
         if (!isBankOpen()) return false;
         if (!Inventory.hasItemContains(itemName)) return true;
         Widget item = Inventory.findItemContains(itemName);
+        if (item == null) return false;
+        setBankOptionX(amount);
         boolean action = Rs2Menu.doAction("Deposit-" + amount, item.getBounds());
         sleep(600, 1000);
         return action;
+    }
+
+    private static void setBankOptionX(int amount) {
+        if (Microbot.getVarbitValue(BANK_WITHDRAW_QUANTITY) != 3 || Microbot.getVarbitValue(3960) != amount) {
+            Widget withdrawX = Rs2Widget.getWidget(786466);
+            if (withdrawX != null) {
+                Rs2Menu.setOption("Set custom quantity");
+                Microbot.getMouse().move(withdrawX.getBounds());
+                sleep(150, 250);
+                Microbot.getMouse().click(withdrawX.getBounds());
+                sleep(1000);
+                VirtualKeyboard.typeString(Integer.toString(amount));
+                VirtualKeyboard.enter();
+                sleep(400, 600);
+            }
+        }
     }
 
     public static boolean depositAll(String itemName) {
@@ -42,6 +60,9 @@ public class Rs2Bank {
         if (!isBankOpen()) return false;
         if (!Inventory.hasItem(itemName)) return true;
         Widget item = Inventory.findItem(itemName);
+        if (item == null) return false;
+        Rs2Widget.clickWidget(786468);
+        sleep(600, 1000);
         boolean action = Rs2Menu.doAction("Deposit-all", item.getBounds());
         sleep(600, 1000);
         return action;
@@ -52,6 +73,9 @@ public class Rs2Bank {
         if (!isBankOpen()) return false;
         if (!Inventory.hasItemContains(itemName)) return true;
         Widget item = Inventory.findItemContains(itemName);
+        if (item == null) return false;
+        Rs2Widget.clickWidget(786468);
+        sleep(600, 1000);
         boolean action = Rs2Menu.doAction("Deposit-all", item.getBounds());
         sleep(600, 1000);
         return action;
@@ -174,19 +198,7 @@ public class Rs2Bank {
         Widget widget = Rs2Widget.findWidgetExact(itemName);
         if (widget == null) return false;
         if (widget.getItemQuantity() <= 0) return false;
-        if (Microbot.getVarbitValue(BANK_WITHDRAW_QUANTITY) != 3 || Microbot.getVarbitValue(3960) != amount) {
-            Widget withdrawX = Rs2Widget.getWidget(786466);
-            if (withdrawX != null) {
-                Rs2Menu.setOption("Set custom quantity");
-                Microbot.getMouse().move(withdrawX.getBounds());
-                sleep(150, 250);
-                Microbot.getMouse().click(withdrawX.getBounds());
-                sleep(1000);
-                VirtualKeyboard.typeString(Integer.toString(amount));
-                VirtualKeyboard.enter();
-                sleep(400, 600);
-            }
-        }
+        setBankOptionX(amount);
         if (scrollTo(widget)) {
             Rs2Menu.doAction("Withdraw-" + amount, widget.getBounds());
             sleep(600, 1000);

@@ -26,6 +26,8 @@ public class VirtualMouse extends Mouse {
 
     public Mouse click(Point point, boolean rightClick) {
 
+        if (point == null) return this;
+
         mouseEvent(MouseEvent.MOUSE_MOVED, point, rightClick);
         sleep(200, 300);
         mouseEvent(MouseEvent.MOUSE_PRESSED, point, rightClick);
