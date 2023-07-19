@@ -100,15 +100,17 @@ public class ProfileManager {
             if (modified) {
                 log.debug("saving {} profiles", profiles.size());
 
-                File tempFile = File.createTempFile("runelite_profiles", null, PROFILES_DIR);
-                try (FileOutputStream out = new FileOutputStream(tempFile);
-                     FileChannel channel = lockOut.getChannel();
-                     OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
-                    Profiles profilesData = new Profiles();
-                    profilesData.setProfiles(profiles);
-                    gson.toJson(profilesData, writer);
-                    channel.force(true);
-                }
+				File tempFile = File.createTempFile("runelite_profiles", null, PROFILES_DIR);
+				try (FileOutputStream out = new FileOutputStream(tempFile);
+					FileChannel channel = lockOut.getChannel();
+					OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8))
+				{
+					Profiles profilesData = new Profiles();
+					profilesData.setProfiles(profiles);
+					gson.toJson(profilesData, writer);
+					writer.flush();
+					channel.force(true);
+				}
 
                 try {
                     Files.move(tempFile.toPath(), PROFILES.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
