@@ -1,7 +1,9 @@
 package net.runelite.client.plugins.microbot.firemaking;
 
 import net.runelite.api.Point;
+import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.natepainthelper.PaintFormat;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -9,6 +11,8 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
+
+import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 public class FiremakingOverlay extends OverlayPanel {
     @Inject
@@ -20,13 +24,29 @@ public class FiremakingOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            panelComponent.setPreferredSize(new Dimension(200, 300));
+            xpGained = Microbot.getClient().getSkillExperience(Skill.FIREMAKING) - expstarted;
+            int xpPerHour = (int)( xpGained / ((System.currentTimeMillis() - timeBegan) / 3600000.0D));
+            nextLevelXp = XP_TABLE[Microbot.getClient().getRealSkillLevel(Skill.FIREMAKING) + 1];
+            xpTillNextLevel = nextLevelXp - Microbot.getClient().getSkillExperience(Skill.FIREMAKING);
+            if (xpGained >= 1)
+            {
+                timeTNL = (long) ((xpTillNextLevel / xpPerHour) * 3600000);
+            }
+            panelComponent.setPreferredSize(new Dimension(275, 700));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + FiremakingScript.version)
-                    .color(Color.GREEN)
+                    .text("Micro FireMaker")
+                    .color(Color.ORANGE)
                     .build());
 
-            panelComponent.getChildren().add(LineComponent.builder().build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Firemaking Exp Gained (hr): " + (xpGained)  + " ("+xpPerHour+")")
+                    .build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Firemaking Levels Gained: " + ( Microbot.getClient().getRealSkillLevel(Skill.FIREMAKING) - startinglevel))
+                    .build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Time till next level: " + PaintFormat.ft(timeTNL))
+                    .build());
 
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
