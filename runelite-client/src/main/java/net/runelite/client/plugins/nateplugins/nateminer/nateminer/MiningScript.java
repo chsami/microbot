@@ -1,6 +1,5 @@
-package net.runelite.client.plugins.nateminer;
+package net.runelite.client.plugins.nateplugins.nateminer.nateminer;
 
-import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;

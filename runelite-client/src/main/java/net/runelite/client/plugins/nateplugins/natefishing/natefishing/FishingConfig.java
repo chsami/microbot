@@ -1,10 +1,10 @@
-package net.runelite.client.plugins.natefishing;
+package net.runelite.client.plugins.nateplugins.natefishing.natefishing;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.natefishing.enums.Fishs;
+import net.runelite.client.plugins.nateplugins.natefishing.natefishing.enums.Fishs;
 
 @ConfigGroup("Mining")
 public interface FishingConfig extends Config {

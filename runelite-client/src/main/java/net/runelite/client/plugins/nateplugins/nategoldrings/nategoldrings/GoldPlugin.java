@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.nategoldrings;
+package net.runelite.client.plugins.nateplugins.nategoldrings.nategoldrings;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;

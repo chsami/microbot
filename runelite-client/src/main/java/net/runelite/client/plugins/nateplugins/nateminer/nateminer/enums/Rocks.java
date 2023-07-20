@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.nateminer.enums;
+package net.runelite.client.plugins.nateplugins.nateminer.nateminer.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
