@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.natefishing;
+package net.runelite.client.plugins.nateplugins.natefishing.natefishing;
 
 import net.runelite.api.NPC;
 import net.runelite.client.plugins.microbot.Microbot;

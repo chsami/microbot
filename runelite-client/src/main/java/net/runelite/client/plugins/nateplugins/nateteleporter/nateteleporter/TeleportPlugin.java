@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.natepieshells;
+package net.runelite.client.plugins.nateplugins.nateteleporter.nateteleporter;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -18,37 +18,38 @@ import java.awt.*;
 
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
-
 @PluginDescriptor(
-        name = "Nate's Pie Shell Maker",
-        description = "Nate's Pie Shell Maker",
-        tags = {"MoneyMaking", "nate", "pies"},
+        name = "Nate's Power Teleporter",
+        description = "Nate's Teleporter plugin",
+        tags = {"Magic", "nate", "combat"},
         enabledByDefault = false
 )
 @Slf4j
-public class PiePlugin extends Plugin {
+public class TeleportPlugin extends Plugin {
+    @Inject
+    private TeleporterConfig config;
     @Inject
     private Client client;
-    @Inject
-    private PieConfig config;
     @Inject
     private ClientThread clientThread;
     @Inject
     Notifier notifier;
 
+    @Provides
+    TeleporterConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(TeleporterConfig.class);
+    }
+
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private PieOverlay pieOverlay;
+    private TeleportOverlay teleportOverlay;
 
     @Inject
-    PieScript pieScript;
+    TeleportScript teleportScript;
 
-    @Provides
-    PieConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(PieConfig.class);
-    }
 
+    public static int teleportamount = 0;
 
     @Override
     protected void startUp() throws AWTException {
@@ -57,17 +58,26 @@ public class PiePlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        expstarted = Microbot.getClient().getSkillExperience(Skill.MINING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.MINING);
+        expstarted = Microbot.getClient().getSkillExperience(Skill.MAGIC);
+        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.MAGIC);
         timeBegan = System.currentTimeMillis();
+       // teleportamount = getAmount("law rune");
         if (overlayManager != null) {
-            overlayManager.add(pieOverlay);
+            overlayManager.add(teleportOverlay);
         }
-        pieScript.run(config);
+        teleportScript.run(config);
     }
 
+    /*public int getAmount(String itemname) {
+       return Microbot.getClientThread().runOnClientThread(() -> {
+        ItemContainer container = client.getItemContainer(InventoryID.INVENTORY);
+        int inventoryAmount = container.count(Inventory.getInventoryItem(itemname).getId());
+        return inventoryAmount;
+    });
+    }*/
+
     protected void shutDown() {
-        pieScript.shutdown();
-        overlayManager.remove(pieOverlay);
+        teleportScript.shutdown();
+        overlayManager.remove(teleportOverlay);
     }
 }

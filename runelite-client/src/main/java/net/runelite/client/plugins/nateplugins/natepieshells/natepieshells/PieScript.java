@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.natepieshells;
+package net.runelite.client.plugins.nateplugins.natepieshells.natepieshells;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;

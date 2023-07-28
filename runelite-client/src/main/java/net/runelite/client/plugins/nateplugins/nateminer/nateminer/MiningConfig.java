@@ -1,10 +1,10 @@
-package net.runelite.client.plugins.nateminer;
+package net.runelite.client.plugins.nateplugins.nateminer.nateminer;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.nateminer.enums.Rocks;
+import net.runelite.client.plugins.nateplugins.nateminer.nateminer.enums.Rocks;
 
 @ConfigGroup("Mining")
 public interface MiningConfig extends Config {

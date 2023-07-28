@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.natepieshells;
+package net.runelite.client.plugins.nateplugins.natepieshells.natepieshells;
 
 public class Info {
     public static int expstarted = 0;

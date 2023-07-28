@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.natefishing;
+package net.runelite.client.plugins.nateplugins.natepieshells.natepieshells;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -18,35 +18,36 @@ import java.awt.*;
 
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
+
 @PluginDescriptor(
-        name = "Nate's Power Fisher",
-        description = "Nate's Power Fisher plugin",
-        tags = {"Fishing", "nate", "skilling"},
+        name = "Nate's Pie Shell Maker",
+        description = "Nate's Pie Shell Maker",
+        tags = {"MoneyMaking", "nate", "pies"},
         enabledByDefault = false
 )
 @Slf4j
-public class FishingPlugin extends Plugin {
-    @Inject
-    private FishingConfig config;
+public class PiePlugin extends Plugin {
     @Inject
     private Client client;
+    @Inject
+    private PieConfig config;
     @Inject
     private ClientThread clientThread;
     @Inject
     Notifier notifier;
 
-    @Provides
-    FishingConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(FishingConfig.class);
-    }
-
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private FishingOverlay fishingOverlay;
+    private PieOverlay pieOverlay;
 
     @Inject
-    FishingScript fishingScript;
+    PieScript pieScript;
+
+    @Provides
+    PieConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(PieConfig.class);
+    }
 
 
     @Override
@@ -56,17 +57,17 @@ public class FishingPlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        expstarted = Microbot.getClient().getSkillExperience(Skill.FISHING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.FISHING);
+        expstarted = Microbot.getClient().getSkillExperience(Skill.MINING);
+        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.MINING);
         timeBegan = System.currentTimeMillis();
         if (overlayManager != null) {
-            overlayManager.add(fishingOverlay);
+            overlayManager.add(pieOverlay);
         }
-        fishingScript.run(config);
+        pieScript.run(config);
     }
 
     protected void shutDown() {
-        fishingScript.shutdown();
-        overlayManager.remove(fishingOverlay);
+        pieScript.shutdown();
+        overlayManager.remove(pieOverlay);
     }
 }

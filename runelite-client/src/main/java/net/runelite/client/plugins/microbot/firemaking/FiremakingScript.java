@@ -28,7 +28,7 @@ public class FiremakingScript extends Script {
 
     public static double version = 1.0;
 
-    public static String logs = "Willow logs";
+    public static String logs = "maple logs";
 
     public FiremakingStatus firemakingStatus = net.runelite.client.plugins.microbot.firemaking.enums.FiremakingStatus.FETCH_LOGS;
 
