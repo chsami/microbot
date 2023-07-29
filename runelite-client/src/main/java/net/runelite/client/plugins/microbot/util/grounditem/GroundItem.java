@@ -91,6 +91,9 @@ public class GroundItem {
                 LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), rs2Item.getTile().getWorldLocation());
                 Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, rs2Item.getTile().getItemLayer().getHeight());
                 if (Camera.isTileOnScreen(rs2Item.getTile().getLocalLocation())) {
+                    if (rs2Item.getTileItem().getQuantity() > 1) {
+                        lootItem = lootItem + " (" + rs2Item.getTileItem().getQuantity() + ")";
+                    }
                     if (Rs2Menu.doAction("Take", poly, new String[]{lootItem.toLowerCase()})) {
                         Microbot.pauseAllScripts = true;
                         Global.sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().equals(rs2Item.getTile().getLocalLocation()), 5000);
