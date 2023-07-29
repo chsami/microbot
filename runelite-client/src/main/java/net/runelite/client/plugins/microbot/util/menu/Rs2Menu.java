@@ -33,6 +33,9 @@ public class Rs2Menu {
     @Getter
     @Setter
     private static String option = "";
+    @Getter
+    @Setter
+    private static String name = "";
 
 
     public static boolean hasAction(String... actions) {
@@ -124,9 +127,12 @@ public class Rs2Menu {
      */
     public static boolean doAction(final String action, Point point, final String... target) {
         setOption(action);
+        if (target != null && target.length > 0)
+            setName(target[0]);
         Microbot.getMouse().click(point);
         sleep(300);
         setOption("");
+        setName("");
         return true;
     }
 
