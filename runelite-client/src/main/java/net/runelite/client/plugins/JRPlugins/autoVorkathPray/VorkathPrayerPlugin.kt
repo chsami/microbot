@@ -96,16 +96,14 @@ class VorkathPrayerPlugin : Plugin() {
 
     // Open Prayer tab
     private fun openPrayerTab() {
-        sleep(50, 100)
         VirtualKeyboard.keyPress(KeyEvent.VK_F3)
-        sleep(50, 100)
+        sleep(1, 50)
     }
 
     // Open Inventory tab
     private fun openInventoryTab() {
-        sleep(50, 100)
         VirtualKeyboard.keyPress(KeyEvent.VK_F2)
-        sleep(50, 100)
+        sleep(1, 50)
     }
 
     // Check if projectile exists by ID
