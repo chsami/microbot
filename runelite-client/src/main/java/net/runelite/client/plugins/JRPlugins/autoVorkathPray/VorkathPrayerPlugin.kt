@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.autoVorkathPray
+package net.runelite.client.plugins.JRPlugins.autoVorkathPray
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
