@@ -20,8 +20,8 @@ import javax.inject.Inject
 
 
 @PluginDescriptor(
-    name = "<html><font color=\"#9dfffd\">[JR]</font>Auto Vorkath Prayers",
-    description = "JR - Auto prayers for vorkath",
+    name = "<html><font color=\"#9dfffd\">[JR]</font> Auto Vorkath",
+    description = "JR - Auto vorkath",
     tags = ["vorkath", "prayers", "auto", "auto prayer"],
     enabledByDefault = false
 )
