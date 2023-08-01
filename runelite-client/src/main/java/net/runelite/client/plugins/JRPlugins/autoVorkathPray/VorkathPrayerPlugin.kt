@@ -89,7 +89,7 @@ class VorkathPrayerPlugin : Plugin() {
                     botState = State.MAGIC
                 } else if (doesProjectileExistById(rangeProjectileId)) {
                     botState = State.RANGE
-                } else if (doesProjectileExistById(whiteProjectileId)) {
+                } else if (doesProjectileExistById(whiteProjectileId) || Rs2Npc.getNpc("Zombified Spawn") != null) {
                     botState = State.ZOMBIFIED_SPAWN
                 } else if (doesProjectileExistById(redProjectileId)) {
                     botState = State.RED_BALL
@@ -125,7 +125,9 @@ class VorkathPrayerPlugin : Plugin() {
                     State.ZOMBIFIED_SPAWN -> if (previousBotState != State.ZOMBIFIED_SPAWN) {
                         previousBotState = State.ZOMBIFIED_SPAWN
                         Inventory.useItem(ItemID.SLAYERS_STAFF)
-                        sleep(3800, 3900)
+                        while (Rs2Npc.getNpc("Zombified Spawn") == null) {
+                            sleep(100, 200)
+                        }
                         Rs2Npc.attack("Zombified Spawn")
                         sleep(2300, 2500)
                         Inventory.useItem(ItemID.ARMADYL_CROSSBOW)
@@ -201,6 +203,8 @@ class VorkathPrayerPlugin : Plugin() {
     private fun walkToCenterLocation(isPlayerInCenterLocation: Boolean) {
         if (!isPlayerInCenterLocation) {
             walker.walkFastCanvas(centerTile)
+            sleep(2000, 2100)
+            Rs2Npc.attack("Vorkath")
         }
     }
 }
