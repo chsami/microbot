@@ -9,10 +9,9 @@ import net.runelite.client.callback.ClientThread
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.microbot.util.Global.sleep
-import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
-import net.runelite.client.plugins.microbot.util.math.Random
+import net.runelite.client.plugins.microbot.util.mouse.Mouse
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
 import net.runelite.client.plugins.microbot.util.walker.Walker
@@ -35,6 +34,8 @@ class VorkathPrayerPlugin : Plugin() {
 
     private lateinit var walker: Walker
 
+    private lateinit var mouse: Mouse
+
     private var botState: State? = null
     private var previousBotState: State? = null
     private var running = false
@@ -44,8 +45,12 @@ class VorkathPrayerPlugin : Plugin() {
     private val blueProjectileId = 1479
     private val whiteProjectileId = 395
     private val redProjectileId = 1481
+    private val acidProjectileId = 1483
+    private val acidRedProjectileId = 1482
 
     private lateinit var centerTile: WorldPoint
+    private lateinit var rightTile: WorldPoint
+    private lateinit var leftTile: WorldPoint
 
     private var foods: Array<Widget>? = null
 
@@ -56,6 +61,7 @@ class VorkathPrayerPlugin : Plugin() {
         RED_BALL,
         EAT,
         PRAYER,
+        ACID,
         NONE
     }
 
@@ -76,16 +82,21 @@ class VorkathPrayerPlugin : Plugin() {
         previousBotState = null
     }
 
-    private suspend fun run() {
+    private fun run() {
         while (running) {
             val vorkath = Rs2Npc.getNpc("vorkath")
             // Check if player is in Vorkath Area
             if (vorkath != null && vorkath.isInteracting) {
                 centerTile = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, vorkath.worldLocation.plane)
+                rightTile = WorldPoint(centerTile.x + 2, centerTile.y - 3, centerTile.plane)
+                leftTile = WorldPoint(centerTile.x - 2, centerTile.y - 3, centerTile.plane)
                 // Check what projectile is coming
                 if (doesProjectileExistById(redProjectileId)) {
                     botState = State.RED_BALL
-                }else if (doesProjectileExistById(magicProjectileId) || doesProjectileExistById(purpleProjectileId) || doesProjectileExistById(blueProjectileId)) {
+                }else if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId)) {
+                    botState = State.ACID
+                    println("Acid")
+                } else if (doesProjectileExistById(magicProjectileId) || doesProjectileExistById(purpleProjectileId) || doesProjectileExistById(blueProjectileId)) {
                     botState = State.MAGIC
                 } else if (doesProjectileExistById(rangeProjectileId)) {
                     botState = State.RANGE
@@ -138,12 +149,17 @@ class VorkathPrayerPlugin : Plugin() {
                     State.RED_BALL -> if (client.localPlayer.idlePoseAnimation == 1 || doesProjectileExistById(redProjectileId)){
                         previousBotState = State.RED_BALL
                         redBallWalk()
-                        sleep(2000, 2100)
+                        sleep(1700, 1850)
                         Rs2Npc.attack("Vorkath")
+                    }
+                    State.ACID -> if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId)){
+                        previousBotState = State.ACID
+                        acidWalk()
                     }
                     State.EAT -> if (foods?.size!! > 0) {
                         for (food in foods!!) {
-                            Inventory.eat(food)
+                            mouse.click(food.getBounds())
+                            botState = previousBotState
                             break
                         }
                     } else {
@@ -162,6 +178,21 @@ class VorkathPrayerPlugin : Plugin() {
                     else -> botState = State.NONE
                 }
             }
+        }
+    }
+
+    private fun acidWalk() {
+        var clickedTile: WorldPoint
+        var toggle = true
+        while ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
+            clickedTile = if (toggle) rightTile else leftTile
+            println("Player location: ${client.localPlayer.worldLocation}")
+            walker.walkFastCanvas(clickedTile)
+            println("Walking to $clickedTile")
+            while (client.localPlayer.worldLocation != clickedTile) {
+                sleep(10, 15)
+            }
+            toggle = !toggle
         }
     }
 
@@ -188,14 +219,14 @@ class VorkathPrayerPlugin : Plugin() {
 
     // Click 3 tiles west of the player's current location
     private fun redBallWalk() {
-        val currentPlayerLocation = client.localPlayer.worldLocation;
-        val twoTilesEastFromCurrentLocation = WorldPoint(currentPlayerLocation.x + 2, currentPlayerLocation.y, 0);
-        walker.walkFastMinimap(twoTilesEastFromCurrentLocation)
+        val currentPlayerLocation = client.localPlayer.worldLocation
+        val twoTilesEastFromCurrentLocation = WorldPoint(currentPlayerLocation.x + 2, currentPlayerLocation.y, 0)
+        walker.walkFastCanvas(twoTilesEastFromCurrentLocation)
     }
 
     // player location is center location
     private fun isPlayerInCenterLocation(): Boolean {
-        val currentPlayerLocation = client.localPlayer.worldLocation;
+        val currentPlayerLocation = client.localPlayer.worldLocation
         return currentPlayerLocation.x == centerTile.x && currentPlayerLocation.y == centerTile.y
     }
 
