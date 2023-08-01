@@ -8,10 +8,12 @@ import net.runelite.api.widgets.Widget
 import net.runelite.client.callback.ClientThread
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
+import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
 import net.runelite.client.plugins.microbot.util.mouse.Mouse
+import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
 import net.runelite.client.plugins.microbot.util.walker.Walker
@@ -70,6 +72,7 @@ class AutoVorkathPlugin : Plugin() {
         previousBotState = State.NONE
         running = true
         walker = Walker()
+        mouse = VirtualMouse()
         GlobalScope.launch {
             run()
         }
