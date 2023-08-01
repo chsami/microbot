@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.JRPlugins.autoVorkathPray
+package net.runelite.client.plugins.autoVorkath
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -20,12 +20,12 @@ import javax.inject.Inject
 
 
 @PluginDescriptor(
-    name = "<html><font color=\"#9dfffd\">[JR]</font> Auto Vorkath",
+    name = "AutoVorkath",
     description = "JR - Auto vorkath",
     tags = ["vorkath", "prayers", "auto", "auto prayer"],
     enabledByDefault = false
 )
-class VorkathPrayerPlugin : Plugin() {
+class AutoVorkathPlugin : Plugin() {
     @Inject
     private lateinit var client: Client
 
