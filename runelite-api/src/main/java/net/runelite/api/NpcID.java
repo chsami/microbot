@@ -10419,6 +10419,13 @@ public final class NpcID
 	public static final int STRANGLED_12424 = 12424;
 	public static final int VARDORVIS_12425 = 12425;
 	public static final int VARDORVIS_12426 = 12426;
+	public static final int STRANGLED_12429 = 12429;
+	public static final int STRANGLED_12430 = 12430;
+	public static final int STRANGLED_12431 = 12431;
+	public static final int STRANGLED_12432 = 12432;
+	public static final int STRANGLED_12433 = 12433;
+	public static final int STRANGLED_12434 = 12434;
+	public static final int STRANGLED_12435 = 12435;
 	public static final int ICE_TROLL_MALE_5824 = 5824;
 	public static final int ICE_TROLL_FEMALE_5825 = 5825;
 	public static final int ICE_TROLL_RUNT_5823 = 5823;
