@@ -6,6 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 public class Rs2Equipment {
 
@@ -45,6 +46,24 @@ public class Rs2Equipment {
             Rs2Menu.doAction(new String[]{"wield", "wear"}, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
         }
     }
+
+    public static void useRingAction(String actionName) {
+        Widget ringSlot = Rs2Widget.getWidget(25362456);
+        if(ringSlot != null) {
+            Microbot.status = "found ring slot";
+            Rs2Menu.doAction(actionName, new Point((int) ringSlot.getBounds().getCenterX(), (int) ringSlot.getBounds().getCenterY()));
+
+            Microbot.status = "attempted action";
+        }
+    }
+    public static void useAmuletAction(String actionName) {
+        Widget amuletSlot = Rs2Widget.getWidget(25362449);
+        if(amuletSlot != null) {
+            Microbot.status = "found amulet slot";
+            Rs2Menu.doAction(actionName, new Point((int) amuletSlot.getBounds().getCenterX(), (int) amuletSlot.getBounds().getCenterY()));
+        }
+    }
+
 
     public static ItemComposition getEquippedItem(EquipmentInventorySlot slot) {
         final ItemContainer container = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT));
