@@ -23,9 +23,20 @@ public interface TeleporterConfig extends Config {
             position = 0,
             section = generalSection
     )
+
     default Teleports SPELL()
     {
         return Teleports.FALADOR;
     }
-
+    @ConfigItem(
+            keyName = "High Alchemy",
+            name = "High Alchemy",
+            description = "High alchemy",
+            position = 1,
+            section = generalSection
+    )
+    default boolean highAlchemy()
+    {
+        return false;
+    }
 }
