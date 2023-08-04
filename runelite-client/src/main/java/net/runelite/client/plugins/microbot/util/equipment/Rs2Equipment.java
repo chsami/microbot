@@ -47,6 +47,7 @@ public class Rs2Equipment {
         }
     }
 
+    //only temporary measures while i create proper methods
     public static void useRingAction(String actionName) {
         Widget ringSlot = Rs2Widget.getWidget(25362456);
         if(ringSlot != null) {
@@ -56,6 +57,7 @@ public class Rs2Equipment {
             Microbot.status = "attempted action";
         }
     }
+    //only temporary measures while i create proper methods
     public static void useAmuletAction(String actionName) {
         Widget amuletSlot = Rs2Widget.getWidget(25362449);
         if(amuletSlot != null) {
