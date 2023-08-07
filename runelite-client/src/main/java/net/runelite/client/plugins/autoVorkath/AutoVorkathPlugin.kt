@@ -22,9 +22,9 @@ import javax.inject.Inject
 
 
 @PluginDescriptor(
-    name = "AutoVorkath",
+    name = "Auto Vorkath",
     description = "JR - Auto vorkath",
-    tags = ["vorkath", "prayers", "auto", "auto prayer"],
+    tags = ["vorkath", "microbot", "auto", "auto prayer"],
     enabledByDefault = false
 )
 class AutoVorkathPlugin : Plugin() {
