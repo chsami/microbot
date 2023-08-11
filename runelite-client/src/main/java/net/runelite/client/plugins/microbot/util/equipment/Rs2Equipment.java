@@ -10,16 +10,6 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 public class Rs2Equipment {
 
-    public static void useRingAction(String actionName) {
-        Widget ringSlot = Rs2Widget.getWidget(25362456);
-        if(ringSlot != null) {
-            Microbot.status = "found ring slot";
-            Rs2Menu.doAction(actionName, new Point((int) ringSlot.getBounds().getCenterX(), (int) ringSlot.getBounds().getCenterY()));
-
-            Microbot.status = "attempted action";
-        }
-    }
-
     public static boolean equipItemFast(int id) {
         Tab.switchToInventoryTab();
         Widget item = Inventory.findItem(id);
