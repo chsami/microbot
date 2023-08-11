@@ -6,6 +6,8 @@ import net.runelite.api.*
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
 import net.runelite.client.callback.ClientThread
+import net.runelite.client.config.ConfigManager
+import com.google.inject.Provides
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.microbot.Microbot
@@ -22,9 +24,9 @@ import javax.inject.Inject
 
 
 @PluginDescriptor(
-    name = "AutoVorkath",
+    name = "Auto Vorkath",
     description = "JR - Auto vorkath",
-    tags = ["vorkath", "prayers", "auto", "auto prayer"],
+    tags = ["vorkath", "microbot", "auto", "auto prayer"],
     enabledByDefault = false
 )
 class AutoVorkathPlugin : Plugin() {
@@ -34,9 +36,15 @@ class AutoVorkathPlugin : Plugin() {
     @Inject
     private lateinit var clientThread: ClientThread
 
-    private lateinit var walker: Walker
+    @Inject
+    private lateinit var config: AutoVorkathConfig
 
-    private lateinit var mouse: Mouse
+    @Provides
+    fun getConfig(configManager: ConfigManager): AutoVorkathConfig {
+        return configManager.getConfig(AutoVorkathConfig::class.java)
+    }
+
+
 
     private var botState: State? = null
     private var previousBotState: State? = null
@@ -71,8 +79,6 @@ class AutoVorkathPlugin : Plugin() {
         botState = State.RANGE
         previousBotState = State.NONE
         running = true
-        walker = Walker()
-        mouse = VirtualMouse()
         GlobalScope.launch {
             run()
         }
@@ -138,13 +144,13 @@ class AutoVorkathPlugin : Plugin() {
                     }
                     State.ZOMBIFIED_SPAWN -> if (previousBotState != State.ZOMBIFIED_SPAWN) {
                         previousBotState = State.ZOMBIFIED_SPAWN
-                        Inventory.useItem(ItemID.SLAYERS_STAFF)
+                        Inventory.useItem(config.SLAYERSTAFF().toString())
                         while (Rs2Npc.getNpc("Zombified Spawn") == null) {
                             sleep(100, 200)
                         }
                         Rs2Npc.attack("Zombified Spawn")
                         sleep(2300, 2500)
-                        Inventory.useItem(ItemID.ARMADYL_CROSSBOW)
+                        Inventory.useItem(config.CROSSBOW().toString())
                         sleep(600, 1000)
                         Rs2Npc.attack("Vorkath")
                     }
@@ -161,21 +167,21 @@ class AutoVorkathPlugin : Plugin() {
                     }
                     State.EAT -> if (foods?.size!! > 0) {
                         for (food in foods!!) {
-                            mouse.click(food.getBounds())
+                            VirtualMouse().click(food.getBounds())
                             botState = previousBotState
                             break
                         }
                     } else {
                         println("No food found")
                         // Teleport
-                        Inventory.useItem(ItemID.CONSTRUCT_CAPET)
+                        Inventory.useItem(config.TELEPORT().toString())
                     }
                     State.PRAYER -> if (Inventory.findItemContains("prayer") != null) {
                         Inventory.useItemContains("prayer")
                     } else {
                         println("No prayer potions found")
                         // Teleport
-                        Inventory.useItem(ItemID.CONSTRUCT_CAPET)
+                        Inventory.useItem(config.TELEPORT().toString())
                     }
                     State.NONE -> println("TODO")
                     else -> botState = State.NONE
@@ -190,7 +196,7 @@ class AutoVorkathPlugin : Plugin() {
         while ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
             clickedTile = if (toggle) rightTile else leftTile
             println("Player location: ${client.localPlayer.worldLocation}")
-            walker.walkFastCanvas(clickedTile)
+            Walker().walkFastCanvas(clickedTile)
             println("Walking to $clickedTile")
             while (client.localPlayer.worldLocation != clickedTile) {
                 sleep(10, 15)
@@ -224,7 +230,7 @@ class AutoVorkathPlugin : Plugin() {
     private fun redBallWalk() {
         val currentPlayerLocation = client.localPlayer.worldLocation
         val twoTilesEastFromCurrentLocation = WorldPoint(currentPlayerLocation.x + 2, currentPlayerLocation.y, 0)
-        walker.walkFastCanvas(twoTilesEastFromCurrentLocation)
+        Walker().walkFastCanvas(twoTilesEastFromCurrentLocation)
     }
 
     // player location is center location
@@ -236,7 +242,7 @@ class AutoVorkathPlugin : Plugin() {
     // walk to center location
     private fun walkToCenterLocation(isPlayerInCenterLocation: Boolean) {
         if (!isPlayerInCenterLocation) {
-            walker.walkFastCanvas(centerTile)
+            Walker().walkFastCanvas(centerTile)
             sleep(2000, 2100)
             Rs2Npc.attack("Vorkath")
         }

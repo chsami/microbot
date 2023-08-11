@@ -7,11 +7,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum WoodcuttingTree {
     TREE("tree", 1),
-    OAK_LOG("oak", 15),
-    WILLOW("willow", 30),
-    MAPLE("maple", 45),
-    YEW("yew", 60),
-    MAGIC("magic", 75);
+    OAK_LOG("oak tree", 15),
+    WILLOW("willow tree", 30),
+    MAPLE("maple tree", 45),
+    YEW("yew tree", 60),
+    MAGIC("magic tree", 75),
+    REDWOOD("redwood tree", 90);
 
 
     private final String name;
