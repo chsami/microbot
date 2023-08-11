@@ -35,7 +35,6 @@ public class Pathfinder implements Runnable {
     private final Set<WorldPoint> visited = new HashSet<>();
     @Getter
     private final Queue<Node> pending = new PriorityQueue<>();
-
     @Getter
     @Setter
     private List<Node> path = new ArrayList<>();
@@ -55,6 +54,10 @@ public class Pathfinder implements Runnable {
     boolean executeWalking = true;
 
     boolean calculatePath = true;
+
+    public boolean getDebugger() {
+        return true;
+    }
 
     public Pathfinder(PathfinderConfig config) {
         this.config = config;
@@ -79,7 +82,7 @@ public class Pathfinder implements Runnable {
         this.start = start;
         this.target = target;
         this.config.refresh();
-        this.executeWalking = canReach;
+        this.executeWalking = !canReach;
 
 
         //Calculate all the stairce/obstacles/ladders in advance before calculating the path to walk
@@ -94,7 +97,7 @@ public class Pathfinder implements Runnable {
         this.target = target;
         this.config.refresh();
         this.useTransport = useTransport;
-        this.executeWalking = canReach;
+        this.executeWalking = !canReach;
 
         //Calculate all the stairce/obstacles/ladders in advance before calculating the path to walk
         precalculateTransports(start, target, useTransport);
@@ -200,7 +203,6 @@ public class Pathfinder implements Runnable {
         while (!boundary.isEmpty() || !pending.isEmpty()) {
             Node node = boundary.peekFirst();
             Node p = pending.peek();
-            final Node node1 = node;
 
             if (p != null && (node == null || p.cost < node.cost)) {
                 boundary.addFirst(p);
@@ -209,7 +211,7 @@ public class Pathfinder implements Runnable {
 
             node = boundary.removeFirst();
 
-            if (node.position.distanceTo(target) < 2 || (!isTeleport && !config.isNear(start))) {
+            if (node.position.distanceTo(target) < 1 || (!isTeleport && !config.isNear(start))) {
                 path = node.getPath();
                 break;
             }

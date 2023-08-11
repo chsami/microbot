@@ -21,6 +21,7 @@ import java.util.*;
  * This class represents a travel point between two WorldPoints.
  */
 public class Transport {
+    int agilityLevelRequired = 0;
     /**
      * The starting point of this transport
      */
@@ -400,27 +401,15 @@ public class Transport {
         return this;
     }
 
-    private void addDoor(WorldPoint origin, WorldPoint destination, int objectId, String action, int itemRequired, int wait) {
-        Transport door = new Transport();
-
-        door.origin = origin;
-        door.destination =  destination;
-        door.objectId = objectId;
-        door.action = action;
-        door.itemRequired = itemRequired;
-        door.wait = wait;
-
-        Transport doorReverse = new Transport();
-        doorReverse.origin = door.destination;
-        doorReverse.destination = door.origin;
-        doorReverse.objectId = door.objectId;
-        doorReverse.action = door.action;
-        doorReverse.itemRequired = door.itemRequired;
-        doorReverse.wait = door.wait;
-
+    public Transport addAgilityRequirement(int level) {
+        agilityLevelRequired = level;
+        return this;
     }
 
     public Transport build() {
+        if (Microbot.getClient().getRealSkillLevel(Skill.AGILITY) < agilityLevelRequired)
+            return this;
+
         if (reverse) {
             Transport obstacle_reverse = new Transport();
 

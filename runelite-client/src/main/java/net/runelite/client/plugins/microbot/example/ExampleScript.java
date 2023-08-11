@@ -97,7 +97,8 @@ public class ExampleScript extends Script {
                 //System.out.println(Microbot.getClient().getWorldType());
               //  Microbot.getWalker().walkTo(new WorldPoint(3120, 3441, 0));
               //  Rs2Equipment.useRingAction("Castle wars");
-                boolean result = Microbot.getWalker().walkTo(new WorldPoint(2789, 3306, 0));
+                boolean result = Microbot.getWalker().walkTo(BankLocation.EDGEVILLE_BANK.getWorldPoint());
+                //System.out.println(Microbot.getWalker().canReach(new WorldPoint(3183, 3435, 0)));
 //                boolean result = Microbot.getWalker().canReach(new WorldPoint(3136, 3519, 0));
                 //System.out.println(result);
                /// Microbot.getWalker().walkTo(new WorldPoint(3085, 3491, 0), true);

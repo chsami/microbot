@@ -141,7 +141,7 @@ public class Walker {
         if (pathfinder != null) {
             start = pathfinder.getStart();
         }
-        pathfinder = new Pathfinder(pathfinderConfig, start, target, useTransport);
+        pathfinder = new Pathfinder(pathfinderConfig, start, target, useTransport, false);
         currentDestination = null;
         ignoreTransport = new ArrayList<>();
         pathOrigin = new ArrayList<>();
@@ -161,7 +161,7 @@ public class Walker {
         pathOrigin = new ArrayList<>();
         sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
 
-        boolean result = pathfinder.getPath().get(0).equals(target);
+        boolean result = pathfinder.getPath().get(pathfinder.getPath().size() - 1).position.equals(target);
 
         return result;
     }

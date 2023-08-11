@@ -203,6 +203,7 @@ public class PathfinderConfig {
         new Transport()
                 .addObstacle(new WorldPoint(3138, 3516, 0), new WorldPoint(3141, 3513, 0), "Climb-down", true)
                 .addReverse()
+                .addAgilityRequirement(21)
                 .build(); //varrock tunnel to grand exchange
 
 
