@@ -352,6 +352,8 @@ class DevToolsOverlay extends Overlay
 					{
 						StringBuilder stringBuilder = new StringBuilder();
 						stringBuilder.append("ID: ").append(gameObject.getId());
+						stringBuilder.append(" X: ").append(gameObject.getWorldLocation().getX());
+						stringBuilder.append(" Y: ").append(gameObject.getWorldLocation().getY());
 						if (gameObject.getRenderable() instanceof DynamicObject)
 						{
 							Animation animation = ((DynamicObject) gameObject.getRenderable()).getAnimation();

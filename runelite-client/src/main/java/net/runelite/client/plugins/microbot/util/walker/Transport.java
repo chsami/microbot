@@ -4,11 +4,14 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.ItemID;
+import net.runelite.api.ObjectID;
 import net.runelite.api.Quest;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.magic.Teleport;
+import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
+import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -98,8 +101,14 @@ public class Transport {
 
     @Getter
     public int itemRequired;
+    @Getter
+    public boolean isMember;
 
-    Transport() {
+    public boolean reverse = false;
+    public String reverseAction;
+
+
+    public Transport() {
 
     }
 
@@ -246,26 +255,11 @@ public class Transport {
         }
     }
 
-    public static HashMap<WorldPoint, List<Transport>> fromResources() {
-        HashMap<WorldPoint, List<Transport>> transports = new HashMap<>();
+  /*  public HashMap<WorldPoint, List<Transport>> fromResources() {
 
-        addTransports(transports, "/transports.txt", TransportType.TRANSPORT);
 
-        addTransports(transports, "/boats.txt", TransportType.BOAT);
-
-        addTransports(transports, "/fairy_rings.txt", TransportType.FAIRY_RING);
-
-        addTransports(transports, "/teleports.txt", TransportType.TELEPORT);
-
-        Transport varrock_hillgiant_door = new Transport();
-
-        varrock_hillgiant_door.origin = new WorldPoint(3115, 3449, 0);
-        varrock_hillgiant_door.destination =  new WorldPoint(3115, 3450, 0);
-        varrock_hillgiant_door.objectId = 1804;
-        varrock_hillgiant_door.action = "open";
-        varrock_hillgiant_door.itemRequired = ItemID.BRASS_KEY;
-        varrock_hillgiant_door.wait = 2000;
-
+       //HILL GIANT PATH - Edgeville Dungeon
+        addDoor(new WorldPoint(3115, 3449, 0), new WorldPoint(3115, 3450, 0), ObjectID.DOOR_1804, "Open", ItemID.BRASS_KEY, 2000);
 
         Transport varrock_hillgiant_ladder = new Transport();
 
@@ -282,13 +276,166 @@ public class Transport {
         varrock_hillgiant_ladder_dungeon.objectId = 17385;
         varrock_hillgiant_ladder_dungeon.action = "climb-up";
 
-
-        transports.computeIfAbsent(varrock_hillgiant_door.origin, k -> new ArrayList<>()).add(varrock_hillgiant_door);
         transports.computeIfAbsent(varrock_hillgiant_ladder.origin, k -> new ArrayList<>()).add(varrock_hillgiant_ladder);
         transports.computeIfAbsent(varrock_hillgiant_ladder_dungeon.origin, k -> new ArrayList<>()).add(varrock_hillgiant_ladder_dungeon);
 
+        //AIR ORBS PATH - Edgeville Dungeon
+        Transport edgeville_dungeon_trapdoor_closed = new Transport();
 
-        return transports;
+        edgeville_dungeon_trapdoor_closed.origin = new WorldPoint(3097, 3468, 0);
+        edgeville_dungeon_trapdoor_closed.destination =  new WorldPoint(3097, 3468, 0);
+        edgeville_dungeon_trapdoor_closed.objectId = 1579;
+        edgeville_dungeon_trapdoor_closed.action = "Open";
+
+        Transport edgeville_dungeon_trapdoor_open = new Transport();
+
+        edgeville_dungeon_trapdoor_open.origin = new WorldPoint(3097, 3468, 0);
+        edgeville_dungeon_trapdoor_open.destination =  new WorldPoint(3096, 9867, 0);
+        edgeville_dungeon_trapdoor_open.objectId = 1581;
+        edgeville_dungeon_trapdoor_open.action = "Climb-down";
+
+        Transport edgeville_dungeon_ladder_up = new Transport();
+
+        edgeville_dungeon_ladder_up.origin = new WorldPoint(3097, 9867, 0);
+        edgeville_dungeon_ladder_up.destination =  new WorldPoint(3096, 3468, 0);
+        edgeville_dungeon_ladder_up.objectId = 17385;
+        edgeville_dungeon_ladder_up.action = "Climb-up";
+
+        addDoor(new WorldPoint(3103, 9909, 0), new WorldPoint(3103, 9909, 0), 1727, "Open", -1, 0);
+        addDoor(new WorldPoint(3131, 9917, 0), new WorldPoint(3131, 9918, 0), 1727, "Open", -1, 0);
+        addDoor(new WorldPoint(3106, 9944, 0), new WorldPoint(3106, 9944, 0), 1569, "Open", -1, 0);
+
+        Transport air_orb_ladder_up = new Transport();
+
+        air_orb_ladder_up.origin = new WorldPoint(3088, 9971, 0);
+        air_orb_ladder_up.destination =  new WorldPoint(3088, 3570, 0);
+        air_orb_ladder_up.objectId = 17385;
+        air_orb_ladder_up.action = "Climb-up";
+
+        Transport air_orb_ladder_down = new Transport();
+
+        air_orb_ladder_down.origin = new WorldPoint(3088, 3570, 0);
+        air_orb_ladder_down.destination =  new WorldPoint(3088, 9970, 0);
+        air_orb_ladder_down.objectId = 16680;
+        air_orb_ladder_down.action = "Climb-down";
+
+        transports.computeIfAbsent(edgeville_dungeon_trapdoor_closed.origin, k -> new ArrayList<>()).add(edgeville_dungeon_trapdoor_closed);
+        transports.computeIfAbsent(edgeville_dungeon_trapdoor_open.origin, k -> new ArrayList<>()).add(edgeville_dungeon_trapdoor_open);
+        transports.computeIfAbsent(edgeville_dungeon_ladder_up.origin, k -> new ArrayList<>()).add(edgeville_dungeon_ladder_up);
+        transports.computeIfAbsent(air_orb_ladder_up.origin, k -> new ArrayList<>()).add(air_orb_ladder_up);
+        transports.computeIfAbsent(air_orb_ladder_down.origin, k -> new ArrayList<>()).add(air_orb_ladder_down);
+
+
+        //Lumbridge staircase
+        Transport lumbridge_staircase = new Transport();
+
+        lumbridge_staircase.origin = new WorldPoint(3205, 3208, 0);
+        lumbridge_staircase.destination =  new WorldPoint(3205, 3209, 1);
+        lumbridge_staircase.objectId = ObjectID.STAIRCASE_16671;
+        lumbridge_staircase.action = "Climb-up";
+
+        Transport lumbridge_staircase_1_up = new Transport();
+
+        lumbridge_staircase_1_up.origin = new WorldPoint(3204, 3207, 1);
+        lumbridge_staircase_1_up.destination =  new WorldPoint(3205, 3209, 2);
+        lumbridge_staircase_1_up.objectId = ObjectID.STAIRCASE_16672;
+        lumbridge_staircase_1_up.action = "Climb-up";
+
+        Transport lumbridge_staircase_1_down = new Transport();
+
+        lumbridge_staircase_1_down.origin = new WorldPoint(3204, 3207, 1);
+        lumbridge_staircase_1_down.destination =  new WorldPoint(3206, 3208, 1);
+        lumbridge_staircase_1_down.objectId = ObjectID.STAIRCASE_16672;
+        lumbridge_staircase_1_down.action = "Climb-down";
+
+        Transport lumbridge_staircase_2 = new Transport();
+
+        lumbridge_staircase_2.origin = new WorldPoint(3205, 3208, 2);
+        lumbridge_staircase_2.destination =  new WorldPoint(3205, 3209, 1);
+        lumbridge_staircase_2.objectId = ObjectID.STAIRCASE_16673;
+        lumbridge_staircase_2.action = "Climb-down";
+
+        transports.computeIfAbsent(lumbridge_staircase.origin, k -> new ArrayList<>()).add(lumbridge_staircase);
+        transports.computeIfAbsent(lumbridge_staircase_1_up.origin, k -> new ArrayList<>()).add(lumbridge_staircase_1_up);
+        transports.computeIfAbsent(lumbridge_staircase_1_down.origin, k -> new ArrayList<>()).add(lumbridge_staircase_1_down);
+        transports.computeIfAbsent(lumbridge_staircase_2.origin, k -> new ArrayList<>()).add(lumbridge_staircase_2);
+
+    }*/
+
+    public Transport addObstacle(WorldPoint origin, WorldPoint destination) {
+        return addObstacle(origin, destination, null, false);
+    }
+
+    public Transport addObstacle(WorldPoint origin, WorldPoint destination, String action) {
+        return addObstacle(origin,destination,action,false);
+    }
+
+    public Transport addObstacle(WorldPoint origin, WorldPoint destination, String action, boolean isMember) {
+
+        this.origin = origin;
+        this.destination =  destination;
+        this.action = action;
+        this.isMember = isMember;
+
+
+        return this;
+    }
+
+    public Transport addReverse() {
+        return addReverse(null);
+    }
+
+    public Transport addReverse(String action) {
+
+        reverse = true;
+        reverseAction = action;
+
+        return this;
+    }
+
+    public Transport chain(Transport linkedTransport) {
+
+        this.linkedTransport = linkedTransport;
+
+        return this;
+    }
+
+    private void addDoor(WorldPoint origin, WorldPoint destination, int objectId, String action, int itemRequired, int wait) {
+        Transport door = new Transport();
+
+        door.origin = origin;
+        door.destination =  destination;
+        door.objectId = objectId;
+        door.action = action;
+        door.itemRequired = itemRequired;
+        door.wait = wait;
+
+        Transport doorReverse = new Transport();
+        doorReverse.origin = door.destination;
+        doorReverse.destination = door.origin;
+        doorReverse.objectId = door.objectId;
+        doorReverse.action = door.action;
+        doorReverse.itemRequired = door.itemRequired;
+        doorReverse.wait = door.wait;
+
+    }
+
+    public Transport build() {
+        if (reverse) {
+            Transport obstacle_reverse = new Transport();
+
+            obstacle_reverse.destination = this.origin;
+            obstacle_reverse.origin =  this.destination;
+            obstacle_reverse.linkedTransport = this.linkedTransport;
+            obstacle_reverse.action = reverseAction;
+            obstacle_reverse.isMember = this.isMember;
+
+            PathfinderConfig.transports.computeIfAbsent(obstacle_reverse.origin, k -> new ArrayList<>()).add(obstacle_reverse);
+        }
+
+        PathfinderConfig.transports.computeIfAbsent(this.origin, k -> new ArrayList<>()).add(this);
+
+        return this;
     }
 
     private enum TransportType {

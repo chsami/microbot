@@ -38,7 +38,7 @@ public class GoldScript extends Script {
                 if (Microbot.pauseAllScripts) return;
 
                 if (hasBars && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(furnaceLocation) > 3) {
-                    Microbot.getWalker().walkTo(furnaceLocation, true, false);
+                    Microbot.getWalker().walkTo(furnaceLocation, false);
                 }
                 if (hasBars && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(furnaceLocation) < 3) {
                     if (Rs2Widget.hasWidget("What would you like to make?")) {
@@ -60,7 +60,7 @@ public class GoldScript extends Script {
                     }
                 }
                 if (!hasBars && !isBankVisible) {
-                    Microbot.getWalker().walkTo(BankLocation.AL_KHARID.getWorldPoint(), true, false);
+                    Microbot.getWalker().walkTo(BankLocation.AL_KHARID.getWorldPoint(), false);
                 }
                 if (!hasBars && isBankVisible) {
                     if(Rs2Bank.isOpen()) {

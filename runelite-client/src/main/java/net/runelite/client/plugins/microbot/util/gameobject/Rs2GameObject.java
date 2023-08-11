@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.gameobject;
 
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -26,7 +27,11 @@ public class Rs2GameObject {
     }
 
     public static boolean interact(TileObject tileObject) {
-        return clickObject(tileObject);
+        return clickObject(tileObject, null);
+    }
+
+    public static boolean interact(TileObject tileObject, String action) {
+        return clickObject(tileObject, action);
     }
 
     public static boolean interact(GameObject gameObject, String action) {
@@ -131,6 +136,43 @@ public class Rs2GameObject {
 
         for (DecorativeObject decorativeObject : decorationObjects) {
             if (decorativeObject.getId() == id)
+                return decorativeObject;
+        }
+
+        return null;
+    }
+
+    public static TileObject findObjectByLocation(WorldPoint worldPoint) {
+
+        List<GameObject> gameObjects = getGameObjects();
+
+        if (gameObjects == null) return null;
+
+        for (net.runelite.api.GameObject gameObject : gameObjects) {
+            if (gameObject.getWorldLocation().equals(worldPoint))
+                return gameObject;
+        }
+
+        List<GroundObject> groundObjects = getGroundObjects();
+
+        for (GroundObject groundObject : groundObjects) {
+            if (groundObject.getWorldLocation().equals(worldPoint))
+                return groundObject;
+        }
+
+        List<WallObject> wallObjects = getWallObjects();
+
+
+        for (WallObject wallObject : wallObjects) {
+            if (wallObject.getWorldLocation().equals(worldPoint))
+                return wallObject;
+        }
+
+        List<DecorativeObject> decorationObjects = getDecorationObjects();
+
+
+        for (DecorativeObject decorativeObject : decorationObjects) {
+            if (decorativeObject.getWorldLocation().equals(worldPoint))
                 return decorativeObject;
         }
 
@@ -467,13 +509,15 @@ public class Rs2GameObject {
                 }
                 for (GameObject tileObject :
                         tile.getGameObjects()) {
+                    if (Arrays.stream(tile.getGameObjects()).anyMatch(c -> c!= null && c.getId() == 11797)) {
+                        System.out.println(tile.getGameObjects());
+                    }
                     if (tileObject != null
                             && tileObject.getSceneMinLocation().equals(tile.getSceneLocation()))
                         tileObjects.add(tileObject);
                 }
             }
         }
-
 
         List<GameObject> gameObjects = Arrays.stream(tileObjects.toArray(new GameObject[tileObjects.size()]))
                 .filter(value -> value != null)
@@ -530,7 +574,7 @@ public class Rs2GameObject {
 
 
         List<WallObject> wallObjects = Arrays.stream(tileObjects.toArray(new WallObject[tileObjects.size()]))
-                .filter(value -> value != null && value.getConfig() > 63)
+                .filter(value -> value != null && value.getConfig() >= 0)
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
 

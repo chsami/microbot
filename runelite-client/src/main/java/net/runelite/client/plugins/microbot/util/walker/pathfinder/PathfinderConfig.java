@@ -24,7 +24,7 @@ public class PathfinderConfig {
     @Getter
     private final CollisionMap map;
     @Getter
-    private final Map<WorldPoint, List<Transport>> transports;
+    public static Map<WorldPoint, List<Transport>> transports = new HashMap<>();
     @Getter
     private Duration calculationCutoff;
     private boolean avoidWilderness;
@@ -40,13 +40,13 @@ public class PathfinderConfig {
     private int woodcuttingLevel;
     private Map<Quest, QuestState> questStates = new HashMap<>();
 
-    public PathfinderConfig(CollisionMap map, Map<WorldPoint, List<Transport>> transports) {
+    public PathfinderConfig(CollisionMap map) {
         this.map = map;
-        this.transports = transports;
         refresh();
     }
 
     public void refresh() {
+        initTransports();
         calculationCutoff = Duration.ofMillis(5 * Constants.GAME_TICK_LENGTH);
         avoidWilderness = true;
         useAgilityShortcuts = true;
@@ -196,5 +196,56 @@ public class PathfinderConfig {
         final int dy = (int) ((-(point.getY() - middle.getY())) / zoom);
 
         return mapPoint.dx(dx).dy(dy);
+    }
+
+    public void initTransports() {
+        transports = new HashMap<>();
+        new Transport()
+                .addObstacle(new WorldPoint(3138, 3516, 0), new WorldPoint(3141, 3513, 0), "Climb-down", true)
+                .addReverse()
+                .build(); //varrock tunnel to grand exchange
+
+
+        new Transport()
+                .addObstacle(new WorldPoint(2935, 3355, 0), new WorldPoint(2936, 3355, 0))
+                .addReverse()
+                .build(); //falador wall to taverly dungeon
+
+
+        Transport lumbridgeStairce0 = new Transport()
+                .addObstacle(new WorldPoint(3204, 3207, 0), new WorldPoint(3204, 3207, 1), "Climb-up")
+                .addReverse("Climb-down");
+
+        Transport lumbridgeStairce1 = new Transport()
+                .addObstacle(new WorldPoint(3204, 3207, 1), new WorldPoint(3205, 3208, 2), "Climb-up")
+                .addReverse("Climb-down");
+
+        new Transport()
+                .addObstacle(new WorldPoint(3209, 3216, 0), new WorldPoint(3209, 9616, 0), "Climb-down")
+                .addReverse("Climb-up")
+                .build(); //trapdoor to lumbridge cellar
+
+        new Transport()
+                .addObstacle(new WorldPoint(3157, 3435, 0), new WorldPoint(3155, 3435, 1), "Climb-up")
+                .build(); //varrock romeo julliet house
+
+        new Transport()
+                .addObstacle(new WorldPoint(3156, 3435, 1), new WorldPoint(3459, 3435, 0), "Climb-down")
+                .build(); //varrock romeo julliet house
+
+        new Transport()
+                .addObstacle(new WorldPoint(3097, 3468, 0), new WorldPoint(3097, 9867, 0))
+                .addReverse()
+                .build();
+
+        new Transport()
+                .addObstacle(new WorldPoint(3116, 3452, 0), new WorldPoint(3116, 9852, 0), "Climb-down")
+                .addReverse("Climb-up")
+                .build();
+
+
+        lumbridgeStairce0.chain(lumbridgeStairce1).build();
+        lumbridgeStairce1.chain(lumbridgeStairce0).build();
+
     }
 }

@@ -304,9 +304,9 @@ public class Rs2Bank {
 
     public static boolean walkToBank() {
         BankLocation bankLocation = getNearestBank();
-        Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), true, false);
+        Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), false);
         if (bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 4) {
-            Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), false, false);
+            Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), false);
             return false;
         }
         return true;

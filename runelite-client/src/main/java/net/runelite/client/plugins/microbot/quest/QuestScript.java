@@ -114,7 +114,7 @@ public class QuestScript extends Script {
             Rs2Npc.interact(questStep.npcID, "Talk-to");
         } else {
             if (questStep.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
-                Microbot.getWalker().walkTo(questStep.getWorldPoint(), false, true);
+                Microbot.getWalker().walkTo(questStep.getWorldPoint(), true);
                 return false;
             }
         }
@@ -134,7 +134,7 @@ public class QuestScript extends Script {
             if (questStep.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
                 Microbot
                         .getWalker()
-                        .walkTo(questStep.getWorldPoint(), false, true);
+                        .walkTo(questStep.getWorldPoint(), true);
                 return false;
             }
         }

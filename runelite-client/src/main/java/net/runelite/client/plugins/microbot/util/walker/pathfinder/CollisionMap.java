@@ -1,129 +1,190 @@
 package net.runelite.client.plugins.microbot.util.walker.pathfinder;
 
+import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.walker.Transport;
-import net.runelite.client.plugins.microbot.util.walker.Util;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-public class CollisionMap extends SplitFlagMap {
-    public CollisionMap(int regionSize, Map<Position, byte[]> compressedRegions) {
-        super(regionSize, compressedRegions, 2);
+public class CollisionMap {
+
+    public CollisionMap() {
+        doorIds.add(ObjectID.DOOR_11773);
+        doorIds.add(ObjectID.LARGE_DOOR_12349);
+        doorIds.add(ObjectID.LARGE_DOOR_12350);
+        doorIds.add(ObjectID.DOOR_1535);
+        doorIds.add(ObjectID.DOOR_1543);
+        doorIds.add(ObjectID.GATE_1558);
+        doorIds.add(ObjectID.GATE_1560);
+        doorIds.add(ObjectID.DOOR_11775);
+        doorIds.add(44598);//alkharid gate
+        doorIds.add(44599);//alkharid gate
+        doorIds.add(ObjectID.DOOR_1804);//hill giants edgeville dungeon
+        doorIds.add(ObjectID.LARGE_DOOR_17091);//taverly
+        doorIds.add(ObjectID.LARGE_DOOR_17093); //taverly
     }
 
-    public boolean n(int x, int y, int z) {
-        return get(x, y, z, 0);
-    }
+    public WorldArea[] blockingAreas = new WorldArea[] {
+            new WorldArea(new WorldPoint(3085, 3333, 0), 50, 50), //draynor manor
+            new WorldArea(new WorldPoint(2535, 3109, 0), 10, 30)}; //under maze
 
-    public boolean s(int x, int y, int z) {
-        return n(x, y - 1, z);
-    }
+    private static List<Integer> doorIds = new ArrayList<>();
+    public static List<CheckedNode> nodesChecked = new ArrayList<>();
+    public static List<CheckedNode> wallNodes = new ArrayList<>();
 
-    public boolean e(int x, int y, int z) {
-        return get(x, y, z, 1);
-    }
 
-    public boolean w(int x, int y, int z) {
-        return e(x - 1, y, z);
-    }
+    public List<Node> getNeighbors(Node node, PathfinderConfig config, boolean useTransport, WorldPoint target) {
+        try {
+            List<Node> neighbors = new ArrayList<>();
+            CheckedNode checkedNode = new CheckedNode();
+            checkedNode.node = node;
 
-    private boolean ne(int x, int y, int z) {
-        return n(x, y, z) && e(x, y + 1, z) && e(x, y, z) && n(x + 1, y, z);
-    }
+            //list of hard to navigate areas like "draynor". If target point is not inside draynor, then we block any points that are calculated in draynor. This is to avoid getting stuck
+            if (Arrays.stream(blockingAreas).anyMatch(x -> x.contains(node.position)) && !Arrays.stream(blockingAreas).anyMatch(x -> x.contains(target)))
+                return new ArrayList<>();
 
-    private boolean nw(int x, int y, int z) {
-        return n(x, y, z) && w(x, y + 1, z) && w(x, y, z) && n(x - 1, y, z);
-    }
-
-    private boolean se(int x, int y, int z) {
-        return s(x, y, z) && e(x, y - 1, z) && e(x, y, z) && s(x + 1, y, z);
-    }
-
-    private boolean sw(int x, int y, int z) {
-        return s(x, y, z) && w(x, y - 1, z) && w(x, y, z) && s(x - 1, y, z);
-    }
-
-    public boolean isBlocked(int x, int y, int z) {
-        return !n(x, y, z) && !s(x, y, z) && !e(x, y, z) && !w(x, y, z);
-    }
-
-    public List<Node> getNeighbors(Node node, PathfinderConfig config, boolean useTransport) {
-        int x = node.position.getX();
-        int y = node.position.getY();
-        int z = node.position.getPlane();
-
-        List<Node> neighbors = new ArrayList<>();
-
-        if (useTransport) {
-            for (Transport transport : config.getTransports().getOrDefault(node.position, new ArrayList<>())) {
-                if (config.useTransport(transport)) {
-                    neighbors.add(new TransportNode(transport.getDestination(), node, transport.getWait()));
+            if (useTransport) {
+                for (Transport transport : config.getTransports().getOrDefault(node.position, new ArrayList<>())) {
+                    if (transport.isMember && !Microbot.getClient().getWorldType().contains(WorldType.MEMBERS))
+                        continue;
+                    if (config.useTransport(transport)) {
+                        neighbors.add(new TransportNode(transport.getDestination(), node, transport.getWait()));
+                    }
                 }
             }
-        }
 
-        boolean[] traversable;
-        if (isBlocked(x, y, z)) {
-            boolean westBlocked = isBlocked(x - 1, y, z);
-            boolean eastBlocked = isBlocked(x + 1, y, z);
-            boolean southBlocked = isBlocked(x, y - 1, z);
-            boolean northBlocked = isBlocked(x, y + 1, z);
-            boolean southWestBlocked = isBlocked(x - 1, y - 1, z);
-            boolean southEastBlocked = isBlocked(x + 1, y - 1, z);
-            boolean northWestBlocked = isBlocked(x - 1, y + 1, z);
-            boolean northEastBlocked = isBlocked(x + 1, y + 1, z);
-            traversable = new boolean[]{
-                    !westBlocked,
-                    !eastBlocked,
-                    !southBlocked,
-                    !northBlocked,
-                    !southWestBlocked && !westBlocked && !southBlocked,
-                    !southEastBlocked && !eastBlocked && !southBlocked,
-                    !northWestBlocked && !westBlocked && !northBlocked,
-                    !northEastBlocked && !eastBlocked && !northBlocked
-            };
-        } else {
-            traversable = new boolean[]{
-                    w(x, y, z), e(x, y, z), s(x, y, z), n(x, y, z), sw(x, y, z), se(x, y, z), nw(x, y, z), ne(x, y, z)
-            };
-        }
 
-        for (int i = 0; i < traversable.length; i++) {
-            OrdinalDirection d = OrdinalDirection.values()[i];
-            if (traversable[i]) {
-                neighbors.add(new Node(node.position.dx(d.x).dy(d.y), node));
-            } else if (useTransport && Math.abs(d.x + d.y) == 1 && isBlocked(x + d.x, y + d.y, z)) {
-                for (Transport transport : config.getTransports().getOrDefault(node.position.dx(d.x).dy(d.y), new ArrayList<>())) {
-                    neighbors.add(new Node(transport.getOrigin(), node));
+            boolean[] traversable;
+            int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
+            LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), node.position);
+            if (localPoint.getSceneX() < 0 || localPoint.getSceneY() < 0) return neighbors;
+            if (localPoint.getSceneX() >= 104 || localPoint.getSceneY() >= 104) return neighbors;
+            int data = flags[localPoint.getSceneX()][localPoint.getSceneY()];
+            MovementFlag[] movementFlags = MovementFlag.getSetFlags(data).toArray(MovementFlag[]::new);
+
+            if (MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_FULL) && node instanceof TransportNode == false) {
+                traversable = new boolean[]{
+                        false, false, false, false, false, false, false, false
+                };
+                checkedNode.status = 0;
+            }
+            else {
+                traversable = new boolean[]{
+                        !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_WEST),
+                        !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_EAST),
+                        !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_SOUTH),
+                        !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_NORTH),
+                        false,
+                        false,
+                        false,
+                        false,
+                };
+                checkedNode.status = 1;
+                /*
+                code for navigating diagonally
+                     !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_SOUTH_WEST) && !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_WEST)  && !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_SOUTH),
+                        !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_SOUTH_EAST) && !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_EAST) && !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_SOUTH),
+                        !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_NORTH_WEST) && !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_WEST) &&  !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_NORTH),
+                        !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_NORTH_EAST) && !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_EAST) && !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_NORTH),
+                 */
+            }
+
+            Scene scene = Microbot.getClient().getScene();
+            Tile[][][] tiles = scene.getTiles();
+            CheckedNode wallNode = new CheckedNode();
+
+            for (int i = 0; i < traversable.length; i++) {
+                OrdinalDirection d = OrdinalDirection.values()[i];
+                if (d == OrdinalDirection.NORTH_WEST || d == OrdinalDirection.NORTH_EAST || d == OrdinalDirection.SOUTH_EAST || d == OrdinalDirection.SOUTH_WEST)
+                    continue;
+
+                if (traversable[i]) {
+//                    localPoint = LocalPoint.fromWorld(Microbot.getClient(), node.position.dx(d.x).dy(d.y));
+//                    if (localPoint.getSceneX() < 0 || localPoint.getSceneY() < 0) return neighbors;
+//                    if (localPoint.getSceneX() >= 104 || localPoint.getSceneY() >= 104) return neighbors;
+//                    data = flags[localPoint.getSceneX()][localPoint.getSceneY()];
+//                    movementFlags = MovementFlag.getSetFlags(data).toArray(MovementFlag[]::new);
+//                    if (!MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_FULL) && !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_OBJECT))
+//                    {
+                        neighbors.add(new Node(node.position.dx(d.x).dy(d.y), node));
+                        checkedNode.status = 2;
+//                    }
+                } else {
+                    LocalPoint localNodePointNorth = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX(), node.position.getY() + 1, node.position.getPlane()));
+                    LocalPoint localNodePointEast = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX() + 1, node.position.getY(), node.position.getPlane()));
+                    LocalPoint localNodePointSouth = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX(), node.position.getY() - 1, node.position.getPlane()));
+                    LocalPoint localNodePointWest = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX() - 1, node.position.getY(), node.position.getPlane()));
+
+                    Tile tileNorth = tiles[node.position.getPlane()][localNodePointNorth.getSceneX()][localNodePointNorth.getSceneY()];
+                    Tile tileEast = tiles[node.position.getPlane()][localNodePointEast.getSceneX()][localNodePointEast.getSceneY()];
+                    Tile tileSouth = tiles[node.position.getPlane()][localNodePointSouth.getSceneX()][localNodePointSouth.getSceneY()];
+                    Tile tileWest = tiles[node.position.getPlane()][localNodePointWest.getSceneX()][localNodePointWest.getSceneY()];
+
+                    LocalPoint currentNode = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX(), node.position.getY(), node.position.getPlane()));
+                    Tile currentTile = tiles[node.position.getPlane()][currentNode.getSceneX()][currentNode.getSceneY()];
+
+                    if (currentTile.getWallObject() != null) {
+                        if (doorIds.stream().anyMatch(doorId -> doorId == currentTile.getWallObject().getId()))
+                        {
+                            neighbors.add(new Node(node.position.dx(d.x).dy(d.y), node, true));
+                            wallNode.node = new Node(currentTile.getWorldLocation(), node);
+                            wallNode.shape = currentTile.getWallObject().getClickbox();
+                            wallNode.status = 3;
+                            wallNodes.add(wallNode);
+                        }
+                    }
+
+                   if (tileNorth.getWallObject() != null && d == OrdinalDirection.NORTH) {
+                        if (doorIds.stream().anyMatch(doorId -> doorId == tileNorth.getWallObject().getId()))
+                        {
+                            neighbors.add(new Node(tileNorth.getWorldLocation(), node, true));
+                            wallNode.node = new Node(tileNorth.getWorldLocation(), node);
+                            wallNode.shape = tileNorth.getWallObject().getClickbox();
+                            wallNode.status = 3;
+                            wallNodes.add(wallNode);
+                        }
+                    } else if (tileEast.getWallObject() != null &&  d == OrdinalDirection.EAST) {
+                        if (doorIds.stream().anyMatch(doorId -> doorId == tileEast.getWallObject().getId()))
+                        {
+                            neighbors.add(new Node(tileEast.getWorldLocation(), node, true));
+                            wallNode.node = new Node(tileEast.getWorldLocation(), node);
+                            wallNode.shape = tileEast.getWallObject().getClickbox();
+                            wallNode.status = 3;
+                            wallNodes.add(wallNode);
+                        }
+                    } else if (tileSouth.getWallObject() != null &&  d == OrdinalDirection.SOUTH) {
+                        if (doorIds.stream().anyMatch(doorId -> doorId == tileSouth.getWallObject().getId()))
+                        {
+                            neighbors.add(new Node(tileSouth.getWorldLocation(), node, true));
+                            wallNode.node = new Node(tileSouth.getWorldLocation(), node);
+                            wallNode.shape = tileSouth.getWallObject().getClickbox();
+                            wallNode.status = 3;
+                            wallNodes.add(wallNode);
+                        }
+                    } else if (tileWest.getWallObject() != null && d == OrdinalDirection.WEST) {
+                        if (doorIds.stream().anyMatch(doorId -> doorId == tileWest.getWallObject().getId()))
+                        {
+                            neighbors.add(new Node(tileWest.getWorldLocation(), node, true));
+                            wallNode.node = new Node(tileWest.getWorldLocation(), node);
+                            wallNode.shape = tileWest.getWallObject().getClickbox();
+                            wallNode.status = 3;
+                            wallNodes.add(wallNode);
+                        }
+                    }
                 }
             }
+            nodesChecked.add(checkedNode);
+            return neighbors;
+        } catch(Exception ex) {
+           // System.out.println(ex.getMessage());
         }
-
-        return neighbors;
-    }
-
-    public static CollisionMap fromResources() {
-        Map<Position, byte[]> compressedRegions = new HashMap<>();
-        try (ZipInputStream in = new ZipInputStream(Microbot.class.getResourceAsStream("/collision-map.zip"))) {
-            ZipEntry entry;
-            while ((entry = in.getNextEntry()) != null) {
-                String[] n = entry.getName().split("_");
-
-                compressedRegions.put(
-                        new Position(Integer.parseInt(n[0]), Integer.parseInt(n[1])),
-                        Util.readAllBytes(in)
-                );
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        return new CollisionMap(64, compressedRegions);
+        return new ArrayList<>();
     }
 }

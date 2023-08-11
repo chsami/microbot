@@ -82,7 +82,7 @@ public class FarmingScript extends Script {
 
                 } else if (state == FarmingState.FARMING_GNOME_STRONHOLD) {
                     if (isInGrandExchange.getAsBoolean()) {
-                        boolean isNearSpiritTreeGrandExchange = Microbot.getWalker().walkTo(SPIRIT_TREE_GRAND_EXCHANGE, false, false);
+                        boolean isNearSpiritTreeGrandExchange = Microbot.getWalker().walkTo(SPIRIT_TREE_GRAND_EXCHANGE, false);
 
                         if (!isNearSpiritTreeGrandExchange)
                             return;
@@ -101,7 +101,7 @@ public class FarmingScript extends Script {
 
 
                     } else {
-                        boolean isNearTreePatchGnomeStronghold = Microbot.getWalker().walkTo(TREE_RUN_GNOME_STRONDHOLD, true, false);
+                        boolean isNearTreePatchGnomeStronghold = Microbot.getWalker().walkTo(TREE_RUN_GNOME_STRONDHOLD, false);
                         if (!isNearTreePatchGnomeStronghold)
                             return;
 
@@ -113,7 +113,7 @@ public class FarmingScript extends Script {
                         sleep(sleepBetweenTeleports);
                         return;
                     }
-                    boolean isNearVarrockPatch = Microbot.getWalker().walkTo(TREE_RUN_VARROCK, false, false);
+                    boolean isNearVarrockPatch = Microbot.getWalker().walkTo(TREE_RUN_VARROCK, false);
 
                     if (!isNearVarrockPatch)
                         return;
@@ -125,7 +125,7 @@ public class FarmingScript extends Script {
                         sleep(sleepBetweenTeleports);
                         return;
                     }
-                    boolean isNearFaladorPatch = Microbot.getWalker().walkTo(TREE_RUN_FALADOR, false, false);
+                    boolean isNearFaladorPatch = Microbot.getWalker().walkTo(TREE_RUN_FALADOR, false);
 
                     if (!isNearFaladorPatch)
                         return;
@@ -139,7 +139,7 @@ public class FarmingScript extends Script {
                         return;
                     }
 
-                    boolean isNearLumbridgePatch = Microbot.getWalker().walkTo(TREE_RUN_LUMBRIDGE, false, false);
+                    boolean isNearLumbridgePatch = Microbot.getWalker().walkTo(TREE_RUN_LUMBRIDGE, false);
 
                     if (!isNearLumbridgePatch)
                         return;

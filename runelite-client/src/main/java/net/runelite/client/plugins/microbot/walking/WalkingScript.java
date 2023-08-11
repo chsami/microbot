@@ -48,9 +48,10 @@ public class WalkingScript extends Script {
             if (!super.run()) return;
             try {
 
+
                 Microbot.getWalker().walkTo(worldPoint, true);
 
-                if (Microbot.getWalker() == null || Microbot.getWalker().getPathfinder() == null)
+                if (Microbot.getWalker() == null || Microbot.getWalker().getPathfinder() == null || Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(worldPoint) <= 4)
                 {
                     shutdown();
                 }

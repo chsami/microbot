@@ -111,7 +111,7 @@ public class AgilityScript extends Script {
                     LocalPoint startCourseLocal = LocalPoint.fromWorld(Microbot.getClient(), startCourse);
                     if (!Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), startCourse))
                             || playerLocation.distanceTo(startCourseLocal) >= MAX_DISTANCE) {
-                        Microbot.getWalker().walkTo(startCourse, true, false);
+                        Microbot.getWalker().walkTo(startCourse, false);
                         return;
                     }
                 }

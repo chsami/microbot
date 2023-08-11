@@ -66,6 +66,7 @@ public class Calculations {
     }
 
     public static boolean tileOnScreen(LocalPoint localPoint) {
+        if (localPoint == null) return false;
         Point p = new Point((int) localPoint.getX(), (int) localPoint.getY());
         Point tileToScreenPoint = tileToScreenPoint(p, 0.5, 0.5, 0);
         return (tileToScreenPoint != null) && pointOnScreen(tileToScreenPoint);

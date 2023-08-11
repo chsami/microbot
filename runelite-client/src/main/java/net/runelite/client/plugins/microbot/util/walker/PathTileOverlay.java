@@ -2,11 +2,12 @@ package net.runelite.client.plugins.microbot.util.walker;
 
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
-import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.plugins.microbot.util.walker.pathfinder.CheckedNode;
+import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
+import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -17,7 +18,7 @@ public class PathTileOverlay {
 
     private static void renderTransports(Graphics2D graphics) {
         for (WorldPoint a : Microbot.getWalker().pathfinderConfig.getTransports().keySet()) {
-            drawTile(graphics, a, new Color(0, 255, 0, 128), -1, true);
+            drawTile(graphics, a, new Color(0, 255, 0, 128), true);
 
             Point ca = tileCenter(a);
 
@@ -63,10 +64,47 @@ public class PathTileOverlay {
                         new Color(0, 0, 255).getAlpha() / 2);
             }
 
-            List<WorldPoint> path = Microbot.getWalker().getPathfinder().getPath();
-            int counter = 0;
+            List<Node> path = Microbot.getWalker().getPathfinder().getPath();
             for (int i = 1; i < path.size(); i++) {
-                drawLine(graphics, path.get(i - 1), path.get(i), color);
+                drawLine(graphics, path.get(i - 1).position, path.get(i).position, color);
+            }
+            for (int i = 0; i < CollisionMap.wallNodes.size(); i++) {
+                CheckedNode checkedNode = CollisionMap.wallNodes.get(i);
+                drawTile(graphics, checkedNode.node.position, new Color(
+                        new Color(0, 0, 0).getRed(),
+                        new Color(0, 255, 0).getGreen(),
+                        new Color(255, 255, 255).getBlue(),
+                        new Color(255, 255, 255).getAlpha() - 150), true);
+                graphics.setColor(Color.GREEN);
+
+                if (checkedNode.shape != null)
+                    graphics.draw(checkedNode.shape);
+            }
+            for (int i = 0; i < CollisionMap.nodesChecked.size(); i++) {
+                CheckedNode checkedNode = CollisionMap.nodesChecked.get(i);
+
+                Color tileColor = checkedNode.status == 0 ? new Color(
+                        new Color(255, 255, 255).getRed(),
+                        new Color(0, 0, 0).getGreen(),
+                        new Color(0, 0, 0).getBlue(),
+                        100) : checkedNode.status == 1 ? new Color(
+                        new Color(150, 150, 150).getRed(),
+                        new Color(0, 0, 0).getGreen(),
+                        new Color(0, 0, 0).getBlue(),
+                        new Color(0, 0, 255).getAlpha() - 150) : checkedNode.status == 2 ? new Color(
+                        new Color(0, 0, 0).getRed(),
+                        new Color(255, 255, 255).getGreen(),
+                        new Color(0, 0, 0).getBlue(),
+                        0) : new Color(
+                        new Color(0, 0, 0).getRed(),
+                        new Color(0, 255, 0).getGreen(),
+                        new Color(255, 255, 255).getBlue(),
+                        new Color(255, 255, 255).getAlpha() - 150);
+                drawTile(graphics, checkedNode.node.position, tileColor, true);
+                graphics.setColor(Color.GREEN);
+
+                if (checkedNode.shape != null)
+                    graphics.draw(checkedNode.shape);
             }
         }
 
@@ -93,7 +131,7 @@ public class PathTileOverlay {
         return new Point(cx, cy);
     }
 
-    private static void drawTile(Graphics2D graphics, WorldPoint location, Color color, int counter, boolean draw) {
+    private static void drawTile(Graphics2D graphics, WorldPoint location, Color color, boolean draw) {
         for (WorldPoint point : WorldPoint.toLocalInstance(Microbot.getClient(), location)) {
             if (point.getPlane() != Microbot.getClient().getPlane()) {
                 continue;

@@ -296,7 +296,7 @@ public class MicrobotPlugin extends Plugin {
         List<MenuEntry> leftClickMenus = new ArrayList<>(((int) entries.stream().count()) + 2);
 
         leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
-        .setOption(walkingScript == null ? "Set Target" : "Clear target")
+        .setOption(walkingScript == null || walkingScript.mainScheduledFuture.isDone() ? "Set Target" : "Clear target")
         .setTarget(event.getTarget())
         .setType(MenuAction.RUNELITE)
         .onClick(worldMapConsumer()));

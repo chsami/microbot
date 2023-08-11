@@ -4,11 +4,21 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import net.runelite.api.coords.WorldPoint;
+import org.lwjgl.system.linux.XPropertyEvent;
 
 public class Node {
     public final WorldPoint position;
     public final Node previous;
     public final int cost;
+
+    public boolean isDoor;
+
+    public Node(WorldPoint position, Node previous, int wait, boolean isDoor) {
+        this.position = position;
+        this.previous = previous;
+        this.cost = cost(previous, position, wait);
+        this.isDoor = isDoor;
+    }
 
     public Node(WorldPoint position, Node previous, int wait) {
         this.position = position;
@@ -20,12 +30,16 @@ public class Node {
         this(position, previous, 0);
     }
 
-    public List<WorldPoint> getPath() {
-        List<WorldPoint> path = new LinkedList<>();
+    public Node(WorldPoint position, Node previous, boolean isDoor) {
+        this(position, previous, 0, isDoor);
+    }
+
+    public List<Node> getPath() {
+        List<Node> path = new LinkedList<>();
         Node node = this;
 
         while (node != null) {
-            path.add(0, node.position);
+            path.add(0, node);
             node = node.previous;
         }
 

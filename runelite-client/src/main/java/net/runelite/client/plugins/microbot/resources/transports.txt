@@ -799,18 +799,10 @@
 3083 3512 1	3083 3512 0	Climb-down Ladder 16679
 3082 3513 0	3082 3513 1	Climb-up Ladder 16683
 3082 3513 1	3082 3513 0	Climb-down Ladder 16679
-3096 3468 0	3096 9867 0	Climb-down Trapdoor 1581
-3096 3468 0	3096 3468 0	Open Trapdoor 1579
-3096 9867 0	3096 3468 0	Climb-up Ladder 17385
-3097 9868 0	3096 3468 0	Climb-up Ladder 17385
 3094 9895 0	3093 9895 0	Push Odd looking wall 1736
 3093 9895 0	3094 9895 0	Push Odd looking wall 1736
 3094 9896 0	3093 9896 0	Push Odd looking wall 1734
 3093 9896 0	3094 9896 0	Push Odd looking wall 1734
-3132 9917 0	3132 9918 0	Open Gate 1728
-3132 9918 0	3132 9917 0	Open Gate 1728
-3131 9917 0	3131 9918 0	Open Gate 1727
-3131 9918 0	3131 9917 0	Open Gate 1727
 3149 9906 0	3155 9906 0	Squeeze-through Obstacle pipe 16511	51 Agility
 3155 9906 0	3149 9906 0	Squeeze-through Obstacle pipe 16511	51 Agility
 3150 9907 0	3155 9906 0	Squeeze-through Obstacle pipe 16511	51 Agility

@@ -78,7 +78,7 @@ public class TannerScript extends Script {
             Inventory.useItemContains("stamina");
         }
         if (hasHides && !isTannerVisibleOnScreen) {
-            Microbot.getWalker().walkTo(tannerLocation, true, false);
+            Microbot.getWalker().walkTo(tannerLocation, false);
         }
         if (hasHides && isTannerVisibleOnScreen) {
             if (Rs2Widget.hasWidget("What hides would you like tanning?")) {
@@ -99,7 +99,7 @@ public class TannerScript extends Script {
             }
         }
         if (!hasHides && !isBankVisible) {
-            Microbot.getWalker().walkTo(BankLocation.AL_KHARID.getWorldPoint(), true, false);
+            Microbot.getWalker().walkTo(BankLocation.AL_KHARID.getWorldPoint(), false);
         }
     }
 }
