@@ -57,6 +57,26 @@ public class Rs2Equipment {
         }
     }
 
+    //only temporary measures while i create proper methods
+    public static void useRingAction(String actionName) {
+        Widget ringSlot = Rs2Widget.getWidget(25362456);
+        if(ringSlot != null) {
+            Microbot.status = "found ring slot";
+            Rs2Menu.doAction(actionName, new Point((int) ringSlot.getBounds().getCenterX(), (int) ringSlot.getBounds().getCenterY()));
+
+            Microbot.status = "attempted action";
+        }
+    }
+    //only temporary measures while i create proper methods
+    public static void useAmuletAction(String actionName) {
+        Widget amuletSlot = Rs2Widget.getWidget(25362449);
+        if(amuletSlot != null) {
+            Microbot.status = "found amulet slot";
+            Rs2Menu.doAction(actionName, new Point((int) amuletSlot.getBounds().getCenterX(), (int) amuletSlot.getBounds().getCenterY()));
+        }
+    }
+
+
     public static ItemComposition getEquippedItem(EquipmentInventorySlot slot) {
         final ItemContainer container = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT));
         if (container == null) return null;
