@@ -175,6 +175,7 @@ class AutoVorkathPlugin : Plugin() {
                     }
                     State.PRAYER -> if (Inventory.findItemContains("prayer") != null) {
                         Inventory.useItemContains("prayer")
+                        sleep(100,150)
                     } else {
                         println("No prayer potions found")
                         // Teleport
