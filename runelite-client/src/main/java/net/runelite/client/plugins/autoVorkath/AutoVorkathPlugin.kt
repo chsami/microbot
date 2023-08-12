@@ -129,11 +129,13 @@ class AutoVorkathPlugin : Plugin() {
                     State.MAGIC -> if ((clientThread.runOnClientThread { client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MAGIC) == 0 }) || previousBotState != State.MAGIC) {
                         previousBotState = State.MAGIC
                         Rs2Prayer.turnOnFastMagicPrayer()
+                        if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOnFastRigour()}
                         walkToCenterLocation(isPlayerInCenterLocation())
                     }
                     State.RANGE -> if ((clientThread.runOnClientThread { client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 0 }) || previousBotState != State.RANGE) {
                         previousBotState = State.RANGE
                         Rs2Prayer.turnOnFastRangePrayer()
+                        if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOnFastRigour()}
                         walkToCenterLocation(isPlayerInCenterLocation())
                     }
                     State.ZOMBIFIED_SPAWN -> if (previousBotState != State.ZOMBIFIED_SPAWN) {
@@ -184,6 +186,7 @@ class AutoVorkathPlugin : Plugin() {
             } else if(vorkath == null || vorkath.isDead){
                 Rs2Prayer.turnOffFastMagicPrayer()
                 Rs2Prayer.turnOffFastRangePrayer()
+                Rs2Prayer.turnOffFastRigour()
             }
         }
     }
@@ -191,6 +194,7 @@ class AutoVorkathPlugin : Plugin() {
     private fun acidWalk() {
         Rs2Prayer.turnOffFastMagicPrayer()
         Rs2Prayer.turnOffFastRangePrayer()
+        Rs2Prayer.turnOffFastRigour()
         var clickedTile: WorldPoint
         var toggle = true
         while (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId)) {

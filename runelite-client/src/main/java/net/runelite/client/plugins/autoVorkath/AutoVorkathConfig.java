@@ -36,4 +36,12 @@ public interface AutoVorkathConfig extends Config {
     default TELEPORT TELEPORT() {
         return TELEPORT.CONSTRUCT_CAPE_T;
     }
+
+    @ConfigItem(
+            keyName = "rigour",
+            name = "Rigour",
+            description = "Activate Rigour?",
+            position = 3
+    )
+    default boolean ACTIVATERIGOUR() { return true; }
 }
