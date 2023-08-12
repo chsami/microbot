@@ -113,7 +113,7 @@ class AutoVorkathPlugin : Plugin() {
                 }
 
                 // Check if player needs to eat
-                if (clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.HITPOINTS) } < 40 && botState != State.ACID) {
+                if (clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.HITPOINTS) } < 40 && botState != State.ACID && botState != State.RED_BALL) {
                     foods = clientThread.runOnClientThread { Inventory.getInventoryFood() }
                     botState = State.EAT
                 }
