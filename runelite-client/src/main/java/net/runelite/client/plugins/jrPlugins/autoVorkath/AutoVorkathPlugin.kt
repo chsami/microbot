@@ -133,6 +133,8 @@ class AutoVorkathPlugin : Plugin() {
                     }
                     State.ZOMBIFIED_SPAWN -> if (previousBotState != State.ZOMBIFIED_SPAWN) {
                         previousBotState = State.ZOMBIFIED_SPAWN
+                        Rs2Prayer.turnOffFastRangePrayer()
+                        if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOffFastRigour()}
                         Inventory.useItem(config.SLAYERSTAFF().toString())
                         eatAt(75)
                         while (Rs2Npc.getNpc("Zombified Spawn") == null) {
@@ -176,16 +178,15 @@ class AutoVorkathPlugin : Plugin() {
                     else -> botState = State.NONE
                 }
             } else if(vorkath == null || vorkath.isDead){
-                Rs2Prayer.turnOffFastMagicPrayer()
                 Rs2Prayer.turnOffFastRangePrayer()
-                Rs2Prayer.turnOffFastRigour()
+                if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOffFastRigour()}
             }
         }
     }
 
     private fun acidWalk() {
         Rs2Prayer.turnOffFastRangePrayer()
-        Rs2Prayer.turnOffFastRigour()
+        if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOffFastRigour()}
         var clickedTile: WorldPoint
         var toggle = true
         while (botState == State.ACID && previousBotState == State.ACID && (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
