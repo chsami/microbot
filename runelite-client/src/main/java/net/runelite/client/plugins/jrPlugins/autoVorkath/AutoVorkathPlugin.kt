@@ -180,6 +180,7 @@ class AutoVorkathPlugin : Plugin() {
             } else if(vorkath == null || vorkath.isDead){
                 Rs2Prayer.turnOffFastRangePrayer()
                 if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOffFastRigour()}
+                Script.toggleRunEnergy(true)
             }
         }
     }
