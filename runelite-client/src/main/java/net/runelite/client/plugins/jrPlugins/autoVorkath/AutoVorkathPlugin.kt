@@ -96,8 +96,8 @@ class AutoVorkathPlugin : Plugin() {
             if (vorkath != null && vorkath.isInteracting) {
                 Script.toggleRunEnergy(false)
                 centerTile = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, vorkath.worldLocation.plane)
-                rightTile = WorldPoint(centerTile.x + 2, centerTile.y - 3, centerTile.plane)
-                leftTile = WorldPoint(centerTile.x - 2, centerTile.y - 3, centerTile.plane)
+                rightTile = WorldPoint(centerTile.x + 3, centerTile.y - 3, centerTile.plane)
+                leftTile = WorldPoint(centerTile.x - 3, centerTile.y - 3, centerTile.plane)
                 // Check what projectile is coming
                 if (doesProjectileExistById(redProjectileId)) {
                     botState = State.RED_BALL
