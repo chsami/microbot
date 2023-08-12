@@ -46,6 +46,24 @@ public class Rs2Prayer {
         prayIndex = 0;
     }
 
+    public static void turnOffFastPiety(){
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(Varbits.PRAYER_PIETY) == 0)) return;
+        prayIndex = 35455011;
+        Microbot.getMouse().click();
+        sleep(100);
+        prayIndex = 0;
+    }
+
+    public static void turnOffFastAugury(){
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(Varbits.PRAYER_AUGURY) == 0)) return;
+        prayIndex = 35455012;
+        Microbot.getMouse().click();
+        sleep(100);
+        prayIndex = 0;
+    }
+
     public static void turnOnFastMeleePrayer() {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MELEE) == 1)) return;
@@ -75,6 +93,24 @@ public class Rs2Prayer {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_RIGOUR) == 1)) return;
         prayIndex = 35455009;
+        Microbot.getMouse().click();
+        sleep(100);
+        prayIndex = 0;
+    }
+
+    public static void turnOnFastPiety(){
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(Varbits.PRAYER_PIETY) == 1)) return;
+        prayIndex = 35455011;
+        Microbot.getMouse().click();
+        sleep(100);
+        prayIndex = 0;
+    }
+
+    public static void turnOnFastAugury(){
+        if (Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(Varbits.PRAYER_AUGURY) == 1)) return;
+        prayIndex = 35455012;
         Microbot.getMouse().click();
         sleep(100);
         prayIndex = 0;
