@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.example;
 
-import net.runelite.api.Prayer;
-import net.runelite.api.TileObject;
-import net.runelite.api.Varbits;
-import net.runelite.api.World;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -13,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.GroundItem;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CheckedNode;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
@@ -33,7 +31,16 @@ public class ExampleScript extends Script {
             if (!super.run()) return;
 
             try {
-                //write your code here
+                int random = Random.random(0, 10);
+if (random == 0) {
+    Rs2Prayer.turnOnFastMeleePrayer();
+} else if (random == 3) {
+    Rs2Prayer.turnOnFastMagicPrayer();
+} else if (random == 5)  {
+    Rs2Prayer.turnOnFastRangePrayer();
+}
+              //  System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+                //MenuEntryImpl(getOption=Activate, getTarget=<col=ff9040>Protect from Melee</col>, getIdentifier=1, getType=CC_OP, getParam0=-1, getParam1=35454999, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)]
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

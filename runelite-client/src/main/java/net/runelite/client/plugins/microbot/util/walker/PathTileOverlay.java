@@ -48,7 +48,7 @@ public class PathTileOverlay {
     }
 
     public static Dimension render(Graphics2D graphics) {
-        if (!Microbot.getWalker().getPathfinder().getDebugger()) return null;
+        if (Microbot.getWalker().getPathfinder() == null || !Microbot.getWalker().getPathfinder().getDebugger()) return null;
         if (Microbot.getWalker().getPathfinder() != null && Microbot.getWalker().getPathfinder().getPath() != null) {
             Color color;
             if (Microbot.getWalker().getPathfinder().isDone()) {

@@ -5,6 +5,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
+import net.runelite.api.events.PostMenuSort;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -29,6 +30,7 @@ import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.plugins.microbot.walking.WalkingScript;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -287,6 +289,20 @@ public class MicrobotPlugin extends Plugin {
                         .setType(MenuAction.RUNELITE)
                         .onClick(menuActionMinerConsumer( objectEntry.getIdentifier())));
             }
+        }
+    }
+
+    @Subscribe
+    public void onPostMenuSort(PostMenuSort postMenuSort)
+    {
+        if (Rs2Prayer.prayIndex > 0) {
+            MenuEntry entry = Microbot.getClient().getMenuEntries()[0];
+            entry.setOption("Activate");
+            entry.setIdentifier(1);
+            entry.setParam0(-1);
+            entry.setType(MenuAction.CC_OP);
+            entry.setParam1(Rs2Prayer.prayIndex);
+            Microbot.getClient().setMenuEntries(new MenuEntry[] {entry});
         }
     }
 
