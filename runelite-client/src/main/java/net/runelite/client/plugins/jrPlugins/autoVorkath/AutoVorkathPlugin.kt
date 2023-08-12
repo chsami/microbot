@@ -132,12 +132,12 @@ class AutoVorkathPlugin : Plugin() {
                     State.ZOMBIFIED_SPAWN -> if (previousBotState != State.ZOMBIFIED_SPAWN) {
                         previousBotState = State.ZOMBIFIED_SPAWN
                         Inventory.useItem(config.SLAYERSTAFF().toString())
+                        eatAt(75)
                         while (Rs2Npc.getNpc("Zombified Spawn") == null) {
                             sleep(100, 200)
                         }
                         Rs2Npc.attack("Zombified Spawn")
                         sleep(2300, 2500)
-                        eatAt(75)
                         Inventory.useItem(config.CROSSBOW().toString())
                         eatAt(75)
                         sleep(600, 1000)
@@ -150,16 +150,13 @@ class AutoVorkathPlugin : Plugin() {
                         sleep(1700, 1850)
                         Rs2Npc.attack("Vorkath")
                     }
-                    State.ACID -> if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId) || Rs2GameObject.findObject(ObjectID.ACID_POOL) != null){
+                    State.ACID -> if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId) || Rs2GameObject.findObject(ObjectID.ACID_POOL) != null) {
                         previousBotState = State.ACID
                         acidWalk()
                     }
                     State.EAT -> if (foods?.size!! > 0) {
-                        for (food in foods!!) {
-                            VirtualMouse().click(food.getBounds())
-                            botState = previousBotState
-                            break
-                        }
+                        VirtualMouse().click(foods!![0].getBounds())
+                        botState = previousBotState
                     } else {
                         println("No food found")
                         // Teleport
@@ -167,7 +164,7 @@ class AutoVorkathPlugin : Plugin() {
                     }
                     State.PRAYER -> if (Inventory.findItemContains("prayer") != null) {
                         Inventory.useItemContains("prayer")
-                        sleep(100,150)
+                        botState = previousBotState
                     } else {
                         println("No prayer potions found")
                         // Teleport
@@ -189,7 +186,7 @@ class AutoVorkathPlugin : Plugin() {
         Rs2Prayer.turnOffFastRigour()
         var clickedTile: WorldPoint
         var toggle = true
-        while (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId)) {
+        while (botState == State.ACID && previousBotState == State.ACID && (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
             clickedTile = if (toggle) rightTile else leftTile
 
             // Check if player's location is equal to the clicked tile location or if it's within one tile of the clicked location.
