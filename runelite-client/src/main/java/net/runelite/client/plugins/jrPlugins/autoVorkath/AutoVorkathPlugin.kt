@@ -96,8 +96,8 @@ class AutoVorkathPlugin : Plugin() {
             if (vorkath != null && vorkath.isInteracting) {
                 Script.toggleRunEnergy(false)
                 centerTile = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, vorkath.worldLocation.plane)
-                rightTile = WorldPoint(centerTile.x + 3, centerTile.y - 3, centerTile.plane)
-                leftTile = WorldPoint(centerTile.x - 3, centerTile.y - 3, centerTile.plane)
+                rightTile = WorldPoint(centerTile.x + 2, centerTile.y - 3, centerTile.plane)
+                leftTile = WorldPoint(centerTile.x - 2, centerTile.y - 3, centerTile.plane)
                 // Check what projectile is coming
                 if (doesProjectileExistById(redProjectileId)) {
                     botState = State.RED_BALL
@@ -201,7 +201,7 @@ class AutoVorkathPlugin : Plugin() {
             }
 
             Walker().walkFastCanvas(clickedTile)
-            while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 2 && Microbot.isWalking()) {
+            while (client.localPlayer.worldLocation != clickedTile || client.localPlayer.worldLocation.distanceTo(clickedTile) > 2 && Microbot.isWalking()) {
                 sleep(1)
             }
             toggle = !toggle
