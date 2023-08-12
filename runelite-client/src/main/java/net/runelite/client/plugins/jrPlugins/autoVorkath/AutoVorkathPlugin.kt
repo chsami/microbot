@@ -11,6 +11,7 @@ import com.google.inject.Provides
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.microbot.Microbot
+import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
@@ -93,6 +94,7 @@ class AutoVorkathPlugin : Plugin() {
             val vorkath = Rs2Npc.getNpc("vorkath")
             // Check if player is in Vorkath Area
             if (vorkath != null && vorkath.isInteracting) {
+                Script.toggleRunEnergy(false)
                 centerTile = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, vorkath.worldLocation.plane)
                 rightTile = WorldPoint(centerTile.x + 2, centerTile.y - 3, centerTile.plane)
                 leftTile = WorldPoint(centerTile.x - 2, centerTile.y - 3, centerTile.plane)
@@ -189,22 +191,19 @@ class AutoVorkathPlugin : Plugin() {
         while (botState == State.ACID && previousBotState == State.ACID && (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
             clickedTile = if (toggle) rightTile else leftTile
 
-            // Check if player's location is equal to the clicked tile location or if it's within one tile of the clicked location.
+            // Check if player's location is equal to the clicked tile location or if it's within two tile of the clicked location.
             val currentPlayerLocation = client.localPlayer.worldLocation
-            if (currentPlayerLocation.distanceTo(clickedTile) <= 1) {
+            if (currentPlayerLocation.distanceTo(clickedTile) <= 2) {
                 toggle = !toggle
                 clickedTile = if (toggle) rightTile else leftTile
             }
 
             Walker().walkFastCanvas(clickedTile)
             while (client.localPlayer.worldLocation != clickedTile) {
-                if (client.localPlayer.idlePoseAnimation == 1) break
                 sleep(1)
             }
             toggle = !toggle
         }
-        Rs2Prayer.turnOnFastRigour()
-        Rs2Prayer.turnOnFastRangePrayer()
     }
 
     private fun eatAt(health: Int){
