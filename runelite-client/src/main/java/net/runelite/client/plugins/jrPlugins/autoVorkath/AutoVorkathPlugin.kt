@@ -199,7 +199,7 @@ class AutoVorkathPlugin : Plugin() {
             }
 
             Walker().walkFastCanvas(clickedTile)
-            while (client.localPlayer.worldLocation != clickedTile) {
+            while (client.localPlayer.worldLocation != clickedTile || client.localPlayer.worldLocation.distanceTo(clickedTile) > 2 && Microbot.isWalking()) {
                 sleep(1)
             }
             toggle = !toggle
