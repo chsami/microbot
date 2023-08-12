@@ -158,8 +158,6 @@ class AutoVorkathPlugin : Plugin() {
                     }
                     State.ACID -> if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId) || Rs2GameObject.findObject(ObjectID.ACID_POOL) != null){
                         previousBotState = State.ACID
-                        Rs2Prayer.turnOffFastMagicPrayer()
-                        Rs2Prayer.turnOffFastRangePrayer()
                         acidWalk()
                     }
                     State.EAT -> if (foods?.size!! > 0) {
@@ -191,9 +189,11 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     private fun acidWalk() {
+        Rs2Prayer.turnOffFastMagicPrayer()
+        Rs2Prayer.turnOffFastRangePrayer()
         var clickedTile: WorldPoint
         var toggle = true
-        while ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
+        while (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId)) {
             clickedTile = if (toggle) rightTile else leftTile
             //println("Player location: ${client.localPlayer.worldLocation}")
             Walker().walkFastCanvas(clickedTile)
