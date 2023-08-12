@@ -10,6 +10,7 @@ import net.runelite.client.config.ConfigManager
 import com.google.inject.Provides
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
+import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
@@ -75,7 +76,7 @@ class AutoVorkathPlugin : Plugin() {
     override fun startUp() {
         botState = State.RANGE
         previousBotState = State.NONE
-        running = true
+        running = if(Microbot.isLoggedIn()) true else false
         GlobalScope.launch {
             run()
         }
@@ -113,7 +114,7 @@ class AutoVorkathPlugin : Plugin() {
                 }
 
                 // Check if player needs to eat
-                if (clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.HITPOINTS) } < 65) {
+                if (clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.HITPOINTS) } < 40) {
                     foods = clientThread.runOnClientThread { Inventory.getInventoryFood() }
                     botState = State.EAT
                 }
@@ -144,6 +145,7 @@ class AutoVorkathPlugin : Plugin() {
                         Rs2Npc.attack("Zombified Spawn")
                         sleep(2300, 2500)
                         Inventory.useItem(config.CROSSBOW().toString())
+                        eatAt(75)
                         sleep(600, 1000)
                         Rs2Npc.attack("Vorkath")
                     }
@@ -193,14 +195,28 @@ class AutoVorkathPlugin : Plugin() {
         var toggle = true
         while ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
             clickedTile = if (toggle) rightTile else leftTile
-            println("Player location: ${client.localPlayer.worldLocation}")
+            //println("Player location: ${client.localPlayer.worldLocation}")
             Walker().walkFastCanvas(clickedTile)
-            println("Walking to $clickedTile")
+            //println("Walking to $clickedTile")
             while (client.localPlayer.worldLocation != clickedTile) {
                 if (client.localPlayer.idlePoseAnimation == 1) break
                 sleep(1)
             }
             toggle = !toggle
+        }
+    }
+
+    private fun eatAt(health: Int){
+        if (clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.HITPOINTS) } < health && Rs2Npc.getNpc("Vorkath") != null){
+            foods = clientThread.runOnClientThread { Inventory.getInventoryFood() }
+            val food = if(foods?.size!! > 0) foods!![0] else null
+            if(food != null){
+                VirtualMouse().click(food.getBounds())
+            }else{
+                //println("No food found")
+                // Teleport
+                Inventory.useItem(config.TELEPORT().toString())
+            }
         }
     }
 
