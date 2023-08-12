@@ -10,16 +10,13 @@ import net.runelite.client.config.ConfigManager
 import com.google.inject.Provides
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
-import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleep
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
-import net.runelite.client.plugins.microbot.util.mouse.Mouse
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
 import net.runelite.client.plugins.microbot.util.walker.Walker
-import java.awt.event.KeyEvent
 import javax.inject.Inject
 
 
@@ -104,7 +101,7 @@ class AutoVorkathPlugin : Plugin() {
                     botState = State.RED_BALL
                 }else if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId)) {
                     botState = State.ACID
-                    println("Acid")
+                    //println("Acid")
                 } else if (doesProjectileExistById(magicProjectileId) || doesProjectileExistById(purpleProjectileId) || doesProjectileExistById(blueProjectileId)) {
                     botState = State.MAGIC
                 } else if (doesProjectileExistById(rangeProjectileId)) {
@@ -130,16 +127,12 @@ class AutoVorkathPlugin : Plugin() {
                 when (botState) {
                     State.MAGIC -> if ((clientThread.runOnClientThread { client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MAGIC) == 0 }) || previousBotState != State.MAGIC) {
                         previousBotState = State.MAGIC
-                        openPrayerTab()
-                        Rs2Prayer.turnOnMagePrayer()
-                        openInventoryTab()
+                        Rs2Prayer.turnOnFastMagicPrayer()
                         walkToCenterLocation(isPlayerInCenterLocation())
                     }
                     State.RANGE -> if ((clientThread.runOnClientThread { client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 0 }) || previousBotState != State.RANGE) {
                         previousBotState = State.RANGE
-                        openPrayerTab()
-                        Rs2Prayer.turnOnRangedPrayer()
-                        openInventoryTab()
+                        Rs2Prayer.turnOnFastRangePrayer()
                         walkToCenterLocation(isPlayerInCenterLocation())
                     }
                     State.ZOMBIFIED_SPAWN -> if (previousBotState != State.ZOMBIFIED_SPAWN) {
@@ -161,8 +154,10 @@ class AutoVorkathPlugin : Plugin() {
                         sleep(1700, 1850)
                         Rs2Npc.attack("Vorkath")
                     }
-                    State.ACID -> if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId)){
+                    State.ACID -> if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId) || Rs2GameObject.findObject(ObjectID.ACID_POOL) != null){
                         previousBotState = State.ACID
+                        Rs2Prayer.turnOffFastMagicPrayer()
+                        Rs2Prayer.turnOffFastRangePrayer()
                         acidWalk()
                     }
                     State.EAT -> if (foods?.size!! > 0) {
@@ -186,6 +181,9 @@ class AutoVorkathPlugin : Plugin() {
                     State.NONE -> println("TODO")
                     else -> botState = State.NONE
                 }
+            } else if(vorkath == null || vorkath.isDead){
+                Rs2Prayer.turnOffFastMagicPrayer()
+                Rs2Prayer.turnOffFastRangePrayer()
             }
         }
     }
@@ -199,27 +197,18 @@ class AutoVorkathPlugin : Plugin() {
             Walker().walkFastCanvas(clickedTile)
             println("Walking to $clickedTile")
             while (client.localPlayer.worldLocation != clickedTile) {
-                sleep(10, 15)
+                if (client.localPlayer.idlePoseAnimation == 1) break
+                sleep(1)
             }
             toggle = !toggle
         }
-    }
-
-    // Open Prayer tab
-    private fun openPrayerTab() {
-        VirtualKeyboard.keyPress(KeyEvent.VK_F3)
-    }
-
-    // Open Inventory tab
-    private fun openInventoryTab() {
-        VirtualKeyboard.keyPress(KeyEvent.VK_F2)
     }
 
     // Check if projectile exists by ID
     private fun doesProjectileExistById(id: Int): Boolean {
         for (projectile in client.projectiles) {
             if (projectile.id == id) {
-                println("Projectile $id found")
+                //println("Projectile $id found")
                 return true
             }
         }
