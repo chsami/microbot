@@ -195,7 +195,7 @@ class AutoVorkathPlugin : Plugin() {
 
             // Check if player's location is equal to the clicked tile location or if it's within two tile of the clicked location.
             val currentPlayerLocation = client.localPlayer.worldLocation
-            if (currentPlayerLocation.distanceTo(clickedTile) <= 2) {
+            if (currentPlayerLocation.distanceTo(clickedTile) <= 1) {
                 toggle = !toggle
                 clickedTile = if (toggle) rightTile else leftTile
             }
