@@ -26,6 +26,7 @@ import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
@@ -281,8 +282,7 @@ public class MicrobotPlugin extends Plugin {
                         .setOption(summerGardenScript == null ? "Start SummerGarden" : "Stop SummerGarden")
                         .setType(MenuAction.RUNELITE)
                         .onClick(menuActionSummerGarden()));
-            } else {
-
+            } else if (objectEntry.getTarget().toLowerCase().contains("rock")) {
                 List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
 
                 leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
@@ -303,6 +303,16 @@ public class MicrobotPlugin extends Plugin {
             entry.setParam0(-1);
             entry.setType(MenuAction.CC_OP);
             entry.setParam1(Rs2Prayer.prayIndex);
+            Microbot.getClient().setMenuEntries(new MenuEntry[] {entry});
+        }
+        if (Rs2Magic.widgetId > 0) {
+            MenuEntry entry = Microbot.getClient().getMenuEntries()[0];
+            entry.setOption("Cast");
+            entry.setIdentifier(1);
+            entry.setParam0(-1);
+            entry.setTarget("<col=00ff00>" + Rs2Magic.widgetName + "</col>");
+            entry.setType(Rs2Magic.widgetAction);
+            entry.setParam1(Rs2Magic.widgetId);
             Microbot.getClient().setMenuEntries(new MenuEntry[] {entry});
         }
     }
