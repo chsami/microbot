@@ -112,7 +112,7 @@ public class Microbot {
         if (currentSpecEnergy >= 999 && (client.getVarpValue(VarPlayer.SPECIAL_ATTACK_ENABLED) == 0)) {
             for (int i = 0; i < 3; i++) {
                 Rs2Widget.clickWidget("special attack");
-                sleep(5000);
+                sleep(100,600); // sleep for 100-600ms (1tick)
             }
         }
     }
