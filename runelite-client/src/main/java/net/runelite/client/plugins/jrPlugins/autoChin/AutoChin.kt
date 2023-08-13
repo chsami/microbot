@@ -64,22 +64,26 @@ class AutoChinchompasPlugin : Plugin() {
     }
 
     private fun handleIdleState() {
-        // If there are box traps on the floor, interact with them first
-        if (GroundItem.interact(ItemID.BOX_TRAP, "lay", 4)) {
-            currentState = State.CATCHING
-            return
-        }
+        try {
+            // If there are box traps on the floor, interact with them first
+            if (GroundItem.interact(ItemID.BOX_TRAP, "lay", 4)) {
+                currentState = State.CATCHING
+                return
+            }
 
-        // If there are shaking boxes, interact with them
-        if (Rs2GameObject.interact(ObjectID.SHAKING_BOX_9383, "reset", 4)) {
-            currentState = State.CATCHING
-            return
-        }
+            // If there are shaking boxes, interact with them
+            if (Rs2GameObject.interact(ObjectID.SHAKING_BOX_9383, "reset", 4)) {
+                currentState = State.CATCHING
+                return
+            }
 
-        // Interact with traps that have not caught anything
-        if (Rs2GameObject.interact(ObjectID.BOX_TRAP_9385, "reset", 4)) {
-            currentState = State.CATCHING
-            return
+            // Interact with traps that have not caught anything
+            if (Rs2GameObject.interact(ObjectID.BOX_TRAP_9385, "reset", 4)) {
+                currentState = State.CATCHING
+                return
+            }
+        } catch (e: Exception) {
+            //e.printStackTrace()
         }
     }
 
