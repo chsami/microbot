@@ -12,8 +12,6 @@ import net.runelite.api.Client
 import net.runelite.api.ItemID
 import net.runelite.api.ObjectID
 import net.runelite.client.config.ConfigManager
-import net.runelite.client.plugins.jrPlugins.autoVorkath.AutoVorkathConfig
-import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleep
 
 @PluginDescriptor(
@@ -36,7 +34,8 @@ class AutoChinchompasPlugin : Plugin() {
 
     private enum class State {
         IDLE,
-        CATCHING
+        CATCHING,
+        LAYING
     }
 
     private var currentState = State.IDLE
@@ -54,6 +53,7 @@ class AutoChinchompasPlugin : Plugin() {
             when (currentState) {
                 State.IDLE -> handleIdleState()
                 State.CATCHING -> handleCatchingState()
+                State.LAYING -> handleLayingState()
             }
         }
     }
@@ -67,7 +67,7 @@ class AutoChinchompasPlugin : Plugin() {
         try {
             // If there are box traps on the floor, interact with them first
             if (GroundItem.interact(ItemID.BOX_TRAP, "lay", 4)) {
-                currentState = State.CATCHING
+                currentState = State.LAYING
                 return
             }
 
@@ -89,6 +89,11 @@ class AutoChinchompasPlugin : Plugin() {
 
     private fun handleCatchingState() {
         sleep(8000,8100)
+        currentState = State.IDLE
+    }
+
+    private fun handleLayingState() {
+        sleep(6000,6100)
         currentState = State.IDLE
     }
 }
