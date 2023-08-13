@@ -15,6 +15,7 @@ public class WoodcuttingScript  extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
+                Microbot.toggleSpecialAttack(100);
                 if (Microbot.isWalking() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
                 if (Inventory.isFull()) {
                     if (config.hasAxeInventory()) {
