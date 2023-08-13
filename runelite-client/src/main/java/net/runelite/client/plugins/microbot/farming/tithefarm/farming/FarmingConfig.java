@@ -5,7 +5,6 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.FarmingMaterial;
-import net.runelite.client.plugins.microbot.fletching.enums.FletchingMode;
 
 @ConfigGroup("farming")
 public interface FarmingConfig extends Config {
