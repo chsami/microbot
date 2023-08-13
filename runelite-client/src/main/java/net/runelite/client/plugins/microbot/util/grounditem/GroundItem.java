@@ -202,36 +202,4 @@ public class GroundItem {
         }
         return false;
     }
-
-    public static boolean exists(String itemName, int range) {
-        RS2Item[] groundItems = getAll(range);
-        for (RS2Item rs2Item : groundItems) {
-            if (rs2Item.getItem().getName().equalsIgnoreCase(itemName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean exists(String itemName, int x, int y) {
-        RS2Item[] itemsAtTile = getAllAt(x, y);
-        if (itemsAtTile != null) {
-            for (RS2Item item : itemsAtTile) {
-                if (item.getItem().getName().equalsIgnoreCase(itemName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static boolean exists(int itemId, int range) {
-        RS2Item[] groundItems = getAll(range);
-        for (RS2Item rs2Item : groundItems) {
-            if (rs2Item.getItem().getId() == itemId) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
