@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.jrPlugins.autoChin
 
+import com.google.inject.Provides
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.runelite.client.plugins.Plugin
@@ -10,6 +11,9 @@ import javax.inject.Inject
 import net.runelite.api.Client
 import net.runelite.api.ItemID
 import net.runelite.api.ObjectID
+import net.runelite.client.config.ConfigManager
+import net.runelite.client.plugins.jrPlugins.autoVorkath.AutoVorkathConfig
+import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleep
 
 @PluginDescriptor(
@@ -22,6 +26,11 @@ class AutoChinchompasPlugin : Plugin() {
 
     @Inject
     private lateinit var client: Client
+
+    @Provides
+    fun getConfig(configManager: ConfigManager): AutoChinConfig {
+        return configManager.getConfig(AutoChinConfig::class.java)
+    }
 
     private var running = false
 
@@ -56,26 +65,25 @@ class AutoChinchompasPlugin : Plugin() {
 
     private fun handleIdleState() {
         // If there are box traps on the floor, interact with them first
-        if (GroundItem.interact(ItemID.BOX_TRAP, "lay", 3)) {
+        if (GroundItem.interact(ItemID.BOX_TRAP, "lay", 4)) {
             currentState = State.CATCHING
             return
         }
 
         // If there are shaking boxes, interact with them
-        if (Rs2GameObject.interact(ObjectID.SHAKING_BOX_9383, "reset", 3)) {
+        if (Rs2GameObject.interact(ObjectID.SHAKING_BOX_9383, "reset", 4)) {
             currentState = State.CATCHING
             return
         }
 
         // Interact with traps that have not caught anything
-        if (Rs2GameObject.interact(ObjectID.BOX_TRAP_9385, "reset", 3)) {
+        if (Rs2GameObject.interact(ObjectID.BOX_TRAP_9385, "reset", 4)) {
             currentState = State.CATCHING
             return
         }
     }
 
     private fun handleCatchingState() {
-        // For simplicity, we're switching to IDLE after every catch attempt
         sleep(8000,8100)
         currentState = State.IDLE
     }
