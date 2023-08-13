@@ -193,18 +193,28 @@ class AutoVorkathPlugin : Plugin() {
         while (botState == State.ACID && previousBotState == State.ACID && (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
             clickedTile = if (toggle) rightTile else leftTile
 
-            // Check if player's location is equal to the clicked tile location or if it's within two tile of the clicked location.
+            // Check if player's location is equal to the clicked tile location or if it's within one tile of the clicked location.
             val currentPlayerLocation = client.localPlayer.worldLocation
-            if (currentPlayerLocation.distanceTo(clickedTile) <= 1) {
-                toggle = !toggle
-                clickedTile = if (toggle) rightTile else leftTile
-            }
 
-            Walker().walkFastCanvas(clickedTile)
-            while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 1 && client.localPlayer.worldLocation.y == clickedTile.y && Microbot.isWalking()) {
-                sleep(1)
+            // Ensure player is at the clickedTile.y before toggling
+            if(currentPlayerLocation.y != clickedTile.y) {
+                // Walk player to clickedTile.y location
+                Walker().walkFastCanvas(WorldPoint(currentPlayerLocation.x, clickedTile.y, currentPlayerLocation.plane))
+                while (client.localPlayer.worldLocation.y != clickedTile.y) {
+                    sleep(1)
+                }
+            } else {
+                if (currentPlayerLocation.distanceTo(clickedTile) <= 1) {
+                    toggle = !toggle
+                    clickedTile = if (toggle) rightTile else leftTile
+                }
+
+                Walker().walkFastCanvas(clickedTile)
+                while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 1 && client.localPlayer.worldLocation.y == clickedTile.y && Microbot.isWalking()) {
+                    sleep(1)
+                }
+                toggle = !toggle
             }
-            toggle = !toggle
         }
     }
 
