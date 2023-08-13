@@ -48,9 +48,10 @@ import java.util.function.Consumer;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 @PluginDescriptor(
-        name = "Microbot - do not turn this off",
-        description = "Microbot do not turn this off",
-        tags = {"main", "microbot", "parent"}
+        name = "Microbot",
+        description = "Microbot",
+        tags = {"main", "microbot", "parent"},
+        alwaysOn = true
 )
 @Slf4j
 public class MicrobotPlugin extends Plugin {

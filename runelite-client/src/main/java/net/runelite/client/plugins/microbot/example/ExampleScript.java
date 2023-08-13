@@ -31,15 +31,9 @@ public class ExampleScript extends Script {
             if (!super.run()) return;
 
             try {
-                int random = Random.random(0, 10);
-if (random == 0) {
-    Rs2Prayer.turnOnFastMeleePrayer();
-} else if (random == 3) {
-    Rs2Prayer.turnOnFastMagicPrayer();
-} else if (random == 5)  {
-    Rs2Prayer.turnOnFastRangePrayer();
-}
-              //  System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+                Rs2Prayer.turnOnFastRangePrayer();
+
+                //  System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
                 //MenuEntryImpl(getOption=Activate, getTarget=<col=ff9040>Protect from Melee</col>, getIdentifier=1, getType=CC_OP, getParam0=-1, getParam1=35454999, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)]
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());

@@ -66,7 +66,10 @@ public @interface PluginDescriptor
 	 * the user has to install the plugin, then separately enable it, which is confusing.
 	 */
 	boolean enabledByDefault() default true;
-
+	/**
+	 * always on
+	 */
+	boolean alwaysOn() default false;
 	/**
 	 * Whether or not plugin is hidden from configuration panel
 	 */

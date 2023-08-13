@@ -49,7 +49,7 @@ public class PathTileOverlay {
 
     public static Dimension render(Graphics2D graphics) {
         if (Microbot.getWalker().getPathfinder() == null || !Microbot.getWalker().getPathfinder().getDebugger()) return null;
-        if (Microbot.getWalker().getPathfinder() != null && Microbot.getWalker().getPathfinder().getPath() != null) {
+        if (Microbot.getWalker().getPathfinder() != null && Microbot.getWalker().getPathfinder().getPath() != null && Microbot.getWalker().getPathfinder().getPath().size() > 0) {
             Color color;
             if (Microbot.getWalker().getPathfinder().isDone()) {
                 color = new Color(
@@ -156,8 +156,17 @@ public class PathTileOverlay {
     }
 
     private static void drawLine(Graphics2D graphics, WorldPoint startLoc, WorldPoint endLoc, Color color) {
-        WorldPoint start = WorldPoint.toLocalInstance(Microbot.getClient(), startLoc).iterator().next();
-        WorldPoint end = WorldPoint.toLocalInstance(Microbot.getClient(), endLoc).iterator().next();
+        WorldPoint start;
+        WorldPoint end;
+
+        if (WorldPoint.toLocalInstance(Microbot.getClient(), startLoc).iterator().hasNext()) {
+             start = WorldPoint.toLocalInstance(Microbot.getClient(), startLoc).iterator().next();
+             end = WorldPoint.toLocalInstance(Microbot.getClient(), endLoc).iterator().next();
+        } else {
+             start = startLoc;
+             end = endLoc;
+        }
+
 
         final int z = Microbot.getClient().getPlane();
         if (start.getPlane() != z) {

@@ -47,6 +47,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
+import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -170,6 +171,11 @@ class PluginListItem extends JPanel implements SearchablePlugin
 		buttonPanel.add(onOffToggle);
 		if (pluginConfig.getPlugin() != null)
 		{
+			PluginDescriptor pluginDescriptor = pluginConfig.getPlugin().getClass().getAnnotation(PluginDescriptor.class);
+			if (pluginDescriptor.alwaysOn()) {
+				onOffToggle.setEnabled(false);
+				onOffToggle.setSelected(true);
+			}
 			onOffToggle.addActionListener(i ->
 			{
 				if (onOffToggle.isSelected())

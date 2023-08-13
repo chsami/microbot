@@ -668,7 +668,6 @@ public final class NpcID
 	public static final int GIANT_SKELETON_681 = 681;
 	public static final int DAMIS = 682;
 	public static final int DAMIS_683 = 683;
-	public static final int ARCHAEOLOGIST = 684;
 	public static final int STRANGER = 685;
 	public static final int MALAK = 686;
 	public static final int BARTENDER = 687;
