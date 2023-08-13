@@ -5,6 +5,8 @@ Microbot is an opensource automated oldschool runescape client based on runelite
  
 If you have any questions, please join our [Discord](https://discord.gg/zaGrfqFEWE) server.
 
+Documentation coming soon.
+
 ## Project Layout
 
 - [cache](cache/src/main/java/net/runelite/cache) - Libraries used for reading/writing cache files, as well as the data in it
