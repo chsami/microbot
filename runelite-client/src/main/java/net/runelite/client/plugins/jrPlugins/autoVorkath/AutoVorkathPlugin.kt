@@ -91,6 +91,7 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun run() {
         while (running) {
+            if (Microbot.pauseAllScripts){ return }
             val vorkath = Rs2Npc.getNpc("vorkath")
             // Check if player is in Vorkath Area
             if (vorkath != null && vorkath.isInteracting) {
