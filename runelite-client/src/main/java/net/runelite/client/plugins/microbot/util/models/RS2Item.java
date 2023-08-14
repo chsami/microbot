@@ -25,15 +25,4 @@ public class RS2Item {
         this.tile = tile;
         this.tileItem = tileItem;
     }
-
-    public boolean lootItem(String lootItem) {
-        LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), getTile().getWorldLocation());
-        Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, getTile().getItemLayer().getHeight());
-        if (Camera.isTileOnScreen(getTile().getLocalLocation())) {
-            return Rs2Menu.doAction("Take", poly, new String[]{lootItem.toLowerCase()});
-        } else {
-            Camera.turnTo(getTile().getLocalLocation());
-        }
-        return false;
-    }
 }

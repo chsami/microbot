@@ -89,6 +89,14 @@ public class Inventory {
         });
     }
 
+    public static boolean isInventoryFull(int itemId) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget inventoryWidget = getInventory();
+            if (hasItemStackable(itemId)) return false;
+            return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == 28;
+        });
+    }
+
     public static boolean isEmpty() {
         return hasAmountInventoryItems(0);
     }
@@ -108,6 +116,21 @@ public class Inventory {
                     ItemComposition itemComp = Microbot.getItemManager().getItemComposition(x.getItemId());
                     if (itemComp.getNote() == 799 || itemComp.isStackable()) {
                         return itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().equals(itemName.toLowerCase());
+                    } else {
+                        return false;
+                    }
+                });
+    }
+
+    public static boolean hasItemStackable(int itemId) {
+        Microbot.status = "Checking inventory has stackable item " + itemId;
+        Widget inventoryWidget = getInventory();
+
+        return Arrays.stream(inventoryWidget.getDynamicChildren())
+                .anyMatch(x -> {
+                    ItemComposition itemComp = Microbot.getItemManager().getItemComposition(x.getItemId());
+                    if (itemComp.getNote() == 799 || itemComp.isStackable()) {
+                        return itemExistsInInventory(x) && x.getItemId() == itemId;
                     } else {
                         return false;
                     }

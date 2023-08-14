@@ -228,18 +228,22 @@ public class Rs2Npc {
     }
 
     public static void handleMenuSwapper(MenuEntry menuEntry) {
-        if (Rs2Npc.npcInteraction == null) return;
-        menuEntry.setIdentifier(Rs2Npc.npcInteraction.getIndex());
+        if (npcInteraction == null) return;
+        menuEntry.setIdentifier(npcInteraction.getIndex());
         menuEntry.setParam0(0);
-        menuEntry.setTarget("<col=ffff00>" + Rs2Npc.npcInteraction.getName() + "<col=ff00>  (level-" + Rs2Npc.npcInteraction.getCombatLevel() + ")");
+        menuEntry.setTarget("<col=ffff00>" + npcInteraction.getName() + "<col=ff00>  (level-" + npcInteraction.getCombatLevel() + ")");
         menuEntry.setParam1(0);
         menuEntry.setOption(Rs2Npc.npcAction);
-        if (Rs2Npc.npcAction.toLowerCase().equals("talk-to")) {
+        if (npcAction.toLowerCase().equals("talk-to")) {
             menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
-        } else if (Rs2Npc.npcAction.toLowerCase().equals("attack")) {
+        } else if (npcAction.toLowerCase().equals("attack")) {
             menuEntry.setType(MenuAction.NPC_SECOND_OPTION);
-        } else if (Rs2Npc.npcAction.toLowerCase().equals("pickpocket")) {
+        } else if (npcAction.toLowerCase().equals("pickpocket") || npcAction.toLowerCase().equals("bank")) {
             menuEntry.setType(MenuAction.NPC_THIRD_OPTION);
+        } else if (npcAction.toLowerCase().equals("collect")) {
+            menuEntry.setType(MenuAction.NPC_FOURTH_OPTION);
+        } else {
+            menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
         }
     }
 }

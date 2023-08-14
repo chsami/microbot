@@ -26,6 +26,7 @@ import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -131,6 +132,10 @@ public class MicrobotPlugin extends Plugin {
         }
 
         Rs2Npc.handleMenuSwapper(event.getMenuEntry());
+        Rs2GameObject.handleMenuSwapper(event.getMenuEntry());
+        Rs2GroundItem.handleMenuSwapper(event.getMenuEntry());
+        Rs2Prayer.handleMenuSwapper(event.getMenuEntry());
+        Rs2Magic.handleMenuSwapper(event.getMenuEntry());
 
         if (Rs2Menu.getOption().length() > 0) {
             final MenuEntry[] menuEntries = client.getMenuEntries();
@@ -146,36 +151,6 @@ public class MicrobotPlugin extends Plugin {
                     client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals(Rs2Menu.getOption().toLowerCase())).toArray(MenuEntry[]::new));
                 }
             }
-        }
-        if (Rs2Bank.objectToBank != null) {
-            final MenuEntry[] menuEntries = client.getMenuEntries();
-            client.setMenuEntries(new MenuEntry[]{});
-            if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals("bank".toLowerCase()))) {
-                client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals("bank".toLowerCase())).toArray(MenuEntry[]::new));
-            }
-        }
-        if (Rs2GameObject.objectToInteract != null && Rs2GameObject.objectAction != null) {
-            final MenuEntry[] menuEntries = client.getMenuEntries();
-            client.setMenuEntries(new MenuEntry[]{});
-            if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals(Rs2GameObject.objectAction.toLowerCase()))) {
-                client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals(Rs2GameObject.objectAction.toLowerCase())).toArray(MenuEntry[]::new));
-            }
-        }
-
-        if (Rs2Prayer.prayIndex > 0) {
-            event.getMenuEntry().setOption("Activate");
-            event.getMenuEntry().setIdentifier(1);
-            event.getMenuEntry().setParam0(-1);
-            event.getMenuEntry().setType(MenuAction.CC_OP);
-            event.getMenuEntry().setParam1(Rs2Prayer.prayIndex);
-        }
-        if (Rs2Magic.widgetId > 0) {
-            event.getMenuEntry().setOption("Cast");
-            event.getMenuEntry().setIdentifier(1);
-            event.getMenuEntry().setParam0(-1);
-            event.getMenuEntry().setTarget("<col=00ff00>" + Rs2Magic.widgetName + "</col>");
-            event.getMenuEntry().setType(Rs2Magic.widgetAction);
-            event.getMenuEntry().setParam1(Rs2Magic.widgetId);
         }
     }
 

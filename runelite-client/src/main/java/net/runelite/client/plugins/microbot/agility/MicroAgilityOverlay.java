@@ -35,6 +35,11 @@ public class MicroAgilityOverlay extends OverlayPanel {
                     .right(Integer.toString(Microbot.getClient().getSkillExperience(Skill.AGILITY)))
                     .build());
 
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("current obstacle")
+                    .right(Integer.toString(AgilityScript.currentObstacle))
+                    .build());
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }

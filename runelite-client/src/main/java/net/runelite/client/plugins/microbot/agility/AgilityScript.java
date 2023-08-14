@@ -1,7 +1,8 @@
 package net.runelite.client.plugins.microbot.agility;
 
-import net.runelite.api.*;
-import net.runelite.api.Point;
+import net.runelite.api.Skill;
+import net.runelite.api.Tile;
+import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.agility.AgilityPlugin;
@@ -10,20 +11,17 @@ import net.runelite.client.plugins.agility.Obstacles;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.agility.models.AgilityObstacleModel;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.math.Calculations;
-import net.runelite.client.plugins.worldmap.AgilityCourseLocation;
+import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
+import net.runelite.client.plugins.microbot.util.models.RS2Item;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.*;
+import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.GNOME_STRONGHOLD_AGILITY_COURSE;
 
 public class AgilityScript extends Script {
 
@@ -95,7 +93,7 @@ public class AgilityScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                final List<Tile> marksOfGrace = AgilityPlugin.getMarksOfGrace();
+                final List<RS2Item> marksOfGrace = AgilityPlugin.getMarksOfGrace();
                 final LocalPoint playerLocation = Microbot.getClient().getLocalPlayer().getLocalLocation();
                 final WorldPoint playerWorldLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
@@ -109,24 +107,23 @@ public class AgilityScript extends Script {
                 if (Microbot.getClient().getPlane() == 0 && playerWorldLocation.distanceTo(startCourse) > 6 && config.agilityCourse() != GNOME_STRONGHOLD_AGILITY_COURSE) {
                     currentObstacle = 0;
                     LocalPoint startCourseLocal = LocalPoint.fromWorld(Microbot.getClient(), startCourse);
-                    if (!Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), startCourse))
-                            || playerLocation.distanceTo(startCourseLocal) >= MAX_DISTANCE) {
+                    if (playerLocation.distanceTo(startCourseLocal) >= MAX_DISTANCE) {
                         Microbot.getWalker().walkTo(startCourse, false);
                         return;
                     }
                 }
 
                 if (!marksOfGrace.isEmpty()) {
-                    for (Tile markOfGraceTile : marksOfGrace) {
-                        if (Microbot.getClient().getPlane() != markOfGraceTile.getPlane()) continue;
+                    for (RS2Item markOfGraceTile : marksOfGrace) {
+                        if (Microbot.getClient().getPlane() != markOfGraceTile.getTile().getPlane()) continue;
                         //seers needs 7, falador needs 5 for the distance to
-                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(markOfGraceTile.getWorldLocation()) > 7)
+                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(markOfGraceTile.getTile().getWorldLocation()) > 7)
                             continue;
-                        Rs2GameObject.interact(markOfGraceTile);
-                        sleepUntil(() -> marksOfGrace.isEmpty());
+                        Rs2GroundItem.loot(markOfGraceTile.getItem().getId());
+                        sleepUntil(() -> markOfGraceTile.getTile().getGroundItems() == null || markOfGraceTile.getTile().getGroundItems().isEmpty());
                         if (!marksOfGrace.isEmpty()) {
-                            Rs2GameObject.interact(markOfGraceTile);
-                            sleepUntil(() -> marksOfGrace.isEmpty());
+                            Rs2GroundItem.loot(markOfGraceTile.getItem().getId());
+                            sleepUntil(() -> markOfGraceTile.getTile().getGroundItems() == null || markOfGraceTile.getTile().getGroundItems().isEmpty());
                         }
                         break;
                     }
@@ -149,26 +146,17 @@ public class AgilityScript extends Script {
                             }
                             return;
                         }
-                        Shape objectClickbox = object.getClickbox();
-                        if (objectClickbox != null) {
-                            AgilityObstacleModel courseObstacle = getCurrentCourse(config).get(currentObstacle);
-                            final int agilityExp = Microbot.getClient().getSkillExperience(Skill.AGILITY);
-                            //exception for weird objects
-                            if (courseObstacle.getObjectID() == ObjectID.TALL_TREE_14843) {
-                                WorldPoint worldPoint = new WorldPoint(3508, 3489, 0);
-                                LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
-                                Point point = Perspective.localToCanvas(Microbot.getClient(), localPoint, 0);
-                                Microbot.getMouse().click(point);
-                                if (waitForAgilityObstabcleToFinish(agilityExp))
-                                    break;
-                            } else if (Rs2GameObject.interact(courseObstacle.getObjectID())) {
-                                if (waitForAgilityObstabcleToFinish(agilityExp))
-                                    break;
-                            }
 
-                            if (Obstacles.PORTAL_OBSTACLE_IDS.contains(object.getId())) {
-                                //empty for now
-                            }
+                        AgilityObstacleModel courseObstacle = getCurrentCourse(config).get(currentObstacle);
+                        final int agilityExp = Microbot.getClient().getSkillExperience(Skill.AGILITY);
+                        //exception for weird objects
+                         if (Rs2GameObject.interact(courseObstacle.getObjectID())) {
+                            if (waitForAgilityObstabcleToFinish(agilityExp))
+                                break;
+                        }
+
+                        if (Obstacles.PORTAL_OBSTACLE_IDS.contains(object.getId())) {
+                            //empty for now
                         }
                     }
                 }

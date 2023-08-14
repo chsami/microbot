@@ -73,6 +73,8 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.models.RS2Item;
 import net.runelite.client.plugins.xptracker.XpTrackerPlugin;
 import net.runelite.client.plugins.xptracker.XpTrackerService;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -97,7 +99,7 @@ public class AgilityPlugin extends Plugin
 	private static final Map<TileObject, Obstacle> obstacles = new HashMap<>();
 
 	@Getter
-	private static final List<Tile> marksOfGrace = new ArrayList<>();
+	private static final List<RS2Item> marksOfGrace = new ArrayList<>();
 
 	@Getter
 	private final Set<NPC> npcs = new HashSet<>();
@@ -251,7 +253,8 @@ public class AgilityPlugin extends Plugin
 
 		if (item.getId() == ItemID.MARK_OF_GRACE)
 		{
-			marksOfGrace.add(tile);
+			RS2Item rs2Item = new RS2Item(Microbot.getItemManager().getItemComposition(item.getId()), tile, item);
+			marksOfGrace.add(rs2Item);
 		}
 
 		if (item.getId() == ItemID.STICK)

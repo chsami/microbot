@@ -1,22 +1,28 @@
 package net.runelite.client.plugins.microbot.util.grounditem;
 
-import net.runelite.api.Perspective;
-import net.runelite.api.Tile;
-import net.runelite.api.TileItem;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class GroundItem {
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+
+public class Rs2GroundItem {
+
+    public static RS2Item itemInteraction;
+public static String itemAction;
     /**
      * Returns all the ground items at a tile on the current plane.
      *
@@ -57,7 +63,7 @@ public class GroundItem {
     }
 
     public static RS2Item[] getAll(int range) {
-        ArrayList<RS2Item> temp = new ArrayList<>();
+        List<RS2Item> temp = new ArrayList<>();
         int pX = Microbot.getClient().getLocalPlayer().getWorldLocation().getX();
         int pY = Microbot.getClient().getLocalPlayer().getWorldLocation().getY();
         int minX = pX - range, minY = pY - range;
@@ -74,6 +80,12 @@ public class GroundItem {
                     }
             }
         }
+        //sort on closest item first
+        temp = temp.stream().sorted(Comparator
+                .comparingInt(value -> value.getTile().getLocalLocation()
+                        .distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toList());
+
         return temp.toArray(new RS2Item[temp.size()]);
     }
 
@@ -81,79 +93,90 @@ public class GroundItem {
         return loot(lootItem, 1, range);
     }
 
-    public static boolean loot(String lootItem, int quantity, int range) {
+    public static boolean pickup(String lootItem, int range) {
+        return loot(lootItem, 1, range);
+    }
+
+    public static boolean take(String lootItem, int range) {
+        return loot(lootItem, 1, range);
+    }
+
+    public static boolean loot(String lootItem, int minQuantity, int range) {
         if (Inventory.isInventoryFull(lootItem)) return false;
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
-                GroundItem.getAll(range)
+                Rs2GroundItem.getAll(range)
         );
         for (RS2Item rs2Item : groundItems) {
-            if (rs2Item.getItem().getName().toLowerCase().equals(lootItem.toLowerCase()) && rs2Item.getTileItem().getQuantity() >= quantity) {
-                LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), rs2Item.getTile().getWorldLocation());
-                Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, rs2Item.getTile().getItemLayer().getHeight());
-                if (Camera.isTileOnScreen(rs2Item.getTile().getLocalLocation())) {
-                    if (rs2Item.getTileItem().getQuantity() > 1) {
-                        lootItem = lootItem + " (" + rs2Item.getTileItem().getQuantity() + ")";
-                    }
-                    if (Rs2Menu.doAction("Take", poly, new String[]{lootItem.toLowerCase()})) {
-                        Microbot.pauseAllScripts = true;
-                        Global.sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().equals(rs2Item.getTile().getLocalLocation()), 5000);
-                        return true;
-                    }
-                } else {
-                    Camera.turnTo(rs2Item.getTile().getLocalLocation());
-                }
+            if (rs2Item.getItem().getName().toLowerCase().equals(lootItem.toLowerCase()) && rs2Item.getTileItem().getQuantity() >= minQuantity) {
+                interact(rs2Item);
+                return true;
             }
         }
         return false;
     }
 
+    public static boolean loot(int itemId) {
+        if (Inventory.isInventoryFull(itemId)) return false;
+        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
+                Rs2GroundItem.getAll(255)
+        );
+        for (RS2Item rs2Item : groundItems) {
+            if (rs2Item.getItem().getId() == itemId) {
+                interact(rs2Item);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean pickup(int itemId) {
+        return loot(itemId);
+    }
+
+    public static boolean take(int itemId) {
+        return loot(itemId);
+    }
+
+    private static boolean interact(RS2Item rs2Item, String action) {
+        if (rs2Item == null) return false;
+        try {
+            itemInteraction = rs2Item;
+            itemAction = action;
+            Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            sleep(100);
+            itemInteraction = null;
+            itemAction = "";
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return true;
+    }
+
+    private static boolean interact(RS2Item rs2Item) {
+        return interact(rs2Item, "Take");
+    }
+
+    public static boolean interact(String itemName, String action) {
+        return interact(itemName, action, 255);
+    }
+
     public static boolean interact(String itemName, String action, int range) {
-        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> GroundItem.getAll(range));
+        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> Rs2GroundItem.getAll(range));
         for (RS2Item rs2Item : groundItems) {
             if (rs2Item.getItem().getName().toLowerCase().equals(itemName.toLowerCase())) {
-                LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), rs2Item.getTile().getWorldLocation());
-                Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, rs2Item.getTile().getItemLayer().getHeight());
-                if (Camera.isTileOnScreen(rs2Item.getTile().getLocalLocation())) {
-                    if (rs2Item.getTileItem().getQuantity() > 1) {
-                        itemName = itemName + " (" + rs2Item.getTileItem().getQuantity() + ")";
-                    }
-                    if (Rs2Menu.doAction(action, poly, new String[]{itemName.toLowerCase()})) {
-                        Microbot.pauseAllScripts = true;
-                        Global.sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().equals(rs2Item.getTile().getLocalLocation()), 5000);
-                        return true;
-                    }
-                } else {
-                    Camera.turnTo(rs2Item.getTile().getLocalLocation());
-                }
+                interact(rs2Item, action);
+                return true;
             }
         }
         return false;
     }
 
     public static boolean interact(int itemId, String action, int range) {
-        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> GroundItem.getAll(range));
+        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> Rs2GroundItem.getAll(range));
         for (RS2Item rs2Item : groundItems) {
             if (rs2Item.getItem().getId() == itemId) {
-                LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), rs2Item.getTile().getWorldLocation());
-                Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, rs2Item.getTile().getItemLayer().getHeight());
-                if (Camera.isTileOnScreen(rs2Item.getTile().getLocalLocation())) {
-                    if (rs2Item.getTileItem().getQuantity() > 1) {
-                        String itemName = rs2Item.getItem().getName() + " (" + rs2Item.getTileItem().getQuantity() + ")";
-                        if (Rs2Menu.doAction(action, poly, new String[]{itemName.toLowerCase()})) {
-                            Microbot.pauseAllScripts = true;
-                            Global.sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().equals(rs2Item.getTile().getLocalLocation()), 5000);
-                            return true;
-                        }
-                    } else {
-                        if (Rs2Menu.doAction(action, poly)) {
-                            Microbot.pauseAllScripts = true;
-                            Global.sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().equals(rs2Item.getTile().getLocalLocation()), 5000);
-                            return true;
-                        }
-                    }
-                } else {
-                    Camera.turnTo(rs2Item.getTile().getLocalLocation());
-                }
+                interact(rs2Item, action);
+                return true;
             }
         }
         return false;
@@ -164,17 +187,7 @@ public class GroundItem {
         if (itemsAtTile != null) {
             for (RS2Item item : itemsAtTile) {
                 if (item.getItem().getName().equalsIgnoreCase(itemName)) {
-                    LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), item.getTile().getWorldLocation());
-                    Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, item.getTile().getItemLayer().getHeight());
-                    if (Camera.isTileOnScreen(item.getTile().getLocalLocation())) {
-                        if (Rs2Menu.doAction(action, poly, new String[]{itemName.toLowerCase()})) {
-                            Microbot.pauseAllScripts = true;
-                            Global.sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().equals(item.getTile().getLocalLocation()), 5000);
-                            return true;
-                        }
-                    } else {
-                        Camera.turnTo(item.getTile().getLocalLocation());
-                    }
+                    interact(item, action);
                 }
             }
         }
@@ -204,7 +217,7 @@ public class GroundItem {
     }
 
     public static boolean exists(String itemName, int range) {
-        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> GroundItem.getAll(range));
+        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> Rs2GroundItem.getAll(range));
         for (RS2Item rs2Item : groundItems) {
             if (rs2Item.getItem().getName().toLowerCase().equals(itemName.toLowerCase())) {
                 return true;
@@ -214,7 +227,7 @@ public class GroundItem {
     }
 
     public static boolean exists(int itemId, int range) {
-        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> GroundItem.getAll(range));
+        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> Rs2GroundItem.getAll(range));
         for (RS2Item rs2Item : groundItems) {
             if (rs2Item.getItem().getId() == itemId) {
                 return true;
@@ -235,4 +248,17 @@ public class GroundItem {
         return false;
     }
 
+    public static void handleMenuSwapper(MenuEntry menuEntry) {
+        if (itemInteraction == null) return;
+        menuEntry.setIdentifier(itemInteraction.getTileItem().getId());
+        menuEntry.setParam0(itemInteraction.getTile().getLocalLocation().getSceneX());
+        menuEntry.setTarget("<col=ff9040>" + itemInteraction.getItem().getName());
+        menuEntry.setParam1(itemInteraction.getTile().getLocalLocation().getSceneY());
+        menuEntry.setOption(itemAction);
+        if (itemAction.toLowerCase().equals("lay")) {
+            menuEntry.setType(MenuAction.GROUND_ITEM_FOURTH_OPTION);
+        } else {
+            menuEntry.setType(MenuAction.GROUND_ITEM_THIRD_OPTION);
+        }
+    }
 }

@@ -10,7 +10,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
-import net.runelite.client.plugins.microbot.util.grounditem.GroundItem;
+import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -61,13 +61,13 @@ public class LootScript extends Script {
             if (!super.run()) return;
             if (config.toggleLootArrows()) {
                 for (String lootItem : Arrays.asList("bronze arrow", "iron arrow", "steel arrow", "mithril arrow", "adamant arrow", "rune arrow", "dragon arrow")) {
-                    if (GroundItem.loot(lootItem, 13, 14))
+                    if (Rs2GroundItem.loot(lootItem, 13, 14))
                         break;
                 }
             }
             if (!config.toggleLootItems()) return;
             for (String lootItem : lootItems) {
-                if (GroundItem.loot(lootItem, 14))
+                if (Rs2GroundItem.loot(lootItem, 14))
                     break;
             }
             Global.sleep(2000, 4000);

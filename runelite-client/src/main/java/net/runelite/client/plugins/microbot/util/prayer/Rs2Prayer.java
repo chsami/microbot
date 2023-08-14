@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.util.prayer;
 
+import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.Varbits;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -165,5 +167,14 @@ public class Rs2Prayer {
         Widget rangePray = Microbot.getClient().getWidget(35454999);
         if (rangePray == null) return;
         Microbot.getMouse().click(rangePray.getBounds());
+    }
+
+    public static void handleMenuSwapper(MenuEntry menuEntry) {
+        if (prayIndex == 0) return;
+        menuEntry.setOption("Activate");
+        menuEntry.setIdentifier(1);
+        menuEntry.setParam0(-1);
+        menuEntry.setType(MenuAction.CC_OP);
+        menuEntry.setParam1(Rs2Prayer.prayIndex);
     }
 }

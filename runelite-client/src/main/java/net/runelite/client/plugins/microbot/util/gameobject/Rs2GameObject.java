@@ -5,7 +5,9 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 
 import java.util.ArrayList;
@@ -36,10 +38,6 @@ public class Rs2GameObject {
 
     public static boolean interact(GameObject gameObject, String action) {
         return clickObject(gameObject, action);
-    }
-
-    public static boolean interact(Tile tile) {
-        return clickObject(tile);
     }
 
     public static boolean interact(int id) {
@@ -74,11 +72,6 @@ public class Rs2GameObject {
     public static boolean interact(String objectName) {
         GameObject object = findObject(objectName, true);
         return clickObject(object);
-    }
-
-    public static boolean interact(String objectName, String action) {
-        GameObject object = findObject(objectName, true);
-        return Rs2Menu.doAction(action, object.getClickbox().getBounds());
     }
 
     public static boolean interactByOptionName(String action) {
@@ -582,34 +575,50 @@ public class Rs2GameObject {
     }
 
     private static boolean clickObject(TileObject object) {
-        if (object != null && object.getClickbox() != null) {
-            Microbot.getMouse().click(object.getClickbox().getBounds());
-            return true;
-        }
-        return false;
+        return clickObject(object, "");
     }
 
-    private static boolean clickObject(Tile tile) {
-        if (tile != null) {
-            Point p = Perspective.localToCanvas(Microbot.getClient(), tile.getLocalLocation(), Microbot.getClient().getPlane());
-            Microbot.getMouse().click(p);
-            return true;
+    private static boolean clickObject(TileObject object, String action) {
+        if (object == null) return false;
+        try {
+            objectToInteract = object;
+            objectAction = action;
+            Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            sleep(100);
+            objectToInteract = null;
+            objectAction = null;
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
         }
-        return false;
-    }
 
-    private static boolean clickObject(TileObject object, String optionName) {
-        if (object == null || object.getClickbox() == null) return false;
-        objectToInteract = object;
-        objectAction = optionName;
-        Microbot.getMouse().click(object.getClickbox().getBounds());
-        sleep(200, 300);
-        objectToInteract = null;
-        objectAction = "";
         return true;
     }
 
-    public static void findObjectByIndex(int index) {
+    public static void handleMenuSwapper(MenuEntry menuEntry) {
+        if (objectToInteract == null) return;
+        menuEntry.setIdentifier(objectToInteract.getId());
 
+        if (((GameObject) objectToInteract).sizeX() > 1) {
+            int offset = ((GameObject) objectToInteract).sizeX() / 2;
+            menuEntry.setParam0(objectToInteract.getLocalLocation().getSceneX() - offset);
+        }  else {
+            menuEntry.setParam0(objectToInteract.getLocalLocation().getSceneX());
+        }
+        if (((GameObject) objectToInteract).sizeY() > 1) {
+            int offset = ((GameObject) objectToInteract).sizeY() / 2;
+            menuEntry.setParam1(objectToInteract.getLocalLocation().getSceneY() - offset);
+        }  else {
+            menuEntry.setParam1(objectToInteract.getLocalLocation().getSceneY());
+        }
+
+        menuEntry.setTarget("");
+        menuEntry.setOption(objectAction);
+        if (objectAction.toLowerCase().equals("bank")) {
+            menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
+        } else if (objectAction.toLowerCase().equals("collect")) {
+            menuEntry.setType(MenuAction.GAME_OBJECT_THIRD_OPTION);
+        } else {
+            menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
+        }
     }
 }

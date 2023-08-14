@@ -12,10 +12,9 @@ import net.runelite.client.config.ConfigManager
 import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
-import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
-import net.runelite.client.plugins.microbot.util.grounditem.GroundItem
+import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
 import net.runelite.client.ui.overlay.OverlayManager
 import javax.inject.Inject
 
@@ -107,9 +106,9 @@ class AutoChin: Plugin() {
     private fun handleIdleState() {
         try {
             // If there are box traps on the floor, interact with them first
-            val groundBox = GroundItem.exists(ItemID.BOX_TRAP, 4)
+            val groundBox = Rs2GroundItem.exists(ItemID.BOX_TRAP, 4)
             if (groundBox == true) {
-                GroundItem.interact(ItemID.BOX_TRAP, "lay" , 4)
+                Rs2GroundItem.interact(ItemID.BOX_TRAP, "lay" , 4)
                 currentState = State.LAYING
                 return
             }

@@ -68,4 +68,14 @@ public class Rs2Magic {
         sleep(300, 600);
         Microbot.getMouse().click(point);
     }
+
+    public static void handleMenuSwapper(MenuEntry menuEntry) {
+        if (widgetId == 0) return;
+        menuEntry.setOption("Cast");
+        menuEntry.setIdentifier(1);
+        menuEntry.setParam0(-1);
+        menuEntry.setTarget("<col=00ff00>" + Rs2Magic.widgetName + "</col>");
+        menuEntry.setType(Rs2Magic.widgetAction);
+        menuEntry.setParam1(Rs2Magic.widgetId);
+    }
 }
