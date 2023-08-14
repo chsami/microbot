@@ -617,6 +617,8 @@ public class Rs2GameObject {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
         } else if (objectAction.toLowerCase().equals("collect")) {
             menuEntry.setType(MenuAction.GAME_OBJECT_THIRD_OPTION);
+        }else if (objectAction.toLowerCase().equals("reset")) {
+            menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
         } else {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
         }
