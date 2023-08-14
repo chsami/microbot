@@ -17,4 +17,12 @@ public interface AutoChinConfig extends Config {
     default String GUIDE() {
         return "1. Place your box traps down \n2. Enable Plugin";
     }
+
+    @ConfigItem(
+            keyName = "overlay",
+            name = "Enable Overlay",
+            description = "Enable Overlay?",
+            position = 1
+    )
+    default boolean overlay() { return true; }
 }

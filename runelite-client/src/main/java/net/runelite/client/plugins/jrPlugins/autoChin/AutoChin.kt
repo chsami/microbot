@@ -12,7 +12,6 @@ import net.runelite.client.config.ConfigManager
 import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
-import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.grounditem.GroundItem
@@ -34,6 +33,9 @@ class AutoChin: Plugin() {
 
     @Inject
     private lateinit var autoChinOverlay: AutoChinOverlay
+
+    @Inject
+    private lateinit var config: AutoChinConfig
 
     @Provides
     fun getConfig(configManager: ConfigManager): AutoChinConfig {
@@ -81,7 +83,7 @@ class AutoChin: Plugin() {
 
         if (client.getLocalPlayer() != null) {
             running = true
-            if (overlayManager != null) {
+            if (overlayManager != null && config.overlay()) {
                 overlayManager.add(autoChinOverlay)
             }
             GlobalScope.launch { run() }
@@ -107,25 +109,19 @@ class AutoChin: Plugin() {
     private fun handleIdleState() {
         try {
             // If there are box traps on the floor, interact with them first
-            val groundBox = GroundItem.exists(ItemID.BOX_TRAP, 4)
-            if (groundBox == true) {
-                GroundItem.interact(ItemID.BOX_TRAP, "lay" , 4)
+            if (GroundItem.interact(ItemID.BOX_TRAP, "lay" , 4)) {
                 currentState = State.LAYING
                 return
             }
 
             // If there are shaking boxes, interact with them
-            val shakingBox = Rs2GameObject.findObject("shaking box")
-            if (shakingBox != null) {
-                Rs2GameObject.interact(ObjectID.SHAKING_BOX_9383, "reset", 4)
+            if (Rs2GameObject.interact(ObjectID.SHAKING_BOX_9383, "reset", 4)) {
                 currentState = State.CATCHING
                 return
             }
 
             // Interact with traps that have not caught anything
-            val boxTrap = Rs2GameObject.findObject(ObjectID.BOX_TRAP_9385)
-            if (boxTrap != null) {
-                Rs2GameObject.interact(ObjectID.BOX_TRAP_9385, "reset", 4)
+            if (Rs2GameObject.interact(ObjectID.BOX_TRAP_9385, "reset", 4)) {
                 currentState = State.CATCHING
                 return
             }
@@ -136,7 +132,7 @@ class AutoChin: Plugin() {
     }
 
     private fun handleCatchingState() {
-        sleep(8000,8100)
+        sleep(8400,8500)
         currentState = State.IDLE
     }
 
