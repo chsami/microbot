@@ -107,24 +107,31 @@ class AutoChin: Plugin() {
     private fun handleIdleState() {
         try {
             // If there are box traps on the floor, interact with them first
-            if (GroundItem.interact(ItemID.BOX_TRAP, "lay" , 4)) {
+            val groundBox = GroundItem.exists(ItemID.BOX_TRAP, 4)
+            if (groundBox == true) {
+                GroundItem.interact(ItemID.BOX_TRAP, "lay" , 4)
                 currentState = State.LAYING
                 return
             }
 
             // If there are shaking boxes, interact with them
-            if (Rs2GameObject.interact(ObjectID.SHAKING_BOX_9383, "reset", 4)) {
+            val shakingBox = Rs2GameObject.findObject("shaking box")
+            if (shakingBox != null) {
+                Rs2GameObject.interact(ObjectID.SHAKING_BOX_9383, "reset", 4)
                 currentState = State.CATCHING
                 return
             }
 
             // Interact with traps that have not caught anything
-            if (Rs2GameObject.interact(ObjectID.BOX_TRAP_9385, "reset", 4)) {
+            val boxTrap = Rs2GameObject.findObject(ObjectID.BOX_TRAP_9385)
+            if (boxTrap != null) {
+                Rs2GameObject.interact(ObjectID.BOX_TRAP_9385, "reset", 4)
                 currentState = State.CATCHING
                 return
             }
         } catch (e: Exception) {
             //e.printStackTrace()
+            currentState = State.IDLE
         }
     }
 
