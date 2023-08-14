@@ -25,7 +25,7 @@ public class WoodcuttingScript  extends Script {
                     }
                     return;
                 }
-                Rs2GameObject.interact(config.TREE().getName());
+                Rs2GameObject.interact(config.TREE().getName(), config.TREE().getAction(), true);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

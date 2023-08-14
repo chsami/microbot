@@ -6,17 +6,18 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum WoodcuttingTree {
-    TREE("tree", 1),
-    OAK_LOG("oak tree", 15),
-    WILLOW("willow tree", 30),
-    MAPLE("maple tree", 45),
-    YEW("yew tree", 60),
-    MAGIC("magic tree", 75),
-    REDWOOD("redwood tree", 90);
+    TREE("tree", 1, "Chop down"),
+    OAK_LOG("oak tree", 15, "Chop down"),
+    WILLOW("willow tree", 30, "Chop down"),
+    MAPLE("maple tree", 45, "Chop down"),
+    YEW("yew tree", 60, "Chop down"),
+    MAGIC("magic tree", 75, "Chop down"),
+    REDWOOD("redwood tree", 90, "Cut");
 
 
     private final String name;
     private final int woodcuttingLevel;
+    private final String action;
 
     @Override
     public String toString() {
