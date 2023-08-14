@@ -44,6 +44,14 @@ class AutoChin: Plugin() {
 
     @Subscribe
     fun onGameTick(gameTick: GameTick?) {
+        if (overlayManager != null && config.overlay() && !overlayActive) {
+            overlayManager.add(autoChinOverlay)
+            overlayActive = true
+        }
+        if (overlayManager != null && !config.overlay() && overlayActive) {
+            overlayManager.remove(autoChinOverlay)
+            overlayActive = false
+        }
         time = getElapsedTime()
         xpGained = client.getSkillExperience(Skill.HUNTER) - startingXp.toLong()
         caught = xpGained / 265
@@ -67,6 +75,8 @@ class AutoChin: Plugin() {
     private var startingXp: Int = 0
     private var startingLvl: Int = 0
 
+    private var overlayActive = false
+
 
     enum class State {
         IDLE,
@@ -83,9 +93,6 @@ class AutoChin: Plugin() {
 
         if (client.getLocalPlayer() != null) {
             running = true
-            if (overlayManager != null && config.overlay()) {
-                overlayManager.add(autoChinOverlay)
-            }
             GlobalScope.launch { run() }
         }
     }
