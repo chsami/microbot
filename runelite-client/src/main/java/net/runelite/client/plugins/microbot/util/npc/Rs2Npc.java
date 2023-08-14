@@ -1,10 +1,9 @@
 package net.runelite.client.plugins.microbot.util.npc;
 
-import net.runelite.api.Actor;
-import net.runelite.api.NPC;
-import net.runelite.api.NPCComposition;
+import net.runelite.api.*;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.math.Random;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -184,18 +183,15 @@ public class Rs2Npc {
 
     public static boolean interact(NPC npc, String action) {
         if (npc == null) return false;
-        if (!Camera.isTileOnScreen(npc.getLocalLocation())) return false;
         try {
             npcInteraction = npc;
             npcAction = action;
+            Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
             sleep(100);
-            Microbot.getMouse().click(npc.getCanvasTilePoly().getBounds());
-            sleep(200);
-        } catch(Exception ex) {
-            System.out.println(ex.getMessage());
-        } finally {
             npcInteraction = null;
             npcAction = null;
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
         }
 
         return true;
@@ -223,5 +219,27 @@ public class Rs2Npc {
         NPC npc = getNpc(npcName);
 
         return interact(npc, action);
+    }
+
+    public static boolean pickpocket(String npcName) {
+        NPC npc = getNpc(npcName);
+
+        return interact(npc, "pickpocket");
+    }
+
+    public static void handleMenuSwapper(MenuEntry menuEntry) {
+        if (Rs2Npc.npcInteraction == null) return;
+        menuEntry.setIdentifier(Rs2Npc.npcInteraction.getIndex());
+        menuEntry.setParam0(0);
+        menuEntry.setTarget("<col=ffff00>" + Rs2Npc.npcInteraction.getName() + "<col=ff00>  (level-" + Rs2Npc.npcInteraction.getCombatLevel() + ")");
+        menuEntry.setParam1(0);
+        menuEntry.setOption(Rs2Npc.npcAction);
+        if (Rs2Npc.npcAction.toLowerCase().equals("talk-to")) {
+            menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
+        } else if (Rs2Npc.npcAction.toLowerCase().equals("attack")) {
+            menuEntry.setType(MenuAction.NPC_SECOND_OPTION);
+        } else if (Rs2Npc.npcAction.toLowerCase().equals("pickpocket")) {
+            menuEntry.setType(MenuAction.NPC_THIRD_OPTION);
+        }
     }
 }

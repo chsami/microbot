@@ -121,6 +121,7 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onMenuEntryAdded(MenuEntryAdded event) {
+
         final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
 
         if (map != null) {
@@ -128,6 +129,8 @@ public class MicrobotPlugin extends Plugin {
                 addMapMenuEntries(event);
             }
         }
+
+        Rs2Npc.handleMenuSwapper(event.getMenuEntry());
 
         if (Rs2Menu.getOption().length() > 0) {
             final MenuEntry[] menuEntries = client.getMenuEntries();
@@ -144,13 +147,6 @@ public class MicrobotPlugin extends Plugin {
                 }
             }
         }
-        if (Rs2Npc.npcInteraction != null && Rs2Npc.npcAction != null) {
-            final MenuEntry[] menuEntries = client.getMenuEntries();
-            client.setMenuEntries(new MenuEntry[]{});
-            if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals(Rs2Npc.npcAction.toLowerCase()) && x.getIdentifier() == Rs2Npc.npcInteraction.getIndex())) {
-                client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals(Rs2Npc.npcAction.toLowerCase()) && x.getIdentifier() == Rs2Npc.npcInteraction.getIndex()).toArray(MenuEntry[]::new));
-            }
-        }
         if (Rs2Bank.objectToBank != null) {
             final MenuEntry[] menuEntries = client.getMenuEntries();
             client.setMenuEntries(new MenuEntry[]{});
@@ -164,6 +160,22 @@ public class MicrobotPlugin extends Plugin {
             if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals(Rs2GameObject.objectAction.toLowerCase()))) {
                 client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals(Rs2GameObject.objectAction.toLowerCase())).toArray(MenuEntry[]::new));
             }
+        }
+
+        if (Rs2Prayer.prayIndex > 0) {
+            event.getMenuEntry().setOption("Activate");
+            event.getMenuEntry().setIdentifier(1);
+            event.getMenuEntry().setParam0(-1);
+            event.getMenuEntry().setType(MenuAction.CC_OP);
+            event.getMenuEntry().setParam1(Rs2Prayer.prayIndex);
+        }
+        if (Rs2Magic.widgetId > 0) {
+            event.getMenuEntry().setOption("Cast");
+            event.getMenuEntry().setIdentifier(1);
+            event.getMenuEntry().setParam0(-1);
+            event.getMenuEntry().setTarget("<col=00ff00>" + Rs2Magic.widgetName + "</col>");
+            event.getMenuEntry().setType(Rs2Magic.widgetAction);
+            event.getMenuEntry().setParam1(Rs2Magic.widgetId);
         }
     }
 
@@ -290,30 +302,6 @@ public class MicrobotPlugin extends Plugin {
                         .setType(MenuAction.RUNELITE)
                         .onClick(menuActionMinerConsumer( objectEntry.getIdentifier())));
             }
-        }
-    }
-
-    @Subscribe
-    public void onPostMenuSort(PostMenuSort postMenuSort)
-    {
-        if (Rs2Prayer.prayIndex > 0) {
-            MenuEntry entry = Microbot.getClient().getMenuEntries()[0];
-            entry.setOption("Activate");
-            entry.setIdentifier(1);
-            entry.setParam0(-1);
-            entry.setType(MenuAction.CC_OP);
-            entry.setParam1(Rs2Prayer.prayIndex);
-            Microbot.getClient().setMenuEntries(new MenuEntry[] {entry});
-        }
-        if (Rs2Magic.widgetId > 0) {
-            MenuEntry entry = Microbot.getClient().getMenuEntries()[0];
-            entry.setOption("Cast");
-            entry.setIdentifier(1);
-            entry.setParam0(-1);
-            entry.setTarget("<col=00ff00>" + Rs2Magic.widgetName + "</col>");
-            entry.setType(Rs2Magic.widgetAction);
-            entry.setParam1(Rs2Magic.widgetId);
-            Microbot.getClient().setMenuEntries(new MenuEntry[] {entry});
         }
     }
 

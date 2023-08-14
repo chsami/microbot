@@ -698,6 +698,7 @@ public class MenuEntrySwapperPlugin extends Plugin
 			if (type == MenuAction.EXAMINE_NPC)
 			{
 				final NPC npc = entry.getNpc();
+				if (npc == null) return;
 				assert npc != null;
 				final NPCComposition composition = npc.getTransformedComposition();
 				assert composition != null;
@@ -1476,6 +1477,7 @@ public class MenuEntrySwapperPlugin extends Plugin
 		if (NPC_MENU_TYPES.contains(menuAction))
 		{
 			final NPC npc = menuEntry.getNpc();
+			if (npc == null) return;
 			assert npc != null;
 			final NPCComposition composition = npc.getTransformedComposition();
 			assert composition != null;
@@ -1601,6 +1603,7 @@ public class MenuEntrySwapperPlugin extends Plugin
 			else if (NPC_MENU_TYPES.contains(type))
 			{
 				final NPC npc = menuEntry.getNpc();
+				if (npc == null) return;
 				assert npc != null;
 				final NPCComposition composition = npc.getTransformedComposition();
 				assert composition != null;

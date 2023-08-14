@@ -1,7 +1,13 @@
 package net.runelite.client.plugins.microbot.example;
 
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 
@@ -14,8 +20,9 @@ public class ExampleScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                //Rs2Magic.cast(MagicAction.VARROCK_TELEPORT);
-                //System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+                Rs2Npc.pickpocket("master farmer");
+               // Rs2Magic.cast(MagicAction.VARROCK_TELEPORT);
+                System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
@@ -26,5 +33,6 @@ public class ExampleScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
+        Rs2Npc.npcInteraction = null;
     }
 }
