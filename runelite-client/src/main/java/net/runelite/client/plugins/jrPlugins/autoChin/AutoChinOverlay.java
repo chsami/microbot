@@ -23,9 +23,6 @@ public class AutoChinOverlay extends OverlayPanel {
                     .text("Auto Chin V" + AutoChin.version)
                     .color(Color.GREEN)
                     .build());
-
-            panelComponent.getChildren().add(LineComponent.builder().build());
-
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Current State: " + AutoChin.currentState.toString())
                     .build());
