@@ -131,7 +131,7 @@ class AutoChin: Plugin() {
             }
         } catch (e: Exception) {
             //e.printStackTrace()
-            currentState = State.IDLE
+            currentState = State.CATCHING
         }
     }
 
