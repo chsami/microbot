@@ -17,6 +17,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
+import net.runelite.client.plugins.microbot.util.prayer.Prayer
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
 import net.runelite.client.plugins.microbot.util.walker.Walker
 import javax.inject.Inject
@@ -128,14 +129,14 @@ class AutoVorkathPlugin : Plugin() {
                 when (botState) {
                     State.RANGE -> if ((clientThread.runOnClientThread { client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 0 }) || previousBotState != State.RANGE) {
                         previousBotState = State.RANGE
-                        Rs2Prayer.turnOnFastRangePrayer()
-                        if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOnFastRigour()}
+                        Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true)
+                        if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, true) }
                         walkToCenterLocation(isPlayerInCenterLocation())
                     }
                     State.ZOMBIFIED_SPAWN -> if (previousBotState != State.ZOMBIFIED_SPAWN) {
                         previousBotState = State.ZOMBIFIED_SPAWN
-                        Rs2Prayer.turnOffFastRangePrayer()
-                        if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOffFastRigour()}
+                        Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
+                        if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
                         Inventory.useItem(config.SLAYERSTAFF().toString())
                         eatAt(75)
                         while (Rs2Npc.getNpc("Zombified Spawn") == null) {
@@ -179,16 +180,16 @@ class AutoVorkathPlugin : Plugin() {
                     else -> botState = State.NONE
                 }
             } else if(vorkath == null || vorkath.isDead){
-                Rs2Prayer.turnOffFastRangePrayer()
-                if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOffFastRigour()}
+                Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
+                if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
                 Script.toggleRunEnergy(true)
             }
         }
     }
 
     private fun acidWalk() {
-        Rs2Prayer.turnOffFastRangePrayer()
-        if (config.ACTIVATERIGOUR()){ Rs2Prayer.turnOffFastRigour()}
+        Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
+        if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
         var clickedTile: WorldPoint
         var toggle = true
         while (botState == State.ACID && previousBotState == State.ACID && (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
