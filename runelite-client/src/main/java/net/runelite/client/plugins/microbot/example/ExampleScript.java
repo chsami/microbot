@@ -24,7 +24,6 @@ public class ExampleScript extends Script {
             Rs2Equipment.useAmuletAction(JewelleryLocationEnum.WOODCUTTING_GUILD);
             Rs2Equipment.useRingAction(JewelleryLocationEnum.CASTLE_WARS);
 
-// [MenuEntryImpl(getOption=, getTarget=, getIdentifier=10823, getType=GAME_OBJECT_FIRST_OPTION, getParam0=53, getParam1=56, getItemId=0, isForceLeftClick=false, isDeprioritized=false), MenuEntryImpl(getOption=, getTarget=, getIdentifier=10823, getType=GAME_OBJECT_FIRST_OPTION, getParam0=53, getParam1=56, getItemId=-1, isForceLeftClick=false, isDeprioritized=false), MenuEntryImpl(getOption=, getTarget=, getIdentifier=10823, getType=GAME_OBJECT_FIRST_OPTION, getParam0=53, getParam1=56, getItemId=-1, isForceLeftClick=false, isDeprioritized=false), MenuEntryImpl(getOption=, getTarget=, getIdentifier=10823, getType=GAME_OBJECT_FIRST_OPTION, getParam0=53, getParam1=56, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)]
               // Rs2GameObject.interact(14843);
                // Rs2Npc.pickpocket("master farmer");
                // Rs2Magic.cast(MagicAction.VARROCK_TELEPORT);
