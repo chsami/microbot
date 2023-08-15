@@ -5,7 +5,6 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
-import net.runelite.api.events.PostMenuSort;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -24,11 +23,10 @@ import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
-import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -136,6 +134,7 @@ public class MicrobotPlugin extends Plugin {
         Rs2GroundItem.handleMenuSwapper(event.getMenuEntry());
         Rs2Prayer.handleMenuSwapper(event.getMenuEntry());
         Rs2Magic.handleMenuSwapper(event.getMenuEntry());
+        Rs2Equipment.handleMenuSwapper(event.getMenuEntry());
 
         if (Rs2Menu.getOption().length() > 0) {
             final MenuEntry[] menuEntries = client.getMenuEntries();

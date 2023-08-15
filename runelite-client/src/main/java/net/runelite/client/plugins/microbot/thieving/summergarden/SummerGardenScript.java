@@ -1,13 +1,10 @@
 package net.runelite.client.plugins.microbot.thieving.summergarden;
 
-import net.runelite.api.ItemID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.example.ExampleConfig;
-import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 

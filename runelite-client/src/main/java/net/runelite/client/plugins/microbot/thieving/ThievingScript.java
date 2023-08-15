@@ -12,7 +12,6 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.timers.TimersPlugin;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

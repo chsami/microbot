@@ -130,7 +130,7 @@ public class ConstructionScript extends Script {
             return distance > 3;
         });
         if (butlerIsToFar) {
-            Tab.switchToSettings();
+            Tab.switchToSettingsTab();
             sleep(800, 1800);
             Widget houseOptionWidget = Rs2Widget.findWidget(SpriteID.OPTIONS_HOUSE_OPTIONS, null);
             if (houseOptionWidget != null)

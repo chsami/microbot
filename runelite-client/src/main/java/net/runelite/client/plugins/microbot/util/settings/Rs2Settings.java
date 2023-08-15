@@ -16,7 +16,7 @@ public class Rs2Settings {
         if (Microbot.getVarbitValue(DROP_SHIFT_SETTING) == 0) {
             final int ALL_SETTINGS_BUTTON = 7602208;
             final int SETTINGS_INTERFACE = 8781825;
-            Tab.switchToSettings();
+            Tab.switchToSettingsTab();
             Rs2Widget.clickWidget(ALL_SETTINGS_BUTTON);
             sleepUntilOnClientThread(() -> Rs2Widget.getWidget(SETTINGS_INTERFACE) != null);
             final boolean isSettingsInterfaceVisible = Rs2Widget.getWidget(SETTINGS_INTERFACE) != null;

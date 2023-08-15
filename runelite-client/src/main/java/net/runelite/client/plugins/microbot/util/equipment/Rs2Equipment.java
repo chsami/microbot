@@ -2,13 +2,24 @@ package net.runelite.client.plugins.microbot.util.equipment;
 
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.RuneLite;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.worldmap.TeleportLocationData;
+import net.runelite.client.ui.FatalErrorDialog;
+
+import javax.swing.*;
+
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class Rs2Equipment {
+
+    public static int widgetId;
+    public static int identifier;
 
     public static boolean equipItemFast(int id) {
         Tab.switchToInventoryTab();
@@ -47,23 +58,30 @@ public class Rs2Equipment {
         }
     }
 
-    //only temporary measures while i create proper methods
-    public static void useRingAction(String actionName) {
-        Widget ringSlot = Rs2Widget.getWidget(25362456);
-        if(ringSlot != null) {
-            Microbot.status = "found ring slot";
-            Rs2Menu.doAction(actionName, new Point((int) ringSlot.getBounds().getCenterX(), (int) ringSlot.getBounds().getCenterY()));
-
-            Microbot.status = "attempted action";
+    public static void useRingAction(JewelleryLocationEnum jewelleryLocationEnum) {
+        if (!hasEquippedSlot(EquipmentInventorySlot.RING)) {
+            Microbot.status = "Amulet is missing in the equipment slot";
+            return;
         }
+        widgetId = 25362456;
+        identifier = jewelleryLocationEnum.getIdentifier();
+        Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+        sleep(100);
+        widgetId = 0;
+        identifier = 0;
     }
-    //only temporary measures while i create proper methods
-    public static void useAmuletAction(String actionName) {
-        Widget amuletSlot = Rs2Widget.getWidget(25362449);
-        if(amuletSlot != null) {
-            Microbot.status = "found amulet slot";
-            Rs2Menu.doAction(actionName, new Point((int) amuletSlot.getBounds().getCenterX(), (int) amuletSlot.getBounds().getCenterY()));
+
+    public static void useAmuletAction(JewelleryLocationEnum jewelleryLocationEnum) {
+        if (!hasEquippedSlot(EquipmentInventorySlot.AMULET)) {
+            Microbot.status = "Amulet is missing in the equipment slot";
+            return;
         }
+        widgetId = 25362449;
+        identifier = jewelleryLocationEnum.getIdentifier();
+        Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+        sleep(100);
+        widgetId = 0;
+        identifier = 0;
     }
 
 
@@ -105,4 +123,27 @@ public class Rs2Equipment {
             return false;
         });
     }
+
+    public static boolean hasEquippedSlot(EquipmentInventorySlot slot) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            final ItemContainer container = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT));
+
+            if (container == null) return false;
+
+            Item itemSlot = container.getItem(slot.getSlotIdx());
+
+            return itemSlot != null;
+        });
+    }
+
+    public static void handleMenuSwapper(MenuEntry menuEntry) {
+        if (widgetId == 0) return;
+        menuEntry.setOption("Teleport");
+        menuEntry.setIdentifier(identifier);
+        menuEntry.setParam0(-1);
+        menuEntry.setParam1(widgetId);
+        menuEntry.setTarget("");
+        menuEntry.setType(MenuAction.CC_OP);
+    }
+
 }
