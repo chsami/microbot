@@ -22,7 +22,6 @@ public class ExampleScript extends Script {
             if (!super.run()) return;
             try {
            // Rs2Equipment.useAmuletAction(JewelleryLocationEnum.WOODCUTTING_GUILD);
-           // Rs2Equipment.useRingAction(JewelleryLocationEnum.CASTLE_WARS);
 
                 System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
             } catch (Exception ex) {
