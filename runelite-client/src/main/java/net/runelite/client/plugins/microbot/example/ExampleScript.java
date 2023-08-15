@@ -24,7 +24,6 @@ public class ExampleScript extends Script {
             Rs2Equipment.useAmuletAction(JewelleryLocationEnum.WOODCUTTING_GUILD);
             Rs2Equipment.useRingAction(JewelleryLocationEnum.CASTLE_WARS);
 
-              // Rs2GameObject.interact(14843);
                // Rs2Npc.pickpocket("master farmer");
                // Rs2Magic.cast(MagicAction.VARROCK_TELEPORT);
                 //Rs2GroundItem.interact("box trap", "lay");
