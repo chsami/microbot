@@ -14,6 +14,20 @@ public class Rs2Prayer {
 
     public static int prayIndex = 0;
 
+    public static void fastPray(Prayer name, boolean onOff) {
+        if(!onOff) {
+            if (Microbot.getClientThread().runOnClientThread(() ->
+                    Microbot.getClient().getVarbitValue(name.getVarbit()) == 0)) return;
+        } else {
+            if (Microbot.getClientThread().runOnClientThread(() ->
+                    Microbot.getClient().getVarbitValue(name.getVarbit()) == 1)) return;
+        }
+        prayIndex = name.getIndex();
+        Microbot.getMouse().click();
+        sleep(100);
+        prayIndex = 0;
+    }
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOffFastMeleePrayer() {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MELEE) == 0)) return;
@@ -22,6 +36,7 @@ public class Rs2Prayer {
         sleep(100);
         prayIndex = 0;
     }
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOffFastRangePrayer() {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 0)) return;
@@ -30,6 +45,7 @@ public class Rs2Prayer {
         sleep(100);
         prayIndex = 0;
     }
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOffFastMagicPrayer() {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(PRAYER_PROTECT_FROM_MAGIC) == 0)) return;
@@ -38,7 +54,7 @@ public class Rs2Prayer {
         sleep(100);
         prayIndex = 0;
     }
-
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOffFastRigour() {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_RIGOUR) == 0)) return;
@@ -48,6 +64,7 @@ public class Rs2Prayer {
         prayIndex = 0;
     }
 
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOffFastPiety(){
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_PIETY) == 0)) return;
@@ -57,6 +74,7 @@ public class Rs2Prayer {
         prayIndex = 0;
     }
 
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOffFastAugury(){
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_AUGURY) == 0)) return;
@@ -65,7 +83,7 @@ public class Rs2Prayer {
         sleep(100);
         prayIndex = 0;
     }
-
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOnFastMeleePrayer() {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MELEE) == 1)) return;
@@ -74,6 +92,7 @@ public class Rs2Prayer {
         sleep(100);
         prayIndex = 0;
     }
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOnFastRangePrayer() {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 1)) return;
@@ -82,6 +101,7 @@ public class Rs2Prayer {
         sleep(100);
         prayIndex = 0;
     }
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOnFastMagicPrayer() {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(PRAYER_PROTECT_FROM_MAGIC) == 1)) return;
@@ -91,6 +111,7 @@ public class Rs2Prayer {
         prayIndex = 0;
     }
 
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOnFastRigour() {
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_RIGOUR) == 1)) return;
@@ -100,6 +121,7 @@ public class Rs2Prayer {
         prayIndex = 0;
     }
 
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOnFastPiety(){
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_PIETY) == 1)) return;
@@ -109,6 +131,7 @@ public class Rs2Prayer {
         prayIndex = 0;
     }
 
+    @Deprecated(since = "Use fastPray instead", forRemoval = true)
     public static void turnOnFastAugury(){
         if (Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().getVarbitValue(Varbits.PRAYER_AUGURY) == 1)) return;
