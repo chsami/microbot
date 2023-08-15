@@ -21,7 +21,6 @@ public class ExampleScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-           // Rs2Equipment.useAmuletAction(JewelleryLocationEnum.WOODCUTTING_GUILD);
 
                 System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
             } catch (Exception ex) {
