@@ -72,6 +72,11 @@ public class VirtualMouse extends Mouse {
     }
 
     @Override
+    public Mouse clickFast(int x, int y) {
+        return clickFast(new Point(x, y), false);
+    }
+
+    @Override
     public Mouse click() {
         return click(new Point((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY()));
     }

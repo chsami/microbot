@@ -1,29 +1,39 @@
 package net.runelite.client.plugins.microbot.util.bank;
 
-import net.runelite.api.GameObject;
-import net.runelite.api.NPC;
-import net.runelite.api.Point;
-import net.runelite.api.SpriteID;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
+import net.runelite.client.plugins.microbot.util.bank.models.BankItemWidget;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.globval.VarbitIndices.BANK_WITHDRAW_QUANTITY;
 
 public class Rs2Bank {
+
+    public static int widgetId;
+    public static int itemId;
+    public static  Widget itemWidget;
+    public static int identifier;
+    public static List<Widget> bankItems = new ArrayList<>();
+    public static List<Widget> inventoryItems = new ArrayList<>();
 
     public static GameObject objectToBank = null;
 
@@ -351,5 +361,108 @@ public class Rs2Bank {
             }
         }
         return nearest;
+    }
+
+    private static void handleWithdrawFast(int id, int idx) {
+        widgetId = 786445;
+        itemId = id;
+        identifier = idx;
+        itemWidget = bankItems.stream().filter(x -> x.getItemId() == itemId).findFirst().orElse(null);
+        if (itemWidget == null) return;
+        Microbot.getMouse().clickFast(1, 1);
+        sleep(100);
+        widgetId = 0;
+        itemId = 0;
+    }
+
+    private static void handleWearItemFast(int id, int idx)
+    {
+        widgetId = 983043;
+        itemId = id;
+        identifier = idx;
+        itemWidget = inventoryItems.stream().filter(x -> x.getItemId() == itemId).findFirst().orElse(null);
+        if (itemWidget == null) return;
+        Microbot.getMouse().clickFast(1, 1);
+        sleep(100);
+        widgetId = 0;
+        itemId = 0;
+    }
+
+    public static void withdrawFast(int id) {
+        handleWithdrawFast(id, 1);
+    }
+
+    public static void withdrawFast(int id, int amount) {
+        for (int i = 0; i < amount; i++) {
+            handleWithdrawFast(id, 1);
+        }
+    }
+
+    public static void withdrawAllFast(int id) {
+        handleWithdrawFast(id, 8);
+    }
+
+    public static void wearItem(int id) {
+        handleWearItemFast(id, 9);
+    }
+
+    public static void withdrawAndEquipFast(int id) {
+        if (Rs2Equipment.hasEquipped(id)) return;
+        withdrawFast(id);
+        sleepUntil(() -> inventoryItems.stream().anyMatch(x -> x.getItemId() == id));
+        wearItem(id);
+    }
+
+    public static void withdrawAllAndEquipFast(int id) {
+        if (Rs2Equipment.hasEquipped(id)) return;
+        withdrawAllFast(id);
+        sleepUntil(() -> inventoryItems.stream().anyMatch(x -> x.getItemId() == id));
+        wearItem(id);
+    }
+
+    public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        if (widgetId == 0 || itemWidget == null) return;
+        int idx = itemWidget.getIndex();
+        menuEntry.getClass().getMethod("at", int.class).invoke(menuEntry, itemId); //use the setItemId method through reflection
+        menuEntry.setOption("Withdraw-1");
+        menuEntry.setIdentifier(identifier);
+        menuEntry.setParam0(idx);
+        menuEntry.setParam1(widgetId);
+        menuEntry.setTarget("");
+        menuEntry.setType(MenuAction.CC_OP);
+    }
+
+    public static void storeBankItemsInMemory(ItemContainerChanged e) {
+        if (e.getContainerId() == 95) {
+            int i = 0;
+            bankItems.clear();
+            for (Item item : e.getItemContainer().getItems()) {
+                if(item==null){
+                    i++;
+                    continue;
+                }
+                if(Microbot.getItemManager().getItemComposition(item.getId()).getPlaceholderTemplateId()==14401){
+                    i++;
+                    continue;
+                }
+                bankItems.add(new BankItemWidget(Microbot.getItemManager().getItemComposition(item.getId()).getName(),item.getId(),item.getQuantity(),i));
+                i++;
+            }
+        }
+    }
+
+    public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
+        if (e.getContainerId() == 93) {
+            int i = 0;
+            inventoryItems.clear();
+            for (Item item : e.getItemContainer().getItems()) {
+                if(item==null){
+                    i++;
+                    continue;
+                }
+                inventoryItems.add(new BankItemWidget(Microbot.getItemManager().getItemComposition(item.getId()).getName(),item.getId(),item.getQuantity(),i));
+                i++;
+            }
+        }
     }
 }

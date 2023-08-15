@@ -3,9 +3,7 @@ package net.runelite.client.plugins.microbot;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.MenuEntryAdded;
-import net.runelite.api.events.MenuOpened;
-import net.runelite.api.events.StatChanged;
+import net.runelite.api.events.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
@@ -23,6 +21,7 @@ import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -39,6 +38,7 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import javax.inject.Inject;
 
 import java.awt.AWTException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -119,7 +119,7 @@ public class MicrobotPlugin extends Plugin {
 
 
     @Subscribe
-    public void onMenuEntryAdded(MenuEntryAdded event) {
+    public void onMenuEntryAdded(MenuEntryAdded event) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
 
         final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
 
@@ -135,6 +135,7 @@ public class MicrobotPlugin extends Plugin {
         Rs2Prayer.handleMenuSwapper(event.getMenuEntry());
         Rs2Magic.handleMenuSwapper(event.getMenuEntry());
         Rs2Equipment.handleMenuSwapper(event.getMenuEntry());
+        Rs2Bank.handleMenuSwapper(event.getMenuEntry());
 
         if (Rs2Menu.getOption().length() > 0) {
             final MenuEntry[] menuEntries = client.getMenuEntries();
@@ -156,6 +157,19 @@ public class MicrobotPlugin extends Plugin {
     @Subscribe
     public void onStatChanged(StatChanged statChanged) {
         Microbot.setIsGainingExp(true);
+    }
+
+    @Subscribe
+    public void onItemContainerChanged(ItemContainerChanged event) {
+        Rs2Bank.storeInventoryItemsInMemory(event);
+        Rs2Bank.storeBankItemsInMemory(event);
+    }
+
+    @Subscribe
+    public void onGameStateChanged(GameStateChanged gameStateChanged) {
+        if (gameStateChanged.getGameState() == GameState.HOPPING || gameStateChanged.getGameState() == GameState.LOGIN_SCREEN || gameStateChanged.getGameState() == GameState.CONNECTION_LOST) {
+            Rs2Bank.bankItems.clear();
+        }
     }
 
     private Consumer<MenuEntry> menuActionNpcConsumer(boolean shift, net.runelite.api.NPC npc) {
