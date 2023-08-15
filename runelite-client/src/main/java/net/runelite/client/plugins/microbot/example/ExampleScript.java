@@ -21,10 +21,9 @@ public class ExampleScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-            Rs2Equipment.useAmuletAction(JewelleryLocationEnum.WOODCUTTING_GUILD);
-            Rs2Equipment.useRingAction(JewelleryLocationEnum.CASTLE_WARS);
+           // Rs2Equipment.useAmuletAction(JewelleryLocationEnum.WOODCUTTING_GUILD);
+           // Rs2Equipment.useRingAction(JewelleryLocationEnum.CASTLE_WARS);
 
-               // Rs2Magic.cast(MagicAction.VARROCK_TELEPORT);
                 //Rs2GroundItem.interact("box trap", "lay");
                 //getOption=Take, getTarget=<col=ff9040>Manta ray, getIdentifier=391, getType=GROUND_ITEM_THIRD_OPTION, getParam0=51, getParam1=51, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)
                 System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
