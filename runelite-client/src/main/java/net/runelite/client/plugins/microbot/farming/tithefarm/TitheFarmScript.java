@@ -16,7 +16,6 @@ import net.runelite.client.plugins.tithefarm.TitheFarmPlant;
 import net.runelite.client.plugins.tithefarm.TitheFarmPlantState;
 import net.runelite.client.plugins.tithefarm.TitheFarmPlugin;
 
-import javax.swing.plaf.synth.Region;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -64,7 +63,7 @@ public class TitheFarmScript extends Script {
                     }
                     fillWaterCans();
                     for (RegionModel regionModel : regions) {
-                        Microbot.getWalker().walkFastRegionCanvas(regionModel.worldPoint.getX(), regionModel.worldPoint.getY());
+                        Microbot.getWalker().walkRegionCanvas(regionModel.worldPoint.getX(), regionModel.worldPoint.getY());
                         if (!regionModel.hasPlanted) {
                             Inventory.useItemUnsafe(TitheFarmMaterial.getSeedForLevel().getName());
                         }

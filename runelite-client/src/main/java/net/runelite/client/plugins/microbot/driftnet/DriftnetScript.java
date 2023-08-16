@@ -1,23 +1,16 @@
 package net.runelite.client.plugins.microbot.driftnet;
 
 import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
-import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.mta.telekinetic.TelekineticRoom;
-import net.runelite.client.ui.overlay.infobox.Counter;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -93,7 +86,7 @@ public class DriftnetScript extends Script {
         }
 
         if (!Microbot.getClient().getLocalPlayer().getWorldLocation().equals(w)) {
-            Microbot.getWalker().walkFastRegionCanvas(w.getRegionX(), w.getRegionY());
+            Microbot.getWalker().walkRegionCanvas(w.getRegionX(), w.getRegionY());
         } else {
             Tab.switchToMagicTab();
             sleep(300, 600);

@@ -1,27 +1,15 @@
 package net.runelite.client.plugins.microbot.firemaking;
 
 import net.runelite.api.ObjectID;
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.firemaking.enums.FiremakingStatus;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.mta.telekinetic.TelekineticRoom;
-import net.runelite.client.ui.overlay.infobox.Counter;
 
-import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
 public class FiremakingScript extends Script {
@@ -91,7 +79,7 @@ public class FiremakingScript extends Script {
             }
 
             if (currentFiremakingSpot != null) {
-                Microbot.getWalker().walkFastCanvas(currentFiremakingSpot);
+                Microbot.getWalker().walkCanvas(currentFiremakingSpot);
             }
 
             if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(currentFiremakingSpot)) {

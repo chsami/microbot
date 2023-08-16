@@ -1,32 +1,28 @@
 package net.runelite.client.plugins.microbot.util.walker;
 
 import lombok.Getter;
-import net.runelite.api.Player;
-import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
-import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Teleport;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Walker {
+
+    public Point travelToCanvasPoint;
+
     @Getter
     public Pathfinder pathfinder;
     public PathfinderConfig pathfinderConfig;
@@ -87,7 +83,7 @@ public class Walker {
         return worldPoint;
     }
 
-    public WorldPoint walkFastRegionCanvas(int regionX, int regionY) {
+    public WorldPoint walkRegionCanvas(int regionX, int regionY) {
         WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
                 regionX,
                 regionY,
@@ -112,7 +108,32 @@ public class Walker {
         return worldPoint;
     }
 
-    public WorldPoint walkFastCanvas(WorldPoint worldPoint) {
+    public void walkFastCanvas(LocalPoint localPoint) {
+//        WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
+//                0,
+//                54,
+//                Microbot.getClient().getPlane());
+//        LocalPoint localPoint1 = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+        Point point = Perspective.localToCanvas(Microbot.getClient(), localPoint.getX(), localPoint.getY() - 128, Microbot.getClient().getPlane());
+
+        travelToCanvasPoint = point;
+        System.out.println(point);
+        Microbot.getMouse().clickFast(1, 1);
+        sleep(100);
+        travelToCanvasPoint = null;
+    }
+
+    public void handleMenuSwapper(MenuEntry menuEntry) {
+        if (travelToCanvasPoint == null) return;
+        menuEntry.setOption("Walk here");
+        menuEntry.setIdentifier(0);
+        menuEntry.setParam0(travelToCanvasPoint.getX());
+        menuEntry.setParam1(travelToCanvasPoint.getY());
+        menuEntry.setTarget("");
+        menuEntry.setType(MenuAction.WALK);
+    }
+
+    public WorldPoint walkCanvas(WorldPoint worldPoint) {
         Point point = Calculations.worldToCanvas(worldPoint.getX(), worldPoint.getY());
 
         if (point == null) return null;

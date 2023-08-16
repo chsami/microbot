@@ -136,6 +136,7 @@ public class MicrobotPlugin extends Plugin {
         Rs2Magic.handleMenuSwapper(event.getMenuEntry());
         Rs2Equipment.handleMenuSwapper(event.getMenuEntry());
         Rs2Bank.handleMenuSwapper(event.getMenuEntry());
+        Microbot.getWalker().handleMenuSwapper(event.getMenuEntry());
 
         if (Rs2Menu.getOption().length() > 0) {
             final MenuEntry[] menuEntries = client.getMenuEntries();
