@@ -89,6 +89,7 @@ class AutoVorkathPlugin : Plugin() {
         running = false
         botState = null
         previousBotState = null
+        needsToBank = true
     }
 
     private fun run() {
@@ -190,7 +191,8 @@ class AutoVorkathPlugin : Plugin() {
                 if (needsToBank){
                     Rs2Bank.openBank()
                     Rs2Bank.depositAll()
-                    //MicrobotInventorySetup.loadEquipment(config.GEAR())
+                    //Rs2Bank.depositEquipment()
+                    MicrobotInventorySetup.loadEquipment(config.GEAR())
                     MicrobotInventorySetup.loadInventory(config.GEAR())
                     needsToBank = false
                     Rs2Bank.closeBank()
