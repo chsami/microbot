@@ -30,6 +30,7 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.plugins.microbot.walking.WalkingScript;
@@ -293,6 +294,12 @@ public class MicrobotPlugin extends Plugin {
                         .onClick(menuActionMinerConsumer( objectEntry.getIdentifier())));
             }
         }
+    }
+
+    @Subscribe
+    public void onVarbitChanged(VarbitChanged event)
+    {
+        Rs2Player.handlePotionTimers(event);
     }
 
     private void addMapMenuEntries(MenuEntryAdded event) {
