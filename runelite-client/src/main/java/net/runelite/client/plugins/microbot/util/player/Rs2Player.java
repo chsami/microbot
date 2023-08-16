@@ -7,11 +7,11 @@ import net.runelite.api.events.VarbitChanged;
 
 public class Rs2Player {
 
-    public static int antiFireTime = -1;
-    public static int superAntiFireTime = -1;
-    public static int divineRangedTime = -1;
-    public static int divineBastionTime = -1;
-    public static int antiVenomTime = -1;
+    private static int antiFireTime = -1;
+    private static int superAntiFireTime = -1;
+    private static int divineRangedTime = -1;
+    private static int divineBastionTime = -1;
+    private static int antiVenomTime = -1;
 
     public static boolean hasAntiFireActive() {
         return antiFireTime > 0 || hasSuperAntiFireActive();
