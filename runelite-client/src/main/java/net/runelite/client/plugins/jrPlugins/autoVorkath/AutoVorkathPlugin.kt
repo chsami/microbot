@@ -19,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
+import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.prayer.Prayer
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
 import net.runelite.client.plugins.microbot.util.walker.Walker
@@ -71,6 +72,8 @@ class AutoVorkathPlugin : Plugin() {
         RED_BALL,
         EAT,
         PRAYER,
+        RANGE_POTION,
+        ANTIFIRE_POTION,
         ACID,
         NONE
     }
@@ -123,8 +126,18 @@ class AutoVorkathPlugin : Plugin() {
                 }
 
                 // Check if player needs to drink prayer potion
-                if (clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.PRAYER) } < 20) {
+                if (clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.PRAYER) } < 20 && botState != State.ACID && botState != State.RED_BALL) {
                     botState = State.PRAYER
+                }
+
+                // Check if player needs to drink range potion
+                if(!Rs2Player.hasDivineBastionActive() && !Rs2Player.hasDivineRangedActive() && botState != State.ACID && botState != State.RED_BALL){
+                    botState = State.RANGE_POTION
+                }
+
+                // Check if player needs to drink antifire potion
+                if(!Rs2Player.hasAntiFireActive() && !Rs2Player.hasSuperAntiFireActive() && botState != State.ACID && botState != State.RED_BALL){
+                    botState = State.ANTIFIRE_POTION
                 }
 
                 // Handle bot state
@@ -180,6 +193,24 @@ class AutoVorkathPlugin : Plugin() {
                         Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
+                    State.RANGE_POTION -> if (Inventory.findItemContains(config.RANGEPOTION().toString()) != null) {
+                        Inventory.useItemContains(config.RANGEPOTION().toString())
+                        botState = previousBotState
+                    } else {
+                        println("No range potions found")
+                        // Teleport
+                        Inventory.useItem(config.TELEPORT().toString())
+                        needsToBank = true
+                    }
+                    State.ANTIFIRE_POTION -> if (Inventory.findItemContains("super antifire") != null) {
+                        Inventory.useItemContains("super antifire")
+                        botState = previousBotState
+                    } else {
+                        println("No antifire potions found")
+                        // Teleport
+                        Inventory.useItem(config.TELEPORT().toString())
+                        needsToBank = true
+                    }
                     State.NONE -> println("TODO")
                     else -> botState = State.NONE
                 }
@@ -190,8 +221,8 @@ class AutoVorkathPlugin : Plugin() {
                 // Bank
                 if (needsToBank){
                     Rs2Bank.openBank()
-                    Rs2Bank.depositAll()
                     Rs2Bank.depositEquipment()
+                    Rs2Bank.depositAll()
                     MicrobotInventorySetup.loadEquipment(config.GEAR())
                     MicrobotInventorySetup.loadInventory(config.GEAR())
                     needsToBank = false

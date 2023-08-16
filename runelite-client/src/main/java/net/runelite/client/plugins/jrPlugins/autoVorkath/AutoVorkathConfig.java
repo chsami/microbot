@@ -52,4 +52,12 @@ public interface AutoVorkathConfig extends Config {
             position = 4
     )
     default boolean ACTIVATERIGOUR() { return true; }
+
+    @ConfigItem(
+            keyName = "rangePotion",
+            name = "Ranging Potion",
+            description = "What Ranging potion to use?",
+            position = 5
+    )
+    default RANGE_POTION RANGEPOTION() { return RANGE_POTION.DIVINE_RANGING_POTION; }
 }
