@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
@@ -36,16 +37,13 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
 import javax.inject.Inject;
-
-import java.awt.AWTException;
+import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
-
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 @PluginDescriptor(
         name = "Microbot",
@@ -261,10 +259,12 @@ public class MicrobotPlugin extends Plugin {
 
             List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
 
-            leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
-                    .setOption(thievingScript == null ? "Start AutoThiever" : "Stop AutoThiever")
-                    .setType(MenuAction.RUNELITE)
-                    .onClick(menuActionNpcConsumer(false, npc)));
+            if (Arrays.stream(event.getMenuEntries()).anyMatch(x -> x.getOption().toLowerCase().equals("pickpocket"))) {
+                leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
+                        .setOption(thievingScript == null ? "Start AutoThiever" : "Stop AutoThiever")
+                        .setType(MenuAction.RUNELITE)
+                        .onClick(menuActionNpcConsumer(false, npc)));
+            }
         }
         if (objectEntry != null) {
             // Currently only supports alkharid furnace
