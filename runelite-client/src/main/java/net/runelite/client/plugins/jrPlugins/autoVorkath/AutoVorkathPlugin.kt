@@ -63,6 +63,7 @@ class AutoVorkathPlugin : Plugin() {
     private lateinit var leftTile: WorldPoint
 
     private var foods: Array<Widget>? = null
+    private var needsToBank: Boolean = true
 
     private enum class State {
         RANGE,
@@ -167,6 +168,7 @@ class AutoVorkathPlugin : Plugin() {
                         println("No food found")
                         // Teleport
                         Inventory.useItem(config.TELEPORT().toString())
+                        needsToBank = true
                     }
                     State.PRAYER -> if (Inventory.findItemContains("prayer") != null) {
                         Inventory.useItemContains("prayer")
@@ -175,6 +177,7 @@ class AutoVorkathPlugin : Plugin() {
                         println("No prayer potions found")
                         // Teleport
                         Inventory.useItem(config.TELEPORT().toString())
+                        needsToBank = true
                     }
                     State.NONE -> println("TODO")
                     else -> botState = State.NONE
@@ -184,10 +187,13 @@ class AutoVorkathPlugin : Plugin() {
                 if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
                 Script.toggleRunEnergy(true)
                 // Bank
-                if (Rs2Bank.openBank()){
+                if (needsToBank){
+                    Rs2Bank.openBank()
                     Rs2Bank.depositAll()
-                    MicrobotInventorySetup.loadInventory(config.GEAR())
                     //MicrobotInventorySetup.loadEquipment(config.GEAR())
+                    MicrobotInventorySetup.loadInventory(config.GEAR())
+                    needsToBank = false
+                    Rs2Bank.closeBank()
                 }
             }
         }
