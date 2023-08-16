@@ -120,7 +120,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_FAVORITE_ICON = new ImageIcon(favoriteHover);
 		NO_FAVORITE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(favoriteHover, -100));
 
-		final BufferedImage highlightToggleImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "/highlight_icon.png");
+		final BufferedImage highlightToggleImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "highlight_icon.png");
 		final BufferedImage highlightToggleHover = ImageUtil.luminanceOffset(highlightToggleImg, -150);
 		TOGGLE_HIGHLIGHT_ICON = new ImageIcon(highlightToggleImg);
 		TOGGLE_HIGHLIGHT_HOVER_ICON = new ImageIcon(highlightToggleHover);
@@ -128,7 +128,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_TOGGLE_HIGHLIGHT_ICON = new ImageIcon(highlightToggleHover);
 		NO_TOGGLE_HIGHLIGHT_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(highlightToggleHover, -100));
 
-		final BufferedImage highlightImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "/highlight_color_icon.png");
+		final BufferedImage highlightImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "highlight_color_icon.png");
 		final BufferedImage highlightHover = ImageUtil.luminanceOffset(highlightImg, -150);
 		HIGHLIGHT_COLOR_ICON = new ImageIcon(highlightImg);
 		HIGHLIGHT_COLOR_HOVER_ICON = new ImageIcon(highlightHover);
@@ -136,17 +136,17 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_HIGHLIGHT_COLOR_ICON = new ImageIcon(highlightHover);
 		NO_HIGHLIGHT_COLOR_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(highlightHover, -100));
 
-		final BufferedImage viewImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "/visible_icon.png");
+		final BufferedImage viewImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "visible_icon.png");
 		final BufferedImage viewImgHover = ImageUtil.luminanceOffset(viewImg, -150);
 		VIEW_SETUP_ICON = new ImageIcon(viewImg);
 		VIEW_SETUP_HOVER_ICON = new ImageIcon(viewImgHover);
 
-		final BufferedImage exportImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "/export_icon.png");
+		final BufferedImage exportImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "export_icon.png");
 		final BufferedImage exportImgHover = ImageUtil.luminanceOffset(exportImg, -150);
 		EXPORT_ICON = new ImageIcon(exportImg);
 		EXPORT_HOVER_ICON = new ImageIcon(exportImgHover);
 
-		final BufferedImage deleteImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "/delete_icon.png");
+		final BufferedImage deleteImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "delete_icon.png");
 		DELETE_ICON = new ImageIcon(deleteImg);
 		DELETE_HOVER_ICON = new ImageIcon(ImageUtil.luminanceOffset(deleteImg, -100));
 

@@ -1,8 +1,6 @@
 package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.api.GameObject;
-import net.runelite.api.ItemID;
-import net.runelite.api.ObjectID;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -12,7 +10,6 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 
@@ -58,7 +55,7 @@ boolean reachedEndLine = false;
                         GameObject gameObject = Rs2GameObject.getGameObject(new LocalPoint(5824 + x, 7104));
 
                         if (gameObject == null) {
-                            position1 = new LocalPoint(gameObject.getX(), gameObject.getY() - 128);
+                            position1 = new LocalPoint(5824 + x, 7104);
                         }
 
                     }
