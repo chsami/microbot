@@ -155,7 +155,7 @@ class AutoVorkathPlugin : Plugin() {
                     State.RED_BALL -> if (client.localPlayer.idlePoseAnimation == 1 || doesProjectileExistById(redProjectileId)){
                         previousBotState = State.RED_BALL
                         redBallWalk()
-                        sleep(1700, 1850)
+                        sleep(2100, 2200)
                         Rs2Npc.attack("Vorkath")
                     }
                     State.ACID -> if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId) || Rs2GameObject.findObject(ObjectID.ACID_POOL) != null) {
@@ -191,7 +191,7 @@ class AutoVorkathPlugin : Plugin() {
                 if (needsToBank){
                     Rs2Bank.openBank()
                     Rs2Bank.depositAll()
-                    //Rs2Bank.depositEquipment()
+                    Rs2Bank.depositEquipment()
                     MicrobotInventorySetup.loadEquipment(config.GEAR())
                     MicrobotInventorySetup.loadInventory(config.GEAR())
                     needsToBank = false
