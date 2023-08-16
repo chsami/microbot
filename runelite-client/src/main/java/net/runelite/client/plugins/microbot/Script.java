@@ -1,12 +1,12 @@
 package net.runelite.client.plugins.microbot;
 
-import net.runelite.api.*;
-import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.PostMenuSort;
+import net.runelite.api.Perspective;
+import net.runelite.api.Point;
+import net.runelite.api.TileObject;
+import net.runelite.api.WallObject;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -98,7 +98,8 @@ public abstract class Script implements IScript {
 
     public boolean run() {
         hasLeveledUp = false;
-        toggleRunEnergy(true);
+        if (Microbot.enableAutoRunOn)
+            toggleRunEnergy(true);
         if (Microbot.getClient().getMinimapZoom() > 2)
             Microbot.getClient().setMinimapZoom(2);
 

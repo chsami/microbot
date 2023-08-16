@@ -142,7 +142,7 @@ public static String itemAction;
         try {
             itemInteraction = rs2Item;
             itemAction = action;
-            Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
             sleep(100);
             itemInteraction = null;
             itemAction = "";

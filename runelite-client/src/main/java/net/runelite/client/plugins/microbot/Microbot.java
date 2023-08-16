@@ -63,6 +63,8 @@ public class Microbot {
     public static boolean pauseAllScripts = false;
     public static String status = "IDLE";
 
+    public static boolean enableAutoRunOn = true;
+
     private static ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;

@@ -185,7 +185,7 @@ public class Rs2Npc {
         try {
             npcInteraction = npc;
             npcAction = action;
-            Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
             sleep(100);
             npcInteraction = null;
             npcAction = null;
