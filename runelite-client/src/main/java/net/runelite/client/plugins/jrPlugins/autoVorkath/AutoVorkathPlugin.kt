@@ -13,6 +13,8 @@ import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.util.Global.sleep
+import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
@@ -43,8 +45,6 @@ class AutoVorkathPlugin : Plugin() {
     fun getConfig(configManager: ConfigManager): AutoVorkathConfig {
         return configManager.getConfig(AutoVorkathConfig::class.java)
     }
-
-
 
     private var botState: State? = null
     private var previousBotState: State? = null
@@ -183,6 +183,12 @@ class AutoVorkathPlugin : Plugin() {
                 Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
                 if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
                 Script.toggleRunEnergy(true)
+                // Bank
+                if (Rs2Bank.openBank()){
+                    Rs2Bank.depositAll()
+                    MicrobotInventorySetup.loadInventory(config.GEAR())
+                    //MicrobotInventorySetup.loadEquipment(config.GEAR())
+                }
             }
         }
     }
