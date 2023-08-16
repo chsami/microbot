@@ -5,7 +5,6 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -238,7 +237,7 @@ public class Rs2Npc {
             menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
         } else if (npcAction.toLowerCase().equals("attack")) {
             menuEntry.setType(MenuAction.NPC_SECOND_OPTION);
-        } else if (npcAction.toLowerCase().equals("pickpocket") || npcAction.toLowerCase().equals("bank")) {
+        } else if (npcAction.toLowerCase().equals("pickpocket") || npcAction.toLowerCase().equals("bank") || npcAction.toLowerCase().equals("dream")) {
             menuEntry.setType(MenuAction.NPC_THIRD_OPTION);
         } else if (npcAction.toLowerCase().equals("collect")) {
             menuEntry.setType(MenuAction.NPC_FOURTH_OPTION);

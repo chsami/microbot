@@ -161,7 +161,7 @@ public class InventorySetupsPlugin extends Plugin
 	private InventorySetupsPluginPanel panel;
 
 	@Getter
-	private List<InventorySetup> inventorySetups;
+	public static List<InventorySetup> inventorySetups;
 
 	@Getter
 	private List<InventorySetupsSection> sections;

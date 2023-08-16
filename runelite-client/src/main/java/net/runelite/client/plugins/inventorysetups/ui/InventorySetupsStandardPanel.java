@@ -96,7 +96,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 
 	static
 	{
-		final BufferedImage bankFilterImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "/filter_icon.png");
+		final BufferedImage bankFilterImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "filter_icon.png");
 		final BufferedImage bankFilterHover = ImageUtil.luminanceOffset(bankFilterImg, -150);
 		BANK_FILTER_ICON = new ImageIcon(bankFilterImg);
 		BANK_FILTER_HOVER_ICON = new ImageIcon(bankFilterHover);
@@ -104,7 +104,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_BANK_FILTER_ICON = new ImageIcon(bankFilterHover);
 		NO_BANK_FILTER_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(bankFilterHover, -100));
 
-		final BufferedImage unorderedHighlightImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "/unordered_highlight_icon.png");
+		final BufferedImage unorderedHighlightImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "unordered_highlight_icon.png");
 		final BufferedImage unorderedHighlightHover = ImageUtil.luminanceOffset(unorderedHighlightImg, -150);
 		UNORDERED_HIGHLIGHT_ICON = new ImageIcon(unorderedHighlightImg);
 		UNORDERED_HIGHLIGHT_HOVER_ICON = new ImageIcon(unorderedHighlightHover);
@@ -112,7 +112,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_UNORDERED_HIGHLIGHT_ICON = new ImageIcon(unorderedHighlightHover);
 		NO_UNORDERED_HIGHLIGHT_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(unorderedHighlightHover, -100));
 
-		final BufferedImage favoriteImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "/favorite_icon.png");
+		final BufferedImage favoriteImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "favorite_icon.png");
 		final BufferedImage favoriteHover = ImageUtil.luminanceOffset(favoriteImg, -150);
 		FAVORITE_ICON = new ImageIcon(favoriteImg);
 		FAVORITE_HOVER_ICON = new ImageIcon(favoriteHover);

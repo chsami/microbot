@@ -606,9 +606,9 @@ public class Rs2GameObject {
 
         menuEntry.setTarget("");
         menuEntry.setOption(objectAction);
-        if (objectAction.toLowerCase().equals("bank")) {
+        if (objectAction.toLowerCase().equals("bank") || objectAction.toLowerCase().equals("take")) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
-        } else if (objectAction.toLowerCase().equals("collect")) {
+        } else if (objectAction.toLowerCase().equals("collect") || objectAction.toLowerCase().equals("store")) {
             menuEntry.setType(MenuAction.GAME_OBJECT_THIRD_OPTION);
         }else if (objectAction.toLowerCase().equals("reset")) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);

@@ -5,14 +5,12 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.bank.models.BankItemWidget;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -21,7 +19,7 @@ import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.globval.VarbitIndices.BANK_WITHDRAW_QUANTITY;
@@ -33,7 +31,7 @@ public class Rs2Bank {
     public static  Widget itemWidget;
     public static int identifier;
     public static List<Widget> bankItems = new ArrayList<>();
-    public static List<Widget> inventoryItems = new ArrayList<>();
+    public static CopyOnWriteArrayList<Widget> inventoryItems = new CopyOnWriteArrayList<>();
 
     public static GameObject objectToBank = null;
 
@@ -423,7 +421,7 @@ public class Rs2Bank {
     public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (widgetId == 0 || itemWidget == null) return;
         int idx = itemWidget.getIndex();
-        menuEntry.getClass().getMethod("at", int.class).invoke(menuEntry, itemId); //use the setItemId method through reflection
+        menuEntry.getClass().getMethod("qk", int.class).invoke(menuEntry, itemId); //use the setItemId method through reflection
         menuEntry.setOption("Withdraw-1");
         menuEntry.setIdentifier(identifier);
         menuEntry.setParam0(idx);
