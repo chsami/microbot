@@ -50,7 +50,8 @@ import java.util.function.Consumer;
         name = PluginDescriptor.Default + "Microbot",
         description = "Microbot",
         tags = {"main", "microbot", "parent"},
-        alwaysOn = true
+        alwaysOn = true,
+        hidden = true
 )
 @Slf4j
 public class MicrobotPlugin extends Plugin {

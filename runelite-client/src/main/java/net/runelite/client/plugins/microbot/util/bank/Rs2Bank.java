@@ -305,6 +305,18 @@ public class Rs2Bank {
         return false;
     }
 
+    public static boolean depositEquipment(){
+        Microbot.status = "Deposit equipment";
+        if (Inventory.count() == 0) return true;
+        Widget widget = Rs2Widget.findWidget(SpriteID.BANK_DEPOSIT_EQUIPMENT, null);
+        if (widget != null) {
+            Microbot.getMouse().click(widget.getBounds());
+            sleep(1000, 2000);
+            return true;
+        }
+        return false;
+    }
+
     public static boolean hasItem(String itemName) {
         Microbot.status = "Looking for " + itemName + " in the bank";
         return Rs2Widget.findWidgetExact(itemName) != null && Rs2Widget.findWidgetExact(itemName).getItemQuantity() > 0;

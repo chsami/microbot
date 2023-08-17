@@ -87,13 +87,17 @@ class AutoChin: Plugin() {
 
     override fun startUp() {
         currentState = State.IDLE
-        version = "1.0.0"
+        version = "1.0.1"
         startTime = System.currentTimeMillis()
         startingXp = client.getSkillExperience(Skill.HUNTER)
         startingLvl = client.getRealSkillLevel(Skill.HUNTER)
 
         if (client.getLocalPlayer() != null) {
             running = true
+            if (overlayManager != null && config.overlay() && !overlayActive) {
+                overlayManager.add(autoChinOverlay)
+                overlayActive = true
+            }
             GlobalScope.launch { run() }
         }
     }
@@ -112,6 +116,7 @@ class AutoChin: Plugin() {
         running = false
         overlayManager.remove(autoChinOverlay)
         currentState = State.IDLE
+        overlayActive = false
     }
 
     private fun handleIdleState() {
