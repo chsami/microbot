@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.tabs;
 import net.runelite.api.VarClientInt;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.VarcIntValues;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -51,6 +52,7 @@ public class Tab {
     }
 
     public static boolean switchToInventoryTab() {
+        if (Rs2Bank.isOpen()) return true;
         VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
         return getCurrentTab() == InterfaceTab.INVENTORY;
     }
