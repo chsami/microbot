@@ -219,7 +219,7 @@ class AutoVorkathPlugin : Plugin() {
                 if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
                 Script.toggleRunEnergy(true)
                 // Bank
-                if (needsToBank){
+                if (needsToBank && Rs2Bank.getNearestBank() != null) {
                     Rs2Bank.openBank()
                     Rs2Bank.depositEquipment()
                     Rs2Bank.depositAll()
