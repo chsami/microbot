@@ -8,10 +8,18 @@ import net.runelite.client.config.ConfigItem;
 public interface AutoVorkathConfig extends Config {
 
     @ConfigItem(
+            keyName = "gear",
+            name = "Gear Setup",
+            description = "Enter the name of the gear setup you want to use",
+            position = 0
+    )
+    default String GEAR() { return "AutoVorkath"; }
+
+    @ConfigItem(
             keyName = "crossbow",
             name = "Crossbow",
             description = "Choose your crossbow",
-            position = 0
+            position = 1
     )
     default CROSSBOW CROSSBOW() {
         return CROSSBOW.ARMADYL_CROSSBOW;
@@ -21,7 +29,7 @@ public interface AutoVorkathConfig extends Config {
             keyName = "slayersStaff",
             name = "Slayers Staff",
             description = "Choose your slayers staff",
-            position = 1
+            position = 2
     )
     default STAFF SLAYERSTAFF() {
         return STAFF.SLAYER_STAFF;
@@ -31,7 +39,7 @@ public interface AutoVorkathConfig extends Config {
             keyName = "teleport",
             name = "Teleport",
             description = "Choose your teleport",
-            position = 2
+            position = 3
     )
     default TELEPORT TELEPORT() {
         return TELEPORT.CONSTRUCT_CAPE_T;
@@ -41,7 +49,15 @@ public interface AutoVorkathConfig extends Config {
             keyName = "rigour",
             name = "Rigour",
             description = "Activate Rigour?",
-            position = 3
+            position = 4
     )
     default boolean ACTIVATERIGOUR() { return true; }
+
+    @ConfigItem(
+            keyName = "rangePotion",
+            name = "Ranging Potion",
+            description = "What Ranging potion to use?",
+            position = 5
+    )
+    default RANGE_POTION RANGEPOTION() { return RANGE_POTION.DIVINE_RANGING_POTION; }
 }
