@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro t1the Farm",
+        name = PluginDescriptor.Mocrosoft + "t1the Farm",
         description = "Microbot T1the-Farm plugin",
         tags = {"farming", "microbot", "skills", "minigame"},
         enabledByDefault = false

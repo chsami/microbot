@@ -19,7 +19,7 @@ import java.awt.*;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
-        name = "Nate's Gold Ring Maker",
+        name = PluginDescriptor.Nate +"Gold Ring Maker",
         description = "Nate's Gold Ring Maker",
         tags = {"MoneyMaking", "nate", "gold"},
         enabledByDefault = false

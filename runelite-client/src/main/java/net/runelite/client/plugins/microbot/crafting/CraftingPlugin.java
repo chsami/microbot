@@ -21,7 +21,7 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 
 @PluginDescriptor(
-        name = "Micro Crafting",
+        name = PluginDescriptor.Mocrosoft + "Crafting",
         description = "Microbot crafting plugin",
         tags = {"skilling", "microbot", "crafting"},
         enabledByDefault = false

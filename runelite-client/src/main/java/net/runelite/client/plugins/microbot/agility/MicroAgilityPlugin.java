@@ -17,8 +17,9 @@ import java.util.ArrayList;
 import static net.runelite.api.ObjectID.*;
 
 @PluginDescriptor(
-        name = "Micro Agility",
-        description = "Microbot ag!lity plugin",
+
+        name = PluginDescriptor.Mocrosoft + "Agility",
+        description = "Microbot agility plugin",
         tags = {"agility", "microbot"},
         enabledByDefault = false
 )

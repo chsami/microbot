@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro GiantsFoundry",
+        name = PluginDescriptor.Mocrosoft + "GiantsFoundry",
         description = "Microbot giants foundry plugin",
         tags = {"minigame", "microbot", "smithing"},
         enabledByDefault = false

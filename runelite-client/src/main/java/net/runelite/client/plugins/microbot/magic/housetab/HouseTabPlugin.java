@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "MicroHouseTab",
+        name = PluginDescriptor.Mocrosoft + "HouseTab",
         description = "Microbot HouseTab plugin",
         tags = {"microbot", "magic", "moneymaking"}
 )

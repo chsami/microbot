@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 @PluginDescriptor(
-        name = "AutoLogin",
+        name = PluginDescriptor.Mocrosoft + "AutoLogin",
         description = "Microbot autologin plugin",
         tags = {"account", "microbot", "login"}
 )

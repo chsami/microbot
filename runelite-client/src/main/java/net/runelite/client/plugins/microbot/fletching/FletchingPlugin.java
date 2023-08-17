@@ -26,7 +26,7 @@ import static net.runelite.api.widgets.WidgetID.LEVEL_UP_GROUP_ID;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
-        name = "Micro Fletcher",
+        name = PluginDescriptor.Mocrosoft + "Fletcher",
         description = "Microbot fletching plugin",
         tags = {"fletching", "microbot", "skills"},
         enabledByDefault = false

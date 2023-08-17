@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @PluginDescriptor(
-        name = "Micro Pest Control",
+        name = PluginDescriptor.Mocrosoft + "Pest Control",
         description = "Microbot Pest Control plugin",
         tags = {"pest control", "microbot", "minigames"},
         enabledByDefault = false

@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @PluginDescriptor(
-        name = "Microbot",
+        name = PluginDescriptor.Default + "Microbot",
         description = "Microbot",
         tags = {"main", "microbot", "parent"},
         alwaysOn = true

@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Drifnet",
+        name = PluginDescriptor.Mocrosoft + "Drifnet",
         description = "Microbot drifnet plugin",
         tags = {"fishing", "microbot"},
         enabledByDefault = false

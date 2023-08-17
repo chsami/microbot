@@ -19,7 +19,7 @@ import java.awt.*;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
-        name = "Micro Woodcutting",
+        name = PluginDescriptor.Mocrosoft + "Woodcutting",
         description = "Microbot woodcutting plugin",
         tags = {"Woodcutting", "microbot", "skilling"},
         enabledByDefault = false

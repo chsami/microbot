@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Nmz",
+        name = PluginDescriptor.Mocrosoft + "Nmz",
         description = "Microbot NMZ",
         tags = {"nmz", "microbot"},
         enabledByDefault = false

@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Hosidius",
+        name = PluginDescriptor.Mocrosoft + "Hosidius",
         description = "Microbot hosidius favour plugin",
         tags = {"microbot", "minigame", "hosidius", "favour", "zeah"}
 )

@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Basket filling",
+        name = PluginDescriptor.Mocrosoft + "Basket filling",
         description = "Microbot basket filling plugin",
         tags = {"moneymaking", "microbot", "basket filling"},
         enabledByDefault = false

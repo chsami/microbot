@@ -12,6 +12,7 @@ import net.runelite.client.config.ConfigManager
 import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
+import net.runelite.client.plugins.PluginDescriptor.JR
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
@@ -19,7 +20,7 @@ import net.runelite.client.ui.overlay.OverlayManager
 import javax.inject.Inject
 
 @PluginDescriptor(
-    name = "Auto Chinchompa",
+    name = JR + "Auto Chinchompa",
     description = "JR - Automatically catches chinchompas",
     tags = ["chinchompas", "hunter", "auto", "catching", "jr", "JR", "microbot"],
     enabledByDefault = false

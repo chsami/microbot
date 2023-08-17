@@ -19,7 +19,7 @@ import java.awt.*;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
-        name = "Nate's Power Fisher",
+        name = PluginDescriptor.Nate +"Power Fisher",
         description = "Nate's Power Fisher plugin",
         tags = {"Fishing", "nate", "skilling"},
         enabledByDefault = false

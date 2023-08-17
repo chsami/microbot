@@ -28,7 +28,7 @@ import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 
 @PluginDescriptor(
-        name = "Micro Summers Garden",
+        name = PluginDescriptor.Mocrosoft + "Summers Garden",
         description = "Microbot Summers Garden",
         tags = {"Summers Garden", "minigame", "thieving", "microbot", "skilling"},
         enabledByDefault = false

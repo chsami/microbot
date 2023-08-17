@@ -20,7 +20,7 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 
 @PluginDescriptor(
-        name = "Nate's Wine Maker",
+        name = PluginDescriptor.Nate +"Wine Maker",
         description = "Nate's Wine Maker",
         tags = {"skilling", "nate", "wine","cooking"},
         enabledByDefault = false
