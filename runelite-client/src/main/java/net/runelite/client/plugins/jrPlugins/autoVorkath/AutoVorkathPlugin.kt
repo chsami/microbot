@@ -19,6 +19,7 @@ import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
@@ -78,6 +79,7 @@ class AutoVorkathPlugin : Plugin() {
         PRAYER,
         RANGE_POTION,
         ANTIFIRE_POTION,
+        ANTIVENOM,
         ACID,
         NONE
     }
@@ -142,6 +144,11 @@ class AutoVorkathPlugin : Plugin() {
                 // Check if player needs to drink antifire potion
                 if(!Rs2Player.hasAntiFireActive() && !Rs2Player.hasSuperAntiFireActive() && botState != State.ACID && botState != State.RED_BALL){
                     botState = State.ANTIFIRE_POTION
+                }
+
+                // Check if player needs to drink antivenom potion
+                if(!Rs2Player.hasAntiVenomActive() && !Rs2Equipment.hasEquipped("serpentine helm") && botState != State.ACID && botState != State.RED_BALL){
+                    botState = State.ANTIVENOM
                 }
 
                 // Handle bot state
@@ -215,10 +222,19 @@ class AutoVorkathPlugin : Plugin() {
                         Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
+                    State.ANTIVENOM -> if (Inventory.findItemContains("venom") != null){
+                        Inventory.useItemContains("venom")
+                        botState = previousBotState
+                    } else {
+                        println("No antivenom potions found")
+                        // Teleport
+                        Inventory.useItem(config.TELEPORT().toString())
+                        needsToBank = true
+                    }
                     State.NONE -> println("TODO")
                     else -> botState = State.NONE
                 }
-            } else if(vorkath == null || vorkath.isDead){
+            } else if(Rs2Npc.getNpc("vorkath") == null){
                 Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
                 if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
                 Script.toggleRunEnergy(true)

@@ -23,37 +23,47 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.driftnet;
+package net.runelite.client.plugins.microbot.driftnet;
 
-import java.awt.Color;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import net.runelite.api.GameObject;
+import net.runelite.api.annotations.Varbit;
+import net.runelite.api.coords.WorldPoint;
 
-@Getter
+import java.util.Set;
+
+@Data
 @RequiredArgsConstructor
-enum DriftNetStatus
+public class DriftNet
 {
-	UNSET(Color.YELLOW),
-	SET(Color.GREEN),
-	CATCH(Color.GREEN),
-	FULL(Color.RED);
+	private final int objectId;
+	@Getter(onMethod_ = {@Varbit})
+	private final int statusVarbit;
+	@Getter(onMethod_ = {@Varbit})
+	private final int countVarbit;
+	private final Set<WorldPoint> adjacentTiles;
 
-	private final Color color;
+	private GameObject net;
+	private DriftNetStatus status;
+	private int count;
+	@Setter
+	private DriftNetStatus prevTickStatus;
 
-	static DriftNetStatus of(int varbitValue)
+	// Nets that are not accepting fish are those currently not accepting, or those which were not
+	// accepting in the previous tick. (When a fish shoal is 2 tiles adjacent to a drift net and is
+	// moving to a net that is just being setup it will be denied even though the net is currently
+	// in the CATCHING status)
+	boolean isNotAcceptingFish()
 	{
-		switch (varbitValue)
-		{
-			case 0:
-				return UNSET;
-			case 1:
-				return SET;
-			case 2:
-				return CATCH;
-			case 3:
-				return FULL;
-			default:
-				return null;
-		}
+		return (status != DriftNetStatus.CATCH && status != DriftNetStatus.SET) ||
+			(prevTickStatus != DriftNetStatus.CATCH && prevTickStatus != DriftNetStatus.SET);
+	}
+
+	String getFormattedCountText()
+	{
+		return status != DriftNetStatus.UNSET ? count + "/10" : "";
 	}
 }

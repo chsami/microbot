@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.util.inventory;
 
 import net.runelite.api.ItemComposition;
 import net.runelite.api.Point;
-import net.runelite.api.Varbits;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -11,20 +10,12 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 
 public class Inventory {
@@ -151,7 +142,7 @@ public class Inventory {
     public static boolean hasItem(int id) {
         Microbot.status = "Looking for item: " + id;
         Widget inventoryWidget = getInventory();
-
+        if (inventoryWidget == null) return false;
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
                 .anyMatch(x ->
                         itemExistsInInventory(x) && x.getItemId() == id));
