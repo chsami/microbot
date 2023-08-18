@@ -122,7 +122,6 @@ public class Walker {
         sleep(100);
         travelToCanvasPoint = null;
     }
-
     public void handleMenuSwapper(MenuEntry menuEntry) {
         if (travelToCanvasPoint == null) return;
         menuEntry.setOption("Walk here");

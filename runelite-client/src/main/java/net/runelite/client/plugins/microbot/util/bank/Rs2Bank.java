@@ -139,6 +139,66 @@ public class Rs2Bank {
         }
         return false;
     }
+    public static boolean openCertainBanker(int bankerID) {
+        Microbot.status = "Opening bank";
+        try {
+            if (Inventory.isUsingItem())
+                Microbot.getMouse().click();
+            if (isBankOpen()) return true;
+            NPC npc = Rs2Npc.getNpc(bankerID);
+            if (npc == null) return false;
+            boolean action = Rs2Menu.doAction("bank", npc.getCanvasTilePoly() );
+            if (action) {
+                sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleep(600, 1000);
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+    public static boolean openCertainBank(TileObject bank) {
+        Microbot.status = "Opening bank";
+        try {
+            if (Inventory.isUsingItem())
+                Microbot.getMouse().click();
+            if (isBankOpen()) return true;
+            //Microbot.getMouse().click(bank.getCanvasLocation().getX(),bank.getCanvasLocation().getY());
+            if (bank == null) return false;
+            boolean action = Rs2Menu.doAction(new String[]{"use","bank"}, bank.getCanvasTilePoly().getBounds());
+            if (action) {
+                sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleep(600, 1000);
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }public static boolean openCertainBank(NPC banker) {
+        Microbot.status = "Opening bank";
+        try {
+            if (Inventory.isUsingItem())
+                Microbot.getMouse().click();
+            if (isBankOpen()) return true;
+            if (banker == null) return false;
+            boolean action = Rs2Menu.doAction("bank", banker.getCanvasTilePoly());
+            if (action) {
+                sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleep(600, 1000);
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+
+
 
     public static boolean scrollTo(Widget widget) {
         Microbot.status = "Searching for item";
@@ -475,4 +535,7 @@ public class Rs2Bank {
             }
         }
     }
+
+
+
 }

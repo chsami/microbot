@@ -47,6 +47,9 @@ public class Rs2Widget {
             return Arrays.stream(widget.getChildren()).anyMatch(x -> x.getText().contains(matchingText));
         });
     }
+    public static int getChildWidgetSpriteID(int id, int childId) {
+        return  Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId).getSpriteId());
+    }
 
     public static boolean clickWidget(int id) {
         Widget widget = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id));
@@ -230,4 +233,6 @@ public class Rs2Widget {
         }
         return found;
     }
+
+
 }

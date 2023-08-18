@@ -115,6 +115,17 @@ public class Rs2Menu {
         }
         return result;
     }
+    public static boolean doAction(String[] actions, Rectangle bounds) {
+        Microbot.getMouse().move(bounds.getCenterX(), bounds.getCenterY());
+        boolean result = false;
+        for (String action : actions) {
+            if (hasAction(new Point((int)bounds.getCenterX(), (int)bounds.getCenterY()), action)) {
+                result = doAction(action, new Point((int)bounds.getCenterX(), (int)bounds.getCenterY()), (String[]) null);
+                if (result) break;
+            }
+        }
+        return result;
+    }
 
     /**
      * Clicks the menu target. Will left-click if the menu item is the first,
