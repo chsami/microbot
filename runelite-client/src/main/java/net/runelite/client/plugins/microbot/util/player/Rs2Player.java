@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.player;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 
 
 public class Rs2Player {
@@ -30,7 +31,7 @@ public class Rs2Player {
     }
 
     public static boolean hasAntiVenomActive() {
-        return antiVenomTime > 0;
+        if(Rs2Equipment.hasEquipped("serpentine helm")) { return true; } else return antiVenomTime > 0;
     }
 
     public static void handlePotionTimers(VarbitChanged event) {

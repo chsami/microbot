@@ -147,7 +147,7 @@ class AutoVorkathPlugin : Plugin() {
                 }
 
                 // Check if player needs to drink antivenom potion
-                if(!Rs2Player.hasAntiVenomActive() && !Rs2Equipment.hasEquipped("serpentine helm") && botState != State.ACID && botState != State.RED_BALL){
+                if(!Rs2Player.hasAntiVenomActive() && botState != State.ACID && botState != State.RED_BALL){
                     botState = State.ANTIVENOM
                 }
 
@@ -234,7 +234,7 @@ class AutoVorkathPlugin : Plugin() {
                     State.NONE -> println("TODO")
                     else -> botState = State.NONE
                 }
-            } else if(Rs2Npc.getNpc("vorkath") == null){
+            } else if(Rs2Npc.getNpc("vorkath") == null || needsToBank || vorkath.isDead || !vorkath.isInteracting){
                 Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
                 if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
                 Script.toggleRunEnergy(true)
