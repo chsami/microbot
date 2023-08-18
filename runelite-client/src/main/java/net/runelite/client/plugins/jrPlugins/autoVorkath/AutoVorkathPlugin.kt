@@ -230,7 +230,7 @@ class AutoVorkathPlugin : Plugin() {
                     State.NONE -> println("TODO")
                     else -> botState = State.NONE
                 }
-            } else if(Rs2Npc.getNpc("vorkath") == null || vorkath.isDead || !vorkath.isInteracting){
+            } else if(Rs2Npc.getNpc("vorkath") == null || needsToBank || vorkath.isDead || !vorkath.isInteracting){
                 Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
                 if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
                 Script.toggleRunEnergy(true)
