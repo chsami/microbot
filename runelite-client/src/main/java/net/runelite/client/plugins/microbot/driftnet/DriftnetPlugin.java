@@ -21,8 +21,10 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.PluginDescriptor.Mocrosoft;
+
 @PluginDescriptor(
-        name = "Micro Drifnet",
+        name = Mocrosoft + "Drifnet",
         description = "Microbot drifnet plugin",
         tags = {"fishing", "microbot", "hunter", "drift", "net"},
         enabledByDefault = false

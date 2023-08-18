@@ -37,13 +37,13 @@ public class ogBlastFurnaceScript extends Script {
     private int getBFDispenserState() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.BAR_DISPENSER));}
     private void iceGlovesEquip(){if(Rs2Equipment.hasEquipped(ItemID.ICE_GLOVES)){return;} Rs2Equipment.equipItemFast(ItemID.ICE_GLOVES); sleepUntil(() -> Rs2Equipment.hasEquipped(ItemID.ICE_GLOVES));}
     private void goldGlovesEquip(){if(Rs2Equipment.hasEquipped(ItemID.GOLDSMITH_GAUNTLETS)){return;} Rs2Equipment.equipItemFast(ItemID.GOLDSMITH_GAUNTLETS); sleepUntil(() -> Rs2Equipment.hasEquipped(ItemID.GOLDSMITH_GAUNTLETS));}
-    private void openChest() {Microbot.status = "Opening Chest";Rs2Bank.openCertainChest(Rs2GameObject.findObjectById(ObjectID.BANK_CHEST_26707),4,4); /*implement randX and randY currently does nothing with values*/ }
+    private void openChest() {Microbot.status = "Opening Chest";Rs2Bank.openCertainBank(Rs2GameObject.findObjectById(ObjectID.BANK_CHEST_26707)); /*implement randX and randY currently does nothing with values*/ }
     private boolean playerAtRetrieveLocation() { return Arrays.asList(nextToBarDespensor).contains(playerLocation());}
     private int getRunEnergy(){ return Integer.parseInt(Rs2Widget.getWidget(10485788).getText());}
     private int getStam() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.STAMINA_EFFECT));}
     private void grabStam() {
         //Rs2Bank.withdrawItem("Stamina potion(1)");
-        Microbot.getMouse().clickFast(Rs2Widget.findWidget("Stamina potion(1)").getBounds());
+        Microbot.getMouse().click(Rs2Widget.findWidget("Stamina potion(1)").getBounds());
         sleepUntil(() -> Inventory.hasItem(ItemID.STAMINA_POTION1),2000);
         Rs2Widget.clickChildWidget(983043,1);
     }
@@ -84,12 +84,12 @@ public class ogBlastFurnaceScript extends Script {
                 if(Random.random(1,5) == 3){
                     iceGlovesEquip();
                     sleep(120,200);
-                    Microbot.getWalker().walkFastCanvas(new WorldPoint(1940,4962,0));
+                    Microbot.getWalker().walkCanvas(new WorldPoint(1940,4962,0));
                     callAFK(36,1000,6183);
                     sleepUntil(() -> playerAtRetrieveLocation());
                     sleep(120,200);
                 } else {
-                    Microbot.getWalker().walkFastCanvas(new WorldPoint(1940,4962,0));
+                    Microbot.getWalker().walkCanvas(new WorldPoint(1940,4962,0));
                     callAFK(38,1000,6258);
                     sleepUntil(() -> playerAtRetrieveLocation());
                     sleep(120,200);
@@ -105,33 +105,33 @@ public class ogBlastFurnaceScript extends Script {
         Microbot.status = "Retrieving Bars";
         sleep(140,170);
         iceGlovesEquip();
-        if(getBFDispenserState() == 1){sleepUntilMax5Seconds(() -> getBFDispenserState() == 2 || getBFDispenserState() == 3);}
+        if(getBFDispenserState() == 1){sleepUntil(() -> getBFDispenserState() == 2 || getBFDispenserState() == 3);}
         Rs2GameObject.interact(Rs2GameObject.findObjectByIdAndDistance(9092, 10));
         sleepUntilOnClientThread(() -> Rs2Widget.findWidget("How many would you like to take?") != null);
         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         sleep(40,90);
         goldGlovesEquip();
         sleep(120,200);
-        sleepUntilMax5Seconds(() -> Inventory.hasItem(ItemID.GOLD_BAR));
+        sleepUntil(() -> Inventory.hasItem(ItemID.GOLD_BAR));
     }
     private void restock() {
         openChest();
         callAFK(27,1000,6000);
-        sleepUntilMax5Seconds(() -> Rs2Bank.isOpen());
+        sleepUntil(() -> Rs2Bank.isOpen());
         if( Rs2Bank.isOpen()) {
             if(Inventory.hasItem(ItemID.GOLD_BAR)){ Microbot.getMouse().click(Inventory.findItem(ItemID.GOLD_BAR).getBounds());}
             if(Rs2Widget.getChildWidgetSpriteID(786443, 5) != 1079 ){Rs2Widget.clickChildWidget(786443, 5);}
             if( getStam() <= 10|| getRunEnergy() <= 40){grabStam();}
             Microbot.getMouse().click(Rs2Widget.findWidgetExact("Gold ore").getBounds());
             //Rs2Bank.withdrawItem("Gold ore");
-            sleepUntilMax5Seconds(() -> Inventory.hasItem(ItemID.GOLD_ORE));
+            sleepUntil(() -> Inventory.hasItem(ItemID.GOLD_ORE));
             sleep(50,80);
             if(Random.random(0,10) == 3){VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);}
         }
     }
     private void depositOverflow() {
         openChest();
-        sleepUntilMax5Seconds(() -> Rs2Bank.isOpen());
+        sleepUntil(() -> Rs2Bank.isOpen());
         Rs2Widget.clickChildWidget(983043,Random.random(3,27));
         sleep(50,80);
         VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);

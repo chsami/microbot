@@ -535,6 +535,15 @@ public class Rs2Bank {
             }
         }
     }
+    public static void withdrawAllDriftNet() {
+        widgetId = 20250629;
+        itemId = ItemID.DRIFT_NET;
+        identifier = 4;
+        Microbot.getMouse().clickFast(1, 1);
+        sleep(100);
+        widgetId = 0;
+        itemId = 0;
+    }
 
 
 
