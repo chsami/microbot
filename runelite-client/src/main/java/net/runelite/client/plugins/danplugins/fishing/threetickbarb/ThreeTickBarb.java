@@ -33,7 +33,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
-        name = "Three tick barb",
+        name = PluginDescriptor.Dan + "3T Barb Fishing",
         description = "Performs 3T Barb Fishing flawlessly",
         enabledByDefault = false
 )

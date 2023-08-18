@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Leviathan",
+        name = PluginDescriptor.Mocrosoft + "Leviathan",
         description = "Microbot Leviathan plugin",
         tags = {"Leviathan", "microbot", "boss"},
         enabledByDefault = false

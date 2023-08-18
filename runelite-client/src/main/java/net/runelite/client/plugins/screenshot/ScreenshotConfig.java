@@ -47,10 +47,7 @@ public interface ScreenshotConfig extends Config
 		description = "Configures whether or not the client frame is included in screenshots",
 		position = 0
 	)
-	default boolean includeFrame()
-	{
-		return true;
-	}
+	default boolean includeFrame() { return true; }
 
 	@ConfigItem(
 		keyName = "displayDate",

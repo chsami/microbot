@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Tanner",
+        name = PluginDescriptor.Mocrosoft + "Tanner",
         description = "Microbot tanner plugin",
         tags = {"tanner", "microbot", "moneymaking"},
         enabledByDefault = false

@@ -23,7 +23,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
 @PluginDescriptor(
-        name = "Micro PlayerAssistant",
+        name = PluginDescriptor.Mocrosoft + "PlayerAssistant",
         description = "Microbot playerassistant plugin",
         tags = {"assist", "microbot", "misc", "combat"},
         enabledByDefault = false

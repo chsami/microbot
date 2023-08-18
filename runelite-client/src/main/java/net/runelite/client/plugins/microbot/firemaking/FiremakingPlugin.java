@@ -15,7 +15,7 @@ import java.awt.*;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
-        name = "Micro Firemaking",
+        name = PluginDescriptor.Mocrosoft + "Firemaking",
         description = "Microbot firemaking plugin",
         tags = {"firemaking", "microbot"},
         enabledByDefault = false

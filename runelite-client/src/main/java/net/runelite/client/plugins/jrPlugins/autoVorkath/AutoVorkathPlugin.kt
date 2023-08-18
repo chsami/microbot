@@ -1,15 +1,19 @@
 package net.runelite.client.plugins.jrPlugins.autoVorkath
 
+import com.google.inject.Provides
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import net.runelite.api.*
+import net.runelite.api.Client
+import net.runelite.api.ObjectID
+import net.runelite.api.Skill
+import net.runelite.api.Varbits
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
 import net.runelite.client.callback.ClientThread
 import net.runelite.client.config.ConfigManager
-import com.google.inject.Provides
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
+import net.runelite.client.plugins.PluginDescriptor.JR
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.util.Global.sleep
@@ -28,7 +32,7 @@ import javax.inject.Inject
 
 
 @PluginDescriptor(
-    name = "Auto Vorkath",
+    name = JR + "Auto Vorkath",
     description = "JR - Auto vorkath",
     tags = ["vorkath", "microbot", "auto", "auto prayer"],
     enabledByDefault = false

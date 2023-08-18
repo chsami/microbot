@@ -19,7 +19,7 @@ import java.awt.*;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
-        name = "Nate's Power Teleporter",
+        name = PluginDescriptor.Nate +"Power Teleporter",
         description = "Nate's Teleporter plugin",
         tags = {"Magic", "nate", "combat"},
         enabledByDefault = false

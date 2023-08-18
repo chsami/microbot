@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Magic",
+        name = PluginDescriptor.Mocrosoft + "Magic",
         description = "Microbot Magic plugin",
         tags = {"magic", "microbot", "skills", "Mage"},
         enabledByDefault = false

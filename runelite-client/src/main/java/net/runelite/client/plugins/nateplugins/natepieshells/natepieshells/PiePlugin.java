@@ -20,7 +20,7 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 
 @PluginDescriptor(
-        name = "Nate's Pie Shell Maker",
+        name = PluginDescriptor.Nate +"Pie Shell Maker",
         description = "Nate's Pie Shell Maker",
         tags = {"MoneyMaking", "nate", "pies"},
         enabledByDefault = false

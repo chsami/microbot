@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Nate's PowerMiner",
+        name = PluginDescriptor.Nate +"PowerMiner",
         description = "Nate's PowerMiner plugin",
         tags = {"Mining", "nate", "skilling"},
         enabledByDefault = false

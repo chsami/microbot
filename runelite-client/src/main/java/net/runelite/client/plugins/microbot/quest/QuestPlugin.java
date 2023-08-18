@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = "Micro Quester",
+        name = PluginDescriptor.Mocrosoft + "Quester",
         description = "Microbot quest plugin",
         tags = {"example", "microbot"},
         enabledByDefault = false
