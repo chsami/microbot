@@ -37,7 +37,7 @@ public class ogBlastFurnaceScript extends Script {
     private int getBFDispenserState() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.BAR_DISPENSER));}
     private void iceGlovesEquip(){if(Rs2Equipment.hasEquipped(ItemID.ICE_GLOVES)){return;} Rs2Equipment.equipItemFast(ItemID.ICE_GLOVES); sleepUntil(() -> Rs2Equipment.hasEquipped(ItemID.ICE_GLOVES));}
     private void goldGlovesEquip(){if(Rs2Equipment.hasEquipped(ItemID.GOLDSMITH_GAUNTLETS)){return;} Rs2Equipment.equipItemFast(ItemID.GOLDSMITH_GAUNTLETS); sleepUntil(() -> Rs2Equipment.hasEquipped(ItemID.GOLDSMITH_GAUNTLETS));}
-    private void openChest() {Microbot.status = "Opening Chest";Rs2Bank.openCertainBank(Rs2GameObject.findObjectById(ObjectID.BANK_CHEST_26707)); /*implement randX and randY currently does nothing with values*/ }
+    private void openChest() {Rs2Bank.openCertainBank(Rs2GameObject.findObjectById(ObjectID.BANK_CHEST_26707)); /*implement randX and randY currently does nothing with values*/ }
     private boolean playerAtRetrieveLocation() { return Arrays.asList(nextToBarDespensor).contains(playerLocation());}
     private int getRunEnergy(){ return Integer.parseInt(Rs2Widget.getWidget(10485788).getText());}
     private int getStam() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.STAMINA_EFFECT));}
@@ -76,7 +76,7 @@ public class ogBlastFurnaceScript extends Script {
     private void loadConveyor() {
         Microbot.status = "Loading Conveyor";
         if(Inventory.hasItem(ItemID.GOLD_ORE)){
-            Rs2GameObject.interact(Rs2GameObject.findObjectById(9100));
+            Rs2GameObject.interact(9100);
             sleepUntil(() -> !Inventory.hasItem(ItemID.GOLD_ORE), 20000);
             callAFK(36,1000,3000);
             Microbot.status = "Loaded Conveyor";
@@ -106,7 +106,7 @@ public class ogBlastFurnaceScript extends Script {
         sleep(140,170);
         iceGlovesEquip();
         if(getBFDispenserState() == 1){sleepUntil(() -> getBFDispenserState() == 2 || getBFDispenserState() == 3);}
-        Rs2GameObject.interact(Rs2GameObject.findObjectByIdAndDistance(9092, 10));
+        Rs2GameObject.interact(9092);
         sleepUntilOnClientThread(() -> Rs2Widget.findWidget("How many would you like to take?") != null);
         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         sleep(40,90);
