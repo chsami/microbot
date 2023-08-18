@@ -576,7 +576,7 @@ public class Rs2GameObject {
         try {
             objectToInteract = object;
             objectAction = action;
-            Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
             sleep(100);
             objectToInteract = null;
             objectAction = null;
@@ -606,9 +606,9 @@ public class Rs2GameObject {
 
         menuEntry.setTarget("");
         menuEntry.setOption(objectAction);
-        if (objectAction.toLowerCase().equals("bank") || objectAction.toLowerCase().equals("take")) {
+        if (objectAction.equalsIgnoreCase("bank") || objectAction.equalsIgnoreCase("take")) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
-        } else if (objectAction.toLowerCase().equals("collect") || objectAction.toLowerCase().equals("store")) {
+        } else if (objectAction.equalsIgnoreCase("collect") || objectAction.equalsIgnoreCase("store") || objectAction.equalsIgnoreCase("Nets")) {
             menuEntry.setType(MenuAction.GAME_OBJECT_THIRD_OPTION);
         }else if (objectAction.toLowerCase().equals("reset")) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);

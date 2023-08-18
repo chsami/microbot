@@ -1,7 +1,5 @@
 package net.runelite.client.plugins.microbot.example;
 
-import net.runelite.api.GameObject;
-import net.runelite.api.ObjectID;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -11,6 +9,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 
@@ -25,6 +24,8 @@ boolean reachedEndLine = false;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
+            //    Rs2Bank.openBank();
+              //  System.out.println(Rs2Bank.isBankOpen());
        //         MicrobotInventorySetup.loadEquipment("test");
         //        MicrobotInventorySetup.loadInventory("test");
 //                Rs2Bank.withdrawAndEquipFast(ItemID.VOID_KNIGHT_GLOVES);
@@ -58,43 +59,13 @@ boolean reachedEndLine = false;
 //                    System.out.println(inventorySetupsItem.getName());
 //                }
 
-                if (Rs2GameObject.findObjectById(ObjectID.ACID_POOL_32000) != null) {
-                   // toggleRunEnergy(false);
-                    if (position1 == null) {
-                        for (int i = 0; i < 4; i++) {
-                            int x = i * 128;
-                            GameObject gameObject = Rs2GameObject.getGameObject(new LocalPoint(5824 + x, 7104));
-
-                            if (gameObject == null) {
-                                position1 = new LocalPoint(5824 + x, 6976);
-                            }
-
-                        }
-                        return;
-                    }
-
-                    System.out.println(position1);
-
-
-                    if (Microbot.getClient().getLocalPlayer().getLocalLocation().getY() <= 7300 && !reachedEndLine) {
-                        reachedEndLine = true;
-                    }
-
-                    if (!reachedEndLine) {
-                        Microbot.getWalker().walkFastCanvas(position1);
-                        return;
-                    }
-
-                    Microbot.getWalker().walkFastCanvas(position1);
-                    sleep(500);
-                    Rs2Npc.interact("vorkath", "attack");
-                }
 
                 //getParam0=828, getParam1=582
 
                 //getParam0=-5146, getParam1=-4228,
                 //getParam0=-5350, getParam1=-4235
-               // System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+                Rs2Bank.withdrawAllDriftNet();
+                System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

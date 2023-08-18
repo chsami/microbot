@@ -431,9 +431,9 @@ public class Rs2Bank {
     }
 
     public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        if (widgetId == 0 || itemWidget == null) return;
-        int idx = itemWidget.getIndex();
-        menuEntry.getClass().getMethod("qk", int.class).invoke(menuEntry, itemId); //use the setItemId method through reflection
+        if (widgetId == 0) return;
+        int idx = itemWidget != null ? itemWidget.getIndex() : 0;
+        menuEntry.getClass().getMethod("sq", int.class).invoke(menuEntry, itemId); //use the setItemId method through reflection
         menuEntry.setOption("Withdraw-1");
         menuEntry.setIdentifier(identifier);
         menuEntry.setParam0(idx);
@@ -474,5 +474,15 @@ public class Rs2Bank {
                 i++;
             }
         }
+    }
+
+    public static void withdrawAllDriftNet() {
+            widgetId = 20250629;
+            itemId = ItemID.DRIFT_NET;
+            identifier = 4;
+            Microbot.getMouse().clickFast(1, 1);
+            sleep(100);
+            widgetId = 0;
+            itemId = 0;
     }
 }
