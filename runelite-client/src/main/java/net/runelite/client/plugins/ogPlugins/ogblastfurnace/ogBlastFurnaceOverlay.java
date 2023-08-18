@@ -22,7 +22,7 @@ public class ogBlastFurnaceOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("OG Blast Furnace V" + ogBlastFurnaceScript.version)
+                    .text("OG Blast Furnace")
                     .color(Color.GREEN)
                     .build());
 

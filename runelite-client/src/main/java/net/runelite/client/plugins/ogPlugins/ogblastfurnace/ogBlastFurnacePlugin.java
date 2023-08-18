@@ -45,7 +45,7 @@ public class ogBlastFurnacePlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(ogBlastFurnaceOverlay);
         }
-        ogBlastFurnaceScript.run(config);
+        ogBlastFurnaceScript.run(360);
     }
 
     protected void shutDown() {
