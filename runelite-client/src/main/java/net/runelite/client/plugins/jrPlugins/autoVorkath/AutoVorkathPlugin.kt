@@ -143,7 +143,7 @@ class AutoVorkathPlugin : Plugin() {
                 }
 
                 // Check if player needs to drink antivenom potion
-                if(!Rs2Player.hasAntiVenomActive() && !Rs2Equipment.hasEquipped("serpentine helm") && botState != State.ACID && botState != State.RED_BALL){
+                if(!Rs2Player.hasAntiVenomActive() && botState != State.ACID && botState != State.RED_BALL){
                     botState = State.ANTIVENOM
                 }
 
