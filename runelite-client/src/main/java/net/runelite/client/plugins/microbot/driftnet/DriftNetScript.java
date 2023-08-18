@@ -59,7 +59,6 @@ public class DriftNetScript extends Script {
                     if (!DriftNetPlugin.getTaggedFish().containsKey(fish)) {
                         Rs2Npc.interact(fish, "Chase");
                         sleepUntil(() -> DriftNetPlugin.getTaggedFish().containsKey(fish));
-                        //sleep(500 * Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(fish.getWorldLocation()));
                         break;
                     }
                 }
