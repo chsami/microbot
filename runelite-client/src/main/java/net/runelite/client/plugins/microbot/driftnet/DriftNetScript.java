@@ -56,7 +56,7 @@ public class DriftNetScript extends Script {
                 }
 
                 for (NPC fish : DriftNetPlugin.getFish().stream().sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation()))).collect(Collectors.toList())) {
-                    if (!DriftNetPlugin.getTaggedFish().containsKey(fish)) {
+                    if (!DriftNetPlugin.getTaggedFish().containsKey(fish) &&  Rs2Npc.getNpcByIndex(fish.getIndex()) != null) {
                         Rs2Npc.interact(fish, "Chase");
                         sleepUntil(() -> DriftNetPlugin.getTaggedFish().containsKey(fish));
                         break;

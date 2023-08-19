@@ -24,12 +24,13 @@
  */
 package net.runelite.client;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import javax.annotation.Nullable;
-import lombok.AccessLevel;
-import lombok.Getter;
 
 public class RuneLiteProperties
 {

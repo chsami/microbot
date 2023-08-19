@@ -3,6 +3,8 @@ package net.runelite.client.plugins.microbot.util.grounditem;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.grounditems.GroundItem;
+import net.runelite.client.plugins.grounditems.GroundItemsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
@@ -13,16 +15,19 @@ import net.runelite.client.plugins.microbot.util.models.RS2Item;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2GroundItem {
 
     public static RS2Item itemInteraction;
-public static String itemAction;
+    public static String itemAction;
+    public static GroundItem groundItemInteraction;
+
     /**
      * Returns all the ground items at a tile on the current plane.
      *
@@ -129,6 +134,20 @@ public static String itemAction;
         return false;
     }
 
+    public static boolean lootAtGePrice(int minGePrice) {
+        Collection<GroundItem> groundItemList = GroundItemsPlugin.getCollectedGroundItems().values();
+        groundItemList = groundItemList.stream().filter(x -> x.getGePrice() >= minGePrice)
+                .sorted(Comparator.comparingInt(value -> value.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
+                .collect(Collectors.toList());
+        for (GroundItem groundItem : groundItemList) {
+            if (Inventory.isInventoryFull(groundItem.getName())) return false;
+            interact(groundItem);
+            sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(groundItem.getLocation()));
+            return true;
+        }
+        return false;
+    }
+
     public static boolean pickup(int itemId) {
         return loot(itemId);
     }
@@ -152,8 +171,27 @@ public static String itemAction;
         return true;
     }
 
+    private static boolean interact(GroundItem groundItem, String action) {
+        if (groundItem == null) return false;
+        try {
+            groundItemInteraction = groundItem;
+            itemAction = action;
+            Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            sleep(100);
+            groundItemInteraction = null;
+            itemAction = "";
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return true;
+    }
+
     private static boolean interact(RS2Item rs2Item) {
         return interact(rs2Item, "Take");
+    }
+
+    private static boolean interact(GroundItem groundItem) {
+        return interact(groundItem, "Take");
     }
 
     public static boolean interact(String itemName, String action) {
@@ -249,11 +287,20 @@ public static String itemAction;
     }
 
     public static void handleMenuSwapper(MenuEntry menuEntry) {
-        if (itemInteraction == null) return;
-        menuEntry.setIdentifier(itemInteraction.getTileItem().getId());
-        menuEntry.setParam0(itemInteraction.getTile().getLocalLocation().getSceneX());
-        menuEntry.setTarget("<col=ff9040>" + itemInteraction.getItem().getName());
-        menuEntry.setParam1(itemInteraction.getTile().getLocalLocation().getSceneY());
+        if (itemInteraction == null && groundItemInteraction == null) return;
+        if (itemInteraction != null) {
+            menuEntry.setIdentifier(itemInteraction.getTileItem().getId());
+            menuEntry.setParam0(itemInteraction.getTile().getLocalLocation().getSceneX());
+            menuEntry.setTarget("<col=ff9040>" + itemInteraction.getItem().getName());
+            menuEntry.setParam1(itemInteraction.getTile().getLocalLocation().getSceneY());
+        }
+        if (groundItemInteraction != null) {
+            menuEntry.setIdentifier(groundItemInteraction.getId());
+            LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), groundItemInteraction.getLocation());
+            menuEntry.setParam0(localPoint.getSceneX());
+            menuEntry.setTarget("<col=ff9040>" + groundItemInteraction.getName());
+            menuEntry.setParam1(localPoint.getSceneY());
+        }
         menuEntry.setOption(itemAction);
         if (itemAction.toLowerCase().equals("lay")) {
             menuEntry.setType(MenuAction.GROUND_ITEM_FOURTH_OPTION);

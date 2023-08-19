@@ -24,21 +24,24 @@
  */
 package net.runelite.client.plugins.grounditems;
 
-import java.time.Instant;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.time.Instant;
 
 @Data
 @Builder
-class GroundItem
+public class GroundItem
 {
 	private int id;
 	private int itemId;
 	private String name;
 	private int quantity;
+	@Getter
 	private WorldPoint location;
 	private int height;
 	private int haPrice;
@@ -56,7 +59,7 @@ class GroundItem
 		return haPrice * quantity;
 	}
 
-	int getGePrice()
+	public int getGePrice()
 	{
 		return gePrice * quantity;
 	}
