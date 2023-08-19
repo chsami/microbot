@@ -60,6 +60,7 @@ public class ogBlastFurnaceScript extends Script {
 
 
 
+
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
@@ -68,6 +69,9 @@ public class ogBlastFurnaceScript extends Script {
     }
     private void calcState(){
         Microbot.status = "Calculating State";
+        System.out.println("Gold bars = "+getBFGoldBars());
+        System.out.println("Gold ores = "+getBFGoldOres());
+        System.out.println("");
         if(Inventory.isFull() && getBFGoldOres() > 20 && getBFGoldBars() > 20){botState = State.TOMUCHSUPLIES;}
         else if(Inventory.hasItemAmount(ItemID.GOLD_BAR, 20) || ((getBFGoldBars() < 26 || getBFGoldOres() < 26) && !Inventory.hasItem(ItemID.GOLD_ORE))){botState = State.BANKING;}
         else if(getBFGoldBars() >= 26 && getBFGoldOres() >= 26){botState = State.RETRIEVING_ORE;}
@@ -105,9 +109,11 @@ public class ogBlastFurnaceScript extends Script {
         Microbot.status = "Retrieving Bars";
         sleep(140,170);
         iceGlovesEquip();
+        System.out.println("ice gloves");
         if(getBFDispenserState() == 1){sleepUntil(() -> getBFDispenserState() == 2 || getBFDispenserState() == 3);}
         Rs2GameObject.interact(9092);
-        sleepUntilOnClientThread(() -> Rs2Widget.findWidget("How many would you like to take?") != null);
+        System.out.println("click furnace");
+        sleepUntil(() -> Rs2Widget.findWidget("How many would you like to take?") != null);
         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         sleep(40,90);
         goldGlovesEquip();
