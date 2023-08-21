@@ -505,7 +505,7 @@ public class Rs2Bank {
     public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (widgetId == 0 || itemWidget == null) return;
         int idx = itemWidget.getIndex();
-        menuEntry.getClass().getMethod("qk", int.class).invoke(menuEntry, itemId); //use the setItemId method through reflection
+        menuEntry.getClass().getMethod("sq", int.class).invoke(menuEntry, itemId); //use the setItemId method through reflection
         menuEntry.setOption("Withdraw-1");
         menuEntry.setIdentifier(identifier);
         menuEntry.setParam0(idx);
