@@ -1,16 +1,13 @@
 package net.runelite.client.plugins.microbot.util.security;
 
-import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigProfile;
 import net.runelite.client.config.ProfileManager;
-import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.GlobalWidgetInfo;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
-import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.util.WorldUtil;
 
@@ -30,20 +27,20 @@ public class Login {
     }
 
     public Login() {
-        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
-        sleep(300, 600);
         try {
+            if (Encryption.decrypt(getProfile().getPassword()) == null || Encryption.decrypt(getProfile().getPassword()).length() == 0)
+                return;
+            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+            sleep(300, 600);
             setWorld(360);
-        }catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("Changing world failed");
         } finally {
             Microbot.getClient().setUsername(getProfile().getName());
             try {
-                if (Encryption.decrypt(getProfile().getPassword()) != null && Encryption.decrypt(getProfile().getPassword()).length() > 0) {
-                    Microbot.getClient().setPassword(Encryption.decrypt(getProfile().getPassword()));
-                    sleep(300, 600);
-                    VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
-                }
+                Microbot.getClient().setPassword(Encryption.decrypt(getProfile().getPassword()));
+                sleep(300, 600);
+                VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -55,7 +52,7 @@ public class Login {
         sleep(300, 600);
         try {
             setWorld(360);
-        }catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("Changing world failed");
         } finally {
             Microbot.getClient().setUsername(username);
@@ -74,7 +71,7 @@ public class Login {
         sleep(300, 600);
         try {
             setWorld(world);
-        }catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("Changing world failed");
         } finally {
             Microbot.getClient().setUsername(getProfile().getName());
