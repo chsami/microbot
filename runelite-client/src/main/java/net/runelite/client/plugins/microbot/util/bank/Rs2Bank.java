@@ -69,7 +69,19 @@ public class Rs2Bank {
         if (!Inventory.hasItem(itemName)) return true;
         Widget item = Inventory.findItem(itemName);
         if (item == null) return false;
-        Rs2Widget.clickWidget(786468);
+        if(Rs2Widget.getChildWidgetSpriteID(786468,0) != 1150){Rs2Widget.clickWidget(786468);}
+        sleep(600, 1000);
+        boolean action = Rs2Menu.doAction("Deposit-all", item.getBounds());
+        sleep(600, 1000);
+        return action;
+    }
+    public static boolean depositAll(int itemID) {
+        Microbot.status = "Deposit all " + itemID;
+        if (!isBankOpen()) return false;
+        if (!Inventory.hasItem(itemID)) return true;
+        Widget item = Inventory.findItem(itemID);
+        if (item == null) return false;
+        if(Rs2Widget.getChildWidgetSpriteID(786468,0) != 1150){Rs2Widget.clickWidget(786468);}
         sleep(600, 1000);
         boolean action = Rs2Menu.doAction("Deposit-all", item.getBounds());
         sleep(600, 1000);
@@ -82,7 +94,7 @@ public class Rs2Bank {
         if (!Inventory.hasItemContains(itemName)) return true;
         Widget item = Inventory.findItemContains(itemName);
         if (item == null) return false;
-        Rs2Widget.clickWidget(786468);
+        if(Rs2Widget.getChildWidgetSpriteID(786468,0) != 1150){Rs2Widget.clickWidget(786468);}
         sleep(600, 1000);
         boolean action = Rs2Menu.doAction("Deposit-all", item.getBounds());
         sleep(600, 1000);
