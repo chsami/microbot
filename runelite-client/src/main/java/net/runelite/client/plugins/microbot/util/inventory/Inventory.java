@@ -408,6 +408,12 @@ public class Inventory {
         if (item == null) return false;
         return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
+    public static boolean useItemAction(int itemID, String actionName) {
+        Microbot.status = "Use inventory item " + itemID + " with action " + actionName;
+        Widget item = findItem(itemID);
+        if (item == null) return false;
+        return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
+    }
 
     public static boolean useItemAction(String itemName, String[] actionNames) {
         Microbot.status = "Use inventory item " + itemName + " with actions " + Arrays.toString(actionNames);
