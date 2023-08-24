@@ -25,7 +25,7 @@ import javax.inject.Inject
     tags = ["chinchompas", "hunter", "auto", "catching", "jr", "JR", "microbot"],
     enabledByDefault = false
 )
-class AutoChin: Plugin() {
+class AutoChin : Plugin() {
     @Inject
     private lateinit var client: Client
 
@@ -63,8 +63,10 @@ class AutoChin: Plugin() {
     companion object {
         @JvmField
         var xpGained: Long = 0
+
         @JvmField
         var caught: Long = 0
+
         @JvmField
         var lvlsGained: Long = 0
         lateinit var version: String
@@ -104,7 +106,7 @@ class AutoChin: Plugin() {
         }
     }
 
-    private fun run(){
+    private fun run() {
         while (running) {
             when (currentState) {
                 State.IDLE -> handleIdleState()
@@ -124,7 +126,7 @@ class AutoChin: Plugin() {
     private fun handleIdleState() {
         try {
             // If there are box traps on the floor, interact with them first
-            if (Rs2GroundItem.interact(ItemID.BOX_TRAP, "lay" , 4)) {
+            if (Rs2GroundItem.interact(ItemID.BOX_TRAP, "lay", 4)) {
                 currentState = State.LAYING
                 return
             }
@@ -147,12 +149,12 @@ class AutoChin: Plugin() {
     }
 
     private fun handleCatchingState() {
-        sleep(8300,8400)
+        sleep(8300, 8400)
         currentState = State.IDLE
     }
 
     private fun handleLayingState() {
-        sleep(5500,5700)
+        sleep(5500, 5700)
         currentState = State.IDLE
     }
 
