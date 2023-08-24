@@ -63,7 +63,7 @@ public class FiremakingScript extends Script {
     private boolean findEmptyFiremakingSpot() {
         if (firemakingStatus == FiremakingStatus.FIND_EMPTY_SPOT) {
 
-            Microbot.getWalker().walkFastMinimap(startingPositions[Random.random(0, startingPositions.length - 1)]);
+            Microbot.getWalker().walkMiniMap(startingPositions[Random.random(0, startingPositions.length - 1)]);
 
             boolean isCloseToFiremakingSpot = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(startingPositions[0]) < 6;
 

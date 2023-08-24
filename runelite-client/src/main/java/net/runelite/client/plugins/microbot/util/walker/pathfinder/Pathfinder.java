@@ -9,11 +9,8 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.magic.Teleport;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.walker.Transport;
-import net.runelite.client.plugins.tithefarm.TitheFarmPlant;
-import net.runelite.client.plugins.tithefarm.TitheFarmPlugin;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -21,7 +18,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
-import static net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap.nodesChecked;
 import static net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap.wallNodes;
 
 public class Pathfinder implements Runnable {
@@ -56,7 +52,7 @@ public class Pathfinder implements Runnable {
     boolean calculatePath = true;
 
     public boolean getDebugger() {
-        return true;
+        return false;
     }
 
     public Pathfinder(PathfinderConfig config) {
