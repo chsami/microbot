@@ -55,6 +55,7 @@ class AutoChin: Plugin() {
         }
         time = getElapsedTime()
         xpGained = client.getSkillExperience(Skill.HUNTER) - startingXp.toLong()
+        xpHr = ((xpGained * 3600000.0 / (System.currentTimeMillis() - startTime))).toInt().toString()
         caught = xpGained / 265
         lvlsGained = client.getRealSkillLevel(Skill.HUNTER) - startingLvl.toLong()
     }
@@ -69,6 +70,7 @@ class AutoChin: Plugin() {
         lateinit var version: String
         lateinit var currentState: State
         lateinit var time: String
+        lateinit var xpHr: String
     }
 
     private var running = false
