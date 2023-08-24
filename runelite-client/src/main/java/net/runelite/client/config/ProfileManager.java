@@ -128,16 +128,22 @@ public class ProfileManager {
             return profiles;
         }
 
-        public ConfigProfile createProfile(String name, long id) {
-            ConfigProfile profile = new ConfigProfile(id);
-            profile.setName(name);
-            profile.setSync(false);
-            profile.setRev(-1);
-            profiles.add(profile);
-            modified = true;
-            log.debug("Created profile {}", profile);
-            return profile;
-        }
+		public ConfigProfile createProfile(String name, long id)
+		{
+			if (findProfile(id) != null)
+			{
+				throw new IllegalArgumentException("profile " + id + " already exists");
+			}
+
+			ConfigProfile profile = new ConfigProfile(id);
+			profile.setName(name);
+			profile.setSync(false);
+			profile.setRev(-1);
+			profiles.add(profile);
+			modified = true;
+			log.debug("Created profile {}", profile);
+			return profile;
+		}
 
         public ConfigProfile createProfile(String name) {
             return createProfile(name, System.nanoTime());
