@@ -213,7 +213,6 @@ class ProfilePanel extends PluginPanel {
             try {
                 new Login();
             } catch (Exception e) {
-                throw new RuntimeException(e);
             }
             card.setActive(true);
         });
@@ -457,7 +456,6 @@ class ProfilePanel extends PluginPanel {
                                 try {
                                     new Login(profile.getName(), profile.getPassword());
                                 } catch (Exception e) {
-                                    throw new RuntimeException(e);
                                 }
                             }
                         } else {
