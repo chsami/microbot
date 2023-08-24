@@ -87,7 +87,7 @@ class AutoChin: Plugin() {
 
     override fun startUp() {
         currentState = State.IDLE
-        version = "1.0.1"
+        version = "1.0.2"
         startTime = System.currentTimeMillis()
         startingXp = client.getSkillExperience(Skill.HUNTER)
         startingLvl = client.getRealSkillLevel(Skill.HUNTER)
@@ -145,12 +145,12 @@ class AutoChin: Plugin() {
     }
 
     private fun handleCatchingState() {
-        sleep(8400,8500)
+        sleep(8300,8400)
         currentState = State.IDLE
     }
 
     private fun handleLayingState() {
-        sleep(6000,6100)
+        sleep(5500,5700)
         currentState = State.IDLE
     }
 
