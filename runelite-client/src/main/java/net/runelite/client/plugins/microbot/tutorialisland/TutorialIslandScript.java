@@ -2,7 +2,15 @@ package net.runelite.client.plugins.microbot.tutorialisland;
 
 
 public class TutorialIslandScript {
+    public boolean run(TutorialIslandConfig config) {
+        return true;
+    }
+
+     public static void shutdown() {
+
+     }
 /*
+
     public static double version = 1.0;
     LocalPoint position1 = null;
 
