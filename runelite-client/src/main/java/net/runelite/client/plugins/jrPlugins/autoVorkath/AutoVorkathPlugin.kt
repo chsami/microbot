@@ -7,7 +7,6 @@ import net.runelite.api.Client
 import net.runelite.api.ObjectID
 import net.runelite.api.Skill
 import net.runelite.api.Varbits
-import net.runelite.api.coords.LocalPoint
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
 import net.runelite.client.callback.ClientThread
@@ -20,7 +19,6 @@ import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
@@ -86,7 +84,7 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     override fun startUp() {
-        println("Auto Vorkath Plugin Activated")
+        println("Auto Vorkath Plugin Started")
         botState = State.RANGE
         previousBotState = State.NONE
         running = if(Microbot.isLoggedIn()) true else false
@@ -96,7 +94,7 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     override fun shutDown() {
-        println("Auto Vorkath Plugin Deactivated")
+        println("Auto Vorkath Plugin Stopped")
         running = false
         botState = null
         previousBotState = null
@@ -123,8 +121,6 @@ class AutoVorkathPlugin : Plugin() {
                     botState = State.RANGE
                 } else if (doesProjectileExistById(whiteProjectileId) || Rs2Npc.getNpc("Zombified Spawn") != null) {
                     botState = State.ZOMBIFIED_SPAWN
-                } else if (doesProjectileExistById(redProjectileId)) {
-                    botState = State.RED_BALL
                 }
 
                 // Check if player needs to eat
@@ -258,13 +254,9 @@ class AutoVorkathPlugin : Plugin() {
         Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
         if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
         var clickedTile: WorldPoint
-        var clickedTileLocalPoint: LocalPoint
-        val rightTileLocalPoint = LocalPoint(6464, 6976)
-        val leftTileLocalPoint = LocalPoint(5952, 6976)
         var toggle = true
         while (botState == State.ACID && previousBotState == State.ACID && (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
             clickedTile = if (toggle) rightTile else leftTile
-            clickedTileLocalPoint = if (toggle) rightTileLocalPoint else leftTileLocalPoint
 
             // Check if player's location is equal to the clicked tile location or if it's within one tile of the clicked location.
             val currentPlayerLocation = client.localPlayer.worldLocation
@@ -272,7 +264,7 @@ class AutoVorkathPlugin : Plugin() {
             // Ensure player is at the clickedTile.y before toggling
             if(currentPlayerLocation.y != clickedTile.y) {
                 // Walk player to clickedTile.y location
-                Walker().walkFastLocal(LocalPoint(6208, 6976))
+                Walker().walkCanvas(WorldPoint(currentPlayerLocation.x, clickedTile.y, currentPlayerLocation.plane))
                 while (client.localPlayer.worldLocation.y != clickedTile.y) {
                     sleep(1)
                 }
@@ -280,10 +272,9 @@ class AutoVorkathPlugin : Plugin() {
                 if (currentPlayerLocation.distanceTo(clickedTile) <= 1) {
                     toggle = !toggle
                     clickedTile = if (toggle) rightTile else leftTile
-                    clickedTileLocalPoint = if (toggle) rightTileLocalPoint else leftTileLocalPoint
                 }
 
-                Walker().walkFastLocal(clickedTileLocalPoint)
+                Walker().walkCanvas(clickedTile)
                 while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 1 && client.localPlayer.worldLocation.y == clickedTile.y && Microbot.isWalking()) {
                     sleep(1)
                 }
@@ -333,7 +324,7 @@ class AutoVorkathPlugin : Plugin() {
     // walk to center location
     private fun walkToCenterLocation(isPlayerInCenterLocation: Boolean) {
         if (!isPlayerInCenterLocation) {
-            Walker().walkFastLocal(LocalPoint(6208, 7360))
+            Walker().walkCanvas(centerTile)
             sleep(2000, 2100)
             Rs2Npc.attack("Vorkath")
         }
