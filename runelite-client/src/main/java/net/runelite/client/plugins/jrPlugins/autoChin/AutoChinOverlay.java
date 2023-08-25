@@ -27,13 +27,16 @@ public class AutoChinOverlay extends OverlayPanel {
                     .left("Current State: " + AutoChin.currentState.toString())
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Lvls Gained: " + AutoChin.lvlsGained)
+                    .build());
+            panelComponent.getChildren().add(LineComponent.builder()
                     .left("Caught: " + AutoChin.caught)
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("XP Gained: " + AutoChin.xpGained)
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Lvls Gained: " + AutoChin.lvlsGained)
+                    .left("XP/Hr: " + AutoChin.xpHr)
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Running: " + AutoChin.time)
