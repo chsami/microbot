@@ -258,9 +258,13 @@ class AutoVorkathPlugin : Plugin() {
         Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
         if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
         var clickedTile: WorldPoint
+        var clickedTileLocalPoint: LocalPoint
+        val rightTileLocalPoint = LocalPoint(6464, 6976)
+        val leftTileLocalPoint = LocalPoint(5952, 6976)
         var toggle = true
         while (botState == State.ACID && previousBotState == State.ACID && (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
             clickedTile = if (toggle) rightTile else leftTile
+            clickedTileLocalPoint = if (toggle) rightTileLocalPoint else leftTileLocalPoint
 
             // Check if player's location is equal to the clicked tile location or if it's within one tile of the clicked location.
             val currentPlayerLocation = client.localPlayer.worldLocation
@@ -268,12 +272,7 @@ class AutoVorkathPlugin : Plugin() {
             // Ensure player is at the clickedTile.y before toggling
             if(currentPlayerLocation.y != clickedTile.y) {
                 // Walk player to clickedTile.y location
-                Walker().walkFastLocal(
-                    LocalPoint.fromWorld(
-                        client,
-                        WorldPoint(centerTile.x, clickedTile.y, currentPlayerLocation.plane)
-                    )
-                )
+                Walker().walkFastLocal(LocalPoint(6208, 6976))
                 while (client.localPlayer.worldLocation.y != clickedTile.y) {
                     sleep(1)
                 }
@@ -281,9 +280,10 @@ class AutoVorkathPlugin : Plugin() {
                 if (currentPlayerLocation.distanceTo(clickedTile) <= 1) {
                     toggle = !toggle
                     clickedTile = if (toggle) rightTile else leftTile
+                    clickedTileLocalPoint = if (toggle) rightTileLocalPoint else leftTileLocalPoint
                 }
 
-                Walker().walkFastLocal(LocalPoint.fromWorld(client, clickedTile))
+                Walker().walkFastLocal(clickedTileLocalPoint)
                 while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 1 && client.localPlayer.worldLocation.y == clickedTile.y && Microbot.isWalking()) {
                     sleep(1)
                 }
@@ -321,7 +321,7 @@ class AutoVorkathPlugin : Plugin() {
     private fun redBallWalk() {
         val currentPlayerLocation = client.localPlayer.worldLocation
         val twoTilesEastFromCurrentLocation = WorldPoint(currentPlayerLocation.x + 2, currentPlayerLocation.y, 0)
-        Walker().walkFastLocal(LocalPoint.fromWorld(client, twoTilesEastFromCurrentLocation))
+        Walker().walkCanvas(twoTilesEastFromCurrentLocation)
     }
 
     // player location is center location
@@ -333,7 +333,7 @@ class AutoVorkathPlugin : Plugin() {
     // walk to center location
     private fun walkToCenterLocation(isPlayerInCenterLocation: Boolean) {
         if (!isPlayerInCenterLocation) {
-            Walker().walkFastLocal(LocalPoint.fromWorld(client, centerTile))
+            Walker().walkFastLocal(LocalPoint(6208, 7360))
             sleep(2000, 2100)
             Rs2Npc.attack("Vorkath")
         }
