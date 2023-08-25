@@ -7,6 +7,7 @@ import net.runelite.api.Client
 import net.runelite.api.ObjectID
 import net.runelite.api.Skill
 import net.runelite.api.Varbits
+import net.runelite.api.coords.LocalPoint
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
 import net.runelite.client.callback.ClientThread
@@ -85,6 +86,7 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     override fun startUp() {
+        println("Auto Vorkath Plugin Activated")
         botState = State.RANGE
         previousBotState = State.NONE
         running = if(Microbot.isLoggedIn()) true else false
@@ -94,7 +96,7 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     override fun shutDown() {
-        println("Done")
+        println("Auto Vorkath Plugin Deactivated")
         running = false
         botState = null
         previousBotState = null
@@ -266,7 +268,12 @@ class AutoVorkathPlugin : Plugin() {
             // Ensure player is at the clickedTile.y before toggling
             if(currentPlayerLocation.y != clickedTile.y) {
                 // Walk player to clickedTile.y location
-                Walker().walkCanvas(WorldPoint(currentPlayerLocation.x, clickedTile.y, currentPlayerLocation.plane))
+                Walker().walkFastLocal(
+                    LocalPoint.fromWorld(
+                        client,
+                        WorldPoint(centerTile.x, clickedTile.y, currentPlayerLocation.plane)
+                    )
+                )
                 while (client.localPlayer.worldLocation.y != clickedTile.y) {
                     sleep(1)
                 }
@@ -276,7 +283,7 @@ class AutoVorkathPlugin : Plugin() {
                     clickedTile = if (toggle) rightTile else leftTile
                 }
 
-                Walker().walkCanvas(clickedTile)
+                Walker().walkFastLocal(LocalPoint.fromWorld(client, clickedTile))
                 while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 1 && client.localPlayer.worldLocation.y == clickedTile.y && Microbot.isWalking()) {
                     sleep(1)
                 }
@@ -314,7 +321,7 @@ class AutoVorkathPlugin : Plugin() {
     private fun redBallWalk() {
         val currentPlayerLocation = client.localPlayer.worldLocation
         val twoTilesEastFromCurrentLocation = WorldPoint(currentPlayerLocation.x + 2, currentPlayerLocation.y, 0)
-        Walker().walkCanvas(twoTilesEastFromCurrentLocation)
+        Walker().walkFastLocal(LocalPoint.fromWorld(client, twoTilesEastFromCurrentLocation))
     }
 
     // player location is center location
@@ -326,7 +333,7 @@ class AutoVorkathPlugin : Plugin() {
     // walk to center location
     private fun walkToCenterLocation(isPlayerInCenterLocation: Boolean) {
         if (!isPlayerInCenterLocation) {
-            Walker().walkCanvas(centerTile)
+            Walker().walkFastLocal(LocalPoint.fromWorld(client, centerTile))
             sleep(2000, 2100)
             Rs2Npc.attack("Vorkath")
         }
