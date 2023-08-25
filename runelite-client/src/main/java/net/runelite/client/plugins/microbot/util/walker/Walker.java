@@ -114,7 +114,7 @@ public class Walker {
         return worldPoint;
     }
 
-    private void walkFastCanvas(WorldPoint worldPoint) {
+    public void walkFastCanvas(WorldPoint worldPoint) {
         Point canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY()), Microbot.getClient().getPlane());
         canvasX = canv != null ? canv.getX() : -1;
         canvasY = canv != null ? canv.getY() : -1;
