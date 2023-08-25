@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Pest Control",
-        description = "Microbot Pest Control plugin",
+        description = "Microbot Pest Control plugin, this only supports the combat 100+ boat. Start at the front of the boat",
         tags = {"pest control", "microbot", "minigames"},
         enabledByDefault = false
 )

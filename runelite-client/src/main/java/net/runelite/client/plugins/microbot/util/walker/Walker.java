@@ -98,7 +98,7 @@ public class Walker {
     }
 
     /**
-     * Used in instances like vorkath, zulrah, jad etc...
+     * Used in instances like pest control
      * @param regionX
      * @param regionY
      * @return
@@ -109,9 +109,35 @@ public class Walker {
                 regionY,
                 Microbot.getClient().getPlane());
 
-        walkFastCanvas(worldPoint);
+        LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+
+        Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
+        canvasX = canv != null ? canv.getX() : -1;
+        canvasY = canv != null ? canv.getY() : -1;
+
+        Microbot.getMouse().clickFast(1, 1);
+
+        sleep(300);
+        canvasX = 0;
+        canvasY = 0;
 
         return worldPoint;
+    }
+    /**
+     * Used in instances like vorkath, jad
+     * @param localPoint
+     */
+    public void walkFastLocal(LocalPoint localPoint) {
+
+        Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
+        canvasX = canv != null ? canv.getX() : -1;
+        canvasY = canv != null ? canv.getY() : -1;
+
+        Microbot.getMouse().clickFast(1, 1);
+
+        sleep(300);
+        canvasX = 0;
+        canvasY = 0;
     }
 
     public void walkFastCanvas(WorldPoint worldPoint) {

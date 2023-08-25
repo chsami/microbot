@@ -25,10 +25,11 @@
  */
 package net.runelite.api.coords;
 
-import javax.annotation.Nullable;
 import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
+
+import javax.annotation.Nullable;
 
 /**
  * A two-dimensional point in the local coordinate space.
@@ -119,6 +120,7 @@ public class LocalPoint
 			(y << Perspective.LOCAL_COORD_BITS) + (1 << Perspective.LOCAL_COORD_BITS - 1)
 		);
 	}
+
 
 	/**
 	 * Gets the x-axis coordinate in scene space (tiles).
