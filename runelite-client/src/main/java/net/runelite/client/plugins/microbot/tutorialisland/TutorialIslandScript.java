@@ -2,6 +2,8 @@ package net.runelite.client.plugins.microbot.tutorialisland;
 
 
 public class TutorialIslandScript {
+    public static double version = 1.0;
+
     public boolean run(TutorialIslandConfig config) {
         return true;
     }
