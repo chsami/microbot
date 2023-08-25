@@ -48,6 +48,12 @@ public class Rs2GameObject {
         return clickObject(object, action);
     }
 
+    public static boolean interact(String name, String action) {
+        TileObject object = findObject(name);
+        return clickObject(object, action);
+    }
+
+
     public static TileObject interactAndGetObject(int id) {
         TileObject object = findObjectById(id);
         clickObject(object);
@@ -89,6 +95,10 @@ public class Rs2GameObject {
     public static ObjectComposition findObject(int id) {
         ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
         return objComp;
+    }
+
+    public static boolean exists(int id) {
+        return findObjectById(id) != null;
     }
 
     public static TileObject findObjectById(int id) {

@@ -159,6 +159,13 @@ public class Walker {
         return walkTo(target, true);
     }
 
+    public boolean walkTo(net.runelite.api.NPC npc) {
+        if (npc != null)
+            return walkTo(npc.getWorldLocation(), true);
+
+        return false;
+    }
+
     public boolean walkTo(WorldPoint target, boolean useTransport) {
         pathfinder = null;
         WorldPoint start = WorldPoint.fromLocalInstance(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation());

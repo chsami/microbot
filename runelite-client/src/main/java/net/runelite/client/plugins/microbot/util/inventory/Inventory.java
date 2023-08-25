@@ -139,6 +139,10 @@ public class Inventory {
                 ));
     }
 
+    public static boolean contains(String itemName) {
+        return hasItem(itemName);
+    }
+
     public static boolean hasItem(int id) {
         Microbot.status = "Looking for item: " + id;
         Widget inventoryWidget = getInventory();
