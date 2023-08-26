@@ -25,24 +25,20 @@
 package net.runelite.client.discord;
 
 import com.google.common.base.Strings;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.discord.events.DiscordDisconnected;
-import net.runelite.client.discord.events.DiscordErrored;
-import net.runelite.client.discord.events.DiscordJoinGame;
-import net.runelite.client.discord.events.DiscordJoinRequest;
-import net.runelite.client.discord.events.DiscordReady;
-import net.runelite.client.discord.events.DiscordSpectateGame;
+import net.runelite.client.discord.events.*;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.discord.DiscordEventHandlers;
 import net.runelite.discord.DiscordRPC;
 import net.runelite.discord.DiscordRichPresence;
 import net.runelite.discord.DiscordUser;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 @Slf4j
@@ -54,7 +50,7 @@ public class DiscordService implements AutoCloseable
 	private final DiscordRPC discordRPC;
 
 	// Hold a reference to the event handlers to prevent the garbage collector from deleting them
-	private final DiscordEventHandlers discordEventHandlers;
+	private DiscordEventHandlers discordEventHandlers;
 
 	@Getter
 	private DiscordUser currentUser;
@@ -63,6 +59,7 @@ public class DiscordService implements AutoCloseable
 	private DiscordService(
 		final EventBus eventBus,
 		final ScheduledExecutorService executorService,
+		@Named("runelite.discord.enable") boolean enable,
 		@Named("runelite.discord.appid") final String discordAppId
 	)
 	{
@@ -71,21 +68,26 @@ public class DiscordService implements AutoCloseable
 		this.executorService = executorService;
 		this.discordAppId = discordAppId;
 
-		DiscordRPC discordRPC = null;
-		DiscordEventHandlers discordEventHandlers = null;
+		if (!enable)
+		{
+			this.discordRPC = null;
+			return;
+		}
+
+		DiscordRPC discordRPC;
 
 		try
 		{
 			discordRPC = DiscordRPC.INSTANCE;
-			discordEventHandlers = new DiscordEventHandlers();
 		}
 		catch (Error e)
 		{
 			log.warn("Failed to load Discord library, Discord support will be disabled.");
+			this.discordRPC = null;
+			return;
 		}
 
 		this.discordRPC = discordRPC;
-		this.discordEventHandlers = discordEventHandlers;
 	}
 
 	/**
@@ -95,12 +97,13 @@ public class DiscordService implements AutoCloseable
 	 */
 	public void init()
 	{
-		if (discordEventHandlers == null)
+		if (discordRPC == null)
 		{
 			return;
 		}
 
 		log.info("Initializing Discord RPC service.");
+		discordEventHandlers = new DiscordEventHandlers();
 		discordEventHandlers.ready = this::ready;
 		discordEventHandlers.disconnected = this::disconnected;
 		discordEventHandlers.errored = this::errored;

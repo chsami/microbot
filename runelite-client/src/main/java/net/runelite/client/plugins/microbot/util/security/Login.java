@@ -42,7 +42,7 @@ public class Login {
                 sleep(300, 600);
                 VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                //throw new RuntimeException(e);
             }
         }
     }
@@ -59,7 +59,6 @@ public class Login {
             try {
                 Microbot.getClient().setPassword(Encryption.decrypt(password));
             } catch (Exception e) {
-                throw new RuntimeException(e);
             }
             sleep(300, 600);
             VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);

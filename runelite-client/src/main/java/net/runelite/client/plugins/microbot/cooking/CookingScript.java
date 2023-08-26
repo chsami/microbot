@@ -1,31 +1,23 @@
 package net.runelite.client.plugins.microbot.cooking;
 
 import net.runelite.api.*;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.cooking.enums.CookingEnum;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.mta.telekinetic.TelekineticRoom;
-import net.runelite.client.ui.overlay.infobox.Counter;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Math.random;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class CookingScript extends Script {
@@ -59,7 +51,7 @@ public class CookingScript extends Script {
                 }
 
                 if (Inventory.hasItem(itemToCook)) {
-                    Microbot.getWalker().walkFastMinimap(new WorldPoint(3273 + random(-2, 2), 3180+ random(-2, 2), 0));
+                    Microbot.getWalker().walkMiniMap(new WorldPoint(3273 + random(-2, 2), 3180+ random(-2, 2), 0));
 
                     TileObject cookingRange = Rs2GameObject.findObjectById(gameObjectId);
                     if (cookingRange != null) {

@@ -1,7 +1,10 @@
 package net.runelite.client.plugins.microbot.util.walker;
 
 import lombok.Getter;
-import net.runelite.api.*;
+import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
+import net.runelite.api.Perspective;
+import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -21,7 +24,8 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Walker {
 
-    public Point travelToCanvasPoint;
+    int canvasX;
+    int canvasY;
 
     @Getter
     public Pathfinder pathfinder;
@@ -68,21 +72,6 @@ public class Walker {
         return Pair.of(currentPath, currentTeleport);
     }
 
-    public WorldPoint walkFastRegion(int regionX, int regionY) {
-        WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
-                regionX,
-                regionY,
-                Microbot.getClient().getPlane());
-
-        Point point = Calculations.worldToMinimap(worldPoint.getX(), worldPoint.getY());
-
-        if (point == null) return null;
-
-        Microbot.getMouse().click(point);
-
-        return worldPoint;
-    }
-
     public WorldPoint walkRegionCanvas(int regionX, int regionY) {
         WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
                 regionX,
@@ -98,7 +87,7 @@ public class Walker {
         return worldPoint;
     }
 
-    public WorldPoint walkFastMinimap(WorldPoint worldPoint) {
+    public WorldPoint walkMiniMap(WorldPoint worldPoint) {
         Point point = Calculations.worldToMinimap(worldPoint.getX(), worldPoint.getY());
 
         if (point == null) return null;
@@ -108,26 +97,67 @@ public class Walker {
         return worldPoint;
     }
 
-    public void walkFastCanvas(LocalPoint localPoint) {
-//        WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
-//                0,
-//                54,
-//                Microbot.getClient().getPlane());
-//        LocalPoint localPoint1 = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
-        Point point = Perspective.localToCanvas(Microbot.getClient(), localPoint.getX(), localPoint.getY() - 128, Microbot.getClient().getPlane());
+    /**
+     * Used in instances like pest control
+     * @param regionX
+     * @param regionY
+     * @return
+     */
+    public WorldPoint walkFastRegion(int regionX, int regionY) {
+        WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
+                regionX,
+                regionY,
+                Microbot.getClient().getPlane());
 
-        travelToCanvasPoint = point;
-        System.out.println(point);
+        LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+
+        Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
+        canvasX = canv != null ? canv.getX() : -1;
+        canvasY = canv != null ? canv.getY() : -1;
+
         Microbot.getMouse().clickFast(1, 1);
-        sleep(100);
-        travelToCanvasPoint = null;
+
+        sleep(300);
+        canvasX = 0;
+        canvasY = 0;
+
+        return worldPoint;
     }
+    /**
+     * Used in instances like vorkath, jad
+     * @param localPoint
+     */
+    public void walkFastLocal(LocalPoint localPoint) {
+
+        Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
+        canvasX = canv != null ? canv.getX() : -1;
+        canvasY = canv != null ? canv.getY() : -1;
+
+        Microbot.getMouse().clickFast(1, 1);
+
+        sleep(300);
+        canvasX = 0;
+        canvasY = 0;
+    }
+
+    public void walkFastCanvas(WorldPoint worldPoint) {
+        Point canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY()), Microbot.getClient().getPlane());
+        canvasX = canv != null ? canv.getX() : -1;
+        canvasY = canv != null ? canv.getY() : -1;
+
+        Microbot.getMouse().clickFast(1, 1);
+
+        sleep(300);
+        canvasX = 0;
+        canvasY = 0;
+    }
+
     public void handleMenuSwapper(MenuEntry menuEntry) {
-        if (travelToCanvasPoint == null) return;
+        if (canvasX == 0 && canvasY == 0) return;
         menuEntry.setOption("Walk here");
         menuEntry.setIdentifier(0);
-        menuEntry.setParam0(travelToCanvasPoint.getX());
-        menuEntry.setParam1(travelToCanvasPoint.getY());
+        menuEntry.setParam0(canvasX);
+        menuEntry.setParam1(canvasY);
         menuEntry.setTarget("");
         menuEntry.setType(MenuAction.WALK);
     }
@@ -153,6 +183,13 @@ public class Walker {
 
     public boolean walkTo(WorldPoint target) {
         return walkTo(target, true);
+    }
+
+    public boolean walkTo(net.runelite.api.NPC npc) {
+        if (npc != null)
+            return walkTo(npc.getWorldLocation(), true);
+
+        return false;
     }
 
     public boolean walkTo(WorldPoint target, boolean useTransport) {

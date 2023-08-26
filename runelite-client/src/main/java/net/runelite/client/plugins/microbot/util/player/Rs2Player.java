@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.player;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 
 
@@ -55,5 +56,13 @@ public class Rs2Player {
             }
             antiVenomTime = event.getValue();
         }
+    }
+
+    public static boolean isAnimating() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getAnimation() != -1);
+    }
+
+    public static boolean isWalking() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation() != 813 && Microbot.getClient().getLocalPlayer().getPoseAnimation() != 808);
     }
 }

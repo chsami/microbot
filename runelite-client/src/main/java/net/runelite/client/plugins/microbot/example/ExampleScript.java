@@ -9,7 +9,6 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 
@@ -24,6 +23,14 @@ boolean reachedEndLine = false;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
+//                Field field = Microbot.getClient().getLocalPlayer().getClass().getSuperclass().getDeclaredField("dt");
+//                field.setAccessible(true);
+//                int value = (int) field.get(Microbot.getClient().getLocalPlayer());
+//                int realAnimation = value * -1021724449;
+//                System.out.println(realAnimation);
+                //System.out.println(LocalPoint.fromScene(48, 54));
+                Microbot.getWalker().walkFastLocal(new LocalPoint(6208, 6976));
+            //    Rs2Bank.withdrawFast(995);
             //    Rs2Bank.openBank();
               //  System.out.println(Rs2Bank.isBankOpen());
        //         MicrobotInventorySetup.loadEquipment("test");
@@ -64,12 +71,12 @@ boolean reachedEndLine = false;
 
                 //getParam0=-5146, getParam1=-4228,
                 //getParam0=-5350, getParam1=-4235
-                Rs2Bank.withdrawAllDriftNet();
-                System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+               // System.out.println(GroundItemsPlugin.getCollectedGroundItems());
+               // System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 400, TimeUnit.MILLISECONDS);
+        }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
     }
 

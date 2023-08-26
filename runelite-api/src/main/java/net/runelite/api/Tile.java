@@ -24,9 +24,10 @@
  */
 package net.runelite.api;
 
-import java.util.List;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+
+import java.util.List;
 
 /**
  * Represents a tile in the game.
@@ -123,14 +124,6 @@ public interface Tile
 	 * @return
 	 */
 	int getRenderLevel();
-
-	/**
-	 * Computes and returns whether this tile has line of sight to another.
-	 *
-	 * @param other the other tile
-	 * @return true if there is no sight obstruction, false otherwise
-	 */
-	boolean hasLineOfSightTo(Tile other);
 
 	/**
 	 * Get all the ground items for this tile

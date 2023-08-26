@@ -25,7 +25,7 @@ import javax.inject.Inject
     tags = ["chinchompas", "hunter", "auto", "catching", "jr", "JR", "microbot"],
     enabledByDefault = false
 )
-class AutoChin: Plugin() {
+class AutoChin : Plugin() {
     @Inject
     private lateinit var client: Client
 
@@ -55,6 +55,7 @@ class AutoChin: Plugin() {
         }
         time = getElapsedTime()
         xpGained = client.getSkillExperience(Skill.HUNTER) - startingXp.toLong()
+        xpHr = ((xpGained * 3600000.0 / (System.currentTimeMillis() - startTime))).toInt().toString()
         caught = xpGained / 265
         lvlsGained = client.getRealSkillLevel(Skill.HUNTER) - startingLvl.toLong()
     }
@@ -62,13 +63,16 @@ class AutoChin: Plugin() {
     companion object {
         @JvmField
         var xpGained: Long = 0
+
         @JvmField
         var caught: Long = 0
+
         @JvmField
         var lvlsGained: Long = 0
         lateinit var version: String
         lateinit var currentState: State
         lateinit var time: String
+        lateinit var xpHr: String
     }
 
     private var running = false
@@ -87,7 +91,7 @@ class AutoChin: Plugin() {
 
     override fun startUp() {
         currentState = State.IDLE
-        version = "1.0.1"
+        version = "1.0.2"
         startTime = System.currentTimeMillis()
         startingXp = client.getSkillExperience(Skill.HUNTER)
         startingLvl = client.getRealSkillLevel(Skill.HUNTER)
@@ -102,7 +106,7 @@ class AutoChin: Plugin() {
         }
     }
 
-    private fun run(){
+    private fun run() {
         while (running) {
             when (currentState) {
                 State.IDLE -> handleIdleState()
@@ -122,7 +126,7 @@ class AutoChin: Plugin() {
     private fun handleIdleState() {
         try {
             // If there are box traps on the floor, interact with them first
-            if (Rs2GroundItem.interact(ItemID.BOX_TRAP, "lay" , 4)) {
+            if (Rs2GroundItem.interact(ItemID.BOX_TRAP, "lay", 4)) {
                 currentState = State.LAYING
                 return
             }
@@ -145,12 +149,12 @@ class AutoChin: Plugin() {
     }
 
     private fun handleCatchingState() {
-        sleep(8400,8500)
+        sleep(8300, 8400)
         currentState = State.IDLE
     }
 
     private fun handleLayingState() {
-        sleep(6000,6100)
+        sleep(5500, 5700)
         currentState = State.IDLE
     }
 
