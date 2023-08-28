@@ -7,6 +7,7 @@ import net.runelite.api.Client
 import net.runelite.api.ObjectID
 import net.runelite.api.Skill
 import net.runelite.api.Varbits
+import net.runelite.api.coords.LocalPoint
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
 import net.runelite.client.callback.ClientThread
@@ -254,9 +255,13 @@ class AutoVorkathPlugin : Plugin() {
         Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
         if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
         var clickedTile: WorldPoint
+        var clickedTileLocalPoint: LocalPoint
+        val rightTileLocalPoint = LocalPoint(6464, 6976)
+        val leftTileLocalPoint = LocalPoint(5952, 6976)
         var toggle = true
         while (botState == State.ACID && previousBotState == State.ACID && (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
             clickedTile = if (toggle) rightTile else leftTile
+            clickedTileLocalPoint = if (toggle) rightTileLocalPoint else leftTileLocalPoint
 
             // Check if player's location is equal to the clicked tile location or if it's within one tile of the clicked location.
             val currentPlayerLocation = client.localPlayer.worldLocation
@@ -264,7 +269,7 @@ class AutoVorkathPlugin : Plugin() {
             // Ensure player is at the clickedTile.y before toggling
             if(currentPlayerLocation.y != clickedTile.y) {
                 // Walk player to clickedTile.y location
-                Walker().walkCanvas(WorldPoint(currentPlayerLocation.x, clickedTile.y, currentPlayerLocation.plane))
+                Walker().walkFastLocal(LocalPoint(6336, 6976))
                 while (client.localPlayer.worldLocation.y != clickedTile.y) {
                     sleep(1)
                 }
@@ -272,9 +277,10 @@ class AutoVorkathPlugin : Plugin() {
                 if (currentPlayerLocation.distanceTo(clickedTile) <= 1) {
                     toggle = !toggle
                     clickedTile = if (toggle) rightTile else leftTile
+                    clickedTileLocalPoint = if (toggle) rightTileLocalPoint else leftTileLocalPoint
                 }
 
-                Walker().walkCanvas(clickedTile)
+                Walker().walkFastLocal(clickedTileLocalPoint)
                 while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 1 && client.localPlayer.worldLocation.y == clickedTile.y && Microbot.isWalking()) {
                     sleep(1)
                 }
