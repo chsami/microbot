@@ -1,22 +1,40 @@
 package net.runelite.client.plugins.microbot.tutorialisland;
 
 
-public class TutorialIslandScript {
+import net.runelite.api.Actor;
+import net.runelite.api.NPC;
+import net.runelite.api.ObjectID;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.dialogues.Dialogue;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.NameGenerator;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
+
+import java.awt.event.KeyEvent;
+import java.util.concurrent.TimeUnit;
+
+import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.clickContinue;
+import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.isInDialogue;
+import static net.runelite.client.plugins.microbot.util.math.Random.random;
+import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.enableHideRoofs;
+import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.turnOffMusic;
+
+public class TutorialIslandScript extends Script {
+
     public static double version = 1.0;
-
-    public boolean run(TutorialIslandConfig config) {
-        return true;
-    }
-
-     public static void shutdown() {
-
-     }
-/*
-
-    public static double version = 1.0;
-    LocalPoint position1 = null;
-
-    Status status = Status.NAME;
+    public static Status status = Status.NAME;
 
     public boolean run(TutorialIslandConfig config) {
         Microbot.enableAutoRunOn = false;
@@ -25,16 +43,7 @@ public class TutorialIslandScript {
             try {
                 CalculateStatus();
 
-                if (isInDialogue()) {
-                    ClickContinue(231);
-                    ClickContinue(217);
-                    ClickContinue(229);
-                    ClickContinue(193);
-                    sleep(1000);
-                }
-                System.out.println(new NameGenerator(random(3, 6)).getName() + new NameGenerator(random(3, 6)).getName());
-                System.out.println(Microbot.getVarbitValue(281));
-                System.out.println(status);
+                ClickContinue();
 
                 switch (status) {
                     case NAME:
@@ -42,20 +51,15 @@ public class TutorialIslandScript {
                         Rs2Widget.clickWidget("Enter name");
                         VirtualKeyboard.typeString(name);
                         Rs2Widget.clickWidget("Look up name");
-                        sleepUntil(() -> Rs2Widget.getWidget(LOOKUPNAME).getText().contains("Set name"));
-                        if (!widgets.containingText(LOOKUPNAME, new String[]{"Sorry, the display name <col=ffffff>zezima</col> is <col=ff0000>not available</col>.<br>Try clicking one of our suggestions, instead:"}).isEmpty()) {
-                            widgets.interact(LOOKUPNAME, 9, "Enter name");
+                        sleepUntil(() -> Rs2Widget.hasWidget("Set name"));
+                        if (!Rs2Widget.hasWidget("Sorry")) {
+                            Rs2Widget.clickWidget("Enter name");
                             for (int i = 0; i < name.length(); i++) {
-                                keyboard.pressKey(8);
+                                VirtualKeyboard.typeString("8");
                             }
                         }
-                        widgets.interact(LOOKUPNAME, 19, "Set name");
-                        new ConditionalSleep(5000) {
-                            @Override
-                            public boolean condition() throws InterruptedException {
-                                return !widgets.isVisible(LOOKUPNAME);
-                            }
-                        }.sleep();
+                        Rs2Widget.clickWidget("Set name");
+                        sleepUntil(() -> !isLookupNameButtonVisible());
                         sleep(2000);
                         break;
                     case CHARACTER:
@@ -89,25 +93,19 @@ public class TutorialIslandScript {
                         MageGuide();
                         break;
                     case FINISHED:
-                        stop();
+                        shutdown();
                         break;
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
     }
 
     @Override
     public void shutdown() {
         super.shutdown();
-        Rs2Npc.npcInteraction = null;
-        Rs2GroundItem.itemInteraction = null;
-        Rs2GameObject.objectToInteract = null;
-        Rs2Equipment.widgetId = 0;
-        Rs2Bank.widgetId = 0;
-        reachedEndLine = false;
     }
 
     enum Status {
@@ -134,68 +132,67 @@ public class TutorialIslandScript {
 
     final int[] CharacterCreation_Arrows = new int[]{13, 17, 21, 25, 29, 33, 37, 44, 48, 52, 56, 60};
 
+    private boolean isLookupNameButtonVisible() {
+        return Rs2Widget.getWidget(LOOKUPNAME, 1) != null;
+    }
+
+    private boolean isCharacterCreationVisible() {
+        return Rs2Widget.getWidget(CharacterCreation, 1) != null;
+    }
+
     public void CalculateStatus() {
-        if (widgets.isVisible(LOOKUPNAME)) {
+        if (isLookupNameButtonVisible()) {
             status = Status.NAME;
-        } else if (widgets.isVisible(CharacterCreation)) {
+        } else if (isCharacterCreationVisible()) {
             status = Status.CHARACTER;
-        } else if (Microbot.getVarbitValue(281) < 10) {
+        } else if (Microbot.getVarbitPlayerValue(281) < 10) {
             status = Status.GETTING_STARTED;
-        } else if (Microbot.getVarbitValue(281) >= 10 && Microbot.getVarbitValue(281) < 120) {
+        } else if (Microbot.getVarbitPlayerValue(281) >= 10 && Microbot.getVarbitPlayerValue(281) < 120) {
             status = Status.SURVIVAL_GUIDE;
-        } else if (Microbot.getVarbitValue(281) >= 120 && Microbot.getVarbitValue(281) < 200) {
+        } else if (Microbot.getVarbitPlayerValue(281) >= 120 && Microbot.getVarbitPlayerValue(281) < 200) {
             status = Status.COOKING_GUIDE;
-        } else if (Microbot.getVarbitValue(281) >= 200 && Microbot.getVarbitValue(281) <= 250) {
+        } else if (Microbot.getVarbitPlayerValue(281) >= 200 && Microbot.getVarbitPlayerValue(281) <= 250) {
             status = Status.QUEST_GUIDE;
-        } else if (Microbot.getVarbitValue(281) >= 260 && Microbot.getVarbitValue(281) <= 360) {
+        } else if (Microbot.getVarbitPlayerValue(281) >= 260 && Microbot.getVarbitPlayerValue(281) <= 360) {
             status = Status.MINING_GUIDE;
-        } else if (Microbot.getVarbitValue(281) > 360 && Microbot.getVarbitValue(281) < 510) {
+        } else if (Microbot.getVarbitPlayerValue(281) > 360 && Microbot.getVarbitPlayerValue(281) < 510) {
             status = Status.COMBAT_GUIDE;
-        } else if (Microbot.getVarbitValue(281) >= 510 && Microbot.getVarbitValue(281) < 540) {
+        } else if (Microbot.getVarbitPlayerValue(281) >= 510 && Microbot.getVarbitPlayerValue(281) < 540) {
             status = Status.BANKER_GUIDE;
-        } else if (Microbot.getVarbitValue(281) >= 540 && Microbot.getVarbitValue(281) < 610) {
+        } else if (Microbot.getVarbitPlayerValue(281) >= 540 && Microbot.getVarbitPlayerValue(281) < 610) {
             status = Status.PRAYER_GUIDE;
-        } else if (Microbot.getVarbitValue(281) >= 610 && Microbot.getVarbitValue(281) < 1000) {
+        } else if (Microbot.getVarbitPlayerValue(281) >= 610 && Microbot.getVarbitPlayerValue(281) < 1000) {
             status = Status.MAGE_GUIDE;
-        } else if (Microbot.getVarbitValue(281) == 1000) {
+        } else if (Microbot.getVarbitPlayerValue(281) == 1000) {
             status = Status.FINISHED;
         }
     }
 
     public void RandomizeCharacter() {
         if (random(1, 10) == 2) {
-            widgets.interact(CharacterCreation, CharacterCreation_Confirm, "Confirm");
-            new ConditionalSleep(2000) {
-                @Override
-                public boolean condition() throws InterruptedException {
-                    return !widgets.isVisible(CharacterCreation);
-                }
-            }.sleep();
+            Rs2Widget.clickWidget("Confirm");
+            sleepUntil(() -> !isCharacterCreationVisible());
         }
 
         int randomIndex = (int) Math.floor(Math.random() * CharacterCreation_Arrows.length);
         int item = CharacterCreation_Arrows[randomIndex];
-        widgets.interact(CharacterCreation, item, "Select");
-    }
-
-    private boolean isInDialogue() {
-        return !widgets.containingText(231, new String[]{"Click here to continue"}).isEmpty() ||
-                !widgets.containingText(229, new String[]{"Click here to continue"}).isEmpty() ||
-                !widgets.containingText(193, new String[]{"Click here to continue"}).isEmpty() ||
-                !widgets.containingText(217, new String[]{"Click here to continue"}).isEmpty();
+        Widget widget = Rs2Widget.getWidget(CharacterCreation, item);
+        Rs2Widget.clickWidget(widget.getId());
+        Rs2Widget.clickWidget("Select");
     }
 
     //config 281 needed
     public void GettingStarted() {
         NPC npc = Rs2Npc.getNpc(3308);
-        if (!widgets.containingText(231, new String[]{"Click here to continue"}).isEmpty()) return;
-        if (!widgets.containingText(229, new String[]{"Click here to continue"}).isEmpty()) return;
-        if (widgets.isVisible(219)) {
-            getDialogues().selectOption(random(2));
+        if (isInDialogue()) return;
+        if (Rs2Widget.getWidget(219, 1) != null) {
+            VirtualKeyboard.typeString(Integer.toString(random(1, 3)));
             return;
         }
-        if (Microbot.getVarbitValue(281) == 3) {
-            Tab.switchToSettingsTab();
+        if (Microbot.getVarbitPlayerValue(281) == 3) {
+            Rs2Widget.clickWidget(10747944);
+            sleep(1000);
+            turnOffMusic();
             return;
         }
 
@@ -207,39 +204,39 @@ public class TutorialIslandScript {
 
     public void SurvivalGuide() {
         if (Inventory.contains("Shrimps")) return;
-        if (Microbot.getVarbitValue(281) == 10) {
+        if (Microbot.getVarbitPlayerValue(281) == 10) {
             DoorToSurvivalGuide();
-        } else if (Microbot.getVarbitValue(281) == 20) { // SURVIVAL EXPERT
+        } else if (Microbot.getVarbitPlayerValue(281) == 20) { // SURVIVAL EXPERT
             SurvivalExpert();
-        } else if (Microbot.getVarbitValue(281) == 30
-                || Microbot.getVarbitValue(281) == 40
-                || Microbot.getVarbitValue(281) == 50
-                || Microbot.getVarbitValue(281) == 60
-                || Microbot.getVarbitValue(281) == 70
-                || Microbot.getVarbitValue(281) == 80
-                || Microbot.getVarbitValue(281) == 90) { // FISHING + woodcutting + cooking
+        } else if (Microbot.getVarbitPlayerValue(281) == 30
+                || Microbot.getVarbitPlayerValue(281) == 40
+                || Microbot.getVarbitPlayerValue(281) == 50
+                || Microbot.getVarbitPlayerValue(281) == 60
+                || Microbot.getVarbitPlayerValue(281) == 70
+                || Microbot.getVarbitPlayerValue(281) == 80
+                || Microbot.getVarbitPlayerValue(281) == 90) { // FISHING + woodcutting + cooking
             if (!Inventory.contains("Raw shrimps")) {
-                ClickContinue(193);
-                Tab.switchToInventoryTab();
+                ClickContinue();
+                Rs2Widget.clickWidget(10747958);
+                sleep(1000);
+                Rs2Npc.interact(3317, "Net");
                 sleepUntil(() -> Inventory.contains("Raw shrimps"));
-                sleep(2000);
-                Tab.switchToSkillsTab();
             } else {
-                if (Microbot.getVarbitValue(281) < 90) {
+                if (Microbot.getVarbitPlayerValue(281) < 90) {
                     if (!Inventory.contains("Bronze axe")) {
-                        Tab.switchToSkillsTab();
-                        if (widgets.containingText(217, new String[]{"Click here to continue"}).isEmpty()) {
+                        Rs2Widget.clickWidget(10747956);
+                        if (!isInDialogue()) {
                             InteractWithNpc(8503);
                         } else {
-                            ClickContinue(217);
-                            ClickContinue(193);
+                            ClickContinue();
+                            ClickContinue();
                         }
                     } else if (!Inventory.contains("Logs")) {
                         CutTree();
                     } else if (Inventory.contains("Logs")) {
                         LightFire();
                     }
-                } else if (Microbot.getVarbitValue(281) == 90 && Inventory.contains("Raw shrimps")) {
+                } else if (Microbot.getVarbitPlayerValue(281) == 90 && Inventory.contains("Raw shrimps")) {
                     if (!Inventory.contains("Logs"))
                         CutTree();
                     if (!Rs2GameObject.exists(26185))
@@ -255,140 +252,118 @@ public class TutorialIslandScript {
 
     public void MageGuide() {
         if (isInDialogue()) return;
-        if (Microbot.getVarbitValue(281) == 610) {
-            Microbot.getWalker().walkTo(new WorldPoint(3135, 3088, 0));
-        } else if (Microbot.getVarbitValue(281) == 620) {
+        if (Microbot.getVarbitPlayerValue(281) == 610 || Microbot.getVarbitPlayerValue(281) == 620) {
+            WorldPoint worldPoint = new WorldPoint(3135, 3088, 0);
+            if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(worldPoint) > 2) {
+                Microbot.getWalker().walkTo(worldPoint);
+            } else {
+                Rs2Npc.interact(3309, "Talk-to");
+            }
+        } else if (Microbot.getVarbitPlayerValue(281) == 630) {
+            Rs2Widget.clickWidget(10551360); //switchToMagicTab
+        } else if (Microbot.getVarbitPlayerValue(281) == 640) {
             Rs2Npc.interact(3309, "Talk-to");
-        } else if (Microbot.getVarbitValue(281) == 630) {
-            Tab.switchToMagicTab();
-        } else if (Microbot.getVarbitValue(281) == 640) {
-            Rs2Npc.interact(3309, "Talk-to");
-        } else if (Microbot.getVarbitValue(281) == 650) {
-            Rs2Magic.cast(MagicAction.WIND_STRIKE);
-            Rs2Npc.interact("Chicken", "");
-        } else if (Microbot.getVarbitValue(281) == 670) {
-            if (widgets.isVisible(788)) {
-                if (widgets.isVisible(788, 15, 2)) {
-                    widgets.interact(788, 15, 2, "Confirm Old School Main");
-                } else {
-                    widgets.interact(788, 40, 2, "Select");
-                }
+        } else if (Microbot.getVarbitPlayerValue(281) == 650) {
+            Rs2Magic.castOn(MagicAction.WIND_STRIKE, Rs2Npc.getNpc(3316));
+        } else if (Microbot.getVarbitPlayerValue(281) == 670) {
+            if (isInDialogue()) {
+                clickContinue();
                 return;
             }
-            if (widgets.isVisible(219)) {
-                widgets.interact(219, 1, 1, "Continue");
-                return;
+            if (Rs2Widget.hasWidget("Do you want to go to the mainland?")) {
+                Rs2Widget.clickWidget(14352385);
+                VirtualKeyboard.typeString("1");
+                sleep(5000);
+            } else if (Rs2Widget.hasWidget("Select an option")) {
+                VirtualKeyboard.typeString("3");
+            } else {
+                Rs2Npc.interact(3309, "Talk-to");
             }
-            Rs2Npc.interact(3309, "Talk-to");
         }
     }
 
     public void PrayerGuide() {
         if (isInDialogue()) return;
-        if (Microbot.getVarbitValue(281) == 640 || Microbot.getVarbitValue(281) == 550 || Microbot.getVarbitValue(281) == 540) {
+        if (Microbot.getVarbitPlayerValue(281) == 640 || Microbot.getVarbitPlayerValue(281) == 550 || Microbot.getVarbitPlayerValue(281) == 540) {
             Microbot.getWalker().walkTo(new WorldPoint(3124, 3106, 0));
             Rs2Npc.interact(3319, "Talk-to");
-        } else if (Microbot.getVarbitValue(281) == 560) {
-            Tab.switchToPrayerTab();
-        } else if (Microbot.getVarbitValue(281) == 570) {
+        } else if (Microbot.getVarbitPlayerValue(281) == 560) {
+            Rs2Widget.clickWidget(10551359); //switchToPrayerTab
+        } else if (Microbot.getVarbitPlayerValue(281) == 570) {
             Rs2Npc.interact(3319, "Talk-to");
-        } else if (Microbot.getVarbitValue(281) == 580) {
-            Tab.switchToFriendsTab();
-        } else if (Microbot.getVarbitValue(281) == 600) {
+        } else if (Microbot.getVarbitPlayerValue(281) == 580) {
+            Rs2Widget.clickWidget(164, 56); //switchToFriendsTab
+        } else if (Microbot.getVarbitPlayerValue(281) == 600) {
             Rs2Npc.interact(3319, "Talk-to");
         }
     }
 
     public void BankerGuide() {
         if (isInDialogue()) return;
-        if (Microbot.getVarbitValue(281) == 510) {
-            if (!settings.areRoofsEnabled()) {
-                Tab.switchToSettingsTab();
-                widgets.interact(116, 75, 9, "All settings");
-                new ConditionalSleep(5000) {
-                    @Override
-                    public boolean condition() throws InterruptedException {
-                        return widgets.isVisible(134);
-                    }
-                }.sleep();
-                widgets.interact(134, 18, 53, "Toggle");
-            }
-            Rs2GameObject.interact("Bank booth", "Use");
+        if (Microbot.getVarbitPlayerValue(281) == 510) {
+            enableHideRoofs();
+            Rs2GameObject.interact(ObjectID.BANK_BOOTH_10083);
 
-            sleepUntil(() -> Microbot.getVarbitValue(281) != 510);
-        } else if (Microbot.getVarbitValue(281) == 520) {
-            bank.close();
-            Rs2GameObject.interact("Poll booth", "Use");
-            new ConditionalSleep(5000) {
-                @Override
-                public boolean condition() throws InterruptedException {
-                    return Microbot.getVarbitValue(281) != 520;
-                }
-            }.sleep();
-        } else if (Microbot.getVarbitValue(281) == 525) {
+            sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 510);
+        } else if (Microbot.getVarbitPlayerValue(281) == 520) {
+            Rs2Bank.closeBank();
+            Rs2GameObject.interact(26815);
+            sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 520);
+        } else if (Microbot.getVarbitPlayerValue(281) == 525) {
             Microbot.getWalker().walkTo(new WorldPoint(3127, 3123, 0));
-            npcs.closest(3310).interact("Talk-to");
-        } else if (Microbot.getVarbitValue(281) == 531) {
-            tabs.open(Tab.ACCOUNT_MANAGEMENT);
-        } else if (Microbot.getVarbitValue(281) == 532) {
-            npcs.closest(3310).interact("Talk-to");
+            Rs2Npc.interact(3310, "Talk-to");
+        } else if (Microbot.getVarbitPlayerValue(281) == 531) {
+            Rs2Widget.clickWidget(10747942); //switchToAccountManagementTab
+        } else if (Microbot.getVarbitPlayerValue(281) == 532) {
+            Rs2Npc.interact(3310, "Talk-to");
         }
     }
 
     public void CombatGuide() {
-        if (Microbot.getVarbitValue(281) >= 370) {
+        if (Microbot.getVarbitPlayerValue(281) >= 370) {
             if (isInDialogue()) return;
-            if (Microbot.getVarbitValue(281) == 500) {
-                Rs2G.interact("Ladder", "Climb-up");
-                new ConditionalSleep(5000) {
-                    @Override
-                    public boolean condition() throws InterruptedException {
-                        return Microbot.getVarbitValue(281) != 500;
-                    }
-                }.sleep();
-                return;
+            if (Microbot.getVarbitPlayerValue(281) == 500) {
+                Rs2GameObject.interact("Ladder","Climb-up");
+                sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 500);
             }
-            if (Microbot.getVarbitValue(281) == 480 || Microbot.getVarbitValue(281) == 490) { // killl rat with range
-                if (myPlayer().isInteracting(npc)) return;
+            if (Microbot.getVarbitPlayerValue(281) == 480 || Microbot.getVarbitPlayerValue(281) == 490) { // killl rat with range
+                Actor rat = Microbot.getClient().getLocalPlayer().getInteracting();
+                if (rat != null && rat.getName().equalsIgnoreCase("giant rat")) return;
                 Inventory.interact("Wield", "Shortbow");
                 Inventory.interact("Wield", "Bronze arrow");
-                NPC npc = Rs2Npc.getNpc("Giant rat");
-                npc.interact("Attack");
+                Rs2Npc.attack("Giant rat");
                 return;
             }
-            if (Microbot.getVarbitValue(281) == 470) {
+            if (Microbot.getVarbitPlayerValue(281) == 470) {
                 Microbot.getWalker().walkTo(new WorldPoint(3109, 9511, 0));
                 NPC npc = Rs2Npc.getNpc("Combat Instructor");
-                if (npc.interact("Talk-to")) {
-                    new ConditionalSleep(1000) {
-                        @Override
-                        public boolean condition() throws InterruptedException {
-                            return false;
-                        }
-                    }.sleep();
-                    new ConditionalSleep(7000) {
-                        @Override
-                        public boolean condition() throws InterruptedException {
-                            return !isInDialogue();
-                        }
-                    }.sleep();
-                }
+                Rs2Npc.interact(npc, "Talk-to");
+                sleep(1000);
+                sleepUntil(() -> !isInDialogue());
                 return;
             }
-            if (Microbot.getVarbitValue(281) >= 420) {
+            if (Microbot.getVarbitPlayerValue(281) >= 420) {
                 if (Microbot.getClient().getLocalPlayer().isInteracting() || Rs2Player.isAnimating()) return;
-                Tab.switchToCombatOptionsTab();
-                Inventory.interact("Wield", "Bronze sword");
-                Inventory.interact("Wield", "Wooden shield");
                 if (Rs2Equipment.hasEquipped("Bronze sword")) {
-                    Microbot.getWalker().walkTo(new WorldPoint(3105, 9517, 0));
-                    NPC npc = Rs2Npc.getNpc("Giant rat");
-                    Rs2Npc.interact(npc, "Attack");
-                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
+                    Rs2Widget.clickWidget(10747955);
+                    WorldPoint worldPoint = new WorldPoint(3105, 9517, 0);
+                    if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(worldPoint) > 2)
+                        Microbot.getWalker().walkTo(worldPoint);
+                    else {
+                        NPC npc = Rs2Npc.getNpc("Giant rat");
+                        Rs2Npc.interact(npc, "Attack");
+                        sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
+                    }
+                } else {
+                    Tab.switchToInventoryTab();
+                    sleep(500);
+                    Rs2Equipment.equipItem("Bronze sword");
+                    sleep(500);
+                    Rs2Equipment.equipItem("Wooden shield");
                 }
                 return;
             }
-            if (Microbot.getVarbitValue(281) == 410) {
+            if (Microbot.getVarbitPlayerValue(281) == 410) {
                 NPC npc = Rs2Npc.getNpc("Combat Instructor");
                 if (Rs2Npc.interact(npc, "Talk-to")) {
                     sleep(1000);
@@ -396,23 +371,18 @@ public class TutorialIslandScript {
                 }
                 return;
             }
-            if (Microbot.getVarbitValue(281) == 390 || Microbot.getVarbitValue(281) == 405) {
-                if (!widgets.isVisible(84)) {
-                    Tab.switchToEquipmentTab();
-                    widgets.interact(387, 2, "View equipment stats");
-                    new ConditionalSleep(5000) {
-                        @Override
-                        public boolean condition() throws InterruptedException {
-                            return widgets.isVisible(84);
-                        }
-                    }.sleep();
+            if (Microbot.getVarbitPlayerValue(281) == 390 || Microbot.getVarbitPlayerValue(281) == 400 || Microbot.getVarbitPlayerValue(281) == 405) {
+                if (Rs2Widget.getWidget(84, 1) == null) {
+                    Rs2Widget.clickWidget(10747959);
+                    sleep(1000);
+                    Rs2Widget.clickWidget(25362433);
+                    sleepUntil(() ->Rs2Widget.getWidget(84, 1) != null);
+                    sleep(1000);
+                    Rs2Widget.clickWidget("Bronze dagger");
+                    sleep(1000);
                     VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
+                    return;
                 }
-                if (Inventory.contains("Bronze dagger")) {
-                    Inventory.interact("Wield", "Bronze dagger");
-                    Inventory.interact("Wield", "Bronze dagger");
-                }
-                return;
             }
             Microbot.getWalker().walkTo(new WorldPoint(random(3106, 3108), random(9508, 9510), 0));
             sleep(500);
@@ -426,27 +396,22 @@ public class TutorialIslandScript {
     }
 
     public void MiningGuide() {
-        if (Microbot.getVarbitValue(281) == 260) {
-            Microbot.getWalker().walkTo(new WorldPoint(random(3082, 3085), random(9502, 9505), 0));
+        if (Microbot.getVarbitPlayerValue(281) == 260) {
             if (isInDialogue()) return;
+            Microbot.getWalker().walkTo(new WorldPoint(random(3082, 3085), random(9502, 9505), 0));
             NPC npc = Rs2Npc.getNpc(3311);
             Rs2Npc.interact(npc, "Talk-to");
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
         } else {
             if (Inventory.contains("Bronze dagger")) {
-                Rs2GameObject.interact("Gate", "Open");
-                sleepUntil(() -> Microbot.getVarbitValue(281) > 360);
+                Rs2GameObject.interact(ObjectID.GATE_9718, "Open");
+                sleepUntil(() -> Microbot.getVarbitPlayerValue(281) > 360);
                 return;
             }
             if (Inventory.contains("Bronze bar") && Inventory.contains("Hammer")) {
                 Rs2GameObject.interact("Anvil", "Smith");
-                new ConditionalSleep(5000) {
-                    @Override
-                    public boolean condition() throws InterruptedException {
-                        return widgets.isVisible(312);
-                    }
-                }.sleep();
-                widgets.interact(312, 9, "Smith");
+                sleepUntil(() -> Rs2Widget.getWidget(312, 1) != null);
+                Rs2Widget.clickWidget("Bronze dagger");
                 sleepUntil(() -> Inventory.contains("Bronze dagger"));
                 return;
             }
@@ -457,7 +422,7 @@ public class TutorialIslandScript {
                 sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
                 return;
             }
-            if (Inventory.contains("Bronze pickaxe") && !Inventory.contains("Copper ore") && !Inventory.contains("Tin ore")) {
+            if (Inventory.contains("Bronze pickaxe") && (!Inventory.contains("Copper ore") || !Inventory.contains("Tin ore"))) {
                 if (!Inventory.contains("Copper ore")) {
                     Rs2GameObject.interact(10079, "Mine");
                     sleepUntil(() -> Inventory.contains("Copper ore"));
@@ -475,15 +440,16 @@ public class TutorialIslandScript {
     }
 
     public void QuestGuide() {
-        if (Microbot.getVarbitValue(281) == 200) {
+        if (Microbot.getVarbitPlayerValue(281) == 200) {
             Microbot.getWalker().walkTo(new WorldPoint(random(3083, 3086), random(3127, 3129), 0));
             Rs2GameObject.interact(9716, "Open");
-        } else if (Microbot.getVarbitValue(281) != 250) {
+        } else if (Microbot.getVarbitPlayerValue(281) != 250) {
             if (isInDialogue()) return;
             NPC npc = Rs2Npc.getNpc(3312);
             Rs2Npc.interact(npc, "Talk-to");
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
             Tab.switchToQuestTab();
+            Rs2Widget.clickWidget(10747957);
         } else {
             Rs2GameObject.interact(9726, "Climb-down");
             sleep(2000);
@@ -492,17 +458,17 @@ public class TutorialIslandScript {
     }
 
     public void CookingGuide() {
-        if (Microbot.getVarbitValue(281) == 120) {
-            Rs2GameObject.interact("Gate", "Open");
-            sleepUntil(() -> Microbot.getVarbitValue(281) != 120);
-        } else if (Microbot.getVarbitValue(281) == 130) {
-            Rs2GameObject.interact("Door", "Open");
-            sleepUntil(() ->  Microbot.getVarbitValue(281) != 130);
-        } else if (Microbot.getVarbitValue(281) == 140) {
+        if (Microbot.getVarbitPlayerValue(281) == 120) {
+            Rs2GameObject.interact(ObjectID.GATE_9470, "Open");
+            sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 120);
+        } else if (Microbot.getVarbitPlayerValue(281) == 130) {
+            Rs2GameObject.interact(ObjectID.DOOR_9709, "Open");
+            sleepUntil(() ->  Microbot.getVarbitPlayerValue(281) != 130);
+        } else if (Microbot.getVarbitPlayerValue(281) == 140) {
             if (isInDialogue()) return;
             NPC npc = Rs2Npc.getNpc(3305);
             Rs2Npc.interact(npc, "Talk-to");
-        } else if (Microbot.getVarbitValue(281) >= 150 && Microbot.getVarbitValue(281) < 200) {
+        } else if (Microbot.getVarbitPlayerValue(281) >= 150 && Microbot.getVarbitPlayerValue(281) < 200) {
             if (!Inventory.contains("Bread dough") && !Inventory.contains("Bread")) {
                 Inventory.interact("Bucket of water");
                 Inventory.interact("Pot of flour");
@@ -521,13 +487,12 @@ public class TutorialIslandScript {
     }
 
     public void LightFire() {
-        if (Rs2GameObject.findObjectById(26185) != null) {
+        if (Rs2GameObject.findObjectById(26185) == null && Rs2GameObject.findObjectByLocation(Microbot.getClient().getLocalPlayer().getWorldLocation()) == null) {
             Inventory.interact("Logs");
             Inventory.interact("Tinderbox");
             sleepUntil(() -> !Inventory.hasItem("Logs"));
-        } else if (Rs2GameObject.findObjectByLocation(Microbot.getClient().getLocalPlayer().getWorldLocation()) != null) {
+        } else {
             Microbot.getWalker().walkTo(Rs2Npc.getNpc(8503));
-            sleep(1000);
         }
     }
 
@@ -538,21 +503,14 @@ public class TutorialIslandScript {
 
     private void SurvivalExpert() {
         if (InteractWithNpc(8503)) {
-            new ConditionalSleep(5000) {
-                @Override
-                public boolean condition() throws InterruptedException {
-                    return !widgets.containingText(231, new String[]{"Click here to continue"}).isEmpty();
-                }
-            }.sleep();
+            sleepUntil(() -> !isInDialogue());
         } else {
             DoorToSurvivalGuide();
         }
     }
 
-    public void ClickContinue(int rootId) {
-        if (!widgets.containingText(rootId, new String[]{"Click here to continue"}).isEmpty()) {
-            widgets.containingText(rootId, new String[]{"Click here to continue"}).get(0).interact("Continue");
-        }
+    public void ClickContinue() {
+        Dialogue.clickContinue();
     }
 
 
@@ -578,5 +536,5 @@ public class TutorialIslandScript {
         if (Rs2GameObject.interact(9398, "Open")) {
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getX() == 3098);
         }
-    }*/
+    }
 }

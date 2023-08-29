@@ -1,6 +1,9 @@
 package net.runelite.client.plugins.microbot.util.walker.pathfinder;
 
-import net.runelite.api.*;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Scene;
+import net.runelite.api.Tile;
+import net.runelite.api.WorldType;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -11,7 +14,6 @@ import net.runelite.client.plugins.microbot.util.walker.Transport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class CollisionMap {
 
@@ -29,6 +31,11 @@ public class CollisionMap {
         doorIds.add(ObjectID.DOOR_1804);//hill giants edgeville dungeon
         doorIds.add(ObjectID.LARGE_DOOR_17091);//taverly
         doorIds.add(ObjectID.LARGE_DOOR_17093); //taverly
+        doorIds.add(ObjectID.GATE_9720); //rat gate tutorialIsland
+        doorIds.add(ObjectID.GATE_9719); //rat gate tutorialIsland
+        doorIds.add(ObjectID.DOOR_9721); //tutorialIsland door to financial advisor
+        doorIds.add(ObjectID.DOOR_9722); //tutorialIsland door to prayer altar
+        doorIds.add(ObjectID.DOOR_9723); //tutorialIsland door to mage
     }
 
     public WorldArea[] blockingAreas = new WorldArea[] {

@@ -180,12 +180,6 @@ public class Pathfinder implements Runnable {
 
     @Override
     public void run() {
-        if (!calculatePath) {
-            Collections.reverse(path);
-            handleWalkableNodes();
-            done = true;
-            return;
-        }
         boolean skip = false;
         CollisionMap.nodesChecked = new ArrayList<>();
         wallNodes = new ArrayList<>();

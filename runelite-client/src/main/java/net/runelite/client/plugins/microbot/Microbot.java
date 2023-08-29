@@ -69,6 +69,10 @@ public class Microbot {
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
 
+    public static Walker getWalkerForKotlin() {
+        return walker;
+    }
+
     public static boolean isWalking() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808);
     }

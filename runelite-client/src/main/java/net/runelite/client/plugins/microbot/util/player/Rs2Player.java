@@ -8,12 +8,12 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 
 
 public class Rs2Player {
-
+    static int VENOM_VALUE_CUTOFF = -38;
     private static int antiFireTime = -1;
     private static int superAntiFireTime = -1;
     private static int divineRangedTime = -1;
     private static int divineBastionTime = -1;
-    private static int antiVenomTime = -1;
+    public static int antiVenomTime = -1;
 
     public static boolean hasAntiFireActive() {
         return antiFireTime > 0 || hasSuperAntiFireActive();
@@ -32,7 +32,7 @@ public class Rs2Player {
     }
 
     public static boolean hasAntiVenomActive() {
-        if(Rs2Equipment.hasEquipped("serpentine helm")) { return true; } else return antiVenomTime > 0;
+        if(Rs2Equipment.hasEquipped("serpentine helm")) { return true; } else return antiVenomTime < VENOM_VALUE_CUTOFF;
     }
 
     public static void handlePotionTimers(VarbitChanged event) {
@@ -49,7 +49,6 @@ public class Rs2Player {
             divineBastionTime = event.getValue();
         }
         if (event.getVarpId() == VarPlayer.POISON) {
-            int VENOM_VALUE_CUTOFF = -38;
             if (event.getValue() >= VENOM_VALUE_CUTOFF) {
                 antiVenomTime = 0;
                 return;
