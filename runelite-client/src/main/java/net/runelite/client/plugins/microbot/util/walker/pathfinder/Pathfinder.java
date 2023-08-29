@@ -52,7 +52,7 @@ public class Pathfinder implements Runnable {
     boolean calculatePath = true;
 
     public boolean getDebugger() {
-        return true;
+        return false;
     }
 
     public Pathfinder(PathfinderConfig config) {
