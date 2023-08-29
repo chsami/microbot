@@ -49,7 +49,6 @@ public class Pathfinder implements Runnable {
 
     boolean executeWalking = true;
 
-    boolean calculatePath = true;
 
     public boolean getDebugger() {
         return false;
@@ -60,7 +59,6 @@ public class Pathfinder implements Runnable {
         this.config.refresh();
         this.executeWalking = true;
         this.start = null;
-        this.calculatePath = false;
         this.config.refresh();
         new Thread(this).start();
     }
