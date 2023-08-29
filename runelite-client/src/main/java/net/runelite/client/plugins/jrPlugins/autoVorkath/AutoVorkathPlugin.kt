@@ -20,14 +20,17 @@ import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.prayer.Prayer
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
 import net.runelite.client.plugins.microbot.util.walker.Walker
+import net.runelite.client.plugins.skillcalculator.skills.MagicAction
 import javax.inject.Inject
 
 
@@ -85,7 +88,7 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     override fun startUp() {
-        println("Auto Vorkath Plugin Started")
+        println("Auto Vorkath Plugin Activated")
         botState = State.RANGE
         previousBotState = State.NONE
         running = if(Microbot.isLoggedIn()) true else false
@@ -95,7 +98,7 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     override fun shutDown() {
-        println("Auto Vorkath Plugin Stopped")
+        println("Auto Vorkath Plugin Deactivated")
         running = false
         botState = null
         previousBotState = null
@@ -122,6 +125,8 @@ class AutoVorkathPlugin : Plugin() {
                     botState = State.RANGE
                 } else if (doesProjectileExistById(whiteProjectileId) || Rs2Npc.getNpc("Zombified Spawn") != null) {
                     botState = State.ZOMBIFIED_SPAWN
+                } else if (doesProjectileExistById(redProjectileId)) {
+                    botState = State.RED_BALL
                 }
 
                 // Check if player needs to eat
@@ -162,10 +167,14 @@ class AutoVorkathPlugin : Plugin() {
                         previousBotState = State.ZOMBIFIED_SPAWN
                         Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
                         if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
-                        Inventory.useItem(config.SLAYERSTAFF().toString())
                         eatAt(75)
                         while (Rs2Npc.getNpc("Zombified Spawn") == null) {
                             sleep(100, 200)
+                        }
+                        if (config.SLAYERSTAFF().toString() == "Cast") {
+                            Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, Rs2Npc.getNpc("Zombified Spawn"));
+                        } else {
+                            Inventory.useItem(config.SLAYERSTAFF().toString())
                         }
                         Rs2Npc.attack("Zombified Spawn")
                         sleep(2300, 2500)
@@ -212,7 +221,7 @@ class AutoVorkathPlugin : Plugin() {
                         Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
-                    State.ANTIFIRE_POTION -> if (Inventory.findItemContains("super antifire") != null) {
+                    State.ANTIFIRE_POTION -> if (Inventory.findItemContains("antifire") != null) {
                         Inventory.useItemContains("super antifire")
                         botState = previousBotState
                     } else {
@@ -223,6 +232,7 @@ class AutoVorkathPlugin : Plugin() {
                     }
                     State.ANTIVENOM -> if (Inventory.findItemContains("venom") != null){
                         Inventory.useItemContains("venom")
+                        Rs2Player.antiVenomTime = -64; //set this immediatly because the antivenom timer takes a while before it gets triggered
                         botState = previousBotState
                     } else {
                         println("No antivenom potions found")
@@ -255,13 +265,9 @@ class AutoVorkathPlugin : Plugin() {
         Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
         if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
         var clickedTile: WorldPoint
-        var clickedTileLocalPoint: LocalPoint
-        val rightTileLocalPoint = LocalPoint(6464, 6976)
-        val leftTileLocalPoint = LocalPoint(5952, 6976)
         var toggle = true
         while (botState == State.ACID && previousBotState == State.ACID && (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
             clickedTile = if (toggle) rightTile else leftTile
-            clickedTileLocalPoint = if (toggle) rightTileLocalPoint else leftTileLocalPoint
 
             // Check if player's location is equal to the clicked tile location or if it's within one tile of the clicked location.
             val currentPlayerLocation = client.localPlayer.worldLocation
@@ -269,7 +275,12 @@ class AutoVorkathPlugin : Plugin() {
             // Ensure player is at the clickedTile.y before toggling
             if(currentPlayerLocation.y != clickedTile.y) {
                 // Walk player to clickedTile.y location
-                Walker().walkFastLocal(LocalPoint(6336, 6976))
+                Microbot.getWalkerForKotlin().walkFastLocal(
+                    LocalPoint.fromWorld(
+                        client,
+                        WorldPoint(centerTile.x, clickedTile.y, currentPlayerLocation.plane)
+                    )
+                )
                 while (client.localPlayer.worldLocation.y != clickedTile.y) {
                     sleep(1)
                 }
@@ -277,10 +288,9 @@ class AutoVorkathPlugin : Plugin() {
                 if (currentPlayerLocation.distanceTo(clickedTile) <= 1) {
                     toggle = !toggle
                     clickedTile = if (toggle) rightTile else leftTile
-                    clickedTileLocalPoint = if (toggle) rightTileLocalPoint else leftTileLocalPoint
                 }
 
-                Walker().walkFastLocal(clickedTileLocalPoint)
+                Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, clickedTile))
                 while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 1 && client.localPlayer.worldLocation.y == clickedTile.y && Microbot.isWalking()) {
                     sleep(1)
                 }
@@ -318,7 +328,7 @@ class AutoVorkathPlugin : Plugin() {
     private fun redBallWalk() {
         val currentPlayerLocation = client.localPlayer.worldLocation
         val twoTilesEastFromCurrentLocation = WorldPoint(currentPlayerLocation.x + 2, currentPlayerLocation.y, 0)
-        Walker().walkCanvas(twoTilesEastFromCurrentLocation)
+        Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, twoTilesEastFromCurrentLocation))
     }
 
     // player location is center location
@@ -330,7 +340,7 @@ class AutoVorkathPlugin : Plugin() {
     // walk to center location
     private fun walkToCenterLocation(isPlayerInCenterLocation: Boolean) {
         if (!isPlayerInCenterLocation) {
-            Walker().walkCanvas(centerTile)
+            Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, centerTile))
             sleep(2000, 2100)
             Rs2Npc.attack("Vorkath")
         }

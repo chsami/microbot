@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.tutorialisland;
 
-import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -29,13 +28,13 @@ public class TutorialIslandOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder().build());
 
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left(Microbot.status)
+                    .left(Microbot.status + " - " + Microbot.getVarbitValue(281))
                     .build());
 
-            for (Point point: Microbot.getMouse().mousePositions) {
-                graphics.setColor(Color.RED);
-                graphics.drawString("x", point.getX(), point.getY());
-            }
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left(TutorialIslandScript.status.toString())
+                    .build());
+
 
         } catch(Exception ex) {
             System.out.println(ex.getMessage());

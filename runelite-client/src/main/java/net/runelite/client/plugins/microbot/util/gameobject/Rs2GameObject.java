@@ -628,8 +628,10 @@ public class Rs2GameObject {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
         } else if (objectAction.equalsIgnoreCase("collect") || objectAction.equalsIgnoreCase("store") || objectAction.equalsIgnoreCase("Nets")) {
             menuEntry.setType(MenuAction.GAME_OBJECT_THIRD_OPTION);
-        } else if (objectAction.toLowerCase().equals("reset")) {
+        } else if (objectAction.equalsIgnoreCase("reset")) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
+        } else if (objectAction.equalsIgnoreCase("use")){
+            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
         } else {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
         }

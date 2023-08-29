@@ -164,7 +164,7 @@ public class Pathfinder implements Runnable {
     }
 
     private void addNeighbors(Node node) {
-        for (Node neighbor : config.getMap().getNeighbors(node, config, useTransport, target)) {
+        for (Node neighbor : config.getMap().getNeighbors(node, config, useTransport, target, !this.executeWalking)) {
             if (config.avoidWilderness(node.position, neighbor.position, target)) {
                 continue;
             }
@@ -180,12 +180,6 @@ public class Pathfinder implements Runnable {
 
     @Override
     public void run() {
-        if (!calculatePath) {
-            Collections.reverse(path);
-            handleWalkableNodes();
-            done = true;
-            return;
-        }
         boolean skip = false;
         CollisionMap.nodesChecked = new ArrayList<>();
         wallNodes = new ArrayList<>();

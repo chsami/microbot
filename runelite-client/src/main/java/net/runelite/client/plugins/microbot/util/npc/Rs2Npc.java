@@ -162,6 +162,7 @@ public class Rs2Npc {
                 return npcs.stream()
                         .filter(x -> x != null && x.getId() == id)
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                        .filter(x -> Microbot.getWalker().canReach(x.getWorldLocation()))
                         .findFirst().orElse(null);
         });
     }
@@ -197,7 +198,7 @@ public class Rs2Npc {
     }
 
     public static boolean interact(int npcId, String action) {
-        NPC npc = Microbot.getClient().getNpcs().stream().filter(x -> x.getId() == npcId).findFirst().orElse(null);
+        NPC npc = getNpc(npcId);
 
         return interact(npc, action);
     }
@@ -237,7 +238,10 @@ public class Rs2Npc {
             menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
         } else if (npcAction.toLowerCase().equals("attack")) {
             menuEntry.setType(MenuAction.NPC_SECOND_OPTION);
-        } else if (npcAction.toLowerCase().equals("pickpocket") || npcAction.toLowerCase().equals("bank") || npcAction.toLowerCase().equals("dream")) {
+        } else if (npcAction.toLowerCase().equals("pickpocket")
+                || npcAction.toLowerCase().equals("bank")
+                || npcAction.toLowerCase().equals("dream")
+        || npcAction.toLowerCase().equalsIgnoreCase("harpoon")) {
             menuEntry.setType(MenuAction.NPC_THIRD_OPTION);
         } else if (npcAction.toLowerCase().equals("collect")) {
             menuEntry.setType(MenuAction.NPC_FOURTH_OPTION);
