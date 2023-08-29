@@ -52,7 +52,7 @@ public class Pathfinder implements Runnable {
     boolean calculatePath = true;
 
     public boolean getDebugger() {
-        return false;
+        return true;
     }
 
     public Pathfinder(PathfinderConfig config) {
@@ -164,7 +164,7 @@ public class Pathfinder implements Runnable {
     }
 
     private void addNeighbors(Node node) {
-        for (Node neighbor : config.getMap().getNeighbors(node, config, useTransport, target)) {
+        for (Node neighbor : config.getMap().getNeighbors(node, config, useTransport, target, !this.executeWalking)) {
             if (config.avoidWilderness(node.position, neighbor.position, target)) {
                 continue;
             }

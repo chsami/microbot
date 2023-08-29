@@ -47,7 +47,7 @@ public class CollisionMap {
     public static List<CheckedNode> wallNodes = new ArrayList<>();
 
 
-    public List<Node> getNeighbors(Node node, PathfinderConfig config, boolean useTransport, WorldPoint target) {
+    public List<Node> getNeighbors(Node node, PathfinderConfig config, boolean useTransport, WorldPoint target, boolean canReachActivated) {
         try {
             List<Node> neighbors = new ArrayList<>();
             CheckedNode checkedNode = new CheckedNode();
@@ -123,7 +123,7 @@ public class CollisionMap {
                         neighbors.add(new Node(node.position.dx(d.x).dy(d.y), node));
                         checkedNode.status = 2;
 //                    }
-                } else {
+                } else if (!canReachActivated) {
                     LocalPoint localNodePointNorth = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX(), node.position.getY() + 1, node.position.getPlane()));
                     LocalPoint localNodePointEast = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX() + 1, node.position.getY(), node.position.getPlane()));
                     LocalPoint localNodePointSouth = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX(), node.position.getY() - 1, node.position.getPlane()));
