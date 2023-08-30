@@ -29,18 +29,21 @@ public class FishingScript extends Script {
                         Inventory.dropAllStartingFrom(1);
                         return;
                     } else {
-                        Inventory.dropAllStartingFrom(2);
+                        Inventory.dropAllStartingFrom(5);
                         return;
                     }
 
                 } else {
-                    NPC fishingspot = Rs2Npc.getNpc(config.Fish().getFishingSpot());
-                    if(fishingspot != null && !Camera.isTileOnScreen(fishingspot.getLocalLocation())){
-                      validateInteractable(fishingspot);
-                      //Microbot.getWalker().walkTo(fishingspot.getWorldLocation());
-                      //  Camera.turnTo(fishingspot);
+                    for (int fishingSpotId:
+                            config.Fish().getFishingSpot() ) {
+                        NPC fishingspot = Rs2Npc.getNpc(fishingSpotId);
+                        if(fishingspot != null && !Camera.isTileOnScreen(fishingspot.getLocalLocation())){
+                            validateInteractable(fishingspot);
+                        }
+                        Rs2Npc.interact(fishingSpotId,config.Fish().getAction());
+                        Microbot.status = "Fishing...";
                     }
-                    Rs2Npc.interact(config.Fish().getFishingSpot(),config.Fish().getAction());
+
                 }
 
             } catch (Exception ex) {

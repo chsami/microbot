@@ -28,6 +28,14 @@ public class Rs2Widget {
         }
         return false;
     }
+    public static boolean clickWidget(int parentId, int childId) {
+        Widget widget = getWidget(parentId, childId);
+        if (widget != null) {
+            Microbot.getMouse().click(widget.getBounds());
+            return true;
+        }
+        return false;
+    }
     public static Widget getWidget(WidgetInfo wiget) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(wiget));
     }
@@ -82,7 +90,7 @@ public class Rs2Widget {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget foundWidget = null;
             if (children == null) {
-                List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+                List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
                 for (Widget rootWidget : rootWidgets) {
                     if (exact) {
                         if (rootWidget.getText().toLowerCase().contains(text.toLowerCase()) || rootWidget.getName().toLowerCase().contains(">" + text.toLowerCase() + "<")) {
@@ -94,13 +102,13 @@ public class Rs2Widget {
                         }
                     }
                     if (rootWidget.getChildren() != null)
-                        return findWidget(text, Arrays.stream(rootWidget.getChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()), exact);
+                        return findWidget(text, Arrays.stream(rootWidget.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
                     if (rootWidget.getNestedChildren().length > 0)
-                        return findWidget(text, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()), exact);
+                        return findWidget(text, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
                     if (rootWidget.getDynamicChildren().length > 0)
-                        return findWidget(text, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()), exact);
+                        return findWidget(text, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
                     if (rootWidget.getStaticChildren().length > 0)
-                        return findWidget(text, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()), exact);
+                        return findWidget(text, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
                 }
             } else if (children.size() > 0) {
                 for (Widget child : children) {
@@ -146,25 +154,25 @@ public class Rs2Widget {
         }
 
         if (child.getChildren() != null) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+            List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
                 found = findWidget(text, visibleChildWidgets, exact);
         }
         if (found != null) return found;
         if (child.getNestedChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+            List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
                 found = findWidget(text, visibleChildWidgets, exact);
         }
         if (found != null) return found;
         if (child.getDynamicChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+            List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
                 found = findWidget(text, visibleChildWidgets, exact);
         }
         if (found != null) return found;
         if (child.getStaticChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+            List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
                 found = findWidget(text, visibleChildWidgets, exact);
         }
@@ -179,19 +187,19 @@ public class Rs2Widget {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget foundWidget = null;
             if (children == null) {
-                List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+                List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
                 for (Widget rootWidget : rootWidgets) {
                     if (rootWidget.getSpriteId() == spriteId) {
                         return rootWidget;
                     }
                     if (rootWidget.getChildren() != null)
-                        return findWidget(spriteId, Arrays.stream(rootWidget.getChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()));
+                        return findWidget(spriteId, Arrays.stream(rootWidget.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()));
                     if (rootWidget.getNestedChildren().length > 0)
-                        return findWidget(spriteId, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()));
+                        return findWidget(spriteId, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()));
                     if (rootWidget.getDynamicChildren().length > 0)
-                        return findWidget(spriteId, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()));
+                        return findWidget(spriteId, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()));
                     if (rootWidget.getStaticChildren().length > 0)
-                        return findWidget(spriteId, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList()));
+                        return findWidget(spriteId, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()));
                 }
             } else if (children.size() > 0) {
                 for (Widget child : children) {
@@ -209,25 +217,25 @@ public class Rs2Widget {
             return child;
         }
         if (child.getChildren() != null) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+            List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
                 found = findWidget(spriteId, visibleChildWidgets);
         }
         if (found != null) return found;
         if (child.getNestedChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+            List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
                 found = findWidget(spriteId, visibleChildWidgets);
         }
         if (found != null) return found;
         if (child.getDynamicChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+            List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
                 found = findWidget(spriteId, visibleChildWidgets);
         }
         if (found != null) return found;
         if (child.getStaticChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> !x.isHidden()).collect(Collectors.toList());
+            List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
             if (visibleChildWidgets.size() > 0)
                 found = findWidget(spriteId, visibleChildWidgets);
         }

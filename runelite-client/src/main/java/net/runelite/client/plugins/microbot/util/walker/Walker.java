@@ -147,7 +147,7 @@ public class Walker {
 
         Microbot.getMouse().clickFast(1, 1);
 
-        sleep(300);
+        sleep(100);
         canvasX = 0;
         canvasY = 0;
     }

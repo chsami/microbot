@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -443,10 +444,10 @@ public class Rs2GameObject {
         return tileObject;
     }
 
-    public static ObjectComposition convertGameObjectToObjectComposition(GameObject gameObject) {
+    public static ObjectComposition convertGameObjectToObjectComposition(TileObject tileObject) {
         Player player = Microbot.getClient().getLocalPlayer();
-        if (player.getLocalLocation().distanceTo(gameObject.getLocalLocation()) > 2400) return null;
-        ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(gameObject.getId()));
+        if (player.getLocalLocation().distanceTo(tileObject.getLocalLocation()) > 2400) return null;
+        ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(tileObject.getId()));
         return objComp;
     }
 
@@ -601,6 +602,9 @@ public class Rs2GameObject {
         if (objectToInteract == null) return;
 
         menuEntry.setIdentifier(objectToInteract.getId());
+
+        ObjectComposition objComp = convertGameObjectToObjectComposition(objectToInteract);
+
         try {
             GameObject gameObject = (GameObject) objectToInteract;
 
@@ -624,14 +628,22 @@ public class Rs2GameObject {
 
         menuEntry.setTarget("");
         menuEntry.setOption(objectAction);
-        if (objectAction.equalsIgnoreCase("bank") || objectAction.equalsIgnoreCase("take")) {
-            menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
-        } else if (objectAction.equalsIgnoreCase("collect") || objectAction.equalsIgnoreCase("store") || objectAction.equalsIgnoreCase("Nets")) {
-            menuEntry.setType(MenuAction.GAME_OBJECT_THIRD_OPTION);
-        } else if (objectAction.toLowerCase().equals("reset")) {
-            menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
-        } else {
+        int index = IntStream.range(0, objComp.getActions().length)
+                .filter(i -> objectAction.equals(objComp.getActions()[i]))
+                .findFirst().orElse(-1);
+
+        if (index == 0) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
+        } else if (index == 1) {
+            menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
+        } else if (index == 2) {
+            menuEntry.setType(MenuAction.GAME_OBJECT_THIRD_OPTION);
+        } else if (index == 3) {
+            menuEntry.setType(MenuAction.GAME_OBJECT_FOURTH_OPTION);
+        } else if (index == 4) {
+            menuEntry.setType(MenuAction.GAME_OBJECT_FIFTH_OPTION);
+        } else {
+            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
         }
     }
 }

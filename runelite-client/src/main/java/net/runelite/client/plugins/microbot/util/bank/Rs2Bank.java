@@ -396,9 +396,9 @@ public class Rs2Bank {
 
     public static boolean walkToBank() {
         BankLocation bankLocation = getNearestBank();
-        Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), false);
+        Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
         if (bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 4) {
-            Microbot.getWalker().walkTo(bankLocation.getWorldPoint(), false);
+            Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
             return false;
         }
         return true;
@@ -436,6 +436,9 @@ public class Rs2Bank {
         for (BankLocation bankLocation : BankLocation.values())
         {
             double currDist = local.distanceTo(bankLocation.getWorldPoint());
+            if (bankLocation.getWorldPoint().getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
+                currDist = local.distanceTo(new WorldPoint(bankLocation.getWorldPoint().getX(), bankLocation.getWorldPoint().getY(), Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()));
+            }
             if (nearest == null || currDist < dist)
             {
                 dist = currDist;

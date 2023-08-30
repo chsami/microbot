@@ -29,7 +29,7 @@ boolean reachedEndLine = false;
 //                int realAnimation = value * -1021724449;
 //                System.out.println(realAnimation);
                 //System.out.println(LocalPoint.fromScene(48, 54));
-                Microbot.getWalker().walkFastLocal(new LocalPoint(6208, 6976));
+               // Microbot.getWalker().walkFastLocal(new LocalPoint(6208, 6976));
             //    Rs2Bank.withdrawFast(995);
             //    Rs2Bank.openBank();
               //  System.out.println(Rs2Bank.isBankOpen());
@@ -72,7 +72,10 @@ boolean reachedEndLine = false;
                 //getParam0=-5146, getParam1=-4228,
                 //getParam0=-5350, getParam1=-4235
                // System.out.println(GroundItemsPlugin.getCollectedGroundItems());
-               // System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+              //  System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+               // Microbot.getWalker().walkTo(BankLocation.LUMBRIDGE_CASTLE_TOP.getWorldPoint());
+               // Rs2Bank.useBank();
+                Rs2Bank.walkToBank();
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
