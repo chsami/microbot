@@ -76,6 +76,20 @@ public class Inventory {
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count());
     }
 
+    public static int getItemAmount(int id) {
+        Microbot.status = "Looking for item: " + id;
+        Widget inventoryWidget = getInventory();
+        if (inventoryWidget == null) return 0;
+
+        Widget item = Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getItemId() == id)
+                .findFirst().orElse(null));
+
+        if (item != null)
+            return item.getItemQuantity();
+
+        return 0;
+    }
+
     public static boolean isInventoryFull(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget inventoryWidget = getInventory();
