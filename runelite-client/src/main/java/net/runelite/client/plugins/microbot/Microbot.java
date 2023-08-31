@@ -2,8 +2,10 @@ package net.runelite.client.plugins.microbot;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.*;
-import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.Skill;
+import net.runelite.api.VarPlayer;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ProfileManager;
@@ -124,7 +126,7 @@ public class Microbot {
     }
 
     public static void hopToWorld(int worldNumber){
-        if (quickHopTargetWorld != null) return;
+        if (quickHopTargetWorld != null || Microbot.getClient().getGameState() != GameState.LOGGED_IN) return;
         if(Microbot.getClient().getWorld() == worldNumber){return;}
         World newWorld = Microbot.getWorldService().getWorlds().findWorld(worldNumber);
         if(newWorld == null){
@@ -143,9 +145,7 @@ public class Microbot {
         if (rsWorld == null){
             return;
         }
-        if (Microbot.getClient().getWidget(WidgetInfo.WORLD_SWITCHER_LIST) == null) {
-            Microbot.getClient().openWorldHopper();
-        }
+        Microbot.getClient().openWorldHopper();
         Microbot.getClient().hopToWorld(rsWorld);
         quickHopTargetWorld = null;
     }
