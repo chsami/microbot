@@ -8,7 +8,6 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -628,9 +627,14 @@ public class Rs2GameObject {
 
         menuEntry.setTarget("");
         menuEntry.setOption(objectAction);
-        int index = IntStream.range(0, objComp.getActions().length)
-                .filter(i -> objectAction.equals(objComp.getActions()[i]))
-                .findFirst().orElse(-1);
+
+        int index = 0;
+
+        for (int i = 0; i < objComp.getActions().length; i++) {
+            if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
+                index = i;
+            }
+        }
 
         if (index == 0) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
