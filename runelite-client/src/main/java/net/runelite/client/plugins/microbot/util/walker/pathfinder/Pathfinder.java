@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.runelite.api.Point;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
@@ -49,9 +50,11 @@ public class Pathfinder implements Runnable {
 
     boolean executeWalking = true;
 
+    boolean useCanvas = false;
+
 
     public boolean getDebugger() {
-        return false;
+        return true;
     }
 
     public Pathfinder(PathfinderConfig config) {
@@ -85,13 +88,16 @@ public class Pathfinder implements Runnable {
         new Thread(this).start();
     }
 
-    public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target, boolean useTransport, boolean canReach) {
+    public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target, boolean useTransport, boolean canReach, boolean useCanvas, WorldArea[] blockingAreas) {
         this.config = config;
         this.start = start;
         this.target = target;
         this.config.refresh();
         this.useTransport = useTransport;
         this.executeWalking = !canReach;
+        this.useCanvas = useCanvas;
+        if (blockingAreas != null)
+            CollisionMap.blockingAreas = blockingAreas;
 
         //Calculate all the stairce/obstacles/ladders in advance before calculating the path to walk
         precalculateTransports(start, target, useTransport);
@@ -231,7 +237,11 @@ public class Pathfinder implements Runnable {
 
             if (!skip) {
                 Collections.reverse(path);
-                handleWalkableNodes();
+                if (useCanvas) {
+                    handleWalkableNodesCanvas();
+                } else {
+                    handleWalkableNodes();
+                }
             }
         }
 
@@ -246,6 +256,16 @@ public class Pathfinder implements Runnable {
             if (Calculations.tileOnMap(node.position) && node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 14) {
                 Point point = Calculations.tileToMinimap(node.position);
                 Microbot.getMouse().click(point);
+                break;
+            }
+        }
+    }
+
+    private void handleWalkableNodesCanvas() {
+        for (Node node : path) {
+            if (Calculations.tileOnMap(node.position) && node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 3) {
+                LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), node.position);
+                Microbot.getWalker().walkFastLocal(localPoint);
                 break;
             }
         }
@@ -281,6 +301,7 @@ public class Pathfinder implements Runnable {
     }
 
     private boolean handleDoors() {
+        if (useCanvas) return false;
         boolean skip = false;
         CheckedNode[] wallNodeArrays = wallNodes.toArray(CheckedNode[]::new);
         for (int i = 0; i < wallNodeArrays.length; i++) {

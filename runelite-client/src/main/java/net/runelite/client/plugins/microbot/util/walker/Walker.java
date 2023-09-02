@@ -6,6 +6,7 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
@@ -24,8 +25,8 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Walker {
 
-    int canvasX;
-    int canvasY;
+    public int canvasX;
+    public int canvasY;
 
     @Getter
     public Pathfinder pathfinder;
@@ -193,12 +194,20 @@ public class Walker {
     }
 
     public boolean walkTo(WorldPoint target, boolean useTransport) {
+        return walkTo(target, useTransport, false, null);
+    }
+
+    public boolean walkTo(WorldPoint target, boolean useTransport, boolean useCanvas) {
+        return walkTo(target, useTransport, useCanvas, null);
+    }
+
+    public boolean walkTo(WorldPoint target, boolean useTransport, boolean useCanvas, WorldArea[] blockingAreas) {
         pathfinder = null;
         WorldPoint start = WorldPoint.fromLocalInstance(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation());
         if (pathfinder != null) {
             start = pathfinder.getStart();
         }
-        pathfinder = new Pathfinder(pathfinderConfig, start, target, useTransport, false);
+        pathfinder = new Pathfinder(pathfinderConfig, start, target, useTransport, false, useCanvas, blockingAreas);
         currentDestination = null;
         ignoreTransport = new ArrayList<>();
         pathOrigin = new ArrayList<>();

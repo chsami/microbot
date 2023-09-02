@@ -38,7 +38,7 @@ public class CollisionMap {
         doorIds.add(ObjectID.DOOR_9723); //tutorialIsland door to mage
     }
 
-    public WorldArea[] blockingAreas = new WorldArea[] {
+    public static WorldArea[] blockingAreas = new WorldArea[] {
             new WorldArea(new WorldPoint(3085, 3333, 0), 50, 50), //draynor manor
             new WorldArea(new WorldPoint(2535, 3109, 0), 10, 30)}; //under maze
 
@@ -54,7 +54,7 @@ public class CollisionMap {
             checkedNode.node = node;
 
             //list of hard to navigate areas like "draynor". If target point is not inside draynor, then we block any points that are calculated in draynor. This is to avoid getting stuck
-            if (Arrays.stream(blockingAreas).anyMatch(x -> x.contains(node.position)) && !Arrays.stream(blockingAreas).anyMatch(x -> x.contains(target)))
+            if (Arrays.stream(blockingAreas).anyMatch(x -> x.contains(node.position)))
                 return new ArrayList<>();
 
             if (useTransport) {

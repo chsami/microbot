@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -17,6 +19,9 @@ public class ExampleScript extends Script {
     public static double version = 1.0;
 boolean reachedEndLine = false;
     LocalPoint position1 = null;
+
+    public static WorldArea[] blockingAreas = new WorldArea[] {new WorldArea(new WorldPoint(3272, 3214,0), 3, 3 ), new WorldArea(new WorldPoint(3268, 3210,0), 3, 3 )};
+
 
     public boolean run(ExampleConfig config) {
         Microbot.enableAutoRunOn = false;
@@ -73,13 +78,16 @@ boolean reachedEndLine = false;
                 //getParam0=-5350, getParam1=-4235
                // System.out.println(GroundItemsPlugin.getCollectedGroundItems());
               //  System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
-               // Microbot.getWalker().walkTo(BankLocation.LUMBRIDGE_CASTLE_TOP.getWorldPoint());
-               // Rs2Bank.useBank();
-                Rs2Bank.walkToBank();
+             //   Microbot.getWalker().walkTo(WorldPoint.fromLocal(Microbot.getClient(), 9152, 7616, 0));
+              //  System.out.println(Inventory.getStackSizeOfItem(995));
+               // System.out.println(Microbot.getClient().getLocalPlayer().getWorldLocation().isInArea(blockingAreas[0]));
+             //   System.out.println(blockingAreas[0].contains(Microbot.getClient().getLocalPlayer().getWorldLocation()));
+                Microbot.getWalker().walkTo(new WorldPoint(3269, 3212, 0), false, true, blockingAreas);
+               // Microbot.hopToWorld(random(300, 360));
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        }, 0, 500, TimeUnit.MILLISECONDS);
         return true;
     }
 
