@@ -636,6 +636,13 @@ public class Rs2GameObject {
                     index = i;
                 }
             }
+            if (index == 0 && objComp.getImpostor() != null) {
+                for (int i = 0; i < objComp.getImpostor().getActions().length; i++) {
+                    if (objectAction.equalsIgnoreCase(objComp.getImpostor().getActions()[i])) {
+                        index = i;
+                    }
+                }
+            }
         }
 
         if (index == 0) {
