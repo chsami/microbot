@@ -2,17 +2,11 @@ package net.runelite.client.plugins.microbot.util.equipment;
 
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.RuneLite;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.worldmap.TeleportLocationData;
-import net.runelite.client.ui.FatalErrorDialog;
-
-import javax.swing.*;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -95,13 +89,23 @@ public class Rs2Equipment {
 
     public static boolean hasEquipped(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
-            final ItemContainer container = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT));
-            if (container == null) return false;
             for (EquipmentInventorySlot value: EquipmentInventorySlot.values()) {
-                Item itemSlot = container.getItem(value.getSlotIdx());
-                if (itemSlot == null) continue;
-                ItemComposition item =  Microbot.getItemManager().getItemComposition(itemSlot.getId());
+                ItemComposition item =  getEquippedItem(value);
+                if (item == null) continue;
                 if (item.getName().toLowerCase().equals(itemName.toLowerCase())) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    public static boolean hasEquippedContains(String itemName) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            for (EquipmentInventorySlot value: EquipmentInventorySlot.values()) {
+                ItemComposition item =  getEquippedItem(value);
+                if (item == null) continue;
+                if (item.getName().toLowerCase().contains(itemName.toLowerCase())) {
                     return true;
                 }
             }

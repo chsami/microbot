@@ -3,15 +3,25 @@ package net.runelite.client.plugins.microbot.util.walker.pathfinder;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Point;
+import net.runelite.api.Skill;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.magic.Teleport;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
+import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.walker.Transport;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -39,8 +49,6 @@ public class Pathfinder implements Runnable {
     private boolean done = false;
     @Getter
     int totalCost = 0;
-
-    boolean isTeleport = false;
 
     @Getter
     @Setter
@@ -102,13 +110,70 @@ public class Pathfinder implements Runnable {
         //Calculate all the stairce/obstacles/ladders in advance before calculating the path to walk
         precalculateTransports(start, target, useTransport);
 
-        //TODO: Teleports
-        /*for (Teleport teleport : Teleport.values()) {
-            if (teleport.getDestination().equals(start)) {
-                isTeleport = true;
-                break;
+        final int teleportThreshHoldDistance = 20;
+
+        //No need to teleport if we are close to our target location
+        // return early
+        if (start.distanceTo(target) < teleportThreshHoldDistance) {
+            new Thread(this).start();
+            return;
+        }
+
+        Tab.switchToInventoryTab();
+
+        //Teleport spells logic
+        for (Teleport teleport : Teleport.values()) {
+            if (teleport.getDestination().equals(start)
+                    || teleport.getDestination().distanceTo(target) < start.distanceTo(target)
+            ) {
+                boolean hasTablet = Inventory.hasItem(teleport.getTabletName());
+                boolean hasRunes = true;
+                for (Pair itemRequired : teleport.getItemsRequired()) {
+                    if (!Inventory.hasItemAmountStackable(itemRequired.getLeft().toString(), (int) itemRequired.getRight()))
+                        hasRunes = false;
+                }
+
+                if (hasRunes && Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC) >= teleport.getLevel()) {
+                    Rs2Magic.cast(teleport.getSpell());
+                    sleepUntil(() -> Microbot.isAnimating());
+                    sleepUntil(() -> !Microbot.isAnimating());
+                    start = teleport.getDestination();
+                    break;
+                }
+
+                if (hasTablet) {
+                    Inventory.useItemFast(teleport.getTabletName(), "Break");
+                    sleepUntil(() -> Microbot.isAnimating());
+                    sleepUntil(() -> !Microbot.isAnimating());
+                    start = teleport.getDestination();
+                    break;
+                }
             }
-        }*/
+        }
+        //jewellery teleport logic
+        for (JewelleryLocationEnum jewelleryLocationEnum : JewelleryLocationEnum.values()) {
+            if (jewelleryLocationEnum.getLocation().equals(start)
+                    || jewelleryLocationEnum.getLocation().distanceTo(target) < start.distanceTo(target)
+            ) {
+                String itemName = jewelleryLocationEnum.getTooltip() + "(";
+                boolean hasItemEquipped = Rs2Equipment.hasEquippedContains(itemName);
+                if (hasItemEquipped) {
+                    if (jewelleryLocationEnum.name().contains("ring")) {
+                        Rs2Equipment.useRingAction(jewelleryLocationEnum);
+                    } else {
+                        Rs2Equipment.useAmuletAction(jewelleryLocationEnum);
+                    }
+                    sleepUntil(() -> Microbot.isAnimating());
+                    sleepUntil(() -> !Microbot.isAnimating());
+                } else if (Inventory.hasItemContains(itemName)) {
+                    Inventory.useItemFastContains(itemName, "Rub");
+                    sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
+                    VirtualKeyboard.typeString(Integer.toString(jewelleryLocationEnum.getIdentifier() - 1));
+                    sleepUntil(() -> Microbot.isAnimating());
+                    sleepUntil(() -> !Microbot.isAnimating());
+                }
+            }
+        }
 
         new Thread(this).start();
     }
@@ -205,7 +270,7 @@ public class Pathfinder implements Runnable {
 
             node = boundary.removeFirst();
 
-            if (node.position.distanceTo(target) < 1 || (!isTeleport && !config.isNear(start))) {
+            if (node.position.distanceTo(target) < 1 || (!config.isNear(start))) {
                 path = node.getPath();
                 break;
             }

@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 
@@ -77,13 +78,21 @@ boolean reachedEndLine = false;
                 //getParam0=-5146, getParam1=-4228,
                 //getParam0=-5350, getParam1=-4235
                // System.out.println(GroundItemsPlugin.getCollectedGroundItems());
-              //  System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+                System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
              //   Microbot.getWalker().walkTo(WorldPoint.fromLocal(Microbot.getClient(), 9152, 7616, 0));
               //  System.out.println(Inventory.getStackSizeOfItem(995));
                // System.out.println(Microbot.getClient().getLocalPlayer().getWorldLocation().isInArea(blockingAreas[0]));
              //   System.out.println(blockingAreas[0].contains(Microbot.getClient().getLocalPlayer().getWorldLocation()));
-                Microbot.getWalker().walkTo(new WorldPoint(3269, 3212, 0), false, true, blockingAreas);
+//                System.out.println(new WorldPoint(3145, 9911, 0).distanceTo(new WorldPoint(3097, 9867, 0)));
+//                System.out.println(new WorldPoint(3145, 9911, 0).distanceTo(new WorldPoint(3209, 9616, 0)));
+//                Microbot.getWalker().walkTo(BankLocation.EDGEVILLE_BANK.getWorldPoint());
+                //Rs2Magic.cast(MagicAction.OURANIA_TELEPORT);
+                //Microbot.getWalker().walkTo(BankLocation.VARROCK_WEST.getWorldPoint());
+          //      Inventory.useItemActionContains(JewelleryLocationEnum.EDGEVILLE.getTooltip(), "Rub");
                // Microbot.hopToWorld(random(300, 360));
+               //Inventory.useAllItemsFastContains("void", "wear");
+                Rs2GameObject.interact(29156, "Teleport Menu");
+              //  Inventory.useItemFastContains("glory(", "Rub");
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
