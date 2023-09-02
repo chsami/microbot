@@ -626,13 +626,15 @@ public class Rs2GameObject {
         }
 
         menuEntry.setTarget("");
-        menuEntry.setOption(objectAction);
+        menuEntry.setOption(objectAction == null ? "" : objectAction);
 
         int index = 0;
 
-        for (int i = 0; i < objComp.getActions().length; i++) {
-            if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
-                index = i;
+        if (objectAction != null) {
+            for (int i = 0; i < objComp.getActions().length; i++) {
+                if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
+                    index = i;
+                }
             }
         }
 

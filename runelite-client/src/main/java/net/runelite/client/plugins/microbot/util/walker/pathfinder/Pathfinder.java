@@ -146,7 +146,7 @@ public class Pathfinder implements Runnable {
                     //use object to go underground
                     Transport transportUnderground = getClosestTransport(target);
                     if (transportUnderground != null) {
-                        this.target = transportUnderground.getDestination();
+                        this.target = transportUnderground.getOrigin();
                     }
                 } else if (start.getY() >= 9000 && target.getY() < 9000) {
                     //use object to go surface
