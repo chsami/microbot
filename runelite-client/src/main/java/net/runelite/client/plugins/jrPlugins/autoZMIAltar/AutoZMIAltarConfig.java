@@ -26,7 +26,7 @@ public interface AutoZMIAltarConfig extends Config {
                 "MUST HAVE NPC CONTACT RUNES IN INVENTORY\n" +
                 "MUST HAVE JEWELLERY BOX SET TO EDGEVILLE\n" +
                 "1. Setup Your Inventory Setup with it's name\n" +
-                "2. Start at Edgeville bank";
+                "2. Start next to your selected bank";
     }
 
     @ConfigItem(
@@ -48,10 +48,20 @@ public interface AutoZMIAltarConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "bank",
+            name = "Bank",
+            description = "Where to bank?",
+            position = 4
+    )
+    default BANK BANK() {
+        return BANK.ZMIBANK;
+    }
+
+    @ConfigItem(
             keyName = "stamina",
             name = "Stamina",
             description = "Choose your stamina",
-            position = 4
+            position = 5
     )
     default STAMINA STAMINA() {
         return STAMINA.ORNATEPOOL;

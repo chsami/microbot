@@ -132,27 +132,33 @@ class AutoZMIAltar : Plugin() {
     }
 
     private fun handleBankingState() {
-        val bankWorldPoint = WorldPoint(3094, 3491, 0)
-        while (client.localPlayer.worldLocation.distanceTo(bankWorldPoint) >= 3 && running){
-            Microbot.getWalkerForKotlin().walkTo(bankWorldPoint)
-            sleep(600, 1200)
-        }
-        try {
-            Rs2Npc.interact("banker", "bank")
-            while (!Rs2Bank.isOpen()) sleep(600,700)
-            Rs2Bank.depositAll()
-            sleep(600,700)
-            MicrobotInventorySetup.loadInventory(config.INVENTORY())
-            Rs2Bank.closeBank()
-            fillPouches()
-            MicrobotInventorySetup.loadInventory(config.INVENTORY())
-            Rs2Bank.closeBank()
+        if (config.BANK().bankName == "Edgeville"){
+            val bankWorldPoint = WorldPoint(3094, 3491, 0)
+            while (client.localPlayer.worldLocation.distanceTo(bankWorldPoint) >= 3 && running){
+                Microbot.getWalkerForKotlin().walkTo(bankWorldPoint)
+                sleep(600, 1200)
+            }
+            try {
+                Rs2Npc.interact("banker", "bank")
+                while (!Rs2Bank.isOpen()) sleep(600,700)
+                Rs2Bank.depositAll()
+                sleep(600,700)
+                MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                Rs2Bank.closeBank()
+                fillPouches()
+                MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                Rs2Bank.closeBank()
+                Rs2Magic.cast(MagicAction.OURANIA_TELEPORT)
+                sleep(2600, 3000)
+                currentState = State.WALKING
+            } catch (e: Exception){
+                //e.printStackTrace()
+                currentState = State.BANKING
+            }
+        } else {
             Rs2Magic.cast(MagicAction.OURANIA_TELEPORT)
             sleep(2600, 3000)
             currentState = State.WALKING
-        } catch (e: Exception){
-            //e.printStackTrace()
-            currentState = State.BANKING
         }
     }
 
@@ -165,6 +171,31 @@ class AutoZMIAltar : Plugin() {
         }
         Rs2GameObject.interact("Ladder", "Climb")
         sleep(2400, 3000)
+        if (config.BANK().bankName == "ZMI Bank"){
+            try {
+                Rs2Npc.interact("Eniola", "bank")
+                while (!Dialogue.isInDialogue()) sleep(200, 300)
+                Dialogue.clickContinue()
+                sleep(2000,2200)
+                VirtualKeyboard.typeString("2")
+                while (!Rs2Bank.isOpen()) sleep(600,700)
+                Rs2Bank.depositAll()
+                sleep(600,700)
+                MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                Rs2Bank.closeBank()
+                fillPouches()
+                Rs2Npc.interact("Eniola", "bank")
+                while (!Dialogue.isInDialogue()) sleep(200, 300)
+                Dialogue.clickContinue()
+                sleep(1000,1200)
+                VirtualKeyboard.typeString("2")
+                while (!Rs2Bank.isOpen()) sleep(600,700)
+                MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                Rs2Bank.closeBank()
+            }catch (e: Exception){
+                currentState = State.WALKING
+            }
+        }
         while (client.localPlayer.worldLocation.distanceTo(altarWorldPoint) >= 2 && running) {
             Microbot.getWalkerForKotlin().walkTo(altarWorldPoint)
             sleep(600, 1200)
@@ -184,9 +215,13 @@ class AutoZMIAltar : Plugin() {
             Rs2GameObject.interact(ObjectID.ORNATE_POOL_OF_REJUVENATION, "Drink")
             sleep(2400, 2500)
         }
-        Rs2GameObject.interact(29156, "Edgeville")
-        sleep(2600, 2800)
-        currentState = State.BANKING
+        if (config.BANK().bankName == "Edgeville"){
+            Rs2GameObject.interact(29156, "Edgeville")
+            sleep(2600, 2800)
+            currentState = State.BANKING
+        } else {
+            currentState = State.BANKING
+        }
     }
 
     private fun fixPouches(){
