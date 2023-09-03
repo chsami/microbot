@@ -144,15 +144,17 @@ class AutoZMIAltar : Plugin() {
                 // Execute twice
                 for (i in 0..1){
                     Rs2Npc.interact("banker", "bank")
-                    while (!Rs2Bank.isOpen()) sleep(600,700)
+                    while (!Rs2Bank.isOpen()) sleep(700, 800)
                     if(i == 0) {
                         Rs2Bank.depositAll()
-                        sleep(600,700)
+                        sleep(700,800)
                     }
                     MicrobotInventorySetup.loadInventory(config.INVENTORY())
                     Rs2Bank.closeBank()
                     fillPouches()
                 }
+                Rs2Npc.interact("banker", "bank")
+                while (!Rs2Bank.isOpen()) sleep(700, 800)
                 MicrobotInventorySetup.loadInventory(config.INVENTORY())
                 Rs2Bank.closeBank()
                 Rs2Magic.cast(MagicAction.OURANIA_TELEPORT)
@@ -187,10 +189,10 @@ class AutoZMIAltar : Plugin() {
                     Dialogue.clickContinue()
                     sleep(1000,1200)
                     VirtualKeyboard.typeString("2")
-                    while (!Rs2Bank.isOpen()) sleep(600,700)
+                    while (!Rs2Bank.isOpen()) sleep(700,800)
                     if(i == 0){
                         Rs2Bank.depositAll()
-                        sleep(600,700)
+                        sleep(700,800)
                     }
                     MicrobotInventorySetup.loadInventory(config.INVENTORY())
                     Rs2Bank.closeBank()
@@ -201,7 +203,7 @@ class AutoZMIAltar : Plugin() {
                 Dialogue.clickContinue()
                 sleep(1000,1200)
                 VirtualKeyboard.typeString("2")
-                while (!Rs2Bank.isOpen()) sleep(600,700)
+                while (!Rs2Bank.isOpen()) sleep(700,800)
                 MicrobotInventorySetup.loadInventory(config.INVENTORY())
                 Rs2Bank.closeBank()
             }catch (e: Exception){
