@@ -139,13 +139,18 @@ class AutoZMIAltar : Plugin() {
                 sleep(600, 1200)
             }
             try {
-                Rs2Npc.interact("banker", "bank")
-                while (!Rs2Bank.isOpen()) sleep(600,700)
-                Rs2Bank.depositAll()
-                sleep(600,700)
-                MicrobotInventorySetup.loadInventory(config.INVENTORY())
-                Rs2Bank.closeBank()
-                fillPouches()
+                // Execute twice
+                for (i in 0..1){
+                    Rs2Npc.interact("banker", "bank")
+                    while (!Rs2Bank.isOpen()) sleep(600,700)
+                    if(i == 0) {
+                        Rs2Bank.depositAll()
+                        sleep(600,700)
+                    }
+                    MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                    Rs2Bank.closeBank()
+                    fillPouches()
+                }
                 MicrobotInventorySetup.loadInventory(config.INVENTORY())
                 Rs2Bank.closeBank()
                 Rs2Magic.cast(MagicAction.OURANIA_TELEPORT)
@@ -173,17 +178,22 @@ class AutoZMIAltar : Plugin() {
         sleep(2400, 3000)
         if (config.BANK().bankName == "ZMI Bank"){
             try {
-                Rs2Npc.interact("Eniola", "bank")
-                while (!Dialogue.isInDialogue()) sleep(200, 300)
-                Dialogue.clickContinue()
-                sleep(1000,1200)
-                VirtualKeyboard.typeString("2")
-                while (!Rs2Bank.isOpen()) sleep(600,700)
-                Rs2Bank.depositAll()
-                sleep(600,700)
-                MicrobotInventorySetup.loadInventory(config.INVENTORY())
-                Rs2Bank.closeBank()
-                fillPouches()
+                //execute twice
+                for (i in 0..1){
+                    Rs2Npc.interact("Eniola", "bank")
+                    while (!Dialogue.isInDialogue()) sleep(200, 300)
+                    Dialogue.clickContinue()
+                    sleep(1000,1200)
+                    VirtualKeyboard.typeString("2")
+                    while (!Rs2Bank.isOpen()) sleep(600,700)
+                    if(i == 0){
+                        Rs2Bank.depositAll()
+                        sleep(600,700)
+                    }
+                    MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                    Rs2Bank.closeBank()
+                    fillPouches()
+                }
                 Rs2Npc.interact("Eniola", "bank")
                 while (!Dialogue.isInDialogue()) sleep(200, 300)
                 Dialogue.clickContinue()
