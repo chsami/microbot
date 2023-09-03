@@ -150,12 +150,14 @@ class AutoZMIAltar : Plugin() {
                         sleep(700,800)
                     }
                     MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                    sleep(100,200)
                     Rs2Bank.closeBank()
                     fillPouches()
                 }
                 Rs2Npc.interact("banker", "bank")
                 while (!Rs2Bank.isOpen()) sleep(700, 800)
                 MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                sleep(100,200)
                 Rs2Bank.closeBank()
                 Rs2Magic.cast(MagicAction.OURANIA_TELEPORT)
                 sleep(2600, 3000)
@@ -195,6 +197,7 @@ class AutoZMIAltar : Plugin() {
                         sleep(700,800)
                     }
                     MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                    sleep(100,200)
                     Rs2Bank.closeBank()
                     fillPouches()
                 }
@@ -205,6 +208,7 @@ class AutoZMIAltar : Plugin() {
                 VirtualKeyboard.typeString("2")
                 while (!Rs2Bank.isOpen()) sleep(700,800)
                 MicrobotInventorySetup.loadInventory(config.INVENTORY())
+                sleep(100,200)
                 Rs2Bank.closeBank()
             }catch (e: Exception){
                 currentState = State.BANKING
