@@ -262,19 +262,19 @@ class AutoZMIAltar : Plugin() {
     private fun fillPouches() {
         if (Inventory.hasItem("Giant Pouch") && Inventory.hasItem("Pure essence")){
             Inventory.interact("Giant Pouch")
-            sleep(100, 200)
+            sleep(50, 100)
         }
         if (Inventory.hasItem("Large Pouch") && Inventory.hasItem("Pure essence")){
             Inventory.interact("Large Pouch")
-            sleep(100, 200)
+            sleep(50, 100)
         }
         if (Inventory.hasItem("Medium Pouch") && Inventory.hasItem("Pure essence")){
             Inventory.interact("Medium Pouch")
-            sleep(100, 200)
+            sleep(50, 100)
         }
         if (Inventory.hasItem("Small Pouch") && Inventory.hasItem("Pure essence")){
             Inventory.interact("Small Pouch")
-            sleep(100, 200)
+            sleep(50, 100)
         }
     }
 
