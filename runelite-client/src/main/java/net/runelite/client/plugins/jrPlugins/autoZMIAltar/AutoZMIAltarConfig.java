@@ -23,7 +23,8 @@ public interface AutoZMIAltarConfig extends Config {
     )
     default String GUIDE() {
         return "MUST BE ON LUNAR SPELL BOOK\n" +
-                "1. Setup Your Inventory Setup with a name \n" +
+                "MUST HAVE NPC CONTACT RUNES IN INVENTORY\n" +
+                "1. Setup Your Inventory Setup with it's name\n" +
                 "2. Start at Edgeville bank";
     }
 

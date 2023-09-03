@@ -182,7 +182,7 @@ class AutoZMIAltar : Plugin() {
         if (totalRuns % 3 == 0) fixPouches()
         if (config.STAMINA().toString() == "Ornate Pool"){
             Rs2GameObject.interact(ObjectID.ORNATE_POOL_OF_REJUVENATION, "Drink")
-            sleep(3600, 3800)
+            sleep(2400, 2500)
         }
         Rs2GameObject.interact(29156, "Edgeville")
         sleep(2600, 2800)
@@ -228,25 +228,25 @@ class AutoZMIAltar : Plugin() {
     private fun emptyPouches(){
         if (Inventory.hasItem("Giant Pouch")){
             Inventory.useAllItemsFastContains("Giant Pouch", "Empty")
-            sleep(1200, 1800)
+            sleep(1200, 1300)
             Rs2GameObject.interact(29631, "Craft-rune")
             sleep(600,800)
         }
         if (Inventory.hasItem("Large Pouch")){
             Inventory.useAllItemsFastContains("Large Pouch", "Empty")
-            sleep(1200, 1800)
+            sleep(1200, 1300)
             Rs2GameObject.interact(29631, "Craft-rune")
             sleep(600,800)
         }
         if (Inventory.hasItem("Medium Pouch")){
             Inventory.useAllItemsFastContains("Medium Pouch", "Empty")
-            sleep(1200, 1800)
+            sleep(1200, 1300)
             Rs2GameObject.interact(29631, "Craft-rune")
             sleep(600,800)
         }
         if (Inventory.hasItem("Small Pouch")){
             Inventory.useAllItemsFastContains("Small Pouch", "Empty")
-            sleep(1200, 1800)
+            sleep(1200, 1300)
             Rs2GameObject.interact(29631, "Craft-rune")
             sleep(600,800)
         }
