@@ -18,7 +18,8 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
         name = PluginDescriptor.Mocrosoft + "Firemaking",
         description = "Microbot firemaking plugin",
         tags = {"firemaking", "microbot"},
-        enabledByDefault = false
+        enabledByDefault = false,
+        hidden = true
 )
 @Slf4j
 public class FiremakingPlugin extends Plugin {

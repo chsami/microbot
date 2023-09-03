@@ -25,12 +25,13 @@
  */
 package net.runelite.client.plugins.bank;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.Keybind;
+
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 @ConfigGroup("bank")
 public interface BankConfig extends Config
@@ -131,7 +132,7 @@ public interface BankConfig extends Config
 	)
 	default boolean bankPinKeyboard()
 	{
-		return false;
+		return true;
 	}
 
 	@ConfigItem(

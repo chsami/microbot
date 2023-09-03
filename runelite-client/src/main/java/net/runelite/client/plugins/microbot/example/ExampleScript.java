@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
+import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.Arrays;
@@ -92,7 +93,7 @@ boolean reachedEndLine = false;
                // Microbot.hopToWorld(random(300, 360));
                //Inventory.useAllItemsFastContains("void", "wear");
             //    Rs2GameObject.interact(40848);
-              //  Inventory.useItemFastContains("glory(", "Rub");
+                Inventory.useItemFastContains("glory(", "Rub");
                // Rs2GameObject.interact(40848);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
