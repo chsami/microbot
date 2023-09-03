@@ -131,6 +131,7 @@ class AutoZMIAltar : Plugin() {
         running = false
         overlayManager.remove(autoZMIAltarOverlay)
         overlayActive = false
+        totalRuns = 0
     }
 
     private fun handleBankingState() {
