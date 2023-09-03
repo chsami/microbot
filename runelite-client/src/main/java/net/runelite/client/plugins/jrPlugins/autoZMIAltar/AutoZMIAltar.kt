@@ -243,7 +243,6 @@ class AutoZMIAltar : Plugin() {
     }
 
     private fun fixPouches(){
-        sleep(3000,3200)
         Rs2Magic.cast(MagicAction.NPC_CONTACT)
         sleep(1000, 1200)
         Rs2Widget.clickWidget("Dark Mage")
