@@ -18,7 +18,9 @@ import java.awt.*;
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Hosidius",
         description = "Microbot hosidius favour plugin",
-        tags = {"microbot", "minigame", "hosidius", "favour", "zeah"}
+        tags = {"microbot", "minigame", "hosidius", "favour", "zeah"},
+        enabledByDefault = false,
+        hidden = true
 )
 @Slf4j
 public class HosidiusPlugin extends Plugin {
