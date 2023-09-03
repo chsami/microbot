@@ -8,22 +8,24 @@ import net.runelite.client.config.ConfigItem;
 public interface AutoZMIAltarConfig extends Config {
 
     @ConfigItem(
-            keyName = "guide",
-            name = "How to use",
-            description = "How to use this plugin",
-            position = 0
-    )
-    default String GUIDE() {
-        return "1. \n2. ";
-    }
-
-    @ConfigItem(
             keyName = "overlay",
             name = "Enable Overlay",
             description = "Enable Overlay?",
-            position = 1
+            position = 0
     )
     default boolean overlay() { return true; }
+
+    @ConfigItem(
+            keyName = "guide",
+            name = "How to use",
+            description = "How to use this plugin",
+            position = 1
+    )
+    default String GUIDE() {
+        return "MUST BE ON LUNAR SPELL BOOK\n" +
+                "1. Setup Your Inventory Setup with a name \n" +
+                "2. Start at Edgeville bank";
+    }
 
     @ConfigItem(
             keyName = "inventory",

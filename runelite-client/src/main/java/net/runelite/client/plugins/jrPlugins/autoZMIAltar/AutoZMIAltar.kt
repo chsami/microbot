@@ -17,6 +17,7 @@ import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
+import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
@@ -25,7 +26,6 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction
 import net.runelite.client.ui.overlay.OverlayManager
-import java.awt.event.KeyEvent
 import javax.inject.Inject
 
 @PluginDescriptor(
@@ -88,8 +88,7 @@ class AutoZMIAltar : Plugin() {
     enum class State {
         BANKING,
         WALKING,
-        RUNECRAFTING,
-        FIXPOUCHES
+        RUNECRAFTING
     }
 
     private var running = false
@@ -100,7 +99,7 @@ class AutoZMIAltar : Plugin() {
     private var overlayActive = false
 
     override fun startUp() {
-        currentState = State.FIXPOUCHES
+        currentState = State.BANKING
         version = "1.0.0"
         startTime = System.currentTimeMillis()
         startingXp = client.getSkillExperience(Skill.RUNECRAFT)
@@ -122,7 +121,6 @@ class AutoZMIAltar : Plugin() {
                 State.BANKING -> handleBankingState()
                 State.WALKING -> handleWalkingState()
                 State.RUNECRAFTING -> handleRunecraftingState()
-                State.FIXPOUCHES -> handleFixPouchesState()
             }
         }
     }
@@ -135,41 +133,34 @@ class AutoZMIAltar : Plugin() {
 
     private fun handleBankingState() {
         val bankWorldPoint = WorldPoint(3094, 3491, 0)
-        Inventory.interact(config.TELEPORT().toString())
-        sleep(5400, 6000)
-        if (config.STAMINA().toString() == "Ornate Pool"){
-            Rs2GameObject.interact(ObjectID.ORNATE_POOL_OF_REJUVENATION, "Drink")
-            sleep(4200, 4800)
-        }
-        Rs2GameObject.interact(29156, "Edgeville")
-        sleep(3600, 4200)
-        while (client.localPlayer.worldLocation.distanceTo(bankWorldPoint) >= 3){
+        while (client.localPlayer.worldLocation.distanceTo(bankWorldPoint) >= 3 && running){
             Microbot.getWalkerForKotlin().walkTo(bankWorldPoint)
             sleep(600, 1200)
         }
         Rs2Npc.interact("banker", "bank")
-        while (!Rs2Bank.isOpen()) sleep(300,600)
+        while (!Rs2Bank.isOpen()) sleep(600,700)
         Rs2Bank.depositAll()
+        sleep(600,700)
         MicrobotInventorySetup.loadInventory(config.INVENTORY())
         Rs2Bank.closeBank()
         fillPouches()
         MicrobotInventorySetup.loadInventory(config.INVENTORY())
+        Rs2Bank.closeBank()
         Rs2Magic.cast(MagicAction.OURANIA_TELEPORT)
         sleep(2600, 3000)
         currentState = State.WALKING
-
     }
 
     private fun handleWalkingState() {
         val ladderWorldPoint = WorldPoint(2453, 3231, 0)
         val altarWorldPoint = WorldPoint(3056, 5579, 0)
-        while (client.localPlayer.worldLocation.distanceTo(ladderWorldPoint) >= 3) {
+        while (client.localPlayer.worldLocation.distanceTo(ladderWorldPoint) >= 3 && running) {
             Microbot.getWalkerForKotlin().walkTo(ladderWorldPoint)
             sleep(600, 1200)
         }
         Rs2GameObject.interact("Ladder", "Climb")
         sleep(2400, 3000)
-        while (client.localPlayer.worldLocation.distanceTo(altarWorldPoint) >= 3) {
+        while (client.localPlayer.worldLocation.distanceTo(altarWorldPoint) >= 2 && running) {
             Microbot.getWalkerForKotlin().walkTo(altarWorldPoint)
             sleep(600, 1200)
         }
@@ -181,19 +172,32 @@ class AutoZMIAltar : Plugin() {
         sleep(2400, 3000)
         emptyPouches()
         totalRuns += 1
-        if (totalRuns % 3 == 0) currentState = State.FIXPOUCHES else currentState = State.BANKING
+        Inventory.interact(config.TELEPORT().toString())
+        sleep(5400, 6000)
+        if (totalRuns % 3 == 0) fixPouches()
+        if (config.STAMINA().toString() == "Ornate Pool"){
+            Rs2GameObject.interact(ObjectID.ORNATE_POOL_OF_REJUVENATION, "Drink")
+            sleep(4200, 4800)
+        }
+        Rs2GameObject.interact(29156, "Edgeville")
+        sleep(2600, 2800)
+        currentState = State.BANKING
     }
 
-    private fun handleFixPouchesState(){
+    private fun fixPouches(){
+        sleep(3000,3200)
         Rs2Magic.cast(MagicAction.NPC_CONTACT)
-        sleep(2400, 2600)
+        sleep(1000, 1200)
         Rs2Widget.clickWidget("Dark Mage")
-        sleep(4400,4600)
-        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE)
+        while (!Dialogue.isInDialogue()) sleep(200, 300)
+        Dialogue.clickContinue()
         sleep(2000,2200)
-        VirtualKeyboard.keyPress(KeyEvent.VK_2)
-        sleep(2000,2200)
-        VirtualKeyboard.keyPress(KeyEvent.VK_2)
+        VirtualKeyboard.typeString("2")
+        sleep(1000,1200)
+        while (!Dialogue.isInDialogue()) sleep(200, 300)
+        Dialogue.clickContinue()
+        Dialogue.clickContinue()
+        VirtualKeyboard.typeString("2")
         currentState = State.BANKING
     }
 
@@ -219,23 +223,27 @@ class AutoZMIAltar : Plugin() {
     private fun emptyPouches(){
         if (Inventory.hasItem("Giant Pouch")){
             Inventory.useAllItemsFastContains("Giant Pouch", "Empty")
-            sleep(600, 800)
+            sleep(1200, 1800)
             Rs2GameObject.interact(29631, "Craft-rune")
+            sleep(600,800)
         }
         if (Inventory.hasItem("Large Pouch")){
             Inventory.useAllItemsFastContains("Large Pouch", "Empty")
-            sleep(600, 800)
+            sleep(1200, 1800)
             Rs2GameObject.interact(29631, "Craft-rune")
+            sleep(600,800)
         }
         if (Inventory.hasItem("Medium Pouch")){
             Inventory.useAllItemsFastContains("Medium Pouch", "Empty")
-            sleep(600, 800)
+            sleep(1200, 1800)
             Rs2GameObject.interact(29631, "Craft-rune")
+            sleep(600,800)
         }
         if (Inventory.hasItem("Small Pouch")){
             Inventory.useAllItemsFastContains("Small Pouch", "Empty")
-            sleep(600, 800)
+            sleep(1200, 1800)
             Rs2GameObject.interact(29631, "Craft-rune")
+            sleep(600,800)
         }
     }
 

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor
 @Getter
 @RequiredArgsConstructor
 enum class STAMINA(val staminaName: String) {
-    ORNATEPOOL("Construct. cape(t)"),
+    ORNATEPOOL("Ornate Pool"),
     STAMINAPOTION("Stamina Potion");
 
     override fun toString(): String { return staminaName }
