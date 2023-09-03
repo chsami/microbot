@@ -37,7 +37,7 @@ public class Rs2Bank {
 
     public static boolean depositXContains(String itemName, int amount) {
         Microbot.status = "Deposit " + amount + " -> " + itemName;
-        if (!isBankOpen()) return false;
+        if (!isOpen()) return false;
         if (!Inventory.hasItemContains(itemName)) return true;
         Widget item = Inventory.findItemContains(itemName);
         if (item == null) return false;
@@ -65,7 +65,7 @@ public class Rs2Bank {
 
     public static boolean depositAll(String itemName) {
         Microbot.status = "Deposit all " + itemName;
-        if (!isBankOpen()) return false;
+        if (!isOpen()) return false;
         if (!Inventory.hasItem(itemName)) return true;
         Widget item = Inventory.findItem(itemName);
         if (item == null) return false;
@@ -77,7 +77,7 @@ public class Rs2Bank {
     }
     public static boolean depositAll(int itemID) {
         Microbot.status = "Deposit all " + itemID;
-        if (!isBankOpen()) return false;
+        if (!isOpen()) return false;
         if (!Inventory.hasItem(itemID)) return true;
         Widget item = Inventory.findItem(itemID);
         if (item == null) return false;
@@ -90,7 +90,7 @@ public class Rs2Bank {
 
     public static boolean depositAllContains(String itemName) {
         Microbot.status = "Deposit all " + itemName;
-        if (!isBankOpen()) return false;
+        if (!isOpen()) return false;
         if (!Inventory.hasItemContains(itemName)) return true;
         Widget item = Inventory.findItemContains(itemName);
         if (item == null) return false;
@@ -103,7 +103,7 @@ public class Rs2Bank {
 
     public static boolean closeBank() {
         Microbot.status = "Closing bank";
-        if (!isBankOpen()) return true;
+        if (!isOpen()) return true;
         int closeWidget = 786434;
         Rs2Widget.clickChildWidget(closeWidget, 11);
         sleepUntilOnClientThread(() -> Rs2Widget.getWidget(786445) == null);
@@ -136,12 +136,12 @@ public class Rs2Bank {
         try {
             if (Inventory.isUsingItem())
                 Microbot.getMouse().click();
-            if (isBankOpen()) return true;
+            if (isOpen()) return true;
             NPC npc = Rs2Npc.getNpc("banker");
             if (npc == null) return false;
             boolean action = Rs2Menu.doAction("bank", npc.getCanvasTilePoly());
             if (action) {
-                sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
                 sleep(600, 1000);
                 return true;
             }
@@ -156,12 +156,12 @@ public class Rs2Bank {
         try {
             if (Inventory.isUsingItem())
                 Microbot.getMouse().click();
-            if (isBankOpen()) return true;
+            if (isOpen()) return true;
             NPC npc = Rs2Npc.getNpc(bankerID);
             if (npc == null) return false;
             boolean action = Rs2Menu.doAction("bank", npc.getCanvasTilePoly() );
             if (action) {
-                sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
                 sleep(600, 1000);
                 return true;
             }
@@ -176,12 +176,12 @@ public class Rs2Bank {
         try {
             if (Inventory.isUsingItem())
                 Microbot.getMouse().click();
-            if (isBankOpen()) return true;
+            if (isOpen()) return true;
             //Microbot.getMouse().click(bank.getCanvasLocation().getX(),bank.getCanvasLocation().getY());
             if (bank == null) return false;
             boolean action = Rs2Menu.doAction(new String[]{"use","bank"}, bank.getCanvasTilePoly().getBounds());
             if (action) {
-                sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
                 sleep(600, 1000);
                 return true;
             }
@@ -195,11 +195,11 @@ public class Rs2Bank {
         try {
             if (Inventory.isUsingItem())
                 Microbot.getMouse().click();
-            if (isBankOpen()) return true;
+            if (isOpen()) return true;
             if (banker == null) return false;
             boolean action = Rs2Menu.doAction("bank", banker.getCanvasTilePoly());
             if (action) {
-                sleepUntil(() -> isBankOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
                 sleep(600, 1000);
                 return true;
             }
@@ -251,7 +251,7 @@ public class Rs2Bank {
         Microbot.status = "Withdrawing one " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
         if (Inventory.isFull()) return false;
-        if (!isBankOpen()) {
+        if (!isOpen()) {
             openBank();
         }
         Widget widget = Rs2Widget.findWidgetExact(itemName);
@@ -272,7 +272,7 @@ public class Rs2Bank {
     public static boolean withdrawItemX(boolean checkInventory, String itemName, int amount) {
         Microbot.status = "Withdrawing " + amount + " " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
-        if (!isBankOpen()) {
+        if (!isOpen()) {
             openBank();
         }
         Widget widget = Rs2Widget.findWidgetExact(itemName);
@@ -291,7 +291,7 @@ public class Rs2Bank {
         Microbot.status = "Withdrawing All " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
         if (Inventory.isFull()) return false;
-        if (!isBankOpen()) return false;
+        if (!isOpen()) return false;
         Widget widget = Rs2Widget.findWidgetExact(itemName);
         if (widget == null) return false;
         if (widget.getItemQuantity() <= 0) return false;
@@ -308,7 +308,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItems(String... itemNames) {
-        if (isBankOpen()) {
+        if (isOpen()) {
             for (String itemName :
                     itemNames) {
                 withdrawItem(itemName);
@@ -318,7 +318,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItems(boolean checkInventory, String... itemNames) {
-        if (isBankOpen()) {
+        if (isOpen()) {
             for (String itemName :
                     itemNames) {
                 withdrawItem(checkInventory, itemName);
@@ -332,7 +332,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItemsAll(boolean checkInventory, String... itemNames) {
-        if (isBankOpen()) {
+        if (isOpen()) {
             for (String itemName :
                     itemNames) {
                 withdrawItemAll(checkInventory, itemName);
@@ -342,12 +342,12 @@ public class Rs2Bank {
     }
 
     public static boolean useBank() {
-        if (isBankOpen()) return true;
+        if (isOpen()) return true;
         GameObject bank = Rs2GameObject.findBank();
         if (bank == null) return false;
         Microbot.getMouse().click(bank.getClickbox().getBounds());
         sleep(200, 300);
-        sleepUntil(() -> isBankOpen());
+        sleepUntil(() -> isOpen());
         return true;
     }
 
@@ -357,10 +357,10 @@ public class Rs2Bank {
         if (bank == null) return false;
         if (Rs2Menu.hasAction(bank.getCanvasTilePoly(), "Bank")) {
             Rs2Menu.doAction("Bank", bank.getClickbox());
-            sleepUntil(() -> isBankOpen() == true, 5000);
+            sleepUntil(() -> isOpen() == true, 5000);
         } else if (Rs2Menu.hasAction(bank.getCanvasTilePoly(), "Use")) { //for chests
             Rs2Menu.doAction("Use", bank.getClickbox());
-            sleepUntil(() -> isBankOpen() == true, 5000);
+            sleepUntil(() -> isOpen() == true, 5000);
         }
         return false;
     }
