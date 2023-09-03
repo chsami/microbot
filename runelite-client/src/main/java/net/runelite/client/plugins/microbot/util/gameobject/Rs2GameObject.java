@@ -626,17 +626,26 @@ public class Rs2GameObject {
         }
 
         menuEntry.setTarget("");
-        menuEntry.setOption(objectAction);
+        menuEntry.setOption(objectAction == null ? "" : objectAction);
 
-        int index = 0;
+        int index = -1;
 
-        for (int i = 0; i < objComp.getActions().length; i++) {
-            if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
-                index = i;
+        if (objectAction != null) {
+            for (int i = 0; i < objComp.getActions().length; i++) {
+                if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
+                    index = i;
+                }
+            }
+            if (index == -1 && objComp.getImpostor() != null) {
+                for (int i = 0; i < objComp.getImpostor().getActions().length; i++) {
+                    if (objectAction.equalsIgnoreCase(objComp.getImpostor().getActions()[i])) {
+                        index = i;
+                    }
+                }
             }
         }
 
-        if (index == 0) {
+        if (index == 0 || index == -1) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
         } else if (index == 1) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);

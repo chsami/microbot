@@ -3,14 +3,25 @@ package net.runelite.client.plugins.microbot.util.walker.pathfinder;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Point;
+import net.runelite.api.Skill;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.magic.Teleport;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
+import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.walker.Transport;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -39,8 +50,6 @@ public class Pathfinder implements Runnable {
     @Getter
     int totalCost = 0;
 
-    boolean isTeleport = false;
-
     @Getter
     @Setter
     private boolean useTransport = true;
@@ -49,9 +58,11 @@ public class Pathfinder implements Runnable {
 
     boolean executeWalking = true;
 
+    boolean useCanvas = false;
+
 
     public boolean getDebugger() {
-        return false;
+        return true;
     }
 
     public Pathfinder(PathfinderConfig config) {
@@ -85,24 +96,84 @@ public class Pathfinder implements Runnable {
         new Thread(this).start();
     }
 
-    public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target, boolean useTransport, boolean canReach) {
+    public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target, boolean useTransport, boolean canReach, boolean useCanvas, WorldArea[] blockingAreas) {
         this.config = config;
         this.start = start;
         this.target = target;
         this.config.refresh();
         this.useTransport = useTransport;
         this.executeWalking = !canReach;
+        this.useCanvas = useCanvas;
+        if (blockingAreas != null)
+            CollisionMap.blockingAreas = blockingAreas;
 
         //Calculate all the stairce/obstacles/ladders in advance before calculating the path to walk
         precalculateTransports(start, target, useTransport);
 
-        //TODO: Teleports
-        /*for (Teleport teleport : Teleport.values()) {
-            if (teleport.getDestination().equals(start)) {
-                isTeleport = true;
-                break;
+        final int teleportThreshHoldDistance = 20;
+
+        //No need to teleport if we are close to our target location
+        // return early
+        if (start.distanceTo(target) < teleportThreshHoldDistance) {
+            new Thread(this).start();
+            return;
+        }
+
+        Tab.switchToInventoryTab();
+
+        //Teleport spells logic
+        for (Teleport teleport : Teleport.values()) {
+            if (teleport.getDestination().equals(start)
+                    || teleport.getDestination().distanceTo(target) < start.distanceTo(target)
+            ) {
+                boolean hasTablet = Inventory.hasItem(teleport.getTabletName());
+                boolean hasRunes = true;
+                for (Pair itemRequired : teleport.getItemsRequired()) {
+                    if (!Inventory.hasItemAmountStackable(itemRequired.getLeft().toString(), (int) itemRequired.getRight()))
+                        hasRunes = false;
+                }
+
+                if (hasRunes && Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC) >= teleport.getLevel()) {
+                    Rs2Magic.cast(teleport.getSpell());
+                    sleepUntil(() -> Microbot.isAnimating());
+                    sleepUntil(() -> !Microbot.isAnimating());
+                    start = teleport.getDestination();
+                    break;
+                }
+
+                if (hasTablet) {
+                    Inventory.useItemFast(teleport.getTabletName(), "Break");
+                    sleepUntil(() -> Microbot.isAnimating());
+                    sleepUntil(() -> !Microbot.isAnimating());
+                    start = teleport.getDestination();
+                    break;
+                }
             }
-        }*/
+        }
+        //jewellery teleport logic
+        for (JewelleryLocationEnum jewelleryLocationEnum : JewelleryLocationEnum.values()) {
+            if (jewelleryLocationEnum.getLocation().equals(start)
+                    || jewelleryLocationEnum.getLocation().distanceTo(target) < start.distanceTo(target)
+            ) {
+                String itemName = jewelleryLocationEnum.getTooltip() + "(";
+                boolean hasItemEquipped = Rs2Equipment.hasEquippedContains(itemName);
+                if (hasItemEquipped) {
+                    if (jewelleryLocationEnum.name().contains("ring")) {
+                        Rs2Equipment.useRingAction(jewelleryLocationEnum);
+                    } else {
+                        Rs2Equipment.useAmuletAction(jewelleryLocationEnum);
+                    }
+                    sleepUntil(() -> Microbot.isAnimating());
+                    sleepUntil(() -> !Microbot.isAnimating());
+                } else if (Inventory.hasItemContains(itemName)) {
+                    Inventory.useItemFastContains(itemName, "Rub");
+                    sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
+                    VirtualKeyboard.typeString(Integer.toString(jewelleryLocationEnum.getIdentifier() - 1));
+                    sleepUntil(() -> Microbot.isAnimating());
+                    sleepUntil(() -> !Microbot.isAnimating());
+                }
+            }
+        }
 
         new Thread(this).start();
     }
@@ -140,7 +211,7 @@ public class Pathfinder implements Runnable {
                     //use object to go underground
                     Transport transportUnderground = getClosestTransport(target);
                     if (transportUnderground != null) {
-                        this.target = transportUnderground.getDestination();
+                        this.target = transportUnderground.getOrigin();
                     }
                 } else if (start.getY() >= 9000 && target.getY() < 9000) {
                     //use object to go surface
@@ -199,7 +270,7 @@ public class Pathfinder implements Runnable {
 
             node = boundary.removeFirst();
 
-            if (node.position.distanceTo(target) < 1 || (!isTeleport && !config.isNear(start))) {
+            if (node.position.distanceTo(target) < 1 || (!config.isNear(start))) {
                 path = node.getPath();
                 break;
             }
@@ -231,7 +302,11 @@ public class Pathfinder implements Runnable {
 
             if (!skip) {
                 Collections.reverse(path);
-                handleWalkableNodes();
+                if (useCanvas) {
+                    handleWalkableNodesCanvas();
+                } else {
+                    handleWalkableNodes();
+                }
             }
         }
 
@@ -246,6 +321,16 @@ public class Pathfinder implements Runnable {
             if (Calculations.tileOnMap(node.position) && node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 14) {
                 Point point = Calculations.tileToMinimap(node.position);
                 Microbot.getMouse().click(point);
+                break;
+            }
+        }
+    }
+
+    private void handleWalkableNodesCanvas() {
+        for (Node node : path) {
+            if (Calculations.tileOnMap(node.position) && node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 3) {
+                LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), node.position);
+                Microbot.getWalker().walkFastLocal(localPoint);
                 break;
             }
         }
@@ -281,6 +366,7 @@ public class Pathfinder implements Runnable {
     }
 
     private boolean handleDoors() {
+        if (useCanvas) return false;
         boolean skip = false;
         CheckedNode[] wallNodeArrays = wallNodes.toArray(CheckedNode[]::new);
         for (int i = 0; i < wallNodeArrays.length; i++) {

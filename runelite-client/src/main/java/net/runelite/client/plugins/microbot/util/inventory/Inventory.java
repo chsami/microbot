@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.util.inventory;
 
-import net.runelite.api.ItemComposition;
-import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -12,7 +11,10 @@ import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
 import java.awt.event.KeyEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
@@ -20,6 +22,8 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClien
 
 public class Inventory {
 
+    public static Rs2Item item;
+    public static String itemAction;
     public static void eat(Widget widget) {
         Microbot.getMouse().click(widget.getBounds());
         sleep(1200, 2000);
@@ -445,6 +449,12 @@ public class Inventory {
         if (item == null) return false;
         return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
+    public static boolean useItemActionContains(String itemName, String actionName) {
+        Microbot.status = "Use inventory item contains " + itemName + " with action " + actionName;
+        Widget item = findItemContains(itemName);
+        if (item == null) return false;
+        return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
+    }
     public static boolean useItemAction(int itemID, String actionName) {
         Microbot.status = "Use inventory item " + itemID + " with action " + actionName;
         Widget item = findItem(itemID);
@@ -542,5 +552,129 @@ public class Inventory {
                 .filter(x ->
                         itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName.toLowerCase())
                 ).count());
+    }
+
+    private static void useItemFastAbstract(Rs2Item rs2Item, String action) {
+        if (rs2Item == null) return;
+        item = rs2Item;
+        itemAction = action;
+        Microbot.getMouse().clickFast(1, 1);
+        sleep(100);
+        item = null;
+        itemAction = "";
+    }
+
+    public static void useItemFast(int id, String action) {
+        Rs2Item item = findItemFast(id);
+        useItemFastAbstract(item, action);
+    }
+
+    public static void useItemFast(String name, String action) {
+        Rs2Item item = findItemFast(name);
+        useItemFastAbstract(item, action);
+    }
+
+    public static void useItemFastContains(String name, String action) {
+        Rs2Item item = findItemFast(name, true);
+        useItemFastAbstract(item, action);
+    }
+
+    public static void useAllItemsFastContains(String name, String action) {
+        List<Rs2Item> rs2Items = findAllItemFast(name, true);
+        for (Rs2Item rs2Item: rs2Items) {
+            useItemFastAbstract(rs2Item, action);
+        }
+    }
+
+    public static Rs2Item findItemFast(int id) {
+        Microbot.status = "Searching inventory for item with id: " + id;
+        ItemContainer itemContainer = Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
+        if (itemContainer == null) return null;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            for (int i = 0; i <  itemContainer.getItems().length; i++) {
+                Item item = itemContainer.getItems()[i];
+                ItemComposition itemComposition = Microbot.getClient().getItemDefinition(itemContainer.getItems()[i].getId());
+                if (itemComposition.getId() == id) {
+                    return new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i);
+                }
+            }
+            return null;
+        });
+    }
+
+    public static Rs2Item findItemFast(String itemName, boolean contains) {
+        Microbot.status = "Searching inventory for item with name: " + itemName;
+        ItemContainer itemContainer = Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
+        if (itemContainer == null) return null;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            for (int i = 0; i <  itemContainer.getItems().length; i++) {
+                Item item = itemContainer.getItems()[i];
+                ItemComposition itemComposition = Microbot.getClient().getItemDefinition(itemContainer.getItems()[i].getId());
+                if (contains) {
+                    if (itemComposition.getName().toLowerCase().contains(itemName.toLowerCase())) {
+                        return new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i);
+                    }
+                } else {
+                    if (itemComposition.getName().equalsIgnoreCase(itemName.toLowerCase())) {
+                        return new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i);
+                    }
+                }
+
+            }
+            return null;
+        });
+    }
+
+    public static List<Rs2Item> findAllItemFast(String itemName, boolean contains) {
+        Microbot.status = "Searching inventory for item with name: " + itemName;
+        ItemContainer itemContainer = Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
+        if (itemContainer == null) return null;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            List<Rs2Item> rs2Items = new ArrayList<>();
+            for (int i = 0; i <  itemContainer.getItems().length; i++) {
+                Item item = itemContainer.getItems()[i];
+                ItemComposition itemComposition = Microbot.getClient().getItemDefinition(itemContainer.getItems()[i].getId());
+                if (contains) {
+                    if (itemComposition.getName().toLowerCase().contains(itemName.toLowerCase())) {
+                        rs2Items.add(new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i));
+                    }
+                } else {
+                    if (itemComposition.getName().equalsIgnoreCase(itemName.toLowerCase())) {
+                        rs2Items.add(new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i));
+                    }
+                }
+
+            }
+            return rs2Items;
+        });
+    }
+
+    public static Rs2Item findItemFast(String itemName) {
+        return findItemFast(itemName, false);
+    }
+
+    public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        if (item == null) return;
+        ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.id);
+        int index = 0;
+
+        if (itemAction != null) {
+            for (int i = 0; i < itemComposition.getInventoryActions().length; i++) {
+                if (itemAction.equalsIgnoreCase(itemComposition.getInventoryActions()[i])) {
+                    index = i;
+                }
+            }
+        }
+        menuEntry.getClass().getMethod("yp", int.class).invoke(menuEntry, item.id); //use the setItemId method through reflection
+        menuEntry.setOption(itemAction != null ? itemAction : "");
+        index = index + 3;
+        if (index == 4) { //edge case, idx 4 is always CANCEl, so set index to 3
+            index = 3;
+        }
+        menuEntry.setIdentifier(index);
+        menuEntry.setParam0(item.slot);
+        menuEntry.setParam1(9764864);
+        menuEntry.setTarget("<col=ff9040>" + itemComposition.getName() + "</col>");
+        menuEntry.setType(MenuAction.CC_OP);
     }
 }

@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
+import org.apache.commons.lang3.NotImplementedException;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
@@ -30,6 +31,10 @@ public class Rs2Magic {
         } else {
             widgetAction = magicSpell.getWidgetAction();
         }
+
+        if (widgetId == -1)
+            throw new NotImplementedException("This spell has not been configured yet in the MagicAction.java class");
+
         widgetId = magicSpell.getWidgetId();
         widgetName = magicSpell.getName();
         Microbot.getMouse().click();
