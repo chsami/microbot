@@ -101,13 +101,11 @@ public class Rs2Bank {
         return action;
     }
 
-    public static boolean closeBank() {
+    public static void closeBank() {
         Microbot.status = "Closing bank";
-        if (!isOpen()) return true;
-        int closeWidget = 786434;
-        Rs2Widget.clickChildWidget(closeWidget, 11);
+        if (!isOpen()) return;
+        Rs2Widget.clickChildWidget(786434, 11);
         sleepUntilOnClientThread(() -> Rs2Widget.getWidget(786445) == null);
-        return true;
     }
 
     public static boolean isOpen() {
@@ -177,7 +175,6 @@ public class Rs2Bank {
             if (Inventory.isUsingItem())
                 Microbot.getMouse().click();
             if (isOpen()) return true;
-            //Microbot.getMouse().click(bank.getCanvasLocation().getX(),bank.getCanvasLocation().getY());
             if (bank == null) return false;
             boolean action = Rs2Menu.doAction(new String[]{"use","bank"}, bank.getCanvasTilePoly().getBounds());
             if (action) {
@@ -209,8 +206,6 @@ public class Rs2Bank {
         }
         return false;
     }
-
-
 
     public static boolean scrollTo(Widget widget) {
         Microbot.status = "Searching for item";
@@ -309,21 +304,17 @@ public class Rs2Bank {
 
     public static void withdrawItems(String... itemNames) {
         if (isOpen()) {
-            for (String itemName :
-                    itemNames) {
+            for (String itemName : itemNames) {
                 withdrawItem(itemName);
             }
-
         }
     }
 
     public static void withdrawItems(boolean checkInventory, String... itemNames) {
         if (isOpen()) {
-            for (String itemName :
-                    itemNames) {
+            for (String itemName : itemNames) {
                 withdrawItem(checkInventory, itemName);
             }
-
         }
     }
 
@@ -337,7 +328,6 @@ public class Rs2Bank {
                     itemNames) {
                 withdrawItemAll(checkInventory, itemName);
             }
-
         }
     }
 
@@ -347,22 +337,21 @@ public class Rs2Bank {
         if (bank == null) return false;
         Microbot.getMouse().click(bank.getClickbox().getBounds());
         sleep(200, 300);
-        sleepUntil(() -> isOpen());
+        sleepUntil(Rs2Bank::isOpen);
         return true;
     }
 
-    public static boolean useBank(String action) {
+    public static void useBank(String action) {
         Microbot.status = "Banking";
         GameObject bank = Rs2GameObject.findBank(action);
-        if (bank == null) return false;
+        if (bank == null) return;
         if (Rs2Menu.hasAction(bank.getCanvasTilePoly(), "Bank")) {
             Rs2Menu.doAction("Bank", bank.getClickbox());
-            sleepUntil(() -> isOpen() == true, 5000);
+            sleepUntil(Rs2Bank::isOpen, 5000);
         } else if (Rs2Menu.hasAction(bank.getCanvasTilePoly(), "Use")) { //for chests
             Rs2Menu.doAction("Use", bank.getClickbox());
-            sleepUntil(() -> isOpen() == true, 5000);
+            sleepUntil(Rs2Bank::isOpen, 5000);
         }
-        return false;
     }
 
     public static boolean depositAll() {
@@ -411,12 +400,12 @@ public class Rs2Bank {
                 itemsMissing.add(item);
             }
         }
-        if (itemsMissing.size() > 0) {
+        if (!itemsMissing.isEmpty()) {
             for (ItemRequirement item : itemsMissing) {
                 Rs2Bank.withdrawItemX(true, item.getName(), item.getQuantity());
             }
         }
-        return itemsMissing.size() == 0;
+        return itemsMissing.isEmpty();
     }
 
     public static boolean hasItems(List<ItemRequirement> itemsRequired) {
@@ -426,7 +415,7 @@ public class Rs2Bank {
                 itemsMissing.add(item);
             }
         }
-        return itemsMissing.size() == 0;
+        return itemsMissing.isEmpty();
     }
 
     public static BankLocation getNearestBank() {
@@ -559,7 +548,4 @@ public class Rs2Bank {
         widgetId = 0;
         itemId = 0;
     }
-
-
-
 }
