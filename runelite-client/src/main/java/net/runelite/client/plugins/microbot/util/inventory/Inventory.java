@@ -665,7 +665,7 @@ public class Inventory {
                 }
             }
         }
-        menuEntry.getClass().getMethod("yp", int.class).invoke(menuEntry, item.id); //use the setItemId method through reflection
+        menuEntry.getClass().getMethod("aj", int.class).invoke(menuEntry, item.id); //use the setItemId method through reflection
         menuEntry.setOption(itemAction != null ? itemAction : "");
         index = index + 3;
         if (index == 4) { //edge case, idx 4 is always CANCEl, so set index to 3
