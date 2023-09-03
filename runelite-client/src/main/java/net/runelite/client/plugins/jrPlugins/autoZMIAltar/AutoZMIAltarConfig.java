@@ -25,6 +25,7 @@ public interface AutoZMIAltarConfig extends Config {
         return "MUST BE ON LUNAR SPELL BOOK\n" +
                 "MUST HAVE NPC CONTACT RUNES IN INVENTORY\n" +
                 "MUST HAVE JEWELLERY BOX SET TO EDGEVILLE\n" +
+                "MUST HAVE SETUP AUTO PAYMENT AT ZMI BANK\n" +
                 "1. Setup Your Inventory Setup with it's name\n" +
                 "2. Start next to your selected bank";
     }
