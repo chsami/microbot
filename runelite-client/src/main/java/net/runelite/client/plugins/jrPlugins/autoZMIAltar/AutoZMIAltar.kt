@@ -181,7 +181,7 @@ class AutoZMIAltar : Plugin() {
             sleep(600, 1200)
         }
         Rs2GameObject.interact("Ladder", "Climb")
-        sleep(2400, 3000)
+        sleep(3600, 4200)
         if (config.BANK().bankName == "ZMI Bank"){
             try {
                 //execute twice
