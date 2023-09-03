@@ -8,6 +8,7 @@ import net.runelite.api.ObjectID
 import net.runelite.api.Skill
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.events.GameTick
+import net.runelite.client.callback.ClientThread
 import net.runelite.client.config.ConfigManager
 import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.plugins.Plugin
@@ -116,6 +117,7 @@ class AutoZMIAltar : Plugin() {
     }
 
     private fun run() {
+        client.minimapZoom = .5
         while (running && !Microbot.pauseAllScripts) {
             when (currentState) {
                 State.BANKING -> handleBankingState()
