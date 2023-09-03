@@ -207,7 +207,7 @@ class AutoZMIAltar : Plugin() {
                 MicrobotInventorySetup.loadInventory(config.INVENTORY())
                 Rs2Bank.closeBank()
             }catch (e: Exception){
-                currentState = State.WALKING
+                currentState = State.BANKING
             }
         }
         while (client.localPlayer.worldLocation.distanceTo(altarWorldPoint) >= 2 && running) {
