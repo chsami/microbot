@@ -119,12 +119,6 @@ public abstract class Script implements IScript {
             Microbot.getMouse().click(p);
         }
 
-        if (!Microbot.isLoggedIn()) {
-            new Login();
-            sleep(5000);
-            return false;
-        }
-
         if (Microbot.pauseAllScripts)
             return false;
 
@@ -154,12 +148,6 @@ public abstract class Script implements IScript {
             Point p = Microbot.getClientThread()
                     .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
             Microbot.getMouse().click(p);
-        }
-
-        if (!Microbot.isLoggedIn()) {
-            new Login(world);
-            sleep(5000);
-            return false;
         }
 
         if (Microbot.pauseAllScripts)

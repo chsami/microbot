@@ -630,7 +630,7 @@ public class Rs2GameObject {
 
         int index = -1;
 
-        if (objectAction != null) {
+        if (objectAction != null && objectAction != "") {
             for (int i = 0; i < objComp.getActions().length; i++) {
                 if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
                     index = i;
@@ -643,6 +643,8 @@ public class Rs2GameObject {
                     }
                 }
             }
+        } else {
+            index = 0;
         }
 
         if (index == 0 || index == -1) {

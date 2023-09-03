@@ -78,7 +78,7 @@ boolean reachedEndLine = false;
                 //getParam0=-5146, getParam1=-4228,
                 //getParam0=-5350, getParam1=-4235
                // System.out.println(GroundItemsPlugin.getCollectedGroundItems());
-                System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+               System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
              //   Microbot.getWalker().walkTo(WorldPoint.fromLocal(Microbot.getClient(), 9152, 7616, 0));
               //  System.out.println(Inventory.getStackSizeOfItem(995));
                // System.out.println(Microbot.getClient().getLocalPlayer().getWorldLocation().isInArea(blockingAreas[0]));
@@ -87,12 +87,13 @@ boolean reachedEndLine = false;
 //                System.out.println(new WorldPoint(3145, 9911, 0).distanceTo(new WorldPoint(3209, 9616, 0)));
 //                Microbot.getWalker().walkTo(BankLocation.EDGEVILLE_BANK.getWorldPoint());
                 //Rs2Magic.cast(MagicAction.OURANIA_TELEPORT);
-                //Microbot.getWalker().walkTo(BankLocation.VARROCK_WEST.getWorldPoint());
+           //     Microbot.getWalker().walkTo(BankLocation.VARROCK_WEST.getWorldPoint());
           //      Inventory.useItemActionContains(JewelleryLocationEnum.EDGEVILLE.getTooltip(), "Rub");
                // Microbot.hopToWorld(random(300, 360));
                //Inventory.useAllItemsFastContains("void", "wear");
-                Rs2GameObject.interact(29156, "Teleport Menu");
+            //    Rs2GameObject.interact(40848);
               //  Inventory.useItemFastContains("glory(", "Rub");
+               // Rs2GameObject.interact(40848);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
