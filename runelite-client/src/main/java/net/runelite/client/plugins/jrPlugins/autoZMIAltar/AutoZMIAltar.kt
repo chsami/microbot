@@ -151,7 +151,7 @@ class AutoZMIAltar : Plugin() {
             sleep(2600, 3000)
             currentState = State.WALKING
         } catch (e: Exception){
-            e.printStackTrace()
+            //e.printStackTrace()
             currentState = State.BANKING
         }
     }
