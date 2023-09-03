@@ -137,18 +137,23 @@ class AutoZMIAltar : Plugin() {
             Microbot.getWalkerForKotlin().walkTo(bankWorldPoint)
             sleep(600, 1200)
         }
-        Rs2Npc.interact("banker", "bank")
-        while (!Rs2Bank.isOpen()) sleep(600,700)
-        Rs2Bank.depositAll()
-        sleep(600,700)
-        MicrobotInventorySetup.loadInventory(config.INVENTORY())
-        Rs2Bank.closeBank()
-        fillPouches()
-        MicrobotInventorySetup.loadInventory(config.INVENTORY())
-        Rs2Bank.closeBank()
-        Rs2Magic.cast(MagicAction.OURANIA_TELEPORT)
-        sleep(2600, 3000)
-        currentState = State.WALKING
+        try {
+            Rs2Npc.interact("banker", "bank")
+            while (!Rs2Bank.isOpen()) sleep(600,700)
+            Rs2Bank.depositAll()
+            sleep(600,700)
+            MicrobotInventorySetup.loadInventory(config.INVENTORY())
+            Rs2Bank.closeBank()
+            fillPouches()
+            MicrobotInventorySetup.loadInventory(config.INVENTORY())
+            Rs2Bank.closeBank()
+            Rs2Magic.cast(MagicAction.OURANIA_TELEPORT)
+            sleep(2600, 3000)
+            currentState = State.WALKING
+        } catch (e: Exception){
+            e.printStackTrace()
+            currentState = State.BANKING
+        }
     }
 
     private fun handleWalkingState() {
@@ -177,7 +182,7 @@ class AutoZMIAltar : Plugin() {
         if (totalRuns % 3 == 0) fixPouches()
         if (config.STAMINA().toString() == "Ornate Pool"){
             Rs2GameObject.interact(ObjectID.ORNATE_POOL_OF_REJUVENATION, "Drink")
-            sleep(4200, 4800)
+            sleep(3600, 3800)
         }
         Rs2GameObject.interact(29156, "Edgeville")
         sleep(2600, 2800)
