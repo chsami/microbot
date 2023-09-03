@@ -176,7 +176,7 @@ class AutoZMIAltar : Plugin() {
                 Rs2Npc.interact("Eniola", "bank")
                 while (!Dialogue.isInDialogue()) sleep(200, 300)
                 Dialogue.clickContinue()
-                sleep(2000,2200)
+                sleep(1000,1200)
                 VirtualKeyboard.typeString("2")
                 while (!Rs2Bank.isOpen()) sleep(600,700)
                 Rs2Bank.depositAll()
