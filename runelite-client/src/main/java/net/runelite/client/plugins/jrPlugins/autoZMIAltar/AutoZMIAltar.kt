@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.jrPlugins.autoZMIAltar
 
 import com.google.inject.Provides
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.runelite.api.Client
@@ -99,9 +100,10 @@ class AutoZMIAltar : Plugin() {
 
     private var overlayActive = false
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun startUp() {
         currentState = State.BANKING
-        version = "1.0.0"
+        version = "1.0.2"
         startTime = System.currentTimeMillis()
         startingXp = client.getSkillExperience(Skill.RUNECRAFT)
         startingLvl = client.getRealSkillLevel(Skill.RUNECRAFT)
@@ -131,6 +133,7 @@ class AutoZMIAltar : Plugin() {
         running = false
         overlayManager.remove(autoZMIAltarOverlay)
         overlayActive = false
+        totalRuns = 0
     }
 
     private fun handleBankingState() {
@@ -187,10 +190,6 @@ class AutoZMIAltar : Plugin() {
                 //execute twice
                 for (i in 0..1){
                     Rs2Npc.interact("Eniola", "bank")
-                    while (!Dialogue.isInDialogue()) sleep(200, 300)
-                    Dialogue.clickContinue()
-                    sleep(1000,1200)
-                    VirtualKeyboard.typeString("2")
                     while (!Rs2Bank.isOpen()) sleep(700,800)
                     if(i == 0){
                         Rs2Bank.depositAll()
@@ -202,10 +201,6 @@ class AutoZMIAltar : Plugin() {
                     fillPouches()
                 }
                 Rs2Npc.interact("Eniola", "bank")
-                while (!Dialogue.isInDialogue()) sleep(200, 300)
-                Dialogue.clickContinue()
-                sleep(1000,1200)
-                VirtualKeyboard.typeString("2")
                 while (!Rs2Bank.isOpen()) sleep(700,800)
                 MicrobotInventorySetup.loadInventory(config.INVENTORY())
                 sleep(600,700)
@@ -243,7 +238,6 @@ class AutoZMIAltar : Plugin() {
     }
 
     private fun fixPouches(){
-        sleep(3000,3200)
         Rs2Magic.cast(MagicAction.NPC_CONTACT)
         sleep(1000, 1200)
         Rs2Widget.clickWidget("Dark Mage")
@@ -262,19 +256,19 @@ class AutoZMIAltar : Plugin() {
     private fun fillPouches() {
         if (Inventory.hasItem("Giant Pouch") && Inventory.hasItem("Pure essence")){
             Inventory.interact("Giant Pouch")
-            sleep(100, 200)
+            sleep(50, 100)
         }
         if (Inventory.hasItem("Large Pouch") && Inventory.hasItem("Pure essence")){
             Inventory.interact("Large Pouch")
-            sleep(100, 200)
+            sleep(50, 100)
         }
         if (Inventory.hasItem("Medium Pouch") && Inventory.hasItem("Pure essence")){
             Inventory.interact("Medium Pouch")
-            sleep(100, 200)
+            sleep(50, 100)
         }
         if (Inventory.hasItem("Small Pouch") && Inventory.hasItem("Pure essence")){
             Inventory.interact("Small Pouch")
-            sleep(100, 200)
+            sleep(50, 100)
         }
     }
 

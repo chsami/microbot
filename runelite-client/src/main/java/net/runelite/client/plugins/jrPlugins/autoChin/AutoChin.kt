@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.jrPlugins.autoChin
 
 import com.google.inject.Provides
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.runelite.api.Client
@@ -45,11 +46,11 @@ class AutoChin : Plugin() {
 
     @Subscribe
     fun onGameTick(gameTick: GameTick?) {
-        if (overlayManager != null && config.overlay() && !overlayActive) {
+        if (config.overlay() && !overlayActive) {
             overlayManager.add(autoChinOverlay)
             overlayActive = true
         }
-        if (overlayManager != null && !config.overlay() && overlayActive) {
+        if (!config.overlay() && overlayActive) {
             overlayManager.remove(autoChinOverlay)
             overlayActive = false
         }
@@ -89,6 +90,7 @@ class AutoChin : Plugin() {
         LAYING
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun startUp() {
         currentState = State.IDLE
         version = "1.0.2"
@@ -98,7 +100,7 @@ class AutoChin : Plugin() {
 
         if (client.getLocalPlayer() != null) {
             running = true
-            if (overlayManager != null && config.overlay() && !overlayActive) {
+            if (config.overlay() && !overlayActive) {
                 overlayManager.add(autoChinOverlay)
                 overlayActive = true
             }

@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.jrPlugins.autoVorkath
 
 import com.google.inject.Provides
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.runelite.api.Client
@@ -87,6 +88,7 @@ class AutoVorkathPlugin : Plugin() {
         NONE
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun startUp() {
         println("Auto Vorkath Plugin Activated")
         botState = State.RANGE
