@@ -244,6 +244,15 @@ public class PathfinderConfig {
                 .addReverse("Climb-up")
                 .build();
 
+        new Transport()
+                .addObstacle(new WorldPoint(2445, 3434, 0), new WorldPoint(2445, 3434, 1), "Climb-up")
+                .addReverse("Climb-down")
+                .build();
+
+        new Transport()
+                .addObstacle(new WorldPoint(2445, 3414, 0), new WorldPoint(2445, 3414, 1), "Climb-up")
+                .addReverse("Climb-down")
+                .build();
 
         lumbridgeStairce0.chain(lumbridgeStairce1).build();
         lumbridgeStairce1.chain(lumbridgeStairce0).build();
