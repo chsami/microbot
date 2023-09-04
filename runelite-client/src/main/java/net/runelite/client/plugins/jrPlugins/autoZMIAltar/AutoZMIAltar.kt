@@ -101,7 +101,7 @@ class AutoZMIAltar : Plugin() {
 
     override fun startUp() {
         currentState = State.BANKING
-        version = "1.0.1"
+        version = "1.0.2"
         startTime = System.currentTimeMillis()
         startingXp = client.getSkillExperience(Skill.RUNECRAFT)
         startingLvl = client.getRealSkillLevel(Skill.RUNECRAFT)
