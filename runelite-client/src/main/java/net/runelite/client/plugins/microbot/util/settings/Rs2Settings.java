@@ -36,12 +36,12 @@ public class Rs2Settings {
         return Microbot.getVarbitValue(TOGGLE_ROOFS) == 1;
     }
 
-    public static void enableHideRoofs() {
+    public static void hideRoofs() {
         if (!isHideRoofsEnabled()) {
             Tab.switchToSettingsTab();
             Rs2Widget.clickWidget(7602208);
             sleepUntil(() -> Rs2Widget.hasWidget("Hide roofs"));
-            sleep(300, 600);
+            sleep(1000);
             Rs2Widget.clickWidget("Hide roofs");
         }
     }

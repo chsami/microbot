@@ -302,7 +302,7 @@ public class Rs2GroundItem {
             menuEntry.setParam1(localPoint.getSceneY());
         }
         menuEntry.setOption(itemAction);
-        if (itemAction.toLowerCase().equals("lay")) {
+        if (itemAction.toLowerCase().equals("lay") || itemAction.equalsIgnoreCase("light")) {
             menuEntry.setType(MenuAction.GROUND_ITEM_FOURTH_OPTION);
         } else {
             menuEntry.setType(MenuAction.GROUND_ITEM_THIRD_OPTION);
