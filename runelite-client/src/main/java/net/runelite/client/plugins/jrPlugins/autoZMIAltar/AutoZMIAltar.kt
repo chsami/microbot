@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.jrPlugins.autoZMIAltar
 
 import com.google.inject.Provides
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.runelite.api.Client
@@ -99,6 +100,7 @@ class AutoZMIAltar : Plugin() {
 
     private var overlayActive = false
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun startUp() {
         currentState = State.BANKING
         version = "1.0.2"
