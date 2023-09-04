@@ -187,7 +187,7 @@ class AutoZMIAltar : Plugin() {
             try {
                 //execute twice
                 for (i in 0..1){
-                    Rs2Npc.interact("Eniola", "talk-to")
+                    Rs2Npc.interact("Eniola", "bank")
                     while (!Rs2Bank.isOpen()) sleep(700,800)
                     if(i == 0){
                         Rs2Bank.depositAll()
@@ -198,7 +198,7 @@ class AutoZMIAltar : Plugin() {
                     Rs2Bank.closeBank()
                     fillPouches()
                 }
-                Rs2Npc.interact("Eniola", "talk-to")
+                Rs2Npc.interact("Eniola", "bank")
                 while (!Rs2Bank.isOpen()) sleep(700,800)
                 MicrobotInventorySetup.loadInventory(config.INVENTORY())
                 sleep(600,700)
