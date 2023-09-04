@@ -101,7 +101,7 @@ class AutoZMIAltar : Plugin() {
 
     override fun startUp() {
         currentState = State.BANKING
-        version = "1.0.0"
+        version = "1.0.1"
         startTime = System.currentTimeMillis()
         startingXp = client.getSkillExperience(Skill.RUNECRAFT)
         startingLvl = client.getRealSkillLevel(Skill.RUNECRAFT)
@@ -187,11 +187,7 @@ class AutoZMIAltar : Plugin() {
             try {
                 //execute twice
                 for (i in 0..1){
-                    Rs2Npc.interact("Eniola", "bank")
-                    while (!Dialogue.isInDialogue()) sleep(200, 300)
-                    Dialogue.clickContinue()
-                    sleep(1000,1200)
-                    VirtualKeyboard.typeString("2")
+                    Rs2Npc.interact("Eniola", "talk-to")
                     while (!Rs2Bank.isOpen()) sleep(700,800)
                     if(i == 0){
                         Rs2Bank.depositAll()
@@ -202,11 +198,7 @@ class AutoZMIAltar : Plugin() {
                     Rs2Bank.closeBank()
                     fillPouches()
                 }
-                Rs2Npc.interact("Eniola", "bank")
-                while (!Dialogue.isInDialogue()) sleep(200, 300)
-                Dialogue.clickContinue()
-                sleep(1000,1200)
-                VirtualKeyboard.typeString("2")
+                Rs2Npc.interact("Eniola", "talk-to")
                 while (!Rs2Bank.isOpen()) sleep(700,800)
                 MicrobotInventorySetup.loadInventory(config.INVENTORY())
                 sleep(600,700)
