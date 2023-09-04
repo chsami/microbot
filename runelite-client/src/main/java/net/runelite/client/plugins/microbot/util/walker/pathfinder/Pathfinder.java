@@ -64,7 +64,7 @@ public class Pathfinder implements Runnable {
 
 
     public boolean getDebugger() {
-        return true;
+        return false;
     }
 
     public Pathfinder(PathfinderConfig config) {
@@ -123,12 +123,16 @@ public class Pathfinder implements Runnable {
 
         Tab.switchToInventoryTab();
 
+        Teleport shortestPathSpell = null;
+        JewelleryLocationEnum shortestPathJewellery = null;
+        boolean hasTablet = false;
+
         //Teleport spells logic
         for (Teleport teleport : Teleport.values()) {
             if (teleport.getDestination().equals(start)
                     || teleport.getDestination().distanceTo(target) < start.distanceTo(target)
-            ) {
-                boolean hasTablet = Inventory.hasItem(teleport.getTabletName());
+            && (shortestPathSpell == null || shortestPathSpell.getDestination().distanceTo(target) > teleport.getDestination().distanceTo(target))) {
+                hasTablet = Inventory.hasItem(teleport.getTabletName());
                 boolean hasRunes = true;
                 for (Pair itemRequired : teleport.getItemsRequired()) {
                     if (!Inventory.hasItemAmountStackable(itemRequired.getLeft().toString(), (int) itemRequired.getRight()))
@@ -136,18 +140,12 @@ public class Pathfinder implements Runnable {
                 }
 
                 if (hasRunes && Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC) >= teleport.getLevel()) {
-                    Rs2Magic.cast(teleport.getSpell());
-                    sleepUntil(() -> Microbot.isAnimating());
-                    sleepUntil(() -> !Microbot.isAnimating());
-                    start = teleport.getDestination();
+                    shortestPathSpell = teleport;
                     break;
                 }
 
                 if (hasTablet) {
-                    Inventory.useItemFast(teleport.getTabletName(), "Break");
-                    sleepUntil(() -> Microbot.isAnimating());
-                    sleepUntil(() -> !Microbot.isAnimating());
-                    start = teleport.getDestination();
+                    shortestPathSpell = teleport;
                     break;
                 }
             }
@@ -156,28 +154,59 @@ public class Pathfinder implements Runnable {
         for (JewelleryLocationEnum jewelleryLocationEnum : JewelleryLocationEnum.values()) {
             if (jewelleryLocationEnum.getLocation().equals(start)
                     || jewelleryLocationEnum.getLocation().distanceTo(target) < start.distanceTo(target)
-            ) {
-                String itemName = jewelleryLocationEnum.getTooltip() + "(";
-                boolean hasItemEquipped = Rs2Equipment.hasEquippedContains(itemName);
-                if (hasItemEquipped) {
-                    if (jewelleryLocationEnum.name().contains("ring")) {
-                        Rs2Equipment.useRingAction(jewelleryLocationEnum);
-                    } else {
-                        Rs2Equipment.useAmuletAction(jewelleryLocationEnum);
-                    }
-                    sleepUntil(() -> Microbot.isAnimating());
-                    sleepUntil(() -> !Microbot.isAnimating());
-                } else if (Inventory.hasItemContains(itemName)) {
-                    Inventory.useItemFastContains(itemName, "Rub");
-                    sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
-                    VirtualKeyboard.typeString(Integer.toString(jewelleryLocationEnum.getIdentifier() - 1));
-                    sleepUntil(() -> Microbot.isAnimating());
-                    sleepUntil(() -> !Microbot.isAnimating());
-                }
+                    && (shortestPathJewellery == null || shortestPathJewellery.getLocation().distanceTo(target) > jewelleryLocationEnum.getLocation().distanceTo(target))) {
+                shortestPathJewellery = jewelleryLocationEnum;
             }
         }
 
+        if (shortestPathSpell != null && shortestPathJewellery != null) {
+            if (shortestPathSpell.getDestination().distanceTo(target) <= shortestPathJewellery.getLocation().distanceTo(target)) {
+                useTeleport(shortestPathSpell, start, hasTablet);
+            } else {
+                useJewellery(shortestPathJewellery);
+            }
+        } else
+        if (shortestPathSpell != null && shortestPathJewellery == null) {
+            useTeleport(shortestPathSpell, start, hasTablet);
+        } else
+        if (shortestPathSpell == null && shortestPathJewellery != null) {
+            useJewellery(shortestPathJewellery);
+        }
+
         new Thread(this).start();
+
+    }
+
+    private void useTeleport(Teleport shortestPathSpell, WorldPoint start, boolean hasTablet) {
+        if (hasTablet) {
+            Inventory.useItemFast(shortestPathSpell.getTabletName(), "Break");
+            sleepUntil(() -> Microbot.isAnimating());
+            sleepUntil(() -> !Microbot.isAnimating());
+        } else {
+            Rs2Magic.cast(shortestPathSpell.getSpell());
+            sleepUntil(() -> Microbot.isAnimating());
+            sleepUntil(() -> !Microbot.isAnimating());
+        }
+    }
+
+    private void useJewellery(JewelleryLocationEnum shortestPathJewellery) {
+        String itemName = shortestPathJewellery.getTooltip() + "(";
+        boolean hasItemEquipped = Rs2Equipment.hasEquippedContains(itemName);
+        if (hasItemEquipped) {
+            if (shortestPathJewellery.name().contains("ring")) {
+                Rs2Equipment.useRingAction(shortestPathJewellery);
+            } else {
+                Rs2Equipment.useAmuletAction(shortestPathJewellery);
+            }
+            sleepUntil(() -> Microbot.isAnimating());
+            sleepUntil(() -> !Microbot.isAnimating());
+        } else if (Inventory.hasItemContains(itemName)) {
+            Inventory.useItemFastContains(itemName, "Rub");
+            sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
+            VirtualKeyboard.typeString(Integer.toString(shortestPathJewellery.getIdentifier() - 1));
+            sleepUntil(() -> Microbot.isAnimating());
+            sleepUntil(() -> !Microbot.isAnimating());
+        }
     }
 
     private void precalculateTransports(WorldPoint start, WorldPoint target, boolean useTransport) {
