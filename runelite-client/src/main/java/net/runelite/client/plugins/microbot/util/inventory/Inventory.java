@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
@@ -665,7 +666,13 @@ public class Inventory {
                 }
             }
         }
-        menuEntry.getClass().getMethod("aj", int.class).invoke(menuEntry, item.id); //use the setItemId method through reflection
+
+        Arrays.stream(menuEntry.getClass().getMethods())
+                .filter(x -> x.getReturnType().getName() == "void" && x.getParameters().length > 0 && x.getParameters()[0].getType().getName() == "int")
+                .collect(Collectors.toList())
+                .get(0)
+                .invoke(menuEntry, item.id); //use the setItemId method through reflection
+
         menuEntry.setOption(itemAction != null ? itemAction : "");
         index = index + 3;
         if (index == 4) { //edge case, idx 4 is always CANCEl, so set index to 3
