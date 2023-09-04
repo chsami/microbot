@@ -53,7 +53,6 @@ public class Rs2GameObject {
         return clickObject(object, action);
     }
 
-
     public static TileObject interactAndGetObject(int id) {
         TileObject object = findObjectById(id);
         clickObject(object);
@@ -61,8 +60,8 @@ public class Rs2GameObject {
     }
 
     public static boolean interact(int[] objectIds, String action) {
-        for (int i = 0; i < objectIds.length; i++) {
-            if (interact(objectIds[i], action))
+        for (int objectId : objectIds) {
+            if (interact(objectId, action))
                 return true;
         }
         return false;
@@ -93,8 +92,7 @@ public class Rs2GameObject {
     }
 
     public static ObjectComposition findObject(int id) {
-        ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
-        return objComp;
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
     }
 
     public static boolean exists(int id) {
@@ -181,8 +179,6 @@ public class Rs2GameObject {
 
         gameObjects = gameObjects.stream().filter(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation()) < distance).collect(Collectors.toList());
 
-        if (gameObjects == null) return null;
-
         for (net.runelite.api.GameObject gameObject : gameObjects) {
             if (gameObject.getId() == id)
                 return gameObject;
@@ -239,12 +235,10 @@ public class Rs2GameObject {
         }
 
 
-        List<DecorativeObject> decorativeObjects = Arrays.stream(tileObjects.toArray(new DecorativeObject[tileObjects.size()]))
-                .filter(value -> value != null)
+        return Arrays.stream(tileObjects.toArray(new DecorativeObject[tileObjects.size()]))
+                .filter(Objects::nonNull)
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
-
-        return decorativeObjects;
     }
 
     public static GameObject findObjectById(int id, int x) {
@@ -283,8 +277,7 @@ public class Rs2GameObject {
 
         for (net.runelite.api.GameObject gameObject : gameObjects) {
             if (gameObject.getId() == id) {
-                ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
-                return objComp;
+                return convertGameObjectToObjectComposition(gameObject);
             }
         }
         return null;
@@ -304,7 +297,7 @@ public class Rs2GameObject {
             if (objComp == null) continue;
 
             if (exact) {
-                if (objComp.getName().toLowerCase().equals(objectName.toLowerCase())) {
+                if (objComp.getName().equalsIgnoreCase(objectName)) {
                     return gameObject;
                 }
             } else {
@@ -332,10 +325,9 @@ public class Rs2GameObject {
     }
 
     public static boolean hasAction(GameObject gameObject, String action) {
-        boolean result = false;
         ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
 
-        result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
+        boolean result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
         if (!result) {
             try {
                 result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.toLowerCase().equals(action.toLowerCase()));
@@ -349,9 +341,6 @@ public class Rs2GameObject {
     /**
      * Imposter objects are objects that have their menu action changed but still remain the same object.
      * for example: farming patches
-     *
-     * @param action
-     * @return
      */
     public static GameObject findObjectByImposter(int id, String action) {
         return findObjectByImposter(id, action, true);
@@ -407,11 +396,11 @@ public class Rs2GameObject {
             if (objComp == null) continue;
 
             if (exact) {
-                if (Arrays.stream(objComp.getActions()).filter(action -> action != null).anyMatch((action) -> action.toLowerCase().equals(optionName.toLowerCase()))) {
+                if (Arrays.stream(objComp.getActions()).filter(Objects::nonNull).anyMatch((action) -> action.equalsIgnoreCase(optionName))) {
                     return gameObject;
                 }
             } else {
-                if (Arrays.stream(objComp.getActions()).filter(action -> action != null).anyMatch((action) -> action.toLowerCase().contains(optionName.toLowerCase()))) {
+                if (Arrays.stream(objComp.getActions()).filter(Objects::nonNull).anyMatch((action) -> action.toLowerCase().contains(optionName.toLowerCase()))) {
                     return gameObject;
                 }
             }
@@ -430,8 +419,7 @@ public class Rs2GameObject {
     }
 
     public static GameObject findBank(String action) {
-        GameObject bank = findObjectByOption(action, false);
-        return bank;
+        return findObjectByOption(action, false);
     }
 
     public static TileObject findObject(int[] ids) {
@@ -446,8 +434,7 @@ public class Rs2GameObject {
     public static ObjectComposition convertGameObjectToObjectComposition(TileObject tileObject) {
         Player player = Microbot.getClient().getLocalPlayer();
         if (player.getLocalLocation().distanceTo(tileObject.getLocalLocation()) > 2400) return null;
-        ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(tileObject.getId()));
-        return objComp;
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(tileObject.getId()));
     }
 
     public static WallObject findDoor(int id) {
@@ -477,15 +464,7 @@ public class Rs2GameObject {
         Tile[][][] tiles = scene.getTiles();
 
         int z = Microbot.getClient().getPlane();
-        List<GameObject> tileObjects = new ArrayList<>();
         Tile tile = tiles[z][localPoint.getSceneX()][localPoint.getSceneY()];
-
-        for (GameObject tileObject :
-                tile.getGameObjects()) {
-            if (tileObject != null
-                    && tileObject.getSceneMinLocation().equals(tile.getSceneLocation()))
-                tileObjects.add(tileObject);
-        }
 
         return Arrays.stream(tile.getGameObjects()).filter(Objects::nonNull).findFirst().orElse(null);
     }
@@ -503,11 +482,7 @@ public class Rs2GameObject {
                 if (tile == null) {
                     continue;
                 }
-                for (GameObject tileObject :
-                        tile.getGameObjects()) {
-                    if (Arrays.stream(tile.getGameObjects()).anyMatch(c -> c != null && c.getId() == 11797)) {
-                        System.out.println(tile.getGameObjects());
-                    }
+                for (GameObject tileObject : tile.getGameObjects()) {
                     if (tileObject != null
                             && tileObject.getSceneMinLocation().equals(tile.getSceneLocation()))
                         tileObjects.add(tileObject);
@@ -515,12 +490,10 @@ public class Rs2GameObject {
             }
         }
 
-        List<GameObject> gameObjects = Arrays.stream(tileObjects.toArray(new GameObject[tileObjects.size()]))
-                .filter(value -> value != null)
+        return Arrays.stream(tileObjects.toArray(new GameObject[tileObjects.size()]))
+                .filter(Objects::nonNull)
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
-
-        return gameObjects;
     }
 
     private static List<GroundObject> getGroundObjects() {
@@ -542,12 +515,10 @@ public class Rs2GameObject {
         }
 
 
-        List<GroundObject> groundObjects = Arrays.stream(tileObjects.toArray(new GroundObject[tileObjects.size()]))
-                .filter(value -> value != null)
+        return Arrays.stream(tileObjects.toArray(new GroundObject[tileObjects.size()]))
+                .filter(Objects::nonNull)
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
-
-        return groundObjects;
     }
 
     private static List<WallObject> getWallObjects() {
@@ -569,12 +540,10 @@ public class Rs2GameObject {
         }
 
 
-        List<WallObject> wallObjects = Arrays.stream(tileObjects.toArray(new WallObject[tileObjects.size()]))
+        return Arrays.stream(tileObjects.toArray(new WallObject[tileObjects.size()]))
                 .filter(value -> value != null && value.getConfig() >= 0)
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
-
-        return wallObjects;
     }
 
     private static boolean clickObject(TileObject object) {
@@ -630,9 +599,7 @@ public class Rs2GameObject {
 
         int index = -1;
 
-        if (objectAction.equalsIgnoreCase("use")) {
-            index = 10;// 10 is just a random number high enough
-        } else if (objectAction != null && objectAction != "" && objComp != null) {
+        if (objectAction != null && !objectAction.isEmpty()) {
             for (int i = 0; i < objComp.getActions().length; i++) {
                 if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
                     index = i;
