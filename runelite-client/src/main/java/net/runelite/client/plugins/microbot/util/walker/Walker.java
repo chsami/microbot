@@ -235,6 +235,7 @@ public class Walker {
     public boolean walkPath(WorldPoint[] worldPoints) {
         if (worldPoints[worldPoints.length -1].distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 4) return true;
         pathfinder = new Pathfinder(pathfinderConfig);
+        pathfinder.customPath = true;
         List<Node> path = new ArrayList();
         for (WorldPoint worldPoint: worldPoints) {
             path.add(new Node(worldPoint, null, 0));
