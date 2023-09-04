@@ -36,6 +36,9 @@ public class CollisionMap {
         doorIds.add(ObjectID.DOOR_9721); //tutorialIsland door to financial advisor
         doorIds.add(ObjectID.DOOR_9722); //tutorialIsland door to prayer altar
         doorIds.add(ObjectID.DOOR_9723); //tutorialIsland door to mage
+        doorIds.add(ObjectID.DOOR_24318); // door to warriors guild
+        doorIds.add(ObjectID.DOOR_24309); // door to animated armour inside warrior guild
+        doorIds.add(ObjectID.DOOR_24306); // door to animated armour inside warrior guild
     }
 
     public static WorldArea[] blockingAreas = new WorldArea[] {

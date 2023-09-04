@@ -183,7 +183,14 @@ public class PestControlScript extends Script {
                     redShield = true;
                     yellowShield = true;
                     if (!isInBoat) {
-                        Rs2GameObject.interact(ObjectID.GANGPLANK_25632);
+                        if (Microbot.getClient().getLocalPlayer().getCombatLevel() >= 100) {
+                            Rs2GameObject.interact(ObjectID.GANGPLANK_25632);
+                        } else if (Microbot.getClient().getLocalPlayer().getCombatLevel() >= 70) {
+                            Rs2GameObject.interact(ObjectID.GANGPLANK_25631);
+                        } else {
+                            Rs2GameObject.interact(ObjectID.GANGPLANK_14315);
+                        }
+                        sleep(100, 3000);
                     }
                 }
             } catch (Exception ex) {

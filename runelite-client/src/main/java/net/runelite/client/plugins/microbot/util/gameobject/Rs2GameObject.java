@@ -630,7 +630,9 @@ public class Rs2GameObject {
 
         int index = -1;
 
-        if (objectAction != null && objectAction != "") {
+        if (objectAction.equalsIgnoreCase("use")) {
+            index = 10;// 10 is just a random number high enough
+        } else if (objectAction != null && objectAction != "") {
             for (int i = 0; i < objComp.getActions().length; i++) {
                 if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
                     index = i;
