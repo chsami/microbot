@@ -60,6 +60,8 @@ public class Pathfinder implements Runnable {
 
     boolean useCanvas = false;
 
+    public boolean customPath = false;
+
 
     public boolean getDebugger() {
         return true;
@@ -270,6 +272,8 @@ public class Pathfinder implements Runnable {
 
             node = boundary.removeFirst();
 
+            if (node == null || node.position == null) break;
+
             if (node.position.distanceTo(target) < 1 || (!config.isNear(start))) {
                 path = node.getPath();
                 break;
@@ -318,7 +322,7 @@ public class Pathfinder implements Runnable {
 
     private void handleWalkableNodes() {
         for (Node node : path) {
-            if (Calculations.tileOnMap(node.position) && node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 14) {
+            if (Calculations.tileOnMap(node.position) && (node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 14 || customPath)) {
                 Point point = Calculations.tileToMinimap(node.position);
                 Microbot.getMouse().click(point);
                 break;

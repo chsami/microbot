@@ -233,19 +233,31 @@ public class Rs2Npc {
         menuEntry.setTarget("<col=ffff00>" + npcInteraction.getName() + "<col=ff00>  (level-" + npcInteraction.getCombatLevel() + ")");
         menuEntry.setParam1(0);
         menuEntry.setOption(Rs2Npc.npcAction);
-        if (npcAction.toLowerCase().equals("talk-to")) {
+
+        NPCComposition npcComposition = Microbot.getClient().getNpcDefinition(npcInteraction.getId());
+
+        int index = -1;
+        for (int i = 0; i < npcComposition.getActions().length; i++) {
+            String action = npcComposition.getActions()[i];
+            if (action == null || !action.equalsIgnoreCase(npcAction)) continue;
+            index = i;
+        }
+
+        if (index == 0) {
             menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
-        } else if (npcAction.toLowerCase().equals("attack")) {
+        } else if (index == 1) {
             menuEntry.setType(MenuAction.NPC_SECOND_OPTION);
-        } else if (npcAction.toLowerCase().equals("pickpocket")
-                || npcAction.toLowerCase().equals("bank")
-                || npcAction.toLowerCase().equals("dream")
-        || npcAction.toLowerCase().equalsIgnoreCase("harpoon")) {
+
+        } else if (index == 2) {
             menuEntry.setType(MenuAction.NPC_THIRD_OPTION);
-        } else if (npcAction.toLowerCase().equals("collect")) {
+
+        } else if (index == 3) {
             menuEntry.setType(MenuAction.NPC_FOURTH_OPTION);
+
+        } else if (index == 4) {
+            menuEntry.setType(MenuAction.NPC_FIFTH_OPTION);
         } else {
-            menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
+            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_NPC);
         }
     }
 }
