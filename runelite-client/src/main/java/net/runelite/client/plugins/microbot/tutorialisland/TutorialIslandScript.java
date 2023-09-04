@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.clickContinue;
 import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.isInDialogue;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
-import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.enableHideRoofs;
+import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.hideRoofs;
 import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.turnOffMusic;
 
 public class TutorialIslandScript extends Script {
@@ -50,14 +50,18 @@ public class TutorialIslandScript extends Script {
                         VirtualKeyboard.typeString(name);
                         Rs2Widget.clickWidget("Look up name");
                         sleepUntil(() -> Rs2Widget.hasWidget("Set name"));
-                        if (!Rs2Widget.hasWidget("Sorry")) {
+                        sleep(4000);
+                        if (Rs2Widget.hasWidget("Sorry")) {
                             Rs2Widget.clickWidget(36569095);
                             for (int i = 0; i < name.length(); i++) {
                                 VirtualKeyboard.keyPress(KeyEvent.VK_BACK_SPACE);
+                                sleep(300, 600);
                             }
+                        } else {
+                            Rs2Widget.clickWidget("Set name");
+                            Rs2Widget.clickWidget("Set name");
+                            sleepUntil(() -> !isLookupNameButtonVisible());
                         }
-                        Rs2Widget.clickWidget("Set name");
-                        sleepUntil(() -> !isLookupNameButtonVisible());
                         sleep(2000);
                         break;
                     case CHARACTER:
@@ -217,6 +221,7 @@ public class TutorialIslandScript extends Script {
                 || Microbot.getVarbitPlayerValue(281) == 90) { // FISHING + woodcutting + cooking
             if (!Inventory.contains("Raw shrimps")) {
                 ClickContinue();
+                sleep(1000);
                 Rs2Widget.clickWidget(10747958);
                 sleep(1000);
                 Rs2Npc.interact(3317, "Net");
@@ -305,7 +310,6 @@ public class TutorialIslandScript extends Script {
     public void BankerGuide() {
         if (isInDialogue()) return;
         if (Microbot.getVarbitPlayerValue(281) == 510) {
-            enableHideRoofs();
             Rs2GameObject.interact(ObjectID.BANK_BOOTH_10083);
 
             sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 510);
@@ -376,7 +380,7 @@ public class TutorialIslandScript extends Script {
                 return;
             }
             if (Microbot.getVarbitPlayerValue(281) == 390 || Microbot.getVarbitPlayerValue(281) == 400 || Microbot.getVarbitPlayerValue(281) == 405) {
-                if (Rs2Widget.getWidget(84, 1) == null) {
+                if (Rs2Widget.getWidget(84, 1) == null && Rs2Equipment.hasEquipped("Bronze sword")) {
                     Rs2Widget.clickWidget(10747959);
                     sleep(1000);
                     Rs2Widget.clickWidget(25362433);
@@ -444,9 +448,10 @@ public class TutorialIslandScript extends Script {
     }
 
     public void QuestGuide() {
-        if (Microbot.getVarbitPlayerValue(281) == 200) {
+        if (Microbot.getVarbitPlayerValue(281) == 200 || Microbot.getVarbitPlayerValue(281) == 210) {
             Microbot.getWalker().walkTo(new WorldPoint(random(3083, 3086), random(3127, 3129), 0));
             Rs2GameObject.interact(9716, "Open");
+            sleep(600, 1200);
         } else if (Microbot.getVarbitPlayerValue(281) != 250) {
             if (isInDialogue()) return;
             NPC npc = Rs2Npc.getNpc(3312);
@@ -463,6 +468,9 @@ public class TutorialIslandScript extends Script {
 
     public void CookingGuide() {
         if (Microbot.getVarbitPlayerValue(281) == 120) {
+            hideRoofs();
+            sleep(600);
+            VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
             Rs2GameObject.interact(ObjectID.GATE_9470, "Open");
             sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 120);
         } else if (Microbot.getVarbitPlayerValue(281) == 130) {
