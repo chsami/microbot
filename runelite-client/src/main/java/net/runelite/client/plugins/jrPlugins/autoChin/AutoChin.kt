@@ -100,7 +100,7 @@ class AutoChin : Plugin() {
 
         if (client.getLocalPlayer() != null) {
             running = true
-            if (overlayManager != null && config.overlay() && !overlayActive) {
+            if (config.overlay() && !overlayActive) {
                 overlayManager.add(autoChinOverlay)
                 overlayActive = true
             }
