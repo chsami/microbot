@@ -657,7 +657,7 @@ public class Inventory {
     public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (item == null) return;
         ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.id);
-        int index = 0;
+        int index = -1;
 
         if (itemAction != null) {
             for (int i = 0; i < itemComposition.getInventoryActions().length; i++) {
@@ -667,6 +667,15 @@ public class Inventory {
             }
         }
 
+        if (index == -1) {
+            menuEntry.setType(MenuAction.WIDGET_TARGET);
+        } else {
+            menuEntry.setType(MenuAction.CC_OP);
+        }
+
+        //["Use", "Examine", "Drink", "CANCEL", "NULL", NULL, "EMPTY", "DROP",]
+
+
         Arrays.stream(menuEntry.getClass().getMethods())
                 .filter(x -> x.getReturnType().getName() == "void" && x.getParameters().length > 0 && x.getParameters()[0].getType().getName() == "int")
                 .collect(Collectors.toList())
@@ -674,14 +683,18 @@ public class Inventory {
                 .invoke(menuEntry, item.id); //use the setItemId method through reflection
 
         menuEntry.setOption(itemAction != null ? itemAction : "");
-        index = index + 3;
-        if (index == 4) { //edge case, idx 4 is always CANCEl, so set index to 3
-            index = 3;
+        if (index >= 3) {
+            index = index + 3;
+            if (index == 4) { //edge case, idx 4 is always CANCEl, so set index to 3
+                index = 3;
+            }
+        } else {
+            index = index + 2;
         }
+
         menuEntry.setIdentifier(index);
         menuEntry.setParam0(item.slot);
         menuEntry.setParam1(9764864);
         menuEntry.setTarget("<col=ff9040>" + itemComposition.getName() + "</col>");
-        menuEntry.setType(MenuAction.CC_OP);
     }
 }
