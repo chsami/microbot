@@ -573,6 +573,8 @@ public class Rs2GameObject {
 
         ObjectComposition objComp = convertGameObjectToObjectComposition(objectToInteract);
 
+        if (objComp == null) return;
+
         try {
             GameObject gameObject = (GameObject) objectToInteract;
 
@@ -598,6 +600,7 @@ public class Rs2GameObject {
         menuEntry.setOption(objectAction == null ? "" : objectAction);
 
         int index = -1;
+
 
         if (objectAction != null && !objectAction.isEmpty()) {
             for (int i = 0; i < objComp.getActions().length; i++) {
