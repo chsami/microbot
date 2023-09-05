@@ -59,6 +59,8 @@ public class PestControlScript extends Script {
     @Setter
     private static boolean yellowShield = true;
 
+    final int distanceToPortal = 8;
+
     public boolean run(PestControlConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run(344)) return;
@@ -90,6 +92,8 @@ public class PestControlScript extends Script {
                     Widget redHealth = Rs2Widget.getWidget(RED.getHitpoints());
                     Widget yellowHealth = Microbot.getClient().getWidget(YELLOW.getHitpoints());
 
+                    Microbot.toggleSpecialAttack(55);
+
                     for (int brawler : BRAWLER_IDS) {
                         if (!Microbot.getClient().getLocalPlayer().isInteracting())
                             if (Rs2Npc.interact(brawler, "attack")) {
@@ -110,7 +114,7 @@ public class PestControlScript extends Script {
                         return;
 
                     if (!purpleShield && !purpleHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(4, 8, 30)) {
+                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 8, 30)) {
                             WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(8, 30);
                             if (worldPoint == null) {
                                 Microbot.getWalker().walkFastRegion(30, 32);
@@ -123,7 +127,7 @@ public class PestControlScript extends Script {
                     }
 
                     if (!blueShield && !blueHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(4, 55, 29)) {
+                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 55, 29)) {
                             WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(55, 29);
                             if (worldPoint == null) {
                                 Microbot.getWalker().walkFastRegion(30, 32);
@@ -136,7 +140,7 @@ public class PestControlScript extends Script {
                     }
 
                     if (!redShield && !redHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(4, 22, 12)) {
+                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 22, 12)) {
                             WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(22, 12);
                             if (worldPoint == null) {
                                 Microbot.getWalker().walkFastRegion(30, 32);
@@ -149,7 +153,7 @@ public class PestControlScript extends Script {
                     }
 
                     if (!yellowShield && !yellowHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(4, 48, 13)) {
+                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 48, 13)) {
                             WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(48, 13);
                             if (worldPoint == null) {
                                 Microbot.getWalker().walkFastRegion(30, 32);
@@ -191,6 +195,7 @@ public class PestControlScript extends Script {
                             Rs2GameObject.interact(ObjectID.GANGPLANK_14315);
                         }
                         sleep(100, 3000);
+                        games++;
                     }
                 }
             } catch (Exception ex) {
