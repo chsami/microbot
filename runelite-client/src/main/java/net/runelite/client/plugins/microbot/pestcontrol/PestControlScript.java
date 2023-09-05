@@ -28,8 +28,6 @@ public class PestControlScript extends Script {
 
     boolean walkToCenter = false;
 
-    public static int games = 0;
-
     private static final Set<Integer> SPINNER_IDS = ImmutableSet.of(
             NpcID.SPINNER,
             NpcID.SPINNER_1710,
@@ -92,7 +90,7 @@ public class PestControlScript extends Script {
                     Widget redHealth = Rs2Widget.getWidget(RED.getHitpoints());
                     Widget yellowHealth = Microbot.getClient().getWidget(YELLOW.getHitpoints());
 
-                    Microbot.toggleSpecialAttack(55);
+                    Microbot.toggleSpecialAttack(550);
 
                     for (int brawler : BRAWLER_IDS) {
                         if (!Microbot.getClient().getLocalPlayer().isInteracting())
@@ -194,8 +192,7 @@ public class PestControlScript extends Script {
                         } else {
                             Rs2GameObject.interact(ObjectID.GANGPLANK_14315);
                         }
-                        sleep(100, 3000);
-                        games++;
+                        sleep(3000);
                     }
                 }
             } catch (Exception ex) {
