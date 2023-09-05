@@ -615,11 +615,9 @@ public class Rs2GameObject {
                     }
                 }
             }
-        } else {
-            index = 0;
         }
 
-        if (index == 0 || index == -1) {
+        if (index == 0) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
         } else if (index == 1) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
