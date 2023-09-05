@@ -23,10 +23,10 @@ import net.runelite.client.plugins.microbot.util.walker.Transport;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 import static net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap.wallNodes;
@@ -52,14 +52,10 @@ public class Pathfinder implements Runnable {
 
     @Getter
     @Setter
-    private boolean useTransport = true;
-
+    private boolean useTransport;
     Transport useCurrentTransport = null;
-
-    boolean executeWalking = true;
-
-    boolean useCanvas = false;
-
+    boolean executeWalking;
+    boolean useCanvas;
     public boolean customPath = false;
 
 
@@ -68,58 +64,44 @@ public class Pathfinder implements Runnable {
     }
 
     public Pathfinder(PathfinderConfig config) {
-        this.config = config;
-        this.config.refresh();
-        this.executeWalking = true;
-        this.start = null;
-        this.config.refresh();
-        new Thread(this).start();
+        this(config, null, null);
     }
 
     public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target) {
-        this.config = config;
-        this.start = start;
-        this.target = target;
-        this.config.refresh();
-        new Thread(this).start();
+        this(config, start, target, false);
     }
 
     public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target, boolean canReach) {
-        this.config = config;
-        this.start = start;
-        this.target = target;
-        this.config.refresh();
-        this.executeWalking = !canReach;
-
-
-        //Calculate all the stairce/obstacles/ladders in advance before calculating the path to walk
-        precalculateTransports(start, target, useTransport);
-
-        new Thread(this).start();
+        this(config, start, target, true, canReach, false, null);
     }
 
     public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target, boolean useTransport, boolean canReach, boolean useCanvas, WorldArea[] blockingAreas) {
         this.config = config;
+        this.config.refresh();
+
         this.start = start;
         this.target = target;
-        this.config.refresh();
-        this.useTransport = useTransport;
-        this.executeWalking = !canReach;
-        this.useCanvas = useCanvas;
-        if (blockingAreas != null)
-            CollisionMap.blockingAreas = blockingAreas;
 
-        //Calculate all the stairce/obstacles/ladders in advance before calculating the path to walk
+        this.executeWalking = !canReach;
+        this.useTransport = useTransport;
+        this.useCanvas = useCanvas;
+
+        if (blockingAreas != null) {
+            CollisionMap.blockingAreas = blockingAreas;
+        }
+
+        // Calculate all the staircase, obstacles, ladders in advance before calculating the path to walk
         precalculateTransports(start, target, useTransport);
 
         final int teleportThreshHoldDistance = 20;
 
-        //No need to teleport if we are close to our target location
-        // return early
+        // No need to teleport if we are close to our target location
         if (start.distanceTo(target) < teleportThreshHoldDistance) {
             new Thread(this).start();
             return;
         }
+
+        if (!useTransport) return;
 
         Tab.switchToInventoryTab();
 
@@ -127,11 +109,9 @@ public class Pathfinder implements Runnable {
         JewelleryLocationEnum shortestPathJewellery = null;
         boolean hasTablet = false;
 
-        //Teleport spells logic
+        // Teleport spells logic
         for (Teleport teleport : Teleport.values()) {
-            if (teleport.getDestination().equals(start)
-                    || teleport.getDestination().distanceTo(target) < start.distanceTo(target)
-            && (shortestPathSpell == null || shortestPathSpell.getDestination().distanceTo(target) > teleport.getDestination().distanceTo(target))) {
+            if (teleport.getDestination().equals(start) || teleport.getDestination().distanceTo(target) < start.distanceTo(target)) {
                 hasTablet = Inventory.hasItem(teleport.getTabletName());
                 boolean hasRunes = true;
                 for (Pair itemRequired : teleport.getItemsRequired()) {
@@ -150,7 +130,7 @@ public class Pathfinder implements Runnable {
                 }
             }
         }
-        //jewellery teleport logic
+        // Jewellery teleport logic
         for (JewelleryLocationEnum jewelleryLocationEnum : JewelleryLocationEnum.values()) {
             if (jewelleryLocationEnum.getLocation().equals(start)
                     || jewelleryLocationEnum.getLocation().distanceTo(target) < start.distanceTo(target)
@@ -161,32 +141,27 @@ public class Pathfinder implements Runnable {
 
         if (shortestPathSpell != null && shortestPathJewellery != null) {
             if (shortestPathSpell.getDestination().distanceTo(target) <= shortestPathJewellery.getLocation().distanceTo(target)) {
-                useTeleport(shortestPathSpell, start, hasTablet);
+                useTeleport(shortestPathSpell, hasTablet);
             } else {
                 useJewellery(shortestPathJewellery);
             }
-        } else
-        if (shortestPathSpell != null && shortestPathJewellery == null) {
-            useTeleport(shortestPathSpell, start, hasTablet);
-        } else
-        if (shortestPathSpell == null && shortestPathJewellery != null) {
+        } else if (shortestPathSpell != null) {
+            useTeleport(shortestPathSpell, hasTablet);
+        } else if (shortestPathJewellery != null) {
             useJewellery(shortestPathJewellery);
         }
 
         new Thread(this).start();
-
     }
 
-    private void useTeleport(Teleport shortestPathSpell, WorldPoint start, boolean hasTablet) {
+    private void useTeleport(Teleport shortestPathSpell, boolean hasTablet) {
         if (hasTablet) {
             Inventory.useItemFast(shortestPathSpell.getTabletName(), "Break");
-            sleepUntil(() -> Microbot.isAnimating());
-            sleepUntil(() -> !Microbot.isAnimating());
         } else {
             Rs2Magic.cast(shortestPathSpell.getSpell());
-            sleepUntil(() -> Microbot.isAnimating());
-            sleepUntil(() -> !Microbot.isAnimating());
         }
+        sleepUntil(Microbot::isAnimating);
+        sleepUntil(() -> !Microbot.isAnimating());
     }
 
     private void useJewellery(JewelleryLocationEnum shortestPathJewellery) {
@@ -198,13 +173,13 @@ public class Pathfinder implements Runnable {
             } else {
                 Rs2Equipment.useAmuletAction(shortestPathJewellery);
             }
-            sleepUntil(() -> Microbot.isAnimating());
+            sleepUntil(Microbot::isAnimating);
             sleepUntil(() -> !Microbot.isAnimating());
         } else if (Inventory.hasItemContains(itemName)) {
             Inventory.useItemFastContains(itemName, "Rub");
             sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
             VirtualKeyboard.typeString(Integer.toString(shortestPathJewellery.getIdentifier() - 1));
-            sleepUntil(() -> Microbot.isAnimating());
+            sleepUntil(Microbot::isAnimating);
             sleepUntil(() -> !Microbot.isAnimating());
         }
     }
@@ -212,9 +187,8 @@ public class Pathfinder implements Runnable {
     private void precalculateTransports(WorldPoint start, WorldPoint target, boolean useTransport) {
         if (useTransport) {
             if (target.getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
-                //custom logic for stairce/ladders
-                Transport transport = getMatchingTransport(Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane());
-                Transport linkedTransport = transport;
+                //custom logic for staircase/ladders
+                Transport linkedTransport = getMatchingTransport(Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane());
                 while (linkedTransport != null) {
                     if (linkedTransport.linkedTransport == null) {
                         this.target = linkedTransport.origin;
@@ -239,13 +213,13 @@ public class Pathfinder implements Runnable {
                 }
             } else {
                 if (start.getY() < 9000 && target.getY() > 9000) {
-                    //use object to go underground
+                    // Use object to go underground
                     Transport transportUnderground = getClosestTransport(target);
                     if (transportUnderground != null) {
                         this.target = transportUnderground.getOrigin();
                     }
                 } else if (start.getY() >= 9000 && target.getY() < 9000) {
-                    //use object to go surface
+                    // Use object to go surface
                     Transport transportSurface = getClosestTransport(target);
                     if (transportSurface != null) {
                         this.target = transportSurface.getDestination();
@@ -253,14 +227,6 @@ public class Pathfinder implements Runnable {
                 }
             }
         }
-    }
-
-    public Pathfinder(PathfinderConfig config, WorldPoint target) {
-        this.config = config;
-        this.config.refresh();
-        this.target = target;
-        start = null;
-        done = true;
     }
 
     private void addNeighbors(Node node) {
@@ -280,7 +246,6 @@ public class Pathfinder implements Runnable {
 
     @Override
     public void run() {
-        boolean skip = false;
         CollisionMap.nodesChecked = new ArrayList<>();
         wallNodes = new ArrayList<>();
         Microbot.status = "Calculating webwalking, please wait...";
@@ -326,20 +291,12 @@ public class Pathfinder implements Runnable {
         }
 
 
-        if (this.executeWalking) {
-            skip = handleDoors();
-
-            if (!skip) {
-                skip = handleTransports();
-            }
-
-            if (!skip) {
-                Collections.reverse(path);
-                if (useCanvas) {
-                    handleWalkableNodesCanvas();
-                } else {
-                    handleWalkableNodes();
-                }
+        if (this.executeWalking && !handleDoors() && !handleTransports()) {
+            Collections.reverse(path);
+            if (useCanvas) {
+                handleWalkableNodesCanvas();
+            } else {
+                handleWalkableNodes();
             }
         }
 
@@ -373,21 +330,21 @@ public class Pathfinder implements Runnable {
         boolean skip = false;
         if (useTransport) {
             if (useCurrentTransport != null && Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), target))) {
-                //custom logic for stairce/ladders
+                // Custom logic for staircase/ladders
                 TileObject tileObject = Rs2GameObject.findObjectByLocation(this.target);
                 Rs2GameObject.interact(tileObject, this.useCurrentTransport.getAction());
                 int currentPlane = Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane();
                 sleepUntil(() -> currentPlane != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane());
                 skip = true;
             } else {
-                for (Node node : path.stream().collect(Collectors.toList())) {
+                for (Node node : new ArrayList<>(path)) {
                     if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(node.position)) continue;
                     Transport transport = getMatchingTransport(node.position);
                     if (transport == null) continue;
                     if (Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), transport.origin))) {
                         TileObject tileObject = Rs2GameObject.findObjectByLocation(transport.origin);
                         Rs2GameObject.interact(tileObject);
-                        sleepUntil(() -> Microbot.isAnimating());
+                        sleepUntil(Microbot::isAnimating);
                         sleepUntil(() -> !Microbot.isAnimating());
                         skip = true;
                         break;
@@ -402,13 +359,12 @@ public class Pathfinder implements Runnable {
         if (useCanvas) return false;
         boolean skip = false;
         CheckedNode[] wallNodeArrays = wallNodes.toArray(CheckedNode[]::new);
-        for (int i = 0; i < wallNodeArrays.length; i++) {
-            final CheckedNode wallNode = wallNodeArrays[i];
+        for (final CheckedNode wallNode : wallNodeArrays) {
             if (wallNode.node.position.equals(start)) continue;
-            if (!path.stream().anyMatch(x -> x.position.equals(wallNode.node.position))) continue;
+            if (path.stream().noneMatch(x -> x.position.equals(wallNode.node.position))) continue;
             if (Calculations.tileOnMap(wallNode.node.position) && wallNode.shape != null) {
                 Microbot.getMouse().click(wallNode.shape.getBounds());
-                sleepUntil(() -> Microbot.isWalking());
+                sleepUntil(Microbot::isWalking);
                 sleepUntil(() -> !Microbot.isWalking());
                 skip = true;
                 break;
@@ -418,8 +374,8 @@ public class Pathfinder implements Runnable {
     }
 
     public Transport getClosestTransport(WorldPoint worldPoint) {
-        WorldPoint transportKey = config.getTransports().keySet().stream().sorted(Comparator.comparingInt((WorldPoint w) -> w.distanceTo(worldPoint))).findFirst().orElse(null);
-        List<Transport> matchingTransports = config.getTransports().values().stream()
+        WorldPoint transportKey = PathfinderConfig.getTransports().keySet().stream().sorted(Comparator.comparingInt((WorldPoint w) -> w.distanceTo(worldPoint))).findFirst().orElse(null);
+        List<Transport> matchingTransports = PathfinderConfig.getTransports().values().stream()
                 .filter(x -> x.get(0).getDestination() == transportKey)
                 .findFirst().orElse(null);
 
@@ -430,30 +386,29 @@ public class Pathfinder implements Runnable {
     }
 
     public Transport getMatchingTransport(WorldPoint worldPoint) {
-        List<Transport> matchingTransports = config.getTransports().get(worldPoint);
+        List<Transport> matchingTransports = PathfinderConfig.getTransports().get(worldPoint);
         if (matchingTransports == null || matchingTransports.isEmpty()) return null;
-        Transport transportNode = matchingTransports.stream().findFirst().orElseGet(null);
-        return transportNode;
+        return matchingTransports.stream().findFirst().orElse(null);
     }
 
     public Transport getMatchingTransport(int plane) {
         Transport closestTransportNode = null;
-        for (Map.Entry<WorldPoint, List<Transport>> entry : config.getTransports().entrySet()) {
+        for (Map.Entry<WorldPoint, List<Transport>> entry : PathfinderConfig.getTransports().entrySet()) {
             for (Transport transport : entry.getValue()) {
-                //Search for all the transport objects that bring us on the same height
+                // Search for all the transport objects that bring us on the same height
                 if (transport.origin.getPlane() == plane && transport.destination.getPlane() != plane) {
                     if (closestTransportNode == null || (closestTransportNode.origin.distanceTo(target) > transport.destination.distanceTo(target))) {
-                        //if the origin of the transport is on another plane, skip it
+                        // if the origin of the transport is on another plane, skip it
                         if (transport.getOrigin().getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
                             continue;
-                        //if our target plane is greater than our players plane, we want to go up
+                        // if our target plane is greater than our players plane, we want to go up
                         if (target.getPlane() > Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
-                            //if the transport plane is lower than the players current plane, skip this transport, because we want to go up
+                            // if the transport plane is lower than the players current plane, skip this transport, because we want to go up
                             if (transport.getDestination().getPlane() < Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
                                 continue;
                         } else {
-                            //go down
-                            //if the transport plane is higher than the players current plane, skip this transport, because we want to go down
+                            // go down
+                            // if the transport plane is higher than the players current plane, skip this transport, because we want to go down
                             if (transport.getDestination().getPlane() > Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
                                 continue;
                         }
