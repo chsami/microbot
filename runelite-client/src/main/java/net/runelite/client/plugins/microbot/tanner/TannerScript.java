@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.api.*;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -46,7 +47,7 @@ public class TannerScript extends Script {
         boolean isTannerVisibleOnScreen = tanner != null && Camera.isTileOnScreen(tanner.getLocalLocation());
         boolean isBankVisible = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(BankLocation.AL_KHARID.getWorldPoint()) < 5;
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
-        if (hasRunEnergy) toggleRunEnergy(true);
+        if (hasRunEnergy) Rs2Player.toggleRunEnergy(true);
         if (isBankVisible) {
             if ((!hasRunEnergy && !hasStamina) || !hasMoney || !hasHides) {
                 Rs2Bank.openBank();

@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.Arrays;
@@ -90,7 +91,7 @@ public class PestControlScript extends Script {
                     Widget redHealth = Rs2Widget.getWidget(RED.getHitpoints());
                     Widget yellowHealth = Microbot.getClient().getWidget(YELLOW.getHitpoints());
 
-                    Microbot.toggleSpecialAttack(550);
+                    Rs2Player.toggleSpecialAttack(550);
 
                     for (int brawler : BRAWLER_IDS) {
                         if (!Microbot.getClient().getLocalPlayer().isInteracting())

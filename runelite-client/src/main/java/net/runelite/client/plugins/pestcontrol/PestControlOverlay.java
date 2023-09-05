@@ -25,12 +25,6 @@
  */
 package net.runelite.client.plugins.pestcontrol;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import javax.inject.Inject;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -38,15 +32,15 @@ import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import static net.runelite.client.plugins.pestcontrol.Portal.BLUE;
-import static net.runelite.client.plugins.pestcontrol.Portal.PURPLE;
-import static net.runelite.client.plugins.pestcontrol.Portal.RED;
-import static net.runelite.client.plugins.pestcontrol.Portal.YELLOW;
-
-import net.runelite.client.plugins.microbot.pestcontrol.PestControlScript;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+
+import static net.runelite.client.plugins.pestcontrol.Portal.*;
 
 @Slf4j
 public class PestControlOverlay extends Overlay
@@ -75,7 +69,6 @@ public class PestControlOverlay extends Overlay
 			if (game != null)
 			{
 				log.debug("Pest control game has ended");
-				PestControlScript.games++;
 				game = null;
 			}
 

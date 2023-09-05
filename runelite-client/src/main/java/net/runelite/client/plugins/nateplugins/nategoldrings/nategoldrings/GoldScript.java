@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -34,7 +35,7 @@ public class GoldScript extends Script {
                 boolean isBankVisible = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(BankLocation.AL_KHARID.getWorldPoint()) < 5;
                 boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
                 boolean hasBars = Inventory.hasItem("gold bar");
-                if (hasRunEnergy) toggleRunEnergy(true);
+                if (hasRunEnergy) Rs2Player.toggleRunEnergy(true);
                 if (Microbot.pauseAllScripts) return;
 
                 if (hasBars && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(furnaceLocation) > 3) {

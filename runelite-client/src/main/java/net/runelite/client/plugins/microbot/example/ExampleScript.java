@@ -9,8 +9,10 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
+import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 
@@ -77,7 +79,7 @@ boolean reachedEndLine = false;
                 //getParam0=-5146, getParam1=-4228,
                 //getParam0=-5350, getParam1=-4235
                // System.out.println(GroundItemsPlugin.getCollectedGroundItems());
-              // System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+               System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
              //   Microbot.getWalker().walkTo(WorldPoint.fromLocal(Microbot.getClient(), 9152, 7616, 0));
               //  System.out.println(Inventory.getStackSizeOfItem(995));
                // System.out.println(Microbot.getClient().getLocalPlayer().getWorldLocation().isInArea(blockingAreas[0]));
@@ -103,10 +105,23 @@ boolean reachedEndLine = false;
 //                    System.out.println(Rs2Widget.getWidget(116, 93).getChildren()[0].isHidden());
 //                    return 0;
 //                });
-//                System.out.println(Arrays.stream(Rs2Widget.getWidget(116, 93).getChildren()).anyMatch(x -> x != null && x.isHidden()));
-                Microbot.getClient().setCameraPitchTarget(460);
-
+                //System.out.println(Arrays.stream(Rs2Widget.getWidget(116, 93).getChildren()).anyMatch(x -> x != null && x.isHidden()));
+                //Rs2Settings.hideRoofs();
                 //Rs2Settings.enableHideRoofs();
+              //  GameObject object = Rs2GameObject.findBank();
+            //    System.out.println(object.getId());
+              //  Rs2GroundItem.interact("box trap", "lay");
+//                Inventory.useItemFastContains("glory", "Rub");
+              /*  WorldPoint questWorldPoint = ((DetailedQuestStep) QuestHelperPlugin.getSelectedQuest().getQuest().getQuestHelper().getCurrentStep()).getWorldPoint();
+                if (questWorldPoint != null) {
+                    Microbot.getWalker().walkTo(questWorldPoint);
+                }
+
+                Rs2Npc.interact("chicken", "attack");*/
+                Inventory.useItemFast("shark", "use");
+                Rs2Npc.interact("banker", "Use");
+               // System.out.println(Inventory.getAmountForItem("sara"));
+
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
