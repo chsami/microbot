@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.isItemSelected;
 
 
 public class Rs2Npc {

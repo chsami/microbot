@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
-import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.isItemSelected;
 
 public class Rs2GroundItem {
 
@@ -318,7 +317,7 @@ public class Rs2GroundItem {
             index = i;
         }
 
-        if (isItemSelected()) {
+        if (Microbot.getClient().isWidgetSelected()) {
             menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GROUND_ITEM);
         } else if (index == 0) {
             menuEntry.setType(MenuAction.GROUND_ITEM_SECOND_OPTION);
