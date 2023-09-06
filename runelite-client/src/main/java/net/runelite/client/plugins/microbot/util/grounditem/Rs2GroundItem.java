@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
+import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.isItemSelected;
 
 public class Rs2GroundItem {
 
@@ -317,8 +318,10 @@ public class Rs2GroundItem {
             index = i;
         }
 
-        if (index == 0) {
-            menuEntry.setType(MenuAction.GROUND_ITEM_FIRST_OPTION);
+        if (isItemSelected()) {
+            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GROUND_ITEM);
+        } else if (index == 0) {
+            menuEntry.setType(MenuAction.GROUND_ITEM_SECOND_OPTION);
         } else if (index == 1) {
             menuEntry.setType(MenuAction.GROUND_ITEM_SECOND_OPTION);
         } else if (index == 2) {
@@ -327,9 +330,6 @@ public class Rs2GroundItem {
             menuEntry.setType(MenuAction.GROUND_ITEM_FOURTH_OPTION);
         } else if (index == 4) {
             menuEntry.setType(MenuAction.GROUND_ITEM_FIFTH_OPTION);
-        } else {
-            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GROUND_ITEM);
         }
-
     }
 }

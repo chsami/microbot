@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 
 public class Rs2GameObject {
@@ -553,6 +554,18 @@ public class Rs2GameObject {
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
         try {
+
+            //We need to walk close enough to the object or the menuEntry in the
+            // handleMenuSwapper will crash because we calculate the sceneX and sceneY
+            if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(object.getWorldLocation()) > 17) {
+                Microbot.getWalker().walkTo(object.getWorldLocation(), false);
+                sleepUntil(() -> Microbot.isWalking());
+                sleepUntil(() -> !Microbot.isWalking());
+            }
+            //Never continue the code if the distance is bigger than 17 tiles
+            if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(object.getWorldLocation()) > 17)
+                return false;
+
             objectToInteract = object;
             objectAction = action;
             Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
@@ -599,8 +612,7 @@ public class Rs2GameObject {
         menuEntry.setTarget("");
         menuEntry.setOption(objectAction == null ? "" : objectAction);
 
-        int index = -1;
-
+        int index = 0;
 
         if (objectAction != null && !objectAction.isEmpty()) {
             for (int i = 0; i < objComp.getActions().length; i++) {
@@ -617,7 +629,9 @@ public class Rs2GameObject {
             }
         }
 
-        if (index == 0) {
+        if (Microbot.getClient().isWidgetSelected()) {
+            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
+        } else if (index == 0) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
         } else if (index == 1) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
@@ -627,8 +641,6 @@ public class Rs2GameObject {
             menuEntry.setType(MenuAction.GAME_OBJECT_FOURTH_OPTION);
         } else if (index == 4) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIFTH_OPTION);
-        } else {
-            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
         }
     }
 }

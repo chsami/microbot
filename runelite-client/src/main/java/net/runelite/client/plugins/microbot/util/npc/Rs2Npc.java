@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.isItemSelected;
 
 
 public class Rs2Npc {
@@ -243,11 +244,12 @@ public class Rs2Npc {
             index = i;
         }
 
-        if (index == 0) {
+        if (Microbot.getClient().isWidgetSelected()) {
+            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_NPC);
+        } else if (index == 0) {
             menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
         } else if (index == 1) {
             menuEntry.setType(MenuAction.NPC_SECOND_OPTION);
-
         } else if (index == 2) {
             menuEntry.setType(MenuAction.NPC_THIRD_OPTION);
 
@@ -256,8 +258,6 @@ public class Rs2Npc {
 
         } else if (index == 4) {
             menuEntry.setType(MenuAction.NPC_FIFTH_OPTION);
-        } else {
-            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_NPC);
         }
     }
 }
