@@ -673,6 +673,8 @@ public class Inventory {
         if (itemAction.equalsIgnoreCase("use")) {
             index = 0;
             menuEntry.setType(MenuAction.WIDGET_TARGET);
+        } else if(itemComposition.getName().contains("pouch") && itemAction.equalsIgnoreCase("empty")) {
+            index = 1;
         } else if (itemAction.equalsIgnoreCase("drink")
                 || itemAction.equalsIgnoreCase("read")
                 || itemAction.equalsIgnoreCase("eat")
@@ -681,8 +683,7 @@ public class Inventory {
             index = 2;
         } else if (itemAction.equalsIgnoreCase("wield")
                 || itemAction.equalsIgnoreCase("wear")
-                || itemAction.equalsIgnoreCase("check steps")
-        || itemComposition.getName().contains("pouch") && itemAction.equalsIgnoreCase("empty")) {
+                || itemAction.equalsIgnoreCase("check steps")) {
             index = 3;
         } else if (itemAction.equalsIgnoreCase("fill")) {
             index = 4;
