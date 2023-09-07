@@ -681,7 +681,8 @@ public class Inventory {
             index = 2;
         } else if (itemAction.equalsIgnoreCase("wield")
                 || itemAction.equalsIgnoreCase("wear")
-                || itemAction.equalsIgnoreCase("check steps")) {
+                || itemAction.equalsIgnoreCase("check steps")
+        || itemComposition.getName().contains("pouch") && itemAction.equalsIgnoreCase("empty")) {
             index = 3;
         } else if (itemAction.equalsIgnoreCase("fill")) {
             index = 4;
