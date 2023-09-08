@@ -3,11 +3,13 @@ package net.runelite.client.plugins.microbot.paydirt;
 import net.runelite.api.ItemID;
 import net.runelite.api.Varbits;
 import net.runelite.api.WallObject;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.walker.Walker;
 
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +26,10 @@ public class PayDirtScript extends Script {
 
                 if (Inventory.isFull()) {
                     if (Inventory.hasItem(ItemID.PAYDIRT)) {
+                        WorldPoint point = new WorldPoint(3748, 5673, Microbot.getClient().getPlane());
+                        Microbot.getWalker().walkFastCanvas(point);
+                        sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(point) <= 3, 60000);
+
                         Rs2GameObject.interact(26674);
                         sleepUntil(() -> Microbot.getVarbitValue(Varbits.SACK_NUMBER) != 0, 60000);
 

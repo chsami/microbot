@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 
 public class Rs2GameObject {
@@ -554,22 +553,10 @@ public class Rs2GameObject {
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
         try {
-
-            //We need to walk close enough to the object or the menuEntry in the
-            // handleMenuSwapper will crash because we calculate the sceneX and sceneY
-            if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(object.getWorldLocation()) > 17) {
-                Microbot.getWalker().walkTo(object.getWorldLocation(), false);
-                sleepUntil(() -> Microbot.isWalking());
-                sleepUntil(() -> !Microbot.isWalking());
-            }
-            //Never continue the code if the distance is bigger than 17 tiles
-            if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(object.getWorldLocation()) > 17)
-                return false;
-
             objectToInteract = object;
             objectAction = action;
             Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
-            sleep(100);
+            sleep(300);
             objectToInteract = null;
             objectAction = null;
         } catch (Exception ex) {
@@ -585,26 +572,23 @@ public class Rs2GameObject {
         menuEntry.setIdentifier(objectToInteract.getId());
 
         ObjectComposition objComp = convertGameObjectToObjectComposition(objectToInteract);
-
         if (objComp == null) return;
 
-        try {
-            GameObject gameObject = (GameObject) objectToInteract;
+        if (objectToInteract instanceof GameObject) {
+            GameObject obj = (GameObject) objectToInteract;
+            if (obj.sizeX() > 1) {
+                menuEntry.setParam0(obj.getLocalLocation().getSceneX() - obj.sizeX() / 2);
+            } else {
+                menuEntry.setParam0(obj.getLocalLocation().getSceneX());
+            }
 
-            if ((gameObject).sizeX() > 1) {
-                int offset = gameObject.sizeX() / 2;
-                menuEntry.setParam0(gameObject.getLocalLocation().getSceneX() - offset);
+            if (obj.sizeY() > 1) {
+                menuEntry.setParam1(obj.getLocalLocation().getSceneY() - obj.sizeY() / 2);
             } else {
-                menuEntry.setParam0(gameObject.getLocalLocation().getSceneX());
+                menuEntry.setParam1(obj.getLocalLocation().getSceneY());
             }
-            if (gameObject.sizeY() > 1) {
-                int offset = gameObject.sizeY() / 2;
-                menuEntry.setParam1(gameObject.getLocalLocation().getSceneY() - offset);
-            } else {
-                menuEntry.setParam1(gameObject.getLocalLocation().getSceneY());
-            }
-        } catch (Exception ex) {
-            //default objects like walls, groundobjects, decorationobjects etc...
+        } else {
+            // Default objects like walls, groundobjects, decorationobjects etc...
             menuEntry.setParam0(objectToInteract.getLocalLocation().getSceneX());
             menuEntry.setParam1(objectToInteract.getLocalLocation().getSceneY());
         }
@@ -612,26 +596,28 @@ public class Rs2GameObject {
         menuEntry.setTarget("");
         menuEntry.setOption(objectAction == null ? "" : objectAction);
 
-        int index = 0;
-
+        int index = -1;
         if (objectAction != null && !objectAction.isEmpty()) {
-            for (int i = 0; i < objComp.getActions().length; i++) {
-                if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
+            String[] actions;
+            if (objComp.getImpostor() != null) {
+                actions = objComp.getImpostor().getActions();
+            } else {
+                actions = objComp.getActions();
+            }
+
+            for (int i = 0; i < actions.length; i++) {
+                if (objectAction.equalsIgnoreCase(actions[i])) {
                     index = i;
+                    break;
                 }
             }
-            if (index == -1 && objComp.getImpostor() != null) {
-                for (int i = 0; i < objComp.getImpostor().getActions().length; i++) {
-                    if (objectAction.equalsIgnoreCase(objComp.getImpostor().getActions()[i])) {
-                        index = i;
-                    }
-                }
-            }
+        } else {
+            index = 0;
         }
 
         if (Microbot.getClient().isWidgetSelected()) {
             menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
-        } else if (index == 0) {
+        } if (index == 0) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
         } else if (index == 1) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);

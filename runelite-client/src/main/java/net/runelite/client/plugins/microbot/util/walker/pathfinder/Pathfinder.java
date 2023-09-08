@@ -72,7 +72,7 @@ public class Pathfinder implements Runnable {
     }
 
     public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target, boolean canReach) {
-        this(config, start, target, true, canReach, false, null);
+        this(config, start, target, false, canReach, false, null);
     }
 
     public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target, boolean useTransport, boolean canReach, boolean useCanvas, WorldArea[] blockingAreas) {
@@ -95,60 +95,54 @@ public class Pathfinder implements Runnable {
 
         final int teleportThreshHoldDistance = 20;
 
-        // No need to teleport if we are close to our target location
-        if (start.distanceTo(target) < teleportThreshHoldDistance) {
-            new Thread(this).start();
-            return;
-        }
+        if (useTransport && start.distanceTo(target) > teleportThreshHoldDistance && Microbot.getWalker().pathfinder.target == target) {
+            Tab.switchToInventoryTab();
 
-        if (!useTransport) return;
+            Teleport shortestPathSpell = null;
+            JewelleryLocationEnum shortestPathJewellery = null;
+            boolean hasTablet = false;
 
-        Tab.switchToInventoryTab();
+            // Teleport spells logic
+            for (Teleport teleport : Teleport.values()) {
+                if (teleport.getDestination().equals(start) || teleport.getDestination().distanceTo(target) < start.distanceTo(target)) {
+                    hasTablet = Inventory.hasItem(teleport.getTabletName());
+                    boolean hasRunes = true;
+                    for (Pair itemRequired : teleport.getItemsRequired()) {
+                        if (!Inventory.hasItemAmountStackable(itemRequired.getLeft().toString(), (int) itemRequired.getRight()))
+                            hasRunes = false;
+                    }
 
-        Teleport shortestPathSpell = null;
-        JewelleryLocationEnum shortestPathJewellery = null;
-        boolean hasTablet = false;
+                    if (hasRunes && Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC) >= teleport.getLevel()) {
+                        shortestPathSpell = teleport;
+                        break;
+                    }
 
-        // Teleport spells logic
-        for (Teleport teleport : Teleport.values()) {
-            if (teleport.getDestination().equals(start) || teleport.getDestination().distanceTo(target) < start.distanceTo(target)) {
-                hasTablet = Inventory.hasItem(teleport.getTabletName());
-                boolean hasRunes = true;
-                for (Pair itemRequired : teleport.getItemsRequired()) {
-                    if (!Inventory.hasItemAmountStackable(itemRequired.getLeft().toString(), (int) itemRequired.getRight()))
-                        hasRunes = false;
-                }
-
-                if (hasRunes && Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC) >= teleport.getLevel()) {
-                    shortestPathSpell = teleport;
-                    break;
-                }
-
-                if (hasTablet) {
-                    shortestPathSpell = teleport;
-                    break;
+                    if (hasTablet) {
+                        shortestPathSpell = teleport;
+                        break;
+                    }
                 }
             }
-        }
-        // Jewellery teleport logic
-        for (JewelleryLocationEnum jewelleryLocationEnum : JewelleryLocationEnum.values()) {
-            if (jewelleryLocationEnum.getLocation().equals(start)
-                    || jewelleryLocationEnum.getLocation().distanceTo(target) < start.distanceTo(target)
-                    && (shortestPathJewellery == null || shortestPathJewellery.getLocation().distanceTo(target) > jewelleryLocationEnum.getLocation().distanceTo(target))) {
-                shortestPathJewellery = jewelleryLocationEnum;
+            // Jewellery teleport logic
+            for (JewelleryLocationEnum jewelleryLocationEnum : JewelleryLocationEnum.values()) {
+                if (jewelleryLocationEnum.getLocation().equals(start)
+                        || jewelleryLocationEnum.getLocation().distanceTo(target) < start.distanceTo(target)
+                        && (shortestPathJewellery == null || shortestPathJewellery.getLocation().distanceTo(target) > jewelleryLocationEnum.getLocation().distanceTo(target))) {
+                    shortestPathJewellery = jewelleryLocationEnum;
+                }
             }
-        }
 
-        if (shortestPathSpell != null && shortestPathJewellery != null) {
-            if (shortestPathSpell.getDestination().distanceTo(target) <= shortestPathJewellery.getLocation().distanceTo(target)) {
+            if (shortestPathSpell != null && shortestPathJewellery != null) {
+                if (shortestPathSpell.getDestination().distanceTo(target) <= shortestPathJewellery.getLocation().distanceTo(target)) {
+                    useTeleport(shortestPathSpell, hasTablet);
+                } else {
+                    useJewellery(shortestPathJewellery);
+                }
+            } else if (shortestPathSpell != null) {
                 useTeleport(shortestPathSpell, hasTablet);
-            } else {
+            } else if (shortestPathJewellery != null) {
                 useJewellery(shortestPathJewellery);
             }
-        } else if (shortestPathSpell != null) {
-            useTeleport(shortestPathSpell, hasTablet);
-        } else if (shortestPathJewellery != null) {
-            useJewellery(shortestPathJewellery);
         }
 
         new Thread(this).start();
