@@ -23,7 +23,7 @@ public class PayDirtOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + ExampleScript.version)
+                    .text("Pay-dirt mining v" + ExampleScript.version)
                     .color(Color.GREEN)
                     .build());
 
@@ -32,12 +32,6 @@ public class PayDirtOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
                     .build());
-
-            for (Point point: Microbot.getMouse().mousePositions) {
-                graphics.setColor(Color.RED);
-                graphics.drawString("x", point.getX(), point.getY());
-            }
-
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }
