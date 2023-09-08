@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.kstarplugins.sandMiner
 
+import com.google.inject.Provides
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -7,10 +8,12 @@ import net.runelite.api.Client
 import net.runelite.api.Skill
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.events.GameTick
+import net.runelite.client.config.ConfigManager
 import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginDescriptor.Kstar
+import net.runelite.client.plugins.jrPlugins.autoVorkath.AutoVorkathConfig
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
@@ -36,6 +39,14 @@ class SandMiner : Plugin() {
 
     @Inject
     private lateinit var sandMinerOverlay: SandMinerOverlay
+
+    @Inject
+    private lateinit var config: SandMinerConfig
+
+    @Provides
+    fun getConfig(configManager: ConfigManager): SandMinerConfig {
+        return configManager.getConfig(SandMinerConfig::class.java)
+    }
 
     @Subscribe
     fun onGameTick(gameTick: GameTick?) {
@@ -74,7 +85,7 @@ class SandMiner : Plugin() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun startUp() {
         currentAction = Action.MINING
-        version = "1.0.0"
+        version = "1.0.1"
         startTime = System.currentTimeMillis()
         startingXp = client.getSkillExperience(Skill.MINING)
         currentRock = 0
@@ -107,6 +118,12 @@ class SandMiner : Plugin() {
         val thirdRock = findObjectByLocation(WorldPoint(3164, 2915, 0))
         val rocks = listOf(firstRock, secondRock, thirdRock)
         val startingPoint = WorldPoint(3166, 2914, 0)
+
+        if(config.dropClues() && Inventory.findItemContains("geode") != null) {
+            var geode = Inventory.findItemContains("geode").name.substringAfter(">").substringBefore('<')
+            Inventory.drop(geode)
+            println(geode)
+        }
 
         if(Inventory.isFull()) {
             currentAction = Action.DEPOSITING
