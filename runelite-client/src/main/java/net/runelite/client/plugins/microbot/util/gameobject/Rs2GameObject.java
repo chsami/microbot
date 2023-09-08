@@ -4,7 +4,6 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
 import java.util.*;
@@ -616,7 +615,9 @@ public class Rs2GameObject {
             index = 0;
         }
 
-        if (index == 0) {
+        if (Microbot.getClient().isWidgetSelected()) {
+            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
+        } if (index == 0) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
         } else if (index == 1) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
@@ -626,8 +627,6 @@ public class Rs2GameObject {
             menuEntry.setType(MenuAction.GAME_OBJECT_FOURTH_OPTION);
         } else if (index == 4) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIFTH_OPTION);
-        } else {
-            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
         }
     }
 }
