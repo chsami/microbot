@@ -9,7 +9,6 @@ import net.runelite.api.ObjectID
 import net.runelite.api.Skill
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.events.GameTick
-import net.runelite.client.callback.ClientThread
 import net.runelite.client.config.ConfigManager
 import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.plugins.Plugin
@@ -22,7 +21,6 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
@@ -229,10 +227,10 @@ class AutoZMIAltar : Plugin() {
         totalRuns += 1
         Inventory.interact(config.TELEPORT().toString())
         sleep(5400, 6000)
-        if (totalRuns % 3 == 0) fixPouches()
+        if (totalRuns % config.fixPouchesAt() == 0) fixPouches()
         if (config.STAMINA().toString() == "Ornate Pool") {
             Rs2GameObject.interact(ObjectID.ORNATE_POOL_OF_REJUVENATION, "Drink")
-            sleep(2400, 2500)
+            sleep(3000, 3100)
         }
         if (config.BANK().bankName == "Edgeville") {
             Rs2GameObject.interact(29156, "Edgeville")
@@ -260,22 +258,22 @@ class AutoZMIAltar : Plugin() {
     }
 
     private fun fillPouches() {
-        if (Inventory.hasItem("Giant Pouch") && Inventory.hasItem("Pure essence") && !giantPouchFilled) {
+        if (Inventory.hasItem("Giant Pouch") && Inventory.hasItemAmount("Pure essence", 12) && !giantPouchFilled) {
             Inventory.interact("Giant Pouch", "fill")
             sleep(50, 100)
             giantPouchFilled = true
         }
-        if (Inventory.hasItem("Small Pouch") && Inventory.hasItem("Pure essence") && !smallPouchFilled) {
+        if (Inventory.hasItem("Small Pouch") && Inventory.hasItemAmount("Pure essence", 3) && !smallPouchFilled) {
             Inventory.interact("Small Pouch", "fill")
             sleep(50, 100)
             smallPouchFilled = true
         }
-        if (Inventory.hasItem("Medium Pouch") && Inventory.hasItem("Pure essence") && !mediumPouchFilled) {
+        if (Inventory.hasItem("Medium Pouch") && Inventory.hasItemAmount("Pure essence", 6) && !mediumPouchFilled) {
             Inventory.interact("Medium Pouch", "fill")
             sleep(50, 100)
             mediumPouchFilled = true
         }
-        if (Inventory.hasItem("Large Pouch") && Inventory.hasItem("Pure essence") && !largePouchFilled) {
+        if (Inventory.hasItem("Large Pouch") && Inventory.hasItemAmount("Pure essence", 9) && !largePouchFilled) {
             Inventory.interact("Large Pouch", "fill")
             sleep(50, 100)
             largePouchFilled = true
@@ -283,13 +281,6 @@ class AutoZMIAltar : Plugin() {
     }
 
     private fun emptyPouches() {
-        if (Inventory.hasItem("Giant Pouch")) {
-            Inventory.useAllItemsFastContains("Giant Pouch", "Empty")
-            sleep(1200, 1300)
-            giantPouchFilled = false
-            Rs2GameObject.interact(29631, "Craft-rune")
-            sleep(600, 800)
-        }
         if (Inventory.hasItem("Large Pouch")) {
             Inventory.useAllItemsFastContains("Large Pouch", "Empty")
             sleep(1200, 1300)
@@ -310,6 +301,15 @@ class AutoZMIAltar : Plugin() {
             smallPouchFilled = false
             Rs2GameObject.interact(29631, "Craft-rune")
             sleep(600, 800)
+        }
+        if (Inventory.hasItem("Giant Pouch")) {
+            for (i in 0..1){
+                Inventory.useAllItemsFastContains("Giant Pouch", "Empty")
+                sleep(1200, 1300)
+                Rs2GameObject.interact(29631, "Craft-rune")
+                sleep(600, 800)
+            }
+            giantPouchFilled = false
         }
     }
 
