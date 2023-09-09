@@ -67,5 +67,15 @@ public interface AutoZMIAltarConfig extends Config {
     default STAMINA STAMINA() {
         return STAMINA.ORNATEPOOL;
     }
+
+    @ConfigItem(
+            keyName = "fixPouches",
+            name = "Fix Pouches",
+            description = "How many runs until fix pouches?",
+            position = 6
+    )
+    default int fixPouchesAt() {
+        return 9;
+    }
 }
 
