@@ -599,7 +599,7 @@ public class Rs2GameObject {
         int index = -1;
         if (objectAction != null && !objectAction.isEmpty()) {
             String[] actions;
-            if (objComp.getImpostor() != null) {
+            if (objComp.getImpostorIds() != null && objComp.getImpostor() != null) {
                 actions = objComp.getImpostor().getActions();
             } else {
                 actions = objComp.getActions();
