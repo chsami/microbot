@@ -56,6 +56,17 @@ public class Global {
         } while (!done && System.currentTimeMillis() - startTime < time);
     }
 
+    public static boolean sleepUntilTrue(BooleanSupplier awaitedCondition, int time, int timeout) {
+        long startTime = System.currentTimeMillis();
+        do {
+            if (awaitedCondition.getAsBoolean()) {
+                return true;
+            }
+            sleep(time);
+        } while (System.currentTimeMillis() - startTime < timeout);
+        return false;
+    }
+
     public static void sleepUntilOnClientThread(BooleanSupplier awaitedCondition) {
         sleepUntilOnClientThread(awaitedCondition, Random.random(2500, 5000));
     }
