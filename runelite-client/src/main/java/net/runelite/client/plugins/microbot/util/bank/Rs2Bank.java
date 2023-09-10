@@ -386,11 +386,7 @@ public class Rs2Bank {
     public static boolean walkToBank() {
         BankLocation bankLocation = getNearestBank();
         Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
-        if (bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 4) {
-            Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
-            return false;
-        }
-        return true;
+        return bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;
     }
 
     public static boolean withdrawItemsRequired(List<ItemRequirement> itemsRequired) {
@@ -421,13 +417,15 @@ public class Rs2Bank {
     public static BankLocation getNearestBank() {
         BankLocation nearest = null;
         double dist = Double.MAX_VALUE;
-        WorldPoint local = Microbot.getClient().getLocalPlayer().getWorldLocation();
+        int y = Microbot.getClient().getLocalPlayer().getWorldLocation().getY();
+        boolean isInCave = Microbot.getClient().getLocalPlayer().getWorldLocation().getY() > 9000;
+        if (isInCave) {
+            y -= 6300; //minus -6300 to set y to the surface
+        }
+        WorldPoint local = new WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(), y, Microbot.getClient().getPlane());
         for (BankLocation bankLocation : BankLocation.values())
         {
-            double currDist = local.distanceTo(bankLocation.getWorldPoint());
-            if (bankLocation.getWorldPoint().getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
-                currDist = local.distanceTo(new WorldPoint(bankLocation.getWorldPoint().getX(), bankLocation.getWorldPoint().getY(), Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()));
-            }
+            double currDist = local.distanceTo2D(bankLocation.getWorldPoint());
             if (nearest == null || currDist < dist)
             {
                 dist = currDist;

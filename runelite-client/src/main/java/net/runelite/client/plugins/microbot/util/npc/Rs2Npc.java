@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
@@ -139,8 +140,9 @@ public class Rs2Npc {
             else
                 return npcs.stream()
                         .filter(x -> x != null && x.getName().toLowerCase().equalsIgnoreCase(name.toLowerCase()))
-                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .findAny().orElse(null);
+                        .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                        .get();
+
         });
     }
 
@@ -161,21 +163,20 @@ public class Rs2Npc {
             else
                 return npcs.stream()
                         .filter(x -> x != null && x.getId() == id)
-                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .findFirst().orElse(null);
+                        .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                        .orElse(null);
         });
     }
 
-    public static NPC getNpc(int id, List<Integer> excludedIndexes) {
+    public static Optional<NPC> getNpc(int id, List<Integer> excludedIndexes) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             List<NPC> npcs = Arrays.stream(getNpcs()).collect(Collectors.toList());
             if (npcs.isEmpty())
-                return null;
+                return Optional.empty();
             else
                 return npcs.stream()
                         .filter(x -> x != null && x.getId() == id && !excludedIndexes.contains(x.getIndex()))
-                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .findFirst().orElse(null);
+                        .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
         });
     }
 
