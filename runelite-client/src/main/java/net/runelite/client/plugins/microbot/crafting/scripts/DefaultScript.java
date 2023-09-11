@@ -1,7 +1,8 @@
-package net.runelite.client.plugins.microbot.crafting;
+package net.runelite.client.plugins.microbot.crafting.scripts;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -10,7 +11,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
-public class CraftingScript extends Script {
+public class DefaultScript extends Script {
     public boolean run(CraftingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
