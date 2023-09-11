@@ -613,64 +613,68 @@ public class Rs2GameObject {
     public static void handleMenuSwapper(MenuEntry menuEntry) {
         if (objectToInteract == null) return;
 
-        menuEntry.setIdentifier(objectToInteract.getId());
+        try {
+            menuEntry.setIdentifier(objectToInteract.getId());
 
-        ObjectComposition objComp = convertGameObjectToObjectComposition(objectToInteract);
-        if (objComp == null) return;
+            ObjectComposition objComp = convertGameObjectToObjectComposition(objectToInteract);
+            if (objComp == null) return;
 
-        if (objectToInteract instanceof GameObject) {
-            GameObject obj = (GameObject) objectToInteract;
-            if (obj.sizeX() > 1) {
-                menuEntry.setParam0(obj.getLocalLocation().getSceneX() - obj.sizeX() / 2);
-            } else {
-                menuEntry.setParam0(obj.getLocalLocation().getSceneX());
-            }
-
-            if (obj.sizeY() > 1) {
-                menuEntry.setParam1(obj.getLocalLocation().getSceneY() - obj.sizeY() / 2);
-            } else {
-                menuEntry.setParam1(obj.getLocalLocation().getSceneY());
-            }
-        } else {
-            // Default objects like walls, groundobjects, decorationobjects etc...
-            menuEntry.setParam0(objectToInteract.getLocalLocation().getSceneX());
-            menuEntry.setParam1(objectToInteract.getLocalLocation().getSceneY());
-        }
-
-        menuEntry.setTarget("");
-        menuEntry.setOption(objectAction == null ? "" : objectAction);
-
-        int index = -1;
-        if (objectAction != null && !objectAction.isEmpty()) {
-            String[] actions;
-            if (objComp.getImpostorIds() != null) {
-                actions = objComp.getImpostor().getActions();
-            } else {
-                actions = objComp.getActions();
-            }
-
-            for (int i = 0; i < actions.length; i++) {
-                if (objectAction.equalsIgnoreCase(actions[i])) {
-                    index = i;
-                    break;
+            if (objectToInteract instanceof GameObject) {
+                GameObject obj = (GameObject) objectToInteract;
+                if (obj.sizeX() > 1) {
+                    menuEntry.setParam0(obj.getLocalLocation().getSceneX() - obj.sizeX() / 2);
+                } else {
+                    menuEntry.setParam0(obj.getLocalLocation().getSceneX());
                 }
-            }
-        } else {
-            index = 0;
-        }
 
-        if (Microbot.getClient().isWidgetSelected()) {
-            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
-        } if (index == 0) {
-            menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
-        } else if (index == 1) {
-            menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
-        } else if (index == 2) {
-            menuEntry.setType(MenuAction.GAME_OBJECT_THIRD_OPTION);
-        } else if (index == 3) {
-            menuEntry.setType(MenuAction.GAME_OBJECT_FOURTH_OPTION);
-        } else if (index == 4) {
-            menuEntry.setType(MenuAction.GAME_OBJECT_FIFTH_OPTION);
+                if (obj.sizeY() > 1) {
+                    menuEntry.setParam1(obj.getLocalLocation().getSceneY() - obj.sizeY() / 2);
+                } else {
+                    menuEntry.setParam1(obj.getLocalLocation().getSceneY());
+                }
+            } else {
+                // Default objects like walls, groundobjects, decorationobjects etc...
+                menuEntry.setParam0(objectToInteract.getLocalLocation().getSceneX());
+                menuEntry.setParam1(objectToInteract.getLocalLocation().getSceneY());
+            }
+
+            menuEntry.setTarget("");
+            menuEntry.setOption(objectAction == null ? "" : objectAction);
+
+            int index = -1;
+            if (objectAction != null && !objectAction.isEmpty()) {
+                String[] actions;
+                if (objComp.getImpostorIds() != null) {
+                    actions = objComp.getImpostor().getActions();
+                } else {
+                    actions = objComp.getActions();
+                }
+
+                for (int i = 0; i < actions.length; i++) {
+                    if (objectAction.equalsIgnoreCase(actions[i])) {
+                        index = i;
+                        break;
+                    }
+                }
+            } else {
+                index = 0;
+            }
+
+            if (Microbot.getClient().isWidgetSelected()) {
+                menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
+            } if (index == 0) {
+                menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
+            } else if (index == 1) {
+                menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
+            } else if (index == 2) {
+                menuEntry.setType(MenuAction.GAME_OBJECT_THIRD_OPTION);
+            } else if (index == 3) {
+                menuEntry.setType(MenuAction.GAME_OBJECT_FOURTH_OPTION);
+            } else if (index == 4) {
+                menuEntry.setType(MenuAction.GAME_OBJECT_FIFTH_OPTION);
+            }
+        } catch(Exception ex) {
+            System.out.println("GAME OBJECT MENU SWAP FAILED WITH MESSAGE: " + ex.getMessage());
         }
     }
 }
