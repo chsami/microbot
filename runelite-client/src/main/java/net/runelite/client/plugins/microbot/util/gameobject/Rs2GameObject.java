@@ -6,7 +6,6 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.walker.Transport;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -597,16 +596,15 @@ public class Rs2GameObject {
         return true;
     }
 
-    public static boolean hasLineOfSight(TileObject tileObject, Transport transport) {
+    public static boolean hasLineOfSight(TileObject tileObject) {
         if (tileObject == null) return true;
         if (tileObject instanceof GameObject) {
             GameObject gameObject = (GameObject) tileObject;
+            WorldPoint worldPoint = WorldPoint.fromScene(Microbot.getClient(), gameObject.getSceneMinLocation().getX(), gameObject.getSceneMinLocation().getY(), gameObject.getPlane());
             return new WorldArea(
-                    transport.origin.getX(),
-                    transport.origin.getY(),
-                    gameObject.sizeX() + 2,
-                    gameObject.sizeY() + 2,
-                    gameObject.getPlane())
+                    worldPoint,
+                    gameObject.sizeX(),
+                    gameObject.sizeY())
                     .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
         }
         return true;

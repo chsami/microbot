@@ -2,7 +2,9 @@ package net.runelite.client.plugins.microbot.util.walker.pathfinder;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.*;
+import net.runelite.api.Point;
+import net.runelite.api.Skill;
+import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -24,7 +26,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.Deque;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 import static net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap.wallNodes;
@@ -127,12 +128,12 @@ public class Pathfinder implements Runnable {
             }
             // Jewellery teleport logic
             for (JewelleryLocationEnum jewelleryLocationEnum : JewelleryLocationEnum.values()) {
-                if (!Rs2Equipment.hasEquippedContains(jewelleryLocationEnum.getTooltip() + "(")
-                        && !Inventory.hasItemContains(jewelleryLocationEnum.getTooltip() + "("))
-                    continue;
                 if (jewelleryLocationEnum.getLocation().distanceTo2D(target) >= start.distanceTo2D(target))
                     continue;
                 if (jewelleryLocationEnum.getLocation().distanceTo2D(target) > tunnel.destination.distanceTo2D(target))
+                    continue;
+                if (!Rs2Equipment.hasEquippedContains(jewelleryLocationEnum.getTooltip() + "(")
+                        && !Inventory.hasItemContains(jewelleryLocationEnum.getTooltip() + "("))
                     continue;
                 if (shortestPathJewellery != null && shortestPathJewellery.getLocation().distanceTo2D(target) <= jewelleryLocationEnum.getLocation().distanceTo2D(target))
                     continue;
@@ -326,7 +327,7 @@ public class Pathfinder implements Runnable {
             if (transport == null) continue;
             if (Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), transport.origin))) {
                 TileObject tileObject = Rs2GameObject.findObjectByLocation(transport.origin);
-                if (!Rs2GameObject.hasLineOfSight(tileObject, transport)) continue;
+                if (!Rs2GameObject.hasLineOfSight(tileObject)) continue;
                 Rs2GameObject.interact(tileObject);
                 sleepUntil(Microbot::isAnimating);
                 sleepUntil(() -> !Microbot.isAnimating());
@@ -371,7 +372,7 @@ public class Pathfinder implements Runnable {
                     this.target = new WorldPoint(this.target.getX() + useCurrentTransport.offsetX, this.target.getY() + useCurrentTransport.offsetY, this.target.getPlane());
                 }
                 TileObject tileObject = Rs2GameObject.findObjectByLocation(this.target);
-                if (!Rs2GameObject.hasLineOfSight(tileObject, useCurrentTransport)) return false;
+                if (!Rs2GameObject.hasLineOfSight(tileObject)) return false;
                 Rs2GameObject.interact(tileObject, this.useCurrentTransport.getAction());
                 int currentPlane = Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane();
                 sleepUntil(() -> currentPlane != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane());
