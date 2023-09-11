@@ -22,7 +22,7 @@ class ProgressiveGlassblowingModel {
 
 public class GlassblowingScript extends Script {
 
-    public static double version = 1.0;
+    public static double version = 2.0;
     ProgressiveGlassblowingModel model = new ProgressiveGlassblowingModel();
 
     String moltenGlass = "molten glass";
@@ -104,19 +104,19 @@ public class GlassblowingScript extends Script {
 
     public ProgressiveGlassblowingModel calculateItemToCraft() {
         int craftinglvl = Microbot.getClient().getRealSkillLevel(Skill.CRAFTING);
-        if (craftinglvl < 4) {
+        if (craftinglvl < Glass.CANDLE_LANTERN.getLevelRequired()) {
             model.setItemToCraft(Glass.BEER_GLASS);
-        } else if (craftinglvl < 12) {
+        } else if (craftinglvl < Glass.OIL_LAMP.getLevelRequired()) {
             model.setItemToCraft(Glass.CANDLE_LANTERN);
-        } else if (craftinglvl < 33) {
+        } else if (craftinglvl < Glass.VIAL.getLevelRequired()) {
             model.setItemToCraft(Glass.OIL_LAMP);
-        } else if (craftinglvl < 42) {
+        } else if (craftinglvl < Glass.FISHBOWL.getLevelRequired()) {
             model.setItemToCraft(Glass.VIAL);
-        } else if (craftinglvl < 46) {
+        } else if (craftinglvl < Glass.UNPOWERED_ORB.getLevelRequired()) {
             model.setItemToCraft(Glass.FISHBOWL);
-        } else if (craftinglvl < 49) {
+        } else if (craftinglvl < Glass.LANTERN_LENS.getLevelRequired()) {
             model.setItemToCraft(Glass.UNPOWERED_ORB);
-        } else if (craftinglvl < 87) {
+        } else if (craftinglvl < Glass.LIGHT_ORB.getLevelRequired()) {
             model.setItemToCraft(Glass.LANTERN_LENS);
         } else if (craftinglvl < 99) {
             model.setItemToCraft(Glass.LIGHT_ORB);
