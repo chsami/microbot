@@ -24,6 +24,8 @@ import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.event.EventHandler;
+import net.runelite.client.plugins.microbot.util.event.EventSelector;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
@@ -36,6 +38,7 @@ import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.plugins.microbot.walker.pathfinder.WorldDataDownloader;
 import net.runelite.client.plugins.microbot.walking.WalkingScript;
+import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
@@ -62,6 +65,8 @@ public class MicrobotPlugin extends Plugin {
     @Inject
     private ClientThread clientThread;
     @Inject
+    private ClientToolbar clientToolbar;
+    @Inject
     Notifier notifier;
     @Inject
     WorldService worldService;
@@ -85,6 +90,7 @@ public class MicrobotPlugin extends Plugin {
     public MiningScript miningScript;
     public WalkingScript walkingScript;
     public SummerGardenScript summerGardenScript;
+    private EventSelector eventSelector;
 
 
     QuestScript questScript;
@@ -100,16 +106,21 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setNpcManager(npcManager);
         Microbot.setWalker(new Walker());
         Microbot.setMouse(new VirtualMouse());
+        Microbot.setEventHandler(new EventHandler());
         Microbot.setSpriteManager(spriteManager);
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }
+
+        eventSelector = new EventSelector(clientToolbar);
+        eventSelector.startUp();
 
         WorldDataDownloader worldDataDownloader = new WorldDataDownloader();
         worldDataDownloader.run();
     }
 
     protected void shutDown() {
+        eventSelector.shutDown();
         overlayManager.remove(microbotOverlay);
         Microbot.setWalker(null);
         if (cookingScript != null) {

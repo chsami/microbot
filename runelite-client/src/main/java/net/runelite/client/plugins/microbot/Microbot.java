@@ -14,6 +14,7 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
+import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
@@ -26,6 +27,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class Microbot {
+    @Getter
+    @Setter
+    private static EventHandler eventHandler;
     @Getter
     @Setter
     private static Mouse mouse;
