@@ -2,9 +2,7 @@ package net.runelite.client.plugins.microbot.util.walker.pathfinder;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.Point;
-import net.runelite.api.Skill;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -26,6 +24,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.Deque;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 import static net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap.wallNodes;
@@ -194,7 +193,14 @@ public class Pathfinder implements Runnable {
 
     private void precalculateTransports(WorldPoint start, WorldPoint target, boolean useTransport) {
         if (useTransport) {
-            if (target.getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
+            if (start.getY() >= 9000 && target.getY() < 9000) {
+                // Use object to go surface
+                Transport transportSurface = getClosestTunnel();
+                if (transportSurface != null) {
+                    this.target = transportSurface.getOrigin();
+                    this.useCurrentTransport = transportSurface;
+                }
+            } else if (target.getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
                 //custom logic for staircase/ladders
                 Transport linkedTransport = getMatchingTransport(Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane());
                 while (linkedTransport != null) {
@@ -219,21 +225,12 @@ public class Pathfinder implements Runnable {
                     }
                     linkedTransport = linkedTransport.linkedTransport;
                 }
-            } else {
-                if (start.getY() < 9000 && target.getY() > 9000) {
-                    // Use object to go underground
-                    Transport transportUnderground = getClosestTransport(target);
-                    if (transportUnderground != null) {
-                        this.target = transportUnderground.getOrigin();
-                        this.useCurrentTransport = transportUnderground;
-                    }
-                } else if (start.getY() >= 9000 && target.getY() < 9000) {
-                    // Use object to go surface
-                    Transport transportSurface = getClosestTransport(target);
-                    if (transportSurface != null) {
-                        this.target = transportSurface.getDestination();
-                        this.useCurrentTransport = transportSurface;
-                    }
+            } else  if (start.getY() < 9000 && target.getY() > 9000) {
+                // Use object to go underground
+                Transport transportUnderground = getClosestTunnel();
+                if (transportUnderground != null) {
+                    this.target = transportUnderground.getOrigin();
+                    this.useCurrentTransport = transportUnderground;
                 }
             }
         }
@@ -329,6 +326,7 @@ public class Pathfinder implements Runnable {
             if (transport == null) continue;
             if (Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), transport.origin))) {
                 TileObject tileObject = Rs2GameObject.findObjectByLocation(transport.origin);
+                if (!Rs2GameObject.hasLineOfSight(tileObject, transport)) continue;
                 Rs2GameObject.interact(tileObject);
                 sleepUntil(Microbot::isAnimating);
                 sleepUntil(() -> !Microbot.isAnimating());
@@ -373,6 +371,7 @@ public class Pathfinder implements Runnable {
                     this.target = new WorldPoint(this.target.getX() + useCurrentTransport.offsetX, this.target.getY() + useCurrentTransport.offsetY, this.target.getPlane());
                 }
                 TileObject tileObject = Rs2GameObject.findObjectByLocation(this.target);
+                if (!Rs2GameObject.hasLineOfSight(tileObject, useCurrentTransport)) return false;
                 Rs2GameObject.interact(tileObject, this.useCurrentTransport.getAction());
                 int currentPlane = Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane();
                 sleepUntil(() -> currentPlane != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane());
@@ -400,18 +399,6 @@ public class Pathfinder implements Runnable {
         return skip;
     }
 
-    public Transport getClosestTransport(WorldPoint worldPoint) {
-        WorldPoint transportKey = PathfinderConfig.getTransports().keySet().stream().min(Comparator.comparingInt((WorldPoint w) -> w.distanceTo(worldPoint))).orElse(null);
-        List<Transport> matchingTransports = PathfinderConfig.getTransports().values().stream()
-                .filter(x -> x.get(0).getDestination() == transportKey)
-                .findFirst().orElse(null);
-
-        if (matchingTransports != null) {
-            return matchingTransports.get(0);
-        }
-        return null;
-    }
-
     public Transport getMatchingTransport(WorldPoint worldPoint) {
         List<Transport> matchingTransports = PathfinderConfig.getTransports().get(worldPoint);
         if (matchingTransports == null || matchingTransports.isEmpty()) return null;
@@ -420,16 +407,17 @@ public class Pathfinder implements Runnable {
 
     public Transport getClosestTunnel() {
         Transport closestTunnel = null;
+        WorldPoint playerPosition = Microbot.getClient().getLocalPlayer().getWorldLocation();
         for (Map.Entry<WorldPoint, List<Transport>> entry : PathfinderConfig.getTransports().entrySet()) {
             Transport transport = entry
                     .getValue()
                     .stream()
-                    .filter(x -> x.getDestination().getY() > 9000)
-                    .min(Comparator.comparingInt((Transport t) -> t.destination.distanceTo2D(target))).orElse(null);
+                    .filter(x -> x.getOrigin().getY() > 9000 || x.getDestination().getY() > 9000)
+                    .min(Comparator.comparingInt((Transport t) -> t.origin.distanceTo2D(playerPosition))).orElse(null);
 
             if (transport == null)
                 continue;
-            if (closestTunnel != null && closestTunnel.origin.distanceTo2D(target) <= transport.origin.distanceTo(target))
+            if (closestTunnel != null && closestTunnel.origin.distanceTo2D(playerPosition) <= transport.origin.distanceTo2D(playerPosition))
                 continue;
 
             closestTunnel = transport;
@@ -454,7 +442,7 @@ public class Pathfinder implements Runnable {
                     if (closestTransportNode != null) {
                         closestTransportNodeDistance = closestTransportNode.destination.distanceTo2D(target) + closestTransportNode.destination.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation());
                         transportDistance = transport.destination.distanceTo2D(target) + transport.destination.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation());
-                        boolean isCloserTransport = transportDistance <= closestTransportNodeDistance && transport.priority <= closestTransportNode.priority;
+                        boolean isCloserTransport = transportDistance <= closestTransportNodeDistance  || (transport.priority > closestTransportNode.priority && transportDistance < 50);
                         if (!isCloserTransport)
                             continue;
                     }

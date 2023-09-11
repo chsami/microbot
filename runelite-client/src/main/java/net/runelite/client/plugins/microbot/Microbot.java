@@ -5,6 +5,8 @@ import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.Skill;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ProfileManager;
@@ -134,5 +136,9 @@ public class Microbot {
         Microbot.getClient().openWorldHopper();
         Microbot.getClient().hopToWorld(rsWorld);
         quickHopTargetWorld = null;
+    }
+
+    public static boolean hasTileBeenLoaded(WorldPoint worldPoint) {
+        return LocalPoint.fromWorld(Microbot.getClient(), worldPoint) != null;
     }
 }

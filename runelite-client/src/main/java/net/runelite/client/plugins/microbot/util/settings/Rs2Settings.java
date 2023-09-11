@@ -12,6 +12,9 @@ import static net.runelite.client.plugins.microbot.util.globval.VarbitIndices.TO
 
 public class Rs2Settings {
     public static boolean enableDropShiftSetting() {
+        if (Rs2Widget.hasWidget("Click here to continue")) {
+            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+        }
         final int DROP_SHIFT_SETTING = 5542;
         if (Microbot.getVarbitValue(DROP_SHIFT_SETTING) == 0) {
             final int ALL_SETTINGS_BUTTON = 7602208;
