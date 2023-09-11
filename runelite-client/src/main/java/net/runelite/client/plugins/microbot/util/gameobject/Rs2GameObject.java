@@ -6,6 +6,7 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -661,8 +662,9 @@ public class Rs2GameObject {
             }
 
             if (Microbot.getClient().isWidgetSelected()) {
+                Rs2Reflection.setItemId(menuEntry,-1);
                 menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
-            } if (index == 0) {
+            } else if (index == 0) {
                 menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
             } else if (index == 1) {
                 menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);

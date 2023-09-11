@@ -324,6 +324,6 @@ public class MicrobotPlugin extends Plugin {
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event)
     {
-        // System.out.println(event.getMenuEntry());
+         System.out.println(event.getMenuEntry());
     }
 }

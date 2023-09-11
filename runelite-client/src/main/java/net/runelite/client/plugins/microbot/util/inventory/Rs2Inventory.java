@@ -4,6 +4,7 @@ import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
+@Deprecated
 public class Rs2Inventory {
 
     public static Rs2Item item;
@@ -1120,11 +1122,7 @@ public class Rs2Inventory {
             menuEntry.setType(MenuAction.CC_OP);
         }
 
-        Arrays.stream(menuEntry.getClass().getMethods())
-                .filter(x -> x.getReturnType().getName() == "void" && x.getParameters().length > 0 && x.getParameters()[0].getType().getName() == "int")
-                .collect(Collectors.toList())
-                .get(0)
-                .invoke(menuEntry, item.id); //use the setItemId method through reflection
+        Rs2Reflection.setItemId(menuEntry, item.id);
 
         if (itemAction.equalsIgnoreCase("use")) {
             index = 0;

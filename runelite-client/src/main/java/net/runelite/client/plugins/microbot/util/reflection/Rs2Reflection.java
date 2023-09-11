@@ -2,9 +2,11 @@ package net.runelite.client.plugins.microbot.util.reflection;
 
 import lombok.SneakyThrows;
 import net.runelite.api.ItemComposition;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.NPC;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +34,14 @@ public class Rs2Reflection {
             }
         }
         return new String[] {};
+    }
+    @SneakyThrows
+    public static void setItemId(MenuEntry menuEntry, int itemId) throws IllegalAccessException, InvocationTargetException {
+        Arrays.stream(menuEntry.getClass().getMethods())
+                .filter(x -> x.getReturnType().getName() == "void" && x.getParameters().length > 0 && x.getParameters()[0].getType().getName() == "int")
+                .collect(Collectors.toList())
+                .get(0)
+                .invoke(menuEntry, itemId); //use the setItemId method through reflection
     }
 
 }
