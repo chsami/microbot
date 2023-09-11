@@ -182,6 +182,7 @@ public class Walker {
         PathWalker pathWalker = new PathWalker(nodes);
         pathWalker.walkPath();
 
+        PathFinder.Companion.resetPath();
         return player.getWorldLocation().distanceTo(endWorldPoint) <= 3;
     }
 
