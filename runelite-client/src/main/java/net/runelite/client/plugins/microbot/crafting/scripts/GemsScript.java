@@ -1,8 +1,9 @@
-package net.runelite.client.plugins.microbot.crafting;
+package net.runelite.client.plugins.microbot.crafting.scripts;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -11,7 +12,7 @@ import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
 
-public class GemCraftingScript extends Script {
+public class GemsScript extends Script {
 
     public static double version = 1.0;
 
