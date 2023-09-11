@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.alfred.api.rs.walk.pathfinder
+package net.runelite.client.plugins.microbot.walker.pathfinder
 
 import net.runelite.api.GameObject
 import net.runelite.api.Perspective

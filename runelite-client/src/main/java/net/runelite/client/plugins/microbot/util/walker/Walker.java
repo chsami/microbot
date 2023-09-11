@@ -5,10 +5,6 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.alfred.api.rs.walk.pathfinder.PathFinder;
-import net.runelite.client.plugins.alfred.api.rs.walk.pathfinder.PathNode;
-import net.runelite.client.plugins.alfred.api.rs.walk.pathfinder.PathWalker;
-import net.runelite.client.plugins.alfred.api.rs.walk.pathfinder.SavedWorldDataLoader;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
@@ -16,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
+import net.runelite.client.plugins.microbot.walker.pathfinder.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,7 +152,7 @@ public class Walker {
 
     private List<PathNode> getPath(WorldPoint startWorldPoint, WorldPoint endWorldPoint) {
         long startTimeDateLoad = System.currentTimeMillis();
-        SavedWorldDataLoader savedWorldDataLoader = new SavedWorldDataLoader();
+        SavedWorldDataLoader savedWorldDataLoader = new SavedWorldDataLoader(WorldDataDownloader.Companion.getWorldDataFile());
         PathNode[][][] grid = savedWorldDataLoader.getGrid();
         long endTimeDataLoad = System.currentTimeMillis();
 

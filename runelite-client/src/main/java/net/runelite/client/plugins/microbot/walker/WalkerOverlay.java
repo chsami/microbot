@@ -2,10 +2,10 @@ package net.runelite.client.plugins.microbot.walker;
 
 import net.runelite.api.Perspective;
 import net.runelite.api.Tile;
-import net.runelite.client.plugins.alfred.api.rs.walk.pathfinder.PathFinder;
-import net.runelite.client.plugins.alfred.api.rs.walk.pathfinder.PathNode;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.walker.pathfinder.PathFinder;
+import net.runelite.client.plugins.microbot.walker.pathfinder.PathNode;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 

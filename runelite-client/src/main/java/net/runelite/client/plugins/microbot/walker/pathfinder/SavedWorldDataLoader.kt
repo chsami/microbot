@@ -1,51 +1,11 @@
-package net.runelite.client.plugins.alfred.api.rs.walk.pathfinder
+package net.runelite.client.plugins.microbot.walker.pathfinder
 
 import net.runelite.api.coords.WorldPoint
-import net.runelite.client.RuneLite
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
 import java.sql.DriverManager
 
 
-class SavedWorldDataLoader {
-
-    val worldDataFile: File = File(RuneLite.CACHE_DIR, "worlddata.public.sqlite3")
-    val worldDataUrl: String = "https://raw.githubusercontent.com/GriffinBoris/OSRSWorldData/master/db.public.sqlite3"
-
-    init {
-        if (!worldDataFile.exists()) {
-            println("Static Walker: World data file not found")
-            downloadWorldData()
-        }
-    }
-
-    private fun downloadWorldData() {
-        val request = Request.Builder().url(worldDataUrl).build()
-
-        try {
-            OkHttpClient().newCall(request).execute().use { response ->
-                println("Static Walker: Downloading world data")
-
-                if (!response.isSuccessful()) {
-                    println("Static Walker: Failed to download world data")
-                    throw IOException("unsuccessful response looking up worlds")
-                }
-
-                val inputStream: InputStream = response.body()?.byteStream() ?: throw IOException("No response body when downloading world data")
-                FileOutputStream(worldDataFile, false).use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
-            }
-        } catch (ex: IOException) {
-            throw IOException(ex)
-        }
-    }
-
-
+class SavedWorldDataLoader(private val worldDataFile: File) {
     fun getGrid(): Array<Array<Array<PathNode?>>> {
         val nodes = readNodes()
         val transports = readTransports(nodes)
