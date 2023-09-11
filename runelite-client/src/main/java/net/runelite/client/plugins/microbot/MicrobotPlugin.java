@@ -320,4 +320,10 @@ public class MicrobotPlugin extends Plugin {
         .setType(MenuAction.RUNELITE)
         .onClick(worldMapConsumer()));
     }
+
+    @Subscribe
+    public void onMenuOptionClicked(MenuOptionClicked event)
+    {
+        System.out.println(event.getMenuEntry());
+    }
 }
