@@ -74,6 +74,8 @@ public class Microbot {
     }
 
     public static Client getClientForKotlin() { return client; }
+    public static ClientThread getClientThreadForKotlin() { return clientThread; }
+
     public static Mouse getMouseForKotlin() { return mouse; }
 
     public static boolean isWalking() {

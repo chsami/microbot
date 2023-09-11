@@ -80,8 +80,10 @@ class PathWalker(private val nodes: List<PathNode>) {
     }
 
     private fun getMinimapPoint(worldPoint: WorldPoint): Point? {
-        val localPoint = LocalPoint.fromWorld(Microbot.getClientForKotlin(), worldPoint) ?: return null
-        return Perspective.localToMinimap(Microbot.getClientForKotlin(), localPoint)
+        return Microbot.getClientThreadForKotlin().runOnClientThread {
+            val localPoint = LocalPoint.fromWorld(Microbot.getClientForKotlin(), worldPoint) ?: return@runOnClientThread null
+            return@runOnClientThread Perspective.localToMinimap(Microbot.getClientForKotlin(), localPoint)
+        }
     }
 
     private fun clickPoint(minimapPoint: Point) {

@@ -10,7 +10,12 @@ class PathFinder(private val grid: Array<Array<Array<PathNode?>>>) {
         fun get(): List<PathNode> {
             return path
         }
+
+        fun resetPath() {
+            path = emptyList()
+        }
     }
+
 
     fun findPath(startPoint: WorldPoint, endPoint: WorldPoint): List<PathNode> {
         val startNode = grid[startPoint.plane][startPoint.y][startPoint.x]
