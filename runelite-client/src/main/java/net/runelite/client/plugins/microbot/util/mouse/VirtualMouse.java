@@ -87,6 +87,11 @@ public class VirtualMouse extends Mouse {
     }
 
     @Override
+    public Mouse rightClick(Rectangle rectangle) {
+        return click(new Point((int) rectangle.getCenterX() , (int) rectangle.getCenterY()), true);
+    }
+
+    @Override
     public Mouse rightClick() {
         return click(new Point(getLastMousePosition().getX(), getLastMousePosition().getY()), true);
     }
