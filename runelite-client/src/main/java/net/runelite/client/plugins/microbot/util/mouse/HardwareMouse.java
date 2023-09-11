@@ -100,6 +100,11 @@ public class HardwareMouse extends Mouse {
     }
 
     @Override
+    public Mouse rightClick(Rectangle rectangle) {
+        return click(new Point((int) rectangle.getCenterX(), (int) rectangle.getCenterY()), true);
+    }
+
+    @Override
     public Mouse move(Point point) {
         try {
             factory.move(point.getX(), point.getY());

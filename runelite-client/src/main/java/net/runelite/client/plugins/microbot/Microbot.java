@@ -73,6 +73,9 @@ public class Microbot {
         return walker;
     }
 
+    public static Client getClientForKotlin() { return client; }
+    public static Mouse getMouseForKotlin() { return mouse; }
+
     public static boolean isWalking() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808);
     }

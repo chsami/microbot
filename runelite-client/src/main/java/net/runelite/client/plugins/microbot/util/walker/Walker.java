@@ -1,19 +1,18 @@
 package net.runelite.client.plugins.microbot.util.walker;
 
 import lombok.Getter;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
+import net.runelite.client.plugins.microbot.walker.pathfinder.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,6 +148,62 @@ public class Walker {
                 Microbot.getClient().getPlane());
 
         return worldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < distance;
+    }
+
+    private List<PathNode> getPath(WorldPoint startWorldPoint, WorldPoint endWorldPoint) {
+        long startTimeDateLoad = System.currentTimeMillis();
+        SavedWorldDataLoader savedWorldDataLoader = new SavedWorldDataLoader(WorldDataDownloader.Companion.getWorldDataFile());
+        PathNode[][][] grid = savedWorldDataLoader.getGrid();
+        long endTimeDataLoad = System.currentTimeMillis();
+
+        PathFinder pathFinder = new PathFinder(grid);
+
+        long startTimePathFind = System.currentTimeMillis();
+        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint);
+        long endTimePathFind = System.currentTimeMillis();
+
+        System.out.println("Loaded world data in " + (endTimeDataLoad - startTimeDateLoad) + " milliseconds");
+        System.out.println("Found path in " + (endTimePathFind - startTimePathFind) + " milliseconds");
+        System.out.println("Num of nodes: " + nodes.stream().count());
+
+        return nodes;
+    }
+
+    public boolean staticWalkTo(WorldPoint endWorldPoint) {
+        Camera.setAngle(45);
+        Camera.setPitch(1.0f);
+
+        Player player = Microbot.getClient().getLocalPlayer();
+        WorldPoint start = player.getWorldLocation();
+
+        List<PathNode> nodes = getPath(start, endWorldPoint);
+        if (nodes.isEmpty()) return false;
+
+        PathWalker pathWalker = new PathWalker(nodes);
+        pathWalker.walkPath();
+
+        return player.getWorldLocation().distanceTo(endWorldPoint) <= 3;
+    }
+
+    public boolean hybridWalkTo(WorldPoint target) {
+        Player player = Microbot.getClient().getLocalPlayer();
+        List<PathNode> nodes = getPath(player.getWorldLocation(), target);
+
+        if (nodes.isEmpty()) {
+            System.out.println("Static Walker failed to find path, using dynamic walker");
+            return walkTo(target, true);
+
+        } else {
+            Camera.setAngle(45);
+            Camera.setPitch(1.0f);
+
+            if (nodes.isEmpty()) return false;
+
+            PathWalker pathWalker = new PathWalker(nodes);
+            pathWalker.walkPath();
+
+            return player.getWorldLocation().distanceTo(target) <= 3;
+        }
     }
 
     public boolean walkTo(WorldPoint target) {

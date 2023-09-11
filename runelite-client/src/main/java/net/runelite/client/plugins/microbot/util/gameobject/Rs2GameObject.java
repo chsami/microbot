@@ -460,6 +460,35 @@ public class Rs2GameObject {
         return null;
     }
 
+    public static List<Tile> getTiles(int distance) {
+        Player player = Microbot.getClient().getLocalPlayer();
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        int z = Microbot.getClient().getPlane();
+        List<Tile> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+
+                if (player.getLocalLocation().distanceTo(tile.getLocalLocation()) <= distance) {
+                    tileObjects.add(tile);
+                }
+
+            }
+        }
+
+        return tileObjects;
+    }
+
+    public static List<Tile> getTiles() {
+        return getTiles(2400);
+    }
+
 
     public static GameObject getGameObject(LocalPoint localPoint) {
         Scene scene = Microbot.getClient().getScene();

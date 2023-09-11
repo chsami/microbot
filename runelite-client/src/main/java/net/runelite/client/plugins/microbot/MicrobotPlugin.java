@@ -34,6 +34,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
+import net.runelite.client.plugins.microbot.walker.pathfinder.WorldDataDownloader;
 import net.runelite.client.plugins.microbot.walking.WalkingScript;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -103,6 +104,9 @@ public class MicrobotPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }
+
+        WorldDataDownloader worldDataDownloader = new WorldDataDownloader();
+        worldDataDownloader.run();
     }
 
     protected void shutDown() {
