@@ -169,8 +169,10 @@ public class RuneLite {
                 .withRequiredArg()
                 .defaultsTo(RuneLiteProperties.getJavConfig());
         parser.accepts("disable-telemetry", "Disable telemetry");
+        parser.accepts("disable-walker-update", "Disable updates for the static walker");
         parser.accepts("profile", "Configuration profile to use").withRequiredArg();
         parser.accepts("noupdate", "Skips the launcher update");
+
         final ArgumentAcceptingOptionSpec<String> proxyInfo = parser.accepts("proxy", "Use a proxy server for your runelite session")
                 .withRequiredArg().ofType(String.class);
         parser.accepts("proxy-type", "The Type of proxy: HTTP or SOCKS").withRequiredArg().ofType(String.class);
@@ -304,6 +306,7 @@ public class RuneLite {
                     developerMode,
                     options.has("safe-mode"),
                     options.has("disable-telemetry"),
+                    options.has("disable-walker-update"),
                     options.valueOf(sessionfile),
                     (String) options.valueOf("profile"),
                     options.has(insecureWriteCredentials),
