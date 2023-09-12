@@ -63,6 +63,10 @@ public class Microbot {
     @Getter
     @Setter
     private static WorldService worldService;
+    @Getter
+    @Setter
+    private static boolean disableWalkerUpdate;
+
     public static boolean isGainingExp = false;
     public static boolean pauseAllScripts = false;
     public static String status = "IDLE";
@@ -81,6 +85,7 @@ public class Microbot {
     public static ClientThread getClientThreadForKotlin() { return clientThread; }
 
     public static Mouse getMouseForKotlin() { return mouse; }
+    public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
 
     public static boolean isWalking() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808);

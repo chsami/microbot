@@ -43,6 +43,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -85,6 +86,10 @@ public class MicrobotPlugin extends Plugin {
     @Inject
     private WorldMapOverlay worldMapOverlay;
 
+    @Inject
+    @Named("disableWalkerUpdate")
+    private boolean disableWalkerUpdate;
+
     public ThievingScript thievingScript;
     public CookingScript cookingScript;
     public MiningScript miningScript;
@@ -108,6 +113,8 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setMouse(new VirtualMouse());
         Microbot.setEventHandler(new EventHandler());
         Microbot.setSpriteManager(spriteManager);
+        Microbot.setDisableWalkerUpdate(disableWalkerUpdate);
+
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }
