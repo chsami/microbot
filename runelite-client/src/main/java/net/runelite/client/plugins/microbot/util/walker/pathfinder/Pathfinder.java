@@ -339,6 +339,14 @@ public class Pathfinder implements Runnable {
 
     private void handleWalkableNodes() {
         Node lastNode = path.get(path.size() - 1);
+        //if the our target is on the minimap, just navigate to it directly
+        if (this.target.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 7) {
+            if (Calculations.tileOnMap(this.target)) {
+                Point point = Calculations.tileToMinimap(this.target);
+                Microbot.getMouse().click(point);
+                return;
+            }
+        }
         for (Node node : path) {
             if (Calculations.tileOnMap(node.position)
                     && (node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 14
