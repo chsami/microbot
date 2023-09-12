@@ -72,6 +72,7 @@ public class RuneLiteModule extends AbstractModule
 	private final boolean developerMode;
 	private final boolean safeMode;
 	private final boolean disableTelemetry;
+	private final boolean disableWalkerUpdate;
 	private final File sessionfile;
 	private final String profile;
 	private final boolean insecureWriteCredentials;
@@ -120,6 +121,7 @@ public class RuneLiteModule extends AbstractModule
 		bindConstant().annotatedWith(Names.named("developerMode")).to(developerMode);
 		bindConstant().annotatedWith(Names.named("safeMode")).to(safeMode);
 		bindConstant().annotatedWith(Names.named("disableTelemetry")).to(disableTelemetry);
+		bindConstant().annotatedWith(Names.named("disableWalkerUpdate")).to(disableWalkerUpdate);
 		bind(File.class).annotatedWith(Names.named("sessionfile")).toInstance(sessionfile);
 		bind(String.class).annotatedWith(Names.named("profile")).toProvider(Providers.of(profile));
 		bindConstant().annotatedWith(Names.named("insecureWriteCredentials")).to(insecureWriteCredentials);

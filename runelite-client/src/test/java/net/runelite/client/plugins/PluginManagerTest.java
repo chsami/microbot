@@ -107,7 +107,7 @@ public class PluginManagerTest
 			});
 
 		Injector injector = Guice.createInjector(Modules
-			.override(new RuneLiteModule(okHttpClient, () -> null, () -> mock(RuntimeConfig.class), true, false, false,
+			.override(new RuneLiteModule(okHttpClient, () -> null, () -> mock(RuntimeConfig.class), true, false, false, true,
 				RuneLite.DEFAULT_SESSION_FILE,
 				null, false, false
 			))
@@ -139,7 +139,7 @@ public class PluginManagerTest
 	@Test
 	public void testLoadPlugins() throws Exception
 	{
-		PluginManager pluginManager = new PluginManager(false, false, null, null, null, null);
+		PluginManager pluginManager = new PluginManager(false, false, true, null, null, null, null);
 		pluginManager.setOutdated(true);
 		pluginManager.loadCorePlugins();
 		Collection<Plugin> plugins = pluginManager.getPlugins();
@@ -150,7 +150,7 @@ public class PluginManagerTest
 			.count();
 		assertEquals(expected, plugins.size());
 
-		pluginManager = new PluginManager(false, false, null, null, null, null);
+		pluginManager = new PluginManager(false, false, true, null, null, null, null);
 		pluginManager.loadCorePlugins();
 		plugins = pluginManager.getPlugins();
 
@@ -172,7 +172,7 @@ public class PluginManagerTest
 	@Ignore
 	public void dumpGraph() throws Exception
 	{
-		PluginManager pluginManager = new PluginManager(true, false, null, null, null, null);
+		PluginManager pluginManager = new PluginManager(true, false, true, null, null, null, null);
 		pluginManager.loadCorePlugins();
 
 		Injector graphvizInjector = Guice.createInjector(new GraphvizModule());

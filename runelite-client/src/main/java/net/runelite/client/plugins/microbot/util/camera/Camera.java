@@ -48,6 +48,19 @@ public class Camera extends Script {
         return a < 0 ? a + 360 : a;
     }
 
+    public static void setAngle(int degrees) {
+        if (getAngleTo(degrees) > 5) {
+            VirtualKeyboard.keyHold(KeyEvent.VK_LEFT);
+            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT),
+                    () -> Math.abs(getAngleTo(degrees)) <= 5, 10);
+        } else if (getAngleTo(degrees) < -5) {
+            VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
+            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
+                    () -> Math.abs(getAngleTo(degrees)) <= 5, 10);
+        }
+    }
+
+
     public static void setAngle(int degrees, Actor actor) {
         if (getAngleTo(degrees) > 5) {
             VirtualKeyboard.keyHold(KeyEvent.VK_LEFT);
@@ -82,6 +95,31 @@ public class Camera extends Script {
             Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
                     () -> Calculations.tileOnScreen(localPoint), 600);
         }
+    }
+
+    public static void setPitch(float percentage) {
+        float currentPitchPercentage = cameraPitchPercentage();
+
+        if (currentPitchPercentage < percentage) {
+            VirtualKeyboard.keyHold(KeyEvent.VK_UP);
+            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_UP),
+                    () -> cameraPitchPercentage() >= percentage, 600);
+        } else {
+            VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
+            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
+                    () -> cameraPitchPercentage() <= percentage, 600);
+        }
+    }
+
+    private static float cameraPitchPercentage() {
+        int minPitch = 128;
+        int maxPitch = 383;
+        int currentPitch = Microbot.getClient().getCameraPitch();
+
+        int adjustedPitch = currentPitch - minPitch;
+        int adjustedMaxPitch = maxPitch - minPitch;
+
+        return (float)adjustedPitch / (float)adjustedMaxPitch;
     }
 
     public static int getAngleTo(int degrees) {

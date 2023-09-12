@@ -1,7 +1,5 @@
 package net.runelite.client.plugins.microbot.paydirt;
 
-import net.runelite.api.Point;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.example.ExampleScript;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -10,6 +8,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
+
+import static net.runelite.client.plugins.microbot.paydirt.PayDirtScript.status;
+
 
 public class PayDirtOverlay extends OverlayPanel {
     @Inject
@@ -21,6 +22,7 @@ public class PayDirtOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
+            panelComponent.setPreferredLocation(new Point(80, 8));
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Pay-dirt mining v" + ExampleScript.version)
@@ -30,7 +32,7 @@ public class PayDirtOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder().build());
 
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left(Microbot.status)
+                    .left(status.toString())
                     .build());
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
