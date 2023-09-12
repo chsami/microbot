@@ -155,16 +155,16 @@ public class ConfigManager
 
 	public void switchProfile(ConfigProfile newProfile)
 	{
-		/*if (newProfile.getId() == profile.getId())
+		if (newProfile.getId() == profile.getId())
 		{
 			log.warn("switching to existing profile!");
 			return;
-		}*/
+		}
 
 		// Ensure existing config is saved
 		sendConfig();
 
-		log.info("Switching profile to: {}", newProfile.getName());
+		log.info("Switching profile to: {} ({})", newProfile.getName(), newProfile.getId());
 
 		// sync the latest config revision from the server
 		if (sessionManager.getAccountSession() != null && newProfile.isSync())
@@ -290,25 +290,6 @@ public class ConfigManager
 				profile.setRev(-1L);
 			}
 
-			lock.dirty();
-		}
-	}
-
-	public void setPassword(ConfigProfile profile, String password) {
-
-		// flush pending config changes first in the event the profile being
-		// synced is the active profile.
-		sendConfig();
-
-		try (ProfileManager.Lock lock = profileManager.lock())
-		{
-			profile = lock.findProfile(profile.getId());
-			if (profile == null || profile.getPassword() == password)
-			{
-				return;
-			}
-
-			profile.setPassword(password);
 			lock.dirty();
 		}
 	}
@@ -543,7 +524,7 @@ public class ConfigManager
 			{
 				if (p.isInternal())
 				{
-					log.debug("Profile '{}' (sync: {}, active: {}, internal)", p.getName(), p.isSync(), p.isActive());
+					log.debug("Profile '{}' (sync: {}, active: {}, id: {}, internal)", p.getName(), p.isSync(), p.getId(), p.isActive());
 
 					if (p.getName().equals(RSPROFILE_NAME))
 					{
@@ -552,6 +533,8 @@ public class ConfigManager
 
 					continue;
 				}
+
+				log.info("Profile '{}' (sync: {}, active: {}, id: {})", p.getName(), p.isSync(), p.isActive(), p.getId());
 
 				// --profile
 				if (configProfileName != null)
@@ -573,7 +556,7 @@ public class ConfigManager
 
 			if (profile != null)
 			{
-				//log.info("Using profile: {}", profile.getName());
+				log.info("Using profile: {} ({})", profile.getName(), profile.getId());
 			}
 			else
 			{
@@ -585,7 +568,7 @@ public class ConfigManager
 					profile.setActive(true);
 				}
 
-				log.info("Creating profile: {}", profile.getName());
+				log.info("Creating profile: {} ({})", profile.getName(), profile.getId());
 			}
 
 			if (rsProfile == null)
