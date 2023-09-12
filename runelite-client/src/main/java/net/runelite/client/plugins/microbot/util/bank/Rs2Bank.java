@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 
@@ -499,7 +500,7 @@ public class Rs2Bank {
     public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (widgetId == 0 || itemWidget == null) return;
         int idx = itemWidget.getIndex();
-        menuEntry.getClass().getMethod("aj", int.class).invoke(menuEntry, itemId); //use the setItemId method through reflection
+        Rs2Reflection.setItemId(menuEntry, itemId);
         menuEntry.setOption("Withdraw-1");
         menuEntry.setIdentifier(identifier);
         menuEntry.setParam0(idx);
