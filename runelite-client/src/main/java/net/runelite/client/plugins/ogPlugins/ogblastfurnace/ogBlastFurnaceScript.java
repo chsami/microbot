@@ -148,6 +148,7 @@ public class ogBlastFurnaceScript extends Script {
             sleepUntil(() -> Inventory.hasItem(ItemID.GOLD_ORE));
             sleep(50,80);
             VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
+            sleepUntil(() -> !Rs2Bank.isOpen());
         }
     }
     private String barName() {

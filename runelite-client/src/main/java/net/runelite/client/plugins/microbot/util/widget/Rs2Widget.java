@@ -55,6 +55,7 @@ public class Rs2Widget {
             return Arrays.stream(widget.getChildren()).anyMatch(x -> x.getText().contains(matchingText));
         });
     }
+
     public static int getChildWidgetSpriteID(int id, int childId) {
         return  Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId).getSpriteId());
     }
@@ -71,6 +72,9 @@ public class Rs2Widget {
         if (widget == null) return false;
         Microbot.getMouse().click(widget.getChild(childId).getBounds());
         return true;
+    }
+    public static boolean childWidgetExits(int id, int childId) {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId) != null);
     }
 
     public static void changeWidgetText(String textToSearch, String newText) {

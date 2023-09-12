@@ -1,9 +1,14 @@
 package net.runelite.client.plugins.microbot.util.inventory;
 
 import net.runelite.api.*;
+import net.runelite.api.GameObject;
+import net.runelite.api.ItemComposition;
+import net.runelite.api.Point;
+import net.runelite.api.TileObject;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -378,7 +383,7 @@ public class Inventory {
         Widget item = findItem(itemName);
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
-        sleep(600, 800);
+        sleep(100, 300);
         return true;
     }
 
@@ -428,6 +433,28 @@ public class Inventory {
         sleep(600, 1200);
         Microbot.getMouse().click(item2.getBounds().getCenterX(), item2.getBounds().getCenterY());
         sleep(600, 1200);
+        return true;
+    }
+    public static boolean useItemOnObject(int item, int objectID) {
+        if (Rs2Bank.isOpen()) return false;
+        Widget item1 = findItem(item);
+        TileObject object = Rs2GameObject.findObjectById(objectID);
+        if (item1 == null || object == null) return false;
+        Microbot.getMouse().click(item1.getBounds().getCenterX(), item1.getBounds().getCenterY());
+        sleep(600, 1200);
+        Microbot.getMouse().click(object.getCanvasLocation().getX(), object.getCanvasLocation().getY());
+        sleep(600, 1200);
+        return true;
+    }
+    public static boolean useItemOnObjectFast(int item, int objectID) {
+        if (Rs2Bank.isOpen()) return false;
+        Widget item1 = findItem(item);
+        TileObject object = Rs2GameObject.findObjectById(objectID);
+        if (item1 == null || object == null) return false;
+        Microbot.getMouse().click(item1.getBounds().getCenterX(), item1.getBounds().getCenterY());
+        sleep(0, 200);
+        Microbot.getMouse().click(object.getCanvasLocation().getX(), object.getCanvasLocation().getY());
+        sleep(0, 200);
         return true;
     }
 

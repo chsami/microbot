@@ -75,6 +75,18 @@ public class Rs2Bank {
         sleep(600, 1000);
         return action;
     }
+    public static boolean depositAllFast(String itemName) {
+        Microbot.status = "Deposit all " + itemName;
+        if (!isBankOpen()) return false;
+        if (!Inventory.hasItem(itemName)) return true;
+        Widget item = Inventory.findItem(itemName);
+        if (item == null) return false;
+        if(Rs2Widget.getChildWidgetSpriteID(786468,0) != 1150){Rs2Widget.clickWidget(786468);}
+        sleep(60, 80);
+        boolean action = Rs2Menu.doAction("Deposit-all", item.getBounds());
+        sleep(60, 80);
+        return action;
+    }
     public static boolean depositAll(int itemID) {
         Microbot.status = "Deposit all " + itemID;
         if (!isBankOpen()) return false;
@@ -264,6 +276,42 @@ public class Rs2Bank {
         if (scrollTo(widget)) {
             Rs2Menu.doAction("Withdraw-1", widget.getBounds());
             sleep(100, 1000);
+            return true;
+        }
+        return false;
+    }
+    public static boolean withdrawItemFast(boolean checkInventory, String itemName) {
+        Microbot.status = "Withdrawing one " + itemName;
+        if (checkInventory && Inventory.hasItem(itemName)) return true;
+        if (Inventory.isFull()) return false;
+        if (!isBankOpen()) {
+            openBank();
+        }
+        Widget widget = Rs2Widget.findWidgetExact(itemName);
+        if (widget == null) return false;
+        if (widget.getItemQuantity() <= 0) return false;
+        if (Microbot.getVarbitValue(BANK_WITHDRAW_QUANTITY) != 0) {
+            Rs2Widget.clickWidget(786460);
+            sleep(200,300);
+        }
+        if (scrollTo(widget)) {
+            Rs2Menu.doAction("Withdraw-1", widget.getBounds());
+            sleep(100, 300);
+            return true;
+        }
+        return false;
+    }
+    public static boolean withdrawItemFast(boolean checkInventory, String itemName, String action) {
+        Microbot.status = action + itemName;
+        if (checkInventory && Inventory.hasItem(itemName)) return true;
+        if (Inventory.isFull()) return false;
+        if (!isBankOpen()) {return false;}
+        Widget widget = Rs2Widget.findWidgetExact(itemName);
+        if (widget == null) return false;
+        if (widget.getItemQuantity() <= 0) return false;
+        if (scrollTo(widget)) {
+            Rs2Menu.doActionFast(action, widget.getBounds());
+            sleep(240, 300);
             return true;
         }
         return false;
