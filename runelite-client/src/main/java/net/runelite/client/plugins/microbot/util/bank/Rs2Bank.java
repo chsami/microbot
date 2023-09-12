@@ -335,8 +335,7 @@ public class Rs2Bank {
         if (isOpen()) return true;
         GameObject bank = Rs2GameObject.findBank();
         if (bank == null) return false;
-        Microbot.getMouse().click(bank.getClickbox().getBounds());
-        sleep(200, 300);
+        Rs2GameObject.interact(bank);
         sleepUntil(Rs2Bank::isOpen);
         return true;
     }

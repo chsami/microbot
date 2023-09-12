@@ -390,7 +390,7 @@ public class Rs2GameObject {
     public static GameObject findObjectByOption(String optionName, boolean exact) {
         List<GameObject> gameObjects = getGameObjects();
 
-        if (gameObjects == null) return null;
+        if (gameObjects.isEmpty()) return null;
 
         for (net.runelite.api.GameObject gameObject : gameObjects) {
 
@@ -414,11 +414,28 @@ public class Rs2GameObject {
 
 
     public static GameObject findBank() {
-        GameObject bank = findObjectByOption("bank", false);
-        if (bank == null) {
-            bank = findObjectByOption("collect", false);
+        List<GameObject> gameObjects = getGameObjects();
+
+        ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"bank", "chest"}, false);
+
+        for (GameObject gameObject : gameObjects) {
+            if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
+
+            ObjectComposition objectComposition = convertGameObjectToObjectComposition(gameObject);
+
+            if (objectComposition == null) continue;
+
+            if (Arrays.stream(objectComposition.getActions())
+                    .noneMatch(action ->
+                            action != null && (
+                            action.toLowerCase().contains("bank") ||
+                            action.toLowerCase().contains("collect"))))
+                continue;
+
+            return gameObject;
         }
-        return bank;
+
+        return null;
     }
 
     public static GameObject findBank(String action) {
@@ -583,6 +600,10 @@ public class Rs2GameObject {
 
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 17) {
+            Microbot.getWalker().walkFastCanvas(object.getWorldLocation());
+            return false;
+        }
         try {
             objectToInteract = object;
             objectAction = action;
@@ -662,7 +683,7 @@ public class Rs2GameObject {
             }
 
             if (Microbot.getClient().isWidgetSelected()) {
-                Rs2Reflection.setItemId(menuEntry,-1);
+                Rs2Reflection.setItemId(menuEntry, -1);
                 menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
             } else if (index == 0) {
                 menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
@@ -675,7 +696,7 @@ public class Rs2GameObject {
             } else if (index == 4) {
                 menuEntry.setType(MenuAction.GAME_OBJECT_FIFTH_OPTION);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println("GAME OBJECT MENU SWAP FAILED WITH MESSAGE: " + ex.getMessage());
         }
     }
