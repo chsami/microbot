@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.paydirt;
+package net.runelite.client.plugins.microbot.mining.motherloadmine;
 
 import net.runelite.api.ItemID;
 import net.runelite.api.ObjectID;
@@ -7,8 +7,8 @@ import net.runelite.api.WallObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.paydirt.enums.MLMMiningSpot;
-import net.runelite.client.plugins.microbot.paydirt.enums.MLMStatus;
+import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMMiningSpot;
+import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMStatus;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
-public class PayDirtScript extends Script {
+public class MotherloadMineScript extends Script {
     public static double version = 1.0;
 
     final int SACKID = 26688;

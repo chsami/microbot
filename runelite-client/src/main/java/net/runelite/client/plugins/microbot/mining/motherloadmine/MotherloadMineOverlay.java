@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.paydirt;
+package net.runelite.client.plugins.microbot.mining.motherloadmine;
 
 import net.runelite.client.plugins.microbot.example.ExampleScript;
 import net.runelite.client.ui.overlay.OverlayPanel;
@@ -9,12 +9,12 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.microbot.paydirt.PayDirtScript.status;
+import static net.runelite.client.plugins.microbot.mining.motherloadmine.MotherloadMineScript.status;
 
 
-public class PayDirtOverlay extends OverlayPanel {
+public class MotherloadMineOverlay extends OverlayPanel {
     @Inject
-    PayDirtOverlay(PayDirtPlugin plugin)
+    MotherloadMineOverlay(MotherloadMinePlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);

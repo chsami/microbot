@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.paydirt.enums;
+package net.runelite.client.plugins.microbot.mining.motherloadmine.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
