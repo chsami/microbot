@@ -41,7 +41,8 @@ import static net.runelite.client.plugins.microbot.util.player.PvPUtil.isAttacka
         name = "PvP Tools - Work in Progress",
         enabledByDefault = false,
         description = "Enable the PvP Tools panel",
-        tags = {"panel", "pvp", "pk", "pklite", "renderself"}
+        tags = {"panel", "pvp", "pk", "pklite", "renderself"},
+        hidden = true
 )
 public class PvpToolsPlugin extends Plugin
 {

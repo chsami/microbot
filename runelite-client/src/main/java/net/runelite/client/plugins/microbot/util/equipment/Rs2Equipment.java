@@ -66,7 +66,7 @@ public class Rs2Equipment {
     }
 
     public static void useAmuletAction(JewelleryLocationEnum jewelleryLocationEnum) {
-        if (!hasEquippedSlot(EquipmentInventorySlot.AMULET)) {
+        if (!hasEquippedSlot(EquipmentInventorySlot.AMULET) || !hasEquippedContains(jewelleryLocationEnum.getTooltip())) {
             Microbot.status = "Amulet is missing in the equipment slot";
             return;
         }
@@ -141,7 +141,7 @@ public class Rs2Equipment {
     }
 
     public static void handleMenuSwapper(MenuEntry menuEntry) {
-        if (widgetId == 0) return;
+        if (widgetId == 0 && identifier >= 0) return;
         menuEntry.setOption("Teleport");
         menuEntry.setIdentifier(identifier);
         menuEntry.setParam0(-1);

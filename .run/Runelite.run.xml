@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Runelite" type="Application" factoryName="Application">
+  <configuration default="false" name="Runelite" type="Application" factoryName="Application" singleton="false">
     <option name="MAIN_CLASS_NAME" value="net.runelite.client.RuneLite" />
     <module name="client" />
     <option name="PROGRAM_PARAMETERS" value="-developer-mode" />

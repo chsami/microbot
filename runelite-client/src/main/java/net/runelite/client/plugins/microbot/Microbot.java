@@ -5,7 +5,6 @@ import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.Skill;
-import net.runelite.api.VarPlayer;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ProfileManager;
@@ -15,7 +14,6 @@ import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
@@ -24,8 +22,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class Microbot {
     @Getter
@@ -113,16 +109,6 @@ public class Microbot {
 
     public static boolean hasLevel(int levelRequired, Skill skill) {
         return Microbot.getClient().getRealSkillLevel(skill) >= levelRequired;
-    }
-
-    public static void toggleSpecialAttack(int energyRequired) {
-        int currentSpecEnergy = client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
-        if (currentSpecEnergy >= 999 && (client.getVarpValue(VarPlayer.SPECIAL_ATTACK_ENABLED) == 0)) {
-            for (int i = 0; i < 3; i++) {
-                Rs2Widget.clickWidget("special attack");
-                sleep(100,600); // sleep for 100-600ms (1tick)
-            }
-        }
     }
 
     public static void hopToWorld(int worldNumber){

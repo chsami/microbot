@@ -3,8 +3,11 @@ package net.runelite.client.plugins.microbot.util.player;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 
 public class Rs2Player {
@@ -63,5 +66,28 @@ public class Rs2Player {
 
     public static boolean isWalking() {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation() != 813 && Microbot.getClient().getLocalPlayer().getPoseAnimation() != 808);
+    }
+
+    public static void toggleSpecialAttack(int energyRequired) {
+        int currentSpecEnergy = Microbot.getClient().getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
+        if (currentSpecEnergy >= energyRequired && (Microbot.getClient().getVarpValue(VarPlayer.SPECIAL_ATTACK_ENABLED) == 0)) {
+            Rs2Widget.clickWidget("special attack");
+        }
+    }
+
+    public static boolean toggleRunEnergy(boolean toggle) {
+
+        if (Microbot.getVarbitPlayerValue(173) == 0 && !toggle) return true;
+        if (Microbot.getVarbitPlayerValue(173) == 1 && toggle) return true;
+        Widget widget = Rs2Widget.getWidget(WidgetInfo.MINIMAP_TOGGLE_RUN_ORB.getId());
+        if (widget == null) return false;
+        if (Microbot.getClient().getEnergy() > 1000 && toggle) {
+            Microbot.getMouse().click(widget.getCanvasLocation());
+            return true;
+        } else if (!toggle) {
+            Microbot.getMouse().click(widget.getCanvasLocation());
+            return true;
+        }
+        return false;
     }
 }

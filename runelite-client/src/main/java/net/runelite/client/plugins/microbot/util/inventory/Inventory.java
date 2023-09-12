@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
@@ -29,6 +30,7 @@ public class Inventory {
 
     public static Rs2Item item;
     public static String itemAction;
+
     public static void eat(Widget widget) {
         Microbot.getMouse().click(widget.getBounds());
         sleep(1200, 2000);
@@ -69,7 +71,7 @@ public class Inventory {
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).count() == 28);
     }
 
-    @Deprecated(since = "Use isFull method instead",forRemoval = true)
+    @Deprecated(since = "Use isFull method instead", forRemoval = true)
     public static boolean isInventoryFull() {
         Microbot.status = "Checking if inventory is full";
         Tab.switchToInventoryTab();
@@ -476,12 +478,14 @@ public class Inventory {
         if (item == null) return false;
         return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
+
     public static boolean useItemActionContains(String itemName, String actionName) {
         Microbot.status = "Use inventory item contains " + itemName + " with action " + actionName;
         Widget item = findItemContains(itemName);
         if (item == null) return false;
         return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
+
     public static boolean useItemAction(int itemID, String actionName) {
         Microbot.status = "Use inventory item " + itemID + " with action " + actionName;
         Widget item = findItem(itemID);
@@ -608,7 +612,7 @@ public class Inventory {
 
     public static void useAllItemsFastContains(String name, String action) {
         List<Rs2Item> rs2Items = findAllItemFast(name, true);
-        for (Rs2Item rs2Item: rs2Items) {
+        for (Rs2Item rs2Item : rs2Items) {
             useItemFastAbstract(rs2Item, action);
         }
     }
@@ -618,7 +622,7 @@ public class Inventory {
         ItemContainer itemContainer = Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
         if (itemContainer == null) return null;
         return Microbot.getClientThread().runOnClientThread(() -> {
-            for (int i = 0; i <  itemContainer.getItems().length; i++) {
+            for (int i = 0; i < itemContainer.getItems().length; i++) {
                 Item item = itemContainer.getItems()[i];
                 ItemComposition itemComposition = Microbot.getClient().getItemDefinition(itemContainer.getItems()[i].getId());
                 if (itemComposition.getId() == id) {
@@ -634,7 +638,7 @@ public class Inventory {
         ItemContainer itemContainer = Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
         if (itemContainer == null) return null;
         return Microbot.getClientThread().runOnClientThread(() -> {
-            for (int i = 0; i <  itemContainer.getItems().length; i++) {
+            for (int i = 0; i < itemContainer.getItems().length; i++) {
                 Item item = itemContainer.getItems()[i];
                 ItemComposition itemComposition = Microbot.getClient().getItemDefinition(itemContainer.getItems()[i].getId());
                 if (contains) {
@@ -658,7 +662,7 @@ public class Inventory {
         if (itemContainer == null) return null;
         return Microbot.getClientThread().runOnClientThread(() -> {
             List<Rs2Item> rs2Items = new ArrayList<>();
-            for (int i = 0; i <  itemContainer.getItems().length; i++) {
+            for (int i = 0; i < itemContainer.getItems().length; i++) {
                 Item item = itemContainer.getItems()[i];
                 ItemComposition itemComposition = Microbot.getClient().getItemDefinition(itemContainer.getItems()[i].getId());
                 if (contains) {
@@ -685,23 +689,46 @@ public class Inventory {
         ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.id);
         int index = 0;
 
-        if (itemAction != null) {
-            for (int i = 0; i < itemComposition.getInventoryActions().length; i++) {
-                if (itemAction.equalsIgnoreCase(itemComposition.getInventoryActions()[i])) {
-                    index = i;
-                }
-            }
-        }
-        menuEntry.getClass().getMethod("yp", int.class).invoke(menuEntry, item.id); //use the setItemId method through reflection
-        menuEntry.setOption(itemAction != null ? itemAction : "");
-        index = index + 3;
-        if (index == 4) { //edge case, idx 4 is always CANCEl, so set index to 3
+        menuEntry.setType(MenuAction.CC_OP);
+
+        Arrays.stream(menuEntry.getClass().getMethods())
+                .filter(x -> x.getReturnType().getName() == "void" && x.getParameters().length > 0 && x.getParameters()[0].getType().getName() == "int")
+                .collect(Collectors.toList())
+                .get(0)
+                .invoke(menuEntry, item.id); //use the setItemId method through reflection
+
+        if (itemAction.equalsIgnoreCase("use")) {
+            index = 0;
+            menuEntry.setType(MenuAction.WIDGET_TARGET);
+        } else if(itemComposition.getName().contains("pouch") && itemAction.equalsIgnoreCase("empty")) {
+            index = 1;
+        } else if (itemAction.equalsIgnoreCase("drink")
+                || itemAction.equalsIgnoreCase("read")
+                || itemAction.equalsIgnoreCase("eat")
+                || itemAction.equalsIgnoreCase("view")
+                || itemAction.equalsIgnoreCase("bury")) {
+            index = 2;
+        } else if (itemAction.equalsIgnoreCase("wield")
+                || itemAction.equalsIgnoreCase("wear")
+                || itemAction.equalsIgnoreCase("check steps")) {
             index = 3;
+        } else if (itemAction.equalsIgnoreCase("fill")) {
+            index = 4;
+        } else if (itemAction.equalsIgnoreCase("empty") || itemAction.equalsIgnoreCase("rub")
+        || itemAction.equalsIgnoreCase("refund") || itemAction.equalsIgnoreCase("commune")
+                || itemAction.equalsIgnoreCase("extinguish")) {
+            index = 6;
+        } else if (itemAction.equalsIgnoreCase("drop") || itemAction.equalsIgnoreCase("destroy")) {
+            index = 7;
+        } else if (itemAction.equalsIgnoreCase("examine")) {
+            index = 10;
         }
+
+
+        menuEntry.setOption(itemAction != null ? itemAction : "");
         menuEntry.setIdentifier(index);
         menuEntry.setParam0(item.slot);
         menuEntry.setParam1(9764864);
         menuEntry.setTarget("<col=ff9040>" + itemComposition.getName() + "</col>");
-        menuEntry.setType(MenuAction.CC_OP);
     }
 }

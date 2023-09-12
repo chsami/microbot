@@ -11,7 +11,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.magic.housetab.enums.HOUSETABS_CONFIG;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
-import net.runelite.client.plugins.microbot.zeah.hosidius.HosidiusScript;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -20,7 +19,8 @@ import java.awt.*;
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "HouseTab",
         description = "Microbot HouseTab plugin",
-        tags = {"microbot", "magic", "moneymaking"}
+        tags = {"microbot", "magic", "moneymaking"},
+        enabledByDefault = false
 )
 @Slf4j
 public class HouseTabPlugin extends Plugin {

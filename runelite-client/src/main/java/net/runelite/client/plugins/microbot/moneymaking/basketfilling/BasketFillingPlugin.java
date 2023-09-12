@@ -14,7 +14,8 @@ import java.awt.*;
         name = PluginDescriptor.Mocrosoft + "Basket filling",
         description = "Microbot basket filling plugin",
         tags = {"moneymaking", "microbot", "basket filling"},
-        enabledByDefault = false
+        enabledByDefault = false,
+        hidden = true
 )
 @Slf4j
 public class BasketFillingPlugin extends Plugin {

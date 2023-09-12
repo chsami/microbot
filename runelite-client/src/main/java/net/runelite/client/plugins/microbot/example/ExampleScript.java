@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
+import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.Arrays;
@@ -78,7 +79,7 @@ boolean reachedEndLine = false;
                 //getParam0=-5146, getParam1=-4228,
                 //getParam0=-5350, getParam1=-4235
                // System.out.println(GroundItemsPlugin.getCollectedGroundItems());
-                System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
+               System.out.println(Arrays.toString(Microbot.getClient().getMenuEntries()));
              //   Microbot.getWalker().walkTo(WorldPoint.fromLocal(Microbot.getClient(), 9152, 7616, 0));
               //  System.out.println(Inventory.getStackSizeOfItem(995));
                // System.out.println(Microbot.getClient().getLocalPlayer().getWorldLocation().isInArea(blockingAreas[0]));
@@ -87,16 +88,44 @@ boolean reachedEndLine = false;
 //                System.out.println(new WorldPoint(3145, 9911, 0).distanceTo(new WorldPoint(3209, 9616, 0)));
 //                Microbot.getWalker().walkTo(BankLocation.EDGEVILLE_BANK.getWorldPoint());
                 //Rs2Magic.cast(MagicAction.OURANIA_TELEPORT);
-                //Microbot.getWalker().walkTo(BankLocation.VARROCK_WEST.getWorldPoint());
+           //     Microbot.getWalker().walkTo(BankLocation.VARROCK_WEST.getWorldPoint());
           //      Inventory.useItemActionContains(JewelleryLocationEnum.EDGEVILLE.getTooltip(), "Rub");
                // Microbot.hopToWorld(random(300, 360));
                //Inventory.useAllItemsFastContains("void", "wear");
-                Rs2GameObject.interact(29156, "Teleport Menu");
-              //  Inventory.useItemFastContains("glory(", "Rub");
+            //    Rs2GameObject.interact(40848);
+               // Inventory.useItemFastContains("glory(", "Rub");
+                //Microbot.getWalker().walkMiniMap(new WorldPoint(2910, 3355, 0));
+                //Node node = new Node(new WorldPoint(2937, 3355, 0), null);
+               // System.out .println(Node.distanceBetween(new WorldPoint(2937, 3355, 0), Microbot.getClient().getLocalPlayer().getWorldLocation(),2));
+               // Rs2GameObject.interact(40848);
+//                Rs2Settings.turnOffMusic();
+                //System.out.println("test");
+                //System.out.println(Rs2Widget.getWidget(116, 93).getDynamicChildren()[1].isSelfHidden());
+//                Microbot.getClientThread().runOnClientThread(() -> {
+//                    System.out.println(Rs2Widget.getWidget(116, 93).getChildren()[0].isHidden());
+//                    return 0;
+//                });
+                //System.out.println(Arrays.stream(Rs2Widget.getWidget(116, 93).getChildren()).anyMatch(x -> x != null && x.isHidden()));
+                //Rs2Settings.hideRoofs();
+                //Rs2Settings.enableHideRoofs();
+              //  GameObject object = Rs2GameObject.findBank();
+            //    System.out.println(object.getId());
+              //  Rs2GroundItem.interact("box trap", "lay");
+//                Inventory.useItemFastContains("glory", "Rub");
+              /*  WorldPoint questWorldPoint = ((DetailedQuestStep) QuestHelperPlugin.getSelectedQuest().getQuest().getQuestHelper().getCurrentStep()).getWorldPoint();
+                if (questWorldPoint != null) {
+                    Microbot.getWalker().walkTo(questWorldPoint);
+                }
+
+                Rs2Npc.interact("chicken", "attack");*/
+                Inventory.useItemFast("shark", "use");
+                Rs2Npc.interact("banker", "Use");
+               // System.out.println(Inventory.getAmountForItem("sara"));
+
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
     }
 

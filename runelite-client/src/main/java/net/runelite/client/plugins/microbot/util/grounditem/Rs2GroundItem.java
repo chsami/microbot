@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -87,8 +88,8 @@ public class Rs2GroundItem {
         }
         //sort on closest item first
         temp = temp.stream().sorted(Comparator
-                .comparingInt(value -> value.getTile().getLocalLocation()
-                        .distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                        .comparingInt(value -> value.getTile().getLocalLocation()
+                                .distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
 
         return temp.toArray(new RS2Item[temp.size()]);
@@ -165,7 +166,7 @@ public class Rs2GroundItem {
             sleep(100);
             itemInteraction = null;
             itemAction = "";
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         return true;
@@ -180,7 +181,7 @@ public class Rs2GroundItem {
             sleep(100);
             groundItemInteraction = null;
             itemAction = "";
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         return true;
@@ -288,13 +289,18 @@ public class Rs2GroundItem {
 
     public static void handleMenuSwapper(MenuEntry menuEntry) {
         if (itemInteraction == null && groundItemInteraction == null) return;
+
+        ItemComposition item = null;
+
         if (itemInteraction != null) {
+            item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemInteraction.getTileItem().getId()));
             menuEntry.setIdentifier(itemInteraction.getTileItem().getId());
             menuEntry.setParam0(itemInteraction.getTile().getLocalLocation().getSceneX());
             menuEntry.setTarget("<col=ff9040>" + itemInteraction.getItem().getName());
             menuEntry.setParam1(itemInteraction.getTile().getLocalLocation().getSceneY());
         }
         if (groundItemInteraction != null) {
+            item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(groundItemInteraction.getId()));
             menuEntry.setIdentifier(groundItemInteraction.getId());
             LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), groundItemInteraction.getLocation());
             menuEntry.setParam0(localPoint.getSceneX());
@@ -302,10 +308,27 @@ public class Rs2GroundItem {
             menuEntry.setParam1(localPoint.getSceneY());
         }
         menuEntry.setOption(itemAction);
-        if (itemAction.toLowerCase().equals("lay")) {
-            menuEntry.setType(MenuAction.GROUND_ITEM_FOURTH_OPTION);
-        } else {
+
+        String[] groundActions = Rs2Reflection.getGroundItemActions(item);
+        int index = -1;
+        for (int i = 0; i < groundActions.length; i++) {
+            String groundAction = groundActions[i];
+            if (groundAction == null || !groundAction.equalsIgnoreCase(itemAction)) continue;
+            index = i;
+        }
+
+        if (Microbot.getClient().isWidgetSelected()) {
+            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GROUND_ITEM);
+        } else if (index == 0) {
+            menuEntry.setType(MenuAction.GROUND_ITEM_SECOND_OPTION);
+        } else if (index == 1) {
+            menuEntry.setType(MenuAction.GROUND_ITEM_SECOND_OPTION);
+        } else if (index == 2) {
             menuEntry.setType(MenuAction.GROUND_ITEM_THIRD_OPTION);
+        } else if (index == 3) {
+            menuEntry.setType(MenuAction.GROUND_ITEM_FOURTH_OPTION);
+        } else if (index == 4) {
+            menuEntry.setType(MenuAction.GROUND_ITEM_FIFTH_OPTION);
         }
     }
 }

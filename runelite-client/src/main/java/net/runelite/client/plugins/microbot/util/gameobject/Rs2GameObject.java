@@ -53,7 +53,6 @@ public class Rs2GameObject {
         return clickObject(object, action);
     }
 
-
     public static TileObject interactAndGetObject(int id) {
         TileObject object = findObjectById(id);
         clickObject(object);
@@ -61,9 +60,8 @@ public class Rs2GameObject {
     }
 
     public static boolean interact(int[] objectIds, String action) {
-        for (int i = 0; i < objectIds.length; i++) {
-            if (interact(objectIds[i], action))
-                return true;
+        for (int objectId : objectIds) {
+            if (interact(objectId, action)) return true;
         }
         return false;
     }
@@ -93,8 +91,7 @@ public class Rs2GameObject {
     }
 
     public static ObjectComposition findObject(int id) {
-        ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
-        return objComp;
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
     }
 
     public static boolean exists(int id) {
@@ -179,9 +176,9 @@ public class Rs2GameObject {
 
         List<GameObject> gameObjects = getGameObjects();
 
-        gameObjects = gameObjects.stream().filter(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation()) < distance).collect(Collectors.toList());
-
-        if (gameObjects == null) return null;
+        gameObjects = gameObjects.stream()
+                .filter(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation()) < distance)
+                .collect(Collectors.toList());
 
         for (net.runelite.api.GameObject gameObject : gameObjects) {
             if (gameObject.getId() == id)
@@ -239,12 +236,10 @@ public class Rs2GameObject {
         }
 
 
-        List<DecorativeObject> decorativeObjects = Arrays.stream(tileObjects.toArray(new DecorativeObject[tileObjects.size()]))
-                .filter(value -> value != null)
+        return Arrays.stream(tileObjects.toArray(new DecorativeObject[tileObjects.size()]))
+                .filter(Objects::nonNull)
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
-
-        return decorativeObjects;
     }
 
     public static GameObject findObjectById(int id, int x) {
@@ -283,8 +278,7 @@ public class Rs2GameObject {
 
         for (net.runelite.api.GameObject gameObject : gameObjects) {
             if (gameObject.getId() == id) {
-                ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
-                return objComp;
+                return convertGameObjectToObjectComposition(gameObject);
             }
         }
         return null;
@@ -304,7 +298,7 @@ public class Rs2GameObject {
             if (objComp == null) continue;
 
             if (exact) {
-                if (objComp.getName().toLowerCase().equals(objectName.toLowerCase())) {
+                if (objComp.getName().equalsIgnoreCase(objectName)) {
                     return gameObject;
                 }
             } else {
@@ -332,13 +326,12 @@ public class Rs2GameObject {
     }
 
     public static boolean hasAction(GameObject gameObject, String action) {
-        boolean result = false;
         ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
 
-        result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
+        boolean result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
         if (!result) {
             try {
-                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.toLowerCase().equals(action.toLowerCase()));
+                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase(action));
             } catch (Exception ex) {
                 //do nothing
             }
@@ -349,9 +342,6 @@ public class Rs2GameObject {
     /**
      * Imposter objects are objects that have their menu action changed but still remain the same object.
      * for example: farming patches
-     *
-     * @param action
-     * @return
      */
     public static GameObject findObjectByImposter(int id, String action) {
         return findObjectByImposter(id, action, true);
@@ -373,12 +363,12 @@ public class Rs2GameObject {
             try {
                 if (objComp.getImpostor() == null) continue;
                 if (exact) {
-                    if (Arrays.stream(objComp.getImpostor().getActions()).filter(action -> action != null)
-                            .anyMatch((action) -> action.toLowerCase().equals(optionName.toLowerCase()))) {
+                    if (Arrays.stream(objComp.getImpostor().getActions()).filter(Objects::nonNull)
+                            .anyMatch((action) -> action.equalsIgnoreCase(optionName))) {
                         return gameObject;
                     }
                 } else {
-                    if (Arrays.stream(objComp.getImpostor().getActions()).filter(action -> action != null)
+                    if (Arrays.stream(objComp.getImpostor().getActions()).filter(Objects::nonNull)
                             .anyMatch((action) -> action.toLowerCase().contains(optionName.toLowerCase()))) {
                         return gameObject;
                     }
@@ -407,11 +397,11 @@ public class Rs2GameObject {
             if (objComp == null) continue;
 
             if (exact) {
-                if (Arrays.stream(objComp.getActions()).filter(action -> action != null).anyMatch((action) -> action.toLowerCase().equals(optionName.toLowerCase()))) {
+                if (Arrays.stream(objComp.getActions()).filter(Objects::nonNull).anyMatch((action) -> action.equalsIgnoreCase(optionName))) {
                     return gameObject;
                 }
             } else {
-                if (Arrays.stream(objComp.getActions()).filter(action -> action != null).anyMatch((action) -> action.toLowerCase().contains(optionName.toLowerCase()))) {
+                if (Arrays.stream(objComp.getActions()).filter(Objects::nonNull).anyMatch((action) -> action.toLowerCase().contains(optionName.toLowerCase()))) {
                     return gameObject;
                 }
             }
@@ -430,8 +420,7 @@ public class Rs2GameObject {
     }
 
     public static GameObject findBank(String action) {
-        GameObject bank = findObjectByOption(action, false);
-        return bank;
+        return findObjectByOption(action, false);
     }
 
     public static TileObject findObject(int[] ids) {
@@ -446,8 +435,7 @@ public class Rs2GameObject {
     public static ObjectComposition convertGameObjectToObjectComposition(TileObject tileObject) {
         Player player = Microbot.getClient().getLocalPlayer();
         if (player.getLocalLocation().distanceTo(tileObject.getLocalLocation()) > 2400) return null;
-        ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(tileObject.getId()));
-        return objComp;
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(tileObject.getId()));
     }
 
     public static WallObject findDoor(int id) {
@@ -471,26 +459,17 @@ public class Rs2GameObject {
     }
 
 
-    //private methods
     public static GameObject getGameObject(LocalPoint localPoint) {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
         int z = Microbot.getClient().getPlane();
-        List<GameObject> tileObjects = new ArrayList<>();
         Tile tile = tiles[z][localPoint.getSceneX()][localPoint.getSceneY()];
-
-        for (GameObject tileObject :
-                tile.getGameObjects()) {
-            if (tileObject != null
-                    && tileObject.getSceneMinLocation().equals(tile.getSceneLocation()))
-                tileObjects.add(tileObject);
-        }
 
         return Arrays.stream(tile.getGameObjects()).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
-    private static List<GameObject> getGameObjects() {
+    public static List<GameObject> getGameObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
@@ -503,11 +482,7 @@ public class Rs2GameObject {
                 if (tile == null) {
                     continue;
                 }
-                for (GameObject tileObject :
-                        tile.getGameObjects()) {
-                    if (Arrays.stream(tile.getGameObjects()).anyMatch(c -> c != null && c.getId() == 11797)) {
-                        System.out.println(tile.getGameObjects());
-                    }
+                for (GameObject tileObject : tile.getGameObjects()) {
                     if (tileObject != null
                             && tileObject.getSceneMinLocation().equals(tile.getSceneLocation()))
                         tileObjects.add(tileObject);
@@ -515,15 +490,13 @@ public class Rs2GameObject {
             }
         }
 
-        List<GameObject> gameObjects = Arrays.stream(tileObjects.toArray(new GameObject[tileObjects.size()]))
-                .filter(value -> value != null)
-                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
                 .collect(Collectors.toList());
-
-        return gameObjects;
     }
 
-    private static List<GroundObject> getGroundObjects() {
+    public static List<GroundObject> getGroundObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
@@ -541,16 +514,13 @@ public class Rs2GameObject {
             }
         }
 
-
-        List<GroundObject> groundObjects = Arrays.stream(tileObjects.toArray(new GroundObject[tileObjects.size()]))
-                .filter(value -> value != null)
-                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
                 .collect(Collectors.toList());
-
-        return groundObjects;
     }
 
-    private static List<WallObject> getWallObjects() {
+    public static List<WallObject> getWallObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
@@ -569,14 +539,13 @@ public class Rs2GameObject {
         }
 
 
-        List<WallObject> wallObjects = Arrays.stream(tileObjects.toArray(new WallObject[tileObjects.size()]))
-                .filter(value -> value != null && value.getConfig() >= 0)
-                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
                 .collect(Collectors.toList());
-
-        return wallObjects;
     }
 
+    // private methods
     private static boolean clickObject(TileObject object) {
         return clickObject(object, "");
     }
@@ -587,7 +556,7 @@ public class Rs2GameObject {
             objectToInteract = object;
             objectAction = action;
             Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
-            sleep(100);
+            sleep(300);
             objectToInteract = null;
             objectAction = null;
         } catch (Exception ex) {
@@ -603,24 +572,23 @@ public class Rs2GameObject {
         menuEntry.setIdentifier(objectToInteract.getId());
 
         ObjectComposition objComp = convertGameObjectToObjectComposition(objectToInteract);
+        if (objComp == null) return;
 
-        try {
-            GameObject gameObject = (GameObject) objectToInteract;
+        if (objectToInteract instanceof GameObject) {
+            GameObject obj = (GameObject) objectToInteract;
+            if (obj.sizeX() > 1) {
+                menuEntry.setParam0(obj.getLocalLocation().getSceneX() - obj.sizeX() / 2);
+            } else {
+                menuEntry.setParam0(obj.getLocalLocation().getSceneX());
+            }
 
-            if ((gameObject).sizeX() > 1) {
-                int offset = gameObject.sizeX() / 2;
-                menuEntry.setParam0(gameObject.getLocalLocation().getSceneX() - offset);
+            if (obj.sizeY() > 1) {
+                menuEntry.setParam1(obj.getLocalLocation().getSceneY() - obj.sizeY() / 2);
             } else {
-                menuEntry.setParam0(gameObject.getLocalLocation().getSceneX());
+                menuEntry.setParam1(obj.getLocalLocation().getSceneY());
             }
-            if (gameObject.sizeY() > 1) {
-                int offset = gameObject.sizeY() / 2;
-                menuEntry.setParam1(gameObject.getLocalLocation().getSceneY() - offset);
-            } else {
-                menuEntry.setParam1(gameObject.getLocalLocation().getSceneY());
-            }
-        } catch (Exception ex) {
-            //default objects like walls, groundobjects, decorationobjects etc...
+        } else {
+            // Default objects like walls, groundobjects, decorationobjects etc...
             menuEntry.setParam0(objectToInteract.getLocalLocation().getSceneX());
             menuEntry.setParam1(objectToInteract.getLocalLocation().getSceneY());
         }
@@ -629,23 +597,27 @@ public class Rs2GameObject {
         menuEntry.setOption(objectAction == null ? "" : objectAction);
 
         int index = -1;
+        if (objectAction != null && !objectAction.isEmpty()) {
+            String[] actions;
+            if (objComp.getImpostorIds() != null && objComp.getImpostor() != null) {
+                actions = objComp.getImpostor().getActions();
+            } else {
+                actions = objComp.getActions();
+            }
 
-        if (objectAction != null) {
-            for (int i = 0; i < objComp.getActions().length; i++) {
-                if (objectAction.equalsIgnoreCase(objComp.getActions()[i])) {
+            for (int i = 0; i < actions.length; i++) {
+                if (objectAction.equalsIgnoreCase(actions[i])) {
                     index = i;
+                    break;
                 }
             }
-            if (index == -1 && objComp.getImpostor() != null) {
-                for (int i = 0; i < objComp.getImpostor().getActions().length; i++) {
-                    if (objectAction.equalsIgnoreCase(objComp.getImpostor().getActions()[i])) {
-                        index = i;
-                    }
-                }
-            }
+        } else {
+            index = 0;
         }
 
-        if (index == 0 || index == -1) {
+        if (Microbot.getClient().isWidgetSelected()) {
+            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
+        } if (index == 0) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIRST_OPTION);
         } else if (index == 1) {
             menuEntry.setType(MenuAction.GAME_OBJECT_SECOND_OPTION);
@@ -655,8 +627,6 @@ public class Rs2GameObject {
             menuEntry.setType(MenuAction.GAME_OBJECT_FOURTH_OPTION);
         } else if (index == 4) {
             menuEntry.setType(MenuAction.GAME_OBJECT_FIFTH_OPTION);
-        } else {
-            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT);
         }
     }
 }
