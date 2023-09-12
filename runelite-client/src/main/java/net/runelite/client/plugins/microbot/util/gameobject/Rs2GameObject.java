@@ -416,7 +416,7 @@ public class Rs2GameObject {
     public static GameObject findBank() {
         List<GameObject> gameObjects = getGameObjects();
 
-        ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"bank", "chest"}, false);
+        ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"bank"}, false);
 
         for (GameObject gameObject : gameObjects) {
             if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
@@ -430,6 +430,31 @@ public class Rs2GameObject {
                             action != null && (
                             action.toLowerCase().contains("bank") ||
                             action.toLowerCase().contains("collect"))))
+                continue;
+
+            return gameObject;
+        }
+
+        return null;
+    }
+
+    public static GameObject findChest() {
+        List<GameObject> gameObjects = getGameObjects();
+
+        ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"chest"}, false);
+
+        for (GameObject gameObject : gameObjects) {
+            if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
+
+            ObjectComposition objectComposition = convertGameObjectToObjectComposition(gameObject);
+
+            if (objectComposition == null) continue;
+
+            if (Arrays.stream(objectComposition.getActions())
+                    .noneMatch(action ->
+                            action != null && (
+                                    action.toLowerCase().contains("bank") ||
+                                            action.toLowerCase().contains("collect"))))
                 continue;
 
             return gameObject;

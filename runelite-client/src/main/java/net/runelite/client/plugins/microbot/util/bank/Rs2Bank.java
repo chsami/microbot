@@ -220,7 +220,7 @@ public class Rs2Bank {
         do {
             calc = widget.getRelativeY() - mainWindow.getScrollY();
 
-            if (calc >= 0 && calc < 640) break;
+            if (calc >= 0 && calc < 500) break;
 
             point = new Point((int) mainWindow.getBounds().getCenterX(), (int) mainWindow.getBounds().getCenterY());
 
@@ -233,7 +233,7 @@ public class Rs2Bank {
             sleep(100, 300);
             mainWindow = Rs2Widget.getWidget(786445);
 
-        } while (calc <= 0 || calc > 640);
+        } while (calc <= 0 || calc > 500);
 
         return true;
     }
@@ -334,8 +334,13 @@ public class Rs2Bank {
     public static boolean useBank() {
         if (isOpen()) return true;
         GameObject bank = Rs2GameObject.findBank();
-        if (bank == null) return false;
-        Rs2GameObject.interact(bank);
+        if (bank == null) {
+            GameObject chest = Rs2GameObject.findChest();
+            if (chest == null) return false;
+            Rs2GameObject.interact(chest, "use");
+        } else {
+            Rs2GameObject.interact(bank, "bank");
+        }
         sleepUntil(Rs2Bank::isOpen);
         return true;
     }
