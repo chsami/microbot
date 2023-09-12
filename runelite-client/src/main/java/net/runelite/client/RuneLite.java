@@ -227,7 +227,7 @@ public class RuneLite {
                 System.setProperty("http.proxyPort", proxy[1]);
             } else if (socksProxy && proxy.length > 2) {
                 System.setProperty("socksProxyHost", proxy[0]);
-                System.setProperty("socksProxyHost", proxy[1]);
+                System.setProperty("socksProxyPort", proxy[1]);
             }
 
             if (socksProxy && proxy.length >= 4) {
