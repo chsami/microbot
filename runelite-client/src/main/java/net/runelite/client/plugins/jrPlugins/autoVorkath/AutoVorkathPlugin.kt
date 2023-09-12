@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.jrPlugins.autoVorkath
 
 import com.google.inject.Provides
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.runelite.api.Client
@@ -16,11 +17,9 @@ import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginDescriptor.JR
 import net.runelite.client.plugins.microbot.Microbot
-import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic
@@ -29,7 +28,6 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.prayer.Prayer
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
-import net.runelite.client.plugins.microbot.util.walker.Walker
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction
 import javax.inject.Inject
 
@@ -87,6 +85,7 @@ class AutoVorkathPlugin : Plugin() {
         NONE
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun startUp() {
         println("Auto Vorkath Plugin Activated")
         botState = State.RANGE
@@ -111,7 +110,7 @@ class AutoVorkathPlugin : Plugin() {
             val vorkath = Rs2Npc.getNpc("vorkath")
             // Check if player is in Vorkath Area
             if (vorkath != null && vorkath.isInteracting) {
-                Script.toggleRunEnergy(false)
+                Rs2Player.toggleRunEnergy(false)
                 centerTile = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, vorkath.worldLocation.plane)
                 rightTile = WorldPoint(centerTile.x + 2, centerTile.y - 3, centerTile.plane)
                 leftTile = WorldPoint(centerTile.x - 2, centerTile.y - 3, centerTile.plane)
@@ -246,7 +245,7 @@ class AutoVorkathPlugin : Plugin() {
             } else if(Rs2Npc.getNpc("vorkath") == null || needsToBank || vorkath.isDead || !vorkath.isInteracting){
                 Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
                 if (config.ACTIVATERIGOUR()){ Rs2Prayer.fastPray(Prayer.RIGOUR, false) }
-                Script.toggleRunEnergy(true)
+                Rs2Player.toggleRunEnergy(true)
                 // Bank
                 if (needsToBank && Rs2Bank.getNearestBank() != null) {
                     Rs2Bank.openBank()

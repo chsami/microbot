@@ -5,14 +5,12 @@ import net.runelite.api.Point;
 import net.runelite.api.TileObject;
 import net.runelite.api.WallObject;
 import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
-import net.runelite.client.plugins.microbot.util.security.Login;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -99,7 +97,7 @@ public abstract class Script implements IScript {
     public boolean run() {
         hasLeveledUp = false;
         if (Microbot.enableAutoRunOn)
-            toggleRunEnergy(true);
+            Rs2Player.toggleRunEnergy(true);
         if (Microbot.getClient().getMinimapZoom() > 2)
             Microbot.getClient().setMinimapZoom(2);
 
@@ -119,12 +117,6 @@ public abstract class Script implements IScript {
             Microbot.getMouse().click(p);
         }
 
-        if (!Microbot.isLoggedIn()) {
-            new Login();
-            sleep(5000);
-            return false;
-        }
-
         if (Microbot.pauseAllScripts)
             return false;
 
@@ -142,7 +134,7 @@ public abstract class Script implements IScript {
 
     public boolean run(int world) {
         hasLeveledUp = false;
-        toggleRunEnergy(true);
+        Rs2Player.toggleRunEnergy(true);
 
         if (Rs2Widget.getWidget(36241409) != null) {
             Point p = Microbot.getClientThread()
@@ -154,12 +146,6 @@ public abstract class Script implements IScript {
             Point p = Microbot.getClientThread()
                     .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
             Microbot.getMouse().click(p);
-        }
-
-        if (!Microbot.isLoggedIn()) {
-            new Login(world);
-            sleep(5000);
-            return false;
         }
 
         if (Microbot.pauseAllScripts)
@@ -196,22 +182,6 @@ public abstract class Script implements IScript {
         sleepUntil(() -> Tab.getCurrentTab() == InterfaceTab.LOGOUT);
         sleep(600, 1000);
         Rs2Widget.clickWidget("Click here to logout");
-    }
-
-    public static boolean toggleRunEnergy(boolean toggle) {
-
-        if (Microbot.getVarbitPlayerValue(173) == 0 && !toggle) return true;
-        if (Microbot.getVarbitPlayerValue(173) == 1 && toggle) return true;
-        Widget widget = Rs2Widget.getWidget(WidgetInfo.MINIMAP_TOGGLE_RUN_ORB.getId());
-        if (widget == null) return false;
-        if (Microbot.getClient().getEnergy() > 1000 && toggle) {
-            Microbot.getMouse().click(widget.getCanvasLocation());
-            return true;
-        } else if (!toggle) {
-            Microbot.getMouse().click(widget.getCanvasLocation());
-            return true;
-        }
-        return false;
     }
 
     public void onWidgetLoaded(WidgetLoaded event) {

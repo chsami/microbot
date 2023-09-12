@@ -19,7 +19,8 @@ public enum BankLocation {
     VARROCK_EAST("Varrock east", new WorldPoint(3253, 3422, 0)),
 
     LUMBRIDGE_CASTLE_TOP("Lumbridge castle", new WorldPoint(3209, 3219, 2)),
-    EDGEVILLE_BANK("Edgeville bank", new WorldPoint(3093, 3492, 0));
+    EDGEVILLE_BANK("Edgeville bank", new WorldPoint(3093, 3492, 0)),
+    TREE_GNOME_STRONGHOLD_NIEVE("Nieve bank", new WorldPoint(2445, 3424,1));
 
     private final String name;
     private final WorldPoint worldPoint;

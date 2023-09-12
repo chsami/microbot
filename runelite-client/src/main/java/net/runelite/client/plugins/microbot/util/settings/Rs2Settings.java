@@ -6,7 +6,6 @@ import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.globval.VarbitIndices.TOGGLE_ROOFS;
@@ -37,29 +36,33 @@ public class Rs2Settings {
         return Microbot.getVarbitValue(TOGGLE_ROOFS) == 1;
     }
 
-    public static void enableHideRoofs() {
+    public static void hideRoofs() {
         if (!isHideRoofsEnabled()) {
             Tab.switchToSettingsTab();
             Rs2Widget.clickWidget(7602208);
             sleepUntil(() -> Rs2Widget.hasWidget("Hide roofs"));
+            sleep(1000);
             Rs2Widget.clickWidget("Hide roofs");
         }
     }
 
     public static void turnOffMusic() {
-        boolean isMusicTurnedOff = Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Rs2Widget.getWidget(116, 93).getChildren()).anyMatch(x -> x.isHidden()));
-        boolean isSoundEffectOff = Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Rs2Widget.getWidget(116, 107).getChildren()).anyMatch(x -> x.isHidden()));
-        boolean isAreaSoundEffectOff = Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Rs2Widget.getWidget(116, 122).getChildren()).anyMatch(x -> x.isHidden()));
+        Tab.switchToSettingsTab();
+        sleep(600);
+        Rs2Widget.clickWidget(116, 68);
+        sleep(600);
+        boolean isMusicTurnedOff = !Rs2Widget.getWidget(116, 93).getChildren()[1].isSelfHidden();
+        boolean isSoundEffectOff = !Rs2Widget.getWidget(116, 107).getChildren()[1].isSelfHidden();
+        boolean isAreaSoundEffectOff = !Rs2Widget.getWidget(116, 122).getChildren()[1].isSelfHidden();
         if (isMusicTurnedOff && isSoundEffectOff && isAreaSoundEffectOff)
             return;
-        Tab.switchToSettingsTab();
         Rs2Widget.clickWidget(7602244);
         sleep(1000);
         if (!isMusicTurnedOff)
             Rs2Widget.clickWidget(7602269);
         if (!isSoundEffectOff)
             Rs2Widget.clickWidget(7602283);
-        if (isAreaSoundEffectOff)
+        if (!isAreaSoundEffectOff)
             Rs2Widget.clickWidget(7602298);
     }
 }

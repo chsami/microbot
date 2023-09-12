@@ -31,11 +31,6 @@ public class PestControlOverlay  extends OverlayPanel {
                     .left(Microbot.status)
                     .build());
 
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Games played")
-                    .right(Integer.toString(PestControlScript.games))
-                    .build());
-
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }

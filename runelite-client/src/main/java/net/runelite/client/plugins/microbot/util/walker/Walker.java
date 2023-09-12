@@ -202,39 +202,48 @@ public class Walker {
     }
 
     public boolean walkTo(WorldPoint target, boolean useTransport, boolean useCanvas, WorldArea[] blockingAreas) {
-        pathfinder = null;
-        WorldPoint start = WorldPoint.fromLocalInstance(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation());
-        if (pathfinder != null) {
-            start = pathfinder.getStart();
-        }
+        WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
+
         pathfinder = new Pathfinder(pathfinderConfig, start, target, useTransport, false, useCanvas, blockingAreas);
-        currentDestination = null;
-        ignoreTransport = new ArrayList<>();
-        pathOrigin = new ArrayList<>();
+        setupPathfinderDefaults();
+
         sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
+
         return false;
     }
 
     public boolean canReach(WorldPoint target) {
-        pathfinder = null;
-        WorldPoint start = WorldPoint.fromLocalInstance(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation());
-        if (pathfinder != null) {
-            start = pathfinder.getStart();
-        }
+        WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
+
         pathfinder = new Pathfinder(pathfinderConfig, start, target, true);
+        setupPathfinderDefaults();
+
+        sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
+
+        return pathfinder.getPath().get(pathfinder.getPath().size() - 1).position.equals(target);
+    }
+
+    public boolean canInteract(WorldPoint target) {
+        WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
+
+        pathfinder = new Pathfinder(pathfinderConfig, start, target, true);
+        setupPathfinderDefaults();
+
+        sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
+
+        return pathfinder.getPath().get(pathfinder.getPath().size() - 1).position.distanceTo(target) <= 1;
+    }
+
+    public void setupPathfinderDefaults() {
         currentDestination = null;
         ignoreTransport = new ArrayList<>();
         pathOrigin = new ArrayList<>();
-        sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
-
-        boolean result = pathfinder.getPath().get(pathfinder.getPath().size() - 1).position.equals(target);
-
-        return result;
     }
 
     public boolean walkPath(WorldPoint[] worldPoints) {
         if (worldPoints[worldPoints.length -1].distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 4) return true;
         pathfinder = new Pathfinder(pathfinderConfig);
+        pathfinder.customPath = true;
         List<Node> path = new ArrayList();
         for (WorldPoint worldPoint: worldPoints) {
             path.add(new Node(worldPoint, null, 0));

@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.Arrays;
@@ -27,8 +28,6 @@ public class PestControlScript extends Script {
     public static double version = 1.0;
 
     boolean walkToCenter = false;
-
-    public static int games = 0;
 
     private static final Set<Integer> SPINNER_IDS = ImmutableSet.of(
             NpcID.SPINNER,
@@ -58,6 +57,8 @@ public class PestControlScript extends Script {
     @Getter
     @Setter
     private static boolean yellowShield = true;
+
+    final int distanceToPortal = 8;
 
     public boolean run(PestControlConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -90,6 +91,8 @@ public class PestControlScript extends Script {
                     Widget redHealth = Rs2Widget.getWidget(RED.getHitpoints());
                     Widget yellowHealth = Microbot.getClient().getWidget(YELLOW.getHitpoints());
 
+                    Rs2Player.toggleSpecialAttack(550);
+
                     for (int brawler : BRAWLER_IDS) {
                         if (!Microbot.getClient().getLocalPlayer().isInteracting())
                             if (Rs2Npc.interact(brawler, "attack")) {
@@ -110,7 +113,7 @@ public class PestControlScript extends Script {
                         return;
 
                     if (!purpleShield && !purpleHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(4, 8, 30)) {
+                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 8, 30)) {
                             WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(8, 30);
                             if (worldPoint == null) {
                                 Microbot.getWalker().walkFastRegion(30, 32);
@@ -123,7 +126,7 @@ public class PestControlScript extends Script {
                     }
 
                     if (!blueShield && !blueHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(4, 55, 29)) {
+                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 55, 29)) {
                             WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(55, 29);
                             if (worldPoint == null) {
                                 Microbot.getWalker().walkFastRegion(30, 32);
@@ -136,7 +139,7 @@ public class PestControlScript extends Script {
                     }
 
                     if (!redShield && !redHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(4, 22, 12)) {
+                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 22, 12)) {
                             WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(22, 12);
                             if (worldPoint == null) {
                                 Microbot.getWalker().walkFastRegion(30, 32);
@@ -149,7 +152,7 @@ public class PestControlScript extends Script {
                     }
 
                     if (!yellowShield && !yellowHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(4, 48, 13)) {
+                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 48, 13)) {
                             WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(48, 13);
                             if (worldPoint == null) {
                                 Microbot.getWalker().walkFastRegion(30, 32);
@@ -183,7 +186,14 @@ public class PestControlScript extends Script {
                     redShield = true;
                     yellowShield = true;
                     if (!isInBoat) {
-                        Rs2GameObject.interact(ObjectID.GANGPLANK_25632);
+                        if (Microbot.getClient().getLocalPlayer().getCombatLevel() >= 100) {
+                            Rs2GameObject.interact(ObjectID.GANGPLANK_25632);
+                        } else if (Microbot.getClient().getLocalPlayer().getCombatLevel() >= 70) {
+                            Rs2GameObject.interact(ObjectID.GANGPLANK_25631);
+                        } else {
+                            Rs2GameObject.interact(ObjectID.GANGPLANK_14315);
+                        }
+                        sleep(3000);
                     }
                 }
             } catch (Exception ex) {

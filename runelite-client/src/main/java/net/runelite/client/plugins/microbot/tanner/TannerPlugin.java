@@ -20,7 +20,8 @@ import java.awt.*;
         name = PluginDescriptor.Mocrosoft + "Tanner",
         description = "Microbot tanner plugin",
         tags = {"tanner", "microbot", "moneymaking"},
-        enabledByDefault = false
+        enabledByDefault = false,
+        hidden = true
 )
 @Slf4j
 public class TannerPlugin extends Plugin {

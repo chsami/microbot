@@ -20,7 +20,7 @@ public enum Teleport {
             new WorldPoint(3093, 3380, 0), "<col=00ff00>Falador Teleport</col>", "Falador teleport", MagicAction.FALADOR_TELEPORT),
     CAMELOT(45,
                     new Pair[] {Pair.of("law rune", 1), Pair.of("air rune", 5)},
-            new WorldPoint(2885, 3478, 0), "<col=00ff00>Camelot Teleport</col>", "Camelot teleport", MagicAction.CAMELOT_TELEPORT),
+            new WorldPoint(2756, 3476, 0), "<col=00ff00>Camelot Teleport</col>", "Camelot teleport", MagicAction.CAMELOT_TELEPORT),
 
     ARDOUGNE(51,
                     new Pair[] {Pair.of("law rune", 2), Pair.of("water rune", 2)},

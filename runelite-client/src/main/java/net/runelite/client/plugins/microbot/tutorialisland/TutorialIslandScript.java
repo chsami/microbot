@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.microbot.tutorialisland;
 
 
-import net.runelite.api.Actor;
-import net.runelite.api.NPC;
-import net.runelite.api.ObjectID;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -28,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.clickContinue;
 import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.isInDialogue;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
-import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.enableHideRoofs;
+import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.hideRoofs;
 import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.turnOffMusic;
 
 public class TutorialIslandScript extends Script {
@@ -48,18 +46,22 @@ public class TutorialIslandScript extends Script {
                 switch (status) {
                     case NAME:
                         String name = new NameGenerator(random(3, 6)).getName() + new NameGenerator(random(3, 6)).getName();
-                        Rs2Widget.clickWidget("Enter name");
+                        Rs2Widget.clickWidget(36569095);
                         VirtualKeyboard.typeString(name);
                         Rs2Widget.clickWidget("Look up name");
                         sleepUntil(() -> Rs2Widget.hasWidget("Set name"));
-                        if (!Rs2Widget.hasWidget("Sorry")) {
-                            Rs2Widget.clickWidget("Enter name");
+                        sleep(4000);
+                        if (Rs2Widget.hasWidget("Sorry")) {
+                            Rs2Widget.clickWidget(36569095);
                             for (int i = 0; i < name.length(); i++) {
-                                VirtualKeyboard.typeString("8");
+                                VirtualKeyboard.keyPress(KeyEvent.VK_BACK_SPACE);
+                                sleep(300, 600);
                             }
+                        } else {
+                            Rs2Widget.clickWidget("Set name");
+                            Rs2Widget.clickWidget("Set name");
+                            sleepUntil(() -> !isLookupNameButtonVisible());
                         }
-                        Rs2Widget.clickWidget("Set name");
-                        sleepUntil(() -> !isLookupNameButtonVisible());
                         sleep(2000);
                         break;
                     case CHARACTER:
@@ -193,6 +195,8 @@ public class TutorialIslandScript extends Script {
             Rs2Widget.clickWidget(10747944);
             sleep(1000);
             turnOffMusic();
+            Microbot.getMouse().scrollDown(new Point(800, 800));
+            Microbot.getClient().setCameraPitchTarget(460);
             return;
         }
 
@@ -217,6 +221,7 @@ public class TutorialIslandScript extends Script {
                 || Microbot.getVarbitPlayerValue(281) == 90) { // FISHING + woodcutting + cooking
             if (!Inventory.contains("Raw shrimps")) {
                 ClickContinue();
+                sleep(1000);
                 Rs2Widget.clickWidget(10747958);
                 sleep(1000);
                 Rs2Npc.interact(3317, "Net");
@@ -231,13 +236,13 @@ public class TutorialIslandScript extends Script {
                             ClickContinue();
                             ClickContinue();
                         }
-                    } else if (!Inventory.contains("Logs")) {
+                    } else if (!Inventory.contains("Logs") && Microbot.getClient().getSkillExperience(Skill.WOODCUTTING) == 0) {
                         CutTree();
                     } else if (Inventory.contains("Logs")) {
                         LightFire();
                     }
                 } else if (Microbot.getVarbitPlayerValue(281) == 90 && Inventory.contains("Raw shrimps")) {
-                    if (!Inventory.contains("Logs"))
+                    if (!Inventory.contains("Logs") && !Rs2GameObject.exists(26185))
                         CutTree();
                     if (!Rs2GameObject.exists(26185))
                         LightFire();
@@ -258,9 +263,10 @@ public class TutorialIslandScript extends Script {
                 Microbot.getWalker().walkTo(worldPoint);
             } else {
                 Rs2Npc.interact(3309, "Talk-to");
+                sleepUntil(() -> isInDialogue());
             }
         } else if (Microbot.getVarbitPlayerValue(281) == 630) {
-            Rs2Widget.clickWidget(10551360); //switchToMagicTab
+            Rs2Widget.clickWidget(164, 57); //switchToMagicTab
         } else if (Microbot.getVarbitPlayerValue(281) == 640) {
             Rs2Npc.interact(3309, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) == 650) {
@@ -273,9 +279,12 @@ public class TutorialIslandScript extends Script {
             if (Rs2Widget.hasWidget("Do you want to go to the mainland?")) {
                 Rs2Widget.clickWidget(14352385);
                 VirtualKeyboard.typeString("1");
-                sleep(5000);
             } else if (Rs2Widget.hasWidget("Select an option")) {
-                VirtualKeyboard.typeString("3");
+                if (Rs2Widget.hasWidget("No, I'm not planning to do that")) {
+                    VirtualKeyboard.typeString("3");
+                } else {
+                    Rs2Widget.clickWidget("Yes, send me to the mainland");
+                }
             } else {
                 Rs2Npc.interact(3309, "Talk-to");
             }
@@ -288,11 +297,11 @@ public class TutorialIslandScript extends Script {
             Microbot.getWalker().walkTo(new WorldPoint(3124, 3106, 0));
             Rs2Npc.interact(3319, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) == 560) {
-            Rs2Widget.clickWidget(10551359); //switchToPrayerTab
+            Rs2Widget.clickWidget(10747960); //switchToPrayerTab
         } else if (Microbot.getVarbitPlayerValue(281) == 570) {
             Rs2Npc.interact(3319, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) == 580) {
-            Rs2Widget.clickWidget(164, 56); //switchToFriendsTab
+            Rs2Widget.clickWidget(164, 45); //switchToFriendsTab
         } else if (Microbot.getVarbitPlayerValue(281) == 600) {
             Rs2Npc.interact(3319, "Talk-to");
         }
@@ -301,7 +310,6 @@ public class TutorialIslandScript extends Script {
     public void BankerGuide() {
         if (isInDialogue()) return;
         if (Microbot.getVarbitPlayerValue(281) == 510) {
-            enableHideRoofs();
             Rs2GameObject.interact(ObjectID.BANK_BOOTH_10083);
 
             sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 510);
@@ -372,7 +380,7 @@ public class TutorialIslandScript extends Script {
                 return;
             }
             if (Microbot.getVarbitPlayerValue(281) == 390 || Microbot.getVarbitPlayerValue(281) == 400 || Microbot.getVarbitPlayerValue(281) == 405) {
-                if (Rs2Widget.getWidget(84, 1) == null) {
+                if (Rs2Widget.getWidget(84, 1) == null && Rs2Equipment.hasEquipped("Bronze sword")) {
                     Rs2Widget.clickWidget(10747959);
                     sleep(1000);
                     Rs2Widget.clickWidget(25362433);
@@ -440,9 +448,10 @@ public class TutorialIslandScript extends Script {
     }
 
     public void QuestGuide() {
-        if (Microbot.getVarbitPlayerValue(281) == 200) {
+        if (Microbot.getVarbitPlayerValue(281) == 200 || Microbot.getVarbitPlayerValue(281) == 210) {
             Microbot.getWalker().walkTo(new WorldPoint(random(3083, 3086), random(3127, 3129), 0));
             Rs2GameObject.interact(9716, "Open");
+            sleep(600, 1200);
         } else if (Microbot.getVarbitPlayerValue(281) != 250) {
             if (isInDialogue()) return;
             NPC npc = Rs2Npc.getNpc(3312);
@@ -459,6 +468,9 @@ public class TutorialIslandScript extends Script {
 
     public void CookingGuide() {
         if (Microbot.getVarbitPlayerValue(281) == 120) {
+            hideRoofs();
+            sleep(600);
+            VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
             Rs2GameObject.interact(ObjectID.GATE_9470, "Open");
             sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 120);
         } else if (Microbot.getVarbitPlayerValue(281) == 130) {
