@@ -136,16 +136,30 @@ class PathWalker(private val nodes: List<PathNode>) {
     private fun operateTransport(pathTransport: PathTransport): Boolean {
         val player = Microbot.getClientForKotlin().localPlayer
 
-        val transportGameObject = Rs2GameObject.getGameObjects()
+        val allTransportGameObjects = Rs2GameObject.getGameObjects()
             .filter { gameObject: GameObject -> gameObject.id == pathTransport.objectId }
-            .filter { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) < 8 }
-            .minByOrNull { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) }
+            .filter { gameObject: GameObject -> gameObject.worldLocation != null }
 
-        val transportWallObject = Rs2GameObject.getWallObjects()
+        val allTransportWallObjects = Rs2GameObject.getWallObjects()
             .filter { wallObject: WallObject -> wallObject.id == pathTransport.objectId }
-            .filter { wallObject: WallObject -> wallObject.worldLocation.distanceTo(player.worldLocation) < 8 }
-            .minByOrNull { wallObject: WallObject -> wallObject.worldLocation.distanceTo(player.worldLocation) }
+            .filter { wallObject: WallObject -> wallObject.worldLocation != null }
 
+        var transportGameObject: GameObject? = null
+        var transportWallObject: WallObject? = null
+
+        for (i in 1..6) {
+            if (transportGameObject != null || transportWallObject != null) {
+                break
+            }
+
+            transportGameObject = allTransportGameObjects
+                .filter { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) <= i }
+                .minByOrNull{ gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) }
+
+            transportWallObject = allTransportWallObjects
+                .filter { wallObject: WallObject -> wallObject.worldLocation.distanceTo(player.worldLocation) <= i }
+                .minByOrNull{ wallObject: WallObject -> wallObject.worldLocation.distanceTo(player.worldLocation) }
+        }
 
         if (transportGameObject == null && transportWallObject == null) {
             println("No transport: ${pathTransport.name}, found with ID: ${pathTransport.objectId}, at location: ${pathTransport.startPathNode.worldLocation}")

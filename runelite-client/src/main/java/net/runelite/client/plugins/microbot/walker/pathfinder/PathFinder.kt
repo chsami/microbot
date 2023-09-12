@@ -79,7 +79,6 @@ class PathFinder(private val grid: Array<Array<Array<PathNode?>>>) {
             if (endNodes.isNotEmpty()) {
                 return endNodes
             }
-//            return node.pathTransports.map { pathTransport -> pathTransport.startPathNode }.toList()
         }
 
         val northNeighbor = grid[node.worldLocation.plane][node.worldLocation.y + 1][node.worldLocation.x]
@@ -96,6 +95,10 @@ class PathFinder(private val grid: Array<Array<Array<PathNode?>>>) {
             .filter { pathNode -> isNeighborWalkable(node, pathNode) }
             .filter { pathNode -> !pathNode.blocked || pathNode.pathTransports.isNotEmpty() }
             .toMutableList()
+
+        if (node.pathTransports.isNotEmpty()) {
+            neighbors.addAll(node.pathTransports.map { pathTransport: PathTransport -> pathTransport.startPathNode })
+        }
 
         return neighbors
     }
