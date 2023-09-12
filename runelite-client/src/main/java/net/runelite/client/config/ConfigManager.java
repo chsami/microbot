@@ -29,39 +29,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.gson.Gson;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -76,19 +43,31 @@ import net.runelite.client.account.AccountSession;
 import net.runelite.client.account.SessionManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ClientShutdown;
-import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.events.ConfigSync;
-import net.runelite.client.events.ProfileChanged;
-import net.runelite.client.events.RuneScapeProfileChanged;
-import net.runelite.client.events.SessionClose;
-import net.runelite.client.events.SessionOpen;
+import net.runelite.client.events.*;
 import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.RunnableExceptionLogger;
 import net.runelite.http.api.config.ConfigPatch;
 import net.runelite.http.api.config.ConfigPatchResult;
 import net.runelite.http.api.config.Configuration;
 import net.runelite.http.api.config.Profile;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Singleton
 @Slf4j
@@ -290,6 +269,25 @@ public class ConfigManager
 				profile.setRev(-1L);
 			}
 
+			lock.dirty();
+		}
+	}
+
+	public void setPassword(ConfigProfile profile, String password) {
+
+		// flush pending config changes first in the event the profile being
+		// synced is the active profile.
+		sendConfig();
+
+		try (ProfileManager.Lock lock = profileManager.lock())
+		{
+			profile = lock.findProfile(profile.getId());
+			if (profile == null || profile.getPassword() == password)
+			{
+				return;
+			}
+
+			profile.setPassword(password);
 			lock.dirty();
 		}
 	}
