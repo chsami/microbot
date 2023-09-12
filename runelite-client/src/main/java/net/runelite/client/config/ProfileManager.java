@@ -179,21 +179,27 @@ public class ProfileManager {
             modified = true;
             File newFile = profileConfigFile(profile);
 
-            if (!oldFile.exists()) {
-                // no config file is valid if the profile hasn't been used yet.
-                return;
-            }
+			if (!oldFile.exists())
+			{
+				// no config file is valid if the profile hasn't been used yet.
+				log.info("Old profile file {} does not exist", oldFile.getName());
+				return;
+			}
 
-            try {
-                Files.move(
-                        oldFile.toPath(),
-                        newFile.toPath(),
-                        StandardCopyOption.REPLACE_EXISTING
-                );
-            } catch (IOException e) {
-                log.error("error renaming profile", e);
-            }
-        }
+			try
+			{
+				Files.move(
+					oldFile.toPath(),
+					newFile.toPath(),
+					StandardCopyOption.REPLACE_EXISTING
+				);
+				log.info("Renamed profile file {} to {}", oldFile.getName(), newFile.getName());
+			}
+			catch (IOException e)
+			{
+				log.error("error renaming profile", e);
+			}
+		}
 
         public void dirty() {
             modified = true;

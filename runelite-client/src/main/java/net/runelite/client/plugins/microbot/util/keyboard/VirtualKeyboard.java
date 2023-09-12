@@ -26,7 +26,7 @@ public class VirtualKeyboard {
 
             KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_UNDEFINED, word.charAt(i));
 
-            getCanvas().dispatchEvent(keyEvent);
+            Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
             Global.sleep(100, 200);
         }
 
@@ -41,7 +41,7 @@ public class VirtualKeyboard {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_UNDEFINED, key);
 
-        getCanvas().dispatchEvent(keyEvent);
+        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
     }
 
     public static void holdShift() {
@@ -52,7 +52,7 @@ public class VirtualKeyboard {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_SHIFT, CHAR_UNDEFINED);
 
-        getCanvas().dispatchEvent(keyEvent);
+        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
     }
 
     public static void releaseShift() {
@@ -63,7 +63,7 @@ public class VirtualKeyboard {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_SHIFT);
 
-        getCanvas().dispatchEvent(keyEvent);
+        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
     }
 
     public static void keyHold(int key) {
@@ -72,7 +72,7 @@ public class VirtualKeyboard {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, key);
 
-        getCanvas().dispatchEvent(keyEvent);
+        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
     }
 
     public static void keyRelease(int key) {
@@ -81,7 +81,7 @@ public class VirtualKeyboard {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, key);
 
-        getCanvas().dispatchEvent(keyEvent);
+        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
     }
 
     public static void keyPress(int key) {

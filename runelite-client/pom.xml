@@ -29,7 +29,7 @@
 	<parent>
 		<groupId>net.runelite</groupId>
 		<artifactId>runelite-parent</artifactId>
-		<version>1.10.11.1</version>
+		<version>1.10.12.1</version>
 	</parent>
 
 	<artifactId>client</artifactId>
@@ -103,6 +103,11 @@
 					<artifactId>animal-sniffer-annotations</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.42.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>

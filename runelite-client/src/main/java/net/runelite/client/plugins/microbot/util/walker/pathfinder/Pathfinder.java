@@ -23,7 +23,6 @@ import net.runelite.client.plugins.microbot.util.walker.Transport;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -60,7 +59,7 @@ public class Pathfinder implements Runnable {
 
 
     public boolean getDebugger() {
-        return false;
+        return true;
     }
 
     public Pathfinder(PathfinderConfig config) {
@@ -95,7 +94,9 @@ public class Pathfinder implements Runnable {
 
         final int teleportThreshHoldDistance = 20;
 
-        if (useTransport && start.distanceTo(target) > teleportThreshHoldDistance && Microbot.getWalker().pathfinder.target == target) {
+        Transport tunnel = getClosestTunnel();
+
+        if (useTransport && start.distanceTo(target) > teleportThreshHoldDistance) {
             Tab.switchToInventoryTab();
 
             Teleport shortestPathSpell = null;
@@ -104,7 +105,11 @@ public class Pathfinder implements Runnable {
 
             // Teleport spells logic
             for (Teleport teleport : Teleport.values()) {
-                if (teleport.getDestination().equals(start) || teleport.getDestination().distanceTo(target) < start.distanceTo(target)) {
+                if (teleport.getDestination().distanceTo2D(target) > tunnel.destination.distanceTo2D(target))
+                    continue;
+                if (shortestPathSpell != null && shortestPathSpell.getDestination().distanceTo2D(target) <= teleport.getDestination().distanceTo2D(target))
+                    continue;
+                if (teleport.getDestination().equals(target) || teleport.getDestination().distanceTo2D(target) < start.distanceTo2D(target)) {
                     hasTablet = Inventory.hasItem(teleport.getTabletName());
                     boolean hasRunes = true;
                     for (Pair itemRequired : teleport.getItemsRequired()) {
@@ -114,26 +119,30 @@ public class Pathfinder implements Runnable {
 
                     if (hasRunes && Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC) >= teleport.getLevel()) {
                         shortestPathSpell = teleport;
-                        break;
                     }
 
                     if (hasTablet) {
                         shortestPathSpell = teleport;
-                        break;
                     }
                 }
             }
             // Jewellery teleport logic
             for (JewelleryLocationEnum jewelleryLocationEnum : JewelleryLocationEnum.values()) {
-                if (jewelleryLocationEnum.getLocation().equals(start)
-                        || jewelleryLocationEnum.getLocation().distanceTo(target) < start.distanceTo(target)
-                        && (shortestPathJewellery == null || shortestPathJewellery.getLocation().distanceTo(target) > jewelleryLocationEnum.getLocation().distanceTo(target))) {
-                    shortestPathJewellery = jewelleryLocationEnum;
-                }
+                if (jewelleryLocationEnum.getLocation().distanceTo2D(target) >= start.distanceTo2D(target))
+                    continue;
+                if (jewelleryLocationEnum.getLocation().distanceTo2D(target) > tunnel.destination.distanceTo2D(target))
+                    continue;
+                if (!Rs2Equipment.hasEquippedContains(jewelleryLocationEnum.getTooltip() + "(")
+                        && !Inventory.hasItemContains(jewelleryLocationEnum.getTooltip() + "("))
+                    continue;
+                if (shortestPathJewellery != null && shortestPathJewellery.getLocation().distanceTo2D(target) <= jewelleryLocationEnum.getLocation().distanceTo2D(target))
+                    continue;
+
+                shortestPathJewellery = jewelleryLocationEnum;
             }
 
             if (shortestPathSpell != null && shortestPathJewellery != null) {
-                if (shortestPathSpell.getDestination().distanceTo(target) <= shortestPathJewellery.getLocation().distanceTo(target)) {
+                if (shortestPathSpell.getDestination().distanceTo2D(target) <= shortestPathJewellery.getLocation().distanceTo2D(target)) {
                     useTeleport(shortestPathSpell, hasTablet);
                 } else {
                     useJewellery(shortestPathJewellery);
@@ -145,10 +154,13 @@ public class Pathfinder implements Runnable {
             }
         }
 
-        new Thread(this).start();
+        run();
     }
 
     private void useTeleport(Teleport shortestPathSpell, boolean hasTablet) {
+        //no need to teleport if we are close enough
+        if (shortestPathSpell.getDestination().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 10)
+            return;
         if (hasTablet) {
             Inventory.useItemFast(shortestPathSpell.getTabletName(), "Break");
         } else {
@@ -159,6 +171,8 @@ public class Pathfinder implements Runnable {
     }
 
     private void useJewellery(JewelleryLocationEnum shortestPathJewellery) {
+        if (shortestPathJewellery.getLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 10)
+            return;
         String itemName = shortestPathJewellery.getTooltip() + "(";
         boolean hasItemEquipped = Rs2Equipment.hasEquippedContains(itemName);
         if (hasItemEquipped) {
@@ -180,7 +194,14 @@ public class Pathfinder implements Runnable {
 
     private void precalculateTransports(WorldPoint start, WorldPoint target, boolean useTransport) {
         if (useTransport) {
-            if (target.getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
+            if (start.getY() >= 9000 && target.getY() < 9000) {
+                // Use object to go surface
+                Transport transportSurface = getClosestTunnel();
+                if (transportSurface != null) {
+                    this.target = transportSurface.getOrigin();
+                    this.useCurrentTransport = transportSurface;
+                }
+            } else if (target.getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
                 //custom logic for staircase/ladders
                 Transport linkedTransport = getMatchingTransport(Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane());
                 while (linkedTransport != null) {
@@ -205,19 +226,12 @@ public class Pathfinder implements Runnable {
                     }
                     linkedTransport = linkedTransport.linkedTransport;
                 }
-            } else {
-                if (start.getY() < 9000 && target.getY() > 9000) {
-                    // Use object to go underground
-                    Transport transportUnderground = getClosestTransport(target);
-                    if (transportUnderground != null) {
-                        this.target = transportUnderground.getOrigin();
-                    }
-                } else if (start.getY() >= 9000 && target.getY() < 9000) {
-                    // Use object to go surface
-                    Transport transportSurface = getClosestTransport(target);
-                    if (transportSurface != null) {
-                        this.target = transportSurface.getDestination();
-                    }
+            } else  if (start.getY() < 9000 && target.getY() > 9000) {
+                // Use object to go underground
+                Transport transportUnderground = getClosestTunnel();
+                if (transportUnderground != null) {
+                    this.target = transportUnderground.getOrigin();
+                    this.useCurrentTransport = transportUnderground;
                 }
             }
         }
@@ -238,8 +252,14 @@ public class Pathfinder implements Runnable {
         }
     }
 
-    @Override
     public void run() {
+        if (handleTransports()) {
+            done = true;
+            boundary.clear();
+            visited.clear();
+            pending.clear();
+            return;
+        }
         CollisionMap.nodesChecked = new ArrayList<>();
         wallNodes = new ArrayList<>();
         Microbot.status = "Calculating webwalking, please wait...";
@@ -285,8 +305,8 @@ public class Pathfinder implements Runnable {
         }
 
 
-        if (this.executeWalking && !handleDoors() && !handleTransports()) {
-            Collections.reverse(path);
+        if (this.executeWalking && !handleDoors() && !handleShortcuts()) {
+            //  Collections.reverse(path);
             if (useCanvas) {
                 handleWalkableNodesCanvas();
             } else {
@@ -300,9 +320,37 @@ public class Pathfinder implements Runnable {
         pending.clear();
     }
 
+    private boolean handleShortcuts() {
+        for (Node node : new ArrayList<>(path)) {
+            if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(node.position)) continue;
+            Transport transport = getMatchingTransport(node.position);
+            if (transport == null) continue;
+            if (Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), transport.origin))) {
+                TileObject tileObject = Rs2GameObject.findObjectByLocation(transport.origin);
+                if (!Rs2GameObject.hasLineOfSight(tileObject)) continue;
+                Rs2GameObject.interact(tileObject);
+                sleepUntil(Microbot::isAnimating);
+                sleepUntil(() -> !Microbot.isAnimating());
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void handleWalkableNodes() {
+        Node lastNode = path.get(path.size() - 1);
+        //if the our target is on the minimap, just navigate to it directly
+        if (this.target.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 7) {
+            if (Calculations.tileOnMap(this.target)) {
+                Point point = Calculations.tileToMinimap(this.target);
+                Microbot.getMouse().click(point);
+                return;
+            }
+        }
         for (Node node : path) {
-            if (Calculations.tileOnMap(node.position) && (node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 14 || customPath)) {
+            if (Calculations.tileOnMap(node.position)
+                    && (node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 14
+                    || customPath || lastNode == node)) {
                 Point point = Calculations.tileToMinimap(node.position);
                 Microbot.getMouse().click(point);
                 break;
@@ -323,27 +371,20 @@ public class Pathfinder implements Runnable {
     private boolean handleTransports() {
         boolean skip = false;
         if (useTransport) {
-            if (useCurrentTransport != null && Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), target))) {
-                // Custom logic for staircase/ladders
+            // Custom logic for staircase/ladders
+            boolean isLadder = useCurrentTransport != null;
+            if (isLadder) {
+                if (Microbot.getWalker().getReachDistance(target) > 17)
+                    return false;
+                if (useCurrentTransport.offsetX != 0 || useCurrentTransport.offsetY != 0) {
+                    this.target = new WorldPoint(this.target.getX() + useCurrentTransport.offsetX, this.target.getY() + useCurrentTransport.offsetY, this.target.getPlane());
+                }
                 TileObject tileObject = Rs2GameObject.findObjectByLocation(this.target);
+                if (!Rs2GameObject.hasLineOfSight(tileObject)) return false;
                 Rs2GameObject.interact(tileObject, this.useCurrentTransport.getAction());
                 int currentPlane = Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane();
                 sleepUntil(() -> currentPlane != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane());
                 skip = true;
-            } else {
-                for (Node node : new ArrayList<>(path)) {
-                    if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(node.position)) continue;
-                    Transport transport = getMatchingTransport(node.position);
-                    if (transport == null) continue;
-                    if (Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), transport.origin))) {
-                        TileObject tileObject = Rs2GameObject.findObjectByLocation(transport.origin);
-                        Rs2GameObject.interact(tileObject);
-                        sleepUntil(Microbot::isAnimating);
-                        sleepUntil(() -> !Microbot.isAnimating());
-                        skip = true;
-                        break;
-                    }
-                }
             }
         }
         return skip;
@@ -367,47 +408,68 @@ public class Pathfinder implements Runnable {
         return skip;
     }
 
-    public Transport getClosestTransport(WorldPoint worldPoint) {
-        WorldPoint transportKey = PathfinderConfig.getTransports().keySet().stream().sorted(Comparator.comparingInt((WorldPoint w) -> w.distanceTo(worldPoint))).findFirst().orElse(null);
-        List<Transport> matchingTransports = PathfinderConfig.getTransports().values().stream()
-                .filter(x -> x.get(0).getDestination() == transportKey)
-                .findFirst().orElse(null);
-
-        if (matchingTransports != null) {
-            return matchingTransports.get(0);
-        }
-        return null;
-    }
-
     public Transport getMatchingTransport(WorldPoint worldPoint) {
         List<Transport> matchingTransports = PathfinderConfig.getTransports().get(worldPoint);
         if (matchingTransports == null || matchingTransports.isEmpty()) return null;
         return matchingTransports.stream().findFirst().orElse(null);
     }
 
+    public Transport getClosestTunnel() {
+        Transport closestTunnel = null;
+        WorldPoint playerPosition = Microbot.getClient().getLocalPlayer().getWorldLocation();
+        for (Map.Entry<WorldPoint, List<Transport>> entry : PathfinderConfig.getTransports().entrySet()) {
+            Transport transport = entry
+                    .getValue()
+                    .stream()
+                    .filter(x -> x.getOrigin().getY() > 9000 || x.getDestination().getY() > 9000)
+                    .min(Comparator.comparingInt((Transport t) -> t.origin.distanceTo2D(playerPosition))).orElse(null);
+
+            if (transport == null)
+                continue;
+            if (closestTunnel != null && closestTunnel.origin.distanceTo2D(playerPosition) <= transport.origin.distanceTo2D(playerPosition))
+                continue;
+
+            closestTunnel = transport;
+        }
+        return closestTunnel;
+    }
+
     public Transport getMatchingTransport(int plane) {
         Transport closestTransportNode = null;
+        boolean isInCave = Microbot.getClient().getLocalPlayer().getWorldLocation().getY() > 9000;
         for (Map.Entry<WorldPoint, List<Transport>> entry : PathfinderConfig.getTransports().entrySet()) {
             for (Transport transport : entry.getValue()) {
+                //if the player is in a cave and the destination of a transport is not in a cave we can skip
+                if (isInCave && transport.origin.getY() < 9000)
+                    continue;
+                if (target.getPlane() > 0 && transport.destination.getPlane() == 0)
+                    continue;
                 // Search for all the transport objects that bring us on the same height
-                if (transport.origin.getPlane() == plane && transport.destination.getPlane() != plane) {
-                    if (closestTransportNode == null || (closestTransportNode.origin.distanceTo(target) > transport.destination.distanceTo(target))) {
-                        // if the origin of the transport is on another plane, skip it
-                        if (transport.getOrigin().getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
+                if (transport.origin.getPlane() == plane) {
+                    int closestTransportNodeDistance = 0;
+                    int transportDistance = 0;
+                    if (closestTransportNode != null) {
+                        closestTransportNodeDistance = closestTransportNode.destination.distanceTo2D(target) + closestTransportNode.destination.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation());
+                        transportDistance = transport.destination.distanceTo2D(target) + transport.destination.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation());
+                        boolean isCloserTransport = transportDistance <= closestTransportNodeDistance  || (transport.priority > closestTransportNode.priority && transportDistance < 50);
+                        if (!isCloserTransport)
                             continue;
-                        // if our target plane is greater than our players plane, we want to go up
-                        if (target.getPlane() > Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
-                            // if the transport plane is lower than the players current plane, skip this transport, because we want to go up
-                            if (transport.getDestination().getPlane() < Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
-                                continue;
-                        } else {
-                            // go down
-                            // if the transport plane is higher than the players current plane, skip this transport, because we want to go down
-                            if (transport.getDestination().getPlane() > Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
-                                continue;
-                        }
-                        closestTransportNode = transport;
                     }
+                    // if the origin of the transport is on another plane, skip it
+                    if (transport.getOrigin().getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
+                        continue;
+                    // if our target plane is greater than our players plane, we want to go up
+                    if (target.getPlane() > Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
+                        // if the transport plane is lower than the players current plane, skip this transport, because we want to go up
+                        if (transport.getDestination().getPlane() < Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
+                            continue;
+                    } else {
+                        // go down
+                        // if the transport plane is higher than the players current plane, skip this transport, because we want to go down
+                        if (transport.getDestination().getPlane() > Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
+                            continue;
+                    }
+                    closestTransportNode = transport;
                 }
             }
         }

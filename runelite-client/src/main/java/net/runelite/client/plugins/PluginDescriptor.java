@@ -42,6 +42,7 @@ public @interface PluginDescriptor
 	public String Dan = "<html>[<font color=#B22222>D</font>]";
 	public String Kstar = "<html>[<font color=#fcf6bd>K</font>] ";
 	public String Default = "<html>[<font color=green>D</font>] ";
+	public String Griffin = "<html>[<font color=#a78bfa>G</font>] ";
 
 	String name();
 

@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 
@@ -220,7 +221,7 @@ public class Rs2Bank {
         do {
             calc = widget.getRelativeY() - mainWindow.getScrollY();
 
-            if (calc >= 0 && calc < 640) break;
+            if (calc >= 0 && calc < 500) break;
 
             point = new Point((int) mainWindow.getBounds().getCenterX(), (int) mainWindow.getBounds().getCenterY());
 
@@ -233,7 +234,7 @@ public class Rs2Bank {
             sleep(100, 300);
             mainWindow = Rs2Widget.getWidget(786445);
 
-        } while (calc <= 0 || calc > 640);
+        } while (calc <= 0 || calc > 500);
 
         return true;
     }
@@ -334,9 +335,13 @@ public class Rs2Bank {
     public static boolean useBank() {
         if (isOpen()) return true;
         GameObject bank = Rs2GameObject.findBank();
-        if (bank == null) return false;
-        Microbot.getMouse().click(bank.getClickbox().getBounds());
-        sleep(200, 300);
+        if (bank == null) {
+            GameObject chest = Rs2GameObject.findChest();
+            if (chest == null) return false;
+            Rs2GameObject.interact(chest, "use");
+        } else {
+            Rs2GameObject.interact(bank, "bank");
+        }
         sleepUntil(Rs2Bank::isOpen);
         return true;
     }
@@ -386,11 +391,7 @@ public class Rs2Bank {
     public static boolean walkToBank() {
         BankLocation bankLocation = getNearestBank();
         Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
-        if (bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 4) {
-            Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
-            return false;
-        }
-        return true;
+        return bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;
     }
 
     public static boolean withdrawItemsRequired(List<ItemRequirement> itemsRequired) {
@@ -421,13 +422,15 @@ public class Rs2Bank {
     public static BankLocation getNearestBank() {
         BankLocation nearest = null;
         double dist = Double.MAX_VALUE;
-        WorldPoint local = Microbot.getClient().getLocalPlayer().getWorldLocation();
+        int y = Microbot.getClient().getLocalPlayer().getWorldLocation().getY();
+        boolean isInCave = Microbot.getClient().getLocalPlayer().getWorldLocation().getY() > 9000;
+        if (isInCave) {
+            y -= 6300; //minus -6300 to set y to the surface
+        }
+        WorldPoint local = new WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(), y, Microbot.getClient().getPlane());
         for (BankLocation bankLocation : BankLocation.values())
         {
-            double currDist = local.distanceTo(bankLocation.getWorldPoint());
-            if (bankLocation.getWorldPoint().getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) {
-                currDist = local.distanceTo(new WorldPoint(bankLocation.getWorldPoint().getX(), bankLocation.getWorldPoint().getY(), Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()));
-            }
+            double currDist = local.distanceTo2D(bankLocation.getWorldPoint());
             if (nearest == null || currDist < dist)
             {
                 dist = currDist;
@@ -497,7 +500,7 @@ public class Rs2Bank {
     public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (widgetId == 0 || itemWidget == null) return;
         int idx = itemWidget.getIndex();
-        menuEntry.getClass().getMethod("aj", int.class).invoke(menuEntry, itemId); //use the setItemId method through reflection
+        Rs2Reflection.setItemId(menuEntry, itemId);
         menuEntry.setOption("Withdraw-1");
         menuEntry.setIdentifier(identifier);
         menuEntry.setParam0(idx);

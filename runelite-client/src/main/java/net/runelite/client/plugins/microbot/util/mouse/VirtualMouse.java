@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.mouse;
 
 import net.runelite.api.Point;
+import net.runelite.client.plugins.microbot.Microbot;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -87,6 +88,11 @@ public class VirtualMouse extends Mouse {
     }
 
     @Override
+    public Mouse rightClick(Rectangle rectangle) {
+        return click(new Point((int) rectangle.getCenterX() , (int) rectangle.getCenterY()), true);
+    }
+
+    @Override
     public Mouse rightClick() {
         return click(new Point(getLastMousePosition().getX(), getLastMousePosition().getY()), true);
     }
@@ -95,7 +101,7 @@ public class VirtualMouse extends Mouse {
         long time = System.currentTimeMillis();
 
         MouseEvent mouseMove = new MouseEvent(getCanvas(), MouseEvent.MOUSE_MOVED, time, 0, point.getX(), point.getY(), 1, false, MouseEvent.BUTTON1);
-        getCanvas().dispatchEvent(mouseMove);
+        Microbot.getEventHandler().dispatchUnblockedEvent(mouseMove);
 
         mousePositions.add(point);
         return this;
@@ -105,7 +111,7 @@ public class VirtualMouse extends Mouse {
         long time = System.currentTimeMillis();
 
         MouseEvent mouseMove = new MouseEvent(getCanvas(), MouseEvent.MOUSE_MOVED, time, 0, (int) rect.getCenterX(), (int) rect.getCenterY(), 1, false, MouseEvent.BUTTON1);
-        getCanvas().dispatchEvent(mouseMove);
+        Microbot.getEventHandler().dispatchUnblockedEvent(mouseMove);
 
         mousePositions.add(new Point((int) rect.getCenterX(), (int) rect.getCenterY()));
         return this;
@@ -116,7 +122,7 @@ public class VirtualMouse extends Mouse {
         Point point = new Point((int) polygon.getBounds().getCenterX(), (int) polygon.getBounds().getCenterY());
 
         MouseEvent mouseMove = new MouseEvent(getCanvas(), MouseEvent.MOUSE_MOVED, time, 0, point.getX(), point.getY(), 1, false, MouseEvent.BUTTON1);
-        getCanvas().dispatchEvent(mouseMove);
+        Microbot.getEventHandler().dispatchUnblockedEvent(mouseMove);
 
         mousePositions.add(point);
         return this;
@@ -131,7 +137,7 @@ public class VirtualMouse extends Mouse {
             MouseEvent mouseScroll = new MouseWheelEvent(getCanvas(), MouseEvent.MOUSE_WHEEL, time, 0, point.getX(), point.getY(), 0, false,
                     0, 10, 2);
 
-            getCanvas().dispatchEvent(mouseScroll);
+            Microbot.getEventHandler().dispatchUnblockedEvent(mouseScroll);
 
             mousePositions.add(point);
         }, random(40, 100), TimeUnit.MILLISECONDS);
@@ -144,7 +150,7 @@ public class VirtualMouse extends Mouse {
         MouseEvent mouseScroll = new MouseWheelEvent(getCanvas(), MouseEvent.MOUSE_WHEEL, time, 0, point.getX(), point.getY(), 0, false,
                 0, -10, -2);
 
-        getCanvas().dispatchEvent(mouseScroll);
+        Microbot.getEventHandler().dispatchUnblockedEvent(mouseScroll);
 
         mousePositions.add(point);
 
@@ -171,6 +177,6 @@ public class VirtualMouse extends Mouse {
                 1, false, button
         );
 
-        getCanvas().dispatchEvent(e);
+        Microbot.getEventHandler().dispatchUnblockedEvent(e);
     }
 }

@@ -10,7 +10,11 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.crafting.enums.Activities;
 import net.runelite.client.plugins.microbot.crafting.enums.Gems;
+import net.runelite.client.plugins.microbot.crafting.scripts.DefaultScript;
+import net.runelite.client.plugins.microbot.crafting.scripts.GemsScript;
+import net.runelite.client.plugins.microbot.crafting.scripts.GlassblowingScript;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 
@@ -46,10 +50,11 @@ public class CraftingPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private CraftingOverlay constructionOverlay;
+    private CraftingOverlay craftingOverlay;
 
-    private CraftingScript craftingScript = new CraftingScript();
-    private GemCraftingScript gemCraftingScript = new GemCraftingScript();
+    private DefaultScript defaultScript = new DefaultScript();
+    private GemsScript gemsScript = new GemsScript();
+    private GlassblowingScript glassblowingScript = new GlassblowingScript();
 
     @Override
     protected void startUp() throws AWTException {
@@ -62,18 +67,22 @@ public class CraftingPlugin extends Plugin {
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
         if (overlayManager != null) {
-            overlayManager.add(constructionOverlay);
+            overlayManager.add(craftingOverlay);
         }
-        if (config.gemType() != Gems.NONE) {
-            gemCraftingScript.run(config);
-        } else { //add config for hides
-            craftingScript.run(config);
+
+        if (config.activityType() == Activities.DEFAULT) {
+            defaultScript.run(config);
+        } else if (config.activityType() == Activities.GEM_CUTTING) {
+            gemsScript.run(config);
+        } else if (config.activityType() == Activities.GLASSBLOWING) {
+            glassblowingScript.run(config);
         }
     }
 
     protected void shutDown() {
-        gemCraftingScript.shutdown();
-        craftingScript.shutdown();
-        overlayManager.remove(constructionOverlay);
+        glassblowingScript.shutdown();
+        gemsScript.shutdown();
+        defaultScript.shutdown();
+        overlayManager.remove(craftingOverlay);
     }
 }
