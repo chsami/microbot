@@ -19,9 +19,9 @@ public class HumidifierScript extends Script {
 
             try {
                 if (Microbot.pauseAllScripts) return;
-                if (Inventory.getAmountForItem(config.ITEM().getName()) > 0 && (Inventory.getAmountForItem("Astral Rune") > 0)) {
+                if (Inventory.hasItem(config.ITEM().getName())  && (Inventory.hasItemAmountStackable("Astral Rune",0))) {
                     Rs2Magic.cast(MagicAction.HUMIDIFY);
-                    sleepUntilOnClientThread(() -> Inventory.getAmountForItem(config.ITEM().getFinished()) > 0);
+                    sleepUntilOnClientThread(() -> Inventory.hasItem(config.ITEM().getFinished()));
                     return;
                 } else {
                     bank(config);
@@ -35,10 +35,15 @@ public class HumidifierScript extends Script {
 
     private void bank(HumidifierConfig config){
         if(Rs2Bank.isOpen()){
+            System.out.println("finished item name: "+ config.ITEM().getFinished());
+            sleep(200,400);
             Rs2Bank.depositAll(config.ITEM().getFinished());
+            sleep(200,300);
             if(Rs2Bank.hasItem(config.ITEM().getName())) {
-                Rs2Bank.withdrawItemX(true, config.ITEM().getName(), 28);
+                Rs2Bank.withdrawItemsAll(true, config.ITEM().getName());
                 sleepUntilOnClientThread(() -> Inventory.hasItem(config.ITEM().getName()));
+                Rs2Bank.closeBank();
+                sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());
             } else {
                 Microbot.getNotifier().notify("Run out of Materials");
                 shutdown();
@@ -46,7 +51,6 @@ public class HumidifierScript extends Script {
         } else {
             Rs2Bank.openBank();
         }
-        Rs2Bank.closeBank();
-        sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());
+
     }
 }

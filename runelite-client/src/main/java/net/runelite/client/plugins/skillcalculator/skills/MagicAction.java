@@ -130,7 +130,7 @@ public enum MagicAction implements SkillAction
 	CURE_OTHER("Cure Other", 68, 65, SpriteID.SPELL_CURE_OTHER, true, 14286954, MenuAction.WIDGET_TARGET),
 	ENCHANT_DRAGONSTONE_JEWELLERY("Enchant Dragonstone Jewellery", 68, 78, SpriteID.SPELL_LVL_5_ENCHANT, true, 14286905, null),
 	ENCHANT_DRAGONSTONE_BOLT("Enchant Dragonstone Bolt", 68, 78, SpriteID.SPELL_ENCHANT_CROSSBOW_BOLT, true, -1, null),
-	HUMIDIFY("Humidify", 68, 65, SpriteID.SPELL_HUMIDIFY, true, -1, MenuAction.CC_OP),
+	HUMIDIFY("Humidify", 68, 65, SpriteID.SPELL_HUMIDIFY, true, 14286955, MenuAction.CC_OP),
 	KOUREND_CASTLE_TELEPORT("Kourend Castle Teleport", 69, 81, SpriteID.SPELL_TELEPORT_TO_KOUREND, true, 14286906, null),
 	MOONCLAN_TELEPORT("Moonclan Teleport", 69, 66, SpriteID.SPELL_MOONCLAN_TELEPORT, true, 14286956, null),
 	EARTH_WAVE("Earth Wave", 70, 40, SpriteID.SPELL_EARTH_WAVE, true, 14286907, MenuAction.WIDGET_TARGET),
