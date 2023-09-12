@@ -404,20 +404,39 @@ public class Inventory {
     }
 
     public static boolean interact(String itemName) {
-        useItem(itemName);
-        return true;
+        return useItem(itemName);
     }
 
     public static boolean interact(String... itemNames) {
+        boolean interacted = false;
         for (String itemName : itemNames) {
             Widget item = findItem(itemName);
             if (item != null) {
                 Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
                 sleep(600, 1200);
+                interacted = true;
                 break;
             }
         }
-        return true;
+        return interacted;
+    }
+
+    public static boolean interactContains(String itemName) {
+        return useItemContains(itemName);
+    }
+
+    public static boolean interactItemContains(String... itemNames) {
+        boolean interacted = false;
+        for (String itemName : itemNames) {
+            Widget item = findItemContains(itemName);
+            if (item != null) {
+                Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
+                sleep(600, 1200);
+                interacted = true;
+                break;
+            }
+        }
+        return interacted;
     }
 
     public static boolean useItemOnItem(String itemName1, String itemName2) {
