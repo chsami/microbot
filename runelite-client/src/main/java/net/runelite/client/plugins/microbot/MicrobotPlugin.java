@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
