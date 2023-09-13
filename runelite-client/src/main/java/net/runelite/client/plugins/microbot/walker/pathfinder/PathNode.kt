@@ -10,12 +10,12 @@ class PathNode(
     val penalty: Int,
     var pathTransports: MutableList<PathTransport> = mutableListOf(),
     val worldLocation: WorldPoint,
-    val operableName: String?,
     val blocked: Boolean,
-    val blockedMovementNorth: Boolean,
-    val blockedMovementSouth: Boolean,
-    val blockedMovementEast: Boolean,
-    val blockedMovementWest: Boolean,
+    var blockedMovementNorth: Boolean,
+    var blockedMovementSouth: Boolean,
+    var blockedMovementEast: Boolean,
+    var blockedMovementWest: Boolean,
 ) {
     val fCost get() = gCost + hCost
+    val mapKey get() = "${worldLocation.x}_${worldLocation.y}_${worldLocation.plane}"
 }
