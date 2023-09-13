@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.walker.pathfinder.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
@@ -153,13 +154,13 @@ public class Walker {
     private List<PathNode> getPath(WorldPoint startWorldPoint, WorldPoint endWorldPoint) {
         long startTimeDateLoad = System.currentTimeMillis();
         SavedWorldDataLoader savedWorldDataLoader = new SavedWorldDataLoader(WorldDataDownloader.Companion.getWorldDataFile());
-        PathNode[][][] grid = savedWorldDataLoader.getGrid();
+        Map<String, PathNode> pathNodeMap = savedWorldDataLoader.getNodeMap();
         long endTimeDataLoad = System.currentTimeMillis();
 
-        PathFinder pathFinder = new PathFinder(grid);
+        PathFinder pathFinder = new PathFinder(pathNodeMap);
 
         long startTimePathFind = System.currentTimeMillis();
-        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint);
+        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint, false);
         long endTimePathFind = System.currentTimeMillis();
 
         System.out.println("Loaded world data in " + (endTimeDataLoad - startTimeDateLoad) + " milliseconds");

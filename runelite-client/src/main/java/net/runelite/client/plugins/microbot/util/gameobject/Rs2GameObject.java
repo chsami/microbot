@@ -502,7 +502,9 @@ public class Rs2GameObject {
         return null;
     }
 
-    public static List<Tile> getTiles(int distance) {
+    public static List<Tile> getTiles(int maxTileDistance) {
+        int maxDistance = Math.max(2400, maxTileDistance * 128);
+
         Player player = Microbot.getClient().getLocalPlayer();
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
@@ -517,7 +519,7 @@ public class Rs2GameObject {
                     continue;
                 }
 
-                if (player.getLocalLocation().distanceTo(tile.getLocalLocation()) <= distance) {
+                if (player.getLocalLocation().distanceTo(tile.getLocalLocation()) <= maxDistance) {
                     tileObjects.add(tile);
                 }
 

@@ -4,11 +4,11 @@ import net.runelite.api.coords.WorldPoint
 import java.util.*
 import kotlin.math.abs
 
-class PathFinder(private val grid: Array<Array<Array<PathNode?>>>) {
+class PathFinder(private val nodeMap: MutableMap<String, PathNode>) {
     companion object {
         var path: List<PathNode> = emptyList()
         fun get(): List<PathNode> {
-            return path
+            return path;
         }
 
         fun resetPath() {
@@ -16,10 +16,12 @@ class PathFinder(private val grid: Array<Array<Array<PathNode?>>>) {
         }
     }
 
+    fun findPath(startPoint: WorldPoint, endPoint: WorldPoint, useNearest: Boolean = false): List<PathNode> {
+        val startPointKey = "${startPoint.x}_${startPoint.y}_${startPoint.plane}"
+        val endPointKey = "${endPoint.x}_${endPoint.y}_${endPoint.plane}"
 
-    fun findPath(startPoint: WorldPoint, endPoint: WorldPoint): List<PathNode> {
-        val startNode = grid[startPoint.plane][startPoint.y][startPoint.x]
-        val endNode = grid[endPoint.plane][endPoint.y][endPoint.x]
+        val startNode = nodeMap[startPointKey]
+        val endNode = nodeMap[endPointKey]
 
         if (startNode == null || endNode == null) {
             println("Start or end node is null")
@@ -29,10 +31,23 @@ class PathFinder(private val grid: Array<Array<Array<PathNode?>>>) {
         val closedNodes = HashSet<PathNode>()
         val openNodes = PriorityQueue<PathNode> { nodeA, nodeB -> nodeA.fCost.compareTo(nodeB.fCost) }
 
+        var nearestNode: PathNode? = null
+        var nearestDistance = startPoint.distanceTo(endPoint)
+
         openNodes.add(startNode)
 
         while (openNodes.isNotEmpty()) {
             val currentNode = openNodes.peek()
+
+            if (nearestNode != null) {
+                val distanceToEndPoint = currentNode.worldLocation.distanceTo(endPoint)
+                if (distanceToEndPoint < nearestDistance) {
+                    nearestNode = currentNode;
+                    nearestDistance = distanceToEndPoint
+                }
+            } else {
+                nearestNode = currentNode
+            }
 
             openNodes.remove(currentNode)
             closedNodes.add(currentNode)
@@ -59,6 +74,13 @@ class PathFinder(private val grid: Array<Array<Array<PathNode?>>>) {
                 }
             }
         }
+
+        if (useNearest && nearestNode != null) {
+            println("FOUND PARTIAL PATH")
+            path = getPath(startNode, nearestNode)
+            return path
+        }
+
         return emptyList()
     }
 
@@ -81,10 +103,15 @@ class PathFinder(private val grid: Array<Array<Array<PathNode?>>>) {
             }
         }
 
-        val northNeighbor = grid[node.worldLocation.plane][node.worldLocation.y + 1][node.worldLocation.x]
-        val southNeighbor = grid[node.worldLocation.plane][node.worldLocation.y - 1][node.worldLocation.x]
-        val eastNeighbor = grid[node.worldLocation.plane][node.worldLocation.y][node.worldLocation.x + 1]
-        val westNeighbor = grid[node.worldLocation.plane][node.worldLocation.y][node.worldLocation.x - 1]
+        val northNeighborKey = "${node.worldLocation.x}_${node.worldLocation.y + 1}_${node.worldLocation.plane}"
+        val southNeighborKey = "${node.worldLocation.x}_${node.worldLocation.y - 1}_${node.worldLocation.plane}"
+        val eastNeighborKey = "${node.worldLocation.x + 1}_${node.worldLocation.y}_${node.worldLocation.plane}"
+        val westNeighborKey = "${node.worldLocation.x - 1}_${node.worldLocation.y}_${node.worldLocation.plane}"
+
+        val northNeighbor = nodeMap.getOrDefault(northNeighborKey, null)
+        val southNeighbor = nodeMap.getOrDefault(southNeighborKey, null)
+        val eastNeighbor = nodeMap.getOrDefault(eastNeighborKey, null)
+        val westNeighbor = nodeMap.getOrDefault(westNeighborKey, null)
 
         northNeighbor?.let { neighbors.add(it) }
         southNeighbor?.let { neighbors.add(it) }
@@ -147,3 +174,4 @@ class PathFinder(private val grid: Array<Array<Array<PathNode?>>>) {
         return paths.reversed()
     }
 }
+
