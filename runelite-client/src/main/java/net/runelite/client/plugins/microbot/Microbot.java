@@ -67,6 +67,8 @@ public class Microbot {
     @Setter
     private static boolean disableWalkerUpdate;
 
+    public static boolean debug = false;
+
     public static boolean isGainingExp = false;
     public static boolean pauseAllScripts = false;
     public static String status = "IDLE";
@@ -94,7 +96,6 @@ public class Microbot {
     public static boolean isAnimating() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
     }
-
 
     public static int getVarbitValue(int varbit) {
         return getClientThread().runOnClientThread(() -> getClient().getVarbitValue(varbit));
