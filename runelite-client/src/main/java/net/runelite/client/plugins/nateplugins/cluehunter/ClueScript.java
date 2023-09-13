@@ -36,7 +36,8 @@ public class ClueScript extends Script {
                         System.out.println("Error - Make sure you have all the required items- Spade,Nature Runes, Leather Boots, SuperAntiPoison (1)");
                         break;
                     case CLUE1:
-                        if (Microbot.getClient().getLocalPlayer().getWorldLocation() == ClueAreaGloves) {
+                        Microbot.status = "collecting Gloves and boots";
+                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(ClueAreaGloves)) {
                             Inventory.useItemAction("Spade","Dig");
                             sleep(1000, 2000);
                         } else {
@@ -44,7 +45,8 @@ public class ClueScript extends Script {
                         }
                         break;
                     case CLUE2:
-                        if (Microbot.getClient().getLocalPlayer().getWorldLocation() == ClueAreaCloak) {
+                        Microbot.status = "collecting cloak";
+                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(ClueAreaCloak)) {
                             Inventory.useItemAction("Spade","Dig");
                             sleep(1000, 2000);
                         } else {
@@ -52,7 +54,8 @@ public class ClueScript extends Script {
                         }
                         break;
                     case CLUE3:
-                        if (Microbot.getClient().getLocalPlayer().getWorldLocation() == ClueAreaHelm) {
+                        Microbot.status = "collecting Helm";
+                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(ClueAreaHelm)) {
                             Inventory.useItemAction("Spade","Dig");
                             sleep(1000, 2000);
                         } else {
@@ -60,6 +63,7 @@ public class ClueScript extends Script {
                         }
                         break;
                     case DONE:
+                        Microbot.status = "Got the pieces all done";
                         System.out.println("Got 4 pieces of warm gear");
                         shutdown();
                         break;
