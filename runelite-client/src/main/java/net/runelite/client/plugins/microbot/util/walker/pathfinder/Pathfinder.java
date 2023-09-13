@@ -176,7 +176,7 @@ public class Pathfinder implements Runnable {
         String itemName = shortestPathJewellery.getTooltip() + "(";
         boolean hasItemEquipped = Rs2Equipment.hasEquippedContains(itemName);
         if (hasItemEquipped) {
-            if (shortestPathJewellery.name().contains("ring")) {
+            if (itemName.toLowerCase().contains("ring")) {
                 Rs2Equipment.useRingAction(shortestPathJewellery);
             } else {
                 Rs2Equipment.useAmuletAction(shortestPathJewellery);
