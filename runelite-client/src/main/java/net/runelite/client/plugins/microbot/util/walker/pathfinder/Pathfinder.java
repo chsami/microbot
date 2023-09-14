@@ -57,9 +57,8 @@ public class Pathfinder implements Runnable {
     boolean useCanvas;
     public boolean customPath = false;
 
-
     public boolean getDebugger() {
-        return true;
+        return Microbot.debug;
     }
 
     public Pathfinder(PathfinderConfig config) {
