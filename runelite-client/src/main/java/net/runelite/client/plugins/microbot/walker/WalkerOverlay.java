@@ -29,7 +29,7 @@ public class WalkerOverlay extends Overlay {
             return null;
         }
 
-        for (Tile tile : Rs2GameObject.getTiles(1200)) {
+        for (Tile tile : Rs2GameObject.getTiles(10)) {
             for (PathNode node : PathFinder.Companion.getPath()) {
                 if (tile.getWorldLocation().equals(node.getWorldLocation())) {
                     Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), tile.getLocalLocation());

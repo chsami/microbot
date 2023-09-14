@@ -52,6 +52,8 @@ public enum WorldDestinations {
     DUEL_ARENA_BANK("Duel Arena Bank", new WorldPoint(3384, 3269, 0)),
     DWARVEN_MINE("Dwarven Mine", new WorldPoint(3015, 3449, 0)),
     CHAOS_TEMPLE("Chaos Temple", new WorldPoint(2935, 3515, 0)),
+    GNOME_STRONGHOLD("Gnome Stronghold", new WorldPoint(2460, 3400, 0)),
+    SLAYER_TOWER("Slayer Tower", new WorldPoint(3428, 3532, 0)),
 
     NONE("None", new WorldPoint(0, 0, 0));
 
