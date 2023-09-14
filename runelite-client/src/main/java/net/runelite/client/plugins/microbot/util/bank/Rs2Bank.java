@@ -218,10 +218,11 @@ public class Rs2Bank {
         int calc;
         Point point = new Point((int) mainWindow.getBounds().getCenterX(), (int) mainWindow.getBounds().getCenterY());
         Microbot.getMouse().move(point);
+        int scrollAttempts = 0;
         do {
             calc = widget.getRelativeY() - mainWindow.getScrollY();
 
-            if (calc >= 0 && calc < 500) break;
+            if (calc >= 0 && calc < 640) break;
 
             point = new Point((int) mainWindow.getBounds().getCenterX(), (int) mainWindow.getBounds().getCenterY());
 
@@ -233,8 +234,8 @@ public class Rs2Bank {
 
             sleep(100, 300);
             mainWindow = Rs2Widget.getWidget(786445);
-
-        } while (calc <= 0 || calc > 500);
+            scrollAttempts++;
+        } while (calc <= 0 || calc > 640 || scrollAttempts < 70);
 
         return true;
     }
