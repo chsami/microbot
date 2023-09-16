@@ -32,15 +32,17 @@ boolean emptySack = false;
         Microbot.enableAutoRunOn = true;
         miningSpot = MLMMiningSpot.IDLE;
         status = MLMStatus.IDLE;
+        emptySack = false;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
             try {
                 if (Microbot.isAnimating() || Microbot.getClient().getLocalPlayer().isInteracting()) {
+                    sleep(2000);
                     return;
                 }
 
-                if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 80 || emptySack) {
+                if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 80 || (emptySack && !Inventory.contains("payd-dirt"))) {
                     status = MLMStatus.EMPTY_SACK;
                 } else if (!Inventory.isFull()) {
                     status = MLMStatus.MINING;
@@ -76,8 +78,8 @@ boolean emptySack = false;
                                 sleepUntil(Inventory::isFull, 10000);
                             }
                             bank();
-                            emptySack = false;
                         }
+                        emptySack = false;
                         status = MLMStatus.IDLE;
                         break;
                     case FIXING_WATERWHEEL:
