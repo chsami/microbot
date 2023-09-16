@@ -44,6 +44,7 @@ public abstract class Mouse {
     public abstract Mouse click();
 
     public abstract Mouse rightClick(Point point);
+    public abstract Mouse rightClick(Rectangle rectangle);
     public abstract Mouse rightClick();
 
 

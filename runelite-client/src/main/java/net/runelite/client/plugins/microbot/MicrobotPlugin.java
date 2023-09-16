@@ -24,6 +24,8 @@ import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.event.EventHandler;
+import net.runelite.client.plugins.microbot.util.event.EventSelector;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
@@ -34,11 +36,14 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
+import net.runelite.client.plugins.microbot.walker.pathfinder.WorldDataDownloader;
 import net.runelite.client.plugins.microbot.walking.WalkingScript;
+import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -61,6 +66,8 @@ public class MicrobotPlugin extends Plugin {
     @Inject
     private ClientThread clientThread;
     @Inject
+    private ClientToolbar clientToolbar;
+    @Inject
     Notifier notifier;
     @Inject
     WorldService worldService;
@@ -79,11 +86,16 @@ public class MicrobotPlugin extends Plugin {
     @Inject
     private WorldMapOverlay worldMapOverlay;
 
+    @Inject
+    @Named("disableWalkerUpdate")
+    private boolean disableWalkerUpdate;
+
     public ThievingScript thievingScript;
     public CookingScript cookingScript;
     public MiningScript miningScript;
     public WalkingScript walkingScript;
     public SummerGardenScript summerGardenScript;
+    private EventSelector eventSelector;
 
 
     QuestScript questScript;
@@ -99,13 +111,23 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setNpcManager(npcManager);
         Microbot.setWalker(new Walker());
         Microbot.setMouse(new VirtualMouse());
+        Microbot.setEventHandler(new EventHandler());
         Microbot.setSpriteManager(spriteManager);
+        Microbot.setDisableWalkerUpdate(disableWalkerUpdate);
+
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }
+
+        eventSelector = new EventSelector(clientToolbar);
+        eventSelector.startUp();
+
+        WorldDataDownloader worldDataDownloader = new WorldDataDownloader();
+        worldDataDownloader.run();
     }
 
     protected void shutDown() {
+        eventSelector.shutDown();
         overlayManager.remove(microbotOverlay);
         Microbot.setWalker(null);
         if (cookingScript != null) {
@@ -315,5 +337,11 @@ public class MicrobotPlugin extends Plugin {
         .setTarget(event.getTarget())
         .setType(MenuAction.RUNELITE)
         .onClick(worldMapConsumer()));
+    }
+
+    @Subscribe
+    public void onMenuOptionClicked(MenuOptionClicked event)
+    {
+         System.out.println(event.getMenuEntry());
     }
 }

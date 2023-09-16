@@ -8,6 +8,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.worldmap.WorldMap;
+import net.runelite.client.game.AgilityShortcut;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.walker.Transport;
 
@@ -46,15 +47,6 @@ public class PathfinderConfig {
     }
 
     public void refresh() {
-        initTransports();
-        calculationCutoff = Duration.ofMillis(5 * Constants.GAME_TICK_LENGTH);
-        avoidWilderness = true;
-        useAgilityShortcuts = true;
-        useGrappleShortcuts = true;
-        useBoats = true;
-        useFairyRings = true;
-        useTeleports = true;
-
         if (GameState.LOGGED_IN.equals(Microbot.getClient().getGameState())) {
             agilityLevel = Microbot.getClient().getBoostedSkillLevel(Skill.AGILITY);
             rangedLevel = Microbot.getClient().getBoostedSkillLevel(Skill.RANGED);
@@ -63,6 +55,7 @@ public class PathfinderConfig {
             woodcuttingLevel = Microbot.getClient().getBoostedSkillLevel(Skill.WOODCUTTING);
             Microbot.getClientThread().invokeLater(this::refreshQuests);
         }
+        initTransports();
     }
 
     private void refreshQuests() {
@@ -203,7 +196,7 @@ public class PathfinderConfig {
         new Transport()
                 .addObstacle(new WorldPoint(3138, 3516, 0), new WorldPoint(3141, 3513, 0), "Climb-down", true)
                 .addReverse()
-                .addAgilityRequirement(21)
+                .addAgilityRequirement(AgilityShortcut.GRAND_EXCHANGE_UNDERWALL_TUNNEL.getLevel())
                 .build(); //varrock tunnel to grand exchange
 
 
@@ -214,7 +207,8 @@ public class PathfinderConfig {
 
 
         Transport lumbridgeStairce0 = new Transport()
-                .addObstacle(new WorldPoint(3204, 3207, 0), new WorldPoint(3204, 3207, 1), "Climb-up")
+                .addObstacle(new WorldPoint(3204, 3209, 0), new WorldPoint(3204, 3209, 1), "Climb-up")
+                .setOffset(0, -2)
                 .addReverse("Climb-down");
 
         Transport lumbridgeStairce1 = new Transport()
@@ -250,9 +244,42 @@ public class PathfinderConfig {
                 .build();
 
         new Transport()
-                .addObstacle(new WorldPoint(2445, 3414, 0), new WorldPoint(2445, 3414, 1), "Climb-up")
+                .addObstacle(new WorldPoint(2444, 3414, 0), new WorldPoint(2444, 3414, 1), "Climb-up")
                 .addReverse("Climb-down")
                 .build();
+
+        new Transport()
+                .addObstacle(new WorldPoint(3435, 3537, 0), new WorldPoint(3434, 3537, 1), "Climb-up")
+                .addReverse("Climb-down")
+                .build(); // slayer tower stairce level 0 to 1
+
+        new Transport()
+                .addObstacle(new WorldPoint(3414, 3540, 1), new WorldPoint(3415, 3540, 2), "Climb-up")
+                .addReverse("Climb-down")
+                .build(); // slayer tower stairce level 1 to 2
+
+        new Transport()
+                .addObstacle(new WorldPoint(3422, 3550, 0), new WorldPoint(3422, 3550, 1), "Climb-up")
+                .addReverse("Climb-down")
+                .addAgilityRequirement(AgilityShortcut.SLAYER_TOWER_MEDIUM_CHAIN_FIRST.getLevel())
+                .addPriority(1)
+                .build(); // SLAYER_TOWER_MEDIUM_CHAIN_FIRST
+
+        new Transport()
+                .addObstacle(new WorldPoint(3417, 3535, 0), new WorldPoint(3412, 9931, 0), "Climb-down")
+                .addReverse("Climb-up")
+                .build(); // slayer tower ladder to underground
+
+        new Transport()
+                .addObstacle(new WorldPoint(2428, 3424, 0), new WorldPoint(2430, 9825, 0), "Enter")
+                .addReverse("Use")
+                .build(); // Nieve cave in gnome stronghold
+
+        new Transport()
+                .addObstacle(new WorldPoint(2489, 3520, 0), new WorldPoint(2487, 3515, 0), "Climb")
+                .addReverse("Climb")
+                .addAgilityRequirement(AgilityShortcut.GNOME_STRONGHOLD_ROCKS.getLevel())
+                .build(); // Agility shortcut rocks to gnome stronghold
 
         lumbridgeStairce0.chain(lumbridgeStairce1).build();
         lumbridgeStairce1.chain(lumbridgeStairce0).build();

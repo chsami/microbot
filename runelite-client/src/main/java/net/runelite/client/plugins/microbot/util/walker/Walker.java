@@ -1,27 +1,24 @@
 package net.runelite.client.plugins.microbot.util.walker;
 
 import lombok.Getter;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.magic.Teleport;
+import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
-import org.apache.commons.lang3.tuple.Pair;
+import net.runelite.client.plugins.microbot.walker.pathfinder.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.util.Global.*;
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
 
 public class Walker {
 
@@ -42,35 +39,6 @@ public class Walker {
     public Walker() {
         CollisionMap map = new CollisionMap();
         pathfinderConfig = new PathfinderConfig(map);
-    }
-
-    private Pair<Pathfinder, Teleport> walkToWithTeleports(WorldPoint start, WorldPoint target) {
-        List<Teleport> teleportsAvaible = new ArrayList<>();
-        Pathfinder currentPath = new Pathfinder(pathfinderConfig, start, target, false);
-        final Pathfinder _currentPath = currentPath;
-        sleepUntil(() -> _currentPath.isDone(), 10000);
-        Teleport currentTeleport = null;
-        for (Teleport teleport : Teleport.values()) {
-            boolean hasTablet = Inventory.hasItem(teleport.getTabletName());
-            boolean hasRunes = true;
-            for (Pair itemRequired : teleport.getItemsRequired()) {
-                if (!Inventory.hasItemAmountStackable(itemRequired.getLeft().toString(), (int) itemRequired.getRight()))
-                    hasRunes = false;
-            }
-
-            if (hasTablet || hasRunes) {
-                teleportsAvaible.add(teleport);
-            }
-        }
-        for (Teleport teleportAvailble : teleportsAvaible) {
-            final Pathfinder p = new Pathfinder(pathfinderConfig, teleportAvailble.getDestination(), target, false);
-            sleepUntil(() -> p.isDone(), 10000);
-            if (currentPath.getTotalCost() > p.getTotalCost()) {
-                currentTeleport = teleportAvailble;
-                currentPath = p;
-            }
-        }
-        return Pair.of(currentPath, currentTeleport);
     }
 
     public WorldPoint walkRegionCanvas(int regionX, int regionY) {
@@ -182,6 +150,63 @@ public class Walker {
         return worldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < distance;
     }
 
+    private List<PathNode> getPath(WorldPoint startWorldPoint, WorldPoint endWorldPoint) {
+        long startTimeDateLoad = System.currentTimeMillis();
+        SavedWorldDataLoader savedWorldDataLoader = new SavedWorldDataLoader(WorldDataDownloader.Companion.getWorldDataFile());
+        PathNode[][][] grid = savedWorldDataLoader.getGrid();
+        long endTimeDataLoad = System.currentTimeMillis();
+
+        PathFinder pathFinder = new PathFinder(grid);
+
+        long startTimePathFind = System.currentTimeMillis();
+        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint);
+        long endTimePathFind = System.currentTimeMillis();
+
+        System.out.println("Loaded world data in " + (endTimeDataLoad - startTimeDateLoad) + " milliseconds");
+        System.out.println("Found path in " + (endTimePathFind - startTimePathFind) + " milliseconds");
+        System.out.println("Num of nodes: " + nodes.stream().count());
+
+        return nodes;
+    }
+
+    public boolean staticWalkTo(WorldPoint endWorldPoint) {
+        Camera.setAngle(45);
+        Camera.setPitch(1.0f);
+
+        Player player = Microbot.getClient().getLocalPlayer();
+        WorldPoint start = player.getWorldLocation();
+
+        List<PathNode> nodes = getPath(start, endWorldPoint);
+        if (nodes.isEmpty()) return false;
+
+        PathWalker pathWalker = new PathWalker(nodes);
+        pathWalker.walkPath();
+
+        PathFinder.Companion.resetPath();
+        return player.getWorldLocation().distanceTo(endWorldPoint) <= 3;
+    }
+
+    public boolean hybridWalkTo(WorldPoint target) {
+        Player player = Microbot.getClient().getLocalPlayer();
+        List<PathNode> nodes = getPath(player.getWorldLocation(), target);
+
+        if (nodes.isEmpty()) {
+            System.out.println("Static Walker failed to find path, using dynamic walker");
+            return walkTo(target, true);
+
+        } else {
+            Camera.setAngle(45);
+            Camera.setPitch(1.0f);
+
+            if (nodes.isEmpty()) return false;
+
+            PathWalker pathWalker = new PathWalker(nodes);
+            pathWalker.walkPath();
+
+            return player.getWorldLocation().distanceTo(target) <= 3;
+        }
+    }
+
     public boolean walkTo(WorldPoint target) {
         return walkTo(target, true);
     }
@@ -202,6 +227,7 @@ public class Walker {
     }
 
     public boolean walkTo(WorldPoint target, boolean useTransport, boolean useCanvas, WorldArea[] blockingAreas) {
+        if (pathfinder != null && !pathfinder.isDone()) return false;
         WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
         pathfinder = new Pathfinder(pathfinderConfig, start, target, useTransport, false, useCanvas, blockingAreas);
@@ -221,6 +247,17 @@ public class Walker {
         sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
 
         return pathfinder.getPath().get(pathfinder.getPath().size() - 1).position.equals(target);
+    }
+
+    public long getReachDistance(WorldPoint target) {
+        WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
+
+        pathfinder = new Pathfinder(pathfinderConfig, start, target, true);
+        setupPathfinderDefaults();
+
+        sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
+
+        return pathfinder.getPath().size();
     }
 
     public boolean canInteract(WorldPoint target) {
