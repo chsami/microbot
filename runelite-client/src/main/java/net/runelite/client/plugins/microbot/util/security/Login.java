@@ -19,69 +19,41 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class Login {
 
-    private ConfigProfile getProfile() {
+    private static ConfigProfile getProfile() {
         try (ProfileManager.Lock lock = Microbot.getProfileManager().lock()) {
-            return lock.getProfiles().stream().filter(x -> x.isActive()).findFirst().get();
+            return lock.getProfiles().stream().filter(ConfigProfile::isActive).findFirst().get();
         }
-
     }
 
     public Login() {
-        try {
-            if (Encryption.decrypt(getProfile().getPassword()) == null || Encryption.decrypt(getProfile().getPassword()).length() == 0)
-                return;
-            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
-            sleep(300, 600);
-            setWorld(360);
-        } catch (Exception e) {
-            System.out.println("Changing world failed");
-        } finally {
-            Microbot.getClient().setUsername(getProfile().getName());
-            try {
-                Microbot.getClient().setPassword(Encryption.decrypt(getProfile().getPassword()));
-                sleep(300, 600);
-                VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
-            } catch (Exception e) {
-                //throw new RuntimeException(e);
-            }
-        }
-    }
-
-    public Login(String username, String password) {
-        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
-        sleep(300, 600);
-        try {
-            setWorld(360);
-        } catch (Exception e) {
-            System.out.println("Changing world failed");
-        } finally {
-            Microbot.getClient().setUsername(username);
-            try {
-                Microbot.getClient().setPassword(Encryption.decrypt(password));
-            } catch (Exception e) {
-            }
-            sleep(300, 600);
-            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
-        }
+        this(360);
     }
 
     public Login(int world) {
+        this(getProfile().getName(), getProfile().getPassword(), world);
+    }
+
+    public Login(String username, String password) {
+        this(username, password, 360);
+    }
+
+    public Login(String username, String password, int world) {
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
         sleep(300, 600);
         try {
             setWorld(world);
         } catch (Exception e) {
             System.out.println("Changing world failed");
-        } finally {
-            Microbot.getClient().setUsername(getProfile().getName());
-            try {
-                Microbot.getClient().setPassword(Encryption.decrypt(getProfile().getPassword()));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            sleep(300, 600);
-            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
         }
+        Microbot.getClient().setUsername(username);
+        try {
+            Microbot.getClient().setPassword(Encryption.decrypt(password));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        sleep(300, 600);
+        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
     }
 
     //TODO: this should be elsewhere
