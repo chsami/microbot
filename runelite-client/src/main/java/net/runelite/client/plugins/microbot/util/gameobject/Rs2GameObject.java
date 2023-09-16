@@ -664,6 +664,7 @@ public class Rs2GameObject {
 
         try {
             menuEntry.setIdentifier(objectToInteract.getId());
+            menuEntry.setType(MenuAction.WALK);//set default to walk to avoid crashing
 
             ObjectComposition objComp = convertGameObjectToObjectComposition(objectToInteract);
             if (objComp == null) return;
