@@ -170,6 +170,10 @@ public class Walker {
         return nodes;
     }
 
+    public void interruptStaticWalker() {
+        PathWalker.Companion.interrupt();
+    }
+
     public boolean staticWalkTo(WorldPoint endWorldPoint) {
         Camera.setAngle(45);
         Camera.setPitch(1.0f);
