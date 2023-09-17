@@ -16,7 +16,16 @@ import java.awt.Shape
 
 class PathWalker(private val nodes: List<PathNode>) {
 
+    companion object {
+        private var isInterrupted: Boolean = false
+        fun interrupt() {
+            isInterrupted = true
+        }
+    }
+
     fun walkPath() {
+        isInterrupted = false
+
         val skipDistance = 4
         val upperBound = nodes.size - 1
         var previousNode: PathNode? = null
@@ -25,6 +34,11 @@ class PathWalker(private val nodes: List<PathNode>) {
 //        val player = Microbot.getClientForKotlin().localPlayer
 
         for (currentNode in nodes) {
+
+            if (isInterrupted) {
+                return
+            }
+
             val index = nodes.indexOf(currentNode)
             val isLastNode = nodes.indexOf(currentNode) == nodes.lastIndex
 
