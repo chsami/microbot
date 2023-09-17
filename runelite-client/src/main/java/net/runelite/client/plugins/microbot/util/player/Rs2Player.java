@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.player;
 
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -68,6 +69,11 @@ public class Rs2Player {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation() != 813 && Microbot.getClient().getLocalPlayer().getPoseAnimation() != 808);
     }
 
+    public static boolean isInteracting() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().isInteracting());
+    }
+
+
     public static void toggleSpecialAttack(int energyRequired) {
         int currentSpecEnergy = Microbot.getClient().getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
         if (currentSpecEnergy >= energyRequired && (Microbot.getClient().getVarpValue(VarPlayer.SPECIAL_ATTACK_ENABLED) == 0)) {
@@ -89,5 +95,9 @@ public class Rs2Player {
             return true;
         }
         return false;
+    }
+
+    public static WorldPoint getWorldLocation() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation());
     }
 }

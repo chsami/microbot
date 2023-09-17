@@ -1,7 +1,8 @@
-package net.runelite.client.plugins.microbot.walker.pathfinder
+package net.runelite.client.plugins.microbot.staticwalker.pathfinder
 
 import net.runelite.api.GameObject
 import net.runelite.api.GroundObject
+import net.runelite.api.ObjectID
 import net.runelite.api.Perspective
 import net.runelite.api.Point
 import net.runelite.api.WallObject
@@ -16,7 +17,13 @@ import java.awt.Shape
 
 class PathWalker(private val nodes: List<PathNode>) {
 
+    companion object {
+        var enabled: Boolean = false
+    }
+
     fun walkPath() {
+        enabled = true
+
         val skipDistance = 4
         val upperBound = nodes.size - 1
         var previousNode: PathNode? = null
@@ -79,6 +86,8 @@ class PathWalker(private val nodes: List<PathNode>) {
                 previousNode = currentNode
             }
         }
+
+        enabled = false
     }
 
     private fun getMinimapPoint(worldPoint: WorldPoint): Point? {
@@ -137,7 +146,6 @@ class PathWalker(private val nodes: List<PathNode>) {
 
     private fun operateTransport(pathTransport: PathTransport): Boolean {
         val player = Microbot.getClientForKotlin().localPlayer
-
         val clickableShape: Shape? = findTransportObjectShape(pathTransport.objectId)
 
         if (clickableShape == null) {

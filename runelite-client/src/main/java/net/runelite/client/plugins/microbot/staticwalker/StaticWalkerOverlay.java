@@ -1,32 +1,39 @@
-package net.runelite.client.plugins.microbot.walker;
+package net.runelite.client.plugins.microbot.staticwalker;
 
 import net.runelite.api.Perspective;
 import net.runelite.api.Tile;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathFinder;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathNode;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathWalker;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.walker.pathfinder.PathFinder;
-import net.runelite.client.plugins.microbot.walker.pathfinder.PathNode;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
 import javax.inject.Inject;
 import java.awt.*;
 
-public class WalkerOverlay extends Overlay {
-
-    private final Color closeColor = Color.GREEN;
-    private final Color farColor = Color.RED;
+public class StaticWalkerOverlay extends Overlay {
 
     @Inject
-    private WalkerOverlay() {
+    private StaticWalkerOverlay() {
         setPosition(OverlayPosition.DYNAMIC);
     }
 
     @Override
     public Dimension render(Graphics2D graphics) {
+//        renderPathWalkerOverlay(graphics);
+        return null;
+    }
+
+    public static void renderPathWalkerOverlay(Graphics2D graphics) {
+        if (!PathWalker.Companion.getEnabled()) {
+            return;
+        }
+
         int pathSize = PathFinder.Companion.getPath().size();
         if (pathSize < 2) {
-            return null;
+            return;
         }
 
         for (Tile tile : Rs2GameObject.getTiles(10)) {
@@ -52,22 +59,20 @@ public class WalkerOverlay extends Overlay {
                         graphics.setColor(Color.BLUE);
                         graphics.drawPolygon(poly);
                     }
-
                 }
             }
         }
-        return null;
     }
 
-    private Color generateGradient(float step) {
+    public static Color generateGradient(float step) {
         if (step < 0) {
             step = 0;
         } else if (step > 1) {
             step = 1;
         }
 
-        float[] startComponents = farColor.getRGBColorComponents(null);
-        float[] endComponents = closeColor.getRGBColorComponents(null);
+        float[] startComponents = Color.RED.getRGBColorComponents(null);
+        float[] endComponents = Color.GREEN.getRGBColorComponents(null);
 
         float[] interpolatedComponents = new float[3];
 

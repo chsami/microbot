@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.walker;
+package net.runelite.client.plugins.microbot.staticwalker;
 
 import com.google.inject.Provides;
 import net.runelite.client.config.ConfigManager;
@@ -10,32 +10,32 @@ import javax.inject.Inject;
 
 import static net.runelite.client.plugins.PluginDescriptor.Griffin;
 
-@PluginDescriptor(name = Griffin + WalkerPlugin.CONFIG_GROUP, enabledByDefault = false)
-public class WalkerPlugin extends Plugin {
+@PluginDescriptor(name = Griffin + StaticWalkerPlugin.CONFIG_GROUP, enabledByDefault = false)
+public class StaticWalkerPlugin extends Plugin {
     static final String CONFIG_GROUP = "Static Walker";
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private WalkerOverlay overlay;
+    private StaticWalkerOverlay overlay;
     @Inject
-    private WalkerConfig config;
+    private StaticWalkerConfig config;
     @Inject
-    private WalkerScript walkerScript;
+    private StaticWalkerScript staticWalkerScript;
 
     @Provides
-    WalkerConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(WalkerConfig.class);
+    StaticWalkerConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(StaticWalkerConfig.class);
     }
 
     @Override
     protected void startUp() throws Exception {
         overlayManager.add(overlay);
-        walkerScript.run(config);
+        staticWalkerScript.run(config);
     }
 
     @Override
     protected void shutDown() throws Exception {
-        walkerScript.shutdown();
+        staticWalkerScript.shutdown();
         overlayManager.remove(overlay);
     }
 }

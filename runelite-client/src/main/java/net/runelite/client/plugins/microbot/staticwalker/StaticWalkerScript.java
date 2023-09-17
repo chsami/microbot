@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.walker;
+package net.runelite.client.plugins.microbot.staticwalker;
 
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -6,13 +6,13 @@ import net.runelite.client.plugins.microbot.Script;
 
 import java.util.concurrent.TimeUnit;
 
-public class WalkerScript extends Script {
+public class StaticWalkerScript extends Script {
 
     public static double version = 1.0;
     private final int maxFails = 3;
     private int failCount = 0;
 
-    public boolean run(WalkerConfig config) {
+    public boolean run(StaticWalkerConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {

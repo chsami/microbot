@@ -12,7 +12,7 @@ import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
-import net.runelite.client.plugins.microbot.walker.pathfinder.*;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,7 +151,7 @@ public class Walker {
         return worldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < distance;
     }
 
-    private List<PathNode> getPath(WorldPoint startWorldPoint, WorldPoint endWorldPoint) {
+    private List<PathNode> getPath(WorldPoint startWorldPoint, WorldPoint endWorldPoint, boolean useNearest) {
         long startTimeDateLoad = System.currentTimeMillis();
         SavedWorldDataLoader savedWorldDataLoader = new SavedWorldDataLoader(WorldDataDownloader.Companion.getWorldDataFile());
         Map<String, PathNode> pathNodeMap = savedWorldDataLoader.getNodeMap();
@@ -160,7 +160,7 @@ public class Walker {
         PathFinder pathFinder = new PathFinder(pathNodeMap);
 
         long startTimePathFind = System.currentTimeMillis();
-        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint, false);
+        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint, useNearest);
         long endTimePathFind = System.currentTimeMillis();
 
         System.out.println("Loaded world data in " + (endTimeDataLoad - startTimeDateLoad) + " milliseconds");
@@ -177,7 +177,7 @@ public class Walker {
         Player player = Microbot.getClient().getLocalPlayer();
         WorldPoint start = player.getWorldLocation();
 
-        List<PathNode> nodes = getPath(start, endWorldPoint);
+        List<PathNode> nodes = getPath(start, endWorldPoint, false);
         if (nodes.isEmpty()) return false;
 
         PathWalker pathWalker = new PathWalker(nodes);
@@ -187,9 +187,9 @@ public class Walker {
         return player.getWorldLocation().distanceTo(endWorldPoint) <= 3;
     }
 
-    public boolean hybridWalkTo(WorldPoint target) {
+    public boolean hybridWalkTo(WorldPoint target, boolean useNearest) {
         Player player = Microbot.getClient().getLocalPlayer();
-        List<PathNode> nodes = getPath(player.getWorldLocation(), target);
+        List<PathNode> nodes = getPath(player.getWorldLocation(), target, useNearest);
 
         if (nodes.isEmpty()) {
             System.out.println("Static Walker failed to find path, using dynamic walker");
@@ -206,6 +206,10 @@ public class Walker {
 
             return player.getWorldLocation().distanceTo(target) <= 3;
         }
+    }
+
+    public boolean hybridWalkTo(WorldPoint target) {
+        return hybridWalkTo(target, false);
     }
 
     public boolean walkTo(WorldPoint target) {

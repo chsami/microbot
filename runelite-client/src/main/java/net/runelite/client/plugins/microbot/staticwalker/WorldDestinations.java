@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.walker;
+package net.runelite.client.plugins.microbot.staticwalker;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

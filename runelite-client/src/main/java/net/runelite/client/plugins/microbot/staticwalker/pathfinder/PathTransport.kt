@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.walker.pathfinder
+package net.runelite.client.plugins.microbot.staticwalker.pathfinder
 
 data class PathTransport(
     val startPathNode: PathNode,
