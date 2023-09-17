@@ -300,11 +300,11 @@ public class Rs2GameObject {
             if (objComp == null) continue;
 
             if (exact) {
-                if (objComp.getName().equalsIgnoreCase(objectName)) {
+                if (objComp.getName().equalsIgnoreCase(objectName) && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
                     return gameObject;
                 }
             } else {
-                if (objComp.getName().toLowerCase().contains(objectName.toLowerCase())) {
+                if (objComp.getName().toLowerCase().contains(objectName.toLowerCase()) && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
                     return gameObject;
                 }
             }
@@ -664,6 +664,7 @@ public class Rs2GameObject {
 
         try {
             menuEntry.setIdentifier(objectToInteract.getId());
+            menuEntry.setType(MenuAction.WALK);//set default to walk to avoid crashing
 
             ObjectComposition objComp = convertGameObjectToObjectComposition(objectToInteract);
             if (objComp == null) return;

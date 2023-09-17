@@ -63,6 +63,34 @@ public class Rs2Widget {
             return Arrays.stream(widget.getChildren()).anyMatch(x -> x.getText().contains(matchingText));
         });
     }
+
+    public static Widget getWidgetChildName(int id, String matchingText) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget widget = Microbot.getClient().getWidget(id);
+            if (widget == null) return null;
+            if (widget.getChildren().length == 0) return null;
+            return Arrays.stream(widget.getChildren()).filter(x -> x.getName().contains(matchingText)).findFirst().orElse(null);
+        });
+    }
+
+    public static Widget getWidgetChildtxt(int id, String matchingText) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget widget = Microbot.getClient().getWidget(id);
+            if (widget == null) return null;
+            if (widget.getChildren().length == 0) return null;
+            return Arrays.stream(widget.getChildren()).filter(x -> x.getText().contains(matchingText)).findFirst().orElse(null);
+        });
+    }
+
+    public static Widget getWidgetChildSprite(int id, int matchingSpriteId) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget widget = Microbot.getClient().getWidget(id);
+            if (widget == null) return null;
+            if (widget.getChildren().length == 0) return null;
+            return Arrays.stream(widget.getChildren()).filter(x -> x.getSpriteId() == (matchingSpriteId)).findFirst().orElse(null);
+        });
+    }
+
     public static int getChildWidgetSpriteID(int id, int childId) {
         return  Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId).getSpriteId());
     }

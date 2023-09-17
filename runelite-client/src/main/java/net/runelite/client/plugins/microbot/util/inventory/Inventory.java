@@ -685,45 +685,56 @@ public class Inventory {
 
     public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (item == null) return;
-        ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.id);
-        int index = 0;
+        try {
+            ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.id);
+            int index = 0;
 
-        menuEntry.setType(MenuAction.CC_OP);
 
-        Rs2Reflection.setItemId(menuEntry, item.id);
+            Rs2Reflection.setItemId(menuEntry, item.id);
 
-        if (itemAction.equalsIgnoreCase("use")) {
-            index = 0;
-            menuEntry.setType(MenuAction.WIDGET_TARGET);
-        } else if(itemComposition.getName().contains("pouch") && itemAction.equalsIgnoreCase("empty")) {
-            index = 1;
-        } else if (itemAction.equalsIgnoreCase("drink")
-                || itemAction.equalsIgnoreCase("read")
-                || itemAction.equalsIgnoreCase("eat")
-                || itemAction.equalsIgnoreCase("view")
-                || itemAction.equalsIgnoreCase("bury")) {
-            index = 2;
-        } else if (itemAction.equalsIgnoreCase("wield")
-                || itemAction.equalsIgnoreCase("wear")
-                || itemAction.equalsIgnoreCase("check steps")) {
-            index = 3;
-        } else if (itemAction.equalsIgnoreCase("fill")) {
-            index = 4;
-        } else if (itemAction.equalsIgnoreCase("empty") || itemAction.equalsIgnoreCase("rub")
-        || itemAction.equalsIgnoreCase("refund") || itemAction.equalsIgnoreCase("commune")
-                || itemAction.equalsIgnoreCase("extinguish")) {
-            index = 6;
-        } else if (itemAction.equalsIgnoreCase("drop") || itemAction.equalsIgnoreCase("destroy")) {
-            index = 7;
-        } else if (itemAction.equalsIgnoreCase("examine")) {
-            index = 10;
+            if (itemAction.equalsIgnoreCase("use")) {
+                index = 0;
+                menuEntry.setType(MenuAction.WIDGET_TARGET);
+            } else if(itemComposition.getName().contains("pouch") && itemAction.equalsIgnoreCase("empty")) {
+                index = 1;
+                menuEntry.setType(MenuAction.CC_OP);
+            } else if (itemAction.equalsIgnoreCase("drink")
+                    || itemAction.equalsIgnoreCase("read")
+                    || itemAction.equalsIgnoreCase("eat")
+                    || itemAction.equalsIgnoreCase("view")
+                    || itemAction.equalsIgnoreCase("bury")) {
+                index = 2;
+                menuEntry.setType(MenuAction.CC_OP);
+            } else if (itemAction.equalsIgnoreCase("wield")
+                    || itemAction.equalsIgnoreCase("wear")
+                    || itemAction.equalsIgnoreCase("check steps")) {
+                index = 3;
+                menuEntry.setType(MenuAction.CC_OP);
+            } else if (itemAction.equalsIgnoreCase("fill")) {
+                index = 4;
+                menuEntry.setType(MenuAction.CC_OP);
+            } else if (itemAction.equalsIgnoreCase("empty") || itemAction.equalsIgnoreCase("rub")
+                    || itemAction.equalsIgnoreCase("refund") || itemAction.equalsIgnoreCase("commune")
+                    || itemAction.equalsIgnoreCase("extinguish")) {
+                index = 6;
+                menuEntry.setType(MenuAction.CC_OP);
+            } else if (itemAction.equalsIgnoreCase("drop") || itemAction.equalsIgnoreCase("destroy")) {
+                index = 7;
+                menuEntry.setType(MenuAction.CC_OP);
+            } else if (itemAction.equalsIgnoreCase("examine")) {
+                index = 10;
+                menuEntry.setType(MenuAction.CC_OP);
+            }
+
+
+            menuEntry.setOption(itemAction != null ? itemAction : "");
+            menuEntry.setIdentifier(index);
+            menuEntry.setParam0(item.slot);
+            menuEntry.setParam1(9764864);
+            menuEntry.setTarget("<col=ff9040>" + itemComposition.getName() + "</col>");
+        } catch(Exception ex) {
+            System.out.println("INVENTORY MENU SWAP FAILED WITH MESSAGE: " + ex.getMessage());
         }
 
-
-        menuEntry.setOption(itemAction != null ? itemAction : "");
-        menuEntry.setIdentifier(index);
-        menuEntry.setParam0(item.slot);
-        menuEntry.setParam1(9764864);
-        menuEntry.setTarget("<col=ff9040>" + itemComposition.getName() + "</col>");
     }
 }

@@ -51,7 +51,7 @@ public class ogBlastFurnaceScript extends Script {
     private int getBFDispenserState() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.BAR_DISPENSER));}
     private void iceGlovesEquip(){if(Rs2Equipment.hasEquipped(ItemID.ICE_GLOVES)){return;} Rs2Equipment.equipItemFast(ItemID.ICE_GLOVES); sleepUntil(() -> Rs2Equipment.hasEquipped(ItemID.ICE_GLOVES));}
     private void goldGlovesEquip(){if(Rs2Equipment.hasEquipped(ItemID.GOLDSMITH_GAUNTLETS)){return;} Rs2Equipment.equipItemFast(ItemID.GOLDSMITH_GAUNTLETS); sleepUntil(() -> Rs2Equipment.hasEquipped(ItemID.GOLDSMITH_GAUNTLETS));}
-    private void openChest() {Rs2Bank.openCertainBank(Rs2GameObject.findObjectById(ObjectID.BANK_CHEST_26707));}
+    private void openChest() {Rs2GameObject.interact(ObjectID.BANK_CHEST_26707, "bank");}
     private boolean playerAtRetrieveLocation() { return Arrays.asList(nextToBarDespensor).contains(playerLocation());}
     private int getRunEnergy(){ return Integer.parseInt(Rs2Widget.getWidget(10485788).getText());}
     private int getStamEffect() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.STAMINA_EFFECT));}
@@ -142,7 +142,7 @@ public class ogBlastFurnaceScript extends Script {
                 //Inventory.useItemAction(barSelected.getBarID(), "deposit-all");
                 Rs2Bank.depositAll(barSelected.getBarID());
             }
-            Rs2Bank.scrollTo(Rs2Widget.findWidget(barName()));
+//            Rs2Bank.scrollTo(Rs2Widget.findWidget(barName())); // FIXME: HONESTLY THIS IS SO OLD IT DOESN'T EVEN WORK
             if( getStamEffect() <= 10|| getRunEnergy() <= 40){stamPotUp();}
             Microbot.getMouse().click(Rs2Widget.findWidgetExact(barName()).getBounds());
             sleepUntil(() -> Inventory.hasItem(ItemID.GOLD_ORE));
