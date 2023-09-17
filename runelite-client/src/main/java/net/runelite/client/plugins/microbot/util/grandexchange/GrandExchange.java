@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.grandexchange;
 
 import net.runelite.api.NPC;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -9,11 +10,21 @@ import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
+import java.util.Arrays;
+import java.util.Optional;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.widget.Rs2Widget.getWidgetChildtxt;
 
 public class GrandExchange {
+
+    public static int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_1 = 30474265;
+    public static int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_10 = 30474265;
+    public static int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_100 = 30474265;
+    public static int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_1000 = 30474265;
+    public static int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_X = 30474265;
+
+
     public static void closeExchange() {
         Microbot.status = "Closing Grand Exchange";
         if (!isOpen()) return;
@@ -144,4 +155,164 @@ public class GrandExchange {
         return false;
     }
 
+    public static Widget getSearchResultWidget(String search) {
+        Widget parent = Microbot.getClient().getWidget(WidgetInfo.CHATBOX_GE_SEARCH_RESULTS);
+
+        if (parent == null || parent.getChildren() == null) return null;
+
+        return Arrays.stream(parent.getChildren()).filter(x -> x.getText().equalsIgnoreCase(search)).findFirst().orElse(null);
+    }
+
+    public static Widget getSearchResultWidget(int itemId) {
+        Widget parent = Microbot.getClient().getWidget(WidgetInfo.CHATBOX_GE_SEARCH_RESULTS);
+
+        if (parent == null || parent.getChildren() == null) return null;
+
+        return Arrays.stream(parent.getChildren()).filter(x -> x.getItemId() == itemId).findFirst().orElse(null);
+    }
+
+    public static Widget getQuantityButtonOne() {
+        Widget parent = Microbot.getClient().getWidget(WidgetInfo.GRAND_EXCHANGE_OFFER_CONTAINER);
+
+        if (parent == null || parent.getChildren() == null) return null;
+
+        return parent.getChildren()[3];
+    }
+
+    private static Widget getOfferContainer() {
+        return Microbot.getClient().getWidget(WidgetInfo.GRAND_EXCHANGE_OFFER_CONTAINER);
+    }
+
+    public static Widget getQuantityButton_Minus() {
+
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(1)).orElse(null);
+    }
+
+    public static Widget getQuantityButton_Plus() {
+
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(2)).orElse(null);
+    }
+
+    public static Widget getQuantityButton_1() {
+
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(3)).orElse(null);
+    }
+
+    public static Widget getQuantityButton_10() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(4)).orElse(null);
+    }
+
+    public static Widget getQuantityButton_100() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(5)).orElse(null);
+    }
+
+    public static Widget getQuantityButton_1000() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(6)).orElse(null);
+    }
+
+    public static Widget getPricePerItemButton_Minus() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(8)).orElse(null);
+    }
+
+    public static Widget getPricePerItemButton_Plus() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(9)).orElse(null);
+    }
+
+    public static Widget getPricePerItemButton_Minus_5Percent() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(10)).orElse(null);
+    }
+
+    public static Widget getPricePerItemButton_GuidePrice() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(11)).orElse(null);
+    }
+
+    public static Widget getPricePerItemButton_X() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(12)).orElse(null);
+    }
+
+    public static Widget getPricePerItemButton_Plus5Percent() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(13)).orElse(null);
+    }
+
+    public static Widget getChooseItem() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(20)).orElse(null);
+    }
+
+    public static Widget getConfirm() {
+        var parent = getOfferContainer();
+
+        return Optional.ofNullable(parent).map(p -> p.getChild(54)).orElse(null);
+    }
+
+    public static Widget getOfferText() {
+        return Microbot.getClient().getWidget(WidgetInfo.GRAND_EXCHANGE_OFFER_TEXT);
+    }
+
+    public static Widget getItemPrice() {
+        return Microbot.getClient().getWidget(465, 27);
+    }
+
+    public static Widget getSlot(GrandExchangeSlots slot) {
+        switch(slot) {
+            case ONE:
+                return Microbot.getClient().getWidget(465, 7);
+            case TWO:
+                return Microbot.getClient().getWidget(465, 8);
+            case THREE:
+                return Microbot.getClient().getWidget(465, 9);
+            case FOUR:
+                return Microbot.getClient().getWidget(465, 10);
+            case FIVE:
+                return Microbot.getClient().getWidget(465, 11);
+            case SIX:
+                return Microbot.getClient().getWidget(465, 12);
+            case SEVEN:
+                return Microbot.getClient().getWidget(465, 13);
+            case EIGHT:
+                return Microbot.getClient().getWidget(465, 14);
+            default:
+                return null;
+        }
+    }
+
+    public static boolean isSlotAvailable(GrandExchangeSlots slot) {
+        Widget parent = getSlot(slot);
+        return Optional.ofNullable(parent).map(p -> p.getChild(2) == null).orElse(false);
+    }
+
+    public static Widget getBuyButton(GrandExchangeSlots slot) {
+        Widget parent = getSlot(slot);
+        return Optional.ofNullable(parent).map(p -> p.getChild(0)).orElse(null);
+    }
+
+    public static Widget getSellButton(GrandExchangeSlots slot) {
+        Widget parent = getSlot(slot);
+        return Optional.ofNullable(parent).map(p -> p.getChild(1)).orElse(null);
+    }
 }
