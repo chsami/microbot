@@ -30,7 +30,7 @@ public class DriftNetScript extends Script {
                 if (!Inventory.hasItem(ItemID.DRIFT_NET)) {
                     Rs2GameObject.interact(ObjectID.ANNETTE, "Nets");
                     sleepUntil(() -> Rs2Widget.getWidget(20250629) != null);
-                    Rs2Bank.withdrawAllDriftNet();
+                    Rs2Bank.withdrawAllFast(ItemID.DRIFT_NET);
                     sleep(1000);
                     VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
                     return;
