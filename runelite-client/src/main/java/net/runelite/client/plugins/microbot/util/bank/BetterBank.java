@@ -5,7 +5,6 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.SpriteID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.plugins.jrPlugins.autoZMIAltar.BANK;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -25,33 +24,41 @@ public class BetterBank {
 
     private static int widgetId;
     private static int entryIndex;
-    private static int itemId;
-    private static int slotId;
+    private static Widget widget;
 
     public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException {
-        if (widgetId == 0) return;
-        Rs2Reflection.setItemId(menuEntry, itemId);
+        if (widgetId == 0 || widget == null) return;
+        Rs2Reflection.setItemId(menuEntry, widget.getItemId());
         menuEntry.setOption("Withdraw-1"); // Should probably be changed. Doesn't matter though.
-        menuEntry.setIdentifier(entryIndex);
-        menuEntry.setParam0(slotId);
+
+        int varBit = Microbot.getVarbitValue(6590);
+        if (
+                (varBit == 0 && ((widgetId == BANK_WIDGET_ID && entryIndex == 2) || (widgetId == INVENTORY_WIDGET_ID && entryIndex == 3))) ||
+                        (varBit == 3 && ((widgetId == BANK_WIDGET_ID && entryIndex == 5) || (widgetId == INVENTORY_WIDGET_ID && entryIndex == 6))) ||
+                        (varBit == 4 && ((widgetId == BANK_WIDGET_ID && entryIndex == 7) || (widgetId == INVENTORY_WIDGET_ID && entryIndex == 8)))
+        ) {
+            menuEntry.setIdentifier(1);
+        } else {
+            menuEntry.setIdentifier(entryIndex);
+        }
+
+        menuEntry.setParam0(widget.getIndex());
         menuEntry.setParam1(widgetId);
-        menuEntry.setTarget("");
+        menuEntry.setTarget(widget.getName());
         menuEntry.setType(MenuAction.CC_OP);
     }
 
-    public static void execMenuSwapper(int widgetId, int entryIndex, int itemId, int slotId) {
+    public static void execMenuSwapper(int widgetId, int entryIndex, Widget widget) {
         BetterBank.widgetId = widgetId;
         BetterBank.entryIndex = entryIndex;
-        BetterBank.itemId = itemId;
-        BetterBank.slotId = slotId;
+        BetterBank.widget = widget;
 
         Microbot.getMouse().clickFast(1, 1);
         sleep(50);
 
         BetterBank.widgetId = 0;
         BetterBank.entryIndex = 0;
-        BetterBank.itemId = 0;
-        BetterBank.slotId = 0;
+        BetterBank.widget = null;
     }
 
     // UTILS
@@ -108,13 +115,12 @@ public class BetterBank {
         return true;
     }
 
-
     private static boolean depositOneFast(Widget w) {
         if (!isOpen()) return false;
         if (w == null) return false;
         if (!Inventory.hasItem(w.getItemId())) return false;
 
-        execMenuSwapper(INVENTORY_WIDGET_ID, 3, w.getItemId(), w.getIndex());
+        execMenuSwapper(INVENTORY_WIDGET_ID, 3, w);
 
         return true;
     }
@@ -133,14 +139,14 @@ public class BetterBank {
         if (!Inventory.hasItem(w.getItemId())) return false;
 
         if (Arrays.stream(w.getActions()).noneMatch(x -> x != null && x.equals("Deposit-" + amount))) {
-            execMenuSwapper(INVENTORY_WIDGET_ID, 7, w.getItemId(), w.getIndex());
+            execMenuSwapper(INVENTORY_WIDGET_ID, 7, w);
 
             sleep(600, 1000);
             VirtualKeyboard.typeString(String.valueOf(amount));
             VirtualKeyboard.enter();
             sleep(50, 100);
         } else {
-            execMenuSwapper(INVENTORY_WIDGET_ID, 6, w.getItemId(), w.getIndex());
+            execMenuSwapper(INVENTORY_WIDGET_ID, 6, w);
         }
 
         return true;
@@ -159,7 +165,7 @@ public class BetterBank {
         if (w == null) return false;
         if (!Inventory.hasItem(w.getItemId())) return false;
 
-        execMenuSwapper(INVENTORY_WIDGET_ID, 8, w.getItemId(), w.getIndex());
+        execMenuSwapper(INVENTORY_WIDGET_ID, 8, w);
 
         return true;
     }
@@ -190,7 +196,7 @@ public class BetterBank {
         if (w == null) return false;
         if (Inventory.isFull()) return false;
 
-        execMenuSwapper(BANK_WIDGET_ID, 2, w.getItemId(), w.getIndex());
+        execMenuSwapper(BANK_WIDGET_ID, 2, w);
 
         return true;
     }
@@ -209,14 +215,14 @@ public class BetterBank {
         if (Inventory.isFull()) return false;
 
         if (Arrays.stream(w.getActions()).noneMatch(x -> x != null && x.equals("Withdraw-" + amount))) {
-            execMenuSwapper(BANK_WIDGET_ID, 6, w.getItemId(), w.getIndex());
+            execMenuSwapper(BANK_WIDGET_ID, 6, w);
 
             sleep(600, 1000);
             VirtualKeyboard.typeString(String.valueOf(amount));
             VirtualKeyboard.enter();
             sleep(50, 100);
         } else {
-            execMenuSwapper(BANK_WIDGET_ID, 5, w.getItemId(), w.getIndex());
+            execMenuSwapper(BANK_WIDGET_ID, 5, w);
         }
 
         return false;
@@ -235,7 +241,7 @@ public class BetterBank {
         if (w == null) return false;
         if (Inventory.isFull()) return false;
 
-        execMenuSwapper(BANK_WIDGET_ID, 7, w.getItemId(), w.getIndex());
+        execMenuSwapper(BANK_WIDGET_ID, 7, w);
 
         return true;
     }
@@ -252,7 +258,7 @@ public class BetterBank {
         if (!isOpen()) return false;
         if (w == null) return false;
 
-        execMenuSwapper(INVENTORY_WIDGET_ID, 9, w.getItemId(), w.getIndex());
+        execMenuSwapper(INVENTORY_WIDGET_ID, 9, w);
 
         return true;
     }
