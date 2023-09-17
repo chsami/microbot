@@ -22,6 +22,7 @@ import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
+import net.runelite.client.plugins.microbot.util.bank.BetterBank;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
@@ -94,7 +95,6 @@ public class MicrobotPlugin extends Plugin {
     public SummerGardenScript summerGardenScript;
     private EventSelector eventSelector;
 
-
     QuestScript questScript;
     @Override
     protected void startUp() throws AWTException {
@@ -149,7 +149,7 @@ public class MicrobotPlugin extends Plugin {
         Rs2Prayer.handleMenuSwapper(event.getMenuEntry());
         Rs2Magic.handleMenuSwapper(event.getMenuEntry());
         Rs2Equipment.handleMenuSwapper(event.getMenuEntry());
-        Rs2Bank.handleMenuSwapper(event.getMenuEntry());
+        BetterBank.handleMenuSwapper(event.getMenuEntry());
         Microbot.getWalker().handleMenuSwapper(event.getMenuEntry());
         Inventory.handleMenuSwapper(event.getMenuEntry());
         //Rs2Inventory.handleMenuSwapper(event.getMenuEntry());
