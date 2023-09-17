@@ -88,6 +88,10 @@ public class Pathfinder implements Runnable {
             CollisionMap.blockingAreas = blockingAreas;
         }
 
+        if (!this.executeWalking) {
+            run();
+            return;
+        }
         // Calculate all the staircase, obstacles, ladders in advance before calculating the path to walk
         precalculateTransports(start, target, useTransport);
 
@@ -272,6 +276,7 @@ public class Pathfinder implements Runnable {
             Node node = boundary.peekFirst();
             Node p = pending.peek();
 
+
             if (p != null && (node == null || p.cost < node.cost)) {
                 boundary.addFirst(p);
                 pending.poll();
@@ -299,7 +304,6 @@ public class Pathfinder implements Runnable {
             if (Instant.now().isAfter(cutoffTime)) {
                 break;
             }
-
             addNeighbors(node);
         }
 

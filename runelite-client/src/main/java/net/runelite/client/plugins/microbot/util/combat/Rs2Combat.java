@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.combat;
 
+import net.runelite.api.VarPlayer;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -16,7 +17,6 @@ public class Rs2Combat {
         Widget widget = Microbot.getClient().getWidget(style);
         if (widget == null) return false;
         if (isSelected(widget.getId() + 1)) {
-            System.out.println("Returning");
             return true;
         }
 
@@ -40,17 +40,29 @@ public class Rs2Combat {
     }
 
     /**
+     * Sets the special attack state if currentSpecEnergy >= specialAttackEnergyRequired
+     * @param state boolean, true for enabled, false for disabled
+     * @param specialAttackEnergyRequired int, 1000 = 100%
+     * @return boolean, whether the action succeeded
+     */
+    public static boolean setSpecState(boolean state, int specialAttackEnergyRequired) {
+        Widget widget = Microbot.getClient().getWidget(WidgetInfo.MINIMAP_SPEC_ORB);
+        int currentSpecEnergy = Microbot.getClient().getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
+        if (widget == null) return false;
+        if (currentSpecEnergy < specialAttackEnergyRequired) return false;
+        if (state == getSpecState()) return true;
+
+        Microbot.getMouse().click(widget.getBounds());
+        return true;
+    }
+
+    /**
      * Sets the special attack state
      * @param state boolean, true for enabled, false for disabled
      * @return boolean, whether the action succeeded
      */
     public static boolean setSpecState(boolean state) {
-        Widget widget = Microbot.getClient().getWidget(WidgetInfo.MINIMAP_SPEC_ORB);
-        if (widget == null) return false;
-        if (state == getSpecState()) return true;
-
-        Microbot.getMouse().click(widget.getBounds());
-        return true;
+        return setSpecState(state, -1);
     }
 
     /**
@@ -72,4 +84,6 @@ public class Rs2Combat {
     private static boolean isSelected(int widgetId) {
         return Rs2Widget.getChildWidgetSpriteID(widgetId, 0) == 1150;
     }
+
+
 }
