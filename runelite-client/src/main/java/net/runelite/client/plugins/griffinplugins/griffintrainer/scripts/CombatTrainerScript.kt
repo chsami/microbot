@@ -7,6 +7,7 @@ import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
+import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.NPCHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
@@ -227,7 +228,7 @@ class CombatTrainerScript : BaseTrainerScript() {
                         Global.sleep(200)
                     }
 
-//                    Alfred.tasks.item.findAndLootItems(itemLootNames, 2)
+                    ItemHelper.findAndLootItems(itemLootNames, 2)
                 }
                 state = State.WAITING
             }
