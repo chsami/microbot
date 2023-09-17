@@ -37,7 +37,6 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.plugins.microbot.walker.pathfinder.WorldDataDownloader;
-import net.runelite.client.plugins.microbot.walking.WalkingScript;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -48,7 +47,6 @@ import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -93,7 +91,6 @@ public class MicrobotPlugin extends Plugin {
     public ThievingScript thievingScript;
     public CookingScript cookingScript;
     public MiningScript miningScript;
-    public WalkingScript walkingScript;
     public SummerGardenScript summerGardenScript;
     private EventSelector eventSelector;
 
@@ -145,12 +142,6 @@ public class MicrobotPlugin extends Plugin {
     public void onMenuEntryAdded(MenuEntryAdded event) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
 
         final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
-
-        if (map != null) {
-            if (map.getBounds().contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY())) {
-                addMapMenuEntries(event);
-            }
-        }
 
         Rs2Npc.handleMenuSwapper(event.getMenuEntry());
         Rs2GameObject.handleMenuSwapper(event.getMenuEntry());
@@ -262,20 +253,6 @@ public class MicrobotPlugin extends Plugin {
         return mapPoint.dx(dx).dy(dy);
     }
 
-    private Consumer<MenuEntry> worldMapConsumer() {
-        return e ->
-        {
-            if (walkingScript == null) {
-                WorldPoint worldPoint = calculateMapPoint(client.getMouseCanvasPosition());
-                walkingScript = new WalkingScript();
-                walkingScript.run(worldPoint);
-            } else {
-                walkingScript.shutdown();
-                walkingScript = null;
-            }
-        };
-    }
-
     @Subscribe
     public void onMenuOpened(MenuOpened event) {
         MenuEntry[] entries = event.getMenuEntries();
@@ -325,18 +302,6 @@ public class MicrobotPlugin extends Plugin {
     public void onVarbitChanged(VarbitChanged event)
     {
         Rs2Player.handlePotionTimers(event);
-    }
-
-    private void addMapMenuEntries(MenuEntryAdded event) {
-        List<MenuEntry> entries = new LinkedList<>(Arrays.asList(client.getMenuEntries()));
-
-        List<MenuEntry> leftClickMenus = new ArrayList<>(((int) entries.stream().count()) + 2);
-
-        leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
-        .setOption(walkingScript == null || walkingScript.mainScheduledFuture.isDone() ? "Set Target" : "Clear target")
-        .setTarget(event.getTarget())
-        .setType(MenuAction.RUNELITE)
-        .onClick(worldMapConsumer()));
     }
 
     @Subscribe
