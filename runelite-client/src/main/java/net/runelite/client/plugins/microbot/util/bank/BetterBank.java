@@ -217,15 +217,17 @@ public class BetterBank {
         if (w == null) return false;
         if (Inventory.isFull()) return false;
 
-        if (Arrays.stream(w.getActions()).noneMatch(x -> x != null && x.equals("Withdraw-" + amount))) {
+        int withdrawXValue = Microbot.getVarbitValue(3960);
+
+        if (withdrawXValue == amount) {
+            execMenuSwapper(BANK_WIDGET_ID, 5, w);
+        } else {
             execMenuSwapper(BANK_WIDGET_ID, 6, w);
 
             sleep(600, 1000);
             VirtualKeyboard.typeString(String.valueOf(amount));
             VirtualKeyboard.enter();
             sleep(50, 100);
-        } else {
-            execMenuSwapper(BANK_WIDGET_ID, 5, w);
         }
 
         return false;
