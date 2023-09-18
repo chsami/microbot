@@ -22,9 +22,8 @@ public class SummerGardenScript extends Script {
             if (!super.run()) return;
             try {
 
-                if (!Inventory.hasItem("beer glass")) {
-                    //TODO: implement banking here
-                    Microbot.getNotifier().notify("Script shutting down, no more beer glass");
+                if (!Inventory.hasItem("beer glass") || !Inventory.hasItem("Pestle and mortar")) {
+                    Microbot.showMessage("You need a pestle and mortar and beer glass.");
                 }
 
                 if (Inventory.hasItemAmount("Summer sq'irk", 2)) {
