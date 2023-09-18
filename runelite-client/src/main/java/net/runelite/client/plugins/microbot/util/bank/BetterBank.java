@@ -33,11 +33,14 @@ public class BetterBank {
 
         int varBit = Microbot.getVarbitValue(6590);
         if (
-                (varBit == 0 && ((widgetId == BANK_WIDGET_ID && entryIndex == 2) || (widgetId == INVENTORY_WIDGET_ID && entryIndex == 3))) ||
-                        (varBit == 3 && ((widgetId == BANK_WIDGET_ID && entryIndex == 5) || (widgetId == INVENTORY_WIDGET_ID && entryIndex == 6))) ||
+                (varBit == 0 && ((widgetId == BANK_WIDGET_ID && entryIndex == 2))) ||
+                        (varBit == 3 && ((widgetId == BANK_WIDGET_ID && entryIndex == 5))) ||
                         (varBit == 4 && ((widgetId == BANK_WIDGET_ID && entryIndex == 7) || (widgetId == INVENTORY_WIDGET_ID && entryIndex == 8)))
         ) {
             menuEntry.setIdentifier(1);
+        } else if (varBit == 0 && (widgetId == INVENTORY_WIDGET_ID && entryIndex == 3) ||
+                varBit == 3 && (widgetId == INVENTORY_WIDGET_ID && entryIndex == 6)) { //Fix for depositOne & depositX
+            menuEntry.setIdentifier(2);
         } else {
             menuEntry.setIdentifier(entryIndex);
         }
