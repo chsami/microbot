@@ -37,7 +37,7 @@ public class AgilityScript extends Script {
     public List<AgilityObstacleModel> seersCourse = new ArrayList<>();
 
 
-    WorldPoint startCourse = new WorldPoint(0, 0, 0);
+    WorldPoint startCourse = null;
 
     public static int currentObstacle = 0;
 
@@ -92,6 +92,11 @@ public class AgilityScript extends Script {
         init(config);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
+            if (startCourse == null) {
+                Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
+                shutdown();
+                return;
+            }
             try {
                 final List<RS2Item> marksOfGrace = AgilityPlugin.getMarksOfGrace();
                 final LocalPoint playerLocation = Microbot.getClient().getLocalPlayer().getLocalLocation();

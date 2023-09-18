@@ -21,6 +21,7 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
+import javax.swing.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -155,5 +156,13 @@ public class Microbot {
 
     public static boolean hasTileBeenLoaded(WorldPoint worldPoint) {
         return LocalPoint.fromWorld(Microbot.getClient(), worldPoint) != null;
+    }
+
+    public static void showMessage(String message) {
+        SwingUtilities.invokeLater(() ->
+        {
+            JOptionPane.showConfirmDialog(null, message, "Message",
+                    JOptionPane.DEFAULT_OPTION);
+        });
     }
 }
