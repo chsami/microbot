@@ -19,10 +19,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.api.Varbits.QUICK_PRAYER;
-import static net.runelite.client.plugins.microbot.util.globval.VarbitValues.QUICK_PRAYER_DISABLED;
+import static net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer.isQuickPrayerEnabled;
 import static net.runelite.client.plugins.pestcontrol.Portal.*;
-import static net.runelite.client.plugins.pestcontrol.Portal.RED;
 
 public class PestControlScript extends Script {
     public static double version = 1.0;
@@ -70,7 +68,7 @@ public class PestControlScript extends Script {
                 final boolean isInPestControl = Microbot.getClient().getWidget(WidgetInfo.PEST_CONTROL_BLUE_SHIELD) != null;
                 final boolean isInBoat = Microbot.getClient().getWidget(WidgetInfo.PEST_CONTROL_BOAT_INFO) != null;
                 if (isInPestControl) {
-                    if (Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_DISABLED.getValue()) {
+                    if (!isQuickPrayerEnabled()) {
                         final Widget prayerOrb = Rs2Widget.getWidget(WidgetInfo.MINIMAP_QUICK_PRAYER_ORB);
                         if (prayerOrb != null) {
                             Microbot.getMouse().click(prayerOrb.getCanvasLocation());
