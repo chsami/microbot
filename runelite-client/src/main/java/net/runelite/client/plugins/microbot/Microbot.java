@@ -22,7 +22,6 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.swing.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -91,9 +90,17 @@ public class Microbot {
     public static Mouse getMouseForKotlin() { return mouse; }
     public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
 
+    @Deprecated(since="Use isMoving", forRemoval = true)
     public static boolean isWalking() {
-        return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808);
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
+                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
+
+    public static boolean isMoving() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
+                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
+    }
+
 
     public static boolean isAnimating() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
@@ -159,11 +166,15 @@ public class Microbot {
         return LocalPoint.fromWorld(Microbot.getClient(), worldPoint) != null;
     }
 
-    public static void showMessage(String message) throws InterruptedException, InvocationTargetException {
-        SwingUtilities.invokeAndWait(() ->
-        {
-            JOptionPane.showConfirmDialog(null, message, "Message",
-                    JOptionPane.DEFAULT_OPTION);
-        });
+    public static void showMessage(String message) {
+        try {
+            SwingUtilities.invokeAndWait(() ->
+            {
+                JOptionPane.showConfirmDialog(null, message, "Message",
+                        JOptionPane.DEFAULT_OPTION);
+            });
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }
