@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
+import static org.apache.commons.lang3.ArrayUtils.reverse;
 
 public class Walker {
 
@@ -284,13 +285,18 @@ public class Walker {
 
     public boolean walkPath(WorldPoint[] worldPoints) {
         if (worldPoints[worldPoints.length -1].distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 4) return true;
-        pathfinder = new Pathfinder(pathfinderConfig);
+        pathfinder = new Pathfinder();
         pathfinder.customPath = true;
-        List<Node> path = new ArrayList();
+        List<Node> path = new ArrayList<>();
+        reverse(worldPoints);
         for (WorldPoint worldPoint: worldPoints) {
             path.add(new Node(worldPoint, null, 0));
         }
+        pathfinder.setStart(Microbot.getClient().getLocalPlayer().getWorldLocation());
+        pathfinder.setTarget(worldPoints[0]);
+        pathfinder.setConfig(pathfinderConfig);
         pathfinder.setPath(path);
+        pathfinder.run();
         sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
         return false;
     }
