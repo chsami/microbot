@@ -94,11 +94,7 @@ public class AgilityScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (startCourse == null) {
-                try {
-                    Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
-                } catch (InterruptedException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
+                Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
             }
             try {
                 final List<RS2Item> marksOfGrace = AgilityPlugin.getMarksOfGrace();
