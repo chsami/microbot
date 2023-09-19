@@ -22,6 +22,7 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -158,8 +159,8 @@ public class Microbot {
         return LocalPoint.fromWorld(Microbot.getClient(), worldPoint) != null;
     }
 
-    public static void showMessage(String message) {
-        SwingUtilities.invokeLater(() ->
+    public static void showMessage(String message) throws InterruptedException, InvocationTargetException {
+        SwingUtilities.invokeAndWait(() ->
         {
             JOptionPane.showConfirmDialog(null, message, "Message",
                     JOptionPane.DEFAULT_OPTION);
