@@ -91,6 +91,7 @@ public class PluginManager
 
 	private final boolean developerMode;
 	private final boolean safeMode;
+	private final boolean disableWalkerUpdate;
 	private final EventBus eventBus;
 	private final Scheduler scheduler;
 	private final ConfigManager configManager;
@@ -106,6 +107,7 @@ public class PluginManager
 	PluginManager(
 		@Named("developerMode") final boolean developerMode,
 		@Named("safeMode") final boolean safeMode,
+		@Named("disableWalkerUpdate") final boolean disableWalkerUpdate,
 		final EventBus eventBus,
 		final Scheduler scheduler,
 		final ConfigManager configManager,
@@ -113,6 +115,7 @@ public class PluginManager
 	{
 		this.developerMode = developerMode;
 		this.safeMode = safeMode;
+		this.disableWalkerUpdate = disableWalkerUpdate;
 		this.eventBus = eventBus;
 		this.scheduler = scheduler;
 		this.configManager = configManager;

@@ -9,7 +9,6 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.Arrays;
@@ -118,10 +117,26 @@ boolean reachedEndLine = false;
                 }
 
                 Rs2Npc.interact("chicken", "attack");*/
-                Inventory.useItemFast("shark", "use");
-                Rs2Npc.interact("banker", "Use");
+              //  Inventory.useItemFast("giant pouch", "empty");
+          //      Rs2GameObject.interact("Bank booth");
+
+               // Rs2Npc.interact("squire", "Use");
+           //     ObjectComposition objCOmp = Microbot.getClientThread().runOnClientThread(() ->  Microbot.getClient().getObjectDefinition(26818));
+                //System.out.println(Rs2Inventory.isItemSelected());
+              // Rs2GameObject.interact(26818);
+//                Rs2Inventory.interact(995);
                // System.out.println(Inventory.getAmountForItem("sara"));
 
+                // Rs2GameObject.interact(14346);
+               // TileObject gameObject = Rs2GameObject.findObjectById(2120);
+//                if (gameObject != null) {
+//                    System.out.println(Microbot.getWalker().getReachDistance(gameObject.getWorldLocation()));
+//                }
+                //System.out.println(gameObject != null ? gameObject.getWorldLocation() : null);
+             //   System.out.println(Rs2GameObject.findObjectById(17224).getWorldLocation());
+               //Rs2Bank.walkToBank();
+               // Microbot.getWalker().walkTo(BankLocation.TREE_GNOME_STRONGHOLD_NIEVE.getWorldPoint());
+                 Microbot.getWalker().walkTo(new WorldPoint(3436, 3562, 2));
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

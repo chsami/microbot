@@ -16,4 +16,7 @@ public enum Items {
     public String toString() {
         return name;
     }
+    public String getFinished(){
+        return finished;
+    }
 }

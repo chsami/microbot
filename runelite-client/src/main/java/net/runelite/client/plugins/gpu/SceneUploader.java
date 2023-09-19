@@ -48,12 +48,15 @@ import net.runelite.api.WallObject;
 @Slf4j
 class SceneUploader
 {
+	private static final int SCENE_OFFSET = (Constants.EXTENDED_SCENE_SIZE - Constants.SCENE_SIZE) / 2; // offset for sxy -> msxy
+
 	@Inject
 	private Client client;
 
 	int sceneId = (int) System.nanoTime();
 	private int offset;
 	private int uvoffset;
+	private int uniqueModels;
 
 	void upload(Scene scene, GpuIntBuffer vertexbuffer, GpuFloatBuffer uvBuffer)
 	{
@@ -62,16 +65,17 @@ class SceneUploader
 		++sceneId;
 		offset = 0;
 		uvoffset = 0;
+		uniqueModels = 0;
 		vertexbuffer.clear();
 		uvBuffer.clear();
 
 		for (int z = 0; z < Constants.MAX_Z; ++z)
 		{
-			for (int x = 0; x < Constants.SCENE_SIZE; ++x)
+			for (int x = 0; x < Constants.EXTENDED_SCENE_SIZE; ++x)
 			{
-				for (int y = 0; y < Constants.SCENE_SIZE; ++y)
+				for (int y = 0; y < Constants.EXTENDED_SCENE_SIZE; ++y)
 				{
-					Tile tile = scene.getTiles()[z][x][y];
+					Tile tile = scene.getExtendedTiles()[z][x][y];
 					if (tile != null)
 					{
 						upload(scene, tile, vertexbuffer, uvBuffer);
@@ -81,7 +85,7 @@ class SceneUploader
 		}
 
 		stopwatch.stop();
-		log.debug("Scene upload time: {}", stopwatch);
+		log.debug("Scene upload time: {} unique models: {} length: {}KB", stopwatch, uniqueModels, (offset * 16) / 1024);
 	}
 
 	private void upload(Scene scene, Tile tile, GpuIntBuffer vertexBuffer, GpuFloatBuffer uvBuffer)
@@ -208,6 +212,8 @@ class SceneUploader
 		final int localX = offsetX;
 		final int localY = offsetY;
 
+		tileX += SCENE_OFFSET;
+		tileY += SCENE_OFFSET;
 		int swHeight = tileHeights[tileZ][tileX][tileY];
 		int seHeight = tileHeights[tileZ][tileX + 1][tileY];
 		int neHeight = tileHeights[tileZ][tileX + 1][tileY + 1];
@@ -356,6 +362,12 @@ class SceneUploader
 
 	private void uploadSceneModel(Model model, GpuIntBuffer vertexBuffer, GpuFloatBuffer uvBuffer)
 	{
+		// deduplicate hillskewed models
+		if (model.getUnskewedModel() != null)
+		{
+			model = model.getUnskewedModel();
+		}
+
 		if (model.getSceneId() == sceneId)
 		{
 			return; // model has already been uploaded
@@ -371,6 +383,7 @@ class SceneUploader
 			model.setUvBufferOffset(-1);
 		}
 		model.setSceneId(sceneId);
+		++uniqueModels;
 
 		int len = pushModel(model, vertexBuffer, uvBuffer);
 

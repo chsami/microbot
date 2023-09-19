@@ -2,20 +2,18 @@ package net.runelite.client.plugins.microbot.util.walker;
 
 import com.google.common.base.Strings;
 import lombok.Getter;
-import lombok.Setter;
-import net.runelite.api.ItemID;
-import net.runelite.api.ObjectID;
 import net.runelite.api.Quest;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.magic.Teleport;
-import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
  * This class represents a travel point between two WorldPoints.
@@ -107,6 +105,10 @@ public class Transport {
 
     public boolean reverse = false;
     public String reverseAction;
+
+    public int priority = 0;
+    public int offsetX = 0;
+    public int offsetY = 0;
 
 
     public Transport() {
@@ -394,6 +396,33 @@ public class Transport {
         return this;
     }
 
+    /**
+     * Use the offset if the coordinates of the object do no match the best pathing way
+     * @param offsetX
+     * @param offsetY
+     * @return
+     */
+    public Transport setOffset(int offsetX, int offsetY) {
+
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+
+        return this;
+    }
+
+
+    /**
+     * The higher the priority the more likely the web walking will use this transport
+     * @param priority
+     * @return
+     */
+    public Transport addPriority(int priority) {
+
+        this.priority = priority;
+
+        return this;
+    }
+
     public Transport chain(Transport linkedTransport) {
 
         this.linkedTransport = linkedTransport;
@@ -418,6 +447,8 @@ public class Transport {
             obstacle_reverse.linkedTransport = this.linkedTransport;
             obstacle_reverse.action = reverseAction;
             obstacle_reverse.isMember = this.isMember;
+            obstacle_reverse.agilityLevelRequired = this.agilityLevelRequired;
+            obstacle_reverse.priority = this.priority;
 
             PathfinderConfig.transports.computeIfAbsent(obstacle_reverse.origin, k -> new ArrayList<>()).add(obstacle_reverse);
         }

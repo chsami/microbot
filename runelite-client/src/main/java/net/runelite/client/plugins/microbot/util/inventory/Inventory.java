@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
@@ -15,7 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
@@ -404,20 +404,39 @@ public class Inventory {
     }
 
     public static boolean interact(String itemName) {
-        useItem(itemName);
-        return true;
+        return useItem(itemName);
     }
 
     public static boolean interact(String... itemNames) {
+        boolean interacted = false;
         for (String itemName : itemNames) {
             Widget item = findItem(itemName);
             if (item != null) {
                 Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
                 sleep(600, 1200);
+                interacted = true;
                 break;
             }
         }
-        return true;
+        return interacted;
+    }
+
+    public static boolean interactContains(String itemName) {
+        return useItemContains(itemName);
+    }
+
+    public static boolean interactItemContains(String... itemNames) {
+        boolean interacted = false;
+        for (String itemName : itemNames) {
+            Widget item = findItemContains(itemName);
+            if (item != null) {
+                Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
+                sleep(600, 1200);
+                interacted = true;
+                break;
+            }
+        }
+        return interacted;
     }
 
     public static boolean useItemOnItem(String itemName1, String itemName2) {
@@ -664,11 +683,7 @@ public class Inventory {
 
         menuEntry.setType(MenuAction.CC_OP);
 
-        Arrays.stream(menuEntry.getClass().getMethods())
-                .filter(x -> x.getReturnType().getName() == "void" && x.getParameters().length > 0 && x.getParameters()[0].getType().getName() == "int")
-                .collect(Collectors.toList())
-                .get(0)
-                .invoke(menuEntry, item.id); //use the setItemId method through reflection
+        Rs2Reflection.setItemId(menuEntry, item.id);
 
         if (itemAction.equalsIgnoreCase("use")) {
             index = 0;

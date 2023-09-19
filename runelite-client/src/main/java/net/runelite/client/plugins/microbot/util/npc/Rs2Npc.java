@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
@@ -139,8 +140,9 @@ public class Rs2Npc {
             else
                 return npcs.stream()
                         .filter(x -> x != null && x.getName().toLowerCase().equalsIgnoreCase(name.toLowerCase()))
-                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .findAny().orElse(null);
+                        .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                        .get();
+
         });
     }
 
@@ -161,21 +163,20 @@ public class Rs2Npc {
             else
                 return npcs.stream()
                         .filter(x -> x != null && x.getId() == id)
-                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .findFirst().orElse(null);
+                        .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                        .orElse(null);
         });
     }
 
-    public static NPC getNpc(int id, List<Integer> excludedIndexes) {
+    public static Optional<NPC> getNpc(int id, List<Integer> excludedIndexes) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             List<NPC> npcs = Arrays.stream(getNpcs()).collect(Collectors.toList());
             if (npcs.isEmpty())
-                return null;
+                return Optional.empty();
             else
                 return npcs.stream()
                         .filter(x -> x != null && x.getId() == id && !excludedIndexes.contains(x.getIndex()))
-                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .findFirst().orElse(null);
+                        .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
         });
     }
 
@@ -228,35 +229,39 @@ public class Rs2Npc {
 
     public static void handleMenuSwapper(MenuEntry menuEntry) {
         if (npcInteraction == null) return;
-        menuEntry.setIdentifier(npcInteraction.getIndex());
-        menuEntry.setParam0(0);
-        menuEntry.setTarget("<col=ffff00>" + npcInteraction.getName() + "<col=ff00>  (level-" + npcInteraction.getCombatLevel() + ")");
-        menuEntry.setParam1(0);
-        menuEntry.setOption(Rs2Npc.npcAction);
+        try {
+            menuEntry.setIdentifier(npcInteraction.getIndex());
+            menuEntry.setParam0(0);
+            menuEntry.setTarget("<col=ffff00>" + npcInteraction.getName() + "<col=ff00>  (level-" + npcInteraction.getCombatLevel() + ")");
+            menuEntry.setParam1(0);
+            menuEntry.setOption(Rs2Npc.npcAction);
 
-        NPCComposition npcComposition = Microbot.getClient().getNpcDefinition(npcInteraction.getId());
+            NPCComposition npcComposition = Microbot.getClient().getNpcDefinition(npcInteraction.getId());
 
-        int index = -1;
-        for (int i = 0; i < npcComposition.getActions().length; i++) {
-            String action = npcComposition.getActions()[i];
-            if (action == null || !action.equalsIgnoreCase(npcAction)) continue;
-            index = i;
-        }
+            int index = -1;
+            for (int i = 0; i < npcComposition.getActions().length; i++) {
+                String action = npcComposition.getActions()[i];
+                if (action == null || !action.equalsIgnoreCase(npcAction)) continue;
+                index = i;
+            }
 
-        if (Microbot.getClient().isWidgetSelected()) {
-            menuEntry.setType(MenuAction.WIDGET_TARGET_ON_NPC);
-        } else if (index == 0) {
-            menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
-        } else if (index == 1) {
-            menuEntry.setType(MenuAction.NPC_SECOND_OPTION);
-        } else if (index == 2) {
-            menuEntry.setType(MenuAction.NPC_THIRD_OPTION);
+            if (Microbot.getClient().isWidgetSelected()) {
+                menuEntry.setType(MenuAction.WIDGET_TARGET_ON_NPC);
+            } else if (index == 0) {
+                menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
+            } else if (index == 1) {
+                menuEntry.setType(MenuAction.NPC_SECOND_OPTION);
+            } else if (index == 2) {
+                menuEntry.setType(MenuAction.NPC_THIRD_OPTION);
 
-        } else if (index == 3) {
-            menuEntry.setType(MenuAction.NPC_FOURTH_OPTION);
+            } else if (index == 3) {
+                menuEntry.setType(MenuAction.NPC_FOURTH_OPTION);
 
-        } else if (index == 4) {
-            menuEntry.setType(MenuAction.NPC_FIFTH_OPTION);
+            } else if (index == 4) {
+                menuEntry.setType(MenuAction.NPC_FIFTH_OPTION);
+            }
+        } catch (Exception ex) {
+            System.out.println("NPC MENU SWAP FAILED WITH MESSAGE: " + ex.getMessage());
         }
     }
 }

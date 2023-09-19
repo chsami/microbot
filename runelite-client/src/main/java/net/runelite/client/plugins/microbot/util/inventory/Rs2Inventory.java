@@ -4,6 +4,7 @@ import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
+@Deprecated
 public class Rs2Inventory {
 
     public static Rs2Item item;
@@ -290,8 +292,8 @@ public class Rs2Inventory {
      * @return True if all items were successfully dropped, false otherwise.
      */
     public static boolean dropAll() {
-        for (Rs2Item item:
-             items()) {
+        for (Rs2Item item :
+                items()) {
             if (item == null) continue;
             swapMenu(item, "Drop");
             sleep(300, 600);
@@ -306,7 +308,7 @@ public class Rs2Inventory {
      * @return True if all matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAll(int id) {
-        for (Rs2Item item:
+        for (Rs2Item item :
                 items().stream().filter(x -> x.id == id).collect(Collectors.toList())) {
             if (item == null) continue;
             swapMenu(item, "Drop");
@@ -322,7 +324,7 @@ public class Rs2Inventory {
      * @return True if all matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAll(int[] ids) {
-        for (Rs2Item item:
+        for (Rs2Item item :
                 items().stream().filter(x -> Arrays.stream(ids).anyMatch(id -> id == x.id)).collect(Collectors.toList())) {
             if (item == null) continue;
             swapMenu(item, "Drop");
@@ -348,7 +350,7 @@ public class Rs2Inventory {
      * @return True if all matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAll(String name) {
-        for (Rs2Item item:
+        for (Rs2Item item :
                 items().stream().filter(x -> x.name.equalsIgnoreCase(name)).collect(Collectors.toList())) {
             if (item == null) continue;
             swapMenu(item, "Drop");
@@ -364,7 +366,7 @@ public class Rs2Inventory {
      * @return True if all matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAll(String... names) {
-        for (Rs2Item item:
+        for (Rs2Item item :
                 items().stream().filter(x -> Arrays.stream(names).anyMatch(name -> name.equalsIgnoreCase(x.name))).collect(Collectors.toList())) {
             if (item == null) continue;
             swapMenu(item, "Drop");
@@ -380,7 +382,7 @@ public class Rs2Inventory {
      * @return True if all matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAll(Predicate<Rs2Item> predicate) {
-        for (Rs2Item item:
+        for (Rs2Item item :
                 items().stream().filter(predicate).collect(Collectors.toList())) {
             if (item == null) continue;
             swapMenu(item, "Drop");
@@ -396,7 +398,7 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(int[] ids) {
-        for (Rs2Item item:
+        for (Rs2Item item :
                 items().stream().filter(x -> Arrays.stream(ids).noneMatch(id -> id == x.id)).collect(Collectors.toList())) {
             if (item == null) continue;
             swapMenu(item, "Drop");
@@ -422,7 +424,7 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(String... names) {
-        for (Rs2Item item:
+        for (Rs2Item item :
                 items().stream().filter(x -> Arrays.stream(names).noneMatch(id -> id == x.name)).collect(Collectors.toList())) {
             if (item == null) continue;
             swapMenu(item, "Drop");
@@ -438,7 +440,7 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(Predicate<Rs2Item> predicate) {
-        for (Rs2Item item:
+        for (Rs2Item item :
                 items().stream().filter(predicate).collect(Collectors.toList())) {
             if (item == null) continue;
             swapMenu(item, "Drop");
@@ -466,7 +468,7 @@ public class Rs2Inventory {
      * @return A list of items that do not match the filter criteria.
      */
     public static List<Rs2Item> except(Predicate<Rs2Item> predicate) {
-       return items().stream().filter(predicate.negate()).collect(Collectors.toList());
+        return items().stream().filter(predicate.negate()).collect(Collectors.toList());
     }
 
     /**
@@ -840,7 +842,7 @@ public class Rs2Inventory {
      * @return True if an item is selected, false otherwise.
      */
     public static boolean isItemSelected() {
-        return  Microbot.getClient().isWidgetSelected();
+        return Microbot.getClient().isWidgetSelected();
     }
 
     /**
@@ -1120,14 +1122,12 @@ public class Rs2Inventory {
             menuEntry.setType(MenuAction.CC_OP);
         }
 
-        Arrays.stream(menuEntry.getClass().getMethods())
-                .filter(x -> x.getReturnType().getName() == "void" && x.getParameters().length > 0 && x.getParameters()[0].getType().getName() == "int")
-                .collect(Collectors.toList())
-                .get(0)
-                .invoke(menuEntry, item.id); //use the setItemId method through reflection
+        Rs2Reflection.setItemId(menuEntry, item.id);
 
         if (itemAction.equalsIgnoreCase("use")) {
             index = 0;
+        } else if (itemComposition.getName().contains("pouch") && itemAction.equalsIgnoreCase("empty")) {
+            index = 1;
         } else if (itemAction.equalsIgnoreCase("drink")
                 || itemAction.equalsIgnoreCase("read")
                 || itemAction.equalsIgnoreCase("eat")
