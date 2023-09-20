@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -94,8 +95,6 @@ public class AgilityScript extends Script {
             if (!super.run()) return;
             if (startCourse == null) {
                 Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
-                shutdown();
-                return;
             }
             try {
                 final List<RS2Item> marksOfGrace = AgilityPlugin.getMarksOfGrace();

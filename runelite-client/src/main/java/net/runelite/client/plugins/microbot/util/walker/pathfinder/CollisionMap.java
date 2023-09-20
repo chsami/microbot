@@ -46,6 +46,8 @@ public class CollisionMap {
         doorIds.add(ObjectID.DOOR_2100); //  slayer tower to nechryaels
         doorIds.add(ObjectID.DOOR_2102); //  slayer tower to abberant
         doorIds.add(ObjectID.DOOR_2104); //  slayer tower to abberant
+        doorIds.add(ObjectID.LARGE_DOOR_1521); //  door chaos altar
+        doorIds.add(ObjectID.LARGE_DOOR_1524); //  door chaos altar
 
     }
 

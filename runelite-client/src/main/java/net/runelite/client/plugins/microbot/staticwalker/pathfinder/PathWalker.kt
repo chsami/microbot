@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.staticwalker.pathfinder
 
 import net.runelite.api.GameObject
 import net.runelite.api.GroundObject
-import net.runelite.api.ObjectID
 import net.runelite.api.Perspective
 import net.runelite.api.Point
 import net.runelite.api.WallObject
@@ -19,10 +18,15 @@ class PathWalker(private val nodes: List<PathNode>) {
 
     companion object {
         var enabled: Boolean = false
+        private var isInterrupted: Boolean = false
+        fun interrupt() {
+            isInterrupted = true
+        }
     }
 
     fun walkPath() {
         enabled = true
+        isInterrupted = false
 
         val skipDistance = 4
         val upperBound = nodes.size - 1
@@ -32,6 +36,12 @@ class PathWalker(private val nodes: List<PathNode>) {
 //        val player = Microbot.getClientForKotlin().localPlayer
 
         for (currentNode in nodes) {
+
+            if (isInterrupted) {
+                enabled = false
+                return
+            }
+
             val index = nodes.indexOf(currentNode)
             val isLastNode = nodes.indexOf(currentNode) == nodes.lastIndex
 

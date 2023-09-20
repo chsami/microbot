@@ -8,7 +8,9 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 
 import static net.runelite.api.Varbits.PRAYER_PROTECT_FROM_MAGIC;
+import static net.runelite.api.Varbits.QUICK_PRAYER;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.globval.VarbitValues.QUICK_PRAYER_ENABLED;
 
 public class Rs2Prayer {
 
@@ -190,6 +192,10 @@ public class Rs2Prayer {
         Widget rangePray = Microbot.getClient().getWidget(35454999);
         if (rangePray == null) return;
         Microbot.getMouse().click(rangePray.getBounds());
+    }
+
+    public static boolean isQuickPrayerEnabled() {
+        return Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_ENABLED.getValue();
     }
 
     public static void handleMenuSwapper(MenuEntry menuEntry) {

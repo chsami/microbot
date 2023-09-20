@@ -21,6 +21,13 @@ public class BetterBank {
     private static final int BANK_WIDGET_ID = 786445;
     private static final int INVENTORY_WIDGET_ID = 983043;
 
+    private static final int X_AMOUNT_VARBIT = 3960;
+    private static final int SELECTED_OPTION_VARBIT = 6590;
+
+    private static final int HANDLE_X_SET = 5;
+    private static final int HANDLE_X_UNSET = 6;
+    private static final int HANDLE_ALL = 7;
+
 
     private static int widgetId;
     private static int entryIndex;
@@ -31,13 +38,8 @@ public class BetterBank {
         Rs2Reflection.setItemId(menuEntry, widget.getItemId());
         menuEntry.setOption("Withdraw-1"); // Should probably be changed. Doesn't matter though.
 
-        int varBit = Microbot.getVarbitValue(6590);
-        if (
-                (varBit == 0 && ((widgetId == BANK_WIDGET_ID && entryIndex == 2) || (widgetId == INVENTORY_WIDGET_ID && entryIndex == 3))) ||
-                        (varBit == 3 && ((widgetId == BANK_WIDGET_ID && entryIndex == 5) || (widgetId == INVENTORY_WIDGET_ID && entryIndex == 6))) ||
-                        (varBit == 4 && ((widgetId == BANK_WIDGET_ID && entryIndex == 7) || (widgetId == INVENTORY_WIDGET_ID && entryIndex == 8)))
-        ) {
-            menuEntry.setIdentifier(1);
+        if (widgetId == INVENTORY_WIDGET_ID) {
+            menuEntry.setIdentifier(entryIndex + 1);
         } else {
             menuEntry.setIdentifier(entryIndex);
         }
@@ -120,7 +122,11 @@ public class BetterBank {
         if (w == null) return false;
         if (!Inventory.hasItem(w.getItemId())) return false;
 
-        execMenuSwapper(INVENTORY_WIDGET_ID, 3, w);
+        if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
+            execMenuSwapper(INVENTORY_WIDGET_ID, 1, w);
+        } else {
+            execMenuSwapper(INVENTORY_WIDGET_ID, 2, w);
+        }
 
         return true;
     }
@@ -138,15 +144,15 @@ public class BetterBank {
         if (w == null) return false;
         if (!Inventory.hasItem(w.getItemId())) return false;
 
-        if (Arrays.stream(w.getActions()).noneMatch(x -> x != null && x.equals("Deposit-" + amount))) {
-            execMenuSwapper(INVENTORY_WIDGET_ID, 7, w);
+        if (Microbot.getVarbitValue(X_AMOUNT_VARBIT) == amount) {
+            execMenuSwapper(INVENTORY_WIDGET_ID, HANDLE_X_SET, w);
+        } else {
+            execMenuSwapper(INVENTORY_WIDGET_ID, HANDLE_X_UNSET, w);
 
             sleep(600, 1000);
             VirtualKeyboard.typeString(String.valueOf(amount));
             VirtualKeyboard.enter();
             sleep(50, 100);
-        } else {
-            execMenuSwapper(INVENTORY_WIDGET_ID, 6, w);
         }
 
         return true;
@@ -165,7 +171,7 @@ public class BetterBank {
         if (w == null) return false;
         if (!Inventory.hasItem(w.getItemId())) return false;
 
-        execMenuSwapper(INVENTORY_WIDGET_ID, 8, w);
+        execMenuSwapper(INVENTORY_WIDGET_ID, HANDLE_ALL, w);
 
         return true;
     }
@@ -196,7 +202,11 @@ public class BetterBank {
         if (w == null) return false;
         if (Inventory.isFull()) return false;
 
-        execMenuSwapper(BANK_WIDGET_ID, 2, w);
+        if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
+            execMenuSwapper(BANK_WIDGET_ID, 1, w);
+        } else {
+            execMenuSwapper(BANK_WIDGET_ID, 2, w);
+        }
 
         return true;
     }
@@ -214,15 +224,15 @@ public class BetterBank {
         if (w == null) return false;
         if (Inventory.isFull()) return false;
 
-        if (Arrays.stream(w.getActions()).noneMatch(x -> x != null && x.equals("Withdraw-" + amount))) {
-            execMenuSwapper(BANK_WIDGET_ID, 6, w);
+        if (Microbot.getVarbitValue(X_AMOUNT_VARBIT) == amount) {
+            execMenuSwapper(BANK_WIDGET_ID, HANDLE_X_SET, w);
+        } else {
+            execMenuSwapper(BANK_WIDGET_ID, HANDLE_X_UNSET, w);
 
             sleep(600, 1000);
             VirtualKeyboard.typeString(String.valueOf(amount));
             VirtualKeyboard.enter();
             sleep(50, 100);
-        } else {
-            execMenuSwapper(BANK_WIDGET_ID, 5, w);
         }
 
         return false;
@@ -241,7 +251,7 @@ public class BetterBank {
         if (w == null) return false;
         if (Inventory.isFull()) return false;
 
-        execMenuSwapper(BANK_WIDGET_ID, 7, w);
+        execMenuSwapper(BANK_WIDGET_ID, HANDLE_ALL, w);
 
         return true;
     }

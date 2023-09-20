@@ -32,10 +32,13 @@ import static net.runelite.client.plugins.microbot.util.walker.pathfinder.Collis
 
 public class Pathfinder implements Runnable {
     @Getter
-    private final WorldPoint start;
+    @Setter
+    private WorldPoint start;
     @Getter
+    @Setter
     private WorldPoint target;
-    private final PathfinderConfig config;
+    @Setter
+    private PathfinderConfig config;
 
     private final Deque<Node> boundary = new LinkedList<>();
     private final Set<WorldPoint> visited = new HashSet<>();
@@ -53,12 +56,17 @@ public class Pathfinder implements Runnable {
     @Setter
     private boolean useTransport;
     Transport useCurrentTransport = null;
-    boolean executeWalking;
+    boolean executeWalking = true;
     boolean useCanvas;
     public boolean customPath = false;
 
     public boolean getDebugger() {
         return Microbot.debug;
+    }
+
+
+    public Pathfinder() {
+
     }
 
     public Pathfinder(PathfinderConfig config) {
@@ -229,7 +237,7 @@ public class Pathfinder implements Runnable {
                     }
                     linkedTransport = linkedTransport.linkedTransport;
                 }
-            } else  if (start.getY() < 9000 && target.getY() > 9000) {
+            } else if (start.getY() < 9000 && target.getY() > 9000) {
                 // Use object to go underground
                 Transport transportUnderground = getClosestTunnel();
                 if (transportUnderground != null) {
@@ -263,50 +271,52 @@ public class Pathfinder implements Runnable {
             pending.clear();
             return;
         }
-        CollisionMap.nodesChecked = new ArrayList<>();
-        wallNodes = new ArrayList<>();
-        Microbot.status = "Calculating webwalking, please wait...";
-        boundary.addFirst(new Node(start, null));
 
-        int bestDistance = Integer.MAX_VALUE;
-        long bestHeuristic = Integer.MAX_VALUE;
-        Instant cutoffTime = Instant.now().plus(Duration.ofSeconds(8));
+        if (path.isEmpty()) {
+            CollisionMap.nodesChecked = new ArrayList<>();
+            wallNodes = new ArrayList<>();
+            Microbot.status = "Calculating webwalking, please wait...";
+            boundary.addFirst(new Node(start, null));
 
-        while (!boundary.isEmpty() || !pending.isEmpty()) {
-            Node node = boundary.peekFirst();
-            Node p = pending.peek();
+            int bestDistance = Integer.MAX_VALUE;
+            long bestHeuristic = Integer.MAX_VALUE;
+            Instant cutoffTime = Instant.now().plus(Duration.ofSeconds(8));
+
+            while (!boundary.isEmpty() || !pending.isEmpty()) {
+                Node node = boundary.peekFirst();
+                Node p = pending.peek();
 
 
-            if (p != null && (node == null || p.cost < node.cost)) {
-                boundary.addFirst(p);
-                pending.poll();
+                if (p != null && (node == null || p.cost < node.cost)) {
+                    boundary.addFirst(p);
+                    pending.poll();
+                }
+
+                node = boundary.removeFirst();
+
+                if (node == null || node.position == null) break;
+
+                if (node.position.distanceTo(target) < 1 || (!config.isNear(start))) {
+                    path = node.getPath();
+                    break;
+                }
+
+                int distance = Node.distanceBetween(node.position, target);
+                long heuristic = distance + Node.distanceBetween(node.position, target, 2);
+                if (heuristic < bestHeuristic || (heuristic <= bestHeuristic && distance < bestDistance)) {
+                    path = node.getPath();
+                    totalCost += node.cost;
+                    bestDistance = distance;
+                    bestHeuristic = heuristic;
+                    cutoffTime = Instant.now().plus(Duration.ofSeconds(8));
+                }
+
+                if (Instant.now().isAfter(cutoffTime)) {
+                    break;
+                }
+                addNeighbors(node);
             }
-
-            node = boundary.removeFirst();
-
-            if (node == null || node.position == null) break;
-
-            if (node.position.distanceTo(target) < 1 || (!config.isNear(start))) {
-                path = node.getPath();
-                break;
-            }
-
-            int distance = Node.distanceBetween(node.position, target);
-            long heuristic = distance + Node.distanceBetween(node.position, target, 2);
-            if (heuristic < bestHeuristic || (heuristic <= bestHeuristic && distance < bestDistance)) {
-                path = node.getPath();
-                totalCost += node.cost;
-                bestDistance = distance;
-                bestHeuristic = heuristic;
-                cutoffTime = Instant.now().plus(Duration.ofSeconds(8));
-            }
-
-            if (Instant.now().isAfter(cutoffTime)) {
-                break;
-            }
-            addNeighbors(node);
         }
-
 
         if (this.executeWalking && !handleDoors() && !handleShortcuts()) {
             //  Collections.reverse(path);
@@ -341,7 +351,11 @@ public class Pathfinder implements Runnable {
     }
 
     private void handleWalkableNodes() {
-        Node lastNode = path.get(path.size() - 1);
+        if (customPath) {
+            handleCustomPath();
+            return;
+        }
+        Node lastNode = !path.isEmpty() ? path.get(path.size() - 1) : null;
         //if the our target is on the minimap, just navigate to it directly
         if (this.target.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 7) {
             if (Calculations.tileOnMap(this.target)) {
@@ -366,6 +380,16 @@ public class Pathfinder implements Runnable {
             if (Calculations.tileOnMap(node.position) && node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 3) {
                 LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), node.position);
                 Microbot.getWalker().walkFastLocal(localPoint);
+                break;
+            }
+        }
+    }
+
+    private void handleCustomPath() {
+        for (Node node : path) {
+            if (Calculations.tileOnMap(node.position)
+                    && (node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 7)) {
+                Microbot.getWalker().walkFastCanvas(node.position);
                 break;
             }
         }
@@ -454,7 +478,7 @@ public class Pathfinder implements Runnable {
                     if (closestTransportNode != null) {
                         closestTransportNodeDistance = closestTransportNode.destination.distanceTo2D(target) + closestTransportNode.destination.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation());
                         transportDistance = transport.destination.distanceTo2D(target) + transport.destination.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation());
-                        boolean isCloserTransport = transportDistance <= closestTransportNodeDistance  || (transport.priority > closestTransportNode.priority && transportDistance < 50);
+                        boolean isCloserTransport = transportDistance <= closestTransportNodeDistance || (transport.priority > closestTransportNode.priority && transportDistance < 50);
                         if (!isCloserTransport)
                             continue;
                     }

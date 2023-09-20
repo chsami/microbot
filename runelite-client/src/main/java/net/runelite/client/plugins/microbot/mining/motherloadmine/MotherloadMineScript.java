@@ -42,7 +42,7 @@ boolean emptySack = false;
                     return;
                 }
 
-                if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 80 || (emptySack && !Inventory.contains("payd-dirt"))) {
+                if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 80 || (emptySack && !Inventory.contains("pay-dirt"))) {
                     status = MLMStatus.EMPTY_SACK;
                 } else if (!Inventory.isFull()) {
                     status = MLMStatus.MINING;

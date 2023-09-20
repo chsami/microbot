@@ -90,9 +90,17 @@ public class Microbot {
     public static Mouse getMouseForKotlin() { return mouse; }
     public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
 
+    @Deprecated(since="Use isMoving", forRemoval = true)
     public static boolean isWalking() {
-        return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808);
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
+                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
+
+    public static boolean isMoving() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
+                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
+    }
+
 
     public static boolean isAnimating() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
@@ -159,10 +167,14 @@ public class Microbot {
     }
 
     public static void showMessage(String message) {
-        SwingUtilities.invokeLater(() ->
-        {
-            JOptionPane.showConfirmDialog(null, message, "Message",
-                    JOptionPane.DEFAULT_OPTION);
-        });
+        try {
+            SwingUtilities.invokeAndWait(() ->
+            {
+                JOptionPane.showConfirmDialog(null, message, "Message",
+                        JOptionPane.DEFAULT_OPTION);
+            });
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }
