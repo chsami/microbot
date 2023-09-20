@@ -29,7 +29,7 @@
 	<parent>
 		<groupId>net.runelite</groupId>
 		<artifactId>runelite-parent</artifactId>
-		<version>1.10.14-SNAPSHOT</version>
+		<version>1.10.13</version>
 	</parent>
 
 	<artifactId>client</artifactId>
@@ -278,7 +278,7 @@
 		<dependency>
 			<groupId>net.runelite</groupId>
 			<artifactId>client-patch</artifactId>
-			<version>${project.version}</version> <!---->
+			<version>${project.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -481,17 +481,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<configuration>
-					<sourceDirectories>
-						<!-- exclude generated sources from checkstyle https://stackoverflow.com/a/30406454/7189686 -->
-						<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-						<sourceDirectory>${project.basedir}/src/main/java11</sourceDirectory>
-					</sourceDirectories>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
