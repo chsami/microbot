@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogfiremaking;
+package net.runelite.client.plugins.ogPlugins.ogFiremaking;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;

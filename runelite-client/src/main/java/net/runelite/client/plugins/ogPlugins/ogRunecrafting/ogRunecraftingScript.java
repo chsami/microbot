@@ -1,7 +1,6 @@
-package net.runelite.client.plugins.ogPlugins.ogrunecrafting;
+package net.runelite.client.plugins.ogPlugins.ogRunecrafting;
 
 import net.runelite.api.ItemID;
-import net.runelite.api.Tile;
 import net.runelite.api.TileObject;
 import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldPoint;

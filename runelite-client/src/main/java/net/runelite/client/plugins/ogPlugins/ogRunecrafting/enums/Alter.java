@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogrunecrafting.enums;
+package net.runelite.client.plugins.ogPlugins.ogRunecrafting.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

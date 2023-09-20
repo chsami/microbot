@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogrunecrafting;
+package net.runelite.client.plugins.ogPlugins.ogBlastFurnace;
 
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -10,9 +10,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class ogRunecraftingOverlay extends OverlayPanel {
+public class ogBlastFurnaceOverlay extends OverlayPanel {
     @Inject
-    ogRunecraftingOverlay(ogRunecraftingPlugin plugin)
+    ogBlastFurnaceOverlay(ogBlastFurnacePlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -22,7 +22,7 @@ public class ogRunecraftingOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("OG Runecrafting V" + ogRunecraftingScript.version)
+                    .text("OG Blast Furnace BETA")
                     .color(Color.GREEN)
                     .build());
 

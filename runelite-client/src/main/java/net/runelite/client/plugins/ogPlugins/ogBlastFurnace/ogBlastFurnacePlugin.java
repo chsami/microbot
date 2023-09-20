@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogblastfurnace;
+package net.runelite.client.plugins.ogPlugins.ogBlastFurnace;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;

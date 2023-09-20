@@ -1,9 +1,9 @@
-package net.runelite.client.plugins.ogPlugins.ogrunecrafting;
+package net.runelite.client.plugins.ogPlugins.ogRunecrafting;
 
 import net.runelite.client.config.*;
-import net.runelite.client.plugins.ogPlugins.ogrunecrafting.enums.Alter;
-import net.runelite.client.plugins.ogPlugins.ogrunecrafting.enums.Banks;
-import net.runelite.client.plugins.ogPlugins.ogrunecrafting.enums.Runes;
+import net.runelite.client.plugins.ogPlugins.ogRunecrafting.enums.Alter;
+import net.runelite.client.plugins.ogPlugins.ogRunecrafting.enums.Banks;
+import net.runelite.client.plugins.ogPlugins.ogRunecrafting.enums.Runes;
 
 @ConfigGroup("ogrunecrafting")
 public interface ogRunecraftingConfig extends Config {

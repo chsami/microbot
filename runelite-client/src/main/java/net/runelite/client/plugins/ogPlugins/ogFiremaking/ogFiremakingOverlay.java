@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogfiremaking;
+package net.runelite.client.plugins.ogPlugins.ogFiremaking;
 
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;

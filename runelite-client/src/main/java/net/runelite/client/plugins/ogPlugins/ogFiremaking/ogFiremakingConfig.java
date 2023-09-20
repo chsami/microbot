@@ -1,6 +1,6 @@
-package net.runelite.client.plugins.ogPlugins.ogfiremaking;
-import net.runelite.client.plugins.ogPlugins.ogfiremaking.enums.Logs;
-import net.runelite.client.plugins.ogPlugins.ogfiremaking.enums.locations;
+package net.runelite.client.plugins.ogPlugins.ogFiremaking;
+import net.runelite.client.plugins.ogPlugins.ogFiremaking.enums.Logs;
+import net.runelite.client.plugins.ogPlugins.ogFiremaking.enums.locations;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;

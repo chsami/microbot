@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogfiremaking.enums;
+package net.runelite.client.plugins.ogPlugins.ogFiremaking.enums;
 
 public enum FiremakingStatus {
     FETCH_SUPPLIES,

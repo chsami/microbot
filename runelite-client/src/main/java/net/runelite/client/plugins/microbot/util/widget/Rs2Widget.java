@@ -59,6 +59,9 @@ public class Rs2Widget {
     public static int getChildWidgetSpriteID(int id, int childId) {
         return  Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId).getSpriteId());
     }
+    public static String getChildWidgetText(int id, int childId) {
+        return  Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId).getText());
+    }
 
     public static boolean clickWidget(int id) {
         Widget widget = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id));
