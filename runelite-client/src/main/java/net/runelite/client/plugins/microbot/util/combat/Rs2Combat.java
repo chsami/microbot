@@ -5,18 +5,13 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-
-import net.runelite.api.VarPlayer;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 public class Rs2Combat {
     /**
      * Sets the attack style
+     *
      * @param style WidgetInfo. ex. COMBAT_STYLE_ONE
      * @return boolean, whether the action succeeded
      */
@@ -33,6 +28,7 @@ public class Rs2Combat {
 
     /**
      * Sets the auto retaliate state
+     *
      * @param state boolean, true for enabled, false for disabled
      * @return boolean, whether the action succeeded
      */
@@ -48,7 +44,8 @@ public class Rs2Combat {
 
     /**
      * Sets the special attack state if currentSpecEnergy >= specialAttackEnergyRequired
-     * @param state boolean, true for enabled, false for disabled
+     *
+     * @param state                       boolean, true for enabled, false for disabled
      * @param specialAttackEnergyRequired int, 1000 = 100%
      * @return boolean, whether the action succeeded
      */
@@ -65,6 +62,7 @@ public class Rs2Combat {
 
     /**
      * Sets the special attack state
+     *
      * @param state boolean, true for enabled, false for disabled
      * @return boolean, whether the action succeeded
      */
@@ -74,6 +72,7 @@ public class Rs2Combat {
 
     /**
      * Checks the state of the spec widget
+     *
      * @return boolean, whether the spec is enabled
      */
     public static boolean getSpecState() {
@@ -85,6 +84,7 @@ public class Rs2Combat {
 
     /**
      * Checks if the widget is selected (based on the red background)
+     *
      * @param widgetId int, the widget id
      * @return boolean, whether the widget is selected
      */
@@ -92,42 +92,86 @@ public class Rs2Combat {
         return Rs2Widget.getChildWidgetSpriteID(widgetId, 0) == 1150;
     }
 
-
-
+    /**
+     * Toggles the combat style
+     *
+     * @param attackStyleWidgetInfo WidgetInfo, the attack style widget
+     * @return boolean, whether the action succeeded
+     */
     private static boolean toggleCombatStyle(WidgetInfo attackStyleWidgetInfo) {
         Tab.switchToCombatOptionsTab();
         Global.sleep(150, 300);
         return Rs2Widget.clickWidget(attackStyleWidgetInfo);
     }
 
+    /**
+     * Toggles the accurate combat style
+     *
+     * @return boolean, whether the action succeeded
+     */
     public static boolean toggleAccurateCombatStyle() {
         return toggleCombatStyle(WidgetInfo.COMBAT_STYLE_ONE);
     }
 
+    /**
+     * Toggles the aggressive combat style
+     *
+     * @return boolean, whether the action succeeded
+     */
     public static boolean toggleAggressiveCombatStyle() {
         return toggleCombatStyle(WidgetInfo.COMBAT_STYLE_TWO);
     }
 
+    /**
+     * Toggles the controlled combat style
+     *
+     * @return boolean, whether the action succeeded
+     */
     public static boolean toggleControlledCombatStyle() {
         return toggleCombatStyle(WidgetInfo.COMBAT_STYLE_THREE);
     }
 
+    /**
+     * Toggles the defensive combat style
+     *
+     * @return boolean, whether the action succeeded
+     */
     public static boolean toggleDefensiveCombatStyle() {
         return toggleCombatStyle(WidgetInfo.COMBAT_STYLE_FOUR);
     }
 
+    /**
+     * Checks if the accurate combat style is selected
+     *
+     * @return boolean, whether the accurate combat style is selected
+     */
     public static boolean isAccurateCombatStyleSelected() {
         return Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE) == 0;
     }
 
+    /**
+     * Checks if the aggressive combat style is selected
+     *
+     * @return boolean, whether the aggressive combat style is selected
+     */
     public static boolean isAggressiveCombatStyleSelected() {
         return Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE) == 1;
     }
 
+    /**
+     * Checks if the controlled combat style is selected
+     *
+     * @return boolean, whether the controlled combat style is selected
+     */
     public static boolean isControlledCombatStyleSelected() {
         return Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE) == 2;
     }
 
+    /**
+     * Checks if the defensive combat style is selected
+     *
+     * @return boolean, whether the defensive combat style is selected
+     */
     public static boolean isDefensiveCombatStyleSelected() {
         return Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE) == 3;
     }

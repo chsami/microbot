@@ -5,7 +5,7 @@ import net.runelite.client.config.ConfigManager
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginDescriptor.Griffin
-import net.runelite.client.plugins.griffinplugins.griffintrainer.scripts.CombatTrainerScript
+import net.runelite.client.plugins.griffinplugins.griffintrainer.models.PlayTimer
 import net.runelite.client.ui.overlay.OverlayManager
 import javax.inject.Inject
 
@@ -13,13 +13,17 @@ import javax.inject.Inject
 class GriffinTrainerPlugin : Plugin() {
     companion object {
         const val CONFIG_GROUP = "Griffin Trainer"
+        val overallTimer = PlayTimer()
+        val taskTimer = PlayTimer()
+        var countLabel = ""
+        var count = 0
     }
 
     @Inject
     private lateinit var overlayManager: OverlayManager
 
-//    @Inject
-//    private lateinit var overlay: GerberOverlay
+    @Inject
+    private lateinit var overlay: GriffinTrainerOverlay
 
     @Inject
     private lateinit var config: GriffinTrainerConfig
@@ -30,23 +34,14 @@ class GriffinTrainerPlugin : Plugin() {
     }
 
     @Inject
-    lateinit var trainerScript: CombatTrainerScript
-
-    //    private var gerberThread: GerberThread? = null
+    lateinit var trainerScript: GriffinTrainerScript
     override fun startUp() {
-//        if (overlayManager != null) {
-//            overlayManager.add()
-//        }
+        overlayManager.add(overlay)
         trainerScript.run(config)
-//        overlayManager.add(overlay)
-//        gerberThread = GerberThread(config)
-//        gerberThread!!.start()
     }
 
     override fun shutDown() {
         trainerScript.shutdown()
-//        overlayManager.remove(exampleOverlay)
-//        gerberThread!!.stop()
-//        overlayManager.remove(overlay)
+        overlayManager.remove(overlay)
     }
 }

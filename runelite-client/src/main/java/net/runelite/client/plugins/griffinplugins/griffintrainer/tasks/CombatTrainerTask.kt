@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.griffinplugins.griffintrainer.scripts
+package net.runelite.client.plugins.griffinplugins.griffintrainer.tasks
 
 import net.runelite.api.EquipmentInventorySlot
 import net.runelite.api.ItemID
@@ -7,6 +7,7 @@ import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
+import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerPlugin
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.NPCHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
@@ -15,15 +16,12 @@ import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.camera.Camera
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
-import java.util.concurrent.TimeUnit
 
-class CombatTrainerScript : BaseTrainerScript() {
+class CombatTrainerTask(config: GriffinTrainerConfig) : BaseTrainerTask(config) {
 
     companion object {
         private val LUMBRIDGE_CHICKENS_WORLD_AREA = WorldArea(3225, 3287, 12, 15, 0)
@@ -31,41 +29,36 @@ class CombatTrainerScript : BaseTrainerScript() {
     }
 
 
-    lateinit var config: GriffinTrainerConfig
-    var state: State = State.WAITING
+    var state: State = State.PRE_SETUP
 
     enum class State {
-        SETUP, WAITING, FIGHTING, LOOTING
+        PRE_SETUP, SETUP, WAITING, FIGHTING, LOOTING
     }
 
+    override fun process(): Boolean {
 
-    fun run(config: GriffinTrainerConfig): Boolean {
-        this.config = config
+        try {
+            val minimumSkillRequirement = minimumSkillRequirement
 
-        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay({
-            if (!super.run()) return@scheduleWithFixedDelay
-            try {
-                val minimumSkillRequirement = minimumSkillRequirement
+            if (minimumSkillRequirement < 10) {
+                Microbot.status = "Fighting Chickens"
+                GriffinTrainerPlugin.countLabel = "Chickens Killed"
+                fightNPC(LUMBRIDGE_CHICKENS_WORLD_AREA, WorldDestinations.LUMBRIDGE_CHICKENS.worldPoint, "chicken", listOf(ItemID.FEATHER, ItemID.BONES))
 
-                if (minimumSkillRequirement < 10) {
-                    Microbot.status = "Fighting Chickens"
-//                    GerberThread.countLabel = "Chickens Killed"
-                    fightNPC(LUMBRIDGE_CHICKENS_WORLD_AREA, WorldDestinations.LUMBRIDGE_CHICKENS.worldPoint, "chicken", listOf(ItemID.FEATHER, ItemID.BONES))
+            } else if (minimumSkillRequirement < 20) {
+                Microbot.status = "Fighting Cows"
+                GriffinTrainerPlugin.countLabel = "Cows Killed"
+                fightNPC(LUMBRIDGE_COWS_WORLD_AREA, WorldDestinations.LUMBRIDGE_COWS.worldPoint, "cow", listOf(ItemID.COWHIDE, ItemID.BONES))
 
-                } else if (minimumSkillRequirement < 20) {
-                    Microbot.status = "Fighting Cows"
-//                    GerberThread.countLabel = "Cows Killed"
-                    fightNPC(LUMBRIDGE_COWS_WORLD_AREA, WorldDestinations.LUMBRIDGE_COWS.worldPoint, "cow", listOf(ItemID.COWHIDE, ItemID.BONES))
-
-                } else {
-                    shutdown()
-                }
-
-            } catch (ex: Exception) {
-                println(ex.message)
+            } else {
+                return true
             }
-        }, 0, 600, TimeUnit.MILLISECONDS)
-        return true
+
+        } catch (ex: Exception) {
+            println(ex.message)
+        }
+
+        return false
     }
 
     override fun getBankLocation(): WorldPoint {
@@ -75,6 +68,7 @@ class CombatTrainerScript : BaseTrainerScript() {
     override fun getInventoryRequirements(): InventoryRequirements {
         val inventoryRequirements = InventoryRequirements()
         val attackLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.ATTACK)
+        val defenceLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.DEFENCE)
 
         val weapons = DynamicItemSet()
         if (attackLevel >= 1) {
@@ -129,11 +123,11 @@ class CombatTrainerScript : BaseTrainerScript() {
             inventoryRequirements.addItemSet(weapons)
         }
 
-//        val defenceLevel = player.getSkillLevel(Skill.DEFENCE)
-//        if (defenceLevel >= 1) {
-//            requiredItems.add(Pair(ItemID.BRONZE_PICKAXE, 1))
-//            requiredItems.add(Pair(ItemID.IRON_PICKAXE, 1))
-//        }
+        val shields = DynamicItemSet()
+
+        if (defenceLevel >= 1) {
+            shields.add(ItemID.WOODEN_SHIELD, 1)
+        }
 //        if (defenceLevel >= 5) {
 //            requiredItems.add(Pair(ItemID.STEEL_PICKAXE, 1))
 //        }
@@ -149,6 +143,10 @@ class CombatTrainerScript : BaseTrainerScript() {
 //        if (defenceLevel >= 40) {
 //            requiredItems.add(Pair(ItemID.RUNE_PICKAXE, 1))
 //        }
+
+        if (shields.getItems().isNotEmpty()) {
+            inventoryRequirements.addItemSet(shields)
+        }
         return inventoryRequirements
     }
 
@@ -181,14 +179,16 @@ class CombatTrainerScript : BaseTrainerScript() {
         }
 
         when (state) {
+            State.PRE_SETUP -> {
+                fetchRequiredItems()
+                state = State.SETUP
+            }
+
             State.SETUP -> {
                 if (!isWieldingRequiredWeapon) {
                     val weapon = getRequiredWeaponFromInventory
                     if (weapon != null) {
                         Rs2Equipment.equipItem(weapon.itemId)
-//                        val inventoryCount = Inventory.count()
-//                        weapon.leftClick()
-//                        Alfred.sleepUntil({ Alfred.api.inventory.count() == inventoryCount - 1 }, 100, 3000)
                     }
                 } else {
                     state = State.WAITING
@@ -205,7 +205,7 @@ class CombatTrainerScript : BaseTrainerScript() {
             State.FIGHTING -> {
                 setCombatStyle()
                 if (NPCHelper.findAndAttack(npcName)) {
-//                    GerberThread.count++
+                    GriffinTrainerPlugin.count++
                     state = State.LOOTING
                 }
             }
@@ -213,7 +213,7 @@ class CombatTrainerScript : BaseTrainerScript() {
             State.LOOTING -> {
                 if (config.collectItems()) {
                     if (Inventory.isFull()) {
-//                        buryBones()
+                        buryBones()
                         Global.sleep(200)
                     }
 
@@ -224,7 +224,6 @@ class CombatTrainerScript : BaseTrainerScript() {
                             Rs2Bank.depositAll()
                             Rs2Bank.closeBank()
                         }
-//                        Alfred.tasks.banking.depositInventory()
                         Global.sleep(200)
                     }
 
@@ -232,6 +231,15 @@ class CombatTrainerScript : BaseTrainerScript() {
                 }
                 state = State.WAITING
             }
+        }
+    }
+
+    private fun buryBones() {
+        while (Inventory.hasItem(ItemID.BONES)) {
+            val inventoryCount = Inventory.count()
+            Inventory.useItemAction(ItemID.BONES, "Bury")
+            Global.sleep(600)
+            Global.sleepUntilTrue({ Inventory.count() == inventoryCount - 1 && !Rs2Player.isInteracting() }, 100, 3000)
         }
     }
 

@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.worlddatacollection;
+package net.runelite.client.plugins.griffinplugins.worlddatacollection;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

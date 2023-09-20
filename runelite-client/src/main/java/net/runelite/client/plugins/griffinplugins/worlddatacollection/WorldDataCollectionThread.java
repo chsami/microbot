@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.worlddatacollection;
+package net.runelite.client.plugins.griffinplugins.worlddatacollection;
 
 import net.runelite.api.ObjectID;
 import net.runelite.client.plugins.microbot.util.Global;

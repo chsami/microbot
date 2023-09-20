@@ -5,7 +5,6 @@ import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item
 import net.runelite.client.plugins.microbot.util.models.RS2Item
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 
@@ -25,24 +24,17 @@ class ItemHelper {
                 return false
             }
 
-            val groupedItems: Map<WorldPoint, List<RS2Item>> = foundItems.groupBy { rsItem: RS2Item -> rsItem.tile.worldLocation }
+            val groupedItems: Map<WorldPoint, List<RS2Item>> = foundItems
+                .filter { rs2GroundItem: RS2Item -> itemIds.contains(rs2GroundItem.item.id) }
+                .groupBy { rs2GroundItem: RS2Item -> rs2GroundItem.tile.worldLocation }
 
             groupedItems.forEach { entry: Map.Entry<WorldPoint, List<RS2Item>> ->
-                val firstItem = entry.value.get(0)
                 val standingOnItem = player.worldLocation.equals(entry.key)
-
-//                if (!standingOnItem) {
-//                    Alfred.api.camera.lookAt(firstItem.worldLocation)
-//                }
 
                 entry.value.forEach { rsGroundItem: RS2Item ->
                     if (Inventory.isFull()) {
                         return true
                     }
-
-//                    val stillExists = Alfred.api.items.getItemsFromTiles(radius, rsGroundItem.id)
-//                        .filter { groundItem: RSGroundItem -> groundItem.worldLocation.equals(rsGroundItem.worldLocation) }
-//                        .isNotEmpty()
 
                     val stillExists = Rs2GroundItem.getAllAt(rsGroundItem.tile.worldLocation.x, rsGroundItem.tile.worldLocation.y).isNotEmpty()
 
@@ -54,11 +46,15 @@ class ItemHelper {
                         val inventoryCount = Inventory.count()
                         if (Rs2GroundItem.interact(rsGroundItem)) {
                             if (!standingOnItem) {
+                                println("waiting for player to stop moving")
                                 Global.sleepUntilTrue({ !Rs2Player.isWalking() }, 50, 3000)
                             }
 
+                            println("waiting for player to stop moving and interacting")
                             Global.sleepUntilTrue({ !Rs2Player.isWalking() && !Rs2Player.isInteracting() }, 100, 1000 * 10)
+                            println("waiting for item to be removed from ground")
                             Global.sleepUntilTrue({ hasItemAtWorldPoint(rsGroundItem.item.id, rsGroundItem.tile.worldLocation) }, 100, 1000 * 5)
+                            println("waiting for item to be added to inventory")
                             Global.sleepUntilTrue({ Inventory.count() == inventoryCount + 1 }, 100, 1000 * 5)
                         }
                     }

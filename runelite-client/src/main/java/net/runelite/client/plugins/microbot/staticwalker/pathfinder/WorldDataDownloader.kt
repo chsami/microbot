@@ -16,7 +16,8 @@ class WorldDataDownloader {
     companion object {
         val logger = Logger.getLogger(WorldDataDownloader::class.java.name)
         val githubReleaseUrl = "https://api.github.com/repos/GriffinBoris/OSRSWorldData/releases/latest"
-        val worldDataFile = File(RuneLite.CACHE_DIR, "worlddata.public.sqlite3")
+//        val worldDataFile = File(RuneLite.CACHE_DIR, "worlddata.public.sqlite3")
+        val worldDataFile = File("/home/griffin/PycharmProjects/OSRSWorld/world/", "db.sqlite3")
         val worldDataVersionFile = File(RuneLite.CACHE_DIR, "worlddata.public.version")
     }
 

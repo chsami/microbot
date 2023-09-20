@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.worlddatacollection;
+package net.runelite.client.plugins.griffinplugins.worlddatacollection;
 
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;

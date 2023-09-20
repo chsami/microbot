@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.worlddatacollection;
+package net.runelite.client.plugins.griffinplugins.worlddatacollection;
 
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
