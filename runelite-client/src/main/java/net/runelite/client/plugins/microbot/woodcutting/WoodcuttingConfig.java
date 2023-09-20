@@ -39,4 +39,16 @@ public interface WoodcuttingConfig extends Config {
     {
         return false;
     }
+
+    @ConfigItem(
+            keyName = "DistanceToStray",
+            name = "Distance to Stray",
+            description = "Set how far you can travel from your initial position in tiles",
+            position = 2,
+            section = generalSection
+    )
+    default int distanceToStray()
+    {
+        return Integer.MAX_VALUE;
+    }
 }

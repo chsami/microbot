@@ -8,12 +8,14 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class WoodcuttingScript  extends Script {
 
-    public static double version = 1.1;
+    public static double version = 1.2;
 
     public boolean run(WoodcuttingConfig config) {
+        var startingPosition = Microbot.getClient().getLocalPlayer().getWorldLocation();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
@@ -28,7 +30,23 @@ public class WoodcuttingScript  extends Script {
                     }
                     return;
                 }
-                Rs2GameObject.interact(config.TREE().getName(), config.TREE().getAction(), true);
+                var trees = Rs2GameObject.getGameObjects().stream().filter(x-> {
+                    var obj = Rs2GameObject.convertGameObjectToObjectComposition(x);
+                    if (obj == null){
+                        return false;
+                    }
+                    var objDefinition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(obj.getId()));
+                    if (!objDefinition.getName().equalsIgnoreCase(config.TREE().getName())) {
+                        return false;
+                    }
+                    return x.getWorldLocation().distanceTo(startingPosition) < config.distanceToStray();
+                }).collect(Collectors.toList());
+
+                if (trees.size() > 0){
+                    Rs2GameObject.interact(trees.get(0), config.TREE().getAction());
+                }else {
+                    System.out.println("No trees in zone");
+                }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
