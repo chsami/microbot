@@ -3,13 +3,14 @@ package net.runelite.client.plugins.nateplugins.natefishing.natefishing.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.client.game.FishingSpot;
+import org.apache.commons.lang3.ArrayUtils;
 
 @Getter
 @RequiredArgsConstructor
 public enum Fishs {
     SHRIMP("shrimp", FishingSpot.SHRIMP.getIds(),"net"),
     TROUT("trout/salmon", FishingSpot.SALMON.getIds(),"lure"),
-    TUNA("tuna/swordfish", FishingSpot.HARPOONFISH.getIds(),"harpoon"),
+    TUNA("tuna/swordfish", ArrayUtils.addAll(FishingSpot.LOBSTER.getIds(), FishingSpot.HARPOONFISH.getIds()),"harpoon"),
     LOBSTER("lobster", FishingSpot.LOBSTER.getIds(),"cage"),
     MONKFISH("monkfish", FishingSpot.MONKFISH.getIds(),"net"),
 

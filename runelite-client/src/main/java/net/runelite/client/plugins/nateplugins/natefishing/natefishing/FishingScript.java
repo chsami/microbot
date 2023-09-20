@@ -40,8 +40,13 @@ public class FishingScript extends Script {
                         if(fishingspot != null && !Camera.isTileOnScreen(fishingspot.getLocalLocation())){
                             validateInteractable(fishingspot);
                         }
-                        Rs2Npc.interact(fishingSpotId,config.Fish().getAction());
+                        if (fishingspot == null){
+                            Microbot.status = "Finding Fishing Spot...";
+                            continue;
+                        }
+                        Rs2Npc.interact(fishingspot,config.Fish().getAction());
                         Microbot.status = "Fishing...";
+                        return;
                     }
 
                 }
