@@ -1,0 +1,36 @@
+name: Build Java Executable
+
+on:
+  push:
+    branches:
+      - main  # Change this to your main branch name
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # You can choose a different runner if needed
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11  # Specify the JDK version you need
+
+      - name: Build Shaded JAR
+        run: mvn clean package
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            target/client-1.10.13-shaded  # Replace with the actual JAR file name
+          args: |
+            --tag v1.0.0  # Specify the release tag
+            --title "Release v1.0.0"  # Specify the release title
+            --body "Release notes for v1.0.0"  # Specify release notes
+        continue-on-error: true
