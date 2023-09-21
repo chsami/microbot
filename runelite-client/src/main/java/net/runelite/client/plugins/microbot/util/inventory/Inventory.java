@@ -1,9 +1,11 @@
 package net.runelite.client.plugins.microbot.util.inventory;
 
 import net.runelite.api.*;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.bank.models.BankItemWidget;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -16,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
@@ -25,6 +28,7 @@ public class Inventory {
 
     public static Rs2Item item;
     public static String itemAction;
+    public static CopyOnWriteArrayList<Widget> inventoryItems = new CopyOnWriteArrayList<>();
 
     public static void eat(Widget widget) {
         Microbot.getMouse().click(widget.getBounds());
@@ -579,6 +583,11 @@ public class Inventory {
         itemAction = "";
     }
 
+    public static void useItemFast(Widget item, String action) {
+        Rs2Item rs2Item = new Rs2Item(item.getItemId(), item.getItemQuantity(), item.getName(), item.getIndex());
+        useItemFastAbstract(rs2Item, action);
+    }
+
     public static void useItemFast(int id, String action) {
         Rs2Item item = findItemFast(id);
         useItemFastAbstract(item, action);
@@ -679,6 +688,8 @@ public class Inventory {
 
             if (itemAction.equalsIgnoreCase("use")) {
                 menuEntry.setType(MenuAction.WIDGET_TARGET);
+            } else if (itemAction.equalsIgnoreCase("cast")) {
+                menuEntry.setType(MenuAction.WIDGET_TARGET_ON_WIDGET);
             } else if(itemComposition.getName().contains("pouch") && itemAction.equalsIgnoreCase("empty")) {
                 index = 1;
                 menuEntry.setType(MenuAction.CC_OP);
@@ -719,6 +730,32 @@ public class Inventory {
         } catch(Exception ex) {
             System.out.println("INVENTORY MENU SWAP FAILED WITH MESSAGE: " + ex.getMessage());
         }
-
     }
+    public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
+        if (e.getContainerId() == 93) {
+            int i = 0;
+            inventoryItems.clear();
+            for (Item item : e.getItemContainer().getItems()) {
+                if (item == null) {
+                    i++;
+                    continue;
+                }
+                inventoryItems.add(new BankItemWidget(Microbot.getItemManager().getItemComposition(item.getId()).getName(), item.getId(), item.getQuantity(), i));
+                i++;
+            }
+        }
+    }
+
+    public static Widget findItemInMemory(String itemName, boolean exact) {
+        Microbot.status = "Searching inventory for item: " + itemName;
+        Tab.switchToInventoryTab();
+        return inventoryItems
+                .stream()
+                .filter(x -> exact ? x.getName().equalsIgnoreCase(itemName) : x.getName().toLowerCase().contains(itemName.toLowerCase()))
+                .findFirst().orElse(null);
+    }
+    public static Widget findItemInMemory(String itemName) {
+       return findItemInMemory(itemName, false);
+    }
+
 }
