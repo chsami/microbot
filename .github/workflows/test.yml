@@ -31,7 +31,7 @@ jobs:
           files: |
             target/client-1.10.13-shaded  # Replace with the actual JAR file name
           args: |
-            --tag v1.0.0  # Specify the release tag
-            --title "Release v1.0.0"  # Specify the release title
+            --tag_name v1.0.0  # Specify the release tag
+            --release_name "Release v1.0.0"  # Specify the release title
             --body "Release notes for v1.0.0"  # Specify release notes
         continue-on-error: true
