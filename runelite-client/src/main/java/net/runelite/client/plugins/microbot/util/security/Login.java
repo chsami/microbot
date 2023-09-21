@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.util.security;
 import net.runelite.api.GameState;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigProfile;
-import net.runelite.client.config.ProfileManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.GlobalWidgetInfo;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -19,18 +18,14 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class Login {
 
-    private static ConfigProfile getProfile() {
-        try (ProfileManager.Lock lock = Microbot.getProfileManager().lock()) {
-            return lock.getProfiles().stream().filter(ConfigProfile::isActive).findFirst().get();
-        }
-    }
+    public static ConfigProfile activeProfile = null;
 
     public Login() {
         this(360);
     }
 
     public Login(int world) {
-        this(getProfile().getName(), getProfile().getPassword(), world);
+        this(activeProfile.getName(), activeProfile.getPassword(), world);
     }
 
     public Login(String username, String password) {
@@ -85,7 +80,7 @@ public class Login {
 
     public boolean activateCondition() {
         GameState idx = Microbot.getClient().getGameState();
-        return ((Rs2Menu.getIndex("Play") == 0 || (idx == GameState.LOGIN_SCREEN || idx == GameState.LOGGING_IN)) && getProfile().getName() != null)
+        return ((Rs2Menu.getIndex("Play") == 0 || (idx == GameState.LOGIN_SCREEN || idx == GameState.LOGGING_IN)) && activeProfile.getName() != null)
                 || (idx == GameState.LOGGED_IN && Rs2Widget.getWidget(GlobalWidgetInfo.LOGIN_MOTW_TEXT.getPackedId(), 0) != null);
     }
 
@@ -156,7 +151,7 @@ public class Login {
     }
 
     private boolean isUsernameFilled() {
-        String username = getProfile().getName();
+        String username = Login.activeProfile.getName();
         Widget widget = Rs2Widget.getWidget(INTERFACE_LOGIN_SCREEN, 0);
         return Rs2Widget.getWidget(GlobalWidgetInfo.TO_GROUP(widget.getId()), INTERFACE_USERNAME).getText().toLowerCase().equalsIgnoreCase(username);
     }

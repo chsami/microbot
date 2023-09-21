@@ -39,4 +39,15 @@ public interface TeleporterConfig extends Config {
     {
         return false;
     }
+    @ConfigItem(
+            keyName = "High Alchemy item",
+            name = "High Alchemy item",
+            description = "Name of the item to highalch",
+            position = 2,
+            section = generalSection
+    )
+    default String highAlchemyItem()
+    {
+        return "";
+    }
 }

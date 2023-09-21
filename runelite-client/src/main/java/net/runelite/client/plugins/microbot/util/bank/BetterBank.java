@@ -12,7 +12,6 @@ import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
@@ -94,17 +93,23 @@ public class BetterBank {
         return null;
     }
 
-    public static Widget findBankItem(String name) {
+    public static Widget findBankItem(String name, boolean exact) {
         Widget w = Microbot.getClient().getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
         if (w == null) return null;
 
         for (Widget item : w.getDynamicChildren()) {
-            if (item.getName().toLowerCase().contains(name.toLowerCase())) {
+            String itemNameInItem = item.getName().split(">")[1].split("</")[0].toLowerCase();
+            String targetItemName = name.toLowerCase();
+
+            if (exact ? itemNameInItem.equals(targetItemName) : itemNameInItem.contains(targetItemName)) {
                 return item;
             }
         }
-
         return null;
+    }
+
+    public static Widget findBankItem(String name) {
+        return findBankItem(name, false);
     }
 
 
@@ -135,9 +140,13 @@ public class BetterBank {
         return depositOneFast(Inventory.findItem(id));
     }
 
-    public static boolean depositOneFast(String name) {
-        return depositOneFast(Inventory.findItemContains(name));
+    public static boolean depositOneFast(String name, boolean exact) {
+        return depositOneFast(Inventory.findItem(name, exact));
     }
+    public static boolean depositOneFast(String name) {
+        return depositOneFast(name, false);
+    }
+
 
     private static boolean depositXFast(Widget w, int amount) {
         if (!isOpen()) return false;
@@ -162,8 +171,12 @@ public class BetterBank {
         return depositXFast(Inventory.findItem(id), amount);
     }
 
+    public static boolean depositXFast(String name, int amount, boolean exact) {
+        return depositXFast(Inventory.findItem(name, exact), amount);
+    }
+
     public static boolean depositXFast(String name, int amount) {
-        return depositXFast(Inventory.findItemContains(name), amount);
+        return depositXFast(Inventory.findItem(name), amount);
     }
 
     private static boolean depositAllFast(Widget w) {
@@ -180,8 +193,11 @@ public class BetterBank {
         return depositAllFast(Inventory.findItem(id));
     }
 
+    public static boolean depositAllFast(String name, boolean exact) {
+        return depositAllFast(Inventory.findItem(name, exact));
+    }
     public static boolean depositAllFast(String name) {
-        return depositAllFast(Inventory.findItemContains(name));
+        return depositAllFast(name, false);
     }
 
     public static boolean depositAll() {
@@ -215,8 +231,12 @@ public class BetterBank {
         return withdrawOneFast(findBankItem(id));
     }
 
+    public static boolean withdrawOneFast(String name, boolean exact) {
+        return withdrawOneFast(findBankItem(name, exact));
+    }
+
     public static boolean withdrawOneFast(String name) {
-        return withdrawOneFast(findBankItem(name));
+        return withdrawOneFast(name, false);
     }
 
     private static boolean withdrawXFast(Widget w, int amount) {
@@ -242,8 +262,11 @@ public class BetterBank {
         return withdrawXFast(findBankItem(id), amount);
     }
 
+    public static boolean withdrawXFast(String name, int amount, boolean exact) {
+        return withdrawXFast(findBankItem(name, exact), amount);
+    }
     public static boolean withdrawXFast(String name, int amount) {
-        return withdrawXFast(findBankItem(name), amount);
+        return withdrawXFast(findBankItem(name, false), amount);
     }
 
     private static boolean withdrawAllFast(Widget w) {
@@ -260,15 +283,19 @@ public class BetterBank {
         return withdrawAllFast(findBankItem(id));
     }
 
+    public static boolean withdrawAllFast(String name, boolean exact) {
+        return withdrawAllFast(findBankItem(name, exact));
+    }
+
     public static boolean withdrawAllFast(String name) {
-        return withdrawAllFast(findBankItem(name));
+        return withdrawAllFast(findBankItem(name, false));
     }
 
     private static boolean wearItemFast(Widget w) {
         if (!isOpen()) return false;
         if (w == null) return false;
 
-        execMenuSwapper(INVENTORY_WIDGET_ID, 9, w);
+        execMenuSwapper(INVENTORY_WIDGET_ID, 8, w);
 
         return true;
     }
@@ -278,7 +305,7 @@ public class BetterBank {
     }
 
     public static boolean wearItemFast(String name) {
-        return wearItemFast(Inventory.findItemContains(name));
+        return wearItemFast(Inventory.findItem(name));
     }
 
     public static void withdrawItems(int... ids) {

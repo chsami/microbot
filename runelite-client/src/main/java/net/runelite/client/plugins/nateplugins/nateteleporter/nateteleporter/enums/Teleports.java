@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum Teleports {
     FALADOR("falador teleport", 37),
     LUMBRIDGE("lumbridge teleport", 31),
-    VARROK("varrok teleport", 25);
+    VARROK("varrock teleport", 25);
 
     private final String name;
     private final int magicLevel;

@@ -180,6 +180,7 @@ public class MicrobotPlugin extends Plugin {
     public void onItemContainerChanged(ItemContainerChanged event) {
         Rs2Bank.storeInventoryItemsInMemory(event);
         Rs2Bank.storeBankItemsInMemory(event);
+        Inventory.storeInventoryItemsInMemory(event);
     }
 
     @Subscribe
