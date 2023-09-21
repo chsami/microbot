@@ -18,6 +18,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.magic.Teleport;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.walker.Transport;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -61,7 +62,7 @@ public class Pathfinder implements Runnable {
     public boolean customPath = false;
 
     public boolean getDebugger() {
-        return true;
+        return Microbot.debug;
     }
 
 
@@ -264,6 +265,13 @@ public class Pathfinder implements Runnable {
     }
 
     public void run() {
+        if (Microbot.getClient().getCameraPitch() < 370) {
+            Microbot.getClient().setCameraPitchTarget(Random.random(370, 400));
+        }
+        if (Microbot.getClient().getScale() > 500) {
+            Microbot.getMouse().scrollDown(new Point(1, 1));
+            Microbot.getMouse().scrollDown(new Point(1, 1));
+        }
         if (handleTransports()) {
             done = true;
             boundary.clear();
@@ -406,8 +414,13 @@ public class Pathfinder implements Runnable {
                 if (useCurrentTransport.offsetX != 0 || useCurrentTransport.offsetY != 0) {
                     this.target = new WorldPoint(this.target.getX() + useCurrentTransport.offsetX, this.target.getY() + useCurrentTransport.offsetY, this.target.getPlane());
                 }
-                TileObject tileObject = Rs2GameObject.findObjectByLocation(this.target);
-                if (!Rs2GameObject.hasLineOfSight(tileObject)) return false;
+                if (!Microbot.getWalker().canInteract(useCurrentTransport.origin)) {
+                    Microbot.getWalker().walkFastCanvas(this.target);
+                    sleepUntil(Microbot::isMoving);
+                    sleepUntil(() -> !Microbot.isMoving());
+                    return false;
+                }
+                TileObject tileObject = Rs2GameObject.findObjectByLocation(useCurrentTransport.origin);
                 Rs2GameObject.interact(tileObject, this.useCurrentTransport.getAction());
                 int currentPlane = Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane();
                 sleepUntil(() -> currentPlane != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane());
@@ -425,7 +438,7 @@ public class Pathfinder implements Runnable {
             if (wallNode.node.position.equals(start)) continue;
             if (path.stream().noneMatch(x -> x.position.equals(wallNode.node.position))) continue;
             if (Calculations.tileOnMap(wallNode.node.position) && wallNode.shape != null) {
-                Rs2GameObject.interact(wallNode.node.position);
+                Rs2GameObject.interact(wallNode.id);
                 sleepUntil(Microbot::isMoving);
                 sleepUntil(() -> !Microbot.isMoving());
                 skip = true;
