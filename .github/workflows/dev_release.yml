@@ -1,4 +1,4 @@
-name: create release
+name: Development release
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
         run: mvn clean package
         
 
-      - name: Development Release
+      - name: Create Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
