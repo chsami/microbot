@@ -29,6 +29,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.geometry.Cuboid;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.util.QuantityFormatter;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -101,23 +102,22 @@ public class Rs2Pvp {
     /**
      * Determines if another player is attackable based off of wilderness level and combat levels
      *
-     * @param client The client of the local player
      * @param player the player to determine attackability
      * @return returns true if the player is attackable, false otherwise
      */
-    public static boolean isAttackable(Client client, Player player) {
+    public static boolean isAttackable(Player player) {
         int wildernessLevel = 0;
 
-        if (WorldType.isDeadmanWorld(client.getWorldType())) {
+        if (WorldType.isDeadmanWorld(Microbot.getClient().getWorldType())) {
             return true;
         }
-        if (WorldType.isPvpWorld(client.getWorldType())) {
+        if (WorldType.isPvpWorld(Microbot.getClient().getWorldType())) {
             wildernessLevel += 15;
         }
-        if (client.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
-            wildernessLevel += getWildernessLevelFrom(client.getLocalPlayer().getWorldLocation());
+        if (Microbot.getClient().getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
+            wildernessLevel += getWildernessLevelFrom(Microbot.getClient().getLocalPlayer().getWorldLocation());
         }
-        return wildernessLevel != 0 && Math.abs(client.getLocalPlayer().getCombatLevel() - player.getCombatLevel()) <= wildernessLevel;
+        return wildernessLevel != 0 && Math.abs(Microbot.getClient().getLocalPlayer().getCombatLevel() - player.getCombatLevel()) <= wildernessLevel;
     }
 
     public static int calculateRisk(Client client, ItemManager itemManager) {

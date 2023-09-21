@@ -29,7 +29,6 @@ public class TeleportScript extends Script {
             if (!super.run()) return;
             try {
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
-               // if (TeleportPlugin.teleportamount > 0) {
                 Microbot.status = "current tab: " + Tab.getCurrentTab();
                     if(Tab.getCurrentTab() != InterfaceTab.MAGIC){
                         switchcorrectTab();
@@ -40,15 +39,13 @@ public class TeleportScript extends Script {
                                 shutdown();
                             }
                             Microbot.getMouse().click(teleport.getBounds().getCenterX(), teleport.getBounds().getCenterY());
-                            //TeleportPlugin.teleportamount --;
                         }
-                        if (config.SPELL().getName().equals("varrok teleport")) {
+                        if (config.SPELL().getName().equals("varrock teleport")) {
                             Widget teleport = Rs2Widget.getWidget(14286869);
                             if(teleport.getSpriteId() == 77){
                                 shutdown();
                             }
                             Microbot.getMouse().click(teleport.getBounds().getCenterX(), teleport.getBounds().getCenterY());
-                            //TeleportPlugin.teleportamount --;
                         }
                         if (config.SPELL().getName().equals("lumbridge teleport")) {
                             Widget teleport = Rs2Widget.getWidget(14286872);
@@ -56,13 +53,7 @@ public class TeleportScript extends Script {
                                 shutdown();
                             }
                             Microbot.getMouse().click(teleport.getBounds().getCenterX(), teleport.getBounds().getCenterY());
-                            //TeleportPlugin.teleportamount --;
                         }
-
-
-                /*} else {
-                    shutdown();
-                }*/
                     }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
