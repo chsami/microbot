@@ -8,6 +8,19 @@ import net.runelite.client.plugins.microbot.thieving.enums.ThievingNpc;
 
 @ConfigGroup("Thieving")
 public interface ThievingConfig extends Config {
+
+    @ConfigItem(
+            keyName = "guide",
+            name = "How to use",
+            description = "How to use this plugin",
+            position = 1
+    )
+    default String GUIDE() {
+        return "Start near any of the npc\n" +
+                "Script only supports monkfish\n" +
+                "Script will walk to bank if out of food\n"+
+                "Script supports dodgy necklace";
+    }
     @ConfigSection(
             name = "General",
             description = "General",
