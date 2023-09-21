@@ -32,4 +32,4 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            target/*.jar
+            ./target/*.jar
