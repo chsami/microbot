@@ -32,4 +32,4 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-           /home/runner/work/microbot/microbot/cache/target/*.jar
+           /home/runner/work/microbot/microbot/runelite-client/target/*.jar
