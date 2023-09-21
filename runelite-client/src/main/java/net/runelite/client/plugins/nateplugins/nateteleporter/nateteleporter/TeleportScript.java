@@ -24,9 +24,9 @@ public class TeleportScript extends Script {
     }
 
     public boolean run(TeleporterConfig config) {
+        Tab.switchToMagicTab();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-
             try {
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
                // if (TeleportPlugin.teleportamount > 0) {
