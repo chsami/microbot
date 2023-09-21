@@ -94,18 +94,14 @@ public class AgilityScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (startCourse == null) {
-                try {
-                    Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
-                } catch (InterruptedException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
+                Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
             }
             try {
                 final List<RS2Item> marksOfGrace = AgilityPlugin.getMarksOfGrace();
                 final LocalPoint playerLocation = Microbot.getClient().getLocalPlayer().getLocalLocation();
                 final WorldPoint playerWorldLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
-                if (Microbot.isWalking()) return;
+                if (Microbot.isMoving()) return;
                 if (Microbot.isAnimating()) return;
 
                 if (currentObstacle >= getCurrentCourse(config).size()) {
@@ -183,7 +179,7 @@ public class AgilityScript extends Script {
     private boolean waitForAgilityObstabcleToFinish(int agilityExp) {
         sleepUntilOnClientThread(() -> agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY)
                 || (Microbot.getClient().getPlane() == 0 && currentObstacle != 0), 15000);
-        sleepUntilOnClientThread(() -> !Microbot.isWalking() && !Microbot.isAnimating(), 10000);
+        sleepUntilOnClientThread(() -> !Microbot.isMoving() && !Microbot.isAnimating(), 10000);
 
 
         if (agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY) || Microbot.getClient().getPlane() == 0) {

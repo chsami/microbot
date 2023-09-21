@@ -46,6 +46,8 @@ public class CollisionMap {
         doorIds.add(ObjectID.DOOR_2100); //  slayer tower to nechryaels
         doorIds.add(ObjectID.DOOR_2102); //  slayer tower to abberant
         doorIds.add(ObjectID.DOOR_2104); //  slayer tower to abberant
+        doorIds.add(ObjectID.LARGE_DOOR_1521); //  door chaos altar
+        doorIds.add(ObjectID.LARGE_DOOR_1524); //  door chaos altar
 
     }
 
@@ -163,6 +165,7 @@ public class CollisionMap {
                         wallNode.node = new Node(currentTile.getWorldLocation(), node);
                         wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> currentTile.getWallObject().getClickbox());
                         wallNode.status = 3;
+                        wallNode.id = currentTile.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
                 }
@@ -173,6 +176,7 @@ public class CollisionMap {
                         wallNode.node = new Node(tileNorth.getWorldLocation(), node);
                         wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> tileNorth.getWallObject().getClickbox());
                         wallNode.status = 3;
+                        wallNode.id = tileNorth.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
                 } else if (tileEast != null && tileEast.getWallObject() != null && d == OrdinalDirection.EAST) {
@@ -181,6 +185,7 @@ public class CollisionMap {
                         wallNode.node = new Node(tileEast.getWorldLocation(), node);
                         wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> tileEast.getWallObject().getClickbox());
                         wallNode.status = 3;
+                        wallNode.id = tileEast.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
                 } else if (tileSouth != null && tileSouth.getWallObject() != null && d == OrdinalDirection.SOUTH) {
@@ -189,7 +194,7 @@ public class CollisionMap {
                         wallNode.node = new Node(tileSouth.getWorldLocation(), node);
                         wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> tileSouth.getWallObject().getClickbox());
                         wallNode.status = 3;
-
+                        wallNode.id = tileSouth.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
                 } else if (tileWest != null && tileWest.getWallObject() != null && d == OrdinalDirection.WEST) {
@@ -198,6 +203,7 @@ public class CollisionMap {
                         wallNode.node = new Node(tileWest.getWorldLocation(), node);
                         wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> tileWest.getWallObject().getClickbox());
                         wallNode.status = 3;
+                        wallNode.id = tileWest.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
                 }

@@ -20,7 +20,7 @@ public class WoodcuttingScript  extends Script {
             try {
                 if (Rs2Equipment.hasEquipped("Dragon axe"))
                     Rs2Combat.setSpecState(true, 1000);
-                if (Microbot.isWalking() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
+                if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
                 if (Inventory.isFull()) {
                     if (config.hasAxeInventory()) {
                         Inventory.dropAllStartingFrom(1);

@@ -17,7 +17,7 @@ public class MiningScript extends Script {
             if (!super.run()) return;
 
             try {
-                if (Microbot.isWalking() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
+                if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
                 if (Inventory.isFull()) {
                     if (config.hasPickaxeInventory()) {
                         Inventory.dropAllStartingFrom(1);

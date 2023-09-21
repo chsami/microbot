@@ -89,7 +89,7 @@ public class MagicScript extends Script {
             return;
                     }
 
-                    if (Microbot.isWalking()) return;
+                    if (Microbot.isMoving()) return;
 
                     WorldPoint w = TelekineticRoom.optimal();
 

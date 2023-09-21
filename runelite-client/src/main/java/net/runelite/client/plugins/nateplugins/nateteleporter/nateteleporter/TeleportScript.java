@@ -28,7 +28,7 @@ public class TeleportScript extends Script {
             if (!super.run()) return;
 
             try {
-                if (Microbot.isWalking() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
+                if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
                // if (TeleportPlugin.teleportamount > 0) {
                 Microbot.status = "current tab: " + Tab.getCurrentTab();
                     if(Tab.getCurrentTab() != InterfaceTab.MAGIC){

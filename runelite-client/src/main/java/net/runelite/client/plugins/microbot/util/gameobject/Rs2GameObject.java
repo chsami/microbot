@@ -19,6 +19,11 @@ public class Rs2GameObject {
     public static TileObject objectToInteract = null;
     public static String objectAction = null;
 
+    public static boolean interact(WorldPoint worldPoint) {
+        TileObject gameObject = findObjectByLocation(worldPoint);
+        return clickObject(gameObject);
+    }
+
     public static boolean interact(GameObject gameObject) {
         return clickObject(gameObject);
     }
@@ -319,7 +324,7 @@ public class Rs2GameObject {
         result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
         if (!result) {
             try {
-                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.toLowerCase().equals(action.toLowerCase()));
+                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase(action));
             } catch (Exception ex) {
                 //do nothing
             }

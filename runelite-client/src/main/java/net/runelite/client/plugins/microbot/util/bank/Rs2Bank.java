@@ -157,6 +157,31 @@ public class Rs2Bank {
         wearItem(id);
     }
 
+    public static boolean withdrawFast(String name, boolean exact) {
+        return BetterBank.withdrawOneFast(name, exact);
+    }
+
+    public static boolean withdrawFast(String name) {
+        return withdrawFast(name, false);
+    }
+
+    public static boolean withdrawXFast(String name, int amount, boolean exact) {
+        return BetterBank.withdrawXFast(name, amount, exact);
+    }
+
+    public static boolean withdrawXFast(String name, int amount) {
+        return withdrawXFast(name, amount, false);
+    }
+
+    public static boolean withdrawAllFast(String name, boolean exact) {
+        return BetterBank.withdrawAllFast(name, exact);
+    }
+
+    public static boolean withdrawAllFast(String name) {
+        return BetterBank.withdrawAllFast(name);
+    }
+
+
     public static boolean closeBank() {
         Microbot.status = "Closing bank";
         return BetterBank.close();
