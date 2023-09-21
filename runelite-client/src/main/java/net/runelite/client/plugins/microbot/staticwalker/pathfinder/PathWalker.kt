@@ -1,10 +1,6 @@
 package net.runelite.client.plugins.microbot.staticwalker.pathfinder
 
-import net.runelite.api.GameObject
-import net.runelite.api.GroundObject
-import net.runelite.api.Perspective
-import net.runelite.api.Point
-import net.runelite.api.WallObject
+import net.runelite.api.*
 import net.runelite.api.coords.LocalPoint
 import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.microbot.Microbot
@@ -13,6 +9,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import java.awt.Shape
+import kotlin.random.Random
 
 class PathWalker(private val nodes: List<PathNode>) {
 
@@ -28,7 +25,8 @@ class PathWalker(private val nodes: List<PathNode>) {
         enabled = true
         isInterrupted = false
 
-        val skipDistance = 4
+        val maxSkipDistance = 15
+//        val skipDistance = 15
         val upperBound = nodes.size - 1
         var previousNode: PathNode? = null
         var nextNode: PathNode? = null
@@ -36,6 +34,7 @@ class PathWalker(private val nodes: List<PathNode>) {
 //        val player = Microbot.getClientForKotlin().localPlayer
 
         for (currentNode in nodes) {
+            val skipDistance = Random.nextInt(maxSkipDistance - 5, maxSkipDistance)
 
             if (isInterrupted) {
                 enabled = false
@@ -78,7 +77,8 @@ class PathWalker(private val nodes: List<PathNode>) {
                 continue
             }
 
-            if (previousNode == null && nodes.count() < skipDistance) {
+//            if (previousNode == null && nodes.count() < skipDistance) {
+            if (previousNode == null && nodes.count() < maxSkipDistance) {
                 val minimapPoint = getMinimapPoint(currentNode.worldLocation) ?: continue
                 clickPoint(minimapPoint)
                 previousNode = currentNode
@@ -164,7 +164,7 @@ class PathWalker(private val nodes: List<PathNode>) {
         } else {
             println("Operating on Transport: ${pathTransport.objectId}, with action: ${pathTransport.action}")
             interactUsingAction(pathTransport.objectName, clickableShape, pathTransport.action)
-            Global.sleepUntilTrue({findTransportObjectShape(pathTransport.objectId) == null}, 200, 3000)
+            Global.sleepUntilTrue({ findTransportObjectShape(pathTransport.objectId) == null }, 200, 3000)
         }
 
         if (pathTransport.addtionalObjectId != null) {
@@ -226,15 +226,15 @@ class PathWalker(private val nodes: List<PathNode>) {
 
             transportGameObject = allTransportGameObjects
                 .filter { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) <= i }
-                .minByOrNull{ gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) }
+                .minByOrNull { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) }
 
             transportWallObject = allTransportWallObjects
                 .filter { wallObject: WallObject -> wallObject.worldLocation.distanceTo(player.worldLocation) <= i }
-                .minByOrNull{ wallObject: WallObject -> wallObject.worldLocation.distanceTo(player.worldLocation) }
+                .minByOrNull { wallObject: WallObject -> wallObject.worldLocation.distanceTo(player.worldLocation) }
 
             transportGroundObject = allTransportGroundObjects
                 .filter { groundObject: GroundObject -> groundObject.worldLocation.distanceTo(player.worldLocation) <= i }
-                .minByOrNull{ groundObject: GroundObject -> groundObject.worldLocation.distanceTo(player.worldLocation) }
+                .minByOrNull { groundObject: GroundObject -> groundObject.worldLocation.distanceTo(player.worldLocation) }
         }
 
         return clickableShape
