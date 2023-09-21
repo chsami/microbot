@@ -10,9 +10,9 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.Arrays;
@@ -60,7 +60,7 @@ public class PestControlScript extends Script {
 
     public boolean run(PestControlConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run(344)) return;
+            if (!super.run()) return;
             try {
                 if (Microbot.getClient().getMinimapZoom() != 2.0) {
                     Microbot.getClient().setMinimapZoom(2.0);
@@ -89,7 +89,8 @@ public class PestControlScript extends Script {
                     Widget redHealth = Rs2Widget.getWidget(RED.getHitpoints());
                     Widget yellowHealth = Microbot.getClient().getWidget(YELLOW.getHitpoints());
 
-                    Rs2Player.toggleSpecialAttack(550);
+                    Rs2Combat.setSpecState(true, 550);
+
 
                     for (int brawler : BRAWLER_IDS) {
                         if (!Microbot.getClient().getLocalPlayer().isInteracting())

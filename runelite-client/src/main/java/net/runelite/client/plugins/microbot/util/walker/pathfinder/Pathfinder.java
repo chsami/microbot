@@ -61,7 +61,7 @@ public class Pathfinder implements Runnable {
     public boolean customPath = false;
 
     public boolean getDebugger() {
-        return Microbot.debug;
+        return true;
     }
 
 
@@ -365,11 +365,9 @@ public class Pathfinder implements Runnable {
             }
         }
         for (Node node : path) {
-            if (Calculations.tileOnMap(node.position)
-                    && (node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 14
-                    || customPath || lastNode == node)) {
-                Point point = Calculations.tileToMinimap(node.position);
-                Microbot.getMouse().click(point);
+            if ((Calculations.tileOnMap(node.position) && node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 14)
+                    || customPath || lastNode == node) {
+                Microbot.getWalker().walkFastCanvas(node.position);
                 break;
             }
         }
@@ -386,9 +384,11 @@ public class Pathfinder implements Runnable {
     }
 
     private void handleCustomPath() {
+        Node lastNode = !path.isEmpty() ? path.get(0) : null;
+        if (lastNode != null && lastNode.position.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 7)
+            return;
         for (Node node : path) {
-            if (Calculations.tileOnMap(node.position)
-                    && (node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 7)) {
+            if (Calculations.tileOnMap(node.position) && node.position.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 14) {
                 Microbot.getWalker().walkFastCanvas(node.position);
                 break;
             }
@@ -425,9 +425,9 @@ public class Pathfinder implements Runnable {
             if (wallNode.node.position.equals(start)) continue;
             if (path.stream().noneMatch(x -> x.position.equals(wallNode.node.position))) continue;
             if (Calculations.tileOnMap(wallNode.node.position) && wallNode.shape != null) {
-                Microbot.getMouse().click(wallNode.shape.getBounds());
-                sleepUntil(Microbot::isWalking);
-                sleepUntil(() -> !Microbot.isWalking());
+                Rs2GameObject.interact(wallNode.node.position);
+                sleepUntil(Microbot::isMoving);
+                sleepUntil(() -> !Microbot.isMoving());
                 skip = true;
                 break;
             }

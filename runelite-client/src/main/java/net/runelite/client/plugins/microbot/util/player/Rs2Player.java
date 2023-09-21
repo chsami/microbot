@@ -61,11 +61,15 @@ public class Rs2Player {
     }
 
     public static boolean isAnimating() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getAnimation() != -1);
+        return Microbot.isAnimating();
     }
 
     public static boolean isWalking() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation() != 813 && Microbot.getClient().getLocalPlayer().getPoseAnimation() != 808);
+        return Microbot.isMoving();
+    }
+
+    public static boolean isMoving() {
+        return Microbot.isMoving();
     }
 
     @Deprecated(since = "Use the Rs2Combat.specState method", forRemoval = true)

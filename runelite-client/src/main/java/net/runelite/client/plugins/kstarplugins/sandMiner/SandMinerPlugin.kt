@@ -13,7 +13,6 @@ import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginDescriptor.Kstar
-import net.runelite.client.plugins.jrPlugins.autoVorkath.AutoVorkathConfig
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
@@ -119,8 +118,8 @@ class SandMiner : Plugin() {
         val rocks = listOf(firstRock, secondRock, thirdRock)
         val startingPoint = WorldPoint(3166, 2914, 0)
 
-        if(config.dropClues() && Inventory.findItemContains("geode") != null) {
-            var geode = Inventory.findItemContains("geode").name.substringAfter(">").substringBefore('<')
+        if(config.dropClues() && Inventory.findItem("geode") != null) {
+            var geode = Inventory.findItem("geode").name.substringAfter(">").substringBefore('<')
             Inventory.drop(geode)
             println(geode)
         }
