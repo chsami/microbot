@@ -28,6 +28,7 @@ public abstract class Script implements IScript {
     protected ScheduledFuture<?> scheduledFuture;
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
+    public static boolean useStaminaPotsIfNeeded = true;
 
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
@@ -116,7 +117,7 @@ public abstract class Script implements IScript {
 
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
-        if (!hasRunEnergy) {
+        if (!hasRunEnergy && useStaminaPotsIfNeeded) {
             Inventory.useItemContains("Stamina potion");
         }
 

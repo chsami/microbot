@@ -21,6 +21,7 @@ class DriftNetOverlay extends Overlay
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(OverlayPriority.LOW);
         setLayer(OverlayLayer.ABOVE_SCENE);
+        setNaughty();
     }
 
     @Override
