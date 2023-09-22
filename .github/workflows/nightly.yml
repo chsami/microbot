@@ -1,9 +1,6 @@
 name: Nightly release
 
 on:
-  push:
-    branches:
-      - development
   schedule:
     - cron: "0 0 * * *"
 
