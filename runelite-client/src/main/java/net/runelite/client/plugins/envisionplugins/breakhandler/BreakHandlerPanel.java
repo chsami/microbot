@@ -7,6 +7,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakmethod.B
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breaktimer.BreakTimerParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration.RuntimeDurationParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimer.RunTimerParentPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.twofactorauth.TwoFactorAuthParentPanel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
@@ -47,6 +48,7 @@ public class BreakHandlerPanel extends PluginPanel {
         add(new RuntimeDurationParentPanel());
         add(new RunTimerParentPanel());
         add(new AccountParentPanel());
+        add(new TwoFactorAuthParentPanel());
 
     }
 }
