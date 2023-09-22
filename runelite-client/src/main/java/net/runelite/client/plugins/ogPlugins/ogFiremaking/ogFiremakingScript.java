@@ -57,7 +57,7 @@ public class ogFiremakingScript extends Script {
                     sleep(1800,2500);
                 }
                 if(!Rs2Bank.isOpen()){
-                    sleepUntil(() -> Rs2Bank.openCertainBank(SelectedBanker));
+                    sleepUntil(() -> Rs2Bank.openBank(SelectedBanker));
                     callAFK(27,50,5000);
                     if(!hasTinderBox()){
                         if(!Rs2Bank.hasItem("tinderbox")){Microbot.getNotifier().notify("Get more tinderbox ya bum!");super.shutdown();}

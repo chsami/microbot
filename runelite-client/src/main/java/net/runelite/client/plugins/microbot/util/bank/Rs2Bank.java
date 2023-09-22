@@ -212,6 +212,25 @@ public class Rs2Bank {
         }
         return false;
     }
+    public static boolean openBank(NPC npc) {
+        Microbot.status = "Opening bank";
+        try {
+            if (isOpen()) return true;
+            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+
+            if (npc == null) return false;
+
+            if (!Rs2Menu.doAction("bank", npc.getCanvasTilePoly())) {
+                return false;
+            }
+            sleepUntil(Rs2Bank::isOpen);
+            sleep(600, 1000);
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
 
     public static boolean useBank() {
         if (isOpen()) return true;
