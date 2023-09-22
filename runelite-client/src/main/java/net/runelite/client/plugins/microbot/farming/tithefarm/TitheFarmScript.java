@@ -52,6 +52,7 @@ public class TitheFarmScript extends Script {
         DropFertiliser();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                //test commit
                 if (!super.run()) return;
                 final String seed = TitheFarmMaterial.getSeedForLevel().getName();
                 boolean isInMinigame = Rs2Widget.getWidget(15794178) != null;
