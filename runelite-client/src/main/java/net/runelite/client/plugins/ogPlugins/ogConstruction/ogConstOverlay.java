@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogblastfurnace;
+package net.runelite.client.plugins.ogPlugins.ogConstruction;
 
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -10,9 +10,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class ogBlastFurnaceOverlay extends OverlayPanel {
+public class ogConstOverlay extends OverlayPanel {
     @Inject
-    ogBlastFurnaceOverlay(ogBlastFurnacePlugin plugin)
+    ogConstOverlay(ogConstPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -22,7 +22,7 @@ public class ogBlastFurnaceOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("OG Blast Furnace Gold")
+                    .text("OG Construction V" + ogConstScript.version)
                     .color(Color.GREEN)
                     .build());
 

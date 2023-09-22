@@ -160,7 +160,7 @@ public class CompostTracker
 		{
 			case WIDGET_TARGET_ON_GAME_OBJECT:
 				Widget w = client.getSelectedWidget();
-				assert w != null;
+				//assert w != null;
 				return COMPOST_ITEMS.contains(w.getItemId()) || w.getId() == WidgetInfo.SPELL_LUNAR_FERTILE_SOIL.getPackedId();
 
 			case GAME_OBJECT_FIRST_OPTION:

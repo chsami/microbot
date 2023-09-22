@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogfiremaking.enums;
+package net.runelite.client.plugins.ogPlugins.ogFiremaking.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.NpcID;
