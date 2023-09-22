@@ -246,6 +246,18 @@ public class Inventory {
         }
         return null;
     }
+    public static Widget findLastItem(int itemId) {
+        Microbot.status = "Searching inventory for last item with id " + itemId;
+        Widget inventoryWidget = getInventory();
+        Widget lastItem = null;
+        if (inventoryWidget == null) return null;
+        for (Widget item : inventoryWidget.getDynamicChildren()) {
+            if (item.getItemId() == itemId) {
+                lastItem = item;
+            }
+        }
+        return lastItem;
+    }
 
     public static boolean hasItemAmount(int itemId, int amount) {
         Microbot.status = "Check if inventory has item: " + itemId + " with amount: " + amount;
@@ -508,6 +520,12 @@ public class Inventory {
     public static boolean useItemAction(int itemID, String actionName) {
         Microbot.status = "Use inventory item " + itemID + " with action " + actionName;
         Widget item = findItem(itemID);
+        if (item == null) return false;
+        return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
+    }
+    public static boolean useLastItemAction(int itemID, String actionName) {
+        Microbot.status = "Use inventory item " + itemID + " with action " + actionName;
+        Widget item = findLastItem(itemID);
         if (item == null) return false;
         return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
