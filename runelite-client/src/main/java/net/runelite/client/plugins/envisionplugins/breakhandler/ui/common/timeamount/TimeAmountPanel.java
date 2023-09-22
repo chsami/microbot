@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakduration.timeamount;
+package net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount;
 
 import net.runelite.client.ui.ColorScheme;
 

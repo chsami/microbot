@@ -1,15 +1,15 @@
-package net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakduration;
+package net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration;
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.TimeAmountPanel;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
 
-public class BreakDurationParentPanel extends JPanel {
-    public BreakDurationParentPanel() {
+public class RuntimeDurationParentPanel extends JPanel {
+    public RuntimeDurationParentPanel() {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-        add(new BreakDurationTitlePanel());
+        add(new RuntimeDurationTitlePanel());
         add(new TimeAmountPanel());
     }
 }
