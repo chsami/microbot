@@ -38,7 +38,7 @@ public class ogRunecraftingScript extends Script {
     private WorldPoint playerLocation() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation());}
     private boolean atAlter() {return playerLocation().distanceTo(config.selectAlter().getAlterLocation()) < 15;}
     private int distanceToRuin() {return playerLocation().distanceTo(config.selectAlter().getRuinLocation());}
-    private void openChest() {Rs2Bank.openCertainBank(Rs2GameObject.findObjectById(config.selectBank().getBankID()));}
+    private void openChest() {Rs2Bank.openBank(Rs2GameObject.findObjectById(config.selectBank().getBankID()));}
     private void teletoCraftingGuild(){Tab.switchToEquipmentTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.EQUIPMENT);sleep(100,150);Rs2Widget.clickWidget(25362448);}
     private void teletoFireAlter(){Tab.switchToEquipmentTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.EQUIPMENT);sleep(200,300);Rs2Widget.clickWidget(25362456);}
     private void combinationCraft(){
