@@ -1,7 +1,8 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler;
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.*;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakmethod.BreakMethodPanelParent;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakduration.BreakDurationParentPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakmethod.BreakMethodParentPanel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
@@ -22,7 +23,7 @@ public class BreakHandlerPanel extends PluginPanel {
     private final JPanel forceBreakPanel = new JPanel();
 
 
-    private static final Border BORDER = new CompoundBorder(
+    public static final Border BORDER = new CompoundBorder(
             BorderFactory.createMatteBorder(2, 2, 2, 2, ColorScheme.LIGHT_GRAY_COLOR),
             BorderFactory.createLineBorder(ColorScheme.LIGHT_GRAY_COLOR));
 
@@ -34,11 +35,9 @@ public class BreakHandlerPanel extends PluginPanel {
         setLayout(boxLayout);
         setBorder(new EmptyBorder(6, 6, 6, 6));
 
-        MainPanel mainPanel = new MainPanel();
-        final BreakMethodPanelParent breakingMethodPanelParent = new BreakMethodPanelParent();
+        add(new TitlePanel());
+        add(new BreakMethodParentPanel());
+        add(new BreakDurationParentPanel());
 
-        mainPanel.add(breakingMethodPanelParent);
-
-        add(mainPanel);
     }
 }
