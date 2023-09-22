@@ -10,7 +10,7 @@ public class RuntimeDurationTitlePanel extends JPanel {
     public RuntimeDurationTitlePanel() {
         // Style & Layout Setup
         setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(10, 10, 10, 10));
+        setBorder(new EmptyBorder(0, 10, 0, 10));
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
         // Label Setup
