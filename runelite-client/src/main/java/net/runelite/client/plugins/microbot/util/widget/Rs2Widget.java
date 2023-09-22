@@ -56,11 +56,35 @@ public class Rs2Widget {
         });
     }
 
+    public static Widget getWidgetChildName(int id, String matchingText) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget widget = Microbot.getClient().getWidget(id);
+            if (widget == null) return null;
+            if (widget.getChildren().length == 0) return null;
+            return Arrays.stream(widget.getChildren()).filter(x -> x.getName().contains(matchingText)).findFirst().orElse(null);
+        });
+    }
+
+    public static Widget getWidgetChildtxt(int id, String matchingText) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget widget = Microbot.getClient().getWidget(id);
+            if (widget == null) return null;
+            if (widget.getChildren().length == 0) return null;
+            return Arrays.stream(widget.getChildren()).filter(x -> x.getText().contains(matchingText)).findFirst().orElse(null);
+        });
+    }
+
+    public static Widget getWidgetChildSprite(int id, int matchingSpriteId) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget widget = Microbot.getClient().getWidget(id);
+            if (widget == null) return null;
+            if (widget.getChildren().length == 0) return null;
+            return Arrays.stream(widget.getChildren()).filter(x -> x.getSpriteId() == (matchingSpriteId)).findFirst().orElse(null);
+        });
+    }
+
     public static int getChildWidgetSpriteID(int id, int childId) {
         return  Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId).getSpriteId());
-    }
-    public static String getChildWidgetText(int id, int childId) {
-        return  Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId).getText());
     }
 
     public static boolean clickWidget(int id) {
@@ -75,9 +99,6 @@ public class Rs2Widget {
         if (widget == null) return false;
         Microbot.getMouse().click(widget.getChild(childId).getBounds());
         return true;
-    }
-    public static boolean childWidgetExits(int id, int childId) {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId) != null);
     }
 
     public static void changeWidgetText(String textToSearch, String newText) {

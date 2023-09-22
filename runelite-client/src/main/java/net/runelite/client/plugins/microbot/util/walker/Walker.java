@@ -16,9 +16,11 @@ import net.runelite.client.plugins.microbot.walker.pathfinder.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
+import static org.apache.commons.lang3.ArrayUtils.reverse;
 
 public class Walker {
 
@@ -153,13 +155,13 @@ public class Walker {
     private List<PathNode> getPath(WorldPoint startWorldPoint, WorldPoint endWorldPoint) {
         long startTimeDateLoad = System.currentTimeMillis();
         SavedWorldDataLoader savedWorldDataLoader = new SavedWorldDataLoader(WorldDataDownloader.Companion.getWorldDataFile());
-        PathNode[][][] grid = savedWorldDataLoader.getGrid();
+        Map<String, PathNode> pathNodeMap = savedWorldDataLoader.getNodeMap();
         long endTimeDataLoad = System.currentTimeMillis();
 
-        PathFinder pathFinder = new PathFinder(grid);
+        PathFinder pathFinder = new PathFinder(pathNodeMap);
 
         long startTimePathFind = System.currentTimeMillis();
-        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint);
+        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint, false);
         long endTimePathFind = System.currentTimeMillis();
 
         System.out.println("Loaded world data in " + (endTimeDataLoad - startTimeDateLoad) + " milliseconds");
@@ -167,6 +169,10 @@ public class Walker {
         System.out.println("Num of nodes: " + nodes.stream().count());
 
         return nodes;
+    }
+
+    public void interruptStaticWalker() {
+        PathWalker.Companion.interrupt();
     }
 
     public boolean staticWalkTo(WorldPoint endWorldPoint) {
@@ -279,13 +285,18 @@ public class Walker {
 
     public boolean walkPath(WorldPoint[] worldPoints) {
         if (worldPoints[worldPoints.length -1].distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 4) return true;
-        pathfinder = new Pathfinder(pathfinderConfig);
+        pathfinder = new Pathfinder();
         pathfinder.customPath = true;
-        List<Node> path = new ArrayList();
+        List<Node> path = new ArrayList<>();
+        reverse(worldPoints);
         for (WorldPoint worldPoint: worldPoints) {
             path.add(new Node(worldPoint, null, 0));
         }
+        pathfinder.setStart(Microbot.getClient().getLocalPlayer().getWorldLocation());
+        pathfinder.setTarget(worldPoints[0]);
+        pathfinder.setConfig(pathfinderConfig);
         pathfinder.setPath(path);
+        pathfinder.run();
         sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
         return false;
     }

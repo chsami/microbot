@@ -6,7 +6,6 @@ import net.runelite.api.Client;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.config.ConfigProfile;
 import net.runelite.client.config.ProfileManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
@@ -44,12 +43,6 @@ public class AutoLoginPlugin extends Plugin {
     @Provides
     AutoLoginConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(AutoLoginConfig.class);
-    }
-
-    private ConfigProfile getProfile() {
-        try (ProfileManager.Lock lock = Microbot.getProfileManager().lock()) {
-            return lock.getProfiles().stream().filter(x -> x.isActive()).findFirst().get();
-        }
     }
 
     public void setWorld(int worldNumber) {

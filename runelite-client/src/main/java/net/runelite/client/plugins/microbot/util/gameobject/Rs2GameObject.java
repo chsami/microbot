@@ -19,6 +19,11 @@ public class Rs2GameObject {
     public static TileObject objectToInteract = null;
     public static String objectAction = null;
 
+    public static boolean interact(WorldPoint worldPoint) {
+        TileObject gameObject = findObjectByLocation(worldPoint);
+        return clickObject(gameObject);
+    }
+
     public static boolean interact(GameObject gameObject) {
         return clickObject(gameObject);
     }
@@ -300,11 +305,11 @@ public class Rs2GameObject {
             if (objComp == null) continue;
 
             if (exact) {
-                if (objComp.getName().equalsIgnoreCase(objectName)) {
+                if (objComp.getName().equalsIgnoreCase(objectName) && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
                     return gameObject;
                 }
             } else {
-                if (objComp.getName().toLowerCase().contains(objectName.toLowerCase())) {
+                if (objComp.getName().toLowerCase().contains(objectName.toLowerCase()) && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
                     return gameObject;
                 }
             }
@@ -319,7 +324,7 @@ public class Rs2GameObject {
         result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
         if (!result) {
             try {
-                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.toLowerCase().equals(action.toLowerCase()));
+                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase(action));
             } catch (Exception ex) {
                 //do nothing
             }
@@ -502,7 +507,9 @@ public class Rs2GameObject {
         return null;
     }
 
-    public static List<Tile> getTiles(int distance) {
+    public static List<Tile> getTiles(int maxTileDistance) {
+        int maxDistance = Math.max(2400, maxTileDistance * 128);
+
         Player player = Microbot.getClient().getLocalPlayer();
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
@@ -517,7 +524,7 @@ public class Rs2GameObject {
                     continue;
                 }
 
-                if (player.getLocalLocation().distanceTo(tile.getLocalLocation()) <= distance) {
+                if (player.getLocalLocation().distanceTo(tile.getLocalLocation()) <= maxDistance) {
                     tileObjects.add(tile);
                 }
 
@@ -662,6 +669,7 @@ public class Rs2GameObject {
 
         try {
             menuEntry.setIdentifier(objectToInteract.getId());
+            menuEntry.setType(MenuAction.WALK);//set default to walk to avoid crashing
 
             ObjectComposition objComp = convertGameObjectToObjectComposition(objectToInteract);
             if (objComp == null) return;

@@ -52,6 +52,7 @@ public class TitheFarmScript extends Script {
         DropFertiliser();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                //test commit
                 if (!super.run()) return;
                 final String seed = TitheFarmMaterial.getSeedForLevel().getName();
                 boolean isInMinigame = Rs2Widget.getWidget(15794178) != null;
@@ -67,7 +68,7 @@ public class TitheFarmScript extends Script {
                         if (!regionModel.hasPlanted) {
                             Inventory.useItemUnsafe(TitheFarmMaterial.getSeedForLevel().getName());
                         }
-                        sleepUntil(() -> Microbot.isWalking());
+                        sleepUntil(() -> Microbot.isMoving());
                         Point point = new Point(regionModel.worldPoint.getX(), regionModel.worldPoint.getY());
                         sleepUntil(() -> point.distanceTo(new Point(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionX(), Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionY())) == 0);
                         if (!regionModel.hasPlanted) {

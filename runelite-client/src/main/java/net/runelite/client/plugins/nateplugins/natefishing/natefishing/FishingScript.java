@@ -21,7 +21,7 @@ public class FishingScript extends Script {
             if (!super.run()) return;
 
             try {
-                if (Microbot.isWalking() || Microbot.isAnimating() || Microbot.pauseAllScripts) {
+                if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) {
                     return;
                 }
                 if (Inventory.isFull()) {
