@@ -877,7 +877,7 @@ public class ScreenshotPlugin extends Plugin
 	@VisibleForTesting
 	void takeScreenshot(String fileName, String subDir)
 	{
-		toggleNaughtyOverlaysOff();
+		if(overlayManager != null){ toggleNaughtyOverlaysOff(); }
 		if (client.getGameState() == GameState.LOGIN_SCREEN)
 		{
 			// Prevent the screenshot from being captured
@@ -925,7 +925,7 @@ public class ScreenshotPlugin extends Plugin
 			int clientHeight = getScaledValue(transform.getScaleY(), clientUi.getHeight());
 
 			screenshot = new BufferedImage(clientWidth, clientHeight, BufferedImage.TYPE_INT_ARGB);
-			
+
 			Graphics2D graphics = (Graphics2D) screenshot.getGraphics();
 			AffineTransform originalTransform = graphics.getTransform();
 			// scale g2d for the paint() call
@@ -953,7 +953,7 @@ public class ScreenshotPlugin extends Plugin
 		}
 
 		imageCapture.takeScreenshot(screenshot, fileName, subDir, config.notifyWhenTaken(), config.uploadScreenshot());
-		toggleNaughtyOverlaysBackOn();
+		if(overlayManager != null) {toggleNaughtyOverlaysBackOn();}
 	}
 
 	private boolean isInsideGauntlet()
