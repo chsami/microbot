@@ -103,7 +103,7 @@ public abstract class Script implements IScript {
         if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
             VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         }
-        Widget clickHereToPlayButton = Rs2Widget.getWidget(378, 2); //on login screen
+        Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
         if (clickHereToPlayButton != null) {
             Rs2Widget.clickWidget(clickHereToPlayButton.getId());
         }
