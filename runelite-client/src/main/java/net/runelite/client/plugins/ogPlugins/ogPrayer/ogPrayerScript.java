@@ -2,6 +2,7 @@ package net.runelite.client.plugins.ogPlugins.ogPrayer;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.runelite.api.GameState;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldPoint;
@@ -207,20 +208,22 @@ public class ogPrayerScript extends Script {
         if(this.logging != config.verboseLogging()){ if(logging || config.verboseLogging()){System.out.println("Updated Verbose Logging: " + config.verboseLogging() );}  this.logging = config.verboseLogging(); }
     }
     private void calcState(){
-        if(location == Locations.GILDED_ALTAR){sleepUntil(()-> checkVarbit(6719) == 0,Random.random(1300,1500));}
-        if(location == Locations.CHAOS_ALTAR && inPVPArea()){sleepUntil(() -> this.playersInArea == 1, Random.random(20000,25000));}
-        if(Tab.switchToInventoryTab()){
-            if(location == Locations.CHAOS_ALTAR || location == Locations.GILDED_ALTAR){
-                if(Inventory.hasItem(bones.getItemID()) && isNearAlter() && !needToHop){ status = ogPrayerStatus.USE_BONES_ON_ALTER; }
-                else if (Inventory.hasItem(bones.getItemID()) && !isNearAlter() && !needToHop){ status = ogPrayerStatus.GO_TO_ALTER; }
-                else if (!Inventory.hasItem(bones.getItemID()) && hasNotedBonesIfNeeded() && !needToHop) { status = ogPrayerStatus.RESTOCK; }
-                else if (!needToHop && (!Inventory.hasItemStackable(bones.getName()) || !Inventory.hasItemAmountStackable("Coins",1000)) && !Inventory.hasItem(bones.getItemID()) ) { status = ogPrayerStatus.LOGOUT; }
+        if(Microbot.getClient().getGameState() != GameState.LOGIN_SCREEN){
+            if(location == Locations.GILDED_ALTAR){sleepUntil(()-> checkVarbit(6719) == 0,Random.random(1300,1500));}
+            if(location == Locations.CHAOS_ALTAR && inPVPArea()){sleepUntil(() -> this.playersInArea == 1, Random.random(20000,25000));}
+            if(Tab.switchToInventoryTab()){
+                if(location == Locations.CHAOS_ALTAR || location == Locations.GILDED_ALTAR){
+                    if(Inventory.hasItem(bones.getItemID()) && isNearAlter() && !needToHop){ status = ogPrayerStatus.USE_BONES_ON_ALTER; }
+                    else if (Inventory.hasItem(bones.getItemID()) && !isNearAlter() && !needToHop){ status = ogPrayerStatus.GO_TO_ALTER; }
+                    else if (!Inventory.hasItem(bones.getItemID()) && hasNotedBonesIfNeeded() && !needToHop) { status = ogPrayerStatus.RESTOCK; }
+                    else if (!needToHop && (!Inventory.hasItemStackable(bones.getName()) || !Inventory.hasItemAmountStackable("Coins",1000)) && !Inventory.hasItem(bones.getItemID()) ) { status = ogPrayerStatus.LOGOUT; }
+                }
+                if(!status.name().isEmpty()){log("Calculating State: " + status.name());}
+                log("Bones in inventory:  " + Inventory.hasItem(bones.getItemID()));
+                log("Has noted bones if needed:  " + hasNotedBonesIfNeeded());
+                log("Near altar:  " + isAtAlter());
+                log("Need to hop: " + needToHop);
             }
-            if(!status.name().isEmpty()){log("Calculating State: " + status.name());}
-            log("Bones in inventory:  " + Inventory.hasItem(bones.getItemID()));
-            log("Has noted bones if needed:  " + hasNotedBonesIfNeeded());
-            log("Near altar:  " + isAtAlter());
-            log("Need to hop: " + needToHop);
         }
     }
     private void goToAlter(){
