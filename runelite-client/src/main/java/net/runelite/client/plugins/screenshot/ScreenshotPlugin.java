@@ -877,7 +877,7 @@ public class ScreenshotPlugin extends Plugin
 	@VisibleForTesting
 	void takeScreenshot(String fileName, String subDir)
 	{
-		if(overlayManager != null){ toggleNaughtyOverlaysOff(); }
+		try{ toggleNaughtyOverlaysOff(); } catch (NullPointerException ignored){}
 		if (client.getGameState() == GameState.LOGIN_SCREEN)
 		{
 			// Prevent the screenshot from being captured
@@ -953,7 +953,7 @@ public class ScreenshotPlugin extends Plugin
 		}
 
 		imageCapture.takeScreenshot(screenshot, fileName, subDir, config.notifyWhenTaken(), config.uploadScreenshot());
-		if(overlayManager != null) {toggleNaughtyOverlaysBackOn();}
+		try { toggleNaughtyOverlaysBackOn(); } catch (NullPointerException ignored){}
 	}
 
 	private boolean isInsideGauntlet()
