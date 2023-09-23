@@ -2,6 +2,7 @@ package net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakduratio
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.TimeAmountPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.TimerTypes;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
@@ -12,6 +13,6 @@ public class BreakDurationParentPanel extends JPanel {
         setBorder(BreakHandlerPanel.BORDER);
 
         add(new BreakDurationTitlePanel());
-        add(new TimeAmountPanel());
+        add(new TimeAmountPanel(TimerTypes.BREAK));
     }
 }

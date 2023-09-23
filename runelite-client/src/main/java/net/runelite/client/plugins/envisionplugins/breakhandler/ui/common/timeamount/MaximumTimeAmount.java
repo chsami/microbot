@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount;
 
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
+
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.utility.PanelUtils;
 import net.runelite.client.ui.components.FlatTextField;
 
@@ -11,7 +13,7 @@ import java.awt.event.FocusListener;
 public class MaximumTimeAmount extends JPanel {
     protected final FlatTextField durationTextField;
 
-    public MaximumTimeAmount() {
+    public MaximumTimeAmount(TimerTypes myType) {
         setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         final JLabel label1 = new JLabel();
         label1.setText("Max");
@@ -36,6 +38,12 @@ public class MaximumTimeAmount extends JPanel {
 
                 try {
                     duration = PanelUtils.stringToSeconds(durationTextField.getText());
+
+                    if (myType == TimerTypes.BREAK) {
+                        BreakHandlerScript.setMaxBreakDuration(duration);
+                    } else if (myType == TimerTypes.RUNTIME) {
+                        BreakHandlerScript.setMaxRunTimeDuration(duration);
+                    }
                 } catch (Exception ignored){
                 }
 

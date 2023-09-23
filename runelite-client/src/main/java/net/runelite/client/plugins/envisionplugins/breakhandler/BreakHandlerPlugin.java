@@ -25,6 +25,9 @@ public class BreakHandlerPlugin extends Plugin {
     BreakHandlerConfig config;
 
     @Inject
+    BreakHandlerScript breakHandlerScript;
+
+    @Inject
     private ClientToolbar clientToolbar;
 
     @Provides
@@ -50,6 +53,8 @@ public class BreakHandlerPlugin extends Plugin {
                 .build();
 
         clientToolbar.addNavigation(navButton);
+
+        breakHandlerScript.run(config);
     }
 
     @Override

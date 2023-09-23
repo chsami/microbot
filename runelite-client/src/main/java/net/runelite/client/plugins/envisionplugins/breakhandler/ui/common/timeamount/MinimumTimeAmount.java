@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount;
 
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.utility.PanelUtils;
 import net.runelite.client.ui.components.FlatTextField;
 
@@ -11,7 +12,7 @@ import java.awt.event.FocusListener;
 public class MinimumTimeAmount extends JPanel {
     protected final FlatTextField durationTextField;
 
-    public MinimumTimeAmount() {
+    public MinimumTimeAmount(TimerTypes myType) {
         setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         setMinimumSize(new Dimension(100, 5));
 
@@ -38,6 +39,12 @@ public class MinimumTimeAmount extends JPanel {
 
                 try {
                     duration = PanelUtils.stringToSeconds(durationTextField.getText());
+
+                    if (myType == TimerTypes.BREAK) {
+                        BreakHandlerScript.setMinBreakDuration(duration);
+                    } else if (myType == TimerTypes.RUNTIME) {
+                        BreakHandlerScript.setMinRunTimeDuration(duration);
+                    }
                 } catch (Exception ignored){
                 }
 
