@@ -16,6 +16,7 @@ public class ogFiremakingOverlay extends OverlayPanel {
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
+        setNaughty();
     }
     @Override
     public Dimension render(Graphics2D graphics) {

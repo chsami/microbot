@@ -2,7 +2,6 @@ package net.runelite.client.plugins.ogPlugins.ogPrayer;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -39,7 +38,6 @@ public class ogPrayerPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick gameTick){ ogPrayerScript.onGameTick(gameTick); }
-
 
 
     @Override

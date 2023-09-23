@@ -27,12 +27,10 @@ public class TestScript extends Script {
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
     }
-
     public void onVarbitChanged(VarbitChanged varbitChanged){
         if (varbitChanged.getVarpId() == 2176 || varbitChanged.getVarpId() == 6719)
         {
             System.out.println("Varbit: " + varbitChanged.getVarbitId() + " Varbit value: " + varbitChanged.getValue());
         }
     }
-
 }
