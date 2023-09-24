@@ -198,7 +198,7 @@ public abstract class InventorySetupsContainerPanel extends JPanel
 		switch (slot.getSlotID())
 		{
 			case INVENTORY:
-				updateContainerFrom = "Rs2Inventory";
+				updateContainerFrom = "Inventory";
 				break;
 			case EQUIPMENT:
 				updateContainerFrom = "Equipment";

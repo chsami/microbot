@@ -30,7 +30,7 @@ public interface WoodcuttingConfig extends Config {
 
     @ConfigItem(
             keyName = "Axe inventory?",
-            name = "Axe Rs2Inventory?",
+            name = "Axe Inventory?",
             description = "Enable this if you have an axe in your inventory",
             position = 1,
             section = generalSection

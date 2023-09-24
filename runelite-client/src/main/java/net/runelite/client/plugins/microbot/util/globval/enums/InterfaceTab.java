@@ -23,7 +23,7 @@ public enum InterfaceTab {
             GlobalWidgetInfo.FIXED_CLASSIC_QUESTS,
             GlobalWidgetInfo.RESIZABLE_CLASSIC_QUESTS,
             GlobalWidgetInfo.RESIZABLE_MODERN_QUESTS),
-    INVENTORY("Rs2Inventory", KeyEvent.VK_F1,
+    INVENTORY("Inventory", KeyEvent.VK_F1,
             GlobalWidgetInfo.FIXED_CLASSIC_INVENTORY,
             GlobalWidgetInfo.RESIZABLE_CLASSIC_INVENTORY,
             GlobalWidgetInfo.RESIZABLE_MODERN_INVENTORY),

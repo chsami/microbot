@@ -1182,7 +1182,7 @@ public class InventorySetupsPlugin extends Plugin
 						postTitle += "All Items";
 						break;
 					case INVENTORY:
-						postTitle += "Rs2Inventory";
+						postTitle += "Inventory";
 						break;
 					case EQUIPMENT:
 						postTitle += "Equipment";

@@ -173,7 +173,7 @@ class ItemPricesOverlay extends Overlay
 		final int widgetId = menuEntry.getParam1();
 		ItemContainer container = null;
 
-		// Rs2Inventory item
+		// Inventory item
 		if (widgetId == INVENTORY_ITEM_WIDGETID ||
 			widgetId == BANK_INVENTORY_ITEM_WIDGETID ||
 			widgetId == EXPLORERS_RING_ITEM_WIDGETID ||

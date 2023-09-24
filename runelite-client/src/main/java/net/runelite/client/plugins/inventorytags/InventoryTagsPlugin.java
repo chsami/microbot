@@ -59,7 +59,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 
 @PluginDescriptor(
-	name = "Rs2Inventory Tags",
+	name = "Inventory Tags",
 	description = "Add the ability to tag items in your inventory",
 	tags = {"highlight", "items", "overlay", "tagging"},
 	enabledByDefault = false
@@ -183,7 +183,7 @@ public class InventoryTagsPlugin extends Plugin
 				final Tag tag = getTag(itemId);
 
 				final MenuEntry parent = client.createMenuEntry(idx)
-					.setOption("Rs2Inventory tag")
+					.setOption("Inventory tag")
 					.setTarget(entry.getTarget())
 					.setType(MenuAction.RUNELITE_SUBMENU);
 
@@ -217,7 +217,7 @@ public class InventoryTagsPlugin extends Plugin
 						SwingUtilities.invokeLater(() ->
 						{
 							RuneliteColorPicker colorPicker = colorPickerManager.create(SwingUtilities.windowForComponent((Applet) client),
-								color, "Rs2Inventory Tag", true);
+								color, "Inventory Tag", true);
 							colorPicker.setOnClose(c ->
 							{
 								Tag t = new Tag();

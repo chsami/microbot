@@ -30,7 +30,7 @@ public interface MiningConfig extends Config {
 
     @ConfigItem(
             keyName = "Pickaxe inventory?",
-            name = "Pickaxe in Rs2Inventory?",
+            name = "Pickaxe in Inventory?",
             description = "Enable this if you have a pickaxe in your inventory make sure its on the first slot",
             position = 1,
             section = generalSection

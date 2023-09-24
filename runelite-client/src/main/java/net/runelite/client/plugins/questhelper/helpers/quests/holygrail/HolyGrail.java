@@ -152,7 +152,7 @@ public class HolyGrail extends BasicQuestHelper
 		food = new ItemRequirement("Food", ItemCollections.GOOD_EATING_FOOD, -1);
 		combatGear = new ItemRequirement("A weapon and armour", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
-		emptyInvSpot = new ItemRequirement("Empty Rs2Inventory Spot", -1, 1);
+		emptyInvSpot = new ItemRequirement("Empty Inventory Spot", -1, 1);
 		goldFeather = new ItemRequirement("Magic gold feather", ItemID.MAGIC_GOLD_FEATHER);
 		grailBell = new ItemRequirement("Grail Bell", ItemID.GRAIL_BELL);
 		oneMagicWhistle = new ItemRequirement("Magic Whistle", ItemID.MAGIC_WHISTLE);

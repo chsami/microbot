@@ -35,7 +35,7 @@ enum WintertodtInterruptType
 	COLD("Damaged by Wintertodt Cold"),
 	SNOWFALL("Damaged by Wintertodt Snowfall"),
 	BRAZIER("Brazier Shattered"),
-	INVENTORY_FULL("Rs2Inventory full of Bruma Roots"),
+	INVENTORY_FULL("Inventory full of Bruma Roots"),
 	OUT_OF_ROOTS("Out of Bruma Roots"),
 	FIXED_BRAZIER("Fixed Brazier"),
 	LIT_BRAZIER("Lit Brazier"),

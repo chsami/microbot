@@ -26,13 +26,13 @@ public interface AutoZMIAltarConfig extends Config {
                 "MUST HAVE NPC CONTACT RUNES IN INVENTORY\n" +
                 "MUST HAVE JEWELLERY BOX SET TO EDGEVILLE\n" +
                 "MUST HAVE SETUP AUTO PAYMENT AT ZMI BANK\n" +
-                "1. Setup Your Rs2Inventory Setup with it's name\n" +
+                "1. Setup Your Inventory Setup with it's name\n" +
                 "2. Start next to your selected bank";
     }
 
     @ConfigItem(
             keyName = "inventory",
-            name = "Rs2Inventory Setup Name",
+            name = "Inventory Setup Name",
             description = "Enter the name of the inventory setup you want to use",
             position = 2
     )
