@@ -24,10 +24,10 @@ class BankHelper {
 
                     val countBefore = Inventory.getInventoryItems().count { widget: Widget -> widget.itemId == itemAndQuantityPair.first }
                     if (itemAndQuantityPair.second == 1) {
-                        Rs2Bank.withdrawItem(false, itemAndQuantityPair.first)
+                        Global.sleepUntil { Rs2Bank.withdrawItem(false, itemAndQuantityPair.first) }
 
                     } else {
-                        Rs2Bank.withdrawItemX(false, itemAndQuantityPair.first, itemAndQuantityPair.second)
+                        Global.sleepUntil { Rs2Bank.withdrawItemX(false, itemAndQuantityPair.first, itemAndQuantityPair.second) }
                     }
 
                     var success = true
@@ -46,7 +46,7 @@ class BankHelper {
                         throw Exception("Failed to withdraw all required items ${itemAndQuantityPair.first}.")
                     } else {
                         foundItemIds.add(itemAndQuantityPair.first)
-                        Global.sleep(200, 400)
+                        Global.sleep(400, 800)
                     }
 
                     break

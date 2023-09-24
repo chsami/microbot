@@ -3,9 +3,11 @@ package net.runelite.client.plugins.griffinplugins.griffintrainer
 import net.runelite.api.EquipmentInventorySlot
 import net.runelite.api.ItemID
 import net.runelite.api.Skill
+import net.runelite.api.VarPlayer
 import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
+import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.plugins.griffinplugins.griffincombat.GriffinCombatConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
@@ -17,10 +19,11 @@ import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.combat.Rs2Combat
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.tabs.Tab
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 import java.util.concurrent.TimeUnit
 
 class GriffinCombatScript : Script() {
@@ -216,6 +219,7 @@ class GriffinCombatScript : Script() {
                 Global.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
 
                 foundItemIds.forEach { itemId: Int ->
+                    println("Equipping item $itemId")
                     if (!Rs2Equipment.hasEquipped(itemId)) {
                         Inventory.getInventoryItem(itemId)?.let {
                             Microbot.getMouseForKotlin().click(it.bounds)
@@ -281,18 +285,18 @@ class GriffinCombatScript : Script() {
 
 
         if (attackLevel < config.attackLevel()) {
-            if (!Rs2Combat.isAccurateCombatStyleSelected()) {
-                Rs2Combat.toggleAccurateCombatStyle()
+            if (!isAccurateCombatStyleSelected()) {
+                toggleAccurateCombatStyle()
             }
 
         } else if (strengthLevel < config.strengthLevel()) {
-            if (!Rs2Combat.isAggressiveCombatStyleSelected()) {
-                Rs2Combat.toggleAggressiveCombatStyle()
+            if (!isAggressiveCombatStyleSelected()) {
+                toggleAggressiveCombatStyle()
             }
 
         } else if (defenceLevel < config.defenseLevel()) {
-            if (!Rs2Combat.isDefensiveCombatStyleSelected()) {
-                Rs2Combat.toggleDefensiveCombatStyle()
+            if (!isDefensiveCombatStyleSelected()) {
+                toggleDefensiveCombatStyle()
             }
         }
     }
@@ -324,4 +328,42 @@ class GriffinCombatScript : Script() {
                 }
             return null
         }
+
+    private fun toggleCombatStyle(attackStyleWidgetInfo: WidgetInfo): Boolean {
+        Tab.switchToCombatOptionsTab()
+        Global.sleep(150, 300)
+        return Rs2Widget.clickWidget(attackStyleWidgetInfo)
+    }
+
+    fun toggleAccurateCombatStyle(): Boolean {
+        return toggleCombatStyle(WidgetInfo.COMBAT_STYLE_ONE)
+    }
+
+    fun toggleAggressiveCombatStyle(): Boolean {
+        return toggleCombatStyle(WidgetInfo.COMBAT_STYLE_TWO)
+    }
+
+    fun toggleControlledCombatStyle(): Boolean {
+        return toggleCombatStyle(WidgetInfo.COMBAT_STYLE_THREE)
+    }
+
+    fun toggleDefensiveCombatStyle(): Boolean {
+        return toggleCombatStyle(WidgetInfo.COMBAT_STYLE_FOUR)
+    }
+
+    fun isAccurateCombatStyleSelected(): Boolean {
+        return Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE) == 0
+    }
+
+    fun isAggressiveCombatStyleSelected(): Boolean {
+        return Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE) == 1
+    }
+
+    fun isControlledCombatStyleSelected(): Boolean {
+        return Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE) == 2
+    }
+
+    fun isDefensiveCombatStyleSelected(): Boolean {
+        return Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE) == 3
+    }
 }
