@@ -40,8 +40,8 @@ class GriffinCombatScript : Script() {
     }
 
     fun run(config: GriffinCombatConfig): Boolean {
-//        Camera.setAngle(45)
-//        Camera.setPitch(1.0f)
+//        Rs2Camera.setAngle(45)
+//        Rs2Camera.setPitch(1.0f)
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay({
             this.config = config

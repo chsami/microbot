@@ -6,7 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.cooking.enums.CookingEnum;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -55,8 +55,8 @@ public class CookingScript extends Script {
 
                     TileObject cookingRange = Rs2GameObject.findObjectById(gameObjectId);
                     if (cookingRange != null) {
-                        if (!Camera.isTileOnScreen(cookingRange.getLocalLocation())) {
-                            Camera.turnTo(cookingRange.getLocalLocation());
+                        if (!Rs2Camera.isTileOnScreen(cookingRange.getLocalLocation())) {
+                            Rs2Camera.turnTo(cookingRange.getLocalLocation());
                             return;
                         }
                         if (Rs2Widget.getWidget(17694734) == null)

@@ -93,7 +93,7 @@ public class MagicScript extends Script {
 
                     WorldPoint w = TelekineticRoom.optimal();
 
-                    if (!Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), w))) {
+                    if (!Rs2Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), w))) {
                     Microbot.getWalker().walkFastRegion(w.getX(), w.getY());
                     }
 

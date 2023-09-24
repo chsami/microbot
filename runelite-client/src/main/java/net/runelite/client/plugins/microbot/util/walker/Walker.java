@@ -6,7 +6,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
@@ -191,8 +191,8 @@ public class Walker {
     }
 
     public boolean staticWalkTo(WorldPoint endWorldPoint) {
-        Camera.setAngle(45);
-        Camera.setPitch(1.0f);
+        Rs2Camera.setAngle(45);
+        Rs2Camera.setPitch(1.0f);
 
         Player player = Microbot.getClient().getLocalPlayer();
         WorldPoint start = player.getWorldLocation();
@@ -216,8 +216,8 @@ public class Walker {
             return walkTo(target, true);
 
         } else {
-            Camera.setAngle(45);
-            Camera.setPitch(1.0f);
+            Rs2Camera.setAngle(45);
+            Rs2Camera.setPitch(1.0f);
 
             if (nodes.isEmpty()) return false;
 
