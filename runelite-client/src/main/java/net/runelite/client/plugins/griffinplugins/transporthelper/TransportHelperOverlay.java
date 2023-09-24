@@ -6,7 +6,9 @@ import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.ui.overlay.*;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.OverlayUtil;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -16,21 +18,52 @@ public class TransportHelperOverlay extends Overlay {
     @Inject
     private TransportHelperOverlay() {
         setPosition(OverlayPosition.DYNAMIC);
-        setLayer(OverlayLayer.ALWAYS_ON_TOP);
-        setPriority(OverlayPriority.HIGHEST);
     }
 
     @Override
     public Dimension render(Graphics2D graphics) {
         Client client = Microbot.getClient();
-        for (Tile tile : Rs2GameObject.getTiles()) {
-            final LocalPoint tileLocalLocation = tile.getLocalLocation();
-            Polygon poly = Perspective.getCanvasTilePoly(client, tileLocalLocation);
+        int playerPlane = client.getPlane();
 
-            if (poly != null && poly.contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY())) {
+        for (Tile tile : TransportHelperPlugin.Companion.getUnaddedTransportTiles().values()) {
+            if (tile.getPlane() != playerPlane) {
+                continue;
+            }
+
+            Polygon poly = Perspective.getCanvasTilePoly(client, tile.getLocalLocation(), tile.getPlane());
+            if (poly != null) {
+                OverlayUtil.renderPolygon(graphics, poly, Color.RED);
+            }
+        }
+
+        for (Tile tile : TransportHelperPlugin.Companion.getNeedsWorkTransportTiles().values()) {
+            if (tile.getPlane() != playerPlane) {
+                continue;
+            }
+
+            Polygon poly = Perspective.getCanvasTilePoly(client, tile.getLocalLocation(), tile.getPlane());
+            if (poly != null) {
+                OverlayUtil.renderPolygon(graphics, poly, Color.YELLOW);
+            }
+        }
+
+        for (Tile tile : Rs2GameObject.getTiles()) {
+            if (tile.getPlane() != playerPlane) {
+                continue;
+            }
+
+            if (!TransportHelperPlugin.Companion.getAddedTransportWorldPoints().containsValue(tile.getWorldLocation())) {
+                continue;
+            }
+
+            final LocalPoint tileLocalLocation = tile.getLocalLocation();
+            Polygon poly = Perspective.getCanvasTilePoly(client, tileLocalLocation, tile.getPlane());
+
+            if (poly != null) {
                 OverlayUtil.renderPolygon(graphics, poly, Color.GREEN);
             }
         }
+
         return null;
     }
 }

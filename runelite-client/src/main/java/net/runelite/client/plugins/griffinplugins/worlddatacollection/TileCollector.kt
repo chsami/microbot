@@ -7,13 +7,14 @@ import net.runelite.api.Constants
 import net.runelite.api.Player
 import net.runelite.api.Tile
 import net.runelite.client.RuneLite
+import net.runelite.client.plugins.griffinplugins.transporthelper.TransportCollectorDispatch
 import net.runelite.client.plugins.microbot.Microbot
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 
-class TileCollector(private val operableObjectIds: List<Int>) {
+class TileCollector {
     fun collect() {
         val tiles = getTiles()
         val json = getJson(tiles)
@@ -47,7 +48,6 @@ class TileCollector(private val operableObjectIds: List<Int>) {
             row.addProperty("x", tile.getWorldLocation().x)
             row.addProperty("y", tile.getWorldLocation().y)
             row.addProperty("z", tile.getWorldLocation().plane)
-            row.addProperty("is_operable", isOperable(tile))
             row.addProperty("block_movement_full", movementFlags.contains(WorldMovementFlag.BLOCK_MOVEMENT_FULL))
             row.addProperty("block_movement_floor", movementFlags.contains(WorldMovementFlag.BLOCK_MOVEMENT_FLOOR))
             row.addProperty("block_movement_floor_decoration", movementFlags.contains(WorldMovementFlag.BLOCK_MOVEMENT_FLOOR_DECORATION))
@@ -60,6 +60,16 @@ class TileCollector(private val operableObjectIds: List<Int>) {
             row.addProperty("block_movement_north_west", movementFlags.contains(WorldMovementFlag.BLOCK_MOVEMENT_NORTH_WEST))
             row.addProperty("block_movement_south_east", movementFlags.contains(WorldMovementFlag.BLOCK_MOVEMENT_SOUTH_EAST))
             row.addProperty("block_movement_south_west", movementFlags.contains(WorldMovementFlag.BLOCK_MOVEMENT_SOUTH_WEST))
+
+            val transportCollector = TransportCollectorDispatch().getCollector(tile)
+            if (transportCollector != null) {
+                if (transportCollector.shouldCollect()) {
+                    row.add("transports", transportCollector.getJson())
+                }
+            } else {
+                row.add("transports", JsonObject())
+            }
+            
             rows.add(row)
         }
         return rows
@@ -73,33 +83,6 @@ class TileCollector(private val operableObjectIds: List<Int>) {
             return WorldMovementFlag.getSetFlags(data)
         }
         return HashSet()
-    }
-
-    private fun isOperable(tile: Tile): Boolean {
-        return Microbot.getClientThreadForKotlin().runOnClientThread {
-            var wallObjectOperable = false
-            var groundObjectOperable = false
-            var gameObjectOperable = false
-
-            if (tile.wallObject != null) {
-                wallObjectOperable = operableObjectIds.contains(tile.getWallObject().getId())
-            }
-
-            if (tile.groundObject != null) {
-                groundObjectOperable = operableObjectIds.contains(tile.getGroundObject().getId())
-            }
-
-            for (gameObject in tile.getGameObjects()) {
-                if (gameObject == null) {
-                    continue
-                }
-                gameObjectOperable = operableObjectIds.contains(gameObject.getId())
-                if (gameObjectOperable) {
-                    break
-                }
-            }
-            return@runOnClientThread wallObjectOperable || gameObjectOperable || groundObjectOperable
-        }
     }
 
     private fun writeToFile(rows: JsonArray) {

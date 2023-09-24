@@ -21,8 +21,8 @@ public class WorldDataCollectionOverlay extends OverlayPanel {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder().text("Static Walker World Data Collection").color(Color.GREEN).build());
             panelComponent.getChildren().add(LineComponent.builder().build());
-            panelComponent.getChildren().add(LineComponent.builder().left("Started: " + WorldDataCollectionThread.started).build());
-            panelComponent.getChildren().add(LineComponent.builder().left("Completed: " + WorldDataCollectionThread.completed).build());
+            panelComponent.getChildren().add(LineComponent.builder().left("Started: " + WorldDataCollectionThread.Companion.getStarted()).build());
+            panelComponent.getChildren().add(LineComponent.builder().left("Completed: " + WorldDataCollectionThread.Companion.getCompleted()).build());
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());

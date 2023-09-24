@@ -25,16 +25,18 @@ class PathWalker(private val nodes: List<PathNode>) {
         enabled = true
         isInterrupted = false
 
-        val maxSkipDistance = 15
-//        val skipDistance = 15
+        val maxSkipDistance = 12
+        val minSkipDistance = 4
+        var currentSkipDistance = Random.nextInt(minSkipDistance, maxSkipDistance)
+
+
         val upperBound = nodes.size - 1
         var previousNode: PathNode? = null
         var nextNode: PathNode? = null
 
-//        val player = Microbot.getClientForKotlin().localPlayer
+        val player = Microbot.getClientForKotlin().localPlayer
 
         for (currentNode in nodes) {
-            val skipDistance = Random.nextInt(maxSkipDistance - 5, maxSkipDistance)
 
             if (isInterrupted) {
                 enabled = false
@@ -56,6 +58,7 @@ class PathWalker(private val nodes: List<PathNode>) {
                 nextNode = nodes.get(index + 1)
             }
 
+            // if we are at the last node, just click it
             if (isLastNode) {
                 val minimapPoint = getMinimapPoint(currentNode.worldLocation) ?: continue
                 clickPoint(minimapPoint)
@@ -63,6 +66,7 @@ class PathWalker(private val nodes: List<PathNode>) {
                 continue
             }
 
+            // if we have a transport, use it
             if (currentNode.pathTransports.isNotEmpty()) {
                 if (previousNode != null) {
                     val minimapPoint = getMinimapPoint(previousNode.worldLocation)
@@ -71,13 +75,18 @@ class PathWalker(private val nodes: List<PathNode>) {
                     }
                 }
 
+                if (player.worldLocation.distanceTo(currentNode.worldLocation) > 2) {
+                    val minimapPoint = getMinimapPoint(currentNode.worldLocation) ?: continue
+                    clickPoint(minimapPoint)
+                }
+
                 nextNode ?: continue
                 handleTransport(currentNode, nextNode)
                 previousNode = currentNode
                 continue
             }
 
-//            if (previousNode == null && nodes.count() < skipDistance) {
+            // if we are at the first node, and the next node is within the max skip distance, just click it
             if (previousNode == null && nodes.count() < maxSkipDistance) {
                 val minimapPoint = getMinimapPoint(currentNode.worldLocation) ?: continue
                 clickPoint(minimapPoint)
@@ -85,15 +94,18 @@ class PathWalker(private val nodes: List<PathNode>) {
                 continue
 
             } else if (previousNode == null) {
+                // if we are at the first node, and the next node is not within the max skip distance, walk to it
                 previousNode = currentNode
                 continue
             }
 
+            // if our current distance is greater than the max skip distance, walk to it
             val distance = previousNode.worldLocation.distanceTo(currentNode.worldLocation)
-            if (distance >= skipDistance) {
+            if (distance >= currentSkipDistance) {
                 val minimapPoint = getMinimapPoint(currentNode.worldLocation) ?: continue
                 clickPointWhileRunning(minimapPoint, currentNode)
                 previousNode = currentNode
+                currentSkipDistance = Random.nextInt(minSkipDistance, maxSkipDistance)
             }
         }
 

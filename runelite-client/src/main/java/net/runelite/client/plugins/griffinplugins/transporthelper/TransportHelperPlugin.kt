@@ -1,21 +1,25 @@
 package net.runelite.client.plugins.griffinplugins.transporthelper
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import com.google.inject.Provides
-import net.runelite.api.ObjectID
 import net.runelite.api.Perspective
 import net.runelite.api.Tile
+import net.runelite.api.TileObject
+import net.runelite.api.coords.WorldPoint
+import net.runelite.api.events.*
 import net.runelite.client.config.ConfigManager
+import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginDescriptor.Griffin
+import net.runelite.client.plugins.griffinplugins.transporthelper.transporttypes.BaseTransportCollector
+import net.runelite.client.plugins.griffinplugins.transporthelper.transporttypes.DoorTransportCollector
 import net.runelite.client.plugins.microbot.Microbot
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathNode
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathTransport
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.SavedWorldDataLoader
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.WorldDataDownloader
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.ui.overlay.OverlayManager
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.inject.Inject
@@ -24,6 +28,9 @@ import javax.inject.Inject
 class TransportHelperPlugin : Plugin() {
     companion object {
         const val CONFIG_GROUP = "Transport Helper"
+        val addedTransportWorldPoints: MutableMap<String, WorldPoint> = mutableMapOf()
+        val unaddedTransportTiles: MutableMap<String, Tile> = mutableMapOf()
+        val needsWorkTransportTiles: MutableMap<String, Tile> = mutableMapOf()
     }
 
     @Inject
@@ -40,15 +47,92 @@ class TransportHelperPlugin : Plugin() {
     @Inject
     private lateinit var overlay: TransportHelperOverlay
     private var mouseListener: MouseListener? = null
+    private lateinit var transportCollectorDispatch: TransportCollectorDispatch
 
     override fun startUp() {
         overlayManager.add(overlay)
         setupMouseListener()
+        transportCollectorDispatch = TransportCollectorDispatch()
+
+        val dataLoader = SavedWorldDataLoader(WorldDataDownloader.worldDataFile)
+        val nodeMap = dataLoader.getNodeMap()
+
+        nodeMap.forEach { (key: String, value: PathNode) ->
+            if (value.pathTransports.isNotEmpty()) {
+                value.pathTransports.forEach { transport: PathTransport ->
+                    addedTransportWorldPoints[transport.startPathNode.worldLocation.toString()] = transport.startPathNode.worldLocation
+                }
+            }
+        }
     }
 
     override fun shutDown() {
         overlayManager.remove(overlay)
         Microbot.getClientForKotlin().getCanvas().removeMouseListener(mouseListener)
+    }
+
+    @Subscribe
+    fun onWallObjectSpawned(event: WallObjectSpawned) {
+        handleNewTileObject(event.tile, event.wallObject)
+    }
+
+    @Subscribe
+    fun onGameObjectSpawned(event: GameObjectSpawned) {
+        handleNewTileObject(event.tile, event.gameObject)
+    }
+
+    @Subscribe
+    fun onGroundObjectSpawned(event: GroundObjectSpawned) {
+        handleNewTileObject(event.tile, event.groundObject)
+    }
+
+    @Subscribe
+    fun onDecorativeObjectSpawned(event: DecorativeObjectSpawned) {
+        handleNewTileObject(event.tile, event.decorativeObject)
+    }
+
+    @Subscribe
+    fun onWallObjectDespawned(event: WallObjectDespawned) {
+        handleDespawnedTileObjects(event.tile, event.wallObject)
+    }
+
+    @Subscribe
+    fun onGameObjectDespawned(event: GameObjectDespawned) {
+        handleDespawnedTileObjects(event.tile, event.gameObject)
+    }
+
+    @Subscribe
+    fun onGroundObjectDespawned(event: GroundObjectDespawned) {
+        handleDespawnedTileObjects(event.tile, event.groundObject)
+    }
+
+    @Subscribe
+    fun onDecorativeObjectDespawned(event: DecorativeObjectDespawned) {
+        handleDespawnedTileObjects(event.tile, event.decorativeObject)
+    }
+
+    private fun handleNewTileObject(tile: Tile, tileObject: TileObject) {
+        if (addedTransportWorldPoints.containsKey(tile.worldLocation.toString())) {
+            return
+        }
+
+        val transportCollector = transportCollectorDispatch.getCollector(tile) ?: return
+        when {
+            transportCollector.getStartingActions().any { it.contains("open", true) } -> unaddedTransportTiles[tile.worldLocation.toString()] = tile
+            transportCollector.getStartingActions().any { it.contains("climb", true) } -> unaddedTransportTiles[tile.worldLocation.toString()] = tile
+            transportCollector.getStartingActions().any { it.contains("enter", true) } -> unaddedTransportTiles[tile.worldLocation.toString()] = tile
+            transportCollector.getStartingActions().any { it.contains("close", true) } -> needsWorkTransportTiles[tile.worldLocation.toString()] = tile
+        }
+    }
+
+    private fun handleDespawnedTileObjects(tile: Tile, tileObject: TileObject) {
+        if (unaddedTransportTiles.containsKey(tile.worldLocation.toString())) {
+            unaddedTransportTiles.remove(tile.worldLocation.toString())
+        }
+
+        if (needsWorkTransportTiles.containsKey(tile.worldLocation.toString())) {
+            needsWorkTransportTiles.remove(tile.worldLocation.toString())
+        }
     }
 
     private fun setupMouseListener() {
@@ -59,7 +143,7 @@ class TransportHelperPlugin : Plugin() {
                     val tileLocalLocation = tile.localLocation
                     val poly = Perspective.getCanvasTilePoly(client, tileLocalLocation)
                     if (poly != null && poly.contains(client.getMouseCanvasPosition().x, client.getMouseCanvasPosition().y)) {
-                        getTileTransportInformation(tile)
+                        logTransportData(tile)
                     }
                 }
             }
@@ -72,119 +156,18 @@ class TransportHelperPlugin : Plugin() {
         Microbot.getClientForKotlin().getCanvas().addMouseListener(mouseListener)
     }
 
-    private fun getTileTransportInformation(tile: Tile) {
-        var objectName: String? = ""
-        var objectId = -1
-        var objectHash = -1
-        val worldPoint = tile.worldLocation
-        var eastWest = false
-        var found = false
-
-        if (tile.wallObject != null) {
-            objectName = getObjectIdVariableName(tile.wallObject.id)
-            objectId = tile.wallObject.getId()
-            objectHash = tile.wallObject.hash.toInt()
-            if (tile.wallObject.orientationA == 1 || tile.wallObject.orientationA == 4) {
-                eastWest = true
-            }
-            found = true
-        }
-
-        if (!found) {
-            for (gameObject in tile.gameObjects) {
-                if (gameObject == null) {
-                    continue
-                }
-                objectName = getObjectIdVariableName(gameObject.id)
-                objectId = gameObject.id
-                objectHash = gameObject.hash.toInt()
-                println("Game Object Orientation: ${gameObject.orientation}")
-                println("Game Object Model Orientation: ${gameObject.modelOrientation}")
-                found = true
-                break
-            }
-        }
-
-        if (!found) {
-            if (tile.groundObject != null) {
-                objectName = getObjectIdVariableName(tile.groundObject.id)
-                objectId = tile.groundObject.id
-                objectHash = tile.groundObject.hash.toInt()
-                found = true
-            }
-        }
-
-        if (!found) {
-            if (tile.decorativeObject != null) {
-                objectName = getObjectIdVariableName(tile.decorativeObject.id)
-                objectId = tile.decorativeObject.id
-                objectHash = tile.decorativeObject.hash.toInt()
-                found = true
-            }
-        }
-
-        val transport = JsonObject()
-        transport.addProperty("transport_name", "")
-        transport.addProperty("object_hash", objectHash)
-        transport.addProperty("object_id", objectId)
-        transport.addProperty("object_name", objectName)
-
+    private fun logTransportData(tile: Tile) {
+        var collector: BaseTransportCollector? = null
         if (config.transportType() == TransportTypes.DOOR) {
-            if (eastWest) {
-                transport.addProperty("unblock_north_south", false)
-                transport.addProperty("unblock_east_west", true)
-            } else {
-                transport.addProperty("unblock_north_south", true)
-                transport.addProperty("unblock_east_west", false)
-            }
-        } else {
-            transport.addProperty("unblock_north_south", false)
-            transport.addProperty("unblock_east_west", false)
+            collector = DoorTransportCollector(tile)
+        } else if (config.transportType() == TransportTypes.STAIR) {
+            collector = DoorTransportCollector(tile)
         }
 
-        val startTile = JsonObject()
-        startTile.addProperty("x", worldPoint.x)
-        startTile.addProperty("y", worldPoint.y)
-        startTile.addProperty("z", worldPoint.plane)
-
-        val endTile = JsonObject()
-        endTile.addProperty("x", 0)
-        endTile.addProperty("y", 0)
-        endTile.addProperty("z", 0)
-
-        val connection = JsonObject()
-        connection.add("start_tile", startTile)
-        connection.add("end_tile", endTile)
-        connection.addProperty("action", "")
-
-        val connections = JsonArray()
-        connections.add(connection)
-
-        transport.add("connections", connections)
-
-        val gson = GsonBuilder().setPrettyPrinting().create()
-
-        val stringSelection = StringSelection(gson.toJson(transport))
-        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-        clipboard.setContents(stringSelection, null)
-        println(gson.toJson(transport))
-    }
-
-    fun getObjectIdVariableName(objectId: Int): String? {
-        val fields = ObjectID::class.java.getDeclaredFields()
-        for (field in fields) {
-            field.setAccessible(true)
-            if (field.type == Int::class.javaPrimitiveType) {
-                try {
-                    val fieldValue = field.getInt(null)
-                    if (fieldValue == objectId) {
-                        return field.name
-                    }
-                } catch (e: IllegalAccessException) {
-                    e.printStackTrace()
-                }
-            }
+        if (collector == null) {
+            return
         }
-        return null
+
+        collector.getJson()
     }
 }

@@ -1,71 +1,86 @@
-package net.runelite.client.plugins.griffinplugins.griffintrainer.tasks
+package net.runelite.client.plugins.griffinplugins.griffintrainer
 
 import net.runelite.api.EquipmentInventorySlot
+import net.runelite.api.GameState
 import net.runelite.api.ItemID
 import net.runelite.api.Skill
 import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
-import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
-import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerPlugin
+import net.runelite.client.plugins.griffinplugins.griffincombat.GriffinCombatConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.NPCHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.microbot.Microbot
+import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
+import net.runelite.client.plugins.microbot.util.camera.Camera
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import java.util.concurrent.TimeUnit
 
-class CombatTrainerTask(config: GriffinTrainerConfig) : BaseTrainerTask(config) {
-
+class GriffinCombatScript : Script() {
     companion object {
         private val LUMBRIDGE_CHICKENS_WORLD_AREA = WorldArea(3225, 3287, 12, 15, 0)
         private val LUMBRIDGE_COWS_WORLD_AREA = WorldArea(3255, 3258, 9, 37, 0)
     }
 
-
-    var state: State = State.PRE_SETUP
+    lateinit var config: GriffinCombatConfig
+    var state: State = State.WAITING
 
     enum class State {
-        PRE_SETUP, SETUP, WAITING, FIGHTING, LOOTING
+        WAITING, FIGHTING, LOOTING
     }
 
-    override fun process(): Boolean {
+    fun run(config: GriffinCombatConfig): Boolean {
+        this.config = config
 
-        try {
-            val minimumSkillRequirement = minimumSkillRequirement
+//        Camera.setAngle(45)
+//        Camera.setPitch(1.0f)
 
-            if (minimumSkillRequirement < 10) {
-                Microbot.status = "Fighting Chickens"
-                GriffinTrainerPlugin.countLabel = "Chickens Killed"
-                fightNPC(LUMBRIDGE_CHICKENS_WORLD_AREA, WorldDestinations.LUMBRIDGE_CHICKENS.worldPoint, "chicken", listOf(ItemID.FEATHER, ItemID.BONES))
+        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay({
+            if (!super.run()) return@scheduleWithFixedDelay
 
-            } else if (minimumSkillRequirement < 20) {
-                Microbot.status = "Fighting Cows"
-                GriffinTrainerPlugin.countLabel = "Cows Killed"
-                fightNPC(LUMBRIDGE_COWS_WORLD_AREA, WorldDestinations.LUMBRIDGE_COWS.worldPoint, "cow", listOf(ItemID.COWHIDE, ItemID.BONES))
+            try {
+                if (!shouldTrain()) {
+                    shutdown()
+                    return@scheduleWithFixedDelay
+                }
 
-            } else {
-                return true
+                val minimumSkillRequirement = minimumSkillRequirement
+
+                if (minimumSkillRequirement < 10) {
+                    Microbot.status = "Fighting Chickens"
+                    GriffinCombatPlugin.countLabel = "Chickens Killed"
+                    fightNPC(LUMBRIDGE_CHICKENS_WORLD_AREA, WorldDestinations.LUMBRIDGE_CHICKENS.worldPoint, "chicken", listOf(ItemID.FEATHER, ItemID.BONES))
+
+                } else if (minimumSkillRequirement < 20) {
+                    Microbot.status = "Fighting Cows"
+                    GriffinCombatPlugin.countLabel = "Cows Killed"
+                    fightNPC(LUMBRIDGE_COWS_WORLD_AREA, WorldDestinations.LUMBRIDGE_COWS.worldPoint, "cow", listOf(ItemID.COWHIDE, ItemID.BONES))
+
+                } else {
+                    shutdown()
+                    return@scheduleWithFixedDelay
+                }
+
+            } catch (ex: Exception) {
+                println(ex.message)
             }
-
-        } catch (ex: Exception) {
-            println(ex.message)
-        }
-
-        return false
+        }, 0, 400, TimeUnit.MILLISECONDS)
+        return true
     }
 
-    override fun getBankLocation(): WorldPoint {
+    fun getBankLocation(): WorldPoint {
         return WorldDestinations.LUMBRIDGE_BANK.worldPoint
     }
 
-    override fun getInventoryRequirements(): InventoryRequirements {
+    fun getInventoryRequirements(): InventoryRequirements {
         val inventoryRequirements = InventoryRequirements()
         val attackLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.ATTACK)
         val defenceLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.DEFENCE)
@@ -150,7 +165,7 @@ class CombatTrainerTask(config: GriffinTrainerConfig) : BaseTrainerTask(config) 
         return inventoryRequirements
     }
 
-    override fun shouldTrain(): Boolean {
+    fun shouldTrain(): Boolean {
         val attackLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.ATTACK)
         val strengthLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.STRENGTH)
         val defenceLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.DEFENCE)
@@ -179,21 +194,21 @@ class CombatTrainerTask(config: GriffinTrainerConfig) : BaseTrainerTask(config) 
         }
 
         when (state) {
-            State.PRE_SETUP -> {
-                fetchRequiredItems()
-                state = State.SETUP
-            }
+//            State.PRE_SETUP -> {
+//                fetchRequiredItems()
+//                state = State.SETUP
+//            }
 
-            State.SETUP -> {
-                if (!isWieldingRequiredWeapon) {
-                    val weapon = getRequiredWeaponFromInventory
-                    if (weapon != null) {
-                        Rs2Equipment.equipItem(weapon.itemId)
-                    }
-                } else {
-                    state = State.WAITING
-                }
-            }
+//            State.SETUP -> {
+//                if (!isWieldingRequiredWeapon) {
+//                    val weapon = getRequiredWeaponFromInventory
+//                    if (weapon != null) {
+//                        Rs2Equipment.equipItem(weapon.itemId)
+//                    }
+//                } else {
+//                    state = State.WAITING
+//                }
+//            }
 
             State.WAITING -> {
                 if (!worldArea.contains(Rs2Player.getWorldLocation())) {
@@ -205,7 +220,7 @@ class CombatTrainerTask(config: GriffinTrainerConfig) : BaseTrainerTask(config) 
             State.FIGHTING -> {
                 setCombatStyle()
                 if (NPCHelper.findAndAttack(npcName)) {
-                    GriffinTrainerPlugin.count++
+                    GriffinCombatPlugin.count++
                     state = State.LOOTING
                 }
             }
