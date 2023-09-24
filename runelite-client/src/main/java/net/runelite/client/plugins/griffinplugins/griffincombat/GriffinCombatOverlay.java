@@ -16,6 +16,7 @@ public class GriffinCombatOverlay extends OverlayPanel {
     @Inject
     private GriffinCombatOverlay() {
         setPosition(OverlayPosition.DYNAMIC);
+        setNaughty();
     }
 
     @Override

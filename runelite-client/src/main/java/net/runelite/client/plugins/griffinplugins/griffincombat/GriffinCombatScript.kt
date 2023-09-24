@@ -17,15 +17,10 @@ import net.runelite.client.plugins.microbot.Script
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.camera.Camera
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item
-import net.runelite.client.plugins.microbot.util.models.RS2Item
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
-import net.runelite.client.plugins.microbot.util.security.Login
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 import java.util.concurrent.TimeUnit
 
 class GriffinCombatScript : Script() {
@@ -63,7 +58,7 @@ class GriffinCombatScript : Script() {
                     GriffinCombatPlugin.countLabel = "Chickens Killed"
                     fightNPC(LUMBRIDGE_CHICKENS_WORLD_AREA, WorldDestinations.LUMBRIDGE_CHICKENS.worldPoint, "chicken", listOf(ItemID.FEATHER, ItemID.BONES))
 
-                } else if (minimumSkillRequirement < 20) {
+                } else if (minimumSkillRequirement < 99) {
                     Microbot.status = "Fighting Cows"
                     GriffinCombatPlugin.countLabel = "Cows Killed"
                     fightNPC(LUMBRIDGE_COWS_WORLD_AREA, WorldDestinations.LUMBRIDGE_COWS.worldPoint, "cow", listOf(ItemID.COWHIDE, ItemID.BONES))
@@ -223,17 +218,6 @@ class GriffinCombatScript : Script() {
                 }
                 state = State.WAITING
             }
-
-//            State.SETUP -> {
-//                if (!isWieldingRequiredWeapon) {
-//                    val weapon = getRequiredWeaponFromInventory
-//                    if (weapon != null) {
-//                        Rs2Equipment.equipItem(weapon.itemId)
-//                    }
-//                } else {
-//                    state = State.WAITING
-//                }
-//            }
 
             State.WAITING -> {
                 if (!worldArea.contains(Rs2Player.getWorldLocation())) {
