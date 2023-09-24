@@ -175,7 +175,7 @@ class PathWalker(private val nodes: List<PathNode>) {
 
         } else {
             println("Operating on Transport: ${pathTransport.objectId}, with action: ${pathTransport.action}")
-            interactUsingAction(pathTransport.objectName, clickableShape, pathTransport.action)
+            interactUsingAction(clickableShape, pathTransport.action)
             Global.sleepUntilTrue({ findTransportObjectShape(pathTransport.objectId) == null }, 200, 3000)
         }
 
@@ -188,7 +188,7 @@ class PathWalker(private val nodes: List<PathNode>) {
 
             } else {
                 println("Operating on Transport: ${pathTransport.objectId}, with action: ${pathTransport.additionalAction}")
-                interactUsingAction(pathTransport.objectName, additionalTransportObjectShape, pathTransport.additionalAction)
+                interactUsingAction(additionalTransportObjectShape, pathTransport.additionalAction)
             }
         }
 
@@ -252,7 +252,7 @@ class PathWalker(private val nodes: List<PathNode>) {
         return clickableShape
     }
 
-    private fun interactUsingAction(objectName: String, transportObjectShape: Shape, action: String): Boolean {
+    private fun interactUsingAction(transportObjectShape: Shape, action: String): Boolean {
         Rs2Menu.doAction(action, transportObjectShape)
         return true
     }

@@ -10,7 +10,8 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory
 
 class BankHelper {
     companion object {
-        fun fetchInventoryRequirements(inventoryRequirements: InventoryRequirements) {
+        fun fetchInventoryRequirements(inventoryRequirements: InventoryRequirements): List<Int> {
+            val foundItemIds = mutableListOf<Int>()
             inventoryRequirements.getItemSets().forEach { dynamicItemSet: DynamicItemSet ->
                 for (itemAndQuantityPair: Pair<Int, Int> in dynamicItemSet.getItems()) {
                     if (itemAndQuantityPair.second == 0) {
@@ -43,11 +44,16 @@ class BankHelper {
 
                     if (!success) {
                         throw Exception("Failed to withdraw all required items ${itemAndQuantityPair.first}.")
+                    } else {
+                        foundItemIds.add(itemAndQuantityPair.first)
+                        Global.sleep(200, 400)
                     }
 
                     break
                 }
             }
+
+            return foundItemIds
         }
     }
 }

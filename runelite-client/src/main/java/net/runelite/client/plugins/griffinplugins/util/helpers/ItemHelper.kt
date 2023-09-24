@@ -46,15 +46,11 @@ class ItemHelper {
                         val inventoryCount = Inventory.count()
                         if (Rs2GroundItem.interact(rsGroundItem)) {
                             if (!standingOnItem) {
-                                println("waiting for player to stop moving")
                                 Global.sleepUntilTrue({ !Rs2Player.isWalking() }, 50, 3000)
                             }
 
-                            println("waiting for player to stop moving and interacting")
                             Global.sleepUntilTrue({ !Rs2Player.isWalking() && !Rs2Player.isInteracting() }, 100, 1000 * 10)
-                            println("waiting for item to be removed from ground")
                             Global.sleepUntilTrue({ hasItemAtWorldPoint(rsGroundItem.item.id, rsGroundItem.tile.worldLocation) }, 100, 1000 * 5)
-                            println("waiting for item to be added to inventory")
                             Global.sleepUntilTrue({ Inventory.count() == inventoryCount + 1 }, 100, 1000 * 5)
                         }
                     }

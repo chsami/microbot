@@ -1,13 +1,13 @@
 package net.runelite.client.plugins.griffinplugins.griffintrainer
 
 import net.runelite.api.EquipmentInventorySlot
-import net.runelite.api.GameState
 import net.runelite.api.ItemID
 import net.runelite.api.Skill
 import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.Widget
 import net.runelite.client.plugins.griffinplugins.griffincombat.GriffinCombatConfig
+import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.NPCHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
@@ -21,7 +21,11 @@ import net.runelite.client.plugins.microbot.util.camera.Camera
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item
+import net.runelite.client.plugins.microbot.util.models.RS2Item
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.security.Login
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 import java.util.concurrent.TimeUnit
 
 class GriffinCombatScript : Script() {
@@ -31,19 +35,19 @@ class GriffinCombatScript : Script() {
     }
 
     lateinit var config: GriffinCombatConfig
-    var state: State = State.WAITING
+    var state: State = State.SETUP
 
     enum class State {
-        WAITING, FIGHTING, LOOTING
+        SETUP, WAITING, FIGHTING, LOOTING
     }
 
     fun run(config: GriffinCombatConfig): Boolean {
-        this.config = config
-
 //        Camera.setAngle(45)
 //        Camera.setPitch(1.0f)
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay({
+            this.config = config
+
             if (!super.run()) return@scheduleWithFixedDelay
 
             try {
@@ -70,7 +74,7 @@ class GriffinCombatScript : Script() {
                 }
 
             } catch (ex: Exception) {
-                println(ex.message)
+                println(ex)
             }
         }, 0, 400, TimeUnit.MILLISECONDS)
         return true
@@ -194,10 +198,31 @@ class GriffinCombatScript : Script() {
         }
 
         when (state) {
-//            State.PRE_SETUP -> {
-//                fetchRequiredItems()
-//                state = State.SETUP
-//            }
+            State.SETUP -> {
+                Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
+                if (!Rs2Bank.isOpen()) {
+                    Rs2Bank.openBank()
+                }
+
+                Rs2Bank.depositAll()
+                Global.sleep(300, 600)
+                Rs2Bank.depositEquipment()
+                Global.sleep(600, 900)
+
+                val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
+                Rs2Bank.closeBank()
+                Global.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
+
+                foundItemIds.forEach { itemId: Int ->
+                    if (!Rs2Equipment.hasEquipped(itemId)) {
+                        Inventory.getInventoryItem(itemId)?.let {
+                            Microbot.getMouseForKotlin().click(it.bounds)
+                            Global.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
+                        }
+                    }
+                }
+                state = State.WAITING
+            }
 
 //            State.SETUP -> {
 //                if (!isWieldingRequiredWeapon) {

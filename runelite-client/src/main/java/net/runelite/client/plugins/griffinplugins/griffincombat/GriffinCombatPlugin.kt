@@ -13,7 +13,7 @@ import javax.inject.Inject
 @PluginDescriptor(name = Griffin + GriffinCombatPlugin.CONFIG_GROUP, enabledByDefault = false)
 class GriffinCombatPlugin : Plugin() {
     companion object {
-        const val CONFIG_GROUP = "Griffin Combat"
+        const val CONFIG_GROUP = "Combat Trainer"
         var countLabel = ""
         var count = 0
     }

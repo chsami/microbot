@@ -30,9 +30,9 @@ public class GriffinCombatOverlay extends OverlayPanel {
     }
 
     private void drawPanel(Graphics2D graphics) {
-        panelComponent.setPreferredLocation(new java.awt.Point(5, 20));
+        panelComponent.setPreferredLocation(new java.awt.Point(5, 30));
         panelComponent.setPreferredSize(new Dimension(300, 300));
-        panelComponent.getChildren().add(TitleComponent.builder().text("Griffin Trainer").color(Color.GREEN).build());
+        panelComponent.getChildren().add(TitleComponent.builder().text(GriffinCombatPlugin.CONFIG_GROUP).color(Color.GREEN).build());
         panelComponent.getChildren().add(LineComponent.builder().build());
         panelComponent.getChildren().add(LineComponent.builder().left("Status: " + Microbot.status).build());
 
