@@ -17,6 +17,7 @@ import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -353,6 +354,20 @@ public class Inventory {
         });
     }
 
+    public static Widget findItemLast(int itemId) {
+        Microbot.status = "Searching inventory for last item with id " + itemId;
+        Widget inventoryWidget = getInventory();
+        if (inventoryWidget == null) return null;
+        Widget[] children = inventoryWidget.getDynamicChildren();
+        ArrayUtils.reverse(children);
+        for (Widget item : children) {
+            if (item.getItemId() == itemId) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     public static Widget findItem(String itemName) {
         return findItem( itemName, false);
     }
@@ -394,6 +409,16 @@ public class Inventory {
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
         sleep(100, 300);
+        return true;
+    }
+
+    public static boolean useItemLast(int id) {
+        if (Rs2Bank.isOpen()) return false;
+        Microbot.status = "Use inventory item " + id;
+        Widget item = findItemLast(id);
+        if (item == null) return false;
+        Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
+        sleep(600, 1200);
         return true;
     }
 
