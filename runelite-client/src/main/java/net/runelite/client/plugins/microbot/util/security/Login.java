@@ -28,7 +28,7 @@ public class Login {
     private static final int MAX_PLAYER_COUNT = 1950;
 
     public Login() {
-        this(360);
+        this(getRandomWorld(true));
     }
 
     public Login(int world) {
