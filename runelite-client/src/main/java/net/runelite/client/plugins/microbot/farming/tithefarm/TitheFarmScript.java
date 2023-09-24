@@ -37,11 +37,10 @@ public class TitheFarmScript extends Script {
 
     final int FARM_DOOR = 27445;
     final String FERTILISER = "gricoller's fertiliser";
-    static int currentPlant = 0;
-
-    final int TOTAL_PLANTS = 14;
 
     public static List<RegionModel> regions = new ArrayList<>();
+
+    public static int times = 4;
 
     public static long getPlantedPlants() {
         return regions.stream().filter(x -> x.hasPlanted).count();
@@ -50,6 +49,7 @@ public class TitheFarmScript extends Script {
 
     public boolean run(TitheFarmConfig config) {
         reset();
+        times = 4;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
@@ -63,6 +63,7 @@ public class TitheFarmScript extends Script {
                         return;
                     }
                     fillWaterCans();
+                    times++;
                     for (RegionModel regionModel : regions) {
                         Microbot.getWalker().walkFastRegion(regionModel.worldPoint.getX(), regionModel.worldPoint.getY());
                         if (!regionModel.hasPlanted) {
@@ -145,7 +146,8 @@ public class TitheFarmScript extends Script {
     }
 
     public void fillWaterCans() {
-        if (regions.stream().noneMatch(x -> x.hasPlanted)) {
+        if (times > 3) {
+            times = 0;
             Microbot.getWalker().walkFastRegion(regions.get(0).x, regions.get(0).y);
             sleepUntil(Microbot::isMoving);
             sleepUntil(() -> !Microbot.isMoving());
@@ -168,7 +170,8 @@ public class TitheFarmScript extends Script {
     public void takeSeeds() {
         GameObject seedTable = Rs2GameObject.findObject("Seed table");
         click(seedTable);
-        Rs2Widget.sleepUntilHasWidget(TitheFarmMaterial.getSeedForLevel().getName());
+        boolean result = Rs2Widget.sleepUntilHasWidget(TitheFarmMaterial.getSeedForLevel().getName());
+        if (!result) return;
         keyPress(TitheFarmMaterial.getSeedForLevel().getOption());
         sleep(1000);
         VirtualKeyboard.typeString("10000");
