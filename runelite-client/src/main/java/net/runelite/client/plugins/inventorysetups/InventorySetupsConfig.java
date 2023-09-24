@@ -211,7 +211,7 @@ public interface InventorySetupsConfig extends Config
 
 	@ConfigItem(
 			keyName = "filterBankInventoryOnlyHotkey",
-			name = "Filter Rs2Inventory Hotkey",
+			name = "Filter Inventory Hotkey",
 			description = "Configures the hotkey for filtering the inventory in the bank",
 			position = 8,
 			section = hotkeySection
@@ -350,7 +350,7 @@ public interface InventorySetupsConfig extends Config
 	@ConfigItem(
 			keyName = "requireActivePanelFilter",
 			name = "Require Active Panel for Filtering",
-			description = "Only allow filtering if the Rs2Inventory Setups panel is active",
+			description = "Only allow filtering if the Inventory Setups panel is active",
 			position = 17
 	)
 	default boolean requireActivePanelFilter()

@@ -33,7 +33,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @PluginDescriptor(
-	name = "Rs2Inventory Grid",
+	name = "Inventory Grid",
 	description = "Shows a grid over the inventory and a preview of where items will be dragged",
 	tags = {"items", "overlay"},
 	enabledByDefault = false

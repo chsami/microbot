@@ -18,7 +18,7 @@ public class InventorySetupsUpdateNewsPanel extends JPanel
 
 	InventorySetupsUpdateNewsPanel(InventorySetupsPlugin plugin, InventorySetupsPluginPanel panel)
 	{
-		final JLabel welcomeText = new JLabel("Rs2Inventory Setups " + plugin.getCurrentVersionString());
+		final JLabel welcomeText = new JLabel("Inventory Setups " + plugin.getCurrentVersionString());
 		welcomeText.setFont(FontManager.getRunescapeBoldFont());
 		welcomeText.setHorizontalAlignment(JLabel.CENTER);
 

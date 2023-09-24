@@ -193,7 +193,7 @@ public class DevToolsPlugin extends Plugin
 		varInspector = new DevToolsButton("Var Inspector");
 		soundEffects = new DevToolsButton("Sound Effects");
 		scriptInspector = new DevToolsButton("Script Inspector");
-		inventoryInspector = new DevToolsButton("Rs2Inventory Inspector");
+		inventoryInspector = new DevToolsButton("Inventory Inspector");
 		roofs = new DevToolsButton("Roofs");
 		shell = new DevToolsButton("Shell");
 		menus = new DevToolsButton("Menus");
