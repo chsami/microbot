@@ -33,14 +33,18 @@ class GriffinCombatPlugin : Plugin() {
     }
 
     @Inject
-    lateinit var trainerScript: GriffinCombatScript
+    lateinit var combatScript: GriffinCombatScript
     override fun startUp() {
+        countLabel = ""
+        count = 0
+        GriffinCombatScript.state = GriffinCombatScript.State.SETUP
+
         overlayManager.add(overlay)
-        trainerScript.run(config)
+        combatScript.run(config)
     }
 
     override fun shutDown() {
-        trainerScript.shutdown()
+        combatScript.shutdown()
         overlayManager.remove(overlay)
     }
 }

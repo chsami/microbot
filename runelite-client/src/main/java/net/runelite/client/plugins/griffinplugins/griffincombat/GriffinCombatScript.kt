@@ -27,10 +27,10 @@ class GriffinCombatScript : Script() {
     companion object {
         private val LUMBRIDGE_CHICKENS_WORLD_AREA = WorldArea(3225, 3287, 12, 15, 0)
         private val LUMBRIDGE_COWS_WORLD_AREA = WorldArea(3255, 3258, 9, 37, 0)
+        var state: State = State.SETUP
     }
 
     lateinit var config: GriffinCombatConfig
-    var state: State = State.SETUP
 
     enum class State {
         SETUP, WAITING, FIGHTING, LOOTING
