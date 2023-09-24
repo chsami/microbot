@@ -265,12 +265,14 @@ public class Pathfinder implements Runnable {
     }
 
     public void run() {
-        if (Microbot.getClient().getCameraPitch() < 370) {
-            Microbot.getClient().setCameraPitchTarget(Random.random(370, 400));
-        }
-        if (Microbot.getClient().getScale() > 500) {
-            Microbot.getMouse().scrollDown(new Point(1, 1));
-            Microbot.getMouse().scrollDown(new Point(1, 1));
+        if (this.executeWalking) {
+            if (Microbot.getClient().getCameraPitch() < 370) {
+                Microbot.getClient().setCameraPitchTarget(Random.random(370, 400));
+            }
+            if (Microbot.getClient().getScale() > 500) {
+                Microbot.getMouse().scrollDown(new Point(1, 1));
+                Microbot.getMouse().scrollDown(new Point(1, 1));
+            }
         }
         if (handleTransports()) {
             done = true;

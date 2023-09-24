@@ -2,15 +2,11 @@ package net.runelite.client.plugins.microbot.util.inventory;
 
 import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.GameObject;
-import net.runelite.api.ItemComposition;
-import net.runelite.api.Point;
-import net.runelite.api.TileObject;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.bank.models.BankItemWidget;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;

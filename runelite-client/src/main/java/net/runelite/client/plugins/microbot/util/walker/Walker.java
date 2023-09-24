@@ -82,6 +82,11 @@ public class Walker {
 
         LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
 
+        while (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getMouse().scrollDown(new Point(1, 1));
+            sleep(100, 300);
+        }
+
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
         canvasX = canv != null ? canv.getX() : -1;
         canvasY = canv != null ? canv.getY() : -1;
@@ -100,6 +105,11 @@ public class Walker {
      */
     public void walkFastLocal(LocalPoint localPoint) {
 
+        while (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getMouse().scrollDown(new Point(1, 1));
+            sleep(100, 300);
+        }
+
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
         canvasX = canv != null ? canv.getX() : -1;
         canvasY = canv != null ? canv.getY() : -1;
@@ -112,6 +122,11 @@ public class Walker {
     }
 
     public void walkFastCanvas(WorldPoint worldPoint) {
+        while (!Calculations.tileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), worldPoint))) {
+            Microbot.getMouse().scrollDown(new Point(1, 1));
+            sleep(100, 300);
+        }
+
         Point canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY()), Microbot.getClient().getPlane());
         canvasX = canv != null ? canv.getX() : -1;
         canvasY = canv != null ? canv.getY() : -1;
