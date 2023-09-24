@@ -54,13 +54,11 @@ class GriffinCombatScript : Script() {
                 val minimumSkillRequirement = minimumSkillRequirement
 
                 if (minimumSkillRequirement < 10) {
-                    Microbot.status = "Fighting Chickens"
-                    GriffinCombatPlugin.countLabel = "Chickens Killed"
+                    updateCounts("Fighting Chickens", "Chickens Killed")
                     fightNPC(LUMBRIDGE_CHICKENS_WORLD_AREA, WorldDestinations.LUMBRIDGE_CHICKENS.worldPoint, "chicken", listOf(ItemID.FEATHER, ItemID.BONES))
 
                 } else if (minimumSkillRequirement < 99) {
-                    Microbot.status = "Fighting Cows"
-                    GriffinCombatPlugin.countLabel = "Cows Killed"
+                    updateCounts("Fighting Cows", "Cows Killed")
                     fightNPC(LUMBRIDGE_COWS_WORLD_AREA, WorldDestinations.LUMBRIDGE_COWS.worldPoint, "cow", listOf(ItemID.COWHIDE, ItemID.BONES))
 
                 } else {
@@ -73,6 +71,15 @@ class GriffinCombatScript : Script() {
             }
         }, 0, 400, TimeUnit.MILLISECONDS)
         return true
+    }
+
+    fun updateCounts(status: String, countLabel: String) {
+        if (GriffinCombatPlugin.countLabel != countLabel) {
+            GriffinCombatPlugin.count = 0
+        }
+
+        Microbot.status = status
+        GriffinCombatPlugin.countLabel = countLabel
     }
 
     fun getBankLocation(): WorldPoint {
