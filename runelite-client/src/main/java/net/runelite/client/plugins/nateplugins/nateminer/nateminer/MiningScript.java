@@ -3,7 +3,7 @@ package net.runelite.client.plugins.nateplugins.nateminer.nateminer;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,11 +18,11 @@ public class MiningScript extends Script {
 
             try {
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
-                if (Inventory.isFull()) {
+                if (Rs2Inventory.isFull()) {
                     if (config.hasPickaxeInventory()) {
-                        Inventory.dropAllStartingFrom(1);
+                        Rs2Inventory.dropAllStartingFrom(1);
                     } else {
-                        Inventory.dropAll();
+                        Rs2Inventory.dropAll();
                     }
                     return;
                 }

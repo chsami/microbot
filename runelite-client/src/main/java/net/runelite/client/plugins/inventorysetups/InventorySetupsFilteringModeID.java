@@ -33,7 +33,7 @@ public enum InventorySetupsFilteringModeID
 	// All items
 	ALL(0),
 
-	// Only Inventory
+	// Only Rs2Inventory
 	INVENTORY(1),
 
 	// Only Equipment

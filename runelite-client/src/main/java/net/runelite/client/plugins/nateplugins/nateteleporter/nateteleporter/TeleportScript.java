@@ -4,10 +4,9 @@ import net.runelite.api.Skill;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +29,7 @@ public class TeleportScript extends Script {
                 if (config.highAlchemy()) {
                     sleep(600, 800);
 
-                    Widget item = Inventory.findItemInMemory(config.highAlchemyItem());
+                    Widget item = Rs2Inventory.findItemInMemory(config.highAlchemyItem());
                     if (item == null) {
                         Microbot.showMessage("Item: " + config.highAlchemyItem() + " not found in your inventory.");
                         return;

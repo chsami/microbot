@@ -4,7 +4,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -50,7 +50,7 @@ public class GrandExchange {
     public static boolean openExchange() {
         Microbot.status = "Opening Grand Exchange";
         try {
-            if (Inventory.isUsingItem())
+            if (Rs2Inventory.isUsingItem())
                 Microbot.getMouse().click();
             if (isOpen()) return true;
             NPC npc = Rs2Npc.getNpc("Grand Exchange Clerk");

@@ -10,7 +10,7 @@ import net.runelite.client.plugins.microbot.fletching.enums.FletchingItem;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingMaterial;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingMode;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -50,18 +50,18 @@ public class FletchingScript extends Script {
 
                 if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
                     secondaryItemToFletch = (model.getFletchingMaterial().getName() + " logs").trim();
-                    hasRequirementsToFletch = Inventory.hasItem(primaryItemToFletch)
-                            && Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired());
-                    hasRequirementsToBank = !Inventory.hasItem(primaryItemToFletch)
-                            || !Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired());
+                    hasRequirementsToFletch = Rs2Inventory.hasItem(primaryItemToFletch)
+                            && Rs2Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired());
+                    hasRequirementsToBank = !Rs2Inventory.hasItem(primaryItemToFletch)
+                            || !Rs2Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired());
                 } else {
                     secondaryItemToFletch = config.fletchingMode() == FletchingMode.STRUNG
                             ? config.fletchingMaterial().getName() + " " + config.fletchingItem().getContainsInventoryName() + " (u)"
                             : (config.fletchingMaterial().getName() + " logs").trim();
-                    hasRequirementsToFletch = Inventory.hasItem(primaryItemToFletch)
-                            && Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired());
-                    hasRequirementsToBank = !Inventory.hasItem(primaryItemToFletch)
-                            || !Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired());
+                    hasRequirementsToFletch = Rs2Inventory.hasItem(primaryItemToFletch)
+                            && Rs2Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired());
+                    hasRequirementsToBank = !Rs2Inventory.hasItem(primaryItemToFletch)
+                            || !Rs2Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired());
                 }
 
 
@@ -90,7 +90,7 @@ public class FletchingScript extends Script {
         } else {
             Rs2Bank.depositAllContains(config.fletchingItem().getContainsInventoryName());
         }
-        sleepUntilOnClientThread(() -> !Inventory.hasItemContains(config.fletchingItem().getContainsInventoryName()));
+        sleepUntilOnClientThread(() -> !Rs2Inventory.hasItemContains(config.fletchingItem().getContainsInventoryName()));
 
 
         Rs2Bank.withdrawItemX(true, primaryItemToFletch, config.fletchingMode().getAmount());
@@ -109,13 +109,13 @@ public class FletchingScript extends Script {
 
         final String finalSecondaryItemToFletch = secondaryItemToFletch;
 
-        sleepUntilOnClientThread(() -> Inventory.hasItem(finalSecondaryItemToFletch));
+        sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(finalSecondaryItemToFletch));
         sleep(600, 3000);
         Rs2Bank.closeBank();
     }
 
     private void fletch(FletchingConfig config) {
-        Inventory.useItemOnItem(primaryItemToFletch, secondaryItemToFletch);
+        Rs2Inventory.useItemOnItem(primaryItemToFletch, secondaryItemToFletch);
         sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694736) != null);
         if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
             keyPress(model.getFletchingItem().getOption(model.getFletchingMaterial(), config.fletchingMode()));
@@ -124,9 +124,9 @@ public class FletchingScript extends Script {
         }
         sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694736) == null);
         if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
-            sleepUntilOnClientThread(() -> !Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired()), 60000);
+            sleepUntilOnClientThread(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired()), 60000);
         } else {
-            sleepUntilOnClientThread(() -> !Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired()), 60000);
+            sleepUntilOnClientThread(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired()), 60000);
         }
     }
 

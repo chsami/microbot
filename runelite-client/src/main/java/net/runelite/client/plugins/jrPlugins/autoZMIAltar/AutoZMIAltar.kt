@@ -20,7 +20,7 @@ import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
@@ -225,7 +225,7 @@ class AutoZMIAltar : Plugin() {
         sleep(2400, 3000)
         emptyPouches()
         totalRuns += 1
-        Inventory.interact(config.TELEPORT().toString())
+        Rs2Inventory.interact(config.TELEPORT().toString())
         sleep(5400, 6000)
         if (totalRuns % config.fixPouchesAt() == 0) fixPouches()
         if (config.STAMINA().toString() == "Ornate Pool") {
@@ -258,53 +258,53 @@ class AutoZMIAltar : Plugin() {
     }
 
     private fun fillPouches() {
-        if (Inventory.hasItem("Giant Pouch") && Inventory.hasItemAmount("Pure essence", 12) && !giantPouchFilled) {
-            Inventory.interact("Giant Pouch", "fill")
+        if (Rs2Inventory.hasItem("Giant Pouch") && Rs2Inventory.hasItemAmount("Pure essence", 12) && !giantPouchFilled) {
+            Rs2Inventory.interact("Giant Pouch", "fill")
             sleep(50, 100)
             giantPouchFilled = true
         }
-        if (Inventory.hasItem("Small Pouch") && Inventory.hasItemAmount("Pure essence", 3) && !smallPouchFilled) {
-            Inventory.interact("Small Pouch", "fill")
+        if (Rs2Inventory.hasItem("Small Pouch") && Rs2Inventory.hasItemAmount("Pure essence", 3) && !smallPouchFilled) {
+            Rs2Inventory.interact("Small Pouch", "fill")
             sleep(50, 100)
             smallPouchFilled = true
         }
-        if (Inventory.hasItem("Medium Pouch") && Inventory.hasItemAmount("Pure essence", 6) && !mediumPouchFilled) {
-            Inventory.interact("Medium Pouch", "fill")
+        if (Rs2Inventory.hasItem("Medium Pouch") && Rs2Inventory.hasItemAmount("Pure essence", 6) && !mediumPouchFilled) {
+            Rs2Inventory.interact("Medium Pouch", "fill")
             sleep(50, 100)
             mediumPouchFilled = true
         }
-        if (Inventory.hasItem("Large Pouch") && Inventory.hasItemAmount("Pure essence", 9) && !largePouchFilled) {
-            Inventory.interact("Large Pouch", "fill")
+        if (Rs2Inventory.hasItem("Large Pouch") && Rs2Inventory.hasItemAmount("Pure essence", 9) && !largePouchFilled) {
+            Rs2Inventory.interact("Large Pouch", "fill")
             sleep(50, 100)
             largePouchFilled = true
         }
     }
 
     private fun emptyPouches() {
-        if (Inventory.hasItem("Large Pouch")) {
-            Inventory.useAllItemsFastContains("Large Pouch", "Empty")
+        if (Rs2Inventory.hasItem("Large Pouch")) {
+            Rs2Inventory.useAllItemsFastContains("Large Pouch", "Empty")
             sleep(1200, 1300)
             largePouchFilled = false
             Rs2GameObject.interact(29631, "Craft-rune")
             sleep(600, 800)
         }
-        if (Inventory.hasItem("Medium Pouch")) {
-            Inventory.useAllItemsFastContains("Medium Pouch", "Empty")
+        if (Rs2Inventory.hasItem("Medium Pouch")) {
+            Rs2Inventory.useAllItemsFastContains("Medium Pouch", "Empty")
             sleep(1200, 1300)
             mediumPouchFilled = false
             Rs2GameObject.interact(29631, "Craft-rune")
             sleep(600, 800)
         }
-        if (Inventory.hasItem("Small Pouch")) {
-            Inventory.useAllItemsFastContains("Small Pouch", "Empty")
+        if (Rs2Inventory.hasItem("Small Pouch")) {
+            Rs2Inventory.useAllItemsFastContains("Small Pouch", "Empty")
             sleep(1200, 1300)
             smallPouchFilled = false
             Rs2GameObject.interact(29631, "Craft-rune")
             sleep(600, 800)
         }
-        if (Inventory.hasItem("Giant Pouch")) {
+        if (Rs2Inventory.hasItem("Giant Pouch")) {
             for (i in 0..1){
-                Inventory.useAllItemsFastContains("Giant Pouch", "Empty")
+                Rs2Inventory.useAllItemsFastContains("Giant Pouch", "Empty")
                 sleep(1200, 1300)
                 Rs2GameObject.interact(29631, "Craft-rune")
                 sleep(600, 800)

@@ -5,7 +5,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 
 import java.awt.event.KeyEvent;
@@ -26,7 +26,7 @@ public class GemsScript extends Script {
                     return;
                 }
                 final String uncutGemName = "uncut " + config.gemType().getName();
-                if (!Inventory.hasItem("uncut " + config.gemType().getName()) || !Inventory.hasItem("chisel")) {
+                if (!Rs2Inventory.hasItem("uncut " + config.gemType().getName()) || !Rs2Inventory.hasItem("chisel")) {
                     Rs2Bank.openBank();
                     if (Rs2Bank.isOpen()) {
                         Rs2Bank.depositAll("crushed gem");
@@ -42,12 +42,12 @@ public class GemsScript extends Script {
                         sleepUntil(() -> !Rs2Bank.isOpen());
                     }
                 } else {
-                    Inventory.useItem("chisel");
-                    Inventory.useItem(uncutGemName);
+                    Rs2Inventory.useItem("chisel");
+                    Rs2Inventory.useItem(uncutGemName);
                     sleep(600);
                     VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
                     sleep(4000);
-                    sleepUntil(() -> !Microbot.isGainingExp || !Inventory.hasItem(uncutGemName), 30000);
+                    sleepUntil(() -> !Microbot.isGainingExp || !Rs2Inventory.hasItem(uncutGemName), 30000);
                 }
 
             } catch (Exception ex) {

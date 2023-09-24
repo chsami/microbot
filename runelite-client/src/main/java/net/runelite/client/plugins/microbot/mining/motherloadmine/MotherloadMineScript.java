@@ -11,7 +11,7 @@ import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMMinin
 import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMStatus;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -42,13 +42,13 @@ boolean emptySack = false;
                     return;
                 }
 
-                if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 80 || (emptySack && !Inventory.contains("pay-dirt"))) {
+                if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 80 || (emptySack && !Rs2Inventory.contains("pay-dirt"))) {
                     status = MLMStatus.EMPTY_SACK;
-                } else if (!Inventory.isFull()) {
+                } else if (!Rs2Inventory.isFull()) {
                     status = MLMStatus.MINING;
-                } else if (Inventory.isFull()) {
+                } else if (Rs2Inventory.isFull()) {
                     miningSpot = MLMMiningSpot.IDLE;
-                    if (Inventory.hasItem(ItemID.PAYDIRT)) {
+                    if (Rs2Inventory.hasItem(ItemID.PAYDIRT)) {
                         if (Rs2GameObject.findObjectById(ObjectID.BROKEN_STRUT) != null) {
                             status = MLMStatus.FIXING_WATERWHEEL;
                         } else {
@@ -73,9 +73,9 @@ boolean emptySack = false;
                         break;
                     case EMPTY_SACK:
                         while (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 10) {
-                            if (Inventory.count() <= 1) {
+                            if (Rs2Inventory.count() <= 1) {
                                 Rs2GameObject.interact(SACKID);
-                                sleepUntil(Inventory::isFull, 10000);
+                                sleepUntil(Rs2Inventory::isFull, 10000);
                             }
                             bank();
                         }
@@ -87,7 +87,7 @@ boolean emptySack = false;
                         break;
                     case DEPOSIT_HOPPER:
                         if (Rs2GameObject.interact(ObjectID.HOPPER_26674)) {
-                            sleepUntil(() -> !Inventory.isFull());
+                            sleepUntil(() -> !Rs2Inventory.isFull());
                             if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 50) {
                                 emptySack = true;
                             }

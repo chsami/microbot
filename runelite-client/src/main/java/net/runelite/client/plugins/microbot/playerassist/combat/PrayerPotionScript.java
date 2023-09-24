@@ -5,22 +5,22 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
 
 public class PrayerPotionScript extends Script {
     @Inject
-    Inventory inventory;
+    Rs2Inventory rs2Inventory;
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
                 if (!config.togglePrayerPotions()) return;
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) > 40) return;
-                Inventory.open();
-                Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> inventory.getPotions());
+                Rs2Inventory.open();
+                Widget[] potions = Microbot.getClientThread().runOnClientThread(() -> rs2Inventory.getPotions());
                 if (potions == null || potions.length == 0) {
                     Microbot.getNotifier().notify("No more prayer potions left");
                     return;

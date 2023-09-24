@@ -6,7 +6,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -22,13 +22,13 @@ public class SummerGardenScript extends Script {
             if (!super.run()) return;
             try {
 
-                if (!Inventory.hasItem("beer glass") || !Inventory.hasItem("Pestle and mortar")) {
+                if (!Rs2Inventory.hasItem("beer glass") || !Rs2Inventory.hasItem("Pestle and mortar")) {
                     Microbot.showMessage("You need a pestle and mortar and beer glass.");
                 }
 
-                if (Inventory.hasItemAmount("Summer sq'irk", 2)) {
-                    Inventory.useItem("Pestle and mortar");
-                    Inventory.useItem("Summer sq'irk");
+                if (Rs2Inventory.hasItemAmount("Summer sq'irk", 2)) {
+                    Rs2Inventory.useItem("Pestle and mortar");
+                    Rs2Inventory.useItem("Summer sq'irk");
                 }
 
                 if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(startingPosition)) {

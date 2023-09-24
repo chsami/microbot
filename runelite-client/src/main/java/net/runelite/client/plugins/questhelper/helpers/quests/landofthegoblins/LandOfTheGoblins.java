@@ -432,7 +432,7 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		noPet = new NoFollowerRequirement("No pet following you");
 		combatGear = new ItemRequirement("Combat gear", -1, -1);
 
-		invSpaceToUnequip = new ItemRequirement("Inventory space to unequip all your items", -1, -1);
+		invSpaceToUnequip = new ItemRequirement("Rs2Inventory space to unequip all your items", -1, -1);
 		noEquippedItems = new NoItemRequirement("No equipped items", ItemSlots.ANY_EQUIPPED);
 
 		recommendedCombatLevel = new CombatLevelRequirement(65);

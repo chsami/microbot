@@ -9,7 +9,7 @@ import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.Farm
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -108,8 +108,8 @@ public class FarmingScript extends Script {
                         if (plantTree(config, 19147, NpcID.PRISSY_SCILLA, 3, FarmingState.FARMING_VARROCK)) return;
                     }
                 } else if (state == FarmingState.FARMING_VARROCK) {
-                    if (Inventory.hasItemAmountStackable("varrock teleport", 2)) {
-                        Inventory.useItem(ItemID.VARROCK_TELEPORT);
+                    if (Rs2Inventory.hasItemAmountStackable("varrock teleport", 2)) {
+                        Rs2Inventory.useItem(ItemID.VARROCK_TELEPORT);
                         sleep(sleepBetweenTeleports);
                         return;
                     }
@@ -120,8 +120,8 @@ public class FarmingScript extends Script {
 
                     if (plantTree(config, 8390, NpcID.TREZNOR_11957, 2, FarmingState.FARMING_FALADOR)) return;
                 } else if (state == FarmingState.FARMING_FALADOR) {
-                    if (Inventory.hasItem(ItemID.FALADOR_TELEPORT)) {
-                        Inventory.useItem(ItemID.FALADOR_TELEPORT);
+                    if (Rs2Inventory.hasItem(ItemID.FALADOR_TELEPORT)) {
+                        Rs2Inventory.useItem(ItemID.FALADOR_TELEPORT);
                         sleep(sleepBetweenTeleports);
                         return;
                     }
@@ -133,8 +133,8 @@ public class FarmingScript extends Script {
                     if (plantTree(config, 8389, NpcID.HESKEL, 1, FarmingState.FARMING_LUMBRIDGE)) return;
 
                 } else if (state == FarmingState.FARMING_LUMBRIDGE) {
-                    if (Inventory.hasItem(ItemID.LUMBRIDGE_TELEPORT)) {
-                        Inventory.useItem(ItemID.LUMBRIDGE_TELEPORT);
+                    if (Rs2Inventory.hasItem(ItemID.LUMBRIDGE_TELEPORT)) {
+                        Rs2Inventory.useItem(ItemID.LUMBRIDGE_TELEPORT);
                         sleep(sleepBetweenTeleports);
                         return;
                     }
@@ -146,8 +146,8 @@ public class FarmingScript extends Script {
 
                     if (plantTree(config, 8391, NpcID.FAYETH, 0, FarmingState.FINISHED)) return;
                 } else if (state == FarmingState.FINISHED) {
-                    if (Inventory.hasItem(ItemID.VARROCK_TELEPORT)) {
-                        Inventory.useItem(ItemID.VARROCK_TELEPORT);
+                    if (Rs2Inventory.hasItem(ItemID.VARROCK_TELEPORT)) {
+                        Rs2Inventory.useItem(ItemID.VARROCK_TELEPORT);
                         sleep(sleepBetweenTeleports);
                         return;
                     }
@@ -187,7 +187,7 @@ public class FarmingScript extends Script {
                             && !Rs2GameObject.hasAction(tree, "check-health")
                             && tree.getImpostor().getName().toLowerCase().equals(config.farmingMaterial().getName().toLowerCase())) {
                         Rs2Npc.interact(npcId, "pay");
-                        sleepUntil(() -> Inventory.hasItemAmountStackable(config.farmingMaterial().getProtectionItem(), totalItemsForNextStep));
+                        sleepUntil(() -> Rs2Inventory.hasItemAmountStackable(config.farmingMaterial().getProtectionItem(), totalItemsForNextStep));
                     }
                 }
             } else {
@@ -195,8 +195,8 @@ public class FarmingScript extends Script {
                 if (!RakeAndPlantTree(objectId, config.farmingMaterial().getItemName(), tree)) return true;
             }
 
-            if (Inventory.hasItemAmountExact(config.farmingMaterial().getItemName(), totalItemsForNextStep) &&
-                    Inventory.hasItemAmountExact(config.farmingMaterial().getProtectionItem(), totalItemsForNextStep)) {
+            if (Rs2Inventory.hasItemAmountExact(config.farmingMaterial().getItemName(), totalItemsForNextStep) &&
+                    Rs2Inventory.hasItemAmountExact(config.farmingMaterial().getProtectionItem(), totalItemsForNextStep)) {
                 //new state
                 state = nextState;
             }
@@ -218,13 +218,13 @@ public class FarmingScript extends Script {
             sleep(2000);
             sleepUntil(() -> !Microbot.isAnimating());
         } else {
-            Inventory.useItem(treeToPlant);
+            Rs2Inventory.useItem(treeToPlant);
             boolean success = Rs2GameObject.interact(patchId);
             if (success) {
                 sleepUntil(() -> tree != null);
             }
         }
-        Inventory.dropAll("weeds");
+        Rs2Inventory.dropAll("weeds");
         return true;
     }
 

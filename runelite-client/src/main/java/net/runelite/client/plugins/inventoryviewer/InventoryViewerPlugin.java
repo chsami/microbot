@@ -34,7 +34,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.HotkeyListener;
 
 @PluginDescriptor(
-	name = "Inventory Viewer",
+	name = "Rs2Inventory Viewer",
 	description = "Add an overlay showing the contents of your inventory",
 	tags = {"alternate", "items", "overlay", "second"},
 	enabledByDefault = false

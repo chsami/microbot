@@ -16,7 +16,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
@@ -108,7 +108,7 @@ public class ThreeTickBarb extends Plugin {
     private void useGuam() {
         inProgress = true;
         sleep(13, 167);
-        Widget guamLeafWidget = Inventory.findItem("Guam leaf");
+        Widget guamLeafWidget = Rs2Inventory.findItem("Guam leaf");
         Microbot.getMouse().click(guamLeafWidget.getBounds());
 
         state = ThreeTickFishingState.UseTarAndDrop;
@@ -119,12 +119,12 @@ public class ThreeTickBarb extends Plugin {
         inProgress = true;
         sleep(18, 132);
 
-        Widget swampTarWidget = Inventory.findItem("Swamp tar");
+        Widget swampTarWidget = Rs2Inventory.findItem("Swamp tar");
         Microbot.getMouse().click(swampTarWidget.getBounds());
 
-        Widget inventoryItem = Inventory.findItemSlot(1);
-        boolean randomizeTriggered = Inventory.hasItemAmount(11328, random(1, 18));
-        if ((inventoryItem != null && isFish(inventoryItem) && randomizeTriggered) || (inventoryItem != null && Inventory.isFull())) {
+        Widget inventoryItem = Rs2Inventory.findItemSlot(1);
+        boolean randomizeTriggered = Rs2Inventory.hasItemAmount(11328, random(1, 18));
+        if ((inventoryItem != null && isFish(inventoryItem) && randomizeTriggered) || (inventoryItem != null && Rs2Inventory.isFull())) {
             VirtualKeyboard.holdShift();
             Microbot.getMouse().click(inventoryItem.getBounds());
             VirtualKeyboard.releaseShift();

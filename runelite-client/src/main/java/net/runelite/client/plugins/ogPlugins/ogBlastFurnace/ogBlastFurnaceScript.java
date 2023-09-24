@@ -8,7 +8,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -57,8 +57,8 @@ public class ogBlastFurnaceScript extends Script {
     private int getStamEffect() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.STAMINA_EFFECT));}
     private void stamPotUp() {
         Rs2Bank.withdrawItem(false,"Stamina potion(1)");
-        sleepUntil(() -> Inventory.hasItem(ItemID.STAMINA_POTION1),2000);
-        Inventory.useItemAction("Stamina potion(1)","drink");
+        sleepUntil(() -> Rs2Inventory.hasItem(ItemID.STAMINA_POTION1),2000);
+        Rs2Inventory.useItemAction("Stamina potion(1)","drink");
     }
     public boolean run(ogBlastFurnaceConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -80,21 +80,21 @@ public class ogBlastFurnaceScript extends Script {
     private void calcState(){
         Microbot.status = "Calculating State";
         if(barSelected == Bars.SILVER_BAR || barSelected == Bars.GOLD_BAR){
-            if(Inventory.isFull() && getBFPrimaryOre() > 20 && getBFBars() > 20){;botState = State.TO_MUCH_SUPPLIES;}
-            else if(Inventory.hasItem(barSelected.getBarID()) || ((getBFBars() < 26 || getBFPrimaryOre() < 26) && !Inventory.hasItem(barSelected.getPrimaryOre()))){;botState = State.BANKING;}
+            if(Rs2Inventory.isFull() && getBFPrimaryOre() > 20 && getBFBars() > 20){;botState = State.TO_MUCH_SUPPLIES;}
+            else if(Rs2Inventory.hasItem(barSelected.getBarID()) || ((getBFBars() < 26 || getBFPrimaryOre() < 26) && !Rs2Inventory.hasItem(barSelected.getPrimaryOre()))){;botState = State.BANKING;}
             else if(getBFBars() >= 26 && getBFPrimaryOre() >= 26){botState = State.RETRIEVING_ORE;}
-            else if(Inventory.hasItem(barSelected.getPrimaryOre())) {botState = State.LOADING_ORE;}
+            else if(Rs2Inventory.hasItem(barSelected.getPrimaryOre())) {botState = State.LOADING_ORE;}
             else {botState = State.WAITING;}
         }
     }
     private void loadConveyor() {
         Microbot.status = "Loading Conveyor";
         if(barSelected == Bars.SILVER_BAR || barSelected == Bars.GOLD_BAR){
-            if(Inventory.hasItem(barSelected.getPrimaryOre())){
+            if(Rs2Inventory.hasItem(barSelected.getPrimaryOre())){
                 Rs2GameObject.interact(9100);
-                sleepUntil(() -> !Inventory.hasItem(barSelected.getPrimaryOre()), 20000);
+                sleepUntil(() -> !Rs2Inventory.hasItem(barSelected.getPrimaryOre()), 20000);
                 callAFK(36,1000,3000);
-                if(!Inventory.hasItem(barSelected.getPrimaryOre())){
+                if(!Rs2Inventory.hasItem(barSelected.getPrimaryOre())){
                     walkToDispenser();
                 }
             }
@@ -130,22 +130,22 @@ public class ogBlastFurnaceScript extends Script {
             goldGlovesEquip();
             sleep(120,200);
         }
-        sleepUntil(() -> Inventory.hasItem(barSelected.getBarID()));
+        sleepUntil(() -> Rs2Inventory.hasItem(barSelected.getBarID()));
     }
     private void restock() {
         openChest();
         callAFK(27,1000,6000);
         sleepUntil(() -> Rs2Bank.isOpen());
         if( Rs2Bank.isOpen()) {
-            if(Inventory.hasItem(barSelected.getBarID())){
+            if(Rs2Inventory.hasItem(barSelected.getBarID())){
                 //TODO Fix useItemAction
-                //Inventory.useItemAction(barSelected.getBarID(), "deposit-all");
+                //Rs2Inventory.useItemAction(barSelected.getBarID(), "deposit-all");
                 Rs2Bank.depositAll(barSelected.getBarID());
             }
 //            Rs2Bank.scrollTo(Rs2Widget.findWidget(barName())); // FIXME: HONESTLY THIS IS SO OLD IT DOESN'T EVEN WORK
             if( getStamEffect() <= 10|| getRunEnergy() <= 40){stamPotUp();}
             Microbot.getMouse().click(Rs2Widget.findWidgetExact(barName()).getBounds());
-            sleepUntil(() -> Inventory.hasItem(ItemID.GOLD_ORE));
+            sleepUntil(() -> Rs2Inventory.hasItem(ItemID.GOLD_ORE));
             sleep(50,80);
             VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
             sleepUntil(() -> !Rs2Bank.isOpen());
@@ -163,7 +163,7 @@ public class ogBlastFurnaceScript extends Script {
     private void depositOverflow() {
         openChest();
         sleepUntil(() -> Rs2Bank.isOpen());
-        //if(Inventory.hasItem(barSelected.getBarID())){ Inventory.useItemAction(barSelected.getBarID(), new String[]{"deposit-all"});}
+        //if(Rs2Inventory.hasItem(barSelected.getBarID())){ Rs2Inventory.useItemAction(barSelected.getBarID(), new String[]{"deposit-all"});}
         Rs2Bank.depositAll(barSelected.getBarID());
         Rs2Bank.depositAll(barSelected.getPrimaryOre());
         sleep(50,80);

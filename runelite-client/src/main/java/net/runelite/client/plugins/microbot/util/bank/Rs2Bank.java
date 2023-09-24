@@ -12,7 +12,7 @@ import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.bank.models.BankItemWidget;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
@@ -63,13 +63,13 @@ public class Rs2Bank {
 
     public static boolean withdrawItem(boolean checkInventory, String itemName) {
         Microbot.status = "Withdrawing one " + itemName;
-        if (checkInventory && Inventory.hasItem(itemName)) return true;
+        if (checkInventory && Rs2Inventory.hasItem(itemName)) return true;
         return BetterBank.withdrawOneFast(itemName);
     }
 
     public static boolean withdrawItem(boolean checkInventory, int itemId) {
         Microbot.status = "Withdrawing one " + itemId;
-        if (checkInventory && Inventory.hasItem(itemId)) return true;
+        if (checkInventory && Rs2Inventory.hasItem(itemId)) return true;
         return BetterBank.withdrawOneFast(itemId);
     }
 
@@ -80,19 +80,19 @@ public class Rs2Bank {
 
     public static boolean withdrawItemX(boolean checkInventory, String itemName, int amount) {
         Microbot.status = "Withdrawing " + amount + " " + itemName;
-        if (checkInventory && Inventory.hasItem(itemName)) return true;
+        if (checkInventory && Rs2Inventory.hasItem(itemName)) return true;
         return BetterBank.withdrawXFast(itemName, amount);
     }
 
     public static boolean withdrawItemX(boolean checkInventory, int itemId, int amount) {
         Microbot.status = "Withdrawing " + amount + " " + itemId;
-        if (checkInventory && Inventory.hasItem(itemId)) return true;
+        if (checkInventory && Rs2Inventory.hasItem(itemId)) return true;
         return BetterBank.withdrawXFast(itemId, amount);
     }
 
     public static boolean withdrawItemAll(boolean checkInventory, String itemName) {
         Microbot.status = "Withdrawing All " + itemName;
-        if (checkInventory && Inventory.hasItem(itemName)) return true;
+        if (checkInventory && Rs2Inventory.hasItem(itemName)) return true;
         return BetterBank.withdrawAllFast(itemName);
     }
 
@@ -128,7 +128,7 @@ public class Rs2Bank {
     public static boolean withdrawItemsRequired(List<ItemRequirement> itemsRequired) {
         List<ItemRequirement> itemsMissing = new ArrayList<>();
         for (ItemRequirement item : itemsRequired) {
-            if (!Inventory.hasItemAmount(item.getId(), item.getQuantity()) && !Inventory.hasItemAmountStackable(item.getName(), item.getQuantity())) {
+            if (!Rs2Inventory.hasItemAmount(item.getId(), item.getQuantity()) && !Rs2Inventory.hasItemAmountStackable(item.getName(), item.getQuantity())) {
                 itemsMissing.add(item);
             }
         }
@@ -209,7 +209,7 @@ public class Rs2Bank {
         Microbot.status = "Opening bank";
         try {
             if (isOpen()) return true;
-            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+            if (Rs2Inventory.isUsingItem()) Microbot.getMouse().click();
 
             NPC npc = Rs2Npc.getNpc("banker");
             if (npc == null) return false;
@@ -229,7 +229,7 @@ public class Rs2Bank {
         Microbot.status = "Opening bank";
         try {
             if (isOpen()) return true;
-            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+            if (Rs2Inventory.isUsingItem()) Microbot.getMouse().click();
 
             if (npc == null) return false;
 
@@ -248,7 +248,7 @@ public class Rs2Bank {
         Microbot.status = "Opening bank";
         try {
             if (isOpen()) return true;
-            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+            if (Rs2Inventory.isUsingItem()) Microbot.getMouse().click();
 
             if (object == null) return false;
 
@@ -306,7 +306,7 @@ public class Rs2Bank {
 
     public static boolean hasItems(List<ItemRequirement> itemsRequired) {
         for (ItemRequirement item : itemsRequired) {
-            if (!Inventory.hasItemAmount(item.getId(), item.getQuantity()) && !Inventory.hasItemAmountStackable(item.getName(), item.getQuantity())) {
+            if (!Rs2Inventory.hasItemAmount(item.getId(), item.getQuantity()) && !Rs2Inventory.hasItemAmountStackable(item.getName(), item.getQuantity())) {
                 return false;
             }
         }

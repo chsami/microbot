@@ -692,7 +692,7 @@ public class WidgetIndices {
         public static final int TAB_COMBAT_OPTIONS_SPRITE = 58;   // Interactions: Combat Options
         public static final int TAB_SKILLS_SPRITE = 59;           // Interactions: Skills
         public static final int TAB_QUEST_LIST_SPRITE = 60;       // Interactions: Leagues
-        public static final int TAB_INVENTORY_SPRITE = 61;        // Interactions: Inventory
+        public static final int TAB_INVENTORY_SPRITE = 61;        // Interactions: Rs2Inventory
         public static final int TAB_WORN_EQUIPMENT_SPRITE = 62;   // Interactions: Worn Equipment
         public static final int TAB_PRAYER_SPRITE = 63;           // Interactions: Prayer
         public static final int TAB_MAGIC_SPRITE = 64;            // Interactions: Magic, Disable spell filtering
@@ -831,7 +831,7 @@ public class WidgetIndices {
         public static final int TAB_COMBAT_OPTIONS_SPRITE = 51;   // Interactions: Combat Options
         public static final int TAB_SKILLS_SPRITE = 52;           // Interactions: Skills
         public static final int TAB_QUEST_LIST_SPRITE = 53;           // Interactions: Leagues
-        public static final int TAB_INVENTORY_SPRITE = 54;        // Interactions: Inventory
+        public static final int TAB_INVENTORY_SPRITE = 54;        // Interactions: Rs2Inventory
         public static final int TAB_WORN_EQUIPMENT_SPRITE= 55;    // Interactions: Worn Equipment
         public static final int TAB_PRAYER_SPRITE = 56;           // Interactions: Prayer
         public static final int TAB_MAGIC_SPRITE = 57;            // Interactions: Magic, Disable spell filtering

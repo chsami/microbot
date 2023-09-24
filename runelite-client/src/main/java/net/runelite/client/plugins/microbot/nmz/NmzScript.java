@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.nmz;
 
-import net.runelite.api.MenuEntry;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
@@ -8,16 +7,14 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.api.ObjectID.TALL_TREE_14843;
 import static net.runelite.api.Varbits.NMZ_ABSORPTION;
 
 public class NmzScript extends Script {
@@ -46,20 +43,20 @@ public class NmzScript extends Script {
                            // Microbot.toggleSpecialAttack(25);
                         }
                         if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) == Microbot.getClient().getRealSkillLevel(Skill.ATTACK)
-                                && Inventory.hasItemContains("overload")) {
-                            Inventory.interact(new String[] {"overload (4)", "overload (3)", "overload (2)", "overload (1)"});
+                                && Rs2Inventory.hasItemContains("overload")) {
+                            Rs2Inventory.interact(new String[] {"overload (4)", "overload (3)", "overload (2)", "overload (1)"});
                             sleep(5000);
                         }
-                        if (Microbot.getVarbitValue(NMZ_ABSORPTION) < Random.random(300, 600) && Inventory.hasItemContains("absorption")) {
+                        if (Microbot.getVarbitValue(NMZ_ABSORPTION) < Random.random(300, 600) && Rs2Inventory.hasItemContains("absorption")) {
                             for (int i = 0; i < Random.random(1, 5); i++) {
-                                Inventory.interact(new String[] {"absorption (4)", "absorption (3)", "absorption (2)", "absorption (1)"});
+                                Rs2Inventory.interact(new String[] {"absorption (4)", "absorption (3)", "absorption (2)", "absorption (1)"});
                                 sleep(600, 1000);
                             }
                         }
                     }
                 } else {
                     if (isOutsideNmz) {
-                        if (!Inventory.hasItemAmountExact("overload (4)", 8)) {
+                        if (!Rs2Inventory.hasItemAmountExact("overload (4)", 8)) {
                             Rs2GameObject.interact(ObjectID.OVERLOAD_POTION, "Store");
                             sleep(1000);
                             if (Rs2Widget.hasWidget("Store all your overload potion?")) {
@@ -73,7 +70,7 @@ public class NmzScript extends Script {
                                 VirtualKeyboard.enter();
                             }
                         }
-                        if (!Inventory.hasItemAmountExact("absorption (4)", 20)) {
+                        if (!Rs2Inventory.hasItemAmountExact("absorption (4)", 20)) {
                             Rs2GameObject.interact(ObjectID.ABSORPTION_POTION, "Store");
                             sleep(1000);
                             if (Rs2Widget.hasWidget("Store all your absorption potion?")) {
@@ -87,7 +84,7 @@ public class NmzScript extends Script {
                                 VirtualKeyboard.enter();
                             }
                         }
-                        if (Inventory.hasItemAmount("overload (4)", 8) && Inventory.hasItemAmount("absorption (4)", 20)) {
+                        if (Rs2Inventory.hasItemAmount("overload (4)", 8) && Rs2Inventory.hasItemAmount("absorption (4)", 20)) {
                             Rs2GameObject.interact(26291, "drink");
                             sleepUntil(() -> Rs2Widget.hasWidget("Nightmare zone"));
                             Rs2Widget.clickWidget(8454150);

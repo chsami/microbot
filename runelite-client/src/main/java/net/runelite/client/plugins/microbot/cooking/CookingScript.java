@@ -8,7 +8,7 @@ import net.runelite.client.plugins.microbot.cooking.enums.CookingEnum;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -33,7 +33,7 @@ public class CookingScript extends Script {
 
                 String itemToCook = getItemToCook();
 
-                if (!Inventory.isFull() || !Inventory.hasItem(itemToCook)) {
+                if (!Rs2Inventory.isFull() || !Rs2Inventory.hasItem(itemToCook)) {
                     if (!Rs2Bank.isOpen()) {
                         boolean bankIsOnScreen = Rs2Bank.useBank();
                         if (!bankIsOnScreen) {
@@ -50,7 +50,7 @@ public class CookingScript extends Script {
                     }
                 }
 
-                if (Inventory.hasItem(itemToCook)) {
+                if (Rs2Inventory.hasItem(itemToCook)) {
                     Microbot.getWalker().walkMiniMap(new WorldPoint(3273 + random(-2, 2), 3180+ random(-2, 2), 0));
 
                     TileObject cookingRange = Rs2GameObject.findObjectById(gameObjectId);
@@ -69,9 +69,9 @@ public class CookingScript extends Script {
                         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
                         sleep(5000);
                         while (true) {
-                            long rawFoodCount = Inventory.getAmountForItem(itemToCook);
+                            long rawFoodCount = Rs2Inventory.getAmountForItem(itemToCook);
                             sleep(3000);
-                            if (rawFoodCount == Inventory.getAmountForItem(itemToCook))
+                            if (rawFoodCount == Rs2Inventory.getAmountForItem(itemToCook))
                                 break;
                         }
                     }

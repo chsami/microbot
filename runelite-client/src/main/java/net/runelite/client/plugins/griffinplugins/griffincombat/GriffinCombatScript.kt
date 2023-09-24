@@ -20,7 +20,7 @@ import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.tabs.Tab
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
@@ -221,7 +221,7 @@ class GriffinCombatScript : Script() {
                 foundItemIds.forEach { itemId: Int ->
                     println("Equipping item $itemId")
                     if (!Rs2Equipment.hasEquipped(itemId)) {
-                        Inventory.getInventoryItem(itemId)?.let {
+                        Rs2Inventory.getInventoryItem(itemId)?.let {
                             Microbot.getMouseForKotlin().click(it.bounds)
                             Global.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
                         }
@@ -247,12 +247,12 @@ class GriffinCombatScript : Script() {
 
             State.LOOTING -> {
                 if (config.collectItems()) {
-                    if (Inventory.isFull()) {
+                    if (Rs2Inventory.isFull()) {
                         buryBones()
                         Global.sleep(200)
                     }
 
-                    if (Inventory.isFull()) {
+                    if (Rs2Inventory.isFull()) {
                         Microbot.getWalkerForKotlin().hybridWalkTo(getBankLocation())
                         Rs2Bank.openBank()
                         if (Rs2Bank.isOpen()) {
@@ -270,11 +270,11 @@ class GriffinCombatScript : Script() {
     }
 
     private fun buryBones() {
-        while (Inventory.hasItem(ItemID.BONES)) {
-            val inventoryCount = Inventory.count()
-            Inventory.useItemAction(ItemID.BONES, "Bury")
+        while (Rs2Inventory.hasItem(ItemID.BONES)) {
+            val inventoryCount = Rs2Inventory.count()
+            Rs2Inventory.useItemAction(ItemID.BONES, "Bury")
             Global.sleep(600)
-            Global.sleepUntilTrue({ Inventory.count() == inventoryCount - 1 && !Rs2Player.isInteracting() }, 100, 3000)
+            Global.sleepUntilTrue({ Rs2Inventory.count() == inventoryCount - 1 && !Rs2Player.isInteracting() }, 100, 3000)
         }
     }
 
@@ -314,7 +314,7 @@ class GriffinCombatScript : Script() {
 
     private val getRequiredWeaponFromInventory: Widget?
         get() {
-            val inventoryItems = Inventory.getInventoryItems()
+            val inventoryItems = Rs2Inventory.getInventoryItems()
             getInventoryRequirements().getItemSets()
                 .map { dynamicItemSet: DynamicItemSet -> dynamicItemSet.getItems() }
                 .flatten()

@@ -87,7 +87,7 @@ import static net.runelite.client.plugins.inventorysetups.ui.InventorySetupsRune
 
 
 @PluginDescriptor(
-		name = "Inventory Setups",
+		name = "Rs2Inventory Setups",
 		description = "Save gear setups for specific activities"
 )
 
@@ -689,7 +689,7 @@ public class InventorySetupsPlugin extends Plugin
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "inventorysetups_icon.png");
 
 		navButton = NavigationButton.builder()
-				.tooltip("Inventory Setups")
+				.tooltip("Rs2Inventory Setups")
 				.icon(icon)
 				.priority(6)
 				.panel(panel)
@@ -1182,7 +1182,7 @@ public class InventorySetupsPlugin extends Plugin
 						postTitle += "All Items";
 						break;
 					case INVENTORY:
-						postTitle += "Inventory";
+						postTitle += "Rs2Inventory";
 						break;
 					case EQUIPMENT:
 						postTitle += "Equipment";
@@ -1192,7 +1192,7 @@ public class InventorySetupsPlugin extends Plugin
 						break;
 				}
 				Widget bankTitle = client.getWidget(WidgetInfo.BANK_TITLE_BAR);
-				bankTitle.setText("Inventory Setup <col=ff0000>" + panel.getCurrentSelectedSetup().getName() + postTitle + "</col>");
+				bankTitle.setText("Rs2Inventory Setup <col=ff0000>" + panel.getCurrentSelectedSetup().getName() + postTitle + "</col>");
 			}
 		}
 		else if (event.getScriptId() == ScriptID.BANKMAIN_SEARCH_TOGGLE)

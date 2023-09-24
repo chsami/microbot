@@ -4,7 +4,7 @@ import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.models.RS2Item
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 
@@ -32,7 +32,7 @@ class ItemHelper {
                 val standingOnItem = player.worldLocation.equals(entry.key)
 
                 entry.value.forEach { rsGroundItem: RS2Item ->
-                    if (Inventory.isFull()) {
+                    if (Rs2Inventory.isFull()) {
                         return true
                     }
 
@@ -43,7 +43,7 @@ class ItemHelper {
                             Microbot.getWalkerForKotlin().hybridWalkTo(rsGroundItem.tile.worldLocation)
                         }
 
-                        val inventoryCount = Inventory.count()
+                        val inventoryCount = Rs2Inventory.count()
                         if (Rs2GroundItem.interact(rsGroundItem)) {
                             if (!standingOnItem) {
                                 Global.sleepUntilTrue({ !Rs2Player.isWalking() }, 50, 3000)
@@ -51,7 +51,7 @@ class ItemHelper {
 
                             Global.sleepUntilTrue({ !Rs2Player.isWalking() && !Rs2Player.isInteracting() }, 100, 1000 * 10)
                             Global.sleepUntilTrue({ hasItemAtWorldPoint(rsGroundItem.item.id, rsGroundItem.tile.worldLocation) }, 100, 1000 * 5)
-                            Global.sleepUntilTrue({ Inventory.count() == inventoryCount + 1 }, 100, 1000 * 5)
+                            Global.sleepUntilTrue({ Rs2Inventory.count() == inventoryCount + 1 }, 100, 1000 * 5)
                         }
                     }
                 }

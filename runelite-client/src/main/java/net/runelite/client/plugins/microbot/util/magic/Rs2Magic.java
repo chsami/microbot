@@ -5,7 +5,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import org.apache.commons.lang3.NotImplementedException;
@@ -56,7 +56,7 @@ public class Rs2Magic {
 
     public static void highAlch(String itemName, boolean exact) {
         Tab.switchToMagicTab();
-        Widget item = Inventory.findItemInMemory(itemName, exact);
+        Widget item = Rs2Inventory.findItemInMemory(itemName, exact);
         Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
         alch(highAlch, item);
     }
@@ -98,7 +98,7 @@ public class Rs2Magic {
         if (item == null) {
             Microbot.getMouse().click(point);
         } else {
-            Inventory.useItemFast(item, "cast");
+            Rs2Inventory.useItemFast(item, "cast");
         }
     }
 

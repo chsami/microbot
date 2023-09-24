@@ -1,12 +1,11 @@
 package net.runelite.client.plugins.microbot.woodcutting;
 
-import net.runelite.api.GameObject;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -23,11 +22,11 @@ public class WoodcuttingScript  extends Script {
                 if (Rs2Equipment.hasEquipped("Dragon axe"))
                     Rs2Combat.setSpecState(true, 1000);
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
-                if (Inventory.isFull()) {
+                if (Rs2Inventory.isFull()) {
                     if (config.hasAxeInventory()) {
-                        Inventory.dropAllStartingFrom(1);
+                        Rs2Inventory.dropAllStartingFrom(1);
                     } else {
-                        Inventory.dropAll();
+                        Rs2Inventory.dropAll();
                     }
                     return;
                 }

@@ -8,7 +8,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.construction.enums.ConstructionState;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -87,7 +87,7 @@ public class ConstructionScript extends Script {
         TileObject oakLarderSpace = getOakLarderSpace();
         TileObject oakLarder = getOakLarder();
         NPC butler = getButler();
-        boolean hasRequiredPlanks = Inventory.hasItemAmount(8778, Random.random(8, 16)); //oak plank
+        boolean hasRequiredPlanks = Rs2Inventory.hasItemAmount(8778, Random.random(8, 16)); //oak plank
         if (oakLarderSpace == null && oakLarder != null) {
             state = ConstructionState.Remove;
         } else if (oakLarderSpace != null && oakLarder == null && hasRequiredPlanks) {

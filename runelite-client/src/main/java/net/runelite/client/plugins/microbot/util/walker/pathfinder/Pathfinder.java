@@ -13,7 +13,7 @@ import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.magic.Teleport;
@@ -122,10 +122,10 @@ public class Pathfinder implements Runnable {
                 if (shortestPathSpell != null && shortestPathSpell.getDestination().distanceTo2D(target) <= teleport.getDestination().distanceTo2D(target))
                     continue;
                 if (teleport.getDestination().equals(target) || teleport.getDestination().distanceTo2D(target) < start.distanceTo2D(target)) {
-                    hasTablet = Inventory.hasItem(teleport.getTabletName());
+                    hasTablet = Rs2Inventory.hasItem(teleport.getTabletName());
                     boolean hasRunes = true;
                     for (Pair itemRequired : teleport.getItemsRequired()) {
-                        if (!Inventory.hasItemAmountStackable(itemRequired.getLeft().toString(), (int) itemRequired.getRight()))
+                        if (!Rs2Inventory.hasItemAmountStackable(itemRequired.getLeft().toString(), (int) itemRequired.getRight()))
                             hasRunes = false;
                     }
 
@@ -145,7 +145,7 @@ public class Pathfinder implements Runnable {
                 if (jewelleryLocationEnum.getLocation().distanceTo2D(target) > tunnel.destination.distanceTo2D(target))
                     continue;
                 if (!Rs2Equipment.hasEquippedContains(jewelleryLocationEnum.getTooltip() + "(")
-                        && !Inventory.hasItemContains(jewelleryLocationEnum.getTooltip() + "("))
+                        && !Rs2Inventory.hasItemContains(jewelleryLocationEnum.getTooltip() + "("))
                     continue;
                 if (shortestPathJewellery != null && shortestPathJewellery.getLocation().distanceTo2D(target) <= jewelleryLocationEnum.getLocation().distanceTo2D(target))
                     continue;
@@ -174,7 +174,7 @@ public class Pathfinder implements Runnable {
         if (shortestPathSpell.getDestination().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 10)
             return;
         if (hasTablet) {
-            Inventory.useItemFast(shortestPathSpell.getTabletName(), "Break");
+            Rs2Inventory.useItemFast(shortestPathSpell.getTabletName(), "Break");
         } else {
             Rs2Magic.cast(shortestPathSpell.getSpell());
         }
@@ -195,8 +195,8 @@ public class Pathfinder implements Runnable {
             }
             sleepUntil(Microbot::isAnimating);
             sleepUntil(() -> !Microbot.isAnimating());
-        } else if (Inventory.hasItemContains(itemName)) {
-            Inventory.useItemFastContains(itemName, "Rub");
+        } else if (Rs2Inventory.hasItemContains(itemName)) {
+            Rs2Inventory.useItemFastContains(itemName, "Rub");
             sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
             VirtualKeyboard.typeString(Integer.toString(shortestPathJewellery.getIdentifier() - 1));
             sleepUntil(Microbot::isAnimating);

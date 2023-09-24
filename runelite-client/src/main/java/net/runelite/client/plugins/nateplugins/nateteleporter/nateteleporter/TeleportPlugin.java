@@ -71,7 +71,7 @@ public class TeleportPlugin extends Plugin {
     /*public int getAmount(String itemname) {
        return Microbot.getClientThread().runOnClientThread(() -> {
         ItemContainer container = client.getItemContainer(InventoryID.INVENTORY);
-        int inventoryAmount = container.count(Inventory.getInventoryItem(itemname).getId());
+        int inventoryAmount = container.count(Rs2Inventory.getInventoryItem(itemname).getId());
         return inventoryAmount;
     });
     }*/

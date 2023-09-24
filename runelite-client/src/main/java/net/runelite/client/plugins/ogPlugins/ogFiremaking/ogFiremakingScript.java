@@ -6,20 +6,20 @@ import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.ogPlugins.ogFiremaking.enums.FiremakingStatus;
 import net.runelite.client.plugins.ogPlugins.ogFiremaking.enums.Logs;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.concurrent.TimeUnit;
 public class ogFiremakingScript extends Script {
     public static double version = 1.0;
-    private boolean hasTinderBox() {return Inventory.hasItem("tinderbox");}
+    private boolean hasTinderBox() {return Rs2Inventory.hasItem("tinderbox");}
     private boolean doesNeedReturn(ogFiremakingConfig config){ if(config.selectedLocation().getReturnPoints() != null){return true;} return false;}
-    private boolean hasLogs(){if (Inventory.hasItemAmount(calcedLogs.getItemID(), 27)) {return true;} else{return false;}}
+    private boolean hasLogs(){if (Rs2Inventory.hasItemAmount(calcedLogs.getItemID(), 27)) {return true;} else{return false;}}
     private boolean isClosetoBanker(NPC banker){if(Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(banker.getWorldLocation()) <= 6){return true;} else {return false;}}
     private WorldPoint lastSpot = null;
     private WorldPoint secondToLastSpot = null; //Really didn't want to rewrite code lmaoooo
@@ -62,7 +62,7 @@ public class ogFiremakingScript extends Script {
                     if(!hasTinderBox()){
                         if(!Rs2Bank.hasItem("tinderbox")){Microbot.getNotifier().notify("Get more tinderbox ya bum!");super.shutdown();}
                         Rs2Bank.withdrawItem("tinderbox");
-                        sleepUntil(()-> Inventory.hasItem("tinderbox"));
+                        sleepUntil(()-> Rs2Inventory.hasItem("tinderbox"));
                         sleep(30,80);
                     }
                     if(!hasLogs()){
@@ -97,23 +97,23 @@ public class ogFiremakingScript extends Script {
     }
     private void burnShit(Logs getLog){
         if (firemakingStatus == FiremakingStatus.FIREMAKING) {
-            if (!Inventory.hasItem(getLog.getName())) {
+            if (!Rs2Inventory.hasItem(getLog.getName())) {
                 firemakingStatus = FiremakingStatus.FETCH_SUPPLIES;
             }
             if (Rs2GameObject.findObject(ObjectID.FIRE_26185, Microbot.getClient().getLocalPlayer().getWorldLocation()) != null) {
                 firemakingStatus = FiremakingStatus.FIND_EMPTY_SPOT;
             }
             while (firemakingStatus == FiremakingStatus.FIREMAKING) {
-                if (!Inventory.hasItem(getLog.getName()))
+                if (!Rs2Inventory.hasItem(getLog.getName()))
                     break;
                 sleepUntil(()-> Microbot.getClient().getLocalPlayer().getPoseAnimation() != 733);
                 if (Rs2GameObject.findObject(ObjectID.FIRE_26185, Microbot.getClient().getLocalPlayer().getWorldLocation()) != null) {
                     firemakingStatus = FiremakingStatus.FIND_EMPTY_SPOT;
                 }
                 sleep(30,120);
-                Inventory.useItemUnsafe("tinderbox");
+                Rs2Inventory.useItemUnsafe("tinderbox");
                 sleep(30,120);
-                Inventory.useItemUnsafe(getLog.getName());
+                Rs2Inventory.useItemUnsafe(getLog.getName());
                 sleepUntil(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation() == 823, 5000);
                 sleep(30,80);
             }

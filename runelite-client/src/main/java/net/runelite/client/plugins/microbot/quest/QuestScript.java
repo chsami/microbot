@@ -1,17 +1,14 @@
 package net.runelite.client.plugins.microbot.quest;
 
-import net.runelite.api.GameObject;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
@@ -61,7 +58,7 @@ public class QuestScript extends Script {
                     }
 
                     for (ItemRequirement itemRequirement : QuestHelperPlugin.getSelectedQuest().getItemRequirements()) {
-                        if (!Inventory.hasItemAmount(itemRequirement.getId(), itemRequirement.getQuantity())) {
+                        if (!Rs2Inventory.hasItemAmount(itemRequirement.getId(), itemRequirement.getQuantity())) {
                             itemsMissing.add(itemRequirement);
                         }
                     }

@@ -8,7 +8,7 @@ import net.runelite.client.plugins.microbot.tanner.enums.Location;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.api.*;
@@ -40,9 +40,9 @@ public class TannerScript extends Script {
     }
 
     public void tanInAlkharid(TannerConfig config) {
-        boolean hasHides = Inventory.hasItem(config.HIDE_TYPE().getItemName());
-        boolean hasMoney = Inventory.hasItem(995);
-        boolean hasStamina = Inventory.hasItemContains("stamina");
+        boolean hasHides = Rs2Inventory.hasItem(config.HIDE_TYPE().getItemName());
+        boolean hasMoney = Rs2Inventory.hasItem(995);
+        boolean hasStamina = Rs2Inventory.hasItemContains("stamina");
         NPC tanner = Rs2Npc.getNpc(NpcID.ELLIS);
         boolean isTannerVisibleOnScreen = tanner != null && Camera.isTileOnScreen(tanner.getLocalLocation());
         boolean isBankVisible = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(BankLocation.AL_KHARID.getWorldPoint()) < 5;
@@ -76,7 +76,7 @@ public class TannerScript extends Script {
             }
         }
         if (!hasRunEnergy) {
-            Inventory.useItemContains("stamina");
+            Rs2Inventory.useItemContains("stamina");
         }
         if (hasHides && !isTannerVisibleOnScreen) {
             Microbot.getWalker().walkTo(tannerLocation, false);
@@ -86,7 +86,7 @@ public class TannerScript extends Script {
                 Widget widget = Rs2Widget.findWidget((config.HIDE_TYPE().getWidgetName()));
                 if (widget != null) {
                     Rs2Menu.doAction("Tan <col=ff7000>All", widget.getCanvasLocation());
-                    sleepUntil(() -> Inventory.hasItem(config.HIDE_TYPE().getItemName()));
+                    sleepUntil(() -> Rs2Inventory.hasItem(config.HIDE_TYPE().getItemName()));
                 }
             } else {
                 if (Rs2Npc.interact(NpcID.ELLIS, "trade")) {
@@ -94,7 +94,7 @@ public class TannerScript extends Script {
                     Widget widget = Rs2Widget.findWidget((config.HIDE_TYPE().getWidgetName()));
                     if (widget != null) {
                         Rs2Menu.doAction("Tan <col=ff7000>All", widget.getCanvasLocation());
-                        sleepUntil(() -> Inventory.hasItem(config.HIDE_TYPE().getItemName()));
+                        sleepUntil(() -> Rs2Inventory.hasItem(config.HIDE_TYPE().getItemName()));
                     }
                 }
             }

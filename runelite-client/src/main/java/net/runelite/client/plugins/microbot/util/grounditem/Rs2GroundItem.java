@@ -8,7 +8,7 @@ import net.runelite.client.plugins.grounditems.GroundItemsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
@@ -108,7 +108,7 @@ public class Rs2GroundItem {
     }
 
     public static boolean loot(String lootItem, int minQuantity, int range) {
-        if (Inventory.isInventoryFull(lootItem)) return false;
+        if (Rs2Inventory.isInventoryFull(lootItem)) return false;
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
                 Rs2GroundItem.getAll(range)
         );
@@ -122,7 +122,7 @@ public class Rs2GroundItem {
     }
 
     public static boolean loot(int itemId) {
-        if (Inventory.isInventoryFull(itemId)) return false;
+        if (Rs2Inventory.isInventoryFull(itemId)) return false;
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
                 Rs2GroundItem.getAll(255)
         );
@@ -141,7 +141,7 @@ public class Rs2GroundItem {
                 .sorted(Comparator.comparingInt(value -> value.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
                 .collect(Collectors.toList());
         for (GroundItem groundItem : groundItemList) {
-            if (Inventory.isInventoryFull(groundItem.getName())) return false;
+            if (Rs2Inventory.isInventoryFull(groundItem.getName())) return false;
             interact(groundItem);
             sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(groundItem.getLocation()));
             return true;

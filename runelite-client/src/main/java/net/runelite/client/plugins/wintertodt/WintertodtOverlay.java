@@ -66,7 +66,7 @@ class WintertodtOverlay extends OverlayPanel
 
 		String inventoryString = plugin.getNumLogs() > 0 ? plugin.getInventoryScore() + " (" + plugin.getTotalPotentialinventoryScore() + ") pts" : plugin.getInventoryScore() + " pts";
 		panelComponent.getChildren().add(LineComponent.builder()
-			.left("Inventory:")
+			.left("Rs2Inventory:")
 			.leftColor(Color.WHITE)
 			.right(inventoryString)
 			.rightColor(plugin.getInventoryScore() > 0 ? Color.GREEN : Color.RED)

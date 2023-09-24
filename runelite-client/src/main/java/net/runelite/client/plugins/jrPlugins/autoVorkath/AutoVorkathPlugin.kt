@@ -21,7 +21,7 @@ import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
@@ -130,7 +130,7 @@ class AutoVorkathPlugin : Plugin() {
 
                 // Check if player needs to eat
                 if (clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.HITPOINTS) } < 40 && botState != State.ACID && botState != State.RED_BALL) {
-                    foods = clientThread.runOnClientThread { Inventory.getInventoryFood() }
+                    foods = clientThread.runOnClientThread { Rs2Inventory.getInventoryFood() }
                     botState = State.EAT
                 }
 
@@ -173,11 +173,11 @@ class AutoVorkathPlugin : Plugin() {
                         if (config.SLAYERSTAFF().toString() == "Cast") {
                             Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, Rs2Npc.getNpc("Zombified Spawn"));
                         } else {
-                            Inventory.useItem(config.SLAYERSTAFF().toString())
+                            Rs2Inventory.useItem(config.SLAYERSTAFF().toString())
                         }
                         Rs2Npc.attack("Zombified Spawn")
                         sleep(2300, 2500)
-                        Inventory.useItem(config.CROSSBOW().toString())
+                        Rs2Inventory.useItem(config.CROSSBOW().toString())
                         eatAt(75)
                         sleep(600, 1000)
                         Rs2Npc.attack("Vorkath")
@@ -199,44 +199,44 @@ class AutoVorkathPlugin : Plugin() {
                     } else {
                         println("No food found")
                         // Teleport
-                        Inventory.useItem(config.TELEPORT().toString())
+                        Rs2Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
-                    State.PRAYER -> if (Inventory.findItem("prayer") != null) {
-                        Inventory.useItemContains("prayer")
+                    State.PRAYER -> if (Rs2Inventory.findItem("prayer") != null) {
+                        Rs2Inventory.useItemContains("prayer")
                         botState = previousBotState
                     } else {
                         println("No prayer potions found")
                         // Teleport
-                        Inventory.useItem(config.TELEPORT().toString())
+                        Rs2Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
-                    State.RANGE_POTION -> if (Inventory.findItem(config.RANGEPOTION().toString()) != null) {
-                        Inventory.useItemContains(config.RANGEPOTION().toString())
+                    State.RANGE_POTION -> if (Rs2Inventory.findItem(config.RANGEPOTION().toString()) != null) {
+                        Rs2Inventory.useItemContains(config.RANGEPOTION().toString())
                         botState = previousBotState
                     } else {
                         println("No range potions found")
                         // Teleport
-                        Inventory.useItem(config.TELEPORT().toString())
+                        Rs2Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
-                    State.ANTIFIRE_POTION -> if (Inventory.findItem("antifire") != null) {
-                        Inventory.useItemContains("super antifire")
+                    State.ANTIFIRE_POTION -> if (Rs2Inventory.findItem("antifire") != null) {
+                        Rs2Inventory.useItemContains("super antifire")
                         botState = previousBotState
                     } else {
                         println("No antifire potions found")
                         // Teleport
-                        Inventory.useItem(config.TELEPORT().toString())
+                        Rs2Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
-                    State.ANTIVENOM -> if (Inventory.findItem("venom") != null){
-                        Inventory.useItemContains("venom")
+                    State.ANTIVENOM -> if (Rs2Inventory.findItem("venom") != null){
+                        Rs2Inventory.useItemContains("venom")
                         Rs2Player.antiVenomTime = -64; //set this immediatly because the antivenom timer takes a while before it gets triggered
                         botState = previousBotState
                     } else {
                         println("No antivenom potions found")
                         // Teleport
-                        Inventory.useItem(config.TELEPORT().toString())
+                        Rs2Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
                     State.NONE -> println("TODO")
@@ -300,14 +300,14 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun eatAt(health: Int){
         if (clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.HITPOINTS) } < health && Rs2Npc.getNpc("Vorkath") != null){
-            foods = clientThread.runOnClientThread { Inventory.getInventoryFood() }
+            foods = clientThread.runOnClientThread { Rs2Inventory.getInventoryFood() }
             val food = if(foods?.size!! > 0) foods!![0] else null
             if(food != null){
                 VirtualMouse().click(food.getBounds())
             }else{
                 //println("No food found")
                 // Teleport
-                Inventory.useItem(config.TELEPORT().toString())
+                Rs2Inventory.useItem(config.TELEPORT().toString())
             }
         }
     }

@@ -17,7 +17,7 @@ public class ExampleScript extends Script {
             try {
                 /*
                  * Important classes:
-                 * Inventory
+                 * Rs2Inventory
                  * Rs2GameObject
                  * Rs2GroundObject
                  * Rs2NPC

@@ -5,7 +5,7 @@ import net.runelite.api.WallObject;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -118,7 +118,7 @@ public abstract class Script implements IScript {
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
         if (!hasRunEnergy && useStaminaPotsIfNeeded) {
-            Inventory.useItemContains("Stamina potion");
+            Rs2Inventory.useItemContains("Stamina potion");
         }
 
         return true;

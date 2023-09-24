@@ -57,7 +57,7 @@ public class InventorySetupsPanel extends JPanel implements InventorySetupsMoveH
 
 		if (allowEditable)
 		{
-			this.popupMenu = new InventorySetupsMoveMenu<>(plugin, panel, this, "Inventory Setup", invSetup);
+			this.popupMenu = new InventorySetupsMoveMenu<>(plugin, panel, this, "Rs2Inventory Setup", invSetup);
 		}
 		else
 		{

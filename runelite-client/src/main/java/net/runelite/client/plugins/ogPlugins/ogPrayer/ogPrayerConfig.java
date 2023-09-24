@@ -144,7 +144,7 @@ public interface ogPrayerConfig extends Config {
                 "\nIf using Chaos Alter start there" +
                 "\nAdd a few worlds you would like to hop between" +
                 "\nAt least 3 are required. Recommend 7-10\n" +
-                "\nHave coins and desired noted bones in Inventory" +
+                "\nHave coins and desired noted bones in Rs2Inventory" +
                 "\nIf you would like something added please lmk"
                 ;}
     @ConfigItem(

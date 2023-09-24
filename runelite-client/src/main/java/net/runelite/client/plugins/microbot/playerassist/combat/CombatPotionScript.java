@@ -5,7 +5,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +17,7 @@ public class CombatPotionScript extends Script {
                 if (!super.run()) return;
                 if (!config.toggleCombatPotion()) return;
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) - Microbot.getClient().getRealSkillLevel(Skill.ATTACK) > 5) return;
-                Widget[] widgets = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
+                Widget[] widgets = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.getPotions());
                 for (Widget widget: widgets
                 ) {
                     if (widget.getName().contains("combat")) {

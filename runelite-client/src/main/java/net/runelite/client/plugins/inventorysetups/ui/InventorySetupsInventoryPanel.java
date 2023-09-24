@@ -49,7 +49,7 @@ public class InventorySetupsInventoryPanel extends InventorySetupsContainerPanel
 								  final InventorySetupsRunePouchPanel runePouchPanel,
 								  final InventorySetupsBoltPouchPanel boltPouchPanel)
 	{
-		super(itemManager, plugin, "Inventory");
+		super(itemManager, plugin, "Rs2Inventory");
 		this.runePouchPanel = runePouchPanel;
 		this.boltPouchPanel = boltPouchPanel;
 	}

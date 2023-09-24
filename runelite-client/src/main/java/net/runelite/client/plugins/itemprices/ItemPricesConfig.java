@@ -66,7 +66,7 @@ public interface ItemPricesConfig extends Config
 
 	@ConfigItem(
 		keyName = "hideInventory",
-		name = "Hide Tooltips on Inventory Items",
+		name = "Hide Tooltips on Rs2Inventory Items",
 		description = "Tooltips should be hidden on items in the inventory",
 		position = 4
 	)
@@ -89,7 +89,7 @@ public interface ItemPricesConfig extends Config
 	@ConfigItem(
 		keyName = "showWhileAlching",
 		name = "Show prices while alching",
-		description = "Show the price overlay while using High Alchemy. Takes priority over \"Hide tooltips on Inventory Items\"",
+		description = "Show the price overlay while using High Alchemy. Takes priority over \"Hide tooltips on Rs2Inventory Items\"",
 		position = 6
 	)
 	default boolean showWhileAlching()

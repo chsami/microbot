@@ -11,7 +11,7 @@ import net.runelite.client.plugins.microbot.giantsfoundry.enums.CommissionType;
 import net.runelite.client.plugins.microbot.giantsfoundry.enums.Stage;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -25,7 +25,7 @@ import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.g
 public class GiantsFoundryScript extends Script {
 
     @Inject
-    Inventory inventory;
+    Rs2Inventory rs2Inventory;
 
     static final int CRUCIBLE = 44776;
     static final int MOULD_JIG = 44777;
@@ -134,8 +134,8 @@ public class GiantsFoundryScript extends Script {
             return;
         }
 
-        if (!inventory.hasItemAmount("steel bar", 14)
-                && !inventory.hasItemAmount("mithril bar", 14) && !canPour()) {
+        if (!rs2Inventory.hasItemAmount("steel bar", 14)
+                && !rs2Inventory.hasItemAmount("mithril bar", 14) && !canPour()) {
             Rs2Bank.useBank("collect");
             //check if inv is empty and deposit all inv items
             //needs new method in rs2bank depositAllinventoryItems
@@ -145,18 +145,18 @@ public class GiantsFoundryScript extends Script {
             return;
         }
         Rs2Bank.closeBank();
-        if (inventory.hasItem("steel bar") && !canPour()) {
+        if (rs2Inventory.hasItem("steel bar") && !canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Fill");
             sleepUntil(() -> Rs2Widget.findWidget("What metal would you like to add?", null) != null, 5000);
             VirtualKeyboard.keyPress('3');
-            sleepUntil(() -> !inventory.hasItem("steel bar"), 5000);
+            sleepUntil(() -> !rs2Inventory.hasItem("steel bar"), 5000);
         }
-        if (inventory.hasItem("mithril bar") && !canPour()) {
+        if (rs2Inventory.hasItem("mithril bar") && !canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Fill");
             sleepUntil(() -> Rs2Widget.findWidget("What metal would you like to add?", null) != null, 5000);
             sleep(600, 1200);
             VirtualKeyboard.keyPress('4');
-            sleepUntil(() -> !inventory.hasItem("mithril bar"), 5000);
+            sleepUntil(() -> !rs2Inventory.hasItem("mithril bar"), 5000);
         }
         if (canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Pour");
@@ -173,7 +173,7 @@ public class GiantsFoundryScript extends Script {
 
     public void pickupMould() {
         if (!canPickupMould()) return;
-        if (inventory.isEmpty() && GiantsFoundryState.getCurrentStage() == null) {
+        if (rs2Inventory.isEmpty() && GiantsFoundryState.getCurrentStage() == null) {
             Rs2GameObject.interact(MOULD_JIG, "Pick-up");
             sleepUntil(() -> !canPickupMould(), 5000);
         }

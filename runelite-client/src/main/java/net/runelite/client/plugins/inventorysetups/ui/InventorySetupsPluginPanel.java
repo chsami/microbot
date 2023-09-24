@@ -175,7 +175,7 @@ public class InventorySetupsPluginPanel extends PluginPanel
 		BACK_ICON = new ImageIcon(backIcon);
 		BACK_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(backIcon, 0.53f));
 
-		MAIN_TITLE = "Inventory Setups";
+		MAIN_TITLE = "Rs2Inventory Setups";
 	}
 
 	public InventorySetupsPluginPanel(final InventorySetupsPlugin plugin, final ItemManager itemManager)
@@ -558,7 +558,7 @@ public class InventorySetupsPluginPanel extends PluginPanel
 		// setup the error panel. It's wrapped around a normal panel
 		// so it doesn't stretch to fill the parent panel
 		final PluginErrorPanel errorPanel = new PluginErrorPanel();
-		errorPanel.setContent("Inventory Setups", "Create an inventory setup.");
+		errorPanel.setContent("Rs2Inventory Setups", "Create an inventory setup.");
 		noSetupsPanel.add(errorPanel);
 
 		// the panel that holds the inventory panels, error panel, and the overview panel

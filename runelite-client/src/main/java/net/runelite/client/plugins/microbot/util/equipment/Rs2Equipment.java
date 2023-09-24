@@ -3,7 +3,7 @@ package net.runelite.client.plugins.microbot.util.equipment;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
@@ -17,7 +17,7 @@ public class Rs2Equipment {
 
     public static boolean equipItemFast(int id) {
         Tab.switchToInventoryTab();
-        Widget item = Inventory.findItem(id);
+        Widget item = Rs2Inventory.findItem(id);
         if (item == null) return false;
         Microbot.getMouse().click(new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
         return true;
@@ -25,7 +25,7 @@ public class Rs2Equipment {
 
     public static boolean equipItemFast(String name) {
         Tab.switchToInventoryTab();
-        Widget item = Inventory.findItem(name);
+        Widget item = Rs2Inventory.findItem(name);
         if (item == null) return false;
         Microbot.getMouse().click(new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
         return true;
@@ -35,7 +35,7 @@ public class Rs2Equipment {
     public static void equipItem(int id) {
         assert !Microbot.getClient().isClientThread();
         Tab.switchToInventoryTab();
-        Widget item = Inventory.findItem(id);
+        Widget item = Rs2Inventory.findItem(id);
         if (item == null) return;
         while (!hasEquipped(id)) {
             Rs2Menu.doAction(new String[]{"wield", "wear"}, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
@@ -45,7 +45,7 @@ public class Rs2Equipment {
     public static void equipItem(String itemName) {
         assert !Microbot.getClient().isClientThread();
         Tab.switchToInventoryTab();
-        Widget item = Inventory.findItem(itemName);
+        Widget item = Rs2Inventory.findItem(itemName);
         if (item == null) return;
         while (!hasEquipped(itemName)) {
             Rs2Menu.doAction(new String[]{"wield", "wear"}, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));

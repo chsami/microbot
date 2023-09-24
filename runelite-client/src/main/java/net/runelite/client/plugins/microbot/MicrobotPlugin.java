@@ -29,7 +29,7 @@ import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.event.EventSelector;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
@@ -151,8 +151,8 @@ public class MicrobotPlugin extends Plugin {
         Rs2Equipment.handleMenuSwapper(event.getMenuEntry());
         BetterBank.handleMenuSwapper(event.getMenuEntry());
         Microbot.getWalker().handleMenuSwapper(event.getMenuEntry());
-        Inventory.handleMenuSwapper(event.getMenuEntry());
-        //Rs2Inventory.handleMenuSwapper(event.getMenuEntry());
+        Rs2Inventory.handleMenuSwapper(event.getMenuEntry());
+        //Rs2InventoryPreMenuSwap.handleMenuSwapper(event.getMenuEntry());
 
         if (Rs2Menu.getOption().length() > 0) {
             final MenuEntry[] menuEntries = client.getMenuEntries();
@@ -180,7 +180,7 @@ public class MicrobotPlugin extends Plugin {
     public void onItemContainerChanged(ItemContainerChanged event) {
         Rs2Bank.storeInventoryItemsInMemory(event);
         Rs2Bank.storeBankItemsInMemory(event);
-        Inventory.storeInventoryItemsInMemory(event);
+        Rs2Inventory.storeInventoryItemsInMemory(event);
     }
 
     @Subscribe

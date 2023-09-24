@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory
 
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 
 class InventoryRequirements {
 
@@ -16,12 +16,12 @@ class InventoryRequirements {
     }
 
     fun checkMeetsRequirements(): Boolean {
-        Inventory.open()
+        Rs2Inventory.open()
         itemSets.forEach { dynamicItemSet: DynamicItemSet ->
             var meetsRequirement = false
             dynamicItemSet.getItems().forEach { itemAndQuantityPair: Pair<Int, Int> ->
-                if (Inventory.hasItem(itemAndQuantityPair.first)) {
-                    if (Inventory.getItemAmount(itemAndQuantityPair.first) >= itemAndQuantityPair.second) {
+                if (Rs2Inventory.hasItem(itemAndQuantityPair.first)) {
+                    if (Rs2Inventory.getItemAmount(itemAndQuantityPair.first) >= itemAndQuantityPair.second) {
                         meetsRequirement = true
                     }
                 }

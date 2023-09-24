@@ -6,7 +6,7 @@ import net.runelite.api.SpriteID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -125,7 +125,7 @@ public class BetterBank {
     private static boolean depositOneFast(Widget w) {
         if (!isOpen()) return false;
         if (w == null) return false;
-        if (!Inventory.hasItem(w.getItemId())) return false;
+        if (!Rs2Inventory.hasItem(w.getItemId())) return false;
 
         if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
             execMenuSwapper(INVENTORY_WIDGET_ID, 1, w);
@@ -137,11 +137,11 @@ public class BetterBank {
     }
 
     public static boolean depositOneFast(int id) {
-        return depositOneFast(Inventory.findItem(id));
+        return depositOneFast(Rs2Inventory.findItem(id));
     }
 
     public static boolean depositOneFast(String name, boolean exact) {
-        return depositOneFast(Inventory.findItem(name, exact));
+        return depositOneFast(Rs2Inventory.findItem(name, exact));
     }
     public static boolean depositOneFast(String name) {
         return depositOneFast(name, false);
@@ -151,7 +151,7 @@ public class BetterBank {
     private static boolean depositXFast(Widget w, int amount) {
         if (!isOpen()) return false;
         if (w == null) return false;
-        if (!Inventory.hasItem(w.getItemId())) return false;
+        if (!Rs2Inventory.hasItem(w.getItemId())) return false;
 
         if (Microbot.getVarbitValue(X_AMOUNT_VARBIT) == amount) {
             execMenuSwapper(INVENTORY_WIDGET_ID, HANDLE_X_SET, w);
@@ -168,21 +168,21 @@ public class BetterBank {
     }
 
     public static boolean depositXFast(int id, int amount) {
-        return depositXFast(Inventory.findItem(id), amount);
+        return depositXFast(Rs2Inventory.findItem(id), amount);
     }
 
     public static boolean depositXFast(String name, int amount, boolean exact) {
-        return depositXFast(Inventory.findItem(name, exact), amount);
+        return depositXFast(Rs2Inventory.findItem(name, exact), amount);
     }
 
     public static boolean depositXFast(String name, int amount) {
-        return depositXFast(Inventory.findItem(name), amount);
+        return depositXFast(Rs2Inventory.findItem(name), amount);
     }
 
     private static boolean depositAllFast(Widget w) {
         if (!isOpen()) return false;
         if (w == null) return false;
-        if (!Inventory.hasItem(w.getItemId())) return false;
+        if (!Rs2Inventory.hasItem(w.getItemId())) return false;
 
         execMenuSwapper(INVENTORY_WIDGET_ID, HANDLE_ALL, w);
 
@@ -190,11 +190,11 @@ public class BetterBank {
     }
 
     public static boolean depositAllFast(int id) {
-        return depositAllFast(Inventory.findItem(id));
+        return depositAllFast(Rs2Inventory.findItem(id));
     }
 
     public static boolean depositAllFast(String name, boolean exact) {
-        return depositAllFast(Inventory.findItem(name, exact));
+        return depositAllFast(Rs2Inventory.findItem(name, exact));
     }
     public static boolean depositAllFast(String name) {
         return depositAllFast(name, false);
@@ -202,7 +202,7 @@ public class BetterBank {
 
     public static boolean depositAll() {
         Microbot.status = "Deposit all";
-        if (Inventory.count() == 0) return true;
+        if (Rs2Inventory.count() == 0) return true;
 
         Widget widget = Rs2Widget.findWidget(SpriteID.BANK_DEPOSIT_INVENTORY, null);
         if (widget == null) return false;
@@ -216,7 +216,7 @@ public class BetterBank {
     private static boolean withdrawOneFast(Widget w) {
         if (!isOpen()) return false;
         if (w == null) return false;
-        if (Inventory.isFull()) return false;
+        if (Rs2Inventory.isFull()) return false;
 
         if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
             execMenuSwapper(BANK_WIDGET_ID, 1, w);
@@ -242,7 +242,7 @@ public class BetterBank {
     private static boolean withdrawXFast(Widget w, int amount) {
         if (!isOpen()) return false;
         if (w == null) return false;
-        if (Inventory.isFull()) return false;
+        if (Rs2Inventory.isFull()) return false;
 
         if (Microbot.getVarbitValue(X_AMOUNT_VARBIT) == amount) {
             execMenuSwapper(BANK_WIDGET_ID, HANDLE_X_SET, w);
@@ -272,7 +272,7 @@ public class BetterBank {
     private static boolean withdrawAllFast(Widget w) {
         if (!isOpen()) return false;
         if (w == null) return false;
-        if (Inventory.isFull()) return false;
+        if (Rs2Inventory.isFull()) return false;
 
         execMenuSwapper(BANK_WIDGET_ID, HANDLE_ALL, w);
 
@@ -301,11 +301,11 @@ public class BetterBank {
     }
 
     public static boolean wearItemFast(int id) {
-        return wearItemFast(Inventory.findItem(id));
+        return wearItemFast(Rs2Inventory.findItem(id));
     }
 
     public static boolean wearItemFast(String name) {
-        return wearItemFast(Inventory.findItem(name));
+        return wearItemFast(Rs2Inventory.findItem(name));
     }
 
     public static void withdrawItems(int... ids) {

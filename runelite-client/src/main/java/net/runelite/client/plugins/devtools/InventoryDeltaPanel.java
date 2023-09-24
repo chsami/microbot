@@ -129,7 +129,7 @@ class InventoryDeltaPanel extends JPanel implements Scrollable
 			}
 		}
 
-		final JLabel label = new JLabel("Items in Inventory:", JLabel.CENTER);
+		final JLabel label = new JLabel("Items in Rs2Inventory:", JLabel.CENTER);
 		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		add(label);
 		add(currentGrid);

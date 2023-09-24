@@ -11,7 +11,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
@@ -85,7 +85,7 @@ public class ogPrayerScript extends Script {
         log("Selected world: " + selectedWorld);
         return selectedWorld;
     }
-    private boolean hasNotedBonesIfNeeded(){ Tab.switchToInventoryTab() ;if(restockMethod.getRestockType() == RestockMethod.RestockType.NOTING){ return Inventory.hasItem(bones.getNotedID()); } return true; } //Redo this cause this logic is stupid
+    private boolean hasNotedBonesIfNeeded(){ Tab.switchToInventoryTab() ;if(restockMethod.getRestockType() == RestockMethod.RestockType.NOTING){ return Rs2Inventory.hasItem(bones.getNotedID()); } return true; } //Redo this cause this logic is stupid
     private void openChaosDoorsIfNeeded(){
         log("----------------------------------OPEN CHAOS DOOR FUNCTION WAS CALLED----------------------------------");
         if(Rs2GameObject.findDoor(1525) != null || Rs2GameObject.findDoor(1522) != null){return;}
@@ -213,13 +213,13 @@ public class ogPrayerScript extends Script {
             if(location == Locations.CHAOS_ALTAR && inPVPArea()){sleepUntil(() -> this.playersInArea == 1, Random.random(20000,25000));}
             if(Tab.switchToInventoryTab()){
                 if(location == Locations.CHAOS_ALTAR || location == Locations.GILDED_ALTAR){
-                    if(Inventory.hasItem(bones.getItemID()) && isNearAlter() && !needToHop){ status = ogPrayerStatus.USE_BONES_ON_ALTER; }
-                    else if (Inventory.hasItem(bones.getItemID()) && !isNearAlter() && !needToHop){ status = ogPrayerStatus.GO_TO_ALTER; }
-                    else if (!Inventory.hasItem(bones.getItemID()) && hasNotedBonesIfNeeded() && !needToHop) { status = ogPrayerStatus.RESTOCK; }
-                    else if (!needToHop && (!Inventory.hasItemStackable(bones.getName()) || !Inventory.hasItemAmountStackable("Coins",1000)) && !Inventory.hasItem(bones.getItemID()) ) { status = ogPrayerStatus.LOGOUT; }
+                    if(Rs2Inventory.hasItem(bones.getItemID()) && isNearAlter() && !needToHop){ status = ogPrayerStatus.USE_BONES_ON_ALTER; }
+                    else if (Rs2Inventory.hasItem(bones.getItemID()) && !isNearAlter() && !needToHop){ status = ogPrayerStatus.GO_TO_ALTER; }
+                    else if (!Rs2Inventory.hasItem(bones.getItemID()) && hasNotedBonesIfNeeded() && !needToHop) { status = ogPrayerStatus.RESTOCK; }
+                    else if (!needToHop && (!Rs2Inventory.hasItemStackable(bones.getName()) || !Rs2Inventory.hasItemAmountStackable("Coins",1000)) && !Rs2Inventory.hasItem(bones.getItemID()) ) { status = ogPrayerStatus.LOGOUT; }
                 }
                 if(!status.name().isEmpty()){log("Calculating State: " + status.name());}
-                log("Bones in inventory:  " + Inventory.hasItem(bones.getItemID()));
+                log("Bones in inventory:  " + Rs2Inventory.hasItem(bones.getItemID()));
                 log("Has noted bones if needed:  " + hasNotedBonesIfNeeded());
                 log("Near altar:  " + isAtAlter());
                 log("Need to hop: " + needToHop);
@@ -237,15 +237,15 @@ public class ogPrayerScript extends Script {
         log("===========================USE BONES ON ALTAR FUNCTION CALLED===========================");
         if(oneTick){
             boolean usedItem = false;
-            while(Inventory.hasItem(bones.getItemID()) && !needToHop){
+            while(Rs2Inventory.hasItem(bones.getItemID()) && !needToHop){
                 if(location == Locations.CHAOS_ALTAR && !isAtAlter()){openChaosDoorsIfNeeded();}
                 if(isItemSelected()){
                     if(location == Locations.GILDED_ALTAR) { Rs2GameObject.interact("Altar", "use"); lastActionTick = gameTick; usedItem = true;}
                     if(location == Locations.CHAOS_ALTAR) { Rs2GameObject.interact("Chaos Altar", "use"); lastActionTick = gameTick; usedItem = true;}
                 }
                 callDelay();
-                while(!isItemSelected() && Inventory.hasItem(bones.getItemID()) && !needToHop){
-                    Inventory.useLastItemAction(bones.getItemID(), "use");
+                while(!isItemSelected() && Rs2Inventory.hasItem(bones.getItemID()) && !needToHop){
+                    Rs2Inventory.useLastItemAction(bones.getItemID(), "use");
                 }
                 if(!isAtAlter()){
                     if(usedItem){sleepUntil(this::isAtAlter, Random.random(5000,6000)); log("Going to altar");}
@@ -259,7 +259,8 @@ public class ogPrayerScript extends Script {
     }
     private void useBones() {
         callDelay();
-        while(!isItemSelected() && Inventory.hasItem(bones.getItemID()) && !needToHop){Inventory.useLastItemAction(bones.getItemID(), "use");}
+        while(!isItemSelected() && Rs2Inventory.hasItem(bones.getItemID()) && !needToHop){
+            Rs2Inventory.useLastItemAction(bones.getItemID(), "use");}
         callDelay();
         if(isItemSelected()){
             if(location == Locations.GILDED_ALTAR) { Rs2GameObject.interact("Altar", "use"); }
@@ -274,7 +275,7 @@ public class ogPrayerScript extends Script {
             else { leavePOH(); }
             log("Using noted bones");
             if(isItemSelected()){Microbot.getMouse().click(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(),Microbot.getClient().getLocalPlayer().getWorldLocation().getY());}
-            Inventory.useItemAction(bones.getNotedID(), "use");
+            Rs2Inventory.useItemAction(bones.getNotedID(), "use");
             sleep(80,160);
             log("Clicking restocker");
             Rs2Npc.interact(restockMethod.getID(),"use");
@@ -330,7 +331,7 @@ class POHs {
 //2948, 3821, 0
 //2948, 3820, 0
 
-//Inventory.useItemAction("superior dragon bones", "use");
+//Rs2Inventory.useItemAction("superior dragon bones", "use");
 //        Rs2GameObject.interact("chaos altar","Use");
 
 

@@ -3,7 +3,7 @@ package net.runelite.client.plugins.nateplugins.natehumidifier;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
@@ -19,9 +19,9 @@ public class HumidifierScript extends Script {
 
             try {
                 if (Microbot.pauseAllScripts) return;
-                if (Inventory.hasItem(config.ITEM().getName())  && (Inventory.hasItemAmountStackable("Astral Rune",0))) {
+                if (Rs2Inventory.hasItem(config.ITEM().getName())  && (Rs2Inventory.hasItemAmountStackable("Astral Rune",0))) {
                     Rs2Magic.cast(MagicAction.HUMIDIFY);
-                    sleepUntilOnClientThread(() -> Inventory.hasItem(config.ITEM().getFinished()));
+                    sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(config.ITEM().getFinished()));
                     return;
                 } else {
                     bank(config);
@@ -41,7 +41,7 @@ public class HumidifierScript extends Script {
             sleep(200,300);
             if(Rs2Bank.hasItem(config.ITEM().getName())) {
                 Rs2Bank.withdrawItemsAll(true, config.ITEM().getName());
-                sleepUntilOnClientThread(() -> Inventory.hasItem(config.ITEM().getName()));
+                sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(config.ITEM().getName()));
                 Rs2Bank.closeBank();
                 sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());
             } else {

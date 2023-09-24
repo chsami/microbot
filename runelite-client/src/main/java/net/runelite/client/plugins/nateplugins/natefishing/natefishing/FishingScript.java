@@ -4,7 +4,7 @@ import net.runelite.api.NPC;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.concurrent.TimeUnit;
@@ -24,12 +24,12 @@ public class FishingScript extends Script {
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) {
                     return;
                 }
-                if (Inventory.isFull()) {
+                if (Rs2Inventory.isFull()) {
                     if (config.Fish().getName().equals("shrimp")) {
-                        Inventory.dropAllStartingFrom(1);
+                        Rs2Inventory.dropAllStartingFrom(1);
                         return;
                     } else {
-                        Inventory.dropAllStartingFrom(5);
+                        Rs2Inventory.dropAllStartingFrom(5);
                         return;
                     }
 

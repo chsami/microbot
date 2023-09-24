@@ -7,7 +7,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +29,7 @@ public class FoodScript extends Script {
                     unEquipGuthans();
                     return;
                 }
-                Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
+                Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.getInventoryFood());
                 if (foods == null || foods.length == 0) {
                     if (!equipFullGuthans()) {
                         Microbot.getNotifier().notify("No more food left & no guthans available. Please teleport");
@@ -50,20 +50,20 @@ public class FoodScript extends Script {
 
     private void unEquipGuthans() {
         if (weaponIndex >= 0) {
-            Inventory.clickItem(weaponIndex);
-            Inventory.useItem("Dragon defender");
+            Rs2Inventory.clickItem(weaponIndex);
+            Rs2Inventory.useItem("Dragon defender");
             weaponIndex = -1;
         }
         if (bodyIndex >= 0) {
-            Inventory.clickItem(bodyIndex);
+            Rs2Inventory.clickItem(bodyIndex);
             bodyIndex = -1;;
         }
         if (legsIndex >= 0) {
-            Inventory.clickItem(legsIndex);
+            Rs2Inventory.clickItem(legsIndex);
             legsIndex = -1;
         }
         if (helmIndex >= 0) {
-            Inventory.clickItem(helmIndex);
+            Rs2Inventory.clickItem(helmIndex);
             helmIndex = -1;
         }
     }
@@ -79,31 +79,31 @@ public class FoodScript extends Script {
         boolean hasGuthanLegs = legs.getName().toLowerCase().contains("guthan's chainskirt");
         boolean hasGuthanHelm = helm.getName().toLowerCase().contains("guthan's helm");
 
-        Inventory.open();
+        Rs2Inventory.open();
 
         if (!hasGuthanSpear) {
-            Widget spearWidget = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryItem("guthan's warspear"));
+            Widget spearWidget = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.getInventoryItem("guthan's warspear"));
             if (spearWidget == null) return false;
             weaponIndex = spearWidget.getIndex();
             Microbot.getMouse().click(spearWidget.getBounds());
             sleep(1000);
         }
         if (!hasGuthanBody) {
-            Widget bodyWidget = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryItem("guthan's platebody"));
+            Widget bodyWidget = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.getInventoryItem("guthan's platebody"));
             if (bodyWidget == null) return false;
             bodyIndex = bodyWidget.getIndex();
             Microbot.getMouse().click(bodyWidget.getBounds());
             sleep(1000);
         }
         if (!hasGuthanLegs) {
-            Widget legsWidget = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryItem("guthan's chainskirt"));
+            Widget legsWidget = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.getInventoryItem("guthan's chainskirt"));
             if (legsWidget == null) return false;
             legsIndex = legsWidget.getIndex();
             Microbot.getMouse().click(legsWidget.getBounds());
             sleep(1000);
         }
         if (!hasGuthanHelm) {
-            Widget helmWidget = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryItem("guthan's helm"));
+            Widget helmWidget = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.getInventoryItem("guthan's helm"));
             if (helmWidget == null) return false;
             helmIndex = helmWidget.getIndex();
             Microbot.getMouse().click(helmWidget.getBounds());

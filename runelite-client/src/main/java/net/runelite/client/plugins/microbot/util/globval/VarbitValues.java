@@ -304,7 +304,7 @@ public enum VarbitValues {
     TAB_QUEST_SUBTAB_ACHIEVEMENT_DIARY(3),
     TAB_QUEST_SUBTAB_KOUREND_FAVOR(4),
     TAB_QUEST_SUBTAB_LEAGUES(5),
-    // Bank Deposit Inventory
+    // Bank Deposit Rs2Inventory
     BANK_DEPOSIT_INVENTORY_SHOWN(0),
     BANK_DEPOSIT_INVENTORY_HIDDEN(1),
     // Tab Settings Subtabs
@@ -315,7 +315,7 @@ public enum VarbitValues {
     TAB_ACC_MANAGEMENT_SUBTAB_ACCOUNT(0),
     TAB_ACC_MANAGEMENT_SUBTAB_COMMUNITY(1),
     TAB_ACC_MANAGEMENT_SUBTAB_LINKS(2),
-    // Bank Inventory Options
+    // Bank Rs2Inventory Options
     BANK_INVENTORY_OPTIONS_SHOWN(0),
     BANK_INVENTORY_OPTIONS_HIDDEN(1),
     // Bank Tutorial Progress

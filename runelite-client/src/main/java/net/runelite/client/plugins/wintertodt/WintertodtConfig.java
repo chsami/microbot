@@ -110,7 +110,7 @@ public interface WintertodtConfig extends Config
 	@ConfigItem(
 		position = 6,
 		keyName = "notifyFullInv",
-		name = "Full Inventory Notification",
+		name = "Full Rs2Inventory Notification",
 		description = "Notifies when your inventory fills up with bruma roots"
 	)
 	default boolean notifyFullInv()
@@ -121,7 +121,7 @@ public interface WintertodtConfig extends Config
 	@ConfigItem(
 		position = 7,
 		keyName = "notifyEmptyInv",
-		name = "Empty Inventory Notification",
+		name = "Empty Rs2Inventory Notification",
 		description = "Notifies when you run out of bruma roots"
 	)
 	default boolean notifyEmptyInv()

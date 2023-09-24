@@ -4,7 +4,7 @@ import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.Objects;
 
@@ -31,7 +31,7 @@ public class MicrobotInventorySetup {
             if (inventorySetup == null) return;
             for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
                 if (inventorySetupsItem.getId() == -1) continue;
-                if (Inventory.hasItem(inventorySetupsItem.getId())) {
+                if (Rs2Inventory.hasItem(inventorySetupsItem.getId())) {
                     Rs2Bank.wearItem(inventorySetupsItem.getId());
                     continue;
                 }
