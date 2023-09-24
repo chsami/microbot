@@ -6,7 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -46,10 +46,10 @@ public class MagicScript extends Script {
         Widget highAlch = Microbot.getClient().getWidget(14286888);
         if (highAlch == null) return;
         Point point = new Point((int) highAlch.getBounds().getCenterX(), (int) highAlch.getBounds().getCenterY());
-        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.MAGIC), 5000);
+        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC), 5000);
         sleep(300, 600);
         Microbot.getMouse().click(point);
-        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.INVENTORY), 5000);
+        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY), 5000);
         sleep(300, 600);
         Microbot.getMouse().click(point);
     }
@@ -100,7 +100,7 @@ public class MagicScript extends Script {
                     if (!Microbot.getClient().getLocalPlayer().getWorldLocation().equals(w)) {
                     Microbot.getWalker().walkRegionCanvas(w.getRegionX(), w.getRegionY());
                     } else {
-                    Tab.switchToMagicTab();
+                    Rs2Tab.switchToMagicTab();
                     sleep(300, 600);
                     Rs2Widget.clickWidget("grab");
                     sleep(300, 600);
