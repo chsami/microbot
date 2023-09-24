@@ -9,9 +9,15 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.util.WorldUtil;
+import net.runelite.http.api.worlds.World;
+import net.runelite.http.api.worlds.WorldResult;
+import net.runelite.http.api.worlds.WorldType;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
@@ -19,6 +25,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 public class Login {
 
     public static ConfigProfile activeProfile = null;
+    private static final int MAX_PLAYER_COUNT = 1950;
 
     public Login() {
         this(360);
@@ -154,5 +161,54 @@ public class Login {
         String username = Login.activeProfile.getName();
         Widget widget = Rs2Widget.getWidget(INTERFACE_LOGIN_SCREEN, 0);
         return Rs2Widget.getWidget(GlobalWidgetInfo.TO_GROUP(widget.getId()), INTERFACE_USERNAME).getText().toLowerCase().equalsIgnoreCase(username);
+    }
+
+    public static int getRandomWorld(boolean isMembers) {
+        WorldResult worldResult = Microbot.getWorldService().getWorlds();
+
+        List<World> worlds;
+        if (worldResult != null) {
+            worlds = worldResult.getWorlds();
+            Random r = new Random();
+            List<World> filteredWorlds = worlds
+                    .stream()
+                    .filter(x ->
+                            (!x.getTypes().contains(WorldType.PVP) &&
+                                            !x.getTypes().contains(WorldType.HIGH_RISK) &&
+                                            !x.getTypes().contains(WorldType.BOUNTY) &&
+                                            !x.getTypes().contains(WorldType.SKILL_TOTAL) &&
+                                            !x.getTypes().contains(WorldType.LAST_MAN_STANDING) &&
+                                            !x.getTypes().contains(WorldType.QUEST_SPEEDRUNNING) &&
+                                            !x.getTypes().contains(WorldType.BETA_WORLD) &&
+                                            !x.getTypes().contains(WorldType.DEADMAN) &&
+                                            !x.getTypes().contains(WorldType.PVP_ARENA) &&
+                                            !x.getTypes().contains(WorldType.TOURNAMENT) &&
+                                            !x.getTypes().contains(WorldType.FRESH_START_WORLD)) &&
+                                            x.getPlayers() < MAX_PLAYER_COUNT &&
+                                            x.getPlayers() >= 0)
+                    .collect(Collectors.toList());
+
+            if (!isMembers) {
+                filteredWorlds = filteredWorlds
+                        .stream()
+                        .filter(x -> !x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList());
+            } else {
+                filteredWorlds = filteredWorlds
+                        .stream()
+                        .filter(x -> x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList());
+            }
+
+            World world =
+                    filteredWorlds.stream()
+                            .skip(r.nextInt(filteredWorlds.size()))
+                            .findFirst()
+                            .orElse(null);
+
+            if (world != null) {
+                return world.getId();
+            }
+        }
+
+        return isMembers ? 360 : 383;
     }
 }
