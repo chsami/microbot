@@ -293,23 +293,30 @@ public class Rs2GameObject {
 
 
     public static GameObject findObject(String objectName, boolean exact) {
-
         List<GameObject> gameObjects = getGameObjects();
 
-        if (gameObjects == null) return null;
+        if (gameObjects == null) {
+            return null;
+        }
 
-        for (net.runelite.api.GameObject gameObject : gameObjects) {
-
+        for (GameObject gameObject : gameObjects) {
             ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
 
-            if (objComp == null) continue;
+            if (objComp == null) {
+                continue;
+            }
+            String compName = null;
 
-            if (exact) {
-                if (objComp.getName().equalsIgnoreCase(objectName) && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
+            try {
+                compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
+            } catch (Exception e) {
+                continue;
+            }
+
+            if (compName != null && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
+                if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
                     return gameObject;
-                }
-            } else {
-                if (objComp.getName().toLowerCase().contains(objectName.toLowerCase()) && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
+                } else if (exact && compName.equalsIgnoreCase(objectName)) {
                     return gameObject;
                 }
             }
