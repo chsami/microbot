@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.bank;
 import net.runelite.api.GameObject;
 import net.runelite.api.Item;
 import net.runelite.api.NPC;
+import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
@@ -214,6 +215,44 @@ public class Rs2Bank {
             if (npc == null) return false;
 
             if (!Rs2Menu.doAction("bank", npc.getCanvasTilePoly())) {
+                return false;
+            }
+            sleepUntil(Rs2Bank::isOpen);
+            sleep(600, 1000);
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+    public static boolean openBank(NPC npc) {
+        Microbot.status = "Opening bank";
+        try {
+            if (isOpen()) return true;
+            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+
+            if (npc == null) return false;
+
+            if (!Rs2Menu.doAction("bank", npc.getCanvasTilePoly())) {
+                return false;
+            }
+            sleepUntil(Rs2Bank::isOpen);
+            sleep(600, 1000);
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+    public static boolean openBank(TileObject object) {
+        Microbot.status = "Opening bank";
+        try {
+            if (isOpen()) return true;
+            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+
+            if (object == null) return false;
+
+            if (!Rs2Menu.doAction("bank", object.getCanvasTilePoly())) {
                 return false;
             }
             sleepUntil(Rs2Bank::isOpen);

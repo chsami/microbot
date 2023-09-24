@@ -11,8 +11,7 @@ public interface TeleporterConfig extends Config {
     @ConfigSection(
             name = "General",
             description = "General",
-            position = 0,
-            closedByDefault = false
+            position = 0
     )
     String generalSection = "general";
 

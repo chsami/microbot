@@ -62,7 +62,7 @@ class ObjectIndicatorsOverlay extends Overlay
 
 	@Inject
 	private ObjectIndicatorsOverlay(Client client, ObjectIndicatorsConfig config, ObjectIndicatorsPlugin plugin,
-		ModelOutlineRenderer modelOutlineRenderer)
+									ModelOutlineRenderer modelOutlineRenderer)
 	{
 		this.client = client;
 		this.config = config;
@@ -84,10 +84,10 @@ class ObjectIndicatorsOverlay extends Overlay
 
 		Stroke stroke = new BasicStroke((float) config.borderWidth());
 		final var defaultFlags =
-			(config.highlightHull() ? HF_HULL : 0) |
-			(config.highlightOutline() ? HF_OUTLINE : 0) |
-			(config.highlightClickbox() ? HF_CLICKBOX : 0) |
-			(config.highlightTile() ? HF_TILE : 0);
+				(config.highlightHull() ? HF_HULL : 0) |
+						(config.highlightOutline() ? HF_OUTLINE : 0) |
+						(config.highlightClickbox() ? HF_CLICKBOX : 0) |
+						(config.highlightTile() ? HF_TILE : 0);
 		for (ColorTileObject obj : objects)
 		{
 			TileObject object = obj.getTileObject();
@@ -104,9 +104,9 @@ class ObjectIndicatorsOverlay extends Overlay
 				composition = composition.getImpostor();
 				// Only mark the object if the name still matches
 				if (composition == null
-					|| Strings.isNullOrEmpty(composition.getName())
-					|| "null".equals(composition.getName())
-					|| !composition.getName().equals(obj.getName()))
+						|| Strings.isNullOrEmpty(composition.getName())
+						|| "null".equals(composition.getName())
+						|| !composition.getName().equals(obj.getName()))
 				{
 					continue;
 				}

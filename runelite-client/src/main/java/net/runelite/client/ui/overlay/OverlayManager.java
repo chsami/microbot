@@ -62,6 +62,7 @@ public class OverlayManager
 	private static final String OVERLAY_CONFIG_PREFERRED_POSITION = "_preferredPosition";
 	private static final String OVERLAY_CONFIG_PREFERRED_SIZE = "_preferredSize";
 	private static final String RUNELITE_CONFIG_GROUP_NAME = RuneLiteConfig.class.getAnnotation(ConfigGroup.class).value();
+	public  List<Overlay> removedOverlays = new ArrayList<>();
 
 	static final Comparator<Overlay> OVERLAY_COMPARATOR = (a, b) ->
 	{
@@ -89,8 +90,8 @@ public class OverlayManager
 	 * Insertion-order sorted set of overlays
 	 * All access to this must be guarded by a lock on this OverlayManager
 	 */
-	@Getter(AccessLevel.PACKAGE)
-	private final List<Overlay> overlays = new ArrayList<>();
+	@Getter(AccessLevel.PUBLIC)
+	public final List<Overlay> overlays = new ArrayList<>();
 	@Getter
 	@Setter
 	private Collection<WidgetItem> widgetItems = Collections.emptyList();

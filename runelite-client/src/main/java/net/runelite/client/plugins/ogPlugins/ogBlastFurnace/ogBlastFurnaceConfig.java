@@ -1,10 +1,7 @@
-package net.runelite.client.plugins.ogPlugins.ogblastfurnace;
+package net.runelite.client.plugins.ogPlugins.ogBlastFurnace;
 
 import net.runelite.client.config.*;
-import net.runelite.client.plugins.ogPlugins.ogblastfurnace.enums.Bars;
-
-import javax.inject.Inject;
-import java.awt.event.KeyEvent;
+import net.runelite.client.plugins.ogPlugins.ogBlastFurnace.enums.Bars;
 
 @ConfigGroup("ogBlastFurnace")
 public interface ogBlastFurnaceConfig extends Config {

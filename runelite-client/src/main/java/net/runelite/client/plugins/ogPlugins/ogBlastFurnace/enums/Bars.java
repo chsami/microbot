@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogblastfurnace.enums;
+package net.runelite.client.plugins.ogPlugins.ogBlastFurnace.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ogPlugins.ogblastfurnace;
+package net.runelite.client.plugins.ogPlugins.ogBlastFurnace;
 
 
 import net.runelite.api.*;
@@ -12,7 +12,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.ogPlugins.ogblastfurnace.enums.Bars;
+import net.runelite.client.plugins.ogPlugins.ogBlastFurnace.enums.Bars;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -148,6 +148,7 @@ public class ogBlastFurnaceScript extends Script {
             sleepUntil(() -> Inventory.hasItem(ItemID.GOLD_ORE));
             sleep(50,80);
             VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
+            sleepUntil(() -> !Rs2Bank.isOpen());
         }
     }
     private String barName() {

@@ -57,7 +57,7 @@ public enum HiscoreSkill
 	FARMING("Farming", SKILL),
 	RUNECRAFT("Runecraft", SKILL),
 	HUNTER("Hunter", SKILL),
-	CONSTRUCTION("ConstructionScript", SKILL),
+	CONSTRUCTION("Construction", SKILL),
 	LEAGUE_POINTS("League Points", ACTIVITY),
 	BOUNTY_HUNTER_HUNTER("Bounty Hunter - Hunter", ACTIVITY),
 	BOUNTY_HUNTER_ROGUE("Bounty Hunter - Rogue", ACTIVITY),
