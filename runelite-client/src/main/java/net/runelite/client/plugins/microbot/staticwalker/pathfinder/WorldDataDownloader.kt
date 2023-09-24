@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.walker.pathfinder
+package net.runelite.client.plugins.microbot.staticwalker.pathfinder
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser

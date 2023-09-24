@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.walker.pathfinder
+package net.runelite.client.plugins.microbot.staticwalker.pathfinder
 
 import net.runelite.api.coords.WorldPoint
 import java.io.File
@@ -119,8 +119,7 @@ class SavedWorldDataLoader(private val worldDataFile: File) {
             val statement = connection.createStatement()
             val rs = statement.executeQuery(
                 """
-                select t.transport_name,
-                       t.object_id,
+                select t.object_id,
                        t.additional_object_id,
                        t.unblock_start_tile,
                        t.unblock_north_south,
@@ -139,7 +138,7 @@ class SavedWorldDataLoader(private val worldDataFile: File) {
                 val startTileId = rs.getInt("start_tile_id")
                 val endTileId = rs.getInt("end_tile_id")
 
-                val startTile = idNodeMap[startTileId] ?: throw Exception("No start tile for transport: ${rs.getString("transport_name")} and start tile id: ${startTileId}")
+                val startTile = idNodeMap[startTileId] ?: throw Exception("No start tile for transport ID: ${rs.getString("transport_name")} and start tile id: ${startTileId}")
                 val endTile = idNodeMap.getOrDefault(endTileId, null)
 
                 val transport = PathTransport(
@@ -162,6 +161,7 @@ class SavedWorldDataLoader(private val worldDataFile: File) {
         } finally {
             connection.close()
         }
+        println("loaded ${transports.size} transports")
         return transports
     }
 }

@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.walker.pathfinder
+package net.runelite.client.plugins.microbot.staticwalker.pathfinder
 
 import net.runelite.api.coords.WorldPoint
 import java.util.*
@@ -10,7 +10,6 @@ class PathFinder(private val nodeMap: MutableMap<String, PathNode>) {
         fun get(): List<PathNode> {
             return path;
         }
-
         fun resetPath() {
             path = emptyList()
         }

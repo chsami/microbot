@@ -1,12 +1,12 @@
-package net.runelite.client.plugins.microbot.walker;
+package net.runelite.client.plugins.microbot.staticwalker;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
-@ConfigGroup(WalkerPlugin.CONFIG_GROUP)
-public interface WalkerConfig extends Config {
+@ConfigGroup(StaticWalkerPlugin.CONFIG_GROUP)
+public interface StaticWalkerConfig extends Config {
     @ConfigSection(
             name = "General",
             description = "General",

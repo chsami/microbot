@@ -31,8 +31,12 @@ public class QuestScript extends Script {
 
     public static List<ItemRequirement> itemsMissing = new ArrayList<>();
 
+    private QuestConfig config;
+
 
     public boolean run(QuestConfig config) {
+        this.config = config;
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
@@ -114,7 +118,11 @@ public class QuestScript extends Script {
             Rs2Npc.interact(questStep.npcID, "Talk-to");
         } else {
             if (questStep.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
-                Microbot.getWalker().walkTo(questStep.getWorldPoint(), true);
+                if (config.enableHybridWalking()) {
+                    Microbot.getWalker().hybridWalkTo(questStep.getWorldPoint(), config.useNearest());
+                } else {
+                    Microbot.getWalker().walkTo(questStep.getWorldPoint(), true);
+                }
                 return false;
             }
         }
@@ -132,9 +140,11 @@ public class QuestScript extends Script {
         boolean success = Rs2GameObject.interact(questStep.objectID);
         if (!success) {
             if (questStep.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
-                Microbot
-                        .getWalker()
-                        .walkTo(questStep.getWorldPoint(), true);
+                if (config.enableHybridWalking()) {
+                    Microbot.getWalker().hybridWalkTo(questStep.getWorldPoint(), config.useNearest());
+                } else {
+                    Microbot.getWalker().walkTo(questStep.getWorldPoint(), true);
+                }
                 return false;
             }
         }

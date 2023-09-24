@@ -202,6 +202,13 @@ public class Inventory {
         return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getName().toLowerCase().contains(itemName)).findFirst().get();
     }
 
+    public static Widget getInventoryItem(int itemId) {
+        Microbot.status = "Searching inventory item ID:" + itemId;
+        Widget inventoryWidget = getInventory();
+        if (inventoryWidget == null) return null;
+        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getItemId() == itemId).findFirst().get();
+    }
+
     public static Widget[] getInventoryItems() {
         Microbot.status = "Fetching inventory items";
         Widget inventoryWidget = getInventory();
