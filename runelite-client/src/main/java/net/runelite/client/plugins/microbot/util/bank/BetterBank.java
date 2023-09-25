@@ -98,6 +98,7 @@ public class BetterBank {
         if (w == null) return null;
 
         for (Widget item : w.getDynamicChildren()) {
+            if (item.getName().isEmpty()) continue;
             String itemNameInItem = item.getName().split(">")[1].split("</")[0].toLowerCase();
             String targetItemName = name.toLowerCase();
 
