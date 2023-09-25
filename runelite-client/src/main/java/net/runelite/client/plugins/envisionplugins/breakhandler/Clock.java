@@ -29,7 +29,7 @@ abstract class Clock {
 
     abstract void setDuration(long duration);
 
-    abstract boolean start();
+    abstract boolean run();
 
     abstract boolean pause();
 

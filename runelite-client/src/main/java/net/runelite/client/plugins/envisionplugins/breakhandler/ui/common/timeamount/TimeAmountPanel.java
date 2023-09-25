@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount;
 
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimerTypes;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;

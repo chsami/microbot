@@ -11,9 +11,10 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.4;
+    public static double version = 0.5;
 
-    protected boolean shouldBreak = false;
+    protected boolean shouldBreakTimerBeEnabled = false;
+    protected boolean shouldRunTimeTimerBeEnabled = true;
 
 
     /* Run Time Duration Variables */
@@ -26,20 +27,35 @@ public class BreakHandlerScript extends Script {
     protected static long maxBreakDuration = -1;
     protected static long expectedBreakDuration = -1;
 
+    /* Timers */
+    protected Timer runTimeTimer;
+    protected Timer breakTimer;
+
     public boolean run(BreakHandlerConfig config) {
+        runTimeTimer = new Timer("Run Time Timer", expectedRunTimeDuration);
+        breakTimer = new Timer("Break Timer", expectedBreakDuration);
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            //System.out.println(minRunTimeDuration);
-        }, 0, 600, TimeUnit.MILLISECONDS);
+            if (shouldRunTimeTimerBeEnabled) {
+                runTimeTimer.run();
+                SwingUtilities.invokeLater(() -> RunTimerPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
+            }
+
+            if (shouldBreakTimerBeEnabled) {
+                breakTimer.run();
+                SwingUtilities.invokeLater(() -> BreakTimerPanel.setDurationTextField(breakTimer.getDisplayTime()));
+            }
+        }, 200, 200, TimeUnit.MILLISECONDS);
 
         return true;
     }
 
     public boolean shouldBreak() {
-        return shouldBreak;
+        return shouldBreakTimerBeEnabled;
     }
 
     public void setShouldBreak(boolean shouldBreak) {
-        this.shouldBreak = shouldBreak;
+        this.shouldBreakTimerBeEnabled = shouldBreak;
     }
 
     /* Run Time Duration Getters and Setters */

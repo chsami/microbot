@@ -2,6 +2,7 @@ package net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timea
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimerTypes;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.utility.PanelUtils;
 import net.runelite.client.ui.components.FlatTextField;
 

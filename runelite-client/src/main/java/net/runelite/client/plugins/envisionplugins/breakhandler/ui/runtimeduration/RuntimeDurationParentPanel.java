@@ -4,7 +4,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerPane
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MaximumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MinimumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.TimeAmountPanel;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.TimerTypes;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimerTypes;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
