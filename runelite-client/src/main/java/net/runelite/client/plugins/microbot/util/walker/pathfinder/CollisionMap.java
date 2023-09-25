@@ -46,12 +46,10 @@ public class CollisionMap {
         doorIds.add(ObjectID.DOOR_2100); //  slayer tower to nechryaels
         doorIds.add(ObjectID.DOOR_2102); //  slayer tower to abberant
         doorIds.add(ObjectID.DOOR_2104); //  slayer tower to abberant
-        doorIds.add(ObjectID.LARGE_DOOR_1521); //  door chaos altar
-        doorIds.add(ObjectID.LARGE_DOOR_1524); //  door chaos altar
 
     }
 
-    public static WorldArea[] blockingAreas = new WorldArea[]{
+    public static WorldArea[] blockingAreas = new WorldArea[] {
             new WorldArea(new WorldPoint(3085, 3333, 0), 50, 50), //draynor manor
             new WorldArea(new WorldPoint(2535, 3109, 0), 10, 30)}; //under maze
 
@@ -94,7 +92,8 @@ public class CollisionMap {
                         false, false, false, false, false, false, false, false
                 };
                 checkedNode.status = 0;
-            } else {
+            }
+            else {
                 traversable = new boolean[]{
                         !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_WEST),
                         !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_EAST),
@@ -132,86 +131,76 @@ public class CollisionMap {
 //                    movementFlags = MovementFlag.getSetFlags(data).toArray(MovementFlag[]::new);
 //                    if (!MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_FULL) && !MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_OBJECT))
 //                    {
-                    neighbors.add(new Node(node.position.dx(d.x).dy(d.y), node));
-                    checkedNode.status = 2;
+                        neighbors.add(new Node(node.position.dx(d.x).dy(d.y), node));
+                        checkedNode.status = 2;
 //                    }
                 }
-                if (canReachActivated) //don't calculate path for doors
-                    continue;
                 LocalPoint localNodePointNorth = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX(), node.position.getY() + 1, node.position.getPlane()));
                 LocalPoint localNodePointEast = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX() + 1, node.position.getY(), node.position.getPlane()));
                 LocalPoint localNodePointSouth = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX(), node.position.getY() - 1, node.position.getPlane()));
                 LocalPoint localNodePointWest = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX() - 1, node.position.getY(), node.position.getPlane()));
 
-                Tile tileNorth = localNodePointNorth != null ?
-                        tiles[node.position.getPlane()][localNodePointNorth.getSceneX()][localNodePointNorth.getSceneY()]
-                        : null;
-                Tile tileEast = localNodePointEast != null ?
-                        tiles[node.position.getPlane()][localNodePointEast.getSceneX()][localNodePointEast.getSceneY()] :
-                        null;
-                Tile tileSouth = localNodePointSouth != null ?
-                        tiles[node.position.getPlane()][localNodePointSouth.getSceneX()][localNodePointSouth.getSceneY()] :
-                        null;
-                Tile tileWest = localNodePointWest != null ?
-                        tiles[node.position.getPlane()][localNodePointWest.getSceneX()][localNodePointWest.getSceneY()] :
-                        null;
+                Tile tileNorth = tiles[node.position.getPlane()][localNodePointNorth.getSceneX()][localNodePointNorth.getSceneY()];
+                Tile tileEast = tiles[node.position.getPlane()][localNodePointEast.getSceneX()][localNodePointEast.getSceneY()];
+                Tile tileSouth = tiles[node.position.getPlane()][localNodePointSouth.getSceneX()][localNodePointSouth.getSceneY()];
+                Tile tileWest = tiles[node.position.getPlane()][localNodePointWest.getSceneX()][localNodePointWest.getSceneY()];
 
                 LocalPoint currentNode = LocalPoint.fromWorld(Microbot.getClient(), new WorldPoint(node.position.getX(), node.position.getY(), node.position.getPlane()));
                 Tile currentTile = tiles[node.position.getPlane()][currentNode.getSceneX()][currentNode.getSceneY()];
 
                 if (currentTile.getWallObject() != null) {
-                    if (doorIds.stream().anyMatch(doorId -> doorId == currentTile.getWallObject().getId())) {
+                    if (doorIds.stream().anyMatch(doorId -> doorId == currentTile.getWallObject().getId()))
+                    {
                         neighbors.add(new Node(node.position.dx(d.x).dy(d.y), node, true));
                         wallNode.node = new Node(currentTile.getWorldLocation(), node);
-                        wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> currentTile.getWallObject().getClickbox());
+                        wallNode.shape = currentTile.getWallObject().getClickbox();
                         wallNode.status = 3;
-                        wallNode.id = currentTile.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
                 }
 
-                if (tileNorth != null && tileNorth.getWallObject() != null && d == OrdinalDirection.NORTH) {
-                    if (doorIds.stream().anyMatch(doorId -> doorId == tileNorth.getWallObject().getId())) {
+               if (tileNorth.getWallObject() != null && d == OrdinalDirection.NORTH) {
+                    if (doorIds.stream().anyMatch(doorId -> doorId == tileNorth.getWallObject().getId()))
+                    {
                         neighbors.add(new Node(tileNorth.getWorldLocation(), node, true));
                         wallNode.node = new Node(tileNorth.getWorldLocation(), node);
-                        wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> tileNorth.getWallObject().getClickbox());
+                        wallNode.shape = tileNorth.getWallObject().getClickbox();
                         wallNode.status = 3;
-                        wallNode.id = tileNorth.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
-                } else if (tileEast != null && tileEast.getWallObject() != null && d == OrdinalDirection.EAST) {
-                    if (doorIds.stream().anyMatch(doorId -> doorId == tileEast.getWallObject().getId())) {
+                } else if (tileEast.getWallObject() != null &&  d == OrdinalDirection.EAST) {
+                    if (doorIds.stream().anyMatch(doorId -> doorId == tileEast.getWallObject().getId()))
+                    {
                         neighbors.add(new Node(tileEast.getWorldLocation(), node, true));
                         wallNode.node = new Node(tileEast.getWorldLocation(), node);
-                        wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> tileEast.getWallObject().getClickbox());
+                        wallNode.shape = tileEast.getWallObject().getClickbox();
                         wallNode.status = 3;
-                        wallNode.id = tileEast.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
-                } else if (tileSouth != null && tileSouth.getWallObject() != null && d == OrdinalDirection.SOUTH) {
-                    if (doorIds.stream().anyMatch(doorId -> doorId == tileSouth.getWallObject().getId())) {
+                } else if (tileSouth.getWallObject() != null &&  d == OrdinalDirection.SOUTH) {
+                    if (doorIds.stream().anyMatch(doorId -> doorId == tileSouth.getWallObject().getId()))
+                    {
                         neighbors.add(new Node(tileSouth.getWorldLocation(), node, true));
                         wallNode.node = new Node(tileSouth.getWorldLocation(), node);
-                        wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> tileSouth.getWallObject().getClickbox());
+                        wallNode.shape = tileSouth.getWallObject().getClickbox();
                         wallNode.status = 3;
-                        wallNode.id = tileSouth.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
-                } else if (tileWest != null && tileWest.getWallObject() != null && d == OrdinalDirection.WEST) {
-                    if (doorIds.stream().anyMatch(doorId -> doorId == tileWest.getWallObject().getId())) {
+                } else if (tileWest.getWallObject() != null && d == OrdinalDirection.WEST) {
+                    if (doorIds.stream().anyMatch(doorId -> doorId == tileWest.getWallObject().getId()))
+                    {
                         neighbors.add(new Node(tileWest.getWorldLocation(), node, true));
                         wallNode.node = new Node(tileWest.getWorldLocation(), node);
-                        wallNode.shape = Microbot.getClientThread().runOnClientThread(() -> tileWest.getWallObject().getClickbox());
+                        wallNode.shape = tileWest.getWallObject().getClickbox();
                         wallNode.status = 3;
-                        wallNode.id = tileWest.getWallObject().getId();
                         wallNodes.add(wallNode);
                     }
                 }
             }
             nodesChecked.add(checkedNode);
             return neighbors;
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+        } catch(Exception ex) {
+           // System.out.println(ex.getMessage());
         }
         return new ArrayList<>();
     }

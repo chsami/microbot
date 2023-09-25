@@ -2,19 +2,16 @@ package net.runelite.client.plugins.nateplugins.nateteleporter.nateteleporter.en
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.runelite.client.plugins.microbot.util.magic.Teleport;
 
 @Getter
 @RequiredArgsConstructor
 public enum Teleports {
-    FALADOR("Falador teleport", Teleport.FALADOR),
-    LUMBRIDGE("Lumbridge teleport", Teleport.LUMBRIDGE),
-    VARROK("Varrock teleport", Teleport.VARROCK),
-    CAMELOT("Camelot teleport", Teleport.CAMELOT),
-    ARDOUGNE("Ardougne teleport", Teleport.ARDOUGNE);
+    FALADOR("falador teleport", 37),
+    LUMBRIDGE("lumbridge teleport", 31),
+    VARROK("varrok teleport", 25);
 
     private final String name;
-    private final Teleport teleport;
+    private final int magicLevel;
 
     @Override
     public String toString() {

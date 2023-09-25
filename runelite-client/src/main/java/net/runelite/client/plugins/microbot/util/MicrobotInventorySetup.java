@@ -12,7 +12,7 @@ public class MicrobotInventorySetup {
     public static void loadInventory(String name) {
         Rs2Bank.openBank();
         if (Rs2Bank.isOpen()) {
-            InventorySetup inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+            InventorySetup inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().toLowerCase().equals(name.toLowerCase())).findFirst().orElse(null);
             if (inventorySetup == null) return;
             for (int i = 0; i < inventorySetup.getInventory().size(); i++) {
                 InventorySetupsItem inventorySetupsItem = inventorySetup.getInventory().get(i);
@@ -27,14 +27,10 @@ public class MicrobotInventorySetup {
     public static void loadEquipment(String name) {
         Rs2Bank.openBank();
         if (Rs2Bank.isOpen()) {
-            InventorySetup inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+            InventorySetup inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().toLowerCase().equals(name.toLowerCase())).findFirst().orElse(null);
             if (inventorySetup == null) return;
             for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
-                if (inventorySetupsItem.getId() == -1) continue;
-                if (Inventory.hasItem(inventorySetupsItem.getId())) {
-                    Rs2Bank.wearItem(inventorySetupsItem.getId());
-                    continue;
-                }
+                if (inventorySetupsItem.getId() == -1 || Inventory.hasItem(inventorySetupsItem.getId())) continue;
                 if (inventorySetupsItem.getQuantity() > 1) {
                     Rs2Bank.withdrawAllAndEquipFast(inventorySetupsItem.getId());
                 } else {

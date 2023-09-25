@@ -41,7 +41,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.AccessLevel;
@@ -88,7 +87,6 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.DrawManager;
 import net.runelite.client.ui.NavigationButton;
-import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.util.ImageCapture;
@@ -877,7 +875,6 @@ public class ScreenshotPlugin extends Plugin
 	@VisibleForTesting
 	void takeScreenshot(String fileName, String subDir)
 	{
-		try{ toggleNaughtyOverlaysOff(); } catch (NullPointerException ignored){}
 		if (client.getGameState() == GameState.LOGIN_SCREEN)
 		{
 			// Prevent the screenshot from being captured
@@ -953,7 +950,6 @@ public class ScreenshotPlugin extends Plugin
 		}
 
 		imageCapture.takeScreenshot(screenshot, fileName, subDir, config.notifyWhenTaken(), config.uploadScreenshot());
-		try { toggleNaughtyOverlaysBackOn(); } catch (NullPointerException ignored){}
 	}
 
 	private boolean isInsideGauntlet()
@@ -986,17 +982,5 @@ public class ScreenshotPlugin extends Plugin
 	int getKillCountNumber()
 	{
 		return killCountNumber;
-	}
-	public void toggleNaughtyOverlaysOff(){
-		overlayManager.removedOverlays = overlayManager.overlays.stream().filter(Overlay::getNaughty).collect(Collectors.toList());
-		for(Overlay removing: overlayManager.removedOverlays){System.out.println("Removing Overlay For Screenshot: " + removing.getName());}
-		overlayManager.removeIf(Overlay::isNaughtyNaughty);
-	}
-	public void toggleNaughtyOverlaysBackOn(){
-		if(!overlayManager.removedOverlays.isEmpty()){
-			for(Overlay theOverlay: overlayManager.removedOverlays){
-				System.out.println("Re-added Overlay Removed For Screenshot: " + theOverlay.getName() +" - "+ overlayManager.add(theOverlay));
-			}
-		}
 	}
 }

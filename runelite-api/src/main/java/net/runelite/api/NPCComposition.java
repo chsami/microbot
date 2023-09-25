@@ -24,8 +24,6 @@
  */
 package net.runelite.api;
 
-import javax.annotation.Nullable;
-
 /**
  * Information about a specific {@link NpcID}
  */
@@ -47,6 +45,8 @@ public interface NPCComposition extends ParamHolder
 	 * {@link MenuAction#NPC_SECOND_OPTION} and so on.
 	 */
 	String[] getActions();
+
+	boolean isClickable();
 
 	/**
 	 * NPC can be interacting with via menu options
@@ -98,32 +98,4 @@ public interface NPCComposition extends ParamHolder
 	 * @return
 	 */
 	boolean isFollower();
-
-	/**
-	 * Get the colors to be replaced on this npc's model for this npc.
-	 * @see JagexColor
-	 * @return the colors to be replaced
-	 */
-	@Nullable
-	short[] getColorToReplace();
-
-	/**
-	 * Get the colors applied to this npc's model for this npc.
-	 * @see JagexColor
-	 * @return the colors to replace with
-	 */
-	@Nullable
-	short[] getColorToReplaceWith();
-
-	/**
-	 * Horizontal scaling of the npc model (1/128th of a tile).
-	 * @return
-	 */
-	int getWidthScale();
-
-	/**
-	 * Vertical scaling of the npc model (1/128th of a tile).
-	 * @return
-	 */
-	int getHeightScale();
 }

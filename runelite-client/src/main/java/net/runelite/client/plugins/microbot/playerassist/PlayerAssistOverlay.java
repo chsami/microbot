@@ -24,7 +24,6 @@ public class PlayerAssistOverlay extends Overlay {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
         setPriority(OverlayPriority.HIGH);
-        setNaughty();
     }
 
 

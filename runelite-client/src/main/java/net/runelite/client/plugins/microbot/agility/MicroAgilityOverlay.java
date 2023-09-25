@@ -17,7 +17,6 @@ public class MicroAgilityOverlay extends OverlayPanel {
     MicroAgilityOverlay(MicroAgilityPlugin plugin) {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
-        setNaughty();
     }
 
     @Override

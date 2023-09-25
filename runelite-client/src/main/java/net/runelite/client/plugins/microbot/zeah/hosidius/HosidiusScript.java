@@ -67,14 +67,14 @@ public class HosidiusScript extends Script {
             return;
         }
 
-        if (Microbot.getClient().getLocalPlayer().getAnimation() != 3065 && !Microbot.isMoving()) {
+        if (Microbot.getClient().getLocalPlayer().getAnimation() != 3065 && !Microbot.isWalking()) {
             //looks like we are frozen
             repairCounter++;
         } else {
             repairCounter = 0;
         }
 
-        if (repairCounter >= 5 && !Microbot.isMoving()) {
+        if (repairCounter >= 5 && !Microbot.isWalking()) {
             Rs2GameObject.interact(plough);
             sleep(3000, 4000);
             Rs2GameObject.interact(plough);

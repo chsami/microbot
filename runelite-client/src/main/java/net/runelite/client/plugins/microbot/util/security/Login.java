@@ -3,59 +3,85 @@ package net.runelite.client.plugins.microbot.util.security;
 import net.runelite.api.GameState;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigProfile;
+import net.runelite.client.config.ProfileManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.GlobalWidgetInfo;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.util.WorldUtil;
-import net.runelite.http.api.worlds.World;
-import net.runelite.http.api.worlds.WorldResult;
-import net.runelite.http.api.worlds.WorldType;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class Login {
 
-    public static ConfigProfile activeProfile = null;
-    private static final int MAX_PLAYER_COUNT = 1950;
+    private ConfigProfile getProfile() {
+        try (ProfileManager.Lock lock = Microbot.getProfileManager().lock()) {
+            return lock.getProfiles().stream().filter(x -> x.isActive()).findFirst().get();
+        }
 
-    public Login() {
-        this(getRandomWorld(true));
     }
 
-    public Login(int world) {
-        this(activeProfile.getName(), activeProfile.getPassword(), world);
+    public Login() {
+        try {
+            if (Encryption.decrypt(getProfile().getPassword()) == null || Encryption.decrypt(getProfile().getPassword()).length() == 0)
+                return;
+            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+            sleep(300, 600);
+            setWorld(360);
+        } catch (Exception e) {
+            System.out.println("Changing world failed");
+        } finally {
+            Microbot.getClient().setUsername(getProfile().getName());
+            try {
+                Microbot.getClient().setPassword(Encryption.decrypt(getProfile().getPassword()));
+                sleep(300, 600);
+                VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+            } catch (Exception e) {
+                //throw new RuntimeException(e);
+            }
+        }
     }
 
     public Login(String username, String password) {
-        this(username, password, 360);
+        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        sleep(300, 600);
+        try {
+            setWorld(360);
+        } catch (Exception e) {
+            System.out.println("Changing world failed");
+        } finally {
+            Microbot.getClient().setUsername(username);
+            try {
+                Microbot.getClient().setPassword(Encryption.decrypt(password));
+            } catch (Exception e) {
+            }
+            sleep(300, 600);
+            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        }
     }
 
-    public Login(String username, String password, int world) {
+    public Login(int world) {
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
         sleep(300, 600);
         try {
             setWorld(world);
         } catch (Exception e) {
             System.out.println("Changing world failed");
+        } finally {
+            Microbot.getClient().setUsername(getProfile().getName());
+            try {
+                Microbot.getClient().setPassword(Encryption.decrypt(getProfile().getPassword()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            sleep(300, 600);
+            VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
         }
-        Microbot.getClient().setUsername(username);
-        try {
-            Microbot.getClient().setPassword(Encryption.decrypt(password));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        sleep(300, 600);
-        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
     }
 
     //TODO: this should be elsewhere
@@ -87,7 +113,7 @@ public class Login {
 
     public boolean activateCondition() {
         GameState idx = Microbot.getClient().getGameState();
-        return ((Rs2Menu.getIndex("Play") == 0 || (idx == GameState.LOGIN_SCREEN || idx == GameState.LOGGING_IN)) && activeProfile.getName() != null)
+        return ((Rs2Menu.getIndex("Play") == 0 || (idx == GameState.LOGIN_SCREEN || idx == GameState.LOGGING_IN)) && getProfile().getName() != null)
                 || (idx == GameState.LOGGED_IN && Rs2Widget.getWidget(GlobalWidgetInfo.LOGIN_MOTW_TEXT.getPackedId(), 0) != null);
     }
 
@@ -158,57 +184,8 @@ public class Login {
     }
 
     private boolean isUsernameFilled() {
-        String username = Login.activeProfile.getName();
+        String username = getProfile().getName();
         Widget widget = Rs2Widget.getWidget(INTERFACE_LOGIN_SCREEN, 0);
         return Rs2Widget.getWidget(GlobalWidgetInfo.TO_GROUP(widget.getId()), INTERFACE_USERNAME).getText().toLowerCase().equalsIgnoreCase(username);
-    }
-
-    public static int getRandomWorld(boolean isMembers) {
-        WorldResult worldResult = Microbot.getWorldService().getWorlds();
-
-        List<World> worlds;
-        if (worldResult != null) {
-            worlds = worldResult.getWorlds();
-            Random r = new Random();
-            List<World> filteredWorlds = worlds
-                    .stream()
-                    .filter(x ->
-                            (!x.getTypes().contains(WorldType.PVP) &&
-                                            !x.getTypes().contains(WorldType.HIGH_RISK) &&
-                                            !x.getTypes().contains(WorldType.BOUNTY) &&
-                                            !x.getTypes().contains(WorldType.SKILL_TOTAL) &&
-                                            !x.getTypes().contains(WorldType.LAST_MAN_STANDING) &&
-                                            !x.getTypes().contains(WorldType.QUEST_SPEEDRUNNING) &&
-                                            !x.getTypes().contains(WorldType.BETA_WORLD) &&
-                                            !x.getTypes().contains(WorldType.DEADMAN) &&
-                                            !x.getTypes().contains(WorldType.PVP_ARENA) &&
-                                            !x.getTypes().contains(WorldType.TOURNAMENT) &&
-                                            !x.getTypes().contains(WorldType.FRESH_START_WORLD)) &&
-                                            x.getPlayers() < MAX_PLAYER_COUNT &&
-                                            x.getPlayers() >= 0)
-                    .collect(Collectors.toList());
-
-            if (!isMembers) {
-                filteredWorlds = filteredWorlds
-                        .stream()
-                        .filter(x -> !x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList());
-            } else {
-                filteredWorlds = filteredWorlds
-                        .stream()
-                        .filter(x -> x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList());
-            }
-
-            World world =
-                    filteredWorlds.stream()
-                            .skip(r.nextInt(filteredWorlds.size()))
-                            .findFirst()
-                            .orElse(null);
-
-            if (world != null) {
-                return world.getId();
-            }
-        }
-
-        return isMembers ? 360 : 383;
     }
 }

@@ -10,11 +10,10 @@ public class AutoLoginScript extends Script {
 
     public boolean run(AutoLoginConfig autoLoginConfig) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            super.run();
             try {
                 if (!Microbot.isLoggedIn()) {
-                    if (autoLoginConfig.useRandomWorld()) {
-                        new Login(Login.getRandomWorld(autoLoginConfig.isMember()));
+                    if (autoLoginConfig.world() == -1) {
+                        new Login(383);
                     } else {
                         new Login(autoLoginConfig.world());
                     }

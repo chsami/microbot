@@ -13,17 +13,6 @@ public interface FletchingConfig extends Config {
 
     String GROUP = "Fletching";
 
-    @ConfigItem(
-            keyName = "guide",
-            name = "How to use",
-            description = "How to use this plugin",
-            position = 1
-    )
-    default String GUIDE() {
-        return "Start the script at any bank (grand exchange preferably)\n" +
-                "Make sure to have a bank and all the logs in your bank";
-    }
-
     @ConfigSection(
             name = "General",
             description = "General",

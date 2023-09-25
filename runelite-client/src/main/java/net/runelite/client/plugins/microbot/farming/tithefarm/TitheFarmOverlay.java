@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.farming.tithefarm;
 
+import net.runelite.client.plugins.tithefarm.TitheFarmPlant;
+import net.runelite.client.plugins.tithefarm.TitheFarmPlugin;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -14,7 +16,6 @@ public class TitheFarmOverlay extends OverlayPanel {
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
-        setNaughty();
     }
     @Override
     public Dimension render(Graphics2D graphics) {
@@ -25,8 +26,12 @@ public class TitheFarmOverlay extends OverlayPanel {
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
+                .left("Current Plant:")
+                .right(Integer.toString(TitheFarmScript.currentPlant))
+                .build());
+        panelComponent.getChildren().add(LineComponent.builder()
                 .left("Plants left:")
-                .right(Long.toString(TitheFarmScript.getPlantedPlants()))
+                .right(Integer.toString(TitheFarmPlugin.getPlants().size()))
                 .build());
         return super.render(graphics);
     }

@@ -98,10 +98,6 @@ public class Rs2Menu {
         Microbot.getMouse().move(bounds.getCenterX(), bounds.getCenterY());
         return doAction(action, new Point((int) bounds.getCenterX(), (int) bounds.getCenterY()), (String[]) null);
     }
-    public static boolean doActionFast(String action, Rectangle bounds) {
-        Microbot.getMouse().move(bounds.getCenterX(), bounds.getCenterY());
-        return doActionFast(action, new Point((int) bounds.getCenterX(), (int) bounds.getCenterY()), (String[]) null);
-    }
 
     public static boolean doAction(String action, Polygon poly, String... targets) {
         Microbot.getMouse().move(poly.getBounds().getCenterX(), poly.getBounds().getCenterY());
@@ -145,17 +141,7 @@ public class Rs2Menu {
         if (target != null && target.length > 0)
             setName(target[0]);
         Microbot.getMouse().click(point);
-        sleep(300,325);
-        setOption("");
-        setName("");
-        return true;
-    }
-    public static boolean doActionFast(final String action, Point point, final String... target) {
-        setOption(action);
-        if (target != null && target.length > 0)
-            setName(target[0]);
-        Microbot.getMouse().click(point);
-        //sleep(300,325);
+        sleep(300);
         setOption("");
         setName("");
         return true;

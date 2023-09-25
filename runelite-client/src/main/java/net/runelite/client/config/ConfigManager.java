@@ -44,7 +44,6 @@ import net.runelite.client.account.SessionManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.*;
-import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.RunnableExceptionLogger;
 import net.runelite.http.api.config.ConfigPatch;
@@ -135,8 +134,6 @@ public class ConfigManager
 
 	public void switchProfile(ConfigProfile newProfile)
 	{
-		Login.activeProfile = newProfile;
-
 		if (newProfile.getId() == profile.getId())
 		{
 			log.warn("switching to existing profile!");

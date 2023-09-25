@@ -202,7 +202,7 @@ class AutoVorkathPlugin : Plugin() {
                         Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
-                    State.PRAYER -> if (Inventory.findItem("prayer") != null) {
+                    State.PRAYER -> if (Inventory.findItemContains("prayer") != null) {
                         Inventory.useItemContains("prayer")
                         botState = previousBotState
                     } else {
@@ -211,7 +211,7 @@ class AutoVorkathPlugin : Plugin() {
                         Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
-                    State.RANGE_POTION -> if (Inventory.findItem(config.RANGEPOTION().toString()) != null) {
+                    State.RANGE_POTION -> if (Inventory.findItemContains(config.RANGEPOTION().toString()) != null) {
                         Inventory.useItemContains(config.RANGEPOTION().toString())
                         botState = previousBotState
                     } else {
@@ -220,7 +220,7 @@ class AutoVorkathPlugin : Plugin() {
                         Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
-                    State.ANTIFIRE_POTION -> if (Inventory.findItem("antifire") != null) {
+                    State.ANTIFIRE_POTION -> if (Inventory.findItemContains("antifire") != null) {
                         Inventory.useItemContains("super antifire")
                         botState = previousBotState
                     } else {
@@ -229,7 +229,7 @@ class AutoVorkathPlugin : Plugin() {
                         Inventory.useItem(config.TELEPORT().toString())
                         needsToBank = true
                     }
-                    State.ANTIVENOM -> if (Inventory.findItem("venom") != null){
+                    State.ANTIVENOM -> if (Inventory.findItemContains("venom") != null){
                         Inventory.useItemContains("venom")
                         Rs2Player.antiVenomTime = -64; //set this immediatly because the antivenom timer takes a while before it gets triggered
                         botState = previousBotState
@@ -290,7 +290,7 @@ class AutoVorkathPlugin : Plugin() {
                 }
 
                 Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, clickedTile))
-                while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 1 && client.localPlayer.worldLocation.y == clickedTile.y && Microbot.isMoving()) {
+                while (client.localPlayer.worldLocation != clickedTile && client.localPlayer.worldLocation.distanceTo(clickedTile) > 1 && client.localPlayer.worldLocation.y == clickedTile.y && Microbot.isWalking()) {
                     sleep(1)
                 }
                 toggle = !toggle

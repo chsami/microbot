@@ -1,8 +1,7 @@
 package net.runelite.client.plugins.microbot.thieving;
 
-import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.natepainthelper.PaintFormat;
+import net.runelite.client.plugins.microbot.util.walker.PathTileOverlay;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -11,47 +10,23 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.natepainthelper.Info.*;
-import static net.runelite.client.plugins.natepainthelper.Info.xpTillNextLevel;
-
 public class ThievingOverlay extends OverlayPanel {
     @Inject
     ThievingOverlay(ThievingPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
-        setNaughty();
     }
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            long timeElapsed = System.currentTimeMillis() - timeBegan;
-            xpGained = Microbot.getClient().getSkillExperience(Skill.THIEVING) - expstarted;;
-            int xpPerHour = (int)( xpGained / ((System.currentTimeMillis() - timeBegan) / 3600000.0D));
-            nextLevelXp = XP_TABLE[Microbot.getClient().getRealSkillLevel(Skill.THIEVING) + 1];
-            xpTillNextLevel = nextLevelXp - Microbot.getClient().getSkillExperience(Skill.THIEVING);
-            if (xpGained >= 1)
-            {
-                timeTNL = (long) ((xpTillNextLevel / xpPerHour) * 3600000);
-            }
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Micro Thieving V" + ThievingScript.version)
-                    .color(Color.MAGENTA)
+                    .color(Color.GREEN)
                     .build());
 
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Time Ran: " + PaintFormat.ft(timeElapsed))
-                    .build());
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Thieving Exp Gained (hr): " + (xpGained)  + " ("+xpPerHour+")")
-                    .build());
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Thieving Levels Gained: " + ( Microbot.getClient().getRealSkillLevel(Skill.THIEVING) - startinglevel))
-                    .build());
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Time till next level: " + PaintFormat.ft(timeTNL))
-                    .build());
+            panelComponent.getChildren().add(LineComponent.builder().build());
 
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)

@@ -22,8 +22,9 @@ public class SummerGardenScript extends Script {
             if (!super.run()) return;
             try {
 
-                if (!Inventory.hasItem("beer glass") || !Inventory.hasItem("Pestle and mortar")) {
-                    Microbot.showMessage("You need a pestle and mortar and beer glass.");
+                if (!Inventory.hasItem("beer glass")) {
+                    //TODO: implement banking here
+                    Microbot.getNotifier().notify("Script shutting down, no more beer glass");
                 }
 
                 if (Inventory.hasItemAmount("Summer sq'irk", 2)) {
@@ -34,8 +35,8 @@ public class SummerGardenScript extends Script {
                 if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(startingPosition)) {
                     if (ElementalCollisionDetector.getTicksUntilStart() == 0) {
                         Rs2GameObject.interact(12943);
-                        sleepUntil(() -> Microbot.isMoving());
-                        sleepUntil(() -> !Microbot.isMoving(), 30000);
+                        sleepUntil(() -> Microbot.isWalking());
+                        sleepUntil(() -> !Microbot.isWalking(), 30000);
                         sleepUntilOnClientThread(() ->Microbot.getClient().getLocalPlayer().getWorldLocation().getY() < 5481);
                         sleep(1500);//caught or success timeout
                     }
@@ -48,8 +49,8 @@ public class SummerGardenScript extends Script {
 
                 if (gate != null) {
                     Rs2GameObject.interact(gate);
-                    sleepUntil(() -> Microbot.isMoving());
-                    sleepUntil(() -> !Microbot.isMoving());
+                    sleepUntil(() -> Microbot.isWalking());
+                    sleepUntil(() -> !Microbot.isWalking());
                     sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(startingPosition));
                 }
 

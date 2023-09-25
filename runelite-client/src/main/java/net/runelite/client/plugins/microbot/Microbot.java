@@ -21,7 +21,6 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
-import javax.swing.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -68,8 +67,6 @@ public class Microbot {
     @Setter
     private static boolean disableWalkerUpdate;
 
-    public static boolean debug = false;
-
     public static boolean isGainingExp = false;
     public static boolean pauseAllScripts = false;
     public static String status = "IDLE";
@@ -90,21 +87,14 @@ public class Microbot {
     public static Mouse getMouseForKotlin() { return mouse; }
     public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
 
-    @Deprecated(since="Use isMoving", forRemoval = true)
     public static boolean isWalking() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
-                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
+        return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getPoseAnimation() != 813 && getClient().getLocalPlayer().getPoseAnimation() != 808);
     }
-
-    public static boolean isMoving() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
-                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
-    }
-
 
     public static boolean isAnimating() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
     }
+
 
     public static int getVarbitValue(int varbit) {
         return getClientThread().runOnClientThread(() -> getClient().getVarbitValue(varbit));
@@ -164,17 +154,5 @@ public class Microbot {
 
     public static boolean hasTileBeenLoaded(WorldPoint worldPoint) {
         return LocalPoint.fromWorld(Microbot.getClient(), worldPoint) != null;
-    }
-
-    public static void showMessage(String message) {
-        try {
-            SwingUtilities.invokeAndWait(() ->
-            {
-                JOptionPane.showConfirmDialog(null, message, "Message",
-                        JOptionPane.DEFAULT_OPTION);
-            });
-        } catch(Exception ex) {
-            System.out.println(ex.getMessage());
-        }
     }
 }

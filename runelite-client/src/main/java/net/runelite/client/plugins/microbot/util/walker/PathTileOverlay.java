@@ -81,32 +81,32 @@ public class PathTileOverlay {
                 if (checkedNode.shape != null)
                     graphics.draw(checkedNode.shape);
             }
-//            for (int i = 0; i < CollisionMap.nodesChecked.size(); i++) {
-//                CheckedNode checkedNode = CollisionMap.nodesChecked.get(i);
-//
-//                Color tileColor = checkedNode.status == 0 ? new Color(
-//                        new Color(255, 255, 255).getRed(),
-//                        new Color(0, 0, 0).getGreen(),
-//                        new Color(0, 0, 0).getBlue(),
-//                        100) : checkedNode.status == 1 ? new Color(
-//                        new Color(150, 150, 150).getRed(),
-//                        new Color(0, 0, 0).getGreen(),
-//                        new Color(0, 0, 0).getBlue(),
-//                        new Color(0, 0, 255).getAlpha() - 150) : checkedNode.status == 2 ? new Color(
-//                        new Color(0, 0, 0).getRed(),
-//                        new Color(255, 255, 255).getGreen(),
-//                        new Color(0, 0, 0).getBlue(),
-//                        0) : new Color(
-//                        new Color(0, 0, 0).getRed(),
-//                        new Color(0, 255, 0).getGreen(),
-//                        new Color(255, 255, 255).getBlue(),
-//                        new Color(255, 255, 255).getAlpha() - 150);
-//                drawTile(graphics, checkedNode.node.position, tileColor, true);
-//                graphics.setColor(Color.GREEN);
-//
-//                if (checkedNode.shape != null)
-//                    graphics.draw(checkedNode.shape);
-//            }
+            for (int i = 0; i < CollisionMap.nodesChecked.size(); i++) {
+                CheckedNode checkedNode = CollisionMap.nodesChecked.get(i);
+
+                Color tileColor = checkedNode.status == 0 ? new Color(
+                        new Color(255, 255, 255).getRed(),
+                        new Color(0, 0, 0).getGreen(),
+                        new Color(0, 0, 0).getBlue(),
+                        100) : checkedNode.status == 1 ? new Color(
+                        new Color(150, 150, 150).getRed(),
+                        new Color(0, 0, 0).getGreen(),
+                        new Color(0, 0, 0).getBlue(),
+                        new Color(0, 0, 255).getAlpha() - 150) : checkedNode.status == 2 ? new Color(
+                        new Color(0, 0, 0).getRed(),
+                        new Color(255, 255, 255).getGreen(),
+                        new Color(0, 0, 0).getBlue(),
+                        0) : new Color(
+                        new Color(0, 0, 0).getRed(),
+                        new Color(0, 255, 0).getGreen(),
+                        new Color(255, 255, 255).getBlue(),
+                        new Color(255, 255, 255).getAlpha() - 150);
+                drawTile(graphics, checkedNode.node.position, tileColor, true);
+                graphics.setColor(Color.GREEN);
+
+                if (checkedNode.shape != null)
+                    graphics.draw(checkedNode.shape);
+            }
         }
 
         return null;

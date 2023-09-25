@@ -13,7 +13,6 @@ public class AutoZMIAltarOverlay extends OverlayPanel {
     AutoZMIAltarOverlay(AutoZMIAltar plugin){
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
-        setNaughty();
     }
 
     @Override

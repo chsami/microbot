@@ -25,7 +25,6 @@
 package net.runelite.client.plugins.objectindicators;
 
 import java.awt.Color;
-import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import net.runelite.api.ObjectComposition;
@@ -53,9 +52,6 @@ class ColorTileObject
 	 * Name to highlight for multilocs
 	 */
 	private final String name;
-	@Nullable
-	private final Color borderColor;
-	@Nullable
-	private final Color fillColor;
+	private final Color color;
 	byte highlightFlags;
 }

@@ -5,7 +5,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import org.apache.commons.lang3.NotImplementedException;
@@ -54,29 +53,6 @@ public class Rs2Magic {
         Microbot.getMouse().click(point);
     }
 
-    public static void highAlch(String itemName, boolean exact) {
-        Tab.switchToMagicTab();
-        Widget item = Inventory.findItemInMemory(itemName, exact);
-        Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
-        alch(highAlch, item);
-    }
-
-    public static void highAlch(String itemName) {
-        highAlch(itemName, false);
-    }
-
-
-    public static void highAlch(Widget item, boolean exact) {
-        Tab.switchToMagicTab();
-        Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
-        alch(highAlch, item);
-    }
-
-    public static void highAlch(Widget widget) {
-        highAlch(widget, false);
-    }
-
-
     public static void highAlch() {
         Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
         alch(highAlch);
@@ -87,7 +63,7 @@ public class Rs2Magic {
         alch(lowAlch);
     }
 
-    private static void alch(Widget alch, Widget item) {
+    private static void alch(Widget alch) {
         if (alch == null) return;
         Point point = new Point((int) alch.getBounds().getCenterX(), (int) alch.getBounds().getCenterY());
         sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.MAGIC), 5000);
@@ -95,15 +71,7 @@ public class Rs2Magic {
         Microbot.getMouse().click(point);
         sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.INVENTORY), 5000);
         sleep(300, 600);
-        if (item == null) {
-            Microbot.getMouse().click(point);
-        } else {
-            Inventory.useItemFast(item, "cast");
-        }
-    }
-
-    private static void alch(Widget alch) {
-        alch(alch, null);
+        Microbot.getMouse().click(point);
     }
 
     public static void handleMenuSwapper(MenuEntry menuEntry) {

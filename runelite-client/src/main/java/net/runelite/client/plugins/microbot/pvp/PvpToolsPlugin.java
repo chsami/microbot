@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.util.player.Rs2Pvp.isAttackable;
+import static net.runelite.client.plugins.microbot.util.player.PvPUtil.isAttackable;
 
 @PluginDescriptor(
         name = "PvP Tools - Work in Progress",
@@ -346,7 +346,7 @@ public class PvpToolsPlugin extends Plugin
     @Subscribe
     private void onPlayerSpawned(PlayerSpawned event)
     {
-        if (config.countPlayers() && isAttackable(event.getPlayer()))
+        if (config.countPlayers() && isAttackable(client, event.getPlayer()))
         {
             updatePlayers();
         }
@@ -359,7 +359,7 @@ public class PvpToolsPlugin extends Plugin
     @Subscribe
     private void onPlayerDespawned(PlayerDespawned event)
     {
-        if (config.countPlayers() && isAttackable(event.getPlayer()))
+        if (config.countPlayers() && isAttackable(client, event.getPlayer()))
         {
             updatePlayers();
         }
@@ -396,7 +396,7 @@ public class PvpToolsPlugin extends Plugin
                     {
                         continue;
                     }
-                    if (isAttackable(p))
+                    if (isAttackable(client, p))
                     {
                         if (p.isFriendsChatMember())
                         {
@@ -422,7 +422,7 @@ public class PvpToolsPlugin extends Plugin
         overheadCount = new int[]{0, 0, 0};
         for (Player p : client.getPlayers())
         {
-            if (Objects.nonNull(p) && isAttackable(p) &&
+            if (Objects.nonNull(p) && isAttackable(client, p) &&
                     !p.isFriendsChatMember() && !(p.getOverheadIcon() == null))
             {
                 switch (p.getOverheadIcon())
