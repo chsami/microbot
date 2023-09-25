@@ -43,7 +43,10 @@ boolean emptySack = false;
                 }
 
                 if (!Inventory.hasItem("hammer"))
-
+                {
+                    bank();
+                    return;
+                }
 
                 if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 80 || (emptySack && !Inventory.contains("pay-dirt"))) {
                     status = MLMStatus.EMPTY_SACK;
