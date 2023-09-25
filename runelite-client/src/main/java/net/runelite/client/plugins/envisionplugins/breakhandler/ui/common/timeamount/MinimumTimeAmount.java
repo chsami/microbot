@@ -12,7 +12,10 @@ import java.awt.event.FocusListener;
 public class MinimumTimeAmount extends JPanel {
     protected final FlatTextField durationTextField;
 
+    protected TimerTypes timerType;
+
     public MinimumTimeAmount(TimerTypes myType) {
+        timerType = myType;
         setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         setMinimumSize(new Dimension(100, 5));
 
@@ -61,5 +64,15 @@ public class MinimumTimeAmount extends JPanel {
         {
             durationTextField.setText(PanelUtils.getFormattedDuration(seconds));
         }
+    }
+
+    public void setDurationFromConfig(long seconds) {
+        if (timerType == TimerTypes.BREAK) {
+            BreakHandlerScript.setMinBreakDuration(seconds);
+        } else if (timerType == TimerTypes.RUNTIME) {
+            BreakHandlerScript.setMinRunTimeDuration(seconds);
+        }
+
+        updateDisplayInput(seconds);
     }
 }

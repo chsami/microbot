@@ -13,7 +13,11 @@ import java.awt.event.FocusListener;
 public class MaximumTimeAmount extends JPanel {
     protected final FlatTextField durationTextField;
 
+    protected TimerTypes timerType;
+
     public MaximumTimeAmount(TimerTypes myType) {
+        timerType = myType;
+
         setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         final JLabel label1 = new JLabel();
         label1.setText("Max");
@@ -60,5 +64,15 @@ public class MaximumTimeAmount extends JPanel {
         {
             durationTextField.setText(PanelUtils.getFormattedDuration(seconds));
         }
+    }
+
+    public void setDurationFromConfig(long seconds) {
+        if (timerType == TimerTypes.BREAK) {
+            BreakHandlerScript.setMaxBreakDuration(seconds);
+        } else if (timerType == TimerTypes.RUNTIME) {
+            BreakHandlerScript.setMaxRunTimeDuration(seconds);
+        }
+
+        updateDisplayInput(seconds);
     }
 }

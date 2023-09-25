@@ -14,7 +14,6 @@ import net.runelite.client.ui.PluginPanel;
 import javax.inject.Inject;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
@@ -22,6 +21,9 @@ public class BreakHandlerPanel extends PluginPanel {
 
     @Inject
     BreakHandlerScript breakHandlerScript;
+
+    private final RuntimeDurationParentPanel runtimeDurationParentPanel;
+    private final BreakDurationParentPanel breakDurationParentPanel;
 
     private final JPanel breakMethodPanel = new JPanel();
     private final JPanel breakDurationPanel = new JPanel();
@@ -43,12 +45,22 @@ public class BreakHandlerPanel extends PluginPanel {
 
         add(new TitlePanel());
         add(new BreakMethodParentPanel());
-        add(new BreakDurationParentPanel());
+
+        breakDurationParentPanel = new BreakDurationParentPanel();
+        add(breakDurationParentPanel);
+
         add(new BreakTimerParentPanel());
-        add(new RuntimeDurationParentPanel());
+
+        runtimeDurationParentPanel = new RuntimeDurationParentPanel();
+        add(runtimeDurationParentPanel);
+
         add(new RunTimerParentPanel());
         add(new AccountParentPanel());
         add(new TwoFactorAuthParentPanel());
-
     }
+
+    public RuntimeDurationParentPanel getRuntimeDurationParentPanel() {
+        return runtimeDurationParentPanel;
+    }
+    public BreakDurationParentPanel getBreakDurationParentPanel() { return breakDurationParentPanel; }
 }

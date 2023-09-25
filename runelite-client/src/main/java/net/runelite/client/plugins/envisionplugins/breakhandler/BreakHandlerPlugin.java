@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage;
         name = PluginDescriptor.Envision + "Break Handler",
         description = "Break Handler for Microbot",
         tags = {"microbot", "utility"},
-        enabledByDefault = false
+        enabledByDefault = true
 )
 @Slf4j
 public class BreakHandlerPlugin extends Plugin {
@@ -45,6 +45,8 @@ public class BreakHandlerPlugin extends Plugin {
 
         breakHandlerPanel = injector.getInstance(BreakHandlerPanel.class);
 
+        initBreakSettings();
+
         navButton = NavigationButton.builder()
                 .tooltip("Microbot Break Handler")
                 .icon(icon)
@@ -62,4 +64,21 @@ public class BreakHandlerPlugin extends Plugin {
         clientToolbar.removeNavigation(navButton);
     }
 
+    /**
+     * Setup both the Script's initial min-max break and runtime settings, expected break and run time durations,
+     *  as well as setting up the display panel with the freshly generated values.
+     *
+     *  Feeds data from Configuration file to Script and Panels
+     *
+     *  //TODO Debian:: refactor
+     */
+    private void initBreakSettings() {
+        // Setup Run Time panel defaults
+        breakHandlerPanel.getRuntimeDurationParentPanel().getTimeAmountPanel().getMinimumTimeAmount().setDurationFromConfig(config.MINIMUM_RUN_TIME_DURATION());
+        breakHandlerPanel.getRuntimeDurationParentPanel().getTimeAmountPanel().getMaximumTimeAmount().setDurationFromConfig(config.MAXIMUM_RUN_TIME_DURATION());
+
+        // Setup Break panel defaults
+        breakHandlerPanel.getBreakDurationParentPanel().getTimeAmountPanel().getMinimumTimeAmount().setDurationFromConfig(config.MINIMUM_BREAK_DURATION());
+        breakHandlerPanel.getBreakDurationParentPanel().getTimeAmountPanel().getMaximumTimeAmount().setDurationFromConfig(config.MAXIMUM_BREAK_DURATION());
+    }
 }

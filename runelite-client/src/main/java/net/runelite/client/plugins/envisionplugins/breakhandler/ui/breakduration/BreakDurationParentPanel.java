@@ -8,11 +8,18 @@ import net.runelite.client.ui.ColorScheme;
 import javax.swing.*;
 
 public class BreakDurationParentPanel extends JPanel {
+    private final TimeAmountPanel timeAmountPanel;
+
     public BreakDurationParentPanel() {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         setBorder(BreakHandlerPanel.BORDER);
 
         add(new BreakDurationTitlePanel());
-        add(new TimeAmountPanel(TimerTypes.BREAK));
+        timeAmountPanel = new TimeAmountPanel(TimerTypes.BREAK);
+        add(timeAmountPanel);
+    }
+
+    public TimeAmountPanel getTimeAmountPanel() {
+        return timeAmountPanel;
     }
 }

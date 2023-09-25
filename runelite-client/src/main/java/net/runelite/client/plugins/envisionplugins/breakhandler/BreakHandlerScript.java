@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.3;
+    public static double version = 0.4;
+
     protected boolean shouldBreak = false;
 
 
