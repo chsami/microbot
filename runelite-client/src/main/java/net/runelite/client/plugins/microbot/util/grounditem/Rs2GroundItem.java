@@ -187,7 +187,7 @@ public class Rs2GroundItem {
         return true;
     }
 
-    private static boolean interact(RS2Item rs2Item) {
+    public static boolean interact(RS2Item rs2Item) {
         return interact(rs2Item, "Take");
     }
 

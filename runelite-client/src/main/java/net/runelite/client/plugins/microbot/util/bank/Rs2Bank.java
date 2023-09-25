@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.bank;
 import net.runelite.api.GameObject;
 import net.runelite.api.Item;
 import net.runelite.api.NPC;
+import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
@@ -66,6 +67,12 @@ public class Rs2Bank {
         return BetterBank.withdrawOneFast(itemName);
     }
 
+    public static boolean withdrawItem(boolean checkInventory, int itemId) {
+        Microbot.status = "Withdrawing one " + itemId;
+        if (checkInventory && Inventory.hasItem(itemId)) return true;
+        return BetterBank.withdrawOneFast(itemId);
+    }
+
     public static boolean withdrawItemContains(String name) {
         Microbot.status = "Withdrawing one " + name;
         return withdrawItem(name);
@@ -75,6 +82,12 @@ public class Rs2Bank {
         Microbot.status = "Withdrawing " + amount + " " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
         return BetterBank.withdrawXFast(itemName, amount);
+    }
+
+    public static boolean withdrawItemX(boolean checkInventory, int itemId, int amount) {
+        Microbot.status = "Withdrawing " + amount + " " + itemId;
+        if (checkInventory && Inventory.hasItem(itemId)) return true;
+        return BetterBank.withdrawXFast(itemId, amount);
     }
 
     public static boolean withdrawItemAll(boolean checkInventory, String itemName) {
@@ -212,6 +225,44 @@ public class Rs2Bank {
         }
         return false;
     }
+    public static boolean openBank(NPC npc) {
+        Microbot.status = "Opening bank";
+        try {
+            if (isOpen()) return true;
+            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+
+            if (npc == null) return false;
+
+            if (!Rs2Menu.doAction("bank", npc.getCanvasTilePoly())) {
+                return false;
+            }
+            sleepUntil(Rs2Bank::isOpen);
+            sleep(600, 1000);
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+    public static boolean openBank(TileObject object) {
+        Microbot.status = "Opening bank";
+        try {
+            if (isOpen()) return true;
+            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+
+            if (object == null) return false;
+
+            if (!Rs2Menu.doAction("bank", object.getCanvasTilePoly())) {
+                return false;
+            }
+            sleepUntil(Rs2Bank::isOpen);
+            sleep(600, 1000);
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
 
     public static boolean useBank() {
         if (isOpen()) return true;
@@ -247,7 +298,11 @@ public class Rs2Bank {
         return w != null && w.getItemQuantity() > 0;
     }
 
-
+    public static boolean hasItem(int itemId) {
+        Microbot.status = "Looking for " + itemId + " in the bank";
+        Widget w = BetterBank.findBankItem(itemId);
+        return w != null && w.getItemQuantity() > 0;
+    }
 
     public static boolean hasItems(List<ItemRequirement> itemsRequired) {
         for (ItemRequirement item : itemsRequired) {

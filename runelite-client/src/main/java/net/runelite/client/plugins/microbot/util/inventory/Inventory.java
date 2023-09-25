@@ -6,6 +6,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.models.BankItemWidget;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -13,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -202,6 +204,13 @@ public class Inventory {
         return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getName().toLowerCase().contains(itemName)).findFirst().get();
     }
 
+    public static Widget getInventoryItem(int itemId) {
+        Microbot.status = "Searching inventory item ID:" + itemId;
+        Widget inventoryWidget = getInventory();
+        if (inventoryWidget == null) return null;
+        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getItemId() == itemId).findFirst().get();
+    }
+
     public static Widget[] getInventoryItems() {
         Microbot.status = "Fetching inventory items";
         Widget inventoryWidget = getInventory();
@@ -246,6 +255,18 @@ public class Inventory {
             }
         }
         return null;
+    }
+    public static Widget findLastItem(int itemId) {
+        Microbot.status = "Searching inventory for last item with id " + itemId;
+        Widget inventoryWidget = getInventory();
+        Widget lastItem = null;
+        if (inventoryWidget == null) return null;
+        for (Widget item : inventoryWidget.getDynamicChildren()) {
+            if (item.getItemId() == itemId) {
+                lastItem = item;
+            }
+        }
+        return lastItem;
     }
 
     public static boolean hasItemAmount(int itemId, int amount) {
@@ -338,6 +359,20 @@ public class Inventory {
         });
     }
 
+    public static Widget findItemLast(int itemId) {
+        Microbot.status = "Searching inventory for last item with id " + itemId;
+        Widget inventoryWidget = getInventory();
+        if (inventoryWidget == null) return null;
+        Widget[] children = inventoryWidget.getDynamicChildren();
+        ArrayUtils.reverse(children);
+        for (Widget item : children) {
+            if (item.getItemId() == itemId) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     public static Widget findItem(String itemName) {
         return findItem( itemName, false);
     }
@@ -378,7 +413,17 @@ public class Inventory {
         Widget item = findItem(itemName);
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
-        sleep(600, 800);
+        sleep(100, 300);
+        return true;
+    }
+
+    public static boolean useItemLast(int id) {
+        if (Rs2Bank.isOpen()) return false;
+        Microbot.status = "Use inventory item " + id;
+        Widget item = findItemLast(id);
+        if (item == null) return false;
+        Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
+        sleep(600, 1200);
         return true;
     }
 
@@ -449,6 +494,28 @@ public class Inventory {
         sleep(600, 1200);
         return true;
     }
+    public static boolean useItemOnObject(int item, int objectID) {
+        if (Rs2Bank.isOpen()) return false;
+        Widget item1 = findItem(item);
+        TileObject object = Rs2GameObject.findObjectById(objectID);
+        if (item1 == null || object == null) return false;
+        Microbot.getMouse().click(item1.getBounds().getCenterX(), item1.getBounds().getCenterY());
+        sleep(600, 1200);
+        Microbot.getMouse().click(object.getCanvasLocation().getX(), object.getCanvasLocation().getY());
+        sleep(600, 1200);
+        return true;
+    }
+    public static boolean useItemOnObjectFast(int item, int objectID) {
+        if (Rs2Bank.isOpen()) return false;
+        Widget item1 = findItem(item);
+        TileObject object = Rs2GameObject.findObjectById(objectID);
+        if (item1 == null || object == null) return false;
+        Microbot.getMouse().click(item1.getBounds().getCenterX(), item1.getBounds().getCenterY());
+        sleep(0, 200);
+        Microbot.getMouse().click(object.getCanvasLocation().getX(), object.getCanvasLocation().getY());
+        sleep(0, 200);
+        return true;
+    }
 
     public static boolean useItemOnNpc(String itemName, String npcName) {
         if (Rs2Bank.isOpen()) return false;
@@ -492,6 +559,12 @@ public class Inventory {
     public static boolean useItemAction(int itemID, String actionName) {
         Microbot.status = "Use inventory item " + itemID + " with action " + actionName;
         Widget item = findItem(itemID);
+        if (item == null) return false;
+        return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
+    }
+    public static boolean useLastItemAction(int itemID, String actionName) {
+        Microbot.status = "Use inventory item " + itemID + " with action " + actionName;
+        Widget item = findLastItem(itemID);
         if (item == null) return false;
         return Rs2Menu.doAction(actionName, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
     }
