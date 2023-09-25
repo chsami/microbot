@@ -61,6 +61,12 @@ public class Rs2Bank {
         return withdrawItem(false, itemName);
     }
 
+    public static boolean withdrawItem(String itemName, boolean exact) {
+        Microbot.status = "Withdrawing one " + itemName;
+        if (Inventory.hasItem(itemName)) return true;
+        return BetterBank.withdrawOneFast(itemName, exact);
+    }
+
     public static boolean withdrawItem(boolean checkInventory, String itemName) {
         Microbot.status = "Withdrawing one " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
