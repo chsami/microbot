@@ -28,24 +28,6 @@ package net.runelite.client.plugins.timers;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
-import net.runelite.api.annotations.Varp;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.*;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.game.ItemVariationMapping;
-import net.runelite.client.game.SpriteManager;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
-import net.runelite.client.util.RSTimeUnit;
-import org.apache.commons.lang3.ArrayUtils;
-
-import javax.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.EnumMap;
@@ -55,18 +37,54 @@ import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Actor;
+import net.runelite.api.ChatMessageType;
+import net.runelite.api.Client;
+import net.runelite.api.EquipmentInventorySlot;
+import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
+import net.runelite.api.ItemID;
 import static net.runelite.api.ItemID.FIRE_CAPE;
 import static net.runelite.api.ItemID.INFERNAL_CAPE;
+import net.runelite.api.NPC;
+import net.runelite.api.NpcID;
+import net.runelite.api.Player;
+import net.runelite.api.Skill;
+import net.runelite.api.VarPlayer;
 import static net.runelite.api.VarPlayer.LAST_HOME_TELEPORT;
 import static net.runelite.api.VarPlayer.LAST_MINIGAME_TELEPORT;
+import net.runelite.api.Varbits;
+import net.runelite.api.annotations.Varp;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ActorDeath;
+import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.GraphicChanged;
+import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.NpcDespawned;
+import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.ItemVariationMapping;
+import net.runelite.client.game.SpriteManager;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
 import static net.runelite.client.plugins.timers.GameIndicator.VENGEANCE_ACTIVE;
 import static net.runelite.client.plugins.timers.GameTimer.*;
+import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
+import net.runelite.client.util.RSTimeUnit;
+import org.apache.commons.lang3.ArrayUtils;
 
 @PluginDescriptor(
-	name = "Timers",
-	description = "Show various timers in an infobox",
-	tags = {"combat", "items", "magic", "potions", "prayer", "overlay", "abyssal", "sire", "inferno", "fight", "caves", "cape", "timer", "tzhaar", "thieving", "pickpocket", "hunter", "impling", "puro"}
+		name = "Timers",
+		description = "Show various timers in an infobox",
+		tags = {"combat", "items", "magic", "potions", "prayer", "overlay", "abyssal", "sire", "inferno", "fight", "caves", "cape", "timer", "tzhaar", "thieving", "pickpocket", "hunter", "impling", "puro"}
 )
 @Slf4j
 public class TimersPlugin extends Plugin
@@ -96,11 +114,11 @@ public class TimersPlugin extends Plugin
 	private static final String BLESSED_CRYSTAL_SCARAB_MESSAGE = "You crack the crystal in your hand.";
 	private static final String LIQUID_ADRENALINE_MESSAGE = "You drink some of the potion, reducing the energy cost of your special attacks.</col>";
 	private static final Set<Integer> STAVES_OF_THE_DEAD = new ImmutableSet.Builder<Integer>()
-		.addAll(ItemVariationMapping.getVariations(ItemID.STAFF_OF_THE_DEAD))
-		.addAll(ItemVariationMapping.getVariations(ItemID.TOXIC_STAFF_UNCHARGED))
-		.add(ItemID.STAFF_OF_LIGHT)
-		.add(ItemID.STAFF_OF_BALANCE)
-		.build();
+			.addAll(ItemVariationMapping.getVariations(ItemID.STAFF_OF_THE_DEAD))
+			.addAll(ItemVariationMapping.getVariations(ItemID.TOXIC_STAFF_UNCHARGED))
+			.add(ItemID.STAFF_OF_LIGHT)
+			.add(ItemID.STAFF_OF_BALANCE)
+			.build();
 
 	private static final int VENOM_VALUE_CUTOFF = -38; // Antivenom < -38 <= Antipoison < 0
 	private static final int POISON_TICK_LENGTH = 30;
@@ -314,15 +332,15 @@ public class TimersPlugin extends Plugin
 			}
 
 			updateVarTimer(ANTIPOISON, event.getValue(),
-				i -> i >= 0 || i < VENOM_VALUE_CUTOFF,
-				i -> nextPoisonTick - tickCount + Math.abs((i + 1) * POISON_TICK_LENGTH));
+					i -> i >= 0 || i < VENOM_VALUE_CUTOFF,
+					i -> nextPoisonTick - tickCount + Math.abs((i + 1) * POISON_TICK_LENGTH));
 			updateVarTimer(ANTIVENOM, event.getValue(),
-				i -> i >= VENOM_VALUE_CUTOFF,
-				i -> nextPoisonTick - tickCount + Math.abs((i + 1 - VENOM_VALUE_CUTOFF) * POISON_TICK_LENGTH));
+					i -> i >= VENOM_VALUE_CUTOFF,
+					i -> nextPoisonTick - tickCount + Math.abs((i + 1 - VENOM_VALUE_CUTOFF) * POISON_TICK_LENGTH));
 		}
 
 		if ((event.getVarbitId() == Varbits.NMZ_OVERLOAD_REFRESHES_REMAINING
-			|| event.getVarbitId() == Varbits.COX_OVERLOAD_REFRESHES_REMAINING) && config.showOverload())
+				|| event.getVarbitId() == Varbits.COX_OVERLOAD_REFRESHES_REMAINING) && config.showOverload())
 		{
 			final int overloadVarb = event.getValue();
 			final int tickCount = client.getTickCount();
@@ -371,8 +389,8 @@ public class TimersPlugin extends Plugin
 		}
 
 		if (event.getVarbitId() == Varbits.RUN_SLOWED_DEPLETION_ACTIVE
-			|| event.getVarbitId() == Varbits.STAMINA_EFFECT
-			|| event.getVarbitId() == Varbits.RING_OF_ENDURANCE_EFFECT)
+				|| event.getVarbitId() == Varbits.STAMINA_EFFECT
+				|| event.getVarbitId() == Varbits.RING_OF_ENDURANCE_EFFECT)
 		{
 			// staminaEffectActive is checked to match https://github.com/Joshua-F/cs2-scripts/blob/741271f0c3395048c1bad4af7881a13734516adf/scripts/%5Bproc%2Cbuff_bar_get_value%5D.cs2#L25
 			int staminaEffectActive = client.getVarbitValue(Varbits.RUN_SLOWED_DEPLETION_ACTIVE);
@@ -448,8 +466,8 @@ public class TimersPlugin extends Plugin
 		if (event.getVarbitId() == Varbits.DIVINE_SUPER_DEFENCE && config.showDivine())
 		{
 			if (client.getVarbitValue(Varbits.DIVINE_SUPER_COMBAT) > event.getValue()
-				|| client.getVarbitValue(Varbits.DIVINE_BASTION) > event.getValue()
-				|| client.getVarbitValue(Varbits.DIVINE_BATTLEMAGE) > event.getValue())
+					|| client.getVarbitValue(Varbits.DIVINE_BASTION) > event.getValue()
+					|| client.getVarbitValue(Varbits.DIVINE_BATTLEMAGE) > event.getValue())
 			{
 				return;
 			}
@@ -673,6 +691,7 @@ public class TimersPlugin extends Plugin
 			removeGameTimer(RESURRECT_THRALL_COOLDOWN);
 			removeGameTimer(SHADOW_VEIL_COOLDOWN);
 			removeGameTimer(WARD_OF_ARCEUUS_COOLDOWN);
+			removeGameTimer(CORRUPTION_COOLDOWN);
 		}
 
 		if (!config.showAntiPoison())
@@ -755,8 +774,8 @@ public class TimersPlugin extends Plugin
 		if (config.showCannon())
 		{
 			if (message.equals(CANNON_BASE_MESSAGE) || message.equals(CANNON_STAND_MESSAGE)
-				|| message.equals(CANNON_BARRELS_MESSAGE) || message.equals(CANNON_FURNACE_MESSAGE)
-				|| message.contains(CANNON_REPAIR_MESSAGE))
+					|| message.equals(CANNON_BARRELS_MESSAGE) || message.equals(CANNON_FURNACE_MESSAGE)
+					|| message.contains(CANNON_REPAIR_MESSAGE))
 			{
 				removeGameTimer(CANNON_REPAIR);
 				TimerTimer cannonTimer = createGameTimer(CANNON);
@@ -981,7 +1000,7 @@ public class TimersPlugin extends Plugin
 		{
 			// assume movement means unfrozen
 			if (freezeTime != client.getTickCount()
-				&& !currentWorldPoint.equals(lastPoint))
+					&& !currentWorldPoint.equals(lastPoint))
 			{
 				removeGameTimer(freezeTimer.getTimer());
 				freezeTimer = null;

@@ -1,11 +1,22 @@
 package net.runelite.client.plugins.microbot.thieving.summergarden;
 
-import java.awt.Color;
 import net.runelite.api.SoundEffectVolume;
 import net.runelite.client.config.*;
 
+import java.awt.*;
+
 @ConfigGroup(SummerGardenPlugin.CONFIG_GROUP)
 public interface SummerGardenConfig extends Config {
+    @ConfigItem(
+            keyName = "guide",
+            name = "How to use",
+            description = "How to use this plugin",
+            position = 0
+    )
+    default String GUIDE() {
+        return "Right click the tree at summers garden and click 'Start',\n You need a pestle and mortar and empty beer glasses! \n Stamina pots is recommended \n The script might fail the first few attempts to get tick perfect";
+    }
+
     @ConfigItem(
             keyName = "highlightGood",
             name = "On-Parity Color",

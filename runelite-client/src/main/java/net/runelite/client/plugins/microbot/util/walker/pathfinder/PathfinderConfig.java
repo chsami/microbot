@@ -207,8 +207,8 @@ public class PathfinderConfig {
 
 
         Transport lumbridgeStairce0 = new Transport()
-                .addObstacle(new WorldPoint(3204, 3209, 0), new WorldPoint(3204, 3209, 1), "Climb-up")
-                .setOffset(0, -2)
+                .addObstacle(new WorldPoint(3204, 3207, 0), new WorldPoint(3204, 3209, 1), "Climb-up")
+                .setOffset(2, 2)
                 .addReverse("Climb-down");
 
         Transport lumbridgeStairce1 = new Transport()

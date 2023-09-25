@@ -2,16 +2,9 @@ package net.runelite.client.plugins.microbot.thieving.summergarden;
 
 
 import com.google.inject.Provides;
-import java.awt.Color;
-import java.awt.TrayIcon;
-import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.Player;
-import net.runelite.api.Preferences;
-import net.runelite.api.Varbits;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
@@ -27,9 +20,12 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 
+import javax.inject.Inject;
+import java.awt.*;
+
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Summers Garden",
-        description = "Microbot Summers Garden",
+        description = "Microbot Summers Garden - Right click the tree at summers garden and click 'Start', You need a pestle and mortar and empty beer glasses!",
         tags = {"Summers Garden", "minigame", "thieving", "microbot", "skilling"},
         enabledByDefault = false
 )
