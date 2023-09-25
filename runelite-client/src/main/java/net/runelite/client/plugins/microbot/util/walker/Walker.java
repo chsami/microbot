@@ -8,6 +8,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Camera;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
@@ -122,14 +123,25 @@ public class Walker {
     }
 
     public void walkFastCanvas(WorldPoint worldPoint) {
-        while (!Calculations.tileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), worldPoint))) {
+        LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+        int times = 0; //extra check to avoid getting stuck
+        while (!Calculations.tileOnScreen(localPoint)) {
+            if (Microbot.getClient().getCameraPitch() < 370) {
+                Microbot.getClient().setCameraPitchTarget(Random.random(370, 400));
+            }
+            if (Microbot.getClient().getScale() < 400 || times > 10) break;
             Microbot.getMouse().scrollDown(new Point(1, 1));
-            sleep(100, 300);
+            sleep(300, 500);
+            times++;
         }
 
         Point canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY()), Microbot.getClient().getPlane());
         canvasX = canv != null ? canv.getX() : -1;
         canvasY = canv != null ? canv.getY() : -1;
+
+        if (canvasX == -1 && canvasY == -1) {
+            Camera.turnTo(localPoint);
+        }
 
         Microbot.getMouse().clickFast(1, 1);
 

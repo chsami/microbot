@@ -42,6 +42,12 @@ boolean emptySack = false;
                     return;
                 }
 
+                if (!Inventory.hasItem("hammer"))
+                {
+                    bank();
+                    return;
+                }
+
                 if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 80 || (emptySack && !Inventory.contains("pay-dirt"))) {
                     status = MLMStatus.EMPTY_SACK;
                 } else if (!Inventory.isFull()) {
@@ -49,7 +55,7 @@ boolean emptySack = false;
                 } else if (Inventory.isFull()) {
                     miningSpot = MLMMiningSpot.IDLE;
                     if (Inventory.hasItem(ItemID.PAYDIRT)) {
-                        if (Rs2GameObject.findObjectById(ObjectID.BROKEN_STRUT) != null && Inventory.contains("hammer")) {
+                        if (Rs2GameObject.findObjectById(ObjectID.BROKEN_STRUT) != null && Inventory.hasItem("hammer")) {
                             status = MLMStatus.FIXING_WATERWHEEL;
                         } else {
                             status = MLMStatus.DEPOSIT_HOPPER;
@@ -75,7 +81,7 @@ boolean emptySack = false;
                         while (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 10) {
                             if (Inventory.count() <= 1) {
                                 Rs2GameObject.interact(SACKID);
-                                sleepUntil(Inventory::isFull, 10000);
+                                sleepUntil(() -> Inventory.count() > 1, 10000);
                             }
                             bank();
                         }
@@ -83,7 +89,7 @@ boolean emptySack = false;
                         status = MLMStatus.IDLE;
                         break;
                     case FIXING_WATERWHEEL:
-                        Rs2GameObject.interact(ObjectID.BROKEN_STRUT);
+                            Rs2GameObject.interact(ObjectID.BROKEN_STRUT);
                         break;
                     case DEPOSIT_HOPPER:
                         if (Rs2GameObject.interact(ObjectID.HOPPER_26674)) {
@@ -109,7 +115,8 @@ boolean emptySack = false;
         if (Rs2Bank.useBank()) {
             sleepUntil(Rs2Bank::isOpen);
             Rs2Bank.depositAll();
-            Rs2Bank.withdrawItem("hammer");
+            sleep(100, 300);
+            Rs2Bank.withdrawItem("hammer", true);
         }
     }
 
@@ -126,7 +133,7 @@ boolean emptySack = false;
     private boolean walkToMiningSpot() {
         WorldPoint miningWorldPoint = miningSpot.getWorldPoint().get(0);
         if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(miningWorldPoint) > 8) {
-            Microbot.getWalker().walkFastCanvas(miningWorldPoint);
+            Microbot.getWalker().walkMiniMap(miningWorldPoint);
             return false;
         }
         return true;
