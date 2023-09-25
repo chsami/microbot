@@ -8,13 +8,19 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimerTy
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
 public class BreakDurationParentPanel extends JPanel {
     private final TimeAmountPanel timeAmountPanel;
 
     public BreakDurationParentPanel() {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        setBorder(BreakHandlerPanel.BORDER);
+//        setBorder(new EmptyBorder(20, 0, 0, 0));
+        Dimension d = new Dimension(300, 100);
+        setSize(d);
+        setPreferredSize(d);
+        setMaximumSize(d);
 
         add(new BreakDurationTitlePanel());
         timeAmountPanel = new TimeAmountPanel(TimerTypes.BREAK);

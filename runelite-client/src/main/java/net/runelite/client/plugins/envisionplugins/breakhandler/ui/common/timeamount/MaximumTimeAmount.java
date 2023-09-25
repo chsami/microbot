@@ -4,6 +4,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScri
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimerTypes;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.utility.PanelUtils;
+import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.FlatTextField;
 
 import javax.swing.*;
@@ -26,6 +27,7 @@ public class MaximumTimeAmount extends JPanel {
 
         durationTextField = new FlatTextField();
         durationTextField.setText("HH:MM:SS");
+        durationTextField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         durationTextField.setEditable(true);
         durationTextField.setPreferredSize(new Dimension(70, 25));
         durationTextField.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
@@ -49,7 +51,7 @@ public class MaximumTimeAmount extends JPanel {
                     } else if (myType == TimerTypes.RUNTIME) {
                         BreakHandlerScript.setMaxRunTimeDuration(duration);
                     }
-                } catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
 
                 updateDisplayInput(duration);
@@ -59,10 +61,8 @@ public class MaximumTimeAmount extends JPanel {
         add(durationTextField);
     }
 
-    void updateDisplayInput(long seconds)
-    {
-        if (!durationTextField.getTextField().hasFocus())
-        {
+    void updateDisplayInput(long seconds) {
+        if (!durationTextField.getTextField().hasFocus()) {
             durationTextField.setText(PanelUtils.getFormattedDuration(seconds));
         }
     }

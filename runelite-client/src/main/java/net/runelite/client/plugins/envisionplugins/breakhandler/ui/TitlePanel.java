@@ -12,7 +12,11 @@ public class TitlePanel extends JPanel {
 
         // Style & Layout Setup
         setBorder(new EmptyBorder(10, 10, 10, 10));
-        setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        setBackground(ColorScheme.DARK_GRAY_COLOR);
+        Dimension d = new Dimension(300, 50);
+        setSize(d);
+        setPreferredSize(d);
+        setMaximumSize(d);
 
         // Label Setup
         JLabel title = new JLabel("Micro Break Handler V" + BreakHandlerScript.version);
