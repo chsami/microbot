@@ -43,6 +43,7 @@ import net.runelite.client.discord.DiscordService;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 import net.runelite.client.plugins.PluginManager;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.rs.ClientLoader;
 import net.runelite.client.rs.ClientUpdateCheckMode;
 import net.runelite.client.ui.ClientUI;
@@ -163,6 +164,7 @@ public class RuneLite {
         final OptionParser parser = new OptionParser(false);
         parser.accepts("developer-mode", "Enable developer tools");
         parser.accepts("debug", "Show extra debugging output");
+        parser.accepts("microbot-debug", "Enables debug features for microbot");
         parser.accepts("safe-mode", "Disables external plugins and the GPU plugin");
         parser.accepts("insecure-skip-tls-verification", "Disables TLS verification");
         parser.accepts("jav_config", "jav_config url")
@@ -206,6 +208,10 @@ public class RuneLite {
         if (options.has("debug")) {
             final Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
             logger.setLevel(Level.DEBUG);
+        }
+
+        if (options.has("microbot-debug")) {
+            Microbot.debug = true;
         }
 
         //More information about java proxies can be found here

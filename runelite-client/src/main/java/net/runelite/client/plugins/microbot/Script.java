@@ -1,10 +1,9 @@
 package net.runelite.client.plugins.microbot;
 
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
 import net.runelite.api.TileObject;
 import net.runelite.api.WallObject;
 import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -29,6 +28,7 @@ public abstract class Script implements IScript {
     protected ScheduledFuture<?> scheduledFuture;
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
+    public static boolean useStaminaPotsIfNeeded = true;
 
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
@@ -104,17 +104,9 @@ public abstract class Script implements IScript {
         if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
             VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         }
-
-        if (Rs2Widget.getWidget(36241409) != null) {
-            Point p = Microbot.getClientThread()
-                    .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
-            Microbot.getMouse().click(p);
-        }
-
-        if (Rs2Widget.getWidget(26345473) != null) {
-            Point p = Microbot.getClientThread()
-                    .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
-            Microbot.getMouse().click(p);
+        Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
+        if (clickHereToPlayButton != null) {
+            Rs2Widget.clickWidget(clickHereToPlayButton.getId());
         }
 
         if (Microbot.pauseAllScripts)
@@ -125,34 +117,9 @@ public abstract class Script implements IScript {
 
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
-        if (!hasRunEnergy) {
+        if (!hasRunEnergy && useStaminaPotsIfNeeded) {
             Inventory.useItemContains("Stamina potion");
         }
-
-        return true;
-    }
-
-    public boolean run(int world) {
-        hasLeveledUp = false;
-        Rs2Player.toggleRunEnergy(true);
-
-        if (Rs2Widget.getWidget(36241409) != null) {
-            Point p = Microbot.getClientThread()
-                    .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
-            Microbot.getMouse().click(p);
-        }
-
-        if (Rs2Widget.getWidget(26345473) != null) {
-            Point p = Microbot.getClientThread()
-                    .runOnClientThread(() -> Perspective.localToMinimap(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation()));
-            Microbot.getMouse().click(p);
-        }
-
-        if (Microbot.pauseAllScripts)
-            return false;
-
-        if (Microbot.getWalker() != null && Microbot.getWalker().getPathfinder() != null && !Microbot.getWalker().getPathfinder().isDone())
-            return false;
 
         return true;
     }

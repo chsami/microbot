@@ -5,24 +5,23 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.api.Varbits.QUICK_PRAYER;
-import static net.runelite.client.plugins.microbot.util.globval.VarbitValues.QUICK_PRAYER_DISABLED;
+import static net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer.isQuickPrayerEnabled;
 import static net.runelite.client.plugins.pestcontrol.Portal.*;
-import static net.runelite.client.plugins.pestcontrol.Portal.RED;
 
 public class PestControlScript extends Script {
     public static double version = 1.0;
@@ -62,7 +61,7 @@ public class PestControlScript extends Script {
 
     public boolean run(PestControlConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run(344)) return;
+            if (!super.run()) return;
             try {
                 if (Microbot.getClient().getMinimapZoom() != 2.0) {
                     Microbot.getClient().setMinimapZoom(2.0);
@@ -70,7 +69,7 @@ public class PestControlScript extends Script {
                 final boolean isInPestControl = Microbot.getClient().getWidget(WidgetInfo.PEST_CONTROL_BLUE_SHIELD) != null;
                 final boolean isInBoat = Microbot.getClient().getWidget(WidgetInfo.PEST_CONTROL_BOAT_INFO) != null;
                 if (isInPestControl) {
-                    if (Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_DISABLED.getValue()) {
+                    if (!isQuickPrayerEnabled() && Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) != 0) {
                         final Widget prayerOrb = Rs2Widget.getWidget(WidgetInfo.MINIMAP_QUICK_PRAYER_ORB);
                         if (prayerOrb != null) {
                             Microbot.getMouse().click(prayerOrb.getCanvasLocation());
@@ -91,7 +90,8 @@ public class PestControlScript extends Script {
                     Widget redHealth = Rs2Widget.getWidget(RED.getHitpoints());
                     Widget yellowHealth = Microbot.getClient().getWidget(YELLOW.getHitpoints());
 
-                    Rs2Player.toggleSpecialAttack(550);
+                    Rs2Combat.setSpecState(true, 550);
+
 
                     for (int brawler : BRAWLER_IDS) {
                         if (!Microbot.getClient().getLocalPlayer().isInteracting())

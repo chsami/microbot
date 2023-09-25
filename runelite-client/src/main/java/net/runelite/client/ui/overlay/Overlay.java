@@ -59,6 +59,7 @@ public abstract class Overlay implements LayoutableRenderableEntity
 	private boolean resizable;
 	private int minimumSize = 32;
 	private boolean resettable = true;
+	private boolean naughtyNaughty = false;
 
 	/**
 	 * Whether this overlay can be dragged onto other overlays &amp; have
@@ -99,6 +100,7 @@ public abstract class Overlay implements LayoutableRenderableEntity
 	{
 		return this.getClass().getSimpleName();
 	}
+	public boolean getNaughty(){return this.naughtyNaughty;}
 
 	/**
 	 * Configure to draw this overlay after the given interface is drawn. Except
@@ -198,6 +200,7 @@ public abstract class Overlay implements LayoutableRenderableEntity
 				snappable = true;
 		}
 	}
+	public void setNaughty(){ this.naughtyNaughty = true; }
 
 	public OverlayMenuEntry addMenuEntry(MenuAction action, String option, String target)
 	{
@@ -216,4 +219,5 @@ public abstract class Overlay implements LayoutableRenderableEntity
 	{
 		menuEntries.remove(new OverlayMenuEntry(action, option, target));
 	}
+
 }

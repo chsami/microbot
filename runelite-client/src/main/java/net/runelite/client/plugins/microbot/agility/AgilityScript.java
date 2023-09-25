@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class AgilityScript extends Script {
     public List<AgilityObstacleModel> seersCourse = new ArrayList<>();
 
 
-    WorldPoint startCourse = new WorldPoint(0, 0, 0);
+    WorldPoint startCourse = null;
 
     public static int currentObstacle = 0;
 
@@ -92,12 +93,15 @@ public class AgilityScript extends Script {
         init(config);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
+            if (startCourse == null) {
+                Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
+            }
             try {
                 final List<RS2Item> marksOfGrace = AgilityPlugin.getMarksOfGrace();
                 final LocalPoint playerLocation = Microbot.getClient().getLocalPlayer().getLocalLocation();
                 final WorldPoint playerWorldLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
-                if (Microbot.isWalking()) return;
+                if (Microbot.isMoving()) return;
                 if (Microbot.isAnimating()) return;
 
                 if (currentObstacle >= getCurrentCourse(config).size()) {
@@ -175,7 +179,7 @@ public class AgilityScript extends Script {
     private boolean waitForAgilityObstabcleToFinish(int agilityExp) {
         sleepUntilOnClientThread(() -> agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY)
                 || (Microbot.getClient().getPlane() == 0 && currentObstacle != 0), 15000);
-        sleepUntilOnClientThread(() -> !Microbot.isWalking() && !Microbot.isAnimating(), 10000);
+        sleepUntilOnClientThread(() -> !Microbot.isMoving() && !Microbot.isAnimating(), 10000);
 
 
         if (agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY) || Microbot.getClient().getPlane() == 0) {

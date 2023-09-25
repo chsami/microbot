@@ -19,6 +19,7 @@ public class ThreeTickBarbOverlay extends OverlayPanel {
     ThreeTickBarbOverlay(ThreeTickBarb threeTickBarb) {
         super(threeTickBarb);
         setPosition(OverlayPosition.BOTTOM_LEFT);
+        setNaughty();
     }
 
     @Override

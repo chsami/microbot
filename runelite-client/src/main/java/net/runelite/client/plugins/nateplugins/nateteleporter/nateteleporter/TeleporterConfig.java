@@ -11,8 +11,7 @@ public interface TeleporterConfig extends Config {
     @ConfigSection(
             name = "General",
             description = "General",
-            position = 0,
-            closedByDefault = false
+            position = 0
     )
     String generalSection = "general";
 
@@ -38,5 +37,16 @@ public interface TeleporterConfig extends Config {
     default boolean highAlchemy()
     {
         return false;
+    }
+    @ConfigItem(
+            keyName = "High Alchemy item",
+            name = "High Alchemy item",
+            description = "Name of the item to highalch",
+            position = 2,
+            section = generalSection
+    )
+    default String highAlchemyItem()
+    {
+        return "";
     }
 }
