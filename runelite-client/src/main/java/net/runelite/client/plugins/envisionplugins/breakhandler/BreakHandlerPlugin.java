@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDurationType;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
@@ -60,25 +61,33 @@ public class BreakHandlerPlugin extends Plugin {
     }
 
     @Override
-    protected void shutDown() throws Exception{
+    protected void shutDown() throws Exception {
         clientToolbar.removeNavigation(navButton);
     }
 
     /**
      * Setup both the Script's initial min-max break and runtime settings, expected break and run time durations,
-     *  as well as setting up the display panel with the freshly generated values.
-     *
-     *  Feeds data from Configuration file to Script and Panels
-     *
-     *  //TODO Debian:: refactor
+     * as well as setting up the display panel with the freshly generated values.
+     * <p>
+     * Feeds data from Configuration file to Script and Panels
+     * <p>
+     * //TODO Debian:: refactor
      */
-    private void initBreakSettings() {
+    private void initBreakSettings() throws Exception {
         // Setup Run Time panel defaults
-        breakHandlerPanel.getRuntimeDurationParentPanel().getTimeAmountPanel().getMinimumTimeAmount().setDurationFromConfig(config.MINIMUM_RUN_TIME_DURATION());
-        breakHandlerPanel.getRuntimeDurationParentPanel().getTimeAmountPanel().getMaximumTimeAmount().setDurationFromConfig(config.MAXIMUM_RUN_TIME_DURATION());
+        breakHandlerPanel
+                .getMinimumTimeAmount(TimeDurationType.RUNTIME_DURATION)
+                .setDurationFromConfig(config.MINIMUM_RUN_TIME_DURATION());
+        breakHandlerPanel
+                .getMaximumTimeAmount(TimeDurationType.RUNTIME_DURATION)
+                .setDurationFromConfig(config.MAXIMUM_RUN_TIME_DURATION());
 
         // Setup Break panel defaults
-        breakHandlerPanel.getBreakDurationParentPanel().getTimeAmountPanel().getMinimumTimeAmount().setDurationFromConfig(config.MINIMUM_BREAK_DURATION());
-        breakHandlerPanel.getBreakDurationParentPanel().getTimeAmountPanel().getMaximumTimeAmount().setDurationFromConfig(config.MAXIMUM_BREAK_DURATION());
+        breakHandlerPanel
+                .getMinimumTimeAmount(TimeDurationType.BREAK_DURATION)
+                .setDurationFromConfig(config.MINIMUM_BREAK_DURATION());
+        breakHandlerPanel
+                .getMaximumTimeAmount(TimeDurationType.BREAK_DURATION)
+                .setDurationFromConfig(config.MAXIMUM_BREAK_DURATION());
     }
 }

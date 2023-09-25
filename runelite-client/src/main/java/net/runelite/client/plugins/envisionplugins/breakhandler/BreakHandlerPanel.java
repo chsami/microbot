@@ -5,6 +5,9 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.account.Accou
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakduration.BreakDurationParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakmethod.BreakMethodParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breaktimer.BreakTimerParentPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MaximumTimeAmount;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MinimumTimeAmount;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDurationType;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration.RuntimeDurationParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimer.RunTimerParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.twofactorauth.TwoFactorAuthParentPanel;
@@ -62,5 +65,38 @@ public class BreakHandlerPanel extends PluginPanel {
     public RuntimeDurationParentPanel getRuntimeDurationParentPanel() {
         return runtimeDurationParentPanel;
     }
-    public BreakDurationParentPanel getBreakDurationParentPanel() { return breakDurationParentPanel; }
+
+    public BreakDurationParentPanel getBreakDurationParentPanel() {
+        return breakDurationParentPanel;
+    }
+
+    public MinimumTimeAmount getMinimumTimeAmount(TimeDurationType timeDurationType) throws Exception {
+        MinimumTimeAmount minimumTimeAmount;
+        switch (timeDurationType) {
+            case RUNTIME_DURATION:
+                minimumTimeAmount = runtimeDurationParentPanel.getMinimumTimeAmount();
+                break;
+            case BREAK_DURATION:
+                minimumTimeAmount = breakDurationParentPanel.getMinimumTimeAmount();
+                break;
+            default:
+                throw new Exception("Unknown TimeDurationType");
+        }
+        return minimumTimeAmount;
+    }
+
+    public MaximumTimeAmount getMaximumTimeAmount(TimeDurationType timeDurationType) throws Exception {
+        MaximumTimeAmount maximumTimeAmount;
+        switch (timeDurationType) {
+            case RUNTIME_DURATION:
+                maximumTimeAmount = runtimeDurationParentPanel.getMaximumTimeAmount();
+                break;
+            case BREAK_DURATION:
+                maximumTimeAmount = breakDurationParentPanel.getMaximumTimeAmount();
+                break;
+            default:
+                throw new Exception("Unknown TimeDurationType");
+        }
+        return maximumTimeAmount;
+    }
 }

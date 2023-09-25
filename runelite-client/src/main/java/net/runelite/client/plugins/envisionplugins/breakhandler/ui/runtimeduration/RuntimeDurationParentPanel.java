@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration;
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MaximumTimeAmount;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MinimumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.TimeAmountPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.TimerTypes;
 import net.runelite.client.ui.ColorScheme;
@@ -21,5 +23,13 @@ public class RuntimeDurationParentPanel extends JPanel {
 
     public TimeAmountPanel getTimeAmountPanel() {
         return timeAmountPanel;
+    }
+
+    public MinimumTimeAmount getMinimumTimeAmount() {
+        return timeAmountPanel.getMinimumTimeAmount();
+    }
+
+    public MaximumTimeAmount getMaximumTimeAmount() {
+        return timeAmountPanel.getMaximumTimeAmount();
     }
 }
