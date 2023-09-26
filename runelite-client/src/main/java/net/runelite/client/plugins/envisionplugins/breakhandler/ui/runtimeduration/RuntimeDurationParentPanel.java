@@ -13,15 +13,17 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class RuntimeDurationParentPanel extends JPanel {
-    private final TimeAmountPanel timeAmountPanel;
+    private final TimeAmountPanel timeAmountPanel = new TimeAmountPanel(TimerTypes.RUNTIME);
 
     public RuntimeDurationParentPanel() {
-        setBackground(ColorScheme.DARKER_GRAY_COLOR);
-
+        setStyle();
 
         add(new JTitle("Run Time Duration"));
-        timeAmountPanel = new TimeAmountPanel(TimerTypes.RUNTIME);
         add(timeAmountPanel);
+    }
+
+    private void setStyle() {
+        setBackground(ColorScheme.DARKER_GRAY_COLOR);
     }
 
     public TimeAmountPanel getTimeAmountPanel() {

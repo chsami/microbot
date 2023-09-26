@@ -13,26 +13,18 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 public class MaximumTimeAmount extends JPanel {
-    protected final FlatTextField durationTextField;
+    protected final FlatTextField durationTextField = new FlatTextField();
 
     protected TimerTypes timerType;
 
     public MaximumTimeAmount(TimerTypes myType) {
+        setStyle();
         timerType = myType;
 
-        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        final JLabel label1 = new JLabel();
-        label1.setText("Max");
+        final JLabel label1 = new JLabel("Max");
         add(label1);
 
-        durationTextField = new FlatTextField();
-        durationTextField.setText("HH:MM:SS");
-        durationTextField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        durationTextField.setEditable(true);
-        durationTextField.setPreferredSize(new Dimension(70, 25));
-        durationTextField.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
         durationTextField.addActionListener(e -> getParent().requestFocusInWindow());
-
         durationTextField.getTextField().addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -57,9 +49,18 @@ public class MaximumTimeAmount extends JPanel {
                 updateDisplayInput(duration);
             }
         });
-
         add(durationTextField);
     }
+
+    private void setStyle() {
+        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        durationTextField.setText("HH:MM:SS");
+        durationTextField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        durationTextField.setEditable(true);
+        durationTextField.setPreferredSize(new Dimension(70, 25));
+        durationTextField.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
 
     void updateDisplayInput(long seconds) {
         if (!durationTextField.getTextField().hasFocus()) {

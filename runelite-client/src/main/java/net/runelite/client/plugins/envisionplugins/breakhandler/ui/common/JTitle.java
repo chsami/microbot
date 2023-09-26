@@ -11,12 +11,10 @@ public class JTitle extends JPanel {
     private static final Font font = baseFont.deriveFont(baseFont.getStyle() | Font.BOLD);
 
     public JTitle(String text) {
-        // Style & Layout Setup
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(0, 10, 1, 10));
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-        // Label Setup
         JLabel label = new JLabel(text);
         label.setFont(font);
         add(label);

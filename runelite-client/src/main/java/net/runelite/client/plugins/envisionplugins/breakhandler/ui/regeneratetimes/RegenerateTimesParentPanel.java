@@ -8,11 +8,15 @@ import javax.swing.border.EmptyBorder;
 
 public class RegenerateTimesParentPanel extends JPanel {
     public RegenerateTimesParentPanel() {
-        setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        setBorder(new EmptyBorder(20, 0, 0, 0));
+        setStyle();
 
         add(new JTitle("Regenerate Times"));
         add(new JButton("Run Time"));
         add(new JButton("Break Time"));
+    }
+
+    private void setStyle() {
+        setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        setBorder(new EmptyBorder(20, 0, 0, 0));
     }
 }

@@ -9,12 +9,16 @@ import java.awt.*;
 
 public class TwoFactorAuthParentPanel extends JPanel {
     public TwoFactorAuthParentPanel() {
+        setStyle();
+
+        add(new JTitle("F2A / PIN"));
+        add(new TwoFactorAuthPanel());
+    }
+
+    private void setStyle() {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         setBorder(new EmptyBorder(20, 0, 0, 0));
         Dimension d = new Dimension(300, 80);
         setSize(d);
-
-        add(new JTitle("F2A / PIN"));
-        add(new TwoFactorAuthPanel());
     }
 }

@@ -4,15 +4,19 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TwoFactorAuthPanel extends JPanel {
-    public TwoFactorAuthPanel() {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        JPasswordField username = new JPasswordField();
-        username.setPreferredSize(new Dimension(100, 25));
-        JPasswordField password = new JPasswordField();
-        password.setPreferredSize(new Dimension(100, 25));
+    private final JPasswordField username = new JPasswordField();
+    private final JPasswordField password = new JPasswordField();
 
+    public TwoFactorAuthPanel() {
+        setStyle();
 
         add(username);
         add(password);
+    }
+
+    private void setStyle() {
+        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        username.setPreferredSize(new Dimension(100, 25));
+        password.setPreferredSize(new Dimension(100, 25));
     }
 }

@@ -9,21 +9,23 @@ import java.awt.*;
 
 public class CurrentTimesBreakPanel extends JPanel {
     protected static FlatTextField durationTextField = new FlatTextField();
+    private final JLabel label = new JLabel("Break Timer");
 
     public CurrentTimesBreakPanel() {
+        setStyle();
 
-        setBackground(ColorScheme.DARKER_GRAY_COLOR);
-
-        JLabel label = new JLabel("Break Timer");
-        label.setPreferredSize(new Dimension(72, 20));
         add(label);
+        add(durationTextField);
+    }
 
+    private void setStyle() {
+        setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        label.setPreferredSize(new Dimension(72, 20));
         durationTextField = new FlatTextField();
         durationTextField.setText("HH:MM:SS");
         durationTextField.setEditable(false);
         durationTextField.setBackground(ColorScheme.DARK_GRAY_COLOR);
         durationTextField.setPreferredSize(new Dimension(72, 20));
-        add(durationTextField);
     }
 
     public static void setDurationTextField(long runtimeDuration) {
