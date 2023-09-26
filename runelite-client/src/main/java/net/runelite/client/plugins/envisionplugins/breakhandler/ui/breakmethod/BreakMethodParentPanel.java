@@ -6,11 +6,17 @@ import net.runelite.client.ui.ColorScheme;
 import javax.swing.*;
 
 public class BreakMethodParentPanel extends JPanel {
+    private static final BreakMethodPanel breakMethodPanel = new BreakMethodPanel();
+
     public BreakMethodParentPanel() {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         setBorder(BreakHandlerPanel.BORDER);
 
         add(new BreakMethodTitlePanel());
-        add(new BreakMethodPanel());
+        add(breakMethodPanel);
+    }
+
+    public static String getBreakMethod() {
+        return breakMethodPanel.getBreakingMethod();
     }
 }

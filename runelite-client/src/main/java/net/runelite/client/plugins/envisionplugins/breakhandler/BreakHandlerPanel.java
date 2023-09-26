@@ -28,7 +28,7 @@ public class BreakHandlerPanel extends PluginPanel {
     private final RuntimeDurationParentPanel runtimeDurationParentPanel;
     private final BreakDurationParentPanel breakDurationParentPanel;
 
-    private final JPanel breakMethodPanel = new JPanel();
+    private BreakMethodParentPanel breakMethodParentPanel;
     private final JPanel breakDurationPanel = new JPanel();
     private final JPanel playTimeDurationPanel = new JPanel();
     private final JPanel forceBreakPanel = new JPanel();
@@ -47,7 +47,8 @@ public class BreakHandlerPanel extends PluginPanel {
         setBorder(new EmptyBorder(6, 6, 6, 6));
 
         add(new TitlePanel());
-        add(new BreakMethodParentPanel());
+        breakMethodParentPanel = new BreakMethodParentPanel();
+        add(breakMethodParentPanel);
 
         breakDurationParentPanel = new BreakDurationParentPanel();
         add(breakDurationParentPanel);
@@ -98,5 +99,9 @@ public class BreakHandlerPanel extends PluginPanel {
                 throw new Exception("Unknown TimeDurationType");
         }
         return maximumTimeAmount;
+    }
+
+    public String getBreakMethod() {
+        return BreakMethodParentPanel.getBreakMethod();
     }
 }

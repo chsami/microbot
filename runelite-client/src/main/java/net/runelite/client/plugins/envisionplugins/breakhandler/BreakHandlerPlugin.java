@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.envisionplugins.breakhandler.enums.BreakHandlerStates;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDurationType;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
@@ -44,6 +45,9 @@ public class BreakHandlerPlugin extends Plugin {
     protected void startUp() throws Exception {
         final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "breakhandler_watch.png");
 
+        BreakHandlerScript.setBreakHandlerState(BreakHandlerStates.STARTUP);
+        resetTimerFlags();
+
         breakHandlerPanel = injector.getInstance(BreakHandlerPanel.class);
 
         initBreakSettings();
@@ -65,13 +69,17 @@ public class BreakHandlerPlugin extends Plugin {
         clientToolbar.removeNavigation(navButton);
     }
 
+    private void resetTimerFlags() {
+        BreakHandlerScript.setShouldEnableRunTimeTimer(true);
+        BreakHandlerScript.setShouldBreak(false);
+    }
+
     /**
      * Setup both the Script's initial min-max break and runtime settings, expected break and run time durations,
      * as well as setting up the display panel with the freshly generated values.
      * <p>
      * Feeds data from Configuration file to Script and Panels
      * <p>
-     * //TODO Debian:: refactor
      */
     private void initBreakSettings() throws Exception {
         // Setup Run Time panel defaults
@@ -89,5 +97,8 @@ public class BreakHandlerPlugin extends Plugin {
         breakHandlerPanel
                 .getMaximumTimeAmount(TimeDurationType.BREAK_DURATION)
                 .setDurationFromConfig(config.MAXIMUM_BREAK_DURATION());
+
+        BreakHandlerScript.setBreakMethod(
+                breakHandlerPanel.getBreakMethod());
     }
 }

@@ -23,6 +23,14 @@ public interface BreakHandlerConfig extends Config {
     )
     String runTimeSection = "Default Run Time Durations";
 
+    @ConfigSection(
+            name = "Discord Break Notifications",
+            description = "Discord Break Notifications",
+            position = 1,
+            closedByDefault = false
+    )
+    String discordSection = "Discord Webhooks";
+
     @ConfigItem(
             keyName = "Minimum Duration",
             name = "Minimum Duration",
@@ -30,7 +38,7 @@ public interface BreakHandlerConfig extends Config {
             position = 0,
             section = runTimeSection
     )
-    default int MINIMUM_RUN_TIME_DURATION() { return 3600; }
+    default int MINIMUM_RUN_TIME_DURATION() { return 15; }
 
     @ConfigItem(
             keyName = "Maximum Duration",
@@ -39,7 +47,7 @@ public interface BreakHandlerConfig extends Config {
             position = 1,
             section = runTimeSection
     )
-    default int MAXIMUM_RUN_TIME_DURATION() { return 19800; }
+    default int MAXIMUM_RUN_TIME_DURATION() { return 30; }
 
     @ConfigItem(
             keyName = "Minimum Break Duration",
@@ -48,7 +56,7 @@ public interface BreakHandlerConfig extends Config {
             position = 2,
             section = breakSection
     )
-    default int MINIMUM_BREAK_DURATION() { return 300; }
+    default int MINIMUM_BREAK_DURATION() { return 10; }
 
     @ConfigItem(
             keyName = "Maximum Break Duration",
@@ -57,5 +65,23 @@ public interface BreakHandlerConfig extends Config {
             position = 3,
             section = breakSection
     )
-    default int MAXIMUM_BREAK_DURATION() { return 900; }
+    default int MAXIMUM_BREAK_DURATION() { return 20; }
+
+    @ConfigItem(
+            keyName = "Discord Webhook for notifications",
+            name = "Discord Webhook for notifications",
+            description = "Discord webhook to send break start and end notifications to.",
+            position = 4,
+            section = discordSection
+    )
+    default String DISCORD_WEBHOOK() { return ""; }
+
+    @ConfigItem(
+            keyName = "Enable Discord Webhook for notifications",
+            name = "Enable Discord Webhook for notifications",
+            description = "Enable Discord webhook?",
+            position = 5,
+            section = discordSection
+    )
+    default boolean ENABLE_DISCORD_WEBHOOK() { return false; }
 }
