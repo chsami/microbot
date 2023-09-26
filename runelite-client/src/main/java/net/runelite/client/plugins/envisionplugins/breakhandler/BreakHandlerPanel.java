@@ -49,6 +49,7 @@ public class BreakHandlerPanel extends PluginPanel {
         add(new HeaderPanel());
         JTabbedPane tabbedPane = new JTabbedPane();
 
+        // Timers Panel
         JPanel timers = new JPanel();
         BoxLayout boxLayoutTimers = new BoxLayout(timers, BoxLayout.Y_AXIS);
         timers.setLayout(boxLayoutTimers);
@@ -56,6 +57,7 @@ public class BreakHandlerPanel extends PluginPanel {
         timers.add(new RegenerateTimesParentPanel());
         tabbedPane.add("Timers", timers);
 
+        // Account Panel
         JPanel account = new JPanel();
         BoxLayout boxLayoutAccount = new BoxLayout(account, BoxLayout.Y_AXIS);
         account.setLayout(boxLayoutAccount);
@@ -63,6 +65,7 @@ public class BreakHandlerPanel extends PluginPanel {
         account.add(new TwoFactorAuthParentPanel());
         tabbedPane.add("Account", account);
 
+        // Settings Panel
         JPanel settings = new JPanel();
         BoxLayout boxLayoutSettings = new BoxLayout(settings, BoxLayout.Y_AXIS);
         settings.setLayout(boxLayoutSettings);
