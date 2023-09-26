@@ -7,6 +7,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakmethod.B
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breaktimer.BreakTimerParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MaximumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MinimumTimeAmount;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDurationType;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration.RuntimeDurationParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimer.RunTimerParentPanel;
@@ -19,7 +20,6 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 
 public class BreakHandlerPanel extends PluginPanel {
 
@@ -53,8 +53,7 @@ public class BreakHandlerPanel extends PluginPanel {
         JPanel timers = new JPanel();
         BoxLayout boxLayoutTimers = new BoxLayout(timers, BoxLayout.Y_AXIS);
         timers.setLayout(boxLayoutTimers);
-        timers.add(new BreakTimerParentPanel());
-        timers.add(new RunTimerParentPanel());
+        timers.add(new CurrentTimesParentPanel());
         tabbedPane.add("Timers", timers);
 
         JPanel account = new JPanel();
