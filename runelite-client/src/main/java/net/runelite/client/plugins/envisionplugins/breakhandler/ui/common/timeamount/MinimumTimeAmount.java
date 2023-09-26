@@ -3,6 +3,7 @@ package net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timea
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimerTypes;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.utility.PanelUtils;
+import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.FlatTextField;
 
 import javax.swing.*;
@@ -11,26 +12,18 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 public class MinimumTimeAmount extends JPanel {
-    protected final FlatTextField durationTextField;
+    protected final FlatTextField durationTextField = new FlatTextField();
 
     protected TimerTypes timerType;
 
     public MinimumTimeAmount(TimerTypes myType) {
+        setStyle();
         timerType = myType;
-        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        setMinimumSize(new Dimension(100, 5));
 
-        final JLabel label1 = new JLabel();
-        label1.setText("Min");
+        final JLabel label1 = new JLabel("Min");
         add(label1);
 
-        durationTextField = new FlatTextField();
-        durationTextField.setText("HH:MM:SS");
-        durationTextField.setEditable(true);
-        durationTextField.setPreferredSize(new Dimension(70, 25));
-        durationTextField.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
         durationTextField.addActionListener(e -> getParent().requestFocusInWindow());
-
         durationTextField.getTextField().addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -49,20 +42,27 @@ public class MinimumTimeAmount extends JPanel {
                     } else if (myType == TimerTypes.RUNTIME) {
                         BreakHandlerScript.setMinRunTimeDuration(duration);
                     }
-                } catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
 
                 updateDisplayInput(duration);
             }
         });
-
         add(durationTextField);
     }
 
-    void updateDisplayInput(long seconds)
-    {
-        if (!durationTextField.getTextField().hasFocus())
-        {
+    private void setStyle() {
+        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        setMinimumSize(new Dimension(100, 5));
+        durationTextField.setText("HH:MM:SS");
+        durationTextField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        durationTextField.setEditable(true);
+        durationTextField.setPreferredSize(new Dimension(70, 25));
+        durationTextField.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+    void updateDisplayInput(long seconds) {
+        if (!durationTextField.getTextField().hasFocus()) {
             durationTextField.setText(PanelUtils.getFormattedDuration(seconds));
         }
     }

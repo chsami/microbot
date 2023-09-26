@@ -10,8 +10,7 @@ public class BreakMethodPanel extends JPanel {
     private static JComboBox<String> breakingMethodComboBox;
 
     public BreakMethodPanel() {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        setStyle();
 
         String[] breakMethods = {"AFK", "LOGOUT"};
         breakingMethodComboBox = new JComboBox<>(breakMethods);
@@ -19,6 +18,11 @@ public class BreakMethodPanel extends JPanel {
         breakingMethodComboBox.addActionListener(e -> BreakHandlerScript.setBreakMethod(breakingMethodComboBox.getSelectedItem().toString()));
 
         add(breakingMethodComboBox, BorderLayout.SOUTH);
+    }
+
+    private void setStyle() {
+        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        setBackground(ColorScheme.DARKER_GRAY_COLOR);
     }
 
     public String getBreakingMethod() {

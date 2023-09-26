@@ -11,13 +11,17 @@ public class TimeAmountPanel extends JPanel {
     private final MaximumTimeAmount maximumTimeAmount;
 
     public TimeAmountPanel(TimerTypes myType) {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        setStyle();
 
         minimumTimeAmount = new MinimumTimeAmount(myType);
         add(minimumTimeAmount);
         maximumTimeAmount = new MaximumTimeAmount(myType);
         add(maximumTimeAmount);
+    }
+
+    private void setStyle() {
+        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        setBackground(ColorScheme.DARKER_GRAY_COLOR);
     }
 
     public MinimumTimeAmount getMinimumTimeAmount() {
