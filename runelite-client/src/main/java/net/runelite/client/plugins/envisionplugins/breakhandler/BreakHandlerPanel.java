@@ -9,6 +9,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeam
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MinimumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDurationType;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.regeneratetimes.RegenerateTimesParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration.RuntimeDurationParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimer.RunTimerParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.twofactorauth.TwoFactorAuthParentPanel;
@@ -54,6 +55,7 @@ public class BreakHandlerPanel extends PluginPanel {
         BoxLayout boxLayoutTimers = new BoxLayout(timers, BoxLayout.Y_AXIS);
         timers.setLayout(boxLayoutTimers);
         timers.add(new CurrentTimesParentPanel());
+        timers.add(new RegenerateTimesParentPanel());
         tabbedPane.add("Timers", timers);
 
         JPanel account = new JPanel();
