@@ -7,8 +7,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-public class TitlePanel extends JPanel {
-    public TitlePanel() {
+public class HeaderPanel extends JPanel {
+    public HeaderPanel() {
 
         // Style & Layout Setup
         setBorder(new EmptyBorder(10, 10, 10, 10));

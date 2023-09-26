@@ -4,14 +4,12 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.*;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.account.AccountParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakduration.BreakDurationParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakmethod.BreakMethodParentPanel;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breaktimer.BreakTimerParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MaximumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MinimumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDurationType;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.regeneratetimes.RegenerateTimesParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration.RuntimeDurationParentPanel;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimer.RunTimerParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.twofactorauth.TwoFactorAuthParentPanel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
@@ -48,7 +46,7 @@ public class BreakHandlerPanel extends PluginPanel {
         setLayout(boxLayout);
         setBorder(new EmptyBorder(6, 6, 6, 6));
 
-        add(new TitlePanel());
+        add(new HeaderPanel());
         JTabbedPane tabbedPane = new JTabbedPane();
 
         JPanel timers = new JPanel();

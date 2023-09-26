@@ -1,8 +1,6 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.ui.account;
 
-import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerPanel;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakduration.BreakDurationTitlePanel;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.TimeAmountPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.JTitle;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
@@ -18,7 +16,7 @@ public class AccountParentPanel extends JPanel {
         setPreferredSize(d);
         setMaximumSize(d);
 
-        add(new AccountTitlePanel());
+        add(new JTitle("Username / Password"));
         add(new AccountPanel());
     }
 }

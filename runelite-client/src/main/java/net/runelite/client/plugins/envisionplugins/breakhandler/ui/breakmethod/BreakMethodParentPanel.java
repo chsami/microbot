@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakmethod;
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.JTitle;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
@@ -16,7 +17,7 @@ public class BreakMethodParentPanel extends JPanel {
         setPreferredSize(d);
         setMaximumSize(d);
 
-        add(new BreakMethodTitlePanel());
+        add(new JTitle("Break Method", false));
         add(new BreakMethodPanel());
     }
 }

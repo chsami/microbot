@@ -1,8 +1,6 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.ui.twofactorauth;
 
-import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerPanel;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.account.AccountPanel;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.account.AccountTitlePanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.JTitle;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
@@ -16,7 +14,7 @@ public class TwoFactorAuthParentPanel extends JPanel {
         Dimension d = new Dimension(300, 80);
         setSize(d);
 
-        add(new TwoFactorAuthTitlePanel());
+        add(new JTitle("F2A / PIN"));
         add(new TwoFactorAuthPanel());
     }
 }
