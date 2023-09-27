@@ -31,6 +31,14 @@ public interface BreakHandlerConfig extends Config {
     )
     String discordSection = "Discord Webhooks";
 
+    @ConfigSection(
+            name = "Debug",
+            description = "Debug",
+            position = 2,
+            closedByDefault = false
+    )
+    String debugSection = "Debug";
+
     @ConfigItem(
             keyName = "Minimum Duration",
             name = "Minimum Duration",
@@ -38,7 +46,7 @@ public interface BreakHandlerConfig extends Config {
             position = 0,
             section = runTimeSection
     )
-    default int MINIMUM_RUN_TIME_DURATION() { return 15; }
+    default int MINIMUM_RUN_TIME_DURATION() { return 60; }
 
     @ConfigItem(
             keyName = "Maximum Duration",
@@ -47,7 +55,7 @@ public interface BreakHandlerConfig extends Config {
             position = 1,
             section = runTimeSection
     )
-    default int MAXIMUM_RUN_TIME_DURATION() { return 30; }
+    default int MAXIMUM_RUN_TIME_DURATION() { return 120; }
 
     @ConfigItem(
             keyName = "Minimum Break Duration",
@@ -56,7 +64,7 @@ public interface BreakHandlerConfig extends Config {
             position = 2,
             section = breakSection
     )
-    default int MINIMUM_BREAK_DURATION() { return 10; }
+    default int MINIMUM_BREAK_DURATION() { return 20; }
 
     @ConfigItem(
             keyName = "Maximum Break Duration",
@@ -65,7 +73,7 @@ public interface BreakHandlerConfig extends Config {
             position = 3,
             section = breakSection
     )
-    default int MAXIMUM_BREAK_DURATION() { return 20; }
+    default int MAXIMUM_BREAK_DURATION() { return 30; }
 
     @ConfigItem(
             keyName = "Discord Webhook for notifications",
@@ -84,4 +92,13 @@ public interface BreakHandlerConfig extends Config {
             section = discordSection
     )
     default boolean ENABLE_DISCORD_WEBHOOK() { return false; }
+
+    @ConfigItem(
+            keyName = "Enable verbose debug System logs?",
+            name = "Enable verbose debug System logs?",
+            description = "Enable verbose debug System logs?",
+            position = 6,
+            section = debugSection
+    )
+    default boolean VERBOSE_LOGGING() { return false; }
 }
