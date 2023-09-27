@@ -31,4 +31,8 @@ public class CurrentTimesRunPanel extends JPanel {
     public static void setDurationTextField(long runtimeDuration) {
         durationTextField.setText(PanelUtils.getFormattedDuration(runtimeDuration));
     }
+
+    public static void setDurationTextFieldIdleMessage(String message) {
+        durationTextField.setText(message);
+    }
 }

@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.10;
+    public static double version = 0.11;
 
     /* Variables for other script's references */
     // TODO set this to false for production
@@ -52,146 +52,152 @@ public class BreakHandlerScript extends Script {
 
         if (isBreakHandlerCompatible) {
             mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-                switch (myState) {
-                    case RUN:
-                        if (config.VERBOSE_LOGGING() && debugCount == 0) {
-                            System.out.println("STATE: " + myState);
-                            debugCount++;
-                        }
+                try {
+                    switch (myState) {
+                        case RUN:
+                            if (config.VERBOSE_LOGGING() && debugCount == 0) {
+                                System.out.println("STATE: " + myState);
+                                debugCount++;
+                            }
 
-                        runTimeTimer.run();
-                        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
-                        break;
+                            runTimeTimer.run();
+                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
+                            break;
 
-                    case START_BREAK:
-                        if (config.VERBOSE_LOGGING() && debugCount == 0) {
-                            System.out.println("STATE: " + myState + " with break style: " + breakMethod);
-                            debugCount++;
-                        }
+                        case START_BREAK:
+                            if (config.VERBOSE_LOGGING() && debugCount == 0) {
+                                System.out.println("STATE: " + myState + " with break style: " + breakMethod);
+                                debugCount++;
+                            }
 
-                        isBreakOver = false;
+                            isBreakOver = false;
 
-                        if (breakMethod.equals("AFK")) {
-                            myState = BreakHandlerStates.AFK_BREAK;
-                        } else if (breakMethod.equals("LOGOUT")) {
-                            myState = BreakHandlerStates.LOGOUT_BREAK;
-                        } else {
-                            System.err.println("Bad break method...");
-                        }
-                        break;
+                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
 
-                    case AFK_BREAK:
-                        if (config.VERBOSE_LOGGING() && debugCount == 0) {
-                            System.out.println("STATE: " + myState);
-                            debugCount++;
-                        }
+                            if (breakMethod.equals("AFK")) {
+                                myState = BreakHandlerStates.AFK_BREAK;
+                            } else if (breakMethod.equals("LOGOUT")) {
+                                myState = BreakHandlerStates.LOGOUT_BREAK;
+                            } else {
+                                System.err.println("Bad break method...");
+                            }
+                            break;
 
-                        breakTimer.run();
-                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
-                        break;
+                        case AFK_BREAK:
+                            if (config.VERBOSE_LOGGING() && debugCount == 0) {
+                                System.out.println("STATE: " + myState);
+                                debugCount++;
+                            }
 
-                    case LOGOUT_BREAK:
-                        // TODO: Fully implement
-                        if (config.VERBOSE_LOGGING() && debugCount == 0) {
-                            System.out.println("STATE: " + myState);
-                            debugCount++;
-                        }
+                            breakTimer.run();
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
+                            break;
 
-                        breakTimer.run();
-                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
-                        break;
+                        case LOGOUT_BREAK:
+                            // TODO: Fully implement
+                            if (config.VERBOSE_LOGGING() && debugCount == 0) {
+                                System.out.println("STATE: " + myState);
+                                debugCount++;
+                            }
 
-                    case RESET_RUN_TIMER:
-                        if (config.VERBOSE_LOGGING() && debugCount == 0) {
-                            System.out.println("STATE: " + myState);
-                            debugCount++;
-                        }
+                            breakTimer.run();
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
+                            break;
 
-                        calcExpectedRunTime();
-                        break;
+                        case RESET_RUN_TIMER:
+                            if (config.VERBOSE_LOGGING() && debugCount == 0) {
+                                System.out.println("STATE: " + myState);
+                                debugCount++;
+                            }
 
-                    case RESET_BREAK_TIMER:
-                        if (config.VERBOSE_LOGGING() && debugCount == 0) {
-                            System.out.println("STATE: " + myState);
-                            debugCount++;
-                        }
+                            calcExpectedRunTime();
+                            break;
 
-                        calcExpectedBreak();
-                        break;
+                        case RESET_BREAK_TIMER:
+                            if (config.VERBOSE_LOGGING() && debugCount == 0) {
+                                System.out.println("STATE: " + myState);
+                                debugCount++;
+                            }
 
-                    case RESET_BOTH_TIMERS:
-                        if (config.VERBOSE_LOGGING() && debugCount == 0) {
-                            System.out.println("STATE: " + myState);
-                            debugCount++;
-                        }
+                            calcExpectedBreak();
+                            break;
 
-                        isBreakOver = false;
+                        case RESET_BOTH_TIMERS:
+                            if (config.VERBOSE_LOGGING() && debugCount == 0) {
+                                System.out.println("STATE: " + myState);
+                                debugCount++;
+                            }
 
-                        regenerateExpectedRunTime();
-                        runTimeTimer.setDuration(expectedRunTimeDuration);
-                        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
+                            isBreakOver = false;
 
-                        regenerateExpectedBreakTime();
-                        breakTimer.setDuration(expectedBreakDuration);
-                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
+                            regenerateExpectedRunTime(false);
+                            runTimeTimer.setDuration(expectedRunTimeDuration);
+                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
 
+                            regenerateExpectedBreakTime();
+                            breakTimer.setDuration(expectedBreakDuration);
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
+
+                            debugCount = 0;
+                            myState = BreakHandlerStates.RUN;
+                            break;
+
+                        case STARTUP:
+                            // TODO: Temporary until I put in place working with external scripts
+
+                            System.out.println("STARTUP: Wait");
+                            sleep(10000);
+                            System.out.println("STARTUP: Post Wait -> change state to run");
+                            myState = BreakHandlerStates.RUN;
+                            break;
+
+                        case POST_BREAK_AFK:
+                            if (config.VERBOSE_LOGGING() && debugCount == 0) {
+                                System.out.println("STATE: " + myState);
+                                debugCount++;
+                            }
+
+                            isBreakOver = true;
+                            break;
+
+                        case POST_BREAK_LOGIN:
+                            // TODO: Fully implement
+                            if (config.VERBOSE_LOGGING() && debugCount == 0) {
+                                System.out.println("STATE: " + myState);
+                                debugCount++;
+                            }
+
+                            isBreakOver = true;
+                            break;
+
+                        default:
+                            System.err.println("Bad Break Handler State...");
+                    }
+
+
+                    // We should be on break
+                    if (myState == BreakHandlerStates.RUN && (runTimeTimer.getDisplayTime() == 0 && breakTimer.getDisplayTime() > 0)) {
+                        myState = BreakHandlerStates.START_BREAK;
                         debugCount = 0;
-                        myState = BreakHandlerStates.RUN;
-                        break;
+                    }
 
-                    case STARTUP:
-                        // TODO: Temporary until I put in place working with external scripts
+                    // We just finished a afk break - lets move to post_afk_break
+                    if (myState == BreakHandlerStates.AFK_BREAK && !isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeTimer.getDisplayTime() == 0)) {
+                        myState = BreakHandlerStates.POST_BREAK_AFK;
+                        debugCount = 0;
+                    }
 
-                        System.out.println("STARTUP: Wait");
-                        sleep(10000);
-                        System.out.println("STARTUP: Post Wait -> change state to run");
-                        myState = BreakHandlerStates.RUN;
-                        break;
+                    // We are both POST break and run, lets regenerate new timers
+                    if (myState == BreakHandlerStates.POST_BREAK_AFK && isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeTimer.getDisplayTime() == 0)) {
+                        myState = BreakHandlerStates.RESET_BOTH_TIMERS;
+                        debugCount = 0;
+                    }
 
-                    case POST_BREAK_AFK:
-                        if (config.VERBOSE_LOGGING() && debugCount == 0) {
-                            System.out.println("STATE: " + myState);
-                            debugCount++;
-                        }
-
-                        isBreakOver = true;
-                        break;
-
-                    case POST_BREAK_LOGIN:
-                        // TODO: Fully implement
-                        if (config.VERBOSE_LOGGING() && debugCount == 0) {
-                            System.out.println("STATE: " + myState);
-                            debugCount++;
-                        }
-
-                        isBreakOver = true;
-                        break;
-
-                    default:
-                        System.err.println("Bad Break Handler State...");
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
                 }
 
-
-                // We should be on break
-                if (myState == BreakHandlerStates.RUN && (runTimeTimer.getDisplayTime() == 0 && breakTimer.getDisplayTime() > 0)) {
-                    myState = BreakHandlerStates.START_BREAK;
-                    debugCount = 0;
-                }
-
-                // We just finished a afk break - lets move to post_afk_break
-                if (myState == BreakHandlerStates.AFK_BREAK && !isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeTimer.getDisplayTime() == 0)) {
-                    myState = BreakHandlerStates.POST_BREAK_AFK;
-                    debugCount = 0;
-                }
-
-                // We are both POST break and run, lets regenerate new timers
-                if (myState == BreakHandlerStates.POST_BREAK_AFK && isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeTimer.getDisplayTime() == 0)) {
-                    myState = BreakHandlerStates.RESET_BOTH_TIMERS;
-                    debugCount = 0;
-                }
-
-
-            }, 200, 200, TimeUnit.MILLISECONDS);    //TODO: Is this delay good?
+            }, 0, 500, TimeUnit.MILLISECONDS);    //TODO: Is this delay good?
         } else {
             //TODO: Ask Mocrosoft if there is a good way to disable the handler completely if this case hits
             System.err.println("Current active script is not compatible with Micro Break Handler...");
@@ -281,11 +287,14 @@ public class BreakHandlerScript extends Script {
         SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(expectedRunTimeDuration));
     }
 
-    public static void regenerateExpectedRunTime() {
-        expectedRunTimeDuration = Random.random((int) minRunTimeDuration, (int) maxRunTimeDuration);
-        runTimeTimer.setDuration(expectedRunTimeDuration);
-        runTimeTimer.reset();
-        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(expectedRunTimeDuration));
+    public static void regenerateExpectedRunTime(boolean fromButtonRequest) {
+        if (fromButtonRequest && runTimeTimer.getDisplayTime() == 0) {
+        } else {
+            expectedRunTimeDuration = Random.random((int) minRunTimeDuration, (int) maxRunTimeDuration);
+            runTimeTimer.setDuration(expectedRunTimeDuration);
+            runTimeTimer.reset();
+            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(expectedRunTimeDuration));
+        }
     }
 
     public static void calcExpectedBreak() {
