@@ -1,18 +1,18 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler;
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.enums.BreakHandlerStates;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesBreakPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesRunPanel;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimer.RunTimerPanel;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breaktimer.BreakTimerPanel;
 
 import javax.swing.*;
 import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.7;
+    public static double version = 0.8;
 
     /* Variables for other script's references */
     // TODO set this to false for production
@@ -59,7 +59,7 @@ public class BreakHandlerScript extends Script {
                         }
 
                         runTimeTimer.run();
-                        SwingUtilities.invokeLater(() -> RunTimerPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
+                        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
                         break;
 
                     case START_BREAK:
@@ -86,7 +86,7 @@ public class BreakHandlerScript extends Script {
                         }
 
                         breakTimer.run();
-                        SwingUtilities.invokeLater(() -> BreakTimerPanel.setDurationTextField(breakTimer.getDisplayTime()));
+                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
                         break;
 
                     case LOGOUT_BREAK:
@@ -97,7 +97,7 @@ public class BreakHandlerScript extends Script {
                         }
 
                         breakTimer.run();
-                        SwingUtilities.invokeLater(() -> BreakTimerPanel.setDurationTextField(breakTimer.getDisplayTime()));
+                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
                         break;
 
                     case RESET_RUN_TIMER:
@@ -128,11 +128,11 @@ public class BreakHandlerScript extends Script {
 
                         regenerateExpectedRunTime();
                         runTimeTimer.setDuration(expectedRunTimeDuration);
-                        SwingUtilities.invokeLater(() -> RunTimerPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
+                        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
 
                         regenerateExpectedBreakTime();
                         breakTimer.setDuration(expectedBreakDuration);
-                        SwingUtilities.invokeLater(() -> BreakTimerPanel.setDurationTextField(breakTimer.getDisplayTime()));
+                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
 
                         debugCount = 0;
                         myState = BreakHandlerStates.RUN;
@@ -265,7 +265,7 @@ public class BreakHandlerScript extends Script {
     public static void calcExpectedRunTime() {
         expectedRunTimeDuration = Random.random((int) minRunTimeDuration, (int) maxRunTimeDuration);
 
-        SwingUtilities.invokeLater(() -> RunTimerPanel.setDurationTextField(expectedRunTimeDuration));
+        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(expectedRunTimeDuration));
     }
 
     private void regenerateExpectedRunTime() {
@@ -275,7 +275,7 @@ public class BreakHandlerScript extends Script {
     public static void calcExpectedBreak() {
         expectedBreakDuration = Random.random((int) minBreakDuration, (int) maxBreakDuration);
 
-        SwingUtilities.invokeLater(() -> BreakTimerPanel.setDurationTextField(expectedBreakDuration));
+        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(expectedBreakDuration));
     }
 
     private void regenerateExpectedBreakTime() {
