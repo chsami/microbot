@@ -37,7 +37,7 @@ public class BreakHandlerScript extends Script {
 
     /* Timers */
     protected static Timer runTimeTimer;
-    protected Timer breakTimer;
+    protected static Timer breakTimer;
 
     protected static BreakHandlerStates myState;
 
@@ -45,7 +45,8 @@ public class BreakHandlerScript extends Script {
 
     protected int debugCount = 0;
 
-    public boolean run(BreakHandlerConfig config) {
+
+    public boolean run(BreakHandlerConfig config, BreakHandlerPanel breakHandlerPanel) {
         runTimeTimer = new Timer("Run Time Timer", expectedRunTimeDuration);
         breakTimer = new Timer("Break Timer", expectedBreakDuration);
 
@@ -284,6 +285,7 @@ public class BreakHandlerScript extends Script {
         expectedRunTimeDuration = Random.random((int) minRunTimeDuration, (int) maxRunTimeDuration);
         runTimeTimer.setDuration(expectedRunTimeDuration);
         runTimeTimer.reset();
+        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(expectedRunTimeDuration));
     }
 
     public static void calcExpectedBreak() {
@@ -292,8 +294,11 @@ public class BreakHandlerScript extends Script {
         SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(expectedBreakDuration));
     }
 
-    private void regenerateExpectedBreakTime() {
+    public static void regenerateExpectedBreakTime() {
         expectedBreakDuration = Random.random((int) minBreakDuration, (int) maxBreakDuration);
+        breakTimer.setDuration(expectedBreakDuration);
+        breakTimer.reset();
+        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(expectedBreakDuration));
     }
 
     public static void setBreakMethod(String method) {

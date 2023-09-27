@@ -34,6 +34,8 @@ public class BreakHandlerPanel extends PluginPanel {
     private final JPanel forceBreakPanel = new JPanel();
 //    public static final Border BORDER = new LineBorder(ColorScheme.LIGHT_GRAY_COLOR, 0);
 
+    private RegenerateTimesParentPanel regenerateTimesParentPanel = new RegenerateTimesParentPanel();
+
     public static final Border BORDER = new CompoundBorder(
             BorderFactory.createMatteBorder(2, 2, 2, 2, ColorScheme.LIGHT_GRAY_COLOR),
             BorderFactory.createLineBorder(ColorScheme.LIGHT_GRAY_COLOR));
@@ -78,7 +80,6 @@ public class BreakHandlerPanel extends PluginPanel {
 
         add(tabbedPane);
 
-
     }
 
     public RuntimeDurationParentPanel getRuntimeDurationParentPanel() {
@@ -121,5 +122,13 @@ public class BreakHandlerPanel extends PluginPanel {
 
     public String getBreakMethod() {
         return BreakMethodParentPanel.getBreakMethod();
+    }
+
+    public void setRuntimeToDisabled() {
+        regenerateTimesParentPanel.setRuntimeToDisabled();
+    }
+
+    public void setRuntimeToEnabled() {
+        regenerateTimesParentPanel.setRuntimeToEnabled();
     }
 }

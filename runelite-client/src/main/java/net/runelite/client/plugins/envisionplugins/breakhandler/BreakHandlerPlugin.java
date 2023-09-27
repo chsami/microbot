@@ -63,7 +63,7 @@ public class BreakHandlerPlugin extends Plugin {
 
         clientToolbar.addNavigation(navButton);
 
-        breakHandlerScript.run(config);
+        breakHandlerScript.run(config, breakHandlerPanel);
     }
 
     @Override
