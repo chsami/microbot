@@ -24,17 +24,6 @@
  */
 package net.runelite.api;
 
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.Shape;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import static net.runelite.api.Constants.TILE_FLAG_BRIDGE;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.geometry.RectangleUnion;
 import net.runelite.api.geometry.Shapes;
@@ -43,6 +32,16 @@ import net.runelite.api.model.Jarvis;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import org.jetbrains.annotations.ApiStatus;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.runelite.api.Constants.TILE_FLAG_BRIDGE;
 
 /**
  * A utility class containing methods to help with conversion between
@@ -359,7 +358,7 @@ public class Perspective
 				return null;
 			}
 
-			final double zoom = (client.getMinimapZoom()) / LOCAL_TILE_SIZE;
+			final double zoom = (client.getMinimapZoom() - 0.5) / LOCAL_TILE_SIZE;
 			final int x = (int) (dx * zoom);
 			final int y = (int) (dy * zoom);
 
