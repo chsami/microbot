@@ -333,12 +333,13 @@ class ProfilePanel extends PluginPanel {
                     super.replace(fb, offset, length, filter(text), attrs);
                 }
 
-                private String filter(String in) {
-                    // characters commonly forbidden in file names
-                    return CharMatcher.noneOf("/\\<>:\"|?*\0")
-                            .retainFrom(in);
-                }
-            });
+				private String filter(String in)
+				{
+					// characters commonly forbidden in file names
+					return CharMatcher.noneOf("/\\<>:\"|?*\r\n\0")
+						.retainFrom(in);
+				}
+			});
 
             activate = new JButton(ARROW_RIGHT_ICON);
             activate.setDisabledIcon(ARROW_RIGHT_ICON);
