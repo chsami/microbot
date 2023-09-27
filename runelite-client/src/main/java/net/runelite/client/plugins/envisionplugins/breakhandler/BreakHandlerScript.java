@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.8;
+    public static double version = 0.9;
 
     /* Variables for other script's references */
     // TODO set this to false for production

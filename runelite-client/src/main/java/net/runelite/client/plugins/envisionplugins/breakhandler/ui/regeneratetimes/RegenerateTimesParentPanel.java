@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.ui.regeneratetimes;
 
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.JTitle;
 import net.runelite.client.ui.ColorScheme;
 
@@ -11,8 +12,12 @@ public class RegenerateTimesParentPanel extends JPanel {
         setStyle();
 
         add(new JTitle("Regenerate Times"));
-        add(new JButton("Run Time"));
-        add(new JButton("Break Time"));
+        JButton regenerateRunTimeBtn = new JButton("Run Time");
+        add(regenerateRunTimeBtn);
+        regenerateRunTimeBtn.addActionListener(e -> BreakHandlerScript.calcExpectedRunTime());
+        JButton regenerateBreakTimeBtn = new JButton("Break Time");
+        add(regenerateBreakTimeBtn);
+        regenerateBreakTimeBtn.addActionListener(e -> BreakHandlerScript.calcExpectedBreak());
     }
 
     private void setStyle() {
