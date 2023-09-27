@@ -28,6 +28,7 @@ public abstract class Script implements IScript {
     protected ScheduledFuture<?> scheduledFuture;
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
+    public static boolean useStaminaPotsIfNeeded = true;
 
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
@@ -103,7 +104,7 @@ public abstract class Script implements IScript {
         if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
             VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         }
-        Widget clickHereToPlayButton = Rs2Widget.getWidget(378, 2); //on login screen
+        Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
         if (clickHereToPlayButton != null) {
             Rs2Widget.clickWidget(clickHereToPlayButton.getId());
         }
@@ -116,7 +117,7 @@ public abstract class Script implements IScript {
 
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
-        if (!hasRunEnergy) {
+        if (!hasRunEnergy && useStaminaPotsIfNeeded) {
             Inventory.useItemContains("Stamina potion");
         }
 

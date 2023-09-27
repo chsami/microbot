@@ -22,5 +22,23 @@ public interface AutoLoginConfig extends Config {
             position = 0,
             section = generalSection
     )
-    default int world() { return -1; }
+    default int world() { return 360; }
+
+    @ConfigItem(
+            keyName = "Is Member",
+            name = "Is Member",
+            description = "use Member worlds",
+            position = 0,
+            section = generalSection
+    )
+    default boolean isMember() { return true; }
+
+    @ConfigItem(
+            keyName = "RandomWorld",
+            name = "RandomWorld",
+            description = "use random worlds",
+            position = 0,
+            section = generalSection
+    )
+    default boolean useRandomWorld() { return true; }
 }

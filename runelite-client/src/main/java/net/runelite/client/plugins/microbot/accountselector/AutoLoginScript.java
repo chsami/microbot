@@ -13,8 +13,8 @@ public class AutoLoginScript extends Script {
             super.run();
             try {
                 if (!Microbot.isLoggedIn()) {
-                    if (autoLoginConfig.world() == -1) {
-                        new Login(383);
+                    if (autoLoginConfig.useRandomWorld()) {
+                        new Login(Login.getRandomWorld(autoLoginConfig.isMember()));
                     } else {
                         new Login(autoLoginConfig.world());
                     }

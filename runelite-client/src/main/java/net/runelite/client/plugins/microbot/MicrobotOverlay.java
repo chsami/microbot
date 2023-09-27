@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot;
 
 import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.mining.MiningScript;
+import net.runelite.client.plugins.microbot.staticwalker.StaticWalkerOverlay;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.util.walker.PathTileOverlay;
 import net.runelite.client.ui.overlay.OverlayPanel;
@@ -18,13 +19,14 @@ public class MicrobotOverlay extends OverlayPanel {
     MicrobotOverlay(MicrobotPlugin plugin)
     {
         super(plugin);
-        setPosition(OverlayPosition.TOP_LEFT);
+        setPosition(OverlayPosition.DYNAMIC);
         this.plugin = plugin;
     }
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
             PathTileOverlay.render(graphics);
+            StaticWalkerOverlay.renderPathWalkerOverlay(graphics);
 
             if (plugin.thievingScript != null) {
                 drawThievingOverlay();
