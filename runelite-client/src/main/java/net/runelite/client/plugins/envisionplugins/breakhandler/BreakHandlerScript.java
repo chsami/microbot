@@ -232,7 +232,9 @@ public class BreakHandlerScript extends Script {
         }
     }
 
-    public static long getMinRunTimeDuration() { return minRunTimeDuration; }
+    public static long getMinRunTimeDuration() {
+        return minRunTimeDuration;
+    }
 
     public static void setMaxRunTimeDuration(long maxDuration) {
         maxRunTimeDuration = maxDuration;
@@ -242,7 +244,9 @@ public class BreakHandlerScript extends Script {
         }
     }
 
-    public static long getMaxRunTimeDuration() { return maxRunTimeDuration; }
+    public static long getMaxRunTimeDuration() {
+        return maxRunTimeDuration;
+    }
 
 
     /* Break Duration Getters and Setters */
@@ -254,7 +258,9 @@ public class BreakHandlerScript extends Script {
         }
     }
 
-    public static long getMinBreakDuration() { return minBreakDuration; }
+    public static long getMinBreakDuration() {
+        return minBreakDuration;
+    }
 
     public static void setMaxBreakDuration(long maxDuration) {
         maxBreakDuration = maxDuration;
@@ -264,7 +270,9 @@ public class BreakHandlerScript extends Script {
         }
     }
 
-    public static long getMaxBreakDuration() { return maxBreakDuration; }
+    public static long getMaxBreakDuration() {
+        return maxBreakDuration;
+    }
 
     public static void calcExpectedRunTime() {
         expectedRunTimeDuration = Random.random((int) minRunTimeDuration, (int) maxRunTimeDuration);
@@ -272,8 +280,10 @@ public class BreakHandlerScript extends Script {
         SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(expectedRunTimeDuration));
     }
 
-    private void regenerateExpectedRunTime() {
+    public static void regenerateExpectedRunTime() {
         expectedRunTimeDuration = Random.random((int) minRunTimeDuration, (int) maxRunTimeDuration);
+        runTimeTimer.setDuration(expectedRunTimeDuration);
+        runTimeTimer.reset();
     }
 
     public static void calcExpectedBreak() {

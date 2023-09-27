@@ -14,7 +14,7 @@ public class RegenerateTimesParentPanel extends JPanel {
         add(new JTitle("Regenerate Times"));
         JButton regenerateRunTimeBtn = new JButton("Run Time");
         add(regenerateRunTimeBtn);
-        regenerateRunTimeBtn.addActionListener(e -> BreakHandlerScript.calcExpectedRunTime());
+        regenerateRunTimeBtn.addActionListener(e -> BreakHandlerScript.regenerateExpectedRunTime());
         JButton regenerateBreakTimeBtn = new JButton("Break Time");
         add(regenerateBreakTimeBtn);
         regenerateBreakTimeBtn.addActionListener(e -> BreakHandlerScript.calcExpectedBreak());
