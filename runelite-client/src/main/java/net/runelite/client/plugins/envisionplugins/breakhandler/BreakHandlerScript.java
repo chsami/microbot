@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.9;
+    public static double version = 0.10;
 
     /* Variables for other script's references */
     // TODO set this to false for production
@@ -36,7 +36,7 @@ public class BreakHandlerScript extends Script {
     protected static long expectedBreakDuration = -1;
 
     /* Timers */
-    protected Timer runTimeTimer;
+    protected static Timer runTimeTimer;
     protected Timer breakTimer;
 
     protected static BreakHandlerStates myState;
@@ -197,6 +197,10 @@ public class BreakHandlerScript extends Script {
         }
 
         return true;
+    }
+
+    public static Timer getRunTimeTimer() {
+        return runTimeTimer;
     }
 
     public static void setBreakHandlerState(BreakHandlerStates state) {

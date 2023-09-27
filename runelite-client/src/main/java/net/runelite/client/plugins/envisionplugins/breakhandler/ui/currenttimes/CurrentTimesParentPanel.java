@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes;
 
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.JTitle;
 import net.runelite.client.ui.ColorScheme;
 
@@ -14,7 +15,9 @@ public class CurrentTimesParentPanel extends JPanel {
         add(new JTitle("Current Times"));
         add(new CurrentTimesRunPanel());
         add(new CurrentTimesBreakPanel());
-        add(new JButton("Break Now"));
+        JButton breakNowBtn = new JButton("Break Now");
+        add(breakNowBtn);
+        breakNowBtn.addActionListener(e -> BreakHandlerScript.getRunTimeTimer().setDuration(0));
     }
 
     private void setStyle() {

@@ -23,7 +23,7 @@ public class Timer extends Clock{
     }
 
     @Override
-    void setDuration(long duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
         reset();
     }
