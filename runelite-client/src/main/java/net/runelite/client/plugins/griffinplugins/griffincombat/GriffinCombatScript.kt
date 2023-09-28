@@ -152,25 +152,51 @@ class GriffinCombatScript : Script() {
         if (defenceLevel >= 1) {
             shields.add(ItemID.WOODEN_SHIELD, 1)
         }
-//        if (defenceLevel >= 5) {
-//            requiredItems.add(Pair(ItemID.STEEL_PICKAXE, 1))
-//        }
-//        if (defenceLevel >= 10) {
-//            requiredItems.add(Pair(ItemID.BLACK_PICKAXE, 1))
-//        }
-//        if (defenceLevel >= 20) {
-//            requiredItems.add(Pair(ItemID.MITHRIL_PICKAXE, 1))
-//        }
-//        if (defenceLevel >= 30) {
-//            requiredItems.add(Pair(ItemID.ADAMANT_PICKAXE, 1))
-//        }
-//        if (defenceLevel >= 40) {
-//            requiredItems.add(Pair(ItemID.RUNE_PICKAXE, 1))
-//        }
 
         if (shields.getItems().isNotEmpty()) {
             inventoryRequirements.addItemSet(shields)
         }
+
+        val plateBodies = DynamicItemSet()
+        if (defenceLevel >= 1) {
+            plateBodies.add(ItemID.BRONZE_PLATEBODY, 1)
+            plateBodies.add(ItemID.IRON_PLATEBODY, 1)
+        }
+        if (defenceLevel >= 5) {
+            plateBodies.add(ItemID.STEEL_PLATEBODY, 1)
+        }
+        if (defenceLevel >= 10) {
+            plateBodies.add(ItemID.BLACK_PLATEBODY, 1)
+            plateBodies.add(ItemID.WHITE_PLATEBODY, 1)
+        }
+        if (defenceLevel >= 20) {
+            plateBodies.add(ItemID.MITHRIL_PLATEBODY, 1)
+        }
+
+        if (plateBodies.getItems().isNotEmpty()) {
+            inventoryRequirements.addItemSet(plateBodies)
+        }
+
+        val plateLegs = DynamicItemSet()
+        if (defenceLevel >= 1) {
+            plateLegs.add(ItemID.BRONZE_PLATELEGS, 1)
+            plateLegs.add(ItemID.IRON_PLATELEGS, 1)
+        }
+        if (defenceLevel >= 5) {
+            plateLegs.add(ItemID.STEEL_PLATELEGS, 1)
+        }
+        if (defenceLevel >= 10) {
+            plateLegs.add(ItemID.BLACK_PLATELEGS, 1)
+            plateLegs.add(ItemID.WHITE_PLATELEGS, 1)
+        }
+        if (defenceLevel >= 20) {
+            plateLegs.add(ItemID.MITHRIL_PLATELEGS, 1)
+        }
+
+        if (plateLegs.getItems().isNotEmpty()) {
+            inventoryRequirements.addItemSet(plateLegs)
+        }
+
         return inventoryRequirements
     }
 
