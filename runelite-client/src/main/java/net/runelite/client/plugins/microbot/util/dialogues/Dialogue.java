@@ -14,4 +14,8 @@ public class Dialogue {
         if (Rs2Widget.hasWidget("Click here to continue"))
             VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
     }
+
+    public static boolean hasSelectAnOption() {
+        return Rs2Widget.hasWidget("Select an Option");
+    }
 }

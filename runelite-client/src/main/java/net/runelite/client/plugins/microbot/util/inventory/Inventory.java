@@ -285,7 +285,7 @@ public class Inventory {
         if (inventoryWidget == null) return false;
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
                 .filter(x ->
-                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].equalsIgnoreCase(itemName)
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName)
                 ).count() >= amount);
     }
 
@@ -783,7 +783,8 @@ public class Inventory {
                 menuEntry.setType(MenuAction.CC_OP);
             } else if (itemAction.equalsIgnoreCase("empty") || itemAction.equalsIgnoreCase("rub")
                     || itemAction.equalsIgnoreCase("refund") || itemAction.equalsIgnoreCase("commune")
-                    || itemAction.equalsIgnoreCase("extinguish")) {
+                    || itemAction.equalsIgnoreCase("extinguish")
+                    || (itemAction.equalsIgnoreCase("check") && item.id == ItemID.GRICOLLERS_CAN)) {
                 index = 6;
                 menuEntry.setType(MenuAction.CC_OP);
             } else if (itemAction.equalsIgnoreCase("drop") || itemAction.equalsIgnoreCase("destroy")) {
