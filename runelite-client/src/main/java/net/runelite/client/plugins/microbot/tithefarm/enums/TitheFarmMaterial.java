@@ -11,8 +11,8 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 @RequiredArgsConstructor
 public enum TitheFarmMaterial {
     GOLOVANOVA_SEED("Golovanova seed", 34, '1', ItemID.GOLOVANOVA_FRUIT),
-    BOLOGANO_SEED("Bologano seed", 99, '2', ItemID.BOLOGANO_FRUIT),
-    LOGAVANO_SEED("Logavano seed", 99, '3', ItemID.LOGAVANO_FRUIT);
+    BOLOGANO_SEED("Bologano seed", 54, '2', ItemID.BOLOGANO_FRUIT),
+    LOGAVANO_SEED("Logavano seed", 74, '3', ItemID.LOGAVANO_FRUIT);
 
     final String name;
     final int levelRequired;
