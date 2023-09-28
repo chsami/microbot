@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.11;
+    public static double version = 0.12;
 
     /* Variables for other script's references */
     // TODO set this to false for production
@@ -233,10 +233,6 @@ public class BreakHandlerScript extends Script {
     /* Run Time Duration Getters and Setters */
     public static void setMinRunTimeDuration(long minDuration) {
         minRunTimeDuration = minDuration;
-
-        if (minRunTimeDuration != -1 && maxRunTimeDuration != -1) {
-            calcExpectedRunTime();
-        }
     }
 
     public static long getMinRunTimeDuration() {
@@ -245,10 +241,6 @@ public class BreakHandlerScript extends Script {
 
     public static void setMaxRunTimeDuration(long maxDuration) {
         maxRunTimeDuration = maxDuration;
-
-        if (minRunTimeDuration != -1 && maxRunTimeDuration != -1) {
-            calcExpectedRunTime();
-        }
     }
 
     public static long getMaxRunTimeDuration() {
@@ -259,10 +251,6 @@ public class BreakHandlerScript extends Script {
     /* Break Duration Getters and Setters */
     public static void setMinBreakDuration(long minDuration) {
         minBreakDuration = minDuration;
-
-        if (minBreakDuration != -1 && maxBreakDuration != -1) {
-            calcExpectedBreak();
-        }
     }
 
     public static long getMinBreakDuration() {
@@ -271,10 +259,6 @@ public class BreakHandlerScript extends Script {
 
     public static void setMaxBreakDuration(long maxDuration) {
         maxBreakDuration = maxDuration;
-
-        if (minBreakDuration != -1 && maxBreakDuration != -1) {
-            calcExpectedBreak();
-        }
     }
 
     public static long getMaxBreakDuration() {
