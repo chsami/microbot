@@ -3,7 +3,7 @@ package net.runelite.client.plugins.microbot.util.magic;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -45,8 +45,8 @@ public class Rs2Magic {
 
     public static void castOn(MagicAction magicSpell, Actor actor) {
         if (actor == null) return;
-        if (!Camera.isTileOnScreen(actor.getLocalLocation())) {
-            Camera.turnTo(actor.getLocalLocation());
+        if (!Rs2Camera.isTileOnScreen(actor.getLocalLocation())) {
+            Rs2Camera.turnTo(actor.getLocalLocation());
             return;
         }
         cast(magicSpell);

@@ -9,7 +9,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -348,7 +348,7 @@ public class Pathfinder implements Runnable {
             if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(node.position)) continue;
             Transport transport = getMatchingTransport(node.position);
             if (transport == null) continue;
-            if (Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), transport.origin))) {
+            if (Rs2Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), transport.origin))) {
                 TileObject tileObject = Rs2GameObject.findObjectByLocation(transport.origin);
                 if (!Rs2GameObject.hasLineOfSight(tileObject)) continue;
                 Rs2GameObject.interact(tileObject);
