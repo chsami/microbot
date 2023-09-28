@@ -165,52 +165,7 @@ public class Login {
     }
 
     public static int getRandomWorld(boolean isMembers) {
-        WorldResult worldResult = Microbot.getWorldService().getWorlds();
-
-        List<World> worlds;
-        if (worldResult != null) {
-            worlds = worldResult.getWorlds();
-            Random r = new Random();
-            List<World> filteredWorlds = worlds
-                    .stream()
-                    .filter(x ->
-                            (!x.getTypes().contains(WorldType.PVP) &&
-                                            !x.getTypes().contains(WorldType.HIGH_RISK) &&
-                                            !x.getTypes().contains(WorldType.BOUNTY) &&
-                                            !x.getTypes().contains(WorldType.SKILL_TOTAL) &&
-                                            !x.getTypes().contains(WorldType.LAST_MAN_STANDING) &&
-                                            !x.getTypes().contains(WorldType.QUEST_SPEEDRUNNING) &&
-                                            !x.getTypes().contains(WorldType.BETA_WORLD) &&
-                                            !x.getTypes().contains(WorldType.DEADMAN) &&
-                                            !x.getTypes().contains(WorldType.PVP_ARENA) &&
-                                            !x.getTypes().contains(WorldType.TOURNAMENT) &&
-                                            !x.getTypes().contains(WorldType.FRESH_START_WORLD)) &&
-                                            x.getPlayers() < MAX_PLAYER_COUNT &&
-                                            x.getPlayers() >= 0)
-                    .collect(Collectors.toList());
-
-            if (!isMembers) {
-                filteredWorlds = filteredWorlds
-                        .stream()
-                        .filter(x -> !x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList());
-            } else {
-                filteredWorlds = filteredWorlds
-                        .stream()
-                        .filter(x -> x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList());
-            }
-
-            World world =
-                    filteredWorlds.stream()
-                            .skip(r.nextInt(filteredWorlds.size()))
-                            .findFirst()
-                            .orElse(null);
-
-            if (world != null) {
-                return world.getId();
-            }
-        }
-
-        return isMembers ? 360 : 383;
+        return getRandomWorld(isMembers, null);
     }
 
     public static int getRandomWorld(boolean isMembers, WorldRegion region) {
@@ -248,7 +203,8 @@ public class Login {
                         .filter(x -> x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList());
             }
 
-            filteredWorlds = filteredWorlds
+            if (region != null)
+                filteredWorlds = filteredWorlds
                     .stream()
                     .filter(x -> x.getRegion() == region).collect(Collectors.toList());
 
