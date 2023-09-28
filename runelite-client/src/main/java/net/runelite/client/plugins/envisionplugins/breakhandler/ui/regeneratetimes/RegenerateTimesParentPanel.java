@@ -2,7 +2,6 @@ package net.runelite.client.plugins.envisionplugins.breakhandler.ui.regenerateti
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.JTitle;
-import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesRunPanel;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
@@ -27,13 +26,5 @@ public class RegenerateTimesParentPanel extends JPanel {
     private void setStyle() {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         setBorder(new EmptyBorder(20, 0, 0, 0));
-    }
-
-    public void setRuntimeToDisabled() {
-        regenerateRunTimeBtn.setEnabled(false);
-    }
-
-    public void setRuntimeToEnabled() {
-        regenerateRunTimeBtn.setEnabled(true);
     }
 }

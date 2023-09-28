@@ -32,9 +32,10 @@ public class BreakHandlerPanel extends PluginPanel {
     private final JPanel breakDurationPanel = new JPanel();
     private final JPanel playTimeDurationPanel = new JPanel();
     private final JPanel forceBreakPanel = new JPanel();
-//    public static final Border BORDER = new LineBorder(ColorScheme.LIGHT_GRAY_COLOR, 0);
 
-    private RegenerateTimesParentPanel regenerateTimesParentPanel = new RegenerateTimesParentPanel();
+    private final RegenerateTimesParentPanel regenerateTimesParentPanel = new RegenerateTimesParentPanel();
+    TwoFactorAuthParentPanel twoFactorAuthParentPanel = new TwoFactorAuthParentPanel();
+    AccountParentPanel accountParentPanel = new AccountParentPanel();
 
     public static final Border BORDER = new CompoundBorder(
             BorderFactory.createMatteBorder(2, 2, 2, 2, ColorScheme.LIGHT_GRAY_COLOR),
@@ -63,8 +64,8 @@ public class BreakHandlerPanel extends PluginPanel {
         JPanel account = new JPanel();
         BoxLayout boxLayoutAccount = new BoxLayout(account, BoxLayout.Y_AXIS);
         account.setLayout(boxLayoutAccount);
-        account.add(new AccountParentPanel());
-        account.add(new TwoFactorAuthParentPanel());
+        account.add(accountParentPanel);
+        account.add(twoFactorAuthParentPanel);
         tabbedPane.add("Account", account);
 
         // Settings Panel
@@ -80,14 +81,6 @@ public class BreakHandlerPanel extends PluginPanel {
 
         add(tabbedPane);
 
-    }
-
-    public RuntimeDurationParentPanel getRuntimeDurationParentPanel() {
-        return runtimeDurationParentPanel;
-    }
-
-    public BreakDurationParentPanel getBreakDurationParentPanel() {
-        return breakDurationParentPanel;
     }
 
     public MinimumTimeAmount getMinimumTimeAmount(TimeDurationType timeDurationType) throws Exception {
@@ -124,11 +117,20 @@ public class BreakHandlerPanel extends PluginPanel {
         return BreakMethodParentPanel.getBreakMethod();
     }
 
-    public void setRuntimeToDisabled() {
-        regenerateTimesParentPanel.setRuntimeToDisabled();
+    public JTextField getUsername() {
+        return accountParentPanel.getUsername();
     }
 
-    public void setRuntimeToEnabled() {
-        regenerateTimesParentPanel.setRuntimeToEnabled();
+    public JPasswordField getPassword() {
+        return accountParentPanel.getPassword();
     }
+
+    public JPasswordField getF2A() {
+        return twoFactorAuthParentPanel.getF2A();
+    }
+
+    public JPasswordField getPin() {
+        return twoFactorAuthParentPanel.getPin();
+    }
+
 }

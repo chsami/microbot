@@ -8,11 +8,13 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class AccountParentPanel extends JPanel {
+    AccountPanel accountPanel = new AccountPanel();
+
     public AccountParentPanel() {
         setStyle();
 
         add(new JTitle("Username / Password"));
-        add(new AccountPanel());
+        add(accountPanel);
     }
 
     private void setStyle() {
@@ -22,5 +24,13 @@ public class AccountParentPanel extends JPanel {
         setSize(d);
         setPreferredSize(d);
         setMaximumSize(d);
+    }
+
+    public JPasswordField getPassword() {
+        return accountPanel.getPassword();
+    }
+
+    public JTextField getUsername() {
+        return accountPanel.getUsername();
     }
 }

@@ -19,4 +19,12 @@ public class AccountPanel extends JPanel {
         username.setPreferredSize(new Dimension(100, 25));
         password.setPreferredSize(new Dimension(100, 25));
     }
+
+    public JTextField getUsername() {
+        return username;
+    }
+
+    public JPasswordField getPassword() {
+        return password;
+    }
 }
