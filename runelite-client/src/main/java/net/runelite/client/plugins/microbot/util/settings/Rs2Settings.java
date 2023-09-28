@@ -2,7 +2,7 @@ package net.runelite.client.plugins.microbot.util.settings;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -19,7 +19,7 @@ public class Rs2Settings {
         if (Microbot.getVarbitValue(DROP_SHIFT_SETTING) == 0) {
             final int ALL_SETTINGS_BUTTON = 7602208;
             final int SETTINGS_INTERFACE = 8781825;
-            Tab.switchToSettingsTab();
+            Rs2Tab.switchToSettingsTab();
             Rs2Widget.clickWidget(ALL_SETTINGS_BUTTON);
             sleepUntilOnClientThread(() -> Rs2Widget.getWidget(SETTINGS_INTERFACE) != null);
             final boolean isSettingsInterfaceVisible = Rs2Widget.getWidget(SETTINGS_INTERFACE) != null;
@@ -29,7 +29,7 @@ public class Rs2Settings {
                 Rs2Widget.clickWidget("Shift click to drop items");
                 sleep(600);
                 VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
-                Tab.switchToInventoryTab();
+                Rs2Tab.switchToInventoryTab();
             }
         }
         return Microbot.getVarbitValue(DROP_SHIFT_SETTING) == 1;
@@ -41,7 +41,7 @@ public class Rs2Settings {
 
     public static void hideRoofs() {
         if (!isHideRoofsEnabled()) {
-            Tab.switchToSettingsTab();
+            Rs2Tab.switchToSettingsTab();
             Rs2Widget.clickWidget(7602208);
             sleepUntil(() -> Rs2Widget.hasWidget("Hide roofs"));
             sleep(1000);
@@ -50,7 +50,7 @@ public class Rs2Settings {
     }
 
     public static void turnOffMusic() {
-        Tab.switchToSettingsTab();
+        Rs2Tab.switchToSettingsTab();
         sleep(600);
         Rs2Widget.clickWidget(116, 68);
         sleep(600);

@@ -22,7 +22,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
-import net.runelite.client.plugins.microbot.util.tabs.Tab
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 import java.util.concurrent.TimeUnit
 
@@ -40,8 +40,8 @@ class GriffinCombatScript : Script() {
     }
 
     fun run(config: GriffinCombatConfig): Boolean {
-//        Camera.setAngle(45)
-//        Camera.setPitch(1.0f)
+//        Rs2Camera.setAngle(45)
+//        Rs2Camera.setPitch(1.0f)
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay({
             this.config = config
@@ -356,7 +356,7 @@ class GriffinCombatScript : Script() {
         }
 
     private fun toggleCombatStyle(attackStyleWidgetInfo: WidgetInfo): Boolean {
-        Tab.switchToCombatOptionsTab()
+        Rs2Tab.switchToCombatOptionsTab()
         Global.sleep(150, 300)
         return Rs2Widget.clickWidget(attackStyleWidgetInfo)
     }

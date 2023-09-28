@@ -3,7 +3,7 @@ package net.runelite.client.plugins.griffinplugins.griffintrainer.helpers
 import net.runelite.api.NPC
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
-import net.runelite.client.plugins.microbot.util.camera.Camera
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 
@@ -39,8 +39,8 @@ class NPCHelper {
                 Microbot.getWalkerForKotlin().hybridWalkTo(nearestNpc.worldLocation)
             }
 
-            if (!Camera.isTileOnScreen(nearestNpc.getLocalLocation())) {
-                Camera.turnTo(nearestNpc.getLocalLocation())
+            if (!Rs2Camera.isTileOnScreen(nearestNpc.getLocalLocation())) {
+                Rs2Camera.turnTo(nearestNpc.getLocalLocation())
             }
 
             if (Rs2Npc.interact(nearestNpc, "attack")) {
