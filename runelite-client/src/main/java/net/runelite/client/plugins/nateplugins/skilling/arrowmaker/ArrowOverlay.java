@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.nateplugins.arrowmaker;
+package net.runelite.client.plugins.nateplugins.skilling.arrowmaker;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;

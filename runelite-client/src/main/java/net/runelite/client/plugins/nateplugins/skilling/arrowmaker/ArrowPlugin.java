@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.nateplugins.arrowmaker;
+package net.runelite.client.plugins.nateplugins.skilling.arrowmaker;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
