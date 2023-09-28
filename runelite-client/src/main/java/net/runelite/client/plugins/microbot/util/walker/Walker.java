@@ -6,6 +6,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.*;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.staticwalker.pathfinder.*;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
@@ -223,10 +224,6 @@ public class Walker {
             return walkTo(target, true);
 
         } else {
-            Rs2Camera.setAngle(45);
-            Rs2Camera.setPitch(1.0f);
-
-            if (nodes.isEmpty()) return false;
 
             PathWalker pathWalker = new PathWalker(nodes);
             pathWalker.walkPath();
