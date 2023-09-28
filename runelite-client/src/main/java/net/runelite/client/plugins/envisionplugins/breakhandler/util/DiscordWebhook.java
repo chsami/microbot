@@ -17,12 +17,13 @@ public class DiscordWebhook {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 
-    public void sendClientStatus(String clientMsgValue, String statusMsgValue) {
+    public void sendClientStatus(String clientMsgValue, String pluginMsgValue, String statusMsgValue) {
         DiscordWebhookBuilder discordWebhookBuilder = new DiscordWebhookBuilder(url);
         discordWebhookBuilder.addEmbed(new DiscordWebhookBuilder.EmbedObject()
                 .setColor(new Color(88, 185, 225))
                 .addField("Client:", clientMsgValue, true)
-                .addField("Status:", statusMsgValue, true)
+                .addField("Plugin:", pluginMsgValue, true)
+                .addField("Status:", statusMsgValue, false)
                 .setAuthor("Microbot Break Handler", "https://chsami.github.io/microbot/", "https://i.ibb.co/Fm4L8XF/breakhandler-watch.png")
                 .setFooter(now.toString(), "https://i.ibb.co/1Q4TNgK/watch.png")
         );
@@ -34,13 +35,14 @@ public class DiscordWebhook {
 
     }
 
-    public void sendClientStatusWithGains(String clientMsgValue, String statusMsgValue, String[] skillExperienceGained, String[] resourcesGained, String gp) {
+    public void sendClientStatusWithGains(String clientMsgValue, String pluginMsgValue, String statusMsgValue, String[] skillExperienceGained, String[] resourcesGained, String gp) {
         DiscordWebhookBuilder discordWebhookBuilder = new DiscordWebhookBuilder(url);
 
         discordWebhookBuilder.addEmbed(new DiscordWebhookBuilder.EmbedObject()
                 .setColor(new Color(88, 185, 225))
                 .addField("Client:", clientMsgValue, true)
-                .addField("Status:", statusMsgValue, true)
+                .addField("Client:", pluginMsgValue, true)
+                .addField("Status:", statusMsgValue, false)
                 .addField("Experience:", String.join("\\n", skillExperienceGained), false)
                 .addField("Resources:", String.join("\\n", resourcesGained), false)
                 .addField("GP:", gp, false)

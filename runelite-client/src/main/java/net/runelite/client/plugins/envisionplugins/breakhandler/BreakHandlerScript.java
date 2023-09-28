@@ -3,6 +3,7 @@ package net.runelite.client.plugins.envisionplugins.breakhandler;
 import net.runelite.client.plugins.envisionplugins.breakhandler.enums.BreakHandlerStates;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesBreakPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesRunPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.util.DiscordWebhook;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
@@ -12,14 +13,22 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.12;
+    public static double version = 0.13;
 
     /* Variables for other script's references */
     // TODO set this to false for production
     private static boolean isBreakHandlerCompatible = true;     // Use setter method in your Plugin's StartUp Method
     private static boolean letBreakHandlerStartBreak = false;   // Use setter method in your Plugin's StartUp Method
     private static boolean isBreakOver = false;                 // Use this variable to progress have the break has completed
+    private static String parentPluginName = "Default Plugin";
+    private static boolean detailedReportNotification = false;
+    private static String[] skillExperienceGained = {"Default1", "Default2"};
+    private static String[] resourcesGained = {"Default1", "Default2"};
+    private static String gpGained = "ZERO";
     /* End variables for other script's references */
+
+    /* Discord Stuff */
+    private DiscordWebhook discordWebhook;
 
     protected static boolean shouldBreakTimerBeEnabled = false;
     protected static boolean shouldRunTimeTimerBeEnabled = true;
@@ -44,11 +53,13 @@ public class BreakHandlerScript extends Script {
     protected static String breakMethod;
 
     protected int debugCount = 0;
+    protected int discordNotificationCount = 0;
 
 
     public boolean run(BreakHandlerConfig config, BreakHandlerPanel breakHandlerPanel) {
         runTimeTimer = new Timer("Run Time Timer", expectedRunTimeDuration);
         breakTimer = new Timer("Break Timer", expectedBreakDuration);
+        discordWebhook = new DiscordWebhook(config.DISCORD_WEBHOOK());
 
         if (isBreakHandlerCompatible) {
             mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -89,6 +100,8 @@ public class BreakHandlerScript extends Script {
                                 debugCount++;
                             }
 
+                            sendPostRunDiscordMessage(config, breakMethod);
+
                             breakTimer.run();
                             SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
                             break;
@@ -99,6 +112,8 @@ public class BreakHandlerScript extends Script {
                                 System.out.println("STATE: " + myState);
                                 debugCount++;
                             }
+
+                            sendPostRunDiscordMessage(config, breakMethod);
 
                             breakTimer.run();
                             SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
@@ -146,6 +161,7 @@ public class BreakHandlerScript extends Script {
                             // TODO: Temporary until I put in place working with external scripts
 
                             System.out.println("STARTUP: Wait");
+                            detailedReportNotification = true;  // TODO remove
                             sleep(10000);
                             System.out.println("STARTUP: Post Wait -> change state to run");
                             myState = BreakHandlerStates.RUN;
@@ -155,6 +171,15 @@ public class BreakHandlerScript extends Script {
                             if (config.VERBOSE_LOGGING() && debugCount == 0) {
                                 System.out.println("STATE: " + myState);
                                 debugCount++;
+                            }
+
+                            if (config.ENABLE_DISCORD_WEBHOOK() && discordNotificationCount == 0) {
+                                discordNotificationCount++;
+                                discordWebhook.sendClientStatus(
+                                        config.DISCORD_CLIENT_NAME(),
+                                        parentPluginName,
+                                        "Break Over, Resuming Plugin."
+                                );
                             }
 
                             isBreakOver = true;
@@ -167,6 +192,15 @@ public class BreakHandlerScript extends Script {
                                 debugCount++;
                             }
 
+                            if (config.ENABLE_DISCORD_WEBHOOK()) {
+                                discordNotificationCount++;
+                                discordWebhook.sendClientStatus(
+                                        config.DISCORD_CLIENT_NAME(),
+                                        parentPluginName,
+                                        "Break Over, Resuming Plugin."
+                                );
+                            }
+
                             isBreakOver = true;
                             break;
 
@@ -177,18 +211,21 @@ public class BreakHandlerScript extends Script {
 
                     // We should be on break
                     if (myState == BreakHandlerStates.RUN && (runTimeTimer.getDisplayTime() == 0 && breakTimer.getDisplayTime() > 0)) {
+                        discordNotificationCount = 0;
                         myState = BreakHandlerStates.START_BREAK;
                         debugCount = 0;
                     }
 
                     // We just finished a afk break - lets move to post_afk_break
                     if (myState == BreakHandlerStates.AFK_BREAK && !isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeTimer.getDisplayTime() == 0)) {
+                        discordNotificationCount = 0;
                         myState = BreakHandlerStates.POST_BREAK_AFK;
                         debugCount = 0;
                     }
 
                     // We are both POST break and run, lets regenerate new timers
                     if (myState == BreakHandlerStates.POST_BREAK_AFK && isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeTimer.getDisplayTime() == 0)) {
+                        discordNotificationCount = 0;
                         myState = BreakHandlerStates.RESET_BOTH_TIMERS;
                         debugCount = 0;
                     }
@@ -204,6 +241,29 @@ public class BreakHandlerScript extends Script {
         }
 
         return true;
+    }
+
+    private void sendPostRunDiscordMessage(BreakHandlerConfig config, String breakMethod) {
+        if (config.ENABLE_DISCORD_WEBHOOK() && discordNotificationCount == 0) {
+            discordNotificationCount++;
+
+            if (detailedReportNotification) {
+                discordWebhook.sendClientStatusWithGains(
+                        config.DISCORD_CLIENT_NAME(),
+                        parentPluginName,
+                        "Starting break via " + breakMethod + ".",
+                        skillExperienceGained,
+                        resourcesGained,
+                        gpGained
+                );
+            } else {
+                discordWebhook.sendClientStatus(
+                        config.DISCORD_CLIENT_NAME(),
+                        parentPluginName,
+                        "Starting break via " + breakMethod + "."
+                );
+            }
+        }
     }
 
     public static Timer getRunTimeTimer() {
@@ -316,5 +376,45 @@ public class BreakHandlerScript extends Script {
 
     public static boolean getIsBreakOver() {
         return isBreakOver;
+    }
+
+    public static void setParentPluginName(String name) {
+        parentPluginName = name;
+    }
+
+    public static String getParentPluginName() {
+        return parentPluginName;
+    }
+
+    public static void setDetailedReportNotification(boolean flag) {
+        detailedReportNotification = flag;
+    }
+
+    public static boolean getDetailedReportNotification() {
+        return detailedReportNotification;
+    }
+
+    public static void setSkillExperienceGained(String[] experienceGained) {
+        skillExperienceGained = experienceGained;
+    }
+
+    public static String[] getSkillExperienceGained() {
+        return skillExperienceGained;
+    }
+
+    public static void setResourcesGained(String[] resources) {
+        resourcesGained = resources;
+    }
+
+    public static String[] getResourcesGained() {
+        return resourcesGained;
+    }
+
+    public static void setGpGained(String gp) {
+        gpGained = gp;
+    }
+
+    public static String getGpGained() {
+        return gpGained;
     }
 }

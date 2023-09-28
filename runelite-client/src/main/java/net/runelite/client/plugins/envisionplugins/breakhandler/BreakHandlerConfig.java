@@ -46,7 +46,7 @@ public interface BreakHandlerConfig extends Config {
             position = 0,
             section = runTimeSection
     )
-    default int MINIMUM_RUN_TIME_DURATION() { return 60; }
+    default int MINIMUM_RUN_TIME_DURATION() { return 3600; }
 
     @ConfigItem(
             keyName = "Maximum Duration",
@@ -55,7 +55,7 @@ public interface BreakHandlerConfig extends Config {
             position = 1,
             section = runTimeSection
     )
-    default int MAXIMUM_RUN_TIME_DURATION() { return 120; }
+    default int MAXIMUM_RUN_TIME_DURATION() { return 19800; }
 
     @ConfigItem(
             keyName = "Minimum Break Duration",
@@ -85,10 +85,19 @@ public interface BreakHandlerConfig extends Config {
     default String DISCORD_WEBHOOK() { return ""; }
 
     @ConfigItem(
+            keyName = "Client Name for Discord Webhook",
+            name = "Client Name for Discord Webhook",
+            description = "Name to include in the discord messages, don't use your RNS... lol",
+            position = 5,
+            section = discordSection
+    )
+    default String DISCORD_CLIENT_NAME() { return "Default"; }
+
+    @ConfigItem(
             keyName = "Enable Discord Webhook for notifications",
             name = "Enable Discord Webhook for notifications",
             description = "Enable Discord webhook?",
-            position = 5,
+            position = 6,
             section = discordSection
     )
     default boolean ENABLE_DISCORD_WEBHOOK() { return false; }
@@ -97,7 +106,7 @@ public interface BreakHandlerConfig extends Config {
             keyName = "Enable verbose debug System logs?",
             name = "Enable verbose debug System logs?",
             description = "Enable verbose debug System logs?",
-            position = 6,
+            position = 7,
             section = debugSection
     )
     default boolean VERBOSE_LOGGING() { return false; }
