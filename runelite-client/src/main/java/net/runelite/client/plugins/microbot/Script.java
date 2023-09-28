@@ -10,7 +10,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -145,8 +145,8 @@ public abstract class Script implements IScript {
     }
 
     public void logout() {
-        Tab.switchToLogout();
-        sleepUntil(() -> Tab.getCurrentTab() == InterfaceTab.LOGOUT);
+        Rs2Tab.switchToLogout();
+        sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.LOGOUT);
         sleep(600, 1000);
         Rs2Widget.clickWidget("Click here to logout");
     }

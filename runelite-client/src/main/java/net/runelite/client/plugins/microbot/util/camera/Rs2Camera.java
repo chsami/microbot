@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
 
 import static net.runelite.client.plugins.microbot.util.math.Calculations.angleToTile;
 
-public class Camera extends Script {
+public class Rs2Camera extends Script {
 
     public static void turnTo(final Actor actor) {
         int angle = getCharacterAngle(actor);

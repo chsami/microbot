@@ -494,6 +494,11 @@ public class PluginManager
 		return true;
 	}
 
+	public void setPluginValue(String groupName, String keyName, Object value)
+	{
+		configManager.setConfiguration(groupName, keyName, value);
+	}
+
 	public void setPluginEnabled(Plugin plugin, boolean enabled)
 	{
 		final PluginDescriptor pluginDescriptor = plugin.getClass().getAnnotation(PluginDescriptor.class);

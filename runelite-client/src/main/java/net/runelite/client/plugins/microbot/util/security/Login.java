@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
+import net.runelite.http.api.worlds.WorldRegion;
 import net.runelite.http.api.worlds.WorldResult;
 import net.runelite.http.api.worlds.WorldType;
 
@@ -164,6 +165,10 @@ public class Login {
     }
 
     public static int getRandomWorld(boolean isMembers) {
+        return getRandomWorld(isMembers, null);
+    }
+
+    public static int getRandomWorld(boolean isMembers, WorldRegion region) {
         WorldResult worldResult = Microbot.getWorldService().getWorlds();
 
         List<World> worlds;
@@ -174,18 +179,18 @@ public class Login {
                     .stream()
                     .filter(x ->
                             (!x.getTypes().contains(WorldType.PVP) &&
-                                            !x.getTypes().contains(WorldType.HIGH_RISK) &&
-                                            !x.getTypes().contains(WorldType.BOUNTY) &&
-                                            !x.getTypes().contains(WorldType.SKILL_TOTAL) &&
-                                            !x.getTypes().contains(WorldType.LAST_MAN_STANDING) &&
-                                            !x.getTypes().contains(WorldType.QUEST_SPEEDRUNNING) &&
-                                            !x.getTypes().contains(WorldType.BETA_WORLD) &&
-                                            !x.getTypes().contains(WorldType.DEADMAN) &&
-                                            !x.getTypes().contains(WorldType.PVP_ARENA) &&
-                                            !x.getTypes().contains(WorldType.TOURNAMENT) &&
-                                            !x.getTypes().contains(WorldType.FRESH_START_WORLD)) &&
-                                            x.getPlayers() < MAX_PLAYER_COUNT &&
-                                            x.getPlayers() >= 0)
+                                    !x.getTypes().contains(WorldType.HIGH_RISK) &&
+                                    !x.getTypes().contains(WorldType.BOUNTY) &&
+                                    !x.getTypes().contains(WorldType.SKILL_TOTAL) &&
+                                    !x.getTypes().contains(WorldType.LAST_MAN_STANDING) &&
+                                    !x.getTypes().contains(WorldType.QUEST_SPEEDRUNNING) &&
+                                    !x.getTypes().contains(WorldType.BETA_WORLD) &&
+                                    !x.getTypes().contains(WorldType.DEADMAN) &&
+                                    !x.getTypes().contains(WorldType.PVP_ARENA) &&
+                                    !x.getTypes().contains(WorldType.TOURNAMENT) &&
+                                    !x.getTypes().contains(WorldType.FRESH_START_WORLD)) &&
+                                    x.getPlayers() < MAX_PLAYER_COUNT &&
+                                    x.getPlayers() >= 0)
                     .collect(Collectors.toList());
 
             if (!isMembers) {
@@ -197,6 +202,11 @@ public class Login {
                         .stream()
                         .filter(x -> x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList());
             }
+
+            if (region != null)
+                filteredWorlds = filteredWorlds
+                    .stream()
+                    .filter(x -> x.getRegion() == region).collect(Collectors.toList());
 
             World world =
                     filteredWorlds.stream()

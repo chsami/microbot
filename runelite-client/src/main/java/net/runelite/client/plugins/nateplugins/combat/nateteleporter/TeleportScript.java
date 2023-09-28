@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.nateplugins.combat.nateteleporter;
+package net.runelite.client.plugins.nateplugins.nateteleporter.nateteleporter;
 
 import net.runelite.api.Skill;
 import net.runelite.api.widgets.Widget;
@@ -6,7 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,9 +23,9 @@ public class TeleportScript extends Script {
             try {
                 if (!config.highAlchemy() && (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts)) return;
 
-                Tab.switchToMagicTab();
+                Rs2Tab.switchToMagicTab();
 
-                Microbot.status = "current tab: " + Tab.getCurrentTab();
+                Microbot.status = "current tab: " + Rs2Tab.getCurrentTab();
                 if (config.highAlchemy()) {
                     sleep(600, 800);
 

@@ -14,7 +14,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -26,7 +25,6 @@ import java.util.concurrent.Executors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
@@ -116,13 +114,11 @@ public class ThreeTickBarb extends Plugin {
         inProgress = true;
         sleep(18, 132);
 
-        Widget swampTarWidget = Inventory.findItem("Swamp tar");
-        Microbot.getMouse().click(swampTarWidget.getBounds());
+        Inventory.useItemFast(ItemID.SWAMP_TAR, "Use");
 
-
-        if (Inventory.hasItem("leaping trout")) {
-            Inventory.drop("leaping trout");
-        }
+        Inventory.useItemFast(ItemID.LEAPING_TROUT, "drop");
+        Inventory.useItemFast(ItemID.LEAPING_SALMON, "drop");
+        Inventory.useItemFast(ItemID.LEAPING_STURGEON, "drop");
 
         state = ThreeTickFishingState.ClickFishingSpot;
         inProgress = false;
@@ -133,18 +129,8 @@ public class ThreeTickBarb extends Plugin {
         sleep(23, 213);
 
         NPC fishingSpot = getFishingSpot();
-        boolean fishingSpotTooFar = Microbot.getClientThread().runOnClientThread(() -> {
-            int distance = fishingSpot.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
-            return distance > 1;
-        });
 
-        if (fishingSpotTooFar) {
-            state = ThreeTickFishingState.LocatingFishingSpot;
-
-            locateFishingSpot(fishingSpot);
-        }
-
-        Rs2Npc.interact(fishingSpot,"Use-rod");
+        Rs2Npc.interact(fishingSpot, "Use-rod");
 
         state = ThreeTickFishingState.UseGuam;
         inProgress = false;
@@ -152,8 +138,9 @@ public class ThreeTickBarb extends Plugin {
 
     private void locateFishingSpot(NPC fishingSpot) {
         inProgress = true;
+        sleep(11, 254);
 
-        Rs2Npc.interact(fishingSpot,"Use-rod");
+        Rs2Menu.doAction("Use-rod", fishingSpot.getCanvasTilePoly());
         sleepUntilOnClientThread(() -> {
             int distance = fishingSpot.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
             return distance <= 1;
