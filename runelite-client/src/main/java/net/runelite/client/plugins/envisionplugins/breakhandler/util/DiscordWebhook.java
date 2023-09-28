@@ -41,7 +41,7 @@ public class DiscordWebhook {
         discordWebhookBuilder.addEmbed(new DiscordWebhookBuilder.EmbedObject()
                 .setColor(new Color(88, 185, 225))
                 .addField("Client:", clientMsgValue, true)
-                .addField("Client:", pluginMsgValue, true)
+                .addField("Plugin:", pluginMsgValue, true)
                 .addField("Status:", statusMsgValue, false)
                 .addField("Experience:", String.join("\\n", skillExperienceGained), false)
                 .addField("Resources:", String.join("\\n", resourcesGained), false)
