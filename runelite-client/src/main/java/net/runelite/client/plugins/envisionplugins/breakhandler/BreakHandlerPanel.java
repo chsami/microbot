@@ -11,6 +11,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDur
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.regeneratetimes.RegenerateTimesParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration.RuntimeDurationParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.twofactorauth.TwoFactorAuthParentPanel;
+import net.runelite.client.plugins.microbot.util.security.Encryption;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
@@ -121,8 +122,12 @@ public class BreakHandlerPanel extends PluginPanel {
         return accountParentPanel.getUsername();
     }
 
-    public JPasswordField getPassword() {
+    private JPasswordField getPassword() {
         return accountParentPanel.getPassword();
+    }
+
+    public String getPasswordEncryptedValue() throws Exception {
+        return Encryption.encrypt(new String(getPassword().getPassword()));
     }
 
     public JPasswordField getF2A() {
