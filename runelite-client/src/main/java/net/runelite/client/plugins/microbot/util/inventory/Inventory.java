@@ -759,7 +759,9 @@ public class Inventory {
 
             Rs2Reflection.setItemId(menuEntry, item.id);
 
-            if (itemAction.equalsIgnoreCase("use")) {
+            if (Microbot.getClient().isWidgetSelected()) {
+                menuEntry.setType(MenuAction.WIDGET_TARGET_ON_WIDGET);
+            } else if (itemAction.equalsIgnoreCase("use")) {
                 menuEntry.setType(MenuAction.WIDGET_TARGET);
             } else if (itemAction.equalsIgnoreCase("cast")) {
                 menuEntry.setType(MenuAction.WIDGET_TARGET_ON_WIDGET);
