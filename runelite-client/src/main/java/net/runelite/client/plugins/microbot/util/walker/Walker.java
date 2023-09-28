@@ -7,13 +7,12 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.*;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
-import net.runelite.client.plugins.microbot.staticwalker.pathfinder.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +59,9 @@ public class Walker {
     }
 
     public WorldPoint walkMiniMap(WorldPoint worldPoint) {
+        if (Microbot.getClient().getMinimapZoom() > 2)
+            Microbot.getClient().setMinimapZoom(2);
+
         Point point = Calculations.worldToMinimap(worldPoint.getX(), worldPoint.getY());
 
         if (point == null) return null;
@@ -124,17 +126,10 @@ public class Walker {
 
     public void walkFastCanvas(WorldPoint worldPoint) {
         LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
-        int times = 0; //extra check to avoid getting stuck
-        while (!Calculations.tileOnScreen(localPoint)) {
-            if (Microbot.getClient().getCameraPitch() < 370) {
-                Microbot.getClient().setCameraPitchTarget(Random.random(370, 400));
-            }
-            if (Microbot.getClient().getScale() < 400 || times > 10) break;
-            Microbot.getMouse().scrollDown(new Point(1, 1));
-            sleep(300, 500);
-            times++;
+        if (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getWalker().walkMiniMap(worldPoint); //use minimap if tile is not on screen
+            return;
         }
-
         Point canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY()), Microbot.getClient().getPlane());
         canvasX = canv != null ? canv.getX() : -1;
         canvasY = canv != null ? canv.getY() : -1;
