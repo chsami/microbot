@@ -2,7 +2,7 @@ package net.runelite.client.plugins.microbot.util.npc;
 
 import net.runelite.api.*;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
 import java.util.Arrays;
@@ -30,7 +30,7 @@ public class Rs2Npc {
     public static NPC validateInteractable(NPC npc) {
         if(npc != null) {
             Microbot.getWalker().walkTo(npc.getWorldLocation());
-            Camera.turnTo(npc);
+            Rs2Camera.turnTo(npc);
             return npc;
         }
         return null;

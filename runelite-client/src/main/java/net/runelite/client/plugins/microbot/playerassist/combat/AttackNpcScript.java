@@ -6,8 +6,7 @@ import net.runelite.api.Player;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
-import net.runelite.client.plugins.microbot.util.Global;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.ArrayList;
@@ -53,8 +52,8 @@ public class AttackNpcScript extends Script {
                         break;
                     if (npc.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 10)
                         break;
-                    if (!Camera.isTileOnScreen(npc.getLocalLocation()))
-                        Camera.turnTo(npc);
+                    if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation()))
+                        Rs2Camera.turnTo(npc);
                     Rs2Npc.interact(npc, "attack");
                     sleep(600, 1000);
                     break;

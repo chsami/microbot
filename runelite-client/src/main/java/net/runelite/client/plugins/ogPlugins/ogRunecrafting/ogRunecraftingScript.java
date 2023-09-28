@@ -15,7 +15,7 @@ import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -39,8 +39,10 @@ public class ogRunecraftingScript extends Script {
     private boolean atAlter() {return playerLocation().distanceTo(config.selectAlter().getAlterLocation()) < 15;}
     private int distanceToRuin() {return playerLocation().distanceTo(config.selectAlter().getRuinLocation());}
     private void openChest() {Rs2Bank.openBank(Rs2GameObject.findObjectById(config.selectBank().getBankID()));}
-    private void teletoCraftingGuild(){Tab.switchToEquipmentTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.EQUIPMENT);sleep(100,150);Rs2Widget.clickWidget(25362448);}
-    private void teletoFireAlter(){Tab.switchToEquipmentTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.EQUIPMENT);sleep(200,300);Rs2Widget.clickWidget(25362456);}
+    private void teletoCraftingGuild(){
+        Rs2Tab.switchToEquipmentTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.EQUIPMENT);sleep(100,150);Rs2Widget.clickWidget(25362448);}
+    private void teletoFireAlter(){
+        Rs2Tab.switchToEquipmentTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.EQUIPMENT);sleep(200,300);Rs2Widget.clickWidget(25362456);}
     private void combinationCraft(){
         Inventory.useItemOnObjectFast(config.selectRuneToMake().getPrimaryRequiredRune(),config.selectAlter().getAlterID());
         sleepUntil(()-> !Inventory.hasItem(config.selectRuneToMake().getEssenceTypeRequired()));
@@ -81,7 +83,8 @@ public class ogRunecraftingScript extends Script {
     private void grabRunes() {
 
         if(playerLocation().distanceTo( new WorldPoint(2935,3280,0)) > 10){teletoCraftingGuild();sleepUntil(() -> playerLocation().distanceTo( new WorldPoint(2931,3286,0)) < 10);}
-        if(Tab.getCurrentTab() != InterfaceTab.INVENTORY){Tab.switchToInventoryTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.INVENTORY);}
+        if(Rs2Tab.getCurrentTab() != InterfaceTab.INVENTORY){
+            Rs2Tab.switchToInventoryTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);}
         if(!Rs2Bank.isOpen()){
             while(!Rs2Bank.isOpen()){
                 openChest();
@@ -137,7 +140,8 @@ public class ogRunecraftingScript extends Script {
         while (distanceToRuin() > 30){
             teletoFireAlter();
             System.out.println("Tele to fire alter");
-            if(Tab.getCurrentTab() != InterfaceTab.INVENTORY){Tab.switchToInventoryTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.INVENTORY);}
+            if(Rs2Tab.getCurrentTab() != InterfaceTab.INVENTORY){
+                Rs2Tab.switchToInventoryTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);}
             sleepUntil(()-> distanceToRuin() < 30,4000);
         }
         sleepUntil(()-> distanceToRuin() < 30);
@@ -153,7 +157,8 @@ public class ogRunecraftingScript extends Script {
             Rs2Widget.clickWidget("Yes");
             bindingNeckAmmount = getBindingNeckAmmount();
         }
-        if(Inventory.hasItem("Stamina potion(1)")){if(Tab.getCurrentTab() != InterfaceTab.INVENTORY){Tab.switchToInventoryTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.INVENTORY);}Inventory.useItemAction("Stamina potion(1)","drink");}
+        if(Inventory.hasItem("Stamina potion(1)")){if(Rs2Tab.getCurrentTab() != InterfaceTab.INVENTORY){
+            Rs2Tab.switchToInventoryTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);}Inventory.useItemAction("Stamina potion(1)","drink");}
         sleepUntil(() -> distanceToRuin() < Random.random(2,3));
         castMagicImbue();
         while(!atAlter()){
@@ -199,8 +204,8 @@ public class ogRunecraftingScript extends Script {
     }
 
     private void calcState() {
-        Tab.switchToInventoryTab();
-        sleepUntil(() -> Tab.getCurrentTab() == InterfaceTab.INVENTORY);
+        Rs2Tab.switchToInventoryTab();
+        sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);
         if(!hasEssence()){botState = State.RESTOCKING;}
         else if(hasEssence() && !atAlter()) {botState = State.WALKING_TO_ALTER;}
         else if(hasEssence() && atAlter()) {botState = State.CRAFTING_RUNES;}
@@ -208,7 +213,8 @@ public class ogRunecraftingScript extends Script {
 
     }
     private void repairPouches() {
-        if(Tab.getCurrentTab() != InterfaceTab.MAGIC){Tab.switchToMagicTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.MAGIC);}
+        if(Rs2Tab.getCurrentTab() != InterfaceTab.MAGIC){
+            Rs2Tab.switchToMagicTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC);}
         Rs2Widget.clickWidget(14286953);
         sleepUntil(() -> Rs2Widget.getWidget(4915212) != null,10000);
         Rs2Widget.clickWidget(4915212);
@@ -227,15 +233,18 @@ public class ogRunecraftingScript extends Script {
         sleep(60,100);
         //VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         Rs2Widget.clickWidget("Click here to continue");
-        if(Tab.getCurrentTab() != InterfaceTab.INVENTORY){Tab.switchToInventoryTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.INVENTORY);}
+        if(Rs2Tab.getCurrentTab() != InterfaceTab.INVENTORY){
+            Rs2Tab.switchToInventoryTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);}
 
 
     }
     private void castMagicImbue(){
-        if(Tab.getCurrentTab() != InterfaceTab.MAGIC){Tab.switchToMagicTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.MAGIC);}
+        if(Rs2Tab.getCurrentTab() != InterfaceTab.MAGIC){
+            Rs2Tab.switchToMagicTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC);}
         Rs2Widget.clickWidget(14286973);
         sleep(120,180);
-        if(Tab.getCurrentTab() != InterfaceTab.INVENTORY){Tab.switchToInventoryTab(); sleepUntil(()-> Tab.getCurrentTab() == InterfaceTab.INVENTORY);}
+        if(Rs2Tab.getCurrentTab() != InterfaceTab.INVENTORY){
+            Rs2Tab.switchToInventoryTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);}
     }
     void onGameTick(GameTick gameTick){
         this.gameTick++;
