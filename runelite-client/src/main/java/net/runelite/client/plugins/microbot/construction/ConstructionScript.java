@@ -13,7 +13,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -130,7 +130,7 @@ public class ConstructionScript extends Script {
             return distance > 3;
         });
         if (butlerIsToFar) {
-            Tab.switchToSettingsTab();
+            Rs2Tab.switchToSettingsTab();
             sleep(800, 1800);
             Widget houseOptionWidget = Rs2Widget.findWidget(SpriteID.OPTIONS_HOUSE_OPTIONS, null);
             if (houseOptionWidget != null)

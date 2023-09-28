@@ -14,7 +14,7 @@ import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.ogPlugins.ogPrayer.enums.RestockMethod;
 import net.runelite.client.plugins.ogPlugins.ogPrayer.enums.Bones;
@@ -85,7 +85,7 @@ public class ogPrayerScript extends Script {
         log("Selected world: " + selectedWorld);
         return selectedWorld;
     }
-    private boolean hasNotedBonesIfNeeded(){ Tab.switchToInventoryTab() ;if(restockMethod.getRestockType() == RestockMethod.RestockType.NOTING){ return Inventory.hasItem(bones.getNotedID()); } return true; } //Redo this cause this logic is stupid
+    private boolean hasNotedBonesIfNeeded(){ Rs2Tab.switchToInventoryTab() ;if(restockMethod.getRestockType() == RestockMethod.RestockType.NOTING){ return Inventory.hasItem(bones.getNotedID()); } return true; } //Redo this cause this logic is stupid
     private void openChaosDoorsIfNeeded(){
         log("----------------------------------OPEN CHAOS DOOR FUNCTION WAS CALLED----------------------------------");
         if(Rs2GameObject.findDoor(1525) != null || Rs2GameObject.findDoor(1522) != null){return;}
@@ -158,8 +158,8 @@ public class ogPrayerScript extends Script {
                 else if( status == ogPrayerStatus.USE_BONES_ON_ALTER ){useBonesOnAltar();}
                 else if( status == ogPrayerStatus.RESTOCK ){restock();}
                 else if( status == ogPrayerStatus.LOGOUT ){
-                    Tab.switchToLogout();
-                    sleepUntil(() -> Tab.getCurrentTab() == InterfaceTab.LOGOUT);
+                    Rs2Tab.switchToLogout();
+                    sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.LOGOUT);
                     sleep(30,80);
                     Rs2Widget.clickWidget("Click here to logout");
                 }
@@ -179,7 +179,7 @@ public class ogPrayerScript extends Script {
                 Microbot.getMouse().click(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(),Microbot.getClient().getLocalPlayer().getWorldLocation().getY());
                 sleep(80,120);
                 Microbot.hopToWorld(selectWorldFromList());
-        } else {needToHop = false; Tab.switchToInventoryTab();}
+        } else {needToHop = false; Rs2Tab.switchToInventoryTab();}
         this.gameTick++;
         //if(!needToHop && ){
 
@@ -211,7 +211,7 @@ public class ogPrayerScript extends Script {
         if(Microbot.getClient().getGameState() != GameState.LOGIN_SCREEN){
             if(location == Locations.GILDED_ALTAR){sleepUntil(()-> checkVarbit(6719) == 0,Random.random(1300,1500));}
             if(location == Locations.CHAOS_ALTAR && inPVPArea()){sleepUntil(() -> this.playersInArea == 1, Random.random(20000,25000));}
-            if(Tab.switchToInventoryTab()){
+            if(Rs2Tab.switchToInventoryTab()){
                 if(location == Locations.CHAOS_ALTAR || location == Locations.GILDED_ALTAR){
                     if(Inventory.hasItem(bones.getItemID()) && isNearAlter() && !needToHop){ status = ogPrayerStatus.USE_BONES_ON_ALTER; }
                     else if (Inventory.hasItem(bones.getItemID()) && !isNearAlter() && !needToHop){ status = ogPrayerStatus.GO_TO_ALTER; }

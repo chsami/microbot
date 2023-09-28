@@ -18,9 +18,6 @@ public class VirtualKeyboard {
     }
 
     public static void typeString(final String word) {
-       /* if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();*/
-
         for (int i = 0; i < word.length(); i++) {
             final int randomizer = random(20, 200);
 
@@ -34,9 +31,6 @@ public class VirtualKeyboard {
 
 
     public static void keyPress(final char key) {
-      /*  if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();*/
-
         final int randomizer = random(20, 200);
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_UNDEFINED, key);
@@ -45,9 +39,6 @@ public class VirtualKeyboard {
     }
 
     public static void holdShift() {
-       /* if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();*/
-
         final int randomizer = random(20, 200);
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_SHIFT, CHAR_UNDEFINED);
@@ -56,9 +47,6 @@ public class VirtualKeyboard {
     }
 
     public static void releaseShift() {
-        /*if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();
-*/
         final int randomizer = random(20, 200);
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_SHIFT);
@@ -67,8 +55,6 @@ public class VirtualKeyboard {
     }
 
     public static void keyHold(int key) {
-        /*if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();*/
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, key);
 
@@ -76,26 +62,19 @@ public class VirtualKeyboard {
     }
 
     public static void keyRelease(int key) {
-       /* if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();*/
+        final int randomizer = random(20, 200);
 
-        KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, key);
+        KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis() + randomizer, 0, key);
 
         Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
     }
 
     public static void keyPress(int key) {
-       /* if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();*/
-
         keyHold(key);
         keyRelease(key);
     }
 
     public static void enter() {
-        /*if (!getCanvas().hasFocus())
-            getCanvas().requestFocus();*/
-
         keyHold(KeyEvent.VK_ENTER);
         keyRelease(KeyEvent.VK_ENTER);
     }

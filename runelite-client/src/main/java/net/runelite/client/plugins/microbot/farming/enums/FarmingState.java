@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums;
+package net.runelite.client.plugins.microbot.farming.enums;
 
 public enum FarmingState {
     RESET,

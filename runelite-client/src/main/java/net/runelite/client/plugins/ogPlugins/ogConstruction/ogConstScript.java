@@ -14,7 +14,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.ogPlugins.ogConstruction.enums.Butler;
 import net.runelite.client.plugins.ogPlugins.ogConstruction.enums.Furniture;
@@ -88,7 +88,7 @@ public class ogConstScript extends Script {
                 else if(status == State.FILL_MONEY_BAG){fillMoneyBag();}
                 else if(status == State.LOGOUT){
                     Microbot.status = "Logging Out";
-                    Tab.switchToLogout();
+                    Rs2Tab.switchToLogout();
                     Rs2Widget.clickWidget("Click here to logout");
                     super.shutdown();
                 }
@@ -215,7 +215,7 @@ public class ogConstScript extends Script {
             sleepUntil(() -> !checkIfButlerHere(),Random.random(600,700));
             gameTickLastSentButler = currentGameTick;
         }
-        Tab.switchToInventoryTab();
+        Rs2Tab.switchToInventoryTab();
         sleepUntil(() -> Inventory.hasItemAmount(furniture.getPlankNeeded(), furniture.getPlankAmountNeeded()) || checkButlerNearPlayer(),Random.random(10000,13000));
     }
     //TODO Update butlers fetch to correct planks if needed - more regex
@@ -234,7 +234,7 @@ public class ogConstScript extends Script {
         }
     }
     private void navigateToHouseSettings() {
-        Tab.switchToSettingsTab();
+        Rs2Tab.switchToSettingsTab();
         if(Rs2Widget.getWidget(7602207) == null){
             sleep(30,40);
             Rs2Widget.clickWidget(7602241);

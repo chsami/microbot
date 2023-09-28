@@ -8,7 +8,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.Global;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -36,14 +36,14 @@ public class LootScript extends Script {
                 if (item.toLowerCase().equals(itemComposition.getName().toLowerCase()) && distance < 14) {
                     LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), itemSpawned.getTile().getWorldLocation());
                     Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, itemSpawned.getTile().getItemLayer().getHeight());
-                    if (Camera.isTileOnScreen(itemLocation)) {
+                    if (Rs2Camera.isTileOnScreen(itemLocation)) {
                         if (Rs2Menu.doAction("Take", poly, new String[]{item.toLowerCase()})) {
                             Microbot.pauseAllScripts = true;
                             sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation() == itemSpawned.getTile().getWorldLocation(), 5000);
                             Microbot.pauseAllScripts = false;
                         }
                     } else {
-                        Camera.turnTo(itemLocation);
+                        Rs2Camera.turnTo(itemLocation);
                     }
                 }
             }

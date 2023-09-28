@@ -16,7 +16,7 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.NameGenerator;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
@@ -363,7 +363,7 @@ public class TutorialIslandScript extends Script {
                         sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
                     }
                 } else {
-                    Tab.switchToInventoryTab();
+                    Rs2Tab.switchToInventoryTab();
                     sleep(500);
                     Rs2Equipment.equipItem("Bronze sword");
                     sleep(500);
@@ -457,7 +457,7 @@ public class TutorialIslandScript extends Script {
             NPC npc = Rs2Npc.getNpc(3312);
             Rs2Npc.interact(npc, "Talk-to");
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
-            Tab.switchToQuestTab();
+            Rs2Tab.switchToQuestTab();
             Rs2Widget.clickWidget(10747957);
         } else {
             Rs2GameObject.interact(9726, "Climb-down");
@@ -492,7 +492,7 @@ public class TutorialIslandScript extends Script {
             } else if (Inventory.contains("Bread")) {
                 if (Rs2GameObject.interact(9710, "Open")) {
                     sleep(2000);
-                    Tab.switchToMusicTab();
+                    Rs2Tab.switchToMusicTab();
                 }
             }
         }
