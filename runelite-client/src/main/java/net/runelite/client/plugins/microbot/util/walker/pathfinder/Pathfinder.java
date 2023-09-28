@@ -19,7 +19,7 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.magic.Teleport;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Transport;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.tuple.Pair;
@@ -109,7 +109,7 @@ public class Pathfinder implements Runnable {
         Transport tunnel = getClosestTunnel();
 
         if (useTransport && start.distanceTo(target) > teleportThreshHoldDistance) {
-            Tab.switchToInventoryTab();
+            Rs2Tab.switchToInventoryTab();
 
             Teleport shortestPathSpell = null;
             JewelleryLocationEnum shortestPathJewellery = null;

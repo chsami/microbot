@@ -5,7 +5,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -851,7 +851,7 @@ public class Rs2Inventory {
      * @return True if the inventory is open, false otherwise.
      */
     public static boolean isOpen() {
-        return Tab.getCurrentTab() == InterfaceTab.INVENTORY;
+        return Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY;
     }
 
     /**
@@ -948,7 +948,7 @@ public class Rs2Inventory {
      * @return True if the inventory is successfully opened, false otherwise.
      */
     public static boolean open() {
-        Tab.switchToInventoryTab();
+        Rs2Tab.switchToInventoryTab();
         return true;
     }
 

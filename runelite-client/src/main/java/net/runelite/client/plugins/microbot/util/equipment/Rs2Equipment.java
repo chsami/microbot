@@ -6,7 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -16,7 +16,7 @@ public class Rs2Equipment {
     public static int identifier;
 
     public static boolean equipItemFast(int id) {
-        Tab.switchToInventoryTab();
+        Rs2Tab.switchToInventoryTab();
         Widget item = Inventory.findItem(id);
         if (item == null) return false;
         Microbot.getMouse().click(new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
@@ -24,7 +24,7 @@ public class Rs2Equipment {
     }
 
     public static boolean equipItemFast(String name) {
-        Tab.switchToInventoryTab();
+        Rs2Tab.switchToInventoryTab();
         Widget item = Inventory.findItem(name);
         if (item == null) return false;
         Microbot.getMouse().click(new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
@@ -34,7 +34,7 @@ public class Rs2Equipment {
 
     public static void equipItem(int id) {
         assert !Microbot.getClient().isClientThread();
-        Tab.switchToInventoryTab();
+        Rs2Tab.switchToInventoryTab();
         Widget item = Inventory.findItem(id);
         if (item == null) return;
         while (!hasEquipped(id)) {
@@ -44,7 +44,7 @@ public class Rs2Equipment {
 
     public static void equipItem(String itemName) {
         assert !Microbot.getClient().isClientThread();
-        Tab.switchToInventoryTab();
+        Rs2Tab.switchToInventoryTab();
         Widget item = Inventory.findItem(itemName);
         if (item == null) return;
         while (!hasEquipped(itemName)) {
