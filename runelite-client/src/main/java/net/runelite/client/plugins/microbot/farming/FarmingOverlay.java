@@ -22,54 +22,47 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.microbot.farming.tithefarm.farming;
+package net.runelite.client.plugins.microbot.farming;
 
-import com.google.inject.Provides;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.ui.overlay.OverlayPanel;
+import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.components.LineComponent;
+import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
 
-@PluginDescriptor(
-        name = PluginDescriptor.Mocrosoft + "Farming",
-        description = "Microbot farming plugin",
-        tags = {"farming", "microbot"},
-        enabledByDefault = false,
-        hidden = true
-)
-@Slf4j
-public class FarmingPlugin extends Plugin {
+public class FarmingOverlay extends OverlayPanel {
     @Inject
-    private FarmingConfig config;
-
-    @Provides
-    FarmingConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(FarmingConfig.class);
+    FarmingOverlay(FarmingPlugin plugin) {
+        super(plugin);
+        setPosition(OverlayPosition.TOP_LEFT);
     }
-
-    @Inject
-    private OverlayManager overlayManager;
-    @Inject
-    private FarmingOverlay exampleOverlay;
-
-    @Inject
-    FarmingScript farmingScript;
-
 
     @Override
-    protected void startUp() throws AWTException {
-        if (overlayManager != null) {
-            overlayManager.add(exampleOverlay);
-        }
-        farmingScript.run(config);
-    }
+    public Dimension render(Graphics2D graphics) {
+        try {
+            panelComponent.setPreferredSize(new Dimension(200, 300));
+            panelComponent.getChildren().add(TitleComponent.builder()
+                    .text("Micro Farming V" + FarmingScript.version)
+                    .color(Color.GREEN)
+                    .build());
 
-    protected void shutDown() {
-        farmingScript.shutdown();
-        overlayManager.remove(exampleOverlay);
+            panelComponent.getChildren().add(LineComponent.builder().build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Farming state")
+                    .right(FarmingScript.state.toString())
+                    .build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left(Microbot.status)
+                    .build());
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return super.render(graphics);
     }
 }

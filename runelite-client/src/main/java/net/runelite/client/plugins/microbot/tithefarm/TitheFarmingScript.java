@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.farming.tithefarm;
+package net.runelite.client.plugins.microbot.tithefarm;
 
 import net.runelite.api.GameObject;
 import net.runelite.api.ItemID;
@@ -7,14 +7,16 @@ import net.runelite.api.WallObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmMaterial;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmState;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.models.TitheFarmPlant;
+import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmLanes;
+import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmMaterial;
+import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmState;
+import net.runelite.client.plugins.microbot.tithefarm.models.TitheFarmPlant;
 import net.runelite.client.plugins.microbot.util.dialogues.Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -23,12 +25,11 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmState.*;
+import static net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmState.*;
 import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.hasSelectAnOption;
 
 /**
  * TODO list:
- * -xp per hour
  * -plants per hour
  * -check for seed dibber and spade inventory
  * -deposit sack
@@ -57,12 +58,13 @@ public class TitheFarmingScript extends Script {
     public static int gricollerCanCharges = -1;
 
     public void init(TitheFarmingConfig config) {
-        initialFruit = Inventory.getItemAmount(Objects.requireNonNull(TitheFarmMaterial.getSeedForLevel()).getFruitId());
+        TitheFarmLanes lane = config.Lanes();
 
-        if (!plants.isEmpty()) return;
+        if (lane == TitheFarmLanes.Randomize) {
+            lane = TitheFarmLanes.values()[Random.random(0, TitheFarmLanes.values().length - 1)];
+        }
 
-        switch (config.Lanes()) {
-
+        switch (lane) {
             case LANE_1_2:
                 plants = new ArrayList<>(Arrays.asList(
                         new TitheFarmPlant(35, 25, 1),
@@ -82,10 +84,16 @@ public class TitheFarmingScript extends Script {
                         new TitheFarmPlant(35, 49, 15),
                         new TitheFarmPlant(40, 49, 16),
                         new TitheFarmPlant(45, 49, 17),
-                        new TitheFarmPlant(45, 46, 18)));
+                        new TitheFarmPlant(45, 46, 18),
+                        new TitheFarmPlant(45, 49, 19),
+                        new TitheFarmPlant(45, 46, 20),
+                        new TitheFarmPlant(45, 43, 21)));
                 break;
             case LANE_2_3:
                 plants = new ArrayList<>(Arrays.asList(
+                        new TitheFarmPlant(35, 31, -2),
+                        new TitheFarmPlant(35, 28, -1),
+                        new TitheFarmPlant(35, 25, 0),
                         new TitheFarmPlant(40, 25, 1),
                         new TitheFarmPlant(45, 25, 2),
                         new TitheFarmPlant(40, 28, 3),
@@ -101,12 +109,13 @@ public class TitheFarmingScript extends Script {
                         new TitheFarmPlant(40, 46, 13),
                         new TitheFarmPlant(45, 46, 14),
                         new TitheFarmPlant(40, 49, 15),
-                        new TitheFarmPlant(45, 49, 16),
-                        new TitheFarmPlant(50, 49, 17),
-                        new TitheFarmPlant(50, 46, 18)));
+                        new TitheFarmPlant(45, 49, 16)));
                 break;
             case LANE_3_4:
                 plants = new ArrayList<>(Arrays.asList(
+                        new TitheFarmPlant(40, 31, -2),
+                        new TitheFarmPlant(40, 28, -1),
+                        new TitheFarmPlant(40, 25, 0),
                         new TitheFarmPlant(45, 25, 1),
                         new TitheFarmPlant(50, 25, 2),
                         new TitheFarmPlant(45, 28, 3),
@@ -122,13 +131,10 @@ public class TitheFarmingScript extends Script {
                         new TitheFarmPlant(45, 46, 13),
                         new TitheFarmPlant(50, 46, 14),
                         new TitheFarmPlant(45, 49, 15),
-                        new TitheFarmPlant(50, 49, 16),
-                        new TitheFarmPlant(55, 49, 17),
-                        new TitheFarmPlant(55, 46, 18)));
+                        new TitheFarmPlant(50, 49, 16)));
                 break;
             case LANE_4_5:
                 plants = new ArrayList<>(Arrays.asList(
-                        new TitheFarmPlant(45, 34, -1),
                         new TitheFarmPlant(45, 31, 0),
                         new TitheFarmPlant(45, 28, 1),
                         new TitheFarmPlant(45, 25, 2),
@@ -157,6 +163,7 @@ public class TitheFarmingScript extends Script {
         if (!Microbot.isLoggedIn()) return false;
         state = STARTING;
         plants = new ArrayList<>();
+        initialFruit = Inventory.getItemAmount(Objects.requireNonNull(TitheFarmMaterial.getSeedForLevel()).getFruitId());
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
@@ -174,15 +181,13 @@ public class TitheFarmingScript extends Script {
                     return;
                 }
 
-                boolean isInMinigame = Rs2Widget.getWidget(15794178) != null;
-
-                if (!isInMinigame) {
+                if (!isInMinigame()) {
                     state = TitheFarmState.TAKE_SEEDS;
                 }
 
                 switch (state) {
                     case TAKE_SEEDS:
-                        if (isInMinigame) {
+                        if (isInMinigame()) {
                             state = TitheFarmState.STARTING;
                         } else {
                             takeSeeds();
@@ -310,6 +315,10 @@ public class TitheFarmingScript extends Script {
 
         // Helper method to validate inventory items
         private void validateInventory() {
+            if (!Inventory.hasItem(ItemID.SEED_DIBBER) || !Inventory.hasItem(ItemID.SPADE)) {
+                Microbot.showMessage("You need a seed dibber and a spade in your inventory!");
+                shutdown();
+            }
             if (!Inventory.hasItemAmount("watering can", WATERING_CANS_AMOUNT) && !Inventory.hasItem(ItemID.GRICOLLERS_CAN)) {
                 Microbot.showMessage("You need at least 8 watering can(8) or a Gricoller's can!");
                 shutdown();
@@ -395,7 +404,7 @@ public class TitheFarmingScript extends Script {
         if (!result) return;
         keyPress(TitheFarmMaterial.getSeedForLevel().getOption());
         sleep(1000);
-        VirtualKeyboard.typeString("10000");
+        VirtualKeyboard.typeString(String.valueOf(Random.random(1000, 10000)));
         sleep(600);
         VirtualKeyboard.enter();
         sleepUntil(() -> Inventory.hasItem(TitheFarmMaterial.getSeedForLevel().getName()));
@@ -404,7 +413,7 @@ public class TitheFarmingScript extends Script {
     private void enter() {
         WallObject farmDoor = Rs2GameObject.findDoor(FARM_DOOR);
         click(farmDoor);
-        sleep(3000);
+        sleepUntil(this::isInMinigame);
     }
 
     private void leave() {
@@ -415,5 +424,9 @@ public class TitheFarmingScript extends Script {
 
     private boolean hasAllEmptyPatches() {
         return plants.stream().allMatch(TitheFarmPlant::isEmptyPatch);
+    }
+
+    private boolean isInMinigame() {
+        return Rs2Widget.getWidget(15794178) != null;
     }
 }

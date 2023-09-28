@@ -22,13 +22,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.microbot.farming.tithefarm.farming;
+package net.runelite.client.plugins.microbot.farming;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.FarmingMaterial;
+import net.runelite.client.plugins.microbot.farming.enums.FarmingMaterial;
 
 @ConfigGroup("farming")
 public interface FarmingConfig extends Config {

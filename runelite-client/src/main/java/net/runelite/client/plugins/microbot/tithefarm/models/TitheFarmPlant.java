@@ -22,16 +22,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.microbot.farming.tithefarm.farming.models;
+package net.runelite.client.plugins.microbot.tithefarm.models;
 
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.GameObject;
 import net.runelite.api.ObjectID;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.farming.tithefarm.TitheFarmingScript;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmMaterial;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmState;
+import net.runelite.client.plugins.microbot.tithefarm.TitheFarmingScript;
+import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmMaterial;
+import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmState;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.tithefarm.TitheFarmPlantState;
 

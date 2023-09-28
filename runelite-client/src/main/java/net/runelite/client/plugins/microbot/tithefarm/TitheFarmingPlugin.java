@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.farming.tithefarm;
+package net.runelite.client.plugins.microbot.tithefarm;
 
 
 import com.google.inject.Provides;
@@ -15,9 +15,9 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmMaterial;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmState;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.models.TitheFarmPlant;
+import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmMaterial;
+import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmState;
+import net.runelite.client.plugins.microbot.tithefarm.models.TitheFarmPlant;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 
@@ -86,9 +86,11 @@ public class TitheFarmingPlugin extends Plugin {
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
-        Item fruit = Arrays.stream(event.getItemContainer().getItems()).filter(x -> x.getId() == TitheFarmMaterial.getSeedForLevel().getFruitId()).findFirst().orElse(null);
-        if (fruit != null) {
-            TitheFarmingScript.fruits = fruit.getQuantity() - TitheFarmingScript.initialFruit;
+        if (TitheFarmMaterial.getSeedForLevel() != null) {
+            Item fruit = Arrays.stream(event.getItemContainer().getItems()).filter(x -> x.getId() == TitheFarmMaterial.getSeedForLevel().getFruitId()).findFirst().orElse(null);
+            if (fruit != null) {
+                TitheFarmingScript.fruits = fruit.getQuantity() - TitheFarmingScript.initialFruit;
+            }
         }
     }
 

@@ -1,11 +1,12 @@
-package net.runelite.client.plugins.microbot.farming.tithefarm;
+package net.runelite.client.plugins.microbot.tithefarm;
 
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmMaterial;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.models.TitheFarmPlant;
+import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmMaterial;
+import net.runelite.client.plugins.microbot.tithefarm.models.TitheFarmPlant;
+import net.runelite.client.plugins.microbot.util.math.RateCalculator;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
@@ -31,7 +32,7 @@ public class TitheFarmingOverlay extends OverlayPanel {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        panelComponent.setPreferredSize(new Dimension(200, 300));
+        panelComponent.setPreferredSize(new Dimension(300, 300));
         panelComponent.getChildren().add(TitleComponent.builder()
                 .text("TitheFarm")
                 .color(Color.GREEN)
@@ -43,7 +44,17 @@ public class TitheFarmingOverlay extends OverlayPanel {
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
+                .left("Fruit per hour:")
+                .right(String.valueOf(RateCalculator.getRatePerHour(TitheFarmingScript.fruits)))
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
                 .left("")
+                .right("")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Fruits farmed")
                 .right("")
                 .build());
 

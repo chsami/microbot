@@ -1,9 +1,9 @@
-package net.runelite.client.plugins.microbot.farming.tithefarm;
+package net.runelite.client.plugins.microbot.tithefarm;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
-import net.runelite.client.plugins.microbot.farming.tithefarm.farming.enums.TitheFarmLanes;
+import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmLanes;
 
 @ConfigGroup(TitheFarmingConfig.GROUP)
 public interface TitheFarmingConfig extends Config {
