@@ -228,10 +228,6 @@ public class Walker {
             return walkTo(target, true);
 
         } else {
-            Rs2Camera.setAngle(45);
-            Rs2Camera.setPitch(1.0f);
-
-            if (nodes.isEmpty()) return false;
 
             PathWalker pathWalker = new PathWalker(nodes);
             pathWalker.walkPath();
