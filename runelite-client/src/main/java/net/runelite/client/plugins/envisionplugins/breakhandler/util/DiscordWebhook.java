@@ -11,11 +11,6 @@ public class DiscordWebhook {
     private final String url;
     Date now;
 
-    /**
-     * Constructs a new DiscordWebhook instance
-     *
-     * @param url The webhook URL obtained in Discord
-     */
     public DiscordWebhook(String url) {
         this.url = url;
         now = new Date();
@@ -57,27 +52,6 @@ public class DiscordWebhook {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        /*
-            {
-              "title": "Gains:",
-              "color": null,
-              "fields": [
-                {
-                  "name": "Experience:",
-                  "value": "[array of skills and their gained experiences]"
-                },
-                {
-                  "name": "Resources:",
-                  "value": "[array of gathered or looted items]"
-                },
-                {
-                  "name": "GP:",
-                  "value": "[variable]"
-                }
-              ]
-            }
-         */
 
     }
 }
