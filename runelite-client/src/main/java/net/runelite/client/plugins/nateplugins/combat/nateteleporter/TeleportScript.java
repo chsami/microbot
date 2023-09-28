@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.nateplugins.nateteleporter.nateteleporter;
+package net.runelite.client.plugins.nateplugins.combat.nateteleporter;
 
 import net.runelite.api.Skill;
 import net.runelite.api.widgets.Widget;
