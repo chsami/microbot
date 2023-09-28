@@ -3,10 +3,7 @@ package net.runelite.client.plugins.danplugins.fishing.threetickbarb;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.NPC;
-import net.runelite.api.Skill;
+import net.runelite.api.*;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.Notifier;
@@ -122,12 +119,9 @@ public class ThreeTickBarb extends Plugin {
         Widget swampTarWidget = Inventory.findItem("Swamp tar");
         Microbot.getMouse().click(swampTarWidget.getBounds());
 
-        Widget inventoryItem = Inventory.findItemSlot(1);
-        boolean randomizeTriggered = Inventory.hasItemAmount(11328, random(1, 18));
-        if ((inventoryItem != null && isFish(inventoryItem) && randomizeTriggered) || (inventoryItem != null && Inventory.isFull())) {
-            VirtualKeyboard.holdShift();
-            Microbot.getMouse().click(inventoryItem.getBounds());
-            VirtualKeyboard.releaseShift();
+
+        if (Inventory.hasItem("leaping trout")) {
+            Inventory.drop("leaping trout");
         }
 
         state = ThreeTickFishingState.ClickFishingSpot;
@@ -150,7 +144,7 @@ public class ThreeTickBarb extends Plugin {
             locateFishingSpot(fishingSpot);
         }
 
-        Rs2Menu.doAction("Use-rod", fishingSpot.getCanvasTilePoly());
+        Rs2Npc.interact(fishingSpot,"Use-rod");
 
         state = ThreeTickFishingState.UseGuam;
         inProgress = false;
@@ -158,9 +152,8 @@ public class ThreeTickBarb extends Plugin {
 
     private void locateFishingSpot(NPC fishingSpot) {
         inProgress = true;
-        sleep(11, 254);
 
-        Rs2Menu.doAction("Use-rod", fishingSpot.getCanvasTilePoly());
+        Rs2Npc.interact(fishingSpot,"Use-rod");
         sleepUntilOnClientThread(() -> {
             int distance = fishingSpot.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
             return distance <= 1;
