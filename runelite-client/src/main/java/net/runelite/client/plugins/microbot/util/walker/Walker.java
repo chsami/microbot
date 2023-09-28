@@ -140,7 +140,7 @@ public class Walker {
         canvasY = canv != null ? canv.getY() : -1;
 
         if (canvasX == -1 && canvasY == -1) {
-            Camera.turnTo(localPoint);
+            Rs2Camera.turnTo(localPoint);
         }
 
         Microbot.getMouse().clickFast(1, 1);
