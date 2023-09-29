@@ -40,6 +40,7 @@ public class BreakHandlerPlugin extends Plugin {
     private BreakHandlerPanel breakHandlerPanel;
     private NavigationButton navButton;
     public static final BufferedImage discordIcon = ImageUtil.loadImageResource(BreakHandlerPlugin.class, "discord_circle.png");
+    public static final BufferedImage soonIcon = ImageUtil.loadImageResource(BreakHandlerPlugin.class, "soon.png");
     public static final String discordLink = "https://discord.gg/v7G7ZbxnEf";
 
 

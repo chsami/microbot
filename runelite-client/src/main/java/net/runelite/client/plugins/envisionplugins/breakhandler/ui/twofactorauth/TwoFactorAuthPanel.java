@@ -18,6 +18,9 @@ public class TwoFactorAuthPanel extends JPanel {
         setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         f2a.setPreferredSize(new Dimension(100, 25));
         pin.setPreferredSize(new Dimension(100, 25));
+
+        f2a.setEnabled(false);
+        pin.setEnabled(false);
     }
 
     public JPasswordField getF2A() {
