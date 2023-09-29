@@ -1,11 +1,16 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler;
 
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.envisionplugins.breakhandler.enums.BreakHandlerStates;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesBreakPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesRunPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.util.DiscordWebhook;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.security.Login;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.http.api.worlds.WorldRegion;
 
 
 import javax.swing.*;
@@ -13,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.14;
+    public static double version = 0.15;
 
     /* Variables for other script's references */
     // TODO set this to false for production
@@ -51,6 +56,9 @@ public class BreakHandlerScript extends Script {
     protected static BreakHandlerStates myState;
 
     protected static String breakMethod;
+    protected static boolean enableWorldHoppingPostBreak = false;
+    protected static boolean useMemberWorldsToHop = false;
+    protected static WorldRegion worldRegionToHopTo;
 
     protected int debugCount = 0;
     protected int discordNotificationCount = 0;
@@ -107,13 +115,16 @@ public class BreakHandlerScript extends Script {
                             break;
 
                         case LOGOUT_BREAK:
-                            // TODO: Fully implement
                             if (config.VERBOSE_LOGGING() && debugCount == 0) {
                                 System.out.println("STATE: " + myState);
                                 debugCount++;
                             }
 
                             sendPostRunDiscordMessage(config, breakMethod);
+
+                            if (Microbot.isLoggedIn()) {
+                                logout();
+                            }
 
                             breakTimer.run();
                             SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
@@ -192,7 +203,7 @@ public class BreakHandlerScript extends Script {
                                 debugCount++;
                             }
 
-                            if (config.ENABLE_DISCORD_WEBHOOK()) {
+                            if (config.ENABLE_DISCORD_WEBHOOK() && discordNotificationCount == 0) {
                                 discordNotificationCount++;
                                 discordWebhook.sendClientStatus(
                                         config.DISCORD_CLIENT_NAME(),
@@ -201,7 +212,29 @@ public class BreakHandlerScript extends Script {
                                 );
                             }
 
-                            isBreakOver = true;
+                            if (!Microbot.isLoggedIn()) {
+
+                                if (enableWorldHoppingPostBreak) {
+                                    new Login(breakHandlerPanel.getUsername().getText(),
+                                            breakHandlerPanel.getPasswordEncryptedValue(),
+                                            Login.getRandomWorld(useMemberWorldsToHop, worldRegionToHopTo));
+                                } else {
+                                    new Login(breakHandlerPanel.getUsername().getText(),
+                                            breakHandlerPanel.getPasswordEncryptedValue(),
+                                            Microbot.getClient().getWorld());
+                                }
+
+
+                                // TODO Fix this so it moves past second login screen
+                                sleepUntilOnClientThread(()-> Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null);
+
+                                if (Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null) {
+                                    System.out.println("Found LCTPS");
+                                    Rs2Widget.clickWidget(24772681);
+                                    isBreakOver = true;
+                                }
+                            }
+
                             break;
 
                         default:
@@ -223,8 +256,17 @@ public class BreakHandlerScript extends Script {
                         debugCount = 0;
                     }
 
+                    // We just finished a logout break - lets move to post_login_break
+                    if (myState == BreakHandlerStates.LOGOUT_BREAK && !isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeTimer.getDisplayTime() == 0)) {
+                        discordNotificationCount = 0;
+                        myState = BreakHandlerStates.POST_BREAK_LOGIN;
+                        debugCount = 0;
+                    }
+
                     // We are both POST break and run, lets regenerate new timers
-                    if (myState == BreakHandlerStates.POST_BREAK_AFK && isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeTimer.getDisplayTime() == 0)) {
+                    if ((myState == BreakHandlerStates.POST_BREAK_AFK ||
+                            myState == BreakHandlerStates.POST_BREAK_LOGIN) &&
+                            isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeTimer.getDisplayTime() == 0)) {
                         discordNotificationCount = 0;
                         myState = BreakHandlerStates.RESET_BOTH_TIMERS;
                         debugCount = 0;
@@ -356,6 +398,18 @@ public class BreakHandlerScript extends Script {
 
     public static void setBreakMethod(String method) {
         breakMethod = method;
+    }
+
+    public static void setEnableWorldHoppingPostBreak(boolean enableHopping) {
+        enableWorldHoppingPostBreak = enableHopping;
+    }
+
+    public static void setUseMemberWorldsToHop(boolean useMemWorld) {
+        useMemberWorldsToHop = useMemWorld;
+    }
+
+    public static void setWorldRegionToHopTo(WorldRegion region) {
+        worldRegionToHopTo = region;
     }
 
     public static void setIsBreakHandlerCompatible(boolean compatible) {

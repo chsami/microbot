@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.tabs;
 
 import net.runelite.api.VarClientInt;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.VarcIntValues;
@@ -160,10 +161,20 @@ public class Rs2Tab {
 
     public static boolean switchToLogout() {
         if (getCurrentTab() == InterfaceTab.LOGOUT) return true;
-        Widget tab = Microbot.getClient().getWidget(10551341);
+
+        WidgetInfo logoutWidget;
+        if (InterfaceTab.LOGOUT.getFixedClassicWidget() != null) {
+            logoutWidget = WidgetInfo.FIXED_VIEWPORT_LOGOUT_TAB;
+        } else if (InterfaceTab.LOGOUT.getResizableClassicWidget() != null) {
+            logoutWidget = WidgetInfo.RESIZABLE_VIEWPORT_LOGOUT_TAB;
+        } else {
+            logoutWidget = null;
+        }
+
+        Widget tab = Microbot.getClient().getWidget(logoutWidget);
         if (tab == null) return false;
         Microbot.getMouse().click(tab.getBounds());
-        sleep(600, 1000);
+        sleep(200, 600);
         return getCurrentTab() == InterfaceTab.LOGOUT;
     }
 
