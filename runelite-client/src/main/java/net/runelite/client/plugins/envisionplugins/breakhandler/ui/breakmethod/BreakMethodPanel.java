@@ -17,7 +17,7 @@ public class BreakMethodPanel extends JPanel {
 
         breakingMethodComboBox.addActionListener(e -> BreakHandlerScript.setBreakMethod(breakingMethodComboBox.getSelectedItem().toString()));
 
-        add(breakingMethodComboBox, BorderLayout.SOUTH);
+        add(breakingMethodComboBox);
     }
 
     private void setStyle() {

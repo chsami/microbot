@@ -24,6 +24,10 @@ public class RuntimeDurationParentPanel extends JPanel {
 
     private void setStyle() {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        Dimension d = new Dimension(300, 100);
+        setSize(d);
+        setPreferredSize(d);
+        setMaximumSize(d);
     }
 
     public TimeAmountPanel getTimeAmountPanel() {

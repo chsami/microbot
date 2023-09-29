@@ -11,6 +11,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDur
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.regeneratetimes.RegenerateTimesParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration.RuntimeDurationParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.twofactorauth.TwoFactorAuthParentPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.worldhopping.WorldHoppingParentPanel;
 import net.runelite.client.plugins.microbot.util.security.Encryption;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
@@ -37,6 +38,7 @@ public class BreakHandlerPanel extends PluginPanel {
     private final RegenerateTimesParentPanel regenerateTimesParentPanel = new RegenerateTimesParentPanel();
     TwoFactorAuthParentPanel twoFactorAuthParentPanel = new TwoFactorAuthParentPanel();
     AccountParentPanel accountParentPanel = new AccountParentPanel();
+    WorldHoppingParentPanel worldHoppingParentPanel = new WorldHoppingParentPanel();
 
     public static final Border BORDER = new CompoundBorder(
             BorderFactory.createMatteBorder(2, 2, 2, 2, ColorScheme.LIGHT_GRAY_COLOR),
@@ -78,6 +80,7 @@ public class BreakHandlerPanel extends PluginPanel {
         settings.add(new BreakMethodParentPanel());
         settings.add(breakDurationParentPanel);
         settings.add(runtimeDurationParentPanel);
+        settings.add(worldHoppingParentPanel);
         tabbedPane.add("Settings", settings);
 
         add(tabbedPane);
