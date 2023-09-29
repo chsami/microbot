@@ -8,17 +8,21 @@ import javax.swing.*;
 import java.awt.*;
 
 public class WorldHoppingParentPanel extends JPanel {
+    WorldHoppingRegionPanel worldHoppingRegionPanel = new WorldHoppingRegionPanel();
 
     public WorldHoppingParentPanel() {
         setStyle();
 
         add(new JTitle("Post Break World Hopping"));
         add(new WorldHoppingEnabledParentPanel());
-        add(new WorldHoppingRegionPanel());
+        add(worldHoppingRegionPanel);
     }
 
     private void setStyle() {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
     }
 
+    public WorldHoppingRegionPanel getWorldHoppingRegionPanel() {
+        return worldHoppingRegionPanel;
+    }
 }
