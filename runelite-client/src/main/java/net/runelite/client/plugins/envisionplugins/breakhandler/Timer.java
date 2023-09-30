@@ -2,7 +2,7 @@ package net.runelite.client.plugins.envisionplugins.breakhandler;
 
 import java.time.Instant;
 
-public class Timer extends Clock{
+public class Timer extends Clock {
     private long duration;
 
     private long remaining;
@@ -30,10 +30,8 @@ public class Timer extends Clock{
 
     @Override
     boolean run() {
-        if (!active && duration > 0)
-        {
-            if (remaining <= 0)
-            {
+        if (!active && duration > 0) {
+            if (remaining <= 0) {
                 remaining = duration;
             }
             lastUpdate = Instant.now().getEpochSecond();
@@ -46,8 +44,7 @@ public class Timer extends Clock{
 
     @Override
     boolean pause() {
-        if (active)
-        {
+        if (active) {
             active = false;
             remaining = Math.max(0, remaining - (Instant.now().getEpochSecond() - lastUpdate));
             lastUpdate = Instant.now().getEpochSecond();

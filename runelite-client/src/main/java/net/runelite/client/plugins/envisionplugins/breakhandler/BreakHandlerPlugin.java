@@ -101,7 +101,6 @@ public class BreakHandlerPlugin extends Plugin {
                 .getMaximumTimeAmount(TimeDurationType.BREAK_DURATION)
                 .setDurationFromConfig(config.MAXIMUM_BREAK_DURATION());
 
-        BreakHandlerScript.calcExpectedRunTime();
         BreakHandlerScript.calcExpectedBreak();
 
         BreakHandlerScript.setBreakMethod(

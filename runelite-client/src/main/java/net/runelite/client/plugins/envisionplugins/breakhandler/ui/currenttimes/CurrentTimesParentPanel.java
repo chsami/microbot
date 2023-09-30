@@ -7,6 +7,7 @@ import net.runelite.client.ui.ColorScheme;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.time.Instant;
 
 public class CurrentTimesParentPanel extends JPanel {
     public CurrentTimesParentPanel() {
@@ -17,7 +18,7 @@ public class CurrentTimesParentPanel extends JPanel {
         add(new CurrentTimesBreakPanel());
         JButton breakNowBtn = new JButton("Break Now");
         add(breakNowBtn);
-        breakNowBtn.addActionListener(e -> BreakHandlerScript.getRunTimeTimer().setDuration(0));
+        breakNowBtn.addActionListener(e -> BreakHandlerScript.setRunTimeManager(Instant.now()));
     }
 
     private void setStyle() {
