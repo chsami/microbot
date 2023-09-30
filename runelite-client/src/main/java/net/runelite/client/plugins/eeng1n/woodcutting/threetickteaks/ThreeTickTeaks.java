@@ -3,11 +3,12 @@ package net.runelite.client.plugins.eeng1n.woodcutting.threetickteaks;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.GameObject;
+import net.runelite.api.GameState;
+import net.runelite.api.ItemID;
+import net.runelite.api.Skill;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.Notifier;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -15,10 +16,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
-import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -26,27 +23,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
         name = PluginDescriptor.Engin + " 3T Teaks",
         description = "Performs 3T Teaks",
+        tags = { "woodcutting", "microbot", "skills", "eengin", "eeng1n" },
         enabledByDefault = false
 )
 @Slf4j
 public class ThreeTickTeaks extends Plugin {
     @Inject
-    private Client client;
-    @Inject
-    private ClientThread clientThread;
-    @Inject
     private OverlayManager overlayManager;
     @Inject
     private ThreeTickTeaksOverlay threeTickTeaksOverlay;
-    @Inject
-    private Notifier notifier;
-
     @Inject
     private ThreeTickTeaksConfig config;
 
@@ -67,19 +57,32 @@ public class ThreeTickTeaks extends Plugin {
     @Override
     protected void startUp() {
         if (Microbot.getClient().getGameState() == GameState.LOGGED_IN) {
-            Microbot.pauseAllScripts = false;
-            Microbot.setClient(client);
-            Microbot.setClientThread(clientThread);
-            Microbot.setNotifier(notifier);
-            Microbot.setMouse(new VirtualMouse());
 
             enabled = true;
             expstarted = Microbot.getClient().getSkillExperience(Skill.WOODCUTTING);
             startinglevel = Microbot.getClient().getRealSkillLevel(Skill.WOODCUTTING);
             timeBegan = System.currentTimeMillis();
+
             if (overlayManager != null) {
                 overlayManager.add(threeTickTeaksOverlay);
             }
+
+            executor.submit(this::checkRequirements);
+        }
+    }
+
+    private void checkRequirements() {
+        if(Microbot.getClient().getRealSkillLevel(Skill.WOODCUTTING) < 35) {
+            enabled = false;
+            Microbot.showMessage("The plugin has been disabled due to a not high enough Woodcutting level! You need at least level 35. Please make sure you have the required level and restart the script afterwards.");
+        }
+
+        if(!Inventory.hasItem("Guam leaf")
+                || !Inventory.hasItem("Pestle and mortar")
+                || !Inventory.hasItem("Swamp tar")
+        ) {
+            enabled = false;
+            Microbot.showMessage("The plugin has been disabled due to missing items! Please make sure you have the required items and restart the script afterwards.");
         }
     }
 
@@ -110,7 +113,7 @@ public class ThreeTickTeaks extends Plugin {
                     executor.submit(this::clickTeakTree);
                     break;
                 default:
-                    notifier.notify("ThreeTickTeaks stopped unexpectedly!");
+                    Microbot.showMessage("ThreeTickTeaks stopped unexpectedly!");
                     break;
             }
         }

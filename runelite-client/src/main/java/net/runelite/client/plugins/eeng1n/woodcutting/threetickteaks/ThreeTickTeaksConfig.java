@@ -13,7 +13,21 @@ public interface ThreeTickTeaksConfig extends Config {
             position = 0
     )
     default String GUIDE() {
-        return "1. Have your inventory setup for 3T Teaks \n2. Enable Plugin";
+        return "1. Have your inventory setup for 3T Teaks " +
+                "\n2. Enable Plugin" +
+                "\nNotes" +
+                "\nItems:" +
+                "\nRequired" +
+                "\nAny axe (equipped)" +
+                "\nGuam leaf" +
+                "\nSwamp tar" +
+                "\nPestle and mortar" +
+                "\nRecommended:" +
+                "\nGrimy Guam leaf in case the bot accidentally uses the Clean Guam leaf (For example when lagging)" +
+                "\nLocation:" +
+                "\nBetween 2 Teak trees (For example: Ape Atoll)" +
+                "\nRequired Stats:" +
+                "\nAtleast Level 35 Woodcutting";
     }
 
     @ConfigItem(
