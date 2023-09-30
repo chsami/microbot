@@ -389,7 +389,6 @@ public class BreakHandlerScript extends Script {
     public static void calcExpectedBreak() {
         expectedBreakDuration = Random.random((int) minBreakDuration, (int) maxBreakDuration);
         expectedBreakTimeInstant = Instant.now().plus(expectedBreakDuration, ChronoUnit.SECONDS);
-        expectedBreakTimeInstant = Instant.now().plus(Random.random(1, 1000), ChronoUnit.MILLIS);
         SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(expectedBreakDuration));
     }
 
