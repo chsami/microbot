@@ -67,6 +67,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Slf4j
@@ -455,7 +457,10 @@ class ProfilePanel extends PluginPanel {
                                 switchToProfile(profile.getId());
                             } else {
                                 try {
-                                    new Login(profile.getName(), profile.getPassword());
+                                    ExecutorService executor = Executors.newFixedThreadPool(1);
+                                    executor.submit(() -> {
+                                        new Login(profile.getName(), profile.getPassword());
+                                    });
                                 } catch (Exception e) {
                                 }
                             }
