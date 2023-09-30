@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler;
 
+import net.runelite.api.GameState;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.envisionplugins.breakhandler.enums.BreakHandlerStates;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesBreakPanel;
@@ -18,18 +19,20 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.15;
+    public static double version = 0.16;
 
     /* Variables for other script's references */
     // TODO set this to false for production
-    private static boolean isBreakHandlerCompatible = true;     // Use setter method in your Plugin's StartUp Method
-    private static boolean letBreakHandlerStartBreak = false;   // Use setter method in your Plugin's StartUp Method
+    private static boolean isBreakHandlerCompatible = true;     // Use setter method in your Plugin's Run Method
+    private static boolean letBreakHandlerStartBreak = false;   // Use setter method in your Plugin's Run Method
     private static boolean isBreakOver = false;                 // Use this variable to progress have the break has completed
+    private static boolean isParentPluginRunning = false;       // Use setter method in your Plugin's Run Method
     private static String parentPluginName = "Default Plugin";
     private static boolean detailedReportNotification = false;
     private static String[] skillExperienceGained = {"Default1", "Default2"};
     private static String[] resourcesGained = {"Default1", "Default2"};
     private static String gpGained = "ZERO";
+    private static boolean hasRunTimeTimerFinished = false;
     /* End variables for other script's references */
 
     /* Discord Stuff */
@@ -79,8 +82,17 @@ public class BreakHandlerScript extends Script {
                                 debugCount++;
                             }
 
-                            runTimeTimer.run();
-                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
+                            if (!getIsAtAccountScreens()) {    // We are not on the login screens
+                                runTimeTimer.run();
+                                SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
+                            }
+
+                            if (runTimeTimer.getDisplayTime() > 0) {
+                                hasRunTimeTimerFinished = false;
+                            } else {
+                                hasRunTimeTimerFinished = true;
+                            }
+
                             break;
 
                         case START_BREAK:
@@ -112,6 +124,7 @@ public class BreakHandlerScript extends Script {
 
                             breakTimer.run();
                             SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
+                            Microbot.status = "AFK breaking for " + breakTimer.getDisplayTime();
                             break;
 
                         case LOGOUT_BREAK:
@@ -154,8 +167,6 @@ public class BreakHandlerScript extends Script {
                                 debugCount++;
                             }
 
-                            isBreakOver = false;
-
                             regenerateExpectedRunTime(false);
                             runTimeTimer.setDuration(expectedRunTimeDuration);
                             SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeTimer.getDisplayTime()));
@@ -165,17 +176,16 @@ public class BreakHandlerScript extends Script {
                             SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
 
                             debugCount = 0;
+                            isBreakOver = true;
                             myState = BreakHandlerStates.RUN;
                             break;
 
                         case STARTUP:
-                            // TODO: Temporary until I put in place working with external scripts
+                            if (isParentPluginRunning) {
+                                System.out.println("Break Handler has started successfully");
+                                myState = BreakHandlerStates.RUN;
+                            }
 
-                            System.out.println("STARTUP: Wait");
-                            detailedReportNotification = true;  // TODO remove
-                            sleep(10000);
-                            System.out.println("STARTUP: Post Wait -> change state to run");
-                            myState = BreakHandlerStates.RUN;
                             break;
 
                         case POST_BREAK_AFK:
@@ -193,11 +203,11 @@ public class BreakHandlerScript extends Script {
                                 );
                             }
 
+                            hasRunTimeTimerFinished = false;
                             isBreakOver = true;
                             break;
 
                         case POST_BREAK_LOGIN:
-                            // TODO: Fully implement
                             if (config.VERBOSE_LOGGING() && debugCount == 0) {
                                 System.out.println("STATE: " + myState);
                                 debugCount++;
@@ -213,7 +223,6 @@ public class BreakHandlerScript extends Script {
                             }
 
                             if (!Microbot.isLoggedIn()) {
-
                                 if (enableWorldHoppingPostBreak) {
                                     new Login(breakHandlerPanel.getUsername().getText(),
                                             breakHandlerPanel.getPasswordEncryptedValue(),
@@ -223,17 +232,10 @@ public class BreakHandlerScript extends Script {
                                             breakHandlerPanel.getPasswordEncryptedValue(),
                                             Microbot.getClient().getWorld());
                                 }
-
-
-                                // TODO Fix this so it moves past second login screen
-                                sleepUntilOnClientThread(()-> Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null);
-
-                                if (Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null) {
-                                    System.out.println("Found LCTPS");
-                                    Rs2Widget.clickWidget(24772681);
-                                    isBreakOver = true;
-                                }
                             }
+
+                            hasRunTimeTimerFinished = false;
+                            isBreakOver = true;
 
                             break;
 
@@ -241,12 +243,17 @@ public class BreakHandlerScript extends Script {
                             System.err.println("Bad Break Handler State...");
                     }
 
+                    if (!isParentPluginRunning && !getIsAtAccountScreens()) {
+                        myState = BreakHandlerStates.STARTUP;
+                    }
 
-                    // We should be on break
-                    if (myState == BreakHandlerStates.RUN && (runTimeTimer.getDisplayTime() == 0 && breakTimer.getDisplayTime() > 0)) {
-                        discordNotificationCount = 0;
-                        myState = BreakHandlerStates.START_BREAK;
-                        debugCount = 0;
+                    if (letBreakHandlerStartBreak) {
+                        // We should be on break
+                        if (myState == BreakHandlerStates.RUN && (runTimeTimer.getDisplayTime() == 0 && breakTimer.getDisplayTime() > 0)) {
+                            discordNotificationCount = 0;
+                            myState = BreakHandlerStates.START_BREAK;
+                            debugCount = 0;
+                        }
                     }
 
                     // We just finished a afk break - lets move to post_afk_break
@@ -276,9 +283,8 @@ public class BreakHandlerScript extends Script {
                     System.out.println(ex.getMessage());
                 }
 
-            }, 0, 500, TimeUnit.MILLISECONDS);    //TODO: Is this delay good?
+            }, 0, 300, TimeUnit.MILLISECONDS);
         } else {
-            //TODO: Ask Mocrosoft if there is a good way to disable the handler completely if this case hits
             System.err.println("Current active script is not compatible with Micro Break Handler...");
         }
 
@@ -429,7 +435,22 @@ public class BreakHandlerScript extends Script {
     }
 
     public static boolean getIsBreakOver() {
+        System.out.println("Is break over: " + (isBreakOver? "yes": "no"));
         return isBreakOver;
+    }
+
+    public static void setIsParentPluginRunning(boolean isRunning) {
+        isParentPluginRunning = isRunning;
+    }
+
+    public static boolean isIsParentPluginRunning() {
+        return isParentPluginRunning;
+    }
+
+    // Notify the parent script that the Run Time Timer has finished running
+    //      and they can start a break when it is convenient
+    public static boolean getHasRunTimeTimerFinished() {
+        return hasRunTimeTimerFinished;
     }
 
     public static void setParentPluginName(String name) {
@@ -470,5 +491,26 @@ public class BreakHandlerScript extends Script {
 
     public static String getGpGained() {
         return gpGained;
+    }
+
+    private boolean getIsAtAccountScreens() {
+        boolean atAccountScripts = false;
+
+        if (Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null) {
+            atAccountScripts = true;
+        }
+
+        try {
+            if (Microbot.getClient().getGameState() == GameState.LOGIN_SCREEN
+                    || Microbot.getClient().getGameState() == GameState.LOGGING_IN) {
+                atAccountScripts = true;
+            }
+        } catch (Exception ignored) {
+            //Let's just ignore this, it means the client is still loading
+            //Cannot invoke "net.runelite.client.callback.ClientThread.runOnClientThread(java.util.concurrent.Callable)" because the return value of "net.runelite.client.plugins.microbot.Microbot.getClientThread()" is null
+        }
+
+
+        return atAccountScripts;
     }
 }

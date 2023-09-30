@@ -12,7 +12,7 @@ public class BreakMethodPanel extends JPanel {
     public BreakMethodPanel() {
         setStyle();
 
-        String[] breakMethods = {"AFK", "LOGOUT"};
+        String[] breakMethods = {"LOGOUT", "AFK"};
         breakingMethodComboBox = new JComboBox<>(breakMethods);
 
         breakingMethodComboBox.addActionListener(e -> BreakHandlerScript.setBreakMethod(breakingMethodComboBox.getSelectedItem().toString()));

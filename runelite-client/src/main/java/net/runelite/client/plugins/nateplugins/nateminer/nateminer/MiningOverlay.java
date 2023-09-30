@@ -60,4 +60,8 @@ public class MiningOverlay extends OverlayPanel {
         }
         return super.render(graphics);
     }
+
+    public static long getExpGained() {
+        return xpGained;
+    }
 }

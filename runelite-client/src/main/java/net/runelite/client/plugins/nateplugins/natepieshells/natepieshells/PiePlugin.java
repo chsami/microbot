@@ -9,6 +9,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -52,6 +53,9 @@ public class PiePlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
+        initBreakHandlerSetup();
+
+        PieScript.totalPieShellsMade = 0;
         Microbot.pauseAllScripts = false;
         Microbot.setClient(client);
         Microbot.setClientThread(clientThread);
@@ -67,7 +71,15 @@ public class PiePlugin extends Plugin {
     }
 
     protected void shutDown() {
+        BreakHandlerScript.setIsParentPluginRunning(false);
         pieScript.shutdown();
         overlayManager.remove(pieOverlay);
+    }
+
+    private void initBreakHandlerSetup() {
+        BreakHandlerScript.setIsBreakHandlerCompatible(true);
+        BreakHandlerScript.setIsParentPluginRunning(true);
+        BreakHandlerScript.setParentPluginName("Nate's Pie Shells");
+        BreakHandlerScript.setDetailedReportNotification(true);        // Let's send extra details to the breakhandler
     }
 }

@@ -26,7 +26,6 @@ public class WorldHoppingRegionPanel extends JPanel {
             } else if (comboBox.getSelectedItem().toString().equals("Germany")) {
                 BreakHandlerScript.setWorldRegionToHopTo(WorldRegion.GERMANY);
             }
-            System.out.println("Region type changed:: " + comboBox.getSelectedItem().toString());
         });
 
         add(comboBox);

@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.nateplugins.nateminer.nateminer;
 
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -18,15 +19,34 @@ public class MiningScript extends Script {
 
             try {
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
-                if (Inventory.isFull()) {
-                    if (config.hasPickaxeInventory()) {
-                        Inventory.dropAllStartingFrom(1);
-                    } else {
-                        Inventory.dropAll();
+
+                /**
+                 *  Break handler logic:
+                 *      First check to see if the Run Time Timer has finished running
+                 *      Then notify that a break can be started
+                 *      Finally lets wait until the break is over.
+                 */
+                if (BreakHandlerScript.getHasRunTimeTimerFinished()) {
+                    BreakHandlerScript.setSkillExperienceGained(new String[]{
+                            "Mining: " + MiningOverlay.getExpGained()
+                    });
+                    BreakHandlerScript.setResourcesGained(new String[]{"NONE"});
+                    BreakHandlerScript.setGpGained("WIP");
+
+                    BreakHandlerScript.setLetBreakHandlerStartBreak(true);
+                    sleepUntil(BreakHandlerScript::getIsBreakOver);
+                    BreakHandlerScript.setLetBreakHandlerStartBreak(false);
+                } else {
+                    if (Inventory.isFull()) {
+                        if (config.hasPickaxeInventory()) {
+                            Inventory.dropAllStartingFrom(1);
+                        } else {
+                            Inventory.dropAll();
+                        }
+                        return;
                     }
-                    return;
+                    Rs2GameObject.interact(config.ORE().getName());
                 }
-                Rs2GameObject.interact(config.ORE().getName());
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

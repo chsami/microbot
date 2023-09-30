@@ -19,7 +19,6 @@ public class WorldHoppingEnabledParentPanel extends JPanel {
         worldHoppingEnableFeature.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                System.out.println("changed world hop enabled");
                 BreakHandlerScript.setEnableWorldHoppingPostBreak(e.getStateChange() == 1);
             }
         });
@@ -30,8 +29,6 @@ public class WorldHoppingEnabledParentPanel extends JPanel {
         worldHoppingEnableMembers.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                System.out.println("changed use members world");
-
                 BreakHandlerScript.setUseMemberWorldsToHop(e.getStateChange() == 1);
             }
         });
