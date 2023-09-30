@@ -3,7 +3,6 @@ package net.runelite.client.plugins.griffinplugins.griffintrainer.helpers
 import net.runelite.api.widgets.Widget
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
-import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
@@ -18,16 +17,16 @@ class BankHelper {
                         continue
                     }
 
-                    if (!Rs2Bank.hasItem(itemAndQuantityPair.first)) {
+                    if (!Rs2Bank.hasBankItem(itemAndQuantityPair.first)) {
                         continue
                     }
 
                     val countBefore = Inventory.getInventoryItems().count { widget: Widget -> widget.itemId == itemAndQuantityPair.first }
                     if (itemAndQuantityPair.second == 1) {
-                        Global.sleepUntil { Rs2Bank.withdrawItem(false, itemAndQuantityPair.first) }
+                        Rs2Bank.withdrawItem(false, itemAndQuantityPair.first)
 
                     } else {
-                        Global.sleepUntil { Rs2Bank.withdrawItemX(false, itemAndQuantityPair.first, itemAndQuantityPair.second) }
+                         Rs2Bank.withdrawItemX(false, itemAndQuantityPair.first, itemAndQuantityPair.second)
                     }
 
                     var success = true

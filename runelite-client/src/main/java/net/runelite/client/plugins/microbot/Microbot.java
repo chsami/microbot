@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.Item;
 import net.runelite.api.Skill;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ProfileManager;
@@ -17,15 +17,13 @@ import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
+import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.swing.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class Microbot {
     @Getter
@@ -84,13 +82,23 @@ public class Microbot {
         return walker;
     }
 
-    public static Client getClientForKotlin() { return client; }
-    public static ClientThread getClientThreadForKotlin() { return clientThread; }
+    public static Client getClientForKotlin() {
+        return client;
+    }
 
-    public static Mouse getMouseForKotlin() { return mouse; }
-    public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
+    public static ClientThread getClientThreadForKotlin() {
+        return clientThread;
+    }
 
-    @Deprecated(since="Use isMoving", forRemoval = true)
+    public static Mouse getMouseForKotlin() {
+        return mouse;
+    }
+
+    public static boolean getDisableWalkerUpdateForKotlin() {
+        return disableWalkerUpdate;
+    }
+
+    @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
                 != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
@@ -137,11 +145,13 @@ public class Microbot {
         return Microbot.getClient().getRealSkillLevel(skill) >= levelRequired;
     }
 
-    public static void hopToWorld(int worldNumber){
+    public static void hopToWorld(int worldNumber) {
         if (quickHopTargetWorld != null || Microbot.getClient().getGameState() != GameState.LOGGED_IN) return;
-        if(Microbot.getClient().getWorld() == worldNumber){return;}
+        if (Microbot.getClient().getWorld() == worldNumber) {
+            return;
+        }
         World newWorld = Microbot.getWorldService().getWorlds().findWorld(worldNumber);
-        if(newWorld == null){
+        if (newWorld == null) {
             Microbot.getNotifier().notify("Invalid World");
             System.out.println("Tried to hop to an invalid world");
             return;
@@ -154,16 +164,12 @@ public class Microbot {
         rsWorld.setPlayerCount(newWorld.getPlayers());
         rsWorld.setLocation(newWorld.getLocation());
         rsWorld.setTypes(WorldUtil.toWorldTypes(newWorld.getTypes()));
-        if (rsWorld == null){
+        if (rsWorld == null) {
             return;
         }
         Microbot.getClient().openWorldHopper();
         Microbot.getClient().hopToWorld(rsWorld);
         quickHopTargetWorld = null;
-    }
-
-    public static boolean hasTileBeenLoaded(WorldPoint worldPoint) {
-        return LocalPoint.fromWorld(Microbot.getClient(), worldPoint) != null;
     }
 
     public static void showMessage(String message) {
@@ -173,8 +179,25 @@ public class Microbot {
                 JOptionPane.showConfirmDialog(null, message, "Message",
                         JOptionPane.DEFAULT_OPTION);
             });
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    public static CopyOnWriteArrayList<ItemWidget> updateItemContainer(int id, ItemContainerChanged e) {
+        if (e.getContainerId() == id) {
+            CopyOnWriteArrayList<ItemWidget> list = new CopyOnWriteArrayList<>();
+            int i = 0;
+            for (Item item : e.getItemContainer().getItems()) {
+                if (item == null) {
+                    i++;
+                    continue;
+                }
+                list.add(new ItemWidget(Microbot.getItemManager().getItemComposition(item.getId()).getName(), item.getId(), item.getQuantity(), i));
+                i++;
+            }
+            return list;
+        }
+        return null;
     }
 }

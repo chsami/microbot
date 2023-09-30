@@ -116,7 +116,8 @@ boolean emptySack = false;
             sleepUntil(Rs2Bank::isOpen);
             Rs2Bank.depositAll();
             sleep(100, 300);
-            Rs2Bank.withdrawItem("hammer", true);
+            Rs2Bank.withdrawOne("hammer", true);
+            sleep(600);
         }
     }
 

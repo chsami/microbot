@@ -39,8 +39,8 @@ public class HumidifierScript extends Script {
             sleep(200,400);
             Rs2Bank.depositAll(config.ITEM().getFinished());
             sleep(200,300);
-            if(Rs2Bank.hasItem(config.ITEM().getName())) {
-                Rs2Bank.withdrawItemsAll(true, config.ITEM().getName());
+            if(Rs2Bank.hasBankItem(config.ITEM().getName())) {
+                Rs2Bank.withdrawItemAll(true, config.ITEM().getName());
                 sleepUntilOnClientThread(() -> Inventory.hasItem(config.ITEM().getName()));
                 Rs2Bank.closeBank();
                 sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());

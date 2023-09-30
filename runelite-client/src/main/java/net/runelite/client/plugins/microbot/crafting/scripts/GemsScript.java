@@ -31,7 +31,7 @@ public class GemsScript extends Script {
                     if (Rs2Bank.isOpen()) {
                         Rs2Bank.depositAll("crushed gem");
                         Rs2Bank.depositAll(config.gemType().getName());
-                        if(Rs2Bank.hasItem(uncutGemName)) {
+                        if(Rs2Bank.hasBankItem(uncutGemName)) {
                             Rs2Bank.withdrawItem(true, "chisel");
                             Rs2Bank.withdrawItemAll(true, uncutGemName);
                         } else{

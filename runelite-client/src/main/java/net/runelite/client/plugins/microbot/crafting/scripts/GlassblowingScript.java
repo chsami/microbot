@@ -81,7 +81,7 @@ public class GlassblowingScript extends Script {
     }
 
     private void verifyItemInBank(String item) {
-        if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(item)) {
+        if (Rs2Bank.isOpen() && !Rs2Bank.hasBankItem(item)) {
             Rs2Bank.closeBank();
             Microbot.status = "[Shutting down] - Reason: " + item + " not found in the bank.";
             Microbot.getNotifier().notify(Microbot.status);

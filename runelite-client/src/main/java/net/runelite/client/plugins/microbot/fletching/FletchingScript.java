@@ -82,19 +82,19 @@ public class FletchingScript extends Script {
     private void bankItems(FletchingConfig config) {
         Rs2Bank.openBank();
         if (config.fletchingMode() == FletchingMode.STRUNG) {
-            Rs2Bank.depositXContains(config.fletchingItem().getContainsInventoryName(), config.fletchingMode().getAmount());
+            Rs2Bank.depositX(config.fletchingItem().getContainsInventoryName(), config.fletchingMode().getAmount());
         } else if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
-            Rs2Bank.depositAllContains(model.getFletchingItem().getContainsInventoryName());
+            Rs2Bank.depositAll(model.getFletchingItem().getContainsInventoryName());
             calculateItemToFletch();
             secondaryItemToFletch = (model.getFletchingMaterial().getName() + " logs").trim();
         } else {
-            Rs2Bank.depositAllContains(config.fletchingItem().getContainsInventoryName());
+            Rs2Bank.depositAll(config.fletchingItem().getContainsInventoryName());
         }
         sleepUntilOnClientThread(() -> !Inventory.hasItemContains(config.fletchingItem().getContainsInventoryName()));
 
 
         Rs2Bank.withdrawItemX(true, primaryItemToFletch, config.fletchingMode().getAmount());
-        if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(secondaryItemToFletch)) {
+        if (Rs2Bank.isOpen() && !Rs2Bank.hasBankItem(secondaryItemToFletch)) {
             Rs2Bank.closeBank();
             Microbot.status = "[Shutting down] - Reason: " + secondaryItemToFletch + " not found in the bank.";
             Microbot.getNotifier().notify(Microbot.status);
@@ -105,7 +105,7 @@ public class FletchingScript extends Script {
         if (config.fletchingMode() == FletchingMode.STRUNG)
             Rs2Bank.withdrawItemX(true, secondaryItemToFletch, config.fletchingMode().getAmount());
         else
-            Rs2Bank.withdrawItemsAll(secondaryItemToFletch);
+            Rs2Bank.withdrawItemAll(secondaryItemToFletch);
 
         final String finalSecondaryItemToFletch = secondaryItemToFletch;
 

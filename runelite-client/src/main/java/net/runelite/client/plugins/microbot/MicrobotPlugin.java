@@ -20,9 +20,9 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.WorldDataDownloader;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
-import net.runelite.client.plugins.microbot.util.bank.BetterBank;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
@@ -37,7 +37,6 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
-import net.runelite.client.plugins.microbot.staticwalker.pathfinder.WorldDataDownloader;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -149,9 +148,9 @@ public class MicrobotPlugin extends Plugin {
         Rs2Prayer.handleMenuSwapper(event.getMenuEntry());
         Rs2Magic.handleMenuSwapper(event.getMenuEntry());
         Rs2Equipment.handleMenuSwapper(event.getMenuEntry());
-        BetterBank.handleMenuSwapper(event.getMenuEntry());
         Microbot.getWalker().handleMenuSwapper(event.getMenuEntry());
         Inventory.handleMenuSwapper(event.getMenuEntry());
+        Rs2Bank.handleMenuSwapper(event.getMenuEntry());
         //Rs2Inventory.handleMenuSwapper(event.getMenuEntry());
 
         if (Rs2Menu.getOption().length() > 0) {
@@ -178,7 +177,6 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
-        Rs2Bank.storeInventoryItemsInMemory(event);
         Rs2Bank.storeBankItemsInMemory(event);
         Inventory.storeInventoryItemsInMemory(event);
     }

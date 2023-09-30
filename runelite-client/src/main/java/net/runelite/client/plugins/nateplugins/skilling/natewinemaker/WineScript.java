@@ -38,7 +38,7 @@ public class WineScript extends Script {
         Rs2Bank.openBank();
         if(Rs2Bank.isOpen()){
             Rs2Bank.depositAll();
-            if(Rs2Bank.hasItem("jug of water") &&  Rs2Bank.hasItem("grapes")) {
+            if(Rs2Bank.hasBankItem("jug of water") &&  Rs2Bank.hasBankItem("grapes")) {
                 Rs2Bank.withdrawItemX(true, "jug of water", 14);
                 sleepUntilOnClientThread(() -> Inventory.hasItem("jug of water"));
                 Rs2Bank.withdrawItemX(true, "grapes", 14);

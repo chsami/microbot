@@ -60,13 +60,13 @@ public class ogFiremakingScript extends Script {
                     sleepUntil(() -> Rs2Bank.openBank(SelectedBanker));
                     callAFK(27,50,5000);
                     if(!hasTinderBox()){
-                        if(!Rs2Bank.hasItem("tinderbox")){Microbot.getNotifier().notify("Get more tinderbox ya bum!");super.shutdown();}
+                        if(!Rs2Bank.hasBankItem("tinderbox")){Microbot.getNotifier().notify("Get more tinderbox ya bum!");super.shutdown();}
                         Rs2Bank.withdrawItem("tinderbox");
                         sleepUntil(()-> Inventory.hasItem("tinderbox"));
                         sleep(30,80);
                     }
                     if(!hasLogs()){
-                        if(!Rs2Bank.hasItem(calcedLogs.getName())){Microbot.getNotifier().notify("Get more "+calcedLogs.getName()+" ya bum!");super.shutdown();}
+                        if(!Rs2Bank.hasBankItem(calcedLogs.getName())){Microbot.getNotifier().notify("Get more "+calcedLogs.getName()+" ya bum!");super.shutdown();}
                         Rs2Bank.withdrawItemAll(true, calcedLogs.getName());
                         sleepUntil(() -> hasLogs());
                         callAFK(67,50,786);
