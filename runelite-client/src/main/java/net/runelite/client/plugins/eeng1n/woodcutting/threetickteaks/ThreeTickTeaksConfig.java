@@ -13,21 +13,23 @@ public interface ThreeTickTeaksConfig extends Config {
             position = 0
     )
     default String GUIDE() {
-        return "1. Have your inventory setup for 3T Teaks " +
-                "\n2. Enable Plugin" +
-                "\nNotes" +
-                "\nItems:" +
-                "\nRequired" +
+        return "Steps to use the plugin:\n" +
+                "\n1. Have your inventory setup for 3T Teaks" +
+                "\n2. Enable Plugin\n" +
+                "\nNotes:\n" +
+                "\nMake sure to have the RuneLite plugin \"Stretched Mode\" turned off to avoid potential issues!\n"+
+                "\nRequired Items\n" +
                 "\nAny axe (equipped)" +
-                "\nGuam leaf" +
+                "\nGuam leaf (Or any leaf that you can use with your level)" +
                 "\nSwamp tar" +
-                "\nPestle and mortar" +
-                "\nRecommended:" +
-                "\nGrimy Guam leaf in case the bot accidentally uses the Clean Guam leaf (For example when lagging)" +
-                "\nLocation:" +
-                "\nBetween 2 Teak trees (For example: Ape Atoll)" +
-                "\nRequired Stats:" +
-                "\nAtleast Level 35 Woodcutting";
+                "\nPestle and mortar\n" +
+                "\nRecommended Items\n" +
+                "\nGrimy guam leaf (Or any grimy leaf that you can use with your level in case the bot accidentally processes the clean leaf)\n" +
+                "\nLocation:\n" +
+                "\nAny location where you can stand between 2 teak trees\n" +
+                "\nSkill requirements:\n" +
+                "\nLevel 35 Woodcutting\n" +
+                "\nFor a more detailed guide (Including Screenshots and Videos) go to the Discord forum thread (Under eengin-plugins)!";
     }
 
     @ConfigItem(

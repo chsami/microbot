@@ -16,8 +16,8 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
 public class ThreeTickTeaksOverlay extends OverlayPanel {
 
     @Inject
-    ThreeTickTeaksOverlay(ThreeTickTeaks threeTickTeaks) {
-        super(threeTickTeaks);
+    ThreeTickTeaksOverlay(ThreeTickTeaksPlugin threeTickTeaksPlugin) {
+        super(threeTickTeaksPlugin);
         setPosition(OverlayPosition.BOTTOM_LEFT);
         setNaughty();
     }
