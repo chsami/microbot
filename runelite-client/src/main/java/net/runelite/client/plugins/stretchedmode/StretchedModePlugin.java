@@ -26,15 +26,17 @@
 package net.runelite.client.plugins.stretchedmode;
 
 import com.google.inject.Provides;
-import javax.inject.Inject;
 import net.runelite.api.Client;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.api.events.ResizeableChanged;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.input.MouseManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
+
+import javax.inject.Inject;
 
 @PluginDescriptor(
 	name = "Stretched Mode",
@@ -73,6 +75,8 @@ public class StretchedModePlugin extends Plugin
 
 		client.setStretchedEnabled(true);
 		updateConfig();
+
+		Microbot.showMessage("ALERT! Microbot has noticed that your StretchMode plugin is enabled. Please disable this plugin to avoid weird behavior.");
 	}
 
 	@Override

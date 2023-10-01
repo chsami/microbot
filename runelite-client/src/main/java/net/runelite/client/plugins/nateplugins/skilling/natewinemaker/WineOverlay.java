@@ -1,9 +1,7 @@
-package net.runelite.client.plugins.microbot.mining.motherloadmine;
+package net.runelite.client.plugins.nateplugins.skilling.natewinemaker;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.example.ExampleScript;
-import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.natepainthelper.PaintFormat;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -13,47 +11,53 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.microbot.mining.motherloadmine.MotherloadMineScript.status;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
-import static net.runelite.client.plugins.natepainthelper.Info.xpTillNextLevel;
 
 
-public class MotherloadMineOverlay extends OverlayPanel {
+public class WineOverlay extends OverlayPanel {
+
     @Inject
-    MotherloadMineOverlay(MotherloadMinePlugin plugin)
+    WineOverlay(WinePlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
+        setNaughty();
     }
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            xpGained = Microbot.getClient().getSkillExperience(Skill.MINING) - expstarted;
+            long timeElapsed = System.currentTimeMillis() - timeBegan;
+            xpGained = Microbot.getClient().getSkillExperience(Skill.COOKING) - expstarted;;
             int xpPerHour = (int)( xpGained / ((System.currentTimeMillis() - timeBegan) / 3600000.0D));
-            nextLevelXp = XP_TABLE[Microbot.getClient().getRealSkillLevel(Skill.MINING) + 1];
-            xpTillNextLevel = nextLevelXp - Microbot.getClient().getSkillExperience(Skill.MINING);
+            nextLevelXp = XP_TABLE[Microbot.getClient().getRealSkillLevel(Skill.COOKING) + 1];
+            xpTillNextLevel = nextLevelXp - Microbot.getClient().getSkillExperience(Skill.COOKING);
             if (xpGained >= 1)
             {
                 timeTNL = (long) ((xpTillNextLevel / xpPerHour) * 3600000);
             }
-            panelComponent.setPreferredLocation(new Point(80, 8));
-            panelComponent.setPreferredSize(new Dimension(275, 700));
+            panelComponent.setPreferredSize(new Dimension(275, 800));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Pay-dirt mining v" + MiningScript.version)
-                    .color(Color.GREEN)
+                    .text("Nate's Wine Maker")
+                    .color(Color.magenta)
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Mining Exp Gained (hr): " + (xpGained)  + " ("+xpPerHour+")")
+                    .left("Time Ran: " + PaintFormat.ft(timeElapsed))
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Mining Levels Gained: " + ( Microbot.getClient().getRealSkillLevel(Skill.MINING) - startinglevel))
+                    .left("Cooking Exp Gained (hr): " + (xpGained)  + " ("+xpPerHour+")")
+                    .build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Cooking Levels Gained: " + ( Microbot.getClient().getRealSkillLevel(Skill.COOKING) - startinglevel))
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Time till next level: " + PaintFormat.ft(timeTNL))
                     .build());
+
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left(status.toString())
+                    .left(Microbot.status)
                     .build());
+
+
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }

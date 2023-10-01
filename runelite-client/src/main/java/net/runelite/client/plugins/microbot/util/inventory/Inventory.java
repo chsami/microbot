@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -24,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
+import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.getNpc;
 
 
 public class Inventory {
@@ -512,6 +514,19 @@ public class Inventory {
         sleep(0, 200);
         Microbot.getMouse().click(object.getCanvasLocation().getX(), object.getCanvasLocation().getY());
         sleep(0, 200);
+        return true;
+    }
+
+    public static boolean useItemOnNpc(String itemName, String npcName) {
+        if (Rs2Bank.isOpen()) return false;
+        Microbot.status = "Use inventory item " + itemName + " on " + npcName;
+        Widget item1 = findItem(itemName);
+        NPC item2 = getNpc(npcName);
+        if (item1 == null || item2 == null) return false;
+        Microbot.getMouse().click(item1.getBounds().getCenterX(), item1.getBounds().getCenterY());
+        sleep(600, 1200);
+        Rs2Npc.interact(npcName,"use");
+        sleep(600, 1200);
         return true;
     }
 
