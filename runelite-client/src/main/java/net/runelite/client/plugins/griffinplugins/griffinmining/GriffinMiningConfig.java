@@ -46,5 +46,16 @@ public interface GriffinMiningConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            keyName = "equipGear",
+            name = "Equip Initial Gear",
+            description = "Equip Initial Gear",
+            position = 1,
+            section = miningSettingsSection
+    )
+    default boolean equipGear() {
+        return true;
+    }
+
 
 }

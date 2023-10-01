@@ -82,6 +82,7 @@ class GriffinMiningScript : Script() {
     fun getInventoryRequirements(): InventoryRequirements {
         val inventoryRequirements = InventoryRequirements()
         val miningLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.MINING)
+        val defenceLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.DEFENCE)
 
         val pickaxes = DynamicItemSet()
         if (miningLevel >= 1) {
@@ -107,6 +108,47 @@ class GriffinMiningScript : Script() {
         if (pickaxes.getItems().isNotEmpty()) {
             inventoryRequirements.addItemSet(pickaxes)
         }
+
+        val plateBodies = DynamicItemSet()
+        if (defenceLevel >= 1) {
+            plateBodies.add(ItemID.BRONZE_PLATEBODY, 1)
+            plateBodies.add(ItemID.IRON_PLATEBODY, 1)
+        }
+        if (defenceLevel >= 5) {
+            plateBodies.add(ItemID.STEEL_PLATEBODY, 1)
+        }
+        if (defenceLevel >= 10) {
+            plateBodies.add(ItemID.BLACK_PLATEBODY, 1)
+            plateBodies.add(ItemID.WHITE_PLATEBODY, 1)
+        }
+        if (defenceLevel >= 20) {
+            plateBodies.add(ItemID.MITHRIL_PLATEBODY, 1)
+        }
+
+        if (plateBodies.getItems().isNotEmpty()) {
+            inventoryRequirements.addItemSet(plateBodies)
+        }
+
+        val plateLegs = DynamicItemSet()
+        if (defenceLevel >= 1) {
+            plateLegs.add(ItemID.BRONZE_PLATELEGS, 1)
+            plateLegs.add(ItemID.IRON_PLATELEGS, 1)
+        }
+        if (defenceLevel >= 5) {
+            plateLegs.add(ItemID.STEEL_PLATELEGS, 1)
+        }
+        if (defenceLevel >= 10) {
+            plateLegs.add(ItemID.BLACK_PLATELEGS, 1)
+            plateLegs.add(ItemID.WHITE_PLATELEGS, 1)
+        }
+        if (defenceLevel >= 20) {
+            plateLegs.add(ItemID.MITHRIL_PLATELEGS, 1)
+        }
+
+        if (plateLegs.getItems().isNotEmpty()) {
+            inventoryRequirements.addItemSet(plateLegs)
+        }
+
         return inventoryRequirements
     }
 
@@ -122,26 +164,28 @@ class GriffinMiningScript : Script() {
 
         when (state) {
             State.SETUP -> {
-                Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
-                if (!Rs2Bank.isOpen()) {
-                    Rs2Bank.openBank()
-                }
+                if (config.equipGear()) {
+                    Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
+                    if (!Rs2Bank.isOpen()) {
+                        Rs2Bank.openBank()
+                    }
 
-                Rs2Bank.depositAll()
-                Global.sleep(300, 600)
-                Rs2Bank.depositEquipment()
-                Global.sleep(600, 900)
+                    Rs2Bank.depositAll()
+                    Global.sleep(300, 600)
+                    Rs2Bank.depositEquipment()
+                    Global.sleep(600, 900)
 
-                val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
-                Rs2Bank.closeBank()
-                Global.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
+                    val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
+                    Rs2Bank.closeBank()
+                    Global.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
 
-                foundItemIds.forEach { itemId: Int ->
-                    println("Equipping item $itemId")
-                    if (!Rs2Equipment.hasEquipped(itemId)) {
-                        Inventory.getInventoryItem(itemId)?.let {
-                            Microbot.getMouseForKotlin().click(it.bounds)
-                            Global.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
+                    foundItemIds.forEach { itemId: Int ->
+                        println("Equipping item $itemId")
+                        if (!Rs2Equipment.hasEquipped(itemId)) {
+                            Inventory.getInventoryItem(itemId)?.let {
+                                Microbot.getMouseForKotlin().click(it.bounds)
+                                Global.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
+                            }
                         }
                     }
                 }

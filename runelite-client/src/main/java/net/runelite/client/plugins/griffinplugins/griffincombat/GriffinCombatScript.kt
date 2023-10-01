@@ -230,26 +230,28 @@ class GriffinCombatScript : Script() {
 
         when (state) {
             State.SETUP -> {
-                Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
-                if (!Rs2Bank.isOpen()) {
-                    Rs2Bank.openBank()
-                }
+                if (config.equipGear()) {
+                    Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
+                    if (!Rs2Bank.isOpen()) {
+                        Rs2Bank.openBank()
+                    }
 
-                Rs2Bank.depositAll()
-                Global.sleep(300, 600)
-                Rs2Bank.depositEquipment()
-                Global.sleep(600, 900)
+                    Rs2Bank.depositAll()
+                    Global.sleep(300, 600)
+                    Rs2Bank.depositEquipment()
+                    Global.sleep(600, 900)
 
-                val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
-                Rs2Bank.closeBank()
-                Global.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
+                    val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
+                    Rs2Bank.closeBank()
+                    Global.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
 
-                foundItemIds.forEach { itemId: Int ->
-                    println("Equipping item $itemId")
-                    if (!Rs2Equipment.hasEquipped(itemId)) {
-                        Inventory.getInventoryItem(itemId)?.let {
-                            Microbot.getMouseForKotlin().click(it.bounds)
-                            Global.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
+                    foundItemIds.forEach { itemId: Int ->
+                        println("Equipping item $itemId")
+                        if (!Rs2Equipment.hasEquipped(itemId)) {
+                            Inventory.getInventoryItem(itemId)?.let {
+                                Microbot.getMouseForKotlin().click(it.bounds)
+                                Global.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
+                            }
                         }
                     }
                 }

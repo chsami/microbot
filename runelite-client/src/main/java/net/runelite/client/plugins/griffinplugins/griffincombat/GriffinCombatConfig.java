@@ -79,4 +79,15 @@ public interface GriffinCombatConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            keyName = "equipGear",
+            name = "Equip Initial Gear",
+            description = "Equip Initial Gear",
+            position = 2,
+            section = combatSettingsSection
+    )
+    default boolean equipGear() {
+        return true;
+    }
+
 }
