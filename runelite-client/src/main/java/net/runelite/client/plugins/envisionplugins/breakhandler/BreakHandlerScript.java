@@ -208,7 +208,6 @@ public class BreakHandlerScript extends Script {
                             break;
 
                         case POST_BREAK_LOGIN:
-                            System.out.println("yummy yummy");
                             if (config.VERBOSE_LOGGING() && debugCount == 0) {
                                 System.out.println("STATE: " + myState);
                                 debugCount++;
@@ -341,7 +340,6 @@ public class BreakHandlerScript extends Script {
 
     public static void calcExpectedRunTime() {
         runTimeManager.calculateTime((int) minRunTimeDuration, (int) maxRunTimeDuration);
-        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSeconds()));
     }
 
     public static void regenerateExpectedRunTime(boolean fromButtonRequest) {
@@ -352,7 +350,6 @@ public class BreakHandlerScript extends Script {
     public static void calcExpectedBreak() {
         if (breakTimeManager.isEmpty()) return;
         breakTimeManager.orElseThrow().calculateTime((int) minBreakDuration, (int) maxBreakDuration);
-        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.orElseThrow().getSeconds()));
     }
 
     public static void regenerateExpectedBreakTime() {
