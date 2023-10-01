@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.enums;
 
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 
 public enum BreakHandlerStates {
@@ -10,13 +11,18 @@ public enum BreakHandlerStates {
     LOGOUT_BREAK,
     POST_BREAK_AFK,
     POST_BREAK_LOGIN,
-    RESET;
+    RESET,
+    FAILURE;
 
     /**
      * Check if we should shift state to STARTUP
      */
     public static void startupCheck(BreakHandlerScript breakHandlerScript) {
         if (!BreakHandlerScript.isIsParentPluginRunning() && !breakHandlerScript.isAtAccountScreens()) {
+            BreakHandlerScript.myState = STARTUP;
+        }
+
+        if (BreakHandlerScript.myState == FAILURE && BreakHandlerScript.isIsParentPluginRunning()) {
             BreakHandlerScript.myState = STARTUP;
         }
     }
@@ -51,6 +57,33 @@ public enum BreakHandlerStates {
         if (BreakHandlerScript.myState == LOGOUT_BREAK && (BreakHandlerScript.breakTimeManager.orElseThrow().timeHasPast() && BreakHandlerScript.runTimeManager.timeHasPast())) {
             BreakHandlerScript.myState = POST_BREAK_LOGIN;
             resetCounts(breakHandlerScript);
+        }
+    }
+
+    /**
+     * Check if we should shift state to FAILURE
+     */
+    public static void failureCheck(BreakHandlerScript breakHandlerScript, BreakHandlerPanel breakHandlerPanel) throws Exception {
+
+        if (!BreakHandlerScript.isIsParentPluginRunning()) {
+            BreakHandlerScript.myState = FAILURE;
+            breakHandlerScript.getNotificationManager().logState(FAILURE);
+        }
+
+        // Notify the user they are missing login creds before logout break starts
+        if (BreakHandlerScript.myState != STARTUP) {
+            if (breakHandlerScript.getBreakMethod().equals("LOGOUT") &&
+                    (breakHandlerPanel.getUsername().getText() == null || breakHandlerPanel.getUsername().getText().trim().isEmpty()) ||
+                    (breakHandlerPanel.getPasswordEncryptedValue().length() == 0)
+            ){
+                BreakHandlerScript.myState = FAILURE;
+                breakHandlerScript.getNotificationManager().logState(FAILURE);
+
+                breakHandlerScript.getNotificationManager().simpleNotifyDiscord(
+                        breakHandlerScript.getParentPluginName(),
+                        "Missing one or more required fields for account credentials, please set them in the Account Tab!"
+                );
+            }
         }
     }
 
