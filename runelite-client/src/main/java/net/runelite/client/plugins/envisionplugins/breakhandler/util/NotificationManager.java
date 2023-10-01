@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.util;
 
 import net.runelite.client.config.Config;
+import net.runelite.client.plugins.envisionplugins.breakhandler.enums.BreakHandlerStates;
 
 public class NotificationManager {
     private DiscordWebhook discordWebhook;
@@ -23,6 +24,13 @@ public class NotificationManager {
     public void log(String message) {
         if (logToConsole && messageLimit == 0) {
             System.out.println(message);
+            messageLimit++;
+        }
+    }
+
+    public void logState(BreakHandlerStates state) {
+        if (logToConsole && messageLimit == 0) {
+            System.out.println("STATE: " + state);
             messageLimit++;
         }
     }

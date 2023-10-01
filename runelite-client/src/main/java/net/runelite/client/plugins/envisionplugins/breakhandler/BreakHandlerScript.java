@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.17;
+    public static double version = 0.18;
 
     /* Variables for other script's references */
     private static boolean isBreakHandlerCompatible = false;                    // Use setter method in your Plugin's Run Method
@@ -76,11 +76,31 @@ public class BreakHandlerScript extends Script {
             if (isBreakHandlerCompatible) {
                 try {
                     switch (myState) {
+                        case STARTUP:
+                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
+
+                            if (isParentPluginRunning) {
+                                notificationManager.logState(myState);
+
+                                // We are not on the login screens
+                                if (!getIsAtAccountScreens()) {
+                                    myState = BreakHandlerStates.RUN;
+                                    calcExpectedRunTime();
+
+                                    SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
+                                }
+
+                            }
+
+                            break;
                         case RUN:
-                            notificationManager.log("STATE: " + myState);
+                            notificationManager.logState(myState);
 
                             breakTimeManager = Optional.empty();
-                            if (!getIsAtAccountScreens()) {    // We are not on the login screens
+
+                            // We are not on the login screens
+                            if (!getIsAtAccountScreens()) {
                                 SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
                                 SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
                             }
@@ -88,7 +108,7 @@ public class BreakHandlerScript extends Script {
                             break;
 
                         case START_BREAK:
-                            notificationManager.log("STATE: " + myState + " with break style: " + breakMethod);
+                            notificationManager.logState(myState);
 
                             SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
 
@@ -106,7 +126,7 @@ public class BreakHandlerScript extends Script {
                             break;
 
                         case AFK_BREAK:
-                            notificationManager.log("STATE: " + myState);
+                            notificationManager.logState(myState);
                             notificationManager.notifyDiscord(
                                     detailedReportNotification,
                                     config.DISCORD_CLIENT_NAME(),
@@ -123,7 +143,7 @@ public class BreakHandlerScript extends Script {
                             break;
 
                         case LOGOUT_BREAK:
-                            notificationManager.log("STATE: " + myState);
+                            notificationManager.logState(myState);
 
                             notificationManager.notifyDiscord(
                                     detailedReportNotification,
@@ -142,48 +162,9 @@ public class BreakHandlerScript extends Script {
                             SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.orElseThrow().getSecondsUntil()));
                             break;
 
-                        case RESET_RUN_TIMER:
-                            notificationManager.log("STATE: " + myState);
-
-                            calcExpectedRunTime();
-                            break;
-
-                        case RESET_BREAK_TIMER:
-                            notificationManager.log("STATE: " + myState);
-
-                            calcExpectedBreak();
-                            break;
-
-                        case RESET_BOTH_TIMERS:
-                            notificationManager.log("STATE: " + myState);
-
-                            regenerateExpectedRunTime(false);
-                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
-
-                            notificationManager.resetVerboseMessageCount();
-                            myState = BreakHandlerStates.RUN;
-                            break;
-
-                        case STARTUP:
-                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
-
-                            if (isParentPluginRunning) {
-                                notificationManager.log("Break Handler has started successfully");
-
-                                if (!getIsAtAccountScreens()) {    // We are not on the login screens
-                                    myState = BreakHandlerStates.RUN;
-                                    calcExpectedRunTime();
-
-                                    SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
-                                }
-
-                            }
-
-                            break;
 
                         case POST_BREAK_AFK:
-                            notificationManager.log("STATE: " + myState);
+                            notificationManager.logState(myState);
                             notificationManager.notifyDiscord(
                                     false,
                                     config.DISCORD_CLIENT_NAME(),
@@ -197,7 +178,7 @@ public class BreakHandlerScript extends Script {
                             break;
 
                         case POST_BREAK_LOGIN:
-                            notificationManager.log("STATE: " + myState);
+                            notificationManager.logState(myState);
                             notificationManager.notifyDiscord(
                                     false,
                                     config.DISCORD_CLIENT_NAME(),
@@ -222,6 +203,16 @@ public class BreakHandlerScript extends Script {
                                 myState = BreakHandlerStates.RESET_BOTH_TIMERS;
                             }
 
+                            break;
+
+                        case RESET_BOTH_TIMERS:
+                            notificationManager.logState(myState);
+
+                            regenerateExpectedRunTime(false);
+                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
+
+                            notificationManager.resetVerboseMessageCount();
+                            myState = BreakHandlerStates.RUN;
                             break;
 
                         default:

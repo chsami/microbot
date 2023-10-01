@@ -4,15 +4,13 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScri
 
 public enum BreakHandlerStates {
     STARTUP,
+    RUN,
     START_BREAK,
     AFK_BREAK,
     LOGOUT_BREAK,
-    RUN,
-    RESET_BREAK_TIMER,
-    RESET_RUN_TIMER,
-    RESET_BOTH_TIMERS,
     POST_BREAK_AFK,
-    POST_BREAK_LOGIN;
+    POST_BREAK_LOGIN,
+    RESET_BOTH_TIMERS;
 
     /**
      * Check if we should shift state to STARTUP
