@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.accountselector;
 
+import net.runelite.api.GameState;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.security.Login;
@@ -12,7 +13,7 @@ public class AutoLoginScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             super.run();
             try {
-                if (!Microbot.isLoggedIn()) {
+                if (Microbot.getClient().getGameState() == GameState.LOGIN_SCREEN) {
                     if (autoLoginConfig.useRandomWorld()) {
                         new Login(Login.getRandomWorld(autoLoginConfig.isMember()));
                     } else {
