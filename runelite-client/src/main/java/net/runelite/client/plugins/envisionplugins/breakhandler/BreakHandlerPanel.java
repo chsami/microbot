@@ -13,13 +13,10 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimedurati
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.twofactorauth.TwoFactorAuthParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.worldhopping.WorldHoppingParentPanel;
 import net.runelite.client.plugins.microbot.util.security.Encryption;
-import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
 import javax.inject.Inject;
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
 public class BreakHandlerPanel extends PluginPanel {
@@ -29,20 +26,9 @@ public class BreakHandlerPanel extends PluginPanel {
 
     private final RuntimeDurationParentPanel runtimeDurationParentPanel;
     private final BreakDurationParentPanel breakDurationParentPanel;
-
-    private BreakMethodParentPanel breakMethodParentPanel;
-    private final JPanel breakDurationPanel = new JPanel();
-    private final JPanel playTimeDurationPanel = new JPanel();
-    private final JPanel forceBreakPanel = new JPanel();
-
-    private final RegenerateTimesParentPanel regenerateTimesParentPanel = new RegenerateTimesParentPanel();
     TwoFactorAuthParentPanel twoFactorAuthParentPanel = new TwoFactorAuthParentPanel();
     AccountParentPanel accountParentPanel = new AccountParentPanel();
     WorldHoppingParentPanel worldHoppingParentPanel = new WorldHoppingParentPanel();
-
-    public static final Border BORDER = new CompoundBorder(
-            BorderFactory.createMatteBorder(2, 2, 2, 2, ColorScheme.LIGHT_GRAY_COLOR),
-            BorderFactory.createLineBorder(ColorScheme.LIGHT_GRAY_COLOR));
 
     @Inject
     BreakHandlerPanel() {

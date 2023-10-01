@@ -18,9 +18,10 @@ import javax.swing.*;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.18;
+    public static double version = 0.19;
 
     /* Variables for other script's references */
     private static boolean isBreakHandlerCompatible = false;                    // Use setter method in your Plugin's Run Method
@@ -34,9 +35,6 @@ public class BreakHandlerScript extends Script {
     private static String[] resourcesGained = {"Default1", "Default2"};         // Each String in the array is outputted with a new line separator
     private static String gpGained = "ZERO";                                    // MUST be converted to a String
     /* End variables for other script's references */
-
-    protected static boolean shouldBreakTimerBeEnabled = false;
-    protected static boolean shouldRunTimeTimerBeEnabled = true;
 
     /* Run Time Duration Variables */
     protected static long minRunTimeDuration = -1;
@@ -245,55 +243,22 @@ public class BreakHandlerScript extends Script {
         myState = state;
     }
 
-    public boolean shouldBreak() {
-        return shouldBreakTimerBeEnabled;
-    }
-
-    public static void setShouldBreak(boolean shouldBreak) {
-        shouldBreakTimerBeEnabled = shouldBreak;
-    }
-
-    public static boolean isShouldRunTimeTimerBeEnabled() {
-        return shouldRunTimeTimerBeEnabled;
-    }
-
-    public static void setShouldEnableRunTimeTimer(boolean enableRunTimeTimer) {
-        shouldRunTimeTimerBeEnabled = enableRunTimeTimer;
-    }
-
     /* Run Time Duration Getters and Setters */
     public static void setMinRunTimeDuration(long minDuration) {
         minRunTimeDuration = minDuration;
-    }
-
-    public static long getMinRunTimeDuration() {
-        return minRunTimeDuration;
     }
 
     public static void setMaxRunTimeDuration(long maxDuration) {
         maxRunTimeDuration = maxDuration;
     }
 
-    public static long getMaxRunTimeDuration() {
-        return maxRunTimeDuration;
-    }
-
-
     /* Break Duration Getters and Setters */
     public static void setMinBreakDuration(long minDuration) {
         minBreakDuration = minDuration;
     }
 
-    public static long getMinBreakDuration() {
-        return minBreakDuration;
-    }
-
     public static void setMaxBreakDuration(long maxDuration) {
         maxBreakDuration = maxDuration;
-    }
-
-    public static long getMaxBreakDuration() {
-        return maxBreakDuration;
     }
 
     public static void calcExpectedRunTime() {
@@ -308,10 +273,6 @@ public class BreakHandlerScript extends Script {
     public static void calcExpectedBreak() {
         if (breakTimeManager.isEmpty()) return;
         breakTimeManager.orElseThrow().calculateTime((int) minBreakDuration, (int) maxBreakDuration);
-    }
-
-    public static void regenerateExpectedBreakTime() {
-        calcExpectedBreak();
     }
 
     public static void setBreakMethod(String method) {
@@ -334,16 +295,8 @@ public class BreakHandlerScript extends Script {
         isBreakHandlerCompatible = compatible;
     }
 
-    public static boolean getIsBreakHandlerCompatible() {
-        return isBreakHandlerCompatible;
-    }
-
     public static void setLetBreakHandlerStartBreak(boolean startBreak) {
         letBreakHandlerStartBreak = startBreak;
-    }
-
-    public static boolean getLetBreakHandlerStartBreak() {
-        return letBreakHandlerStartBreak;
     }
 
     public static boolean getIsBreakOver() {
@@ -359,7 +312,7 @@ public class BreakHandlerScript extends Script {
     }
 
     // Notify the parent script that the Run Time Timer has finished running
-    //      and they can start a break when it is convenient
+    //      , and they can start a break when it is convenient
     public static boolean getHasRunTimeTimerFinished() {
         return runTimeManager.timeHasPast();
     }
@@ -368,40 +321,20 @@ public class BreakHandlerScript extends Script {
         parentPluginName = name;
     }
 
-    public static String getParentPluginName() {
-        return parentPluginName;
-    }
-
     public static void setDetailedReportNotification(boolean flag) {
         detailedReportNotification = flag;
-    }
-
-    public static boolean getDetailedReportNotification() {
-        return detailedReportNotification;
     }
 
     public static void setSkillExperienceGained(String[] experienceGained) {
         skillExperienceGained = experienceGained;
     }
 
-    public static String[] getSkillExperienceGained() {
-        return skillExperienceGained;
-    }
-
     public static void setResourcesGained(String[] resources) {
         resourcesGained = resources;
     }
 
-    public static String[] getResourcesGained() {
-        return resourcesGained;
-    }
-
     public static void setGpGained(String gp) {
         gpGained = gp;
-    }
-
-    public static String getGpGained() {
-        return gpGained;
     }
 
     public boolean getIsAtAccountScreens() {
@@ -413,8 +346,8 @@ public class BreakHandlerScript extends Script {
                 atAccountScripts = true;
             }
         } catch (Exception ignored) {
-            //Let's just ignore this, it means the client is still loading
-            //Cannot invoke "net.runelite.client.callback.ClientThread.runOnClientThread(java.util.concurrent.Callable)" because the return value of "net.runelite.client.plugins.microbot.Microbot.getClientThread()" is null
+            // Let's just ignore this, it means the client is still loading
+            // Cannot invoke "net.runelite.client.callback.ClientThread.runOnClientThread(java.util.concurrent.Callable)" because the return value of "net.runelite.client.plugins.microbot.Microbot.getClientThread()" is null
         }
 
 

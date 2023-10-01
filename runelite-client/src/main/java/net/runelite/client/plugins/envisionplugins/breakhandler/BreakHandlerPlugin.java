@@ -49,7 +49,6 @@ public class BreakHandlerPlugin extends Plugin {
         final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "breakhandler_watch.png");
 
         BreakHandlerScript.setBreakHandlerState(BreakHandlerStates.STARTUP);
-        resetTimerFlags();
 
         breakHandlerPanel = injector.getInstance(BreakHandlerPanel.class);
 
@@ -70,11 +69,6 @@ public class BreakHandlerPlugin extends Plugin {
     @Override
     protected void shutDown() throws Exception {
         clientToolbar.removeNavigation(navButton);
-    }
-
-    private void resetTimerFlags() {
-        BreakHandlerScript.setShouldEnableRunTimeTimer(true);
-        BreakHandlerScript.setShouldBreak(false);
     }
 
     /**
