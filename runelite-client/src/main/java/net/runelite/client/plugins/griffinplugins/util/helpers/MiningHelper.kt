@@ -38,9 +38,17 @@ class MiningHelper {
                 return false
             }
 
-            Global.sleepUntilTrue({ Rs2Player.isAnimating() }, 100, 3000)
+            Global.sleepUntilTrue({ Rs2Player.isAnimating() || Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null }, 100, 3000)
+            if (Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null) {
+                return false
+            }
+
             Microbot.status = "Waiting to finish mining ${oreName} ore"
-            return Global.sleepUntilTrue({ !Rs2Player.isWalking() && !Rs2Player.isAnimating() }, 100, 1000 * 90)
+            return Global.sleepUntilTrue({
+                val doneMining = !Rs2Player.isWalking() && !Rs2Player.isAnimating()
+                val oreDisappeared = Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null
+                return@sleepUntilTrue doneMining || oreDisappeared
+            }, 100, 1000 * 90)
         }
     }
 }

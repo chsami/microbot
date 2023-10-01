@@ -5,22 +5,20 @@ import net.runelite.client.config.ConfigManager
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginDescriptor.Griffin
-import net.runelite.client.plugins.griffinplugins.griffinmining.GriffinMiningOverlay
-import net.runelite.client.plugins.griffinplugins.griffinmining.GriffinMiningScript
 import net.runelite.client.ui.overlay.OverlayManager
 import javax.inject.Inject
 
-@PluginDescriptor(name = Griffin + GriffinMiningPlugin.CONFIG_GROUP, enabledByDefault = false)
-class GriffinMiningPlugin : Plugin() {
+@PluginDescriptor(name = Griffin + GriffinTrainerPlugin.CONFIG_GROUP, enabledByDefault = false)
+class GriffinTrainerPlugin : Plugin() {
     companion object {
-        const val CONFIG_GROUP = "Mining Trainer"
+        const val CONFIG_GROUP = "Griffin Trainer"
     }
 
     @Inject
     private lateinit var overlayManager: OverlayManager
 
     @Inject
-    private lateinit var overlay: GriffinMiningOverlay
+    private lateinit var overlay: GriffinTrainerOverlay
 
     @Inject
     private lateinit var config: GriffinTrainerConfig
@@ -30,18 +28,17 @@ class GriffinMiningPlugin : Plugin() {
         return configManager.getConfig(GriffinTrainerConfig::class.java)
     }
 
+    private lateinit var trainerThread: TrainerThread
+
     @Inject
-    lateinit var miningScript: GriffinMiningScript
-
     override fun startUp() {
-        miningScript = GriffinMiningScript()
-
+        trainerThread = TrainerThread(config)
         overlayManager.add(overlay)
-        miningScript.run(config)
+        trainerThread.start()
     }
 
     override fun shutDown() {
-        miningScript.shutdown()
+        trainerThread.stop()
         overlayManager.remove(overlay)
     }
 }
