@@ -9,15 +9,12 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.util.DiscordWebh
 import net.runelite.client.plugins.envisionplugins.breakhandler.util.TimeManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.http.api.worlds.WorldRegion;
 
 
 import javax.swing.*;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
@@ -27,8 +24,8 @@ public class BreakHandlerScript extends Script {
     /* Variables for other script's references */
     // TODO set this to false for production
     private static boolean isBreakHandlerCompatible = true;     // Use setter method in your Plugin's Run Method
-    private static boolean letBreakHandlerStartBreak = false;   // Use setter method in your Plugin's Run Method
-    private static boolean isBreakOver = false;                 // Use this variable to progress have the break has completed
+    public static boolean letBreakHandlerStartBreak = false;   // Use setter method in your Plugin's Run Method
+    //    private static boolean isBreakOver = false;                 // Use this variable to progress have the break has completed
     private static boolean isParentPluginRunning = false;       // Use setter method in your Plugin's Run Method
     private static String parentPluginName = "Default Plugin";
     private static boolean detailedReportNotification = false;
@@ -44,36 +41,38 @@ public class BreakHandlerScript extends Script {
     protected static boolean shouldBreakTimerBeEnabled = false;
     protected static boolean shouldRunTimeTimerBeEnabled = true;
 
-
     /* Run Time Duration Variables */
     protected static long minRunTimeDuration = -1;
     protected static long maxRunTimeDuration = -1;
     //    protected static long expectedRunTimeDuration = -1;
-    protected static TimeManager runTimeManager = new TimeManager();
-    protected static Instant expectedBreakTimeInstant;
+    public static TimeManager runTimeManager = new TimeManager();
+    public static TimeManager breakTimeManager = new TimeManager();
+//    protected static Instant expectedBreakTimeInstant;
 
     /* Break Duration Variables */
     protected static long minBreakDuration = -1;
     protected static long maxBreakDuration = -1;
-    protected static long expectedBreakDuration = -1;
+//    protected static long expectedBreakDuration = -1;
 
     /* Timers */
 //    protected static Timer runTimeTimer;
-    protected static Timer breakTimer;
+//    protected static Timer breakTimer;
 
-    protected static BreakHandlerStates myState;
+    public static BreakHandlerStates myState;
 
     protected static String breakMethod;
     protected static boolean enableWorldHoppingPostBreak = false;
     protected static boolean useMemberWorldsToHop = false;
     protected static WorldRegion worldRegionToHopTo;
 
-    protected int debugCount = 0;
-    protected int discordNotificationCount = 0;
+    public int debugCount = 0;
+    public int discordNotificationCount = 0;
 
+    public static void resetRunTimeManager() {
+        runTimeManager = new TimeManager();
+    }
 
     public boolean run(BreakHandlerConfig config, BreakHandlerPanel breakHandlerPanel) {
-        breakTimer = new Timer("Break Timer", expectedBreakDuration);
         discordWebhook = new DiscordWebhook(config.DISCORD_WEBHOOK());
 
         if (isBreakHandlerCompatible) {
@@ -85,9 +84,10 @@ public class BreakHandlerScript extends Script {
                                 System.out.println("STATE: " + myState);
                                 debugCount++;
                             }
-
+                            calcExpectedBreak();
                             if (!getIsAtAccountScreens()) {    // We are not on the login screens
                                 SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
+                                SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
                             }
 
                             break;
@@ -98,9 +98,9 @@ public class BreakHandlerScript extends Script {
                                 debugCount++;
                             }
 
-                            isBreakOver = false;
-
                             SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
+                            calcExpectedBreak();
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSecondsUntil()));
 
                             if (breakMethod.equals("AFK")) {
                                 myState = BreakHandlerStates.AFK_BREAK;
@@ -119,9 +119,8 @@ public class BreakHandlerScript extends Script {
 
                             sendPostRunDiscordMessage(config, breakMethod);
 
-                            breakTimer.run();
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
-                            Microbot.status = "AFK breaking for " + breakTimer.getDisplayTime();
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSecondsUntil()));
+                            Microbot.status = "AFK breaking for " + breakTimeManager.getSecondsUntil();
                             break;
 
                         case LOGOUT_BREAK:
@@ -136,8 +135,7 @@ public class BreakHandlerScript extends Script {
                                 logout();
                             }
 
-                            breakTimer.run();
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSecondsUntil()));
                             break;
 
                         case RESET_RUN_TIMER:
@@ -168,21 +166,21 @@ public class BreakHandlerScript extends Script {
                             SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
 
                             regenerateExpectedBreakTime();
-                            breakTimer.setDuration(expectedBreakDuration);
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimer.getDisplayTime()));
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSecondsUntil()));
 
                             debugCount = 0;
-                            isBreakOver = true;
                             myState = BreakHandlerStates.RUN;
                             break;
 
                         case STARTUP:
                             SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
                             if (isParentPluginRunning) {
                                 System.out.println("Break Handler has started successfully");
                                 if (!getIsAtAccountScreens()) {    // We are not on the login screens
                                     myState = BreakHandlerStates.RUN;
                                     calcExpectedRunTime();
+
                                     SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
                                 }
 
@@ -205,10 +203,10 @@ public class BreakHandlerScript extends Script {
                                 );
                             }
 
-                            isBreakOver = true;
                             break;
 
                         case POST_BREAK_LOGIN:
+                            System.out.println("yummy yummy");
                             if (config.VERBOSE_LOGGING() && debugCount == 0) {
                                 System.out.println("STATE: " + myState);
                                 debugCount++;
@@ -233,8 +231,9 @@ public class BreakHandlerScript extends Script {
                                             breakHandlerPanel.getPasswordEncryptedValue(),
                                             Microbot.getClient().getWorld());
                                 }
+                            } else {
+                                myState = BreakHandlerStates.RESET_BOTH_TIMERS;
                             }
-                            isBreakOver = true;
 
                             break;
 
@@ -242,41 +241,10 @@ public class BreakHandlerScript extends Script {
                             System.err.println("Bad Break Handler State...");
                     }
 
-                    if (!isParentPluginRunning && !getIsAtAccountScreens()) {
-                        myState = BreakHandlerStates.STARTUP;
-                    }
-
-                    if (letBreakHandlerStartBreak) {
-                        // We should be on break
-                        if (myState == BreakHandlerStates.RUN && (runTimeManager.timeHasPast() && breakTimer.getDisplayTime() > 0)) {
-                            discordNotificationCount = 0;
-                            myState = BreakHandlerStates.START_BREAK;
-                            debugCount = 0;
-                        }
-                    }
-
-                    // We just finished a afk break - lets move to post_afk_break
-                    if (myState == BreakHandlerStates.AFK_BREAK && !isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeManager.timeHasPast())) {
-                        discordNotificationCount = 0;
-                        myState = BreakHandlerStates.POST_BREAK_AFK;
-                        debugCount = 0;
-                    }
-
-                    // We just finished a logout break - lets move to post_login_break
-                    if (myState == BreakHandlerStates.LOGOUT_BREAK && !isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeManager.timeHasPast())) {
-                        discordNotificationCount = 0;
-                        myState = BreakHandlerStates.POST_BREAK_LOGIN;
-                        debugCount = 0;
-                    }
-
-                    // We are both POST break and run, lets regenerate new timers
-                    if ((myState == BreakHandlerStates.POST_BREAK_AFK ||
-                            myState == BreakHandlerStates.POST_BREAK_LOGIN) &&
-                            isBreakOver && (breakTimer.getDisplayTime() == 0 && runTimeManager.timeHasPast())) {
-                        discordNotificationCount = 0;
-                        myState = BreakHandlerStates.RESET_BOTH_TIMERS;
-                        debugCount = 0;
-                    }
+                    BreakHandlerStates.startupCheck(this);
+                    BreakHandlerStates.breakCheck(this);
+                    BreakHandlerStates.afkBreakCheck(this);
+                    BreakHandlerStates.logoutBreakCheck(this);
 
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());
@@ -313,10 +281,6 @@ public class BreakHandlerScript extends Script {
         }
     }
 
-
-    public static void setRunTimeManager(Instant instant) {
-        expectedBreakTimeInstant = instant;
-    }
 
     public static void setBreakHandlerState(BreakHandlerStates state) {
         myState = state;
@@ -380,23 +344,16 @@ public class BreakHandlerScript extends Script {
 
     public static void regenerateExpectedRunTime(boolean fromButtonRequest) {
         if (fromButtonRequest && runTimeManager.timeHasPast()) return;
-
-        runTimeManager.calculateTime((int) minRunTimeDuration, (int) maxRunTimeDuration);
-        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSeconds()));
-
+        calcExpectedRunTime();
     }
 
     public static void calcExpectedBreak() {
-        expectedBreakDuration = Random.random((int) minBreakDuration, (int) maxBreakDuration);
-        expectedBreakTimeInstant = Instant.now().plus(expectedBreakDuration, ChronoUnit.SECONDS);
-        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(expectedBreakDuration));
+        breakTimeManager.calculateTime((int) minBreakDuration, (int) maxBreakDuration);
+        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSeconds()));
     }
 
     public static void regenerateExpectedBreakTime() {
-        expectedBreakDuration = Random.random((int) minBreakDuration, (int) maxBreakDuration);
-        breakTimer.setDuration(expectedBreakDuration);
-        breakTimer.reset();
-        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(expectedBreakDuration));
+        calcExpectedBreak();
     }
 
     public static void setBreakMethod(String method) {
@@ -432,8 +389,7 @@ public class BreakHandlerScript extends Script {
     }
 
     public static boolean getIsBreakOver() {
-        System.out.println("Is break over: " + (isBreakOver ? "yes" : "no"));
-        return isBreakOver;
+        return breakTimeManager.timeHasPast() && runTimeManager.timeHasPast();
     }
 
     public static void setIsParentPluginRunning(boolean isRunning) {
@@ -490,7 +446,7 @@ public class BreakHandlerScript extends Script {
         return gpGained;
     }
 
-    private boolean getIsAtAccountScreens() {
+    public boolean getIsAtAccountScreens() {
         boolean atAccountScripts = false;
 
         if (Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null) {

@@ -18,7 +18,7 @@ public class CurrentTimesParentPanel extends JPanel {
         add(new CurrentTimesBreakPanel());
         JButton breakNowBtn = new JButton("Break Now");
         add(breakNowBtn);
-        breakNowBtn.addActionListener(e -> BreakHandlerScript.setRunTimeManager(Instant.now()));
+        breakNowBtn.addActionListener(e -> BreakHandlerScript.resetRunTimeManager());
     }
 
     private void setStyle() {

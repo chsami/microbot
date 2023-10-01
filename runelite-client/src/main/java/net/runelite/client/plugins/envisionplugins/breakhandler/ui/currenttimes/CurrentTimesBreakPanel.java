@@ -18,6 +18,10 @@ public class CurrentTimesBreakPanel extends JPanel {
         add(durationTextField);
     }
 
+    public static void setDurationTextFieldIdleMessage(String message) {
+        durationTextField.setText(message);
+    }
+
     private void setStyle() {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         label.setPreferredSize(new Dimension(72, 20));
