@@ -21,46 +21,44 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.21;
+    public static double version = 0.22;
 
-    /* Variables for other script's references */
+    /* External Script Fields */
     private static boolean isBreakHandlerCompatible = false;                    // Use setter method in your Plugin's Run Method
     public static boolean letBreakHandlerStartBreak = false;                    // Use setter method in your Plugin's Run Method
     private static boolean isParentPluginRunning = false;                       // Use setter method in your Plugin's Run Method
 
-    /* Discord Notification Variable Section */                                 // Use setter methods in your Plugin to update these
+    /* Discord Notification Fields */                                           // Use setter methods in your Plugin to update these
     private static String parentPluginName = "Default Plugin";                  // The name of your plugin
     private static boolean detailedReportNotification = false;                  // Send simple discord notification for advanced
     private static String[] skillExperienceGained = {"Default1", "Default2"};   // Each String in the array is outputted with a new line separator
     private static String[] resourcesGained = {"Default1", "Default2"};         // Each String in the array is outputted with a new line separator
     private static String gpGained = "ZERO";                                    // MUST be converted to a String
-    /* End variables for other script's references */
+    /* -- End variables for other script's references -- */
 
-    /* Run Time Duration Variables */
+    /* Run Time Duration Fields */
     protected static long minRunTimeDuration = -1;
     protected static long maxRunTimeDuration = -1;
-    public static TimeManager runTimeManager = new TimeManager();
-    public static Optional<TimeManager> breakTimeManager = Optional.of(new TimeManager());
 
-    /* Break Duration Variables */
+    /* Break Duration Fields */
     protected static long minBreakDuration = -1;
     protected static long maxBreakDuration = -1;
 
-    public static BreakHandlerStates myState;
+    /* Time Manager Fields */
+    public static TimeManager runTimeManager = new TimeManager();
+    public static Optional<TimeManager> breakTimeManager = Optional.of(new TimeManager());
 
+    /* State Fields */
+    public static BreakHandlerStates myState;
     protected static String breakMethod;
 
-    /* Post Break Options */
+    /* Post Break Option Fields */
     protected static boolean enableWorldHoppingPostBreak = false;
     protected static boolean useMemberWorldsToHop = false;
     protected static WorldRegion worldRegionToHopTo;
 
-    /* Notification Management */
+    /* Notification Management Fields */
     protected static NotificationManager notificationManager;
-
-    public static void resetRunTimeManager() {
-        runTimeManager = new TimeManager();
-    }
 
     public boolean run(BreakHandlerConfig config, BreakHandlerPanel breakHandlerPanel) {
         notificationManager = new NotificationManager(
@@ -82,7 +80,7 @@ public class BreakHandlerScript extends Script {
                                 notificationManager.logState(myState);
 
                                 // We are not on the login screens
-                                if (!getIsAtAccountScreens()) {
+                                if (!isAtAccountScreens()) {
                                     myState = BreakHandlerStates.RUN;
                                     calcExpectedRunTime();
 
@@ -98,7 +96,7 @@ public class BreakHandlerScript extends Script {
                             breakTimeManager = Optional.empty();
 
                             // We are not on the login screens
-                            if (!getIsAtAccountScreens()) {
+                            if (!isAtAccountScreens()) {
                                 SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
                                 SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
                             }
@@ -235,30 +233,15 @@ public class BreakHandlerScript extends Script {
         return true;
     }
 
-    public NotificationManager getNotificationManager() {
-        return notificationManager;
+    /*
+        Class Methods
+    */
+    public static void resetRunTimeManager() {
+        runTimeManager = new TimeManager();
     }
 
-    public static void setBreakHandlerState(BreakHandlerStates state) {
-        myState = state;
-    }
-
-    /* Run Time Duration Getters and Setters */
-    public static void setMinRunTimeDuration(long minDuration) {
-        minRunTimeDuration = minDuration;
-    }
-
-    public static void setMaxRunTimeDuration(long maxDuration) {
-        maxRunTimeDuration = maxDuration;
-    }
-
-    /* Break Duration Getters and Setters */
-    public static void setMinBreakDuration(long minDuration) {
-        minBreakDuration = minDuration;
-    }
-
-    public static void setMaxBreakDuration(long maxDuration) {
-        maxBreakDuration = maxDuration;
+    public static boolean isIsParentPluginRunning() {
+        return isParentPluginRunning;
     }
 
     public static void calcExpectedRunTime() {
@@ -275,12 +258,51 @@ public class BreakHandlerScript extends Script {
         breakTimeManager.orElseThrow().calculateTime((int) minBreakDuration, (int) maxBreakDuration);
     }
 
+    public boolean isAtAccountScreens() {
+        boolean atAccountScripts = Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null;
+
+        try {
+            if (Microbot.getClient().getGameState() == GameState.LOGIN_SCREEN
+                    || Microbot.getClient().getGameState() == GameState.LOGGING_IN) {
+                atAccountScripts = true;
+            }
+        } catch (Exception ignored) {
+            // Let's just ignore this, it means the client is still loading
+            // Cannot invoke "net.runelite.client.callback.ClientThread.runOnClientThread(java.util.concurrent.Callable)" because the return value of "net.runelite.client.plugins.microbot.Microbot.getClientThread()" is null
+        }
+
+        return atAccountScripts;
+    }
+
+    /*
+        Class Setters
+    */
     public static void setBreakMethod(String method) {
         breakMethod = method;
     }
 
     public static void setEnableWorldHoppingPostBreak(boolean enableHopping) {
         enableWorldHoppingPostBreak = enableHopping;
+    }
+
+    public static void setBreakHandlerState(BreakHandlerStates state) {
+        myState = state;
+    }
+
+    public static void setMinRunTimeDuration(long minDuration) {
+        minRunTimeDuration = minDuration;
+    }
+
+    public static void setMaxRunTimeDuration(long maxDuration) {
+        maxRunTimeDuration = maxDuration;
+    }
+
+    public static void setMinBreakDuration(long minDuration) {
+        minBreakDuration = minDuration;
+    }
+
+    public static void setMaxBreakDuration(long maxDuration) {
+        maxBreakDuration = maxDuration;
     }
 
     public static void setUseMemberWorldsToHop(boolean useMemWorld) {
@@ -299,22 +321,8 @@ public class BreakHandlerScript extends Script {
         letBreakHandlerStartBreak = startBreak;
     }
 
-    public static boolean getIsBreakOver() {
-        return breakTimeManager.orElseThrow().timeHasPast() && runTimeManager.timeHasPast();
-    }
-
     public static void setIsParentPluginRunning(boolean isRunning) {
         isParentPluginRunning = isRunning;
-    }
-
-    public static boolean isIsParentPluginRunning() {
-        return isParentPluginRunning;
-    }
-
-    // Notify the parent script that the Run Time Timer has finished running
-    //      , and they can start a break when it is convenient
-    public static boolean getHasRunTimeTimerFinished() {
-        return runTimeManager.timeHasPast();
     }
 
     public static void setParentPluginName(String name) {
@@ -337,20 +345,18 @@ public class BreakHandlerScript extends Script {
         gpGained = gp;
     }
 
-    public boolean getIsAtAccountScreens() {
-        boolean atAccountScripts = Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null;
+    /*
+        Class Getters
+    */
+    public NotificationManager getNotificationManager() {
+        return notificationManager;
+    }
 
-        try {
-            if (Microbot.getClient().getGameState() == GameState.LOGIN_SCREEN
-                    || Microbot.getClient().getGameState() == GameState.LOGGING_IN) {
-                atAccountScripts = true;
-            }
-        } catch (Exception ignored) {
-            // Let's just ignore this, it means the client is still loading
-            // Cannot invoke "net.runelite.client.callback.ClientThread.runOnClientThread(java.util.concurrent.Callable)" because the return value of "net.runelite.client.plugins.microbot.Microbot.getClientThread()" is null
-        }
+    public static boolean getIsBreakOver() {
+        return breakTimeManager.orElseThrow().timeHasPast() && runTimeManager.timeHasPast();
+    }
 
-
-        return atAccountScripts;
+    public static boolean getHasRunTimeTimerFinished() {
+        return runTimeManager.timeHasPast();
     }
 }

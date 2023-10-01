@@ -16,7 +16,7 @@ public enum BreakHandlerStates {
      * Check if we should shift state to STARTUP
      */
     public static void startupCheck(BreakHandlerScript breakHandlerScript) {
-        if (!BreakHandlerScript.isIsParentPluginRunning() && !breakHandlerScript.getIsAtAccountScreens()) {
+        if (!BreakHandlerScript.isIsParentPluginRunning() && !breakHandlerScript.isAtAccountScreens()) {
             BreakHandlerScript.myState = STARTUP;
         }
     }
