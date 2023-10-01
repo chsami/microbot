@@ -10,14 +10,14 @@ public enum BreakHandlerStates {
     LOGOUT_BREAK,
     POST_BREAK_AFK,
     POST_BREAK_LOGIN,
-    RESET_BOTH_TIMERS;
+    RESET;
 
     /**
      * Check if we should shift state to STARTUP
      */
     public static void startupCheck(BreakHandlerScript breakHandlerScript) {
         if (!BreakHandlerScript.isIsParentPluginRunning() && !breakHandlerScript.getIsAtAccountScreens()) {
-            BreakHandlerScript.myState = BreakHandlerStates.STARTUP;
+            BreakHandlerScript.myState = STARTUP;
         }
     }
 
@@ -26,10 +26,9 @@ public enum BreakHandlerStates {
      */
     public static void breakCheck(BreakHandlerScript breakHandlerScript) {
         if (BreakHandlerScript.letBreakHandlerStartBreak) {
-            if (BreakHandlerScript.myState == BreakHandlerStates.RUN && (BreakHandlerScript.runTimeManager.timeHasPast() && BreakHandlerScript.breakTimeManager.isEmpty())) {
-                breakHandlerScript.getNotificationManager().resetDiscordNotificationCount();
-                BreakHandlerScript.myState = BreakHandlerStates.START_BREAK;
-                breakHandlerScript.getNotificationManager().resetVerboseMessageCount();
+            if (BreakHandlerScript.myState == RUN && (BreakHandlerScript.runTimeManager.timeHasPast() && BreakHandlerScript.breakTimeManager.isEmpty())) {
+                BreakHandlerScript.myState = START_BREAK;
+                resetCounts(breakHandlerScript);
             }
         }
     }
@@ -38,10 +37,9 @@ public enum BreakHandlerStates {
      * Check if we should shift state to POST_BREAK_AFK
      */
     public static void afkBreakCheck(BreakHandlerScript breakHandlerScript) {
-        if (BreakHandlerScript.myState == BreakHandlerStates.AFK_BREAK && (BreakHandlerScript.breakTimeManager.orElseThrow().timeHasPast() && BreakHandlerScript.runTimeManager.timeHasPast())) {
-            breakHandlerScript.getNotificationManager().resetDiscordNotificationCount();
-            BreakHandlerScript.myState = BreakHandlerStates.POST_BREAK_AFK;
-            breakHandlerScript.getNotificationManager().resetVerboseMessageCount();
+        if (BreakHandlerScript.myState == AFK_BREAK && (BreakHandlerScript.breakTimeManager.orElseThrow().timeHasPast() && BreakHandlerScript.runTimeManager.timeHasPast())) {
+            BreakHandlerScript.myState = POST_BREAK_AFK;
+            resetCounts(breakHandlerScript);
         }
 
     }
@@ -50,10 +48,14 @@ public enum BreakHandlerStates {
      * Check if we should shift state to POST_BREAK_LOGIN
      */
     public static void logoutBreakCheck(BreakHandlerScript breakHandlerScript) {
-        if (BreakHandlerScript.myState == BreakHandlerStates.LOGOUT_BREAK && (BreakHandlerScript.breakTimeManager.orElseThrow().timeHasPast() && BreakHandlerScript.runTimeManager.timeHasPast())) {
-            breakHandlerScript.getNotificationManager().resetDiscordNotificationCount();
-            BreakHandlerScript.myState = BreakHandlerStates.POST_BREAK_LOGIN;
-            breakHandlerScript.getNotificationManager().resetVerboseMessageCount();
+        if (BreakHandlerScript.myState == LOGOUT_BREAK && (BreakHandlerScript.breakTimeManager.orElseThrow().timeHasPast() && BreakHandlerScript.runTimeManager.timeHasPast())) {
+            BreakHandlerScript.myState = POST_BREAK_LOGIN;
+            resetCounts(breakHandlerScript);
         }
+    }
+
+    private static void resetCounts(BreakHandlerScript breakHandlerScript) {
+        breakHandlerScript.getNotificationManager().resetDiscordNotificationCount();
+        breakHandlerScript.getNotificationManager().resetVerboseMessageCount();
     }
 }

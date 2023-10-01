@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.20;
+    public static double version = 0.21;
 
     /* Variables for other script's references */
     private static boolean isBreakHandlerCompatible = false;                    // Use setter method in your Plugin's Run Method
@@ -172,7 +172,7 @@ public class BreakHandlerScript extends Script {
                                     gpGained,
                                     "Break Over, resuming plugin."
                             );
-                            myState = BreakHandlerStates.RESET_BOTH_TIMERS;
+                            myState = BreakHandlerStates.RESET;
                             break;
 
                         case POST_BREAK_LOGIN:
@@ -198,12 +198,12 @@ public class BreakHandlerScript extends Script {
                                             Microbot.getClient().getWorld());
                                 }
                             } else {
-                                myState = BreakHandlerStates.RESET_BOTH_TIMERS;
+                                myState = BreakHandlerStates.RESET;
                             }
 
                             break;
 
-                        case RESET_BOTH_TIMERS:
+                        case RESET:
                             notificationManager.logState(myState);
 
                             regenerateExpectedRunTime(false);
