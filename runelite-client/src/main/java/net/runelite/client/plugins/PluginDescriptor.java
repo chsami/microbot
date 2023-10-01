@@ -43,7 +43,7 @@ public @interface PluginDescriptor
 	public String Kstar = "<html>[<font color=#fcf6bd>K</font>] ";
 	public String Default = "<html>[<font color=green>D</font>] ";
 	public String Griffin = "<html>[<font color=#a78bfa>G</font>] ";
-
+	public String Engin = "<html>[<font color=#b8f704>E</font>]";
 	String name();
 
 	/**
