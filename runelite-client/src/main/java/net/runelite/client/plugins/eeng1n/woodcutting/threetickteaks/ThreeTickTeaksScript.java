@@ -64,10 +64,12 @@ public class ThreeTickTeaksScript extends Script {
     private boolean checkRequirements() {
         if(!hasRequiredWoodcuttingLevel()) {
             Microbot.showMessage("The plugin has been disabled due to a not high enough Woodcutting level! You need at least level 35. Please make sure you have the required level and restart the script afterwards.");
+            shutdown();
             return false;
         }
         if(!hasRequiredItems()) {
             Microbot.showMessage("The plugin has been disabled due to missing items! Please make sure you have the required items and restart the script afterwards.");
+            shutdown();
             return false;
         }
         return true;
