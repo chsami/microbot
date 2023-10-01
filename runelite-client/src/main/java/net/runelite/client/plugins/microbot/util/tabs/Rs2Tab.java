@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.VarcIntValues;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
 
@@ -162,16 +163,24 @@ public class Rs2Tab {
     public static boolean switchToLogout() {
         if (getCurrentTab() == InterfaceTab.LOGOUT) return true;
 
-        WidgetInfo logoutWidget;
-        if (InterfaceTab.LOGOUT.getFixedClassicWidget() != null) {
-            logoutWidget = WidgetInfo.FIXED_VIEWPORT_LOGOUT_TAB;
-        } else if (InterfaceTab.LOGOUT.getResizableClassicWidget() != null) {
-            logoutWidget = WidgetInfo.RESIZABLE_VIEWPORT_LOGOUT_TAB;
+        /* Widget Ids - These may change */
+        final int FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB = 35913778;
+        final int RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON = 10551348;
+        final int RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON = 10747950;
+
+        int logout_widget_id;
+        if (Rs2Widget.getWidget(FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB) != null) {
+            logout_widget_id = FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB;
+        } else if (Rs2Widget.getWidget(RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON) != null) {
+            logout_widget_id = RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON;
+        } else if (Rs2Widget.getWidget(RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON) != null) {
+            logout_widget_id = RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON;
         } else {
-            logoutWidget = null;
+            logout_widget_id = 0;
         }
 
-        Widget tab = Microbot.getClient().getWidget(logoutWidget);
+        if (logout_widget_id == 0) return false;
+        Widget tab = Microbot.getClient().getWidget(logout_widget_id);
         if (tab == null) return false;
         Microbot.getMouse().click(tab.getBounds());
         sleep(200, 600);
