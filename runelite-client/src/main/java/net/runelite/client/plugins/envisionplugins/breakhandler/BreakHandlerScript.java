@@ -69,7 +69,7 @@ public class BreakHandlerScript extends Script {
                 config.DISCORD_WEBHOOK(),
                 config.VERBOSE_LOGGING(),
                 config.ENABLE_DISCORD_WEBHOOK(),
-                1,1
+                1, 1
         );
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -193,6 +193,7 @@ public class BreakHandlerScript extends Script {
                                     gpGained,
                                     "Break Over, resuming plugin."
                             );
+                            myState = BreakHandlerStates.RESET_BOTH_TIMERS;
                             break;
 
                         case POST_BREAK_LOGIN:
