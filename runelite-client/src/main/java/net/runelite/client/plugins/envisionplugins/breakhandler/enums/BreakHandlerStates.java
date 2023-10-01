@@ -28,8 +28,7 @@ public enum BreakHandlerStates {
      */
     public static void breakCheck(BreakHandlerScript breakHandlerScript) {
         if (BreakHandlerScript.letBreakHandlerStartBreak) {
-            // We should be on break
-            if (BreakHandlerScript.myState == BreakHandlerStates.RUN && (BreakHandlerScript.runTimeManager.timeHasPast() && !BreakHandlerScript.breakTimeManager.timeHasPast())) {
+            if (BreakHandlerScript.myState == BreakHandlerStates.RUN && (BreakHandlerScript.runTimeManager.timeHasPast() && BreakHandlerScript.breakTimeManager.isEmpty())) {
                 breakHandlerScript.discordNotificationCount = 0;
                 BreakHandlerScript.myState = BreakHandlerStates.START_BREAK;
                 breakHandlerScript.debugCount = 0;
@@ -41,7 +40,7 @@ public enum BreakHandlerStates {
      * Check if we should shift state to POST_BREAK_AFK
      */
     public static void afkBreakCheck(BreakHandlerScript breakHandlerScript) {
-        if (BreakHandlerScript.myState == BreakHandlerStates.AFK_BREAK && (BreakHandlerScript.breakTimeManager.timeHasPast() && BreakHandlerScript.runTimeManager.timeHasPast())) {
+        if (BreakHandlerScript.myState == BreakHandlerStates.AFK_BREAK && (BreakHandlerScript.breakTimeManager.orElseThrow().timeHasPast() && BreakHandlerScript.runTimeManager.timeHasPast())) {
             breakHandlerScript.discordNotificationCount = 0;
             BreakHandlerScript.myState = BreakHandlerStates.POST_BREAK_AFK;
             breakHandlerScript.debugCount = 0;
@@ -53,7 +52,7 @@ public enum BreakHandlerStates {
      * Check if we should shift state to POST_BREAK_LOGIN
      */
     public static void logoutBreakCheck(BreakHandlerScript breakHandlerScript) {
-        if (BreakHandlerScript.myState == BreakHandlerStates.LOGOUT_BREAK && (BreakHandlerScript.breakTimeManager.timeHasPast() && BreakHandlerScript.runTimeManager.timeHasPast())) {
+        if (BreakHandlerScript.myState == BreakHandlerStates.LOGOUT_BREAK && (BreakHandlerScript.breakTimeManager.orElseThrow().timeHasPast() && BreakHandlerScript.runTimeManager.timeHasPast())) {
             breakHandlerScript.discordNotificationCount = 0;
             BreakHandlerScript.myState = BreakHandlerStates.POST_BREAK_LOGIN;
             breakHandlerScript.debugCount = 0;

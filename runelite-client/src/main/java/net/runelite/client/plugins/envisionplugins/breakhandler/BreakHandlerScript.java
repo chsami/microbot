@@ -15,6 +15,7 @@ import net.runelite.http.api.worlds.WorldRegion;
 
 
 import javax.swing.*;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class BreakHandlerScript extends Script {
@@ -46,7 +47,7 @@ public class BreakHandlerScript extends Script {
     protected static long maxRunTimeDuration = -1;
     //    protected static long expectedRunTimeDuration = -1;
     public static TimeManager runTimeManager = new TimeManager();
-    public static TimeManager breakTimeManager = new TimeManager();
+    public static Optional<TimeManager> breakTimeManager = Optional.of(new TimeManager());
 //    protected static Instant expectedBreakTimeInstant;
 
     /* Break Duration Variables */
@@ -84,7 +85,8 @@ public class BreakHandlerScript extends Script {
                                 System.out.println("STATE: " + myState);
                                 debugCount++;
                             }
-                            calcExpectedBreak();
+
+                            breakTimeManager = Optional.empty();
                             if (!getIsAtAccountScreens()) {    // We are not on the login screens
                                 SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
                                 SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
@@ -99,8 +101,10 @@ public class BreakHandlerScript extends Script {
                             }
 
                             SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
+
+                            if (breakTimeManager.isEmpty()) breakTimeManager = Optional.of(new TimeManager());
                             calcExpectedBreak();
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSecondsUntil()));
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.get().getSecondsUntil()));
 
                             if (breakMethod.equals("AFK")) {
                                 myState = BreakHandlerStates.AFK_BREAK;
@@ -119,8 +123,9 @@ public class BreakHandlerScript extends Script {
 
                             sendPostRunDiscordMessage(config, breakMethod);
 
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSecondsUntil()));
-                            Microbot.status = "AFK breaking for " + breakTimeManager.getSecondsUntil();
+                            long secondsUntil = breakTimeManager.orElseThrow().getSecondsUntil();
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(secondsUntil));
+                            Microbot.status = "AFK breaking for " + secondsUntil;
                             break;
 
                         case LOGOUT_BREAK:
@@ -135,7 +140,7 @@ public class BreakHandlerScript extends Script {
                                 logout();
                             }
 
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSecondsUntil()));
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.orElseThrow().getSecondsUntil()));
                             break;
 
                         case RESET_RUN_TIMER:
@@ -164,9 +169,6 @@ public class BreakHandlerScript extends Script {
 
                             regenerateExpectedRunTime(false);
                             SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
-
-                            regenerateExpectedBreakTime();
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSecondsUntil()));
 
                             debugCount = 0;
                             myState = BreakHandlerStates.RUN;
@@ -348,8 +350,9 @@ public class BreakHandlerScript extends Script {
     }
 
     public static void calcExpectedBreak() {
-        breakTimeManager.calculateTime((int) minBreakDuration, (int) maxBreakDuration);
-        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.getSeconds()));
+        if (breakTimeManager.isEmpty()) return;
+        breakTimeManager.orElseThrow().calculateTime((int) minBreakDuration, (int) maxBreakDuration);
+        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.orElseThrow().getSeconds()));
     }
 
     public static void regenerateExpectedBreakTime() {
@@ -389,7 +392,7 @@ public class BreakHandlerScript extends Script {
     }
 
     public static boolean getIsBreakOver() {
-        return breakTimeManager.timeHasPast() && runTimeManager.timeHasPast();
+        return breakTimeManager.orElseThrow().timeHasPast() && runTimeManager.timeHasPast();
     }
 
     public static void setIsParentPluginRunning(boolean isRunning) {
