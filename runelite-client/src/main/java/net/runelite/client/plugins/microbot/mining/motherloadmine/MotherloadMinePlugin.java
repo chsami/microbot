@@ -1,13 +1,17 @@
 package net.runelite.client.plugins.microbot.mining.motherloadmine;
 
 import com.google.inject.Provides;
+import net.runelite.api.Skill;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
+
+import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "MotherloadMine",
@@ -33,6 +37,9 @@ public class MotherloadMinePlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
+        expstarted = Microbot.getClient().getSkillExperience(Skill.MINING);
+        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.MINING);
+        timeBegan = System.currentTimeMillis();
         overlayManager.add(motherloadMineOverlay);
         motherloadMineScript.run();
     }

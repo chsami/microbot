@@ -19,7 +19,7 @@ public interface TitheFarmingConfig extends Config {
     )
     default String GUIDE() {
         return "Start at the entrance near the table to get seeds\n" +
-                "Make sure to have 16 x watering can(8) or Gricoller's can, seed dibber, spade in inventory\n" +
+                "Make sure to have 8 x watering can(8) or Gricoller's can, seed dibber, spade in inventory\n" +
                 "Stamina potions are supported!\n" +
                 "Make sure to have the tithe farm plugin from runelite enabled\n" +
                 "Happy botting!";

@@ -1,9 +1,7 @@
-package net.runelite.client.plugins.microbot.mining.motherloadmine;
+package net.runelite.client.plugins.nateplugins.skilling.nateminer.nateminer;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.example.ExampleScript;
-import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.natepainthelper.PaintFormat;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -13,17 +11,17 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.microbot.mining.motherloadmine.MotherloadMineScript.status;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
-import static net.runelite.client.plugins.natepainthelper.Info.xpTillNextLevel;
+
+public class MiningOverlay extends OverlayPanel {
 
 
-public class MotherloadMineOverlay extends OverlayPanel {
     @Inject
-    MotherloadMineOverlay(MotherloadMinePlugin plugin)
+    MiningOverlay(MiningPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
+        setNaughty();
     }
     @Override
     public Dimension render(Graphics2D graphics) {
@@ -36,12 +34,12 @@ public class MotherloadMineOverlay extends OverlayPanel {
             {
                 timeTNL = (long) ((xpTillNextLevel / xpPerHour) * 3600000);
             }
-            panelComponent.setPreferredLocation(new Point(80, 8));
             panelComponent.setPreferredSize(new Dimension(275, 700));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Pay-dirt mining v" + MiningScript.version)
-                    .color(Color.GREEN)
+                    .text("Nate's Power Miner")
+                    .color(Color.darkGray)
                     .build());
+
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Mining Exp Gained (hr): " + (xpGained)  + " ("+xpPerHour+")")
                     .build());
@@ -51,9 +49,12 @@ public class MotherloadMineOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Time till next level: " + PaintFormat.ft(timeTNL))
                     .build());
+
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left(status.toString())
+                    .left(Microbot.status)
                     .build());
+
+
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }
