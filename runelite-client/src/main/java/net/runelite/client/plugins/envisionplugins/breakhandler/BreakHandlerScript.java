@@ -59,8 +59,12 @@ public class BreakHandlerScript extends Script {
 
     /* Notification Management Fields */
     protected static NotificationManager notificationManager;
+    public BreakHandlerPanel breakHandlerPanel;
+
+    public String failureMessage = "";
 
     public boolean run(BreakHandlerConfig config, BreakHandlerPanel breakHandlerPanel) {
+        this.breakHandlerPanel = breakHandlerPanel;
         notificationManager = new NotificationManager(
                 config.DISCORD_WEBHOOK(),
                 config.VERBOSE_LOGGING(),
@@ -211,8 +215,9 @@ public class BreakHandlerScript extends Script {
                         break;
 
                     case FAILURE:
-                            // TODO - handle failure status
+                        // TODO - handle failure status
                         notificationManager.logState(myState);
+                        breakHandlerPanel.showError(failureMessage);
                         break;
 
                     default:
@@ -226,7 +231,7 @@ public class BreakHandlerScript extends Script {
                 BreakHandlerStates.failureCheck(this);
 
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                ex.printStackTrace();
             }
 
         }, 0, 300, TimeUnit.MILLISECONDS);

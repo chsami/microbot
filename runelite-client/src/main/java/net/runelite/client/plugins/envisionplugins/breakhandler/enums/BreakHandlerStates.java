@@ -63,19 +63,20 @@ public enum BreakHandlerStates {
      * Check if we should shift state to FAILURE
      */
     public static void failureCheck(BreakHandlerScript breakHandlerScript) {
-        Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
-
-        if (!BreakHandlerScript.isIsParentPluginRunning() &&
-            (Microbot.getClient().getGameState() != GameState.LOGIN_SCREEN &&
-                Microbot.getClient().getGameState() != GameState.LOADING &&
-                Microbot.getClient().getGameState() != GameState.LOGGING_IN &&
-                clickHereToPlayButton != null
-            ) &&
-            Microbot.isLoggedIn()
-        ) {
+        if (!BreakHandlerScript.isIsParentPluginRunning()) {
             BreakHandlerScript.myState = FAILURE;
+            breakHandlerScript.failureMessage = "No supported plugin is enabled!";
             resetCounts(breakHandlerScript);
+            return;
         }
+
+        // THIS IF STATEMENT MUST BE CALLED LAST!!
+        // DO NOT MOVE!!
+        if (BreakHandlerScript.myState == FAILURE) {
+            breakHandlerScript.breakHandlerPanel.redrawTimers();
+            BreakHandlerScript.myState = STARTUP;
+        }
+
     }
 
     private static void resetCounts(BreakHandlerScript breakHandlerScript) {

@@ -29,6 +29,9 @@ public class BreakHandlerPanel extends PluginPanel {
     TwoFactorAuthParentPanel twoFactorAuthParentPanel = new TwoFactorAuthParentPanel();
     AccountParentPanel accountParentPanel = new AccountParentPanel();
     WorldHoppingParentPanel worldHoppingParentPanel = new WorldHoppingParentPanel();
+    JPanel timers = new JPanel();
+    CurrentTimesParentPanel currentTimesParentPanel = new CurrentTimesParentPanel();
+    RegenerateTimesParentPanel regenerateTimesParentPanel = new RegenerateTimesParentPanel();
 
     @Inject
     BreakHandlerPanel() {
@@ -42,11 +45,10 @@ public class BreakHandlerPanel extends PluginPanel {
         JTabbedPane tabbedPane = new JTabbedPane();
 
         // Timers Panel
-        JPanel timers = new JPanel();
         BoxLayout boxLayoutTimers = new BoxLayout(timers, BoxLayout.Y_AXIS);
         timers.setLayout(boxLayoutTimers);
-        timers.add(new CurrentTimesParentPanel());
-        timers.add(new RegenerateTimesParentPanel());
+        timers.add(currentTimesParentPanel);
+        timers.add(regenerateTimesParentPanel);
         tabbedPane.add("Timers", timers);
 
         // Account Panel
@@ -125,6 +127,16 @@ public class BreakHandlerPanel extends PluginPanel {
 
     public JPasswordField getPin() {
         return twoFactorAuthParentPanel.getPin();
+    }
+
+    public void showError(String failureMessage) {
+        timers.remove(currentTimesParentPanel);
+        timers.remove(regenerateTimesParentPanel);
+    }
+
+    public void redrawTimers() {
+        timers.add(currentTimesParentPanel);
+        timers.add(regenerateTimesParentPanel);
     }
 
 }
