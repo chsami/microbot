@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.util.tabs;
 
 import net.runelite.api.VarClientInt;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.VarcIntValues;
@@ -164,9 +163,9 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.LOGOUT) return true;
 
         /* Widget Ids - These may change */
-        final int FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB = 35913778;
+        final int FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB = 35913777;
         final int RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON = 10551348;
-        final int RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON = 10747950;
+        final int RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON = 10747938;
 
         int logout_widget_id;
         if (Rs2Widget.getWidget(FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB) != null) {
