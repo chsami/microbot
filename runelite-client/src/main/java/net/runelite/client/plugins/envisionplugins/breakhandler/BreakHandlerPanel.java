@@ -8,6 +8,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeam
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MinimumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDurationType;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.error.ErrorParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.regeneratetimes.RegenerateTimesParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.runtimeduration.RuntimeDurationParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.twofactorauth.TwoFactorAuthParentPanel;
@@ -32,6 +33,8 @@ public class BreakHandlerPanel extends PluginPanel {
     JPanel timers = new JPanel();
     CurrentTimesParentPanel currentTimesParentPanel = new CurrentTimesParentPanel();
     RegenerateTimesParentPanel regenerateTimesParentPanel = new RegenerateTimesParentPanel();
+
+    ErrorParentPanel errorParentPanel = new ErrorParentPanel();
 
     @Inject
     BreakHandlerPanel() {
@@ -132,11 +135,14 @@ public class BreakHandlerPanel extends PluginPanel {
     public void showError(String failureMessage) {
         timers.remove(currentTimesParentPanel);
         timers.remove(regenerateTimesParentPanel);
+        errorParentPanel.setText(failureMessage);
+        timers.add(errorParentPanel);
     }
 
     public void redrawTimers() {
         timers.add(currentTimesParentPanel);
         timers.add(regenerateTimesParentPanel);
+        timers.remove(errorParentPanel);
     }
 
 }
