@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.microbot.mining.motherloadmine;
 
-import net.runelite.api.ItemID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Varbits;
-import net.runelite.api.WallObject;
+import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -18,6 +16,7 @@ import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
+import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 public class MotherloadMineScript extends Script {
     public static double version = 1.0;
@@ -33,9 +32,15 @@ boolean emptySack = false;
         miningSpot = MLMMiningSpot.IDLE;
         status = MLMStatus.IDLE;
         emptySack = false;
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
+            if (expstarted == 0) {
+                expstarted = Microbot.getClient().getSkillExperience(Skill.MINING);
+                startinglevel = Microbot.getClient().getRealSkillLevel(Skill.MINING);
+                timeBegan = System.currentTimeMillis();
+            }
             try {
                 if (Microbot.isAnimating() || Microbot.getClient().getLocalPlayer().isInteracting()) {
                     sleep(2000);
@@ -133,7 +138,7 @@ boolean emptySack = false;
     private boolean walkToMiningSpot() {
         WorldPoint miningWorldPoint = miningSpot.getWorldPoint().get(0);
         if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(miningWorldPoint) > 8) {
-            Microbot.getWalker().walkMiniMap(miningWorldPoint);
+            Microbot.getWalker().walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), miningWorldPoint));
             return false;
         }
         return true;
