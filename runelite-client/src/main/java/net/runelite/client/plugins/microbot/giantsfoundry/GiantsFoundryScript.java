@@ -136,7 +136,7 @@ public class GiantsFoundryScript extends Script {
 
         if (!inventory.hasItemAmount("steel bar", 14)
                 && !inventory.hasItemAmount("mithril bar", 14) && !canPour()) {
-            Rs2Bank.useBank("collect");
+            Rs2Bank.useBank();
             //check if inv is empty and deposit all inv items
             //needs new method in rs2bank depositAllinventoryItems
             Rs2Bank.withdrawItemX(true, "steel bar", 14);

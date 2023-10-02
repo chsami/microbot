@@ -284,14 +284,6 @@ public class Rs2Bank {
         return true;
     }
 
-    public static void useBank(String action) {
-        Microbot.status = "Banking";
-        GameObject bank = Rs2GameObject.findBank(action);
-        if (bank == null) return;
-        Rs2GameObject.interact(bank, action);
-        sleepUntil(Rs2Bank::isOpen);
-    }
-
     public static boolean walkToBank() {
         BankLocation bankLocation = getNearestBank();
         Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
