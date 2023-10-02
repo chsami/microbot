@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.23;
+    public static double version = 0.24;
 
     /* External Script Fields */
     private static boolean isBreakHandlerCompatible = false;                    // Use setter method in your Plugin's Run Method
@@ -69,163 +69,164 @@ public class BreakHandlerScript extends Script {
         );
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (isBreakHandlerCompatible) {
-                try {
-                    switch (myState) {
-                        case STARTUP:
-                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
+            try {
+                switch (myState) {
+                    case STARTUP:
+                        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
+                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
 
-                            if (isParentPluginRunning) {
-                                notificationManager.logState(myState);
-
-                                // We are not on the login screens
-                                if (!isAtAccountScreens()) {
-                                    myState = BreakHandlerStates.RUN;
-                                    calcExpectedRunTime();
-
-                                    SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
-                                }
-
-                            }
-
-                            break;
-                        case RUN:
+                        if (isParentPluginRunning) {
                             notificationManager.logState(myState);
-
-                            breakTimeManager = Optional.empty();
 
                             // We are not on the login screens
                             if (!isAtAccountScreens()) {
+                                myState = BreakHandlerStates.RUN;
+                                calcExpectedRunTime();
+
                                 SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
-                                SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
                             }
 
-                            break;
+                        }
 
-                        case START_BREAK:
-                            notificationManager.logState(myState);
+                        break;
+                    case RUN:
+                        notificationManager.logState(myState);
 
-                            SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
+                        breakTimeManager = Optional.empty();
 
-                            if (breakTimeManager.isEmpty()) breakTimeManager = Optional.of(new TimeManager());
-                            calcExpectedBreak();
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.get().getSecondsUntil()));
-
-                            if (breakMethod.equals("AFK")) {
-                                myState = BreakHandlerStates.AFK_BREAK;
-                            } else if (breakMethod.equals("LOGOUT")) {
-                                myState = BreakHandlerStates.LOGOUT_BREAK;
-                            } else {
-                                System.err.println("Bad break method...");
-                            }
-                            break;
-
-                        case AFK_BREAK:
-                            notificationManager.logState(myState);
-                            notificationManager.notifyDiscord(
-                                    detailedReportNotification,
-                                    config.DISCORD_CLIENT_NAME(),
-                                    parentPluginName,
-                                    skillExperienceGained,
-                                    resourcesGained,
-                                    gpGained,
-                                    "Starting break via " + breakMethod + "."
-                            );
-
-                            long secondsUntil = breakTimeManager.orElseThrow().getSecondsUntil();
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(secondsUntil));
-                            Microbot.status = "AFK breaking for " + secondsUntil;
-                            break;
-
-                        case LOGOUT_BREAK:
-                            notificationManager.logState(myState);
-
-                            notificationManager.notifyDiscord(
-                                    detailedReportNotification,
-                                    config.DISCORD_CLIENT_NAME(),
-                                    parentPluginName,
-                                    skillExperienceGained,
-                                    resourcesGained,
-                                    gpGained,
-                                    "Starting break via " + breakMethod + "."
-                            );
-
-                            if (Microbot.isLoggedIn()) {
-                                logout();
-                            }
-
-                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.orElseThrow().getSecondsUntil()));
-                            break;
-
-
-                        case POST_BREAK_AFK:
-                            notificationManager.logState(myState);
-                            notificationManager.notifyDiscord(
-                                    false,
-                                    config.DISCORD_CLIENT_NAME(),
-                                    parentPluginName,
-                                    skillExperienceGained,
-                                    resourcesGained,
-                                    gpGained,
-                                    "Break Over, resuming plugin."
-                            );
-                            myState = BreakHandlerStates.RESET;
-                            break;
-
-                        case POST_BREAK_LOGIN:
-                            notificationManager.logState(myState);
-                            notificationManager.notifyDiscord(
-                                    false,
-                                    config.DISCORD_CLIENT_NAME(),
-                                    parentPluginName,
-                                    skillExperienceGained,
-                                    resourcesGained,
-                                    gpGained,
-                                    "Break Over, resuming plugin."
-                            );
-
-                            if (!Microbot.isLoggedIn()) {
-                                if (enableWorldHoppingPostBreak) {
-                                    new Login(breakHandlerPanel.getUsername().getText(),
-                                            breakHandlerPanel.getPasswordEncryptedValue(),
-                                            Login.getRandomWorld(useMemberWorldsToHop, worldRegionToHopTo));
-                                } else {
-                                    new Login(breakHandlerPanel.getUsername().getText(),
-                                            breakHandlerPanel.getPasswordEncryptedValue(),
-                                            Microbot.getClient().getWorld());
-                                }
-                            } else {
-                                myState = BreakHandlerStates.RESET;
-                            }
-
-                            break;
-
-                        case RESET:
-                            notificationManager.logState(myState);
-
-                            regenerateExpectedRunTime(false);
+                        // We are not on the login screens
+                        if (!isAtAccountScreens()) {
                             SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
+                            SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextFieldIdleMessage("Waiting..."));
+                        }
 
-                            notificationManager.resetVerboseMessageCount();
-                            myState = BreakHandlerStates.RUN;
-                            break;
+                        break;
 
-                        default:
-                            System.err.println("Bad Break Handler State...");
-                    }
+                    case START_BREAK:
+                        notificationManager.logState(myState);
 
-                    BreakHandlerStates.startupCheck(this);
-                    BreakHandlerStates.breakCheck(this);
-                    BreakHandlerStates.afkBreakCheck(this);
-                    BreakHandlerStates.logoutBreakCheck(this);
+                        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextFieldIdleMessage("Waiting..."));
 
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
+                        if (breakTimeManager.isEmpty()) breakTimeManager = Optional.of(new TimeManager());
+                        calcExpectedBreak();
+                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.get().getSecondsUntil()));
+
+                        if (breakMethod.equals("AFK")) {
+                            myState = BreakHandlerStates.AFK_BREAK;
+                        } else if (breakMethod.equals("LOGOUT")) {
+                            myState = BreakHandlerStates.LOGOUT_BREAK;
+                        } else {
+                            System.err.println("Bad break method...");
+                        }
+                        break;
+
+                    case AFK_BREAK:
+                        notificationManager.logState(myState);
+                        notificationManager.notifyDiscord(
+                                detailedReportNotification,
+                                config.DISCORD_CLIENT_NAME(),
+                                parentPluginName,
+                                skillExperienceGained,
+                                resourcesGained,
+                                gpGained,
+                                "Starting break via " + breakMethod + "."
+                        );
+
+                        long secondsUntil = breakTimeManager.orElseThrow().getSecondsUntil();
+                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(secondsUntil));
+                        Microbot.status = "AFK breaking for " + secondsUntil;
+                        break;
+
+                    case LOGOUT_BREAK:
+                        notificationManager.logState(myState);
+
+                        notificationManager.notifyDiscord(
+                                detailedReportNotification,
+                                config.DISCORD_CLIENT_NAME(),
+                                parentPluginName,
+                                skillExperienceGained,
+                                resourcesGained,
+                                gpGained,
+                                "Starting break via " + breakMethod + "."
+                        );
+
+                        if (Microbot.isLoggedIn()) {
+                            logout();
+                        }
+
+                        SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.orElseThrow().getSecondsUntil()));
+                        break;
+
+
+                    case POST_BREAK_AFK:
+                        notificationManager.logState(myState);
+                        notificationManager.notifyDiscord(
+                                false,
+                                config.DISCORD_CLIENT_NAME(),
+                                parentPluginName,
+                                skillExperienceGained,
+                                resourcesGained,
+                                gpGained,
+                                "Break Over, resuming plugin."
+                        );
+                        myState = BreakHandlerStates.RESET;
+                        break;
+
+                    case POST_BREAK_LOGIN:
+                        notificationManager.logState(myState);
+                        notificationManager.notifyDiscord(
+                                false,
+                                config.DISCORD_CLIENT_NAME(),
+                                parentPluginName,
+                                skillExperienceGained,
+                                resourcesGained,
+                                gpGained,
+                                "Break Over, resuming plugin."
+                        );
+
+                        if (!Microbot.isLoggedIn()) {
+                            if (enableWorldHoppingPostBreak) {
+                                new Login(breakHandlerPanel.getUsername().getText(),
+                                        breakHandlerPanel.getPasswordEncryptedValue(),
+                                        Login.getRandomWorld(useMemberWorldsToHop, worldRegionToHopTo));
+                            } else {
+                                new Login(breakHandlerPanel.getUsername().getText(),
+                                        breakHandlerPanel.getPasswordEncryptedValue(),
+                                        Microbot.getClient().getWorld());
+                            }
+                        } else {
+                            myState = BreakHandlerStates.RESET;
+                        }
+
+                        break;
+
+                    case RESET:
+                        notificationManager.logState(myState);
+
+                        regenerateExpectedRunTime(false);
+                        SwingUtilities.invokeLater(() -> CurrentTimesRunPanel.setDurationTextField(runTimeManager.getSecondsUntil()));
+
+                        notificationManager.resetVerboseMessageCount();
+                        myState = BreakHandlerStates.RUN;
+                        break;
+
+                    case FAILURE:
+                            // TODO - handle failure status
+                        notificationManager.logState(myState);
+                        break;
+
+                    default:
+                        System.err.println("Bad Break Handler State...");
                 }
 
-            } else {
-                System.err.println("Current active script is not compatible with Micro Break Handler...");
+                BreakHandlerStates.startupCheck(this);
+                BreakHandlerStates.breakCheck(this);
+                BreakHandlerStates.afkBreakCheck(this);
+                BreakHandlerStates.logoutBreakCheck(this);
+                BreakHandlerStates.failureCheck(this);
+
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
             }
 
         }, 0, 300, TimeUnit.MILLISECONDS);
