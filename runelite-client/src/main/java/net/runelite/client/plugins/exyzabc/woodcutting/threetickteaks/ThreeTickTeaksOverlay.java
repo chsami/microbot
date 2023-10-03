@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.eeng1n.woodcutting.threetickteaks;
+package net.runelite.client.plugins.exyzabc.woodcutting.threetickteaks;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
