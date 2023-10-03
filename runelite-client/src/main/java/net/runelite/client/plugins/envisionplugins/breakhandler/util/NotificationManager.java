@@ -4,14 +4,15 @@ import net.runelite.client.config.Config;
 import net.runelite.client.plugins.envisionplugins.breakhandler.enums.BreakHandlerStates;
 
 public class NotificationManager {
-    private DiscordWebhook discordWebhook;
+    private final DiscordWebhook discordWebhook;
 
-    private boolean logToConsole;
-    private boolean sendDiscordNotifications;
+    private final boolean logToConsole;
+    private final boolean sendDiscordNotifications;
     private int messageLimit;
     private int discordNotificationLimit;
+    private final String clientName;
 
-    public NotificationManager(String discordWebhookEndpoint, boolean verboseLogging, boolean discordNotifications, int logMessageLimit, int discordMessageLimit) {
+    public NotificationManager(String discordWebhookEndpoint, boolean verboseLogging, boolean discordNotifications, int logMessageLimit, int discordMessageLimit, String clientName) {
         discordWebhook = new DiscordWebhook(discordWebhookEndpoint);
 
         logToConsole = verboseLogging;
@@ -19,6 +20,7 @@ public class NotificationManager {
 
         messageLimit = logMessageLimit;
         discordNotificationLimit = discordMessageLimit;
+        this.clientName = clientName;
     }
 
     public void log(String message) {
@@ -35,8 +37,8 @@ public class NotificationManager {
         }
     }
 
-    public void notifyDiscord(boolean sendDetailedReport, String clientName, String parentPluginName,
-                              String[] skillExperienceGained, String[] resourcesGained, String gpGained, String message) {
+    public void notifyDiscord(boolean sendDetailedReport, String parentPluginName, String[] skillExperienceGained,
+                              String[] resourcesGained, String gpGained, String message) {
         if (sendDiscordNotifications && discordNotificationLimit == 0) {
             discordNotificationLimit++;
 
@@ -52,6 +54,14 @@ public class NotificationManager {
             } else {
                 discordWebhook.sendClientStatus(clientName, parentPluginName, message);
             }
+        }
+    }
+
+    public void notifyDiscordSimple(String parentPluginName, String message) {
+        if (sendDiscordNotifications && discordNotificationLimit == 0) {
+            discordNotificationLimit++;
+
+            discordWebhook.sendClientStatus(clientName, parentPluginName, message);
         }
     }
 

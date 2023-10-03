@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.26;
+    public static double version = 0.27;
 
     /* External Script Fields */
     public static boolean letBreakHandlerStartBreak = false;                    // Use setter method in your Plugin's Run Method
@@ -68,7 +68,8 @@ public class BreakHandlerScript extends Script {
                 config.DISCORD_WEBHOOK(),
                 config.VERBOSE_LOGGING(),
                 config.ENABLE_DISCORD_WEBHOOK(),
-                1, 1
+                1, 1,
+                config.DISCORD_CLIENT_NAME()
         );
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -127,7 +128,6 @@ public class BreakHandlerScript extends Script {
                         notificationManager.logState(myState);
                         notificationManager.notifyDiscord(
                                 detailedReportNotification,
-                                config.DISCORD_CLIENT_NAME(),
                                 parentPluginName,
                                 skillExperienceGained,
                                 resourcesGained,
@@ -145,7 +145,6 @@ public class BreakHandlerScript extends Script {
 
                         notificationManager.notifyDiscord(
                                 detailedReportNotification,
-                                config.DISCORD_CLIENT_NAME(),
                                 parentPluginName,
                                 skillExperienceGained,
                                 resourcesGained,
@@ -165,7 +164,6 @@ public class BreakHandlerScript extends Script {
                         notificationManager.logState(myState);
                         notificationManager.notifyDiscord(
                                 false,
-                                config.DISCORD_CLIENT_NAME(),
                                 parentPluginName,
                                 skillExperienceGained,
                                 resourcesGained,
@@ -179,7 +177,6 @@ public class BreakHandlerScript extends Script {
                         notificationManager.logState(myState);
                         notificationManager.notifyDiscord(
                                 false,
-                                config.DISCORD_CLIENT_NAME(),
                                 parentPluginName,
                                 skillExperienceGained,
                                 resourcesGained,
@@ -338,6 +335,10 @@ public class BreakHandlerScript extends Script {
 
     public static void setParentPluginName(String name) {
         parentPluginName = name;
+    }
+
+    public static String getParentPluginName() {
+        return parentPluginName;
     }
 
     public static void setDetailedReportNotification(boolean flag) {

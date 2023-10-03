@@ -62,11 +62,23 @@ public enum BreakHandlerStates {
     /**
      * Check if we should shift state to FAILURE
      */
-    public static void failureCheck(BreakHandlerScript breakHandlerScript) {
+    public static void failureCheck(BreakHandlerScript breakHandlerScript) throws Exception {
         if (!BreakHandlerScript.isIsParentPluginRunning()) {
             BreakHandlerScript.myState = FAILURE;
             breakHandlerScript.failureMessage = "No supported plugin is enabled!";
             resetCounts(breakHandlerScript);
+            return;
+        }
+
+        if (breakHandlerScript.breakHandlerPanel.getBreakMethod().equals("LOGOUT") &&
+            breakHandlerScript.breakHandlerPanel.getUsername().getText().trim().equals("") &&
+            !breakHandlerScript.breakHandlerPanel.isPasswordValid()
+        ) {
+            BreakHandlerScript.myState = FAILURE;
+            breakHandlerScript.failureMessage = "Missing or invalid account credentials for login!";
+            breakHandlerScript.getNotificationManager().notifyDiscordSimple(
+                BreakHandlerScript.getParentPluginName(),
+                "Missing or invalid account credentials for login. Please return to client and fix errors to resume.");
             return;
         }
 

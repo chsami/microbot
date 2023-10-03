@@ -120,6 +120,10 @@ public class BreakHandlerPanel extends PluginPanel {
         return accountParentPanel.getPassword();
     }
 
+    public boolean isPasswordValid() {
+        return accountParentPanel.getPassword().getPassword().length >= 5;
+    }
+
     public String getPasswordEncryptedValue() throws Exception {
         return Encryption.encrypt(new String(getPassword().getPassword()));
     }
