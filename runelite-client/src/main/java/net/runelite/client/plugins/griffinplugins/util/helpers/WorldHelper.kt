@@ -5,8 +5,8 @@ import net.runelite.api.Player
 import net.runelite.api.coords.WorldArea
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
+import net.runelite.client.plugins.microbot.util.security.Login
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
-import net.runelite.http.api.worlds.WorldType
 
 class WorldHelper {
 
@@ -26,29 +26,21 @@ class WorldHelper {
         }
 
         fun hopToWorldWithoutPlayersInArea(isMembers: Boolean, worldArea: WorldArea, maxPlayers: Int, maxWorldsToTry: Int): Boolean {
-            val worlds = Microbot.getWorldServiceForKotlin().worlds ?: return false
-
-            val worldsToHopTo = worlds.worlds.filterNotNull()
-            if (worldsToHopTo.isEmpty()) {
-                return false
-            }
-
-            val worldIds: MutableList<Int> = mutableListOf()
-
-            if (!isMembers) {
-                worldIds.addAll(worldsToHopTo.filter { !it.types.contains(WorldType.MEMBERS) }.map { it.id })
-            } else {
-                worldIds.addAll(worldsToHopTo.map { it.id })
-            }
-
-            worldIds.shuffle()
-
             val player = Microbot.getClientForKotlin().localPlayer
-            var triedWorlds = 0
-            for (worldId in worldIds) {
+            val usedWorldIds = mutableListOf<Int>()
+
+            for (index in 0..maxWorldsToTry) {
+                val worldId = Login.getRandomWorld(isMembers)
+
                 if (worldId == Microbot.getClientForKotlin().world) {
                     continue
                 }
+
+                if (usedWorldIds.contains(worldId)) {
+                    continue
+                }
+
+                usedWorldIds.add(worldId)
 
                 if (hopToWorld(worldId)) {
                     val players = Microbot.getClientForKotlin().players
@@ -61,11 +53,6 @@ class WorldHelper {
                     if (playerCount <= maxPlayers) {
                         return true
                     }
-                }
-
-                triedWorlds++
-                if (triedWorlds >= maxWorldsToTry) {
-                    return false
                 }
             }
 
