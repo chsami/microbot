@@ -2,6 +2,9 @@ name: Manual Nightly release
 
 on:
   workflow_dispatch:
+    inputs:
+      parameter:
+        description: branch
 
 jobs:
   build:
