@@ -168,13 +168,19 @@ public class Rs2Tab {
         final int RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON = 10747938;
 
         int logout_widget_id;
-        if (Rs2Widget.getWidget(FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB) != null) {
-            logout_widget_id = FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB;
-        } else if (Rs2Widget.getWidget(RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON) != null) {
-            logout_widget_id = RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON;
-        } else if (Rs2Widget.getWidget(RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON) != null) {
-            logout_widget_id = RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON;
-        } else {
+
+        try {
+            if (Rs2Widget.getWidget(FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB) != null) {
+                logout_widget_id = FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB;
+            } else if (Rs2Widget.getWidget(RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON) != null) {
+                logout_widget_id = RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON;
+            } else if (Rs2Widget.getWidget(RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON) != null) {
+                logout_widget_id = RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON;
+            } else {
+                logout_widget_id = 0;
+            }
+        } catch (Exception ignored) {
+            // Rs2Widget.getWidget returns null if the game isn't finished loading
             logout_widget_id = 0;
         }
 

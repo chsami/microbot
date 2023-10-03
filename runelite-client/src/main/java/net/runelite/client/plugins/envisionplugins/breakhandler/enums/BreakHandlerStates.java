@@ -1,10 +1,6 @@
 package net.runelite.client.plugins.envisionplugins.breakhandler.enums;
 
-import net.runelite.api.GameState;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 public enum BreakHandlerStates {
     STARTUP,
@@ -77,9 +73,6 @@ public enum BreakHandlerStates {
         if (isUsingLogoutMethod && (isUsernameEmpty || !isPasswordValid)) {
             BreakHandlerScript.myState = FAILURE;
             breakHandlerScript.failureMessage = "Missing or invalid account credentials for login!";
-            breakHandlerScript.getNotificationManager().notifyDiscordSimple(
-                    BreakHandlerScript.getParentPluginName(),
-                    "Missing or invalid account credentials for login. Please return to client and fix errors to resume.");
             return;
         }
 
