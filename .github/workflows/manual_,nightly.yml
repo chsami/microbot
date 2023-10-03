@@ -1,8 +1,10 @@
-name: Nightly release
+name: Manual Nightly release
 
 on:
-  schedule:
-    - cron: "0 0 * * *"
+  workflow_dispatch:
+    inputs:
+      parameter:
+        description: branch
 
 jobs:
   build:
