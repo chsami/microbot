@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.eeng1n.woodcutting.threetickteaks;
+package net.runelite.client.plugins.exyzabc.woodcutting.threetickteaks;
 
 import com.google.inject.Provides;
 import net.runelite.client.config.ConfigManager;
@@ -10,9 +10,9 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Engin + " 3T Teaks",
+        name = PluginDescriptor.Exyzabc + " 3T Teaks",
         description = "Performs 3T Teaks",
-        tags = { "woodcutting", "microbot", "skills", "eengin", "eeng1n" },
+        tags = { "woodcutting", "microbot", "skills", "exyzabc", "exyzabc" },
         enabledByDefault = false
 )
 public class ThreeTickTeaksPlugin extends Plugin {

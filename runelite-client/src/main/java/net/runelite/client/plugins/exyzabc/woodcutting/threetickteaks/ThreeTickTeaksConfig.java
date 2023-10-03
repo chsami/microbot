@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.eeng1n.woodcutting.threetickteaks;
+package net.runelite.client.plugins.exyzabc.woodcutting.threetickteaks;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -29,7 +29,7 @@ public interface ThreeTickTeaksConfig extends Config {
                 "\nAny location where you can stand between 2 teak trees\n" +
                 "\nSkill requirements:\n" +
                 "\nLevel 35 Woodcutting\n" +
-                "\nFor a more detailed guide (Including Screenshots and Videos) go to the Discord forum thread (Under eengin-plugins)!";
+                "\nFor a more detailed guide (Including Screenshots and Videos) go to the Discord forum thread (Under exyzabc-plugins)!";
     }
 
     @ConfigItem(
