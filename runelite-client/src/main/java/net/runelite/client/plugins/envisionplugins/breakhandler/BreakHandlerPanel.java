@@ -123,7 +123,7 @@ public class BreakHandlerPanel extends PluginPanel {
 
     public boolean isPasswordValid() {
         int passwordLength = accountParentPanel.getPassword().getPassword().length;
-        return passwordLength >= 5 && passwordLength <= 20;
+        return passwordLength >= 5;
     }
 
     public String getPasswordEncryptedValue() throws Exception {
