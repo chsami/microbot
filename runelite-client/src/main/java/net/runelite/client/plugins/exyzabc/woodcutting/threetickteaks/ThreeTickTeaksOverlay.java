@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.eeng1n.woodcutting.threetickteaks;
+package net.runelite.client.plugins.exyzabc.woodcutting.threetickteaks;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -16,8 +16,8 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
 public class ThreeTickTeaksOverlay extends OverlayPanel {
 
     @Inject
-    ThreeTickTeaksOverlay(ThreeTickTeaks threeTickTeaks) {
-        super(threeTickTeaks);
+    ThreeTickTeaksOverlay(ThreeTickTeaksPlugin threeTickTeaksPlugin) {
+        super(threeTickTeaksPlugin);
         setPosition(OverlayPosition.BOTTOM_LEFT);
         setNaughty();
     }
