@@ -3,6 +3,7 @@ package net.runelite.client.plugins.griffinplugins.griffintrainer.helpers
 import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.models.RS2Item
@@ -58,6 +59,18 @@ class ItemHelper {
             }
 
             return true
+        }
+
+        fun equipItemIds(itemIds: List<Int>) {
+            itemIds.forEach { itemId: Int ->
+                Microbot.status = "Equipping item $itemId"
+                if (!Rs2Equipment.hasEquipped(itemId)) {
+                    Inventory.getInventoryItem(itemId)?.let {
+                        Microbot.getMouseForKotlin().click(it.bounds)
+                        Global.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
+                    }
+                }
+            }
         }
     }
 }
