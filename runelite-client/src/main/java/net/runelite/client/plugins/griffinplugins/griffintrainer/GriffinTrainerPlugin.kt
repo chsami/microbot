@@ -11,7 +11,7 @@ import javax.inject.Inject
 @PluginDescriptor(name = Griffin + GriffinTrainerPlugin.CONFIG_GROUP, enabledByDefault = false)
 class GriffinTrainerPlugin : Plugin() {
     companion object {
-        const val CONFIG_GROUP = "Griffin Trainer"
+        const val CONFIG_GROUP = "Auto Pilot"
     }
 
     @Inject

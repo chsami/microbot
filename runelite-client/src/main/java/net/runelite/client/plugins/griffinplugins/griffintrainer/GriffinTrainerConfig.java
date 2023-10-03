@@ -228,4 +228,24 @@ public interface GriffinTrainerConfig extends Config {
         return 10;
     }
 
+    @ConfigSection(
+            name = "Combat Settings",
+            description = "Combat Settings",
+            position = 4,
+            closedByDefault = false
+    )
+    String combatSettingsSection = "combatSettingsSection";
+
+    @ConfigItem(
+            keyName = "collectItems",
+            name = "Collect Items",
+            description = "Collect Items",
+            position = 0,
+            section = combatSettingsSection
+    )
+    default boolean collectItems() {
+        return true;
+    }
+
+
 }

@@ -9,7 +9,7 @@ import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerC
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
-import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
+import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
 import net.runelite.client.plugins.griffinplugins.util.helpers.MiningHelper
@@ -37,73 +37,19 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
 
     override fun getInventoryRequirements(): InventoryRequirements {
         val inventoryRequirements = InventoryRequirements()
-        val miningLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.MINING)
-        val defenceLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.DEFENCE)
+        val pickaxes = GeneralItemSets.getPickaxesItemSet()
+        val helmets = GeneralItemSets.getHelmetItemSet()
+        val bodies = GeneralItemSets.getBodiesItemSet()
+        val legs = GeneralItemSets.getLegsItemSet()
+        val boots = GeneralItemSets.getBootsItemSet()
+        val shields = GeneralItemSets.getShieldsItemSet()
 
-        val pickaxes = DynamicItemSet()
-        if (miningLevel >= 1) {
-            pickaxes.add(ItemID.BRONZE_PICKAXE, 1)
-            pickaxes.add(ItemID.IRON_PICKAXE, 1)
-        }
-        if (miningLevel >= 6) {
-            pickaxes.add(ItemID.STEEL_PICKAXE, 1)
-        }
-        if (miningLevel >= 11) {
-            pickaxes.add(ItemID.BLACK_PICKAXE, 1)
-        }
-        if (miningLevel >= 21) {
-            pickaxes.add(ItemID.MITHRIL_PICKAXE, 1)
-        }
-        if (miningLevel >= 31) {
-            pickaxes.add(ItemID.ADAMANT_PICKAXE, 1)
-        }
-        if (miningLevel >= 41) {
-            pickaxes.add(ItemID.RUNE_PICKAXE, 1)
-        }
-
-        if (pickaxes.getItems().isNotEmpty()) {
-            inventoryRequirements.addItemSet(pickaxes)
-        }
-
-        val plateBodies = DynamicItemSet()
-        if (defenceLevel >= 1) {
-            plateBodies.add(ItemID.BRONZE_PLATEBODY, 1)
-            plateBodies.add(ItemID.IRON_PLATEBODY, 1)
-        }
-        if (defenceLevel >= 5) {
-            plateBodies.add(ItemID.STEEL_PLATEBODY, 1)
-        }
-        if (defenceLevel >= 10) {
-            plateBodies.add(ItemID.BLACK_PLATEBODY, 1)
-            plateBodies.add(ItemID.WHITE_PLATEBODY, 1)
-        }
-        if (defenceLevel >= 20) {
-            plateBodies.add(ItemID.MITHRIL_PLATEBODY, 1)
-        }
-
-        if (plateBodies.getItems().isNotEmpty()) {
-            inventoryRequirements.addItemSet(plateBodies)
-        }
-
-        val plateLegs = DynamicItemSet()
-        if (defenceLevel >= 1) {
-            plateLegs.add(ItemID.BRONZE_PLATELEGS, 1)
-            plateLegs.add(ItemID.IRON_PLATELEGS, 1)
-        }
-        if (defenceLevel >= 5) {
-            plateLegs.add(ItemID.STEEL_PLATELEGS, 1)
-        }
-        if (defenceLevel >= 10) {
-            plateLegs.add(ItemID.BLACK_PLATELEGS, 1)
-            plateLegs.add(ItemID.WHITE_PLATELEGS, 1)
-        }
-        if (defenceLevel >= 20) {
-            plateLegs.add(ItemID.MITHRIL_PLATELEGS, 1)
-        }
-
-        if (plateLegs.getItems().isNotEmpty()) {
-            inventoryRequirements.addItemSet(plateLegs)
-        }
+        inventoryRequirements.addItemSet(pickaxes)
+        inventoryRequirements.addItemSet(helmets)
+        inventoryRequirements.addItemSet(bodies)
+        inventoryRequirements.addItemSet(legs)
+        inventoryRequirements.addItemSet(boots)
+        inventoryRequirements.addItemSet(shields)
 
         return inventoryRequirements
     }
@@ -218,8 +164,10 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
     private fun runBankingState() {
         if (config.keepOre()) {
             if (Inventory.isFull()) {
-                Microbot.getWalkerForKotlin().hybridWalkTo(getBankLocation())
+                Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
                 Global.sleep(400, 600)
+
+                Rs2Bank.getNearestBank()
 
                 Rs2Bank.openBank()
                 if (Rs2Bank.isOpen()) {

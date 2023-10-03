@@ -2,6 +2,7 @@ package net.runelite.client.plugins.griffinplugins.griffintrainer
 
 import net.runelite.api.Skill
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.PlayTimer
+import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.combat.CombatTrainer
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.mining.MiningTrainer
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
@@ -21,8 +22,10 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
     }
 
     private lateinit var miningTrainer: MiningTrainer
+    private lateinit var combatTrainer: CombatTrainer
     override fun run() {
         miningTrainer = MiningTrainer(config)
+        combatTrainer = CombatTrainer(config)
 
         overallTimer.setRandomTimeout(config.minTotalTime(), config.maxTotalTime())
         overallTimer.start()
@@ -59,7 +62,7 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
     private fun runTrainer(trainerToRun: TrainerScripts): Boolean {
         return when (trainerToRun) {
             TrainerScripts.MINING -> miningTrainer.run()
-            TrainerScripts.COMBAT -> false
+            TrainerScripts.COMBAT -> combatTrainer.run()
             else -> false
         }
     }
@@ -72,9 +75,9 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
         val defenceLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.DEFENCE)
         val miningLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.MINING)
 
-//        if (config.trainCombat() && attackLevel < config.attackLevel() && strengthLevel < config.strengthLevel() && defenceLevel < config.defenceLevel()) {
-//            schedule.add(TrainerScripts.COMBAT)
-//        }
+        if (config.trainCombat() && attackLevel < config.attackLevel() && strengthLevel < config.strengthLevel() && defenceLevel < config.defenceLevel()) {
+            schedule.add(TrainerScripts.COMBAT)
+        }
 
         if (config.trainMining() && miningLevel < config.miningLevel()) {
             schedule.add(TrainerScripts.MINING)

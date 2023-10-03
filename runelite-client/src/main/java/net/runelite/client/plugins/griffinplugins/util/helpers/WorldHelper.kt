@@ -17,7 +17,12 @@ class WorldHelper {
             if (!Rs2Widget.clickWidget("Switch World")) {
                 return false
             }
-            return Global.sleepUntilTrue({ Microbot.getClientForKotlin().world == world && Microbot.getClientForKotlin().gameState == GameState.LOGGED_IN }, 100, 15000)
+            return Global.sleepUntilTrue({
+                val inCorrectWorld = Microbot.getClientForKotlin().world == world
+                val inCorrectGameState = Microbot.getClientForKotlin().gameState == GameState.LOGGED_IN
+                val loadingWidgetAbsent = Rs2Widget.findWidget("please wait") == null
+                return@sleepUntilTrue inCorrectWorld && inCorrectGameState && loadingWidgetAbsent
+            }, 100, 15000)
         }
 
         fun hopToWorldWithoutPlayersInArea(isMembers: Boolean, worldArea: WorldArea, maxPlayers: Int, maxWorldsToTry: Int): Boolean {
@@ -53,7 +58,7 @@ class WorldHelper {
                         .filter { otherPlayer: Player -> worldArea.contains(player.worldLocation) }
                         .count()
 
-                    if (playerCount < maxPlayers) {
+                    if (playerCount <= maxPlayers) {
                         return true
                     }
                 }
