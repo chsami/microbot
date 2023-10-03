@@ -328,7 +328,7 @@ public class Pathfinder implements Runnable {
             }
         }
 
-        if (this.executeWalking && !handleDoors() && !handleShortcuts()) {
+        if (this.executeWalking && (!handleDoors() && !handleShortcuts())) {
             //  Collections.reverse(path);
             if (useCanvas) {
                 handleWalkableNodesCanvas();
