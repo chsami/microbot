@@ -1,4 +1,4 @@
-name: Nightly release
+name: Manual Nightly release
 
 on:
   workflow_dispatch:
