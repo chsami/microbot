@@ -70,15 +70,16 @@ public enum BreakHandlerStates {
             return;
         }
 
-        if (breakHandlerScript.breakHandlerPanel.getBreakMethod().equals("LOGOUT") &&
-            breakHandlerScript.breakHandlerPanel.getUsername().getText().trim().equals("") &&
-            !breakHandlerScript.breakHandlerPanel.isPasswordValid()
-        ) {
+        boolean isUsingLogoutMethod = breakHandlerScript.breakHandlerPanel.getBreakMethod().equals("LOGOUT");
+        boolean isUsernameEmpty = breakHandlerScript.breakHandlerPanel.getUsername().getText().trim().length() == 0;
+        boolean isPasswordValid = breakHandlerScript.breakHandlerPanel.isPasswordValid();
+
+        if (isUsingLogoutMethod && (isUsernameEmpty || !isPasswordValid)) {
             BreakHandlerScript.myState = FAILURE;
             breakHandlerScript.failureMessage = "Missing or invalid account credentials for login!";
             breakHandlerScript.getNotificationManager().notifyDiscordSimple(
-                BreakHandlerScript.getParentPluginName(),
-                "Missing or invalid account credentials for login. Please return to client and fix errors to resume.");
+                    BreakHandlerScript.getParentPluginName(),
+                    "Missing or invalid account credentials for login. Please return to client and fix errors to resume.");
             return;
         }
 

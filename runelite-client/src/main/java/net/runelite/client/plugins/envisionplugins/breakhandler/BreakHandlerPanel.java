@@ -35,6 +35,7 @@ public class BreakHandlerPanel extends PluginPanel {
     RegenerateTimesParentPanel regenerateTimesParentPanel = new RegenerateTimesParentPanel();
 
     ErrorParentPanel errorParentPanel = new ErrorParentPanel();
+    boolean firstErrorCall = true;
 
     @Inject
     BreakHandlerPanel() {
@@ -121,7 +122,8 @@ public class BreakHandlerPanel extends PluginPanel {
     }
 
     public boolean isPasswordValid() {
-        return accountParentPanel.getPassword().getPassword().length >= 5;
+        int passwordLength = accountParentPanel.getPassword().getPassword().length;
+        return passwordLength >= 5 && passwordLength <= 20;
     }
 
     public String getPasswordEncryptedValue() throws Exception {
@@ -141,12 +143,18 @@ public class BreakHandlerPanel extends PluginPanel {
         timers.remove(regenerateTimesParentPanel);
         errorParentPanel.setText(failureMessage);
         timers.add(errorParentPanel);
+        if (firstErrorCall) {
+            timers.repaint();
+            firstErrorCall = false;
+        }
     }
 
     public void redrawTimers() {
         timers.add(currentTimesParentPanel);
         timers.add(regenerateTimesParentPanel);
         timers.remove(errorParentPanel);
+        timers.repaint();
+        firstErrorCall = true;
     }
 
 }
