@@ -71,7 +71,10 @@ public class ProfileManager {
             lockChannel = lockOut.getChannel();
             lockChannel.lock();
             profiles = new ArrayList<>(load());
-            Login.activeProfile = profiles.stream().filter(ConfigProfile::isActive).findFirst().orElse(null);
+            if (ConfigManager.getConfigProfileName() != null && Login.activeProfile == null)
+                Login.activeProfile = profiles.stream().filter(x -> x.getName().equals(ConfigManager.getConfigProfileName())).findFirst().orElse(null);
+            else if (Login.activeProfile == null)
+                Login.activeProfile = profiles.stream().filter(ConfigProfile::isActive).findFirst().orElse(null);
         }
 
         private List<ConfigProfile> load() {

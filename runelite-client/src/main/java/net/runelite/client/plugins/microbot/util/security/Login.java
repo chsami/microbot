@@ -19,7 +19,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.math.Random.*;
+import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class Login {
 
@@ -39,10 +39,12 @@ public class Login {
     }
 
     public Login(String username, String password, int world) {
-        Microbot.getMouse().click(random(830, 850), random(294, 316)); //clicks a button "OK" when you've been disconnected
-        sleep(300, 600);
+        if (Microbot.getClient().getLoginIndex() == 24) { // you were disconnected from the server.
+            Microbot.getMouse().click(random(830, 850), random(294, 316)); //clicks a button "OK" when you've been disconnected
+            sleep(600);
+        }
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
-        sleep(300, 600);
+        sleep(600);
         try {
             setWorld(world);
         } catch (Exception e) {
@@ -54,8 +56,9 @@ public class Login {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        sleep(300, 600);
+        sleep(300);
+        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        sleep(300);
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
     }
 

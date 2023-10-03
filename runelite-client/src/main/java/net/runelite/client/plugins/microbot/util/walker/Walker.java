@@ -86,9 +86,9 @@ public class Walker {
 
         LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
 
-        while (!Calculations.tileOnScreen(localPoint)) {
-            Microbot.getMouse().scrollDown(new Point(1, 1));
-            sleep(100, 300);
+        if (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getWalker().walkMiniMap(worldPoint); //use minimap if tile is not on screen
+            return worldPoint;
         }
 
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
@@ -109,9 +109,9 @@ public class Walker {
      */
     public void walkFastLocal(LocalPoint localPoint) {
 
-        while (!Calculations.tileOnScreen(localPoint)) {
-            Microbot.getMouse().scrollDown(new Point(1, 1));
-            sleep(100, 300);
+        if (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getWalker().walkMiniMap(WorldPoint.fromLocal(Microbot.getClient(), localPoint)); //use minimap if tile is not on screen
+            return;
         }
 
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());

@@ -46,6 +46,7 @@ public @interface PluginDescriptor
 	public String Envision = "<html>[<font color=#c0c0c0>E</font>] ";
 
 
+	public String Engin = "<html>[<font color=#b8f704>E</font>]";
 	String name();
 
 	/**
