@@ -21,10 +21,9 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.25;
+    public static double version = 0.26;
 
     /* External Script Fields */
-    private static boolean isBreakHandlerCompatible = false;                    // Use setter method in your Plugin's Run Method
     public static boolean letBreakHandlerStartBreak = false;                    // Use setter method in your Plugin's Run Method
     private static boolean isParentPluginRunning = false;                       // Use setter method in your Plugin's Run Method
 
@@ -239,6 +238,16 @@ public class BreakHandlerScript extends Script {
         return true;
     }
 
+    public static void initBreakHandler(String pluginName, boolean enableDetailedDiscordMessages) {
+        parentPluginName = pluginName;
+        detailedReportNotification = enableDetailedDiscordMessages;
+        isParentPluginRunning = true;
+    }
+
+    public static void disableParentPlugin() {
+        isParentPluginRunning = false;
+    }
+
     /*
         Class Methods
     */
@@ -317,10 +326,6 @@ public class BreakHandlerScript extends Script {
 
     public static void setWorldRegionToHopTo(WorldRegion region) {
         worldRegionToHopTo = region;
-    }
-
-    public static void setIsBreakHandlerCompatible(boolean compatible) {
-        isBreakHandlerCompatible = compatible;
     }
 
     public static void setLetBreakHandlerStartBreak(boolean startBreak) {

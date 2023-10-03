@@ -64,7 +64,7 @@ public interface BreakHandlerConfig extends Config {
             position = 2,
             section = breakSection
     )
-    default int MINIMUM_BREAK_DURATION() { return 20; }
+    default int MINIMUM_BREAK_DURATION() { return 900; }
 
     @ConfigItem(
             keyName = "Maximum Break Duration",
@@ -73,7 +73,7 @@ public interface BreakHandlerConfig extends Config {
             position = 3,
             section = breakSection
     )
-    default int MAXIMUM_BREAK_DURATION() { return 30; }
+    default int MAXIMUM_BREAK_DURATION() { return 1800; }
 
     @ConfigItem(
             keyName = "Discord Webhook for notifications",

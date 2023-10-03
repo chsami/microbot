@@ -68,14 +68,13 @@ public class MiningPlugin extends Plugin {
     }
 
     protected void shutDown() {
-        BreakHandlerScript.setIsParentPluginRunning(false);
+        BreakHandlerScript.disableParentPlugin();
 
         miningScript.shutdown();
         overlayManager.remove(miningOverlay);
     }
 
     private void initBreakHandlerSetup() {
-        BreakHandlerScript.setIsBreakHandlerCompatible(true);
         BreakHandlerScript.setIsParentPluginRunning(true);
         BreakHandlerScript.setParentPluginName("Nate's Power Miner");
         BreakHandlerScript.setDetailedReportNotification(true);        // Let's send extra details to the breakhandler

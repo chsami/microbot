@@ -71,13 +71,12 @@ public class PiePlugin extends Plugin {
     }
 
     protected void shutDown() {
-        BreakHandlerScript.setIsParentPluginRunning(false);
+        BreakHandlerScript.disableParentPlugin();
         pieScript.shutdown();
         overlayManager.remove(pieOverlay);
     }
 
     private void initBreakHandlerSetup() {
-        BreakHandlerScript.setIsBreakHandlerCompatible(true);
         BreakHandlerScript.setIsParentPluginRunning(true);
         BreakHandlerScript.setParentPluginName("Nate's Pie Shells");
         BreakHandlerScript.setDetailedReportNotification(true);        // Let's send extra details to the breakhandler
