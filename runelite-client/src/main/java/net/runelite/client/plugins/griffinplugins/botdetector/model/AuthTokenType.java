@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
+import static net.runelite.client.plugins.griffinplugins.botdetector.model.AuthTokenPermission.VERIFY_DISCORD;
 @Getter
 @RequiredArgsConstructor
 public enum AuthTokenType

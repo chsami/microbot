@@ -315,38 +315,38 @@ public class BotDetectorClient
 			)))).build();
 
 		CompletableFuture<Boolean> future = new CompletableFuture<>();
-		okHttpClient.newCall(request).enqueue(new Callback()
-		{
-			@Override
-			public void onFailure(Call call, IOException e)
-			{
-				log.warn("Error sending prediction feedback", e);
-				future.completeExceptionally(e);
-			}
-
-			@Override
-			public void onResponse(Call call, Response response)
-			{
-				try
-				{
-					if (!response.isSuccessful())
-					{
-						throw getIOException(response);
-					}
-
-					future.complete(true);
-				}
-				catch (IOException e)
-				{
-					log.warn("Error sending prediction feedback", e);
-					future.completeExceptionally(e);
-				}
-				finally
-				{
-					response.close();
-				}
-			}
-		});
+//		okHttpClient.newCall(request).enqueue(new Callback()
+//		{
+//			@Override
+//			public void onFailure(Call call, IOException e)
+//			{
+//				log.warn("Error sending prediction feedback", e);
+//				future.completeExceptionally(e);
+//			}
+//
+//			@Override
+//			public void onResponse(Call call, Response response)
+//			{
+//				try
+//				{
+//					if (!response.isSuccessful())
+//					{
+//						throw getIOException(response);
+//					}
+//
+//					future.complete(true);
+//				}
+//				catch (IOException e)
+//				{
+//					log.warn("Error sending prediction feedback", e);
+//					future.completeExceptionally(e);
+//				}
+//				finally
+//				{
+//					response.close();
+//				}
+//			}
+//		});
 
 		return future;
 	}

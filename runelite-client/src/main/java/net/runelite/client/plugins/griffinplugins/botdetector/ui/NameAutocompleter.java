@@ -26,7 +26,6 @@
  */
 package net.runelite.client.plugins.griffinplugins.botdetector.ui;
 
-import com.botdetector.BotDetectorConfig;
 import com.google.common.collect.EvictingQueue;
 import com.google.inject.Inject;
 import java.awt.event.KeyEvent;
@@ -49,6 +48,7 @@ import net.runelite.api.Friend;
 import net.runelite.api.Nameable;
 import net.runelite.api.NameableContainer;
 import net.runelite.api.Player;
+import net.runelite.client.plugins.griffinplugins.botdetector.BotDetectorConfig;
 
 @Slf4j
 @Singleton
