@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 0.28;
+    public static double version = 1.0;
 
     /* External Script Fields */
     public static boolean letBreakHandlerStartBreak = false;                    // Use setter method in your Plugin's Run Method
