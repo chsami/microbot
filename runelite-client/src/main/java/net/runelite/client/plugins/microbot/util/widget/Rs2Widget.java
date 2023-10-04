@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
@@ -52,6 +53,9 @@ public class Rs2Widget {
             return true;
         }
         return false;
+    }
+    public static boolean isWidgetVisible(WidgetInfo wiget) {
+        return !Microbot.getClientThread().runOnClientThread(() -> Objects.requireNonNull(Microbot.getClient().getWidget(wiget)).isHidden());
     }
     public static Widget getWidget(WidgetInfo wiget) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(wiget));
