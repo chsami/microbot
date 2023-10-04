@@ -67,7 +67,7 @@ public class GoldScript extends Script {
                     if(Rs2Bank.isOpen()) {
                         Rs2Bank.depositAll("gold ring");
                         sleepUntil(() -> !Inventory.hasItem("gold ring"));
-                        if(Rs2Bank.hasBankItem("gold bar")){
+                        if(Rs2Bank.hasItem("gold bar")){
                             Rs2Bank.withdrawItemAll("gold bar");
                             sleepUntil(() -> Inventory.hasItem("gold bar"));
                         } else {

@@ -94,7 +94,7 @@ public class FletchingScript extends Script {
 
 
         Rs2Bank.withdrawItemX(true, primaryItemToFletch, config.fletchingMode().getAmount());
-        if (Rs2Bank.isOpen() && !Rs2Bank.hasBankItem(secondaryItemToFletch)) {
+        if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(secondaryItemToFletch)) {
             Rs2Bank.closeBank();
             Microbot.status = "[Shutting down] - Reason: " + secondaryItemToFletch + " not found in the bank.";
             Microbot.getNotifier().notify(Microbot.status);

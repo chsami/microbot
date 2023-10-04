@@ -41,7 +41,7 @@ public class CookingScript extends Script {
                         }
                     }
                     if (Rs2Bank.isOpen()) {
-                        if (!Rs2Bank.hasBankItem(getItemToCook())) {
+                        if (!Rs2Bank.hasItem(getItemToCook())) {
                             missingItemsInBank.add(getItemToCook());
                             return;
                         }

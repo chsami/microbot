@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
@@ -122,7 +123,7 @@ public class Rs2Bank {
      * @param id the item id
      * @return boolean
      */
-    public static boolean hasBankItem(int id) {
+    public static boolean hasItem(int id) {
         return findBankItem(id) != null;
     }
 
@@ -132,7 +133,7 @@ public class Rs2Bank {
      * @param name the item name
      * @return boolean
      */
-    public static boolean hasBankItem(String name) {
+    public static boolean hasItem(String name) {
         return findBankItem(name) != null;
     }
 
@@ -363,7 +364,7 @@ public class Rs2Bank {
         if (!isOpen()) return;
         if (w == null) return;
         if (inventoryItems.size() == 28) return;
-        if (!hasBankItem(w.getItemId())) return;
+        if (!hasItem(w.getItemId())) return;
 
         if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
             execMenuSwapper(BANK_WIDGET_ID, 1, w);
@@ -391,7 +392,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItem(boolean checkInv, String name) {
-        if (checkInv && !hasBankItem(name)) return;
+        if (checkInv && !hasItem(name)) return;
         withdrawOne(name);
     }
 
@@ -425,18 +426,18 @@ public class Rs2Bank {
         if (!isOpen()) return;
         if (w == null) return;
         if (Inventory.isFull()) return;
-        if (!hasBankItem(w.getItemId())) return;
+        if (!hasItem(w.getItemId())) return;
 
         handleAmount(w, BANK_WIDGET_ID, amount);
     }
 
     public static void withdrawItemX(boolean checkInv, int id, int amount) {
-        if (checkInv && !hasBankItem(id)) return;
+        if (checkInv && !hasItem(id)) return;
         withdrawX(id, amount);
     }
 
     public static void withdrawItemX(boolean checkInv, String name, int amount) {
-        if (checkInv && !hasBankItem(name)) return;
+        if (checkInv && !hasItem(name)) return;
         withdrawX(name, amount);
     }
 
@@ -496,7 +497,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItemAll(boolean checkInv, String name) {
-        if (checkInv && !hasBankItem(name)) return;
+        if (checkInv && !hasItem(name)) return;
         withdrawItemAll(name);
     }
 

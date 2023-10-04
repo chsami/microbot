@@ -65,7 +65,7 @@ public class TannerScript extends Script {
                     if (!hasRunEnergy && !hasStamina) {
                         Rs2Bank.withdrawItem( "Stamina potion(4)");
                     }
-                    if (!Rs2Bank.hasBankItem(config.HIDE_TYPE().getItemName())) {
+                    if (!Rs2Bank.hasItem(config.HIDE_TYPE().getItemName())) {
                         Rs2Bank.closeBank();
                         logout();
                         shutdown();

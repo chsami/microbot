@@ -4,7 +4,6 @@ import net.runelite.api.widgets.Widget
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
-import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 
@@ -27,7 +26,7 @@ class BankHelper {
                         continue
                     }
 
-                    if (!Rs2Bank.hasBankItem(itemAndQuantityPair.first)) {
+                    if (!Rs2Bank.hasItem(itemAndQuantityPair.first)) {
                         continue
                     }
 

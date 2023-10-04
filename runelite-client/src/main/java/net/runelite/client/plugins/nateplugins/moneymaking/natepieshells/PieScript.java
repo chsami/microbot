@@ -38,7 +38,7 @@ public class PieScript extends Script {
         Rs2Bank.openBank();
         if(Rs2Bank.isOpen()){
             Rs2Bank.depositAll();
-            if(Rs2Bank.hasBankItem("pie dish") &&  Rs2Bank.hasBankItem("pastry dough")) {
+            if(Rs2Bank.hasItem("pie dish") &&  Rs2Bank.hasItem("pastry dough")) {
                 Rs2Bank.withdrawItemX(true, "pie dish", 14);
                 sleepUntilOnClientThread(() -> Inventory.hasItem("pie dish"));
                 Rs2Bank.withdrawItemX(true, "pastry dough", 14);
