@@ -814,12 +814,19 @@ public class Inventory {
                 menuEntry.setType(MenuAction.CC_OP);
             }
 
-
             menuEntry.setOption(itemAction != null ? itemAction : "");
             menuEntry.setIdentifier(index);
             menuEntry.setParam0(item.slot);
             menuEntry.setParam1(9764864);
             menuEntry.setTarget("<col=ff9040>" + itemComposition.getName() + "</col>");
+
+
+            //grandexchange inventory
+            if (itemAction.equalsIgnoreCase("offer")) {
+                menuEntry.setIdentifier(1);
+                menuEntry.setParam1(30605312);
+            }
+
         } catch(Exception ex) {
             System.out.println("INVENTORY MENU SWAP FAILED WITH MESSAGE: " + ex.getMessage());
         }
