@@ -19,7 +19,7 @@ public class MicrobotInventorySetup {
                 if (Rs2Bank.inventoryItems.stream().filter(x -> x.getItemId() == inventorySetupsItem.getId()).count() ==
                         inventorySetup.getInventory().stream().filter(x -> x.getId() == inventorySetupsItem.getId()).count())
                     continue;
-                Rs2Bank.withdrawFast(inventorySetupsItem.getId(), inventorySetupsItem.getQuantity());
+                Rs2Bank.withdrawX(inventorySetupsItem.getId(), inventorySetupsItem.getQuantity());
             }
         }
     }
@@ -36,9 +36,9 @@ public class MicrobotInventorySetup {
                     continue;
                 }
                 if (inventorySetupsItem.getQuantity() > 1) {
-                    Rs2Bank.withdrawAllAndEquipFast(inventorySetupsItem.getId());
+                    Rs2Bank.withdrawAllAndEquip(inventorySetupsItem.getId());
                 } else {
-                    Rs2Bank.withdrawAndEquipFast(inventorySetupsItem.getId());
+                    Rs2Bank.withdrawAndEquip(inventorySetupsItem.getId());
                 }
             }
         }
