@@ -3,6 +3,7 @@ package net.runelite.client.plugins.griffinplugins.util.helpers
 import net.runelite.api.GameState
 import net.runelite.api.Player
 import net.runelite.api.coords.WorldArea
+import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.security.Login
@@ -17,7 +18,7 @@ class WorldHelper {
             if (!Rs2Widget.clickWidget("Switch World")) {
                 return false
             }
-            return Global.sleepUntilTrue({
+            return TrainerInterruptor.sleepUntilTrue({
                 val inCorrectWorld = Microbot.getClientForKotlin().world == world
                 val inCorrectGameState = Microbot.getClientForKotlin().gameState == GameState.LOGGED_IN
                 val loadingWidgetAbsent = Rs2Widget.findWidget("please wait") == null
@@ -30,6 +31,10 @@ class WorldHelper {
             val usedWorldIds = mutableListOf<Int>()
 
             for (index in 0..maxWorldsToTry) {
+                if (TrainerInterruptor.isInterrupted) {
+                    return false
+                }
+
                 val worldId = Login.getRandomWorld(isMembers)
 
                 if (worldId == Microbot.getClientForKotlin().world) {
