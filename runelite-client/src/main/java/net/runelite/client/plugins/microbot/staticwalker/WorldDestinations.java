@@ -20,7 +20,7 @@ public enum WorldDestinations {
     VARROCK_CHAMPIONS_GUILD("Varrock Champions Guild", new WorldPoint(3191, 3364, 0)),
     VARROCK_COOKS_GUILD("Varrock Cooks Guild", new WorldPoint(3143, 3442, 0)),
     VARROCK_MAGE_STORE("Varrock Mage Store", new WorldPoint(3252, 3400, 0)),
-    VARROCK_EAST_BANK("Varrock East Bank", new WorldPoint(3253, 3422, 0)),
+    VARROCK_EAST_BANK("Varrock East Bank", new WorldPoint(3253, 3420, 0)),
     VARROCK_WEST_BANK("Varrock West Bank", new WorldPoint(3183, 3441, 0)),
     VARROCK_GRAND_EXCHANGE("Varrock Grand Exchange", new WorldPoint(3164, 3486, 0)),
     VARROCK_SOUTH_EAST_MINE("Varrock South East Mine", new WorldPoint(3285, 3364, 0)),

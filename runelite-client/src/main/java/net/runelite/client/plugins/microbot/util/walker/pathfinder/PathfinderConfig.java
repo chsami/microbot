@@ -244,7 +244,7 @@ public class PathfinderConfig {
                 .build();
 
         new Transport()
-                .addObstacle(new WorldPoint(2444, 3414, 0), new WorldPoint(2444, 3414, 1), "Climb-up")
+                .addObstacle(new WorldPoint(2444, 3414, 0), new WorldPoint(2445, 3415, 1), "Climb-up")
                 .addReverse("Climb-down")
                 .build();
 
