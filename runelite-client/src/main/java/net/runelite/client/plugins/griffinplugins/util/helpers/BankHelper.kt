@@ -33,10 +33,10 @@ class BankHelper {
 
                     val countBefore = Inventory.getInventoryItems().count { widget: Widget -> widget.itemId == itemAndQuantityPair.first }
                     if (itemAndQuantityPair.second == 1) {
-                        TrainerInterruptor.sleepUntil { Rs2Bank.withdrawItem(false, itemAndQuantityPair.first) }
+                        Rs2Bank.withdrawItem(false, itemAndQuantityPair.first)
 
                     } else {
-                        TrainerInterruptor.sleepUntil { Rs2Bank.withdrawItemX(false, itemAndQuantityPair.first, itemAndQuantityPair.second) }
+                        Rs2Bank.withdrawItemX(false, itemAndQuantityPair.first, itemAndQuantityPair.second)
                     }
 
                     var success = true
