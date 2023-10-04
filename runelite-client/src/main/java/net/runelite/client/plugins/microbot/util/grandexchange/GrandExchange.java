@@ -144,6 +144,13 @@ public class GrandExchange {
         return false;
     }
 
+    /**
+     * Sell item to the grand exchange
+     * @param itemName
+     * @param quantity
+     * @param price
+     * @return
+     */
     public static boolean sellItem(String itemName, int quantity, int price) {
         try {
             if (!Inventory.hasItem(itemName)) return false;
@@ -191,6 +198,11 @@ public class GrandExchange {
         return false;
     }
 
+    /**
+     * Collect all the grand exchange slots to the bank or inventory
+     * @param collectToBank
+     * @return
+     */
     public static boolean collect(boolean collectToBank) {
         if (isAllSlotsEmpty()) {
             return true;
