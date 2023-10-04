@@ -85,6 +85,8 @@ public class Microbot {
     public static ClientThread getClientThreadForKotlin() { return clientThread; }
 
     public static Mouse getMouseForKotlin() { return mouse; }
+    public static WorldService getWorldServiceForKotlin() { return worldService; }
+
     public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
 
     @Deprecated(since="Use isMoving", forRemoval = true)

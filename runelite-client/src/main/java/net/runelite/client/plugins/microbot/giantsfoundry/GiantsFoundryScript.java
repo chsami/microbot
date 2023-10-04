@@ -214,7 +214,7 @@ public class GiantsFoundryScript extends Script {
             Stage stage = GiantsFoundryState.getCurrentStage();
             GameObject obj = GiantsFoundryState.getStageObject(stage);
             if (obj == null) return;
-            Microbot.getMouse().click(obj.getClickbox().getBounds());
+            Microbot.getMouse().click(obj.getCanvasLocation());
             isCoolingDown = false;
             isHeatingUp = false;
             sleepUntil(() -> Microbot.isGainingExp || GiantsFoundryState.getHeatChangeNeeded() != -1, 5000);
