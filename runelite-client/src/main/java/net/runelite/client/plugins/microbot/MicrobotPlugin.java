@@ -37,6 +37,8 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.WorldDataDownloader;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -151,6 +153,7 @@ public class MicrobotPlugin extends Plugin {
         Microbot.getWalker().handleMenuSwapper(event.getMenuEntry());
         Inventory.handleMenuSwapper(event.getMenuEntry());
         Rs2Bank.handleMenuSwapper(event.getMenuEntry());
+        Rs2Widget.handleMenuSwapper(event.getMenuEntry());
         //Rs2Inventory.handleMenuSwapper(event.getMenuEntry());
 
         if (Rs2Menu.getOption().length() > 0) {

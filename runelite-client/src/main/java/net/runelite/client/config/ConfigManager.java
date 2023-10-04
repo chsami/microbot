@@ -88,7 +88,8 @@ public class ConfigManager
 	private static final int KEY_SPLITTER_KEY = 2;
 
 	@Nullable
-	private final String configProfileName;
+	@Getter
+	private static String configProfileName;
 	private final EventBus eventBus;
 	@Nullable
 	private final Client client;

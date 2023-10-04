@@ -6,6 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -1160,7 +1161,8 @@ public class Rs2Inventory {
     private static void swapMenu(Rs2Item rs2Item, String action) {
         item = rs2Item;
         itemAction = action;
-        Microbot.getMouse().clickFast(1, 1);
+        Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
+        Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
         sleep(100);
         item = null;
         itemAction = "";

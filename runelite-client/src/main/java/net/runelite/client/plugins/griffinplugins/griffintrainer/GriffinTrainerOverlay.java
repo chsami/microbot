@@ -1,7 +1,6 @@
-package net.runelite.client.plugins.griffinplugins.griffincombat;
+package net.runelite.client.plugins.griffinplugins.griffintrainer;
 
 import net.runelite.api.Point;
-import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinCombatPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -11,10 +10,10 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class GriffinCombatOverlay extends OverlayPanel {
+public class GriffinTrainerOverlay extends OverlayPanel {
 
     @Inject
-    private GriffinCombatOverlay() {
+    private GriffinTrainerOverlay() {
         setPosition(OverlayPosition.DYNAMIC);
         setNaughty();
     }
@@ -33,12 +32,19 @@ public class GriffinCombatOverlay extends OverlayPanel {
     private void drawPanel(Graphics2D graphics) {
         panelComponent.setPreferredLocation(new java.awt.Point(5, 30));
         panelComponent.setPreferredSize(new Dimension(300, 300));
-        panelComponent.getChildren().add(TitleComponent.builder().text(GriffinCombatPlugin.CONFIG_GROUP).color(Color.GREEN).build());
+        panelComponent.getChildren().add(TitleComponent.builder().text(GriffinTrainerPlugin.CONFIG_GROUP).color(Color.GREEN).build());
         panelComponent.getChildren().add(LineComponent.builder().build());
-        panelComponent.getChildren().add(LineComponent.builder().left("Status: " + Microbot.status).build());
 
-        if (!GriffinCombatPlugin.Companion.getCountLabel().isEmpty()) {
-            panelComponent.getChildren().add(LineComponent.builder().left(GriffinCombatPlugin.Companion.getCountLabel() + ": " + GriffinCombatPlugin.Companion.getCount()).build());
+        panelComponent.getChildren().add(LineComponent.builder().left("Task/Overall Max Time:").right(TrainerThread.Companion.getTaskTimer().getTimeout() + " minutes / " + TrainerThread.Companion.getOverallTimer().getTimeout() + " minutes").build());
+        panelComponent.getChildren().add(LineComponent.builder().left("Task/Overall Elapsed Time:").right(TrainerThread.Companion.getTaskTimer().getElapsedTimeString() + " / " + TrainerThread.Companion.getOverallTimer().getElapsedTimeString()).build());
+        panelComponent.getChildren().add(LineComponent.builder().left("Task: " + TrainerThread.Companion.getCurrentTask()).build());
+        panelComponent.getChildren().add(LineComponent.builder().build());
+
+        panelComponent.getChildren().add(LineComponent.builder().left("Status: " + Microbot.status).build());
+        panelComponent.getChildren().add(LineComponent.builder().build());
+
+        if (!TrainerThread.Companion.getCountLabel().isEmpty()) {
+            panelComponent.getChildren().add(LineComponent.builder().left(TrainerThread.Companion.getCountLabel() + ":").right(Integer.toString(TrainerThread.Companion.getCount())).build());
         }
     }
 

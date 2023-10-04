@@ -85,9 +85,9 @@ public class Walker {
 
         LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
 
-        while (!Calculations.tileOnScreen(localPoint)) {
-            Microbot.getMouse().scrollDown(new Point(1, 1));
-            sleep(100, 300);
+        if (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getWalker().walkMiniMap(worldPoint); //use minimap if tile is not on screen
+            return worldPoint;
         }
 
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
@@ -108,9 +108,9 @@ public class Walker {
      */
     public void walkFastLocal(LocalPoint localPoint) {
 
-        while (!Calculations.tileOnScreen(localPoint)) {
-            Microbot.getMouse().scrollDown(new Point(1, 1));
-            sleep(100, 300);
+        if (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getWalker().walkMiniMap(WorldPoint.fromLocal(Microbot.getClient(), localPoint)); //use minimap if tile is not on screen
+            return;
         }
 
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
@@ -197,9 +197,7 @@ public class Walker {
         PathWalker.Companion.interrupt();
     }
 
-    public boolean staticWalkTo(WorldPoint endWorldPoint) {
-        Rs2Camera.setAngle(45);
-        Rs2Camera.setPitch(1.0f);
+    public boolean staticWalkTo(WorldPoint endWorldPoint, int maxDestinationDistance) {
 
         Player player = Microbot.getClient().getLocalPlayer();
         WorldPoint start = player.getWorldLocation();
@@ -211,7 +209,11 @@ public class Walker {
         pathWalker.walkPath();
 
         PathFinder.Companion.resetPath();
-        return player.getWorldLocation().distanceTo(endWorldPoint) <= 3;
+        return player.getWorldLocation().distanceTo(endWorldPoint) <= maxDestinationDistance;
+    }
+
+    public boolean staticWalkTo(WorldPoint endWorldPoint) {
+        return staticWalkTo(endWorldPoint, 3);
     }
 
     public boolean hybridWalkTo(WorldPoint target, boolean useNearest) {

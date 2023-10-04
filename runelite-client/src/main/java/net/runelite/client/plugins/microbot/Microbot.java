@@ -90,13 +90,10 @@ public class Microbot {
         return clientThread;
     }
 
-    public static Mouse getMouseForKotlin() {
-        return mouse;
-    }
+    public static Mouse getMouseForKotlin() { return mouse; }
+    public static WorldService getWorldServiceForKotlin() { return worldService; }
 
-    public static boolean getDisableWalkerUpdateForKotlin() {
-        return disableWalkerUpdate;
-    }
+    public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
@@ -173,15 +170,18 @@ public class Microbot {
     }
 
     public static void showMessage(String message) {
-        try {
-            SwingUtilities.invokeAndWait(() ->
-            {
-                JOptionPane.showConfirmDialog(null, message, "Message",
-                        JOptionPane.DEFAULT_OPTION);
-            });
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        executor.submit(() -> {
+            try {
+                SwingUtilities.invokeAndWait(() ->
+                {
+                    JOptionPane.showConfirmDialog(null, message, "Message",
+                            JOptionPane.DEFAULT_OPTION);
+                });
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        });
     }
 
     public static CopyOnWriteArrayList<ItemWidget> updateItemContainer(int id, ItemContainerChanged e) {

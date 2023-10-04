@@ -12,6 +12,9 @@ class InventoryRequirements {
     }
 
     fun addItemSet(itemSet: DynamicItemSet) {
+        if (itemSet.getItems().isEmpty()) {
+            return
+        }
         itemSets.add(itemSet)
     }
 
