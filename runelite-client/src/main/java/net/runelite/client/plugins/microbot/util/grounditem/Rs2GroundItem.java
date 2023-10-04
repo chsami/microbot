@@ -7,7 +7,7 @@ import net.runelite.client.plugins.grounditems.GroundItem;
 import net.runelite.client.plugins.grounditems.GroundItemsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -187,7 +187,7 @@ public class Rs2GroundItem {
         return true;
     }
 
-    private static boolean interact(RS2Item rs2Item) {
+    public static boolean interact(RS2Item rs2Item) {
         return interact(rs2Item, "Take");
     }
 
@@ -240,14 +240,14 @@ public class Rs2GroundItem {
                 if (item.getItem().getId() == itemId) {
                     LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), item.getTile().getWorldLocation());
                     Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, item.getTile().getItemLayer().getHeight());
-                    if (Camera.isTileOnScreen(item.getTile().getLocalLocation())) {
+                    if (Rs2Camera.isTileOnScreen(item.getTile().getLocalLocation())) {
                         if (Rs2Menu.doAction(action, poly)) {
                             Microbot.pauseAllScripts = true;
                             Global.sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().equals(item.getTile().getLocalLocation()), 5000);
                             return true;
                         }
                     } else {
-                        Camera.turnTo(item.getTile().getLocalLocation());
+                        Rs2Camera.turnTo(item.getTile().getLocalLocation());
                     }
                 }
             }

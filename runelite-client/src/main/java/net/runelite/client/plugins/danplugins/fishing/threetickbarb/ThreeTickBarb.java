@@ -3,10 +3,7 @@ package net.runelite.client.plugins.danplugins.fishing.threetickbarb;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.NPC;
-import net.runelite.api.Skill;
+import net.runelite.api.*;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.Notifier;
@@ -17,7 +14,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -29,7 +25,6 @@ import java.util.concurrent.Executors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
@@ -119,16 +114,11 @@ public class ThreeTickBarb extends Plugin {
         inProgress = true;
         sleep(18, 132);
 
-        Widget swampTarWidget = Inventory.findItem("Swamp tar");
-        Microbot.getMouse().click(swampTarWidget.getBounds());
+        Inventory.useItemFast(ItemID.SWAMP_TAR, "Use");
 
-        Widget inventoryItem = Inventory.findItemSlot(1);
-        boolean randomizeTriggered = Inventory.hasItemAmount(11328, random(1, 18));
-        if ((inventoryItem != null && isFish(inventoryItem) && randomizeTriggered) || (inventoryItem != null && Inventory.isFull())) {
-            VirtualKeyboard.holdShift();
-            Microbot.getMouse().click(inventoryItem.getBounds());
-            VirtualKeyboard.releaseShift();
-        }
+        Inventory.useItemFast(ItemID.LEAPING_TROUT, "drop");
+        Inventory.useItemFast(ItemID.LEAPING_SALMON, "drop");
+        Inventory.useItemFast(ItemID.LEAPING_STURGEON, "drop");
 
         state = ThreeTickFishingState.ClickFishingSpot;
         inProgress = false;
@@ -139,18 +129,8 @@ public class ThreeTickBarb extends Plugin {
         sleep(23, 213);
 
         NPC fishingSpot = getFishingSpot();
-        boolean fishingSpotTooFar = Microbot.getClientThread().runOnClientThread(() -> {
-            int distance = fishingSpot.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
-            return distance > 1;
-        });
 
-        if (fishingSpotTooFar) {
-            state = ThreeTickFishingState.LocatingFishingSpot;
-
-            locateFishingSpot(fishingSpot);
-        }
-
-        Rs2Menu.doAction("Use-rod", fishingSpot.getCanvasTilePoly());
+        Rs2Npc.interact(fishingSpot, "Use-rod");
 
         state = ThreeTickFishingState.UseGuam;
         inProgress = false;

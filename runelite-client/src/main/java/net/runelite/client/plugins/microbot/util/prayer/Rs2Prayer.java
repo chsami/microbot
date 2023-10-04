@@ -5,7 +5,7 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.Varbits;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import static net.runelite.api.Varbits.PRAYER_PROTECT_FROM_MAGIC;
 import static net.runelite.api.Varbits.QUICK_PRAYER;
@@ -174,21 +174,21 @@ public class Rs2Prayer {
         clickRangePrayer();
     }
     public static void clickMagePrayer() {
-        Tab.switchToPrayerTab();
+        Rs2Tab.switchToPrayerTab();
         Widget magePray = Microbot.getClient().getWidget(35454997);
         if (magePray == null) return;
         Microbot.getMouse().click(magePray.getBounds());
     }
 
     public static void clickRangePrayer() {
-        Tab.switchToPrayerTab();
+        Rs2Tab.switchToPrayerTab();
         Widget rangePray = Microbot.getClient().getWidget(35454998);
         if (rangePray == null) return;
         Microbot.getMouse().click(rangePray.getBounds());
     }
 
     public static void clickMeleePrayer() {
-        Tab.switchToPrayerTab();
+        Rs2Tab.switchToPrayerTab();
         Widget rangePray = Microbot.getClient().getWidget(35454999);
         if (rangePray == null) return;
         Microbot.getMouse().click(rangePray.getBounds());

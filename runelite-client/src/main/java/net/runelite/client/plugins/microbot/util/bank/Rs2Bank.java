@@ -61,10 +61,22 @@ public class Rs2Bank {
         return withdrawItem(false, itemName);
     }
 
+    public static boolean withdrawItem(String itemName, boolean exact) {
+        Microbot.status = "Withdrawing one " + itemName;
+        if (Inventory.hasItem(itemName)) return true;
+        return BetterBank.withdrawOneFast(itemName, exact);
+    }
+
     public static boolean withdrawItem(boolean checkInventory, String itemName) {
         Microbot.status = "Withdrawing one " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
         return BetterBank.withdrawOneFast(itemName);
+    }
+
+    public static boolean withdrawItem(boolean checkInventory, int itemId) {
+        Microbot.status = "Withdrawing one " + itemId;
+        if (checkInventory && Inventory.hasItem(itemId)) return true;
+        return BetterBank.withdrawOneFast(itemId);
     }
 
     public static boolean withdrawItemContains(String name) {
@@ -76,6 +88,12 @@ public class Rs2Bank {
         Microbot.status = "Withdrawing " + amount + " " + itemName;
         if (checkInventory && Inventory.hasItem(itemName)) return true;
         return BetterBank.withdrawXFast(itemName, amount);
+    }
+
+    public static boolean withdrawItemX(boolean checkInventory, int itemId, int amount) {
+        Microbot.status = "Withdrawing " + amount + " " + itemId;
+        if (checkInventory && Inventory.hasItem(itemId)) return true;
+        return BetterBank.withdrawXFast(itemId, amount);
     }
 
     public static boolean withdrawItemAll(boolean checkInventory, String itemName) {
@@ -266,14 +284,6 @@ public class Rs2Bank {
         return true;
     }
 
-    public static void useBank(String action) {
-        Microbot.status = "Banking";
-        GameObject bank = Rs2GameObject.findBank(action);
-        if (bank == null) return;
-        Rs2GameObject.interact(bank, action);
-        sleepUntil(Rs2Bank::isOpen);
-    }
-
     public static boolean walkToBank() {
         BankLocation bankLocation = getNearestBank();
         Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
@@ -286,7 +296,11 @@ public class Rs2Bank {
         return w != null && w.getItemQuantity() > 0;
     }
 
-
+    public static boolean hasItem(int itemId) {
+        Microbot.status = "Looking for " + itemId + " in the bank";
+        Widget w = BetterBank.findBankItem(itemId);
+        return w != null && w.getItemQuantity() > 0;
+    }
 
     public static boolean hasItems(List<ItemRequirement> itemsRequired) {
         for (ItemRequirement item : itemsRequired) {

@@ -22,10 +22,7 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.swing.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class Microbot {
     @Getter
@@ -88,6 +85,8 @@ public class Microbot {
     public static ClientThread getClientThreadForKotlin() { return clientThread; }
 
     public static Mouse getMouseForKotlin() { return mouse; }
+    public static WorldService getWorldServiceForKotlin() { return worldService; }
+
     public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
 
     @Deprecated(since="Use isMoving", forRemoval = true)
@@ -167,14 +166,17 @@ public class Microbot {
     }
 
     public static void showMessage(String message) {
-        try {
-            SwingUtilities.invokeAndWait(() ->
-            {
-                JOptionPane.showConfirmDialog(null, message, "Message",
-                        JOptionPane.DEFAULT_OPTION);
-            });
-        } catch(Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        executor.submit(() -> {
+            try {
+                SwingUtilities.invokeAndWait(() ->
+                {
+                    JOptionPane.showConfirmDialog(null, message, "Message",
+                            JOptionPane.DEFAULT_OPTION);
+                });
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        });
     }
 }

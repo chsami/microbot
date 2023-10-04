@@ -87,10 +87,10 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 
 @PluginDescriptor(
-		name = "Object Markers",
-		description = "Enable marking of objects using the Shift key",
-		tags = {"overlay", "objects", "mark", "marker"},
-		enabledByDefault = false
+	name = "Object Markers",
+	description = "Enable marking of objects using the Shift key",
+	tags = {"overlay", "objects", "mark", "marker"},
+	enabledByDefault = false
 )
 @Slf4j
 public class ObjectIndicatorsPlugin extends Plugin
@@ -242,13 +242,13 @@ public class ObjectIndicatorsPlugin extends Plugin
 		int idx = -1;
 		final var marked = objects.stream().filter(o -> o.getTileObject() == tileObject).findFirst();
 		client.createMenuEntry(idx--)
-				.setOption(marked.isPresent() ? UNMARK : MARK)
-				.setTarget(event.getTarget())
-				.setParam0(event.getActionParam0())
-				.setParam1(event.getActionParam1())
-				.setIdentifier(event.getIdentifier())
-				.setType(MenuAction.RUNELITE)
-				.onClick(this::markObject);
+			.setOption(marked.isPresent() ? UNMARK : MARK)
+			.setTarget(event.getTarget())
+			.setParam0(event.getActionParam0())
+			.setParam1(event.getActionParam1())
+			.setIdentifier(event.getIdentifier())
+			.setType(MenuAction.RUNELITE)
+			.onClick(this::markObject);
 
 		if (marked.isPresent())
 		{
@@ -271,32 +271,32 @@ public class ObjectIndicatorsPlugin extends Plugin
 		}
 
 		MenuEntry parent = client.createMenuEntry(idx--)
-				.setOption("Mark border color")
-				.setTarget(target)
-				.setType(MenuAction.RUNELITE_SUBMENU);
+			.setOption("Mark border color")
+			.setTarget(target)
+			.setType(MenuAction.RUNELITE_SUBMENU);
 
 		for (final Color c : colors)
 		{
 			client.createMenuEntry(idx--)
-					.setOption(ColorUtil.prependColorTag("Set color", c))
-					.setType(MenuAction.RUNELITE)
-					.setParent(parent)
-					.onClick(e -> updateObjectConfig(object, p -> p.setBorderColor(c)));
+				.setOption(ColorUtil.prependColorTag("Set color", c))
+				.setType(MenuAction.RUNELITE)
+				.setParent(parent)
+				.onClick(e -> updateObjectConfig(object, p -> p.setBorderColor(c)));
 		}
 
 		client.createMenuEntry(idx--)
-				.setOption("Pick color")
-				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
-				.onClick(e -> SwingUtilities.invokeLater(() ->
-				{
-					RuneliteColorPicker colorPicker = colorPickerManager.create(SwingUtilities.windowForComponent((Applet) client),
-							MoreObjects.firstNonNull(colorTileObject.getBorderColor(), config.markerColor()), "Mark Border Color", false);
-					colorPicker.setOnClose(c ->
-							clientThread.invokeLater(() ->
-									updateObjectConfig(object, p -> p.setBorderColor(c))));
-					colorPicker.setVisible(true);
-				}));
+			.setOption("Pick color")
+			.setType(MenuAction.RUNELITE)
+			.setParent(parent)
+			.onClick(e -> SwingUtilities.invokeLater(() ->
+			{
+				RuneliteColorPicker colorPicker = colorPickerManager.create(SwingUtilities.windowForComponent((Applet) client),
+					MoreObjects.firstNonNull(colorTileObject.getBorderColor(), config.markerColor()), "Mark Border Color", false);
+				colorPicker.setOnClose(c ->
+					clientThread.invokeLater(() ->
+						updateObjectConfig(object, p -> p.setBorderColor(c))));
+				colorPicker.setVisible(true);
+			}));
 
 		return idx;
 	}
@@ -315,41 +315,41 @@ public class ObjectIndicatorsPlugin extends Plugin
 		}
 
 		MenuEntry parent = client.createMenuEntry(idx--)
-				.setOption("Mark fill color")
-				.setTarget(target)
-				.setType(MenuAction.RUNELITE_SUBMENU);
+			.setOption("Mark fill color")
+			.setTarget(target)
+			.setType(MenuAction.RUNELITE_SUBMENU);
 
 		for (final Color c : colors)
 		{
 			client.createMenuEntry(idx--)
-					.setOption(ColorUtil.prependColorTag("Set color", c))
-					.setType(MenuAction.RUNELITE)
-					.setParent(parent)
-					.onClick(e -> updateObjectConfig(object, p -> p.setFillColor(c)));
+				.setOption(ColorUtil.prependColorTag("Set color", c))
+				.setType(MenuAction.RUNELITE)
+				.setParent(parent)
+				.onClick(e -> updateObjectConfig(object, p -> p.setFillColor(c)));
 		}
 
 		client.createMenuEntry(idx--)
-				.setOption("Pick color")
-				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
-				.onClick(e -> SwingUtilities.invokeLater(() ->
-				{
-					// default fill color depends on the highlight type. just use a=50 from hull fill.
-					var previousColor = MoreObjects.firstNonNull(colorTileObject.getFillColor(), new Color(0, 0, 0, 50));
+			.setOption("Pick color")
+			.setType(MenuAction.RUNELITE)
+			.setParent(parent)
+			.onClick(e -> SwingUtilities.invokeLater(() ->
+			{
+				// default fill color depends on the highlight type. just use a=50 from hull fill.
+				var previousColor = MoreObjects.firstNonNull(colorTileObject.getFillColor(), new Color(0, 0, 0, 50));
 
-					RuneliteColorPicker colorPicker = colorPickerManager.create(SwingUtilities.windowForComponent((Applet) client),
-							previousColor, "Mark Fill Color", false);
-					colorPicker.setOnClose(c ->
-							clientThread.invokeLater(() ->
-									updateObjectConfig(object, p -> p.setFillColor(c))));
-					colorPicker.setVisible(true);
-				}));
+				RuneliteColorPicker colorPicker = colorPickerManager.create(SwingUtilities.windowForComponent((Applet) client),
+					previousColor, "Mark Fill Color", false);
+				colorPicker.setOnClose(c ->
+					clientThread.invokeLater(() ->
+						updateObjectConfig(object, p -> p.setFillColor(c))));
+				colorPicker.setVisible(true);
+			}));
 
 		client.createMenuEntry(idx--)
-				.setOption("Reset")
-				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
-				.onClick(e -> updateObjectConfig(object, p -> p.setFillColor(null)));
+			.setOption("Reset")
+			.setType(MenuAction.RUNELITE)
+			.setParent(parent)
+			.onClick(e -> updateObjectConfig(object, p -> p.setFillColor(null)));
 
 		return idx;
 	}
@@ -357,46 +357,46 @@ public class ObjectIndicatorsPlugin extends Plugin
 	private int createTagStyleMenu(int idx, String target, TileObject object)
 	{
 		MenuEntry parent = client.createMenuEntry(idx--)
-				.setOption("Mark style")
-				.setTarget(target)
-				.setType(MenuAction.RUNELITE_SUBMENU);
+			.setOption("Mark style")
+			.setTarget(target)
+			.setType(MenuAction.RUNELITE_SUBMENU);
 
 		client.createMenuEntry(idx--)
-				.setOption("Hull")
-				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
-				.onClick(e -> updateObjectConfig(object, c -> c.setHull(c.getHull() != Boolean.TRUE)));
+			.setOption("Hull")
+			.setType(MenuAction.RUNELITE)
+			.setParent(parent)
+			.onClick(e -> updateObjectConfig(object, c -> c.setHull(c.getHull() != Boolean.TRUE)));
 
 		client.createMenuEntry(idx--)
-				.setOption("Outline")
-				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
-				.onClick(e -> updateObjectConfig(object, c -> c.setOutline(c.getOutline() != Boolean.TRUE)));
+			.setOption("Outline")
+			.setType(MenuAction.RUNELITE)
+			.setParent(parent)
+			.onClick(e -> updateObjectConfig(object, c -> c.setOutline(c.getOutline() != Boolean.TRUE)));
 
 		client.createMenuEntry(idx--)
-				.setOption("Clickbox")
-				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
-				.onClick(e -> updateObjectConfig(object, c -> c.setClickbox(c.getClickbox() != Boolean.TRUE)));
+			.setOption("Clickbox")
+			.setType(MenuAction.RUNELITE)
+			.setParent(parent)
+			.onClick(e -> updateObjectConfig(object, c -> c.setClickbox(c.getClickbox() != Boolean.TRUE)));
 
 		client.createMenuEntry(idx--)
-				.setOption("Tile")
-				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
-				.onClick(e -> updateObjectConfig(object, c -> c.setTile(c.getTile() != Boolean.TRUE)));
+			.setOption("Tile")
+			.setType(MenuAction.RUNELITE)
+			.setParent(parent)
+			.onClick(e -> updateObjectConfig(object, c -> c.setTile(c.getTile() != Boolean.TRUE)));
 
 		client.createMenuEntry(idx--)
-				.setOption("Reset")
-				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
-				.onClick(e ->
-						updateObjectConfig(object, c ->
-						{
-							c.setHull(null);
-							c.setOutline(null);
-							c.setClickbox(null);
-							c.setTile(null);
-						}));
+			.setOption("Reset")
+			.setType(MenuAction.RUNELITE)
+			.setParent(parent)
+			.onClick(e ->
+				updateObjectConfig(object, c ->
+				{
+					c.setHull(null);
+					c.setOutline(null);
+					c.setClickbox(null);
+					c.setTile(null);
+				}));
 
 		return idx;
 	}
@@ -488,16 +488,16 @@ public class ObjectIndicatorsPlugin extends Plugin
 			{
 				log.debug("Marking object {} due to matching {}", object, objectPoint);
 				var flags =
-						(objectPoint.getHull() == Boolean.TRUE ? HF_HULL : 0) |
-								(objectPoint.getOutline() == Boolean.TRUE ? HF_OUTLINE : 0) |
-								(objectPoint.getClickbox() == Boolean.TRUE ? HF_CLICKBOX : 0) |
-								(objectPoint.getTile() == Boolean.TRUE ? HF_TILE : 0);
+					(objectPoint.getHull() == Boolean.TRUE ? HF_HULL : 0) |
+					(objectPoint.getOutline() == Boolean.TRUE ? HF_OUTLINE : 0) |
+					(objectPoint.getClickbox() == Boolean.TRUE ? HF_CLICKBOX : 0) |
+					(objectPoint.getTile() == Boolean.TRUE ? HF_TILE : 0);
 				objects.add(new ColorTileObject(object,
-						objectComposition,
-						objectPoint.getName(),
-						objectPoint.getBorderColor(),
-						objectPoint.getFillColor(),
-						(byte) flags));
+					objectComposition,
+					objectPoint.getName(),
+					objectPoint.getBorderColor(),
+					objectPoint.getFillColor(),
+					(byte) flags));
 				break;
 			}
 		}
@@ -585,17 +585,18 @@ public class ObjectIndicatorsPlugin extends Plugin
 		final WorldPoint worldPoint = WorldPoint.fromLocalInstance(client, object.getLocalLocation());
 		final int regionId = worldPoint.getRegionID();
 		final Color borderColor = config.markerColor();
+		final Color fillColor = config.fillColor();
 		final ObjectPoint point = new ObjectPoint(
-				object.getId(),
-				name,
-				regionId,
-				worldPoint.getRegionX(),
-				worldPoint.getRegionY(),
-				worldPoint.getPlane(),
-				borderColor,
-				null,
-				// use the default config values
-				null, null, null, null);
+			object.getId(),
+			name,
+			regionId,
+			worldPoint.getRegionX(),
+			worldPoint.getRegionY(),
+			worldPoint.getPlane(),
+			borderColor,
+			fillColor,
+			// use the default config values
+			null, null, null, null);
 
 		Set<ObjectPoint> objectPoints = points.computeIfAbsent(regionId, k -> new HashSet<>());
 
@@ -612,11 +613,11 @@ public class ObjectIndicatorsPlugin extends Plugin
 		{
 			objectPoints.add(point);
 			objects.add(new ColorTileObject(object,
-					client.getObjectDefinition(object.getId()),
-					name,
-					borderColor,
-					null,
-					(byte) 0));
+				client.getObjectDefinition(object.getId()),
+				name,
+				borderColor,
+				fillColor,
+				(byte) 0));
 			log.debug("Marking object: {}", point);
 		}
 
@@ -630,9 +631,9 @@ public class ObjectIndicatorsPlugin extends Plugin
 		// 2) not a multiloc, but an object has spawned with an identical name and a different
 		//    id as what was originally marked
 		return op -> ((op.getId() == -1 || op.getId() == object.getId()) || op.getName().equals(objectComposition.getName()))
-				&& op.getRegionX() == worldPoint.getRegionX()
-				&& op.getRegionY() == worldPoint.getRegionY()
-				&& op.getZ() == worldPoint.getPlane();
+			&& op.getRegionX() == worldPoint.getRegionX()
+			&& op.getRegionY() == worldPoint.getRegionY()
+			&& op.getZ() == worldPoint.getPlane();
 	}
 
 	private void savePoints(final int id, final Set<ObjectPoint> points)
@@ -664,8 +665,8 @@ public class ObjectIndicatorsPlugin extends Plugin
 		// in most cases due to the specific object being identified being ambiguous, so remove
 		// them
 		return points.stream()
-				.filter(point -> !point.getName().equals("null"))
-				.collect(Collectors.toSet());
+			.filter(point -> !point.getName().equals("null"))
+			.collect(Collectors.toSet());
 	}
 
 	@Nullable

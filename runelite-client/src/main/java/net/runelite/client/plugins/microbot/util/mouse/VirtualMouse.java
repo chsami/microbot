@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.mouse;
 
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.math.Random;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -70,6 +71,10 @@ public class VirtualMouse extends Mouse {
     @Override
     public Mouse clickFast(Point point) {
         return clickFast(point, false);
+    }
+    @Override
+    public Mouse clickFast() {
+        return clickFast(new Point(Random.random(10, 100), Random.random(10, 100)));
     }
 
     @Override

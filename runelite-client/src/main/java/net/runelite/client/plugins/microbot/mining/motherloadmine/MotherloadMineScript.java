@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.microbot.mining.motherloadmine;
 
-import net.runelite.api.ItemID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Varbits;
-import net.runelite.api.WallObject;
+import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -18,6 +16,7 @@ import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
+import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 public class MotherloadMineScript extends Script {
     public static double version = 1.0;
@@ -33,12 +32,24 @@ boolean emptySack = false;
         miningSpot = MLMMiningSpot.IDLE;
         status = MLMStatus.IDLE;
         emptySack = false;
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
+            if (expstarted == 0) {
+                expstarted = Microbot.getClient().getSkillExperience(Skill.MINING);
+                startinglevel = Microbot.getClient().getRealSkillLevel(Skill.MINING);
+                timeBegan = System.currentTimeMillis();
+            }
             try {
                 if (Microbot.isAnimating() || Microbot.getClient().getLocalPlayer().isInteracting()) {
                     sleep(2000);
+                    return;
+                }
+
+                if (!Inventory.hasItem("hammer"))
+                {
+                    bank();
                     return;
                 }
 
@@ -49,7 +60,7 @@ boolean emptySack = false;
                 } else if (Inventory.isFull()) {
                     miningSpot = MLMMiningSpot.IDLE;
                     if (Inventory.hasItem(ItemID.PAYDIRT)) {
-                        if (Rs2GameObject.findObjectById(ObjectID.BROKEN_STRUT) != null) {
+                        if (Rs2GameObject.findObjectById(ObjectID.BROKEN_STRUT) != null && Inventory.hasItem("hammer")) {
                             status = MLMStatus.FIXING_WATERWHEEL;
                         } else {
                             status = MLMStatus.DEPOSIT_HOPPER;
@@ -75,7 +86,7 @@ boolean emptySack = false;
                         while (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 10) {
                             if (Inventory.count() <= 1) {
                                 Rs2GameObject.interact(SACKID);
-                                sleepUntil(Inventory::isFull, 10000);
+                                sleepUntil(() -> Inventory.count() > 1, 10000);
                             }
                             bank();
                         }
@@ -83,7 +94,7 @@ boolean emptySack = false;
                         status = MLMStatus.IDLE;
                         break;
                     case FIXING_WATERWHEEL:
-                        Rs2GameObject.interact(ObjectID.BROKEN_STRUT);
+                            Rs2GameObject.interact(ObjectID.BROKEN_STRUT);
                         break;
                     case DEPOSIT_HOPPER:
                         if (Rs2GameObject.interact(ObjectID.HOPPER_26674)) {
@@ -109,7 +120,8 @@ boolean emptySack = false;
         if (Rs2Bank.useBank()) {
             sleepUntil(Rs2Bank::isOpen);
             Rs2Bank.depositAll();
-            Rs2Bank.withdrawItem("hammer");
+            sleep(100, 300);
+            Rs2Bank.withdrawItem("hammer", true);
         }
     }
 
@@ -126,7 +138,7 @@ boolean emptySack = false;
     private boolean walkToMiningSpot() {
         WorldPoint miningWorldPoint = miningSpot.getWorldPoint().get(0);
         if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(miningWorldPoint) > 8) {
-            Microbot.getWalker().walkFastCanvas(miningWorldPoint);
+            Microbot.getWalker().walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), miningWorldPoint));
             return false;
         }
         return true;

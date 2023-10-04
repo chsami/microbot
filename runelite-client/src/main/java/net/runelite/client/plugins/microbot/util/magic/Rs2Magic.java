@@ -3,10 +3,11 @@ package net.runelite.client.plugins.microbot.util.magic;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -38,15 +39,16 @@ public class Rs2Magic {
 
         widgetId = magicSpell.getWidgetId();
         widgetName = magicSpell.getName();
-        Microbot.getMouse().click();
+        Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
+        Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
         sleep(100);
         widgetId = 0;
     }
 
     public static void castOn(MagicAction magicSpell, Actor actor) {
         if (actor == null) return;
-        if (!Camera.isTileOnScreen(actor.getLocalLocation())) {
-            Camera.turnTo(actor.getLocalLocation());
+        if (!Rs2Camera.isTileOnScreen(actor.getLocalLocation())) {
+            Rs2Camera.turnTo(actor.getLocalLocation());
             return;
         }
         cast(magicSpell);
@@ -55,7 +57,7 @@ public class Rs2Magic {
     }
 
     public static void highAlch(String itemName, boolean exact) {
-        Tab.switchToMagicTab();
+        Rs2Tab.switchToMagicTab();
         Widget item = Inventory.findItemInMemory(itemName, exact);
         Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
         alch(highAlch, item);
@@ -67,7 +69,7 @@ public class Rs2Magic {
 
 
     public static void highAlch(Widget item, boolean exact) {
-        Tab.switchToMagicTab();
+        Rs2Tab.switchToMagicTab();
         Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
         alch(highAlch, item);
     }
@@ -90,10 +92,10 @@ public class Rs2Magic {
     private static void alch(Widget alch, Widget item) {
         if (alch == null) return;
         Point point = new Point((int) alch.getBounds().getCenterX(), (int) alch.getBounds().getCenterY());
-        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.MAGIC), 5000);
+        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC), 5000);
         sleep(300, 600);
         Microbot.getMouse().click(point);
-        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Tab.getCurrentTab() == InterfaceTab.INVENTORY), 5000);
+        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY), 5000);
         sleep(300, 600);
         if (item == null) {
             Microbot.getMouse().click(point);

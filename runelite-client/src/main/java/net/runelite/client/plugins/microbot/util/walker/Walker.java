@@ -6,13 +6,13 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.*;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
-import net.runelite.client.plugins.microbot.walker.pathfinder.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +59,9 @@ public class Walker {
     }
 
     public WorldPoint walkMiniMap(WorldPoint worldPoint) {
+        if (Microbot.getClient().getMinimapZoom() > 2)
+            Microbot.getClient().setMinimapZoom(2);
+
         Point point = Calculations.worldToMinimap(worldPoint.getX(), worldPoint.getY());
 
         if (point == null) return null;
@@ -82,9 +85,9 @@ public class Walker {
 
         LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
 
-        while (!Calculations.tileOnScreen(localPoint)) {
-            Microbot.getMouse().scrollDown(new Point(1, 1));
-            sleep(100, 300);
+        if (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getWalker().walkMiniMap(worldPoint); //use minimap if tile is not on screen
+            return worldPoint;
         }
 
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
@@ -105,9 +108,9 @@ public class Walker {
      */
     public void walkFastLocal(LocalPoint localPoint) {
 
-        while (!Calculations.tileOnScreen(localPoint)) {
-            Microbot.getMouse().scrollDown(new Point(1, 1));
-            sleep(100, 300);
+        if (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getWalker().walkMiniMap(WorldPoint.fromLocal(Microbot.getClient(), localPoint)); //use minimap if tile is not on screen
+            return;
         }
 
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
@@ -122,14 +125,18 @@ public class Walker {
     }
 
     public void walkFastCanvas(WorldPoint worldPoint) {
-        while (!Calculations.tileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), worldPoint))) {
-            Microbot.getMouse().scrollDown(new Point(1, 1));
-            sleep(100, 300);
+        LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+        if (!Calculations.tileOnScreen(localPoint)) {
+            Microbot.getWalker().walkMiniMap(worldPoint); //use minimap if tile is not on screen
+            return;
         }
-
         Point canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY()), Microbot.getClient().getPlane());
         canvasX = canv != null ? canv.getX() : -1;
         canvasY = canv != null ? canv.getY() : -1;
+
+        if (canvasX == -1 && canvasY == -1) {
+            Rs2Camera.turnTo(localPoint);
+        }
 
         Microbot.getMouse().clickFast(1, 1);
 
@@ -167,7 +174,7 @@ public class Walker {
         return worldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < distance;
     }
 
-    private List<PathNode> getPath(WorldPoint startWorldPoint, WorldPoint endWorldPoint) {
+    private List<PathNode> getPath(WorldPoint startWorldPoint, WorldPoint endWorldPoint, boolean useNearest) {
         long startTimeDateLoad = System.currentTimeMillis();
         SavedWorldDataLoader savedWorldDataLoader = new SavedWorldDataLoader(WorldDataDownloader.Companion.getWorldDataFile());
         Map<String, PathNode> pathNodeMap = savedWorldDataLoader.getNodeMap();
@@ -176,7 +183,7 @@ public class Walker {
         PathFinder pathFinder = new PathFinder(pathNodeMap);
 
         long startTimePathFind = System.currentTimeMillis();
-        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint, false);
+        List<PathNode> nodes = pathFinder.findPath(startWorldPoint, endWorldPoint, useNearest);
         long endTimePathFind = System.currentTimeMillis();
 
         System.out.println("Loaded world data in " + (endTimeDataLoad - startTimeDateLoad) + " milliseconds");
@@ -190,42 +197,44 @@ public class Walker {
         PathWalker.Companion.interrupt();
     }
 
-    public boolean staticWalkTo(WorldPoint endWorldPoint) {
-        Camera.setAngle(45);
-        Camera.setPitch(1.0f);
+    public boolean staticWalkTo(WorldPoint endWorldPoint, int maxDestinationDistance) {
 
         Player player = Microbot.getClient().getLocalPlayer();
         WorldPoint start = player.getWorldLocation();
 
-        List<PathNode> nodes = getPath(start, endWorldPoint);
+        List<PathNode> nodes = getPath(start, endWorldPoint, false);
         if (nodes.isEmpty()) return false;
 
         PathWalker pathWalker = new PathWalker(nodes);
         pathWalker.walkPath();
 
         PathFinder.Companion.resetPath();
-        return player.getWorldLocation().distanceTo(endWorldPoint) <= 3;
+        return player.getWorldLocation().distanceTo(endWorldPoint) <= maxDestinationDistance;
     }
 
-    public boolean hybridWalkTo(WorldPoint target) {
+    public boolean staticWalkTo(WorldPoint endWorldPoint) {
+        return staticWalkTo(endWorldPoint, 3);
+    }
+
+    public boolean hybridWalkTo(WorldPoint target, boolean useNearest) {
         Player player = Microbot.getClient().getLocalPlayer();
-        List<PathNode> nodes = getPath(player.getWorldLocation(), target);
+        List<PathNode> nodes = getPath(player.getWorldLocation(), target, useNearest);
 
         if (nodes.isEmpty()) {
             System.out.println("Static Walker failed to find path, using dynamic walker");
             return walkTo(target, true);
 
         } else {
-            Camera.setAngle(45);
-            Camera.setPitch(1.0f);
-
-            if (nodes.isEmpty()) return false;
 
             PathWalker pathWalker = new PathWalker(nodes);
             pathWalker.walkPath();
 
             return player.getWorldLocation().distanceTo(target) <= 3;
         }
+    }
+
+    public boolean hybridWalkTo(WorldPoint target) {
+        return hybridWalkTo(target, false);
     }
 
     public boolean walkTo(WorldPoint target) {

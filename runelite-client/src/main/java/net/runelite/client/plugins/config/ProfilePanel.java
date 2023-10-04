@@ -67,6 +67,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Slf4j
@@ -333,12 +335,13 @@ class ProfilePanel extends PluginPanel {
                     super.replace(fb, offset, length, filter(text), attrs);
                 }
 
-                private String filter(String in) {
-                    // characters commonly forbidden in file names
-                    return CharMatcher.noneOf("/\\<>:\"|?*\0")
-                            .retainFrom(in);
-                }
-            });
+				private String filter(String in)
+				{
+					// characters commonly forbidden in file names
+					return CharMatcher.noneOf("/\\<>:\"|?*\r\n\0")
+						.retainFrom(in);
+				}
+			});
 
             activate = new JButton(ARROW_RIGHT_ICON);
             activate.setDisabledIcon(ARROW_RIGHT_ICON);
@@ -454,7 +457,10 @@ class ProfilePanel extends PluginPanel {
                                 switchToProfile(profile.getId());
                             } else {
                                 try {
-                                    new Login(profile.getName(), profile.getPassword());
+                                    ExecutorService executor = Executors.newFixedThreadPool(1);
+                                    executor.submit(() -> {
+                                        new Login(profile.getName(), profile.getPassword());
+                                    });
                                 } catch (Exception e) {
                                 }
                             }

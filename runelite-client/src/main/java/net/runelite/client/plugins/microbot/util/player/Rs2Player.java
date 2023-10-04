@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.player;
 
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -35,7 +36,9 @@ public class Rs2Player {
     }
 
     public static boolean hasAntiVenomActive() {
-        if(Rs2Equipment.hasEquipped("serpentine helm")) { return true; } else return antiVenomTime < VENOM_VALUE_CUTOFF;
+        if (Rs2Equipment.hasEquipped("serpentine helm")) {
+            return true;
+        } else return antiVenomTime < VENOM_VALUE_CUTOFF;
     }
 
     public static void handlePotionTimers(VarbitChanged event) {
@@ -72,6 +75,14 @@ public class Rs2Player {
         return Microbot.isMoving();
     }
 
+    public static boolean isInteracting() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().isInteracting());
+    }
+
+    public static boolean isMember() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.MEMBERSHIP_DAYS) > 0);
+    }
+
     @Deprecated(since = "Use the Rs2Combat.specState method", forRemoval = true)
     public static void toggleSpecialAttack(int energyRequired) {
         int currentSpecEnergy = Microbot.getClient().getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
@@ -94,5 +105,9 @@ public class Rs2Player {
             return true;
         }
         return false;
+    }
+
+    public static WorldPoint getWorldLocation() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation());
     }
 }

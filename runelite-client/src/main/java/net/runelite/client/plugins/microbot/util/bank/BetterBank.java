@@ -8,6 +8,7 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -54,7 +55,11 @@ public class BetterBank {
         BetterBank.entryIndex = entryIndex;
         BetterBank.widget = widget;
 
-        Microbot.getMouse().clickFast(1, 1);
+        if (isOpen()) {
+            Widget randomClickWidget = Random.random(1, 10) < 5 ? Rs2Widget.findWidget("Rearrange mode", null) : Rs2Widget.findWidget("The bank of", null);
+            Microbot.getMouse().clickFast((int) randomClickWidget.getBounds().getCenterX(), (int) randomClickWidget.getBounds().getCenterY());
+        }
+
         sleep(50);
 
         BetterBank.widgetId = 0;
@@ -98,6 +103,7 @@ public class BetterBank {
         if (w == null) return null;
 
         for (Widget item : w.getDynamicChildren()) {
+            if (item.getName().isEmpty()) continue;
             String itemNameInItem = item.getName().split(">")[1].split("</")[0].toLowerCase();
             String targetItemName = name.toLowerCase();
 

@@ -9,7 +9,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.camera.Camera;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -19,7 +19,7 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.magic.Teleport;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.tabs.Tab;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Transport;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.tuple.Pair;
@@ -62,7 +62,7 @@ public class Pathfinder implements Runnable {
     public boolean customPath = false;
 
     public boolean getDebugger() {
-        return Microbot.debug;
+        return true;
     }
 
 
@@ -109,7 +109,7 @@ public class Pathfinder implements Runnable {
         Transport tunnel = getClosestTunnel();
 
         if (useTransport && start.distanceTo(target) > teleportThreshHoldDistance) {
-            Tab.switchToInventoryTab();
+            Rs2Tab.switchToInventoryTab();
 
             Teleport shortestPathSpell = null;
             JewelleryLocationEnum shortestPathJewellery = null;
@@ -328,7 +328,7 @@ public class Pathfinder implements Runnable {
             }
         }
 
-        if (this.executeWalking && !handleDoors() && !handleShortcuts()) {
+        if (this.executeWalking && (!handleDoors() && !handleShortcuts())) {
             //  Collections.reverse(path);
             if (useCanvas) {
                 handleWalkableNodesCanvas();
@@ -348,7 +348,7 @@ public class Pathfinder implements Runnable {
             if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(node.position)) continue;
             Transport transport = getMatchingTransport(node.position);
             if (transport == null) continue;
-            if (Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), transport.origin))) {
+            if (Rs2Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), transport.origin))) {
                 TileObject tileObject = Rs2GameObject.findObjectByLocation(transport.origin);
                 if (!Rs2GameObject.hasLineOfSight(tileObject)) continue;
                 Rs2GameObject.interact(tileObject);
@@ -411,7 +411,8 @@ public class Pathfinder implements Runnable {
             // Custom logic for staircase/ladders
             boolean isLadder = useCurrentTransport != null;
             if (isLadder) {
-                if (Microbot.getWalker().getReachDistance(target) > 17)
+                if (Microbot.getWalker().getReachDistance(useCurrentTransport.origin) > 17
+                        && !Calculations.tileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), useCurrentTransport.origin)))
                     return false;
                 if (useCurrentTransport.offsetX != 0 || useCurrentTransport.offsetY != 0) {
                     this.target = new WorldPoint(this.target.getX() + useCurrentTransport.offsetX, this.target.getY() + useCurrentTransport.offsetY, this.target.getPlane());
