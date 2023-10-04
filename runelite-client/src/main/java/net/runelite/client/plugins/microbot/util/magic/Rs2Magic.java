@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -38,7 +39,8 @@ public class Rs2Magic {
 
         widgetId = magicSpell.getWidgetId();
         widgetName = magicSpell.getName();
-        Microbot.getMouse().click();
+        Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
+        Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
         sleep(100);
         widgetId = 0;
     }

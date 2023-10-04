@@ -14,7 +14,7 @@ public abstract class Mouse {
     public List<Point> mousePositions = new ArrayList<>();
 
     public Point getLastMousePosition() {
-        return mousePositions.stream().reduce((first, second) -> second).get();
+        return mousePositions.stream().reduce((first, second) -> second).orElse(null);
     }
 
     public Mouse() {
@@ -36,6 +36,7 @@ public abstract class Mouse {
 
     public abstract Mouse click(Point point);
     public abstract Mouse clickFast(Point point);
+    public abstract Mouse clickFast();
     public abstract Mouse clickFast(int x, int y);
 
 

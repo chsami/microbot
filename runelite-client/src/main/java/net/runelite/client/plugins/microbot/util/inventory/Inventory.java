@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.event.KeyEvent;
@@ -208,14 +209,14 @@ public class Inventory {
         Microbot.status = "Searching inventory item ID:" + itemId;
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return null;
-        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getItemId() == itemId).findFirst().get();
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getItemId() == itemId).findFirst().get());
     }
 
     public static Widget[] getInventoryItems() {
         Microbot.status = "Fetching inventory items";
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return null;
-        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(Inventory::itemExistsInInventory).toArray(Widget[]::new);
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(Inventory::itemExistsInInventory).toArray(Widget[]::new));
     }
 
     public static Widget[] getInventoryFood() {
@@ -665,7 +666,8 @@ public class Inventory {
         if (rs2Item == null) return;
         item = rs2Item;
         itemAction = action;
-        Microbot.getMouse().clickFast(1, 1);
+        Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
+        Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
         sleep(100);
         item = null;
         itemAction = "";

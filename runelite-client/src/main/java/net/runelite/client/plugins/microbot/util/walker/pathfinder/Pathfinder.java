@@ -62,7 +62,7 @@ public class Pathfinder implements Runnable {
     public boolean customPath = false;
 
     public boolean getDebugger() {
-        return Microbot.debug;
+        return true;
     }
 
 
@@ -328,7 +328,7 @@ public class Pathfinder implements Runnable {
             }
         }
 
-        if (this.executeWalking && !handleDoors() && !handleShortcuts()) {
+        if (this.executeWalking && (!handleDoors() && !handleShortcuts())) {
             //  Collections.reverse(path);
             if (useCanvas) {
                 handleWalkableNodesCanvas();
@@ -411,7 +411,8 @@ public class Pathfinder implements Runnable {
             // Custom logic for staircase/ladders
             boolean isLadder = useCurrentTransport != null;
             if (isLadder) {
-                if (Microbot.getWalker().getReachDistance(target) > 17)
+                if (Microbot.getWalker().getReachDistance(useCurrentTransport.origin) > 17
+                        && !Calculations.tileOnScreen(LocalPoint.fromWorld(Microbot.getClient(), useCurrentTransport.origin)))
                     return false;
                 if (useCurrentTransport.offsetX != 0 || useCurrentTransport.offsetY != 0) {
                     this.target = new WorldPoint(this.target.getX() + useCurrentTransport.offsetX, this.target.getY() + useCurrentTransport.offsetY, this.target.getPlane());

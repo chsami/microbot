@@ -36,7 +36,9 @@ public class Rs2Player {
     }
 
     public static boolean hasAntiVenomActive() {
-        if(Rs2Equipment.hasEquipped("serpentine helm")) { return true; } else return antiVenomTime < VENOM_VALUE_CUTOFF;
+        if (Rs2Equipment.hasEquipped("serpentine helm")) {
+            return true;
+        } else return antiVenomTime < VENOM_VALUE_CUTOFF;
     }
 
     public static void handlePotionTimers(VarbitChanged event) {
@@ -75,6 +77,10 @@ public class Rs2Player {
 
     public static boolean isInteracting() {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().isInteracting());
+    }
+
+    public static boolean isMember() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.MEMBERSHIP_DAYS) > 0);
     }
 
     @Deprecated(since = "Use the Rs2Combat.specState method", forRemoval = true)

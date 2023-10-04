@@ -107,7 +107,7 @@ public class Rs2Npc {
 
     public static NPC[] getAttackableNpcs() {
         List<NPC> npcs = Microbot.getClient().getNpcs().stream()
-                .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead())
+                .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead() && !npc.isInteracting())
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
 
@@ -116,7 +116,7 @@ public class Rs2Npc {
 
     public static NPC[] getAttackableNpcs(String name) {
         List<NPC> npcs = Microbot.getClient().getNpcs().stream()
-                .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead() && npc.getName().toLowerCase().equals(name))
+                .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead() && npc.getName().toLowerCase().equals(name) && !npc.isInteracting())
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
 

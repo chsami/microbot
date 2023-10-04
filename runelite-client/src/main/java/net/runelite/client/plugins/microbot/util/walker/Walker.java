@@ -197,7 +197,7 @@ public class Walker {
         PathWalker.Companion.interrupt();
     }
 
-    public boolean staticWalkTo(WorldPoint endWorldPoint) {
+    public boolean staticWalkTo(WorldPoint endWorldPoint, int maxDestinationDistance) {
         Rs2Camera.setAngle(45);
         Rs2Camera.setPitch(1.0f);
 
@@ -211,7 +211,11 @@ public class Walker {
         pathWalker.walkPath();
 
         PathFinder.Companion.resetPath();
-        return player.getWorldLocation().distanceTo(endWorldPoint) <= 3;
+        return player.getWorldLocation().distanceTo(endWorldPoint) <= maxDestinationDistance;
+    }
+
+    public boolean staticWalkTo(WorldPoint endWorldPoint) {
+        return staticWalkTo(endWorldPoint, 3);
     }
 
     public boolean hybridWalkTo(WorldPoint target, boolean useNearest) {
