@@ -2,10 +2,7 @@ package net.runelite.client.plugins.nateplugins.moneymaking.natehumidifier;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
 import net.runelite.api.Skill;
-import net.runelite.client.Notifier;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -27,14 +24,7 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
 @Slf4j
 public class HumidifierPlugin extends Plugin {
     @Inject
-    private Client client;
-    @Inject
     private HumidifierConfig config;
-    @Inject
-    private ClientThread clientThread;
-    @Inject
-    Notifier notifier;
-
     @Inject
     private OverlayManager overlayManager;
     @Inject
