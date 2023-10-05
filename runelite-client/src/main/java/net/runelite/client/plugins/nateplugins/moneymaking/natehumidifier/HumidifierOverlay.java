@@ -54,6 +54,14 @@ public class HumidifierOverlay extends OverlayPanel {
                     .build());
 
             panelComponent.getChildren().add(LineComponent.builder()
+                    .left(HumidifierScript.itemsProcessedMessage)
+                    .build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left(HumidifierScript.profitMessage)
+                    .build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
                     .build());
 

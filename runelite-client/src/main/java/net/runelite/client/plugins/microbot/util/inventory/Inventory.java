@@ -105,6 +105,16 @@ public class Inventory {
         return 0;
     }
 
+    public static long getItemAmount(String itemName) {
+        Microbot.status = "Looking for item: " + itemName;
+        Widget inventoryWidget = getInventory();
+        if (inventoryWidget == null) return 0;
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .filter(x ->
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName.toLowerCase())
+                ).count());
+    }
+
     public static boolean isInventoryFull(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget inventoryWidget = getInventory();
