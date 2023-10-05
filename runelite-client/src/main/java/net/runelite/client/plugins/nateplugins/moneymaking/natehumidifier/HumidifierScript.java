@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
+import net.runelite.client.util.QuantityFormatter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -14,19 +15,16 @@ import static net.runelite.client.plugins.natepainthelper.Info.timeBegan;
 
 public class HumidifierScript extends Script {
 
-    public static double version = 1.2;
+    public static double version = 1.5;
     private static long itemsProcessed = 0;
     public static String itemsProcessedMessage = "";
     public static String profitMessage = "Calculating...";
 
-    private int unprocessedItemPrice = 0;
-    private int processedItemPrice = 0;
-
     private int profit = 0;
 
     public boolean run(HumidifierConfig config) {
-        unprocessedItemPrice = Microbot.getItemManager().search(config.ITEM().getName()).get(0).getPrice();
-        processedItemPrice = Microbot.getItemManager().search(config.ITEM().getFinished()).get(0).getPrice();
+        int unprocessedItemPrice = Microbot.getItemManager().search(config.ITEM().getName()).get(0).getPrice();
+        int processedItemPrice = Microbot.getItemManager().search(config.ITEM().getFinished()).get(0).getPrice();
         profit = processedItemPrice - unprocessedItemPrice;
         itemsProcessedMessage = config.ITEM().getFinished() + " processed: " + itemsProcessed;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -52,8 +50,8 @@ public class HumidifierScript extends Script {
 
     private void calculateItemsProcessedPerHour(HumidifierConfig  config) {
         int itemsProcessedPerHour = (int)( itemsProcessed / ((System.currentTimeMillis() - timeBegan) / 3600000.0D));
-        itemsProcessedMessage = config.ITEM().getFinished() + " processed (hr): " + itemsProcessed + " (" + itemsProcessedPerHour + ")";
-        profitMessage = "profit (hr): " + profit * itemsProcessed + "(" + profit * itemsProcessedPerHour + ")";
+        itemsProcessedMessage = config.ITEM().getFinished() + " processed (hr): " + QuantityFormatter.quantityToRSDecimalStack((int) itemsProcessed) + " (" + QuantityFormatter.quantityToRSDecimalStack(itemsProcessedPerHour) + ")";
+        profitMessage = "profit (hr): " + QuantityFormatter.quantityToRSDecimalStack((int) (profit * itemsProcessed)) + " (" + QuantityFormatter.quantityToRSDecimalStack(profit * itemsProcessedPerHour) + ")";
     }
 
     private void bank(HumidifierConfig config, boolean hasAstralRunes){
@@ -85,6 +83,11 @@ public class HumidifierScript extends Script {
         } else {
             Rs2Bank.openBank();
         }
+    }
 
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        itemsProcessed = 0;
     }
 }
