@@ -50,7 +50,7 @@ public class BreakHandlerExecutor {
     }
 
     public void breakOrExecute(Executor executor) {
-        if (BreakHandlerScript.getHasRunTimeTimerFinished()) {
+        if (BreakHandlerScript.getHasRunTimeTimerFinished() && BreakHandlerScript.getIsEnabled()) {
             executeBreak();
         } else {
             executor.execute();
@@ -58,7 +58,7 @@ public class BreakHandlerExecutor {
     }
 
     public void breakOrExecute(Executor executor, Boolean skipBreakCheck) {
-        if (BreakHandlerScript.getHasRunTimeTimerFinished() && !skipBreakCheck) {
+        if ((BreakHandlerScript.getHasRunTimeTimerFinished() && !skipBreakCheck) && BreakHandlerScript.getIsEnabled()) {
             executeBreak();
         } else {
             executor.execute();

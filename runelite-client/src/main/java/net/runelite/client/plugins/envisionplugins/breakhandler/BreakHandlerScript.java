@@ -5,11 +5,11 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.envisionplugins.breakhandler.enums.BreakHandlerStates;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesBreakPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesRunPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.util.Login;
 import net.runelite.client.plugins.envisionplugins.breakhandler.util.NotificationManager;
 import net.runelite.client.plugins.envisionplugins.breakhandler.util.TimeManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.http.api.worlds.WorldRegion;
 
@@ -21,7 +21,10 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 1.0;
+    public static double version = 1.2;
+
+    /* Break Handler Enabled Check Field */
+    private static boolean isEnabled = false;
 
     /* External Script Fields */
     public static boolean letBreakHandlerStartBreak = false;                    // Use setter method in your Plugin's Run Method
@@ -211,7 +214,6 @@ public class BreakHandlerScript extends Script {
                         break;
 
                     case FAILURE:
-                        // TODO - handle failure status
                         notificationManager.logState(myState);
                         breakHandlerPanel.showError(failureMessage);
                         break;
@@ -233,6 +235,14 @@ public class BreakHandlerScript extends Script {
         }, 0, 300, TimeUnit.MILLISECONDS);
 
         return true;
+    }
+
+    protected static void setIsEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    public static boolean getIsEnabled() {
+        return isEnabled;
     }
 
     public static void initBreakHandler(String pluginName, boolean enableDetailedDiscordMessages) {

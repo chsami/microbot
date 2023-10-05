@@ -17,8 +17,7 @@ import java.awt.image.BufferedImage;
 @PluginDescriptor(
         name = PluginDescriptor.Envision + "Break Handler",
         description = "Break Handler for Microbot",
-        tags = {"microbot", "utility"},
-        enabledByDefault = true
+        tags = {"microbot", "utility"}
 )
 @Slf4j
 public class BreakHandlerPlugin extends Plugin {
@@ -46,6 +45,8 @@ public class BreakHandlerPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
+        BreakHandlerScript.setIsEnabled(true);
+
         final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "breakhandler_watch.png");
 
         BreakHandlerScript.setBreakHandlerState(BreakHandlerStates.STARTUP);
@@ -68,6 +69,8 @@ public class BreakHandlerPlugin extends Plugin {
 
     @Override
     protected void shutDown() throws Exception {
+        BreakHandlerScript.setIsEnabled(false);
+
         clientToolbar.removeNavigation(navButton);
     }
 
