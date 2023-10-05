@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.nateplugins.moneymaking.natehumidifier;
 
 import net.runelite.api.ItemID;
+import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -11,7 +12,7 @@ import net.runelite.client.util.QuantityFormatter;
 
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.natepainthelper.Info.timeBegan;
+import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 public class HumidifierScript extends Script {
 
@@ -23,6 +24,9 @@ public class HumidifierScript extends Script {
     private int profit = 0;
 
     public boolean run(HumidifierConfig config) {
+        expstarted = Microbot.getClient().getSkillExperience(Skill.MAGIC);
+        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.MAGIC);
+        timeBegan = System.currentTimeMillis();
         int unprocessedItemPrice = Microbot.getItemManager().search(config.ITEM().getName()).get(0).getPrice();
         int processedItemPrice = Microbot.getItemManager().search(config.ITEM().getFinished()).get(0).getPrice();
         profit = processedItemPrice - unprocessedItemPrice;
@@ -64,7 +68,7 @@ public class HumidifierScript extends Script {
                 shutdown();
                 return;
             }
-            if(!Rs2Bank.hasItem(config.ITEM().getName())) {
+            if(!Rs2Bank.hasBankItemExact(config.ITEM().getName())) {
                 Microbot.showMessage("Ran out of Materials");
                 shutdown();
                 return;

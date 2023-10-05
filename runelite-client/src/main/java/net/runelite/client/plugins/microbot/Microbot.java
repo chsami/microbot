@@ -2,10 +2,7 @@ package net.runelite.client.plugins.microbot;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.Item;
-import net.runelite.api.Skill;
+import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
@@ -193,7 +190,11 @@ public class Microbot {
                     i++;
                     continue;
                 }
-                list.add(new ItemWidget(Microbot.getItemManager().getItemComposition(item.getId()).getName(), item.getId(), item.getQuantity(), i));
+                ItemComposition composition = Microbot.getItemManager().getItemComposition(item.getId());
+                boolean isPlaceholder = composition.getPlaceholderId() > 0;
+                if (isPlaceholder) continue;
+
+                list.add(new ItemWidget(composition.getName(), item.getId(), item.getQuantity(), i));
                 i++;
             }
             return list;
