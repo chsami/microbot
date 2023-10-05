@@ -5,6 +5,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
@@ -646,7 +647,11 @@ public class Rs2GameObject {
         try {
             objectToInteract = object;
             objectAction = action;
-            Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            if (Calculations.tileOnScreen(object) && object.getCanvasTilePoly() != null) {
+                Microbot.getMouse().click(object.getCanvasTilePoly().getBounds());
+            } else {
+                Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            }
             sleep(300);
             objectToInteract = null;
             objectAction = null;

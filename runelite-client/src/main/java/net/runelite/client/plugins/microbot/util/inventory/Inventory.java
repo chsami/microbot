@@ -664,10 +664,19 @@ public class Inventory {
 
     private static void useItemFastAbstract(Rs2Item rs2Item, String action) {
         if (rs2Item == null) return;
+
+        Widget itemWidget = Rs2Widget.getWidget(rs2Item.id);
+
         item = rs2Item;
         itemAction = action;
-        Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
-        Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
+
+        if (itemWidget == null) {
+            Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
+            Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
+        } else {
+            Microbot.getMouse().click(itemWidget.getBounds());
+        }
+
         sleep(100);
         item = null;
         itemAction = "";

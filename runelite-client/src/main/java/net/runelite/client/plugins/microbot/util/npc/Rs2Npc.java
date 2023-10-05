@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.npc;
 import net.runelite.api.*;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
 import java.util.Arrays;
@@ -186,7 +187,11 @@ public class Rs2Npc {
         try {
             npcInteraction = npc;
             npcAction = action;
-            Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            if (Calculations.tileOnScreen(npc)) {
+                Microbot.getMouse().click(npc.getCanvasTilePoly().getBounds());
+            } else {
+                Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            }
             sleep(100);
             npcInteraction = null;
             npcAction = null;

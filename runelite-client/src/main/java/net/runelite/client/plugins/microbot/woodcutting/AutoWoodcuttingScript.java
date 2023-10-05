@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.woodcutting;
 
-import net.runelite.api.GameObject;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
@@ -11,11 +10,11 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class WoodcuttingScript  extends Script {
+public class AutoWoodcuttingScript extends Script {
 
     public static double version = 1.2;
 
-    public boolean run(WoodcuttingConfig config) {
+    public boolean run(AutoWoodcuttingConfig config) {
         var startingPosition = Microbot.getClient().getLocalPlayer().getWorldLocation();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
@@ -43,7 +42,7 @@ public class WoodcuttingScript  extends Script {
                     return x.getWorldLocation().distanceTo(startingPosition) < config.distanceToStray();
                 }).collect(Collectors.toList());
 
-                if (trees.size() > 0){
+                if (!trees.isEmpty()){
                     Rs2GameObject.interact(trees.get(0), config.TREE().getAction());
                 }else {
                     System.out.println("No trees in zone");

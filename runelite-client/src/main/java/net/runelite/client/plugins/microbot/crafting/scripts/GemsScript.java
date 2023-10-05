@@ -21,7 +21,7 @@ public class GemsScript extends Script {
             if (!super.run()) return;
             try {
                 if (!Microbot.hasLevel(config.gemType().getLevelRequired(), Skill.CRAFTING)) {
-                    Microbot.getNotifier().notify("Crafting level to low to craft " + config.gemType().getName());
+                    Microbot.showMessage("Crafting level to low to craft " + config.gemType().getName());
                     shutdown();
                     return;
                 }
@@ -35,7 +35,7 @@ public class GemsScript extends Script {
                             Rs2Bank.withdrawItem(true, "chisel");
                             Rs2Bank.withdrawItemAll(true, uncutGemName);
                         } else{
-                            Microbot.getNotifier().notify("Run out of Materials");
+                            Microbot.showMessage("Run out of Materials");
                             shutdown();
                         }
                         Rs2Bank.closeBank();
