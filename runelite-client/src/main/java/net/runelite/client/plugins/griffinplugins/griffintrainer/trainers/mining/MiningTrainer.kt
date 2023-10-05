@@ -6,6 +6,7 @@ import net.runelite.api.Skill
 import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
+import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
@@ -106,13 +107,13 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
             }
 
             Rs2Bank.depositAll()
-            Global.sleep(300, 600)
+            TrainerInterruptor.sleep(300, 600)
             Rs2Bank.depositEquipment()
-            Global.sleep(600, 900)
+            TrainerInterruptor.sleep(600, 900)
 
             val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
             Rs2Bank.closeBank()
-            Global.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
+            TrainerInterruptor.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
 
             ItemHelper.equipItemIds(foundItemIds)
         }
@@ -165,7 +166,7 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
         if (config.keepOre()) {
             if (Inventory.isFull()) {
                 Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
-                Global.sleep(400, 600)
+                TrainerInterruptor.sleep(400, 600)
 
                 Rs2Bank.getNearestBank()
 
@@ -174,7 +175,7 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
                     Rs2Bank.depositAll()
                     Rs2Bank.closeBank()
                 }
-                Global.sleep(200)
+                TrainerInterruptor.sleep(200)
             }
         } else {
             Inventory.dropAll()

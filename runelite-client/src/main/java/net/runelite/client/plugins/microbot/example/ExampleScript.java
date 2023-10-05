@@ -2,7 +2,7 @@ package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.security.Login;
+import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchange;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +28,7 @@ public class ExampleScript extends Script {
                 World currentWorld = worldResult.findWorld(Microbot.getClient().getWorld());
                 System.out.println(currentWorld);*/
           //      System.out.println(Login.getRandomMembersWorld());
-                System.out.println(Login.getRandomWorld(true));
+                GrandExchange.collect(true);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

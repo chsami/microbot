@@ -31,7 +31,6 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.farming.enums.FarmingState;
-import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
@@ -41,12 +40,9 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
-
-import static net.runelite.client.plugins.microbot.util.bank.Rs2Bank.*;
 
 public class FarmingScript extends Script {
 
@@ -80,7 +76,7 @@ public class FarmingScript extends Script {
                         shutdown();
                         return;
                     }
-                    itemsRequired = new ArrayList<>(Arrays.asList(new ItemRequirement("falador teleport", ItemID.FALADOR_TELEPORT, 1),
+                    /*itemsRequired = new ArrayList<>(Arrays.asList(new ItemRequirement("falador teleport", ItemID.FALADOR_TELEPORT, 1),
                             new ItemRequirement("lumbridge teleport", ItemID.LUMBRIDGE_TELEPORT, 1),
                             new ItemRequirement("spade", ItemID.SPADE, 1),
                             new ItemRequirement("rake", ItemID.RAKE, 1),
@@ -95,13 +91,13 @@ public class FarmingScript extends Script {
                         state = FarmingState.BANKING;
                     } else {
                         state = FarmingState.FARMING_GNOME_STRONHOLD;
-                    }
+                    }*/
                 } else if (state == FarmingState.BANKING) {
 
-                    boolean hasItems = Rs2Bank.withdrawItemsRequired(itemsRequired);
+                  /*  boolean hasItems = Rs2Bank.withdrawItemsRequired(itemsRequired);
 
                     if (!hasItems)
-                        return;
+                        return;*/
 
                     state = FarmingState.FARMING_GNOME_STRONHOLD;
 

@@ -5,13 +5,15 @@ import net.runelite.client.config.ConfigManager
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginDescriptor.Griffin
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathFinder
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathWalker
 import net.runelite.client.ui.overlay.OverlayManager
 import javax.inject.Inject
 
 @PluginDescriptor(name = Griffin + GriffinTrainerPlugin.CONFIG_GROUP, enabledByDefault = false)
 class GriffinTrainerPlugin : Plugin() {
     companion object {
-        const val CONFIG_GROUP = "Auto Pilot"
+        const val CONFIG_GROUP = "Auto Pilot [<font color=#f22727>DANGER</font>]"
     }
 
     @Inject
@@ -30,15 +32,26 @@ class GriffinTrainerPlugin : Plugin() {
 
     private lateinit var trainerThread: TrainerThread
 
-    @Inject
     override fun startUp() {
+        TrainerInterruptor.isInterrupted = false
         trainerThread = TrainerThread(config)
         overlayManager.add(overlay)
         trainerThread.start()
     }
 
     override fun shutDown() {
-        trainerThread.stop()
+        TrainerInterruptor.isInterrupted = true
+        PathWalker.interrupt()
+
+        trainerThread.interrupt()
+        trainerThread.join(5000)
+
+        while (trainerThread.isAlive) {
+            println("$CONFIG_GROUP: Thread took too long to stop, forcing unsafe stop.")
+            trainerThread.stop();
+        }
+
+        PathFinder.resetPath()
         overlayManager.remove(overlay)
     }
 }
