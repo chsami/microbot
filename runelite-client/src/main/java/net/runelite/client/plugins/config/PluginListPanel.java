@@ -192,10 +192,6 @@ class PluginListPanel extends PluginPanel
 						.map(Plugin::getName)
 						.collect(Collectors.toList());
 
-					if (descriptor.name().toLowerCase().contains("micro")) {
-						pinnedPlugins.add(descriptor.name());
-					}
-
 					return new PluginConfigurationDescriptor(
 						descriptor.name(),
 						descriptor.description(),
