@@ -199,8 +199,6 @@ public class Walker {
     }
 
     public boolean staticWalkTo(WorldPoint endWorldPoint, int maxDestinationDistance) {
-        Rs2Camera.setAngle(45);
-        Rs2Camera.setPitch(1.0f);
 
         Player player = Microbot.getClient().getLocalPlayer();
         WorldPoint start = player.getWorldLocation();

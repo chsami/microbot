@@ -33,6 +33,7 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
         var trainerSchedule = getTrainerSchedule()
 
         while (!overallTimer.isTimerComplete) {
+            if (isInterrupted) return
 
             if (trainerSchedule.isEmpty()) {
                 trainerSchedule = getTrainerSchedule()
@@ -50,6 +51,8 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
             taskTimer.start()
 
             while (!taskTimer.isTimerComplete) {
+                if (isInterrupted) return
+
                 if (runTrainer(trainerToRun)) {
                     break
                 }

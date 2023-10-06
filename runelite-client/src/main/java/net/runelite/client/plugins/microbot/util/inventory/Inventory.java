@@ -5,7 +5,7 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.bank.models.BankItemWidget;
+import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -103,6 +103,16 @@ public class Inventory {
             return item.getItemQuantity();
 
         return 0;
+    }
+
+    public static long getItemAmount(String itemName) {
+        Microbot.status = "Looking for item: " + itemName;
+        Widget inventoryWidget = getInventory();
+        if (inventoryWidget == null) return 0;
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
+                .filter(x ->
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName.toLowerCase())
+                ).count());
     }
 
     public static boolean isInventoryFull(String itemName) {
@@ -664,10 +674,19 @@ public class Inventory {
 
     private static void useItemFastAbstract(Rs2Item rs2Item, String action) {
         if (rs2Item == null) return;
+
+        Widget itemWidget = Rs2Widget.getWidget(rs2Item.id);
+
         item = rs2Item;
         itemAction = action;
-        Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
-        Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
+
+        if (itemWidget == null) {
+            Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
+            Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
+        } else {
+            Microbot.getMouse().click(itemWidget.getBounds());
+        }
+
         sleep(100);
         item = null;
         itemAction = "";
@@ -814,12 +833,19 @@ public class Inventory {
                 menuEntry.setType(MenuAction.CC_OP);
             }
 
-
             menuEntry.setOption(itemAction != null ? itemAction : "");
             menuEntry.setIdentifier(index);
             menuEntry.setParam0(item.slot);
             menuEntry.setParam1(9764864);
             menuEntry.setTarget("<col=ff9040>" + itemComposition.getName() + "</col>");
+
+
+            //grandexchange inventory
+            if (itemAction.equalsIgnoreCase("offer")) {
+                menuEntry.setIdentifier(1);
+                menuEntry.setParam1(30605312);
+            }
+
         } catch(Exception ex) {
             System.out.println("INVENTORY MENU SWAP FAILED WITH MESSAGE: " + ex.getMessage());
         }
@@ -833,7 +859,7 @@ public class Inventory {
                     i++;
                     continue;
                 }
-                inventoryItems.add(new BankItemWidget(Microbot.getItemManager().getItemComposition(item.getId()).getName(), item.getId(), item.getQuantity(), i));
+                inventoryItems.add(new ItemWidget(Microbot.getItemManager().getItemComposition(item.getId()).getName(), item.getId(), item.getQuantity(), i));
                 i++;
             }
         }

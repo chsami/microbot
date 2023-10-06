@@ -1,8 +1,8 @@
 package net.runelite.client.plugins.griffinplugins.util.helpers
 
 import net.runelite.api.GameObject
+import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.microbot.Microbot
-import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
@@ -29,6 +29,10 @@ class MiningHelper {
                 }
             }
 
+            if (TrainerInterruptor.isInterrupted) {
+                return false
+            }
+
             if (!Rs2Camera.isTileOnScreen(nearestOre.localLocation)) {
                 Rs2Camera.turnTo(nearestOre.localLocation)
             }
@@ -38,13 +42,13 @@ class MiningHelper {
                 return false
             }
 
-            Global.sleepUntilTrue({ Rs2Player.isAnimating() || Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null }, 100, 3000)
+            TrainerInterruptor.sleepUntilTrue({ Rs2Player.isAnimating() || Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null }, 100, 3000)
             if (Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null) {
                 return false
             }
 
             Microbot.status = "Waiting to finish mining ${oreName} ore"
-            return Global.sleepUntilTrue({
+            return TrainerInterruptor.sleepUntilTrue({
                 val doneMining = !Rs2Player.isWalking() && !Rs2Player.isAnimating()
                 val oreDisappeared = Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null
                 return@sleepUntilTrue doneMining || oreDisappeared
