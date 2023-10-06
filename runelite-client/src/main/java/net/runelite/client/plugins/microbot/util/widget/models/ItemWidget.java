@@ -25,11 +25,11 @@ public class ItemWidget implements Widget {
         this.index = w.getIndex();
     }
 
-    public ItemWidget(String name, int itemId, int quantity, int slot) {
+    public ItemWidget(String name, int itemId, int quantity, int index) {
         this.name = name;
         this.itemId = itemId;
         this.quantity = quantity;
-        this.slot = slot;
+        this.index = index;
     }
 
     @Override

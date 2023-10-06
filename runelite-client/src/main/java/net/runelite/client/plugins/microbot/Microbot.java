@@ -184,18 +184,18 @@ public class Microbot {
     public static CopyOnWriteArrayList<ItemWidget> updateItemContainer(int id, ItemContainerChanged e) {
         if (e.getContainerId() == id) {
             CopyOnWriteArrayList<ItemWidget> list = new CopyOnWriteArrayList<>();
-            int i = 0;
+            int i = -1;
             for (Item item : e.getItemContainer().getItems()) {
                 if (item == null) {
                     i++;
                     continue;
                 }
+                i++; //increment before checking if it is a placeholder. This way the index will match the slots in the bank
                 ItemComposition composition = Microbot.getItemManager().getItemComposition(item.getId());
-                boolean isPlaceholder = composition.getPlaceholderId() > 0;
+                boolean isPlaceholder = composition.getPlaceholderTemplateId() > 0;
                 if (isPlaceholder) continue;
 
                 list.add(new ItemWidget(composition.getName(), item.getId(), item.getQuantity(), i));
-                i++;
             }
             return list;
         }

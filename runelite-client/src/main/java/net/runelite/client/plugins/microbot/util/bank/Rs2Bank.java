@@ -719,9 +719,6 @@ public class Rs2Bank {
 
         ItemWidget bankItem = bankItems.stream().filter(x -> x.getItemId() == id).findFirst().orElse(null);
 
-        if (bankItem != null)
-            bankItem.setIndex(bankItems.indexOf(bankItem));
-
         return bankItem;
     }
 
@@ -741,9 +738,6 @@ public class Rs2Bank {
         ItemWidget bankItem = bankItems.stream().filter(x -> exact
                 ? x.getName().equalsIgnoreCase(lowerCaseName)
                 : x.getName().toLowerCase().contains(lowerCaseName)).findFirst().orElse(null);
-
-        if (bankItem != null)
-            bankItem.setIndex(bankItems.indexOf(bankItem));
 
         return bankItem;
     }
