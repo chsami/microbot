@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.globval.VarcIntValues;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
 
@@ -160,11 +161,40 @@ public class Rs2Tab {
 
     public static boolean switchToLogout() {
         if (getCurrentTab() == InterfaceTab.LOGOUT) return true;
-        Widget tab = Microbot.getClient().getWidget(10551341);
+
+        int logout_widget_id = getLogoutWidgetId();
+
+        if (logout_widget_id == 0) return false;
+
+        Widget tab = Microbot.getClient().getWidget(logout_widget_id);
         if (tab == null) return false;
+
         Microbot.getMouse().click(tab.getBounds());
-        sleep(600, 1000);
+        sleep(200, 600);
+
         return getCurrentTab() == InterfaceTab.LOGOUT;
+    }
+
+    private static int getLogoutWidgetId() {
+        /* Widget Ids - These may change during Runelite updates */
+        final int FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB = 35913777;
+        final int RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON = 10551348;
+        final int RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON = 10747938;
+
+        try {
+            if (Rs2Widget.getWidget(FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB) != null) {
+                return FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB;
+            } else if (Rs2Widget.getWidget(RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON) != null) {
+                return RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON;
+            } else if (Rs2Widget.getWidget(RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON) != null) {
+                return RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON;
+            }
+        } catch (Exception ex) {
+            // Rs2Widget.getWidget returns null if the game isn't finished loading
+            ex.printStackTrace();
+        }
+
+        return 0;
     }
 
     private static int getKeyBind(int value) {

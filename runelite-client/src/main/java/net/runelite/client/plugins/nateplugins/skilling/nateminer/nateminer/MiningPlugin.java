@@ -9,6 +9,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -61,11 +62,21 @@ public class MiningPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(miningOverlay);
         }
+
+        initBreakHandlerSetup();
         miningScript.run(config);
     }
 
     protected void shutDown() {
+        BreakHandlerScript.disableParentPlugin();
+
         miningScript.shutdown();
         overlayManager.remove(miningOverlay);
+    }
+
+    private void initBreakHandlerSetup() {
+        BreakHandlerScript.setIsParentPluginRunning(true);
+        BreakHandlerScript.setParentPluginName("Nate's Power Miner");
+        BreakHandlerScript.setDetailedReportNotification(true);        // Let's send extra details to the breakhandler
     }
 }
