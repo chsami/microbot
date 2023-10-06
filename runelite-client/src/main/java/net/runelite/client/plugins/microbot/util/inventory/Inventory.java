@@ -808,7 +808,8 @@ public class Inventory {
                     || itemAction.equalsIgnoreCase("read")
                     || itemAction.equalsIgnoreCase("eat")
                     || itemAction.equalsIgnoreCase("view")
-                    || itemAction.equalsIgnoreCase("bury")) {
+                    || itemAction.equalsIgnoreCase("bury")
+                    || itemAction.equalsIgnoreCase("feel")) {
                 index = 2;
                 menuEntry.setType(MenuAction.CC_OP);
             } else if (itemAction.equalsIgnoreCase("wield")
