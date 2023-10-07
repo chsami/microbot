@@ -24,8 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.getNpc;
 
 
@@ -351,6 +350,7 @@ public class Inventory {
     public static Widget findItem(String itemName, boolean exact) {
         Microbot.status = "Searching inventory for item: " + itemName;
         Rs2Tab.switchToInventoryTab();
+        sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return null;
         return Microbot.getClientThread().runOnClientThread(() -> {

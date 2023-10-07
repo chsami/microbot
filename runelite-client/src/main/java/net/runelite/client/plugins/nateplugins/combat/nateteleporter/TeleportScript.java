@@ -29,7 +29,7 @@ public class TeleportScript extends Script {
                 if (config.highAlchemy()) {
                     sleep(600, 800);
 
-                    Widget item = Inventory.findItemInMemory(config.highAlchemyItem());
+                    Widget item = Inventory.findItem(config.highAlchemyItem());
                     if (item == null) {
                         Microbot.showMessage("Item: " + config.highAlchemyItem() + " not found in your inventory.");
                         return;
