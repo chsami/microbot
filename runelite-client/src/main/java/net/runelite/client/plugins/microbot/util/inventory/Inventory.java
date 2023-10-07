@@ -119,7 +119,7 @@ public class Inventory {
             Widget inventoryWidget = getInventory();
             if (inventoryWidget == null) return false;
             if (hasItemStackable(itemName)) return false;
-            return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(Inventory::itemExistsInInventory).count() == 28;
+            return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(Inventory::itemExistsInInventory).count() == 28);
         });
     }
 
@@ -128,7 +128,7 @@ public class Inventory {
             Widget inventoryWidget = getInventory();
             if (inventoryWidget == null) return false;
             if (hasItemStackable(itemId)) return false;
-            return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(Inventory::itemExistsInInventory).count() == 28;
+            return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(Inventory::itemExistsInInventory).count() == 28);
         });
     }
 
@@ -147,7 +147,8 @@ public class Inventory {
         Microbot.status = "Checking inventory has stackable item " + itemName;
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return false;
-        return Arrays.stream(inventoryWidget.getDynamicChildren())
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(
+                inventoryWidget.getDynamicChildren())
                 .anyMatch(x -> {
                     ItemComposition itemComp = Microbot.getItemManager().getItemComposition(x.getItemId());
                     if (itemComp.getNote() == 799 || itemComp.isStackable()) {
@@ -155,14 +156,15 @@ public class Inventory {
                     } else {
                         return false;
                     }
-                });
+                })
+        );
     }
 
     public static boolean hasItemStackable(int itemId) {
         Microbot.status = "Checking inventory has stackable item " + itemId;
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return false;
-        return Arrays.stream(inventoryWidget.getDynamicChildren())
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
                 .anyMatch(x -> {
                     ItemComposition itemComp = Microbot.getItemManager().getItemComposition(x.getItemId());
                     if (itemComp.getNote() == 799 || itemComp.isStackable()) {
@@ -170,7 +172,8 @@ public class Inventory {
                     } else {
                         return false;
                     }
-                });
+                })
+        );
     }
 
     public static boolean hasItem(String itemName) {
@@ -211,7 +214,7 @@ public class Inventory {
         Microbot.status = "Searching inventory item:" + itemName;
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return null;
-        return Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getName().toLowerCase().contains(itemName)).findFirst().get();
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x) && x.getName().toLowerCase().contains(itemName)).findFirst().get());
     }
 
     public static Widget getInventoryItem(int itemId) {
@@ -233,50 +236,57 @@ public class Inventory {
         Inventory.open();
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return null;
-        Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
-        items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("eat"))).toArray(Widget[]::new);
-        ;
-        return items;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
+            items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("eat"))).toArray(Widget[]::new);
+            return items;
+        });
     }
 
     public static Widget[] getPotions() {
         Microbot.status = "Fetching inventory potions";
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return null;
-        Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
-        items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("drink"))).toArray(Widget[]::new);
-        return items;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
+            items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("drink"))).toArray(Widget[]::new);
+            return items;
+        });
     }
 
     public static Widget findItemSlot(int index) {
         Microbot.status = "Searching inventory slot " + index;
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return null;
-        return inventoryWidget.getChild(index);
+        return Microbot.getClientThread().runOnClientThread(() -> inventoryWidget.getChild(index));
     }
 
     public static Widget findItem(int itemId) {
         Microbot.status = "Searching inventory item with id " + itemId;
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return null;
-        for (Widget item : inventoryWidget.getDynamicChildren()) {
-            if (item.getItemId() == itemId) {
-                return item;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            for (Widget item : inventoryWidget.getDynamicChildren()) {
+                if (item.getItemId() == itemId) {
+                    return item;
+                }
             }
-        }
-        return null;
+            return null;
+        });
     }
     public static Widget findLastItem(int itemId) {
         Microbot.status = "Searching inventory for last item with id " + itemId;
         Widget inventoryWidget = getInventory();
-        Widget lastItem = null;
         if (inventoryWidget == null) return null;
-        for (Widget item : inventoryWidget.getDynamicChildren()) {
-            if (item.getItemId() == itemId) {
-                lastItem = item;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget lastItem = null;
+            for (Widget item : inventoryWidget.getDynamicChildren()) {
+                if (item.getItemId() == itemId) {
+                    lastItem = item;
+                }
             }
-        }
-        return lastItem;
+            return lastItem;
+        });
     }
 
     public static boolean hasItemAmount(int itemId, int amount) {
@@ -334,16 +344,18 @@ public class Inventory {
             Widget inventoryWidget = Microbot.getClient().getWidget(9764864);
             Widget bankInventoryWidget = Microbot.getClient().getWidget(983043);
             Widget bankPinInventoryWidget = Microbot.getClient().getWidget(17563648);
-            if (inventoryWidget != null && inventoryWidget.getDynamicChildren() != null && !inventoryWidget.isHidden()) {
-                return inventoryWidget;
-            }
-            if (bankInventoryWidget != null && bankInventoryWidget.getDynamicChildren() != null && !bankInventoryWidget.isHidden()) {
-                return bankInventoryWidget;
-            }
-            if (bankPinInventoryWidget != null && bankPinInventoryWidget.getDynamicChildren() != null && !bankPinInventoryWidget.isHidden()) {
-                return bankPinInventoryWidget;
-            }
-            return null;
+            return Microbot.getClientThread().runOnClientThread(() -> {
+                if (inventoryWidget != null && inventoryWidget.getDynamicChildren() != null && !inventoryWidget.isHidden()) {
+                    return inventoryWidget;
+                }
+                if (bankInventoryWidget != null && bankInventoryWidget.getDynamicChildren() != null && !bankInventoryWidget.isHidden()) {
+                    return bankInventoryWidget;
+                }
+                if (bankPinInventoryWidget != null && bankPinInventoryWidget.getDynamicChildren() != null && !bankPinInventoryWidget.isHidden()) {
+                    return bankPinInventoryWidget;
+                }
+                return null;
+            });
         });
     }
 
@@ -374,14 +386,16 @@ public class Inventory {
         Microbot.status = "Searching inventory for last item with id " + itemId;
         Widget inventoryWidget = getInventory();
         if (inventoryWidget == null) return null;
-        Widget[] children = inventoryWidget.getDynamicChildren();
-        ArrayUtils.reverse(children);
-        for (Widget item : children) {
-            if (item.getItemId() == itemId) {
-                return item;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget[] children = inventoryWidget.getDynamicChildren();
+            ArrayUtils.reverse(children);
+            for (Widget item : children) {
+                if (item.getItemId() == itemId) {
+                    return item;
+                }
             }
-        }
-        return null;
+            return null;
+        });
     }
 
     public static Widget findItem(String itemName) {
