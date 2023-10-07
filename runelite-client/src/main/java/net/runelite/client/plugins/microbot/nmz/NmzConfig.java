@@ -13,7 +13,8 @@ public interface NmzConfig extends Config {
             keyName = "guide",
             name = "How to use",
             description = "How to use this plugin",
-            position = 1
+            position = 0,
+            section = generalSection
     )
     default String GUIDE() {
         return "Start outside NMZ with gp in Dominic's coffer and make sure bankpin has been unlocked\n" +
@@ -73,6 +74,30 @@ public interface NmzConfig extends Config {
             section = generalSection
     )
     default boolean stopAfterDeath()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "Use Zapper",
+            name = "Use Zapper",
+            description = "Use Zapper to increase nightmare zone points",
+            position = 4,
+            section = generalSection
+    )
+    default boolean useZapper()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "Use Reccurent damage",
+            name = "Use Reccurent damage",
+            description = "Use reccurent damage to increase nightmare zone points",
+            position = 4,
+            section = generalSection
+    )
+    default boolean useReccurentDamage()
     {
         return true;
     }

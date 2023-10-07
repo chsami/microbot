@@ -38,12 +38,6 @@ public class PlayerAssistPlugin extends Plugin {
     }
 
     @Inject
-    private Client client;
-    @Inject
-    private ClientThread clientThread;
-    @Inject
-    private Notifier notifier;
-    @Inject
     private OverlayManager overlayManager;
     @Inject
     private PlayerAssistOverlay playerAssistOverlay;
