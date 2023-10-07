@@ -14,7 +14,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.util.concurrent.TimeUnit;
 
 
-public class AlcherScript extends Script {
+public class AlcherScriptCleaned extends Script {
 
     private AlcherState botState;
 
