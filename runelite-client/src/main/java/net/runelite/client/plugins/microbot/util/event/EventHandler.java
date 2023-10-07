@@ -40,6 +40,13 @@ public class EventHandler extends EventQueue {
         }
     }
 
+    public void regainFocus() {
+        FocusEvent canvasFocusEvent = new FocusEvent(gameCanvas, FocusEvent.FOCUS_GAINED, false, null, FocusEvent.Cause.ACTIVATION);
+        FocusEvent frameFocusEvent = new FocusEvent(gameFrame, FocusEvent.FOCUS_GAINED, false, null, FocusEvent.Cause.ACTIVATION);
+        Microbot.getEventHandler().dispatchUnblockedEvent(canvasFocusEvent);
+        Microbot.getEventHandler().dispatchUnblockedEvent(frameFocusEvent);
+    }
+
     public void dispatchUnblockedEvent(AWTEvent event) {
         if (event != null && event.getSource() != null) {
             postEvent(new UnblockedEvent(event));
@@ -65,27 +72,17 @@ public class EventHandler extends EventQueue {
         if (isUnblockedEvent) {
             ((Component) eventSource).dispatchEvent(event);
 
-        } else if (eventSource == gameCanvas && (event instanceof WindowEvent || event instanceof MouseEvent)) {
+        } else if (eventSource == gameCanvas && (event instanceof WindowEvent || event instanceof MouseEvent || event instanceof KeyEvent)) {
             if (!blocked) {
                 super.dispatchEvent(event);
             }
 
-//        } else if (eventSource == gameCanvas && event instanceof KeyEvent) {
-//            System.out.println("1: " + event);
-//            ((Component) eventSource).dispatchEvent(event);
-//            super.dispatchEvent(event);
-//
-//        } else if (eventSource == gameFrame && event instanceof KeyEvent) {
-////            if (!blocked) {
-////                super.dispatchEvent(event);
-////            }
-//            System.out.println("2: " + event);
-////            ((Component) eventSource).dispatchEvent(event);
-//            super.dispatchEvent(event);
-
+        } else if (eventSource == gameFrame && (event instanceof KeyEvent)) {
+            if (!blocked) {
+                super.dispatchEvent(event);
+            }
 
         } else {
-//            ((Component) eventSource).dispatchEvent(event);
             super.dispatchEvent(event);
         }
     }
