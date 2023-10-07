@@ -51,6 +51,8 @@ public class MiningPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
+        Microbot.setBreakHandler("Nate's Miner", true);
+
         Microbot.pauseAllScripts = false;
         Microbot.setClient(client);
         Microbot.setClientThread(clientThread);
@@ -63,20 +65,11 @@ public class MiningPlugin extends Plugin {
             overlayManager.add(miningOverlay);
         }
 
-        initBreakHandlerSetup();
         miningScript.run(config);
     }
 
     protected void shutDown() {
-        BreakHandlerScript.disableParentPlugin();
-
         miningScript.shutdown();
         overlayManager.remove(miningOverlay);
-    }
-
-    private void initBreakHandlerSetup() {
-        BreakHandlerScript.setIsParentPluginRunning(true);
-        BreakHandlerScript.setParentPluginName("Nate's Power Miner");
-        BreakHandlerScript.setDetailedReportNotification(true);        // Let's send extra details to the breakhandler
     }
 }

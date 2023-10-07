@@ -39,6 +39,15 @@ public interface BreakHandlerConfig extends Config {
     )
     String debugSection = "Debug";
 
+    //TODO: Remove after Hyper implements UI
+    @ConfigSection(
+            name = "Temporary",
+            description = "Temporary",
+            position = 3,
+            closedByDefault = false
+    )
+    String temporarySection = "Temporary";
+
     @ConfigItem(
             keyName = "Minimum Duration",
             name = "Minimum Duration",
@@ -110,4 +119,14 @@ public interface BreakHandlerConfig extends Config {
             section = debugSection
     )
     default boolean VERBOSE_LOGGING() { return false; }
+
+    //TODO: Remove after Hyper implements UI
+    @ConfigItem(
+            keyName = "Enable Breakhandler?",
+            name = "Enable Breakhandler?",
+            description = "Enable Breakhandler?",
+            position = 8,
+            section = temporarySection
+    )
+    default boolean ENABLE_BREAKHANDLER() { return false; }
 }

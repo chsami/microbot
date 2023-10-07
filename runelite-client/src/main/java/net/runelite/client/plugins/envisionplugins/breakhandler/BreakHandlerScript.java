@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 1.2;
+    public static double version = 1.3;
 
     /* Break Handler Enabled Check Field */
     private static boolean isEnabled = false;
@@ -218,6 +218,11 @@ public class BreakHandlerScript extends Script {
                         breakHandlerPanel.showError(failureMessage);
                         break;
 
+                    case DISABLED:
+                        breakHandlerPanel.showError(failureMessage);
+
+                        break;
+
                     default:
                         System.err.println("Bad Break Handler State...");
                 }
@@ -227,6 +232,8 @@ public class BreakHandlerScript extends Script {
                 BreakHandlerStates.afkBreakCheck(this);
                 BreakHandlerStates.logoutBreakCheck(this);
                 BreakHandlerStates.failureCheck(this);
+                //TODO: Remove the second parameter after Hyper does the UI
+                BreakHandlerStates.disableCheck(this, config.ENABLE_BREAKHANDLER());
 
             } catch (Exception ex) {
                 ex.printStackTrace();

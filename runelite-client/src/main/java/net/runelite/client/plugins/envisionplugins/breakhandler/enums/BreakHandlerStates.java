@@ -11,7 +11,8 @@ public enum BreakHandlerStates {
     POST_BREAK_AFK,
     POST_BREAK_LOGIN,
     RESET,
-    FAILURE;
+    FAILURE,
+    DISABLED;
 
     /**
      * Check if we should shift state to STARTUP
@@ -83,6 +84,13 @@ public enum BreakHandlerStates {
             BreakHandlerScript.myState = STARTUP;
         }
 
+    }
+
+    public static void disableCheck(BreakHandlerScript breakHandlerScript, boolean temporaryIsBreakHandlerEnabled) {
+        if (!temporaryIsBreakHandlerEnabled) {      // TODO: Convert to UI based check and get via breakHandlerScript and not temporaryIsBreakHandlerEnabled
+            BreakHandlerScript.myState = DISABLED;
+            breakHandlerScript.failureMessage = "If you wish to use the Break Handler, please enable it!";
+        }
     }
 
     private static void resetCounts(BreakHandlerScript breakHandlerScript) {
