@@ -10,11 +10,10 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-
 import java.util.concurrent.TimeUnit;
 
 
-public class AlcherScriptCleaned extends Script {
+public class AlcherScript extends Script {
 
     private AlcherState botState;
 
@@ -31,6 +30,8 @@ public class AlcherScriptCleaned extends Script {
     String itemList;
 
     String[] itemListArray;
+
+    private int delayTime = 300;
 
     public boolean run(AlcherConfig config) {
 
@@ -99,6 +100,20 @@ public class AlcherScriptCleaned extends Script {
         if(orState) botState = stateToOr;
     }
 
+    private void alchSpell(){
+        afkBreak(32, 200, 300);
+        sleep(200, 400);
+        alchSpellWidget = Rs2Widget.getWidget(14286888);
+        if(alchSpellWidget != null){
+            if(Random.random(0,3) == 1){
+                Microbot.getMouse().click((alchSpellWidget.getBounds().getCenterX() + Random.random(-5,5)), (alchSpellWidget.getBounds().getCenterY() + Random.random(-5,5)));
+            }else{
+                Microbot.getMouse().click(alchSpellWidget.getBounds().getCenterX(), alchSpellWidget.getBounds().getCenterY());
+            }
+            botState = AlcherState.CHOOSING_ITEM;
+        }
+    }
+
     private String findItemsInArray(String[] itemListArray){
         for(String str : itemListArray){
             if(Inventory.contains(str.toLowerCase())){
@@ -114,6 +129,14 @@ public class AlcherScriptCleaned extends Script {
             }
         }
         return null;
+    }
+
+    private void clickItem(){
+        afkBreak(32, 200, 300);
+        sleep(200, 400);
+        Inventory.useItemAction(item.getName(), "Cast");
+        sleep(500,1000);
+        botState = AlcherState.ALCHING;
     }
 
     private void afkBreak(int chance, int min, int max){
