@@ -5,6 +5,7 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
+import java.awt.event.FocusEvent;
 import java.awt.image.BufferedImage;
 
 public class EventSelector {
@@ -45,6 +46,7 @@ public class EventSelector {
     public void enableClick() {
         Microbot.getEventHandler().setBlocked(false);
         addAndRemoveButtons();
+        Microbot.getEventHandler().regainFocus();
     }
 
     public void disableClick() {
