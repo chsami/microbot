@@ -70,6 +70,17 @@ public interface GriffinTrainerConfig extends Config {
         return 30;
     }
 
+    @ConfigItem(
+            keyName = "equipGear",
+            name = "Equip Initial Gear",
+            description = "Equip Initial Gear",
+            position = 5,
+            section = generalSection
+    )
+    default boolean equipGear() {
+        return true;
+    }
+
     @ConfigSection(
             name = "Task Settings",
             description = "Task Settings",
@@ -97,6 +108,17 @@ public interface GriffinTrainerConfig extends Config {
             section = tasksSection
     )
     default boolean trainMining() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "trainFishing",
+            name = "Train Fishing",
+            description = "Train Fishing",
+            position = 2,
+            section = tasksSection
+    )
+    default boolean trainFishing() {
         return true;
     }
 
@@ -163,6 +185,17 @@ public interface GriffinTrainerConfig extends Config {
         return 0;
     }
 
+    @ConfigItem(
+            keyName = "fishingLevel",
+            name = "Fishing",
+            description = " Fishing Level",
+            position = 5,
+            section = skillsSection
+    )
+    default int fishingLevel() {
+        return 0;
+    }
+
     @ConfigSection(
             name = "Mining Settings",
             description = "Mining Settings",
@@ -170,19 +203,6 @@ public interface GriffinTrainerConfig extends Config {
             closedByDefault = false
     )
     String miningSettingsSection = "miningSettingsSection";
-
-
-    @ConfigItem(
-            keyName = "equipGear",
-            name = "Equip Initial Gear",
-            description = "Equip Initial Gear",
-            position = 0,
-            section = miningSettingsSection
-    )
-    default boolean equipGear() {
-        return true;
-    }
-
 
     @ConfigItem(
             keyName = "keepOre",
@@ -195,38 +215,38 @@ public interface GriffinTrainerConfig extends Config {
         return true;
     }
 
-    @ConfigItem(
-            keyName = "hopWorlds",
-            name = "Hop Worlds",
-            description = "Hop Worlds",
-            position = 2,
-            section = miningSettingsSection
-    )
-    default boolean hopWorlds() {
-        return true;
-    }
-
-    @ConfigItem(
-            keyName = "maxPlayers",
-            name = "Max Players In Mining Area",
-            description = "Max Players In Mining Area",
-            position = 3,
-            section = miningSettingsSection
-    )
-    default int maxPlayers() {
-        return 2;
-    }
-
-    @ConfigItem(
-            keyName = "maxWorldsToTry",
-            name = "Max Worlds To Try",
-            description = "Max Worlds To Try",
-            position = 4,
-            section = miningSettingsSection
-    )
-    default int maxWorldsToTry() {
-        return 10;
-    }
+//    @ConfigItem(
+//            keyName = "hopWorlds",
+//            name = "Hop Worlds",
+//            description = "Hop Worlds",
+//            position = 2,
+//            section = miningSettingsSection
+//    )
+//    default boolean hopWorlds() {
+//        return true;
+//    }
+//
+//    @ConfigItem(
+//            keyName = "maxPlayers",
+//            name = "Max Players In Mining Area",
+//            description = "Max Players In Mining Area",
+//            position = 3,
+//            section = miningSettingsSection
+//    )
+//    default int maxPlayers() {
+//        return 2;
+//    }
+//
+//    @ConfigItem(
+//            keyName = "maxWorldsToTry",
+//            name = "Max Worlds To Try",
+//            description = "Max Worlds To Try",
+//            position = 4,
+//            section = miningSettingsSection
+//    )
+//    default int maxWorldsToTry() {
+//        return 10;
+//    }
 
     @ConfigSection(
             name = "Combat Settings",
@@ -247,5 +267,23 @@ public interface GriffinTrainerConfig extends Config {
         return true;
     }
 
+    @ConfigSection(
+            name = "Fishing Settings",
+            description = "Fishing Settings",
+            position = 5,
+            closedByDefault = false
+    )
+    String fishingSettingsSection = "fishingSettings";
+
+    @ConfigItem(
+            keyName = "keepFish",
+            name = "Keep Fish",
+            description = "Keep Fish",
+            position = 0,
+            section = fishingSettingsSection
+    )
+    default boolean keepFish() {
+        return true;
+    }
 
 }

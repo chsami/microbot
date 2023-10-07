@@ -1,21 +1,20 @@
 package net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.combat
 
 import net.runelite.api.ItemID
-import net.runelite.api.Player
 import net.runelite.api.Skill
 import net.runelite.api.VarPlayer
 import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.widgets.WidgetInfo
-import net.runelite.client.plugins.griffinplugins.griffintrainer.*
+import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
+import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
+import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.NPCHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
-import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
-import net.runelite.client.plugins.griffinplugins.util.helpers.WorldHelper
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.Global
@@ -88,15 +87,6 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
         return false
     }
 
-    private fun updateCounts(status: String, countLabel: String) {
-        if (TrainerThread.countLabel != countLabel) {
-            TrainerThread.count = 0
-        }
-
-        Microbot.status = status
-        TrainerThread.countLabel = countLabel
-    }
-
     private fun processState(worldArea: WorldArea, worldPoint: WorldPoint, npcName: String, itemLootIds: List<Int>) {
         when (scriptState) {
             ScriptState.SETUP -> runSetupState()
@@ -135,24 +125,24 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
             Microbot.getWalkerForKotlin().staticWalkTo(worldPoint)
         }
 
-        if (config.hopWorlds()) {
-
-            val players = Microbot.getClientForKotlin().players
-            val playerCount = players
-                .filterNotNull()
-                .filter { otherPlayer: Player -> otherPlayer.id != player.id }
-                .filter { otherPlayer: Player -> worldArea.contains(player.worldLocation) }
-                .count()
-
-            if (config.hopWorlds() && playerCount > config.maxPlayers()) {
-                WorldHelper.hopToWorldWithoutPlayersInArea(
-                    Rs2Player.isMember(),
-                    worldArea,
-                    config.maxPlayers(),
-                    config.maxWorldsToTry()
-                )
-            }
-        }
+//        if (config.hopWorlds()) {
+//
+//            val players = Microbot.getClientForKotlin().players
+//            val playerCount = players
+//                .filterNotNull()
+//                .filter { otherPlayer: Player -> otherPlayer.id != player.id }
+//                .filter { otherPlayer: Player -> worldArea.contains(player.worldLocation) }
+//                .count()
+//
+//            if (config.hopWorlds() && playerCount > config.maxPlayers()) {
+//                WorldHelper.hopToWorldWithoutPlayersInArea(
+//                    Rs2Player.isMember(),
+//                    worldArea,
+//                    config.maxPlayers(),
+//                    config.maxWorldsToTry()
+//                )
+//            }
+//        }
 
         scriptState = ScriptState.FIGHTING
     }

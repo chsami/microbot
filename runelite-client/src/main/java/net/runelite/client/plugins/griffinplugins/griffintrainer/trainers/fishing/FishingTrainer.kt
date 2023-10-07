@@ -1,47 +1,58 @@
-package net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.mining
+package net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.fishing
 
 import net.runelite.api.ItemID
 import net.runelite.api.Skill
+import net.runelite.api.VarPlayer
 import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
-import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
-import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
-import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
+import net.runelite.api.widgets.WidgetInfo
+import net.runelite.client.plugins.griffinplugins.griffintrainer.*
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
+import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.NPCHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
-import net.runelite.client.plugins.griffinplugins.util.helpers.MiningHelper
+import net.runelite.client.plugins.griffinplugins.util.helpers.FishingHelper
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
+import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 
-class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
-    private val varrockEastMineWorldArea = WorldArea(3281, 3363, 10, 9, 0)
-    private val varrockEastMineWorldPoint = WorldPoint(3284, 3366, 0)
+class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
+    private val draynorFishingArea = WorldArea(3084, 3223, 7, 11, 0)
+    private val draynorFishingPoint = WorldPoint(3087, 3229, 0)
+    private val barbarianFishingArea = WorldArea(3101, 3423, 10, 13, 0)
+    private val barbarianFishingPoint = WorldPoint(3105, 3430, 0)
 
     private enum class ScriptState {
-        SETUP, CHECKING_AREA, MINING, BANKING
+        SETUP, CHECKING_AREA, FISHING, BANKING
     }
 
     private var scriptState: ScriptState = ScriptState.SETUP
 
     override fun getBankLocation(): WorldPoint {
-        return WorldDestinations.VARROCK_EAST_BANK.worldPoint
+        return if (getMinimumSkillLevel() < 20) {
+            WorldDestinations.DRAYNOR_VILLAGE_BANK.worldPoint
+        } else {
+            WorldDestinations.VARROCK_WEST_BANK.worldPoint
+        }
     }
 
     override fun getInventoryRequirements(): InventoryRequirements {
         val inventoryRequirements = InventoryRequirements()
-        val pickaxes = GeneralItemSets.getPickaxesItemSet()
+        val weapons = GeneralItemSets.getWeaponItemSet()
         val helmets = GeneralItemSets.getHelmetItemSet()
         val bodies = GeneralItemSets.getBodiesItemSet()
         val legs = GeneralItemSets.getLegsItemSet()
         val boots = GeneralItemSets.getBootsItemSet()
         val shields = GeneralItemSets.getShieldsItemSet()
 
-        inventoryRequirements.addItemSet(pickaxes)
+        inventoryRequirements.addItemSet(weapons)
         inventoryRequirements.addItemSet(helmets)
         inventoryRequirements.addItemSet(bodies)
         inventoryRequirements.addItemSet(legs)
@@ -52,23 +63,27 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
     }
 
     override fun getMinimumSkillLevel(): Int {
-        return Microbot.getClientForKotlin().getRealSkillLevel(Skill.MINING)
+        return Microbot.getClientForKotlin().getRealSkillLevel(Skill.FISHING)
     }
 
     override fun shouldTrain(): Boolean {
-        return getMinimumSkillLevel() < config.miningLevel()
+        return getMinimumSkillLevel() < config.fishingLevel()
     }
 
     override fun process(): Boolean {
         val minimumSkillLevel = getMinimumSkillLevel()
 
         if (minimumSkillLevel < 15) {
-            updateCounts("Mining Copper", "Copper Mined")
-            processState(varrockEastMineWorldArea, varrockEastMineWorldPoint, "copper rocks", ItemID.COPPER_ORE)
+            updateCounts("Fishing Shrimp", "Shrimp Caught")
+            processState(draynorFishingArea, draynorFishingPoint, "fishing spot", "small net", listOf(ItemID.RAW_SHRIMPS))
+
+        } else if (minimumSkillLevel < 20) {
+            updateCounts("Fishing Shrimp & Anchovies", "Shrimp & Anchovies Caught")
+            processState(draynorFishingArea, draynorFishingPoint, "fishing spot", "small net", listOf(ItemID.RAW_SHRIMPS, ItemID.RAW_ANCHOVIES))
 
         } else if (minimumSkillLevel < 99) {
-            updateCounts("Mining Iron", "Iron Mined")
-            processState(varrockEastMineWorldArea, varrockEastMineWorldPoint, "iron rocks", ItemID.IRON_ORE)
+            updateCounts("Fishing Trout & Salmon", "Trout & Salmon Caught")
+            processState(barbarianFishingArea, barbarianFishingPoint, "rod fishing spot", "lure", listOf(ItemID.RAW_SALMON, ItemID.RAW_TROUT))
 
         } else {
             return true
@@ -77,11 +92,11 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
         return false
     }
 
-    fun processState(worldArea: WorldArea, worldPoint: WorldPoint, oreName: String, oreId: Int) {
+    private fun processState(worldArea: WorldArea, worldPoint: WorldPoint, npcName: String, actionName: String, itemIds: List<Int>) {
         when (scriptState) {
             ScriptState.SETUP -> runSetupState()
             ScriptState.CHECKING_AREA -> runCheckingAreaState(worldArea, worldPoint)
-            ScriptState.MINING -> runMiningState(oreName, oreId)
+            ScriptState.FISHING -> runFishingState(npcName, actionName, itemIds)
             ScriptState.BANKING -> runBankingState()
         }
     }
@@ -114,43 +129,29 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
             Microbot.getWalkerForKotlin().staticWalkTo(worldPoint)
         }
 
-//        if (config.hopWorlds()) {
-//
-//            val players = Microbot.getClientForKotlin().players
-//            val playerCount = players
-//                .filterNotNull()
-//                .filter { otherPlayer: Player -> otherPlayer.id != player.id }
-//                .filter { otherPlayer: Player -> worldArea.contains(player.worldLocation) }
-//                .count()
-//
-//            if (config.hopWorlds() && playerCount > config.maxPlayers()) {
-//                WorldHelper.hopToWorldWithoutPlayersInArea(
-//                    Rs2Player.isMember(),
-//                    worldArea,
-//                    config.maxPlayers(),
-//                    config.maxWorldsToTry()
-//                )
-//            }
-//        }
-
-        scriptState = ScriptState.MINING
+        scriptState = ScriptState.FISHING
     }
 
-    private fun runMiningState(oreName: String, oreId: Int) {
-        val beforeCount = Inventory.getInventoryItems().count { item -> item.itemId == oreId }
+    private fun runFishingState(npcName: String, actionName: String, itemIds: List<Int>) {
+        var countBefore = 0
+        itemIds.forEach { itemId: Int ->
+            countBefore += Inventory.getInventoryItems().count { it.id == itemId }
+        }
 
-        if (MiningHelper.findAndMineOre(oreName)) {
-            val afterCount = Inventory.getInventoryItems().count { item -> item.itemId == oreId }
-            if (afterCount > beforeCount) {
-                TrainerThread.count++
+        if (FishingHelper.findAndInteract(npcName, actionName)) {
+            var countAfter = 0
+            itemIds.forEach { itemId: Int ->
+                countAfter += Inventory.getInventoryItems().count { it.id == itemId }
             }
 
-            scriptState = ScriptState.BANKING
+            TrainerThread.count += countAfter - countBefore
         }
+
+        scriptState = ScriptState.BANKING
     }
 
     private fun runBankingState() {
-        if (config.keepOre()) {
+        if (config.collectItems()) {
             if (Inventory.isFull()) {
                 Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
                 TrainerInterruptor.sleep(400, 600)
@@ -170,5 +171,4 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
 
         scriptState = ScriptState.CHECKING_AREA
     }
-
 }

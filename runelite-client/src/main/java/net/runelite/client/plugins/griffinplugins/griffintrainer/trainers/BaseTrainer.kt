@@ -1,8 +1,10 @@
 package net.runelite.client.plugins.griffinplugins.griffintrainer.trainers
 
 import net.runelite.api.coords.WorldPoint
-import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
+import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
+import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
+import net.runelite.client.plugins.microbot.Microbot
 
 abstract class BaseTrainer {
     abstract fun getBankLocation(): WorldPoint
@@ -28,5 +30,14 @@ abstract class BaseTrainer {
         }
 
         return false
+    }
+
+    fun updateCounts(status: String, countLabel: String) {
+        if (TrainerThread.countLabel != countLabel) {
+            TrainerThread.count = 0
+        }
+
+        Microbot.status = status
+        TrainerThread.countLabel = countLabel
     }
 }
