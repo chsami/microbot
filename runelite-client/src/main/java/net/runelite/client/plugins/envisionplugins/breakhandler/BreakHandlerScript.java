@@ -218,10 +218,6 @@ public class BreakHandlerScript extends Script {
                         breakHandlerPanel.showError(failureMessage);
                         break;
 
-                    case DISABLED:
-                        breakHandlerPanel.showError(failureMessage);
-
-                        break;
 
                     default:
                         System.err.println("Bad Break Handler State...");
@@ -232,8 +228,6 @@ public class BreakHandlerScript extends Script {
                 BreakHandlerStates.afkBreakCheck(this);
                 BreakHandlerStates.logoutBreakCheck(this);
                 BreakHandlerStates.failureCheck(this);
-                //TODO: Remove the second parameter after Hyper does the UI
-                BreakHandlerStates.disableCheck(this, config.ENABLE_BREAKHANDLER());
 
             } catch (Exception ex) {
                 ex.printStackTrace();

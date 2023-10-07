@@ -38,16 +38,7 @@ public interface BreakHandlerConfig extends Config {
             closedByDefault = false
     )
     String debugSection = "Debug";
-
-    //TODO: Remove after Hyper implements UI
-    @ConfigSection(
-            name = "Temporary",
-            description = "Temporary",
-            position = 3,
-            closedByDefault = false
-    )
-    String temporarySection = "Temporary";
-
+    
     @ConfigItem(
             keyName = "Minimum Duration",
             name = "Minimum Duration",
@@ -55,7 +46,9 @@ public interface BreakHandlerConfig extends Config {
             position = 0,
             section = runTimeSection
     )
-    default int MINIMUM_RUN_TIME_DURATION() { return 3600; }
+    default int MINIMUM_RUN_TIME_DURATION() {
+        return 3600;
+    }
 
     @ConfigItem(
             keyName = "Maximum Duration",
@@ -64,7 +57,9 @@ public interface BreakHandlerConfig extends Config {
             position = 1,
             section = runTimeSection
     )
-    default int MAXIMUM_RUN_TIME_DURATION() { return 19800; }
+    default int MAXIMUM_RUN_TIME_DURATION() {
+        return 19800;
+    }
 
     @ConfigItem(
             keyName = "Minimum Break Duration",
@@ -73,7 +68,9 @@ public interface BreakHandlerConfig extends Config {
             position = 2,
             section = breakSection
     )
-    default int MINIMUM_BREAK_DURATION() { return 900; }
+    default int MINIMUM_BREAK_DURATION() {
+        return 900;
+    }
 
     @ConfigItem(
             keyName = "Maximum Break Duration",
@@ -82,7 +79,9 @@ public interface BreakHandlerConfig extends Config {
             position = 3,
             section = breakSection
     )
-    default int MAXIMUM_BREAK_DURATION() { return 1800; }
+    default int MAXIMUM_BREAK_DURATION() {
+        return 1800;
+    }
 
     @ConfigItem(
             keyName = "Discord Webhook for notifications",
@@ -91,7 +90,9 @@ public interface BreakHandlerConfig extends Config {
             position = 4,
             section = discordSection
     )
-    default String DISCORD_WEBHOOK() { return ""; }
+    default String DISCORD_WEBHOOK() {
+        return "";
+    }
 
     @ConfigItem(
             keyName = "Client Name for Discord Webhook",
@@ -100,7 +101,9 @@ public interface BreakHandlerConfig extends Config {
             position = 5,
             section = discordSection
     )
-    default String DISCORD_CLIENT_NAME() { return "Default"; }
+    default String DISCORD_CLIENT_NAME() {
+        return "Default";
+    }
 
     @ConfigItem(
             keyName = "Enable Discord Webhook for notifications",
@@ -109,7 +112,9 @@ public interface BreakHandlerConfig extends Config {
             position = 6,
             section = discordSection
     )
-    default boolean ENABLE_DISCORD_WEBHOOK() { return false; }
+    default boolean ENABLE_DISCORD_WEBHOOK() {
+        return false;
+    }
 
     @ConfigItem(
             keyName = "Enable verbose debug System logs?",
@@ -118,15 +123,7 @@ public interface BreakHandlerConfig extends Config {
             position = 7,
             section = debugSection
     )
-    default boolean VERBOSE_LOGGING() { return false; }
-
-    //TODO: Remove after Hyper implements UI
-    @ConfigItem(
-            keyName = "Enable Breakhandler?",
-            name = "Enable Breakhandler?",
-            description = "Enable Breakhandler?",
-            position = 8,
-            section = temporarySection
-    )
-    default boolean ENABLE_BREAKHANDLER() { return false; }
+    default boolean VERBOSE_LOGGING() {
+        return false;
+    }
 }
