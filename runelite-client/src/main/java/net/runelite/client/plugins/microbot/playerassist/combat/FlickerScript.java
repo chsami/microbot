@@ -1,42 +1,33 @@
 package net.runelite.client.plugins.microbot.playerassist.combat;
 
-import net.runelite.api.NpcID;
-import net.runelite.api.events.GameTick;
+import net.runelite.api.NPC;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyle;
 import net.runelite.client.plugins.microbot.playerassist.model.Monster;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
+import net.runelite.client.plugins.microbot.util.prayer.Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import net.runelite.api.NPC;
+import static net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager.attackStyleMap;
 
 public class FlickerScript extends Script {
 
-    List<Monster> monsters;
+    List<Monster> monsters = new ArrayList<>();
     public static List<Monster> currentMonstersAttackingUs = new ArrayList<>();
 
     AttackStyle prayFlickAttackStyle = null;
 
-    public void init() {
-        monsters = new ArrayList<>();
-        monsters.add(new Monster(NpcID.GUARD_11947, 6, 426, AttackStyle.RANGED));
-        monsters.add(new Monster(NpcID.GUARD_3271, 6, 395, AttackStyle.MELEE));
-        monsters.add(new Monster(NpcID.FIRE_GIANT_2081, 5, 4667, AttackStyle.MELEE));
-        monsters.add(new Monster(NpcID.FIRE_GIANT_2082, 5, 4667, AttackStyle.MELEE));
-        monsters.add(new Monster(NpcID.FIRE_GIANT_2083, 5, 4666, AttackStyle.MELEE));
-        monsters.add(new Monster(NpcID.FIRE_GIANT_2084, 5, 4667, AttackStyle.MELEE));
-
-    }
-
     public boolean run(PlayerAssistConfig config) {
-        init();
+        monsters.add(new Monster(3274, 426));
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!config.prayFlick()) return;
@@ -46,47 +37,50 @@ public class FlickerScript extends Script {
 
 
                 //keep track of which monsters still have aggro on the player
-                for (Monster monster: currentMonstersAttackingUs) {
+                for (Monster monster : currentMonstersAttackingUs) {
                     if (!npcs.stream().anyMatch(x -> x.getIndex() == monster.npc.getIndex()))
                         monster.delete = true;
                 }
 
                 currentMonstersAttackingUs = currentMonstersAttackingUs.stream().filter(x -> !x.delete).collect(Collectors.toList());
 
-                for (NPC npc: npcs) {
-                    boolean npcIsNotInTheList = currentMonstersAttackingUs.stream().anyMatch(x -> x.npc.getIndex() == npc.getIndex());
-                    if (npc != null && !npcIsNotInTheList) {
-                        Monster currentMonster = monsters.stream().filter(x -> x.id == npc.getId()).findFirst().orElse(null);
-                        if (currentMonster == null) continue;
-                        if (!npc.isDead() && npc.getAnimation() == currentMonster.attackAnimation) {
-                            Monster monsterToAdd = new Monster(currentMonster.id, currentMonster.attackSpeed,
-                                    currentMonster.attackAnimation, currentMonster.attackStyle);
-                            monsterToAdd.npc = npc;
+                for (NPC npc : npcs) {
+                    Monster currentMonster = currentMonstersAttackingUs.stream().filter(x -> x.npc.getIndex() == npc.getIndex()).findFirst().orElse(null);
+                    String attackAnimation = Rs2NpcManager.attackAnimationMap.get(npc.getId());
+                    if (attackAnimation == null || attackAnimation.isEmpty()) continue;
+
+                    if (currentMonster != null) {
+                        //TODO
+                       /* if (!npc.isDead() && npc.getAnimation() == Integer.parseInt(attackAnimation) && currentMonster.lastAttack <= 0)
+                            currentMonster.lastAttack = currentMonster.rs2NpcStats.getAttackSpeed();
+                        if (currentMonster.lastAttack <= -currentMonster.rs2NpcStats.getAttackSpeed() / 2)
+                            currentMonstersAttackingUs.remove(currentMonster);*/
+                    } else {
+                        if (!npc.isDead() && npc.getAnimation() == Integer.parseInt(attackAnimation)) {
+                            Monster monsterToAdd = new Monster(npc, Objects.requireNonNull(Rs2NpcManager.getStats(npc.getId())));
                             currentMonstersAttackingUs.add(monsterToAdd);
                         }
                     }
                 }
-
-
                 if (prayFlickAttackStyle != null) {
-                    switch(prayFlickAttackStyle) {
+                    switch (prayFlickAttackStyle) {
                         case MAGE:
                             prayFlickAttackStyle = null;
-                            Rs2Prayer.turnOnMagePrayer();
+                            Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, true);
                             sleep(200);
-                            Rs2Prayer.turnOffMagePrayer();
+                            Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, false);
                             break;
                         case MELEE:
                             prayFlickAttackStyle = null;
-                            Rs2Prayer.turnOnMeleePrayer();
+                            Rs2Prayer.fastPray(Prayer.PROTECT_MELEE, true);
                             sleep(200);
-                            Rs2Prayer.turnOffMeleePrayer();
+                            Rs2Prayer.fastPray(Prayer.PROTECT_MELEE, false);
                             break;
                         case RANGED:
                             prayFlickAttackStyle = null;
-                            Rs2Prayer.turnOnRangedPrayer();
+                            Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true);
                             sleep(200);
-                            Rs2Prayer.turnOffRangedPrayer();
+                            Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false);
                             break;
                     }
                 }
@@ -104,18 +98,14 @@ public class FlickerScript extends Script {
     }
 
 
-    public void onGameTick(GameTick gameTick) {
+    public void onGameTick() {
         if (!currentMonstersAttackingUs.isEmpty()) {
-            for (Monster currentMonster: currentMonstersAttackingUs) {
-                if (currentMonster.adjustableAttackSpeed > 0) {
-                    currentMonster.adjustableAttackSpeed--;
-                }
-
-                if (currentMonster.adjustableAttackSpeed <= 0) {
-                    currentMonster.adjustableAttackSpeed = currentMonster.attackSpeed;
-                }
-                if (currentMonster.adjustableAttackSpeed == 1) {
-                    prayFlickAttackStyle = currentMonster.attackStyle;
+            for (Monster currentMonster : currentMonstersAttackingUs) {
+                currentMonster.lastAttack--;
+                String attackStyle = attackStyleMap.get(currentMonster.npc.getId());
+                if (currentMonster.lastAttack == 1) {
+                    prayFlickAttackStyle = attackStyle.equalsIgnoreCase("magic") ? AttackStyle.MAGE :
+                            attackStyle.equalsIgnoreCase("ranged") ? AttackStyle.RANGED : AttackStyle.MELEE;
                 }
             }
         }
@@ -127,7 +117,6 @@ public class FlickerScript extends Script {
                 .findFirst().orElse(null);
 
         if (monster != null) {
-            prayFlickAttackStyle = monster.attackStyle;
             currentMonstersAttackingUs.remove(monster);
         }
     }

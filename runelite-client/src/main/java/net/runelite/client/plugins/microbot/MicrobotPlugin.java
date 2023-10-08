@@ -32,6 +32,7 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
@@ -87,6 +88,9 @@ public class MicrobotPlugin extends Plugin {
     @Named("disableWalkerUpdate")
     private boolean disableWalkerUpdate;
 
+    @Inject
+    private Rs2NpcManager rs2NpcManager;
+
     public ThievingScript thievingScript;
     public CookingScript cookingScript;
     public MiningScript miningScript;
@@ -119,6 +123,8 @@ public class MicrobotPlugin extends Plugin {
 
         WorldDataDownloader worldDataDownloader = new WorldDataDownloader();
         worldDataDownloader.run();
+
+        Rs2NpcManager.loadJson();
     }
 
     protected void shutDown() {
@@ -184,7 +190,8 @@ public class MicrobotPlugin extends Plugin {
     @Subscribe
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
         if (gameStateChanged.getGameState() == GameState.HOPPING || gameStateChanged.getGameState() == GameState.LOGIN_SCREEN || gameStateChanged.getGameState() == GameState.CONNECTION_LOST) {
-            Rs2Bank.bankItems.clear();
+            if (Rs2Bank.bankItems != null)
+                Rs2Bank.bankItems.clear();
         }
     }
 

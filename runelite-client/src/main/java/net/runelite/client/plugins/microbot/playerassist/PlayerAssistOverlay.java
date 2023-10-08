@@ -46,12 +46,12 @@ public class PlayerAssistOverlay extends Overlay {
         }
 
         for (Monster currentMonster: currentMonstersAttackingUs) {
-            if (currentMonster != null && currentMonster.npc != null) {
+            if (currentMonster != null && currentMonster.npc != null && currentMonster.npc.getCanvasTilePoly() != null) {
                 try {
                     graphics.setColor(Color.CYAN);
                     modelOutlineRenderer.drawOutline((NPC) currentMonster.npc, 2, Color.RED, 4);
                     graphics.draw(currentMonster.npc.getCanvasTilePoly());
-                    graphics.drawString("" + currentMonster.adjustableAttackSpeed,
+                    graphics.drawString("" + currentMonster.lastAttack,
                             (int) currentMonster.npc.getCanvasTilePoly().getBounds().getCenterX(),
                             (int) currentMonster.npc.getCanvasTilePoly().getBounds().getCenterY());
                 } catch(Exception ex) {
