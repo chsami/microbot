@@ -7,8 +7,6 @@ import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
-import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
-import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
@@ -18,11 +16,11 @@ import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 
-class WoodcuttingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
+class WoodcuttingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
     private val varrockWestTreeWorldArea = WorldArea(3159, 3388, 13, 25, 0)
     private val varrockWestTreeWorldPoint = WorldPoint(3164, 3402, 0)
     private val varrockWestOakTreeWorldArea = WorldArea(3132, 3393, 17, 23, 0)
-    private val varrockWestOakTreeWorldPoint = WorldPoint(3137, 3403, 0);
+    private val varrockWestOakTreeWorldPoint = WorldPoint(3137, 3403, 0)
     private val seersWillowTreeWorldArea = WorldArea(2701, 3502, 20, 14, 0)
     private val seersWillowTreeWorldPoint = WorldPoint(2709, 3506, 0)
 
@@ -98,24 +96,7 @@ class WoodcuttingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer
     }
 
     private fun runSetupState() {
-        if (config.equipGear()) {
-            Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
-            if (!Rs2Bank.isOpen()) {
-                Rs2Bank.openBank()
-            }
-
-            Rs2Bank.depositAll()
-            TrainerInterruptor.sleep(300, 600)
-            Rs2Bank.depositEquipment()
-            TrainerInterruptor.sleep(600, 900)
-
-            val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
-            Rs2Bank.closeBank()
-            TrainerInterruptor.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
-
-            ItemHelper.equipItemIds(foundItemIds)
-        }
-
+        fetchItemRequirements()
         scriptState = ScriptState.CHECKING_AREA
     }
 
@@ -129,10 +110,10 @@ class WoodcuttingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer
     }
 
     private fun runChoppingState(treeName: String, itemId: Int) {
-        val countBefore = Inventory.getInventoryItems().count { it.id == itemId }
+        val countBefore = Inventory.getInventoryItems().count { it.itemId == itemId }
 
         if (WoodcuttingHelper.findAndChopTree(treeName)) {
-            val countAfter = Inventory.getInventoryItems().count { it.id == itemId }
+            val countAfter = Inventory.getInventoryItems().count { it.itemId == itemId }
             TrainerThread.count += countAfter - countBefore
         }
 

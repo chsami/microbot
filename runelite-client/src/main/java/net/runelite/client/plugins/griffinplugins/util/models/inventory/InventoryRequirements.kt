@@ -22,7 +22,7 @@ class InventoryRequirements {
         Inventory.open()
         itemSets.forEach { dynamicItemSet: DynamicItemSet ->
             var meetsRequirement = false
-            dynamicItemSet.getItems().forEach { itemAndQuantityPair: Pair<Int, Int> ->
+            dynamicItemSet.getItems().forEach { itemAndQuantityPair: Triple<Int, Int, Boolean> ->
                 if (Inventory.hasItem(itemAndQuantityPair.first)) {
                     if (Inventory.getItemAmount(itemAndQuantityPair.first) >= itemAndQuantityPair.second) {
                         meetsRequirement = true

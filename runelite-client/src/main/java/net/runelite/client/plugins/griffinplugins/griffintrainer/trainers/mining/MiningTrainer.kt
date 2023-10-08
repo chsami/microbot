@@ -7,8 +7,6 @@ import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
-import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
-import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
@@ -18,7 +16,7 @@ import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 
-class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
+class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
     private val varrockEastMineWorldArea = WorldArea(3281, 3363, 10, 9, 0)
     private val varrockEastMineWorldPoint = WorldPoint(3284, 3366, 0)
 
@@ -87,24 +85,7 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
     }
 
     private fun runSetupState() {
-        if (config.equipGear()) {
-            Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
-            if (!Rs2Bank.isOpen()) {
-                Rs2Bank.openBank()
-            }
-
-            Rs2Bank.depositAll()
-            TrainerInterruptor.sleep(300, 600)
-            Rs2Bank.depositEquipment()
-            TrainerInterruptor.sleep(600, 900)
-
-            val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
-            Rs2Bank.closeBank()
-            TrainerInterruptor.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
-
-            ItemHelper.equipItemIds(foundItemIds)
-        }
-
+        fetchItemRequirements()
         scriptState = ScriptState.CHECKING_AREA
     }
 

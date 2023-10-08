@@ -9,7 +9,6 @@ import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
-import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.NPCHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
@@ -24,7 +23,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 
-class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
+class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
     private val lumbridgeChickensWorldArea = WorldArea(3225, 3287, 12, 15, 0)
     private val lumbridgeCowsWorldArea = WorldArea(3255, 3258, 9, 37, 0)
 
@@ -98,24 +97,7 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
     }
 
     private fun runSetupState() {
-        if (config.equipGear()) {
-            Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
-            if (!Rs2Bank.isOpen()) {
-                Rs2Bank.openBank()
-            }
-
-            Rs2Bank.depositAll()
-            TrainerInterruptor.sleep(300, 600)
-            Rs2Bank.depositEquipment()
-            TrainerInterruptor.sleep(600, 900)
-
-            val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
-            Rs2Bank.closeBank()
-            TrainerInterruptor.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
-
-            ItemHelper.equipItemIds(foundItemIds)
-        }
-
+        fetchItemRequirements()
         scriptState = ScriptState.CHECKING_AREA
     }
 

@@ -7,8 +7,6 @@ import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
-import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHelper
-import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
@@ -19,7 +17,7 @@ import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 
-class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
+class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
     private val draynorFishingArea = WorldArea(3084, 3223, 7, 11, 0)
     private val draynorFishingPoint = WorldPoint(3087, 3229, 0)
     private val barbarianFishingArea = WorldArea(3101, 3423, 10, 13, 0)
@@ -58,12 +56,12 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
 
         val fishingLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.FISHING)
         if (fishingLevel >= 1) {
-            tools.add(ItemID.SMALL_FISHING_NET, 1)
+            tools.add(ItemID.SMALL_FISHING_NET, 1, false)
         }
 
         if (fishingLevel >= 20) {
-            tools.add(ItemID.FLY_FISHING_ROD, 1)
-            other.add(ItemID.FEATHER, 300)
+            tools.add(ItemID.FLY_FISHING_ROD, 1, false)
+            other.add(ItemID.FEATHER, 300, false)
         }
 
         inventoryRequirements.addItemSet(tools)
@@ -112,24 +110,7 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
     }
 
     private fun runSetupState() {
-        if (config.equipGear()) {
-            Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
-            if (!Rs2Bank.isOpen()) {
-                Rs2Bank.openBank()
-            }
-
-            Rs2Bank.depositAll()
-            TrainerInterruptor.sleep(300, 600)
-            Rs2Bank.depositEquipment()
-            TrainerInterruptor.sleep(600, 900)
-
-            val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
-            Rs2Bank.closeBank()
-            TrainerInterruptor.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
-
-            ItemHelper.equipItemIds(foundItemIds)
-        }
-
+        fetchItemRequirements()
         scriptState = ScriptState.CHECKING_AREA
     }
 
@@ -145,13 +126,13 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
     private fun runFishingState(npcName: String, actionName: String, itemIds: List<Int>) {
         var countBefore = 0
         itemIds.forEach { itemId: Int ->
-            countBefore += Inventory.getInventoryItems().count { it.id == itemId }
+            countBefore += Inventory.getInventoryItems().count { it.itemId == itemId }
         }
 
         if (FishingHelper.findAndInteract(npcName, actionName)) {
             var countAfter = 0
             itemIds.forEach { itemId: Int ->
-                countAfter += Inventory.getInventoryItems().count { it.id == itemId }
+                countAfter += Inventory.getInventoryItems().count { it.itemId == itemId }
             }
 
             TrainerThread.count += countAfter - countBefore

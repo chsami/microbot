@@ -13,7 +13,7 @@ class WoodcuttingHelper {
             val player = Microbot.getClientForKotlin().localPlayer
             val nearestTree = Rs2GameObject.getGameObjects()
                 .filterNotNull()
-                .filter { gameObject: GameObject -> Microbot.getClientForKotlin().getObjectDefinition(gameObject.id).name == treeName }
+                .filter { gameObject: GameObject -> Microbot.getClientForKotlin().getObjectDefinition(gameObject.id).name.equals(treeName, ignoreCase = true) }
                 .minByOrNull { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) } ?: return false
 
             if (TrainerInterruptor.isInterrupted) {

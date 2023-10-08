@@ -73,24 +73,21 @@ class ItemHelper {
             return true
         }
 
-        fun equipItemIds(itemIds: List<Int>) {
-            itemIds.forEach { itemId: Int ->
+        fun equipItemIds(itemPairs: List<Pair<Int, Boolean>>) {
+            for (itemPair in itemPairs) {
                 if (TrainerInterruptor.isInterrupted) {
                     return
                 }
 
-                Microbot.status = "Equipping item $itemId"
-                if (!Rs2Equipment.hasEquipped(itemId)) {
-                    Inventory.getInventoryItem(itemId)?.let {
-//                        val actions = it.actions?.filterNotNull()
-//                        actions ?: return@let
-//
-//                        if (!actions.contains("Wield") || !actions.contains("Wear")) {
-//                            return@let
-//                        }
+                if (!itemPair.second) {
+                    continue
+                }
 
+                Microbot.status = "Equipping item ${itemPair.first}"
+                if (!Rs2Equipment.hasEquipped(itemPair.first)) {
+                    Inventory.getInventoryItem(itemPair.first)?.let {
                         Microbot.getMouseForKotlin().click(it.bounds)
-                        TrainerInterruptor.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
+                        TrainerInterruptor.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemPair.first) }, 100, 3000)
                     }
                 }
             }
