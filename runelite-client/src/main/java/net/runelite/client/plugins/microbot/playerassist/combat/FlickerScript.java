@@ -50,11 +50,10 @@ public class FlickerScript extends Script {
                     if (attackAnimation == null || attackAnimation.isEmpty()) continue;
 
                     if (currentMonster != null) {
-                        //TODO
-                       /* if (!npc.isDead() && npc.getAnimation() == Integer.parseInt(attackAnimation) && currentMonster.lastAttack <= 0)
+                        if (!npc.isDead() && npc.getAnimation() == Integer.parseInt(attackAnimation) && currentMonster.lastAttack <= 0)
                             currentMonster.lastAttack = currentMonster.rs2NpcStats.getAttackSpeed();
                         if (currentMonster.lastAttack <= -currentMonster.rs2NpcStats.getAttackSpeed() / 2)
-                            currentMonstersAttackingUs.remove(currentMonster);*/
+                            currentMonstersAttackingUs.remove(currentMonster);
                     } else {
                         if (!npc.isDead() && npc.getAnimation() == Integer.parseInt(attackAnimation)) {
                             Monster monsterToAdd = new Monster(npc, Objects.requireNonNull(Rs2NpcManager.getStats(npc.getId())));

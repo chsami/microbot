@@ -1,20 +1,19 @@
 package net.runelite.client.plugins.microbot.playerassist;
 
-import net.runelite.api.NPC;
 import net.runelite.client.plugins.microbot.playerassist.model.Monster;
-import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayPriority;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
-
+import net.runelite.api.*;
 import javax.inject.Inject;
 import java.awt.*;
 
 import static net.runelite.client.plugins.microbot.playerassist.combat.AttackNpcScript.attackableNpcs;
 import static net.runelite.client.plugins.microbot.playerassist.combat.FlickerScript.currentMonstersAttackingUs;
 
-public class PlayerAssistOverlay extends Overlay {
+public class PlayerAssistOverlay extends OverlayPanel {
 
     private final ModelOutlineRenderer modelOutlineRenderer;
 
@@ -34,7 +33,7 @@ public class PlayerAssistOverlay extends Overlay {
 
         for (net.runelite.api.NPC npc :
                 attackableNpcs) {
-            if (npc != null) {
+            if (npc != null && npc.getCanvasTilePoly() != null) {
                 try {
                     graphics.setColor(Color.CYAN);
                     modelOutlineRenderer.drawOutline((NPC) npc, 2, Color.RED, 4);
@@ -60,6 +59,6 @@ public class PlayerAssistOverlay extends Overlay {
             }
         }
 
-        return null;
+        return super.render(graphics);
     }
 }
