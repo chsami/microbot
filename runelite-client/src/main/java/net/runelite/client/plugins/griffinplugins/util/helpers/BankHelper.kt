@@ -16,7 +16,6 @@ class BankHelper {
                     return foundItemIds
                 }
 
-
                 for (itemAndQuantityPair: Pair<Int, Int> in dynamicItemSet.getItems()) {
                     if (TrainerInterruptor.isInterrupted) {
                         return foundItemIds

@@ -3,6 +3,7 @@ package net.runelite.client.plugins.griffinplugins.griffintrainer
 import net.runelite.api.Skill
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.PlayTimer
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.combat.CombatTrainer
+import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.fishing.FishingTrainer
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.mining.MiningTrainer
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
@@ -18,14 +19,17 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
     }
 
     private enum class TrainerScripts {
-        MINING, COMBAT
+        MINING, COMBAT, FISHING
     }
 
     private lateinit var miningTrainer: MiningTrainer
     private lateinit var combatTrainer: CombatTrainer
+    private lateinit var fishingTrainer: FishingTrainer
+
     override fun run() {
         miningTrainer = MiningTrainer(config)
         combatTrainer = CombatTrainer(config)
+        fishingTrainer = FishingTrainer(config)
 
         overallTimer.setRandomTimeout(config.minTotalTime(), config.maxTotalTime())
         overallTimer.start()
@@ -66,6 +70,7 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
         return when (trainerToRun) {
             TrainerScripts.MINING -> miningTrainer.run()
             TrainerScripts.COMBAT -> combatTrainer.run()
+            TrainerScripts.FISHING -> fishingTrainer.run()
             else -> false
         }
     }
@@ -77,6 +82,7 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
         val strengthLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.STRENGTH)
         val defenceLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.DEFENCE)
         val miningLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.MINING)
+        val fishingLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.FISHING)
 
         if (config.trainCombat() && attackLevel < config.attackLevel() && strengthLevel < config.strengthLevel() && defenceLevel < config.defenceLevel()) {
             schedule.add(TrainerScripts.COMBAT)
@@ -84,6 +90,10 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
 
         if (config.trainMining() && miningLevel < config.miningLevel()) {
             schedule.add(TrainerScripts.MINING)
+        }
+
+        if (config.trainFishing() && fishingLevel < config.fishingLevel()) {
+            schedule.add(TrainerScripts.FISHING)
         }
 
         return schedule

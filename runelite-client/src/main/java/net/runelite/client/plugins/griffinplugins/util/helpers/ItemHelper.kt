@@ -82,6 +82,13 @@ class ItemHelper {
                 Microbot.status = "Equipping item $itemId"
                 if (!Rs2Equipment.hasEquipped(itemId)) {
                     Inventory.getInventoryItem(itemId)?.let {
+                        val actions = it.actions?.filterNotNull()
+                        actions ?: return@let
+
+                        if (!actions.contains("Wield") || !actions.contains("Wear")) {
+                            return@let
+                        }
+
                         Microbot.getMouseForKotlin().click(it.bounds)
                         TrainerInterruptor.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
                     }
