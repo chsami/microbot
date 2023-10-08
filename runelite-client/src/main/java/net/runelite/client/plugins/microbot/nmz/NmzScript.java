@@ -30,6 +30,7 @@ public class NmzScript extends Script {
         NmzScript.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
+            if (!Microbot.isLoggedIn()) return;
             try {
                 boolean isOutsideNmz = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2602, 3116, 0)) < 20;
                 useOverload = Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) == Microbot.getClient().getRealSkillLevel(Skill.ATTACK);
@@ -150,6 +151,7 @@ public class NmzScript extends Script {
             }
             Rs2GameObject.interact(objectId, "Take");
             String widgetText = "How many doses of " + itemName;
+            sleepUntil(() -> Rs2Widget.hasWidget(widgetText));
             if (Rs2Widget.hasWidget(widgetText)) {
                 VirtualKeyboard.typeString(keyboardInput);
                 VirtualKeyboard.enter();
