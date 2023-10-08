@@ -17,7 +17,8 @@ import java.awt.image.BufferedImage;
 @PluginDescriptor(
         name = PluginDescriptor.Envision + "Break Handler",
         description = "Break Handler for Microbot",
-        tags = {"microbot", "utility"}
+        tags = {"microbot", "utility"},
+        alwaysOn = true
 )
 @Slf4j
 public class BreakHandlerPlugin extends Plugin {

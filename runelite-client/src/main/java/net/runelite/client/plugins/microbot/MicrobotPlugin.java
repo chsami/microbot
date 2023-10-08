@@ -15,6 +15,7 @@ import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
@@ -124,10 +125,13 @@ public class MicrobotPlugin extends Plugin {
         WorldDataDownloader worldDataDownloader = new WorldDataDownloader();
         worldDataDownloader.run();
 
+        BreakHandlerScript.initBreakHandler("Microbot", false);
+
         Rs2NpcManager.loadJson();
     }
 
     protected void shutDown() {
+        BreakHandlerScript.disableParentPlugin();
         eventSelector.shutDown();
         overlayManager.remove(microbotOverlay);
         Microbot.setWalker(null);

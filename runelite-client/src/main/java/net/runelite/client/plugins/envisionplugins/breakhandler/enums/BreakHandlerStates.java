@@ -2,6 +2,8 @@ package net.runelite.client.plugins.envisionplugins.breakhandler.enums;
 
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 
+import java.util.Objects;
+
 public enum BreakHandlerStates {
     STARTUP,
     RUN,
@@ -59,9 +61,16 @@ public enum BreakHandlerStates {
      * Check if we should shift state to FAILURE
      */
     public static void failureCheck(BreakHandlerScript breakHandlerScript) throws Exception {
-        if (!BreakHandlerScript.isIsParentPluginRunning()) {
+
+        if (!breakHandlerScript.breakHandlerPanel.pluginEnabledBoxChecked()) {
+            breakHandlerScript.failureMessage = "If you wish to use the Break Handler, please enable it!";
             BreakHandlerScript.myState = FAILURE;
+            return;
+        }
+
+        if (!BreakHandlerScript.isIsParentPluginRunning()) {
             breakHandlerScript.failureMessage = "No supported plugin is enabled!";
+            BreakHandlerScript.myState = FAILURE;
             resetCounts(breakHandlerScript);
             return;
         }
@@ -71,8 +80,8 @@ public enum BreakHandlerStates {
         boolean isPasswordValid = breakHandlerScript.breakHandlerPanel.isPasswordValid();
 
         if (isUsingLogoutMethod && (isUsernameEmpty || !isPasswordValid)) {
-            BreakHandlerScript.myState = FAILURE;
             breakHandlerScript.failureMessage = "Missing or invalid account credentials for login!";
+            BreakHandlerScript.myState = FAILURE;
             return;
         }
 

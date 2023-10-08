@@ -7,6 +7,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.ui.breakmethod.B
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MaximumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.common.timeamount.MinimumTimeAmount;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.currenttimes.CurrentTimesParentPanel;
+import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enableglobal.EnabledGlobalParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.enums.TimeDurationType;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.error.ErrorParentPanel;
 import net.runelite.client.plugins.envisionplugins.breakhandler.ui.regeneratetimes.RegenerateTimesParentPanel;
@@ -36,6 +37,7 @@ public class BreakHandlerPanel extends PluginPanel {
 
     ErrorParentPanel errorParentPanel = new ErrorParentPanel();
     boolean firstErrorCall = true;
+    EnabledGlobalParentPanel enabledGlobalParentPanel = new EnabledGlobalParentPanel();
 
     @Inject
     BreakHandlerPanel() {
@@ -46,6 +48,7 @@ public class BreakHandlerPanel extends PluginPanel {
         setBorder(new EmptyBorder(6, 6, 6, 6));
 
         add(new HeaderPanel());
+        add(enabledGlobalParentPanel);
         JTabbedPane tabbedPane = new JTabbedPane();
 
         // Timers Panel
@@ -155,6 +158,10 @@ public class BreakHandlerPanel extends PluginPanel {
         timers.remove(errorParentPanel);
         timers.repaint();
         firstErrorCall = true;
+    }
+
+    public boolean pluginEnabledBoxChecked() {
+        return enabledGlobalParentPanel.pluginEnabledBoxChecked();
     }
 
 }
