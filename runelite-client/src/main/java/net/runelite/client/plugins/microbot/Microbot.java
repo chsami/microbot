@@ -11,6 +11,7 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
+import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
@@ -200,5 +201,10 @@ public class Microbot {
             return list;
         }
         return null;
+    }
+
+    public static void setBreakHandler(String pluginName, boolean advancedPostRunDiscordNotifications) {
+        BreakHandlerScript.setParentPluginName(pluginName);
+        BreakHandlerScript.setDetailedReportNotification(advancedPostRunDiscordNotifications);
     }
 }
