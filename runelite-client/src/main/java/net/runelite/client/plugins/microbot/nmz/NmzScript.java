@@ -4,6 +4,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -113,7 +114,7 @@ public class NmzScript extends Script {
 
     public void toggleSpecialAttack() {
         if (Microbot.getClient().getLocalPlayer().isInteracting() && config.useSpecialAttack()) {
-            // Microbot.toggleSpecialAttack(25);
+             Rs2Combat.setSpecState(true, 100);
         }
     }
 

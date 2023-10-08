@@ -46,9 +46,9 @@ public class HeaderPanel extends JPanel {
     }
 
     private void setStyle() {
-        setBorder(new EmptyBorder(10, 8, 9, 0));
+        setBorder(new EmptyBorder(10, 8, 3, 0));
         setBackground(ColorScheme.DARK_GRAY_COLOR);
-        Dimension d = new Dimension(300, 60);
+        Dimension d = new Dimension(300, 50);
         setSize(d);
         setPreferredSize(d);
         setMaximumSize(d);

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BreakHandlerScript extends Script {
 
-    public static double version = 1.2;
+    public static double version = 1.4;
 
     /* Break Handler Enabled Check Field */
     private static boolean isEnabled = false;
@@ -218,6 +218,7 @@ public class BreakHandlerScript extends Script {
                         breakHandlerPanel.showError(failureMessage);
                         break;
 
+
                     default:
                         System.err.println("Bad Break Handler State...");
                 }
@@ -281,9 +282,11 @@ public class BreakHandlerScript extends Script {
     }
 
     public boolean isAtAccountScreens() {
-        boolean atAccountScripts = Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null;
+        boolean atAccountScripts = false;
 
         try {
+            atAccountScripts = Rs2Widget.getWidget(WidgetInfo.LOGIN_CLICK_TO_PLAY_SCREEN) != null;
+
             if (Microbot.getClient().getGameState() == GameState.LOGIN_SCREEN
                     || Microbot.getClient().getGameState() == GameState.LOGGING_IN) {
                 atAccountScripts = true;

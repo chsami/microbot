@@ -28,7 +28,9 @@ public class ErrorParentPanel extends JPanel {
     }
 
     public void setText(String failureMessage) {
-
-        label.setText("<html>" + failureMessage + "</html>");
+        SwingUtilities.invokeLater(() -> {
+            label.setText("<html>" + failureMessage + "</html>");
+            repaint();
+        });
     }
 }
