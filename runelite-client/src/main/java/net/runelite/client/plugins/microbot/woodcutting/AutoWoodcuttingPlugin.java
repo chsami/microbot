@@ -25,9 +25,9 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
         enabledByDefault = false
 )
 @Slf4j
-public class WoodcuttingPlugin extends Plugin {
+public class AutoWoodcuttingPlugin extends Plugin {
     @Inject
-    private WoodcuttingConfig config;
+    private AutoWoodcuttingConfig config;
     @Inject
     private Client client;
     @Inject
@@ -36,17 +36,17 @@ public class WoodcuttingPlugin extends Plugin {
     Notifier notifier;
 
     @Provides
-    WoodcuttingConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(WoodcuttingConfig.class);
+    AutoWoodcuttingConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(AutoWoodcuttingConfig.class);
     }
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private WoodcuttingOverlay woodcuttingOverlay;
+    private AutoWoodcuttingOverlay woodcuttingOverlay;
 
     @Inject
-    WoodcuttingScript woodcuttingScript;
+    AutoWoodcuttingScript autoWoodcuttingScript;
 
 
     @Override
@@ -62,11 +62,11 @@ public class WoodcuttingPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(woodcuttingOverlay);
         }
-        woodcuttingScript.run(config);
+        autoWoodcuttingScript.run(config);
     }
 
     protected void shutDown() {
-        woodcuttingScript.shutdown();
+        autoWoodcuttingScript.shutdown();
         overlayManager.remove(woodcuttingOverlay);
     }
 }

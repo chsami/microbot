@@ -7,6 +7,7 @@ import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
+import net.runelite.client.util.QuantityFormatter;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -44,13 +45,22 @@ public class HumidifierOverlay extends OverlayPanel {
                     .left("Time Ran: " + PaintFormat.ft(timeElapsed))
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Magic Exp Gained (hr): " + (xpGained)  + " ("+xpPerHour+")")
+                    .left("Magic Exp Gained (hr): " + (QuantityFormatter.quantityToRSDecimalStack((int) xpGained))  +
+                            " ("+QuantityFormatter.quantityToRSDecimalStack(xpPerHour)+")")
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Magic Levels Gained: " + ( Microbot.getClient().getRealSkillLevel(Skill.MAGIC) - startinglevel))
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Time till next level: " + PaintFormat.ft(timeTNL))
+                    .build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left(HumidifierScript.itemsProcessedMessage)
+                    .build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left(HumidifierScript.profitMessage)
                     .build());
 
             panelComponent.getChildren().add(LineComponent.builder()

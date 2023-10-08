@@ -12,9 +12,9 @@ import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHel
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.NPCHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
-import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
+import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.util.helpers.WorldHelper
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
@@ -115,13 +115,13 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
             }
 
             Rs2Bank.depositAll()
-            Global.sleep(300, 600)
+            TrainerInterruptor.sleep(300, 600)
             Rs2Bank.depositEquipment()
-            Global.sleep(600, 900)
+            TrainerInterruptor.sleep(600, 900)
 
             val foundItemIds = BankHelper.fetchInventoryRequirements(getInventoryRequirements())
             Rs2Bank.closeBank()
-            Global.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
+            TrainerInterruptor.sleepUntilTrue({ !Rs2Bank.isOpen() }, 100, 3000)
 
             ItemHelper.equipItemIds(foundItemIds)
         }
@@ -171,7 +171,7 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
         if (config.collectItems()) {
             if (Inventory.isFull() && prayerLevel < config.prayerLevel()) {
                 buryBones()
-                Global.sleep(200)
+                TrainerInterruptor.sleep(200)
             }
 
             if (!Inventory.isFull()) {
@@ -186,7 +186,7 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
         if (config.collectItems()) {
             if (Inventory.isFull()) {
                 Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
-                Global.sleep(400, 600)
+                TrainerInterruptor.sleep(400, 600)
 
                 Rs2Bank.getNearestBank()
 
@@ -195,7 +195,7 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
                     Rs2Bank.depositAll()
                     Rs2Bank.closeBank()
                 }
-                Global.sleep(200)
+                TrainerInterruptor.sleep(200)
             }
         } else {
             Inventory.dropAll()
@@ -208,8 +208,8 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer() {
         while (Inventory.hasItem(ItemID.BONES)) {
             val inventoryCount = Inventory.count()
             Inventory.useItemAction(ItemID.BONES, "Bury")
-            Global.sleep(700)
-            Global.sleepUntilTrue({ Inventory.count() == inventoryCount - 1 && !Rs2Player.isInteracting() }, 100, 3000)
+            TrainerInterruptor.sleep(700)
+            TrainerInterruptor.sleepUntilTrue({ Inventory.count() == inventoryCount - 1 && !Rs2Player.isInteracting() }, 100, 3000)
         }
     }
 

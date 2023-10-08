@@ -27,14 +27,15 @@ public class AttackNpcScript extends Script {
     boolean clicked = false;
 
     public void run(PlayerAssistConfig config) {
-        String npcToAttack = Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(x -> x.trim()).toArray(String[]::new)).findFirst().get();
+        String npcToAttack = Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).findFirst().get();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
+                if (!config.toggleCombat()) return;
                  attackableNpcs =  Microbot.getClient().getNpcs().stream()
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                         .filter(x -> !x.isDead()
-                                && x.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 7
+                                && x.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < config.attackRadius()
                                 && (!x.isInteracting() || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && (x.getInteracting() == null  || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && x.getAnimation() == -1 && npcToAttack.toLowerCase().equals(x.getName().toLowerCase())).collect(Collectors.toList());
@@ -50,12 +51,12 @@ public class AttackNpcScript extends Script {
                             || (npc.isInteracting()  && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
                             || !npc.getName().toLowerCase().equals(npcToAttack.toLowerCase()))
                         break;
-                    if (npc.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 10)
+                    if (npc.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > config.attackRadius())
                         break;
                     if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation()))
                         Rs2Camera.turnTo(npc);
                     Rs2Npc.interact(npc, "attack");
-                    sleep(600, 1000);
+                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
                     break;
                 }
             } catch (Exception ex) {

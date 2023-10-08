@@ -7,7 +7,7 @@ import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingTree;
 
 @ConfigGroup("Woodcutting")
-public interface WoodcuttingConfig extends Config {
+public interface AutoWoodcuttingConfig extends Config {
     @ConfigSection(
             name = "General",
             description = "General",

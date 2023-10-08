@@ -45,6 +45,7 @@ public class EventSelector {
     public void enableClick() {
         Microbot.getEventHandler().setBlocked(false);
         addAndRemoveButtons();
+        Microbot.getEventHandler().regainFocus();
     }
 
     public void disableClick() {
