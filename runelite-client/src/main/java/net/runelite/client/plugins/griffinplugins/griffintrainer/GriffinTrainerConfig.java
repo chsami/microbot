@@ -122,6 +122,17 @@ public interface GriffinTrainerConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            keyName = "trainWoodcutting",
+            name = "Train Woodcutting",
+            description = "Train Woodcutting",
+            position = 3,
+            section = tasksSection
+    )
+    default boolean trainWoodcutting() {
+        return true;
+    }
+
     @ConfigSection(
             name = "Skill Levels",
             description = "Skill Levels",
@@ -193,6 +204,17 @@ public interface GriffinTrainerConfig extends Config {
             section = skillsSection
     )
     default int fishingLevel() {
+        return 0;
+    }
+
+    @ConfigItem(
+            keyName = "woodcuttingLevel",
+            name = "Woodcutting",
+            description = " Woodcutting Level",
+            position = 6,
+            section = skillsSection
+    )
+    default int woodcuttingLevel() {
         return 0;
     }
 
@@ -283,6 +305,25 @@ public interface GriffinTrainerConfig extends Config {
             section = fishingSettingsSection
     )
     default boolean keepFish() {
+        return true;
+    }
+
+    @ConfigSection(
+            name = "Woodcutting Settings",
+            description = "Woodcutting Settings",
+            position = 6,
+            closedByDefault = false
+    )
+    String woodcuttingSettingsSection = "woodcuttingSettings";
+
+    @ConfigItem(
+            keyName = "keepLogs",
+            name = "Keep Logs",
+            description = "Keep Logs",
+            position = 0,
+            section = woodcuttingSettingsSection
+    )
+    default boolean keepLogs() {
         return true;
     }
 

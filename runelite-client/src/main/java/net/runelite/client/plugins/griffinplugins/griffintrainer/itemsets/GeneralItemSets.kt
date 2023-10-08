@@ -253,5 +253,32 @@ class GeneralItemSets {
 
             return pickaxes
         }
+
+        fun getAxesItemSet(): DynamicItemSet {
+            val miningLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.ATTACK)
+            val pickaxes = DynamicItemSet()
+
+            if (miningLevel >= 1) {
+                pickaxes.add(ItemID.BRONZE_AXE, 1)
+                pickaxes.add(ItemID.IRON_AXE, 1)
+            }
+            if (miningLevel >= 6) {
+                pickaxes.add(ItemID.STEEL_AXE, 1)
+            }
+            if (miningLevel >= 11) {
+                pickaxes.add(ItemID.BLACK_AXE, 1)
+            }
+            if (miningLevel >= 21) {
+                pickaxes.add(ItemID.MITHRIL_AXE, 1)
+            }
+            if (miningLevel >= 31) {
+                pickaxes.add(ItemID.ADAMANT_AXE, 1)
+            }
+            if (miningLevel >= 41) {
+                pickaxes.add(ItemID.RUNE_AXE, 1)
+            }
+
+            return pickaxes
+        }
     }
 }
