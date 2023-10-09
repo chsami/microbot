@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.models.RS2Item
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab
 
 class ItemHelper {
 
@@ -74,6 +75,8 @@ class ItemHelper {
         }
 
         fun equipItemIds(itemPairs: List<Pair<Int, Boolean>>) {
+            Rs2Tab.switchToInventoryTab()
+
             for (itemPair in itemPairs) {
                 if (TrainerInterruptor.isInterrupted) {
                     return
