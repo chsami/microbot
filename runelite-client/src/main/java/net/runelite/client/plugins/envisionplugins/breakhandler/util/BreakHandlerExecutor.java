@@ -49,6 +49,14 @@ public class BreakHandlerExecutor {
 
     }
 
+    public boolean breakScript() {
+        if (BreakHandlerScript.getHasRunTimeTimerFinished() && BreakHandlerScript.getIsEnabled()) {
+            executeBreak();
+            return true;
+        }
+        return false;
+    }
+
     public void breakOrExecute(Executor executor) {
         if (BreakHandlerScript.getHasRunTimeTimerFinished() && BreakHandlerScript.getIsEnabled()) {
             executeBreak();
@@ -69,7 +77,7 @@ public class BreakHandlerExecutor {
         if (preNotification) sendDiscordNotifications(false);
 
         BreakHandlerScript.setLetBreakHandlerStartBreak(true);
-        sleepUntil(BreakHandlerScript::getIsBreakOver);
+        sleepUntil(BreakHandlerScript::getIsBreakOver); //this only waits for 5 seconds
         BreakHandlerScript.setLetBreakHandlerStartBreak(false);
 
         if (postNotification) sendDiscordNotifications(true);

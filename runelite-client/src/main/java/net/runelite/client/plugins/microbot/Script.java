@@ -4,6 +4,8 @@ import net.runelite.api.TileObject;
 import net.runelite.api.WallObject;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.envisionplugins.breakhandler.util.BreakHandlerExecutor;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -33,6 +35,8 @@ public abstract class Script implements IScript {
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
     }
+
+    public BreakHandlerExecutor breakHandlerExecutor = new BreakHandlerExecutor();
 
     public void sleep(int time) {
         long startTime = System.currentTimeMillis();
@@ -95,9 +99,19 @@ public abstract class Script implements IScript {
     }
 
     public boolean run() {
+        return run(true);
+    }
+
+    public boolean run(boolean enableBreaks) {
+
+        if (enableBreaks && breakHandlerExecutor.breakScript())
+            return false;
+
+
         hasLeveledUp = false;
         if (Microbot.enableAutoRunOn)
             Rs2Player.toggleRunEnergy(true);
+
         if (Microbot.getClient().getMinimapZoom() > 2)
             Microbot.getClient().setMinimapZoom(2);
 
@@ -144,10 +158,10 @@ public abstract class Script implements IScript {
         VirtualKeyboard.keyPress(c);
     }
 
-    public void logout() {
+    public static void logout() {
         Rs2Tab.switchToLogout();
-        sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.LOGOUT);
-        sleep(600, 1000);
+        Global.sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.LOGOUT);
+        Global.sleep(600, 1000);
         Rs2Widget.clickWidget("Click here to logout");
     }
 

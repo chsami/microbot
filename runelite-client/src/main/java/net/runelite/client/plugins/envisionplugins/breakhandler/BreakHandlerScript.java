@@ -16,10 +16,13 @@ import net.runelite.http.api.worlds.WorldRegion;
 
 import javax.swing.*;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public class BreakHandlerScript extends Script {
+public class BreakHandlerScript {
 
     public static double version = 1.4;
 
@@ -64,6 +67,9 @@ public class BreakHandlerScript extends Script {
     public BreakHandlerPanel breakHandlerPanel;
 
     public String failureMessage = "";
+
+    ScheduledFuture<?> mainScheduledFuture;
+    ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
     public boolean run(BreakHandlerConfig config, BreakHandlerPanel breakHandlerPanel) {
         this.breakHandlerPanel = breakHandlerPanel;
@@ -156,7 +162,7 @@ public class BreakHandlerScript extends Script {
                         );
 
                         if (Microbot.isLoggedIn()) {
-                            logout();
+                            Script.logout();
                         }
 
                         SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.orElseThrow().getSecondsUntil()));
