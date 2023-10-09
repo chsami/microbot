@@ -27,7 +27,7 @@ class ProgressiveFletchingModel {
 
 public class FletchingScript extends Script {
 
-    public static double version = 1.0;
+    public static double version = 1.5;
     ProgressiveFletchingModel model = new ProgressiveFletchingModel();
 
     String primaryItemToFletch = "";
@@ -90,10 +90,10 @@ public class FletchingScript extends Script {
         } else {
             Rs2Bank.depositAll(config.fletchingItem().getContainsInventoryName());
         }
-        sleepUntilOnClientThread(() -> !Inventory.hasItemContains(config.fletchingItem().getContainsInventoryName()));
+        sleepUntil(() -> !Inventory.hasItemContains(config.fletchingItem().getContainsInventoryName()));
 
 
-        Rs2Bank.withdrawItemX(true, primaryItemToFletch, config.fletchingMode().getAmount());
+        Rs2Bank.withdrawItemXExact(true, primaryItemToFletch, config.fletchingMode().getAmount());
         if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(secondaryItemToFletch)) {
             Rs2Bank.closeBank();
             Microbot.status = "[Shutting down] - Reason: " + secondaryItemToFletch + " not found in the bank.";
@@ -109,24 +109,24 @@ public class FletchingScript extends Script {
 
         final String finalSecondaryItemToFletch = secondaryItemToFletch;
 
-        sleepUntilOnClientThread(() -> Inventory.hasItem(finalSecondaryItemToFletch));
+        sleepUntil(() -> Inventory.hasItem(finalSecondaryItemToFletch));
         sleep(600, 3000);
         Rs2Bank.closeBank();
     }
 
     private void fletch(FletchingConfig config) {
         Inventory.useItemOnItem(primaryItemToFletch, secondaryItemToFletch);
-        sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694736) != null);
+        sleepUntil(() -> Rs2Widget.getWidget(17694736) != null);
         if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
             keyPress(model.getFletchingItem().getOption(model.getFletchingMaterial(), config.fletchingMode()));
         } else {
             keyPress(config.fletchingItem().getOption(config.fletchingMaterial(), config.fletchingMode()));
         }
-        sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694736) == null);
+        sleepUntil(() -> Rs2Widget.getWidget(17694736) == null);
         if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
-            sleepUntilOnClientThread(() -> !Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired()), 60000);
+            sleepUntil(() -> !Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired()), 60000);
         } else {
-            sleepUntilOnClientThread(() -> !Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired()), 60000);
+            sleepUntil(() -> !Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired()), 60000);
         }
     }
 

@@ -140,9 +140,9 @@ public class Rs2Npc {
                 return null;
             else
                 return npcs.stream()
-                        .filter(x -> x != null && x.getName().toLowerCase().equalsIgnoreCase(name.toLowerCase()))
+                        .filter(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(name))
                         .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .get();
+                        .orElse(null);
 
         });
     }

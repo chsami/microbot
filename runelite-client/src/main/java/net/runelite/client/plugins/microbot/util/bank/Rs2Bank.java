@@ -443,6 +443,11 @@ public class Rs2Bank {
         withdrawX(name, amount);
     }
 
+    public static void withdrawItemXExact(boolean checkInv, String name, int amount) {
+        if (checkInv && !hasItem(name)) return;
+        withdrawXExact(name, amount);
+    }
+
     /**
      * withdraw x amount of items identified by its id.
      *
@@ -482,7 +487,7 @@ public class Rs2Bank {
      * @param amount
      */
     public static void withdrawXExact(String name, int amount) {
-        withdrawX(findBankItem(name, false), amount);
+        withdrawX(findBankItem(name, true), amount);
     }
 
     /**
@@ -622,12 +627,23 @@ public class Rs2Bank {
     public static boolean openBank() {
         Microbot.status = "Opening bank";
         try {
-            if (Inventory.isUsingItem())
+            if (Microbot.getClient().isWidgetSelected())
                 Microbot.getMouse().click();
             if (isOpen()) return true;
             NPC npc = Rs2Npc.getNpc("banker");
-            if (npc == null) return false;
-            boolean action = Rs2Menu.doAction("bank", npc.getCanvasTilePoly());
+            if (npc == null) {
+                GameObject bank = Rs2GameObject.findBank();
+                if (bank == null) {
+                    GameObject chest = Rs2GameObject.findChest();
+                    if (chest == null) return false;
+                    Rs2GameObject.interact(chest, "use");
+                } else {
+                    Rs2GameObject.interact(bank, "bank");
+                }
+                sleepUntil(Rs2Bank::isOpen);
+                return Rs2Bank.isOpen();
+            }
+            boolean action = Rs2Npc.interact(npc, "bank");
             if (action) {
                 sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
                 sleep(600, 1000);
@@ -782,30 +798,7 @@ public class Rs2Bank {
      * @return
      */
     public static boolean useBank() {
-        if (isOpen()) return true;
-        GameObject bank = Rs2GameObject.findBank();
-        if (bank == null) {
-            GameObject chest = Rs2GameObject.findChest();
-            if (chest == null) return false;
-            Rs2GameObject.interact(chest, "use");
-        } else {
-            Rs2GameObject.interact(bank, "bank");
-        }
-        sleepUntil(Rs2Bank::isOpen);
-        return true;
-    }
-
-    /**
-     * Use bank or chest with identified action
-     *
-     * @return
-     */
-    public static void useBank(String action) {
-        Microbot.status = "Banking";
-        GameObject bank = Rs2GameObject.findBank(action);
-        if (bank == null) return;
-        Rs2GameObject.interact(bank, action);
-        sleepUntil(Rs2Bank::isOpen);
+        return openBank();
     }
 
     /**
