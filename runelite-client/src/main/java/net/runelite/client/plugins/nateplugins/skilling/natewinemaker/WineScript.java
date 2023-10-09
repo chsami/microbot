@@ -20,10 +20,9 @@ public class WineScript extends Script {
                 if (Microbot.pauseAllScripts) return;
                 if (Inventory.getAmountForItem("grapes") > 0 && (Inventory.getAmountForItem("jug of water") > 0)) {
                     Inventory.useItemOnItem("jug of water", "grapes");
-                    sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694734) != null);
+                    sleepUntil(() -> Rs2Widget.getWidget(17694734) != null);
                     keyPress('1');
-                    sleepUntilOnClientThread(() -> !Inventory.hasItem("jug of water"),25000);
-                    return;
+                    sleepUntil(() -> !Inventory.hasItem("jug of water"),25000);
                 } else {
                     bank();
                 }
@@ -40,15 +39,15 @@ public class WineScript extends Script {
             Rs2Bank.depositAll();
             if(Rs2Bank.hasItem("jug of water") &&  Rs2Bank.hasItem("grapes")) {
                 Rs2Bank.withdrawItemX(true, "jug of water", 14);
-                sleepUntilOnClientThread(() -> Inventory.hasItem("jug of water"));
+                sleepUntil(() -> Inventory.hasItem("jug of water"));
                 Rs2Bank.withdrawItemX(true, "grapes", 14);
-                sleepUntilOnClientThread(() -> Inventory.hasItem("grapes"));
+                sleepUntil(() -> Inventory.hasItem("grapes"));
             } else {
                 Microbot.getNotifier().notify("Run out of Materials");
                 shutdown();
             }
         }
         Rs2Bank.closeBank();
-        sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());
+        sleepUntil(() -> !Rs2Bank.isOpen());
     }
 }

@@ -1,14 +1,9 @@
 package net.runelite.client.plugins.microbot.playerassist;
 
 import com.google.inject.Provides;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.HitsplatApplied;
 import net.runelite.api.events.NpcDespawned;
-import net.runelite.client.Notifier;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -17,11 +12,13 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
-import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "PlayerAssistant",
         description = "Microbot playerassistant plugin",
@@ -50,7 +47,7 @@ public class PlayerAssistPlugin extends Plugin {
     private LootScript lootScript = new LootScript();
     private SafeSpot safeSpotScript = new SafeSpot();
     private FlickerScript flickerScript = new FlickerScript();
-
+    private final ExecutorService executor = Executors.newFixedThreadPool(1);
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -88,11 +85,13 @@ public class PlayerAssistPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick gameTick) {
-        flickerScript.onGameTick(gameTick);
+        if (config.prayFlick())
+            executor.submit(flickerScript::onGameTick);
     }
 
     @Subscribe
     public void onNpcDespawned(NpcDespawned npcDespawned) {
-        flickerScript.onNpcDespawned(npcDespawned);
+        if (config.prayFlick())
+            executor.submit(() -> flickerScript.onNpcDespawned(npcDespawned));
     }
 }

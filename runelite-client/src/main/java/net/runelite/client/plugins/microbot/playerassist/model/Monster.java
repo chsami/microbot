@@ -1,26 +1,25 @@
 package net.runelite.client.plugins.microbot.playerassist.model;
 
 import net.runelite.api.NPC;
-import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyle;
+import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
+import net.runelite.client.plugins.microbot.util.npc.Rs2NpcStats;
 
 public class Monster {
     public int id;
-    public int attackSpeed;
-    public int attackAnimation;
-
+    public int attackAnim;
     public NPC npc;
-    public int adjustableAttackSpeed;
-
-    public AttackStyle attackStyle;
-
+    public Rs2NpcStats rs2NpcStats;
     public boolean delete;
 
+    public int lastAttack = 0;
 
-    public Monster(int id, int attackSpeed, int attackAnimation, AttackStyle attackStyle) {
-        this.id = id;
-        this.attackSpeed = attackSpeed;
-        this.adjustableAttackSpeed = attackSpeed;
-        this.attackAnimation = attackAnimation;
-        this.attackStyle = attackStyle;
+    public Monster(int npcId, int attackAnim) {
+        this.id = npcId;
+        this.attackAnim = attackAnim;
+    }
+    public Monster(NPC npc, Rs2NpcStats rs2NpcStats) {
+        this.npc = npc;
+        this.rs2NpcStats = rs2NpcStats;
+        this.lastAttack = Rs2NpcManager.getAttackSpeed(npc.getId());
     }
 }

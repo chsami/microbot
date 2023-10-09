@@ -62,7 +62,7 @@ public class Pathfinder implements Runnable {
     public boolean customPath = false;
 
     public boolean getDebugger() {
-        return true;
+        return Microbot.debug;
     }
 
 

@@ -695,7 +695,9 @@ public class Inventory {
         itemAction = action;
 
         if (itemWidget == null) {
-            Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
+            Widget inventory = Rs2Widget.getWidget(10551357); //classic layout - click on inventory to be safe
+            if (inventory == null)
+                inventory = Rs2Widget.getWidget(10747958); //modern layout
             Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
         } else {
             Microbot.getMouse().click(itemWidget.getBounds());
