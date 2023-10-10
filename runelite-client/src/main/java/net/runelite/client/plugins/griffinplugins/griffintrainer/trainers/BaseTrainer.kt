@@ -9,6 +9,7 @@ import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHel
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntiBan
 
 abstract class BaseTrainer(private val config: GriffinTrainerConfig) {
     abstract fun getBankLocation(): WorldPoint
@@ -19,6 +20,10 @@ abstract class BaseTrainer(private val config: GriffinTrainerConfig) {
     fun run(): Boolean {
         if (TrainerInterruptor.isInterrupted) {
             return true
+        }
+
+        if (Rs2AntiBan.tryFindAndDismissRandomEvent()) {
+            TrainerThread.randomEventDismissedCount++
         }
 
         if (!shouldTrain()) {

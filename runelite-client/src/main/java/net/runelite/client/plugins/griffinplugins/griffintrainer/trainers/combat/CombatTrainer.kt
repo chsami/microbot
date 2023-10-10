@@ -149,6 +149,11 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
             if (!Inventory.isFull()) {
                 ItemHelper.findAndLootItems(itemLootIds, 2)
             }
+
+            if (Inventory.isFull() && prayerLevel < config.prayerLevel()) {
+                buryBones()
+                TrainerInterruptor.sleep(200)
+            }
         }
 
         scriptState = ScriptState.BANKING

@@ -46,6 +46,8 @@ public class GriffinTrainerOverlay extends OverlayPanel {
         if (!TrainerThread.Companion.getCountLabel().isEmpty()) {
             panelComponent.getChildren().add(LineComponent.builder().left(TrainerThread.Companion.getCountLabel() + ":").right(Integer.toString(TrainerThread.Companion.getCount())).build());
         }
+
+        panelComponent.getChildren().add(LineComponent.builder().left("Random Events Dismissed:").right(Integer.toString(TrainerThread.Companion.getRandomEventDismissedCount())).build());
     }
 
     private void drawMouse(Graphics2D graphics) {

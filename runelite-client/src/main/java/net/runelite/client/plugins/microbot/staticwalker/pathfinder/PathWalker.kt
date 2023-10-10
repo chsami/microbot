@@ -46,13 +46,9 @@ class PathWalker(private val nodes: List<PathNode>) {
             val index = nodes.indexOf(currentNode)
             val isLastNode = nodes.indexOf(currentNode) == nodes.lastIndex
 
-
-//            Utility.retryFunction(3, true) {
-//                if (player.runEnergy >= 30 && !player.isRunningActive) {
-//                    player.toggleRunning(true)
-//                }
-//                return@retryFunction true
-//            }
+            if (Microbot.getClientForKotlin().getEnergy() > 3000) {
+                Rs2Player.toggleRunEnergy(true)
+            }
 
             if (index + 1 <= upperBound) {
                 nextNode = nodes.get(index + 1)

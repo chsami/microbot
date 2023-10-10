@@ -17,6 +17,7 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
         var currentTask = ""
         var countLabel = ""
         var count = 0
+        var randomEventDismissedCount = 0
     }
 
     private enum class TrainerScripts {
@@ -105,6 +106,7 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
             schedule.add(TrainerScripts.WOODCUTTING)
         }
 
+        schedule.shuffle()
         return schedule
     }
 }
