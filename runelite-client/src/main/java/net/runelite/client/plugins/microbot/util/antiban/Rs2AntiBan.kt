@@ -14,7 +14,7 @@ class Rs2AntiBan {
 
     companion object {
 
-        val randomEventNPCIDs = listOf<Int>(
+        val randomEventNPCIDs = listOf(
             NpcID.BEE_KEEPER_6747,
             NpcID.CAPT_ARNAV,
             NpcID.DRUNKEN_DWARF,
@@ -76,7 +76,7 @@ class Rs2AntiBan {
                     ?.map { widget: Widget -> widget.text } ?: emptyList<String>()
             }
 
-            messages ?: return emptyList<Player>()
+            messages ?: return emptyList()
 
             val regex = "^<img=[a-zA-Z0-9]*>".toRegex()
             val playerNames = messages
