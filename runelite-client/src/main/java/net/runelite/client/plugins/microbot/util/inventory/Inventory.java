@@ -307,7 +307,7 @@ public class Inventory {
         if (inventoryWidget == null) return false;
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
                 .filter(x ->
-                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName)
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].toLowerCase().contains(itemName.toLowerCase())
                 ).count() >= amount);
     }
 
@@ -318,7 +318,7 @@ public class Inventory {
         if (inventoryWidget == null) return false;
         return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(inventoryWidget.getDynamicChildren())
                 .filter(x ->
-                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].equalsIgnoreCase(itemName)
+                        itemExistsInInventory(x) && x.getName().split(">")[1].split("</")[0].equalsIgnoreCase(itemName.toLowerCase())
                 ).count() == amount);
     }
 
@@ -334,7 +334,7 @@ public class Inventory {
                                 x.getName()
                                         .split(">")[1]
                                         .split("</")[0]
-                                        .equalsIgnoreCase(itemName) &&
+                                        .equalsIgnoreCase(itemName.toLowerCase()) &&
                                 x.getItemQuantity() >= amount
                 ));
     }
