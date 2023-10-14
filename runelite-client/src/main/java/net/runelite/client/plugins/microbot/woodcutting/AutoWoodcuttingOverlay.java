@@ -17,9 +17,9 @@ import java.awt.*;
 
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
-public class WoodcuttingOverlay extends OverlayPanel {
+public class AutoWoodcuttingOverlay extends OverlayPanel {
     @Inject
-    WoodcuttingOverlay(WoodcuttingPlugin plugin)
+    AutoWoodcuttingOverlay(AutoWoodcuttingPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -39,7 +39,7 @@ public class WoodcuttingOverlay extends OverlayPanel {
 
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Woodcutting V" + WoodcuttingScript.version)
+                    .text("Micro Woodcutting V" + AutoWoodcuttingScript.version)
                     .color(Color.GREEN)
                     .build());
 

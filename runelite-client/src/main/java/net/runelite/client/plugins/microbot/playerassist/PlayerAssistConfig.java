@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.playerassist;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
 
 @ConfigGroup(net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig.GROUP)
 public interface PlayerAssistConfig extends Config {
@@ -120,6 +119,16 @@ public interface PlayerAssistConfig extends Config {
     default boolean prayFlick()
     {
         return false;
+    }
+    @ConfigItem(
+            keyName = "Attack Radius",
+            name = "Attack Radius",
+            description = "The max radius to attack npcs",
+            position = 6
+    )
+    default int attackRadius()
+    {
+        return 10;
     }
 }
 

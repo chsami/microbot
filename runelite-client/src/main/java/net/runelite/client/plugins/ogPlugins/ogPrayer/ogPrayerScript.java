@@ -16,9 +16,9 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.ogPlugins.ogPrayer.enums.RestockMethod;
 import net.runelite.client.plugins.ogPlugins.ogPrayer.enums.Bones;
 import net.runelite.client.plugins.ogPlugins.ogPrayer.enums.Locations;
+import net.runelite.client.plugins.ogPlugins.ogPrayer.enums.RestockMethod;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.*;
@@ -46,8 +46,8 @@ public class ogPrayerScript extends Script {
     private boolean logging;
     private int gameTick = 0;
     private int lastActionTick;
-    private enum ogPrayerStatus  { GO_TO_ALTER , USE_BONES_ON_ALTER , RESTOCK , LOGOUT }
-    private ogPrayerStatus status;
+    public enum ogPrayerStatus  { GO_TO_ALTER , USE_BONES_ON_ALTER , RESTOCK , LOGOUT }
+    public static ogPrayerStatus status = ogPrayerStatus.GO_TO_ALTER;
     private boolean needToHop = false;
     private int playersInArea;
     private List<String> worldHopList = new ArrayList<>();
@@ -154,6 +154,7 @@ public class ogPrayerScript extends Script {
                 log("Script rerunning.");
                 setSettings(config);
                 calcState();
+                detectPvpPlayer();
                 if( status == ogPrayerStatus.GO_TO_ALTER ){goToAlter();}
                 else if( status == ogPrayerStatus.USE_BONES_ON_ALTER ){useBonesOnAltar();}
                 else if( status == ogPrayerStatus.RESTOCK ){restock();}
@@ -163,27 +164,27 @@ public class ogPrayerScript extends Script {
                     sleep(30,80);
                     Rs2Widget.clickWidget("Click here to logout");
                 }
+
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }, 0, 50, TimeUnit.MILLISECONDS);
         return true;
     }
-    public void onGameTick(GameTick gameTick){
+    public void detectPvpPlayer() {
         this.playersInArea =  Microbot.getClient().getPlayers().size();
-        if( inPVPArea() && Microbot.getClient().getPlayers().size() > 1){
+        if(Microbot.getClient().getPlayers().size() > 1){
             log("===========================DETECTED THAT I NEED TO HOP===========================");
-                needToHop = true;
-                //if(Microbot.getClient().getLocalPlayer().isInteracting()){}
-                //For now turn on attack players to right-click just in case one spawns under you
-                Microbot.getMouse().click(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(),Microbot.getClient().getLocalPlayer().getWorldLocation().getY());
-                sleep(80,120);
-                Microbot.hopToWorld(selectWorldFromList());
+            needToHop = true;
+            //if(Microbot.getClient().getLocalPlayer().isInteracting()){}
+            //For now turn on attack players to right-click just in case one spawns under you
+            Microbot.getMouse().click(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(),Microbot.getClient().getLocalPlayer().getWorldLocation().getY());
+            sleep(80,120);
+            Microbot.hopToWorld(selectWorldFromList());
         } else {needToHop = false; Rs2Tab.switchToInventoryTab();}
+    }
+    public void onGameTick(GameTick gameTick){
         this.gameTick++;
-        //if(!needToHop && ){
-
-        //}
     }
 
 
@@ -203,8 +204,8 @@ public class ogPrayerScript extends Script {
         if(!Objects.equals(this.preferredPOHs, new ArrayList<>(Arrays.asList(config.preferredPOH().split(","))))){this.preferredPOHs = Arrays.asList(config.preferredPOH().split(",")); log("Updated preferred POH: " + this.preferredPOHs);}
         if(!Objects.equals(this.badPOHs, new ArrayList<>(Arrays.asList(config.bannedPOHs().split(","))))){this.badPOHs = Arrays.asList(config.bannedPOHs().split(","));  log("Updated banned POHs: " + this.badPOHs); }
         if(this.usePersonalPOH != config.usePersonalPOH()){this.usePersonalPOH = config.usePersonalPOH(); log("Updated Use POH: " + this.usePersonalPOH); }
-        if(Integer.parseInt(config.getBankPin()) != this.bankPin && config.getBankPin().length() == 4 && NumberUtils.isDigits(config.getBankPin())){this.bankPin = Integer.parseInt(config.getBankPin()); log("Updated Bank Pin: " + this.bankPin); }
-        if(!Objects.equals(this.worldHopList, new ArrayList<>(Arrays.asList(config.worldHopList().split(","))))){this.worldHopList = Arrays.asList(config.worldHopList().split(","));  log("Updated Worlds: " + this.worldHopList); }
+        if(!config.getBankPin().isEmpty() && Integer.parseInt(config.getBankPin()) != this.bankPin && config.getBankPin().length() == 4 && NumberUtils.isDigits(config.getBankPin())){this.bankPin = Integer.parseInt(config.getBankPin()); log("Updated Bank Pin: " + this.bankPin); }
+        if(!config.worldHopList().isEmpty() && !Objects.equals(this.worldHopList, new ArrayList<>(Arrays.asList(config.worldHopList().split(","))))){this.worldHopList = Arrays.asList(config.worldHopList().split(","));  log("Updated Worlds: " + this.worldHopList); }
         if(this.logging != config.verboseLogging()){ if(logging || config.verboseLogging()){System.out.println("Updated Verbose Logging: " + config.verboseLogging() );}  this.logging = config.verboseLogging(); }
     }
     private void calcState(){

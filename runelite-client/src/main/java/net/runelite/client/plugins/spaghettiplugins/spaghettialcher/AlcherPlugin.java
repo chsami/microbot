@@ -1,9 +1,7 @@
-package net.runelite.client.plugins.microbot.woodcutting;
+package net.runelite.client.plugins.spaghettiplugins.spaghettialcher;
 
 import com.google.inject.Provides;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Skill;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -16,18 +14,15 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.natepainthelper.Info.*;
-
 @PluginDescriptor(
-        name = PluginDescriptor.Mocrosoft + "Woodcutting",
-        description = "Microbot woodcutting plugin",
-        tags = {"Woodcutting", "microbot", "skilling"},
+        name = PluginDescriptor.Spaghetti +"Alcher",
+        description = "Plugin for alching.",
+        tags = {"Money", "spaghetti", "skilling"},
         enabledByDefault = false
 )
-@Slf4j
-public class WoodcuttingPlugin extends Plugin {
+public class AlcherPlugin extends Plugin {
     @Inject
-    private WoodcuttingConfig config;
+    private AlcherConfig config;
     @Inject
     private Client client;
     @Inject
@@ -36,17 +31,17 @@ public class WoodcuttingPlugin extends Plugin {
     Notifier notifier;
 
     @Provides
-    WoodcuttingConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(WoodcuttingConfig.class);
+    AlcherConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(AlcherConfig.class);
     }
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private WoodcuttingOverlay woodcuttingOverlay;
+    private AlcherOverlay alcherOverlay;
 
     @Inject
-    WoodcuttingScript woodcuttingScript;
+    AlcherScript alcherScript;
 
 
     @Override
@@ -56,17 +51,14 @@ public class WoodcuttingPlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        expstarted = Microbot.getClient().getSkillExperience(Skill.WOODCUTTING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.WOODCUTTING);
-        timeBegan = System.currentTimeMillis();
         if (overlayManager != null) {
-            overlayManager.add(woodcuttingOverlay);
+            overlayManager.add(alcherOverlay);
         }
-        woodcuttingScript.run(config);
+        alcherScript.run(config);
     }
 
     protected void shutDown() {
-        woodcuttingScript.shutdown();
-        overlayManager.remove(woodcuttingOverlay);
+        alcherScript.shutdown();
+        overlayManager.remove(alcherOverlay);
     }
 }

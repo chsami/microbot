@@ -39,7 +39,9 @@ public class Rs2Magic {
 
         widgetId = magicSpell.getWidgetId();
         widgetName = magicSpell.getName();
-        Widget inventory = Rs2Widget.getWidget(10551357); //click on inventory to be safe
+        Widget inventory = Rs2Widget.getWidget(10551357); //classic layout - click on inventory to be safe
+        if (inventory == null)
+            inventory = Rs2Widget.getWidget(10747958); //modern layout
         Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
         sleep(100);
         widgetId = 0;

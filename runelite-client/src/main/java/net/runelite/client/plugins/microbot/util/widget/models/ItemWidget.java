@@ -1,29 +1,44 @@
-package net.runelite.client.plugins.microbot.util.bank.models;
+package net.runelite.client.plugins.microbot.util.widget.models;
 
 import net.runelite.api.FontTypeFace;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 
 import javax.annotation.Nullable;
 import java.awt.*;
 
-public class BankItemWidget implements Widget {
+public class ItemWidget implements Widget {
 
+    int id;
     int index;
     String name;
-    int itemid;
+    int itemId;
     int quantity;
-    public BankItemWidget(String name,int itemid,int quantity,int index){
+    private int slot;
+
+    // temp constructor untill we move everything from inventory to a memory list instead of widgets
+    public ItemWidget(Widget w) {
+        this.name = w.getName();
+        this.itemId = w.getItemId();
+        this.quantity = w.getItemQuantity();
+        this.index = w.getIndex();
+    }
+
+    public ItemWidget(String name, int itemId, int quantity, int index) {
         this.name = name;
-        this.itemid = itemid;
+        this.itemId = itemId;
         this.quantity = quantity;
         this.index = index;
     }
+
     @Override
     public int getId() {
-        return WidgetInfo.BANK_ITEM_CONTAINER.getPackedId();
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
@@ -198,7 +213,7 @@ public class BankItemWidget implements Widget {
     }
 
     @Override
-    public Widget setRotationX( int modelX) {
+    public Widget setRotationX(int modelX) {
         return null;
     }
 
@@ -208,7 +223,7 @@ public class BankItemWidget implements Widget {
     }
 
     @Override
-    public Widget setRotationY( int modelY) {
+    public Widget setRotationY(int modelY) {
         return null;
     }
 
@@ -272,6 +287,18 @@ public class BankItemWidget implements Widget {
         return index;
     }
 
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public int getSlot() {
+        return slot;
+    }
+
+    public void setSlot(int slot) {
+        this.slot = slot;
+    }
+
     @Override
     public Point getCanvasLocation() {
         return null;
@@ -304,7 +331,7 @@ public class BankItemWidget implements Widget {
 
     @Override
     public int getItemId() {
-        return itemid;
+        return itemId;
     }
 
     @Override

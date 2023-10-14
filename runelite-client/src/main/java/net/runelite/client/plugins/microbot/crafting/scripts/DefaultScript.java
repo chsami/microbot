@@ -27,9 +27,9 @@ public class DefaultScript extends Script {
                         sleepUntil(() -> Rs2Bank.isOpen(), 5000);
                         if (!Rs2Bank.isOpen()) return;
                         Rs2Bank.withdrawItem(true, "needle");
-                        Rs2Bank.withdrawItemsAll(true, "thread");
+                        Rs2Bank.withdrawItemAll(true, "thread");
                         if (!Inventory.hasItem("needle") || !Inventory.hasItem("thread")) return;
-                        Rs2Bank.withdrawItemsAll(leather);
+                        Rs2Bank.withdrawItemAll(leather);
                     } else if (Inventory.hasItem(leather)) {
                         Rs2Bank.closeBank();
                         Inventory.useItemOnItem("needle", leather);
@@ -41,7 +41,7 @@ public class DefaultScript extends Script {
                 } else {
                     Rs2Bank.openBank();
                     Rs2Bank.depositAll(craftedItem);
-                    Rs2Bank.withdrawItemsAll(leather);
+                    Rs2Bank.withdrawItemAll(leather);
                     Rs2Bank.closeBank();
                 }
             } catch (Exception ex) {

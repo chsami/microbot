@@ -31,7 +31,7 @@ public class TutorialislandPlugin extends Plugin {
     private TutorialIslandOverlay exampleOverlay;
 
     @Inject
-    TutorialIslandScript exampleScript;
+    TutorialIslandScript tutorialIslandScript;
 
 
     @Override
@@ -39,11 +39,11 @@ public class TutorialislandPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(exampleOverlay);
         }
-        exampleScript.run(config);
+        tutorialIslandScript.run(config);
     }
 
     protected void shutDown() {
-        exampleScript.shutdown();
+        tutorialIslandScript.shutdown();
         overlayManager.remove(exampleOverlay);
     }
 }

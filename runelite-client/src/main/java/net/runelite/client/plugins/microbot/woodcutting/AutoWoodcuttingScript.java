@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.woodcutting;
 
-import net.runelite.api.GameObject;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
@@ -9,14 +9,13 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
-public class WoodcuttingScript  extends Script {
+public class AutoWoodcuttingScript extends Script {
 
     public static double version = 1.2;
 
-    public boolean run(WoodcuttingConfig config) {
-        var startingPosition = Microbot.getClient().getLocalPlayer().getWorldLocation();
+    public boolean run(AutoWoodcuttingConfig config) {
+        WorldPoint startPoint = Microbot.getClient().getLocalPlayer().getWorldLocation();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
@@ -31,20 +30,10 @@ public class WoodcuttingScript  extends Script {
                     }
                     return;
                 }
-                var trees = Rs2GameObject.getGameObjects().stream().filter(x-> {
-                    var obj = Rs2GameObject.convertGameObjectToObjectComposition(x);
-                    if (obj == null){
-                        return false;
-                    }
-                    var objDefinition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(obj.getId()));
-                    if (!objDefinition.getName().equalsIgnoreCase(config.TREE().getName())) {
-                        return false;
-                    }
-                    return x.getWorldLocation().distanceTo(startingPosition) < config.distanceToStray();
-                }).collect(Collectors.toList());
+                var tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), startPoint);
 
-                if (trees.size() > 0){
-                    Rs2GameObject.interact(trees.get(0), config.TREE().getAction());
+                if (tree != null){
+                    Rs2GameObject.interact(tree, config.TREE().getAction());
                 }else {
                     System.out.println("No trees in zone");
                 }

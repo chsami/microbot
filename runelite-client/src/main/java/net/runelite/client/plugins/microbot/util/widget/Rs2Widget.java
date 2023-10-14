@@ -1,16 +1,26 @@
 package net.runelite.client.plugins.microbot.util.widget;
 
+import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Widget {
+
+    public static Widget menuSwapWidget = null;
+    public static int menuSwapParam0 = -1;
+    public static int menuSwapIdentifier = 1;
 
     public static boolean clickWidget(String text) {
         Widget widget = findWidget(text, null);
@@ -43,6 +53,9 @@ public class Rs2Widget {
             return true;
         }
         return false;
+    }
+    public static boolean isWidgetVisible(WidgetInfo wiget) {
+        return !Microbot.getClientThread().runOnClientThread(() -> Objects.requireNonNull(Microbot.getClient().getWidget(wiget)).isHidden());
     }
     public static Widget getWidget(WidgetInfo wiget) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(wiget));
@@ -184,41 +197,43 @@ public class Rs2Widget {
 
 
     public static Widget searchChildren(String text, Widget child, boolean exact) {
-        Widget found = null;
-        if (exact) {
-            if (child.getText().toLowerCase().contains(text.toLowerCase()) || child.getName().toLowerCase().contains(">" + text.toLowerCase() + "<")) {
-                return child;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget found = null;
+            if (exact) {
+                if (child.getText().toLowerCase().contains(text.toLowerCase()) || child.getName().toLowerCase().contains(">" + text.toLowerCase() + "<")) {
+                    return child;
+                }
+            } else {
+                if (child.getText().toLowerCase().contains(text.toLowerCase()) || child.getName().toLowerCase().contains(text.toLowerCase())) {
+                    return child;
+                }
             }
-        } else {
-            if (child.getText().toLowerCase().contains(text.toLowerCase()) || child.getName().toLowerCase().contains(text.toLowerCase())) {
-                return child;
-            }
-        }
 
-        if (child.getChildren() != null) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-            if (visibleChildWidgets.size() > 0)
-                found = findWidget(text, visibleChildWidgets, exact);
-        }
-        if (found != null) return found;
-        if (child.getNestedChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-            if (visibleChildWidgets.size() > 0)
-                found = findWidget(text, visibleChildWidgets, exact);
-        }
-        if (found != null) return found;
-        if (child.getDynamicChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-            if (visibleChildWidgets.size() > 0)
-                found = findWidget(text, visibleChildWidgets, exact);
-        }
-        if (found != null) return found;
-        if (child.getStaticChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-            if (visibleChildWidgets.size() > 0)
-                found = findWidget(text, visibleChildWidgets, exact);
-        }
-        return found;
+            if (child.getChildren() != null) {
+                List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
+                if (visibleChildWidgets.size() > 0)
+                    found = findWidget(text, visibleChildWidgets, exact);
+            }
+            if (found != null) return found;
+            if (child.getNestedChildren().length > 0) {
+                List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
+                if (visibleChildWidgets.size() > 0)
+                    found = findWidget(text, visibleChildWidgets, exact);
+            }
+            if (found != null) return found;
+            if (child.getDynamicChildren().length > 0) {
+                List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
+                if (visibleChildWidgets.size() > 0)
+                    found = findWidget(text, visibleChildWidgets, exact);
+            }
+            if (found != null) return found;
+            if (child.getStaticChildren().length > 0) {
+                List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
+                if (visibleChildWidgets.size() > 0)
+                    found = findWidget(text, visibleChildWidgets, exact);
+            }
+            return found;
+        });
     }
 
     public static Widget searchChildren(String text, Widget child) {
@@ -254,35 +269,76 @@ public class Rs2Widget {
     }
 
     public static Widget searchChildren(int spriteId, Widget child) {
-        Widget found = null;
-        if (child.getSpriteId() == spriteId) {
-            return child;
-        }
-        if (child.getChildren() != null) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-            if (visibleChildWidgets.size() > 0)
-                found = findWidget(spriteId, visibleChildWidgets);
-        }
-        if (found != null) return found;
-        if (child.getNestedChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-            if (visibleChildWidgets.size() > 0)
-                found = findWidget(spriteId, visibleChildWidgets);
-        }
-        if (found != null) return found;
-        if (child.getDynamicChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-            if (visibleChildWidgets.size() > 0)
-                found = findWidget(spriteId, visibleChildWidgets);
-        }
-        if (found != null) return found;
-        if (child.getStaticChildren().length > 0) {
-            List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-            if (visibleChildWidgets.size() > 0)
-                found = findWidget(spriteId, visibleChildWidgets);
-        }
-        return found;
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget found = null;
+            if (child.getSpriteId() == spriteId) {
+                return child;
+            }
+            if (child.getChildren() != null) {
+                List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
+                if (visibleChildWidgets.size() > 0)
+                    found = findWidget(spriteId, visibleChildWidgets);
+            }
+            if (found != null) return found;
+            if (child.getNestedChildren().length > 0) {
+                List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
+                if (visibleChildWidgets.size() > 0)
+                    found = findWidget(spriteId, visibleChildWidgets);
+            }
+            if (found != null) return found;
+            if (child.getDynamicChildren().length > 0) {
+                List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
+                if (visibleChildWidgets.size() > 0)
+                    found = findWidget(spriteId, visibleChildWidgets);
+            }
+            if (found != null) return found;
+            if (child.getStaticChildren().length > 0) {
+                List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
+                if (visibleChildWidgets.size() > 0)
+                    found = findWidget(spriteId, visibleChildWidgets);
+            }
+            return found;
+        });
     }
 
+    public static void clickWidgetFast(int packetId, int identifier) {
+        Widget widget = getWidget(packetId);
+        menuSwapIdentifier = identifier;
+        clickWidgetFast(widget);
+    }
 
+    public static void clickWidgetFast(int packetId) {
+        Widget widget = getWidget(packetId, 1);
+        clickWidgetFast(widget);
+    }
+
+    public static void clickWidgetFast(Widget widget, int param0, int identifier) {
+        menuSwapWidget = widget;
+        menuSwapParam0 = param0;
+        menuSwapIdentifier = identifier;
+        Microbot.getMouse().clickFast(1, 1);
+        sleep(100);
+        menuSwapParam0 = -1;
+        menuSwapWidget = null;
+        menuSwapIdentifier = 1;
+    }
+
+    public static void clickWidgetFast(Widget widget, int param0) {
+        clickWidgetFast(widget, param0, 1);
+    }
+
+    public static void clickWidgetFast(Widget widget) {
+        clickWidgetFast(widget, -1, 1);
+    }
+
+    public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException {
+        if (menuSwapWidget == null) return;
+        Rs2Reflection.setItemId(menuEntry, menuSwapWidget.getItemId());
+        menuEntry.setOption("Select");
+        menuEntry.setParam0(menuSwapParam0 != -1 ? menuSwapParam0 : menuSwapWidget.getType());
+        menuEntry.setParam1(menuSwapWidget.getId());
+        menuEntry.setTarget("");
+        menuEntry.setType(MenuAction.CC_OP);
+        menuEntry.setIdentifier(menuSwapIdentifier);
+    }
 }

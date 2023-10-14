@@ -6,17 +6,15 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Items {
-    JUG("jug", "jug of water"),
-    CLAY("clay", "soft clay");
+    JUG("jug", "Jug of water"),
+    CLAY("clay", "Soft clay");
 
     private final String name;
+    @Getter
     private final String finished;
 
     @Override
     public String toString() {
         return name;
-    }
-    public String getFinished(){
-        return finished;
     }
 }

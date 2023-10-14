@@ -8,6 +8,8 @@ import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 
 import java.util.Objects;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+
 public class MicrobotInventorySetup {
     public static void loadInventory(String name) {
         Rs2Bank.openBank();
@@ -16,10 +18,10 @@ public class MicrobotInventorySetup {
             if (inventorySetup == null) return;
             for (int i = 0; i < inventorySetup.getInventory().size(); i++) {
                 InventorySetupsItem inventorySetupsItem = inventorySetup.getInventory().get(i);
-                if (Rs2Bank.inventoryItems.stream().filter(x -> x.getItemId() == inventorySetupsItem.getId()).count() ==
-                        inventorySetup.getInventory().stream().filter(x -> x.getId() == inventorySetupsItem.getId()).count())
+                if (Inventory.hasItemAmount(inventorySetupsItem.getId(), (int) inventorySetup.getInventory().stream().filter(x -> x.getId() == inventorySetupsItem.getId()).count()))
                     continue;
-                Rs2Bank.withdrawFast(inventorySetupsItem.getId(), inventorySetupsItem.getQuantity());
+                Rs2Bank.withdrawX(inventorySetupsItem.getId(), inventorySetupsItem.getQuantity());
+                sleep(300, 600);
             }
         }
     }
@@ -36,9 +38,9 @@ public class MicrobotInventorySetup {
                     continue;
                 }
                 if (inventorySetupsItem.getQuantity() > 1) {
-                    Rs2Bank.withdrawAllAndEquipFast(inventorySetupsItem.getId());
+                    Rs2Bank.withdrawAllAndEquip(inventorySetupsItem.getId());
                 } else {
-                    Rs2Bank.withdrawAndEquipFast(inventorySetupsItem.getId());
+                    Rs2Bank.withdrawAndEquip(inventorySetupsItem.getId());
                 }
             }
         }

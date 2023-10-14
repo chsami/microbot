@@ -1,7 +1,5 @@
 package net.runelite.client.plugins.ogPlugins.ogPrayer;
 
-import net.runelite.api.Point;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -30,7 +28,7 @@ public class ogPrayerOverlay extends OverlayPanel {
                 panelComponent.getChildren().add(LineComponent.builder().build());
 
                 panelComponent.getChildren().add(LineComponent.builder()
-                        .left(Microbot.status)
+                        .left(ogPrayerScript.status.toString())
                         .build());
 
 //            for (Point point: Microbot.getMouse().mousePositions) {

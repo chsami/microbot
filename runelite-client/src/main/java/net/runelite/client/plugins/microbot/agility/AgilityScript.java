@@ -67,6 +67,7 @@ public class AgilityScript extends Script {
         switch (config.agilityCourse()) {
             case GNOME_STRONGHOLD_AGILITY_COURSE:
                 startCourse = new WorldPoint(2474, 3436, 0);
+                break;
             case DRAYNOR_VILLAGE_ROOFTOP_COURSE:
                 startCourse = new WorldPoint(3103, 3279, 0);
                 break;
