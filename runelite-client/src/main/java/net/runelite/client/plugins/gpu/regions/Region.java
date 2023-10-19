@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Alexsuperfly <https://github.com/Alexsuperfly>
+ * Copyright (c) 2023, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,13 +22,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.gpu.regions;
 
-package net.runelite.client.util;
-
-@Deprecated
-public enum ImageUploadStyle
+class Region
 {
-	NEITHER,
-	IMGUR,
-	CLIPBOARD
+	int id;
+	int cx1;
+	int cy1;
+	int cx2;
+	int cy2;
 }
