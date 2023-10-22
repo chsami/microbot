@@ -91,6 +91,7 @@ public class Microbot {
     public static Mouse getMouseForKotlin() { return mouse; }
     public static WorldService getWorldServiceForKotlin() { return worldService; }
 
+    public static Notifier getNotifierForKotlin() { return notifier; }
     public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
