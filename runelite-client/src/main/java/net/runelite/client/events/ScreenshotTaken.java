@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Alexsuperfly <https://github.com/Alexsuperfly>
+ * Copyright (c) 2023, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,13 +22,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.events;
 
-package net.runelite.client.util;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import lombok.Value;
 
-@Deprecated
-public enum ImageUploadStyle
+/**
+ * Event fired when a screenshot is taken
+ */
+@Value
+public class ScreenshotTaken
 {
-	NEITHER,
-	IMGUR,
-	CLIPBOARD
+	/**
+	 * Path to where the screenshot is stored
+	 */
+	File path;
+	/**
+	 * The screenshot
+	 */
+	BufferedImage screenshot;
 }

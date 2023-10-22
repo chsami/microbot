@@ -34,13 +34,6 @@ public class MagicPlugin extends Plugin {
     MagicConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(MagicConfig.class);
     }
-
-    @Inject
-    private Client client;
-    @Inject
-    private ClientThread clientThread;
-    @Inject
-    private Notifier notifier;
     @Inject
     private OverlayManager overlayManager;
     @Inject
@@ -51,9 +44,6 @@ public class MagicPlugin extends Plugin {
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
-        Microbot.setClient(client);
-        Microbot.setClientThread(clientThread);
-        Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
         if (overlayManager != null) {
             overlayManager.add(magicOverlay);
