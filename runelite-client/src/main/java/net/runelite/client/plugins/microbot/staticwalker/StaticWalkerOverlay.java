@@ -55,6 +55,13 @@ public class StaticWalkerOverlay extends Overlay {
                     graphics.drawPolygon(poly);
                     graphics.fill(poly);
 
+                    int centerX = (int) poly.getBounds().getCenterX();
+                    int centerY = (int) poly.getBounds().getCenterY();
+                    int percentage = (int) (step * 100);
+
+                    graphics.setColor(Color.WHITE);
+                    graphics.drawString(percentage + "%", centerX - 9, centerY + 5);
+
                     if (!node.getPathTransports().isEmpty()) {
                         graphics.setColor(Color.BLUE);
                         graphics.drawPolygon(poly);

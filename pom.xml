@@ -28,7 +28,7 @@
 
 	<groupId>net.runelite</groupId>
 	<artifactId>runelite-parent</artifactId>
-	<version>1.10.14.2</version>
+	<version>1.10.14.3</version>
 	<packaging>pom</packaging>
 
 	<name>RuneLite</name>
@@ -38,7 +38,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.outputTimestamp>1</project.build.outputTimestamp>
-		<lombok.version>1.18.20</lombok.version>
+		<lombok.version>1.18.30</lombok.version>
 		<logback.version>1.2.9</logback.version>
 		<slf4j.version>1.7.25</slf4j.version>
 

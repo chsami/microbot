@@ -15,7 +15,7 @@ abstract class BaseTransportCollector(val tile: Tile) {
     fun shouldCollect(): Boolean {
         val tileObjectData = getObjectDataFromTile(tile) ?: return false
 
-        val composition = Microbot.getClientForKotlin().getObjectDefinition(tileObjectData.objectId)
+        val composition = Microbot.getClientThreadForKotlin().runOnClientThread { return@runOnClientThread Microbot.getClientForKotlin().getObjectDefinition(tileObjectData.objectId) }
         if (composition.actions == null) {
             return false
         }
@@ -90,9 +90,9 @@ abstract class BaseTransportCollector(val tile: Tile) {
         val gson = GsonBuilder().setPrettyPrinting().create()
         val json = gson.toJson(transport)
 
-        val stringSelection = StringSelection(json)
-        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-        clipboard.setContents(stringSelection, null)
+//        val stringSelection = StringSelection(json)
+//        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+//        clipboard.setContents(stringSelection, null)
 
         println(json)
         return transport
@@ -103,7 +103,7 @@ abstract class BaseTransportCollector(val tile: Tile) {
         if (tile.wallObject != null) {
             return TileObjectData(
 //                TransportUtility.getObjectIdVariableName(tile.wallObject.id),
-                client.getObjectDefinition(tile.wallObject.id).name,
+                Microbot.getClientThreadForKotlin().runOnClientThread { return@runOnClientThread client.getObjectDefinition(tile.wallObject.id).name },
                 tile.wallObject.getId(),
                 tile.wallObject.hash.toInt(),
                 tile.wallObject.orientationA == 1 || tile.wallObject.orientationA == 4
@@ -117,7 +117,7 @@ abstract class BaseTransportCollector(val tile: Tile) {
 
             return TileObjectData(
 //                TransportUtility.getObjectIdVariableName(gameObject.id),
-                client.getObjectDefinition(gameObject.id).name,
+                Microbot.getClientThreadForKotlin().runOnClientThread { return@runOnClientThread client.getObjectDefinition(gameObject.id).name },
                 gameObject.id,
                 gameObject.hash.toInt(),
                 false
@@ -126,7 +126,7 @@ abstract class BaseTransportCollector(val tile: Tile) {
         if (tile.groundObject != null) {
             return TileObjectData(
 //                TransportUtility.getObjectIdVariableName(tile.groundObject.id),
-                client.getObjectDefinition(tile.groundObject.id).name,
+                Microbot.getClientThreadForKotlin().runOnClientThread { return@runOnClientThread client.getObjectDefinition(tile.groundObject.id).name },
                 tile.groundObject.id,
                 tile.groundObject.hash.toInt(),
                 false
@@ -135,7 +135,7 @@ abstract class BaseTransportCollector(val tile: Tile) {
         if (tile.decorativeObject != null) {
             return TileObjectData(
 //                TransportUtility.getObjectIdVariableName(tile.decorativeObject.id),
-                client.getObjectDefinition(tile.decorativeObject.id).name,
+                Microbot.getClientThreadForKotlin().runOnClientThread { return@runOnClientThread client.getObjectDefinition(tile.decorativeObject.id).name },
                 tile.decorativeObject.id,
                 tile.decorativeObject.hash.toInt(),
                 false
