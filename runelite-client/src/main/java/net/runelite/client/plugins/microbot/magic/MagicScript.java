@@ -44,6 +44,8 @@ public class MagicScript extends Script {
 
     private void highAlch() {
         Widget highAlch = Microbot.getClient().getWidget(14286888);
+        if (Microbot.getClient().isWidgetSelected())
+            Microbot.getMouse().clickFast();
         if (highAlch == null || Microbot.getClientThread().runOnClientThread(highAlch::isHidden)) {
             Rs2Tab.switchToMagicTab();
             return;
