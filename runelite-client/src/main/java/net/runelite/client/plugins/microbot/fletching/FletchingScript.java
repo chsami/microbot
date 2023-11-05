@@ -34,11 +34,11 @@ public class FletchingScript extends Script {
     String secondaryItemToFletch = "";
 
     public void run(FletchingConfig config) {
-
-        if (config.fletchingMode() == FletchingMode.PROGRESSIVE)
-            calculateItemToFletch();
-
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (!Microbot.isLoggedIn())
+                return;
+            if (config.fletchingMode() == FletchingMode.PROGRESSIVE && model.getFletchingItem() == null)
+                calculateItemToFletch();
             if (!super.run()) return;
             if (!configChecks(config)) return;
             if (config.Afk() && Random.random(1, 100) == 2)
@@ -82,7 +82,7 @@ public class FletchingScript extends Script {
     private void bankItems(FletchingConfig config) {
         Rs2Bank.openBank();
         if (config.fletchingMode() == FletchingMode.STRUNG) {
-            Rs2Bank.depositX(config.fletchingItem().getContainsInventoryName(), config.fletchingMode().getAmount());
+            Rs2Bank.depositAll();
         } else if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
             Rs2Bank.depositAll(model.getFletchingItem().getContainsInventoryName());
             calculateItemToFletch();
@@ -92,13 +92,25 @@ public class FletchingScript extends Script {
         }
         sleepUntil(() -> !Inventory.hasItemContains(config.fletchingItem().getContainsInventoryName()));
 
+        if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(primaryItemToFletch) && !Inventory.hasItem(primaryItemToFletch)) {
+            Rs2Bank.closeBank();
+            Microbot.status = "[Shutting down] - Reason: " + primaryItemToFletch + " not found in the bank.";
+            Microbot.showMessage(Microbot.status);
+            shutdown();
+            return;
+        }
+
+        //Extra check if we for some reason have a full inventory without a knife
+        if (!Inventory.hasItem(primaryItemToFletch) && Inventory.isFull()) {
+            Rs2Bank.depositAll();
+            sleep(2000);
+        }
 
         Rs2Bank.withdrawItemXExact(true, primaryItemToFletch, config.fletchingMode().getAmount());
         if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(secondaryItemToFletch)) {
             Rs2Bank.closeBank();
             Microbot.status = "[Shutting down] - Reason: " + secondaryItemToFletch + " not found in the bank.";
-            Microbot.getNotifier().notify(Microbot.status);
-            // logout();
+            Microbot.showMessage(Microbot.status);
             shutdown();
             return;
         }
