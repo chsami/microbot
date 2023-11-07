@@ -20,11 +20,23 @@ public interface MicroAgilityConfig extends Config {
             keyName = "Course",
             name = "Course",
             description = "Choose your agility course",
-            position = 0,
+            position = 1,
             section = generalSection
     )
     default AgilityCourseLocation agilityCourse()
     {
         return AgilityCourseLocation.CANIFIS_ROOFTOP_COURSE;
+    }
+
+    @ConfigItem(
+            keyName = "Hitpoints",
+            name = "Hitpoints treshhold",
+            description = "Use food at certain hitpoint treshhold",
+            position = 2,
+            section = generalSection
+    )
+    default int hitpoints()
+    {
+        return 20;
     }
 }
