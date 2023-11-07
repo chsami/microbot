@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -7,6 +8,8 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.ProfileManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -15,12 +18,16 @@ import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginInstantiationException;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.microbot.staticwalker.pathfinder.WorldDataDownloader;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
+import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenConfig;
+import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenPlugin;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -44,6 +51,7 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -77,6 +85,13 @@ public class MicrobotPlugin extends Plugin {
     @Inject
     NPCManager npcManager;
     @Inject
+    ConfigManager configManager;
+    @Inject
+    ChatMessageManager chatMessageManager;
+    @Inject
+    PluginManager pluginManager;
+
+    @Inject
     private MicrobotOverlay microbotOverlay;
     @Inject
     private OverlayManager overlayManager;
@@ -91,6 +106,9 @@ public class MicrobotPlugin extends Plugin {
 
     @Inject
     private Rs2NpcManager rs2NpcManager;
+
+
+    private Plugin summerGardenPlugin = null;
 
     public ThievingScript thievingScript;
     public CookingScript cookingScript;
@@ -128,6 +146,12 @@ public class MicrobotPlugin extends Plugin {
         BreakHandlerScript.initBreakHandler("Microbot", false);
 
         Rs2NpcManager.loadJson();
+
+        for (Plugin plugin : pluginManager.getPlugins()) {
+            if (plugin.getClass() == SummerGardenPlugin.class) {
+                summerGardenPlugin = plugin;
+            }
+        }
     }
 
     protected void shutDown() {
@@ -243,7 +267,9 @@ public class MicrobotPlugin extends Plugin {
         {
             if (summerGardenScript == null) {
                 summerGardenScript = new SummerGardenScript();
-                summerGardenScript.run();
+                summerGardenScript.run(configManager.getConfig(SummerGardenConfig.class), chatMessageManager);
+                startPlugin(summerGardenPlugin);
+
             } else {
                 summerGardenScript.shutdown();
                 summerGardenScript = null;
@@ -306,5 +332,34 @@ public class MicrobotPlugin extends Plugin {
     public void onMenuOptionClicked(MenuOptionClicked event)
     {
          System.out.println(event.getMenuEntry());
+    }
+
+    @Subscribe
+    protected void onClientTick(ClientTick t) {
+        if (!pluginManager.isActive(summerGardenPlugin) && summerGardenScript != null) {
+            summerGardenScript.shutdown();
+            summerGardenScript = null;
+        }
+        else if (pluginManager.isActive(summerGardenPlugin) && summerGardenScript == null) {
+            summerGardenScript = new SummerGardenScript();
+            summerGardenScript.run(configManager.getConfig(SummerGardenConfig.class), chatMessageManager);
+            startPlugin(summerGardenPlugin);
+        }
+    }
+
+    @SneakyThrows
+    private void startPlugin(Plugin p) {
+        SwingUtilities.invokeAndWait(() ->
+        {
+            try
+            {
+                pluginManager.setPluginEnabled(p, true);
+                pluginManager.startPlugin(p);
+            }
+            catch (PluginInstantiationException e)
+            {
+                System.out.printf("Failed to start plugin: %s%n", p.getName());
+            }
+        });
     }
 }

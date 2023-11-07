@@ -7,15 +7,6 @@ import java.awt.*;
 
 @ConfigGroup(SummerGardenPlugin.CONFIG_GROUP)
 public interface SummerGardenConfig extends Config {
-    @ConfigItem(
-            keyName = "guide",
-            name = "How to use",
-            description = "How to use this plugin",
-            position = 0
-    )
-    default String GUIDE() {
-        return "Right click the tree at summers garden and click 'Start',\n You need a pestle and mortar and empty beer glasses! \n Stamina pots is recommended \n The script might fail the first few attempts to get tick perfect";
-    }
 
     @ConfigItem(
             keyName = "highlightGood",
@@ -174,4 +165,65 @@ public interface SummerGardenConfig extends Config {
     {
         return SoundEffectVolume.MEDIUM_HIGH;
     }
+
+    @ConfigSection(
+            name = "Bot Settings",
+            description = "Options for the bot",
+            position = 13,
+            closedByDefault = false
+    )
+    String botSection = "botSection";
+
+    @ConfigItem(
+            keyName = "botGuide",
+            name = "How to use",
+            description = "How to use this plugin",
+            position = 1,
+            section = botSection
+    )
+    default String GUIDE() {
+        return "To start this script, right click the tree at summers garden and click 'Start' or toggle this plugin on. " +
+                "For full automation, enable the 'Auto Hand in and Reset' and 'Auto Maze Completion' options. " +
+                "If the 'Auto Hand in and Reset' option is enabled your inventory should only contain a pestle and mortar (at the moment, it does not support stamina potions). " +
+                "Otherwise, if you only have the 'Auto Maze Completion' option enabled, " +
+                "you need to get enough beer glasses and manually hand in or bank your sq'irk before returning to the garden. " +
+                "Stamina potions are recommended if you're only using the 'Auto Maze Completion' option (you'll need to drink them manually). " +
+                "Note that if collision check is not disabled, the script might fail the first few attempts until it is tick perfect";
+    }
+
+    @ConfigItem(
+            keyName = "autoMazeCompletion",
+            name = "Auto Maze Completion",
+            description = "Clicks the tree, makes the sq'irk juice and reenters the summer maze.",
+            position = 2,
+            section = botSection
+    )
+    default boolean autoMazeCompletion() { return false; }
+
+    @ConfigItem(
+            keyName = "handInAndReset",
+            name = "Auto Hand in and Reset",
+            description = "Hands in all of your juice to Osman, gets more beer glasses from the shelves and teleports to the garden.",
+            position = 3,
+            section = botSection
+    )
+    default boolean autoHandInAndReset() { return false; }
+
+    @ConfigItem(
+            keyName = "waitForOneClick",
+            name = "Disable Collision Check",
+            description = "Immediately clicks the tree without checking elemental NPC position. This is useful when you're in a world with many people and you aren't caught.",
+            position = 4,
+            section = botSection
+    )
+    default boolean waitForOneClick() { return false; }
+
+    @ConfigItem(
+            keyName = "sendInvFullNotification",
+            name = "Full Inventory Notification",
+            description = "Sends a notification in the chat box when there's no more empty beer glasses left.",
+            position = 5,
+            section = botSection
+    )
+    default boolean sendInvFullNotification() { return false; }
 }

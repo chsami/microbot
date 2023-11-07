@@ -494,6 +494,11 @@ public class PluginManager
 		return true;
 	}
 
+	public boolean isActive(Plugin plugin)
+	{
+		return activePlugins.contains(plugin);
+	}
+
 	public void setPluginValue(String groupName, String keyName, Object value)
 	{
 		configManager.setConfiguration(groupName, keyName, value);

@@ -16,6 +16,8 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.MicrobotPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
@@ -25,8 +27,8 @@ import java.awt.*;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Summers Garden",
-        description = "Microbot Summers Garden - Right click the tree at summers garden and click 'Start', You need a pestle and mortar and empty beer glasses!",
-        tags = {"Summers Garden", "minigame", "thieving", "microbot", "skilling"},
+        description = " Microbot Summers Garden (V2.1)",
+        tags = {"Summers Garden", "minigame", "thieving", "microbot", "skilling", "summer", "summers", "garden", "sq'irk", "juice"},
         enabledByDefault = false
 )
 @Slf4j
@@ -51,7 +53,7 @@ public class SummerGardenPlugin extends Plugin
     private SummerGardenOverlay overlay;
 
     @Inject
-    private SummerGardenConfig config;
+    public SummerGardenConfig config;
 
     public static final String CONFIG_GROUP = "oneclicksummergarden";
     public static final String CONFIG_KEY_GATE_START = "useGateStartPoint";
