@@ -37,26 +37,27 @@ public class Rs2GroundItem {
      * @return An array of the ground items on the specified tile.
      */
     public static RS2Item[] getAllAt(int x, int y) {
-        if (!Microbot.isLoggedIn()) {
-            return null;
-        }
-        List<RS2Item> list = new ArrayList<>();
-
-        Tile tile = getTile(x, y);
-        if (tile == null) {
-            return null;
-        }
-
-        List<TileItem> groundItems = tile.getGroundItems();
-
-        if (groundItems != null && !groundItems.isEmpty()) {
-            for (TileItem groundItem : groundItems) {
-                RS2Item rs2Item = new RS2Item(Microbot.getItemManager().getItemComposition(groundItem.getId()), tile, groundItem);
-                list.add(rs2Item);
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            if (!Microbot.isLoggedIn()) {
+                return null;
             }
-        }
+            List<RS2Item> list = new ArrayList<>();
 
-        return list.toArray(new RS2Item[list.size()]);
+            Tile tile = getTile(x, y);
+            if (tile == null) {
+                return null;
+            }
+
+            List<TileItem> groundItems = tile.getGroundItems();
+
+            if (groundItems != null && !groundItems.isEmpty()) {
+                for (TileItem groundItem : groundItems) {
+                    RS2Item rs2Item = new RS2Item(Microbot.getItemManager().getItemComposition(groundItem.getId()), tile, groundItem);
+                    list.add(rs2Item);
+                }
+            }
+            return list.toArray(new RS2Item[list.size()]);
+        });
     }
 
     public static Tile getTile(int x, int y) {
