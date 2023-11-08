@@ -136,6 +136,7 @@ public class ProfileManager {
 			profile.setName(name);
 			profile.setSync(false);
 			profile.setRev(-1);
+			profile.setDefaultForRsProfiles(new ArrayList<>());
 			profiles.add(profile);
 			modified = true;
 			log.debug("Created profile {}", profile);

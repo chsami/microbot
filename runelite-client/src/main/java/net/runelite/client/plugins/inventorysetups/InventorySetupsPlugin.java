@@ -32,9 +32,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
+import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetID;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -339,7 +339,7 @@ public class InventorySetupsPlugin extends Plugin
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
-		Widget bankWidget = client.getWidget(WidgetInfo.BANK_TITLE_BAR);
+		Widget bankWidget = client.getWidget(ComponentID.BANK_TITLE_BAR);
 		if (bankWidget == null || bankWidget.isHidden())
 		{
 			return;
@@ -353,7 +353,7 @@ public class InventorySetupsPlugin extends Plugin
 		// If shift is held and item is right clicked in the bank while a setup is active,
 		// add item to additional filtered items
 		else if (panel.getCurrentSelectedSetup() != null
-				&& event.getActionParam1() == WidgetInfo.BANK_ITEM_CONTAINER.getId()
+				&& event.getActionParam1() == ComponentID.BANK_ITEM_CONTAINER
 				&& client.isKeyPressed(KeyCode.KC_SHIFT)
 				&& event.getOption().equals("Examine"))
 		{
@@ -593,7 +593,7 @@ public class InventorySetupsPlugin extends Plugin
 	@Subscribe
 	private void onWidgetClosed(WidgetClosed event)
 	{
-		if (event.getGroupId() == WidgetID.BANK_GROUP_ID && !config.persistHotKeysOutsideBank())
+		if (event.getGroupId() == InterfaceID.BANK && !config.persistHotKeysOutsideBank())
 		{
 			unregisterHotkeys();
 		}
@@ -604,7 +604,7 @@ public class InventorySetupsPlugin extends Plugin
 	{
 		// when the bank is loaded up allowing filtering again
 		// this is to make it so the bank will refilter if a tab was clicked and then the player exited the bank
-		if (event.getGroupId() == WidgetID.BANK_GROUP_ID)
+		if (event.getGroupId() == InterfaceID.BANK)
 		{
 			// If manual bank filter is selected, don't allow filtering when the bank is opened
 			// filtering will only occur if the user selects a setup or uses a filtering hotkey
@@ -940,10 +940,10 @@ public class InventorySetupsPlugin extends Plugin
 
 				// When tab is selected with search window open, the search window closes but the search button
 				// stays highlighted, this solves that issue
-				Widget bankContainer = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
+				Widget bankContainer = client.getWidget(ComponentID.BANK_ITEM_CONTAINER);
 				if (bankContainer != null && !bankContainer.isHidden())
 				{
-					Widget searchBackground = client.getWidget(WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND);
+					Widget searchBackground = client.getWidget(ComponentID.BANK_SEARCH_BUTTON_BACKGROUND);
 					searchBackground.setSpriteId(SpriteID.EQUIPMENT_SLOT_TILE);
 				}
 			});
@@ -964,7 +964,7 @@ public class InventorySetupsPlugin extends Plugin
 			return;
 		}
 
-		if (event.getParam1() == WidgetInfo.BANK_ITEM_CONTAINER.getId() && event.getMenuOption().startsWith("View tab"))
+		if (event.getParam1() == ComponentID.BANK_ITEM_CONTAINER && event.getMenuOption().startsWith("View tab"))
 		{
 			if (config.disableBankTabBar())
 			{
@@ -1191,7 +1191,7 @@ public class InventorySetupsPlugin extends Plugin
 						postTitle += "Additional Items";
 						break;
 				}
-				Widget bankTitle = client.getWidget(WidgetInfo.BANK_TITLE_BAR);
+				Widget bankTitle = client.getWidget(ComponentID.BANK_TITLE_BAR);
 				bankTitle.setText("Inventory Setup <col=ff0000>" + panel.getCurrentSelectedSetup().getName() + postTitle + "</col>");
 			}
 		}
@@ -1226,7 +1226,7 @@ public class InventorySetupsPlugin extends Plugin
 
 		int items = 0;
 
-		Widget itemContainer = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
+		Widget itemContainer = client.getWidget(ComponentID.BANK_ITEM_CONTAINER);
 		if (itemContainer == null)
 		{
 			return;

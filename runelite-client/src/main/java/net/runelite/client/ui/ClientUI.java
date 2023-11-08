@@ -30,8 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.RuneLiteProperties;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -748,11 +748,11 @@ public class ClientUI {
         final Client client = (Client) this.client;
         final int x = client.getRealDimensions().width - sidebarOpenIcon.getWidth() - 5;
 
-        // Offset sidebar button if resizable mode logout is visible
-        final Widget logoutButton = client.getWidget(WidgetInfo.RESIZABLE_VIEWPORT_BOTTOM_LINE_LOGOUT_BUTTON);
-        final int y = logoutButton != null && !logoutButton.isHidden() && logoutButton.getParent() != null
-                ? logoutButton.getHeight() + logoutButton.getRelativeY()
-                : 5;
+		// Offset sidebar button if resizable mode logout is visible
+		final Widget logoutButton = client.getWidget(ComponentID.RESIZABLE_VIEWPORT_BOTTOM_LINE_LOGOUT_BUTTON_OVERLAY);
+		final int y = logoutButton != null && !logoutButton.isHidden() && logoutButton.getParent() != null
+			? logoutButton.getHeight() + logoutButton.getRelativeY()
+			: 5;
 
         final BufferedImage image = sidebarOpen ? sidebarClosedIcon : sidebarOpenIcon;
 
