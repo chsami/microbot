@@ -28,7 +28,7 @@
 
 	<groupId>net.runelite</groupId>
 	<artifactId>runelite-parent</artifactId>
-	<version>1.10.14.3</version>
+	<version>1.10.16</version>
 	<packaging>pom</packaging>
 
 	<name>RuneLite</name>
@@ -46,7 +46,7 @@
 		<checkstyle.skip>true</checkstyle.skip>
 		<glslang.path></glslang.path>
 
-		<rs.version>217</rs.version>
+		<rs.version>218</rs.version>
 	</properties>
 
 	<licenses>
@@ -125,7 +125,7 @@
 		<module>runelite-api</module>
 		<module>runelite-client</module>
 		<module>runelite-jshell</module>
-		<module>runelite-script-assembler-plugin</module>
+		<module>runelite-maven-plugin</module>
 	</modules>
 
 	<dependencyManagement>
@@ -231,26 +231,26 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--			<plugin>-->
-			<!--				<groupId>org.apache.maven.plugins</groupId>-->
-			<!--				<artifactId>maven-javadoc-plugin</artifactId>-->
-			<!--				<version>3.5.0</version>-->
-			<!--				<configuration>-->
-			<!--					&lt;!&ndash; Javadoc the delombok sources &ndash;&gt;-->
-			<!--					<sourcepath>${project.build.directory}/delombok</sourcepath>-->
-			<!--				</configuration>-->
-			<!--				&lt;!&ndash; maven-release-plugin runs maven-javadoc-plugin:jar as one of its-->
-			<!--				     release steps, so we will run it as well for the CI. Note this-->
-			<!--				     defaults to disabled due to the maven.javadoc.skip property above. &ndash;&gt;-->
-			<!--				<executions>-->
-			<!--					<execution>-->
-			<!--						<id>attach-javadocs</id>-->
-			<!--						<goals>-->
-			<!--							<goal>jar</goal>-->
-			<!--						</goals>-->
-			<!--					</execution>-->
-			<!--				</executions>-->
-			<!--			</plugin>-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.5.0</version>
+				<configuration>
+					<!-- Javadoc the delombok sources -->
+					<sourcepath>${project.build.directory}/delombok</sourcepath>
+				</configuration>
+				<!-- maven-release-plugin runs maven-javadoc-plugin:jar as one of its
+				     release steps, so we will run it as well for the CI. Note this
+				     defaults to disabled due to the maven.javadoc.skip property above. -->
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
