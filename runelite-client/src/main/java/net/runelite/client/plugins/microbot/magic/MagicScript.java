@@ -44,7 +44,12 @@ public class MagicScript extends Script {
 
     private void highAlch() {
         Widget highAlch = Microbot.getClient().getWidget(14286888);
-        if (highAlch == null) return;
+        if (Microbot.getClient().isWidgetSelected())
+            Microbot.getMouse().clickFast();
+        if (highAlch == null || Microbot.getClientThread().runOnClientThread(highAlch::isHidden)) {
+            Rs2Tab.switchToMagicTab();
+            return;
+        }
         Point point = new Point((int) highAlch.getBounds().getCenterX(), (int) highAlch.getBounds().getCenterY());
         sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC), 5000);
         sleep(300, 600);

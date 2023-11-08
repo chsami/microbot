@@ -102,7 +102,7 @@ public class XpUpdaterPlugin extends Plugin
 				fetchXp = true;
 			}
 		}
-		else if (state == GameState.LOGIN_SCREEN)
+		else if (state == GameState.LOGIN_SCREEN || state == GameState.HOPPING)
 		{
 			Player local = client.getLocalPlayer();
 			if (local == null)
@@ -203,10 +203,8 @@ public class XpUpdaterPlugin extends Plugin
 		{
 			HttpUrl url = new HttpUrl.Builder()
 				.scheme("https")
-				.host(
-					worldTypes.contains(WorldType.SEASONAL) ? "seasonal.api.wiseoldman.net" :
-						"api.wiseoldman.net")
-				.addPathSegment("v2")
+				.host("api.wiseoldman.net")
+				.addPathSegment(worldTypes.contains(WorldType.SEASONAL) ? "league" : "v2")
 				.addPathSegment("players")
 				.addPathSegment(username)
 				.build();

@@ -19,6 +19,9 @@ class PathWalker(private val nodes: List<PathNode>) {
         fun interrupt() {
             isInterrupted = true
         }
+        fun getIsInterrupted(): Boolean {
+            return isInterrupted
+        }
     }
 
     fun walkPath() {
