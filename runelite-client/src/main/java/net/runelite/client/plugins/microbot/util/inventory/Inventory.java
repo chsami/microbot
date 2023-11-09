@@ -433,9 +433,13 @@ public class Inventory {
     }
 
     public static boolean useItem(String itemName) {
+        return useItem(itemName, false);
+    }
+
+    public static boolean useItem(String itemName, boolean exact) {
         if (Rs2Bank.isOpen()) return false;
         Microbot.status = "Use inventory item " + itemName;
-        Widget item = findItem(itemName);
+        Widget item = findItem(itemName, exact);
         if (item == null) return false;
         Microbot.getMouse().click(item.getBounds().getCenterX(), item.getBounds().getCenterY());
         sleep(100, 300);
