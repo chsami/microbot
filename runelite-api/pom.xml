@@ -136,14 +136,14 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<!-- include generated sources in javadoc -->
-					<sourcepath>${project.build.directory}/delombok;${project.build.directory}/generated-sources</sourcepath>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-javadoc-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					&lt;!&ndash; include generated sources in javadoc &ndash;&gt;-->
+<!--					<sourcepath>${project.build.directory}/delombok;${project.build.directory}/generated-sources</sourcepath>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 			<plugin>
 				<groupId>net.runelite</groupId>
 				<artifactId>runelite-maven-plugin</artifactId>

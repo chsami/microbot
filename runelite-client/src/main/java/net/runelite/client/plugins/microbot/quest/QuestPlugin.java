@@ -13,7 +13,7 @@ import java.awt.*;
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Quester",
         description = "Microbot quest plugin",
-        tags = {"example", "microbot"},
+        tags = {"quest", "microbot"},
         enabledByDefault = false
 )
 @Slf4j
