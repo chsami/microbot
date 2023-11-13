@@ -11,10 +11,14 @@ class WoodcuttingHelper {
     companion object {
         fun findAndChopTree(treeName: String): Boolean {
             val player = Microbot.getClientForKotlin().localPlayer
-            val nearestTree = Rs2GameObject.getGameObjects()
-                .filterNotNull()
-                .filter { gameObject: GameObject -> Microbot.getClientForKotlin().getObjectDefinition(gameObject.id).name.equals(treeName, ignoreCase = true) }
-                .minByOrNull { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) } ?: return false
+            val nearestTree = Microbot.getClientThreadForKotlin().runOnClientThread {
+                return@runOnClientThread Rs2GameObject.getGameObjects()
+                    .filterNotNull()
+                    .filter { gameObject: GameObject -> Microbot.getClientForKotlin().getObjectDefinition(gameObject.id).name.equals(treeName, ignoreCase = true) }
+                    .minByOrNull { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) }
+            }
+
+            nearestTree ?: return false
 
             if (TrainerInterruptor.isInterrupted) {
                 return false

@@ -90,7 +90,7 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
         val fishingLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.FISHING)
         val woodcuttingLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.WOODCUTTING)
 
-        if (config.trainCombat() && attackLevel < config.attackLevel() && strengthLevel < config.strengthLevel() && defenceLevel < config.defenceLevel()) {
+        if (config.trainCombat() && (attackLevel < config.attackLevel() || strengthLevel < config.strengthLevel() || defenceLevel < config.defenceLevel())) {
             schedule.add(TrainerScripts.COMBAT)
         }
 
