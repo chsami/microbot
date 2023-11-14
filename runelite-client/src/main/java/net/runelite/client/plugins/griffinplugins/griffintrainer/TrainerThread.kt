@@ -18,6 +18,7 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
         var countLabel = ""
         var count = 0
         var randomEventDismissedCount = 0
+        var currentWorldNumber = 0
     }
 
     private enum class TrainerScripts {
@@ -37,6 +38,8 @@ class TrainerThread(private val config: GriffinTrainerConfig) : Thread() {
 
         overallTimer.setRandomTimeout(config.minTotalTime(), config.maxTotalTime())
         overallTimer.start()
+
+        currentWorldNumber = Microbot.getClientForKotlin().world
 
         var trainerSchedule = getTrainerSchedule()
 

@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.griffinplugins.griffintrainer.trainers
 
+import net.runelite.api.GameState
 import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
@@ -8,8 +9,9 @@ import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.BankHel
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.microbot.Microbot
-import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntiBan
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
+import net.runelite.client.plugins.microbot.util.security.Login
 
 abstract class BaseTrainer(private val config: GriffinTrainerConfig) {
     abstract fun getBankLocation(): WorldPoint
@@ -36,6 +38,14 @@ abstract class BaseTrainer(private val config: GriffinTrainerConfig) {
 
         if (process()) {
             return true
+        }
+
+        if (Microbot.getClientForKotlin().gameState == GameState.CONNECTION_LOST) {
+            TrainerInterruptor.sleepUntilTrue({ Microbot.getClientForKotlin().gameState == GameState.LOGGED_IN }, 100, 30000)
+        }
+
+        if (Microbot.getClientForKotlin().gameState == GameState.LOGIN_SCREEN) {
+            Login(TrainerThread.currentWorldNumber)
         }
 
         return false
