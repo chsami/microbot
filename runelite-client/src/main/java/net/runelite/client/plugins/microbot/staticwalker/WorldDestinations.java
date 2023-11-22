@@ -24,7 +24,7 @@ public enum WorldDestinations {
     VARROCK_WEST_BANK("Varrock West Bank", new WorldPoint(3183, 3441, 0)),
     VARROCK_GRAND_EXCHANGE("Varrock Grand Exchange", new WorldPoint(3164, 3486, 0)),
     VARROCK_SOUTH_EAST_MINE("Varrock South East Mine", new WorldPoint(3285, 3364, 0)),
-    VARROCK_SOUTH_WEST_MINE("Varrock South West Mine", new WorldPoint(3182, 3445, 0)),
+    VARROCK_SOUTH_WEST_MINE("Varrock South West Mine", new WorldPoint(3175, 3363, 0)),
 
     PORT_SARIM_MAGE_STORE("Port Sarim Mage Store", new WorldPoint(3014, 3258, 0)),
     PORT_SARIM_RING_STORE("Port Sarim Ring Store", new WorldPoint(3013, 3247, 0)),

@@ -142,7 +142,7 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
     }
 
     private fun runBankingState(itemIdsToDeposit: List<Int>) {
-        if (config.collectItems()) {
+        if (config.keepFish()) {
             if (Inventory.isFull()) {
                 Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
                 TrainerInterruptor.sleep(400, 600)
@@ -162,7 +162,9 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
                 TrainerInterruptor.sleep(200)
             }
         } else {
-            Inventory.dropAll()
+            for (itemId in itemIdsToDeposit) {
+                Inventory.dropAll(itemId)
+            }
         }
 
         scriptState = ScriptState.CHECKING_AREA

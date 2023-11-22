@@ -4,6 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.mining.MiningLocations;
 
 @ConfigGroup(GriffinTrainerPlugin.CONFIG_GROUP)
 public interface GriffinTrainerConfig extends Config {
@@ -227,48 +228,58 @@ public interface GriffinTrainerConfig extends Config {
     String miningSettingsSection = "miningSettingsSection";
 
     @ConfigItem(
+            keyName = "miningLocation",
+            name = "Mining Location",
+            description = "Mining Location",
+            position = 1,
+            section = miningSettingsSection
+    )
+    default MiningLocations miningLocation() {
+        return MiningLocations.VARROCK_EAST;
+    }
+    @ConfigItem(
             keyName = "keepOre",
             name = "Keep Ore",
             description = "Keep Ore",
-            position = 1,
+            position = 2,
             section = miningSettingsSection
     )
     default boolean keepOre() {
         return true;
     }
 
-//    @ConfigItem(
-//            keyName = "hopWorlds",
-//            name = "Hop Worlds",
-//            description = "Hop Worlds",
-//            position = 2,
-//            section = miningSettingsSection
-//    )
-//    default boolean hopWorlds() {
-//        return true;
-//    }
-//
-//    @ConfigItem(
-//            keyName = "maxPlayers",
-//            name = "Max Players In Mining Area",
-//            description = "Max Players In Mining Area",
-//            position = 3,
-//            section = miningSettingsSection
-//    )
-//    default int maxPlayers() {
-//        return 2;
-//    }
-//
-//    @ConfigItem(
-//            keyName = "maxWorldsToTry",
-//            name = "Max Worlds To Try",
-//            description = "Max Worlds To Try",
-//            position = 4,
-//            section = miningSettingsSection
-//    )
-//    default int maxWorldsToTry() {
-//        return 10;
-//    }
+    @ConfigItem(
+            keyName = "hopWorlds",
+            name = "Hop Worlds",
+            description = "Hop Worlds",
+            position = 3,
+            section = miningSettingsSection
+    )
+    default boolean hopWorlds() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "maxPlayers",
+            name = "Max Players In Mining Area",
+            description = "Max Players In Mining Area",
+            position = 4,
+            section = miningSettingsSection
+    )
+    default int maxPlayers() {
+        return 2;
+    }
+
+    @ConfigItem(
+            keyName = "maxWorldsToTry",
+            name = "Max Worlds To Try",
+            description = "Max Worlds To Try",
+            position = 5,
+            section = miningSettingsSection
+    )
+    default int maxWorldsToTry() {
+        return 10;
+    }
 
     @ConfigSection(
             name = "Combat Settings",

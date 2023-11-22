@@ -174,8 +174,8 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
                 }
                 TrainerInterruptor.sleep(200)
             }
-        } else {
-            Inventory.dropAll()
+//        } else {
+//            Inventory.dropAll()
         }
 
         scriptState = ScriptState.CHECKING_AREA

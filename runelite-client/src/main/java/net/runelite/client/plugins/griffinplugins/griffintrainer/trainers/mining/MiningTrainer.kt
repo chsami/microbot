@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.mining
 
 import net.runelite.api.ItemID
+import net.runelite.api.Player
 import net.runelite.api.Skill
 import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
@@ -11,14 +12,19 @@ import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.Genera
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
 import net.runelite.client.plugins.griffinplugins.util.helpers.MiningHelper
+import net.runelite.client.plugins.griffinplugins.util.helpers.WorldHelper
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.player.Rs2Player
 
 class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
     private val varrockEastMineWorldArea = WorldArea(3281, 3363, 10, 9, 0)
     private val varrockEastMineWorldPoint = WorldPoint(3284, 3366, 0)
+
+    private val varrockWestMineWorldArea = WorldArea(3172, 3364, 13, 16, 0)
+    private val varrockWestMineWorldPoint = WorldPoint(3175, 3363, 0)
 
     private enum class ScriptState {
         SETUP, CHECKING_AREA, MINING, BANKING
@@ -27,7 +33,11 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
     private var scriptState: ScriptState = ScriptState.SETUP
 
     override fun getBankLocation(): WorldPoint {
-        return WorldDestinations.VARROCK_EAST_BANK.worldPoint
+        if (config.miningLocation() == MiningLocations.VARROCK_EAST) {
+            return WorldDestinations.VARROCK_EAST_BANK.worldPoint
+        } else {
+            return WorldDestinations.VARROCK_WEST_BANK.worldPoint
+        }
     }
 
     override fun getInventoryRequirements(): InventoryRequirements {
@@ -66,7 +76,12 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
 
         } else if (minimumSkillLevel < 99) {
             updateCounts("Mining Iron", "Iron Mined")
-            processState(varrockEastMineWorldArea, varrockEastMineWorldPoint, "iron rocks", ItemID.IRON_ORE)
+
+            if (config.miningLocation() == MiningLocations.VARROCK_EAST) {
+                processState(varrockEastMineWorldArea, varrockEastMineWorldPoint, "iron rocks", ItemID.IRON_ORE)
+            } else {
+                processState(varrockWestMineWorldArea, varrockWestMineWorldPoint, "iron rocks", ItemID.IRON_ORE)
+            }
 
         } else {
             return true
@@ -95,24 +110,30 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
             Microbot.getWalkerForKotlin().staticWalkTo(worldPoint)
         }
 
-//        if (config.hopWorlds()) {
-//
-//            val players = Microbot.getClientForKotlin().players
-//            val playerCount = players
-//                .filterNotNull()
-//                .filter { otherPlayer: Player -> otherPlayer.id != player.id }
-//                .filter { otherPlayer: Player -> worldArea.contains(player.worldLocation) }
-//                .count()
-//
-//            if (config.hopWorlds() && playerCount > config.maxPlayers()) {
-//                WorldHelper.hopToWorldWithoutPlayersInArea(
-//                    Rs2Player.isMember(),
-//                    worldArea,
-//                    config.maxPlayers(),
-//                    config.maxWorldsToTry()
-//                )
-//            }
-//        }
+        if (config.hopWorlds()) {
+            try {
+                val players = Microbot.getClientForKotlin().players
+                val playerCount = players
+                    .filterNotNull()
+                    .filter { otherPlayer: Player -> otherPlayer.id != player.id }
+                    .filter { otherPlayer: Player -> worldArea.contains(player.worldLocation) }
+                    .count()
+
+                if (config.hopWorlds() && playerCount > config.maxPlayers()) {
+                    WorldHelper.hopToWorldWithoutPlayersInArea(
+                        Rs2Player.isMember(),
+                        worldArea,
+                        config.maxPlayers(),
+                        config.maxWorldsToTry()
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+            } finally {
+                TrainerInterruptor.sleep(5000)
+            }
+        }
 
         scriptState = ScriptState.MINING
     }
