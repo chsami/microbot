@@ -12,9 +12,11 @@ class MiningHelper {
     companion object {
         fun findAndMineOre(oreName: String): Boolean {
             val player = Microbot.getClientForKotlin().localPlayer
-            val objects = Rs2GameObject.getGameObjects()
-                .filterNotNull()
-                .filter { gameObject: GameObject -> Microbot.getClientForKotlin().getObjectDefinition(gameObject.id).name.equals(oreName, ignoreCase = true) }
+            val objects = Microbot.getClientThreadForKotlin().runOnClientThread {
+                return@runOnClientThread Rs2GameObject.getGameObjects()
+                    .filterNotNull()
+                    .filter { gameObject: GameObject -> Microbot.getClientForKotlin().getObjectDefinition(gameObject.id).name.equals(oreName, ignoreCase = true) }
+            }
 
             if (objects.isEmpty()) {
                 Microbot.status = "No ${oreName} ores found"

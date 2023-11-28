@@ -671,6 +671,20 @@ public class Inventory {
         return !hasItem(itemName);
     }
 
+    public static boolean dropAll(int itemId) {
+        if (!Rs2Settings.enableDropShiftSetting()) return false;
+        if (Inventory.isEmpty()) return true;
+        while (hasItem(itemId)) {
+            if (!VirtualKeyboard.isKeyPressed(KeyEvent.VK_SHIFT) || !Rs2Menu.hasAction("drop"))
+                VirtualKeyboard.holdShift();
+            useItemAction(itemId, "drop");
+            sleep(150, 300);
+        }
+        VirtualKeyboard.releaseShift();
+
+        return !hasItem(itemId);
+    }
+
     public static boolean isUsingItem() {
         return Arrays.stream(Rs2Menu.getTargets()).anyMatch(x -> x.contains("->"));
     }

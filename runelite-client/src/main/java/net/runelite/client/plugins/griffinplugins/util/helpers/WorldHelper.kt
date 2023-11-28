@@ -14,16 +14,20 @@ class WorldHelper {
     companion object {
         fun hopToWorld(world: Int): Boolean {
             Microbot.hopToWorld(world)
+            TrainerInterruptor.sleepUntilTrue({ Rs2Widget.findWidget("Switch World") != null }, 100, 5000)
             Global.sleep(1000)
             if (!Rs2Widget.clickWidget("Switch World")) {
                 return false
             }
+
+            TrainerInterruptor.sleepUntilTrue({ Microbot.getClientForKotlin().gameState != GameState.LOGGED_IN }, 100, 5000)
+
             return TrainerInterruptor.sleepUntilTrue({
                 val inCorrectWorld = Microbot.getClientForKotlin().world == world
                 val inCorrectGameState = Microbot.getClientForKotlin().gameState == GameState.LOGGED_IN
                 val loadingWidgetAbsent = Rs2Widget.findWidget("please wait") == null
                 return@sleepUntilTrue inCorrectWorld && inCorrectGameState && loadingWidgetAbsent
-            }, 100, 15000)
+            }, 100, 30000)
         }
 
         fun hopToWorldWithoutPlayersInArea(isMembers: Boolean, worldArea: WorldArea, maxPlayers: Int, maxWorldsToTry: Int): Boolean {

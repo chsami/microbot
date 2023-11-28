@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
 import net.runelite.client.plugins.microbot.util.models.RS2Item
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab
 
 class ItemHelper {
 
@@ -73,17 +74,23 @@ class ItemHelper {
             return true
         }
 
-        fun equipItemIds(itemIds: List<Int>) {
-            itemIds.forEach { itemId: Int ->
+        fun equipItemIds(itemPairs: List<Pair<Int, Boolean>>) {
+            Rs2Tab.switchToInventoryTab()
+
+            for (itemPair in itemPairs) {
                 if (TrainerInterruptor.isInterrupted) {
                     return
                 }
 
-                Microbot.status = "Equipping item $itemId"
-                if (!Rs2Equipment.hasEquipped(itemId)) {
-                    Inventory.getInventoryItem(itemId)?.let {
+                if (!itemPair.second) {
+                    continue
+                }
+
+                Microbot.status = "Equipping item ${itemPair.first}"
+                if (!Rs2Equipment.hasEquipped(itemPair.first)) {
+                    Inventory.getInventoryItem(itemPair.first)?.let {
                         Microbot.getMouseForKotlin().click(it.bounds)
-                        TrainerInterruptor.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemId) }, 100, 3000)
+                        TrainerInterruptor.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemPair.first) }, 100, 3000)
                     }
                 }
             }
