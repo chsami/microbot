@@ -36,12 +36,26 @@ class NPCHelper {
 //                HelperInterruptor.sleepUntilTrue({ nearestNpc.isDead || player.isDead }, 200, 1000 * 90)
 
 
-                val result = TrainerInterruptor.sleepUntilTrue({
+//                val result = TrainerInterruptor.sleepUntilTrue({
+//                    if (player.interacting != nearestNpc) {
+//                        return@sleepUntilTrue false
+//                    }
+//                    return@sleepUntilTrue nearestNpc.isDead || player.isDead
+//                }, 100, 1000 * 90)
+                var result = false
+                var count = 0
+                while (true) {
                     if (player.interacting != nearestNpc) {
-                        return@sleepUntilTrue false
+                        break
                     }
-                    return@sleepUntilTrue nearestNpc.isDead || player.isDead
-                }, 100, 1000 * 90)
+
+                    result = TrainerInterruptor.sleepUntilTrue({ return@sleepUntilTrue nearestNpc.isDead || player.isDead }, 100, 1000 * 3)
+                    count += 3
+
+                    if (count >= 90) {
+                        break
+                    }
+                }
 
                 if (!result) {
                     return false

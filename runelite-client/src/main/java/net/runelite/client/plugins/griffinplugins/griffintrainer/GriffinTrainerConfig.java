@@ -4,6 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.mining.MiningLocations;
 
 @ConfigGroup(GriffinTrainerPlugin.CONFIG_GROUP)
 public interface GriffinTrainerConfig extends Config {
@@ -70,6 +71,17 @@ public interface GriffinTrainerConfig extends Config {
         return 30;
     }
 
+    @ConfigItem(
+            keyName = "equipGear",
+            name = "Equip Initial Gear",
+            description = "Equip Initial Gear",
+            position = 5,
+            section = generalSection
+    )
+    default boolean equipGear() {
+        return true;
+    }
+
     @ConfigSection(
             name = "Task Settings",
             description = "Task Settings",
@@ -97,6 +109,28 @@ public interface GriffinTrainerConfig extends Config {
             section = tasksSection
     )
     default boolean trainMining() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "trainFishing",
+            name = "Train Fishing",
+            description = "Train Fishing",
+            position = 2,
+            section = tasksSection
+    )
+    default boolean trainFishing() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "trainWoodcutting",
+            name = "Train Woodcutting",
+            description = "Train Woodcutting",
+            position = 3,
+            section = tasksSection
+    )
+    default boolean trainWoodcutting() {
         return true;
     }
 
@@ -163,6 +197,28 @@ public interface GriffinTrainerConfig extends Config {
         return 0;
     }
 
+    @ConfigItem(
+            keyName = "fishingLevel",
+            name = "Fishing",
+            description = " Fishing Level",
+            position = 5,
+            section = skillsSection
+    )
+    default int fishingLevel() {
+        return 0;
+    }
+
+    @ConfigItem(
+            keyName = "woodcuttingLevel",
+            name = "Woodcutting",
+            description = " Woodcutting Level",
+            position = 6,
+            section = skillsSection
+    )
+    default int woodcuttingLevel() {
+        return 0;
+    }
+
     @ConfigSection(
             name = "Mining Settings",
             description = "Mining Settings",
@@ -171,24 +227,21 @@ public interface GriffinTrainerConfig extends Config {
     )
     String miningSettingsSection = "miningSettingsSection";
 
-
     @ConfigItem(
-            keyName = "equipGear",
-            name = "Equip Initial Gear",
-            description = "Equip Initial Gear",
-            position = 0,
+            keyName = "miningLocation",
+            name = "Mining Location",
+            description = "Mining Location",
+            position = 1,
             section = miningSettingsSection
     )
-    default boolean equipGear() {
-        return true;
+    default MiningLocations miningLocation() {
+        return MiningLocations.VARROCK_EAST;
     }
-
-
     @ConfigItem(
             keyName = "keepOre",
             name = "Keep Ore",
             description = "Keep Ore",
-            position = 1,
+            position = 2,
             section = miningSettingsSection
     )
     default boolean keepOre() {
@@ -199,7 +252,7 @@ public interface GriffinTrainerConfig extends Config {
             keyName = "hopWorlds",
             name = "Hop Worlds",
             description = "Hop Worlds",
-            position = 2,
+            position = 3,
             section = miningSettingsSection
     )
     default boolean hopWorlds() {
@@ -210,7 +263,7 @@ public interface GriffinTrainerConfig extends Config {
             keyName = "maxPlayers",
             name = "Max Players In Mining Area",
             description = "Max Players In Mining Area",
-            position = 3,
+            position = 4,
             section = miningSettingsSection
     )
     default int maxPlayers() {
@@ -221,7 +274,7 @@ public interface GriffinTrainerConfig extends Config {
             keyName = "maxWorldsToTry",
             name = "Max Worlds To Try",
             description = "Max Worlds To Try",
-            position = 4,
+            position = 5,
             section = miningSettingsSection
     )
     default int maxWorldsToTry() {
@@ -247,5 +300,42 @@ public interface GriffinTrainerConfig extends Config {
         return true;
     }
 
+    @ConfigSection(
+            name = "Fishing Settings",
+            description = "Fishing Settings",
+            position = 5,
+            closedByDefault = false
+    )
+    String fishingSettingsSection = "fishingSettings";
+
+    @ConfigItem(
+            keyName = "keepFish",
+            name = "Keep Fish",
+            description = "Keep Fish",
+            position = 0,
+            section = fishingSettingsSection
+    )
+    default boolean keepFish() {
+        return true;
+    }
+
+    @ConfigSection(
+            name = "Woodcutting Settings",
+            description = "Woodcutting Settings",
+            position = 6,
+            closedByDefault = false
+    )
+    String woodcuttingSettingsSection = "woodcuttingSettings";
+
+    @ConfigItem(
+            keyName = "keepLogs",
+            name = "Keep Logs",
+            description = "Keep Logs",
+            position = 0,
+            section = woodcuttingSettingsSection
+    )
+    default boolean keepLogs() {
+        return true;
+    }
 
 }
