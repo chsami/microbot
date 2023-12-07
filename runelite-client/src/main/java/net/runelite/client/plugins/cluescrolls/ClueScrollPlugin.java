@@ -144,6 +144,7 @@ public class ClueScrollPlugin extends Plugin
 	private static final Color HIGHLIGHT_HOVER_BORDER_COLOR = HIGHLIGHT_BORDER_COLOR.darker();
 	private static final Color HIGHLIGHT_FILL_COLOR = new Color(0, 255, 0, 20);
 	private static final String CLUE_TAG_NAME = "clue";
+	private static final String TREASURE_CHEST_TAG_NAME = "treasure chest";
 	private static final int[] RUNEPOUCH_AMOUNT_VARBITS = {
 		Varbits.RUNE_POUCH_AMOUNT1, Varbits.RUNE_POUCH_AMOUNT2, Varbits.RUNE_POUCH_AMOUNT3, Varbits.RUNE_POUCH_AMOUNT4
 	};
@@ -251,11 +252,13 @@ public class ClueScrollPlugin extends Plugin
 		overlayManager.add(clueScrollWorldOverlay);
 		overlayManager.add(clueScrollMusicOverlay);
 		tagManager.registerTag(CLUE_TAG_NAME, this::testClueTag);
+		tagManager.registerTag(TREASURE_CHEST_TAG_NAME, this::testTreasureChestTag);
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
+		tagManager.unregisterTag(TREASURE_CHEST_TAG_NAME);
 		tagManager.unregisterTag(CLUE_TAG_NAME);
 		overlayManager.remove(clueScrollOverlay);
 		overlayManager.remove(clueScrollEmoteOverlay);
@@ -1201,6 +1204,46 @@ public class ClueScrollPlugin extends Plugin
 			}
 		}
 
+		return false;
+	}
+
+	private boolean testTreasureChestTag(int itemId)
+	{
+		EnumComposition members = client.getEnum(EnumID.POH_COSTUME_MEMBERS);
+		EnumComposition[] enums = {
+			client.getEnum(EnumID.POH_COSTUMES_CLUE_BEGINNER),
+			client.getEnum(EnumID.POH_COSTUMES_CLUE_EASY),
+			client.getEnum(EnumID.POH_COSTUMES_CLUE_MEDIUM),
+			client.getEnum(EnumID.POH_COSTUMES_CLUE_HARD),
+			client.getEnum(EnumID.POH_COSTUMES_CLUE_ELITE),
+			client.getEnum(EnumID.POH_COSTUMES_CLUE_MASTER)
+		};
+		for (var tierEnum : enums)
+		{
+			for (int baseItem : tierEnum.getIntVals())
+			{
+				if (baseItem == itemId)
+				{
+					return true;
+				}
+
+				int membersEnumId = members.getIntValue(baseItem);
+				if (membersEnumId == -1)
+				{
+					continue;
+				}
+
+				// check members in the group
+				var memberEnum = client.getEnum(membersEnumId);
+				for (int memberItem : memberEnum.getIntVals())
+				{
+					if (memberItem == itemId)
+					{
+						return true;
+					}
+				}
+			}
+		}
 		return false;
 	}
 
