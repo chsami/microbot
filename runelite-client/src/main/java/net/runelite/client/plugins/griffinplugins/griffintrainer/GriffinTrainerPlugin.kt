@@ -10,10 +10,10 @@ import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathWalker
 import net.runelite.client.ui.overlay.OverlayManager
 import javax.inject.Inject
 
-@PluginDescriptor(name = Griffin + GriffinTrainerPlugin.CONFIG_GROUP, enabledByDefault = false)
+@PluginDescriptor(name = Griffin + GriffinTrainerPlugin.CONFIG_GROUP + "[<font color=#f22727>DANGER</font>]", enabledByDefault = false)
 class GriffinTrainerPlugin : Plugin() {
     companion object {
-        const val CONFIG_GROUP = "Auto Pilot [<font color=#f22727>DANGER</font>]"
+        const val CONFIG_GROUP = "Auto Pilot"
     }
 
     @Inject
