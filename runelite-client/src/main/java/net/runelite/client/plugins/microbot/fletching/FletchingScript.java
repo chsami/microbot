@@ -27,7 +27,7 @@ class ProgressiveFletchingModel {
 
 public class FletchingScript extends Script {
 
-    public static double version = 1.5;
+    public static double version = 1.6;
     ProgressiveFletchingModel model = new ProgressiveFletchingModel();
 
     String primaryItemToFletch = "";
@@ -37,12 +37,17 @@ public class FletchingScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!Microbot.isLoggedIn())
                 return;
+
             if (config.fletchingMode() == FletchingMode.PROGRESSIVE && model.getFletchingItem() == null)
                 calculateItemToFletch();
+
             if (!super.run()) return;
+
             if (!configChecks(config)) return;
+
             if (config.Afk() && Random.random(1, 100) == 2)
                 sleep(1000, 60000);
+
             try {
                 boolean hasRequirementsToFletch = false;
                 boolean hasRequirementsToBank = false;
@@ -64,8 +69,6 @@ public class FletchingScript extends Script {
                             || !Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired());
                 }
 
-
-
                 if (hasRequirementsToFletch) {
                     fletch(config);
                 }
@@ -81,16 +84,24 @@ public class FletchingScript extends Script {
 
     private void bankItems(FletchingConfig config) {
         Rs2Bank.openBank();
-        if (config.fletchingMode() == FletchingMode.STRUNG) {
-            Rs2Bank.depositAll();
-        } else if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
-            Rs2Bank.depositAll(model.getFletchingItem().getContainsInventoryName());
-            calculateItemToFletch();
-            secondaryItemToFletch = (model.getFletchingMaterial().getName() + " logs").trim();
-        } else {
-            Rs2Bank.depositAll(config.fletchingItem().getContainsInventoryName());
-        }
-        sleepUntil(() -> !Inventory.hasItemContains(config.fletchingItem().getContainsInventoryName()));
+
+        // make sure there's no long bows left
+        do {
+            if (config.fletchingMode() == FletchingMode.STRUNG) {
+                Rs2Bank.depositAll();
+            } else if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
+                Rs2Bank.depositAll(model.getFletchingItem().getContainsInventoryName());
+                calculateItemToFletch();
+                secondaryItemToFletch = (model.getFletchingMaterial().getName() + " logs").trim();
+            } else {
+                // make sure there's no long bows left
+                Rs2Bank.depositAll(config.fletchingItem().getContainsInventoryName());
+            }
+
+            sleepUntil(() -> !Inventory.hasItemContains(config.fletchingItem().getContainsInventoryName()), 10000);
+
+        } while (Inventory.hasItemContains(config.fletchingItem().getContainsInventoryName()));
+
 
         if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(primaryItemToFletch) && !Inventory.hasItem(primaryItemToFletch)) {
             Rs2Bank.closeBank();
@@ -100,13 +111,17 @@ public class FletchingScript extends Script {
             return;
         }
 
-        //Extra check if we for some reason have a full inventory without a knife
+        // Extra check if we for some reason have a full inventory without a knife
         if (!Inventory.hasItem(primaryItemToFletch) && Inventory.isFull()) {
             Rs2Bank.depositAll();
-            sleep(2000);
+            sleepUntil(() -> Inventory.isEmpty(), 10000);
         }
 
-        Rs2Bank.withdrawItemXExact(true, primaryItemToFletch, config.fletchingMode().getAmount());
+        if (!Inventory.hasItem(primaryItemToFletch)) {
+            Rs2Bank.withdrawItemXExact(true, primaryItemToFletch, config.fletchingMode().getAmount());
+            sleepUntil(() -> Inventory.hasItem(primaryItemToFletch));
+        }
+
         if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(secondaryItemToFletch)) {
             Rs2Bank.closeBank();
             Microbot.status = "[Shutting down] - Reason: " + secondaryItemToFletch + " not found in the bank.";
@@ -114,14 +129,18 @@ public class FletchingScript extends Script {
             shutdown();
             return;
         }
-        if (config.fletchingMode() == FletchingMode.STRUNG)
-            Rs2Bank.withdrawItemX(true, secondaryItemToFletch, config.fletchingMode().getAmount());
-        else
-            Rs2Bank.withdrawItemAll(secondaryItemToFletch);
 
         final String finalSecondaryItemToFletch = secondaryItemToFletch;
 
-        sleepUntil(() -> Inventory.hasItem(finalSecondaryItemToFletch));
+        do {
+            if (config.fletchingMode() == FletchingMode.STRUNG)
+                Rs2Bank.withdrawItemX(true, secondaryItemToFletch, config.fletchingMode().getAmount());
+            else
+                Rs2Bank.withdrawItemAll(secondaryItemToFletch);
+
+            sleepUntil(() -> Inventory.hasItem(finalSecondaryItemToFletch), 2000);
+        } while (!Inventory.hasItem(finalSecondaryItemToFletch));
+
         sleep(600, 3000);
         Rs2Bank.closeBank();
     }
