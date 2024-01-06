@@ -333,6 +333,10 @@ public class IdleNotifierPlugin extends Plugin
 			case PISCARILIUS_CRANE_REPAIR:
 			case HOME_MAKE_TABLET:
 			case SAND_COLLECTION:
+			case MILKING_COW:
+			case CHURN_MILK_SHORT:
+			case CHURN_MILK_MEDIUM:
+			case CHURN_MILK_LONG:
 			case LOOKING_INTO:
 				resetTimers();
 				lastAnimation = animation;
