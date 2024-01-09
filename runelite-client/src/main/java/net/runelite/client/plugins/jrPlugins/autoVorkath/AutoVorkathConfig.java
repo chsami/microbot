@@ -1,35 +1,34 @@
+/*
+ * Copyright (c) 2024. By Jrod7938
+ *
+ */
 package net.runelite.client.plugins.jrPlugins.autoVorkath;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.plugins.jrPlugins.autoVorkath.enums.*;
+
+import java.awt.*;
 
 @ConfigGroup("AutoVorkath")
 public interface AutoVorkathConfig extends Config {
 
     @ConfigItem(
-            keyName = "gear",
-            name = "Gear Setup",
-            description = "Enter the name of the gear setup you want to use",
-            position = 0
-    )
-    default String GEAR() { return "AutoVorkath"; }
-
-    @ConfigItem(
             keyName = "crossbow",
             name = "Crossbow",
             description = "Choose your crossbow",
-            position = 1
+            position = 0
     )
     default CROSSBOW CROSSBOW() {
-        return CROSSBOW.ARMADYL_CROSSBOW;
+        return CROSSBOW.DRAGON_HUNTER_CROSSBOW;
     }
 
     @ConfigItem(
             keyName = "slayersStaff",
             name = "Slayers Staff",
             description = "Choose your slayers staff",
-            position = 2
+            position = 1
     )
     default STAFF SLAYERSTAFF() {
         return STAFF.SLAYER_STAFF;
@@ -39,10 +38,20 @@ public interface AutoVorkathConfig extends Config {
             keyName = "teleport",
             name = "Teleport",
             description = "Choose your teleport",
-            position = 3
+            position = 2
     )
     default TELEPORT TELEPORT() {
         return TELEPORT.CONSTRUCT_CAPE_T;
+    }
+
+    @ConfigItem(
+            keyName = "portal",
+            name = "Portal",
+            description = "What Portal to use to teleport to Lunar Isle.",
+            position = 3
+    )
+    default PORTAL PORTAL() {
+        return PORTAL.PORTAL_NEXUS;
     }
 
     @ConfigItem(
@@ -51,7 +60,9 @@ public interface AutoVorkathConfig extends Config {
             description = "Activate Rigour?",
             position = 4
     )
-    default boolean ACTIVATERIGOUR() { return true; }
+    default boolean ACTIVATERIGOUR() {
+        return true;
+    }
 
     @ConfigItem(
             keyName = "rangePotion",
@@ -59,5 +70,98 @@ public interface AutoVorkathConfig extends Config {
             description = "What Ranging potion to use?",
             position = 5
     )
-    default RANGE_POTION RANGEPOTION() { return RANGE_POTION.DIVINE_RANGING_POTION; }
+    default RANGE_POTION RANGEPOTION() {
+        return RANGE_POTION.DIVINE_RANGING_POTION;
+    }
+
+    @ConfigItem(
+            keyName = "prayerPotion",
+            name = "Prayer Potion",
+            description = "What Prayer potion to use?",
+            position = 6
+    )
+    default PRAYER_POTION PRAYERPOTION() {
+        return PRAYER_POTION.PRAYER;
+    }
+
+    @ConfigItem(
+            keyName = "antiFirePotion",
+            name = "Antifire Potion",
+            description = "What Antifire potion to use?",
+            position = 7
+    )
+    default ANTIFIRE ANTIFIRE() {
+        return ANTIFIRE.EXTENDED_SUPER_ANTIFIRE;
+    }
+
+    @ConfigItem(
+            keyName = "foodAmount",
+            name = "Food Amount",
+            description = "MAX FOOD : MIN FOOD",
+            position = 8
+    )
+    default Dimension FOODAMOUNT() {
+        return new Dimension(15, 10);
+    }
+
+    @ConfigItem(
+            keyName = "poolDrinkat",
+            name = "Ornate Pool Drink",
+            description = "HEALTH : PRAYER",
+            position = 9
+    )
+    default Dimension POOLDRINK() {
+        return new Dimension(90, 90);
+    }
+
+    @ConfigItem(
+            keyName = "eatat",
+            name = "Eat at",
+            description = "Eat at what health?",
+            position = 10
+    )
+    default int EATAT() {
+        return 75;
+    }
+
+    @ConfigItem(
+            keyName = "sellAt",
+            name = "Sell At",
+            description = "Sell items at what kill?",
+            position = 11
+    )
+    default int SELLAT() {
+        return 15;
+    }
+
+    @ConfigItem(
+            keyName = "mule",
+            name = "Mule GP?",
+            description = "Trade GP after selling? (TARGET MUST BE IN GE)",
+            position = 12
+    )
+    default boolean MULE() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "muleName",
+            name = "Mule Name",
+            description = "Name of player in GE to trade.",
+            position = 13
+    )
+    default String MULENAME() {
+        return "";
+    }
+
+    @ConfigItem(
+            keyName = "food",
+            name = "Food",
+            description = "What food to use? (NOT MANTA RAY!)",
+            position = 14
+    )
+    default String FOOD() {
+        return "Shark";
+    }
+
 }

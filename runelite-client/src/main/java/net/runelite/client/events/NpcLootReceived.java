@@ -33,5 +33,5 @@ import net.runelite.client.game.ItemStack;
 public class NpcLootReceived
 {
 	private final NPC npc;
-	private final Collection<ItemStack> items;
+	public final Collection<ItemStack> items;
 }
