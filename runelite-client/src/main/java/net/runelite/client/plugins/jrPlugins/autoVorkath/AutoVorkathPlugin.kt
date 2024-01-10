@@ -194,14 +194,14 @@ class AutoVorkathPlugin : Plugin() {
     fun onProjectileMoved(e: ProjectileMoved) {
         when (e.projectile.id) {
             acidProjectileId -> {
-                acidPools.add(WorldPoint.fromLocal(client, e.position))
+                clientThread.runOnClientThread { acidPools.add(WorldPoint.fromLocal(client, e.position)) }
                 changeStateTo(State.ACID)
             }
 
             whiteProjectileId -> changeStateTo(State.SPAWN)
             acidRedProjectileId -> changeStateTo(State.ACID)
             redProjectileId -> {
-                redBallLocation = WorldPoint.fromLocal(client, e.position)
+                redBallLocation = clientThread.runOnClientThread { WorldPoint.fromLocal(client, e.position) }
                 changeStateTo(State.RED_BALL)
             }
         }
