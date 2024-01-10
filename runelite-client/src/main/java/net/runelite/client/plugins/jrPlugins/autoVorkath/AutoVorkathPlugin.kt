@@ -245,8 +245,8 @@ class AutoVorkathPlugin : Plugin() {
         Inventory.useItemAction(config.CROSSBOW().toString(), "Wield")
         lootQueue.firstOrNull()?.let {
             //println("Queue first")
-            if (!Rs2Player.isMoving()) {
-                if (!Inventory.isFull()) {
+            if (!isMoving()) {
+                if (clientThread.runOnClientThread { !Inventory.isFull() }) {
                     Rs2GroundItem.loot(it.id)
                     //println("Looting")
                     lootQueue.removeAt(lootQueue.indexOf(it))
