@@ -5,6 +5,7 @@
 package net.runelite.client.plugins.jrPlugins.autoVorkath;
 
 import net.runelite.api.Client;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -33,11 +34,9 @@ public class AutoVorkathOverlay extends Overlay {
         panelComponent.getChildren().clear();
 
         LineComponent state = buildLine("State: ", plugin.getBotState().toString());
-        LineComponent tickDelay = buildLine("Tick Delay: ", String.valueOf(plugin.getTickDelay()));
         LineComponent killCount = buildLine("Kill Count: ", String.valueOf(plugin.getKillCount()));
 
         panelComponent.getChildren().add(state);
-        panelComponent.getChildren().add(tickDelay);
         panelComponent.getChildren().add(killCount);
 
         return panelComponent.render(graphics);

@@ -5,10 +5,14 @@
 package net.runelite.client.plugins.jrPlugins.autoVorkath
 
 import com.google.inject.Provides
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.runelite.api.*
+import net.runelite.api.coords.LocalPoint
 import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
 import net.runelite.api.events.*
+import net.runelite.client.callback.ClientThread
 import net.runelite.client.config.ConfigManager
 import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.events.NpcLootReceived
@@ -18,21 +22,23 @@ import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginManager
 import net.runelite.client.plugins.microbot.Microbot
+import net.runelite.client.plugins.microbot.util.Global.sleepUntil
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchange
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
 import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
 import net.runelite.client.plugins.microbot.util.walker.Walker
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
-import net.runelite.client.plugins.microbot.util.prayer.*
 import net.runelite.client.plugins.microbot.util.prayer.Prayer
 import net.runelite.client.ui.overlay.OverlayManager
 import java.awt.event.KeyEvent
+import java.lang.Thread.sleep
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -46,6 +52,9 @@ import kotlin.math.abs
 class AutoVorkathPlugin : Plugin() {
     @Inject
     private lateinit var client: Client
+
+    @Inject
+    private lateinit var clientThread: ClientThread
 
     @Inject
     private lateinit var pluginManager: PluginManager
@@ -67,14 +76,9 @@ class AutoVorkathPlugin : Plugin() {
         return configManager.getConfig(AutoVorkathConfig::class.java)
     }
 
-    var botState: State? = null
-    var tickDelay: Int = 0
+    var botState: State = State.NONE
     var killCount: Int = 0
     private var running = false
-    private val rangeProjectileId = 1477
-    private val magicProjectileId = 393
-    private val purpleProjectileId = 1471
-    private val blueProjectileId = 1479
     private val redProjectileId = 1481
     private val acidProjectileId = 1483
     private val acidRedProjectileId = 1482
@@ -109,9 +113,6 @@ class AutoVorkathPlugin : Plugin() {
         SPAWN,
         RED_BALL,
         LOOTING,
-        WALKING_TO_GE,
-        GETTING_ITEM,
-        SELLING,
         THINKING,
         NONE
     }
@@ -122,12 +123,13 @@ class AutoVorkathPlugin : Plugin() {
         running = client.gameState == GameState.LOGGED_IN
         lootNames = mutableSetOf()
         overlayManager.add(autoVorkathOverlay)
+        GlobalScope.launch { autoVorkath() }
     }
 
     override fun shutDown() {
         println("Auto Vorkath Plugin Deactivated")
         running = false
-        botState = null
+        botState = State.NONE
         drankAntiFire = false
         drankRangePotion = false
         lastDrankAntiFire = 0
@@ -173,19 +175,16 @@ class AutoVorkathPlugin : Plugin() {
             if (item != null) {
                 lootQueue.add(item)
                 val comp: ItemComposition = itemManager.getItemComposition(item.id)
-                if (comp.isTradeable) lootNames.add(comp.name)
+                lootNames.add(comp.name)
             }
         }
         killCount++
-        changeStateTo(State.LOOTING)
+        changeStateTo(State.LOOTING, 2)
     }
 
     @Subscribe
     fun onNpcDespawned(e: NpcDespawned) {
         if (e.npc.name == "Zombified Spawn") {
-            if (Inventory.contains(config.CROSSBOW().toString())) {
-                Inventory.useItemAction(config.CROSSBOW().toString(), "Wield")
-            }
             changeStateTo(State.FIGHTING)
         }
     }
@@ -200,7 +199,6 @@ class AutoVorkathPlugin : Plugin() {
 
             whiteProjectileId -> changeStateTo(State.SPAWN)
             acidRedProjectileId -> changeStateTo(State.ACID)
-            rangeProjectileId, magicProjectileId, purpleProjectileId, blueProjectileId -> activatePrayers(true)
             redProjectileId -> {
                 redBallLocation = WorldPoint.fromLocal(client, e.position)
                 changeStateTo(State.RED_BALL)
@@ -217,14 +215,8 @@ class AutoVorkathPlugin : Plugin() {
     }
 
 
-    @Subscribe
-    fun onGameTick(e: GameTick) {
-        if (running) {
-            if (tickDelay > 0) { // Tick delay
-                tickDelay--
-                return
-            }
-
+    private fun autoVorkath() {
+        while (running) {
             when (botState) {
                 State.WALKING_TO_BANK -> walkingToBankState()
                 State.BANKING -> bankingState()
@@ -237,129 +229,27 @@ class AutoVorkathPlugin : Plugin() {
                 State.RED_BALL -> redBallState()
                 State.LOOTING -> lootingState()
                 State.THINKING -> thinkingState()
-                State.WALKING_TO_GE -> walkingToGEState()
-                State.GETTING_ITEM -> gettingItemState()
-                State.SELLING -> sellingItemState()
                 State.NONE -> println("None State")
-                null -> println("Null State")
-            }
-        }
-    }
-
-    private fun sellingItemState() {
-        if (!isMoving()) {
-            if (geIsOpen()) {
-                if (inventoryHasLoot() && Rs2Widget.hasWidget("Select an offer slot to set up")) {
-                    val itemToSell = Inventory.getInventoryItems().firstOrNull {
-                        !it.name.contains(config.TELEPORT().toString())
-                    }
-                    val itemAmount = Inventory.getItemAmount(itemToSell?.name).toInt()
-                    itemToSell?.let {
-                        GrandExchange.sellItem(itemToSell.name, itemAmount, 100)
-                        //println("Offered Item")
-                        tickDelay = 1
-                        return
-                    } ?: run {
-                        changeStateTo(State.GETTING_ITEM, 1)
-                        return
-                    }
-                }
-                if (Rs2Widget.hasWidget("Confirm")) {
-                    Rs2Widget.clickWidget("-5%")
-                    Rs2Widget.clickWidget("-5%")
-                    Rs2Widget.clickWidget("Confirm")
-                    lootNames.remove(lootNames.toList()[0])
-                    tickDelay = 1
-                    return
-                }
-                if (Rs2Widget.hasWidget("Collect to inventory")) {
-                    GrandExchange.collectToInventory()
-                    Rs2Bank.openBank()
-                    changeStateTo(State.GETTING_ITEM, 1)
-                }
-            }
-        }
-    }
-
-    private fun gettingItemState() {
-        if (lootNames.isEmpty()) {
-            if (Rs2Bank.isOpen()) {
-                Rs2Bank.depositAll("Coins")
-                Rs2Bank.closeBank()
-            }
-            changeStateTo(State.WALKING_TO_BANK)
-            return
-        }
-        if (!isMoving()) {
-            if (Rs2Bank.isOpen()) {
-                if (Inventory.hasItem("Coins")) {
-                    Rs2Bank.depositAll("Coins")
-                    tickDelay = 1
-                    return
-                }
-                if (inventoryHasLoot()) {
-                    GrandExchange.openExchange()
-                    changeStateTo(State.SELLING, 1)
-                    return
-                } else {
-                    if (client.getVarbitValue(3958) == 0) {
-                        Rs2Widget.clickWidget("Note")
-                        tickDelay = 1
-                        return
-                    }
-                    Rs2Bank.withdrawAll(lootNames.toList()[0])
-                    tickDelay = 1
-                    return
-                }
-            } else {
-                Rs2Bank.openBank()
-                return
-            }
-        }
-    }
-
-    private fun walkingToGEState() {
-        if (!isMoving()) {
-            if (inVorkathArea() || !inGE() && !inHouse()) {
-                teleToHouse()
-                return
-            }
-            if (inHouse()) {
-                Rs2GameObject.interact("Ornate Jewellery Box", "Grand Exchange")
-                return
-            }
-            if (Rs2Bank.isOpen()) {
-                val item = Inventory.getInventoryItems().firstOrNull { !it.name.contains(config.TELEPORT().toString()) }
-                Rs2Bank.depositAll(item?.name)
-                if (Inventory.getInventoryItems().size == 1) { // only has teleport in inventory
-                    //println("LootId Before Check: $lootNames")
-                    lootNames = lootNames.filter {
-                        Rs2Bank.hasItem(it)
-                    }.toMutableSet()
-                    //println("LootId After Check: $lootNames")
-                    changeStateTo(State.GETTING_ITEM, 1)
-                    return
-                }
-            } else {
-                Rs2Bank.openBank()
-                return
             }
         }
     }
 
     private fun lootingState() {
         if (lootQueue.isEmpty()) {
-            if (killCount % config.SELLAT() == 0 && killCount != 0) changeStateTo(State.WALKING_TO_GE)
-            else changeStateTo(State.WALKING_TO_BANK, 1)
+            //println("Queue empty")
+            changeStateTo(State.WALKING_TO_BANK)
             return
         }
+        activatePrayers(false)
         Inventory.useItemAction(config.CROSSBOW().toString(), "Wield")
         lootQueue.firstOrNull()?.let {
+            //println("Queue first")
             if (!Rs2Player.isMoving()) {
                 if (!Inventory.isFull()) {
                     Rs2GroundItem.loot(it.id)
+                    //println("Looting")
                     lootQueue.removeAt(lootQueue.indexOf(it))
-                    tickDelay = if (isMoving()) 3 else 1
+                    //println("Removed")
                     return
                 } else {
                     Microbot.showMessage("Inventory full, going to bank.")
@@ -372,7 +262,10 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     private fun acidState() {
-        if (!runIsOff()) enableRun(false)
+        if (runIs(true)) {
+            enableRun(false)
+            return
+        }
         activatePrayers(false)
         if (!inVorkathArea()) {
             acidPools.clear()
@@ -404,18 +297,17 @@ class AutoVorkathPlugin : Plugin() {
         //println("Left Tile: $swPoint")
         //println("Safe tile: $safeTile")
 
-        val playerLocation = client.localPlayer.worldLocation
-
         safeTile?.let {
-            if (playerLocation == safeTile) {
+            if (client.localPlayer.worldLocation == safeTile) {
                 // Attack Vorkath if the player close to the safe tile
                 Rs2Npc.interact(vorkath, "Attack")
+                sleepUntil { Rs2Player.isInteracting() }
             } else {
-                eat(config.EATAT())
                 // Move to the safe tile if the player is not close enough
                 //println("Moving to safe tile: $safeTile")
                 //println("Player location: $playerLocation")
-                Walker().walkTo(safeTile)
+                Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, it))
+                sleepUntil { client.localPlayer.worldLocation == safeTile }
             }
         } ?: run {
             Microbot.showMessage("NO SAFE TILES! TELEPORTING TF OUT!")
@@ -425,10 +317,12 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     private fun redBallState() {
+        val safeTile = WorldPoint(redBallLocation.x + 2, redBallLocation.y, redBallLocation.plane)
+        Microbot.getWalkerForKotlin().walkTo(safeTile)
         drinkPrayer()
         eat(config.EATAT())
-        Walker().walkTo(WorldPoint(redBallLocation.x + 2, redBallLocation.y, redBallLocation.plane))
-        changeStateTo(State.FIGHTING, 2)
+        sleepUntil { client.localPlayer.worldLocation == safeTile && !doesProjectileExistById(redProjectileId) }
+        changeStateTo(State.FIGHTING)
     }
 
     private fun spawnState() {
@@ -438,41 +332,50 @@ class AutoVorkathPlugin : Plugin() {
         }
         activatePrayers(false)
         drinkPrayer()
-        if (!Rs2Equipment.hasEquipped(config.SLAYERSTAFF().toString())) {
-            Inventory.useItemAction(config.SLAYERSTAFF().toString(), "Wield")
+        if (!Rs2Equipment.hasEquippedContains(config.SLAYERSTAFF().toString())) {
+            Inventory.useItemContains(config.SLAYERSTAFF().toString())
+            sleepUntil { Rs2Equipment.hasEquippedContains(config.SLAYERSTAFF().toString()) }
             return
         } else {
-            Rs2Npc.interact("Zombie spawn", "Attack")
+            if (Rs2Npc.getNpc("Zombified Spawn") != null) {
+                Rs2Npc.interact("Zombified Spawn", "Attack")
+                sleepUntil { Rs2Npc.getNpc("Zombified Spawn") == null }
+                Inventory.useItemContains(config.CROSSBOW().toString())
+                sleepUntil { Rs2Equipment.hasEquippedContains(config.CROSSBOW().toString()) }
+                changeStateTo(State.FIGHTING)
+                return
+            }
         }
     }
 
     private fun fightingState() {
-        if (runIsOff()) enableRun(true)
-        acidPools.clear()
+        if (runIs()) enableRun(true)
+        activatePrayers(true)
         if (!inVorkathArea()) {
             changeStateTo(State.THINKING)
             return
         } else {
-            val vorkath = Rs2Npc.getNpc("Vorkath")
-            val middle = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, 0)
             if (isVorkathAsleep()) {
                 changeStateTo(State.WALKING_TO_BANK)
                 return
             }
+            val vorkath = Rs2Npc.getNpc(8061) ?: return
+            val middle = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, 0)
             if (client.localPlayer.interacting == null) {
                 Rs2Npc.interact(vorkath, "Attack")
+                sleep(300)
                 return
             }
             if (client.localPlayer.worldLocation != middle) {
                 if (!isMoving()) {
-                    Walker().walkTo(middle)
+                    Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, middle))
                 }
             }
             eat(config.EATAT())
-            if (Inventory.hasItem(config.CROSSBOW().toString())) {
-                Inventory.useItemAction(config.CROSSBOW().toString(), "Wield")
+            if (hasItem(config.CROSSBOW().toString())) {
+                Inventory.useItemContains(config.CROSSBOW().toString())
+                sleepUntil { Rs2Equipment.hasEquippedContains(config.CROSSBOW().toString()) }
             }
-
         }
     }
 
@@ -480,35 +383,40 @@ class AutoVorkathPlugin : Plugin() {
         if (isVorkathAsleep()) {
             acidPools.clear()
             lootQueue.clear()
-            lootNames.clear()
             if (!isMoving()) {
                 Rs2Npc.interact("Vorkath", "Poke")
+                sleepUntil { !isVorkathAsleep() }
                 return
             }
         } else {
             val vorkath = Rs2Npc.getNpc("Vorkath")
             val middle = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, 0)
-            Walker().walkTo(middle)
+            Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, middle))
+            sleepUntil { client.localPlayer.worldLocation == middle }
             changeStateTo(State.FIGHTING)
             return
         }
     }
 
     private fun walkingToVorkathState() {
-        if (runIsOff()) enableRun(true)
+        if (runIs()) enableRun(true)
         activatePrayers(false)
         if (!isMoving()) {
             if (bankArea.contains(client.localPlayer.worldLocation)) {
                 if (Rs2Widget.hasWidget("Click here to continue")) {
                     sendKey(KeyEvent.VK_SPACE)
+                    sleep(1000)
                     return
                 }
                 if (client.localPlayer.worldLocation != bankLocation) {
                     Walker().walkTo(bankLocation)
                     return
                 } else {
-                    Rs2Npc.interact("Sirsal Banker", "Talk-to")
-                    return
+                    if (!Rs2Widget.hasWidget("Click here to continue")) {
+                        Rs2Npc.interact("Sirsal Banker", "Talk-to")
+                        sleepUntil { Rs2Widget.hasWidget("Click here to continue") }
+                        return
+                    }
                 }
             } else {
                 if (inVorkathArea()) {
@@ -517,10 +425,12 @@ class AutoVorkathPlugin : Plugin() {
                 }
                 if (fremennikArea.contains(client.localPlayer.worldLocation)) {
                     Rs2GameObject.interact(29917, "Travel")
+                    sleepUntil { !Microbot.isMoving() }
                     return
                 } else {
                     if (Rs2GameObject.exists(31990)) {
                         Rs2GameObject.interact(31990, "Climb-over")
+                        sleepUntil { inVorkathArea() }
                         return
                     } else {
                         changeStateTo(State.WALKING_TO_BANK)
@@ -540,10 +450,8 @@ class AutoVorkathPlugin : Plugin() {
                         Walker().walkTo(bankLocation)
                         return
                     } else {
-                        val jack = Rs2Npc.getNpc("'Birds-Eye' Jack")
-                        Rs2Npc.interact(jack, "Bank")
-                        tickDelay = 1
-                        return
+                        val bank = Rs2GameObject.findObject(16700, WorldPoint(2099, 3920, 0))
+                        Rs2Bank.openBank(bank)
                     }
                 } else {
                     bank()
@@ -557,7 +465,7 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     private fun walkingToBankState() {
-        if (runIsOff()) enableRun(true)
+        if (runIs()) enableRun(true)
         activatePrayers(false)
         if (!isMoving()) {
             if (bankArea.contains(client.localPlayer.worldLocation)) {
@@ -604,11 +512,7 @@ class AutoVorkathPlugin : Plugin() {
                 changeStateTo(State.BANKING)
                 return
             } else { // Player is not in bank area
-                if (killCount == 0) {
-                    changeStateTo(State.WALKING_TO_BANK)
-                    return
-                }
-                if (killCount % config.SELLAT() == 0) changeStateTo(State.WALKING_TO_GE) else changeStateTo(State.WALKING_TO_BANK)
+                changeStateTo(State.WALKING_TO_BANK)
                 return
             }
         }
@@ -621,14 +525,14 @@ class AutoVorkathPlugin : Plugin() {
             Inventory.interact(config.RANGEPOTION().toString(), "Drink")
             lastDrankRangePotion = System.currentTimeMillis()
             drankRangePotion = true
-            tickDelay = 2
+            sleep(2000)
             return
         }
         if (!drankAntiFire && currentTime - lastDrankAntiFire > config.ANTIFIRE().time()) {
             Inventory.interact(config.ANTIFIRE().toString(), "Drink")
             lastDrankAntiFire = System.currentTimeMillis()
             drankAntiFire = true
-            tickDelay = 2
+            sleep(2000)
             return
         }
 
@@ -636,6 +540,7 @@ class AutoVorkathPlugin : Plugin() {
 
         if (!Rs2Equipment.hasEquipped("Serpentine helm")) {
             Inventory.interact("Anti-venom", "Drink")
+            sleep(2000)
         }
         isPrepared = drankAntiFire && drankRangePotion && !inventoryHasLoot()
         if (isPrepared) {
@@ -649,9 +554,10 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun drinkPrayer() {
         if (needsToDrinkPrayer()) {
-            if (Inventory.hasItem(config.PRAYERPOTION().toString())) {
+            if (Inventory.hasItemContains(config.PRAYERPOTION().toString())) {
                 Inventory.useItemAction(config.PRAYERPOTION().toString(), "Drink")
-                tickDelay = 2
+                //println("Drink Sleep")
+                sleep(200)
                 return
             } else {
                 isPrepared = false
@@ -666,41 +572,45 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun bank() {
         lootNames.forEach { item ->
-            if (Inventory.hasItem(item)) {
-                Rs2Bank.depositAll(item)
-            } else {
-                lootNames.remove(item)
-            }
+            Rs2Bank.depositAll(item)
         }
         if (!hasItem(config.TELEPORT().toString())) {
-            Rs2Bank.withdrawItem(config.TELEPORT().toString())
+            //("Withdraw teleport")
+            Rs2Bank.withdrawAll(config.TELEPORT().toString())
         }
-        if (!Inventory.hasItemAmount(config.RANGEPOTION().toString(), 1)) {
+        if (!Inventory.hasItemAmount(config.RANGEPOTION().toString(), 2)) {
+            //println("Withdraw Range potion")
             Rs2Bank.withdrawItem(config.RANGEPOTION().toString())
         }
         if (!Inventory.hasItem(config.SLAYERSTAFF().toString())) {
+            //println("Withdraw staff")
             Rs2Bank.withdrawItem(config.SLAYERSTAFF().toString())
         }
-        if (!Inventory.hasItemAmount(config.PRAYERPOTION().toString(), 1)) {
+        if (!Inventory.hasItemAmount(config.PRAYERPOTION().toString(), 2)) {
+            //println("Withdraw Prayer potion")
             Rs2Bank.withdrawItem(config.PRAYERPOTION().toString())
         }
         if (!Inventory.hasItem("Rune pouch")) {
+            //println("Withdraw rune pouch")
             Rs2Bank.withdrawItem("Rune pouch")
         }
-        if (!Inventory.hasItemAmount(config.ANTIFIRE().toString(), 1)) {
+        if (!Inventory.hasItemAmount(config.ANTIFIRE().toString(), 2)) {
+            //println("Withdraw anti-fire")
             Rs2Bank.withdrawItem(config.ANTIFIRE().toString())
         }
         if (!Rs2Equipment.hasEquipped("Serpentine helm")) {
-            if (Inventory.hasItemAmount("Anti-venom", 1)) {
+            if (!Inventory.hasItemAmount("Anti-venom", 2)) {
+                //println("Withdraw Anti-venom")
                 Rs2Bank.withdrawItem("Anti-venom")
             }
         }
-        if (!Inventory.isFull()) {
+        if (!Inventory.hasItemAmount(config.FOOD().toString(), config.FOODAMOUNT().width)) {
             for (i in 1..config.FOODAMOUNT().width - Inventory.getItemAmount(config.FOOD())) {
+                //println("Withdrawing food")
                 Rs2Bank.withdrawItem(config.FOOD())
             }
         }
-        changeStateTo(State.THINKING)
+        if (Inventory.hasItemAmount(config.FOOD().toString(), config.FOODAMOUNT().width)) changeStateTo(State.THINKING)
     }
 
     private fun inVorkathArea(): Boolean =
@@ -716,23 +626,24 @@ class AutoVorkathPlugin : Plugin() {
     private fun isMoving(): Boolean = Rs2Player.isMoving() || client.localPlayer.animation != -1
     private fun needsToDrinkPrayer(): Boolean = client.getBoostedSkillLevel(Skill.PRAYER) <= 70
 
-    private fun readyToFight(): Boolean = Inventory.hasItemAmount(config.FOOD(), config.FOODAMOUNT().height)
-                && Inventory.hasItem(config.ANTIFIRE().toString())
-                && Inventory.hasItem(config.RANGEPOTION().toString())
-                && Inventory.hasItem(config.SLAYERSTAFF().toString())
-                && Inventory.hasItem(config.TELEPORT().toString())
-                && Inventory.hasItem("Rune pouch")
-                && Inventory.hasItem(config.PRAYERPOTION().toString())
-                && !inventoryHasLoot()
+    private fun readyToFight(): Boolean = Inventory.getInventoryFood().size >= config.FOODAMOUNT().height
+            && Inventory.hasItemContains(config.ANTIFIRE().toString())
+            && Inventory.hasItemContains(config.RANGEPOTION().toString())
+            && Inventory.hasItemContains(config.SLAYERSTAFF().toString())
+            && Inventory.hasItemContains(config.TELEPORT().toString())
+            && Inventory.hasItemContains("Rune pouch")
+            && Inventory.hasItemContains(config.PRAYERPOTION().toString())
+            && !inventoryHasLoot()
 
-    private fun needsToEat(at: Int): Boolean = client.getBoostedSkillLevel(Skill.HITPOINTS) <= at
+    private fun needsToEat(at: Int): Boolean =
+        clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.HITPOINTS) <= at }
 
     private fun eat(at: Int) {
         if (needsToEat(at)) {
             if (Inventory.getInventoryFood().isNotEmpty()) {
-                Inventory.getInventoryFood().first().let {
-                    Inventory.eat(it)
-                }
+                val food = Inventory.getInventoryFood().first()
+                VirtualMouse().click(food.bounds)
+                return
             } else {
                 isPrepared = false
                 drankRangePotion = false
@@ -747,7 +658,7 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun inventoryHasLoot(): Boolean {
         lootNames.forEach { item ->
-            if (Inventory.hasItem(item)) {
+            if (hasItem(item)) {
                 return true
             }
         }
@@ -772,28 +683,45 @@ class AutoVorkathPlugin : Plugin() {
         client.canvas.dispatchEvent(e)
     }
 
-    private fun hasItem(name: String): Boolean = Inventory.hasItem(name)
+    private fun hasItem(name: String): Boolean = Inventory.hasItemContains(name)
 
-    private fun runIsOff(): Boolean = client.getVarpValue(173) == 0
+    private fun runIs(on: Boolean = false): Boolean =
+        clientThread.runOnClientThread { client.getVarpValue(173) == if (on) 1 else 0 }
 
     private fun enableRun(on: Boolean) {
         Rs2Player.toggleRunEnergy(on)
+        sleep(30)
     }
 
     private fun activatePrayers(on: Boolean) {
         if (config.ACTIVATERIGOUR()) {
             Rs2Prayer.fastPray(Prayer.RIGOUR, on)
+            sleep(30)
         }
         Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, on)
+        sleep(30)
+        return
     }
 
     private fun teleToHouse() {
-        Inventory.useItemAction(config.TELEPORT().toString(), config.TELEPORT().action())
+        Inventory.useItem(config.TELEPORT().toString())
+        sleepUntil { !isMoving() }
     }
+
+    private fun doesProjectileExistById(id: Int): Boolean {
+        for (projectile in client.projectiles) {
+            if (projectile.id == id) {
+                //println("Projectile $id found")
+                return true
+            }
+        }
+        return false
+    }
+
 
     private fun changeStateTo(stateName: State, ticksToDelay: Int = 0) {
         botState = stateName
-        tickDelay = ticksToDelay
+        sleep((ticksToDelay * 600).toLong())
         // println("State : $stateName")
     }
 }
