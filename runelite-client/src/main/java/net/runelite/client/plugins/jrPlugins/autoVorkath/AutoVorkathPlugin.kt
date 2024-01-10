@@ -290,7 +290,7 @@ class AutoVorkathPlugin : Plugin() {
             val safeTiles = wooxWalkArea.toWorldPointList().filter { isTileSafe(it) }
 
             // Find the closest safe tile by x-coordinate to the player
-            return safeTiles.minByOrNull { abs(it.x - client.localPlayer.worldLocation.x) }
+            return clientThread.runOnClientThread { safeTiles.minByOrNull { abs(it.x - client.localPlayer.worldLocation.x) } }
         }
 
         val safeTile: WorldPoint? = findSafeTiles()
@@ -299,16 +299,18 @@ class AutoVorkathPlugin : Plugin() {
         //println("Safe tile: $safeTile")
 
         safeTile?.let {
-            if (client.localPlayer.worldLocation == safeTile) {
+            if (clientThread.runOnClientThread { client.localPlayer.worldLocation == safeTile }) {
                 // Attack Vorkath if the player close to the safe tile
                 Rs2Npc.interact(vorkath, "Attack")
-                sleepUntil { Rs2Player.isInteracting() }
+                println("Attacked")
+                sleepUntil { Rs2Player.isInteracting() || !isMoving() }
             } else {
                 // Move to the safe tile if the player is not close enough
                 //println("Moving to safe tile: $safeTile")
                 //println("Player location: $playerLocation")
                 Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, it))
-                sleepUntil { client.localPlayer.worldLocation == safeTile }
+                println("Walked back")
+                sleepUntil { clientThread.runOnClientThread { client.localPlayer.worldLocation == safeTile } }
             }
         } ?: run {
             Microbot.showMessage("NO SAFE TILES! TELEPORTING TF OUT!")
@@ -322,7 +324,11 @@ class AutoVorkathPlugin : Plugin() {
         Microbot.getWalkerForKotlin().walkTo(safeTile)
         drinkPrayer()
         eat(config.EATAT())
-        sleepUntil { client.localPlayer.worldLocation == safeTile && !doesProjectileExistById(redProjectileId) }
+        sleepUntil {
+            clientThread.runOnClientThread { client.localPlayer.worldLocation == safeTile } && !doesProjectileExistById(
+                redProjectileId
+            )
+        }
         changeStateTo(State.FIGHTING)
     }
 
@@ -350,6 +356,10 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     private fun fightingState() {
+        if (doesProjectileExistById(redProjectileId)) {
+            changeStateTo(State.RED_BALL)
+            return
+        }
         if (runIs()) enableRun(true)
         activatePrayers(true)
         if (!inVorkathArea()) {
@@ -362,12 +372,12 @@ class AutoVorkathPlugin : Plugin() {
             }
             val vorkath = Rs2Npc.getNpc(8061) ?: return
             val middle = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, 0)
-            if (client.localPlayer.interacting == null) {
+            if (clientThread.runOnClientThread { client.localPlayer.interacting == null }) {
                 Rs2Npc.interact(vorkath, "Attack")
                 sleep(300)
                 return
             }
-            if (client.localPlayer.worldLocation != middle) {
+            if (clientThread.runOnClientThread { client.localPlayer.worldLocation != middle }) {
                 if (!isMoving()) {
                     Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, middle))
                 }
@@ -393,7 +403,7 @@ class AutoVorkathPlugin : Plugin() {
             val vorkath = Rs2Npc.getNpc("Vorkath")
             val middle = WorldPoint(vorkath.worldLocation.x + 3, vorkath.worldLocation.y - 5, 0)
             Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, middle))
-            sleepUntil { client.localPlayer.worldLocation == middle }
+            sleepUntil { clientThread.runOnClientThread { client.localPlayer.worldLocation == middle } }
             changeStateTo(State.FIGHTING)
             return
         }
@@ -403,13 +413,13 @@ class AutoVorkathPlugin : Plugin() {
         if (runIs()) enableRun(true)
         activatePrayers(false)
         if (!isMoving()) {
-            if (bankArea.contains(client.localPlayer.worldLocation)) {
+            if (clientThread.runOnClientThread { bankArea.contains(client.localPlayer.worldLocation) }) {
                 if (Rs2Widget.hasWidget("Click here to continue")) {
                     sendKey(KeyEvent.VK_SPACE)
                     sleep(1000)
                     return
                 }
-                if (client.localPlayer.worldLocation != bankLocation) {
+                if (clientThread.runOnClientThread { client.localPlayer.worldLocation != bankLocation }) {
                     Walker().walkTo(bankLocation)
                     return
                 } else {
@@ -424,7 +434,7 @@ class AutoVorkathPlugin : Plugin() {
                     changeStateTo(State.THINKING, 3)
                     return
                 }
-                if (fremennikArea.contains(client.localPlayer.worldLocation)) {
+                if (clientThread.runOnClientThread { fremennikArea.contains(client.localPlayer.worldLocation) }) {
                     Rs2GameObject.interact(29917, "Travel")
                     sleepUntil { !Microbot.isMoving() }
                     return
@@ -444,10 +454,10 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun bankingState() {
         activatePrayers(false)
-        if (bankArea.contains(client.localPlayer.worldLocation)) {
+        if (clientThread.runOnClientThread { bankArea.contains(client.localPlayer.worldLocation) }) {
             if (!isMoving()) {
                 if (!Rs2Bank.isOpen()) {
-                    if (client.localPlayer.worldLocation != bankLocation) {
+                    if (clientThread.runOnClientThread { client.localPlayer.worldLocation != bankLocation }) {
                         Walker().walkTo(bankLocation)
                         return
                     } else {
@@ -469,7 +479,7 @@ class AutoVorkathPlugin : Plugin() {
         if (runIs()) enableRun(true)
         activatePrayers(false)
         if (!isMoving()) {
-            if (bankArea.contains(client.localPlayer.worldLocation)) {
+            if (clientThread.runOnClientThread { bankArea.contains(client.localPlayer.worldLocation) }) {
                 changeStateTo(State.THINKING)
                 return
             }
@@ -477,10 +487,11 @@ class AutoVorkathPlugin : Plugin() {
                 teleToHouse()
                 return
             }
-            if (client.getBoostedSkillLevel(Skill.HITPOINTS) < config.POOLDRINK().width || client.getBoostedSkillLevel(
-                    Skill.PRAYER
-                ) < config.POOLDRINK().height
-            ) {
+            if (clientThread.runOnClientThread {
+                    client.getBoostedSkillLevel(Skill.HITPOINTS) < config.POOLDRINK().width || client.getBoostedSkillLevel(
+                        Skill.PRAYER
+                    ) < config.POOLDRINK().height
+                }) {
                 Rs2GameObject.interact("Ornate pool of Rejuvenation", "Drink")
                 return
             }
@@ -509,7 +520,7 @@ class AutoVorkathPlugin : Plugin() {
             drankRangePotion = false
             drankAntiFire = false
             isPrepared = false
-            if (bankArea.contains(client.localPlayer.worldLocation)) { // Player is in bank area
+            if (clientThread.runOnClientThread { bankArea.contains(client.localPlayer.worldLocation) }) { // Player is in bank area
                 changeStateTo(State.BANKING)
                 return
             } else { // Player is not in bank area
@@ -615,7 +626,7 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     private fun inVorkathArea(): Boolean =
-        Rs2Npc.getNpc("Vorkath") != null && client.isInInstancedRegion
+        Rs2Npc.getNpc("Vorkath") != null && clientThread.runOnClientThread { client.isInInstancedRegion }
 
     private fun isVorkathAsleep(): Boolean = Rs2Npc.getNpc(8059) != null
     private fun inHouse(): Boolean = Rs2GameObject.exists(4525)
@@ -624,8 +635,8 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun geIsOpen(): Boolean = GrandExchange.isOpen()
 
-    private fun isMoving(): Boolean = Rs2Player.isMoving() || client.localPlayer.animation != -1
-    private fun needsToDrinkPrayer(): Boolean = client.getBoostedSkillLevel(Skill.PRAYER) <= 70
+    private fun isMoving(): Boolean = Rs2Player.isMoving() || clientThread.runOnClientThread { client.localPlayer.animation != -1 }
+    private fun needsToDrinkPrayer(): Boolean = clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.PRAYER) <= 70 }
 
     private fun readyToFight(): Boolean = Inventory.getInventoryFood().size >= config.FOODAMOUNT().height
             && Inventory.hasItemContains(config.ANTIFIRE().toString())
@@ -697,10 +708,8 @@ class AutoVorkathPlugin : Plugin() {
     private fun activatePrayers(on: Boolean) {
         if (config.ACTIVATERIGOUR()) {
             Rs2Prayer.fastPray(Prayer.RIGOUR, on)
-            sleep(30)
         }
         Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, on)
-        sleep(30)
         return
     }
 
@@ -710,7 +719,7 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     private fun doesProjectileExistById(id: Int): Boolean {
-        for (projectile in client.projectiles) {
+        for (projectile in clientThread.runOnClientThread { client.projectiles }) {
             if (projectile.id == id) {
                 //println("Projectile $id found")
                 return true
