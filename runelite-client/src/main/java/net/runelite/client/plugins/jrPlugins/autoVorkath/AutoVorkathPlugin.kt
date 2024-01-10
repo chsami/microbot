@@ -274,49 +274,55 @@ class AutoVorkathPlugin : Plugin() {
             return
         }
 
-        val vorkath = Rs2Npc.getNpc("Vorkath")
-        val swPoint = WorldPoint(vorkath.worldLocation.x + 1, vorkath.worldLocation.y - 8, 0)
+        if (acidPools.isNotEmpty()){
+            val vorkath = Rs2Npc.getNpc("Vorkath")
+            val swPoint = WorldPoint(vorkath.worldLocation.x + 1, vorkath.worldLocation.y - 8, 0)
 
-        fun findSafeTiles(): WorldPoint? {
-            val wooxWalkArea = WorldArea(swPoint, 5, 1)
-            //println("Woox Walk Area: ${wooxWalkArea.toWorldPointList()}")
+            fun findSafeTiles(): WorldPoint? {
+                val wooxWalkArea = WorldArea(swPoint, 5, 1)
+                //println("Woox Walk Area: ${wooxWalkArea.toWorldPointList()}")
 
-            fun isTileSafe(tile: WorldPoint): Boolean = tile !in acidPools
-                    && WorldPoint(tile.x, tile.y + 1, tile.plane) !in acidPools
-                    && WorldPoint(tile.x, tile.y + 2, tile.plane) !in acidPools
-                    && WorldPoint(tile.x, tile.y + 3, tile.plane) !in acidPools
+                fun isTileSafe(tile: WorldPoint): Boolean = tile !in acidPools
+                        && WorldPoint(tile.x, tile.y + 1, tile.plane) !in acidPools
+                        && WorldPoint(tile.x, tile.y + 2, tile.plane) !in acidPools
+                        && WorldPoint(tile.x, tile.y + 3, tile.plane) !in acidPools
 
 
-            val safeTiles = wooxWalkArea.toWorldPointList().filter { isTileSafe(it) }
+                val safeTiles = wooxWalkArea.toWorldPointList().filter { isTileSafe(it) }
 
-            // Find the closest safe tile by x-coordinate to the player
-            return clientThread.runOnClientThread { safeTiles.minByOrNull { abs(it.x - client.localPlayer.worldLocation.x) } }
-        }
-
-        val safeTile: WorldPoint? = findSafeTiles()
-        //println("Acid pools: $acidPools")
-        //println("Left Tile: $swPoint")
-        //println("Safe tile: $safeTile")
-
-        safeTile?.let {
-            if (clientThread.runOnClientThread { client.localPlayer.worldLocation == safeTile }) {
-                // Attack Vorkath if the player close to the safe tile
-                Rs2Npc.interact(vorkath, "Attack")
-                println("Attacked")
-                sleepUntil { Rs2Player.isInteracting() || !isMoving() }
-            } else {
-                // Move to the safe tile if the player is not close enough
-                //println("Moving to safe tile: $safeTile")
-                //println("Player location: $playerLocation")
-                Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, it))
-                println("Walked back")
-                sleepUntil { clientThread.runOnClientThread { client.localPlayer.worldLocation == safeTile } }
+                // Find the closest safe tile by x-coordinate to the player
+                return clientThread.runOnClientThread { safeTiles.minByOrNull { abs(it.x - client.localPlayer.worldLocation.x) } }
             }
-        } ?: run {
-            Microbot.showMessage("NO SAFE TILES! TELEPORTING TF OUT!")
-            teleToHouse()
-            changeStateTo(State.WALKING_TO_BANK)
+
+            val safeTile: WorldPoint? = findSafeTiles()
+            //println("Acid pools: $acidPools")
+            //println("Left Tile: $swPoint")
+            //println("Safe tile: $safeTile")
+
+            safeTile?.let {
+                if (clientThread.runOnClientThread { client.localPlayer.worldLocation == safeTile }) {
+                    // Attack Vorkath if the player close to the safe tile
+                    Rs2Npc.interact(vorkath, "Attack")
+                    println("Attacked")
+                    sleepUntil { Rs2Player.isInteracting() || !isMoving() }
+                } else {
+                    // Move to the safe tile if the player is not close enough
+                    //println("Moving to safe tile: $safeTile")
+                    //println("Player location: $playerLocation")
+                    Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(client, it))
+                    println("Walked back")
+                    sleepUntil { clientThread.runOnClientThread { client.localPlayer.worldLocation == safeTile } }
+                }
+            } ?: run {
+                Microbot.showMessage("NO SAFE TILES! TELEPORTING TF OUT!")
+                teleToHouse()
+                changeStateTo(State.WALKING_TO_BANK)
+            }
+        } else {
+            changeStateTo(State.FIGHTING)
+            return
         }
+
     }
 
     private fun redBallState() {
@@ -358,6 +364,10 @@ class AutoVorkathPlugin : Plugin() {
     private fun fightingState() {
         if (doesProjectileExistById(redProjectileId)) {
             changeStateTo(State.RED_BALL)
+            return
+        }
+        if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId)){
+            changeStateTo(State.ACID)
             return
         }
         if (runIs()) enableRun(true)
@@ -720,7 +730,7 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun doesProjectileExistById(id: Int): Boolean {
         for (projectile in clientThread.runOnClientThread { client.projectiles }) {
-            if (projectile.id == id) {
+            if (projectile.id == id && projectile != null) {
                 //println("Projectile $id found")
                 return true
             }
