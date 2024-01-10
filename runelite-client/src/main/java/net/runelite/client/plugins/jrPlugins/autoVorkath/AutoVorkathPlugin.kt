@@ -23,6 +23,7 @@ import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginManager
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleepUntil
+import net.runelite.client.plugins.PluginDescriptor.JR
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
@@ -44,7 +45,7 @@ import kotlin.math.abs
 
 
 @PluginDescriptor(
-    name = "<html><font color=\"#9ddbff\">[JR]</font> Auto Vorkath </html>",
+    name = JR + "Auto Vorkath",
     description = "JR - Auto Vorkath",
     tags = ["vorkath", "auto", "auto prayer", "mule", "trade"],
     enabledByDefault = false
