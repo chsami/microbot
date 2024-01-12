@@ -112,13 +112,13 @@ public class ArchitecturalAlliance extends BasicQuestHelper
 		talkToHosaToFinish = new NpcStep(this, NpcID.HOSA, new WorldPoint(1636, 3670, 0),
 			"Talk to Hosa outside the Kourend Castle to finish the miniquest.");
 
-		talkToArcis = new NpcStep(this, NpcID.ARCIS, new WorldPoint(1652, 3754, 0),
+		talkToArcis = new NpcStep(this, 1, new WorldPoint(1652, 3754, 0),
 			"Talk to Arcis in the house east of Arceuus's bank.");
-		talkToPiliar = new NpcStep(this, NpcID.PILIAR, new WorldPoint(1794, 3737, 0),
+		talkToPiliar = new NpcStep(this, 1, new WorldPoint(1794, 3737, 0),
 			"Talk to Piliar in the house north west of the Piscarilius general store.");
 		talkToLovada = new NpcStep(this, NpcID.LOVADA, new WorldPoint(1485, 3834, 0),
 			"Talk to Lovada in their home just south of the Blast Mine in Lovakengj.");
-		talkToShayda = new NpcStep(this, NpcID.SHAYDA, new WorldPoint(1532, 3544, 0),
+		talkToShayda = new NpcStep(this, 1, new WorldPoint(1532, 3544, 0),
 			"Talk to Shayda in their home just south of the Shayzien Administration building");
 	}
 
