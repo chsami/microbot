@@ -241,7 +241,7 @@ public class TheQueenOfThieves extends BasicQuestHelper
 	{
 		return Arrays.asList(
 			new ItemReward("2,000 Coins", ItemID.COINS_995, 2000),
-			new ItemReward("A Piscarilius Favour Certificate", ItemID.PISCARILIUS_FAVOUR_CERTIFICATE, 1),
+			new ItemReward("A Piscarilius Favour Certificate", 1, 1),
 			new ItemReward("A page for Kharedst's Memoirs", ItemID.KHAREDSTS_MEMOIRS, 1));
 	}
 

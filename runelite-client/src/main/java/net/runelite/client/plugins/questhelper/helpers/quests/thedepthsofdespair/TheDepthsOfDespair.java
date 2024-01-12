@@ -246,7 +246,7 @@ public class TheDepthsOfDespair extends BasicQuestHelper
 	{
 		return Arrays.asList(
 				new ItemReward("4,000 Coins", ItemID.COINS_995, 4000),
-				new ItemReward("Hosidius Favour Certificate", ItemID.HOSIDIUS_FAVOUR_CERTIFICATE, 1),
+				new ItemReward("Hosidius Favour Certificate", 1, 1),
 				new ItemReward("A Kharedst's Memoirs page", ItemID.KHAREDSTS_MEMOIRS, 1));
 	}
 

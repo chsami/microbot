@@ -32,6 +32,7 @@ public enum Quest
 {
 	ANIMAL_MAGNETISM(0, "Animal Magnetism"),
 	ANOTHER_SLICE_OF_HAM(1, "Another Slice of H.A.M."),
+	ARCHITECTURAL_ALLIANCE(2, "Architectural Alliance"),
 	THE_ASCENT_OF_ARCEUUS(3, "The Ascent of Arceuus"),
 	ALFRED_GRIMHANDS_BARCRAWL(4, "Alfred Grimhand's Barcrawl"),
 	BEAR_YOUR_SOUL(5, "Bear Your Soul"),
