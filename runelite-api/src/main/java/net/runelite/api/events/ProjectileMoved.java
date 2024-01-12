@@ -40,11 +40,11 @@ public class ProjectileMoved
 	/**
 	 * The projectile being moved.
 	 */
-	private Projectile projectile;
+	public Projectile projectile;
 	/**
 	 * The target location of the projectile.
 	 */
-	private LocalPoint position;
+	public LocalPoint position;
 	/**
 	 * The z-axis target location of the projectile.
 	 */
