@@ -79,6 +79,7 @@ import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static net.runelite.client.plugins.inventorysetups.ui.InventorySetupsBoltPouchPanel.BOLT_POUCH_AMOUNT_VARBIT_IDS;
 import static net.runelite.client.plugins.inventorysetups.ui.InventorySetupsBoltPouchPanel.BOLT_POUCH_BOLT_VARBIT_IDS;
@@ -188,6 +189,10 @@ public class InventorySetupsPlugin extends Plugin
 
 	// global filtering is allowed for any setup
 	private boolean internalFilteringIsAllowed;
+
+	@Setter
+	@Getter
+	private boolean navButtonIsSelected;
 
 	// current version of the plugin
 	private String currentVersion;
@@ -317,10 +322,6 @@ public class InventorySetupsPlugin extends Plugin
 					panel.redrawOverviewPanel(false);
 				});
 			}
-			else if (event.getKey().equals(CONFIG_KEY_MANUAL_BANK_FILTER))
-			{
-				navButton.setOnClick(config.manualBankFilter() ? null : this::doBankSearch);
-			}
 			else if (event.getKey().equals(CONFIG_KEY_PERSIST_HOTKEYS))
 			{
 				boolean bankOpen = client.getItemContainer(InventoryID.BANK) != null;
@@ -336,9 +337,90 @@ public class InventorySetupsPlugin extends Plugin
 		}
 	}
 
+	@Subscribe(priority = -1)
+	public void onPostMenuSort(PostMenuSort postMenuSort)
+	{
+		// The menu is not rebuilt when it is open, so don't swap or else it will
+		// repeatedly swap entries
+		if (client.isMenuOpen())
+		{
+			return;
+		}
+
+		if (panel.getCurrentSelectedSetup() != null && (config.groundItemMenuSwap() || config.groundItemMenuHighlight()))
+		{
+			MenuEntry[] clientEntries = client.getMenuEntries();
+
+			// We want to be sure to preserve menu entry order while only sorting the "Take" menu options
+			int firstTakeIndex = IntStream.range(0, clientEntries.length)
+					.filter(i -> clientEntries[i].getOption().equals("Take"))
+					.findFirst().orElse(-1);
+
+			if (firstTakeIndex == -1)
+			{
+				// no work to be done if no "Take" options are present
+				return;
+			}
+
+			int lastTakeIndex = IntStream.range(firstTakeIndex, clientEntries.length)
+					.map(i -> firstTakeIndex + (clientEntries.length - 1 - i))
+					.filter(i -> clientEntries[i].getOption().equals("Take"))
+					.findFirst().orElse(-1);
+
+			List<MenuEntry> takeEntriesInSetup = new ArrayList<>();
+			List<MenuEntry> takeEntriesNotInSetup = new ArrayList<>();
+
+			// Bucket sort the "Take" entries
+			String colorHex = ColorUtil.colorToHexCode(config.groundItemMenuHighlightColor());
+			String replacementColorText = "<col=" + colorHex + ">";
+			for (int i = firstTakeIndex; i < lastTakeIndex + 1; i++)
+			{
+				MenuEntry oldEntry = clientEntries[i];
+				int itemID = oldEntry.getIdentifier();
+				boolean setupContainsItem = setupContainsItem(panel.getCurrentSelectedSetup(), itemID);
+				if (setupContainsItem)
+				{
+					if (config.groundItemMenuHighlight())
+					{
+						// Change the color of the item to indicate it's in the setup.
+						final String newTarget = oldEntry.getTarget().replaceFirst("<col=[a-fA-F0-9]+>", replacementColorText);
+						oldEntry.setTarget(newTarget);
+					}
+					takeEntriesInSetup.add(oldEntry);
+				}
+				else
+				{
+					takeEntriesNotInSetup.add(oldEntry);
+				}
+			}
+
+			if (config.groundItemMenuSwap())
+			{
+				// Based on the swap priority config, figure out the starting indexes for the entries in and not in the setup
+				int entriesInSetupStartIndex = firstTakeIndex + takeEntriesNotInSetup.size();
+				int entriesNotInSetupStartIndex = firstTakeIndex;
+
+
+				for (int i = 0; i < takeEntriesInSetup.size(); i++)
+				{
+					clientEntries[entriesInSetupStartIndex + i] = takeEntriesInSetup.get(i);
+				}
+
+				for (int i = 0; i < takeEntriesNotInSetup.size(); i++)
+				{
+					clientEntries[entriesNotInSetupStartIndex + i] = takeEntriesNotInSetup.get(i);
+				}
+			}
+
+			client.setMenuEntries(clientEntries);
+
+		}
+	}
+
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
+
 		Widget bankWidget = client.getWidget(ComponentID.BANK_TITLE_BAR);
 		if (bankWidget == null || bankWidget.isHidden())
 		{
@@ -593,6 +675,7 @@ public class InventorySetupsPlugin extends Plugin
 	@Subscribe
 	private void onWidgetClosed(WidgetClosed event)
 	{
+
 		if (event.getGroupId() == InterfaceID.BANK && !config.persistHotKeysOutsideBank())
 		{
 			unregisterHotkeys();
@@ -688,15 +771,13 @@ public class InventorySetupsPlugin extends Plugin
 		this.panel = new InventorySetupsPluginPanel(this, itemManager);
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "inventorysetups_icon.png");
 
+		this.navButtonIsSelected = false;
 		navButton = NavigationButton.builder()
 				.tooltip("Inventory Setups")
 				.icon(icon)
 				.priority(6)
 				.panel(panel)
 				.build();
-
-		// Clicking the nav button will do a bank search
-		navButton.setOnClick(config.manualBankFilter() ? null : this::doBankSearch);
 
 		clientToolbar.addNavigation(navButton);
 
@@ -2175,7 +2256,7 @@ public class InventorySetupsPlugin extends Plugin
 
 	public boolean isFilteringAllowed()
 	{
-		boolean allowBasedOnActivePanel = navButton.isSelected() || !config.requireActivePanelFilter();
+		boolean allowBasedOnActivePanel = navButtonIsSelected || !config.requireActivePanelFilter();
 
 		return internalFilteringIsAllowed && allowBasedOnActivePanel;
 	}

@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
+ * Copyright (c) 2017, Psikoi <https://github.com/psikoi>
+ * Copyright (c) 2023, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,13 +23,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.events;
+package net.runelite.client.ui.components;
 
-import lombok.Value;
-import net.runelite.client.ui.NavigationButton;
+import java.awt.Component;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
+import net.runelite.client.util.Text;
 
-@Value
-public class NavigationButtonRemoved
+public final class TitleCaseListCellRenderer extends DefaultListCellRenderer
 {
-	private NavigationButton button;
+	@Override
+	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus)
+	{
+		String text;
+		if (value instanceof Enum<?>)
+		{
+			text = Text.titleCase((Enum<?>) value);
+		}
+		else
+		{
+			text = value.toString();
+		}
+		return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+	}
 }

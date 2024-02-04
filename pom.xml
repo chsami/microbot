@@ -28,7 +28,7 @@
 
 	<groupId>net.runelite</groupId>
 	<artifactId>runelite-parent</artifactId>
-	<version>1.10.20</version>
+	<version>1.10.22-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>RuneLite</name>
@@ -41,6 +41,7 @@
 		<lombok.version>1.18.30</lombok.version>
 		<logback.version>1.2.9</logback.version>
 		<slf4j.version>1.7.25</slf4j.version>
+		<flatlaf.version>3.2.5-rl4</flatlaf.version>
 
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 		<checkstyle.skip>true</checkstyle.skip>
@@ -231,26 +232,26 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.5.0</version>
-				<configuration>
-					<!-- Javadoc the delombok sources -->
-					<sourcepath>${project.build.directory}/delombok</sourcepath>
-				</configuration>
-				<!-- maven-release-plugin runs maven-javadoc-plugin:jar as one of its
-				     release steps, so we will run it as well for the CI. Note this
-				     defaults to disabled due to the maven.javadoc.skip property above. -->
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-javadoc-plugin</artifactId>-->
+<!--				<version>3.5.0</version>-->
+<!--				<configuration>-->
+<!--					&lt;!&ndash; Javadoc the delombok sources &ndash;&gt;-->
+<!--					<sourcepath>${project.build.directory}/delombok</sourcepath>-->
+<!--				</configuration>-->
+<!--				&lt;!&ndash; maven-release-plugin runs maven-javadoc-plugin:jar as one of its-->
+<!--				     release steps, so we will run it as well for the CI. Note this-->
+<!--				     defaults to disabled due to the maven.javadoc.skip property above. &ndash;&gt;-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>attach-javadocs</id>-->
+<!--						<goals>-->
+<!--							<goal>jar</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>

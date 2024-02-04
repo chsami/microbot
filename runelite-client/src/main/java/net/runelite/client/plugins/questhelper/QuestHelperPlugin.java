@@ -30,17 +30,6 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provides;
-import net.runelite.client.plugins.microbot.quest.QuestScript;
-import net.runelite.client.plugins.questhelper.banktab.QuestBankTab;
-import net.runelite.client.plugins.questhelper.banktab.QuestHelperBankTagService;
-import net.runelite.client.plugins.questhelper.overlays.*;
-import net.runelite.client.plugins.questhelper.panel.QuestHelperPanel;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.client.plugins.questhelper.steps.playermadesteps.RuneliteConfigSetter;
-import net.runelite.client.plugins.questhelper.steps.playermadesteps.extendedruneliteobjects.RuneliteObjectManager;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +53,16 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.bank.BankSearch;
+import net.runelite.client.plugins.questhelper.banktab.QuestBankTab;
+import net.runelite.client.plugins.questhelper.banktab.QuestHelperBankTagService;
+import net.runelite.client.plugins.questhelper.overlays.*;
+import net.runelite.client.plugins.questhelper.panel.QuestHelperPanel;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.playermadesteps.RuneliteConfigSetter;
+import net.runelite.client.plugins.questhelper.steps.playermadesteps.extendedruneliteobjects.RuneliteObjectManager;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.components.colorpicker.ColorPickerManager;
@@ -808,10 +807,7 @@ public class QuestHelperPlugin extends Plugin
 	private void displayPanel()
 	{
 		SwingUtilities.invokeLater(() -> {
-			if (!navButton.isSelected())
-			{
-				navButton.getOnSelect().run();
-			}
+			clientToolbar.openPanel(navButton);
 		});
 	}
 
