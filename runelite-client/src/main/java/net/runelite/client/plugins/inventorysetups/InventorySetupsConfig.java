@@ -48,6 +48,13 @@ public interface InventorySetupsConfig extends Config
 	)
 	String hotkeySection = "hotkeysection";
 
+	@ConfigSection(
+			name = "Ground Item Menu Options",
+			description = "Options for ground item menus (Useful for UIM)",
+			position = 2
+	)
+	String groundItemSection = "groundItemSection";
+
 	@ConfigItem(
 			keyName = "bankFilter",
 			name = "Default Filter Bank",
@@ -270,10 +277,47 @@ public interface InventorySetupsConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "groundItemMenuHighlight",
+			name = "Highlight Menu Entries on Ground Items",
+			description = "Highlights menu entries on ground items which are in the current setup",
+			position = 13,
+			section = groundItemSection
+	)
+	default boolean groundItemMenuHighlight()
+	{
+		return false;
+	}
+
+
+	@ConfigItem(
+			keyName = "groundItemMenuHighlightColor",
+			name = "Highlight Menu Entries Color",
+			description = "Highlight color for menu entries on ground items which are in the current setup",
+			position = 14,
+			section = groundItemSection
+	)
+	default Color groundItemMenuHighlightColor()
+	{
+		return Color.decode("#87CEFA");
+	}
+
+	@ConfigItem(
+			keyName = "groundItemMenuSwap",
+			name = "Swap Menu Entries on Ground Items",
+			description = "Swaps menu entries on ground items which are in the current setup",
+			position = 15,
+			section = groundItemSection
+	)
+	default boolean groundItemMenuSwap()
+	{
+		return false;
+	}
+
+	@ConfigItem(
 			keyName = CONFIG_KEY_SECTION_MODE,
 			name = "Section Mode",
 			description = "Configures the view to be in section mode",
-			position = 11
+			position = 17
 	)
 	default boolean sectionMode()
 	{
@@ -281,10 +325,10 @@ public interface InventorySetupsConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = CONFIG_KEY_PANEL_VIEW,
-		name = "Panel View",
-		description = "Configures which type of panels are displayed for setups",
-		position = 12
+			keyName = CONFIG_KEY_PANEL_VIEW,
+			name = "Panel View",
+			description = "Configures which type of panels are displayed for setups",
+			position = 18
 	)
 	default InventorySetupsPanelViewID panelView()
 	{
@@ -296,7 +340,7 @@ public interface InventorySetupsConfig extends Config
 			name = "Compact Mode",
 			description = "Configures the setup panels to be compact",
 			hidden = true,
-			position = 12
+			position = 19
 	)
 	default boolean compactMode()
 	{
@@ -307,7 +351,7 @@ public interface InventorySetupsConfig extends Config
 			keyName = CONFIG_KEY_SORTING_MODE,
 			name = "Sorting Mode",
 			description = "Configures the sorting of setups",
-			position = 13
+			position = 20
 	)
 	default InventorySetupsSortingID sortingMode()
 	{
@@ -318,7 +362,7 @@ public interface InventorySetupsConfig extends Config
 			keyName = CONFIG_KEY_HIDE_BUTTON,
 			name = "Hide Help Button",
 			description = "Hide the help button",
-			position = 14
+			position = 21
 	)
 	default boolean hideButton()
 	{
@@ -329,7 +373,7 @@ public interface InventorySetupsConfig extends Config
 			keyName = "disableBankTabBar",
 			name = "Disable Bank Tab Separator",
 			description = "Stops the thin bank tab separator from removing the bank filter when clicked",
-			position = 15
+			position = 22
 	)
 	default boolean disableBankTabBar()
 	{
@@ -340,7 +384,7 @@ public interface InventorySetupsConfig extends Config
 			keyName = "removeBankTabSeparator",
 			name = "Remove Bank Tab Separator",
 			description = "Removes the thin bank tab separators from the bank filter",
-			position = 16
+			position = 23
 	)
 	default boolean removeBankTabSeparator()
 	{
@@ -351,7 +395,7 @@ public interface InventorySetupsConfig extends Config
 			keyName = "requireActivePanelFilter",
 			name = "Require Active Panel for Filtering",
 			description = "Only allow filtering if the Inventory Setups panel is active",
-			position = 17
+			position = 24
 	)
 	default boolean requireActivePanelFilter()
 	{
@@ -362,7 +406,7 @@ public interface InventorySetupsConfig extends Config
 			keyName = "showWornItemsFilter",
 			name = "Show Worn Items Filter",
 			description = "Determines which setups show up when right clicking the show worn items menu",
-			position = 18
+			position = 25
 	)
 	default InventorySetupsShowWornItemsFilterID showWornItemsFilter()
 	{
@@ -373,7 +417,7 @@ public interface InventorySetupsConfig extends Config
 			keyName = "showSectionSubmenusWornItems",
 			name = "Worn Items Section Submenus",
 			description = "Enable section submenus on the worn items button when section mode is enabled",
-			position = 19
+			position = 26
 	)
 	default boolean wornItemSelectionSubmenu()
 	{
@@ -385,11 +429,13 @@ public interface InventorySetupsConfig extends Config
 			keyName = CONFIG_KEY_MANUAL_BANK_FILTER,
 			name = "Manual Bank Filter",
 			description = "Disable automatic bank filtering when opening the bank",
-			position = 20
+			position = 27
 	)
 	default boolean manualBankFilter()
 	{
 		return false;
 	}
+
+
 
 }

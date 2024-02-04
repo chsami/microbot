@@ -25,11 +25,12 @@
  */
 package net.runelite.client.ui;
 
+import lombok.Builder;
+import lombok.Value;
+
 import java.awt.image.BufferedImage;
 import java.util.Comparator;
 import java.util.Map;
-import lombok.Builder;
-import lombok.Value;
 
 /**
  * UI navigation button.
@@ -45,6 +46,12 @@ public class NavigationButton
 	 * Icon of button.
 	 */
 	private final BufferedImage icon;
+
+	/**
+	 * If the button is tab or not
+	 */
+	@Builder.Default
+	private boolean tab = true;
 
 	/**
 	 * Tooltip to show when hovered.

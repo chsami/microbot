@@ -32,27 +32,12 @@ import com.google.inject.Provides;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Point;
-import net.runelite.api.Actor;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.Player;
-import net.runelite.api.ScriptID;
-import net.runelite.api.SpriteID;
-import net.runelite.api.VarClientStr;
-import net.runelite.api.Varbits;
+import net.runelite.api.*;
 import net.runelite.api.annotations.Component;
-import net.runelite.api.events.ActorDeath;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.ScriptCallbackEvent;
-import net.runelite.api.events.ScriptPreFired;
-import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.events.*;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import static net.runelite.client.RuneLite.SCREENSHOT_DIR;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.PlayerLootReceived;
@@ -71,6 +56,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import javax.swing.*;
+import java.awt.Point;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -84,7 +70,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static net.runelite.api.widgets.WidgetID.*;
 import static net.runelite.client.RuneLite.SCREENSHOT_DIR;
 
 @PluginDescriptor(
@@ -926,8 +911,8 @@ public class ScreenshotPlugin extends Plugin
 
             // Find the position of the canvas inside the frame
             final Point canvasOffset = clientUi.getCanvasOffset();
-            final int gameOffsetX = getScaledValue(transform.getScaleX(), canvasOffset.getX());
-            final int gameOffsetY = getScaledValue(transform.getScaleY(), canvasOffset.getY());
+            final int gameOffsetX = getScaledValue(transform.getScaleX(), (int) canvasOffset.getX());
+            final int gameOffsetY = getScaledValue(transform.getScaleY(), (int) canvasOffset.getY());
 
             // Draw the original screenshot onto the new screenshot
             graphics.setTransform(originalTransform); // the original screenshot is already scaled
