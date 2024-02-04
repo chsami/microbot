@@ -221,19 +221,18 @@ public class ScreenshotPlugin extends Plugin
 
         final BufferedImage iconImage = ImageUtil.loadImageResource(getClass(), "screenshot.png");
 
-        titleBarButton = NavigationButton.builder()
-                .tab(false)
-                .tooltip("Take screenshot")
-                .icon(iconImage)
-                .onClick(this::manualScreenshot)
-                .popup(ImmutableMap
-                        .<String, Runnable>builder()
-                        .put("Open screenshot folder...", () ->
-                        {
-                            LinkBrowser.open(SCREENSHOT_DIR.toString());
-                        })
-                        .build())
-                .build();
+		titleBarButton = NavigationButton.builder()
+			.tooltip("Take screenshot")
+			.icon(iconImage)
+			.onClick(this::manualScreenshot)
+			.popup(ImmutableMap
+				.<String, Runnable>builder()
+				.put("Open screenshot folder...", () ->
+				{
+					LinkBrowser.open(SCREENSHOT_DIR.toString());
+				})
+				.build())
+			.build();
 
         clientToolbar.addNavigation(titleBarButton);
 

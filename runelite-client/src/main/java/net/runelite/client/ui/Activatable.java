@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
- * Copyright (c) 2018, Psikoi <https://github.com/psikoi>
+ * Copyright (c) 2020 Abex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,14 +22,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.ui.skin;
+package net.runelite.client.ui;
 
-import org.pushingpixels.substance.api.SubstanceLookAndFeel;
-
-public class SubstanceRuneLiteLookAndFeel extends SubstanceLookAndFeel
+public interface Activatable
 {
-	public SubstanceRuneLiteLookAndFeel()
+	default void onActivate()
 	{
-		super(new ObsidianSkin());
+	}
+
+	default void onDeactivate()
+	{
 	}
 }
