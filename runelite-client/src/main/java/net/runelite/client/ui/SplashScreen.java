@@ -58,7 +58,7 @@ public class SplashScreen extends JFrame implements ActionListener
 	private volatile String progressText = null;
 	private SplashScreen()
 	{
-		BufferedImage logo = ImageUtil.loadImageResource(SplashScreen.class, "runelite_transparent.png");
+		BufferedImage logo = ImageUtil.loadImageResource(SplashScreen.class, "runelite_splash.png");
 
 		setTitle("Microbot");
 
