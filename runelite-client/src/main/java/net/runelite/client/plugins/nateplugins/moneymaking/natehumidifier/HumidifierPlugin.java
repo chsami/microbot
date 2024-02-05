@@ -42,6 +42,10 @@ public class HumidifierPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(humidifierOverlay);
         }
+
+        if (Microbot.getClient() == null)
+            shutDown();
+
         humidifierScript.run(config);
     }
 
