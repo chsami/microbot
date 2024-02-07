@@ -34,7 +34,7 @@ public class NmzScript extends Script {
             if (!Microbot.isLoggedIn()) return;
             try {
                 boolean isOutsideNmz = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2602, 3116, 0)) < 20;
-                useOverload = Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) == Microbot.getClient().getRealSkillLevel(Skill.ATTACK);
+                useOverload = Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) == Microbot.getClient().getRealSkillLevel(Skill.RANGED);
                 if (isOutsideNmz) {
                     handleOutsideNmz();
                 } else {
@@ -114,7 +114,7 @@ public class NmzScript extends Script {
 
     public void toggleSpecialAttack() {
         if (Microbot.getClient().getLocalPlayer().isInteracting() && config.useSpecialAttack()) {
-             Rs2Combat.setSpecState(true, 100);
+             Rs2Combat.setSpecState(true, 1000);
         }
     }
 
