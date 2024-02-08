@@ -20,7 +20,7 @@ import static net.runelite.api.Varbits.NMZ_ABSORPTION;
 
 public class NmzScript extends Script {
 
-    public static double version = 1.0;
+    public static double version = 1.8;
 
     public static NmzConfig config;
 

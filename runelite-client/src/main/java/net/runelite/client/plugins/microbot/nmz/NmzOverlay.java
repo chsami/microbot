@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.nmz;
 
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.walker.PathTileOverlay;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -24,7 +23,7 @@ public class NmzOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + NmzScript.version)
+                    .text("Micro NMZ V" + NmzScript.version)
                     .color(Color.GREEN)
                     .build());
 
