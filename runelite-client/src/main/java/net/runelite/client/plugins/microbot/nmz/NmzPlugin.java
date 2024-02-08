@@ -2,7 +2,9 @@ package net.runelite.client.plugins.microbot.nmz;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.events.ActorDeath;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -45,5 +47,14 @@ public class NmzPlugin extends Plugin {
     protected void shutDown() {
         nmzScript.shutdown();
         overlayManager.remove(nmzOverlay);
+    }
+
+    @Subscribe
+    public void onActorDeath(ActorDeath actorDeath)
+    {
+        if (config.stopAfterDeath()) {
+            nmzScript.logout();
+            shutDown();
+        }
     }
 }
