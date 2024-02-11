@@ -1,29 +1,32 @@
 package net.runelite.client.plugins.microbot.playerassist.combat;
 
-import net.runelite.api.Skill;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.concurrent.TimeUnit;
 
-public class CombatPotionScript extends Script {
-
+public class AntiPoisonScript extends Script {
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
-                if (!config.toggleCombatPotion()) return;
-                if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) - Microbot.getClient().getRealSkillLevel(Skill.ATTACK) > 5) return;
-                Widget[] widgets = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
-                for (Widget widget: widgets
-                ) {
-                    if (widget.getName().contains("combat")) {
-                        Microbot.getMouse().click(widget.getBounds());
-                        sleep(1800, 2400);
-                        break;
+                if (!config.useAntiPoison()) return;
+                if (Rs2Player.hasAntiPoisonActive()) {
+                    Inventory.open();
+                    Widget[] potions = Microbot.getClientThread().runOnClientThread(Inventory::getPotions);
+                    if (potions == null || potions.length == 0) {
+                        return;
+                    }
+                    for (Widget potion: potions) {
+                        if (potion.getName().toLowerCase().contains("poison")) {
+                            Microbot.getMouse().click(potion.getBounds());
+                            sleep(1200, 2000);
+                            break;
+                        }
                     }
                 }
             } catch(Exception ex) {
@@ -32,9 +35,4 @@ public class CombatPotionScript extends Script {
         }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
     }
-
-    public void shutdown() {
-        super.shutdown();
-    }
-
 }

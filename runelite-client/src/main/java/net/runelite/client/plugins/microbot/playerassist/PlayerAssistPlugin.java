@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
+import net.runelite.client.plugins.microbot.playerassist.specialAttack.UseSpecialAttackScript;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -47,6 +48,10 @@ public class PlayerAssistPlugin extends Plugin {
     private LootScript lootScript = new LootScript();
     private SafeSpot safeSpotScript = new SafeSpot();
     private FlickerScript flickerScript = new FlickerScript();
+    private UseSpecialAttackScript useSpecialAttackScript = new UseSpecialAttackScript();
+    private AntiPoisonScript antiPoisonScript = new AntiPoisonScript();
+
+
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
     @Override
     protected void startUp() throws AWTException {
@@ -62,6 +67,8 @@ public class PlayerAssistPlugin extends Plugin {
         prayerPotionScript.run(config);
         safeSpotScript.run(config);
         flickerScript.run(config);
+        useSpecialAttackScript.run(config);
+        antiPoisonScript.run(config);
     }
 
     protected void shutDown() {
@@ -73,6 +80,8 @@ public class PlayerAssistPlugin extends Plugin {
         prayerPotionScript.shutdown();
         safeSpotScript.shutdown();
         flickerScript.shutdown();
+        useSpecialAttackScript.shutdown();
+        antiPoisonScript.shutdown();
         overlayManager.remove(playerAssistOverlay);
     }
 

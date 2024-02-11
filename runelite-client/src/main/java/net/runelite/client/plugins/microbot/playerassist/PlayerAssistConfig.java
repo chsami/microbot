@@ -111,9 +111,9 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
     @ConfigItem(
-            keyName = "PrayFlick",
-            name = "PrayFlick",
-            description = "PrayFlick",
+            keyName = "PrayFlick (TEST STAGE)",
+            name = "PrayFlick (TEST STAGE)",
+            description = "PrayFlick (TEST STAGE)",
             position = 6
     )
     default boolean prayFlick()
@@ -129,6 +129,26 @@ public interface PlayerAssistConfig extends Config {
     default int attackRadius()
     {
         return 10;
+    }
+    @ConfigItem(
+            keyName = "Use special attack",
+            name = "Use special attack",
+            description = "Use special attack",
+            position = 7
+    )
+    default boolean useSpecialAttack()
+    {
+        return false;
+    }
+    @ConfigItem(
+            keyName = "Use AntiPoison",
+            name = "Use AntiPoison",
+            description = "Use AntiPoison",
+            position = 7
+    )
+    default boolean useAntiPoison()
+    {
+        return false;
     }
 }
 
