@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.playerassist.specialAttack;
+package net.runelite.client.plugins.microbot.playerassist.combat;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;

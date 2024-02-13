@@ -12,7 +12,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
-import net.runelite.client.plugins.microbot.playerassist.specialAttack.UseSpecialAttackScript;
+import net.runelite.client.plugins.microbot.playerassist.combat.UseSpecialAttackScript;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;

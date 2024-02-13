@@ -29,7 +29,7 @@ public class FoodScript extends Script {
                     unEquipGuthans();
                     return;
                 }
-                Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
+                Widget[] foods = Microbot.getClientThread().runOnClientThread(Inventory::getInventoryFood);
                 if (foods == null || foods.length == 0) {
                     if (!equipFullGuthans()) {
                         Microbot.getNotifier().notify("No more food left & no guthans available. Please teleport");
