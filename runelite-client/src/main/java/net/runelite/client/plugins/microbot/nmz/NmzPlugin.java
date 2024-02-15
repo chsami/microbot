@@ -7,6 +7,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -52,7 +53,7 @@ public class NmzPlugin extends Plugin {
     @Subscribe
     public void onActorDeath(ActorDeath actorDeath)
     {
-        if (config.stopAfterDeath()) {
+        if (config.stopAfterDeath() && actorDeath.getActor() == Microbot.getClient().getLocalPlayer()) {
             nmzScript.logout();
             shutDown();
         }

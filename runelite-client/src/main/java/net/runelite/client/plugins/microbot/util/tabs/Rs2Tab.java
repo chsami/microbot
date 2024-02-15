@@ -177,17 +177,16 @@ public class Rs2Tab {
 
     private static int getLogoutWidgetId() {
         /* Widget Ids - These may change during Runelite updates */
-        final int FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB = 35913777;
-        final int RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON = 10551348;
-        final int RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON = 10747938;
+        final int FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB = 35913778;
+        final int RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON = 10551342;
 
         try {
             if (Rs2Widget.getWidget(FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB) != null) {
                 return FIXED_CLASSIC_DISPLAY__FIXED_VIEWPORT_OPTIONS_TAB;
             } else if (Rs2Widget.getWidget(RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON) != null) {
                 return RESIZABLE_CLASSIC_DISPLAY__RESIZABLE_VIEWPORT_LOGOUT_ICON;
-            } else if (Rs2Widget.getWidget(RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON) != null) {
-                return RESIZABLE_MODERN_DISPLAY__RESIZABLE_VIEWPORT_BOTTOM_LINE_OPTIONS_ICON;
+            } else {
+                Microbot.showMessage("Logout for modern layout is not supported!");
             }
         } catch (Exception ex) {
             // Rs2Widget.getWidget returns null if the game isn't finished loading
