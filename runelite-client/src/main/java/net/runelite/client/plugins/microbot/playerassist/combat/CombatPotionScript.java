@@ -17,12 +17,13 @@ public class CombatPotionScript extends Script {
                 if (!super.run()) return;
                 if (!config.toggleCombatPotion()) return;
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) - Microbot.getClient().getRealSkillLevel(Skill.ATTACK) > 5) return;
-                Widget[] widgets = Microbot.getClientThread().runOnClientThread(() -> Inventory.getPotions());
+                Widget[] widgets = Microbot.getClientThread().runOnClientThread(Inventory::getPotions);
                 for (Widget widget: widgets
                 ) {
                     if (widget.getName().contains("combat")) {
                         Microbot.getMouse().click(widget.getBounds());
-                        sleep(600, 1200);
+                        sleep(1800, 2400);
+                        break;
                     }
                 }
             } catch(Exception ex) {

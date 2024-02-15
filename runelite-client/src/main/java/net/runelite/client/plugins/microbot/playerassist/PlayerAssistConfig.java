@@ -10,10 +10,24 @@ public interface PlayerAssistConfig extends Config {
     String GROUP = "PlayerAssistant";
 
     @ConfigItem(
+            keyName = "GUIDE",
+            name = "GUIDE",
+            description = "GUIDE",
+            position = 0
+    )
+    default String GUIDE()
+    {
+        return "This plugin allows for semi afk.\n 1.Make sure to place cannon first before starting the plugin \n" +
+                "\n 2. Use food also supports guthan healing, the shield weapon is default set to dragon defender \n" +
+                " 3. Use antiPosion supports any potion with 'poison' in the name\n 4. Items to loot are comma seperated strings \n 5. You can turn auto attack npc off if you have a cannon \n " +
+                " 6. PrayFlick does not work at the moment \n 7. SafeSpot & auto loot arrows might act funny and is not tested throughly. Use @ own risk!";
+    }
+
+    @ConfigItem(
             keyName = "Cannon",
             name = "Auto reload cannon",
             description = "Automatically reloads cannon",
-            position = 0
+            position = 1
     )
     default boolean toggleCannon()
     {
@@ -111,9 +125,9 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
     @ConfigItem(
-            keyName = "PrayFlick",
-            name = "PrayFlick",
-            description = "PrayFlick",
+            keyName = "PrayFlick (DEVS ONLY)",
+            name = "PrayFlick (DEVS ONLY)",
+            description = "PrayFlick (DEVS ONLY)",
             position = 6
     )
     default boolean prayFlick()
@@ -129,6 +143,26 @@ public interface PlayerAssistConfig extends Config {
     default int attackRadius()
     {
         return 10;
+    }
+    @ConfigItem(
+            keyName = "Use special attack",
+            name = "Use special attack",
+            description = "Use special attack",
+            position = 7
+    )
+    default boolean useSpecialAttack()
+    {
+        return false;
+    }
+    @ConfigItem(
+            keyName = "Use AntiPoison",
+            name = "Use AntiPoison",
+            description = "Use AntiPoison",
+            position = 7
+    )
+    default boolean useAntiPoison()
+    {
+        return false;
     }
 }
 

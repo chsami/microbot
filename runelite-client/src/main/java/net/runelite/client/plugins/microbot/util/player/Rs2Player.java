@@ -19,6 +19,9 @@ public class Rs2Player {
     private static int divineBastionTime = -1;
     public static int antiVenomTime = -1;
 
+    public static int antiPoisonTime = -1;
+
+
     public static boolean hasAntiFireActive() {
         return antiFireTime > 0 || hasSuperAntiFireActive();
     }
@@ -40,7 +43,9 @@ public class Rs2Player {
             return true;
         } else return antiVenomTime < VENOM_VALUE_CUTOFF;
     }
-
+    public static boolean hasAntiPoisonActive() {
+        return antiPoisonTime > 0;
+    }
     public static void handlePotionTimers(VarbitChanged event) {
         if (event.getVarbitId() == Varbits.ANTIFIRE) {
             antiFireTime = event.getValue();
@@ -57,9 +62,17 @@ public class Rs2Player {
         if (event.getVarpId() == VarPlayer.POISON) {
             if (event.getValue() >= VENOM_VALUE_CUTOFF) {
                 antiVenomTime = 0;
-                return;
+            } else {
+                antiVenomTime = event.getValue();
             }
-            antiVenomTime = event.getValue();
+            final int poisonVarp = event.getValue();
+
+            if (poisonVarp == 0)
+            {
+                antiPoisonTime = -1;
+            } else {
+                antiPoisonTime = poisonVarp;
+            }
         }
     }
 
