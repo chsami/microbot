@@ -105,7 +105,7 @@ public abstract class Script implements IScript {
             VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         }
         Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
-        if (clickHereToPlayButton != null) {
+        if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(() -> clickHereToPlayButton.isHidden())) {
             Rs2Widget.clickWidget(clickHereToPlayButton.getId());
         }
 

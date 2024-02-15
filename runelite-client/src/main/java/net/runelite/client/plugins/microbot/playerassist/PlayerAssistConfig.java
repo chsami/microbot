@@ -18,16 +18,16 @@ public interface PlayerAssistConfig extends Config {
     default String GUIDE()
     {
         return "This plugin allows for semi afk.\n 1.Make sure to place cannon first before starting the plugin \n" +
-                "\n2. Use food also supports guthan healing, the shield weapon is default set to dragon defender \n" +
-                "3. Use antiPosion supports any potion with 'poison' in the name\n 4. Items to loot are comma seperated strings \n 5. You can turn auto attack npc off if you have a cannon \n " +
-                "6. PrayFlick does not work at the momen \n 7. SafeSpot & auto loot arrows might act funny and is not tested throughly. Use @ own risk!";
+                "\n 2. Use food also supports guthan healing, the shield weapon is default set to dragon defender \n" +
+                " 3. Use antiPosion supports any potion with 'poison' in the name\n 4. Items to loot are comma seperated strings \n 5. You can turn auto attack npc off if you have a cannon \n " +
+                " 6. PrayFlick does not work at the moment \n 7. SafeSpot & auto loot arrows might act funny and is not tested throughly. Use @ own risk!";
     }
 
     @ConfigItem(
             keyName = "Cannon",
             name = "Auto reload cannon",
             description = "Automatically reloads cannon",
-            position = 0
+            position = 1
     )
     default boolean toggleCannon()
     {
