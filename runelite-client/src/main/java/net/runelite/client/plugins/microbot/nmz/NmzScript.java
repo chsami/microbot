@@ -99,7 +99,8 @@ public class NmzScript extends Script {
     }
 
     public void handleLocatorOrbUsage() {
-        if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > Random.random(1, 5) && !useOverload) {
+        if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > Random.random(1, 5) && !useOverload
+                && Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) != Microbot.getClient().getRealSkillLevel(Skill.RANGED)) {
             Inventory.useItemFast(ItemID.LOCATOR_ORB, "feel");
         }
     }
@@ -119,7 +120,7 @@ public class NmzScript extends Script {
     }
 
     public void useOverloadPotion() {
-        if (useOverload && Inventory.hasItemContains("overload")) {
+        if (useOverload && Inventory.hasItemContains("overload") && Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) > 50) {
             Inventory.interact(new String[]{"overload (4)", "overload (3)", "overload (2)", "overload (1)"});
             sleep(10000);
         }
