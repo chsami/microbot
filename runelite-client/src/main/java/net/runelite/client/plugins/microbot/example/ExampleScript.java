@@ -2,7 +2,8 @@ package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchange;
+import net.runelite.client.plugins.microbot.util.prayer.Prayer;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,11 +29,17 @@ public class ExampleScript extends Script {
                 World currentWorld = worldResult.findWorld(Microbot.getClient().getWorld());
                 System.out.println(currentWorld);*/
           //      System.out.println(Login.getRandomMembersWorld());
-                GrandExchange.collect(true);
+                //GrandExchange.collect(true);
+            //    Rs2Reflection.invoke(0, 9764864, WIDGET_TARGET_ON_WIDGET.getId(), 0,2347, "Use", "<col=ff9040>Hammer</col>", -1, -1);
+                //MenuEntryImpl(getOption=Use, getTarget=<col=ff9040>Hammer</col><col=ffffff> -> <col=ff9040>Hammer</col>, getIdentifier=0, getType=WIDGET_TARGET_ON_WIDGET, getParam0=0, getParam1=9764864, getItemId=2347, isForceLeftClick=false, isDeprioritized=false)
+//MenuEntryImpl(getOption=Use, getTarget=<col=ff9040>Hammer</col>, getIdentifier=0, getType=WIDGET_TARGET, getParam0=0, getParam1=9764864, getItemId=2347, isForceLeftClick=false, isDeprioritized=false)
+                Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, true);
+                sleep(1000);
+                Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, false);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        }, 0, 1500, TimeUnit.MILLISECONDS);
         return true;
     }
 }
