@@ -1,5 +1,8 @@
 package net.runelite.client.plugins.microbot.util.prayer;
+
 import net.runelite.api.Varbits;
+import net.runelite.api.annotations.Varbit;
+
 public enum Prayer {
     THICK_SKIN("Thick Skin", 35454985, 1, Varbits.PRAYER_THICK_SKIN),
     BURST_STRENGTH("Burst of Strength", 35454986, 4, Varbits.PRAYER_BURST_OF_STRENGTH),
@@ -54,7 +57,7 @@ public enum Prayer {
     public int getLevel(){
         return level;
     }
-    public int getVarbit(){
+    public @Varbit int getVarbit(){
         return pVar;
     }
 
