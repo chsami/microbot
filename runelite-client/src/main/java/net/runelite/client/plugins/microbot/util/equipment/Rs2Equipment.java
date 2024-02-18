@@ -150,4 +150,24 @@ public class Rs2Equipment {
         menuEntry.setType(MenuAction.CC_OP);
     }
 
+    public static boolean hasGuthanWeaponEquiped() {
+        final ItemComposition weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
+        return weapon != null && weapon.getName().toLowerCase().contains("guthan's warspear");
+    }
+
+    public static boolean hasGuthanBodyEquiped() {
+        final ItemComposition body = getEquippedItem(EquipmentInventorySlot.BODY);
+        return  body != null && body.getName().toLowerCase().contains("guthan's platebody");
+    }
+
+    public static boolean hasGuthanLegsEquiped() {
+        final ItemComposition legs = getEquippedItem(EquipmentInventorySlot.LEGS);
+        return legs != null && legs.getName().toLowerCase().contains("guthan's chainskirt");
+    }
+
+    public static boolean hasGuthanHelmEquiped() {
+        final ItemComposition helm = getEquippedItem(EquipmentInventorySlot.HEAD);
+        return helm != null && helm.getName().toLowerCase().contains("guthan's helm");
+    }
+
 }

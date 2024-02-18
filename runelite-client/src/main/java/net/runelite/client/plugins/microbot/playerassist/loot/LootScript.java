@@ -47,11 +47,10 @@ public class LootScript extends Script {
                     }
                 }
             }
-        }), 600, TimeUnit.MILLISECONDS);
+        }), 2000, TimeUnit.MILLISECONDS);
     }
 
     public boolean run(PlayerAssistConfig config) {
-        lootItems = Arrays.stream(config.itemsToLoot().split(",")).map(x -> x.trim()).toArray(String[]::new);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay((() -> {
             if (!super.run()) return;
             if (config.toggleLootArrows()) {
@@ -61,13 +60,12 @@ public class LootScript extends Script {
                 }
             }
             if (!config.toggleLootItems()) return;
-            for (String lootItem : lootItems) {
-                if (Rs2GroundItem.loot(lootItem, 14))
-                    break;
+            boolean result = Rs2GroundItem.lootItemBasedOnValue(config.priceOfItemsToLoot(), 14);
+            if (result) {
+                Global.sleep(2000, 4000);
+                Microbot.pauseAllScripts = false;
             }
-            Global.sleep(2000, 4000);
-            Microbot.pauseAllScripts = false;
-        }), 0, 1000, TimeUnit.MILLISECONDS);
+        }), 0, 2000, TimeUnit.MILLISECONDS);
         return true;
     }
 

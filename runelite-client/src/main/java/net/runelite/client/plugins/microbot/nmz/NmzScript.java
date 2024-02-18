@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.nmz;
 
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
@@ -25,6 +26,10 @@ public class NmzScript extends Script {
     public static NmzConfig config;
 
     public static boolean useOverload = false;
+
+    public boolean canStartNmz() {
+        return Inventory.hasItemAmount("overload (4)", config.overloadPotionAmount()) && Inventory.hasItemAmount("absorption (4)", config.absorptionPotionAmount());
+    }
 
 
     public boolean run(NmzConfig config) {
@@ -52,15 +57,20 @@ public class NmzScript extends Script {
         if (!hasStartedDream) {
             startNmzDream();
         } else {
+            if (canStartNmz()) {
+                consumeEmptyVial();
+                return;
+            }
             manageInventoryOutsideNmz();
+            handleStore();
         }
     }
 
     public void handleInsideNmz() {
         useZapperIfConfigured();
+        useOverloadPotion();
         manageLocatorOrb();
         toggleSpecialAttack();
-        useOverloadPotion();
         useAbsorptionPotion();
     }
 
@@ -115,12 +125,12 @@ public class NmzScript extends Script {
 
     public void toggleSpecialAttack() {
         if (Microbot.getClient().getLocalPlayer().isInteracting() && config.useSpecialAttack()) {
-             Rs2Combat.setSpecState(true, 1000);
+            Rs2Combat.setSpecState(true, 1000);
         }
     }
 
     public void useOverloadPotion() {
-        if (useOverload && Inventory.hasItemContains("overload") && Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) > 50) {
+        if (useOverload && Inventory.hasItemContains("overload") && Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > 50) {
             Inventory.interact(new String[]{"overload (4)", "overload (3)", "overload (2)", "overload (1)"});
             sleep(10000);
         }
@@ -138,7 +148,6 @@ public class NmzScript extends Script {
     public void manageInventoryOutsideNmz() {
         managePotionInventory(ObjectID.OVERLOAD_POTION, "overload", config.overloadPotionAmount(), "32");
         managePotionInventory(ObjectID.ABSORPTION_POTION, "absorption", config.absorptionPotionAmount(), "80");
-        consumeEmptyVial();
     }
 
     public void managePotionInventory(int objectId, String itemName, int requiredAmount, String keyboardInput) {
@@ -163,12 +172,48 @@ public class NmzScript extends Script {
     }
 
     public void consumeEmptyVial() {
-        if (Inventory.hasItemAmount("overload (4)", config.overloadPotionAmount()) && Inventory.hasItemAmount("absorption (4)", config.absorptionPotionAmount())) {
-            final int EMPTY_VIAL = 26291;
-            Rs2GameObject.interact(EMPTY_VIAL, "drink");
-            sleepUntil(() -> Rs2Widget.hasWidget("Nightmare zone"));
-            Rs2Widget.clickWidget(8454150);
-            sleep(5000);
+        final int EMPTY_VIAL = 26291;
+        Rs2GameObject.interact(EMPTY_VIAL, "drink");
+        sleepUntil(() -> Rs2Widget.hasWidget("Nightmare zone"));
+        Rs2Widget.clickWidget(8454150);
+        sleep(5000);
+    }
+
+    public void handleStore() {
+        int varbitOverload = 3953;
+        int varbitAbsorption = 3954;
+        int overloadAmt = Microbot.getVarbitValue(varbitOverload);
+        int absorptionAmt = Microbot.getVarbitValue(varbitAbsorption);
+        int nmzPoints = Microbot.getVarbitPlayerValue(VarPlayer.NMZ_REWARD_POINTS);
+
+        if (!Inventory.isFull()) {
+            if ((absorptionAmt < (config.absorptionPotionAmount() * 4) || overloadAmt < config.overloadPotionAmount() * 4) && nmzPoints < 100000) {
+                Microbot.showMessage("BOT SHUTDOWN: Not enough points to buy potions");
+                shutdown();
+                return;
+            }
+        }
+
+        Rs2GameObject.interact(26273);
+
+        sleepUntil(() -> Rs2Widget.getWidget(13500418) != null, 10000);
+
+        Widget benefitsBtn = Rs2Widget.getWidget(13500418);
+        if (benefitsBtn == null) return;
+        boolean notSelected = benefitsBtn.getSpriteId() != 813;
+        if (notSelected) {
+            Rs2Widget.clickWidgetFast(benefitsBtn, 4, 4);
+        }
+        int count = 0;
+        while (count < Random.random(3, 5)) {
+            Widget nmzRewardShop = Rs2Widget.getWidget(206, 6);
+            if (nmzRewardShop == null) break;
+            Widget overload = nmzRewardShop.getChild(6);
+            Rs2Widget.clickWidgetFast(overload, 6, 4);
+            Widget absorption = nmzRewardShop.getChild(9);
+            Rs2Widget.clickWidgetFast(absorption, 9, 4);
+            sleep(600, 1200);
+            count++;
         }
     }
 

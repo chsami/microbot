@@ -94,14 +94,14 @@ public interface PlayerAssistConfig extends Config {
         return true;
     }
     @ConfigItem(
-            keyName = "Items to loot",
-            name = "Items to loot",
-            description = "Items to loot comma seperated",
+            keyName = "Price of items to loot",
+            name = "Price of items to loot",
+            description = "Price of items to loot comma seperated",
             position = 5
     )
-    default String itemsToLoot()
+    default int priceOfItemsToLoot()
     {
-        return "";
+        return 10000;
     }
     @ConfigItem(
             keyName = "Loot arrows",

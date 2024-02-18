@@ -21,7 +21,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.util.Global.*;
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
 
 public class Rs2GroundItem {
 
@@ -117,6 +118,21 @@ public class Rs2GroundItem {
             if (rs2Item.getItem().getName().toLowerCase().equals(lootItem.toLowerCase()) && rs2Item.getTileItem().getQuantity() >= minQuantity) {
                 interact(rs2Item);
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean lootItemBasedOnValue(int value, int range) {
+        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
+                Rs2GroundItem.getAll(range)
+        );
+        for (RS2Item rs2Item : groundItems) {
+            if (Inventory.isInventoryFull(rs2Item.getItem().getName())) return false;
+            long totalPrice = (long) Microbot.getClientThread().runOnClientThread(() ->
+                    Microbot.getItemManager().getItemPrice(rs2Item.getItem().getId()) * rs2Item.getTileItem().getQuantity());
+            if (totalPrice >= value) {
+                return interact(rs2Item);
             }
         }
         return false;
@@ -332,7 +348,7 @@ public class Rs2GroundItem {
             } else if (index == 4) {
                 menuEntry.setType(MenuAction.GROUND_ITEM_FIFTH_OPTION);
             }
-        } catch(Exception ex){
+        } catch (Exception ex) {
             System.out.println("Rs2GroundItem Menu handler Exception: " + ex.getMessage());
         }
     }

@@ -7,6 +7,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 
 import java.util.concurrent.TimeUnit;
@@ -15,16 +16,21 @@ import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.g
 
 public class FoodScript extends Script {
 
-    int weaponIndex = 0;
-    int bodyIndex = 0;
-    int legsIndex = 0;
-    int helmIndex = 0;
+    String weaponname = "";
+    String bodyName = "";
+    String legsName = "";
+    String helmName = "";
+
+    String shieldName = "";
 
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
                 if (!config.toggleFood()) return;
+                if (Inventory.hasItem("empty vial"))
+                    Inventory.drop("empty vial");
+
                 if ((Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS)) < 20) {
                     unEquipGuthans();
                     return;
@@ -49,65 +55,55 @@ public class FoodScript extends Script {
     }
 
     private void unEquipGuthans() {
-        if (weaponIndex >= 0) {
-            Inventory.clickItem(weaponIndex);
-            Inventory.useItem("Dragon defender");
-            weaponIndex = -1;
+        if (Rs2Equipment.hasGuthanWeaponEquiped()) {
+            Rs2Equipment.equipItemFast(weaponname);
+            if (shieldName != null)
+                Rs2Equipment.equipItemFast(shieldName);
         }
-        if (bodyIndex >= 0) {
-            Inventory.clickItem(bodyIndex);
-            bodyIndex = -1;;
+        if (Rs2Equipment.hasGuthanBodyEquiped()) {
+            Rs2Equipment.equipItemFast(bodyName);
         }
-        if (legsIndex >= 0) {
-            Inventory.clickItem(legsIndex);
-            legsIndex = -1;
+        if (Rs2Equipment.hasGuthanLegsEquiped()) {
+            Rs2Equipment.equipItemFast(legsName);
         }
-        if (helmIndex >= 0) {
-            Inventory.clickItem(helmIndex);
-            helmIndex = -1;
+        if (Rs2Equipment.hasGuthanHelmEquiped()) {
+            Rs2Equipment.equipItemFast(helmName);
         }
     }
 
     private boolean equipFullGuthans() {
-        final ItemComposition weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
-        final ItemComposition body = getEquippedItem(EquipmentInventorySlot.BODY);
-        final ItemComposition legs = getEquippedItem(EquipmentInventorySlot.LEGS);
-        final ItemComposition helm = getEquippedItem(EquipmentInventorySlot.HEAD);
-
-        boolean hasGuthanSpear = weapon.getName().toLowerCase().contains("guthan's warspear");
-        boolean hasGuthanBody = body.getName().toLowerCase().contains("guthan's platebody");
-        boolean hasGuthanLegs = legs.getName().toLowerCase().contains("guthan's chainskirt");
-        boolean hasGuthanHelm = helm.getName().toLowerCase().contains("guthan's helm");
-
+        ItemComposition shield = getEquippedItem(EquipmentInventorySlot.SHIELD);
+        if (shield != null)
+            shieldName = shield.getName();
         Inventory.open();
 
-        if (!hasGuthanSpear) {
+        if (!Rs2Equipment.hasGuthanWeaponEquiped()) {
             Widget spearWidget = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryItem("guthan's warspear"));
             if (spearWidget == null) return false;
-            weaponIndex = spearWidget.getIndex();
-            Microbot.getMouse().click(spearWidget.getBounds());
-            sleep(1000);
+            ItemComposition weapon = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.WEAPON);
+            weaponname = weapon != null ? weapon.getName() : "";
+            Rs2Equipment.equipItemFast(spearWidget.getName().split(">")[1].split("</")[0]);
         }
-        if (!hasGuthanBody) {
+        if (!Rs2Equipment.hasGuthanBodyEquiped()) {
             Widget bodyWidget = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryItem("guthan's platebody"));
             if (bodyWidget == null) return false;
-            bodyIndex = bodyWidget.getIndex();
-            Microbot.getMouse().click(bodyWidget.getBounds());
-            sleep(1000);
+            ItemComposition body = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.BODY);
+            bodyName = body != null ? body.getName() : "";
+            Rs2Equipment.equipItemFast(bodyWidget.getName().split(">")[1].split("</")[0]);
         }
-        if (!hasGuthanLegs) {
+        if (!Rs2Equipment.hasGuthanLegsEquiped()) {
             Widget legsWidget = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryItem("guthan's chainskirt"));
             if (legsWidget == null) return false;
-            legsIndex = legsWidget.getIndex();
-            Microbot.getMouse().click(legsWidget.getBounds());
-            sleep(1000);
+            ItemComposition legs = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.LEGS);
+            legsName = legs != null ? legs.getName() : "";
+            Rs2Equipment.equipItemFast(legsWidget.getName().split(">")[1].split("</")[0]);
         }
-        if (!hasGuthanHelm) {
+        if (!Rs2Equipment.hasGuthanHelmEquiped()) {
             Widget helmWidget = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryItem("guthan's helm"));
             if (helmWidget == null) return false;
-            helmIndex = helmWidget.getIndex();
-            Microbot.getMouse().click(helmWidget.getBounds());
-            sleep(1000);
+            ItemComposition helm = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.HEAD);
+            helmName = helm != null ? helm.getName() : "";
+            Rs2Equipment.equipItemFast(helmWidget.getName().split(">")[1].split("</")[0]);
         }
         return true;
     }

@@ -40,7 +40,7 @@ public class Login {
 
     public Login(String username, String password, int world) {
         if (Microbot.getClient().getLoginIndex() == 24) { // you were disconnected from the server.
-            Microbot.getMouse().click(random(830, 850), random(294, 316)); //clicks a button "OK" when you've been disconnected
+            Microbot.getMouse().click(random(360, 380), random(294, 316)); //clicks a button "OK" when you've been disconnected
             sleep(600);
         }
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
