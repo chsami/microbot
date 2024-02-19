@@ -186,6 +186,9 @@ public class NmzScript extends Script {
         int absorptionAmt = Microbot.getVarbitValue(varbitAbsorption);
         int nmzPoints = Microbot.getVarbitPlayerValue(VarPlayer.NMZ_REWARD_POINTS);
 
+        if (absorptionAmt > config.absorptionPotionAmount() * 4 && overloadAmt > config.overloadPotionAmount() * 4)
+            return;
+
         if (!Inventory.isFull()) {
             if ((absorptionAmt < (config.absorptionPotionAmount() * 4) || overloadAmt < config.overloadPotionAmount() * 4) && nmzPoints < 100000) {
                 Microbot.showMessage("BOT SHUTDOWN: Not enough points to buy potions");
