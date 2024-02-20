@@ -22,7 +22,7 @@ public class PrayerPotionScript extends Script {
                 Widget[] potions = Microbot.getClientThread().runOnClientThread(Inventory::getPotions);
                 if (potions == null || potions.length == 0) {
                     return;
-                }//
+                }
                 for (Widget potion: potions) {
                     if (potion.getName().toLowerCase().contains("prayer")) {
                         Microbot.getMouse().click(potion.getBounds());
