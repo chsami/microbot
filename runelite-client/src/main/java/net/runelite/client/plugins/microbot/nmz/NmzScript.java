@@ -22,7 +22,7 @@ import static net.runelite.api.Varbits.NMZ_ABSORPTION;
 
 public class NmzScript extends Script {
 
-    public static double version = 1.9;
+    public static double version = 2.0;
 
     public static NmzConfig config;
 
@@ -64,6 +64,8 @@ public class NmzScript extends Script {
             if (canStartNmz()) {
                 consumeEmptyVial();
                 return;
+            } else {
+                Microbot.showMessage("Bot can't start because your overloads or absorption potions do not match the configured number in your plugin settings.");
             }
             manageInventoryOutsideNmz();
             handleStore();

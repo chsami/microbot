@@ -63,7 +63,7 @@ public interface NmzConfig extends Config {
     )
     default int absorptionPotionAmount()
     {
-        return 20;
+        return 19;
     }
 
     @ConfigItem(
