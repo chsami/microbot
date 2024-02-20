@@ -101,4 +101,15 @@ public interface NmzConfig extends Config {
     {
         return true;
     }
+    @ConfigItem(
+            keyName = "Auto Prayer Potion",
+            name = "Auto drink prayer potion",
+            description = "Automatically drinks prayer potions",
+            position = 5,
+            section = generalSection
+    )
+    default boolean togglePrayerPotions()
+    {
+        return false;
+    }
 }

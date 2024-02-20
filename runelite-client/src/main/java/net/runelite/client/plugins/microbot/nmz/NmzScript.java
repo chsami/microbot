@@ -5,6 +5,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.playerassist.combat.PrayerPotionScript;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
@@ -27,6 +28,8 @@ public class NmzScript extends Script {
 
     public static boolean useOverload = false;
 
+    public static PrayerPotionScript prayerPotionScript;
+
     public boolean canStartNmz() {
         return Inventory.hasItemAmount("overload (4)", config.overloadPotionAmount()) && Inventory.hasItemAmount("absorption (4)", config.absorptionPotionAmount());
     }
@@ -34,6 +37,7 @@ public class NmzScript extends Script {
 
     public boolean run(NmzConfig config) {
         NmzScript.config = config;
+        prayerPotionScript = new PrayerPotionScript();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
@@ -67,6 +71,7 @@ public class NmzScript extends Script {
     }
 
     public void handleInsideNmz() {
+        prayerPotionScript.run();
         useZapperIfConfigured();
         useOverloadPotion();
         manageLocatorOrb();
