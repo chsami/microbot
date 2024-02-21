@@ -229,7 +229,7 @@ public class Rs2GroundItem {
             if (Microbot.getClient().isWidgetSelected()) {
                 menuAction = MenuAction.WIDGET_TARGET_ON_GROUND_ITEM;
             } else if (index == 0) {
-                menuAction = (MenuAction.GROUND_ITEM_SECOND_OPTION;
+                menuAction = MenuAction.GROUND_ITEM_SECOND_OPTION;
             } else if (index == 1) {
                 menuAction = MenuAction.GROUND_ITEM_SECOND_OPTION;
             } else if (index == 2) {
