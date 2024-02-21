@@ -192,12 +192,55 @@ public class Rs2GroundItem {
     private static boolean interact(GroundItem groundItem, String action) {
         if (groundItem == null) return false;
         try {
-            groundItemInteraction = groundItem;
-            itemAction = action;
-            Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
-            sleep(100);
-            groundItemInteraction = null;
-            itemAction = "";
+
+            int param0 = 0;
+            int param1 = 0;
+            int identifier = 0;
+            String target = "";
+            String option ="";
+            MenuAction menuAction = MenuAction.CANCEL;
+            ItemComposition item = null;
+
+            if (itemInteraction != null) {
+                item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemInteraction.getTileItem().getId()));
+                identifier = itemInteraction.getTileItem().getId();
+                param0 = itemInteraction.getTile().getLocalLocation().getSceneX();
+                target = "<col=ff9040>" + itemInteraction.getItem().getName();
+                param1 = itemInteraction.getTile().getLocalLocation().getSceneY();
+            }
+            if (groundItemInteraction != null) {
+                item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(groundItemInteraction.getId()));
+                identifier = groundItemInteraction.getId();
+                LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), groundItemInteraction.getLocation());
+                param0 = localPoint.getSceneX();
+                target = "<col=ff9040>" + groundItemInteraction.getName();
+                param1 = localPoint.getSceneY();
+            }
+            option = itemAction;
+
+            String[] groundActions = Rs2Reflection.getGroundItemActions(item);
+            int index = -1;
+            for (int i = 0; i < groundActions.length; i++) {
+                String groundAction = groundActions[i];
+                if (groundAction == null || !groundAction.equalsIgnoreCase(itemAction)) continue;
+                index = i;
+            }
+
+            if (Microbot.getClient().isWidgetSelected()) {
+                menuAction = MenuAction.WIDGET_TARGET_ON_GROUND_ITEM;
+            } else if (index == 0) {
+                menuAction = (MenuAction.GROUND_ITEM_SECOND_OPTION;
+            } else if (index == 1) {
+                menuAction = MenuAction.GROUND_ITEM_SECOND_OPTION;
+            } else if (index == 2) {
+                menuAction = MenuAction.GROUND_ITEM_THIRD_OPTION;
+            } else if (index == 3) {
+                menuAction = MenuAction.GROUND_ITEM_FOURTH_OPTION;
+            } else if (index == 4) {
+                menuAction = MenuAction.GROUND_ITEM_FIFTH_OPTION;
+            }
+
+            Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, -1, option, target, -1, -1);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -302,54 +345,5 @@ public class Rs2GroundItem {
             }
         }
         return false;
-    }
-
-    public static void handleMenuSwapper(MenuEntry menuEntry) {
-        if (itemInteraction == null && groundItemInteraction == null) return;
-
-        try {
-            ItemComposition item = null;
-
-            if (itemInteraction != null) {
-                item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemInteraction.getTileItem().getId()));
-                menuEntry.setIdentifier(itemInteraction.getTileItem().getId());
-                menuEntry.setParam0(itemInteraction.getTile().getLocalLocation().getSceneX());
-                menuEntry.setTarget("<col=ff9040>" + itemInteraction.getItem().getName());
-                menuEntry.setParam1(itemInteraction.getTile().getLocalLocation().getSceneY());
-            }
-            if (groundItemInteraction != null) {
-                item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(groundItemInteraction.getId()));
-                menuEntry.setIdentifier(groundItemInteraction.getId());
-                LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), groundItemInteraction.getLocation());
-                menuEntry.setParam0(localPoint.getSceneX());
-                menuEntry.setTarget("<col=ff9040>" + groundItemInteraction.getName());
-                menuEntry.setParam1(localPoint.getSceneY());
-            }
-            menuEntry.setOption(itemAction);
-
-            String[] groundActions = Rs2Reflection.getGroundItemActions(item);
-            int index = -1;
-            for (int i = 0; i < groundActions.length; i++) {
-                String groundAction = groundActions[i];
-                if (groundAction == null || !groundAction.equalsIgnoreCase(itemAction)) continue;
-                index = i;
-            }
-
-            if (Microbot.getClient().isWidgetSelected()) {
-                menuEntry.setType(MenuAction.WIDGET_TARGET_ON_GROUND_ITEM);
-            } else if (index == 0) {
-                menuEntry.setType(MenuAction.GROUND_ITEM_SECOND_OPTION);
-            } else if (index == 1) {
-                menuEntry.setType(MenuAction.GROUND_ITEM_SECOND_OPTION);
-            } else if (index == 2) {
-                menuEntry.setType(MenuAction.GROUND_ITEM_THIRD_OPTION);
-            } else if (index == 3) {
-                menuEntry.setType(MenuAction.GROUND_ITEM_FOURTH_OPTION);
-            } else if (index == 4) {
-                menuEntry.setType(MenuAction.GROUND_ITEM_FIFTH_OPTION);
-            }
-        } catch (Exception ex) {
-            System.out.println("Rs2GroundItem Menu handler Exception: " + ex.getMessage());
-        }
     }
 }
