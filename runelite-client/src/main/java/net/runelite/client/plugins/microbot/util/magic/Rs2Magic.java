@@ -6,6 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
@@ -15,36 +16,26 @@ import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Magic {
-    public static int widgetId = 0;
-    public static MenuAction widgetAction;
-    public static String widgetName;
-
     public boolean canCast(MagicAction magicSpell) {
         return Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= magicSpell.getLevel();
     }
 
     public static void cast(MagicAction magicSpell) {
+        MenuAction menuAction;
         if (magicSpell.getWidgetAction() == null) {
             if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")) {
-                widgetAction = MenuAction.CC_OP;
+                menuAction = MenuAction.CC_OP;
             } else {
-                widgetAction = MenuAction.WIDGET_TARGET;
+                menuAction = MenuAction.WIDGET_TARGET;
             }
         } else {
-            widgetAction = magicSpell.getWidgetAction();
+            menuAction = magicSpell.getWidgetAction();
         }
 
-        if (widgetId == -1)
+        if (magicSpell.getWidgetId() == -1)
             throw new NotImplementedException("This spell has not been configured yet in the MagicAction.java class");
 
-        widgetId = magicSpell.getWidgetId();
-        widgetName = magicSpell.getName();
-        Widget inventory = Rs2Widget.getWidget(10551357); //classic layout - click on inventory to be safe
-        if (inventory == null)
-            inventory = Rs2Widget.getWidget(10747958); //modern layout
-        Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
-        sleep(100);
-        widgetId = 0;
+        Rs2Reflection.invokeMenu(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "Cast", "<col=00ff00>" + magicSpell.getName() + "</col>", -1, -1);
     }
 
     public static void castOn(MagicAction magicSpell, Actor actor) {
@@ -118,5 +109,6 @@ public class Rs2Magic {
         menuEntry.setTarget("<col=00ff00>" + Rs2Magic.widgetName + "</col>");
         menuEntry.setType(Rs2Magic.widgetAction);
         menuEntry.setParam1(Rs2Magic.widgetId);
+
     }
 }
