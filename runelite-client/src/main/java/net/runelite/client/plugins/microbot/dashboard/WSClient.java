@@ -2,7 +2,9 @@ package net.runelite.client.plugins.microbot.dashboard;
 
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.plugins.microbot.Microbot;
 
 import javax.inject.Singleton;
 
@@ -10,18 +12,19 @@ import javax.inject.Singleton;
 @Singleton
 public class WSClient {
 
+    @Getter
+    public static HubConnection hubConnection;
+
     public WSClient() {
-        HubConnection hubConnection = HubConnectionBuilder
-                .create("")
+        hubConnection = HubConnectionBuilder
+                .create("http://localhost:5029/chatHub")
                 .build();
 
-        hubConnection.on("Send", (message) -> {
-            System.out.println("New Message: " + message);
-        }, String.class);
+        hubConnection.on("ReceiveMessage", (user, message) -> {
+            Microbot.showMessage("Received a message: " + message + " from: " + user);
+        }, String.class, String.class);
 
-        hubConnection.start();
-
-        hubConnection.send("Send", "test");
+        hubConnection.start().blockingAwait();
 
     }
 
