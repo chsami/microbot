@@ -170,7 +170,6 @@ public class MicrobotPlugin extends Plugin {
 
         final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
 
-        Inventory.handleMenuSwapper(event.getMenuEntry());
         Rs2Bank.handleMenuSwapper(event.getMenuEntry());
         Rs2Widget.handleMenuSwapper(event.getMenuEntry());
         //Rs2Inventory.handleMenuSwapper(event.getMenuEntry());

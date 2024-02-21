@@ -29,9 +29,6 @@ import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.getNpc;
 
 
 public class Inventory {
-
-    public static Rs2Item item;
-    public static String itemAction;
     public static CopyOnWriteArrayList<Widget> inventoryItems = new CopyOnWriteArrayList<>();
 
     public static void eat(Widget widget) {
@@ -709,21 +706,69 @@ public class Inventory {
 
         Widget itemWidget = Rs2Widget.getWidget(rs2Item.id);
 
-        item = rs2Item;
-        itemAction = action;
+        int param0;
+        int param1;
+        int identifier;
+        String option = "";
+        String target = "";
+        MenuAction menuAction = MenuAction.WALK;
+        ItemComposition itemComposition = Microbot.getClient().getItemDefinition(rs2Item.id);
+        int index = 0;
 
-        if (itemWidget == null) {
-            Widget inventory = Rs2Widget.getWidget(10551357); //classic layout - click on inventory to be safe
-            if (inventory == null)
-                inventory = Rs2Widget.getWidget(10747958); //modern layout
-            Microbot.getMouse().clickFast((int) inventory.getBounds().getCenterX(), (int) inventory.getBounds().getCenterY());
-        } else {
-            Microbot.getMouse().click(itemWidget.getBounds());
+
+        if (Microbot.getClient().isWidgetSelected()) {
+            menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
+        } else if (action.equalsIgnoreCase("use")) {
+            menuAction = MenuAction.WIDGET_TARGET;
+        } else if (action.equalsIgnoreCase("cast")) {
+            menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
+        } else if(itemComposition.getName().contains("pouch") && action.equalsIgnoreCase("empty")) {
+            index = 1;
+            menuAction = MenuAction.CC_OP;
+        } else if (action.equalsIgnoreCase("drink")
+                || action.equalsIgnoreCase("read")
+                || action.equalsIgnoreCase("eat")
+                || action.equalsIgnoreCase("view")
+                || action.equalsIgnoreCase("bury")
+                || action.equalsIgnoreCase("feel")) {
+            index = 2;
+            menuAction = MenuAction.CC_OP;
+        } else if (action.equalsIgnoreCase("wield")
+                || action.equalsIgnoreCase("wear")
+                || action.equalsIgnoreCase("check steps")) {
+            index = 3;
+            menuAction = MenuAction.CC_OP;
+        } else if (action.equalsIgnoreCase("fill")) {
+            index = 4;
+            menuAction = MenuAction.CC_OP;
+        } else if (action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("rub")
+                || action.equalsIgnoreCase("refund") || action.equalsIgnoreCase("commune")
+                || action.equalsIgnoreCase("extinguish")
+                || (action.equalsIgnoreCase("check") && rs2Item.id == ItemID.GRICOLLERS_CAN)) {
+            index = 6;
+            menuAction = MenuAction.CC_OP;
+        } else if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("destroy")) {
+            index = 7;
+            menuAction = MenuAction.CC_OP;
+        } else if (action.equalsIgnoreCase("examine")) {
+            index = 10;
+            menuAction = MenuAction.CC_OP;
         }
 
-        sleep(100);
-        item = null;
-        itemAction = "";
+        option = action != null ? action : "";
+        identifier = index;
+        param0 = rs2Item.slot;
+        param1 = 9764864;
+        target = "<col=ff9040>" + itemComposition.getName() + "</col>";
+
+
+        //grandexchange inventory
+        if (action.equalsIgnoreCase("offer")) {
+            identifier = 1;
+            param1 = 30605312;
+        }
+
+        Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, option, target, -1, -1);
     }
 
     public static void useItemFast(Widget item, String action) {
@@ -820,71 +865,6 @@ public class Inventory {
         return findItemFast(itemName, false);
     }
 
-    public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        if (item == null) return;
-        try {
-            ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.id);
-            int index = 0;
-
-
-            Rs2Reflection.setItemId(menuEntry, item.id);
-
-            if (Microbot.getClient().isWidgetSelected()) {
-                menuEntry.setType(MenuAction.WIDGET_TARGET_ON_WIDGET);
-            } else if (itemAction.equalsIgnoreCase("use")) {
-                menuEntry.setType(MenuAction.WIDGET_TARGET);
-            } else if (itemAction.equalsIgnoreCase("cast")) {
-                menuEntry.setType(MenuAction.WIDGET_TARGET_ON_WIDGET);
-            } else if(itemComposition.getName().contains("pouch") && itemAction.equalsIgnoreCase("empty")) {
-                index = 1;
-                menuEntry.setType(MenuAction.CC_OP);
-            } else if (itemAction.equalsIgnoreCase("drink")
-                    || itemAction.equalsIgnoreCase("read")
-                    || itemAction.equalsIgnoreCase("eat")
-                    || itemAction.equalsIgnoreCase("view")
-                    || itemAction.equalsIgnoreCase("bury")
-                    || itemAction.equalsIgnoreCase("feel")) {
-                index = 2;
-                menuEntry.setType(MenuAction.CC_OP);
-            } else if (itemAction.equalsIgnoreCase("wield")
-                    || itemAction.equalsIgnoreCase("wear")
-                    || itemAction.equalsIgnoreCase("check steps")) {
-                index = 3;
-                menuEntry.setType(MenuAction.CC_OP);
-            } else if (itemAction.equalsIgnoreCase("fill")) {
-                index = 4;
-                menuEntry.setType(MenuAction.CC_OP);
-            } else if (itemAction.equalsIgnoreCase("empty") || itemAction.equalsIgnoreCase("rub")
-                    || itemAction.equalsIgnoreCase("refund") || itemAction.equalsIgnoreCase("commune")
-                    || itemAction.equalsIgnoreCase("extinguish")
-                    || (itemAction.equalsIgnoreCase("check") && item.id == ItemID.GRICOLLERS_CAN)) {
-                index = 6;
-                menuEntry.setType(MenuAction.CC_OP);
-            } else if (itemAction.equalsIgnoreCase("drop") || itemAction.equalsIgnoreCase("destroy")) {
-                index = 7;
-                menuEntry.setType(MenuAction.CC_OP);
-            } else if (itemAction.equalsIgnoreCase("examine")) {
-                index = 10;
-                menuEntry.setType(MenuAction.CC_OP);
-            }
-
-            menuEntry.setOption(itemAction != null ? itemAction : "");
-            menuEntry.setIdentifier(index);
-            menuEntry.setParam0(item.slot);
-            menuEntry.setParam1(9764864);
-            menuEntry.setTarget("<col=ff9040>" + itemComposition.getName() + "</col>");
-
-
-            //grandexchange inventory
-            if (itemAction.equalsIgnoreCase("offer")) {
-                menuEntry.setIdentifier(1);
-                menuEntry.setParam1(30605312);
-            }
-
-        } catch(Exception ex) {
-            System.out.println("INVENTORY MENU SWAP FAILED WITH MESSAGE: " + ex.getMessage());
-        }
-    }
     public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == 93) {
             int i = 0;
