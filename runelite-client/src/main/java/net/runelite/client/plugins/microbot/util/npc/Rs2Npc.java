@@ -18,10 +18,6 @@ import java.util.stream.Collectors;
 
 public class Rs2Npc {
 
-    public static NPC npcInteraction = null;
-    public static String npcAction = null;
-
-
     public static NPC getNpcByIndex(int index) {
         return Microbot.getClient().getNpcs().stream()
                 .filter(x -> x.getIndex() == index)
@@ -186,7 +182,7 @@ public class Rs2Npc {
     public static boolean interact(NPC npc, String action) {
         if (npc == null) return false;
         try {
-            NPCComposition npcComposition = Microbot.getClient().getNpcDefinition(npcInteraction.getId());
+            NPCComposition npcComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(npc.getId()));
 
             int index = -1;
             for (int i = 0; i < npcComposition.getActions().length; i++) {
@@ -198,7 +194,7 @@ public class Rs2Npc {
             MenuAction menuAction = getMenuAction(index);
 
             if (menuAction != null) {
-                Rs2Reflection.invokeMenu(0, 0, menuAction.getId(), npc.getIndex(),-1, npcAction, "", -1, -1);
+                Rs2Reflection.invokeMenu(0, 0, menuAction.getId(), npc.getIndex(),-1, action, "", -1, -1);
             }
 
         } catch(Exception ex) {

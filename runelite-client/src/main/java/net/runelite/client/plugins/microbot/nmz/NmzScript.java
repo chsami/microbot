@@ -61,14 +61,13 @@ public class NmzScript extends Script {
         if (!hasStartedDream) {
             startNmzDream();
         } else {
+            manageInventoryOutsideNmz();
+            handleStore();
             if (canStartNmz()) {
                 consumeEmptyVial();
-                return;
             } else {
                 Microbot.showMessage("Bot can't start because your overloads or absorption potions do not match the configured number in your plugin settings.");
             }
-            manageInventoryOutsideNmz();
-            handleStore();
         }
     }
 
@@ -153,6 +152,7 @@ public class NmzScript extends Script {
     }
 
     public void manageInventoryOutsideNmz() {
+        if (canStartNmz()) return;
         managePotionInventory(ObjectID.OVERLOAD_POTION, "overload", config.overloadPotionAmount(), "32");
         managePotionInventory(ObjectID.ABSORPTION_POTION, "absorption", config.absorptionPotionAmount(), "80");
     }
@@ -187,6 +187,7 @@ public class NmzScript extends Script {
     }
 
     public void handleStore() {
+        if (canStartNmz()) return;
         int varbitOverload = 3953;
         int varbitAbsorption = 3954;
         int overloadAmt = Microbot.getVarbitValue(varbitOverload);
