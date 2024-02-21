@@ -30,12 +30,9 @@ import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenCo
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenPlugin;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.event.EventSelector;
-import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -173,8 +170,6 @@ public class MicrobotPlugin extends Plugin {
 
         final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
 
-        Rs2Equipment.handleMenuSwapper(event.getMenuEntry());
-        Microbot.getWalker().handleMenuSwapper(event.getMenuEntry());
         Inventory.handleMenuSwapper(event.getMenuEntry());
         Rs2Bank.handleMenuSwapper(event.getMenuEntry());
         Rs2Widget.handleMenuSwapper(event.getMenuEntry());

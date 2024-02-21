@@ -4,16 +4,11 @@ import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-
 public class Rs2Equipment {
-
-    public static int widgetId;
-    public static int identifier;
 
     public static boolean equipItemFast(int id) {
         Rs2Tab.switchToInventoryTab();
@@ -57,12 +52,7 @@ public class Rs2Equipment {
             Microbot.status = "Amulet is missing in the equipment slot";
             return;
         }
-        widgetId = 25362456;
-        identifier = jewelleryLocationEnum.getIdentifier();
-        Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
-        sleep(100);
-        widgetId = 0;
-        identifier = 0;
+        Rs2Reflection.invokeMenu(-1, 25362456, MenuAction.CC_OP.getId(), jewelleryLocationEnum.getIdentifier(), -1, "Equip", "", -1, -1);
     }
 
     public static void useAmuletAction(JewelleryLocationEnum jewelleryLocationEnum) {
@@ -70,12 +60,7 @@ public class Rs2Equipment {
             Microbot.status = "Amulet is missing in the equipment slot";
             return;
         }
-        widgetId = 25362449;
-        identifier = jewelleryLocationEnum.getIdentifier();
-        Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
-        sleep(100);
-        widgetId = 0;
-        identifier = 0;
+        Rs2Reflection.invokeMenu(-1, 25362449, MenuAction.CC_OP.getId(), jewelleryLocationEnum.getIdentifier(), -1, "Equip", "", -1, -1);
     }
 
 
@@ -138,16 +123,6 @@ public class Rs2Equipment {
 
             return itemSlot != null;
         });
-    }
-
-    public static void handleMenuSwapper(MenuEntry menuEntry) {
-        if (widgetId == 0 && identifier >= 0) return;
-        menuEntry.setOption("Teleport");
-        menuEntry.setIdentifier(identifier);
-        menuEntry.setParam0(-1);
-        menuEntry.setParam1(widgetId);
-        menuEntry.setTarget("");
-        menuEntry.setType(MenuAction.CC_OP);
     }
 
     public static boolean hasGuthanWeaponEquiped() {
