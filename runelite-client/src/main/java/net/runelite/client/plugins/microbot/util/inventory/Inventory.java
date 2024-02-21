@@ -5,7 +5,6 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -14,11 +13,10 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.event.KeyEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -704,15 +702,13 @@ public class Inventory {
     private static void useItemFastAbstract(Rs2Item rs2Item, String action) {
         if (rs2Item == null) return;
 
-        Widget itemWidget = Rs2Widget.getWidget(rs2Item.id);
-
         int param0;
         int param1;
         int identifier;
         String option = "";
         String target = "";
         MenuAction menuAction = MenuAction.WALK;
-        ItemComposition itemComposition = Microbot.getClient().getItemDefinition(rs2Item.id);
+        ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
         int index = 0;
 
 
