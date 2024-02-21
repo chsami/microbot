@@ -1,18 +1,19 @@
 package net.runelite.client.plugins.microbot.util.npc;
 
-import net.runelite.api.*;
+import net.runelite.api.Actor;
+import net.runelite.api.MenuAction;
+import net.runelite.api.NPC;
+import net.runelite.api.NPCComposition;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
-import net.runelite.client.plugins.microbot.util.math.Calculations;
-import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 
 public class Rs2Npc {
@@ -185,21 +186,46 @@ public class Rs2Npc {
     public static boolean interact(NPC npc, String action) {
         if (npc == null) return false;
         try {
-            npcInteraction = npc;
-            npcAction = action;
-            if (Calculations.tileOnScreen(npc)) {
-                Microbot.getMouse().click(npc.getCanvasTilePoly().getBounds());
-            } else {
-                Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
+            NPCComposition npcComposition = Microbot.getClient().getNpcDefinition(npcInteraction.getId());
+
+            int index = -1;
+            for (int i = 0; i < npcComposition.getActions().length; i++) {
+                String npcAction = npcComposition.getActions()[i];
+                if (npcAction == null || !npcAction.equalsIgnoreCase(action)) continue;
+                index = i;
             }
-            sleep(100);
-            npcInteraction = null;
-            npcAction = null;
+
+            MenuAction menuAction = getMenuAction(index);
+
+            if (menuAction != null) {
+                Rs2Reflection.invokeMenu(0, 0, menuAction.getId(), npc.getIndex(),-1, npcAction, "", -1, -1);
+            }
+
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }
 
         return true;
+    }
+
+    @Nullable
+    private static MenuAction getMenuAction(int index) {
+        MenuAction menuAction = null;
+
+        if (Microbot.getClient().isWidgetSelected()) {
+            menuAction = MenuAction.WIDGET_TARGET_ON_NPC;
+        } else if (index == 0) {
+            menuAction = MenuAction.NPC_FIRST_OPTION;
+        } else if (index == 1) {
+            menuAction = MenuAction.NPC_SECOND_OPTION;
+        } else if (index == 2) {
+            menuAction = MenuAction.NPC_THIRD_OPTION;
+        } else if (index == 3) {
+            menuAction = MenuAction.NPC_FOURTH_OPTION;
+        } else if (index == 4) {
+            menuAction = MenuAction.NPC_FIFTH_OPTION;
+        }
+        return menuAction;
     }
 
     public static boolean interact(int npcId, String action) {
@@ -230,43 +256,5 @@ public class Rs2Npc {
         NPC npc = getNpc(npcName);
 
         return interact(npc, "pickpocket");
-    }
-
-    public static void handleMenuSwapper(MenuEntry menuEntry) {
-        if (npcInteraction == null) return;
-        try {
-            menuEntry.setIdentifier(npcInteraction.getIndex());
-            menuEntry.setParam0(0);
-            menuEntry.setTarget("<col=ffff00>" + npcInteraction.getName() + "<col=ff00>  (level-" + npcInteraction.getCombatLevel() + ")");
-            menuEntry.setParam1(0);
-            menuEntry.setOption(Rs2Npc.npcAction);
-
-            NPCComposition npcComposition = Microbot.getClient().getNpcDefinition(npcInteraction.getId());
-
-            int index = -1;
-            for (int i = 0; i < npcComposition.getActions().length; i++) {
-                String action = npcComposition.getActions()[i];
-                if (action == null || !action.equalsIgnoreCase(npcAction)) continue;
-                index = i;
-            }
-
-            if (Microbot.getClient().isWidgetSelected()) {
-                menuEntry.setType(MenuAction.WIDGET_TARGET_ON_NPC);
-            } else if (index == 0) {
-                menuEntry.setType(MenuAction.NPC_FIRST_OPTION);
-            } else if (index == 1) {
-                menuEntry.setType(MenuAction.NPC_SECOND_OPTION);
-            } else if (index == 2) {
-                menuEntry.setType(MenuAction.NPC_THIRD_OPTION);
-
-            } else if (index == 3) {
-                menuEntry.setType(MenuAction.NPC_FOURTH_OPTION);
-
-            } else if (index == 4) {
-                menuEntry.setType(MenuAction.NPC_FIFTH_OPTION);
-            }
-        } catch (Exception ex) {
-            System.out.println("NPC MENU SWAP FAILED WITH MESSAGE: " + ex.getMessage());
-        }
     }
 }

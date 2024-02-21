@@ -174,7 +174,6 @@ public class MicrobotPlugin extends Plugin {
 
         final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
 
-        Rs2Npc.handleMenuSwapper(event.getMenuEntry());
         Rs2GameObject.handleMenuSwapper(event.getMenuEntry());
         Rs2GroundItem.handleMenuSwapper(event.getMenuEntry());
         Rs2Magic.handleMenuSwapper(event.getMenuEntry());
