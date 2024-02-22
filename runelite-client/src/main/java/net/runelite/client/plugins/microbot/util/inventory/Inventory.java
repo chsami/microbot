@@ -25,7 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.getNpc;
 
-
+@Deprecated
 public class Inventory {
     public static CopyOnWriteArrayList<Widget> inventoryItems = new CopyOnWriteArrayList<>();
 
@@ -768,7 +768,7 @@ public class Inventory {
     }
 
     public static void useItemFast(Widget item, String action) {
-        Rs2Item rs2Item = new Rs2Item(item.getItemId(), item.getItemQuantity(), item.getName(), item.getIndex());
+        Rs2Item rs2Item = new Rs2Item(item, -1);
         useItemFastAbstract(rs2Item, action);
     }
 
@@ -803,7 +803,7 @@ public class Inventory {
                 Item item = itemContainer.getItems()[i];
                 ItemComposition itemComposition = Microbot.getClient().getItemDefinition(itemContainer.getItems()[i].getId());
                 if (itemComposition.getId() == id) {
-                    return new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i);
+                    return new Rs2Item(item, itemComposition, i);
                 }
             }
             return null;
@@ -820,11 +820,11 @@ public class Inventory {
                 ItemComposition itemComposition = Microbot.getClient().getItemDefinition(itemContainer.getItems()[i].getId());
                 if (contains) {
                     if (itemComposition.getName().toLowerCase().contains(itemName.toLowerCase())) {
-                        return new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i);
+                        return new Rs2Item(item, itemComposition, i);
                     }
                 } else {
                     if (itemComposition.getName().equalsIgnoreCase(itemName.toLowerCase())) {
-                        return new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i);
+                        return new Rs2Item(item, itemComposition, i);
                     }
                 }
 
@@ -844,11 +844,11 @@ public class Inventory {
                 ItemComposition itemComposition = Microbot.getClient().getItemDefinition(itemContainer.getItems()[i].getId());
                 if (contains) {
                     if (itemComposition.getName().toLowerCase().contains(itemName.toLowerCase())) {
-                        rs2Items.add(new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i));
+                        rs2Items.add(new Rs2Item(item, itemComposition, i));
                     }
                 } else {
                     if (itemComposition.getName().equalsIgnoreCase(itemName.toLowerCase())) {
-                        rs2Items.add(new Rs2Item(item.getId(), item.getQuantity(), itemComposition.getName(), i));
+                        rs2Items.add(new Rs2Item(item, itemComposition, i));
                     }
                 }
 

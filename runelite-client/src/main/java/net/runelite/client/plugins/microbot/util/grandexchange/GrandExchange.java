@@ -109,7 +109,7 @@ public class GrandExchange {
             sleepUntil(() -> Rs2Widget.getWidget(10616882) != null, 5000); //GE Search Results
             Pair<Widget, Integer> itemResult = getSearchResultWidget(itemName);
             if (itemResult != null) {
-                Rs2Widget.clickWidgetFast(itemResult.getLeft(), itemResult.getRight());
+                Rs2Widget.clickWidgetFast(itemResult.getLeft(), itemResult.getRight(), 1);
                 sleep(1000);
             }
             Widget pricePerItemButtonX = getPricePerItemButton_X();

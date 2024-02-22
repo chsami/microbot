@@ -1,19 +1,29 @@
 package net.runelite.client.plugins.microbot.util.inventory;
 
+import lombok.Getter;
+import net.runelite.api.Item;
+import net.runelite.api.ItemComposition;
+import net.runelite.api.widgets.Widget;
+
 public class Rs2Item {
     public  int id;
     public  int quantity;
+    @Getter
     public int slot = -1;
     public String name;
-    public Rs2Item(int id, int quantity, String name) {
-        this.id = id;
-        this.quantity = quantity;
-        this.name = name;
-    }
-    public Rs2Item(int id, int quantity, String name, int slot) {
-        this.id = id;
-        this.quantity = quantity;
+    String[] actions;
+    public Rs2Item(Item item, ItemComposition itemComposition, int slot) {
+        this.id = item.getId();
+        this.quantity = item.getQuantity();
+        this.name = itemComposition.getName();
+        this.actions = itemComposition.getInventoryActions();
         this.slot = slot;
-        this.name = name;
+    }
+    public Rs2Item(Widget item, int slot) {
+        this.id = item.getItemId();
+        this.quantity = item.getItemQuantity();
+        this.slot = slot;
+        this.name = item.getName();
+        this.actions = item.getActions();
     }
 }

@@ -140,9 +140,9 @@ public class Rs2Bank {
         if (!Inventory.hasItem(w.getItemId())) return;
 
         if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
-            invokeMenu(INVENTORY_WIDGET_ID, 1, w);
+            invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, 1, w);
         } else {
-            invokeMenu(INVENTORY_WIDGET_ID, 2, w);
+            invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, 2, w);
         }
     }
 
@@ -191,7 +191,7 @@ public class Rs2Bank {
         if (w == null) return;
         if (!Inventory.hasItem(w.getItemId())) return;
 
-        handleAmount(w, INVENTORY_WIDGET_ID, amount);
+        handleAmount(w, ComponentID.BANK_INVENTORY_ITEM_CONTAINER, amount);
     }
 
     /**
@@ -276,7 +276,7 @@ public class Rs2Bank {
         if (w == null) return;
         if (!Inventory.hasItem(w.getItemId())) return;
 
-        invokeMenu(INVENTORY_WIDGET_ID, HANDLE_ALL, w);
+        invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, HANDLE_ALL, w);
     }
 
     /**
@@ -521,7 +521,7 @@ public class Rs2Bank {
 
         ItemWidget itemWidget = new ItemWidget(w);
 
-        invokeMenu(INVENTORY_WIDGET_ID, 8, itemWidget);
+        invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, 8, itemWidget);
     }
 
     /**
@@ -679,7 +679,7 @@ public class Rs2Bank {
     private static void handleWearItem(int id) {
         Widget w = Inventory.findItem(id);
         if (w == null) return;
-        invokeMenu(INVENTORY_WIDGET_ID, 8, new ItemWidget(w));
+        invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, 8, new ItemWidget(w));
     }
 
     /**

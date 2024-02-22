@@ -299,9 +299,21 @@ public class Rs2Widget {
         clickWidgetFast(widget,-1, identifier);
     }
 
+    public static void clickWidgetFast(int packetId, MenuAction menuAction) {
+        Widget widget = getWidget(packetId);
+        clickWidgetFast(widget, menuAction);
+    }
+
     public static void clickWidgetFast(int packetId) {
         Widget widget = getWidget(packetId, 1);
         clickWidgetFast(widget);
+    }
+
+    public static void clickWidgetFast(Widget widget, MenuAction menuAction) {
+        int param1 = widget.getId();
+        String option = "Select";
+        String target = "";
+        Rs2Reflection.invokeMenu(-1, param1, menuAction.getId(), 0, widget.getItemId(), option, target, -1, -1);
     }
 
     public static void clickWidgetFast(Widget widget, int param0, int identifier) {
@@ -309,6 +321,13 @@ public class Rs2Widget {
         String option = "Select";
         String target = "";
         MenuAction menuAction = MenuAction.CC_OP;
+        Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
+    }
+
+    public static void clickWidgetFast(Widget widget, int param0, int identifier, MenuAction menuAction) {
+        int param1 = widget.getId();
+        String option = "Select";
+        String target = "";
         Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
     }
 

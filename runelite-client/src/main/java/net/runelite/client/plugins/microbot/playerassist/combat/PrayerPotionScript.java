@@ -27,6 +27,7 @@ public class PrayerPotionScript extends Script {
                     if (potion.getName().toLowerCase().contains("prayer")) {
                         Microbot.getMouse().click(potion.getBounds());
                         sleep(1200, 2000);
+                        Inventory.dropAll("Vial");
                         break;
                     }
                 }

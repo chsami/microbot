@@ -1,9 +1,9 @@
 package net.runelite.client.plugins.microbot.example;
 
+import net.runelite.api.ItemID;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.prayer.Prayer;
-import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,10 +34,13 @@ public class ExampleScript extends Script {
                 //MenuEntryImpl(getOption=Use, getTarget=<col=ff9040>Hammer</col><col=ffffff> -> <col=ff9040>Hammer</col>, getIdentifier=0, getType=WIDGET_TARGET_ON_WIDGET, getParam0=0, getParam1=9764864, getItemId=2347, isForceLeftClick=false, isDeprioritized=false)
 //MenuEntryImpl(getOption=Use, getTarget=<col=ff9040>Hammer</col>, getIdentifier=0, getType=WIDGET_TARGET, getParam0=0, getParam1=9764864, getItemId=2347, isForceLeftClick=false, isDeprioritized=false)
 //                Rs2GameObject.interact("tree");
-                Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true);
-                sleep(1000);
-                Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false);
-//               Inventory.useItemFast("rune arrow", "wield");
+                System.out.println(Rs2Inventory.onlyContains("earth talisman"));
+                System.out.println(Rs2Inventory.getSelectedItemIndex());
+                System.out.println(Rs2Inventory.get("earth talisman"));
+                System.out.println(Rs2Inventory.get(ItemID.EARTH_TALISMAN));
+                System.out.println(Rs2Inventory.get(ItemID.FIRE_CAPE));
+//                System.out.println(Rs2Inventory.drop("earth talisman"));
+                System.out.println(Rs2Inventory.use("earth talisman"));
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

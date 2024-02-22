@@ -158,7 +158,7 @@ public class NmzScript extends Script {
     }
 
     private void storePotions(int objectId, String itemName) {
-        if (!Inventory.hasItemContains(itemName)) return;
+        if (Inventory.hasItemContains(itemName)) return;
 
         Rs2GameObject.interact(objectId, "Store");
         String storeWidgetText = "Store all your ";
@@ -185,9 +185,12 @@ public class NmzScript extends Script {
     public void consumeEmptyVial() {
         final int EMPTY_VIAL = 26291;
         Rs2GameObject.interact(EMPTY_VIAL, "drink");
-        sleepUntil(() -> Rs2Widget.hasWidget("Nightmare zone"));
-        Rs2Widget.clickWidget(8454150);
-        sleep(5000);
+        Widget widget = Rs2Widget.getWidget(129, 0);
+        if (widget != null && !Microbot.getClientThread().runOnClientThread(widget::isHidden)) {
+            Rs2Widget.clickWidgetFast(8454150, MenuAction.WIDGET_CONTINUE);
+            // MenuEntryImpl(getOption=Continue, getTarget=, getIdentifier=0, getType=WIDGET_CONTINUE, getParam0=-1, getParam1=8454150, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)
+            sleep(5000);
+        }
     }
 
     public void handleStore() {

@@ -24,6 +24,7 @@ public class CombatPotionScript extends Script {
                     if (widget.getName().contains("combat") || widget.getName().contains("ranging") || widget.getName().contains("bastion")) {
                         Microbot.getMouse().click(widget.getBounds());
                         sleep(1800, 2400);
+                        Inventory.dropAll("Vial");
                         break;
                     }
                 }
