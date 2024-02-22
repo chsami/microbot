@@ -39,7 +39,6 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -164,32 +163,6 @@ public class MicrobotPlugin extends Plugin {
         }
     }
 
-
-    @Subscribe
-    public void onMenuEntryAdded(MenuEntryAdded event) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-
-        final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
-
-        Rs2Bank.handleMenuSwapper(event.getMenuEntry());
-        Rs2Widget.handleMenuSwapper(event.getMenuEntry());
-        //Rs2Inventory.handleMenuSwapper(event.getMenuEntry());
-
-        if (Rs2Menu.getOption().length() > 0) {
-            final MenuEntry[] menuEntries = client.getMenuEntries();
-            client.setMenuEntries(new MenuEntry[]{});
-            if (!Rs2Menu.getName().isEmpty()) {
-                if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals(Rs2Menu.getOption().toLowerCase()) && x.getTarget() != null &&
-                        x.getTarget().toLowerCase().split(">")[1] != null && x.getTarget().toLowerCase().split(">")[1].equals(Rs2Menu.getName().toLowerCase()))) {
-                    client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals(Rs2Menu.getOption().toLowerCase()) && x.getTarget() != null &&
-                            x.getTarget().toLowerCase().split(">")[1] != null && x.getTarget().toLowerCase().split(">")[1].equals(Rs2Menu.getName().toLowerCase())).toArray(MenuEntry[]::new));
-                }
-            } else {
-                if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals(Rs2Menu.getOption().toLowerCase()))) {
-                    client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals(Rs2Menu.getOption().toLowerCase())).toArray(MenuEntry[]::new));
-                }
-            }
-        }
-    }
 
     @Subscribe
     public void onStatChanged(StatChanged statChanged) {

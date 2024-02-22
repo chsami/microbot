@@ -15,12 +15,13 @@ public class CombatPotionScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
-                if (!config.toggleCombatPotion()) return;
+                if (!config.toggleCombatPotion() && !config.toggleRangingPotion()) return;
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) - Microbot.getClient().getRealSkillLevel(Skill.ATTACK) > 5) return;
+                if (Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) - Microbot.getClient().getRealSkillLevel(Skill.RANGED) > 5) return;
                 Widget[] widgets = Microbot.getClientThread().runOnClientThread(Inventory::getPotions);
                 for (Widget widget: widgets
                 ) {
-                    if (widget.getName().contains("combat")) {
+                    if (widget.getName().contains("combat") || widget.getName().contains("ranging") || widget.getName().contains("bastion")) {
                         Microbot.getMouse().click(widget.getBounds());
                         sleep(1800, 2400);
                         break;

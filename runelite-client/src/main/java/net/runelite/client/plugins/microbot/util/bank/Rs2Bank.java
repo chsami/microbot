@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.bank;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
@@ -10,14 +11,12 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
@@ -27,37 +26,11 @@ public class Rs2Bank {
     public static CopyOnWriteArrayList<ItemWidget> bankItems = new CopyOnWriteArrayList<>();
     private static final int BANK_CONTAINER_ID = 95;
     private static final int BANK_WIDGET_ID = 786445;
-    private static final int INVENTORY_WIDGET_ID = 983043;
     private static final int X_AMOUNT_VARBIT = 3960;
     private static final int SELECTED_OPTION_VARBIT = 6590;
     private static final int HANDLE_X_SET = 5;
     private static final int HANDLE_X_UNSET = 6;
     private static final int HANDLE_ALL = 7;
-    private static ItemWidget bankWidget;
-
-    /**
-     * Prepares a MenuEntry for menu swapping with specific parameters.
-     *
-     * @param menuEntry The MenuEntry to be modified for menu swapping.
-     * @throws InvocationTargetException If there's an issue with invoking a method.
-     * @throws IllegalAccessException    If there's an illegal access attempt.
-     */
-    public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException {
-        if (bankWidget == null) return;
-        Rs2Reflection.setItemId(menuEntry, bankWidget.getItemId());
-        menuEntry.setOption("Withdraw-1"); // Should probably be changed. Doesn't matter though.
-
-        if (bankWidget.getId() == INVENTORY_WIDGET_ID) {
-            menuEntry.setIdentifier(bankWidget.getSlot() + 1);
-        } else {
-            menuEntry.setIdentifier(bankWidget.getSlot());
-        }
-
-        menuEntry.setParam0(bankWidget.getIndex());
-        menuEntry.setParam1(bankWidget.getId());
-        menuEntry.setTarget(bankWidget.getName());
-        menuEntry.setType(MenuAction.CC_OP);
-    }
 
     /**
      * Executes menu swapping for a specific widget and entry index.
@@ -66,24 +39,16 @@ public class Rs2Bank {
      * @param entryIndex The index of the entry to swap.
      * @param widget     The ItemWidget associated with the menu swap.
      */
-    public static void execMenuSwapper(int widgetId, int entryIndex, ItemWidget widget) {
-        Rs2Bank.bankWidget = widget;
-        Rs2Bank.bankWidget.setSlot(entryIndex);
-        Rs2Bank.bankWidget.setId(widgetId);
-        if (isOpen()) {
-            try {
-                Widget randomClickWidget = Random.random(1, 10) < 5 ? Rs2Widget.findWidget("Rearrange mode", null) : Rs2Widget.findWidget("The bank of", null);
-                if (randomClickWidget == null) {
-                    Microbot.getMouse().clickFast((int) widget.getBounds().getCenterX(), (int) widget.getBounds().getCenterY());
-                } else {
-                    Microbot.getMouse().clickFast((int) randomClickWidget.getBounds().getCenterX(), (int) randomClickWidget.getBounds().getCenterY());
-                }
-            } catch(Exception ex) {
-                Microbot.getMouse().clickFast(1, 1);
-            }
+    public static void invokeMenu(int widgetId, int entryIndex, ItemWidget widget) {
+        int identifier = entryIndex;
+
+        if (widget.getId() == ComponentID.BANK_INVENTORY_ITEM_CONTAINER) {
+            identifier = identifier + 1;
         }
-        sleep(50);
-        Rs2Bank.bankWidget = null;
+
+        if (isOpen()) {
+            Rs2Reflection.invokeMenu(widget.getIndex(), widgetId, MenuAction.CC_OP.getId(), identifier, widget.getItemId(), "Withdraw-1", widget.getName(), -1, -1);
+        }
     }
 
     /**
@@ -175,9 +140,9 @@ public class Rs2Bank {
         if (!Inventory.hasItem(w.getItemId())) return;
 
         if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
-            execMenuSwapper(INVENTORY_WIDGET_ID, 1, w);
+            invokeMenu(INVENTORY_WIDGET_ID, 1, w);
         } else {
-            execMenuSwapper(INVENTORY_WIDGET_ID, 2, w);
+            invokeMenu(INVENTORY_WIDGET_ID, 2, w);
         }
     }
 
@@ -243,9 +208,9 @@ public class Rs2Bank {
      */
     private static void handleAmount(ItemWidget w, int container, int amount) {
         if (Microbot.getVarbitValue(X_AMOUNT_VARBIT) == amount) {
-            execMenuSwapper(container, HANDLE_X_SET, w);
+            invokeMenu(container, HANDLE_X_SET, w);
         } else {
-            execMenuSwapper(container, HANDLE_X_UNSET, w);
+            invokeMenu(container, HANDLE_X_UNSET, w);
 
             sleep(600, 1000);
             VirtualKeyboard.typeString(String.valueOf(amount));
@@ -311,7 +276,7 @@ public class Rs2Bank {
         if (w == null) return;
         if (!Inventory.hasItem(w.getItemId())) return;
 
-        execMenuSwapper(INVENTORY_WIDGET_ID, HANDLE_ALL, w);
+        invokeMenu(INVENTORY_WIDGET_ID, HANDLE_ALL, w);
     }
 
     /**
@@ -373,9 +338,9 @@ public class Rs2Bank {
         if (!hasItem(w.getItemId())) return;
 
         if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
-            execMenuSwapper(BANK_WIDGET_ID, 1, w);
+            invokeMenu(BANK_WIDGET_ID, 1, w);
         } else {
-            execMenuSwapper(BANK_WIDGET_ID, 2, w);
+            invokeMenu(BANK_WIDGET_ID, 2, w);
         }
     }
 
@@ -504,7 +469,7 @@ public class Rs2Bank {
         if (w == null) return;
         if (Inventory.isFull()) return;
 
-        execMenuSwapper(BANK_WIDGET_ID, HANDLE_ALL, w);
+        invokeMenu(BANK_WIDGET_ID, HANDLE_ALL, w);
     }
 
     public static void withdrawItemAll(boolean checkInv, String name) {
@@ -556,7 +521,7 @@ public class Rs2Bank {
 
         ItemWidget itemWidget = new ItemWidget(w);
 
-        execMenuSwapper(INVENTORY_WIDGET_ID, 8, itemWidget);
+        invokeMenu(INVENTORY_WIDGET_ID, 8, itemWidget);
     }
 
     /**
@@ -714,7 +679,7 @@ public class Rs2Bank {
     private static void handleWearItem(int id) {
         Widget w = Inventory.findItem(id);
         if (w == null) return;
-        execMenuSwapper(INVENTORY_WIDGET_ID, 8, new ItemWidget(w));
+        invokeMenu(INVENTORY_WIDGET_ID, 8, new ItemWidget(w));
     }
 
     /**

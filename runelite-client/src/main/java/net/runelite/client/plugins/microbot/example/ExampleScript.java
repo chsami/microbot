@@ -33,9 +33,11 @@ public class ExampleScript extends Script {
             //    Rs2Reflection.invoke(0, 9764864, WIDGET_TARGET_ON_WIDGET.getId(), 0,2347, "Use", "<col=ff9040>Hammer</col>", -1, -1);
                 //MenuEntryImpl(getOption=Use, getTarget=<col=ff9040>Hammer</col><col=ffffff> -> <col=ff9040>Hammer</col>, getIdentifier=0, getType=WIDGET_TARGET_ON_WIDGET, getParam0=0, getParam1=9764864, getItemId=2347, isForceLeftClick=false, isDeprioritized=false)
 //MenuEntryImpl(getOption=Use, getTarget=<col=ff9040>Hammer</col>, getIdentifier=0, getType=WIDGET_TARGET, getParam0=0, getParam1=9764864, getItemId=2347, isForceLeftClick=false, isDeprioritized=false)
-                Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, true);
+//                Rs2GameObject.interact("tree");
+                Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true);
                 sleep(1000);
-                Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, false);
+                Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false);
+//               Inventory.useItemFast("rune arrow", "wield");
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

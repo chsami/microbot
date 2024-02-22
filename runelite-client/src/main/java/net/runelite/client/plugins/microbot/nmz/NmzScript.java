@@ -61,12 +61,18 @@ public class NmzScript extends Script {
         if (!hasStartedDream) {
             startNmzDream();
         } else {
-            manageInventoryOutsideNmz();
+            final String overload = "Overload (4)";
+            final String absorption = "Absorption (4)";
+            storePotions(ObjectID.OVERLOAD_POTION, overload);
+            storePotions(ObjectID.ABSORPTION_POTION, absorption);
             handleStore();
+            fetchPotions(ObjectID.OVERLOAD_POTION, overload, config.overloadPotionAmount());
+            fetchPotions(ObjectID.ABSORPTION_POTION, absorption, config.absorptionPotionAmount());
             if (canStartNmz()) {
                 consumeEmptyVial();
             } else {
                 Microbot.showMessage("Bot can't start because your overloads or absorption potions do not match the configured number in your plugin settings.");
+                sleep(2000);
             }
         }
     }
@@ -151,30 +157,28 @@ public class NmzScript extends Script {
         }
     }
 
-    public void manageInventoryOutsideNmz() {
-        if (canStartNmz()) return;
-        managePotionInventory(ObjectID.OVERLOAD_POTION, "overload", config.overloadPotionAmount(), "32");
-        managePotionInventory(ObjectID.ABSORPTION_POTION, "absorption", config.absorptionPotionAmount(), "80");
+    private void storePotions(int objectId, String itemName) {
+        if (!Inventory.hasItemContains(itemName)) return;
+
+        Rs2GameObject.interact(objectId, "Store");
+        String storeWidgetText = "Store all your ";
+        sleepUntil(() -> Rs2Widget.hasWidget(storeWidgetText));
+        if (Rs2Widget.hasWidget(storeWidgetText)) {
+            VirtualKeyboard.typeString("1");
+            VirtualKeyboard.enter();
+            sleepUntil(() -> !Inventory.hasItem(objectId));
+        }
     }
 
-    public void managePotionInventory(int objectId, String itemName, int requiredAmount, String keyboardInput) {
-        if (!Inventory.hasItemAmountExact(itemName, requiredAmount)) {
-            Rs2GameObject.interact(objectId, "Store");
-            String storeWidgetText = "Store all your " + itemName + " potion?";
-            sleepUntil(() -> Rs2Widget.hasWidget(storeWidgetText));
-            if (Rs2Widget.hasWidget(storeWidgetText)) {
-                VirtualKeyboard.typeString("1");
-                VirtualKeyboard.enter();
-                sleepUntil(() -> !Inventory.hasItem(objectId));
-            }
-            Rs2GameObject.interact(objectId, "Take");
-            String widgetText = "How many doses of " + itemName;
-            sleepUntil(() -> Rs2Widget.hasWidget(widgetText));
-            if (Rs2Widget.hasWidget(widgetText)) {
-                VirtualKeyboard.typeString(keyboardInput);
-                VirtualKeyboard.enter();
-                sleepUntil(() -> Inventory.hasItemAmountExact(itemName + " (4)", requiredAmount));
-            }
+    private void fetchPotions(int objectId, String itemName, int requiredAmount) {
+        if (Inventory.hasItemAmountExact(itemName, requiredAmount)) return;
+        Rs2GameObject.interact(objectId, "Take");
+        String widgetText = "How many doses of ";
+        sleepUntil(() -> Rs2Widget.hasWidget(widgetText));
+        if (Rs2Widget.hasWidget(widgetText)) {
+            VirtualKeyboard.typeString(Integer.toString(requiredAmount * 4));
+            VirtualKeyboard.enter();
+            sleepUntil(() -> Inventory.hasItemAmountExact(itemName + " (4)", requiredAmount));
         }
     }
 

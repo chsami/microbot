@@ -9,7 +9,6 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
@@ -21,14 +20,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
 
 public class Rs2GroundItem {
-
-    public static RS2Item itemInteraction;
-    public static String itemAction;
-    public static GroundItem groundItemInteraction;
 
     /**
      * Returns all the ground items at a tile on the current plane.
@@ -177,19 +171,14 @@ public class Rs2GroundItem {
     private static boolean interact(RS2Item rs2Item, String action) {
         if (rs2Item == null) return false;
         try {
-            itemInteraction = rs2Item;
-            itemAction = action;
-            Microbot.getMouse().clickFast(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()));
-            sleep(100);
-            itemInteraction = null;
-            itemAction = "";
+            interact(new InteractModel(rs2Item.getTileItem().getId(), rs2Item.getTile().getWorldLocation(), rs2Item.getItem().getName()), action);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         return true;
     }
 
-    private static boolean interact(GroundItem groundItem, String action) {
+    private static boolean interact(InteractModel groundItem, String action) {
         if (groundItem == null) return false;
         try {
 
@@ -201,28 +190,20 @@ public class Rs2GroundItem {
             MenuAction menuAction = MenuAction.CANCEL;
             ItemComposition item = null;
 
-            if (itemInteraction != null) {
-                item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemInteraction.getTileItem().getId()));
-                identifier = itemInteraction.getTileItem().getId();
-                param0 = itemInteraction.getTile().getLocalLocation().getSceneX();
-                target = "<col=ff9040>" + itemInteraction.getItem().getName();
-                param1 = itemInteraction.getTile().getLocalLocation().getSceneY();
-            }
-            if (groundItemInteraction != null) {
-                item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(groundItemInteraction.getId()));
-                identifier = groundItemInteraction.getId();
-                LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), groundItemInteraction.getLocation());
-                param0 = localPoint.getSceneX();
-                target = "<col=ff9040>" + groundItemInteraction.getName();
-                param1 = localPoint.getSceneY();
-            }
-            option = itemAction;
+            item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(groundItem.getId()));
+            identifier = groundItem.getId();
+            LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), groundItem.getLocation());
+            param0 = localPoint.getSceneX();
+            target = "<col=ff9040>" + groundItem.getName();
+            param1 = localPoint.getSceneY();
+
+            option = action;
 
             String[] groundActions = Rs2Reflection.getGroundItemActions(item);
             int index = -1;
             for (int i = 0; i < groundActions.length; i++) {
                 String groundAction = groundActions[i];
-                if (groundAction == null || !groundAction.equalsIgnoreCase(itemAction)) continue;
+                if (groundAction == null || !groundAction.equalsIgnoreCase(action)) continue;
                 index = i;
             }
 
@@ -252,7 +233,7 @@ public class Rs2GroundItem {
     }
 
     private static boolean interact(GroundItem groundItem) {
-        return interact(groundItem, "Take");
+        return interact(new InteractModel(groundItem.getId(), groundItem.getLocation(), groundItem.getName()), "Take");
     }
 
     public static boolean interact(String itemName, String action) {

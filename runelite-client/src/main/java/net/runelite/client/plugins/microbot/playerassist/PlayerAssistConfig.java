@@ -84,6 +84,16 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
     @ConfigItem(
+            keyName = "Ranging/Bastion potion",
+            name = "Auto drink Ranging/Bastion potion",
+            description = "Automatically drinks Ranging/Bastion potions",
+            position = 5
+    )
+    default boolean toggleRangingPotion()
+    {
+        return false;
+    }
+    @ConfigItem(
             keyName = "Loot items",
             name = "auto loot items",
             description = "Enable/disable loot items",

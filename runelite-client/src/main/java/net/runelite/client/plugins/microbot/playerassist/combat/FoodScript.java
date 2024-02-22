@@ -24,6 +24,11 @@ public class FoodScript extends Script {
     String shieldName = "";
 
     public boolean run(PlayerAssistConfig config) {
+        weaponname = "";
+        bodyName = "";
+        legsName = "";
+        helmName = "";
+        shieldName = "";
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
@@ -55,18 +60,18 @@ public class FoodScript extends Script {
     }
 
     private void unEquipGuthans() {
-        if (Rs2Equipment.hasGuthanWeaponEquiped()) {
+        if (Rs2Equipment.hasGuthanWeaponEquiped()  && !weaponname.equals("")) {
             Rs2Equipment.equipItemFast(weaponname);
             if (shieldName != null)
                 Rs2Equipment.equipItemFast(shieldName);
         }
-        if (Rs2Equipment.hasGuthanBodyEquiped()) {
+        if (Rs2Equipment.hasGuthanBodyEquiped() && !bodyName.equals("")) {
             Rs2Equipment.equipItemFast(bodyName);
         }
-        if (Rs2Equipment.hasGuthanLegsEquiped()) {
+        if (Rs2Equipment.hasGuthanLegsEquiped() && !legsName.equals("")) {
             Rs2Equipment.equipItemFast(legsName);
         }
-        if (Rs2Equipment.hasGuthanHelmEquiped()) {
+        if (Rs2Equipment.hasGuthanHelmEquiped() && !helmName.equals("")) {
             Rs2Equipment.equipItemFast(helmName);
         }
     }

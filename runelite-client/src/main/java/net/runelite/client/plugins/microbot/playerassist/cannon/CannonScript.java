@@ -21,7 +21,7 @@ public class CannonScript extends Script {
                 if (!config.toggleCannon()) return;
                 TileObject brokenCannon = Rs2GameObject.findObjectById(14916);
                 if (brokenCannon != null) {
-                    Rs2Menu.doAction("Repair", brokenCannon.getCanvasTilePoly(), new String[]{"Broken multicannon"});
+                    Rs2GameObject.interact(brokenCannon, "Repair");
                     return;
                 }
                 int cannonBallsLeft = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.CANNON_AMMO));
@@ -30,8 +30,8 @@ public class CannonScript extends Script {
                     if (cannon == null) return;
                     WorldArea cannonLocation = new WorldArea(cannon.getWorldLocation().getX() - 1, cannon.getWorldLocation().getY() - 1, 3, 3, cannon.getWorldLocation().getPlane());
                     if (!cannonLocation.toWorldPoint().equals(CannonPlugin.getCannonPosition().toWorldPoint())) return;
-                    Rs2Menu.doAction("Fire", cannon.getCanvasTilePoly(), new String[]{"Dwarf multicannon"});
-                    sleep(2000, 4000);
+                    Rs2GameObject.interact(cannon, "Fire");
+                    sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.CANNON_AMMO)) > Random.random(10, 15));
                 }
             } catch(Exception ex) {
                 System.out.println(ex.getMessage());

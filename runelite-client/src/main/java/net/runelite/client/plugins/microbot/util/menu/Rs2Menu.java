@@ -5,8 +5,6 @@ import lombok.Setter;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.Global;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.ui.FontManager;
 
 import java.applet.Applet;
@@ -103,6 +101,7 @@ public class Rs2Menu {
         return doActionFast(action, new Point((int) bounds.getCenterX(), (int) bounds.getCenterY()), (String[]) null);
     }
 
+    @Deprecated
     public static boolean doAction(String action, Polygon poly, String... targets) {
         Microbot.getMouse().move(poly.getBounds().getCenterX(), poly.getBounds().getCenterY());
         return doAction(action, new Point((int) poly.getBounds().getCenterX(), (int) poly.getBounds().getCenterY()), targets);
