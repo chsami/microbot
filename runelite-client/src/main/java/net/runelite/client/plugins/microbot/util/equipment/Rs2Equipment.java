@@ -145,4 +145,12 @@ public class Rs2Equipment {
         return helm != null && helm.getName().toLowerCase().contains("guthan's helm");
     }
 
+//    public static boolean isEquipped(String name) {
+//
+//    }
+//
+//    public static boolean isWearing(String name) {
+//
+//    }
+
 }

@@ -23,7 +23,7 @@ public class Rs2Item {
         this.id = item.getItemId();
         this.quantity = item.getItemQuantity();
         this.slot = slot;
-        this.name = item.getName();
+        this.name = item.getName().split(">")[1].split("</")[0];
         this.actions = item.getActions();
     }
 }

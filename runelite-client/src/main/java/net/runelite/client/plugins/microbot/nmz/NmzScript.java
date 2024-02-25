@@ -63,8 +63,8 @@ public class NmzScript extends Script {
         } else {
             final String overload = "Overload (4)";
             final String absorption = "Absorption (4)";
-            storePotions(ObjectID.OVERLOAD_POTION, overload);
-            storePotions(ObjectID.ABSORPTION_POTION, absorption);
+            storePotions(ObjectID.OVERLOAD_POTION, overload, config.overloadPotionAmount());
+            storePotions(ObjectID.ABSORPTION_POTION, absorption, config.absorptionPotionAmount());
             handleStore();
             fetchPotions(ObjectID.OVERLOAD_POTION, overload, config.overloadPotionAmount());
             fetchPotions(ObjectID.ABSORPTION_POTION, absorption, config.absorptionPotionAmount());
@@ -157,8 +157,8 @@ public class NmzScript extends Script {
         }
     }
 
-    private void storePotions(int objectId, String itemName) {
-        if (Inventory.hasItemContains(itemName)) return;
+    private void storePotions(int objectId, String itemName, int requiredAmount) {
+        if (Inventory.hasItemAmountExact(itemName, requiredAmount)) return;
 
         Rs2GameObject.interact(objectId, "Store");
         String storeWidgetText = "Store all your ";

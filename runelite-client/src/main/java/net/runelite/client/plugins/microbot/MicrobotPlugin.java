@@ -4,8 +4,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
@@ -33,7 +31,6 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.event.EventSelector;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
@@ -47,7 +44,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -126,7 +122,7 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setEventHandler(new EventHandler());
         Microbot.setSpriteManager(spriteManager);
         Microbot.setDisableWalkerUpdate(disableWalkerUpdate);
-
+        Microbot.setPluginManager(pluginManager);
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }
@@ -139,7 +135,7 @@ public class MicrobotPlugin extends Plugin {
 
         BreakHandlerScript.initBreakHandler("Microbot", false);
 
-        Rs2NpcManager.loadJson();
+        //TODO: Rs2NpcManager.loadJson();
 
         for (Plugin plugin : pluginManager.getPlugins()) {
             if (plugin.getClass() == SummerGardenPlugin.class) {

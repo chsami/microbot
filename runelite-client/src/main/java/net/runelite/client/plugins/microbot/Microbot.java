@@ -11,7 +11,10 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
+import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
@@ -21,6 +24,8 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class Microbot {
@@ -63,6 +68,12 @@ public class Microbot {
     @Getter
     @Setter
     private static boolean disableWalkerUpdate;
+    @Getter
+    @Setter
+    private static List<PluginRequestModel> botPlugins = new ArrayList<>();
+    @Getter
+    @Setter
+    private static PluginManager pluginManager;
 
     public static boolean debug = false;
 
@@ -207,5 +218,9 @@ public class Microbot {
     public static void setBreakHandler(String pluginName, boolean advancedPostRunDiscordNotifications) {
         BreakHandlerScript.setParentPluginName(pluginName);
         BreakHandlerScript.setDetailedReportNotification(advancedPostRunDiscordNotifications);
+    }
+
+    public static void startPlugin(Plugin plugin) {
+
     }
 }

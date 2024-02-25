@@ -463,7 +463,7 @@ public class Rs2Inventory {
      * @return The item with the specified name, or null if not found.
      */
     public static Rs2Item get(String name) {
-        return items().stream().filter(x -> x.name.equalsIgnoreCase(name)).findFirst().orElse(null);
+        return items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).findFirst().orElse(null);
     }
 
     /**
@@ -487,6 +487,42 @@ public class Rs2Inventory {
     }
 
     /**
+     *
+     * @param name
+     * @return
+     */
+    public static Rs2Item getContains(String name) {
+        return items().stream().filter(x -> x.name.contains(name)).findFirst().orElse(null);
+    }
+
+    /**
+     *
+     * @param id
+     * @return boolean
+     */
+    public static boolean hasItem(int id) {
+        return get(id) != null;
+    }
+
+    /**
+     *
+     * @param name
+     * @return boolean
+     */
+    public static boolean hasItem(String name) {
+        return get(name) != null;
+    }
+
+    /**
+     *
+     * @param names
+     * @return boolean
+     */
+    public static boolean hasItem(String... names) {
+        return get(names) != null;
+    }
+
+    /**
      * Gets the actions available for the item in the specified slot.
      *
      * @param slot The slot to check.
@@ -497,6 +533,12 @@ public class Rs2Inventory {
                 .filter(x -> x.slot == slot)
                 .map(x -> x.actions)
                 .findFirst().orElse(new String[] {});
+    }
+
+    public static List<Rs2Item> getInventoryFood() {
+        return items().stream()
+                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a!= null && a.equalsIgnoreCase("eat")))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -691,7 +733,7 @@ public class Rs2Inventory {
      * @return True if the interaction was successful, false otherwise.
      */
     public static boolean interact(String name) {
-        Rs2Item rs2Item = items().stream().filter(x -> x.name == name).findFirst().orElse(null);
+        Rs2Item rs2Item = items().stream().filter(x -> x.name.equalsIgnoreCase(name)).findFirst().orElse(null);
         if (rs2Item == null) return false;
         invokeMenu(rs2Item, "");
         return true;
@@ -1060,6 +1102,38 @@ public class Rs2Inventory {
         Rs2Item item = items().stream().filter(x -> x == rs2Item).findFirst().orElse(null);
         if (item == null) return false;
         return interact(item, "Use");
+    }
+
+    /**
+     *
+     * @param name
+     */
+    public static void equip(String name) {
+        wield(name);
+    }
+
+    /**
+     *
+     * @param name
+     */
+    public static void wield(String name) {
+        invokeMenu(get(name), "wield");
+    }
+
+    /**
+     *
+     * @param id
+     */
+    public static void equip(int id) {
+        wield(id);
+    }
+
+    /**
+     *
+     * @param id
+     */
+    public static void wield(int id) {
+        invokeMenu(get(id), "wield");
     }
 
     /**
