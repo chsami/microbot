@@ -61,10 +61,13 @@ public class DashboardWebSocket {
      *
      */
     public static void SendPluginList() {
+        if (!isDashboardPluginEnabled()) return;
         Microbot.setBotPlugins(new ArrayList<>());
         for (Plugin plugin : Microbot.getPluginManager().getPlugins()) {
             if (plugin.getName().startsWith("<html>")) {
-                Microbot.getBotPlugins().add(new PluginRequestModel(plugin.getName().split("<[^>]*>|\\[|\\]")[plugin.getName().split("<[^>]*>|\\[|\\]").length - 1].trim(), Microbot.getPluginManager().isPluginEnabled(plugin)));
+                Microbot.getBotPlugins().add(new PluginRequestModel(plugin.getName()
+                        .split("<[^>]*>|\\[|\\]")[plugin.getName().split("<[^>]*>|\\[|\\]").length - 1]
+                        .trim(), Microbot.getPluginManager().isPluginEnabled(plugin)));
             }
         }
         hubConnection.invoke("SendBotPlugins", new SendBotPluginRequestModel(token, Microbot.getBotPlugins())).blockingAwait();
@@ -101,6 +104,17 @@ public class DashboardWebSocket {
         if (plugin == null) return;
 
         Microbot.getPluginManager().stopPlugin(plugin);
+    }
+
+    private static boolean isDashboardPluginEnabled() {
+        Plugin dashboard = Microbot.getPluginManager().getPlugins().stream()
+                .filter(x -> x.getName().contains("dashboard"))
+                .findFirst()
+                .orElse(null);
+
+        if (dashboard == null) return false;
+
+        return Microbot.getPluginManager().isPluginEnabled(dashboard);
     }
 
 
