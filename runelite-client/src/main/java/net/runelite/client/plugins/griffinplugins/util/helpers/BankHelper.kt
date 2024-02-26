@@ -34,7 +34,7 @@ class BankHelper {
                         Rs2Bank.withdrawItem(false, itemAndQuantityPair.first)
 
                     } else {
-                        Rs2Bank.withdrawItemX(false, itemAndQuantityPair.first, itemAndQuantityPair.second)
+                        Rs2Bank.withdrawX(false, itemAndQuantityPair.first, itemAndQuantityPair.second)
                     }
 
                     var success = true

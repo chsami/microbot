@@ -38,9 +38,9 @@ public class WineScript extends Script {
         if(Rs2Bank.isOpen()){
             Rs2Bank.depositAll();
             if(Rs2Bank.hasItem("jug of water") &&  Rs2Bank.hasItem("grapes")) {
-                Rs2Bank.withdrawItemX(true, "jug of water", 14);
+                Rs2Bank.withdrawX(true, "jug of water", 14);
                 sleepUntil(() -> Inventory.hasItem("jug of water"));
-                Rs2Bank.withdrawItemX(true, "grapes", 14);
+                Rs2Bank.withdrawX(true, "grapes", 14);
                 sleepUntil(() -> Inventory.hasItem("grapes"));
             } else {
                 Microbot.getNotifier().notify("Run out of Materials");

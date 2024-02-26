@@ -68,7 +68,7 @@ public class HumidifierScript extends Script {
                 shutdown();
                 return;
             }
-            if(!Rs2Bank.hasBankItemExact(config.ITEM().getName())) {
+            if(!Rs2Bank.hasBankItem(config.ITEM().getName(), true)) {
                 Microbot.showMessage("Ran out of Materials");
                 shutdown();
                 return;

@@ -74,8 +74,8 @@ public class Rs2Equipment {
 
     public static boolean hasEquipped(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
-            for (EquipmentInventorySlot value: EquipmentInventorySlot.values()) {
-                ItemComposition item =  getEquippedItem(value);
+            for (EquipmentInventorySlot value : EquipmentInventorySlot.values()) {
+                ItemComposition item = getEquippedItem(value);
                 if (item == null) continue;
                 if (item.getName().toLowerCase().equals(itemName.toLowerCase())) {
                     return true;
@@ -87,8 +87,8 @@ public class Rs2Equipment {
 
     public static boolean hasEquippedContains(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
-            for (EquipmentInventorySlot value: EquipmentInventorySlot.values()) {
-                ItemComposition item =  getEquippedItem(value);
+            for (EquipmentInventorySlot value : EquipmentInventorySlot.values()) {
+                ItemComposition item = getEquippedItem(value);
                 if (item == null) continue;
                 if (item.getName().toLowerCase().contains(itemName.toLowerCase())) {
                     return true;
@@ -102,7 +102,7 @@ public class Rs2Equipment {
         return Microbot.getClientThread().runOnClientThread(() -> {
             final ItemContainer container = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT));
             if (container == null) return false;
-            for (EquipmentInventorySlot value: EquipmentInventorySlot.values()) {
+            for (EquipmentInventorySlot value : EquipmentInventorySlot.values()) {
                 Item itemSlot = container.getItem(value.getSlotIdx());
                 if (itemSlot == null) continue;
                 if (itemSlot.getId() == id) {
@@ -125,32 +125,36 @@ public class Rs2Equipment {
         });
     }
 
+    public static boolean equipmentContains(String name, EquipmentInventorySlot slot) {
+        final ItemComposition item = getEquippedItem(slot);
+        return item != null && item.getName().toLowerCase().contains(name.toLowerCase());
+    }
+
+    public static boolean isEquipped(String name, EquipmentInventorySlot slot) {
+        final ItemComposition item = getEquippedItem(slot);
+        return item != null && item.getName().equalsIgnoreCase(name);
+    }
+
+
     public static boolean hasGuthanWeaponEquiped() {
-        final ItemComposition weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
-        return weapon != null && weapon.getName().toLowerCase().contains("guthan's warspear");
+        return equipmentContains("guthan's warspear", EquipmentInventorySlot.WEAPON);
     }
 
     public static boolean hasGuthanBodyEquiped() {
-        final ItemComposition body = getEquippedItem(EquipmentInventorySlot.BODY);
-        return  body != null && body.getName().toLowerCase().contains("guthan's platebody");
+        return equipmentContains("guthan's platebody", EquipmentInventorySlot.BODY);
     }
 
     public static boolean hasGuthanLegsEquiped() {
-        final ItemComposition legs = getEquippedItem(EquipmentInventorySlot.LEGS);
-        return legs != null && legs.getName().toLowerCase().contains("guthan's chainskirt");
+        return equipmentContains("guthan's chainskirt", EquipmentInventorySlot.LEGS);
     }
 
     public static boolean hasGuthanHelmEquiped() {
-        final ItemComposition helm = getEquippedItem(EquipmentInventorySlot.HEAD);
-        return helm != null && helm.getName().toLowerCase().contains("guthan's helm");
+        return equipmentContains("guthan's helm", EquipmentInventorySlot.HEAD);
     }
 
-//    public static boolean isEquipped(String name) {
-//
-//    }
-//
-//    public static boolean isWearing(String name) {
-//
-//    }
+    public static boolean isWearingFullGuthan() {
+        return hasGuthanBodyEquiped() && hasGuthanWeaponEquiped() &&
+                hasGuthanHelmEquiped() && hasGuthanLegsEquiped();
+    }
 
 }

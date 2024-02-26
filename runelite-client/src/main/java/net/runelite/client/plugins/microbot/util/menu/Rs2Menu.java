@@ -17,6 +17,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 /**
  * Context menu related operations.
  */
+@Deprecated()
 public class Rs2Menu {
     private static final Pattern HTML_TAG = Pattern
             .compile("(^[^<]+>|<[^>]+>|<[^>]+$)");

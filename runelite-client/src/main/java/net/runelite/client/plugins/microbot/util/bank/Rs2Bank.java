@@ -9,23 +9,24 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
+import static net.runelite.api.widgets.ComponentID.BANK_ITEM_CONTAINER;
 import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
+@SuppressWarnings("unused")
 public class Rs2Bank {
-    public static CopyOnWriteArrayList<ItemWidget> bankItems = new CopyOnWriteArrayList<>();
+    public static CopyOnWriteArrayList<Rs2Item> bankItems = new CopyOnWriteArrayList<>();
     private static final int BANK_CONTAINER_ID = 95;
-    private static final int BANK_WIDGET_ID = 786445;
     private static final int X_AMOUNT_VARBIT = 3960;
     private static final int SELECTED_OPTION_VARBIT = 6590;
     private static final int HANDLE_X_SET = 5;
@@ -33,22 +34,27 @@ public class Rs2Bank {
     private static final int HANDLE_ALL = 7;
 
     /**
-     * Executes menu swapping for a specific widget and entry index.
-     *
-     * @param widgetId   The ID of the widget to interact with.
-     * @param entryIndex The index of the entry to swap.
-     * @param widget     The ItemWidget associated with the menu swap.
+     * Container describes from what interface the action happens
+     * eg: withdraw means the contailer will be the bank container
+     * eg: deposit means that the container will be the inventory container
+     * and so on...
      */
-    public static void invokeMenu(int widgetId, int entryIndex, ItemWidget widget) {
+    private static int container = -1;
+
+    /**
+     * Executes menu swapping for a specific rs2Item and entry index.
+     *
+     * @param entryIndex     The index of the entry to swap.
+     * @param rs2Item        The ItemWidget associated with the menu swap.
+     */
+    public static void invokeMenu(int entryIndex, Rs2Item rs2Item) {
         int identifier = entryIndex;
 
-        if (widget.getId() == ComponentID.BANK_INVENTORY_ITEM_CONTAINER) {
+        if (container == ComponentID.BANK_INVENTORY_ITEM_CONTAINER) {
             identifier = identifier + 1;
         }
-
-        if (isOpen()) {
-            Rs2Reflection.invokeMenu(widget.getIndex(), widgetId, MenuAction.CC_OP.getId(), identifier, widget.getItemId(), "Withdraw-1", widget.getName(), -1, -1);
-        }
+       // MenuEntryImpl(getOption=Wear, getTarget=<col=ff9040>Amulet of glory(4)</col>, getIdentifier=9, getType=CC_OP_LOW_PRIORITY, getParam0=1, getParam1=983043, getItemId=1712, isForceLeftClick=false, isDeprioritized=false)
+        Rs2Reflection.invokeMenu(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, "Withdraw-1", rs2Item.name, -1, -1);
     }
 
     /**
@@ -84,7 +90,7 @@ public class Rs2Bank {
      * @param name The name of the item to find.
      * @return The bank item widget if found, or null if not found.
      */
-    public static Widget findBankItem(String name) {
+    public static Rs2Item findBankItem(String name) {
         return findBankItem(name, false);
     }
 
@@ -114,8 +120,19 @@ public class Rs2Bank {
      * @param name the item name
      * @return boolean
      */
-    public static boolean hasBankItemExact(String name) {
-        return findBankItem(name, true) != null;
+    public static boolean hasBankItem(String name) {
+        return findBankItem(name, false) != null;
+    }
+
+    /**
+     * check if the player has a bank item identified by exact name.
+     *
+     * @param name the item name
+     * @param exact exact search based on equalsIgnoreCase
+     * @return boolean
+     */
+    public static boolean hasBankItem(String name, boolean exact) {
+        return findBankItem(name, exact) != null;
     }
 
     /**
@@ -132,17 +149,18 @@ public class Rs2Bank {
     /**
      * Deposits one item quickly into the bank by its ItemWidget.
      *
-     * @param w The ItemWidget representing the item to deposit.
+     * @param rs2Item The ItemWidget representing the item to deposit.
      */
-    private static void depositOne(ItemWidget w) {
+    private static void depositOne(Rs2Item rs2Item) {
         if (!isOpen()) return;
-        if (w == null) return;
-        if (!Inventory.hasItem(w.getItemId())) return;
+        if (rs2Item == null) return;
+        if (!Rs2Inventory.hasItem(rs2Item.id)) return;
+        container = BANK_INVENTORY_ITEM_CONTAINER;
 
         if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
-            invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, 1, w);
+            invokeMenu(1, rs2Item);
         } else {
-            invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, 2, w);
+            invokeMenu(2, rs2Item);
         }
     }
 
@@ -152,9 +170,9 @@ public class Rs2Bank {
      * @param id The ID of the item to deposit.
      */
     public static void depositOne(int id) {
-        Widget w = Inventory.findItem(id);
-        if (w == null) return;
-        depositOne(new ItemWidget(w));
+        Rs2Item rs2Item = Rs2Inventory.get(id);
+        if (rs2Item == null) return;
+        depositOne(rs2Item);
     }
 
     /**
@@ -163,9 +181,9 @@ public class Rs2Bank {
      * @param name The name of the item to deposit.
      */
     public static void depositOne(String name, boolean exact) {
-        Widget w = Inventory.findItem(name, exact);
-        if (w == null) return;
-        depositOne(new ItemWidget(w));
+        Rs2Item rs2Item = Rs2Inventory.get(name, exact);
+        if (rs2Item == null) return;
+        depositOne(rs2Item);
     }
 
     /**
@@ -183,15 +201,16 @@ public class Rs2Bank {
      * if the player has the item in their inventory. If all conditions are met, it calls the
      * 'handleAmount' method to deposit the specified amount of the item into the inventory.
      *
-     * @param w      The ItemWidget representing the item to deposit.
-     * @param amount The desired amount to deposit.
+     * @param rs2Item item to handle
+     * @param amount amount to deposit
      */
-    private static void depositX(ItemWidget w, int amount) {
+    private static void depositX(Rs2Item rs2Item, int amount) {
         if (!isOpen()) return;
-        if (w == null) return;
-        if (!Inventory.hasItem(w.getItemId())) return;
+        if (rs2Item == null) return;
+        if (!Rs2Inventory.hasItem(rs2Item.id)) return;
+        container = BANK_INVENTORY_ITEM_CONTAINER;
 
-        handleAmount(w, ComponentID.BANK_INVENTORY_ITEM_CONTAINER, amount);
+        handleAmount(rs2Item, amount);
     }
 
     /**
@@ -202,15 +221,14 @@ public class Rs2Bank {
      * If it doesn't match, it executes the menu swapper with the HANDLE_X_UNSET option,
      * enters the specified amount using the VirtualKeyboard, and presses Enter.
      *
-     * @param w         The ItemWidget to handle.
-     * @param container The container to interact with.
+     * @param rs2Item         The item to handle.
      * @param amount    The desired amount to set.
      */
-    private static void handleAmount(ItemWidget w, int container, int amount) {
+    private static void handleAmount(Rs2Item rs2Item, int amount) {
         if (Microbot.getVarbitValue(X_AMOUNT_VARBIT) == amount) {
-            invokeMenu(container, HANDLE_X_SET, w);
+            invokeMenu(HANDLE_X_SET, rs2Item);
         } else {
-            invokeMenu(container, HANDLE_X_UNSET, w);
+            invokeMenu(HANDLE_X_UNSET, rs2Item);
 
             sleep(600, 1000);
             VirtualKeyboard.typeString(String.valueOf(amount));
@@ -226,87 +244,77 @@ public class Rs2Bank {
      * @param id param amount
      */
     public static void depositX(int id, int amount) {
-        Widget w = Inventory.findItem(id);
-        if (w == null) return;
-        depositX(new ItemWidget(w), amount);
+        Rs2Item rs2Item = Rs2Inventory.get(id);
+        if (rs2Item == null) return;
+        depositX(rs2Item, amount);
     }
 
     /**
-     * dpeosit x amount of items identified by its name
+     * deposit x amount of items identified by its name
      * set exact to true if you want to identify by its exact name
      *
      * @param name param amount
      *             param exact
      */
     private static void depositX(String name, int amount, boolean exact) {
-        Widget w = Inventory.findItem(name, exact);
-        if (w == null) return;
-        depositX(new ItemWidget(w), amount);
+        Rs2Item rs2Item = Rs2Inventory.get(name, exact);
+        if (rs2Item == null) return;
+        depositX(rs2Item, amount);
     }
 
     /**
-     * dpeosit x amount of items identified by its name
+     * deposit x amount of items identified by its name
      *
      * @param name param amount
      */
     public static void depositX(String name, int amount) {
-        Widget w = Inventory.findItem(name);
-        if (w == null) return;
-        depositX(new ItemWidget(w), amount);
-    }
-
-    /**
-     * dpeosit x amount of items identified by its exact name
-     *
-     * @param name param amount
-     */
-    public static void depositXExact(String name, int amount) {
-        Widget w = Inventory.findItem(name, true);
-        if (w == null) return;
-        depositX(new ItemWidget(w), amount);
+        Rs2Item rs2Item = Rs2Inventory.get(name);
+        if (rs2Item == null) return;
+        depositX(rs2Item, amount);
     }
 
     /**
      * deposit all items identified by its ItemWidget
      *
-     * @param w
+     * @param rs2Item item to deposit
      */
-    private static void depositAll(ItemWidget w) {
+    private static void depositAll(Rs2Item rs2Item) {
         if (!isOpen()) return;
-        if (w == null) return;
-        if (!Inventory.hasItem(w.getItemId())) return;
+        if (rs2Item == null) return;
+        if (!Rs2Inventory.hasItem(rs2Item.id)) return;
+        container = BANK_INVENTORY_ITEM_CONTAINER;
 
-        invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, HANDLE_ALL, w);
+        invokeMenu(HANDLE_ALL, rs2Item);
     }
 
     /**
      * deposit all items identified by its id
      *
-     * @param id
+     * @param id searches based on the id
      */
     public static void depositAll(int id) {
-        Widget w = Inventory.findItem(id);
-        if (w == null) return;
-        depositAll(new ItemWidget(w));
+        Rs2Item rs2Item = Rs2Inventory.get(id);
+        if (rs2Item == null) return;
+        depositAll(rs2Item);
     }
 
     /**
      * deposit all items identified by its name
      * set exact to true if you want to be identified by its exact name
      *
-     * @param name
-     * @param exact
+     * @param name name to search
+     * @param exact does an exact search equalsIgnoreCase
      */
     public static void depositAll(String name, boolean exact) {
-        Widget w = Inventory.findItem(name, exact);
-        if (w == null) return;
-        depositAll(new ItemWidget(w));
+        Rs2Item rs2Item = Rs2Inventory.get(name);
+        if (rs2Item == null) return;
+        depositAll(rs2Item);
     }
 
     /**
      * deposit all items identified by its name
      *
-     * @param name
+     * @param name item name to search
      */
     public static void depositAll(String name) {
         depositAll(name, false);
@@ -317,7 +325,7 @@ public class Rs2Bank {
      */
     public static void depositAll() {
         Microbot.status = "Deposit all";
-        if (Inventory.isEmpty()) return;
+        if (Rs2Inventory.isEmpty()) return;
 
         Widget widget = Rs2Widget.findWidget(SpriteID.BANK_DEPOSIT_INVENTORY, null);
         if (widget == null) return;
@@ -329,18 +337,19 @@ public class Rs2Bank {
     /**
      * withdraw one item identified by its ItemWidget.
      *
-     * @param w
+     * @param rs2Item item to withdraw
      */
-    private static void withdrawOne(ItemWidget w) {
+    private static void withdrawOne(Rs2Item rs2Item) {
         if (!isOpen()) return;
-        if (w == null) return;
-        if (Inventory.isFull()) return;
-        if (!hasItem(w.getItemId())) return;
+        if (rs2Item == null) return;
+        if (Rs2Inventory.isFull()) return;
+        if (!hasItem(rs2Item.id)) return;
+        container = BANK_ITEM_CONTAINER;
 
         if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
-            invokeMenu(BANK_WIDGET_ID, 1, w);
+            invokeMenu(1, rs2Item);
         } else {
-            invokeMenu(BANK_WIDGET_ID, 2, w);
+            invokeMenu(2, rs2Item);
         }
     }
 
@@ -358,7 +367,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItem(boolean checkInv, int id) {
-        if (checkInv && Inventory.hasItem(id)) return;
+        if (checkInv && Rs2Inventory.hasItem(id)) return;
         withdrawOne(id);
     }
 
@@ -369,7 +378,7 @@ public class Rs2Bank {
 
     /**
      * withdraw one item identified by its name.
-     * set exact to true if you want to identify by the its exact name.
+     * set exact to true if you want to identify by the exact name.
      *
      * @param name  the item name
      * @param exact boolean
@@ -390,86 +399,95 @@ public class Rs2Bank {
     /**
      * withdraw x amount of items identified by its ItemWidget.
      *
-     * @param w      ItemWidget
+     * @param rs2Item      Item to handle
      * @param amount int
      */
-    private static void withdrawX(ItemWidget w, int amount) {
+    private static void withdrawXItem(Rs2Item rs2Item, int amount) {
         if (!isOpen()) return;
-        if (w == null) return;
-        if (Inventory.isFull()) return;
-        if (!hasItem(w.getItemId())) return;
+        if (rs2Item == null) return;
+        if (Rs2Inventory.isFull()) return;
+        if (!hasItem(rs2Item.id)) return;
+        container = BANK_ITEM_CONTAINER;
 
-        handleAmount(w, BANK_WIDGET_ID, amount);
+        handleAmount(rs2Item, amount);
     }
-
-    public static void withdrawItemX(boolean checkInv, int id, int amount) {
+    /**
+     * Checks inventory before withdrawing item
+     * @param checkInv check inventory before withdrawing item
+     * @param id item id
+     * @param amount amount to withdraw
+     */
+    public static void withdrawX(boolean checkInv, int id, int amount) {
         if (checkInv && !hasItem(id)) return;
         withdrawX(id, amount);
     }
-
-    public static void withdrawItemX(boolean checkInv, String name, int amount) {
+    /**
+     * Checks inventory before withdrawing item
+     * @param checkInv check inventory before withdrawing item
+     * @param name item name
+     * @param amount amount to withdraw
+     */
+    public static void withdrawX(boolean checkInv, String name, int amount) {
         if (checkInv && !hasItem(name)) return;
         withdrawX(name, amount);
     }
 
-    public static void withdrawItemXExact(boolean checkInv, String name, int amount) {
+    /**
+     * Checks inventory before withdrawing item
+     * @param checkInv check inventory before withdrawing item
+     * @param name item name
+     * @param amount amount to withdraw
+     * @param exact exact search based on equalsIgnoreCase
+     */
+    public static void withdrawX(boolean checkInv, String name, int amount, boolean exact) {
         if (checkInv && !hasItem(name)) return;
-        withdrawXExact(name, amount);
+        withdrawX(name, amount, exact);
     }
 
     /**
      * withdraw x amount of items identified by its id.
      *
-     * @param id
-     * @param amount
+     * @param id item id to search
+     * @param amount amount to withdraw
      */
     public static void withdrawX(int id, int amount) {
-        withdrawX(findBankItem(id), amount);
+        withdrawXItem(findBankItem(id), amount);
     }
 
     /**
      * withdraw x amount of items identified by its name.
      * set exact to true if you want to identify an item by its exact name.
      *
-     * @param name
-     * @param amount
-     * @param exact
+     * @param name item name to search
+     * @param amount amount to withdraw
+     * @param exact exact search based on equalsIgnoreCase
      */
     private static void withdrawX(String name, int amount, boolean exact) {
-        withdrawX(findBankItem(name, exact), amount);
+        withdrawXItem(findBankItem(name, exact), amount);
     }
 
     /**
      * withdraw x amount of items identified by its name
      *
-     * @param name
-     * @param amount
+     * @param name item name to search
+     * @param amount amount to withdraw
      */
     public static void withdrawX(String name, int amount) {
-        withdrawX(findBankItem(name, false), amount);
-    }
-
-    /**
-     * withdraw x amount of items identified by its name.
-     *
-     * @param name
-     * @param amount
-     */
-    public static void withdrawXExact(String name, int amount) {
-        withdrawX(findBankItem(name, true), amount);
+        withdrawXItem(findBankItem(name, false), amount);
     }
 
     /**
      * withdraw all items identified by its ItemWidget.
      *
-     * @param w
+     * @param rs2Item Item to withdraw
      */
-    private static void withdrawAll(ItemWidget w) {
+    private static void withdrawAll(Rs2Item rs2Item) {
         if (!isOpen()) return;
-        if (w == null) return;
-        if (Inventory.isFull()) return;
+        if (rs2Item == null) return;
+        if (Rs2Inventory.isFull()) return;
+        container = BANK_ITEM_CONTAINER;
 
-        invokeMenu(BANK_WIDGET_ID, HANDLE_ALL, w);
+        invokeMenu(HANDLE_ALL, rs2Item);
     }
 
     public static void withdrawItemAll(boolean checkInv, String name) {
@@ -484,7 +502,7 @@ public class Rs2Bank {
     /**
      * withdraw all items identified by its id.
      *
-     * @param id
+     * @param id item id to search
      */
     public static void withdrawAll(int id) {
         withdrawAll(findBankItem(id));
@@ -494,8 +512,8 @@ public class Rs2Bank {
      * withdraw all items identified by its name
      * set the boolean exact to true if you want to identify the item by the exact name
      *
-     * @param name
-     * @param exact
+     * @param name item name to search
+     * @param exact exact search based on equalsIgnoreCase
      */
     public static void withdrawAll(String name, boolean exact) {
         withdrawAll(findBankItem(name, exact));
@@ -504,7 +522,7 @@ public class Rs2Bank {
     /**
      * withdraw all items identified by its name
      *
-     * @param name
+     * @param name item name to search
      */
     public static void withdrawAll(String name) {
         withdrawAll(findBankItem(name, false));
@@ -513,63 +531,63 @@ public class Rs2Bank {
     /**
      * wear an item identified by its ItemWidget.
      *
-     * @param w
+     * @param rs2Item item to wear
      */
-    private static void wearItem(Widget w) {
+    private static void wearItem(Rs2Item rs2Item) {
         if (!isOpen()) return;
-        if (w == null) return;
+        if (rs2Item == null) return;
+        container = BANK_INVENTORY_ITEM_CONTAINER;
 
-        ItemWidget itemWidget = new ItemWidget(w);
-
-        invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, 8, itemWidget);
+        invokeMenu(8, rs2Item);
     }
 
     /**
-     * wear an item identified by its exact name.
+     * wear an item identified by the name contains
      *
-     * @param name
+     * @param name item name to search based on contains(string)
      */
     public static void wearItem(String name) {
-        wearItem(Inventory.findItem(name, false));
+        wearItem(Rs2Inventory.get(name, false));
     }
 
     /**
      * wear an item identified by its exact name.
      *
-     * @param name
+     * @param name item name to search
+     * @param exact exact search based on equalsIgnoreCase
      */
-    public static void wearItemExact(String name) {
-        wearItem(Inventory.findItem(name, true));
+    public static void wearItem(String name, boolean exact) {
+        wearItem(Rs2Inventory.get(name, exact));
     }
 
     /**
      * withdraw all and equip item identified by its id.
      *
-     * @param id
+     * @param id item id
      */
     public static void withdrawAllAndEquip(int id) {
         if (Rs2Equipment.hasEquipped(id)) return;
         withdrawAll(id);
-        sleepUntil(() -> Inventory.hasItem(id));
+        sleepUntil(() -> Rs2Inventory.hasItem(id));
         wearItem(id);
     }
 
     /**
      * withdraw and equip item identified by its id.
      *
-     * @param id
+     * @param id item ids
      */
     public static void withdrawAndEquip(int id) {
         if (Rs2Equipment.hasEquipped(id)) return;
         withdrawOne(id);
-        sleepUntil(() -> Inventory.hasItem(id));
+        sleepUntil(() -> Rs2Inventory.hasItem(id));
         wearItem(id);
     }
 
     /**
-     * withdraw items identified by one ore more ids
+     * withdraw items identified by one or more ids
      *
-     * @param ids
+     * @param ids item ids
      */
     public static void withdrawItems(int... ids) {
         for (int id : ids) {
@@ -578,9 +596,9 @@ public class Rs2Bank {
     }
 
     /**
-     * Deposit items identified by one ore more ids
+     * Deposit items identified by one or more ids
      *
-     * @param ids
+     * @param ids item ids
      */
     public static void depositItems(int... ids) {
         for (int id : ids) {
@@ -629,13 +647,16 @@ public class Rs2Bank {
         Microbot.status = "Opening bank";
         try {
             if (isOpen()) return true;
-            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+            if (Rs2Inventory.isItemSelected()) Microbot.getMouse().click();
 
             if (npc == null) return false;
 
-            if (!Rs2Menu.doAction("bank", npc.getCanvasTilePoly())) {
+            boolean interactResult = Rs2Npc.interact(npc, "bank");
+
+            if (!interactResult) {
                 return false;
             }
+
             sleepUntil(Rs2Bank::isOpen);
             sleep(600, 1000);
             return true;
@@ -648,20 +669,23 @@ public class Rs2Bank {
     /**
      * open bank identified by tile object.
      *
-     * @param object
-     * @return
+     * @param object TileObject
+     * @return true if bank is open
      */
     public static boolean openBank(TileObject object) {
         Microbot.status = "Opening bank";
         try {
             if (isOpen()) return true;
-            if (Inventory.isUsingItem()) Microbot.getMouse().click();
+            if (Rs2Inventory.isItemSelected()) Microbot.getMouse().click();
 
             if (object == null) return false;
 
-            if (!Rs2Menu.doAction("bank", object.getCanvasTilePoly())) {
+            boolean interactResult = Rs2GameObject.interact(object, "bank");
+
+            if (!interactResult) {
                 return false;
             }
+
             sleepUntil(Rs2Bank::isOpen);
             sleep(600, 1000);
             return true;
@@ -674,18 +698,18 @@ public class Rs2Bank {
     /**
      * Sets the values of the inventoryWidget
      *
-     * @param id
+     * @param id item id
      */
     private static void handleWearItem(int id) {
-        Widget w = Inventory.findItem(id);
-        if (w == null) return;
-        invokeMenu(ComponentID.BANK_INVENTORY_ITEM_CONTAINER, 8, new ItemWidget(w));
+        Rs2Item rs2Item = Rs2Inventory.get(id);
+        if (rs2Item == null) return;
+        invokeMenu(8, rs2Item);
     }
 
     /**
      * Tries to wear an item identified by its id.
      *
-     * @param id
+     * @param id item id
      */
     public static void wearItem(int id) {
         handleWearItem(id);
@@ -694,14 +718,15 @@ public class Rs2Bank {
     /**
      * find an item in the bank identified by its id.
      *
-     * @param id
-     * @return
+     * @param id item id to find
+     * @return bankItem
      */
-    private static ItemWidget findBankItem(int id) {
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    private static Rs2Item findBankItem(int id) {
         if (bankItems == null) return null;
         if (bankItems.stream().findAny().isEmpty()) return null;
 
-        ItemWidget bankItem = bankItems.stream().filter(x -> x.getItemId() == id).findFirst().orElse(null);
+        Rs2Item bankItem = bankItems.stream().filter(x -> x.id == id).findFirst().orElse(null);
 
         return bankItem;
     }
@@ -709,19 +734,20 @@ public class Rs2Bank {
     /**
      * Finds an item in the bank based on its name.
      *
-     * @param name  The name of the item.
+     * @param name The name of the item.
      * @param exact If true, requires an exact name match.
      * @return The item widget, or null if the item isn't found.
      */
-    private static ItemWidget findBankItem(String name, boolean exact) {
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    private static Rs2Item findBankItem(String name, boolean exact) {
         if (bankItems == null) return null;
         if (bankItems.stream().findAny().isEmpty()) return null;
 
         final String lowerCaseName = name.toLowerCase();
 
-        ItemWidget bankItem = bankItems.stream().filter(x -> exact
-                ? x.getName().equalsIgnoreCase(lowerCaseName)
-                : x.getName().toLowerCase().contains(lowerCaseName)).findFirst().orElse(null);
+        Rs2Item bankItem = bankItems.stream().filter(x -> exact
+                ? x.name.equalsIgnoreCase(lowerCaseName)
+                : x.name.toLowerCase().contains(lowerCaseName)).findFirst().orElse(null);
 
         return bankItem;
     }
@@ -753,7 +779,7 @@ public class Rs2Bank {
     /**
      * Walk to the closest bank
      *
-     * @return
+     * @return true if player location is less than 4 tiles away from the bank location
      */
     public static boolean walkToBank() {
         BankLocation bankLocation = getNearestBank();
@@ -764,7 +790,7 @@ public class Rs2Bank {
     /**
      * Use bank or chest
      *
-     * @return
+     * @return true if bank is opened
      */
     public static boolean useBank() {
         return openBank();
@@ -776,7 +802,7 @@ public class Rs2Bank {
      * @param e The event containing the latest bank items.
      */
     public static void storeBankItemsInMemory(ItemContainerChanged e) {
-        CopyOnWriteArrayList<ItemWidget> list = updateItemContainer(BANK_CONTAINER_ID, e);
+        CopyOnWriteArrayList<Rs2Item> list = updateItemContainer(BANK_CONTAINER_ID, e);
         if (list != null)
             bankItems = list;
     }

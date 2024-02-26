@@ -37,9 +37,13 @@ public class FoodScript extends Script {
                 if (Rs2Inventory.hasItem("empty vial"))
                     Rs2Inventory.drop("empty vial");
                 double treshHold = (double) (Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) * Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS)) / 100;
-                if (treshHold < 51) {
-                    unEquipGuthans();
+                if (Rs2Equipment.isWearingFullGuthan()) {
+                    if (treshHold > 80) //only unequip guthans if we have more than 80% hp
+                        unEquipGuthans();
                     return;
+                } else {
+                    if (treshHold > 51) //return as long as we have more than 51% health and not guthan equipped
+                        return;
                 }
                 List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
                 if (foods == null || foods.isEmpty()) {
@@ -62,7 +66,7 @@ public class FoodScript extends Script {
 
     private void unEquipGuthans() {
         if (Rs2Equipment.hasGuthanWeaponEquiped()  && !weaponname.isEmpty()) {
-            Rs2Equipment.equipItemFast(weaponname);
+            Rs2Inventory.equip(weaponname);
             if (shieldName != null)
                 Rs2Inventory.equip(shieldName);
         }

@@ -139,8 +139,8 @@ public class GiantsFoundryScript extends Script {
             Rs2Bank.useBank();
             //check if inv is empty and deposit all inv items
             //needs new method in rs2bank depositAllinventoryItems
-            Rs2Bank.withdrawItemX(true, "steel bar", 14);
-            Rs2Bank.withdrawItemX(true, "mithril bar", 14);
+            Rs2Bank.withdrawX(true, "steel bar", 14);
+            Rs2Bank.withdrawX(true, "mithril bar", 14);
             Rs2Bank.closeBank();
             return;
         }

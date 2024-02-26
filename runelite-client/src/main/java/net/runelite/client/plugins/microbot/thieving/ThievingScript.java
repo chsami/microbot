@@ -38,7 +38,7 @@ public class ThievingScript extends Script {
                     }
                     if (Rs2Bank.walkToBank()) {
                         Rs2Bank.useBank();
-                        Rs2Bank.withdrawItemX(true, "monkfish", 5);
+                        Rs2Bank.withdrawX(true, "monkfish", 5);
                         final ItemComposition amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
                         if (amulet == null) {
                             Rs2Bank.withdrawItem(true, "dodgy necklace");
@@ -99,7 +99,7 @@ public class ThievingScript extends Script {
                                     .getClientThread()
                                     .runOnClientThread(() -> Inventory.getInventoryFood()).length != 0)
                                 break;
-                            Rs2Bank.withdrawItemX(true, supportedFood, 5);
+                            Rs2Bank.withdrawX(true, supportedFood, 5);
                         }
                         final ItemComposition amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
                         if (amulet == null) {

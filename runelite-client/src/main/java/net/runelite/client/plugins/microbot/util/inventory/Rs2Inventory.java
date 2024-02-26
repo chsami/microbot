@@ -467,6 +467,19 @@ public class Rs2Inventory {
     }
 
     /**
+     * Gets the item in the inventory with the specified name.
+     * this method ignores casing
+     * @param name The name to match.
+     * @return The item with the specified name, or null if not found.
+     */
+    public static Rs2Item get(String name, boolean exact) {
+        if (exact)
+            return items().stream().filter(x -> x.name.equalsIgnoreCase(name)).findFirst().orElse(null);
+        else
+            return items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).findFirst().orElse(null);
+    }
+
+    /**
      * Gets the item in the inventory with one of the specified names.
      *
      * @param names The names to match.
@@ -488,15 +501,6 @@ public class Rs2Inventory {
 
     /**
      *
-     * @param name
-     * @return
-     */
-    public static Rs2Item getContains(String name) {
-        return items().stream().filter(x -> x.name.contains(name)).findFirst().orElse(null);
-    }
-
-    /**
-     *
      * @param id
      * @return boolean
      */
@@ -511,6 +515,15 @@ public class Rs2Inventory {
      */
     public static boolean hasItem(String name) {
         return get(name) != null;
+    }
+
+    /**
+     *
+     * @param name
+     * @return boolean
+     */
+    public static boolean hasItem(String name, boolean exact) {
+        return get(name, true) != null;
     }
 
     /**
@@ -538,6 +551,12 @@ public class Rs2Inventory {
     public static List<Rs2Item> getInventoryFood() {
         return items().stream()
                 .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a!= null && a.equalsIgnoreCase("eat")))
+                .collect(Collectors.toList());
+    }
+
+    public static List<Rs2Item> getPotions() {
+        return items().stream()
+                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a!= null && a.equalsIgnoreCase("drink")))
                 .collect(Collectors.toList());
     }
 
@@ -760,7 +779,7 @@ public class Rs2Inventory {
      * @return True if the interaction was successful, false otherwise.
      */
     public static boolean interact(Predicate<Rs2Item> filter) {
-        return interact(filter, "");
+        return interact(filter, "Use");
     }
 
     /**
@@ -1150,7 +1169,7 @@ public class Rs2Inventory {
         int identifier;
         String option;
         String target;
-        MenuAction menuAction = MenuAction.WALK;
+        MenuAction menuAction = MenuAction.CC_OP;
         ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
         int index = 0;
 

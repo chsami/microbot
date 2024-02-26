@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +40,9 @@ public class ExampleScript extends Script {
                 System.out.println(Rs2Inventory.get(ItemID.FIRE_CAPE));
 //                System.out.println(Rs2Inventory.drop("earth talisman"));
                 System.out.println(Rs2Inventory.use("earth talisman"));*/
+                Rs2Bank.openBank();
+                Rs2Bank.withdrawItem("Steel studs");
+                Rs2Bank.wearItem("amulet of glory(4)");
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

@@ -55,6 +55,9 @@ public class AttackNpcScript extends Script {
                         break;
                     if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation()))
                         Rs2Camera.turnTo(npc);
+
+                    if (!Microbot.getWalker().canReach(npc.getWorldLocation()))
+                        continue;
                     Rs2Npc.interact(npc, "attack");
                     sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
                     break;

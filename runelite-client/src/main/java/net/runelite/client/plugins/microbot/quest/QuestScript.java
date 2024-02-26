@@ -1,7 +1,5 @@
 package net.runelite.client.plugins.microbot.quest;
 
-import net.runelite.api.GameObject;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -11,7 +9,6 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
@@ -69,7 +66,7 @@ public class QuestScript extends Script {
                         Rs2Bank.useBank();
                         Rs2Bank.depositAll();
                         for (ItemRequirement itemRequirement : QuestScript.itemsMissing) {
-                            Rs2Bank.withdrawItemX(true, itemRequirement.getName(), itemRequirement.getQuantity());
+                            Rs2Bank.withdrawX(true, itemRequirement.getName(), itemRequirement.getQuantity());
                         }
                     }
 

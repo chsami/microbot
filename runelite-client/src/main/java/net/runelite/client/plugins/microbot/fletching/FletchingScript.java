@@ -118,7 +118,7 @@ public class FletchingScript extends Script {
         }
 
         if (!Inventory.hasItem(primaryItemToFletch)) {
-            Rs2Bank.withdrawItemXExact(true, primaryItemToFletch, config.fletchingMode().getAmount());
+            Rs2Bank.withdrawX(true, primaryItemToFletch, config.fletchingMode().getAmount());
             sleepUntil(() -> Inventory.hasItem(primaryItemToFletch));
         }
 
@@ -134,7 +134,7 @@ public class FletchingScript extends Script {
 
         do {
             if (config.fletchingMode() == FletchingMode.STRUNG)
-                Rs2Bank.withdrawItemX(true, secondaryItemToFletch, config.fletchingMode().getAmount());
+                Rs2Bank.withdrawX(true, secondaryItemToFletch, config.fletchingMode().getAmount());
             else
                 Rs2Bank.withdrawItemAll(secondaryItemToFletch);
 
