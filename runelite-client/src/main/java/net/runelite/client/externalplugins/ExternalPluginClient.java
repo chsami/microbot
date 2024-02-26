@@ -27,6 +27,16 @@ package net.runelite.client.externalplugins;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.RuneLiteProperties;
+import net.runelite.client.util.VerificationException;
+import net.runelite.http.api.RuneLiteAPI;
+import okhttp3.*;
+import okio.BufferedSource;
+
+import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -41,21 +51,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.List;
 import java.util.Map;
-import javax.imageio.ImageIO;
-import javax.inject.Inject;
-import javax.inject.Named;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.RuneLiteProperties;
-import net.runelite.client.util.VerificationException;
-import net.runelite.http.api.RuneLiteAPI;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okio.BufferedSource;
 
 @Slf4j
 public class ExternalPluginClient
@@ -93,7 +88,7 @@ public class ExternalPluginClient
 		HttpUrl manifest = pluginHubBase
 			.newBuilder()
 			.addPathSegment("manifest")
-			.addPathSegment(RuneLiteProperties.getPluginHubVersion() + "_" + name + ".js")
+			.addPathSegment(RuneLiteProperties.getPluginHubVersion().replace("-SNAPSHOT","") + "_" + name + ".js")
 			.build();
 		try (Response res = okHttpClient.newCall(new Request.Builder().url(manifest).build()).execute())
 		{
