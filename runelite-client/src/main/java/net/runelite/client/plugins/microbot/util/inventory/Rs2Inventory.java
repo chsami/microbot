@@ -504,6 +504,17 @@ public class Rs2Inventory {
      *
      * @param id The id of the item to check.
      * @param amount The desired quantity of the item.
+     * @return True if the player has the specified quantity of the item, false otherwise.
+     */
+    public static boolean hasItemAmount(int id, int amount) {
+        return items().stream().filter(x -> x.id == id).count() >= amount;
+    }
+
+    /**
+     * Checks if the player has a certain quantity of an item.
+     *
+     * @param id The id of the item to check.
+     * @param amount The desired quantity of the item.
      * @param stackable A boolean indicating if the item is stackable.
      * @return True if the player has the specified quantity of the item, false otherwise.
      */

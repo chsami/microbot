@@ -25,7 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.getNpc;
 
-@Deprecated
+@Deprecated(since = "Use Rs2Tab instead", forRemoval = true)
 public class Inventory {
     public static CopyOnWriteArrayList<Widget> inventoryItems = new CopyOnWriteArrayList<>();
 

@@ -27,7 +27,7 @@ public enum TitheFarmMaterial {
         if (Microbot.getClient().getRealSkillLevel(Skill.FARMING) >= GOLOVANOVA_SEED.levelRequired)
             return GOLOVANOVA_SEED;
 
-        return null;
+        return LOGAVANO_SEED;
     }
 
     public static boolean hasWateringCanToBeFilled() {
