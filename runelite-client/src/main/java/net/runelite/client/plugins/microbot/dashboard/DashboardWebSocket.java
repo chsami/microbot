@@ -27,7 +27,7 @@ public class DashboardWebSocket {
      */
     public static void start(DashboardConfig config) {
         if (hubConnection != null) {
-            hubConnection.start().blockingAwait();;
+            hubConnection.start().blockingAwait();
             Microbot.showMessage("Connection to https://microbot-dashboard.vercel.app opened!");
         }
         token = config.token();

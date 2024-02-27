@@ -74,7 +74,6 @@ public class FarmingScript extends Script {
                     if (!isInGrandExchange.getAsBoolean()) {
                         Microbot.getNotifier().notify("Start the script in the grand exchange.");
                         shutdown();
-                        return;
                     }
                     /*itemsRequired = new ArrayList<>(Arrays.asList(new ItemRequirement("falador teleport", ItemID.FALADOR_TELEPORT, 1),
                             new ItemRequirement("lumbridge teleport", ItemID.LUMBRIDGE_TELEPORT, 1),
@@ -126,7 +125,8 @@ public class FarmingScript extends Script {
                         if (!isNearTreePatchGnomeStronghold)
                             return;
 
-                        if (plantTree(config, 19147, NpcID.PRISSY_SCILLA, 3, FarmingState.FARMING_VARROCK)) return;
+                        if (plantTree(config, 19147, NpcID.PRISSY_SCILLA, 3, FarmingState.FARMING_VARROCK)) {
+                        }
                     }
                 } else if (state == FarmingState.FARMING_VARROCK) {
                     if (Inventory.hasItemAmountStackable("varrock teleport", 2)) {
@@ -139,7 +139,8 @@ public class FarmingScript extends Script {
                     if (!isNearVarrockPatch)
                         return;
 
-                    if (plantTree(config, 8390, NpcID.TREZNOR_11957, 2, FarmingState.FARMING_FALADOR)) return;
+                    if (plantTree(config, 8390, NpcID.TREZNOR_11957, 2, FarmingState.FARMING_FALADOR)) {
+                    }
                 } else if (state == FarmingState.FARMING_FALADOR) {
                     if (Inventory.hasItem(ItemID.FALADOR_TELEPORT)) {
                         Inventory.useItem(ItemID.FALADOR_TELEPORT);
@@ -151,7 +152,8 @@ public class FarmingScript extends Script {
                     if (!isNearFaladorPatch)
                         return;
 
-                    if (plantTree(config, 8389, NpcID.HESKEL, 1, FarmingState.FARMING_LUMBRIDGE)) return;
+                    if (plantTree(config, 8389, NpcID.HESKEL, 1, FarmingState.FARMING_LUMBRIDGE)) {
+                    }
 
                 } else if (state == FarmingState.FARMING_LUMBRIDGE) {
                     if (Inventory.hasItem(ItemID.LUMBRIDGE_TELEPORT)) {
@@ -165,7 +167,8 @@ public class FarmingScript extends Script {
                     if (!isNearLumbridgePatch)
                         return;
 
-                    if (plantTree(config, 8391, NpcID.FAYETH, 0, FarmingState.FINISHED)) return;
+                    if (plantTree(config, 8391, NpcID.FAYETH, 0, FarmingState.FINISHED)) {
+                    }
                 } else if (state == FarmingState.FINISHED) {
                     if (Inventory.hasItem(ItemID.VARROCK_TELEPORT)) {
                         Inventory.useItem(ItemID.VARROCK_TELEPORT);
@@ -190,7 +193,7 @@ public class FarmingScript extends Script {
     private boolean plantTree(FarmingConfig config, int objectId, int npcId, int totalItemsForNextStep, FarmingState nextState) {
         try {
             final ObjectComposition tree = Rs2GameObject.findObject(objectId);
-            if (tree.getImpostor().getName().toLowerCase().equals(config.farmingMaterial().getName().toLowerCase())) {
+            if (tree.getImpostor().getName().equalsIgnoreCase(config.farmingMaterial().getName())) {
                 if (Rs2GameObject.hasAction(tree, "check-health")) {
                     Rs2GameObject.interact(objectId, "check-health");
                     int currentFarmingExp = Microbot.getClient().getSkillExperience(Skill.FARMING);
@@ -206,7 +209,7 @@ public class FarmingScript extends Script {
                     if (tree != null
                             && !Rs2GameObject.hasAction(tree, "chop down")
                             && !Rs2GameObject.hasAction(tree, "check-health")
-                            && tree.getImpostor().getName().toLowerCase().equals(config.farmingMaterial().getName().toLowerCase())) {
+                            && tree.getImpostor().getName().equalsIgnoreCase(config.farmingMaterial().getName())) {
                         Rs2Npc.interact(npcId, "pay");
                         sleepUntil(() -> Inventory.hasItemAmountStackable(config.farmingMaterial().getProtectionItem(), totalItemsForNextStep));
                     }

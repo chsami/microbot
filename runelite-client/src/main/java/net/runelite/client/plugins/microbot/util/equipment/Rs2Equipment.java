@@ -77,7 +77,7 @@ public class Rs2Equipment {
             for (EquipmentInventorySlot value : EquipmentInventorySlot.values()) {
                 ItemComposition item = getEquippedItem(value);
                 if (item == null) continue;
-                if (item.getName().toLowerCase().equals(itemName.toLowerCase())) {
+                if (item.getName().equalsIgnoreCase(itemName)) {
                     return true;
                 }
             }

@@ -67,7 +67,7 @@ public class Calculations {
 
     public static boolean tileOnScreen(LocalPoint localPoint) {
         if (localPoint == null) return false;
-        Point p = new Point((int) localPoint.getX(), (int) localPoint.getY());
+        Point p = new Point(localPoint.getX(), localPoint.getY());
         Point tileToScreenPoint = tileToScreenPoint(p, 0.5, 0.5, 0);
         return (tileToScreenPoint != null) && pointOnScreen(tileToScreenPoint);
     }
@@ -209,7 +209,7 @@ public class Calculations {
         int step_ptr = 0;
         path_x[path_ptr] = startX;
         path_y[path_ptr++] = startY;
-        final byte blocks[][] = Microbot.getClient().getTileSettings()[Microbot.getClient().getPlane()];
+        final byte[][] blocks = Microbot.getClient().getTileSettings()[Microbot.getClient().getPlane()];
         final int pathLength = path_x.length;
         boolean foundPath = false;
         while (step_ptr != path_ptr) {
@@ -332,10 +332,7 @@ public class Calculations {
                     lp.getY() + dy * Perspective.LOCAL_TILE_SIZE + dy * Perspective.LOCAL_TILE_SIZE * (area.getHeight() - 1) / 2);
 
             Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), lp);
-            if (poly == null) {
-                return false;
-            }
-            return true;
+            return poly != null;
         });
     }
 }

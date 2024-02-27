@@ -55,7 +55,7 @@ public class TitheFarmingPlugin extends Plugin {
     @Inject
     private TitheFarmingOverlay titheFarmOverlay;
 
-    private TitheFarmingScript titheFarmScript = new TitheFarmingScript();
+    private final TitheFarmingScript titheFarmScript = new TitheFarmingScript();
 
     @Override
     protected void startUp() throws AWTException {

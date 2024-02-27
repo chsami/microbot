@@ -30,7 +30,7 @@ enum BotState {
     COMPLETE_AND_RESET,
     RETURN_TO_HOUSE,
     MAKE_LAST_JUICE,
-    RUN;
+    RUN
 }
 
 // TODO I can replace the findDoor with the exact tile. check the findDoor function.

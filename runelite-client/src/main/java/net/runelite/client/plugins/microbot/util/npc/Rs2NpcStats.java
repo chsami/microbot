@@ -194,8 +194,8 @@ public final class Rs2NpcStats {
     };
 
     public double calculateXpModifier() {
-        double averageLevel = Math.floor((double) ((this.attackLevel + this.strengthLevel + this.defenceLevel + this.hitpoints) / 4));
-        double averageDefBonus = Math.floor((double) ((this.stabDef + this.slashDef + this.crushDef) / 3));
+        double averageLevel = Math.floor((this.attackLevel + this.strengthLevel + this.defenceLevel + this.hitpoints) / 4);
+        double averageDefBonus = Math.floor((this.stabDef + this.slashDef + this.crushDef) / 3);
         return 1.0 + Math.floor(averageLevel * (averageDefBonus + (double) this.bonusStrength + (double) this.bonusAttack) / 5120.0) / 40.0;
     }
 

@@ -86,7 +86,6 @@ public class GlassblowingScript extends Script {
             Microbot.status = "[Shutting down] - Reason: " + item + " not found in the bank.";
             Microbot.getNotifier().notify(Microbot.status);
             shutdown();
-            return;
         }
     }
 

@@ -39,7 +39,7 @@ public class MagicPlugin extends Plugin {
     @Inject
     private MagicOverlay magicOverlay;
 
-    private MagicScript magicScript = new MagicScript();
+    private final MagicScript magicScript = new MagicScript();
 
     @Override
     protected void startUp() throws AWTException {

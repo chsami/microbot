@@ -500,6 +500,64 @@ public class Rs2Inventory {
     }
 
     /**
+     * Checks if the player has a certain quantity of an item.
+     *
+     * @param id The id of the item to check.
+     * @param amount The desired quantity of the item.
+     * @param stackable A boolean indicating if the item is stackable.
+     * @return True if the player has the specified quantity of the item, false otherwise.
+     */
+    public static boolean hasItemAmount(int id, int amount, boolean stackable) {
+        Rs2Item item = get(id);
+        return stackable ? item.quantity >= amount : items().stream().filter(x -> x.id == id).count() >= amount;
+    }
+
+    /**
+     * Checks if the player has a certain quantity of an item.
+     *
+     * @param name The name of the item to check.
+     * @param amount The desired quantity of the item.
+     * @return True if the player has the specified quantity of the item, false otherwise.
+     */
+    public static boolean hasItemAmount(String name, int amount) {
+        return hasItemAmount(name, amount, false);
+    }
+
+    /**
+     * Checks if the player has a certain quantity of an item.
+     *
+     * @param name The name of the item to check.
+     * @param amount The desired quantity of the item.
+     * @param stackable A boolean indicating if the item is stackable.
+     * @return True if the player has the specified quantity of the item, false otherwise.
+     */
+    public static boolean hasItemAmount(String name, int amount, boolean stackable) {
+        return hasItemAmount(name, amount, stackable, false);
+    }
+
+    /**
+     * Checks if the player has a certain quantity of an item.
+     *
+     * @param name The name of the item to check.
+     * @param amount The desired quantity of the item.
+     * @param stackable A boolean indicating if the item is stackable.
+     * @param exact A boolean indicating whether the check should be exact or partial for non-stackable items.
+     * @return True if the player has the specified quantity of the item, false otherwise.
+     */
+    public static boolean hasItemAmount(String name, int amount, boolean stackable, boolean exact) {
+        if (!stackable) {
+            if (exact) {
+                return items().stream().filter(x -> x.name.equalsIgnoreCase(name)).count() >= amount;
+            } else {
+                return items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).count() >= amount;
+            }
+        }
+
+        Rs2Item item = get(name, true);
+        return item.quantity >= amount;
+    }
+
+    /**
      *
      * @param id
      * @return boolean
@@ -881,7 +939,24 @@ public class Rs2Inventory {
 
         if (inventory == null) return false;
 
-        if (slot > inventory.getDynamicChildren().length) return false;
+        return slot <= inventory.getDynamicChildren().length;
+    }
+
+    /**
+     * Checks if the given slot in the inventory is empty.
+     *
+     * @param slots The slots to check.
+     * @return True if the slot is empty, false otherwise.
+     */
+    public static boolean isSlotsEmpty(int... slots) {
+        Widget inventory = getInventory();
+
+        if (inventory == null) return false;
+
+        for (int slot:
+             slots) {
+            if (slot > inventory.getDynamicChildren().length) return false;
+        }
 
         return true;
     }

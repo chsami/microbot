@@ -109,7 +109,7 @@ public class Rs2GroundItem {
                 Rs2GroundItem.getAll(range)
         );
         for (RS2Item rs2Item : groundItems) {
-            if (rs2Item.getItem().getName().toLowerCase().equals(lootItem.toLowerCase()) && rs2Item.getTileItem().getQuantity() >= minQuantity) {
+            if (rs2Item.getItem().getName().equalsIgnoreCase(lootItem) && rs2Item.getTileItem().getQuantity() >= minQuantity) {
                 interact(rs2Item);
                 return true;
             }
@@ -243,7 +243,7 @@ public class Rs2GroundItem {
     public static boolean interact(String itemName, String action, int range) {
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> Rs2GroundItem.getAll(range));
         for (RS2Item rs2Item : groundItems) {
-            if (rs2Item.getItem().getName().toLowerCase().equals(itemName.toLowerCase())) {
+            if (rs2Item.getItem().getName().equalsIgnoreCase(itemName)) {
                 interact(rs2Item, action);
                 return true;
             }
@@ -299,7 +299,7 @@ public class Rs2GroundItem {
     public static boolean exists(String itemName, int range) {
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> Rs2GroundItem.getAll(range));
         for (RS2Item rs2Item : groundItems) {
-            if (rs2Item.getItem().getName().toLowerCase().equals(itemName.toLowerCase())) {
+            if (rs2Item.getItem().getName().equalsIgnoreCase(itemName)) {
                 return true;
             }
         }

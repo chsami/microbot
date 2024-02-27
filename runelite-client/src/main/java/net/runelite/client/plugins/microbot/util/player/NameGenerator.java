@@ -42,7 +42,7 @@ public class NameGenerator {
                     nameInCharArray[i] = getConsonant(randomNumberGenerator);
                 }
             }
-            nameInCharArray[0] = (char) Character
+            nameInCharArray[0] = Character
                     .toUpperCase(nameInCharArray[0]);
 
             String currentGeneratedName = new String(nameInCharArray);

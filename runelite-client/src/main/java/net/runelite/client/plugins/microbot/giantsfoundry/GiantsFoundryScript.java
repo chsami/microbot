@@ -134,8 +134,8 @@ public class GiantsFoundryScript extends Script {
             return;
         }
 
-        if (!inventory.hasItemAmount("steel bar", 14)
-                && !inventory.hasItemAmount("mithril bar", 14) && !canPour()) {
+        if (!Inventory.hasItemAmount("steel bar", 14)
+                && !Inventory.hasItemAmount("mithril bar", 14) && !canPour()) {
             Rs2Bank.useBank();
             //check if inv is empty and deposit all inv items
             //needs new method in rs2bank depositAllinventoryItems
@@ -145,18 +145,18 @@ public class GiantsFoundryScript extends Script {
             return;
         }
         Rs2Bank.closeBank();
-        if (inventory.hasItem("steel bar") && !canPour()) {
+        if (Inventory.hasItem("steel bar") && !canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Fill");
             sleepUntil(() -> Rs2Widget.findWidget("What metal would you like to add?", null) != null, 5000);
             VirtualKeyboard.keyPress('3');
-            sleepUntil(() -> !inventory.hasItem("steel bar"), 5000);
+            sleepUntil(() -> !Inventory.hasItem("steel bar"), 5000);
         }
-        if (inventory.hasItem("mithril bar") && !canPour()) {
+        if (Inventory.hasItem("mithril bar") && !canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Fill");
             sleepUntil(() -> Rs2Widget.findWidget("What metal would you like to add?", null) != null, 5000);
             sleep(600, 1200);
             VirtualKeyboard.keyPress('4');
-            sleepUntil(() -> !inventory.hasItem("mithril bar"), 5000);
+            sleepUntil(() -> !Inventory.hasItem("mithril bar"), 5000);
         }
         if (canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Pour");
@@ -173,7 +173,7 @@ public class GiantsFoundryScript extends Script {
 
     public void pickupMould() {
         if (!canPickupMould()) return;
-        if (inventory.isEmpty() && GiantsFoundryState.getCurrentStage() == null) {
+        if (Inventory.isEmpty() && GiantsFoundryState.getCurrentStage() == null) {
             Rs2GameObject.interact(MOULD_JIG, "Pick-up");
             sleepUntil(() -> !canPickupMould(), 5000);
         }

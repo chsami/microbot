@@ -79,7 +79,7 @@ public class SummerGardenOverlay extends Overlay
 
     private Color selectColor(int npcId, int parity)
     {
-        if (collisionDetector.isLaunchCycle() && (npcId == 1801 || npcId == 1803))
+        if (ElementalCollisionDetector.isLaunchCycle() && (npcId == 1801 || npcId == 1803))
         {
             return config.highlightLaunch();
         }
@@ -98,7 +98,7 @@ public class SummerGardenOverlay extends Overlay
     {
         // determine parity and color
         int npcId = npc.getId();
-        int parity = collisionDetector.getParity(npcId);
+        int parity = ElementalCollisionDetector.getParity(npcId);
         Color highlightColor = selectColor(npcId, parity);
 
         // draw tile under
@@ -131,7 +131,7 @@ public class SummerGardenOverlay extends Overlay
             return;
         }
 
-        String t = String.valueOf(collisionDetector.getTicksUntilStart());
+        String t = String.valueOf(ElementalCollisionDetector.getTicksUntilStart());
         Font font = graphics.getFont().deriveFont((float) config.countdownOnTreeSize());
         int width = graphics.getFontMetrics().stringWidth(t);
         int height = graphics.getFontMetrics().getHeight();
@@ -139,7 +139,7 @@ public class SummerGardenOverlay extends Overlay
         Rectangle2D bounds = clickbox.getBounds();
         Point center = new Point((int) bounds.getCenterX() - width / 2, (int) bounds.getCenterY() + height / 2);
 
-        Color color = collisionDetector.isLaunchCycle() ? config.highlightLaunch() : config.highlightGood();
+        Color color = ElementalCollisionDetector.isLaunchCycle() ? config.highlightLaunch() : config.highlightGood();
         graphics.setFont(font);
         OverlayUtil.renderPolygon(graphics, clickbox, color);
         OverlayUtil.renderTextLocation(graphics, center, t, color);

@@ -24,7 +24,7 @@ public class CookingScript extends Script {
 
     public static double version = 1.0;
 
-    List<String> missingItemsInBank = new ArrayList<>(Arrays.asList());
+    List<String> missingItemsInBank = new ArrayList<>(List.of());
 
     public boolean run(int gameObjectId) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {

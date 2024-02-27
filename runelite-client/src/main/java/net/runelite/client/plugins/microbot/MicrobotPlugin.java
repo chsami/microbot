@@ -243,7 +243,7 @@ public class MicrobotPlugin extends Plugin {
 
             List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
 
-            if (Arrays.stream(event.getMenuEntries()).anyMatch(x -> x.getOption().toLowerCase().equals("pickpocket"))) {
+            if (Arrays.stream(event.getMenuEntries()).anyMatch(x -> x.getOption().equalsIgnoreCase("pickpocket"))) {
                 leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
                         .setOption(thievingScript == null ? "Start AutoThiever" : "Stop AutoThiever")
                         .setType(MenuAction.RUNELITE)

@@ -50,9 +50,9 @@ class DriftNetOverlay extends Overlay
 
     private void renderFish(Graphics2D graphics)
     {
-        for (NPC fish : plugin.getFish())
+        for (NPC fish : DriftNetPlugin.getFish())
         {
-            if (!plugin.getTaggedFish().containsKey(fish))
+            if (!DriftNetPlugin.getTaggedFish().containsKey(fish))
             {
                 OverlayUtil.renderActorOverlay(graphics, fish, "", config.untaggedFishColor());
             }
@@ -61,7 +61,7 @@ class DriftNetOverlay extends Overlay
 
     private void renderNets(Graphics2D graphics)
     {
-        for (DriftNet net : plugin.getNETS())
+        for (DriftNet net : DriftNetPlugin.getNETS())
         {
             final Shape polygon = net.getNet().getConvexHull();
 

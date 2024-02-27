@@ -8,7 +8,7 @@ class PathFinder(private val nodeMap: MutableMap<String, PathNode>) {
     companion object {
         var path: List<PathNode> = emptyList()
         fun get(): List<PathNode> {
-            return path;
+            return path
         }
         fun resetPath() {
             path = emptyList()
@@ -41,7 +41,7 @@ class PathFinder(private val nodeMap: MutableMap<String, PathNode>) {
             if (nearestNode != null) {
                 val distanceToEndPoint = currentNode.worldLocation.distanceTo(endPoint)
                 if (distanceToEndPoint < nearestDistance) {
-                    nearestNode = currentNode;
+                    nearestNode = currentNode
                     nearestDistance = distanceToEndPoint
                 }
             } else {

@@ -43,7 +43,7 @@ public class ConstructionPlugin extends Plugin {
     @Inject
     private ConstructionOverlay constructionOverlay;
 
-    private ConstructionScript constructionScript = new ConstructionScript();
+    private final ConstructionScript constructionScript = new ConstructionScript();
 
     @Override
     protected void startUp() throws AWTException {

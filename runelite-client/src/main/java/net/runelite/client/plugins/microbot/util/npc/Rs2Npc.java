@@ -123,7 +123,7 @@ public class Rs2Npc {
 
     public static NPC[] getPestControlPortals() {
         List<NPC> npcs = Microbot.getClient().getNpcs().stream()
-                .filter((npc) -> !npc.isDead() && npc.getHealthRatio() > 0 && npc.getName().toLowerCase().equals("portal"))
+                .filter((npc) -> !npc.isDead() && npc.getHealthRatio() > 0 && npc.getName().equalsIgnoreCase("portal"))
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
 
@@ -146,7 +146,7 @@ public class Rs2Npc {
 
     public static List<NPC> getNpcs(String name) {
         List<NPC> npcs = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcs().stream()
-                .filter(x -> x != null && x.getName().toLowerCase().equalsIgnoreCase(name.toLowerCase()))
+                .filter(x -> x != null && x.getName().equalsIgnoreCase(name))
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList()));
 

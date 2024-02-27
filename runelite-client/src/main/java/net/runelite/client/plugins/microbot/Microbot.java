@@ -83,7 +83,7 @@ public class Microbot {
 
     public static boolean enableAutoRunOn = true;
 
-    private static ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
 

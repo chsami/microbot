@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CheckedNode;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
+import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -17,7 +18,7 @@ import java.util.List;
 public class PathTileOverlay {
 
     private static void renderTransports(Graphics2D graphics) {
-        for (WorldPoint a : Microbot.getWalker().pathfinderConfig.getTransports().keySet()) {
+        for (WorldPoint a : PathfinderConfig.getTransports().keySet()) {
             drawTile(graphics, a, new Color(0, 255, 0, 128), true);
 
             Point ca = tileCenter(a);
@@ -27,7 +28,7 @@ public class PathTileOverlay {
             }
 
             StringBuilder s = new StringBuilder();
-            for (Transport b : Microbot.getWalker().pathfinderConfig.getTransports().getOrDefault(a, new ArrayList<>())) {
+            for (Transport b : PathfinderConfig.getTransports().getOrDefault(a, new ArrayList<>())) {
                 for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), b.getOrigin())) {
                     Point cb = tileCenter(origin);
                     if (cb != null) {

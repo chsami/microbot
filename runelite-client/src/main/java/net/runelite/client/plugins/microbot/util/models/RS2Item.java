@@ -5,7 +5,7 @@ import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 
 public class RS2Item {
-    private ItemComposition item;
+    private final ItemComposition item;
     private final Tile tile;
     private final TileItem tileItem;
 

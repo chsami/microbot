@@ -52,9 +52,9 @@ public class CraftingPlugin extends Plugin {
     @Inject
     private CraftingOverlay craftingOverlay;
 
-    private DefaultScript defaultScript = new DefaultScript();
-    private GemsScript gemsScript = new GemsScript();
-    private GlassblowingScript glassblowingScript = new GlassblowingScript();
+    private final DefaultScript defaultScript = new DefaultScript();
+    private final GemsScript gemsScript = new GemsScript();
+    private final GlassblowingScript glassblowingScript = new GlassblowingScript();
 
     @Override
     protected void startUp() throws AWTException {

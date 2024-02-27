@@ -6,6 +6,4 @@ import net.runelite.api.WallObject;
 
 public interface IScript {
     boolean run();
-    IScript click(TileObject gameObject);
-    IScript click(WallObject gameObject);
 }

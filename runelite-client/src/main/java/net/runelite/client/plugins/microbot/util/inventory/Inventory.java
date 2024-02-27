@@ -233,7 +233,7 @@ public class Inventory {
         if (inventoryWidget == null) return null;
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
-            items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("eat"))).toArray(Widget[]::new);
+            items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.equalsIgnoreCase("eat"))).toArray(Widget[]::new);
             return items;
         });
     }
@@ -244,7 +244,7 @@ public class Inventory {
         if (inventoryWidget == null) return null;
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget[] items = Arrays.stream(inventoryWidget.getDynamicChildren()).filter(x -> itemExistsInInventory(x)).toArray(Widget[]::new);
-            items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.toLowerCase().equals("drink"))).toArray(Widget[]::new);
+            items = Arrays.stream(items).filter(x -> Arrays.stream(x.getActions()).anyMatch(c -> c != null && c.equalsIgnoreCase("drink"))).toArray(Widget[]::new);
             return items;
         });
     }

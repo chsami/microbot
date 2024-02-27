@@ -34,11 +34,11 @@ public enum Prayer {
     RIGOUR("Rigour", 35455009, 74, Varbits.PRAYER_RIGOUR),
     AUGURY("Augury", 35455012, 77, Varbits.PRAYER_AUGURY);
 
-    private String name;
-    private int index;
-    private int level;
+    private final String name;
+    private final int index;
+    private final int level;
 
-    private int pVar;
+    private final int pVar;
 
     Prayer(String name, int index, int level, int pVar){
         this.name = name;

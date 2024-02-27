@@ -1,14 +1,12 @@
 package net.runelite.client.plugins.microbot;
 
-import net.runelite.api.TileObject;
-import net.runelite.api.WallObject;
 import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -20,7 +18,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
-import static net.runelite.api.widgets.WidgetID.LEVEL_UP_GROUP_ID;
 
 public abstract class Script implements IScript {
 
@@ -89,7 +86,6 @@ public abstract class Script implements IScript {
     public void shutdown() {
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
             Microbot.getNotifier().notify("Shutdown script");
-            Rs2Menu.setOption("");
             mainScheduledFuture.cancel(true);
         }
     }
@@ -118,26 +114,10 @@ public abstract class Script implements IScript {
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
         if (!hasRunEnergy && useStaminaPotsIfNeeded) {
-            Inventory.useItemContains("Stamina potion");
+            Rs2Inventory.use("Stamina potion");
         }
 
         return true;
-    }
-
-    public IScript click(TileObject gameObject) {
-        if (gameObject != null)
-            Microbot.getMouse().click(gameObject.getClickbox().getBounds());
-        else
-            System.out.println("GameObject is null");
-        return this;
-    }
-
-    public IScript click(WallObject wall) {
-        if (wall != null)
-            Microbot.getMouse().click(wall.getClickbox().getBounds());
-        else
-            System.out.println("wall is null");
-        return this;
     }
 
     public void keyPress(char c) {
@@ -154,10 +134,8 @@ public abstract class Script implements IScript {
     public void onWidgetLoaded(WidgetLoaded event) {
         int groupId = event.getGroupId();
 
-        switch (groupId) {
-            case LEVEL_UP_GROUP_ID:
-                hasLeveledUp = true;
-                break;
+        if (groupId == InterfaceID.LEVEL_UP) {
+            hasLeveledUp = true;
         }
     }
 }

@@ -36,7 +36,7 @@ public class PlayerAssistOverlay extends OverlayPanel {
             if (npc != null && npc.getCanvasTilePoly() != null) {
                 try {
                     graphics.setColor(Color.CYAN);
-                    modelOutlineRenderer.drawOutline((NPC) npc, 2, Color.RED, 4);
+                    modelOutlineRenderer.drawOutline(npc, 2, Color.RED, 4);
                     graphics.draw(npc.getCanvasTilePoly());
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());
@@ -48,7 +48,7 @@ public class PlayerAssistOverlay extends OverlayPanel {
             if (currentMonster != null && currentMonster.npc != null && currentMonster.npc.getCanvasTilePoly() != null) {
                 try {
                     graphics.setColor(Color.CYAN);
-                    modelOutlineRenderer.drawOutline((NPC) currentMonster.npc, 2, Color.RED, 4);
+                    modelOutlineRenderer.drawOutline(currentMonster.npc, 2, Color.RED, 4);
                     graphics.draw(currentMonster.npc.getCanvasTilePoly());
                     graphics.drawString("" + currentMonster.lastAttack,
                             (int) currentMonster.npc.getCanvasTilePoly().getBounds().getCenterX(),

@@ -48,7 +48,7 @@ public class GiantsFoundryPlugin extends Plugin {
     @Inject
     private GiantsFoundryOverlay giantsFoundryOverlay;
 
-    private GiantsFoundryScript giantsFoundryScript = new GiantsFoundryScript();
+    private final GiantsFoundryScript giantsFoundryScript = new GiantsFoundryScript();
 
     @Override
     protected void startUp() throws AWTException {

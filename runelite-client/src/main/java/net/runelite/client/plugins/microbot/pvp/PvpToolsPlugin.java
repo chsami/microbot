@@ -624,7 +624,6 @@ public class PvpToolsPlugin extends Plugin
         {
             if (client.getVarbitValue(Varbits.IN_RAID) == 1 || client.getVarbitValue(Varbits.THEATRE_OF_BLOOD) == 2)
             {
-                return;
             }
 
             //client.setHideFriendAttackOptions(false);
