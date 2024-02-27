@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.combat;
 
 import net.runelite.api.VarPlayer;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -46,7 +47,7 @@ public class Rs2Combat {
      * @return boolean, whether the action succeeded
      */
     public static boolean setSpecState(boolean state, int specialAttackEnergyRequired) {
-        Widget widget = Microbot.getClient().getWidget(WidgetInfo.MINIMAP_SPEC_ORB);
+        Widget widget = Microbot.getClient().getWidget(ComponentID.MINIMAP_SPEC_ORB);
         int currentSpecEnergy = Microbot.getClient().getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
         if (widget == null) return false;
         if (currentSpecEnergy < specialAttackEnergyRequired) return false;

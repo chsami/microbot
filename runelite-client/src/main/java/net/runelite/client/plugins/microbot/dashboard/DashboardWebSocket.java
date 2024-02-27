@@ -23,7 +23,7 @@ public class DashboardWebSocket {
 
     /**
      * Start websocket connection with dashboard
-     * @param config
+     * @param config dashboard Config
      */
     public static void start(DashboardConfig config) {
         if (hubConnection != null) {
@@ -36,9 +36,7 @@ public class DashboardWebSocket {
                 .withHeader("token", config.token())
                 .build();
 
-        hubConnection.on("ReceiveMessage", (user, message) -> {
-            Microbot.showMessage("Received a message: " + message + " from: " + user);
-        }, String.class, String.class);
+        hubConnection.on("ReceiveMessage", (user, message) -> Microbot.showMessage("Received a message: " + message + " from: " + user), String.class, String.class);
 
         hubConnection.start().blockingAwait();
 
@@ -66,7 +64,7 @@ public class DashboardWebSocket {
         for (Plugin plugin : Microbot.getPluginManager().getPlugins()) {
             if (plugin.getName().startsWith("<html>")) {
                 Microbot.getBotPlugins().add(new PluginRequestModel(plugin.getName()
-                        .split("<[^>]*>|\\[|\\]")[plugin.getName().split("<[^>]*>|\\[|\\]").length - 1]
+                        .split("<[^>]*>|\\[|]")[plugin.getName().split("<[^>]*>|\\[|]").length - 1]
                         .trim(), Microbot.getPluginManager().isPluginEnabled(plugin)));
             }
         }
@@ -75,8 +73,8 @@ public class DashboardWebSocket {
 
     /**
      *
-     * @param name
-     * @return
+     * @param name plugin name
+     * @return the plguin
      */
     public static Plugin findPlugin(String name) {
         return Microbot.getPluginManager().getPlugins().stream().filter(x -> x.getName().equals(name)).findFirst().orElse(null);
@@ -84,8 +82,8 @@ public class DashboardWebSocket {
 
     /**
      * NOT IMPLEMENTED
-     * @param pluginRequestModel
-     * @throws PluginInstantiationException
+     * @param pluginRequestModel requestModel
+     * @throws PluginInstantiationException exception
      */
     public static void startPlugin(PluginRequestModel pluginRequestModel) throws PluginInstantiationException {
         Plugin plugin = findPlugin(pluginRequestModel.name);
@@ -96,8 +94,8 @@ public class DashboardWebSocket {
 
     /**
      * NOT IMPLEMENTED
-     * @param pluginRequestModel
-     * @throws PluginInstantiationException
+     * @param pluginRequestModel requestModel
+     * @throws PluginInstantiationException exception
      */
     public static void stopPlugin(PluginRequestModel pluginRequestModel) throws PluginInstantiationException {
         Plugin plugin = findPlugin(pluginRequestModel.name);

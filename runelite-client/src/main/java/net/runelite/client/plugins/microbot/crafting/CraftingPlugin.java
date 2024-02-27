@@ -11,7 +11,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.crafting.enums.Activities;
-import net.runelite.client.plugins.microbot.crafting.enums.Gems;
 import net.runelite.client.plugins.microbot.crafting.scripts.DefaultScript;
 import net.runelite.client.plugins.microbot.crafting.scripts.GemsScript;
 import net.runelite.client.plugins.microbot.crafting.scripts.GlassblowingScript;

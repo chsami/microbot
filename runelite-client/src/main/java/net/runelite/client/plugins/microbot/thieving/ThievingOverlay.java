@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import java.awt.*;
 
 import static net.runelite.client.plugins.natepainthelper.Info.*;
-import static net.runelite.client.plugins.natepainthelper.Info.xpTillNextLevel;
 
 public class ThievingOverlay extends OverlayPanel {
     @Inject

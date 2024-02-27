@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.deserttreasure2.bosses.leviathan;
 
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.example.ExampleConfig;
 
 import java.util.concurrent.TimeUnit;
 

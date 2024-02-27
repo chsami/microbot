@@ -25,16 +25,16 @@
 package net.runelite.client.callback;
 
 import com.google.inject.Inject;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
+
+import javax.inject.Singleton;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.FutureTask;
 import java.util.function.BooleanSupplier;
-import javax.inject.Singleton;
-
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
 
 @Singleton
 @Slf4j

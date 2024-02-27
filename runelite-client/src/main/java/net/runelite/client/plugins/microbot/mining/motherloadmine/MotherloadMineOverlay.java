@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.mining.motherloadmine;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.example.ExampleScript;
 import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.natepainthelper.PaintFormat;
 import net.runelite.client.ui.overlay.OverlayPanel;
@@ -15,7 +14,6 @@ import java.awt.*;
 
 import static net.runelite.client.plugins.microbot.mining.motherloadmine.MotherloadMineScript.status;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
-import static net.runelite.client.plugins.natepainthelper.Info.xpTillNextLevel;
 
 
 public class MotherloadMineOverlay extends OverlayPanel {

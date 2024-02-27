@@ -703,6 +703,8 @@ public class Rs2Bank {
     private static void handleWearItem(int id) {
         Rs2Item rs2Item = Rs2Inventory.get(id);
         if (rs2Item == null) return;
+        container = ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
+
         invokeMenu(8, rs2Item);
     }
 

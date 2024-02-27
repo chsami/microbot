@@ -32,7 +32,7 @@ public class Rs2Inventory {
         for (int i = 0; i < inventory().getItems().length; i++) {
             Item item = inventory().getItems()[i];
             if (item.getId() == -1) continue;
-            ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(item.getId()));
+            ItemComposition itemComposition = (ItemComposition) Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(item.getId()));
             rs2Items.add(new Rs2Item(item, itemComposition, i));
         }
         return rs2Items;
@@ -202,7 +202,7 @@ public class Rs2Inventory {
      * @return The count of items that match the name.
      */
     public static int count(String name) {
-        return (int) items().stream().filter(x -> x.name.equalsIgnoreCase(name)).count();
+        return (int) items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).count();
     }
 
     /**
@@ -821,9 +821,7 @@ public class Rs2Inventory {
      * @return True if the interaction was successful, false otherwise.
      */
     public static boolean interact(String name) {
-        Rs2Item rs2Item = items().stream().filter(x -> x.name.equalsIgnoreCase(name)).findFirst().orElse(null);
-        if (rs2Item == null) return false;
-        invokeMenu(rs2Item, "");
+        interact(name, "", false);
         return true;
     }
 
@@ -835,7 +833,24 @@ public class Rs2Inventory {
      * @return True if the interaction was successful, false otherwise.
      */
     public static boolean interact(String name, String action) {
-        Rs2Item rs2Item = items().stream().filter(x -> x.name.equalsIgnoreCase(name)).findFirst().orElse(null);
+        interact(name, action, false);
+        return true;
+    }
+
+    /**
+     * Interacts with an item with the specified name in the inventory using the specified action.
+     *
+     * @param name   The name of the item to interact with.
+     * @param action The action to perform on the item.
+     * @return True if the interaction was successful, false otherwise.
+     */
+    public static boolean interact(String name, String action, boolean exact) {
+        Rs2Item rs2Item;
+        if (exact) {
+             rs2Item = items().stream().filter(x -> x.name.equalsIgnoreCase(name.toLowerCase())).findFirst().orElse(null);
+        } else {
+             rs2Item = items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).findFirst().orElse(null);
+        }
         if (rs2Item == null) return false;
         invokeMenu(rs2Item, action);
         return true;
@@ -919,6 +934,30 @@ public class Rs2Inventory {
      */
     public static boolean isFull() {
         return items().size() == CAPACITY;
+    }
+
+    /**
+     * Checks if the inventory is full based on the item name.
+     *
+     * @param name The name of the item to check.
+     * @return true if the inventory is full, false otherwise.
+     */
+    public static boolean isFull(String name) {
+        Rs2Item rs2Item = get(name);
+        if (rs2Item == null && items().size() == CAPACITY) return true;
+        return rs2Item != null && rs2Item.quantity <= 1 && items().size() == CAPACITY;
+    }
+
+    /**
+     * Checks if the inventory is full based on the item ID.
+     *
+     * @param id The ID of the item to check.
+     * @return true if the inventory is full, false otherwise.
+     */
+    public static boolean isFull(int id) {
+        Rs2Item rs2Item = get(id);
+        if (rs2Item == null && items().size() == CAPACITY) return true;
+        return rs2Item != null && rs2Item.quantity <= 1 && items().size() == CAPACITY;
     }
 
     /**
@@ -1192,7 +1231,7 @@ public class Rs2Inventory {
      * @return True if the item is successfully used, false otherwise.
      */
     public static boolean use(String name) {
-        Rs2Item item = items().stream().filter(x -> x.name.equalsIgnoreCase(name)).findFirst().orElse(null);
+        Rs2Item item = items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).findFirst().orElse(null);
         if (item == null) return false;
         return interact(name, "Use");
     }
@@ -1257,7 +1296,7 @@ public class Rs2Inventory {
         String target;
         MenuAction menuAction = MenuAction.CC_OP;
         ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
-        int index = 0;
+        int index = 2;
 
 
         if (isItemSelected()) {

@@ -63,8 +63,8 @@ public class NmzScript extends Script {
         } else {
             final String overload = "Overload (4)";
             final String absorption = "Absorption (4)";
-            storePotions(ObjectID.OVERLOAD_POTION, overload, config.overloadPotionAmount());
-            storePotions(ObjectID.ABSORPTION_POTION, absorption, config.absorptionPotionAmount());
+            storePotions(ObjectID.OVERLOAD_POTION, "overload", config.overloadPotionAmount());
+            storePotions(ObjectID.ABSORPTION_POTION, "absorption", config.absorptionPotionAmount());
             handleStore();
             fetchPotions(ObjectID.OVERLOAD_POTION, overload, config.overloadPotionAmount());
             fetchPotions(ObjectID.ABSORPTION_POTION, absorption, config.absorptionPotionAmount());
@@ -151,7 +151,7 @@ public class NmzScript extends Script {
     public void useAbsorptionPotion() {
         if (Microbot.getVarbitValue(NMZ_ABSORPTION) < Random.random(300, 600) && Rs2Inventory.hasItem("absorption")) {
             for (int i = 0; i < Random.random(1, 5); i++) {
-                Rs2Inventory.interact(x -> x.name.contains("absorption"), "drink");
+                Rs2Inventory.interact(x -> x.name.toLowerCase().contains("absorption"), "drink");
                 sleep(600, 1000);
             }
         }
@@ -159,6 +159,7 @@ public class NmzScript extends Script {
 
     private void storePotions(int objectId, String itemName, int requiredAmount) {
         if (Rs2Inventory.count(itemName) == requiredAmount) return;
+        if (Rs2Inventory.get(itemName) == null) return;
 
         Rs2GameObject.interact(objectId, "Store");
         String storeWidgetText = "Store all your ";
@@ -179,7 +180,7 @@ public class NmzScript extends Script {
         if (Rs2Widget.hasWidget(widgetText)) {
             VirtualKeyboard.typeString(Integer.toString(requiredAmount * 4));
             VirtualKeyboard.enter();
-            sleepUntil(() -> Rs2Inventory.count(itemName + " (4)") == requiredAmount);
+            sleepUntil(() -> Rs2Inventory.count(itemName) == requiredAmount);
         }
     }
 

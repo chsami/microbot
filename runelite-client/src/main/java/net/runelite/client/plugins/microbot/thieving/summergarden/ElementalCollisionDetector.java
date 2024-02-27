@@ -1,12 +1,13 @@
 package net.runelite.client.plugins.microbot.thieving.summergarden;
 
 
-import java.util.Arrays;
-import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
+
+import javax.inject.Singleton;
+import java.util.Arrays;
 
 @Singleton
 public class ElementalCollisionDetector {

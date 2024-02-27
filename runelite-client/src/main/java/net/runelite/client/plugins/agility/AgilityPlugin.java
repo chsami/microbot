@@ -26,44 +26,13 @@ package net.runelite.client.plugins.agility;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.ItemID;
-import static net.runelite.api.ItemID.AGILITY_ARENA_TICKET;
-import net.runelite.api.NPC;
-import net.runelite.api.NullNpcID;
-import net.runelite.api.Player;
-import static net.runelite.api.Skill.AGILITY;
-import net.runelite.api.Tile;
-import net.runelite.api.TileItem;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.DecorativeObjectDespawned;
-import net.runelite.api.events.DecorativeObjectSpawned;
-import net.runelite.api.events.GameObjectDespawned;
-import net.runelite.api.events.GameObjectSpawned;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.GroundObjectDespawned;
-import net.runelite.api.events.GroundObjectSpawned;
-import net.runelite.api.events.ItemDespawned;
-import net.runelite.api.events.ItemSpawned;
-import net.runelite.api.events.NpcDespawned;
-import net.runelite.api.events.NpcSpawned;
-import net.runelite.api.events.StatChanged;
-import net.runelite.api.events.WallObjectDespawned;
-import net.runelite.api.events.WallObjectSpawned;
+import net.runelite.api.events.*;
 import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -79,6 +48,12 @@ import net.runelite.client.plugins.xptracker.XpTrackerPlugin;
 import net.runelite.client.plugins.xptracker.XpTrackerService;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
+
+import javax.inject.Inject;
+import java.util.*;
+
+import static net.runelite.api.ItemID.AGILITY_ARENA_TICKET;
+import static net.runelite.api.Skill.AGILITY;
 
 @PluginDescriptor(
 	name = "Agility",

@@ -367,6 +367,13 @@
 				</excludes>
 				<filtering>true</filtering>
 			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>logback.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>

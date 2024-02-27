@@ -1,9 +1,10 @@
 package net.runelite.client.plugins.microbot.giantsfoundry.enums;
 
-import java.awt.Color;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.client.ui.ColorScheme;
+
+import java.awt.*;
 
 @Getter
 @AllArgsConstructor
