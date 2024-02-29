@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.example;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -27,8 +28,7 @@ public class ExampleScript extends Script {
                  */
                // Rs2Bank.withdrawAll("void ranger helm");
               //  Rs2Bank.wearItem(ItemID.VOID_RANGER_HELM);
-                System.out.println(Rs2Widget.isHidden(10485795));
-                Rs2Combat.setSpecState(true);
+                Rs2Inventory.use("Ancient essence");
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

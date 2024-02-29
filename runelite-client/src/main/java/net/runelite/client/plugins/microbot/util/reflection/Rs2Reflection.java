@@ -6,7 +6,9 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.NPC;
 import net.runelite.api.ObjectID;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.math.Random;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -96,6 +98,9 @@ public class Rs2Reflection {
             }
         }
 
+        if (Random.random(1, 10) == 1) {
+            Microbot.getMouse().clickFast(Random.random(0, 500), Random.random(0, 500), true);
+        }
         doAction.setAccessible(true);
         Microbot.getClientThread().runOnClientThread(() -> doAction.invoke(null, param0, param1, opcode, identifier, itemId, option, target, x, y));
         doAction.setAccessible(false);

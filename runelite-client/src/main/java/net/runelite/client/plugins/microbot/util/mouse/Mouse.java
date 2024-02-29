@@ -38,7 +38,7 @@ public abstract class Mouse {
     public abstract Mouse clickFast(Point point);
     public abstract Mouse clickFast();
     public abstract Mouse clickFast(int x, int y);
-
+    public abstract Mouse clickFast(int x, int y, boolean rightClick);
 
     public abstract Mouse click(Point point, boolean rightClick);
 
