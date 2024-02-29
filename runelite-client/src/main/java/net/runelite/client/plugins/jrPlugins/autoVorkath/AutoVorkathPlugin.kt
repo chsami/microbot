@@ -232,7 +232,7 @@ class AutoVorkathPlugin : Plugin() {
                     }
 
                     State.RANGE_POTION -> if (Rs2Inventory.get(config.RANGEPOTION().toString()) != null) {
-                        Rs2Inventory.interact(config.RANGEPOTION().toString())
+                        Rs2Inventory.interact(config.RANGEPOTION().toString(), "drink")
                         botState = previousBotState
                     } else {
                         println("No range potions found")

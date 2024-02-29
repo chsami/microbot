@@ -103,12 +103,6 @@ public class Walker {
      * @param localPoint
      */
     public void walkFastLocal(LocalPoint localPoint) {
-
-        if (!Calculations.tileOnScreen(localPoint)) {
-            Microbot.getWalker().walkMiniMap(WorldPoint.fromLocal(Microbot.getClient(), localPoint)); //use minimap if tile is not on screen
-            return;
-        }
-
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
         int canvasX = canv != null ? canv.getX() : -1;
         int canvasY = canv != null ? canv.getY() : -1;

@@ -28,6 +28,7 @@ public class Rs2Inventory {
     }
 
     public static List<Rs2Item> items() {
+        if (inventory() == null) return new ArrayList<>();
         List<Rs2Item> rs2Items = new ArrayList<>();
         for (int i = 0; i < inventory().getItems().length; i++) {
             Item item = inventory().getItems()[i];
@@ -1292,11 +1293,22 @@ public class Rs2Inventory {
         int param0;
         int param1;
         int identifier;
-        String option;
         String target;
         MenuAction menuAction = MenuAction.CC_OP;
         ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
-        int index = 2;
+        int index = 0;
+
+        if (!action.isEmpty()) {
+            String[] actions;
+            actions = itemComposition.getInventoryActions();
+
+            for (int i = 0; i < actions.length; i++) {
+                if (action.equalsIgnoreCase(actions[i])) {
+                    index = i;
+                    break;
+                }
+            }
+        }
 
 
         if (isItemSelected()) {
@@ -1305,40 +1317,8 @@ public class Rs2Inventory {
             menuAction = MenuAction.WIDGET_TARGET;
         } else if (action.equalsIgnoreCase("cast")) {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
-        } else if(itemComposition.getName().contains("pouch") && action.equalsIgnoreCase("empty")) {
-            index = 1;
-            menuAction = MenuAction.CC_OP;
-        } else if (action.equalsIgnoreCase("drink")
-                || action.equalsIgnoreCase("read")
-                || action.equalsIgnoreCase("eat")
-                || action.equalsIgnoreCase("view")
-                || action.equalsIgnoreCase("bury")
-                || action.equalsIgnoreCase("feel")) {
-            index = 2;
-            menuAction = MenuAction.CC_OP;
-        } else if (action.equalsIgnoreCase("wield")
-                || action.equalsIgnoreCase("wear")
-                || action.equalsIgnoreCase("check steps")) {
-            index = 3;
-            menuAction = MenuAction.CC_OP;
-        } else if (action.equalsIgnoreCase("fill")) {
-            index = 4;
-            menuAction = MenuAction.CC_OP;
-        } else if (action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("rub")
-                || action.equalsIgnoreCase("refund") || action.equalsIgnoreCase("commune")
-                || action.equalsIgnoreCase("extinguish")
-                || (action.equalsIgnoreCase("check") && rs2Item.id == ItemID.GRICOLLERS_CAN)) {
-            index = 6;
-            menuAction = MenuAction.CC_OP;
-        } else if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("destroy")) {
-            index = 7;
-            menuAction = MenuAction.CC_OP;
-        } else if (action.equalsIgnoreCase("examine")) {
-            index = 10;
-            menuAction = MenuAction.CC_OP;
         }
 
-        option = action != null ? action : "";
         identifier = index;
         param0 = rs2Item.slot;
         param1 = 9764864;
@@ -1346,12 +1326,12 @@ public class Rs2Inventory {
 
 
         //grandexchange inventory
-        if (option.equalsIgnoreCase("offer")) {
+        if (action.equalsIgnoreCase("offer")) {
             identifier = 1;
             param1 = 30605312;
         }
 
-        Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, option, target, -1, -1);
+        Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
     }
 
     private static Widget getInventory() {

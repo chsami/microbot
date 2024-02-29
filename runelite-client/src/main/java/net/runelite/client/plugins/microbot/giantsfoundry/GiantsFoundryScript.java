@@ -107,6 +107,7 @@ public class GiantsFoundryScript extends Script {
             Microbot.getMouse().click(tips.getBounds());
             sleep(600, 1200);
             MouldHelper.selectBest();
+            Microbot.getMouse().click(forte.getBounds());
         }
         Widget setMould = Rs2Widget.getWidget(47054854);
         if (setMould != null) {
@@ -213,7 +214,7 @@ public class GiantsFoundryScript extends Script {
             if (stage == null) return;
             GameObject obj = GiantsFoundryState.getStageObject(stage);
             if (obj == null) return;
-            Microbot.getMouse().click(obj.getCanvasLocation());
+            Rs2GameObject.interact(obj);
             isCoolingDown = false;
             isHeatingUp = false;
             sleepUntil(() -> Microbot.isGainingExp || GiantsFoundryState.getHeatChangeNeeded() != -1, 5000);

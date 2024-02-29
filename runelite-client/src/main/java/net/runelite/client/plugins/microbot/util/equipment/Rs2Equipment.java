@@ -125,36 +125,53 @@ public class Rs2Equipment {
         });
     }
 
-    public static boolean equipmentContains(String name, EquipmentInventorySlot slot) {
-        final ItemComposition item = getEquippedItem(slot);
-        return item != null && item.getName().toLowerCase().contains(name.toLowerCase());
+    public static boolean isEquipped(String name, EquipmentInventorySlot slot) {
+        return isEquipped(name, slot, false);
     }
 
-    public static boolean isEquipped(String name, EquipmentInventorySlot slot) {
+    public static boolean isEquipped(String name, EquipmentInventorySlot slot, boolean exact) {
         final ItemComposition item = getEquippedItem(slot);
-        return item != null && item.getName().equalsIgnoreCase(name);
+        if (exact) {
+            return item != null && item.getName().equalsIgnoreCase(name);
+        } else {
+            return item != null && item.getName().toLowerCase().contains(name.toLowerCase());
+        }
     }
 
 
     public static boolean hasGuthanWeaponEquiped() {
-        return equipmentContains("guthan's warspear", EquipmentInventorySlot.WEAPON);
+        return isEquipped("guthan's warspear", EquipmentInventorySlot.WEAPON);
     }
 
     public static boolean hasGuthanBodyEquiped() {
-        return equipmentContains("guthan's platebody", EquipmentInventorySlot.BODY);
+        return isEquipped("guthan's platebody", EquipmentInventorySlot.BODY);
     }
 
     public static boolean hasGuthanLegsEquiped() {
-        return equipmentContains("guthan's chainskirt", EquipmentInventorySlot.LEGS);
+        return isEquipped("guthan's chainskirt", EquipmentInventorySlot.LEGS);
     }
 
     public static boolean hasGuthanHelmEquiped() {
-        return equipmentContains("guthan's helm", EquipmentInventorySlot.HEAD);
+        return isEquipped("guthan's helm", EquipmentInventorySlot.HEAD);
     }
 
     public static boolean isWearingFullGuthan() {
         return hasGuthanBodyEquiped() && hasGuthanWeaponEquiped() &&
                 hasGuthanHelmEquiped() && hasGuthanLegsEquiped();
+    }
+
+    public static boolean isWearing(String name) {
+        return isWearing(name, false);
+    }
+
+    public static boolean isWearing(String name, boolean exact) {
+        for (EquipmentInventorySlot slot : EquipmentInventorySlot.values()
+        ) {
+            if (isEquipped(name, slot, exact)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

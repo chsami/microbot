@@ -42,6 +42,9 @@ public class NmzScript extends Script {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
             try {
+                if (Random.random(1, 10) == 1) {
+                    Microbot.getMouse().clickFast(Random.random(0, 500), Random.random(0, 500), true);
+                }
                 boolean isOutsideNmz = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2602, 3116, 0)) < 20;
                 useOverload = Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) == Microbot.getClient().getRealSkillLevel(Skill.RANGED);
                 if (isOutsideNmz) {

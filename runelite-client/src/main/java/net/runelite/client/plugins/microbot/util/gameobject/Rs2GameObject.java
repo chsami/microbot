@@ -90,6 +90,7 @@ public class Rs2GameObject {
         return findObject(objectName, true);
     }
 
+    @Deprecated(since="Use findObjectById", forRemoval = true)
     public static ObjectComposition findObject(int id) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
     }
