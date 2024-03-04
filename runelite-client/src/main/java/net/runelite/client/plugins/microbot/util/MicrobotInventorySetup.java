@@ -10,12 +10,9 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class MicrobotInventorySetup {
     static InventorySetup inventorySetup;
@@ -33,18 +30,20 @@ public class MicrobotInventorySetup {
     public static boolean loadInventory(String name) {
         Rs2Bank.openBank();
         Rs2Bank.depositAll();
-        // depositNonMatchingItems();
         if (Rs2Bank.isOpen()) {
             if (inventorySetup == null) return false;
             for (int i = 0; i < inventorySetup.getInventory().size(); i++) {
                 InventorySetupsItem inventorySetupsItem = inventorySetup.getInventory().get(i);
-                int itemId = hasItemInBank(inventorySetupsItem);
-                if (itemId == -1)
-                    continue;
+                if (InventorySetupsItem.itemIsDummy(inventorySetupsItem)) continue;
+                if (!Rs2Bank.hasBankItem(inventorySetupsItem.getName())) {
+                    Microbot.pauseAllScripts = true;
+                    Microbot.showMessage("Bank is missing the following item " + inventorySetupsItem.getName());
+                    break;
+                }
                 if (inventorySetupsItem.isFuzzy()) {
-                    Rs2Bank.withdrawX(itemId, inventorySetupsItem.getQuantity());
-                } else {
                     Rs2Bank.withdrawX(inventorySetupsItem.getName(), inventorySetupsItem.getQuantity());
+                } else {
+                    Rs2Bank.withdrawX(inventorySetupsItem.getId(), inventorySetupsItem.getQuantity());
                 }
             }
         }
@@ -56,22 +55,24 @@ public class MicrobotInventorySetup {
     public static boolean loadEquipment(String name) {
         Rs2Bank.openBank();
         if (Rs2Bank.isOpen()) {
-            if (!getInventorySetup(name))
-            {
+            if (!getInventorySetup(name)) {
                 return false;
             }
             if (inventorySetup == null) return false;
             for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
+                if (InventorySetupsItem.itemIsDummy(inventorySetupsItem)) continue;
                 if (inventorySetupsItem.isFuzzy()) {
-                    int itemId = hasItemInBank(inventorySetupsItem);
-                    if (itemId == -1)
-                        continue;
-                    if (Rs2Inventory.hasItemAmount(itemId, (int) inventorySetup.getInventory().stream().filter(x -> x.getId() == inventorySetupsItem.getId()).count()))
+                    if (!Rs2Bank.hasBankItem(inventorySetupsItem.getName())) {
+                        Microbot.pauseAllScripts = true;
+                        Microbot.showMessage("Bank is missing the following item " + inventorySetupsItem.getName());
+                        break;
+                    }
+                    if (Rs2Inventory.hasItemAmount(inventorySetupsItem.getName(), (int) inventorySetup.getInventory().stream().filter(x -> x.getId() == inventorySetupsItem.getId()).count()))
                         continue;
                     if (inventorySetupsItem.getQuantity() > 1) {
-                        Rs2Bank.withdrawAllAndEquip(itemId);
+                        Rs2Bank.withdrawAllAndEquip(inventorySetupsItem.getName());
                     } else {
-                        Rs2Bank.withdrawAndEquip(itemId);
+                        Rs2Bank.withdrawAndEquip(inventorySetupsItem.getName());
                     }
                 } else {
                     if (inventorySetupsItem.getId() == -1 || !Rs2Bank.hasItem(inventorySetupsItem.getName()))
@@ -93,45 +94,14 @@ public class MicrobotInventorySetup {
         return doesEquipmentMatch(name);
     }
 
-    private static void depositNonMatchingItems() {
-        for (Rs2Item rs2Item : Rs2Inventory.items()) {
-            boolean match = false;
-            for (int i = 0; i < inventorySetup.getInventory().size(); i++) {
-                if (match)
-                    break;
-                InventorySetupsItem inventorySetupsItem = inventorySetup.getInventory().get(i);
-                if (inventorySetupsItem.isFuzzy()) {
-                    Collection<Integer> possibleIds = inventorySetupsItem.getVariations();
-                    match = possibleIds.stream().anyMatch(id -> id == rs2Item.id);
-                } else {
-                    match = inventorySetupsItem.getId() == rs2Item.id;
-                }
-            }
-            if (!match) {
-                Rs2Bank.depositAll(rs2Item.id);
-            }
+    public static boolean wearEquipment(String name) {
+        if (!getInventorySetup(name)) {
+            return false;
         }
-    }
-
-    private static int hasItemInBank(InventorySetupsItem inventorySetupsItem) {
-        if (inventorySetupsItem.getId() == -1) return -1;
-        for (int mappedId : inventorySetupsItem.getVariations()) {
-            if (Rs2Bank.hasItem(mappedId)) {
-                return mappedId;
-            }
+        for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
+            Rs2Inventory.wield(inventorySetupsItem.getId());
         }
-        Microbot.pauseAllScripts = true;
-        Microbot.showMessage("Bank is missing the following item " + inventorySetupsItem.getName());
-        return -1;
-    }
-
-    private static int itemExistsInInventory(InventorySetupsItem inventorySetupsItem) {
-        for (int mappedId : inventorySetupsItem.getVariations()) {
-            if (Rs2Inventory.hasItemAmount(mappedId, (int) inventorySetup.getInventory().stream().filter(x -> x.getId() == inventorySetupsItem.getId()).count())) {
-                return mappedId;
-            }
-        }
-        return -1;
+        return doesEquipmentMatch(name);
     }
 
     public static boolean doesInventoryMatch(String name) {
@@ -143,10 +113,8 @@ public class MicrobotInventorySetup {
             Rs2Item rsItem = Rs2Inventory.getItemInSlot(i);
             if (rsItem == null) return false;
             if (inventorySetupsItem.isFuzzy()) {
-                Collection<Integer> variations = inventorySetupsItem.getVariations();
-                if (!variations.contains(rsItem.id)) {
+                if (!inventorySetupsItem.getName().contains(name))
                     return false;
-                }
             } else {
                 if (rsItem.id != inventorySetupsItem.getId()) {
                     return false;

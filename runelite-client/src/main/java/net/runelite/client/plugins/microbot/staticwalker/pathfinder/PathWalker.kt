@@ -6,8 +6,10 @@ import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 import java.awt.Shape
 import kotlin.random.Random
 
@@ -149,6 +151,14 @@ class PathWalker(private val nodes: List<PathNode>) {
         val success = operateTransport(transport)
         if (!success) {
             return false
+        } else {
+            if (Rs2Widget.hasWidget("Climb up or down")) {
+                if (transport.action.equals("climb-up", true)) {
+                    VirtualKeyboard.typeString("1");
+                } else {
+                    VirtualKeyboard.typeString("2");
+                }
+            }
         }
 
         Global.sleep(1000)

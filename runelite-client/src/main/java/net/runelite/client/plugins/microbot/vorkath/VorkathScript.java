@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.vorkath;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.itemstats.stats.Stat;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
@@ -20,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
 import java.util.List;
@@ -115,18 +115,7 @@ public class VorkathScript extends Script {
                             hasInventory = MicrobotInventorySetup.loadInventory("vorkath");
                         }
                         if (hasEquipment && hasInventory) {
-                            while (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) != Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) && !Rs2Inventory.getInventoryFood().isEmpty()) {
-                                Rs2Bank.closeBank();
-                                eatAt(99);
-                                Rs2Player.waitForAnimation();
-                                hasInventory = false;
-                            }
-                            while (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) != Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) && Rs2Inventory.hasItem("prayer potion")) {
-                                Rs2Bank.closeBank();
-                                Rs2Inventory.interact(config.prayerPotion().toString(), "drink");
-                                Rs2Player.waitForAnimation();
-                                hasInventory = false;
-                            }
+                            healAndDrinkPrayerPotion();
                             if (hasEquipment && hasInventory) {
                                 state = State.TELEPORT_TO_RELLEKKA;
                             }
@@ -204,8 +193,6 @@ public class VorkathScript extends Script {
                         }
                         if (Rs2Inventory.getInventoryFood().isEmpty()) {
                             leaveVorkath();
-                            state = State.TELEPORT_AWAY;
-                            Rs2Player.waitForAnimation();
                         }
                         drinkPotions();
                         handlePrayer();
@@ -273,7 +260,7 @@ public class VorkathScript extends Script {
                                 Rs2Player.waitForAnimation();
                             }
                         }
-                        Rs2GroundItem.loot("Vorkath's head", 20);
+                        boolean vorkathHead = Rs2GroundItem.loot("Vorkath's head", 20);
                         boolean itemsLeft = Rs2GroundItem.lootAllItemBasedOnValue(5000, 20) && !Rs2GroundItem.exists("Vorkath's head", 20);
                         int foodInventorySize = Rs2Inventory.getInventoryFood().size();
                         boolean hasVenom = Rs2Inventory.hasItem("venom");
@@ -281,7 +268,7 @@ public class VorkathScript extends Script {
                         boolean hasPrayerPotion = Rs2Inventory.hasItem("prayer potion");
                         boolean hasRangePotion = Rs2Inventory.hasItem(config.rangePotion().toString());
 
-                        if (!itemsLeft) {
+                        if (!itemsLeft && !vorkathHead) {
                             if (foodInventorySize < 7 || !hasVenom || !hasSuperAntifire || !hasPrayerPotion || !hasRangePotion) {
                                 leaveVorkath();
                             } else {
@@ -292,6 +279,7 @@ public class VorkathScript extends Script {
                     case TELEPORT_AWAY:
                         boolean reachedDestination = Rs2Bank.walkToBank();
                         if (reachedDestination) {
+                            healAndDrinkPrayerPotion();
                             state = State.BANKING;
                         }
                         break;
@@ -301,10 +289,18 @@ public class VorkathScript extends Script {
                             torfin = Rs2Npc.getNpc(NpcID.TORFINN_10405);
                             if (torfin != null) {
                                 Rs2Npc.interact(torfin, "Collect");
-                                //wait for death interface
-                                //interact with death interface
-                                //check if inventory has items
-                                //state = teleport_away
+                                sleepUntil(() -> Rs2Widget.hasWidget("Retrieval Service"));
+                                final int invSize = Rs2Inventory.size();
+                                Rs2Widget.clickWidget(39452678);
+                                sleepUntil(() -> Rs2Inventory.size() != invSize);
+                                boolean isWearingOriginalEquipment = MicrobotInventorySetup.wearEquipment("vorkath");
+                                if (!isWearingOriginalEquipment) {
+                                    int finalInvSize = Rs2Inventory.size();
+                                    Rs2Widget.clickWidget(39452678);
+                                    sleepUntil(() -> Rs2Inventory.size() != finalInvSize);
+                                    MicrobotInventorySetup.wearEquipment("vorkath");
+                                }
+                                state = State.TELEPORT_AWAY;
                             }
                         } else {
                             Microbot.getWalker().hybridWalkTo(WorldDestinations.LUMBRIDGE_BANK.getWorldPoint());
@@ -330,11 +326,30 @@ public class VorkathScript extends Script {
         return true;
     }
 
+    /**
+     * will heal and drink pray pots
+     */
+    private void healAndDrinkPrayerPotion() {
+        while (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) != Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) && !Rs2Inventory.getInventoryFood().isEmpty()) {
+            Rs2Bank.closeBank();
+            eatAt(99);
+            Rs2Player.waitForAnimation();
+            hasInventory = false;
+        }
+        while (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) != Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) && Rs2Inventory.hasItem("prayer potion")) {
+            Rs2Bank.closeBank();
+            Rs2Inventory.interact(config.prayerPotion().toString(), "drink");
+            Rs2Player.waitForAnimation();
+            hasInventory = false;
+        }
+    }
+
     private void leaveVorkath() {
         togglePrayer(false);
         Rs2Player.toggleRunEnergy(true);
         state = State.TELEPORT_AWAY;
         Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
+        Rs2Player.waitForAnimation();
     }
 
     private boolean drinkPotions() {

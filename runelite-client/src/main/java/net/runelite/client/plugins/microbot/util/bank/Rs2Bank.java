@@ -224,17 +224,35 @@ public class Rs2Bank {
      * @param amount    The desired amount to set.
      */
     private static void handleAmount(Rs2Item rs2Item, int amount) {
+        handleAmount(rs2Item, amount, false);
+    }
+
+    /**
+     * Handles the amount for an item widget.
+     * <p>
+     * This method checks if the current varbit value matches the specified amount.
+     * If it does, it executes the menu swapper with the HANDLE_X_SET option.
+     * If it doesn't match, it executes the menu swapper with the HANDLE_X_UNSET option,
+     * enters the specified amount using the VirtualKeyboard, and presses Enter.
+     *
+     * @param rs2Item         The item to handle.
+     * @param amount    The desired amount to set.
+     * @param safe      will wait for item to appear in inventory before continuing if set to true
+     */
+    private static void handleAmount(Rs2Item rs2Item, int amount, boolean safe) {
         int inventorySize = Rs2Inventory.size();
         if (Microbot.getVarbitValue(X_AMOUNT_VARBIT) == amount) {
             invokeMenu(HANDLE_X_SET, rs2Item);
+            if (safe)
+                sleepUntil(() -> inventorySize != Rs2Inventory.size(), 2500);
         } else {
             invokeMenu(HANDLE_X_UNSET, rs2Item);
 
             sleep(1200);
             VirtualKeyboard.typeString(String.valueOf(amount));
             VirtualKeyboard.enter();
+            sleepUntil(() -> inventorySize != Rs2Inventory.size(), 2500);
         }
-        sleepUntil(() -> inventorySize != Rs2Inventory.size(), 2500);
     }
 
     /**

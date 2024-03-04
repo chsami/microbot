@@ -1,29 +1,16 @@
 package net.runelite.client.plugins.microbot.example;
 
-import net.runelite.api.*;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
-import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
-import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.prayer.Prayer;
-import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
-import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static net.runelite.client.plugins.microbot.vorkath.VorkathScript.togglePrayer;
 
 
 public class ExampleScript extends Script {
@@ -49,7 +36,7 @@ public class ExampleScript extends Script {
 //                Microbot.getWalker().walkFastCanvas(centerTile);
 //               // System.out.println(vorkath.getHealthRatio());
 //                System.out.println(Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY());
-               // System.out.println(Rs2Equipment.isWearing("diamond dragon bolts"));
+                // System.out.println(Rs2Equipment.isWearing("diamond dragon bolts"));
                 //System.out.println(Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(Rs2Npc.getNpc("vorkath").getWorldLocation()));
 //                Microbot.getWalkerForKotlin().walkFastLocal(
 //                        LocalPoint.fromScene(48, 54)
@@ -59,8 +46,19 @@ public class ExampleScript extends Script {
                 //sleepUntil(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() <= 55);
 //                Rs2Magic.castOn(MagicAction.EARTH_BOLT, Rs2Npc.getNpc("guard"));
                 long startTime = System.currentTimeMillis();
-                System.out.println( MicrobotInventorySetup.loadInventory("vorkath"));
-                long endTime   = System.currentTimeMillis();
+//                System.out.println(Rs2Widget.hasWidget("Retrieval Service"));
+                final int invSize = Rs2Inventory.size();
+                Rs2Widget.clickWidget(39452678);
+                sleepUntil(() -> Rs2Inventory.size() != invSize);
+                boolean result = MicrobotInventorySetup.wearEquipment("vorkath");
+                if (!result) {
+                    int finalInvSize = Rs2Inventory.size();
+                    Rs2Widget.clickWidget(39452678);
+                    sleepUntil(() -> Rs2Inventory.size() != finalInvSize);
+                    result = MicrobotInventorySetup.wearEquipment("vorkath");
+                }
+//                Microbot.getWalker().hybridWalkTo(WorldDestinations.LUMBRIDGE_BANK.getWorldPoint());
+                long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
                 System.out.println(totalTime);
 

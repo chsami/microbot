@@ -86,8 +86,8 @@ public class Rs2Inventory {
      * @return True if the combine operation was successful, false otherwise.
      */
     public static boolean combine(int primaryItemId, int secondaryItemId) {
-        boolean primaryItemInteracted = interact(primaryItemId);
-        boolean secondaryItemInteracted = interact(secondaryItemId);
+        boolean primaryItemInteracted = use(primaryItemId);
+        boolean secondaryItemInteracted = use(secondaryItemId);
         return primaryItemInteracted && secondaryItemInteracted;
     }
 
@@ -99,8 +99,8 @@ public class Rs2Inventory {
      * @return True if the combine operation was successful, false otherwise.
      */
     public static boolean combine(String primaryItemName, String secondaryItemName) {
-        boolean primaryItemInteracted = interact(primaryItemName);
-        boolean secondaryItemInteracted = interact(secondaryItemName);
+        boolean primaryItemInteracted = use(primaryItemName);
+        boolean secondaryItemInteracted = use(secondaryItemName);
         return primaryItemInteracted && secondaryItemInteracted;
     }
 
@@ -112,8 +112,8 @@ public class Rs2Inventory {
      * @return True if the combine operation was successful, false otherwise.
      */
     public static boolean combine(Item primary, Item secondary) {
-        boolean primaryItemInteracted = interact(primary.getId());
-        boolean secondaryItemInteracted = interact(secondary.getId());
+        boolean primaryItemInteracted = use(primary.getId());
+        boolean secondaryItemInteracted = use(secondary.getId());
         return primaryItemInteracted && secondaryItemInteracted;
     }
 
@@ -234,7 +234,7 @@ public class Rs2Inventory {
      */
     public static boolean deselect() {
         if (isItemSelected()) {
-            return interact(getSelectedItemId());
+            return use(getSelectedItemId());
         }
         return false;
     }
@@ -1307,7 +1307,7 @@ public class Rs2Inventory {
         int param1;
         int identifier;
         String target;
-        MenuAction menuAction = MenuAction.WIDGET_TARGET;
+        MenuAction menuAction = MenuAction.CC_OP;
         ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
         int index = 0;
 
@@ -1331,7 +1331,6 @@ public class Rs2Inventory {
                 || action.equalsIgnoreCase("wear")
                 || action.equalsIgnoreCase("check steps")) {
             index = 3;
-            menuAction = MenuAction.CC_OP;
         } else if (action.equalsIgnoreCase("fill")) {
             index = 4;
         } else if (action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("rub")
