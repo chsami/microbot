@@ -11,6 +11,8 @@ import net.runelite.client.plugins.microbot.util.dialogues.Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -365,9 +367,9 @@ public class TutorialIslandScript extends Script {
                 } else {
                     Rs2Tab.switchToInventoryTab();
                     sleep(500);
-                    Rs2Equipment.equipItem("Bronze sword");
+                    Rs2Inventory.wield("Bronze sword");
                     sleep(500);
-                    Rs2Equipment.equipItem("Wooden shield");
+                    Rs2Inventory.wield("Wooden shield");
                 }
                 return;
             }

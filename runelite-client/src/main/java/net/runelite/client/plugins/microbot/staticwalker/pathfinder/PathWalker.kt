@@ -29,7 +29,7 @@ class PathWalker(private val nodes: List<PathNode>) {
         isInterrupted = false
 
         val maxSkipDistance = 12
-        val minSkipDistance = 4
+        val minSkipDistance = 6
         var currentSkipDistance = Random.nextInt(minSkipDistance, maxSkipDistance)
 
 

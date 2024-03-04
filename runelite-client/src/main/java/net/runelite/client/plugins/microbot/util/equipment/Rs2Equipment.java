@@ -1,51 +1,36 @@
 package net.runelite.client.plugins.microbot.util.equipment;
 
 import net.runelite.api.*;
-import net.runelite.api.widgets.Widget;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
-import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Rs2Equipment {
-
-    public static boolean equipItemFast(int id) {
-        Rs2Tab.switchToInventoryTab();
-        Widget item = Inventory.findItem(id);
-        if (item == null) return false;
-        Microbot.getMouse().click(new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
-        return true;
+    public static ItemContainer equipment() {
+        return Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT);
     }
+    public static CopyOnWriteArrayList<Rs2Item> equipmentItems = new CopyOnWriteArrayList<>();
 
-    public static boolean equipItemFast(String name) {
-        Rs2Tab.switchToInventoryTab();
-        Widget item = Inventory.findItem(name);
-        if (item == null) return false;
-        Microbot.getMouse().click(new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
-        return true;
-    }
-
-
-    public static void equipItem(int id) {
-        assert !Microbot.getClient().isClientThread();
-        Rs2Tab.switchToInventoryTab();
-        Widget item = Inventory.findItem(id);
-        if (item == null) return;
-        while (!hasEquipped(id)) {
-            Rs2Menu.doAction(new String[]{"wield", "wear"}, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
+    public static void storeEquipmentItemsInMemory(ItemContainerChanged e) {
+        if (e.getContainerId() == InventoryID.EQUIPMENT.getId() && e.getItemContainer() != null) {
+            equipmentItems = new CopyOnWriteArrayList<>();
+            for (int i = 0; i < e.getItemContainer().getItems().length; i++) {
+                Item item = equipment().getItems()[i];
+                if (item.getId() == -1) continue;
+                ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(item.getId()));
+                int finalI = i;
+                Optional<EquipmentInventorySlot> equipmentSlot = Arrays.stream(EquipmentInventorySlot.values()).filter(x -> x.getSlotIdx() == finalI).findFirst();
+                if (equipmentSlot.isEmpty()) continue;
+                int slot = equipmentSlot.get().getSlotIdx();
+                equipmentItems.add(new Rs2Item(item, itemComposition, slot));
+            }
         }
-    }
-
-    public static void equipItem(String itemName) {
-        assert !Microbot.getClient().isClientThread();
-        Rs2Tab.switchToInventoryTab();
-        Widget item = Inventory.findItem(itemName);
-        if (item == null) return;
-        while (!hasEquipped(itemName)) {
-            Rs2Menu.doAction(new String[]{"wield", "wear"}, new Point((int) item.getBounds().getCenterX(), (int) item.getBounds().getCenterY()));
-        }
-    }
+}
 
     public static void useRingAction(JewelleryLocationEnum jewelleryLocationEnum) {
         if (!hasEquippedSlot(EquipmentInventorySlot.RING)) {
@@ -64,20 +49,17 @@ public class Rs2Equipment {
     }
 
 
-    public static ItemComposition getEquippedItem(EquipmentInventorySlot slot) {
-        final ItemContainer container = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT));
-        if (container == null) return null;
-        Item itemSlot = container.getItem(slot.getSlotIdx());
-        if (itemSlot == null) return null;
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(itemSlot.getId()));
+    public static Rs2Item getEquippedItem(EquipmentInventorySlot slot) {
+        return equipmentItems.stream().filter(x -> x.slot == slot.getSlotIdx()).findFirst().orElse(null);
     }
 
+    @Deprecated(since="Use isWearing", forRemoval = true)
     public static boolean hasEquipped(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             for (EquipmentInventorySlot value : EquipmentInventorySlot.values()) {
-                ItemComposition item = getEquippedItem(value);
+                Rs2Item item = getEquippedItem(value);
                 if (item == null) continue;
-                if (item.getName().equalsIgnoreCase(itemName)) {
+                if (item.name.equalsIgnoreCase(itemName)) {
                     return true;
                 }
             }
@@ -88,9 +70,9 @@ public class Rs2Equipment {
     public static boolean hasEquippedContains(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             for (EquipmentInventorySlot value : EquipmentInventorySlot.values()) {
-                ItemComposition item = getEquippedItem(value);
+                Rs2Item item = getEquippedItem(value);
                 if (item == null) continue;
-                if (item.getName().toLowerCase().contains(itemName.toLowerCase())) {
+                if (item.name.toLowerCase().contains(itemName.toLowerCase())) {
                     return true;
                 }
             }
@@ -129,12 +111,18 @@ public class Rs2Equipment {
         return isEquipped(name, slot, false);
     }
 
+    public static boolean isEquipped(int id, EquipmentInventorySlot slot) {
+        final Rs2Item item = getEquippedItem(slot);
+
+        return item != null && item.id == id;
+    }
+
     public static boolean isEquipped(String name, EquipmentInventorySlot slot, boolean exact) {
-        final ItemComposition item = getEquippedItem(slot);
+        final Rs2Item item = getEquippedItem(slot);
         if (exact) {
-            return item != null && item.getName().equalsIgnoreCase(name);
+            return item != null && item.name.equalsIgnoreCase(name);
         } else {
-            return item != null && item.getName().toLowerCase().contains(name.toLowerCase());
+            return item != null && item.name.toLowerCase().contains(name.toLowerCase());
         }
     }
 
@@ -162,6 +150,16 @@ public class Rs2Equipment {
 
     public static boolean isWearing(String name) {
         return isWearing(name, false);
+    }
+
+    public static boolean isWearing(int id) {
+        for (EquipmentInventorySlot slot : EquipmentInventorySlot.values()
+        ) {
+            if (isEquipped(id, slot)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isWearing(String name, boolean exact) {

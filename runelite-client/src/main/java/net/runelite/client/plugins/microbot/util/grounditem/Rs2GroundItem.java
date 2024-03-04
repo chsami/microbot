@@ -203,6 +203,22 @@ public class Rs2GroundItem {
         return false;
     }
 
+    public static boolean lootAllItemBasedOnValue(int value, int range) {
+        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
+                Rs2GroundItem.getAll(range)
+        );
+        for (RS2Item rs2Item : groundItems) {
+            if (Rs2Inventory.isFull(rs2Item.getItem().getName())) continue;
+            long totalPrice = (long) Microbot.getClientThread().runOnClientThread(() ->
+                    Microbot.getItemManager().getItemPrice(rs2Item.getItem().getId()) * rs2Item.getTileItem().getQuantity());
+            if (totalPrice >= value) {
+                interact(rs2Item);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean loot(int itemId) {
         if (Rs2Inventory.isFull(itemId)) return false;
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->

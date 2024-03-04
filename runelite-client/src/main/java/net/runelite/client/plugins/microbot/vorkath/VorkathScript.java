@@ -3,11 +3,15 @@ package net.runelite.client.plugins.microbot.vorkath;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.itemstats.stats.Stat;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
@@ -20,6 +24,10 @@ import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
+
+import static net.runelite.client.plugins.microbot.util.MicrobotInventorySetup.doesEquipmentMatch;
+import static net.runelite.client.plugins.microbot.util.MicrobotInventorySetup.doesInventoryMatch;
 
 
 enum State {
@@ -31,7 +39,9 @@ enum State {
     FIGHT_VORKATH,
     ZOMBIE_SPAWN,
     ACID,
-    TELEPORT_AWAY
+    LOOT_ITEMS,
+    TELEPORT_AWAY,
+    DEAD_WALK
 }
 
 public class VorkathScript extends Script {
@@ -51,30 +61,81 @@ public class VorkathScript extends Script {
     private WorldPoint centerTile;
     private WorldPoint rightTile;
     private WorldPoint leftTile;
+    NPC vorkath;
+    boolean hasEquipment = false;
+    boolean hasInventory = false;
+    boolean init = true;
+    public static VorkathConfig config;
 
     public boolean run(VorkathConfig config) {
         Microbot.enableAutoRunOn = false;
+        init = true;
+        state = State.BANKING;
+        hasEquipment = false;
+        hasInventory = false;
+        this.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                /*
-                 * Important classes:
-                 * Inventory
-                 * Rs2GameObject
-                 * Rs2GroundObject
-                 * Rs2NPC
-                 * Rs2Bank
-                 * etc...
-                 */
+                if (!Microbot.isLoggedIn()) return;
+                if (init) {
+                    if (Rs2Npc.getNpc(NpcID.VORKATH_8061) != null) {
+                        state = State.FIGHT_VORKATH;
+                    }
+                    if (Rs2Npc.getNpc(NpcID.VORKATH_8059) != null) {
+                        state = State.PREPARE_FIGHT;
+                    }
+                    if (Rs2GameObject.findObjectById(ObjectID.ICE_CHUNKS_31990) != null) {
+                        state = State.WALK_TO_VORKATH;
+                    }
+                    if (isCloseToRelleka()) {
+                        state = State.WALK_TO_VORKATH_ISLAND;
+                    }
+                    if (Rs2Npc.getNpc(NpcID.TORFINN_10406) != null) {
+                        state = State.WALK_TO_VORKATH;
+                    }
+                    init = false;
+                }
 
                 switch (state) {
                     case BANKING:
-                        boolean hasEquipment = MicrobotInventorySetup.loadEquipment("vorkath");
-                        boolean hasInventory = MicrobotInventorySetup.loadInventory("vorkath");
-                        if (hasEquipment && hasInventory)
-                            state = State.TELEPORT_TO_RELLEKKA;
+                        hasEquipment = doesEquipmentMatch("vorkath");
+                        hasInventory = doesInventoryMatch("vorkath");
+                        if (!Rs2Bank.isOpen()) {
+                            Rs2Bank.openBank();
+                        }
+                        if (!hasEquipment) {
+                            Rs2Bank.depositAll();
+                            Rs2Bank.depositEquipment();
+                            sleep(600);
+                            hasEquipment = MicrobotInventorySetup.loadEquipment("vorkath");
+                        }
+                        if (!hasInventory) {
+                            sleep(600);
+                            hasInventory = MicrobotInventorySetup.loadInventory("vorkath");
+                        }
+                        if (hasEquipment && hasInventory) {
+                            while (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) != Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) && !Rs2Inventory.getInventoryFood().isEmpty()) {
+                                Rs2Bank.closeBank();
+                                eatAt(99);
+                                Rs2Player.waitForAnimation();
+                                hasInventory = false;
+                            }
+                            while (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) != Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) && Rs2Inventory.hasItem("prayer potion")) {
+                                Rs2Bank.closeBank();
+                                Rs2Inventory.interact(config.prayerPotion().toString(), "drink");
+                                Rs2Player.waitForAnimation();
+                                hasInventory = false;
+                            }
+                            if (hasEquipment && hasInventory) {
+                                state = State.TELEPORT_TO_RELLEKKA;
+                            }
+                        }
                         break;
                     case TELEPORT_TO_RELLEKKA:
+                        if (Rs2Bank.isOpen()) {
+                            Rs2Bank.closeBank();
+                        }
                         if (!isCloseToRelleka()) {
                             Rs2Inventory.interact("Rellekka teleport", "break");
                             sleepUntil(this::isCloseToRelleka);
@@ -84,11 +145,11 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case WALK_TO_VORKATH_ISLAND:
-                        Microbot.getWalker().staticWalkTo(new WorldPoint(2640, 3693, 0));
+                        Microbot.getWalker().walkTo(new WorldPoint(2640, 3693, 0));
                         net.runelite.api.NPC torfin = Rs2Npc.getNpc(NpcID.TORFINN_10405);
                         if (torfin != null) {
                             Rs2Npc.interact(torfin, "Ungael");
-                            sleepUntil(() -> Rs2Npc.getNpc(NpcID.TORFINN_10405) == null);
+                            sleepUntil(() -> Rs2Npc.getNpc(NpcID.TORFINN_10406) != null);
                         }
                         if (Rs2Npc.getNpc(NpcID.TORFINN_10406) != null) {
                             state = State.WALK_TO_VORKATH;
@@ -106,82 +167,162 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case PREPARE_FIGHT:
-                        boolean drinkRangePotion = !Rs2Player.hasDivineBastionActive() && !Rs2Player.hasDivineRangedActive();
-                        boolean drinkAntiFire = !Rs2Player.hasAntiFireActive() && !Rs2Player.hasSuperAntiFireActive();
-                        boolean drinkAntiVenom = !Rs2Player.hasAntiVenomActive();
+                        Rs2Player.toggleRunEnergy(false);
 
-                        if (drinkRangePotion) {
-                            Rs2Inventory.interact(config.rangePotion().toString(), "drink");
-                        }
-                        if (drinkAntiFire) {
-                            Rs2Inventory.interact("super antifire", "drink");
-                        }
-                        if (drinkAntiVenom) {
-                            Rs2Inventory.interact("venom", "drink");
-                        }
+                        boolean result = drinkPotions();
 
-                        if (!drinkRangePotion && !drinkAntiFire && !drinkAntiVenom) {
+                        if (result) {
                             Rs2Npc.interact(NpcID.VORKATH_8059, "Poke");
-                        }
-                        NPC vorkath = Rs2Npc.getNpc(NpcID.VORKATH_8060);
-                        if (vorkath != null) {
-                            centerTile =
-                                    new WorldPoint(vorkath.getWorldLocation().getX() + 3, vorkath.getWorldLocation().getY() - 5, vorkath.getWorldLocation().getPlane());
-                            rightTile = new WorldPoint(centerTile.getX() + 2, centerTile.getY() - 3, centerTile.getPlane());
-                            leftTile = new WorldPoint(centerTile.getX() - 2, centerTile.getY() - 3, centerTile.getPlane());
+                            Rs2Player.waitForWalking();
+                            Rs2Npc.interact(NpcID.VORKATH_8059, "Poke");
+                            Rs2Player.waitForAnimation(10000);
+                            Microbot.getWalkerForKotlin().walkFastLocal(
+                                    LocalPoint.fromScene(48, 58)
+                            );
+                            Rs2Player.waitForWalking();
                             state = State.FIGHT_VORKATH;
                         }
                         break;
                     case FIGHT_VORKATH:
-                        handlePrayer(config);
-                        eatAt(51);
+                        if (Microbot.getClient().getLocalPlayer().isDead()) {
+                            state = State.DEAD_WALK;
+                            return;
+                        }
+                        if (Rs2Inventory.getInventoryFood().isEmpty()) {
+                            state = State.TELEPORT_AWAY;
+                            leaveVorkath();
+                            return;
+                        }
+                        if (Microbot.getClient().getLocalPlayer().getInteracting() == null || Microbot.getClient().getLocalPlayer().getInteracting().getName() == null ||
+                                !Microbot.getClient().getLocalPlayer().getInteracting().getName().equalsIgnoreCase("vorkath")) {
+                            Rs2Npc.attack("Vorkath");
+                        }
+                        if (Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() >= 59) {
+                            Microbot.getWalkerForKotlin().walkFastLocal(
+                                    LocalPoint.fromScene(48, 58)
+                            );
+                        }
+                        if (Rs2Inventory.getInventoryFood().isEmpty()) {
+                            leaveVorkath();
+                            state = State.TELEPORT_AWAY;
+                            Rs2Player.waitForAnimation();
+                        }
+                        drinkPotions();
+                        handlePrayer();
+                        eatAt(60);
                         handleRedBall();
-                        if (doesProjectileExistById(whiteProjectileId) || Rs2Npc.getNpc("Zombified Spawn") != null) {
+                        if (doesProjectileExistById(whiteProjectileId) || (Rs2Npc.getNpc("Zombified Spawn") != null && !Rs2Npc.getNpc("Zombified Spawn").isDead())) {
                             state = State.ZOMBIE_SPAWN;
                         }
-                        if ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(
-                                acidRedProjectileId
-                        ) || Rs2GameObject.findObjectById(ObjectID.ACID_POOL) != null
-                        )) {
+                        if ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
                             state = State.ACID;
+                        }
+                        vorkath = Rs2Npc.getNpc(NpcID.VORKATH_8061);
+                        if (vorkath.getHealthRatio() < 60 && vorkath.getHealthRatio() != -1 && !Rs2Equipment.isWearing("diamond dragon bolts")) {
+                            Rs2Inventory.wield("diamond dragon bolts");
+                        } else if (vorkath.getHealthRatio() >= 60 && !Rs2Equipment.isWearing("ruby dragon bolts")) {
+                            Rs2Inventory.wield("ruby dragon bolts");
+                        }
+                        if (vorkath == null || vorkath.isDead()) {
+                            state = State.LOOT_ITEMS;
+                            Rs2Inventory.wield("ruby dragon bolts");
+                            togglePrayer(false);
+                            sleepUntil(() -> Rs2GroundItem.exists("Superior dragon bones", 20, 7000));
                         }
                         break;
                     case ZOMBIE_SPAWN:
+                        if (Rs2Npc.getNpc("Zombified Spawn") != null && Rs2Npc.getNpc("Zombified Spawn").isDead()) {
+                            eatAt(60);
+                            state = State.FIGHT_VORKATH;
+                            return;
+                        }
                         togglePrayer(false);
-                        eatAt(75);
-                        while (Rs2Npc.getNpc("Zombified Spawn") == null) {
-                            sleep(100, 200);
+                        eatAt(60);
+                        drinkPrayer();
+                        Microbot.getWalkerForKotlin().walkFastLocal(
+                                LocalPoint.fromScene(48, 58)
+                        );
+                        sleepUntil(() -> Rs2Npc.getNpc("Zombified Spawn") != null, 10000);
+                        NPC zombieSpawn = Rs2Npc.getNpc("Zombified Spawn");
+                        if (zombieSpawn != null) {
+                            if (config.SLAYERSTAFF().toString().equals("Cast")) {
+                                System.out.println("Cast crumble undeaad on zombified spawn!");
+                                Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, zombieSpawn);
+                                sleep(600);
+                            } else {
+                                Rs2Inventory.wield(config.SLAYERSTAFF().toString());
+                                Rs2Npc.attack("Zombified Spawn");
+                                sleep(600);
+                            }
                         }
-                        if (config.SLAYERSTAFF().toString().equals("Cast")) {
-                            Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, Rs2Npc.getNpc("Zombified Spawn"));
-                        } else {
-                            Rs2Inventory.wield(config.SLAYERSTAFF().toString());
+                        togglePrayer(true);
+                        if (Rs2Npc.getNpc("Zombified Spawn") == null) {
+                            eatAt(60);
+                            state = State.FIGHT_VORKATH;
                         }
-                        Rs2Npc.attack("Zombified Spawn");
-                        sleep(2300, 2500);
-                        Rs2Inventory.wield(config.CROSSBOW().toString());
-                        eatAt(75);
-                        sleep(600, 1000);
-                        Rs2Npc.attack("Vorkath");
-                        state = State.FIGHT_VORKATH;
                         break;
                     case ACID:
                         togglePrayer(false);
                         handleAcidWalk();
                         break;
+                    case LOOT_ITEMS:
+                        if (Rs2Inventory.isFull()) {
+                            boolean hasFood = !Rs2Inventory.getInventoryFood().isEmpty();
+                            if (hasFood) {
+                                eatAt(100);
+                                Rs2Player.waitForAnimation();
+                            }
+                        }
+                        Rs2GroundItem.loot("Vorkath's head", 20);
+                        boolean itemsLeft = Rs2GroundItem.lootAllItemBasedOnValue(5000, 20) && !Rs2GroundItem.exists("Vorkath's head", 20);
+                        int foodInventorySize = Rs2Inventory.getInventoryFood().size();
+                        boolean hasVenom = Rs2Inventory.hasItem("venom");
+                        boolean hasSuperAntifire = Rs2Inventory.hasItem("super antifire");
+                        boolean hasPrayerPotion = Rs2Inventory.hasItem("prayer potion");
+                        boolean hasRangePotion = Rs2Inventory.hasItem(config.rangePotion().toString());
+
+                        if (!itemsLeft) {
+                            if (foodInventorySize < 7 || !hasVenom || !hasSuperAntifire || !hasPrayerPotion || !hasRangePotion) {
+                                leaveVorkath();
+                            } else {
+                                state = State.PREPARE_FIGHT;
+                            }
+                        }
+                        break;
                     case TELEPORT_AWAY:
-                        Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
-                        boolean result = Rs2Bank.walkToBank();
-                        if (result) {
+                        boolean reachedDestination = Rs2Bank.walkToBank();
+                        if (reachedDestination) {
                             state = State.BANKING;
+                        }
+                        break;
+                    case DEAD_WALK:
+                        if (isCloseToRelleka()) {
+                            Microbot.getWalker().walkTo(new WorldPoint(2640, 3693, 0));
+                            torfin = Rs2Npc.getNpc(NpcID.TORFINN_10405);
+                            if (torfin != null) {
+                                Rs2Npc.interact(torfin, "Collect");
+                                //wait for death interface
+                                //interact with death interface
+                                //check if inventory has items
+                                //state = teleport_away
+                            }
+                        } else {
+                            Microbot.getWalker().hybridWalkTo(WorldDestinations.LUMBRIDGE_BANK.getWorldPoint());
+                            if (!Rs2Bank.isOpen()) {
+                                Rs2Bank.openBank();
+                            } else {
+                                if (Rs2Inventory.hasItem("Rellekka teleport")) {
+                                    Rs2Inventory.interact("Rellekka teleport", "break");
+                                    Rs2Player.waitForAnimation();
+                                } else {
+                                    Rs2Bank.withdrawItem("Rellekka teleport");
+                                    Rs2Bank.closeBank();
+                                }
+                            }
                         }
                         break;
                 }
 
-                //interact with npc
-
-                //teleport out
-                //Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
@@ -189,29 +330,61 @@ public class VorkathScript extends Script {
         return true;
     }
 
-    private static void togglePrayer(boolean onOff) {
+    private void leaveVorkath() {
+        togglePrayer(false);
+        Rs2Player.toggleRunEnergy(true);
+        state = State.TELEPORT_AWAY;
+        Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
+    }
+
+    private boolean drinkPotions() {
+        boolean drinkRangePotion = config.rangePotion().getPotionName().contains("divine") ? !Rs2Player.hasDivineBastionActive() && !Rs2Player.hasDivineRangedActive() : !Rs2Player.hasRangingPotionActive();
+        boolean drinkAntiFire = !Rs2Player.hasAntiFireActive() && !Rs2Player.hasSuperAntiFireActive();
+        boolean drinkAntiVenom = !Rs2Player.hasAntiVenomActive();
+
+        if (drinkRangePotion) {
+            Rs2Inventory.interact(config.rangePotion().toString(), "drink");
+            Rs2Player.waitForAnimation(2000);
+        }
+        if (drinkAntiFire) {
+            Rs2Inventory.interact("super antifire", "drink");
+            Rs2Player.waitForAnimation(2000);
+        }
+        if (drinkAntiVenom) {
+            Rs2Inventory.interact("venom", "drink");
+            Rs2Player.waitForAnimation(2000);
+        }
+
+        return !drinkRangePotion && !drinkAntiFire && !drinkAntiVenom;
+    }
+
+    public static void togglePrayer(boolean onOff) {
         if (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) >= 77) {
             Rs2Prayer.fastPray(Prayer.RIGOUR, onOff);
         } else {
             Rs2Prayer.fastPray(Prayer.EAGLE_EYE, onOff);
         }
+        Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, onOff);
     }
 
     private void handleRedBall() {
         if (Microbot.getClient().getLocalPlayer().getIdlePoseAnimation() == 1 ||
                 doesProjectileExistById(redProjectileId)) {
             redBallWalk();
-            sleep(2100, 2200);
             Rs2Npc.attack("Vorkath");
         }
     }
 
-    private static void handlePrayer(VorkathConfig config) {
-        if ((Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) * 100) / Microbot.getClient().getRealSkillLevel(Skill.PRAYER) > Random.random(25, 30)) {
-            Rs2Inventory.interact(config.prayerPotion().toString(), "drink");
-        }
+    private static void handlePrayer() {
+        drinkPrayer();
         Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true);
         togglePrayer(true);
+    }
+
+    private static void drinkPrayer() {
+        if ((Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) * 100) / Microbot.getClient().getRealSkillLevel(Skill.PRAYER) < Random.random(25, 30)) {
+            Rs2Inventory.interact(config.prayerPotion().toString(), "drink");
+        }
     }
 
     private boolean doesProjectileExistById(int id) {
@@ -225,15 +398,24 @@ public class VorkathScript extends Script {
     }
 
     private boolean isCloseToRelleka() {
-        return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2670, 3634, 0)) < 50;
+        if (Microbot.getClient().getLocalPlayer() == null) return false;
+        return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2670, 3634, 0)) < 70;
     }
 
-    private void eatAt(int number) {
-        double treshHold = (double) (Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) * Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS)) / 100;
-        if (treshHold < number) {
+    private void eatAt(int percentage) {
+        double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
+        int missingHitpoints = Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
+        if (treshHold < percentage) {
             List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
             for (Rs2Item food : foods) {
-                Rs2Inventory.interact(food, "eat");
+                if (missingHitpoints >= 40 && Rs2Inventory.get("Cooked karambwan") != null) {
+                    //double eat
+                    Rs2Inventory.interact(food, "eat");
+                    sleep(1000);
+                    Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
+                } else {
+                    Rs2Inventory.interact(food, "eat");
+                }
                 break;
             }
         }
@@ -241,28 +423,35 @@ public class VorkathScript extends Script {
 
     private void redBallWalk() {
         WorldPoint currentPlayerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
-        WorldPoint twoTilesEastFromCurrentLocation = new WorldPoint(currentPlayerLocation.getX() + 2, currentPlayerLocation.getY(), 0);
-        Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), twoTilesEastFromCurrentLocation));
+        WorldPoint sideStepLocation = new WorldPoint(currentPlayerLocation.getX() + 2, currentPlayerLocation.getY(), 0);
+        if (Random.random(0, 2) == 1) {
+            sideStepLocation = new WorldPoint(currentPlayerLocation.getX() - 2, currentPlayerLocation.getY(), 0);
+        }
+        Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), sideStepLocation));
+        Rs2Player.waitForWalking();
     }
 
     private void handleAcidWalk() {
-        if (Rs2GameObject.findObjectById(ObjectID.ACID_POOL) == null) {
+        if (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.findObjectById(ObjectID.ACID_POOL_32000) == null) {
             Rs2Npc.attack("Vorkath");
             state = State.FIGHT_VORKATH;
+            return;
         }
 
-        Microbot.getWalkerForKotlin().walkFastLocal(
-                LocalPoint.fromScene(48, 54)
-        );
-        sleepUntil(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() <= 55);
-        Microbot.getWalkerForKotlin().walkFastLocal(
-                LocalPoint.fromScene(42, 54)
-        );
-        sleep(2400, 3600);
-        Microbot.getWalkerForKotlin().walkFastLocal(
-                LocalPoint.fromScene(52, 54)
-        );
-        sleep(2400, 3600);
+        executeAcidWalk(43, 54, () -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneX() < 48 || (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.findObjectById(ObjectID.ACID_POOL_32000) == null));
+        executeAcidWalk(51, 54, () -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneX() > 48 || (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.findObjectById(ObjectID.ACID_POOL_32000) == null));
+    }
+
+    public void executeAcidWalk(int x, int y, BooleanSupplier awaitedCondition) {
+        if (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId)) return;
+
+        eatAt(80);
+        while (!awaitedCondition.getAsBoolean()) {
+            Microbot.getWalkerForKotlin().walkFastLocal(
+                    LocalPoint.fromScene(x, y)
+            );
+            sleep(400);
+        }
     }
 
     /**

@@ -184,7 +184,7 @@ public class Rs2Npc {
         try {
             NPCComposition npcComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(npc.getId()));
 
-            int index = -1;
+            int index = 0;
             for (int i = 0; i < npcComposition.getActions().length; i++) {
                 String npcAction = npcComposition.getActions()[i];
                 if (npcAction == null || !npcAction.equalsIgnoreCase(action)) continue;
@@ -222,6 +222,10 @@ public class Rs2Npc {
             menuAction = MenuAction.NPC_FIFTH_OPTION;
         }
         return menuAction;
+    }
+
+    public static boolean interact(NPC npc) {
+        return interact(npc, "");
     }
 
     public static boolean interact(int npcId, String action) {

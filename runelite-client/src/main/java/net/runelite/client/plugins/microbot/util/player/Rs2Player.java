@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.player;
 
+import net.runelite.api.Skill;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldPoint;
@@ -9,6 +10,8 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 
 public class Rs2Player {
@@ -32,6 +35,10 @@ public class Rs2Player {
 
     public static boolean hasDivineRangedActive() {
         return divineRangedTime > 0 || hasDivineBastionActive();
+    }
+
+    public static boolean hasRangingPotionActive() {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) - 5 > Microbot.getClient().getRealSkillLevel(Skill.RANGED);
     }
 
     public static boolean hasDivineBastionActive() {
@@ -74,6 +81,21 @@ public class Rs2Player {
                 antiPoisonTime = poisonVarp;
             }
         }
+    }
+
+    public static void waitForWalking() {
+        sleepUntil(Rs2Player::isWalking);
+        sleepUntil(() -> !Rs2Player.isWalking());
+    }
+
+    public static void waitForAnimation() {
+        sleepUntil(Rs2Player::isAnimating);
+        sleepUntil(() -> !Rs2Player.isAnimating());
+    }
+
+    public static void waitForAnimation(int time) {
+        sleepUntil(Rs2Player::isAnimating, time);
+        sleepUntil(() -> !Rs2Player.isAnimating(), time);
     }
 
     public static boolean isAnimating() {

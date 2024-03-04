@@ -27,6 +27,9 @@ package net.runelite.client.plugins.inventorysetups;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import net.runelite.client.game.ItemVariationMapping;
+
+import java.util.Collection;
 
 @AllArgsConstructor
 public class InventorySetupsItem
@@ -63,6 +66,10 @@ public class InventorySetupsItem
 				item.getQuantity() == 0 &&
 				!item.isFuzzy() &&
 				(item.getStackCompare() == InventorySetupsStackCompareID.None || item.getStackCompare() == null);
+	}
+
+	public Collection<Integer> getVariations() {
+		return ItemVariationMapping.getCustomVariations(this.getId());
 	}
 
 }

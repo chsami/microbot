@@ -222,6 +222,8 @@ public class Rs2GameObject {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
+        if (tiles == null) return new ArrayList<>();
+
         int z = Microbot.getClient().getPlane();
         List<DecorativeObject> tileObjects = new ArrayList<>();
         for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
@@ -620,6 +622,8 @@ public class Rs2GameObject {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
+        if (tiles == null) return new ArrayList<>();
+
         int z = Microbot.getClient().getPlane();
         List<GameObject> tileObjects = new ArrayList<>();
         for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
@@ -675,6 +679,8 @@ public class Rs2GameObject {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
+        if (tiles == null) return new ArrayList<>();
+
         int z = Microbot.getClient().getPlane();
         List<GroundObject> tileObjects = new ArrayList<>();
         for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
@@ -698,6 +704,8 @@ public class Rs2GameObject {
     public static List<WallObject> getWallObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
+
+        if (tiles == null) return new ArrayList<>();
 
         int z = Microbot.getClient().getPlane();
         List<WallObject> tileObjects = new ArrayList<>();

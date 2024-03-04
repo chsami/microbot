@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.inventory;
 
 import net.runelite.api.*;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -8,11 +9,14 @@ import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -27,16 +31,23 @@ public class Rs2Inventory {
         return Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
     }
 
-    public static List<Rs2Item> items() {
-        if (inventory() == null) return new ArrayList<>();
-        List<Rs2Item> rs2Items = new ArrayList<>();
-        for (int i = 0; i < inventory().getItems().length; i++) {
-            Item item = inventory().getItems()[i];
-            if (item.getId() == -1) continue;
-            ItemComposition itemComposition = (ItemComposition) Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(item.getId()));
-            rs2Items.add(new Rs2Item(item, itemComposition, i));
+    public static CopyOnWriteArrayList<Rs2Item> inventoryItems = new CopyOnWriteArrayList<>();
+
+
+    public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
+        if (e.getContainerId() == InventoryID.INVENTORY.getId() && e.getItemContainer() != null) {
+            inventoryItems = new CopyOnWriteArrayList<>();
+            for (int i = 0; i < e.getItemContainer().getItems().length; i++) {
+                Item item = inventory().getItems()[i];
+                if (item.getId() == -1) continue;
+                ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(item.getId()));
+                inventoryItems.add(new Rs2Item(item, itemComposition, i));
+            }
         }
-        return rs2Items;
+    }
+
+    public static List<Rs2Item> items() {
+        return inventoryItems;
     }
 
     /**
@@ -566,6 +577,7 @@ public class Rs2Inventory {
         }
 
         Rs2Item item = get(name, true);
+        if (item == null) return false;
         return item.quantity >= amount;
     }
 
@@ -901,6 +913,7 @@ public class Rs2Inventory {
      * @return True if the interaction was successful, false otherwise.
      */
     public static boolean interact(Rs2Item item, String action) {
+        if (item == null) return false;
         Rs2Item rs2Item = items().stream().filter(x -> x == item).findFirst().orElse(null);
         if (rs2Item == null) {
             rs2Item = items().stream().filter(x -> x.id == item.id).findFirst().orElse(null);
@@ -1298,25 +1311,37 @@ public class Rs2Inventory {
         ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
         int index = 0;
 
-        if (!action.isEmpty()) {
-            String[] actions;
-            actions = itemComposition.getInventoryActions();
-
-            for (int i = 0; i < actions.length; i++) {
-                if (action.equalsIgnoreCase(actions[i])) {
-                    index = i;
-                    break;
-                }
-            }
-        }
-
-
         if (isItemSelected()) {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
         } else if (action.equalsIgnoreCase("use")) {
             menuAction = MenuAction.WIDGET_TARGET;
         } else if (action.equalsIgnoreCase("cast")) {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
+        } else if(itemComposition.getName().contains("pouch") && action.equalsIgnoreCase("empty")) {
+            index = 1;
+        } else if (action.equalsIgnoreCase("drink")
+                || action.equalsIgnoreCase("read")
+                || action.equalsIgnoreCase("eat")
+                || action.equalsIgnoreCase("view")
+                || action.equalsIgnoreCase("bury")
+                || action.equalsIgnoreCase("feel")
+                || action.equalsIgnoreCase("break")) {
+            index = 2;
+        } else if (action.equalsIgnoreCase("wield")
+                || action.equalsIgnoreCase("wear")
+                || action.equalsIgnoreCase("check steps")) {
+            index = 3;
+        } else if (action.equalsIgnoreCase("fill")) {
+            index = 4;
+        } else if (action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("rub")
+                || action.equalsIgnoreCase("refund") || action.equalsIgnoreCase("commune")
+                || action.equalsIgnoreCase("extinguish")
+                || (action.equalsIgnoreCase("check") && rs2Item.id == ItemID.GRICOLLERS_CAN)) {
+            index = 6;
+        } else if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("destroy")) {
+            index = 7;
+        } else if (action.equalsIgnoreCase("examine")) {
+            index = 10;
         }
 
         identifier = index;

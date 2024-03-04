@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.giantsfoundry.enums.Stage;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -32,7 +33,7 @@ public class GiantsFoundryScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                final ItemComposition weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
+                final Rs2Item weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
                 if (GiantsFoundryState.getProgressAmount() == 1000) {
                     handIn();
                     sleep(600, 1200);

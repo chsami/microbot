@@ -33,7 +33,7 @@ public class VorkathPlugin extends Plugin {
     private VorkathOverlay exampleOverlay;
 
     @Inject
-    VorkathScript vorkathScript;
+    public VorkathScript vorkathScript;
 
     @Override
     protected void startUp() throws AWTException {

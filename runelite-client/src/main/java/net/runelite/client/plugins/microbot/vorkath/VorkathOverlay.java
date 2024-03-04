@@ -11,10 +11,13 @@ import javax.inject.Inject;
 import java.awt.*;
 
 public class VorkathOverlay extends OverlayPanel {
+    private final VorkathPlugin plugin;
+
     @Inject
     VorkathOverlay(VorkathPlugin plugin)
     {
         super(plugin);
+        this.plugin = plugin;
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }
@@ -23,7 +26,7 @@ public class VorkathOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + VorkathScript.version)
+                    .text("Micro Vorkath V" + VorkathScript.version)
                     .color(Color.GREEN)
                     .build());
 
@@ -31,6 +34,10 @@ public class VorkathOverlay extends OverlayPanel {
 
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
+                    .build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left(plugin.vorkathScript.state.toString())
                     .build());
 
             for (Point point: Microbot.getMouse().mousePositions) {

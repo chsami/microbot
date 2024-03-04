@@ -13,7 +13,7 @@ public interface VorkathConfig extends Config {
             keyName = "guide",
             name = "How to use",
             description = "How to use this plugin",
-            position = 1
+            position = 0
     )
     default String GUIDE() {
         return "Use the equipment inventory plugin to setup your plugin and give it a name\n" +
@@ -23,7 +23,7 @@ public interface VorkathConfig extends Config {
     @ConfigSection(
             name = "Potions",
             description = "Potions",
-            position = 0,
+            position = 1,
             closedByDefault = false
     )
     String potionSection = "potions";
@@ -32,10 +32,18 @@ public interface VorkathConfig extends Config {
     @ConfigSection(
             name = "Equipment",
             description = "Equipment",
-            position = 1,
+            position = 2,
             closedByDefault = false
     )
     String equipmentSection = "Equipment";
+
+    @ConfigSection(
+            name = "Loot",
+            description = "Loot",
+            position = 3,
+            closedByDefault = false
+    )
+    String lootSection = "Loot";
 
     @ConfigSection(
             name = "Teleports",
@@ -91,6 +99,18 @@ public interface VorkathConfig extends Config {
     )
     default net.runelite.client.plugins.jrPlugins.autoVorkath.CROSSBOW CROSSBOW() {
         return CROSSBOW.ARMADYL_CROSSBOW;
+    }
+
+    @ConfigItem(
+            keyName = "Price of items to loot",
+            name = "Price of items to loot",
+            description = "Price of items to loot comma seperated",
+            position = 0,
+            section = lootSection
+    )
+    default int priceOfItemsToLoot()
+    {
+        return 5000;
     }
 
 }

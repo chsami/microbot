@@ -26,7 +26,6 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 @SuppressWarnings("unused")
 public class Rs2Bank {
     public static CopyOnWriteArrayList<Rs2Item> bankItems = new CopyOnWriteArrayList<>();
-    private static final int BANK_CONTAINER_ID = 95;
     private static final int X_AMOUNT_VARBIT = 3960;
     private static final int SELECTED_OPTION_VARBIT = 6590;
     private static final int HANDLE_X_SET = 5;
@@ -225,16 +224,17 @@ public class Rs2Bank {
      * @param amount    The desired amount to set.
      */
     private static void handleAmount(Rs2Item rs2Item, int amount) {
+        int inventorySize = Rs2Inventory.size();
         if (Microbot.getVarbitValue(X_AMOUNT_VARBIT) == amount) {
             invokeMenu(HANDLE_X_SET, rs2Item);
         } else {
             invokeMenu(HANDLE_X_UNSET, rs2Item);
 
-            sleep(600, 1000);
+            sleep(1200);
             VirtualKeyboard.typeString(String.valueOf(amount));
             VirtualKeyboard.enter();
-            sleep(50, 100);
         }
+        sleepUntil(() -> inventorySize != Rs2Inventory.size(), 2500);
     }
 
     /**
@@ -331,6 +331,7 @@ public class Rs2Bank {
         if (widget == null) return;
 
         Microbot.getMouse().click(widget.getBounds());
+        sleepUntil(Rs2Inventory::isEmpty);
     }
 
 
@@ -343,7 +344,6 @@ public class Rs2Bank {
         if (!isOpen()) return;
         if (rs2Item == null) return;
         if (Rs2Inventory.isFull()) return;
-        if (!hasItem(rs2Item.id)) return;
         container = BANK_ITEM_CONTAINER;
 
         if (Microbot.getVarbitValue(SELECTED_OPTION_VARBIT) == 0) {
@@ -406,7 +406,6 @@ public class Rs2Bank {
         if (!isOpen()) return;
         if (rs2Item == null) return;
         if (Rs2Inventory.isFull()) return;
-        if (!hasItem(rs2Item.id)) return;
         container = BANK_ITEM_CONTAINER;
 
         handleAmount(rs2Item, amount);
@@ -428,8 +427,7 @@ public class Rs2Bank {
      * @param amount amount to withdraw
      */
     public static void withdrawX(boolean checkInv, String name, int amount) {
-        if (checkInv && !hasItem(name)) return;
-        withdrawX(name, amount);
+        withdrawX(checkInv, name, amount, false);
     }
 
     /**
@@ -440,7 +438,7 @@ public class Rs2Bank {
      * @param exact exact search based on equalsIgnoreCase
      */
     public static void withdrawX(boolean checkInv, String name, int amount, boolean exact) {
-        if (checkInv && !hasItem(name)) return;
+        if (checkInv && Rs2Inventory.hasItem(name)) return;
         withdrawX(name, amount, exact);
     }
 
@@ -565,6 +563,30 @@ public class Rs2Bank {
      *
      * @param id item id
      */
+    public static void withdrawXAndEquip(int id, int amount) {
+        if (Rs2Equipment.isWearing(id)) return;
+        withdrawX(id, amount);
+        sleepUntil(() -> Rs2Inventory.hasItem(id));
+        wearItem(id);
+    }
+
+    /**
+     * withdraw all and equip item identified by its id.
+     *
+     * @param name item name
+     */
+    public static void withdrawAllAndEquip(String name) {
+        if (Rs2Equipment.isWearing(name)) return;
+        withdrawAll(name);
+        sleepUntil(() -> Rs2Inventory.hasItem(name));
+        wearItem(name);
+    }
+
+    /**
+     * withdraw all and equip item identified by its id.
+     *
+     * @param id item id
+     */
     public static void withdrawAllAndEquip(int id) {
         if (Rs2Equipment.hasEquipped(id)) return;
         withdrawAll(id);
@@ -575,7 +597,19 @@ public class Rs2Bank {
     /**
      * withdraw and equip item identified by its id.
      *
-     * @param id item ids
+     * @param name item name
+     */
+    public static void withdrawAndEquip(String name) {
+        if (Rs2Equipment.isWearing(name)) return;
+        withdrawOne(name);
+        sleepUntil(() -> Rs2Inventory.hasItem(name), 1000);
+        wearItem(name);
+    }
+
+    /**
+     * withdraw and equip item identified by its id.
+     *
+     * @param id item id
      */
     public static void withdrawAndEquip(int id) {
         if (Rs2Equipment.hasEquipped(id)) return;
@@ -804,7 +838,7 @@ public class Rs2Bank {
      * @param e The event containing the latest bank items.
      */
     public static void storeBankItemsInMemory(ItemContainerChanged e) {
-        CopyOnWriteArrayList<Rs2Item> list = updateItemContainer(BANK_CONTAINER_ID, e);
+        CopyOnWriteArrayList<Rs2Item> list = updateItemContainer(InventoryID.BANK.getId(), e);
         if (list != null)
             bankItems = list;
     }

@@ -34,10 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Converts variation items to it's base item counterparts
@@ -46,6 +43,9 @@ public class ItemVariationMapping
 {
 	private static final Map<Integer, Integer> MAPPINGS;
 	private static final Multimap<Integer, Integer> INVERTED_MAPPINGS;
+
+	private static final Multimap<Integer, Integer> CUSTOM_MAPPINGS;
+
 
 	static
 	{
@@ -66,23 +66,28 @@ public class ItemVariationMapping
 
 		ImmutableMap.Builder<Integer, Integer> builder = new ImmutableMap.Builder<>();
 		ImmutableMultimap.Builder<Integer, Integer> invertedBuilder = new ImmutableMultimap.Builder<>();
+		ImmutableMultimap.Builder<Integer, Integer> customBuilder = new ImmutableMultimap.Builder<>();
+		int i = 0;
 		for (Collection<Integer> value : itemVariations.values())
 		{
 			final Iterator<Integer> iterator = value.iterator();
 			final int base = iterator.next();
-
+			customBuilder.put(i, base);
 			while (iterator.hasNext())
 			{
 				final int id = iterator.next();
 				builder.put(id, base);
 				invertedBuilder.put(base, id);
+				customBuilder.put(i, id);
 			}
 
 			invertedBuilder.put(base, base);
+			i++;
 		}
 
 		INVERTED_MAPPINGS = invertedBuilder.build();
 		MAPPINGS = builder.build();
+		CUSTOM_MAPPINGS = customBuilder.build();
 	}
 
 	/**
@@ -105,5 +110,15 @@ public class ItemVariationMapping
 	public static Collection<Integer> getVariations(int itemId)
 	{
 		return INVERTED_MAPPINGS.asMap().getOrDefault(itemId, Collections.singletonList(itemId));
+	}
+
+	public static Collection<Integer> getCustomVariations(int itemId)
+	{
+		for (int i = 0; i < CUSTOM_MAPPINGS.size(); i++) {
+			Collection<Integer> list = CUSTOM_MAPPINGS.get(i);
+			if (list.contains(itemId))
+				return list;
+		}
+		return Collections.singletonList(itemId);
 	}
 }

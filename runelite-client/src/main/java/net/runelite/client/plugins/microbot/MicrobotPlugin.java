@@ -28,9 +28,12 @@ import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenCo
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenPlugin;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.event.EventSelector;
 import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
@@ -167,8 +170,15 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
-        Rs2Bank.storeBankItemsInMemory(event);
-        Inventory.storeInventoryItemsInMemory(event);
+        if (event.getContainerId() == InventoryID.BANK.getId()) {
+            Rs2Bank.storeBankItemsInMemory(event);
+        }
+        if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
+            Rs2Inventory.storeInventoryItemsInMemory(event);
+        }
+        if (event.getContainerId() == InventoryID.EQUIPMENT.getId()) {
+            Rs2Equipment.storeEquipmentItemsInMemory(event);
+        }
     }
 
     @Subscribe
