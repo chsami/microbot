@@ -31,7 +31,7 @@ public interface AutoLoginConfig extends Config {
             position = 0,
             section = generalSection
     )
-    default boolean isMember() { return true; }
+    default boolean isMember() { return false; }
 
     @ConfigItem(
             keyName = "RandomWorld",

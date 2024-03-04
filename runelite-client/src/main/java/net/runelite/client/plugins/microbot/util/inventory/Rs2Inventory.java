@@ -1307,7 +1307,7 @@ public class Rs2Inventory {
         int param1;
         int identifier;
         String target;
-        MenuAction menuAction = MenuAction.CC_OP;
+        MenuAction menuAction = MenuAction.WIDGET_TARGET;
         ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
         int index = 0;
 
@@ -1331,6 +1331,7 @@ public class Rs2Inventory {
                 || action.equalsIgnoreCase("wear")
                 || action.equalsIgnoreCase("check steps")) {
             index = 3;
+            menuAction = MenuAction.CC_OP;
         } else if (action.equalsIgnoreCase("fill")) {
             index = 4;
         } else if (action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("rub")

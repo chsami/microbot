@@ -767,7 +767,7 @@ public class Rs2GameObject {
                 param1 = object.getLocalLocation().getSceneY();
             }
 
-            int index = -1;
+            int index = 0;
             if (action != null && !action.isEmpty()) {
                 String[] actions;
                 if (objComp.getImpostorIds() != null) {
@@ -782,9 +782,8 @@ public class Rs2GameObject {
                         break;
                     }
                 }
-            } else {
-                index = 0;
             }
+
 
             if (Microbot.getClient().isWidgetSelected()) {
                 menuAction = MenuAction.WIDGET_TARGET_ON_GAME_OBJECT;
