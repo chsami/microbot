@@ -118,13 +118,13 @@ class SandMiner : Plugin() {
         val rocks = listOf(firstRock, secondRock, thirdRock)
         val startingPoint = WorldPoint(3166, 2914, 0)
 
-        if(config.dropClues() && Rs2Inventory.findItem("geode") != null) {
-            var geode = Rs2Inventory.findItem("geode").name.substringAfter(">").substringBefore('<')
+        if(config.dropClues() && Rs2Inventory.get("geode") != null) {
+            var geode = Rs2Inventory.get("geode").name.substringAfter(">").substringBefore('<')
             Rs2Inventory.drop(geode)
             println(geode)
         }
 
-        if(Inventory.isFull()) {
+        if(Rs2Inventory.isFull()) {
             currentAction = Action.DEPOSITING
             currentRock = 0
             return

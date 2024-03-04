@@ -12,7 +12,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -34,7 +34,7 @@ public class ogRunecraftingScript extends Script {
     private int lastActionTick;
     private int pouchMaxCycle = 0; //Varplayer 262? or 261? VarclientInt 44?
     private int soundEffect;
-    private boolean hasEssence() { return (Inventory.hasItem(config.selectRuneToMake().getEssenceTypeRequired()) || Inventory.hasItem(ItemID.DAEYALT_ESSENCE));}
+    private boolean hasEssence() { return (Rs2Inventory.hasItem(config.selectRuneToMake().getEssenceTypeRequired()) || Rs2Inventory.hasItem(ItemID.DAEYALT_ESSENCE));}
     private WorldPoint playerLocation() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation());}
     private boolean atAlter() {return playerLocation().distanceTo(config.selectAlter().getAlterLocation()) < 15;}
     private int distanceToRuin() {return playerLocation().distanceTo(config.selectAlter().getRuinLocation());}
@@ -44,8 +44,8 @@ public class ogRunecraftingScript extends Script {
     private void teletoFireAlter(){
         Rs2Tab.switchToEquipmentTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.EQUIPMENT);sleep(200,300);Rs2Widget.clickWidget(25362456);}
     private void combinationCraft(){
-        Inventory.useItemOnObjectFast(config.selectRuneToMake().getPrimaryRequiredRune(),config.selectAlter().getAlterID());
-        sleepUntil(()-> !Inventory.hasItem(config.selectRuneToMake().getEssenceTypeRequired()));
+        Rs2Inventory.useItemOnObject(config.selectRuneToMake().getPrimaryRequiredRune(),config.selectAlter().getAlterID());
+        sleepUntil(()-> !Rs2Inventory.hasItem(config.selectRuneToMake().getEssenceTypeRequired()));
     }
     private int getRunEnergy(){ return Integer.parseInt(Rs2Widget.getWidget(10485788).getText());}
     private int getStamEffect() {return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(Varbits.STAMINA_EFFECT));}
@@ -97,8 +97,8 @@ public class ogRunecraftingScript extends Script {
                 Rs2Widget.clickChildWidget(786442,3);
                 waitNextTick();
             }
-            if(Inventory.hasItem("fire rune")){/*Rs2Bank.depositAllFast("fire rune");*/Rs2Widget.clickChildWidget(983043,1);}
-            if(Inventory.hasItem("lava rune")){
+            if(Rs2Inventory.hasItem("fire rune")){/*Rs2Bank.depositAllFast("fire rune");*/Rs2Widget.clickChildWidget(983043,1);}
+            if(Rs2Inventory.hasItem("lava rune")){
                 Rs2Widget.clickChildWidget(983043,1);
                 //Inventory.useItemUnsafe("Lava rune");
                 //Rs2Bank.depositAllFast("lava rune");
@@ -151,14 +151,15 @@ public class ogRunecraftingScript extends Script {
         myInteract();
 
         sleep(80,120);
-        if(Inventory.hasItem(ItemID.BINDING_NECKLACE)){
-            Inventory.useItem("Binding Necklace");
+        if(Rs2Inventory.hasItem(ItemID.BINDING_NECKLACE)){
+            Rs2Inventory.use("Binding Necklace");
             sleepUntil(()-> Rs2Widget.findWidget("Destroy necklace of binding?") != null);
             Rs2Widget.clickWidget("Yes");
             bindingNeckAmmount = getBindingNeckAmmount();
         }
-        if(Inventory.hasItem("Stamina potion(1)")){if(Rs2Tab.getCurrentTab() != InterfaceTab.INVENTORY){
-            Rs2Tab.switchToInventoryTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);}Inventory.useItemAction("Stamina potion(1)","drink");}
+        if(Rs2Inventory.hasItem("Stamina potion(1)")){if(Rs2Tab.getCurrentTab() != InterfaceTab.INVENTORY){
+            Rs2Tab.switchToInventoryTab(); sleepUntil(()-> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);}
+            Rs2Inventory.interact("Stamina potion(1)","drink");}
         sleepUntil(() -> distanceToRuin() < Random.random(2,3));
         castMagicImbue();
         while(!atAlter()){
@@ -186,16 +187,16 @@ public class ogRunecraftingScript extends Script {
                 bindingNeckAmmount = getBindingNeckAmmount();
                 pouchMaxCycle++;
                 sleepUntil(()-> soundEffectCheck() || !hasEssence());
-                Inventory.useItemAction("Colossal pouch","Empty");
+                Rs2Inventory.interact("Colossal pouch","Empty");
             } pouchMaxCycle = 0;
 
         }
-        if((Inventory.hasItem(5515) && config.useGiantPouch()) ||
-                (Inventory.hasItem(5513) && config.useLargePouch()) ||
-                (Inventory.hasItem(6819) && config.useLargePouch()) ||
-                (Inventory.hasItem(5511) && config.useMediumPouch()) ||
-                (Inventory.hasItem(26786) && config.useColossalPouch()) ||
-                (Inventory.hasItem(26906) && config.useColossalPouch())
+        if((Rs2Inventory.hasItem(5515) && config.useGiantPouch()) ||
+                (Rs2Inventory.hasItem(5513) && config.useLargePouch()) ||
+                (Rs2Inventory.hasItem(6819) && config.useLargePouch()) ||
+                (Rs2Inventory.hasItem(5511) && config.useMediumPouch()) ||
+                (Rs2Inventory.hasItem(26786) && config.useColossalPouch()) ||
+                (Rs2Inventory.hasItem(26906) && config.useColossalPouch())
             ){
             sleep(100,120);
             repairPouches();

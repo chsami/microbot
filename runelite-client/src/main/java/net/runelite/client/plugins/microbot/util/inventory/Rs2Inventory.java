@@ -5,7 +5,10 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.models.RS2Item;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -446,6 +450,20 @@ public class Rs2Inventory {
     public static int fullSlotCount() {
         // Implement fullSlotCount logic here
         return 0;
+    }
+
+    /**
+     * Gets the last item in the inventory that matches the specified item ID.
+     *
+     * @param id The ID to match.
+     * @return The last item that matches the ID, or null if not found.
+     */
+    public static Rs2Item getLast(int id) {
+
+        long count = items().size();
+        Stream<Rs2Item> stream = items().stream();
+
+        return stream.skip(count - 1).findFirst().orElse(null);
     }
 
     /**
@@ -1227,6 +1245,19 @@ public class Rs2Inventory {
 
 
     /**
+     * Uses the last item with the specified ID in the inventory.
+     *
+     * @param id The ID to match.
+     * @return The last item that matches the ID, or null if not found.
+     */
+    public static boolean useLast(int id) {
+
+        Rs2Item rs2Item = getLast(id);
+        if (rs2Item == null) return false;
+        return use(rs2Item);
+    }
+
+    /**
      * Uses the item with the specified ID in the inventory.
      *
      * @param id The ID of the item to use.
@@ -1292,6 +1323,19 @@ public class Rs2Inventory {
      */
     public static void wield(int id) {
         invokeMenu(get(id), "wield");
+    }
+
+    /**
+     * use inventory item on ingame object
+     * @param item
+     * @param objectID
+     * @return
+     */
+    public static boolean useItemOnObject(int item, int objectID) {
+        if (Rs2Bank.isOpen()) return false;
+        use(item);
+        Rs2GameObject.interact(objectID);
+        return true;
     }
 
     /**
