@@ -8,7 +8,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.magic.housetab.enums.HOUSETABS_CONFIG;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -38,15 +38,15 @@ public class HouseTabScript extends Script {
 
 
     private boolean hasSoftClay() {
-        return Inventory.hasItem(1761);
+        return Rs2Inventory.hasItem(1761);
     }
 
     private boolean hasSoftClayNoted() {
-        return Inventory.hasItem(1762);
+        return Rs2Inventory.hasItem(1762);
     }
 
     private boolean hasLawRune() {
-        return Inventory.hasItem(ItemID.LAW_RUNE);
+        return Rs2Inventory.hasItem(ItemID.LAW_RUNE);
     }
 
     public HouseTabScript(HOUSETABS_CONFIG houseTabConfig, String[] playerHouses) {
@@ -156,7 +156,7 @@ public class HouseTabScript extends Script {
         if (Microbot.getClient().getWidget(14352385) == null) {
             do {
                 Microbot.getClientThread().invoke(() -> {
-                    Inventory.useItemSafe("Soft clay");
+                    Rs2Inventory.use("Soft clay");
                 });
                 sleep(300, 380);
             } while (!Rs2Npc.interact("Phials", "Use"));
@@ -211,8 +211,8 @@ public class HouseTabScript extends Script {
                         }
 
                     } else {
-                        if (!Inventory.isInventoryFull()) {
-                            Inventory.useItemSafe("soft clay");
+                        if (!Rs2Inventory.isFull()) {
+                            Rs2Inventory.use("soft clay");
                             if (Rs2Npc.interact("phials", "use"))
                                 sleepUntil(() -> Rs2Widget.hasWidget("select an option"));
                             Rs2Widget.clickWidget("exchange all");

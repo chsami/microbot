@@ -251,7 +251,7 @@ public class Rs2Bank {
             sleep(1200);
             VirtualKeyboard.typeString(String.valueOf(amount));
             VirtualKeyboard.enter();
-            sleepUntil(() -> inventorySize != Rs2Inventory.size(), 2500);
+            sleepUntil(() -> Rs2Inventory.hasItem(rs2Item.id), 2500);
         }
     }
 
@@ -382,6 +382,10 @@ public class Rs2Bank {
 
     public static void withdrawItem(String name) {
         withdrawOne(name);
+    }
+
+    public static void withdrawItem(int id) {
+        withdrawOne(id);
     }
 
     public static void withdrawItem(boolean checkInv, int id) {

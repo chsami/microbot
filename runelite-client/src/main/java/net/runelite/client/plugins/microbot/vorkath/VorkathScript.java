@@ -22,6 +22,7 @@ import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
@@ -93,6 +94,9 @@ public class VorkathScript extends Script {
                     }
                     if (Rs2Npc.getNpc(NpcID.TORFINN_10406) != null) {
                         state = State.WALK_TO_VORKATH;
+                    }
+                    if (Rs2Equipment.equipment() == null) {
+                        state = State.DEAD_WALK;
                     }
                     init = false;
                 }
@@ -169,10 +173,18 @@ public class VorkathScript extends Script {
                                     LocalPoint.fromScene(48, 58)
                             );
                             Rs2Player.waitForWalking();
+                            sleepUntil(() -> Rs2Npc.getNpc(NpcID.VORKATH_8061) != null);
                             state = State.FIGHT_VORKATH;
                         }
                         break;
                     case FIGHT_VORKATH:
+                        vorkath = Rs2Npc.getNpc(NpcID.VORKATH_8061);
+                        if (vorkath == null || vorkath.isDead()) {
+                            state = State.LOOT_ITEMS;
+                            Rs2Inventory.wield("ruby dragon bolts");
+                            togglePrayer(false);
+                            sleepUntil(() -> Rs2GroundItem.exists("Superior dragon bones", 20), 15000);
+                        }
                         if (Microbot.getClient().getLocalPlayer().isDead()) {
                             state = State.DEAD_WALK;
                             return;
@@ -204,17 +216,10 @@ public class VorkathScript extends Script {
                         if ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
                             state = State.ACID;
                         }
-                        vorkath = Rs2Npc.getNpc(NpcID.VORKATH_8061);
                         if (vorkath.getHealthRatio() < 60 && vorkath.getHealthRatio() != -1 && !Rs2Equipment.isWearing("diamond dragon bolts")) {
                             Rs2Inventory.wield("diamond dragon bolts");
                         } else if (vorkath.getHealthRatio() >= 60 && !Rs2Equipment.isWearing("ruby dragon bolts")) {
                             Rs2Inventory.wield("ruby dragon bolts");
-                        }
-                        if (vorkath == null || vorkath.isDead()) {
-                            state = State.LOOT_ITEMS;
-                            Rs2Inventory.wield("ruby dragon bolts");
-                            togglePrayer(false);
-                            sleepUntil(() -> Rs2GroundItem.exists("Superior dragon bones", 20, 7000));
                         }
                         break;
                     case ZOMBIE_SPAWN:
@@ -261,7 +266,7 @@ public class VorkathScript extends Script {
                             }
                         }
                         boolean vorkathHead = Rs2GroundItem.loot("Vorkath's head", 20);
-                        boolean itemsLeft = Rs2GroundItem.lootAllItemBasedOnValue(5000, 20) && !Rs2GroundItem.exists("Vorkath's head", 20);
+                        boolean itemsLeft = Rs2GroundItem.lootAllItemBasedOnValue(5000, 20) || Rs2GroundItem.exists("Vorkath's head", 20);
                         int foodInventorySize = Rs2Inventory.getInventoryFood().size();
                         boolean hasVenom = Rs2Inventory.hasItem("venom");
                         boolean hasSuperAntifire = Rs2Inventory.hasItem("super antifire");
@@ -272,6 +277,10 @@ public class VorkathScript extends Script {
                             if (foodInventorySize < 7 || !hasVenom || !hasSuperAntifire || !hasPrayerPotion || !hasRangePotion) {
                                 leaveVorkath();
                             } else {
+                                Microbot.getWalkerForKotlin().walkFastLocal(
+                                        LocalPoint.fromScene(48, 58)
+                                );
+                                Rs2Player.waitForWalking();
                                 state = State.PREPARE_FIGHT;
                             }
                         }
@@ -290,7 +299,14 @@ public class VorkathScript extends Script {
                             if (torfin != null) {
                                 Rs2Npc.interact(torfin, "Collect");
                                 sleepUntil(() -> Rs2Widget.hasWidget("Retrieval Service"));
+                                if (Rs2Widget.hasWidget("I'm afraid I don't have anything")) { // this means we looted all our stuff
+                                    leaveVorkath();
+                                    state = State.TELEPORT_AWAY;
+                                    return;
+                                }
                                 final int invSize = Rs2Inventory.size();
+                                Rs2Widget.clickWidget(39452678);
+                                sleep(600);
                                 Rs2Widget.clickWidget(39452678);
                                 sleepUntil(() -> Rs2Inventory.size() != invSize);
                                 boolean isWearingOriginalEquipment = MicrobotInventorySetup.wearEquipment("vorkath");
@@ -300,7 +316,6 @@ public class VorkathScript extends Script {
                                     sleepUntil(() -> Rs2Inventory.size() != finalInvSize);
                                     MicrobotInventorySetup.wearEquipment("vorkath");
                                 }
-                                state = State.TELEPORT_AWAY;
                             }
                         } else {
                             Microbot.getWalker().hybridWalkTo(WorldDestinations.LUMBRIDGE_BANK.getWorldPoint());

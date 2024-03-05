@@ -5,7 +5,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -80,11 +80,11 @@ public class AlcherScript extends Script {
             String listItem = findItemsInArray(itemListArray);
             if(listItem == null) shutdown();
             sleep(300,600);
-            Inventory.useItemAction(listItem, "cast");
+            Rs2Inventory.interact(listItem, "cast");
             return;
         }
         sleep(300, 600);
-        Inventory.useItemAction(item.getName(), "cast");
+        Rs2Inventory.interact(item.getName(), "cast");
     }
 
     private void setupConfig(AlcherConfig cfg){
@@ -100,7 +100,7 @@ public class AlcherScript extends Script {
 
     private String findItemsInArray(String[] itemListArray){
         for(String str : itemListArray){
-            if(Inventory.contains(str.toLowerCase())){
+            if(Rs2Inventory.contains(str.toLowerCase())){
                 return str.toLowerCase();
             }
         }
@@ -108,7 +108,7 @@ public class AlcherScript extends Script {
     }
     private Items findItems(){
         for (Items i: Items.values()) {
-            if(Inventory.contains(i.getName())){
+            if(Rs2Inventory.contains(i.getName())){
                 return i;
             }
         }

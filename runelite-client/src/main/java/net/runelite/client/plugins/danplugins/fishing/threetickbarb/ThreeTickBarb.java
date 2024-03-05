@@ -13,7 +13,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -103,8 +103,7 @@ public class ThreeTickBarb extends Plugin {
     private void useGuam() {
         inProgress = true;
         sleep(13, 167);
-        Widget guamLeafWidget = Inventory.findItem("Guam leaf");
-        Microbot.getMouse().click(guamLeafWidget.getBounds());
+        Rs2Inventory.use("Guam leaf");
 
         state = ThreeTickFishingState.UseTarAndDrop;
         inProgress = false;
@@ -114,11 +113,11 @@ public class ThreeTickBarb extends Plugin {
         inProgress = true;
         sleep(18, 132);
 
-        Inventory.useItemFast(ItemID.SWAMP_TAR, "Use");
+        Rs2Inventory.use(ItemID.SWAMP_TAR);
 
-        Inventory.useItemFast(ItemID.LEAPING_TROUT, "drop");
-        Inventory.useItemFast(ItemID.LEAPING_SALMON, "drop");
-        Inventory.useItemFast(ItemID.LEAPING_STURGEON, "drop");
+        Rs2Inventory.drop(ItemID.LEAPING_TROUT);
+        Rs2Inventory.drop(ItemID.LEAPING_SALMON);
+        Rs2Inventory.drop(ItemID.LEAPING_STURGEON);
 
         state = ThreeTickFishingState.ClickFishingSpot;
         inProgress = false;

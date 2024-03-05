@@ -537,7 +537,13 @@ public class Rs2Inventory {
      * @return True if the player has the specified quantity of the item, false otherwise.
      */
     public static boolean hasItemAmount(int id, int amount) {
-        return items().stream().filter(x -> x.id == id).count() >= amount;
+        Rs2Item rs2Item = get(id);
+        if (rs2Item == null) return false;
+        if (rs2Item.isStackable) {
+            return rs2Item.quantity >= amount;
+        } else {
+            return items().stream().filter(x -> x.id == id).count() >= amount;
+        }
     }
 
     /**

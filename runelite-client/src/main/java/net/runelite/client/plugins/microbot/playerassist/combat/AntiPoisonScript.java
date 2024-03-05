@@ -4,9 +4,11 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class AntiPoisonScript extends Script {
@@ -16,15 +18,14 @@ public class AntiPoisonScript extends Script {
                 if (!super.run()) return;
                 if (!config.useAntiPoison()) return;
                 if (Rs2Player.hasAntiPoisonActive()) {
-                    Inventory.open();
-                    Widget[] potions = Microbot.getClientThread().runOnClientThread(Inventory::getPotions);
-                    if (potions == null || potions.length == 0) {
+                    List<Rs2Item> potions = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getPotions);
+                    if (potions == null || potions.isEmpty()) {
                         return;
                     }
-                    for (Widget potion: potions) {
-                        if (potion.getName().toLowerCase().contains("poison")) {
-                            Microbot.getMouse().click(potion.getBounds());
-                            sleep(1200, 2000);
+                    for (Rs2Item potion: potions) {
+                        if (potion.name.toLowerCase().contains("poison")) {
+                            Rs2Inventory.interact(potion, "drink");
+                            Rs2Player.waitForAnimation();
                             break;
                         }
                     }

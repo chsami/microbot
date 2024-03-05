@@ -46,7 +46,7 @@ public class Rs2Player {
     }
 
     public static boolean hasAntiVenomActive() {
-        if (Rs2Equipment.hasEquipped("serpentine helm")) {
+        if (Rs2Equipment.isWearing("serpentine helm")) {
             return true;
         } else return antiVenomTime < VENOM_VALUE_CUTOFF;
     }

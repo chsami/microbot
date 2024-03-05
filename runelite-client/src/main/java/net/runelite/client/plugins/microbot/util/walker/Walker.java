@@ -190,6 +190,8 @@ public class Walker {
     public boolean hybridWalkTo(WorldPoint target, boolean useNearest) {
         Player player = Microbot.getClient().getLocalPlayer();
         List<PathNode> nodes = getPath(player.getWorldLocation(), target, useNearest);
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5)
+            return true;
 
         if (nodes.isEmpty()) {
             System.out.println("Static Walker failed to find path, using dynamic walker");

@@ -9,7 +9,6 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 
-import java.util.Collection;
 import java.util.Objects;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
@@ -31,10 +30,12 @@ public class MicrobotInventorySetup {
         Rs2Bank.openBank();
         Rs2Bank.depositAll();
         if (Rs2Bank.isOpen()) {
-            if (inventorySetup == null) return false;
+            if (!getInventorySetup(name)) {
+                return false;
+            }
             for (int i = 0; i < inventorySetup.getInventory().size(); i++) {
                 InventorySetupsItem inventorySetupsItem = inventorySetup.getInventory().get(i);
-                if (InventorySetupsItem.itemIsDummy(inventorySetupsItem)) continue;
+                if (inventorySetupsItem.getId() == -1) continue;
                 if (!Rs2Bank.hasBankItem(inventorySetupsItem.getName())) {
                     Microbot.pauseAllScripts = true;
                     Microbot.showMessage("Bank is missing the following item " + inventorySetupsItem.getName());
@@ -43,7 +44,11 @@ public class MicrobotInventorySetup {
                 if (inventorySetupsItem.isFuzzy()) {
                     Rs2Bank.withdrawX(inventorySetupsItem.getName(), inventorySetupsItem.getQuantity());
                 } else {
-                    Rs2Bank.withdrawX(inventorySetupsItem.getId(), inventorySetupsItem.getQuantity());
+                    if (inventorySetupsItem.getQuantity() > 1) {
+                        Rs2Bank.withdrawX(inventorySetupsItem.getId(), inventorySetupsItem.getQuantity());
+                    } else {
+                        Rs2Bank.withdrawItem(inventorySetupsItem.getId());
+                    }
                 }
             }
         }
