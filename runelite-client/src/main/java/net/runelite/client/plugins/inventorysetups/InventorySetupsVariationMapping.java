@@ -134,6 +134,9 @@ public class InventorySetupsVariationMapping
 		mappings.put(ItemID.GHOMMALS_AVERNIC_DEFENDER_5_L, ItemID.AVERNIC_DEFENDER);
 		mappings.put(ItemID.GHOMMALS_AVERNIC_DEFENDER_6, ItemID.AVERNIC_DEFENDER);
 		mappings.put(ItemID.GHOMMALS_AVERNIC_DEFENDER_6_L, ItemID.AVERNIC_DEFENDER);
+
+		mappings.put(ItemID.DRAGONFIRE_WARD_22003, ItemID.DRAGONFIRE_WARD);
+
 	}
 
 }

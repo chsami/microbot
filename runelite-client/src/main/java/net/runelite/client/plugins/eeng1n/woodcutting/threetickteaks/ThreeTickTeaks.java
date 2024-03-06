@@ -8,14 +8,13 @@ import net.runelite.api.GameState;
 import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -77,9 +76,9 @@ public class ThreeTickTeaks extends Plugin {
             Microbot.showMessage("The plugin has been disabled due to a not high enough Woodcutting level! You need at least level 35. Please make sure you have the required level and restart the script afterwards.");
         }
 
-        if(!Inventory.hasItem("Guam leaf")
-                || !Inventory.hasItem("Pestle and mortar")
-                || !Inventory.hasItem("Swamp tar")
+        if(!Rs2Inventory.hasItem("Guam leaf")
+                || !Rs2Inventory.hasItem("Pestle and mortar")
+                || !Rs2Inventory.hasItem("Swamp tar")
         ) {
             enabled = false;
             Microbot.showMessage("The plugin has been disabled due to missing items! Please make sure you have the required items and restart the script afterwards.");
@@ -122,8 +121,7 @@ public class ThreeTickTeaks extends Plugin {
     private void useGuam() {
         inProgress = true;
         sleep(13, 167);
-        Widget guamLeafWidget = Inventory.findItem("Guam leaf");
-        Microbot.getMouse().click(guamLeafWidget.getBounds());
+        Rs2Inventory.interact("Guam leaf");
 
         state = ThreeTickTeaksState.UseTarAndDrop;
         inProgress = false;
@@ -133,9 +131,8 @@ public class ThreeTickTeaks extends Plugin {
         inProgress = true;
         sleep(18, 132);
 
-        Inventory.useItemFast(ItemID.SWAMP_TAR, "Use");
-
-        Inventory.useItemFast(ItemID.TEAK_LOGS, "Drop");
+        Rs2Inventory.interact(ItemID.SWAMP_TAR);
+        Rs2Inventory.interact(ItemID.TEAK_LOGS, "Drop");
 
         state = ThreeTickTeaksState.ClickTeakTree;
         inProgress = false;

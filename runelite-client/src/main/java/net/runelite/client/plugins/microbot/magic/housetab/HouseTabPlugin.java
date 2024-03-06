@@ -44,7 +44,7 @@ public class HouseTabPlugin extends Plugin {
     @Inject
     Notifier notifier;
 
-    private HouseTabScript houseTabScript = new HouseTabScript(HOUSETABS_CONFIG.FRIENDS_HOUSE,
+    private final HouseTabScript houseTabScript = new HouseTabScript(HOUSETABS_CONFIG.FRIENDS_HOUSE,
             new String[]{"xGrace", "workless", "Lego Batman", "Batman 321", "Batman Chest"});
 
     @Override

@@ -3,10 +3,7 @@ package net.runelite.client.plugins.microbot.magic;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
-import net.runelite.client.Notifier;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -39,7 +36,7 @@ public class MagicPlugin extends Plugin {
     @Inject
     private MagicOverlay magicOverlay;
 
-    private MagicScript magicScript = new MagicScript();
+    private final MagicScript magicScript = new MagicScript();
 
     @Override
     protected void startUp() throws AWTException {

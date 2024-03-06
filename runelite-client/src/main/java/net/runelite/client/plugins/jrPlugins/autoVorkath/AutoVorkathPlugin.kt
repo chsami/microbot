@@ -29,14 +29,13 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchange
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
-import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
 import net.runelite.client.plugins.microbot.util.walker.Walker
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
-import net.runelite.client.plugins.microbot.util.prayer.Prayer
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum
 import net.runelite.client.ui.overlay.OverlayManager
 import java.awt.event.KeyEvent
 import java.lang.Thread.sleep
@@ -242,11 +241,11 @@ class AutoVorkathPlugin : Plugin() {
             return
         }
         activatePrayers(false)
-        Inventory.useItemAction(config.CROSSBOW().toString(), "Wield")
+        Rs2Inventory.wield(config.CROSSBOW().toString())
         lootQueue.firstOrNull()?.let {
             //println("Queue first")
             if (clientThread.runOnClientThread { !Rs2Player.isMoving() }) {
-                if (clientThread.runOnClientThread { !Inventory.isFull() }) {
+                if (clientThread.runOnClientThread { !Rs2Inventory.isFull() }) {
                     Rs2GroundItem.loot(it.id)
                     //println("Looting")
                     lootQueue.removeAt(lootQueue.indexOf(it))
@@ -346,14 +345,14 @@ class AutoVorkathPlugin : Plugin() {
         activatePrayers(false)
         drinkPrayer()
         if (!Rs2Equipment.hasEquippedContains(config.SLAYERSTAFF().toString())) {
-            Inventory.useItemContains(config.SLAYERSTAFF().toString())
+            Rs2Inventory.wield(config.SLAYERSTAFF().toString())
             sleepUntil { Rs2Equipment.hasEquippedContains(config.SLAYERSTAFF().toString()) }
             return
         } else {
             if (Rs2Npc.getNpc("Zombified Spawn") != null) {
                 Rs2Npc.interact("Zombified Spawn", "Attack")
                 sleepUntil { Rs2Npc.getNpc("Zombified Spawn") == null }
-                Inventory.useItemContains(config.CROSSBOW().toString())
+                Rs2Inventory.wield(config.CROSSBOW().toString())
                 sleepUntil { Rs2Equipment.hasEquippedContains(config.CROSSBOW().toString()) }
                 changeStateTo(State.FIGHTING)
                 return
@@ -394,7 +393,7 @@ class AutoVorkathPlugin : Plugin() {
             }
             eat(config.EATAT())
             if (hasItem(config.CROSSBOW().toString())) {
-                Inventory.useItemContains(config.CROSSBOW().toString())
+                Rs2Inventory.wield(config.CROSSBOW().toString())
                 sleepUntil { Rs2Equipment.hasEquippedContains(config.CROSSBOW().toString()) }
             }
         }
@@ -544,14 +543,14 @@ class AutoVorkathPlugin : Plugin() {
         val currentTime = System.currentTimeMillis()
 
         if (!drankRangePotion && currentTime - lastDrankRangePotion > config.RANGEPOTION().time()) {
-            Inventory.interact(config.RANGEPOTION().toString(), "Drink")
+            Rs2Inventory.interact(config.RANGEPOTION().toString(), "Drink")
             lastDrankRangePotion = System.currentTimeMillis()
             drankRangePotion = true
             sleep(2000)
             return
         }
         if (!drankAntiFire && currentTime - lastDrankAntiFire > config.ANTIFIRE().time()) {
-            Inventory.interact(config.ANTIFIRE().toString(), "Drink")
+            Rs2Inventory.interact(config.ANTIFIRE().toString(), "Drink")
             lastDrankAntiFire = System.currentTimeMillis()
             drankAntiFire = true
             sleep(2000)
@@ -560,8 +559,8 @@ class AutoVorkathPlugin : Plugin() {
 
         drinkPrayer()
 
-        if (!Rs2Equipment.hasEquipped("Serpentine helm")) {
-            Inventory.interact("Anti-venom", "Drink")
+        if (!Rs2Equipment.isWearing("Serpentine helm")) {
+            Rs2Inventory.interact("Anti-venom", "Drink")
             sleep(2000)
         }
         isPrepared = drankAntiFire && drankRangePotion && !inventoryHasLoot()
@@ -576,8 +575,8 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun drinkPrayer() {
         if (needsToDrinkPrayer()) {
-            if (Inventory.hasItemContains(config.PRAYERPOTION().toString())) {
-                Inventory.useItemAction(config.PRAYERPOTION().toString(), "Drink")
+            if (Rs2Inventory.hasItem(config.PRAYERPOTION().toString())) {
+                Rs2Inventory.interact(config.PRAYERPOTION().toString(), "Drink")
                 //println("Drink Sleep")
                 sleep(200)
                 return
@@ -600,39 +599,39 @@ class AutoVorkathPlugin : Plugin() {
             //("Withdraw teleport")
             Rs2Bank.withdrawAll(config.TELEPORT().toString())
         }
-        if (!Inventory.hasItemAmount(config.RANGEPOTION().toString(), 2)) {
+        if (!Rs2Inventory.hasItemAmount(config.RANGEPOTION().toString(), 2)) {
             //println("Withdraw Range potion")
             Rs2Bank.withdrawItem(config.RANGEPOTION().toString())
         }
-        if (!Inventory.hasItem(config.SLAYERSTAFF().toString())) {
+        if (!Rs2Inventory.hasItem(config.SLAYERSTAFF().toString())) {
             //println("Withdraw staff")
             Rs2Bank.withdrawItem(config.SLAYERSTAFF().toString())
         }
-        if (!Inventory.hasItemAmount(config.PRAYERPOTION().toString(), 2)) {
+        if (!Rs2Inventory.hasItemAmount(config.PRAYERPOTION().toString(), 2)) {
             //println("Withdraw Prayer potion")
             Rs2Bank.withdrawItem(config.PRAYERPOTION().toString())
         }
-        if (!Inventory.hasItem("Rune pouch")) {
+        if (!Rs2Inventory.hasItem("Rune pouch")) {
             //println("Withdraw rune pouch")
             Rs2Bank.withdrawItem("Rune pouch")
         }
-        if (!Inventory.hasItemAmount(config.ANTIFIRE().toString(), 2)) {
+        if (!Rs2Inventory.hasItemAmount(config.ANTIFIRE().toString(), 2)) {
             //println("Withdraw anti-fire")
             Rs2Bank.withdrawItem(config.ANTIFIRE().toString())
         }
-        if (!Rs2Equipment.hasEquipped("Serpentine helm")) {
-            if (!Inventory.hasItemAmount("Anti-venom", 2)) {
+        if (!Rs2Equipment.isWearing("Serpentine helm")) {
+            if (!Rs2Inventory.hasItemAmount("Anti-venom", 2)) {
                 //println("Withdraw Anti-venom")
                 Rs2Bank.withdrawItem("Anti-venom")
             }
         }
-        if (!Inventory.hasItemAmount(config.FOOD().toString(), config.FOODAMOUNT().width)) {
-            for (i in 1..config.FOODAMOUNT().width - Inventory.getItemAmount(config.FOOD())) {
+        if (!Rs2Inventory.hasItemAmount(config.FOOD().toString(), config.FOODAMOUNT().width)) {
+            for (i in 1..config.FOODAMOUNT().width - Rs2Inventory.count(config.FOOD())) {
                 //println("Withdrawing food")
                 Rs2Bank.withdrawItem(config.FOOD())
             }
         }
-        if (Inventory.hasItemAmount(config.FOOD().toString(), config.FOODAMOUNT().width)) changeStateTo(State.THINKING)
+        if (Rs2Inventory.hasItemAmount(config.FOOD().toString(), config.FOODAMOUNT().width)) changeStateTo(State.THINKING)
     }
 
     private fun inVorkathArea(): Boolean =
@@ -648,13 +647,13 @@ class AutoVorkathPlugin : Plugin() {
     private fun isMoving(): Boolean = Rs2Player.isMoving() || clientThread.runOnClientThread { client.localPlayer.animation != -1 }
     private fun needsToDrinkPrayer(): Boolean = clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.PRAYER) <= 70 }
 
-    private fun readyToFight(): Boolean = Inventory.getInventoryFood().size >= config.FOODAMOUNT().height
-            && Inventory.hasItemContains(config.ANTIFIRE().toString())
-            && Inventory.hasItemContains(config.RANGEPOTION().toString())
-            && Inventory.hasItemContains(config.SLAYERSTAFF().toString())
-            && Inventory.hasItemContains(config.TELEPORT().toString())
-            && Inventory.hasItemContains("Rune pouch")
-            && Inventory.hasItemContains(config.PRAYERPOTION().toString())
+    private fun readyToFight(): Boolean = Rs2Inventory.getInventoryFood().size >= config.FOODAMOUNT().height
+            && Rs2Inventory.hasItem(config.ANTIFIRE().toString())
+            && Rs2Inventory.hasItem(config.RANGEPOTION().toString())
+            && Rs2Inventory.hasItem(config.SLAYERSTAFF().toString())
+            && Rs2Inventory.hasItem(config.TELEPORT().toString())
+            && Rs2Inventory.hasItem("Rune pouch")
+            && Rs2Inventory.hasItem(config.PRAYERPOTION().toString())
             && !inventoryHasLoot()
 
     private fun needsToEat(at: Int): Boolean =
@@ -662,9 +661,9 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun eat(at: Int) {
         if (needsToEat(at)) {
-            if (Inventory.getInventoryFood().isNotEmpty()) {
-                val food = Inventory.getInventoryFood().first()
-                VirtualMouse().click(food.bounds)
+            if (Rs2Inventory.getInventoryFood().isNotEmpty()) {
+                val food = Rs2Inventory.getInventoryFood().first()
+                Rs2Inventory.interact(food);
                 return
             } else {
                 isPrepared = false
@@ -705,7 +704,7 @@ class AutoVorkathPlugin : Plugin() {
         client.canvas.dispatchEvent(e)
     }
 
-    private fun hasItem(name: String): Boolean = Inventory.hasItemContains(name)
+    private fun hasItem(name: String): Boolean = Rs2Inventory.hasItem(name)
 
     private fun runIs(on: Boolean = false): Boolean =
         clientThread.runOnClientThread { client.getVarpValue(173) == if (on) 1 else 0 }
@@ -717,14 +716,14 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun activatePrayers(on: Boolean) {
         if (config.ACTIVATERIGOUR()) {
-            Rs2Prayer.fastPray(Prayer.RIGOUR, on)
+            Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, on)
         }
-        Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, on)
+        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, on)
         return
     }
 
     private fun teleToHouse() {
-        Inventory.useItem(config.TELEPORT().toString())
+        Rs2Inventory.interact(config.TELEPORT().toString())
         sleepUntil { !isMoving() }
     }
 

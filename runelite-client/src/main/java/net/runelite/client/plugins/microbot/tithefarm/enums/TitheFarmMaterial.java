@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 @Getter
 @RequiredArgsConstructor
@@ -27,43 +27,43 @@ public enum TitheFarmMaterial {
         if (Microbot.getClient().getRealSkillLevel(Skill.FARMING) >= GOLOVANOVA_SEED.levelRequired)
             return GOLOVANOVA_SEED;
 
-        return null;
+        return LOGAVANO_SEED;
     }
 
     public static boolean hasWateringCanToBeFilled() {
-        return Inventory.hasItem(ItemID.WATERING_CAN7) || Inventory.hasItem(ItemID.WATERING_CAN6)
-                || Inventory.hasItem(ItemID.WATERING_CAN5) || Inventory.hasItem(ItemID.WATERING_CAN4)
-                || Inventory.hasItem(ItemID.WATERING_CAN3) || Inventory.hasItem(ItemID.WATERING_CAN2)
-                || Inventory.hasItem(ItemID.WATERING_CAN1) || Inventory.hasItem(ItemID.WATERING_CAN);
+        return Rs2Inventory.hasItem(ItemID.WATERING_CAN7) || Rs2Inventory.hasItem(ItemID.WATERING_CAN6)
+                || Rs2Inventory.hasItem(ItemID.WATERING_CAN5) || Rs2Inventory.hasItem(ItemID.WATERING_CAN4)
+                || Rs2Inventory.hasItem(ItemID.WATERING_CAN3) || Rs2Inventory.hasItem(ItemID.WATERING_CAN2)
+                || Rs2Inventory.hasItem(ItemID.WATERING_CAN1) || Rs2Inventory.hasItem(ItemID.WATERING_CAN);
     }
 
     public static boolean hasGricollersCan() {
-        return Inventory.hasItem(ItemID.GRICOLLERS_CAN);
+        return Rs2Inventory.hasItem(ItemID.GRICOLLERS_CAN);
     }
 
     public static int getWateringCanToBeFilled() {
-        if (Inventory.hasItem(ItemID.WATERING_CAN7)) {
+        if (Rs2Inventory.hasItem(ItemID.WATERING_CAN7)) {
             return ItemID.WATERING_CAN7;
         }
-        if (Inventory.hasItem(ItemID.WATERING_CAN6)) {
+        if (Rs2Inventory.hasItem(ItemID.WATERING_CAN6)) {
             return ItemID.WATERING_CAN6;
         }
-        if (Inventory.hasItem(ItemID.WATERING_CAN5)) {
+        if (Rs2Inventory.hasItem(ItemID.WATERING_CAN5)) {
             return ItemID.WATERING_CAN5;
         }
-        if (Inventory.hasItem(ItemID.WATERING_CAN4)) {
+        if (Rs2Inventory.hasItem(ItemID.WATERING_CAN4)) {
             return ItemID.WATERING_CAN4;
         }
-        if (Inventory.hasItem(ItemID.WATERING_CAN3)) {
+        if (Rs2Inventory.hasItem(ItemID.WATERING_CAN3)) {
             return ItemID.WATERING_CAN3;
         }
-        if (Inventory.hasItem(ItemID.WATERING_CAN2)) {
+        if (Rs2Inventory.hasItem(ItemID.WATERING_CAN2)) {
             return ItemID.WATERING_CAN2;
         }
-        if (Inventory.hasItem(ItemID.WATERING_CAN1)) {
+        if (Rs2Inventory.hasItem(ItemID.WATERING_CAN1)) {
             return ItemID.WATERING_CAN1;
         }
-        if (Inventory.hasItem(ItemID.WATERING_CAN)) {
+        if (Rs2Inventory.hasItem(ItemID.WATERING_CAN)) {
             return ItemID.WATERING_CAN;
         }
         return -1;

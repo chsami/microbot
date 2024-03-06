@@ -5,7 +5,6 @@ import net.runelite.api.Tile;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.agility.AgilityPlugin;
 import net.runelite.client.plugins.agility.Obstacle;
 import net.runelite.client.plugins.agility.Obstacles;
@@ -14,19 +13,16 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.agility.models.AgilityObstacleModel;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.timers.TimersPlugin;
 
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.util.inventory.Inventory.eat;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.GNOME_STRONGHOLD_AGILITY_COURSE;
 
@@ -121,15 +117,15 @@ public class AgilityScript extends Script {
                     }
                 }
                 else if (config.hitpoints() > 0) {
-                    Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
-                    if (foods.length == 0) {
+                    List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
+                    if (foods.isEmpty()) {
                         return;
                     }
 
-                    for (Widget food : foods) {
-                        eat(food);
+                    for (Rs2Item food : foods) {
+                        Rs2Inventory.interact(food, "eat");
                         if (random(1, 10) == 2) { //double eat
-                            eat(food);
+                            Rs2Inventory.interact(food, "eat");
                         }
                         break;
                     }

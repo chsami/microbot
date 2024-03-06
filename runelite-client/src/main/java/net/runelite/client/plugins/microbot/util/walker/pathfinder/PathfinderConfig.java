@@ -39,7 +39,7 @@ public class PathfinderConfig {
     private int strengthLevel;
     private int prayerLevel;
     private int woodcuttingLevel;
-    private Map<Quest, QuestState> questStates = new HashMap<>();
+    private final Map<Quest, QuestState> questStates = new HashMap<>();
 
     public PathfinderConfig(CollisionMap map) {
         this.map = map;
@@ -135,11 +135,7 @@ public class PathfinderConfig {
             return false;
         }
 
-        if (isQuestLocked && !QuestState.FINISHED.equals(questStates.getOrDefault(transport.getQuest(), QuestState.NOT_STARTED))) {
-            return false;
-        }
-
-        return true;
+        return !isQuestLocked || QuestState.FINISHED.equals(questStates.getOrDefault(transport.getQuest(), QuestState.NOT_STARTED));
     }
 
     public Point mapWorldPointToGraphicsPoint(WorldPoint worldPoint) {

@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import java.awt.*;
 
 import static net.runelite.client.plugins.natepainthelper.Info.*;
-import static net.runelite.client.plugins.natepainthelper.Info.xpTillNextLevel;
 
 public class ThievingOverlay extends OverlayPanel {
     @Inject
@@ -26,7 +25,7 @@ public class ThievingOverlay extends OverlayPanel {
     public Dimension render(Graphics2D graphics) {
         try {
             long timeElapsed = System.currentTimeMillis() - timeBegan;
-            xpGained = Microbot.getClient().getSkillExperience(Skill.THIEVING) - expstarted;;
+            xpGained = Microbot.getClient().getSkillExperience(Skill.THIEVING) - expstarted;
             int xpPerHour = (int)( xpGained / ((System.currentTimeMillis() - timeBegan) / 3600000.0D));
             nextLevelXp = XP_TABLE[Microbot.getClient().getRealSkillLevel(Skill.THIEVING) + 1];
             xpTillNextLevel = nextLevelXp - Microbot.getClient().getSkillExperience(Skill.THIEVING);

@@ -4,7 +4,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
@@ -21,18 +21,18 @@ public class DefaultScript extends Script {
                 String leather = "green dragon leather";
                 String craftedItem = "green d'hide body";
                 if (Microbot.isGainingExp) return;
-                if (!Inventory.hasItem(craftedItem)) {
-                    if (!Inventory.isFull()) {
+                if (!Rs2Inventory.hasItem(craftedItem)) {
+                    if (!Rs2Inventory.isFull()) {
                         Rs2Bank.openBank();
                         sleepUntil(() -> Rs2Bank.isOpen(), 5000);
                         if (!Rs2Bank.isOpen()) return;
                         Rs2Bank.withdrawItem(true, "needle");
                         Rs2Bank.withdrawItemAll(true, "thread");
-                        if (!Inventory.hasItem("needle") || !Inventory.hasItem("thread")) return;
+                        if (!Rs2Inventory.hasItem("needle") || !Rs2Inventory.hasItem("thread")) return;
                         Rs2Bank.withdrawItemAll(leather);
-                    } else if (Inventory.hasItem(leather)) {
+                    } else if (Rs2Inventory.hasItem(leather)) {
                         Rs2Bank.closeBank();
-                        Inventory.useItemOnItem("needle", leather);
+                        Rs2Inventory.combine("needle", leather);
                         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
                         sleep(3000);
                     } else {

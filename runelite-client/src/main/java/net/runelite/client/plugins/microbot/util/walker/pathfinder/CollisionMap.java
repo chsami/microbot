@@ -55,7 +55,7 @@ public class CollisionMap {
             new WorldArea(new WorldPoint(3085, 3333, 0), 50, 50), //draynor manor
             new WorldArea(new WorldPoint(2535, 3109, 0), 10, 30)}; //under maze
 
-    private static List<Integer> doorIds = new ArrayList<>();
+    private static final List<Integer> doorIds = new ArrayList<>();
     public static List<CheckedNode> nodesChecked = new ArrayList<>();
     public static List<CheckedNode> wallNodes = new ArrayList<>();
 
@@ -71,7 +71,7 @@ public class CollisionMap {
                 return new ArrayList<>();
 
             if (useTransport) {
-                for (Transport transport : config.getTransports().getOrDefault(node.position, new ArrayList<>())) {
+                for (Transport transport : PathfinderConfig.getTransports().getOrDefault(node.position, new ArrayList<>())) {
                     if (transport.isMember && !Microbot.getClient().getWorldType().contains(WorldType.MEMBERS))
                         continue;
                     if (config.useTransport(transport)) {
@@ -89,7 +89,7 @@ public class CollisionMap {
             int data = flags[localPoint.getSceneX()][localPoint.getSceneY()];
             MovementFlag[] movementFlags = MovementFlag.getSetFlags(data).toArray(MovementFlag[]::new);
 
-            if (MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_FULL) && node instanceof TransportNode == false) {
+            if (MovementFlag.hasFlag(movementFlags, MovementFlag.BLOCK_MOVEMENT_FULL) && !(node instanceof TransportNode)) {
                 traversable = new boolean[]{
                         false, false, false, false, false, false, false, false
                 };

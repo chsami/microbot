@@ -8,8 +8,8 @@ import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyle;
 import net.runelite.client.plugins.microbot.playerassist.model.Monster;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
-import net.runelite.client.plugins.microbot.util.prayer.Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,21 +65,21 @@ public class FlickerScript extends Script {
                     switch (prayFlickAttackStyle) {
                         case MAGE:
                             prayFlickAttackStyle = null;
-                            Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, true);
-                            sleep(200);
-                            Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, false);
+                            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, true);
+                            sleep(400);
+                            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, false);
                             break;
                         case MELEE:
                             prayFlickAttackStyle = null;
-                            Rs2Prayer.fastPray(Prayer.PROTECT_MELEE, true);
-                            sleep(200);
-                            Rs2Prayer.fastPray(Prayer.PROTECT_MELEE, false);
+                            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
+                            sleep(400);
+                            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, false);
                             break;
                         case RANGED:
                             prayFlickAttackStyle = null;
-                            Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true);
-                            sleep(200);
-                            Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false);
+                            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true);
+                            sleep(400);
+                            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, false);
                             break;
                     }
                 }

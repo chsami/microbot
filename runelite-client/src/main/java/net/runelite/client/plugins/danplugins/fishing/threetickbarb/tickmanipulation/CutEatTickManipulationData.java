@@ -6,7 +6,7 @@ import net.runelite.api.ItemID;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +52,7 @@ public class CutEatTickManipulationData extends TickManipulationData {
 
     private Runnable eatFood()
     {
-        return () -> Inventory.useItemFast(foodId, "eat");
+        return () -> Rs2Inventory.interact(foodId, "eat");
     }
 
     private void cutItem()
@@ -62,8 +62,8 @@ public class CutEatTickManipulationData extends TickManipulationData {
             return;
         }
 
-        Inventory.useItemFast(ItemID.KNIFE, "Use");
-        Inventory.useItemFast(cutId, "Use");
+        Rs2Inventory.interact(ItemID.KNIFE, "Use");
+        Rs2Inventory.interact(cutId, "Use");
     }
 
     @Subscribe

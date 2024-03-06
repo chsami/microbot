@@ -16,7 +16,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.danplugins.fishing.threetickbarb.tickmanipulation.CutEatTickManipulationData;
 import net.runelite.client.plugins.danplugins.fishing.threetickbarb.tickmanipulation.TickManipulationData;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -128,7 +128,7 @@ public class ThreeTickBarb extends Plugin {
 
         for (Integer itemId : tickManipulationData.getItemIdsToDrop())
         {
-            Inventory.useItemFast(itemId, "drop");
+            Rs2Inventory.interact(itemId, "drop");
         }
 
         state = ThreeTickFishingState.ClickFishingSpot;

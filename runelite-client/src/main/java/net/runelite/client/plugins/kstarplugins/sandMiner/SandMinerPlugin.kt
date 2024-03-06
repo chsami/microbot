@@ -18,7 +18,7 @@ import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject.findObjectByLocation
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.ui.overlay.OverlayManager
 import java.util.function.BooleanSupplier
 import javax.inject.Inject
@@ -118,13 +118,13 @@ class SandMiner : Plugin() {
         val rocks = listOf(firstRock, secondRock, thirdRock)
         val startingPoint = WorldPoint(3166, 2914, 0)
 
-        if(config.dropClues() && Inventory.findItem("geode") != null) {
-            var geode = Inventory.findItem("geode").name.substringAfter(">").substringBefore('<')
-            Inventory.drop(geode)
+        if(config.dropClues() && Rs2Inventory.get("geode") != null) {
+            var geode = Rs2Inventory.get("geode").name.substringAfter(">").substringBefore('<')
+            Rs2Inventory.drop(geode)
             println(geode)
         }
 
-        if(Inventory.isFull()) {
+        if(Rs2Inventory.isFull()) {
             currentAction = Action.DEPOSITING
             currentRock = 0
             return

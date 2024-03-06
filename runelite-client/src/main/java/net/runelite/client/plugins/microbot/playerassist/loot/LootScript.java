@@ -10,7 +10,7 @@ import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 
 import java.awt.*;
@@ -28,16 +28,16 @@ public class LootScript extends Script {
     public void run(ItemSpawned itemSpawned) {
         mainScheduledFuture = scheduledExecutorService.schedule((() -> {
             if (!super.run()) return;
-            if (Microbot.getClientThread().runOnClientThread(() -> Inventory.isFull())) return;
+            if (Microbot.getClientThread().runOnClientThread(Rs2Inventory::isFull)) return;
             final ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemSpawned.getItem().getId()));
             for (String item : lootItems) {
                 LocalPoint itemLocation = itemSpawned.getTile().getLocalLocation();
                 int distance = itemSpawned.getTile().getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
-                if (item.toLowerCase().equals(itemComposition.getName().toLowerCase()) && distance < 14) {
+                if (item.equalsIgnoreCase(itemComposition.getName()) && distance < 14) {
                     LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), itemSpawned.getTile().getWorldLocation());
                     Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, itemSpawned.getTile().getItemLayer().getHeight());
                     if (Rs2Camera.isTileOnScreen(itemLocation)) {
-                        if (Rs2Menu.doAction("Take", poly, new String[]{item.toLowerCase()})) {
+                        if (Rs2Menu.doAction("Take", poly, item.toLowerCase())) {
                             Microbot.pauseAllScripts = true;
                             sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation() == itemSpawned.getTile().getWorldLocation(), 5000);
                             Microbot.pauseAllScripts = false;
@@ -47,11 +47,10 @@ public class LootScript extends Script {
                     }
                 }
             }
-        }), 600, TimeUnit.MILLISECONDS);
+        }), 2000, TimeUnit.MILLISECONDS);
     }
 
     public boolean run(PlayerAssistConfig config) {
-        lootItems = Arrays.stream(config.itemsToLoot().split(",")).map(x -> x.trim()).toArray(String[]::new);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay((() -> {
             if (!super.run()) return;
             if (config.toggleLootArrows()) {
@@ -61,13 +60,12 @@ public class LootScript extends Script {
                 }
             }
             if (!config.toggleLootItems()) return;
-            for (String lootItem : lootItems) {
-                if (Rs2GroundItem.loot(lootItem, 14))
-                    break;
+            boolean result = Rs2GroundItem.lootItemBasedOnValue(config.priceOfItemsToLoot(), 14);
+            if (result) {
+                Global.sleep(2000, 4000);
+                Microbot.pauseAllScripts = false;
             }
-            Global.sleep(2000, 4000);
-            Microbot.pauseAllScripts = false;
-        }), 0, 1000, TimeUnit.MILLISECONDS);
+        }), 0, 2000, TimeUnit.MILLISECONDS);
         return true;
     }
 

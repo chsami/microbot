@@ -1,10 +1,10 @@
 package net.runelite.client.plugins.microbot.util.walker.pathfinder;
 
+import net.runelite.api.coords.WorldPoint;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import net.runelite.api.coords.WorldPoint;
-import org.lwjgl.system.linux.XPropertyEvent;
 
 public class Node {
     public final WorldPoint position;

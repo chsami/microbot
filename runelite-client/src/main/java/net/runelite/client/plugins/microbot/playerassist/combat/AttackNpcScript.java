@@ -38,7 +38,7 @@ public class AttackNpcScript extends Script {
                                 && x.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < config.attackRadius()
                                 && (!x.isInteracting() || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && (x.getInteracting() == null  || x.getInteracting() == Microbot.getClient().getLocalPlayer())
-                                && x.getAnimation() == -1 && npcToAttack.toLowerCase().equals(x.getName().toLowerCase())).collect(Collectors.toList());
+                                && x.getAnimation() == -1 && npcToAttack.equalsIgnoreCase(x.getName())).collect(Collectors.toList());
                 Player player = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer());
                 if (player.isInteracting() || player.getAnimation() != -1) {
                     return;
@@ -49,12 +49,15 @@ public class AttackNpcScript extends Script {
                             || npc.isDead()
                             || (npc.getInteracting() != null && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
                             || (npc.isInteracting()  && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
-                            || !npc.getName().toLowerCase().equals(npcToAttack.toLowerCase()))
+                            || !npc.getName().equalsIgnoreCase(npcToAttack))
                         break;
                     if (npc.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > config.attackRadius())
                         break;
                     if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation()))
                         Rs2Camera.turnTo(npc);
+
+                    if (!Microbot.getWalker().canReach(npc.getWorldLocation()))
+                        continue;
                     Rs2Npc.interact(npc, "attack");
                     sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
                     break;

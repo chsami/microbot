@@ -1,9 +1,8 @@
 package net.runelite.client.plugins.danplugins.fishing.threetickbarb.tickmanipulation;
 
 import net.runelite.api.ItemID;
-import net.runelite.api.widgets.Widget;
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 
 import java.util.Optional;
 
@@ -15,15 +14,15 @@ public class KnifeLogTickManipulationData extends TickManipulationData
     {
         return () ->
         {
-            Widget logs = Optional.ofNullable(Inventory.findItem(ItemID.TEAK_LOGS))
-                                  .orElse(Inventory.findItem(ItemID.MAHOGANY_LOGS));
-            Microbot.getMouse().click(logs.getBounds());
+            Rs2Item logs = Optional.ofNullable(Rs2Inventory.get(ItemID.TEAK_LOGS))
+                                  .orElse(Rs2Inventory.get(ItemID.MAHOGANY_LOGS));
+            Rs2Inventory.use(logs);
         };
     }
 
     @Override
     public Runnable getSecondTickRunnable()
     {
-        return () -> Inventory.useItemFast(ItemID.KNIFE, "use");
+        return () -> Rs2Inventory.interact(ItemID.KNIFE, "use");
     }
 }

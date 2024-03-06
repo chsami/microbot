@@ -3,11 +3,9 @@ package net.runelite.client.plugins.microbot.giantsfoundry;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.events.StatChanged;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -48,7 +46,7 @@ public class GiantsFoundryPlugin extends Plugin {
     @Inject
     private GiantsFoundryOverlay giantsFoundryOverlay;
 
-    private GiantsFoundryScript giantsFoundryScript = new GiantsFoundryScript();
+    private final GiantsFoundryScript giantsFoundryScript = new GiantsFoundryScript();
 
     @Override
     protected void startUp() throws AWTException {

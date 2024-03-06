@@ -18,7 +18,7 @@ import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
@@ -141,16 +141,16 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
     private fun runLootingState(itemLootIds: List<Int>) {
         val prayerLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.PRAYER)
         if (config.collectItems()) {
-            if (Inventory.isFull() && prayerLevel < config.prayerLevel()) {
+            if (Rs2Inventory.isFull() && prayerLevel < config.prayerLevel()) {
                 buryBones()
                 TrainerInterruptor.sleep(200)
             }
 
-            if (!Inventory.isFull()) {
+            if (!Rs2Inventory.isFull()) {
                 ItemHelper.findAndLootItems(itemLootIds, 2)
             }
 
-            if (Inventory.isFull() && prayerLevel < config.prayerLevel()) {
+            if (Rs2Inventory.isFull() && prayerLevel < config.prayerLevel()) {
                 buryBones()
                 TrainerInterruptor.sleep(200)
             }
@@ -161,7 +161,7 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
 
     private fun runBankingState() {
         if (config.collectItems()) {
-            if (Inventory.isFull()) {
+            if (Rs2Inventory.isFull()) {
                 Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
                 TrainerInterruptor.sleep(400, 600)
 
@@ -182,11 +182,11 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
     }
 
     private fun buryBones() {
-        while (Inventory.hasItem(ItemID.BONES)) {
-            val inventoryCount = Inventory.count()
-            Inventory.useItemAction(ItemID.BONES, "Bury")
+        while (Rs2Inventory.hasItem(ItemID.BONES)) {
+            val inventoryCount = Rs2Inventory.size()
+            Rs2Inventory.interact(ItemID.BONES, "Bury")
             TrainerInterruptor.sleep(700)
-            TrainerInterruptor.sleepUntilTrue({ Inventory.count() == inventoryCount - 1 && !Rs2Player.isInteracting() }, 100, 3000)
+            TrainerInterruptor.sleepUntilTrue({ Rs2Inventory.size() == inventoryCount - 1 && !Rs2Player.isInteracting() }, 100, 3000)
         }
     }
 

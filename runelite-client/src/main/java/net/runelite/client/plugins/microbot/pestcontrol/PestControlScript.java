@@ -197,8 +197,6 @@ public class PestControlScript extends Script {
                     }
                 }
             } catch (Exception ex) {
-                Rs2Npc.npcInteraction = null;
-                Rs2Npc.npcAction = null;
                 System.out.println(ex.getMessage());
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);

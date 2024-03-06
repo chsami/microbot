@@ -5,8 +5,6 @@ import lombok.Setter;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.Global;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.ui.FontManager;
 
 import java.applet.Applet;
@@ -19,6 +17,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 /**
  * Context menu related operations.
  */
+@Deprecated()
 public class Rs2Menu {
     private static final Pattern HTML_TAG = Pattern
             .compile("(^[^<]+>|<[^>]+>|<[^>]+$)");
@@ -103,6 +102,7 @@ public class Rs2Menu {
         return doActionFast(action, new Point((int) bounds.getCenterX(), (int) bounds.getCenterY()), (String[]) null);
     }
 
+    @Deprecated
     public static boolean doAction(String action, Polygon poly, String... targets) {
         Microbot.getMouse().move(poly.getBounds().getCenterX(), poly.getBounds().getCenterY());
         return doAction(action, new Point((int) poly.getBounds().getCenterX(), (int) poly.getBounds().getCenterY()), targets);
@@ -290,7 +290,7 @@ public class Rs2Menu {
         if (isOpen()) {
             final int MIN_MENU_WIDTH = 102;
             int width = calculateWidth();
-            return (width + MENU_SIDE_BORDER < MIN_MENU_WIDTH) ? ((int) Microbot.getMouse().getLastMousePosition().getX()
+            return (width + MENU_SIDE_BORDER < MIN_MENU_WIDTH) ? (Microbot.getMouse().getLastMousePosition().getX()
                     - (MIN_MENU_WIDTH / 2)) : (Microbot.getMouse().getLastMousePosition().getX() - (width / 2));
         }
         return -1;
@@ -370,7 +370,7 @@ public class Rs2Menu {
         MenuEntry[] entries = getEntries();
         action = action.toLowerCase();
         for (int i = 0; i < entries.length; i++) {
-            if (entries[i].getOption().toLowerCase().equals(action.toLowerCase())) {
+            if (entries[i].getOption().equalsIgnoreCase(action)) {
                 lastIndex = i;
                 return i;
             }
@@ -424,11 +424,7 @@ public class Rs2Menu {
         boolean targetMatch = false;
         if (target[0] != null) {
             for (String targetPart : target) {
-                if (targets[index].toLowerCase().contains(targetPart.toLowerCase())) {
-                    targetMatch = true;
-                } else {
-                    targetMatch = false;
-                }
+                targetMatch = targets[index].toLowerCase().contains(targetPart.toLowerCase());
             }
             if (targetMatch)
                 return index;

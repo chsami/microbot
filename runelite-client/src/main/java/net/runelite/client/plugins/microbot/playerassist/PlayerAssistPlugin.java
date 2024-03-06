@@ -12,7 +12,6 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
-import net.runelite.client.plugins.microbot.playerassist.combat.UseSpecialAttackScript;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -40,16 +39,16 @@ public class PlayerAssistPlugin extends Plugin {
     @Inject
     private PlayerAssistOverlay playerAssistOverlay;
 
-    private CannonScript cannonScript = new CannonScript();
-    private AttackNpcScript attackNpc = new AttackNpcScript();
-    private CombatPotionScript combatPotion = new CombatPotionScript();
-    private FoodScript foodScript = new FoodScript();
-    private PrayerPotionScript prayerPotionScript = new PrayerPotionScript();
-    private LootScript lootScript = new LootScript();
-    private SafeSpot safeSpotScript = new SafeSpot();
-    private FlickerScript flickerScript = new FlickerScript();
-    private UseSpecialAttackScript useSpecialAttackScript = new UseSpecialAttackScript();
-    private AntiPoisonScript antiPoisonScript = new AntiPoisonScript();
+    private final CannonScript cannonScript = new CannonScript();
+    private final AttackNpcScript attackNpc = new AttackNpcScript();
+    private final CombatPotionScript combatPotion = new CombatPotionScript();
+    private final FoodScript foodScript = new FoodScript();
+    private final PrayerPotionScript prayerPotionScript = new PrayerPotionScript();
+    private final LootScript lootScript = new LootScript();
+    private final SafeSpot safeSpotScript = new SafeSpot();
+    private final FlickerScript flickerScript = new FlickerScript();
+    private final UseSpecialAttackScript useSpecialAttackScript = new UseSpecialAttackScript();
+    private final AntiPoisonScript antiPoisonScript = new AntiPoisonScript();
 
 
     private final ExecutorService executor = Executors.newFixedThreadPool(1);

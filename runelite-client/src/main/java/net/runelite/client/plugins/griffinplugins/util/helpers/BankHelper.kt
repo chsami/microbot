@@ -1,11 +1,10 @@
 package net.runelite.client.plugins.griffinplugins.griffintrainer.helpers
 
-import net.runelite.api.widgets.Widget
+import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
-import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 
 class BankHelper {
     companion object {
@@ -29,12 +28,12 @@ class BankHelper {
                         continue
                     }
 
-                    val countBefore = Inventory.getInventoryItems().count { widget: Widget -> widget.itemId == itemAndQuantityPair.first }
+                    val countBefore = Rs2Inventory.count(itemAndQuantityPair.first)
                     if (itemAndQuantityPair.second == 1) {
                         Rs2Bank.withdrawItem(false, itemAndQuantityPair.first)
 
                     } else {
-                        Rs2Bank.withdrawItemX(false, itemAndQuantityPair.first, itemAndQuantityPair.second)
+                        Rs2Bank.withdrawX(false, itemAndQuantityPair.first, itemAndQuantityPair.second)
                     }
 
                     var success = true
@@ -44,8 +43,8 @@ class BankHelper {
                     }
 
                     success = TrainerInterruptor.sleepUntilTrue({
-                        val meetsCountItems = Inventory.getInventoryItems().count { widget: Widget -> widget.itemId == itemAndQuantityPair.first } == countBefore + itemAndQuantityPair.second
-                        val meetsCountQuantity = Inventory.getInventoryItems().firstOrNull { widget: Widget -> widget.itemId == itemAndQuantityPair.first }?.itemQuantity == itemAndQuantityPair.second
+                        val meetsCountItems = Rs2Inventory.count(itemAndQuantityPair.first) == countBefore + itemAndQuantityPair.second
+                        val meetsCountQuantity = Rs2Inventory.get(itemAndQuantityPair.first)?.quantity == itemAndQuantityPair.second
                         return@sleepUntilTrue meetsCountItems || meetsCountQuantity
                     }, 100, 2000)
 

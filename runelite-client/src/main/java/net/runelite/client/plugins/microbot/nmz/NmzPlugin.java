@@ -8,6 +8,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.playerassist.combat.PrayerPotionScript;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -35,6 +36,8 @@ public class NmzPlugin extends Plugin {
 
     @Inject
     NmzScript nmzScript;
+    @Inject
+    PrayerPotionScript prayerPotionScript;
 
 
     @Override
@@ -43,6 +46,9 @@ public class NmzPlugin extends Plugin {
             overlayManager.add(nmzOverlay);
         }
         nmzScript.run(config);
+        if (config.togglePrayerPotions()) {
+            prayerPotionScript.run(config);
+        }
     }
 
     protected void shutDown() {

@@ -63,7 +63,7 @@ public interface NmzConfig extends Config {
     )
     default int absorptionPotionAmount()
     {
-        return 20;
+        return 19;
     }
 
     @ConfigItem(
@@ -100,5 +100,16 @@ public interface NmzConfig extends Config {
     default boolean useReccurentDamage()
     {
         return true;
+    }
+    @ConfigItem(
+            keyName = "Auto Prayer Potion",
+            name = "Auto drink prayer potion",
+            description = "Automatically drinks prayer potions",
+            position = 5,
+            section = generalSection
+    )
+    default boolean togglePrayerPotions()
+    {
+        return false;
     }
 }

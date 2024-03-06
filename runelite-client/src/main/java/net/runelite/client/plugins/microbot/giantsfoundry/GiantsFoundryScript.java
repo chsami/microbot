@@ -11,21 +11,18 @@ import net.runelite.client.plugins.microbot.giantsfoundry.enums.CommissionType;
 import net.runelite.client.plugins.microbot.giantsfoundry.enums.Stage;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
-import javax.inject.Inject;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.getEquippedItem;
 
 public class GiantsFoundryScript extends Script {
-
-    @Inject
-    Inventory inventory;
 
     static final int CRUCIBLE = 44776;
     static final int MOULD_JIG = 44777;
@@ -36,7 +33,7 @@ public class GiantsFoundryScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                final ItemComposition weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
+                final Rs2Item weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
                 if (GiantsFoundryState.getProgressAmount() == 1000) {
                     handIn();
                     sleep(600, 1200);
@@ -75,7 +72,7 @@ public class GiantsFoundryScript extends Script {
         if (!hasCommission()) {
             GiantsFoundryState.reset();
             if (Rs2Npc.interact("kovac", "Commission"))
-                sleepUntil(() -> hasCommission(), 5000);
+                sleepUntil(this::hasCommission, 5000);
         }
     }
 
@@ -111,6 +108,7 @@ public class GiantsFoundryScript extends Script {
             Microbot.getMouse().click(tips.getBounds());
             sleep(600, 1200);
             MouldHelper.selectBest();
+            Microbot.getMouse().click(forte.getBounds());
         }
         Widget setMould = Rs2Widget.getWidget(47054854);
         if (setMould != null) {
@@ -120,6 +118,7 @@ public class GiantsFoundryScript extends Script {
 
     public boolean canPour() {
         ObjectComposition objectComposition = Rs2GameObject.findObjectComposition(CRUCIBLE);
+        if (objectComposition == null) return false;
         return objectComposition.getImpostor().getName().toLowerCase().contains("(full)");
     }
 
@@ -134,29 +133,29 @@ public class GiantsFoundryScript extends Script {
             return;
         }
 
-        if (!inventory.hasItemAmount("steel bar", 14)
-                && !inventory.hasItemAmount("mithril bar", 14) && !canPour()) {
+        if (!Rs2Inventory.hasItemAmount("steel bar", 14)
+                && !Rs2Inventory.hasItemAmount("mithril bar", 14) && !canPour()) {
             Rs2Bank.useBank();
             //check if inv is empty and deposit all inv items
-            //needs new method in rs2bank depositAllinventoryItems
-            Rs2Bank.withdrawItemX(true, "steel bar", 14);
-            Rs2Bank.withdrawItemX(true, "mithril bar", 14);
+            //needs new method in rs2bank depositAllRs2InventoryItems
+            Rs2Bank.withdrawX(true, "steel bar", 14);
+            Rs2Bank.withdrawX(true, "mithril bar", 14);
             Rs2Bank.closeBank();
             return;
         }
         Rs2Bank.closeBank();
-        if (inventory.hasItem("steel bar") && !canPour()) {
+        if (Rs2Inventory.hasItem("steel bar") && !canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Fill");
             sleepUntil(() -> Rs2Widget.findWidget("What metal would you like to add?", null) != null, 5000);
             VirtualKeyboard.keyPress('3');
-            sleepUntil(() -> !inventory.hasItem("steel bar"), 5000);
+            sleepUntil(() -> !Rs2Inventory.hasItem("steel bar"), 5000);
         }
-        if (inventory.hasItem("mithril bar") && !canPour()) {
+        if (Rs2Inventory.hasItem("mithril bar") && !canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Fill");
             sleepUntil(() -> Rs2Widget.findWidget("What metal would you like to add?", null) != null, 5000);
             sleep(600, 1200);
             VirtualKeyboard.keyPress('4');
-            sleepUntil(() -> !inventory.hasItem("mithril bar"), 5000);
+            sleepUntil(() -> !Rs2Inventory.hasItem("mithril bar"), 5000);
         }
         if (canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Pour");
@@ -168,12 +167,13 @@ public class GiantsFoundryScript extends Script {
     public boolean canPickupMould() {
         if (canPour()) return false;
         ObjectComposition objectComposition = Rs2GameObject.findObjectComposition(MOULD_JIG);
+        if (objectComposition == null) return false;
         return objectComposition.getImpostor().getName().toLowerCase().contains("poured metal");
     }
 
     public void pickupMould() {
         if (!canPickupMould()) return;
-        if (inventory.isEmpty() && GiantsFoundryState.getCurrentStage() == null) {
+        if (Rs2Inventory.isEmpty() && GiantsFoundryState.getCurrentStage() == null) {
             Rs2GameObject.interact(MOULD_JIG, "Pick-up");
             sleepUntil(() -> !canPickupMould(), 5000);
         }
@@ -212,9 +212,10 @@ public class GiantsFoundryScript extends Script {
         if (Microbot.isGainingExp && !BonusWidget.isActive()) return;
         if (GiantsFoundryState.getHeatChangeNeeded() == -1) {
             Stage stage = GiantsFoundryState.getCurrentStage();
+            if (stage == null) return;
             GameObject obj = GiantsFoundryState.getStageObject(stage);
             if (obj == null) return;
-            Microbot.getMouse().click(obj.getCanvasLocation());
+            Rs2GameObject.interact(obj);
             isCoolingDown = false;
             isHeatingUp = false;
             sleepUntil(() -> Microbot.isGainingExp || GiantsFoundryState.getHeatChangeNeeded() != -1, 5000);

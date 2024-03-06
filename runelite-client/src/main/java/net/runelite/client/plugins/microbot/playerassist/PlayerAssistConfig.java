@@ -84,6 +84,16 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
     @ConfigItem(
+            keyName = "Ranging/Bastion potion",
+            name = "Auto drink Ranging/Bastion potion",
+            description = "Automatically drinks Ranging/Bastion potions",
+            position = 5
+    )
+    default boolean toggleRangingPotion()
+    {
+        return false;
+    }
+    @ConfigItem(
             keyName = "Loot items",
             name = "auto loot items",
             description = "Enable/disable loot items",
@@ -94,14 +104,14 @@ public interface PlayerAssistConfig extends Config {
         return true;
     }
     @ConfigItem(
-            keyName = "Items to loot",
-            name = "Items to loot",
-            description = "Items to loot comma seperated",
+            keyName = "Price of items to loot",
+            name = "Price of items to loot",
+            description = "Price of items to loot comma seperated",
             position = 5
     )
-    default String itemsToLoot()
+    default int priceOfItemsToLoot()
     {
-        return "";
+        return 10000;
     }
     @ConfigItem(
             keyName = "Loot arrows",

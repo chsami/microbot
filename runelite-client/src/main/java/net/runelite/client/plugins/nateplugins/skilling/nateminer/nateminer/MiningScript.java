@@ -1,11 +1,10 @@
 package net.runelite.client.plugins.nateplugins.skilling.nateminer.nateminer;
 
-import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.envisionplugins.breakhandler.util.BreakHandlerExecutor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,11 +27,11 @@ public class MiningScript extends Script {
                         "WIP");
 
                 breakHandlerExecutor.breakOrExecute(() -> {
-                    if (Inventory.isFull()) {
+                    if (Rs2Inventory.isFull()) {
                         if (config.hasPickaxeInventory()) {
-                            Inventory.dropAllStartingFrom(1);
+                            Rs2Inventory.drop(x -> x.slot == 0);
                         } else {
-                            Inventory.dropAll();
+                            Rs2Inventory.dropAll();
                         }
                         return;
                     }

@@ -3,7 +3,8 @@ package net.runelite.client.plugins.danplugins.fishing.threetickbarb.tickmanipul
 import net.runelite.api.ItemID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 
 public class HerbTarTickManipulationData extends TickManipulationData {
 
@@ -11,13 +12,13 @@ public class HerbTarTickManipulationData extends TickManipulationData {
     public Runnable getFirstTickRunnable() {
         return () ->
         {
-            Widget guamLeafWidget = Inventory.findItem(ItemID.GUAM_LEAF);
-            Microbot.getMouse().click(guamLeafWidget.getBounds());
+            Rs2Item guamLeafWidget = Rs2Inventory.get(ItemID.GUAM_LEAF);
+            Rs2Inventory.use(guamLeafWidget);
         };
     }
 
     @Override
     public Runnable getSecondTickRunnable() {
-        return () -> Inventory.useItemFast(ItemID.SWAMP_TAR, "use");
+        return () -> Rs2Inventory.interact(ItemID.SWAMP_TAR, "use");
     }
 }

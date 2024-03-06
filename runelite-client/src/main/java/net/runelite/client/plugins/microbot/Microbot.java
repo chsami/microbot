@@ -11,16 +11,21 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
+import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
-import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class Microbot {
@@ -63,6 +68,12 @@ public class Microbot {
     @Getter
     @Setter
     private static boolean disableWalkerUpdate;
+    @Getter
+    @Setter
+    private static List<PluginRequestModel> botPlugins = new ArrayList<>();
+    @Getter
+    @Setter
+    private static PluginManager pluginManager;
 
     public static boolean debug = false;
 
@@ -72,7 +83,7 @@ public class Microbot {
 
     public static boolean enableAutoRunOn = true;
 
-    private static ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
 
@@ -183,9 +194,9 @@ public class Microbot {
         });
     }
 
-    public static CopyOnWriteArrayList<ItemWidget> updateItemContainer(int id, ItemContainerChanged e) {
+    public static CopyOnWriteArrayList<Rs2Item> updateItemContainer(int id, ItemContainerChanged e) {
         if (e.getContainerId() == id) {
-            CopyOnWriteArrayList<ItemWidget> list = new CopyOnWriteArrayList<>();
+            CopyOnWriteArrayList<Rs2Item> list = new CopyOnWriteArrayList<>();
             int i = -1;
             for (Item item : e.getItemContainer().getItems()) {
                 if (item == null) {
@@ -197,7 +208,7 @@ public class Microbot {
                 boolean isPlaceholder = composition.getPlaceholderTemplateId() > 0;
                 if (isPlaceholder) continue;
 
-                list.add(new ItemWidget(composition.getName(), item.getId(), item.getQuantity(), i));
+                list.add(new Rs2Item(item, composition, i));
             }
             return list;
         }
@@ -207,5 +218,9 @@ public class Microbot {
     public static void setBreakHandler(String pluginName, boolean advancedPostRunDiscordNotifications) {
         BreakHandlerScript.setParentPluginName(pluginName);
         BreakHandlerScript.setDetailedReportNotification(advancedPostRunDiscordNotifications);
+    }
+
+    public static void startPlugin(Plugin plugin) {
+
     }
 }

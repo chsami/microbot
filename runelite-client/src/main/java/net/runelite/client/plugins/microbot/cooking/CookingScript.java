@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.cooking;
 
-import net.runelite.api.*;
+import net.runelite.api.Skill;
+import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -8,13 +9,12 @@ import net.runelite.client.plugins.microbot.cooking.enums.CookingEnum;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +24,7 @@ public class CookingScript extends Script {
 
     public static double version = 1.0;
 
-    List<String> missingItemsInBank = new ArrayList<>(Arrays.asList());
+    List<String> missingItemsInBank = new ArrayList<>(List.of());
 
     public boolean run(int gameObjectId) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -33,7 +33,7 @@ public class CookingScript extends Script {
 
                 String itemToCook = getItemToCook();
 
-                if (!Inventory.isFull() || !Inventory.hasItem(itemToCook)) {
+                if (!Rs2Inventory.isFull() || !Rs2Inventory.hasItem(itemToCook)) {
                     if (!Rs2Bank.isOpen()) {
                         boolean bankIsOnScreen = Rs2Bank.useBank();
                         if (!bankIsOnScreen) {
@@ -50,7 +50,7 @@ public class CookingScript extends Script {
                     }
                 }
 
-                if (Inventory.hasItem(itemToCook)) {
+                if (Rs2Inventory.hasItem(itemToCook)) {
                     Microbot.getWalker().walkMiniMap(new WorldPoint(3273 + random(-2, 2), 3180+ random(-2, 2), 0));
 
                     TileObject cookingRange = Rs2GameObject.findObjectById(gameObjectId);
@@ -69,9 +69,9 @@ public class CookingScript extends Script {
                         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
                         sleep(5000);
                         while (true) {
-                            long rawFoodCount = Inventory.getAmountForItem(itemToCook);
+                            long rawFoodCount = Rs2Inventory.get(itemToCook).quantity;
                             sleep(3000);
-                            if (rawFoodCount == Inventory.getAmountForItem(itemToCook))
+                            if (rawFoodCount == Rs2Inventory.get(itemToCook).quantity)
                                 break;
                         }
                     }

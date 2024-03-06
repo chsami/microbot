@@ -17,8 +17,8 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.PluginDescriptor.Mocrosoft;
@@ -51,9 +51,9 @@ public class DriftNetPlugin extends Plugin {
     private DriftNetOverlay overlay;
 
     @Getter
-    private static Set<NPC> fish = new HashSet<>();
+    private static final Set<NPC> fish = new HashSet<>();
     @Getter
-    private static Map<NPC, Integer> taggedFish = new HashMap<>();
+    private static final Map<NPC, Integer> taggedFish = new HashMap<>();
     @Getter
     private static final List<DriftNet> NETS = ImmutableList.of(
             new DriftNet(NullObjectID.NULL_31433, Varbits.NORTH_NET_STATUS, Varbits.NORTH_NET_CATCH_COUNT, ImmutableSet.of(

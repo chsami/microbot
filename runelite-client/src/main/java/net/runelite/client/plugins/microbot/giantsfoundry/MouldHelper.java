@@ -1,9 +1,12 @@
 package net.runelite.client.plugins.microbot.giantsfoundry;
 
+import net.runelite.api.MenuAction;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.giantsfoundry.enums.CommissionType;
 import net.runelite.client.plugins.microbot.giantsfoundry.enums.Mould;
+import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.LinkedHashMap;
@@ -36,19 +39,25 @@ public class MouldHelper {
         Widget bestWidget = null;
         CommissionType type1 = CommissionType.forVarbit(Microbot.getVarbitValue(SWORD_TYPE_1_VARBIT));
         CommissionType type2 = CommissionType.forVarbit(Microbot.getVarbitValue(SWORD_TYPE_2_VARBIT));
+        int i = 0;
+        int bestIndex = 0;
         for (Map.Entry<Mould, Widget> entry : mouldToChild.entrySet()) {
             Mould mould = entry.getKey();
             int score = mould.getScore(type1, type2);
             if (score > bestScore) {
                 bestScore = score;
                 bestWidget = entry.getValue();
+                bestIndex = i;
             }
+            i++;
         }
         if (bestWidget != null) {
             bestWidget.setTextColor(GREEN);
         }
-        Microbot.getMouse().click(bestWidget.getBounds());
-        sleep(1000, 2000);
+
+        Rs2Reflection.invokeMenu(bestIndex * 17, MOULD_LIST_PARENT, MenuAction.CC_OP.getId(), 1,
+                -1, "Select", "", (int) bestWidget.getBounds().getCenterX(), (int ) bestWidget.getBounds().getCenterY());
+        sleep(800, 1200);
     }
 
     private static Map<Mould, Widget> getOptions(Widget[] children) {

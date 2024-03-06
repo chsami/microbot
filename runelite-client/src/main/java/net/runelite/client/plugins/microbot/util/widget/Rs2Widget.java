@@ -1,26 +1,19 @@
 package net.runelite.client.plugins.microbot.util.widget;
 
 import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Widget {
-
-    public static Widget menuSwapWidget = null;
-    public static int menuSwapParam0 = -1;
-    public static int menuSwapIdentifier = 1;
 
     public static boolean clickWidget(String text) {
         Widget widget = findWidget(text, null);
@@ -63,6 +56,15 @@ public class Rs2Widget {
     public static Widget getWidget(int id) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id));
     }
+
+    public static boolean isHidden(int id) {
+        return Microbot.getClientThread().runOnClientThread(() ->  {
+            Widget widget = Microbot.getClient().getWidget(id);
+            if (widget == null) return true;
+            return widget.isHidden();
+        });
+    }
+
 
     public static Widget getWidget(int id, int child) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id, child));
@@ -303,8 +305,12 @@ public class Rs2Widget {
 
     public static void clickWidgetFast(int packetId, int identifier) {
         Widget widget = getWidget(packetId);
-        menuSwapIdentifier = identifier;
-        clickWidgetFast(widget);
+        clickWidgetFast(widget,-1, identifier);
+    }
+
+    public static void clickWidgetFast(int packetId, MenuAction menuAction) {
+        Widget widget = getWidget(packetId);
+        clickWidgetFast(widget, menuAction);
     }
 
     public static void clickWidgetFast(int packetId) {
@@ -312,15 +318,26 @@ public class Rs2Widget {
         clickWidgetFast(widget);
     }
 
+    public static void clickWidgetFast(Widget widget, MenuAction menuAction) {
+        int param1 = widget.getId();
+        String option = "Select";
+        String target = "";
+        Rs2Reflection.invokeMenu(-1, param1, menuAction.getId(), 0, widget.getItemId(), option, target, -1, -1);
+    }
+
     public static void clickWidgetFast(Widget widget, int param0, int identifier) {
-        menuSwapWidget = widget;
-        menuSwapParam0 = param0;
-        menuSwapIdentifier = identifier;
-        Microbot.getMouse().clickFast(1, 1);
-        sleep(100);
-        menuSwapParam0 = -1;
-        menuSwapWidget = null;
-        menuSwapIdentifier = 1;
+        int param1 = widget.getId();
+        String option = "Select";
+        String target = "";
+        MenuAction menuAction = MenuAction.CC_OP;
+        Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
+    }
+
+    public static void clickWidgetFast(Widget widget, int param0, int identifier, MenuAction menuAction) {
+        int param1 = widget.getId();
+        String option = "Select";
+        String target = "";
+        Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
     }
 
     public static void clickWidgetFast(Widget widget, int param0) {
@@ -329,16 +346,5 @@ public class Rs2Widget {
 
     public static void clickWidgetFast(Widget widget) {
         clickWidgetFast(widget, -1, 1);
-    }
-
-    public static void handleMenuSwapper(MenuEntry menuEntry) throws InvocationTargetException, IllegalAccessException {
-        if (menuSwapWidget == null) return;
-        Rs2Reflection.setItemId(menuEntry, menuSwapWidget.getItemId());
-        menuEntry.setOption("Select");
-        menuEntry.setParam0(menuSwapParam0 != -1 ? menuSwapParam0 : menuSwapWidget.getType());
-        menuEntry.setParam1(menuSwapWidget.getId());
-        menuEntry.setTarget("");
-        menuEntry.setType(MenuAction.CC_OP);
-        menuEntry.setIdentifier(menuSwapIdentifier);
     }
 }

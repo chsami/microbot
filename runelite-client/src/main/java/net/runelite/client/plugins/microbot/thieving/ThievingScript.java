@@ -4,11 +4,11 @@ import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.timers.TimersPlugin;
 
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.getEquippedItem;
-import static net.runelite.client.plugins.microbot.util.inventory.Inventory.eat;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class ThievingScript extends Script {
@@ -29,31 +28,31 @@ public class ThievingScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
-                if (foods.length == 0) {
+                List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
+                if (foods.isEmpty()) {
 
-                    if (Inventory.count() > 3) {
-                        Inventory.dropAllStartingFrom(3);
+                    if (Rs2Inventory.getEmptySlots() > 3) {
+                        Rs2Inventory.dropAllExcept(x -> x.slot <= 3);
                         return;
                     }
                     if (Rs2Bank.walkToBank()) {
                         Rs2Bank.useBank();
-                        Rs2Bank.withdrawItemX(true, "monkfish", 5);
-                        final ItemComposition amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
+                        Rs2Bank.withdrawX(true, "monkfish", 5);
+                        final Rs2Item amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
                         if (amulet == null) {
                             Rs2Bank.withdrawItem(true, "dodgy necklace");
                         }
                         Rs2Bank.closeBank();
                         sleep(1000, 2000);
-                        Inventory.useItem(ItemID.DODGY_NECKLACE);
+                        Rs2Inventory.use(ItemID.DODGY_NECKLACE);
                     }
                     return;
                 }
-                if (Inventory.isFull()) {
-                    Inventory.dropAllStartingFrom(8);
+                if (Rs2Inventory.isFull()) {
+                    Rs2Inventory.dropAllExcept(x -> x.slot <= 8);
                 }
-                if (Inventory.hasItemAmountStackable("coin pouch", 28)) {
-                    Inventory.interact("coin pouch");
+                if (Rs2Inventory.hasItemAmount("coin pouch", 28, true)) {
+                    Rs2Inventory.interact("coin pouch");
                 }
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > config.hitpoints()) {
                     if (random(1, 10) == 2)
@@ -63,10 +62,10 @@ public class ThievingScript extends Script {
                     }
                 } else {
 
-                    for (Widget food : foods) {
-                        eat(food);
+                    for (Rs2Item food : foods) {
+                        Rs2Inventory.interact(food, "eat");
                         if (random(1, 10) == 2) { //double eat
-                            eat(food);
+                            Rs2Inventory.interact(food, "eat");
                         }
                         break;
                     }
@@ -85,37 +84,37 @@ public class ThievingScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                Widget[] foods = Microbot.getClientThread().runOnClientThread(() -> Inventory.getInventoryFood());
-                if (foods.length == 0) {
+                List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
+                if (foods.isEmpty()) {
 
-                    if (Inventory.count() > 3) {
-                        Inventory.dropAllStartingFrom(3);
+                    if (Rs2Inventory.isSlotsEmpty(0, 1, 2)) {
+                        Rs2Inventory.dropAllExcept(x -> x.slot < 3);
                         return;
                     }
                     if (Rs2Bank.walkToBank()) {
                         Rs2Bank.useBank();
                         for (String supportedFood: supportedFoods) {
-                            if (Microbot
+                            if (!Microbot
                                     .getClientThread()
-                                    .runOnClientThread(() -> Inventory.getInventoryFood()).length != 0)
+                                    .runOnClientThread(Rs2Inventory::getInventoryFood).isEmpty())
                                 break;
-                            Rs2Bank.withdrawItemX(true, supportedFood, 5);
+                            Rs2Bank.withdrawX(true, supportedFood, 5);
                         }
-                        final ItemComposition amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
+                        final Rs2Item amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
                         if (amulet == null) {
                             Rs2Bank.withdrawItem(true, "dodgy necklace");
                         }
                         Rs2Bank.closeBank();
                         sleep(1000, 2000);
-                        Inventory.useItem(ItemID.DODGY_NECKLACE);
+                        Rs2Inventory.use(ItemID.DODGY_NECKLACE);
                     }
                     return;
                 }
-                if (Inventory.isFull()) {
-                    Inventory.dropAllStartingFrom(8);
+                if (Rs2Inventory.isFull()) {
+                    Rs2Inventory.dropAllExcept(x -> x.slot <= 8);
                 }
-                if (Inventory.hasItemAmountStackable("coin pouch", 28)) {
-                    Inventory.interact("coin pouch");
+                if (Rs2Inventory.hasItemAmount("coin pouch", 28)) {
+                    Rs2Inventory.interact("coin pouch");
                 }
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > 20) {
                     if (random(1, 10) == 2)
@@ -125,10 +124,10 @@ public class ThievingScript extends Script {
                     }
                 } else {
 
-                    for (Widget food : foods) {
-                        eat(food);
+                    for (Rs2Item food : foods) {
+                        Rs2Inventory.interact(food, "eat");
                         if (random(1, 10) == 2) { //double eat
-                            eat(food);
+                            Rs2Inventory.interact(food, "eat");
                         }
                         break;
                     }

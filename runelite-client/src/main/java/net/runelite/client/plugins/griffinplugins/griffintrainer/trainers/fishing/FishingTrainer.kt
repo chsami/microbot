@@ -15,7 +15,7 @@ import net.runelite.client.plugins.griffinplugins.util.helpers.FishingHelper
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 
 class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
     private val draynorFishingArea = WorldArea(3084, 3223, 7, 11, 0)
@@ -126,13 +126,13 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
     private fun runFishingState(npcName: String, actionName: String, itemIds: List<Int>) {
         var countBefore = 0
         itemIds.forEach { itemId: Int ->
-            countBefore += Inventory.getInventoryItems().count { it.itemId == itemId }
+            countBefore += Rs2Inventory.count(itemId)
         }
 
         if (FishingHelper.findAndInteract(npcName, actionName)) {
             var countAfter = 0
             itemIds.forEach { itemId: Int ->
-                countAfter += Inventory.getInventoryItems().count { it.itemId == itemId }
+                countAfter += Rs2Inventory.count(itemId)
             }
 
             TrainerThread.count += countAfter - countBefore
@@ -143,7 +143,7 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
 
     private fun runBankingState(itemIdsToDeposit: List<Int>) {
         if (config.keepFish()) {
-            if (Inventory.isFull()) {
+            if (Rs2Inventory.isFull()) {
                 Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
                 TrainerInterruptor.sleep(400, 600)
 
@@ -154,7 +154,7 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
 
                     for (itemId in itemIdsToDeposit) {
                         Rs2Bank.depositAll(itemId)
-                        TrainerInterruptor.sleepUntilTrue({ !Inventory.hasItem(itemId) }, 100, 3000)
+                        TrainerInterruptor.sleepUntilTrue({ !Rs2Inventory.hasItem(itemId) }, 100, 3000)
                     }
 
                     Rs2Bank.closeBank()
@@ -163,7 +163,7 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
             }
         } else {
             for (itemId in itemIdsToDeposit) {
-                Inventory.dropAll(itemId)
+                Rs2Inventory.dropAll(itemId)
             }
         }
 

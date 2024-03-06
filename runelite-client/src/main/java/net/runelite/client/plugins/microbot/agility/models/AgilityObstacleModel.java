@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.agility.models;
 
 import lombok.Getter;
-import net.runelite.api.coords.WorldPoint;
 
 public class AgilityObstacleModel {
     @Getter

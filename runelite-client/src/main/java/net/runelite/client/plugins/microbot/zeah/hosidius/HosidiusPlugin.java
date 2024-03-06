@@ -44,7 +44,7 @@ public class HosidiusPlugin extends Plugin {
     @Inject
     private HosidiusOverlay hosidiusOverlay;
 
-    private HosidiusScript hosidiusScript = new HosidiusScript();
+    private final HosidiusScript hosidiusScript = new HosidiusScript();
 
     @Override
     protected void startUp() throws AWTException {

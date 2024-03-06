@@ -14,7 +14,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -30,7 +30,7 @@ enum BotState {
     COMPLETE_AND_RESET,
     RETURN_TO_HOUSE,
     MAKE_LAST_JUICE,
-    RUN;
+    RUN
 }
 
 // TODO I can replace the findDoor with the exact tile. check the findDoor function.
@@ -53,7 +53,7 @@ public class SummerGardenScript extends Script {
 
 
     private Actor lastInteractedActor = null;
-    public boolean sendInventoryFullNotification = false;
+    public boolean sendRs2InventoryFullNotification = false;
     private BotState botState = BotState.RUN;
 
     public boolean run(SummerGardenConfig config, ChatMessageManager chatMessageManager) {
@@ -76,7 +76,7 @@ public class SummerGardenScript extends Script {
                     }
 
                     if (botState == BotState.RUN) {
-                        if (Inventory.hasItemAmountExact("Summer sq'irk", 2) && Inventory.getItemAmount("Summer sq'irkjuice") == 25) {
+                        if (Rs2Inventory.hasItemAmount("Summer sq'irk", 2, false, true) && Rs2Inventory.count("Summer sq'irkjuice") == 25) {
                             if (isInGarden()) {
                                 botState = BotState.EXIT_GARDEN;
                             }
@@ -84,12 +84,12 @@ public class SummerGardenScript extends Script {
                                 botState = BotState.MAKE_LAST_JUICE;
                             }
                         }
-                        else if (Inventory.hasItem("Summer sq'irkjuice") && isInAlKharid()) {
+                        else if (Rs2Inventory.hasItem("Summer sq'irkjuice") && isInAlKharid()) {
                             botState = BotState.COMPLETE_AND_RESET;
                         }
-                        else if (!Inventory.hasItem("Summer sq'irk")
-                                && !Inventory.hasItemAmountExact("Beer glass", 25)
-                                && !Inventory.hasItem("Summer sq'irkjuice")
+                        else if (!Rs2Inventory.hasItem("Summer sq'irk")
+                                && !Rs2Inventory.hasItemAmount("Beer glass", 25, false, true)
+                                && !Rs2Inventory.hasItem("Summer sq'irkjuice")
                                 && isInAlKharid()) {
                             botState = BotState.RETURN_TO_HOUSE;
                         }
@@ -102,7 +102,7 @@ public class SummerGardenScript extends Script {
                     }
                     else if (botState == BotState.COMPLETE_AND_RESET) {
                         completeAndReset();
-                        if (config.sendInvFullNotification() && !sendInventoryFullNotification) {
+                        if (config.sendInvFullNotification() && !sendRs2InventoryFullNotification) {
                             // this line causes a freeze when using dev mode
                             //Microbot.getClient().playSoundEffect(OUT_OF_SUPPLY_SOUND, SoundEffectVolume.HIGH);
                             String message = new ChatMessageBuilder()
@@ -113,7 +113,7 @@ public class SummerGardenScript extends Script {
                                     .type(ChatMessageType.CONSOLE)
                                     .runeLiteFormattedMessage(message)
                                     .build());
-                            sendInventoryFullNotification = true;
+                            sendRs2InventoryFullNotification = true;
                         }
                         return;
                     } else if (botState == BotState.RETURN_TO_HOUSE) {
@@ -200,7 +200,7 @@ public class SummerGardenScript extends Script {
 
     private void exitGarden() {
         // Can't find the fountain?
-        if (Rs2GameObject.findObject(12941) == null) {
+        if (Rs2GameObject.findObjectById(12941) == null) {
             return;
         }
 
@@ -215,7 +215,7 @@ public class SummerGardenScript extends Script {
             return;
         }
 
-        if (Inventory.hasItemAmountExact("Summer sq'irk", 2)) {
+        if (Rs2Inventory.hasItemAmount("Summer sq'irk", 2, false, true)) {
             botState = BotState.MAKE_LAST_JUICE;
         }
         else {
@@ -224,17 +224,17 @@ public class SummerGardenScript extends Script {
     }
 
     private void doMaze(SummerGardenConfig config) {
-        // If the player's inventory is full and there's no empty beer glasses, or if the player isn't in the garden
-        if ((Inventory.isFull() && !Inventory.hasItem("beer glass")) || !isInGarden()) {
+        // If the player's Rs2Inventory is full and there's no empty beer glasses, or if the player isn't in the garden
+        if ((Rs2Inventory.isFull() && !Rs2Inventory.hasItem("beer glass")) || !isInGarden()) {
             return;
         }
 
         // Use sq'irk with pestle and mortar
-        if (Inventory.hasItemAmountExact("Summer sq'irk", 2)) {
-            if (Inventory.hasItem("beer glass") && Inventory.hasItem("Pestle and mortar")) {
-                Inventory.useItem("Pestle and mortar");
-                Inventory.useItem("Summer sq'irk", true);
-                sendInventoryFullNotification = false;
+        if (Rs2Inventory.hasItemAmount("Summer sq'irk", 2, false, true)) {
+            if (Rs2Inventory.hasItem("beer glass") && Rs2Inventory.hasItem("Pestle and mortar")) {
+                Rs2Inventory.use("Pestle and mortar");
+                Rs2Inventory.use("Summer sq'irk");
+                sendRs2InventoryFullNotification = false;
             }
         }
 
@@ -274,7 +274,7 @@ public class SummerGardenScript extends Script {
         }
 
         // The player doesn't have any juice to hand in.
-        if (!Inventory.hasItem("Summer sq'irkjuice")) {
+        if (!Rs2Inventory.hasItem("Summer sq'irkjuice")) {
             botState = BotState.RETURN_TO_HOUSE;
             return;
         }
@@ -362,15 +362,15 @@ public class SummerGardenScript extends Script {
         }
 
         // Interact with shelf to get beer glass.
-        while (Inventory.getItemAmount("Beer glass") < 25) {
+        while (Rs2Inventory.count("Beer glass") < 25) {
             Rs2GameObject.interact(OBJECT_BEER_GLASS_SHELF);
             sleep(3000);
         }
 
-        if (!Inventory.hasItemAmountExact("Beer glass", 25)) {
-            if (Inventory.getItemAmount("Beer glass") > 25) {
-                Inventory.drop("Beer glass");
-                sleepUntil(() -> Inventory.getItemAmount("Beer glass") == 25, 2000);
+        if (!Rs2Inventory.hasItemAmount("Beer glass", 25, false, true)) {
+            if (Rs2Inventory.count("Beer glass") > 25) {
+                Rs2Inventory.drop("Beer glass");
+                sleepUntil(() -> Rs2Inventory.count("Beer glass") == 25, 2000);
             }
             return;
         }
@@ -394,7 +394,7 @@ public class SummerGardenScript extends Script {
     }
 
     private void makeLastJuice() {
-        if (!Inventory.hasItemAmountExact("Summer sq'irk", 2)) {
+        if (!Rs2Inventory.hasItemAmount("Summer sq'irk", 2, false, true)) {
             botState = BotState.COMPLETE_AND_RESET;
             return;
         }
@@ -404,37 +404,37 @@ public class SummerGardenScript extends Script {
             return;
         }
 
-        if (Inventory.isFull()) {
-            Inventory.drop("Summer sq'irkjuice");
-            sleepUntil(() -> !Inventory.isFull(), 2000);
+        if (Rs2Inventory.isFull()) {
+            Rs2Inventory.drop("Summer sq'irkjuice");
+            sleepUntil(() -> !Rs2Inventory.isFull(), 2000);
         }
 
-        if (!Inventory.hasItemAmountExact("Beer glass", 1)) {
-            if (Inventory.getItemAmount("Beer glass") == 0) {
+        if (!Rs2Inventory.hasItemAmount("Beer glass", 1, false, true)) {
+            if (Rs2Inventory.count("Beer glass") == 0) {
                 Rs2GameObject.interact(OBJECT_BEER_GLASS_SHELF);
-                sleepUntil(() -> Inventory.hasItem("beer glass"), 5000);
+                sleepUntil(() -> Rs2Inventory.hasItem("beer glass"), 5000);
                 sleep(3000);
             }
 
-            if (Inventory.getItemAmount("Beer glass") > 1) {
-                Inventory.drop("Beer glass");
-                sleepUntil(() -> Inventory.getItemAmount("Beer glass") == 1, 5000);
+            if (Rs2Inventory.count("Beer glass") > 1) {
+                Rs2Inventory.drop("Beer glass");
+                sleepUntil(() -> Rs2Inventory.count("Beer glass") == 1, 5000);
             }
         }
 
-        if (!Inventory.hasItem("beer glass")) {
+        if (!Rs2Inventory.hasItem("beer glass")) {
             return;
         }
 
-        if (Inventory.hasItem("beer glass") && Inventory.hasItem("Pestle and mortar")) {
-            Inventory.useItem("Pestle and mortar");
-            Inventory.useItem("Summer sq'irk", true);
-            sleepUntil(() -> Inventory.getItemAmount("Beer glass") == 0, 2000);
+        if (Rs2Inventory.hasItem("beer glass") && Rs2Inventory.hasItem("Pestle and mortar")) {
+            Rs2Inventory.use("Pestle and mortar");
+            Rs2Inventory.use("Summer sq'irk");
+            sleepUntil(() -> Rs2Inventory.count("Beer glass") == 0, 2000);
         }
 
-        while (Inventory.getItemAmount("Summer sq'irkjuice") != 26) {
+        while (Rs2Inventory.count("Summer sq'irkjuice") != 26) {
             Rs2GroundItem.pickup("Summer sq'irkjuice", 200);
-            sleepUntil(() -> Inventory.hasItemAmountExact("Summer sq'irk", 26), 5000);
+            sleepUntil(() -> Rs2Inventory.hasItemAmount("Summer sq'irk", 26, false, true), 5000);
             sleep(3000);
         }
 

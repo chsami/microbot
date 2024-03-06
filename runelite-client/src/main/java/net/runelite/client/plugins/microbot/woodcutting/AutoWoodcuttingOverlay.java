@@ -2,18 +2,14 @@ package net.runelite.client.plugins.microbot.woodcutting;
 
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
-
 import net.runelite.client.plugins.natepainthelper.PaintFormat;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
-
-
 import javax.inject.Inject;
 import java.awt.*;
-
 
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 

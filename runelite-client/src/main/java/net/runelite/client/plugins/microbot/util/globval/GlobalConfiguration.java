@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class GlobalConfiguration {
@@ -261,11 +262,8 @@ public class GlobalConfiguration {
 		final ByteArrayOutputStream logout = new ByteArrayOutputStream();
 		if (GlobalConfiguration.RUNNING_FROM_JAR) {
 			String path = resource.toString();
-			try {
-				path = URLDecoder.decode(path, "UTF-8");
-			} catch (final UnsupportedEncodingException ignored) {
-			}
-			final String prefix = "jar:file:/";
+            path = URLDecoder.decode(path, StandardCharsets.UTF_8);
+            final String prefix = "jar:file:/";
 			if (path.indexOf(prefix) == 0) {
 				path = path.substring(prefix.length());
 				path = path.substring(0, path.indexOf('!'));
@@ -313,10 +311,9 @@ public class GlobalConfiguration {
 			os = "Macintosh; Intel Mac OS X 10_6_6";
 		else if (GlobalConfiguration.getCurrentOperatingSystem() != OperatingSystem.WINDOWS)
 			os = "X11; Linux x86_64";
-		StringBuilder buf = new StringBuilder(125);
-		buf.append("Mozilla/5.0 (").append(os).append(")");
-		buf.append(" AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.60 Safari/534.24");
-		httpUserAgent = buf.toString();
+		String buf = "Mozilla/5.0 (" + os + ")" +
+				" AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.60 Safari/534.24";
+		httpUserAgent = buf;
 		return httpUserAgent;
 	}
 

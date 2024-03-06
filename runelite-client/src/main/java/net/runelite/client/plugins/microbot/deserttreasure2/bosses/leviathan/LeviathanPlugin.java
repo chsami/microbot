@@ -2,11 +2,8 @@ package net.runelite.client.plugins.microbot.deserttreasure2.bosses.leviathan;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.GraphicID;
-import net.runelite.api.GraphicsObject;
 import net.runelite.api.NpcID;
 import net.runelite.api.Projectile;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GraphicsObjectCreated;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.ProjectileMoved;
@@ -14,8 +11,8 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.microbot.example.ExampleScript;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -74,16 +71,14 @@ public class LeviathanPlugin extends Plugin {
     {
         final Projectile projectile = event.getProjectile();
 
-        System.out.println(projectile.getId());
-
         if (event.getProjectile().getRemainingCycles() < 10) {
             if (projectile.getId() == meleeProjectile)
             {
-                Rs2Prayer.turnOnMeleePrayer();
+                Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
             } else if (projectile.getId() == mageProjectile) {
-                Rs2Prayer.turnOnMagePrayer();
+                Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, true);
             } else if (projectile.getId() == rangeProjectile) {
-                Rs2Prayer.turnOnRangedPrayer();
+                Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true);
             }
         }
     }

@@ -12,8 +12,8 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -34,7 +34,7 @@ public class GoldScript extends Script {
                 TileObject furnace = (TileObject) Rs2GameObject.findObjectById(24009);
                 boolean isBankVisible = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(BankLocation.AL_KHARID.getWorldPoint()) < 5;
                 boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
-                boolean hasBars = Inventory.hasItem("gold bar");
+                boolean hasBars = Rs2Inventory.hasItem("gold bar");
                 if (hasRunEnergy) Rs2Player.toggleRunEnergy(true);
                 if (Microbot.pauseAllScripts) return;
 
@@ -47,7 +47,7 @@ public class GoldScript extends Script {
                         sleepUntil(() -> Rs2Widget.hasWidget("What would you like to make?"));
                         if (widget != null) {
                             Microbot.getMouse().click(51,87);
-                            sleepUntil(() -> !Inventory.hasItem("gold bar"),60000);
+                            sleepUntil(() -> !Rs2Inventory.hasItem("gold bar"),60000);
                         }
                     } else {
                         if (Rs2GameObject.interact("Furnace")) {
@@ -55,7 +55,7 @@ public class GoldScript extends Script {
                             Widget widget = Rs2Widget.getWidget(446,7);
                             if (widget != null) {
                                 Microbot.getMouse().click(51,87);
-                                sleepUntil(() -> !Inventory.hasItem("gold bar"),60000);
+                                sleepUntil(() -> !Rs2Inventory.hasItem("gold bar"),60000);
                             }
                         }
                     }
@@ -66,10 +66,10 @@ public class GoldScript extends Script {
                 if (!hasBars && isBankVisible) {
                     if(Rs2Bank.isOpen()) {
                         Rs2Bank.depositAll("gold ring");
-                        sleepUntil(() -> !Inventory.hasItem("gold ring"));
+                        sleepUntil(() -> !Rs2Inventory.hasItem("gold ring"));
                         if(Rs2Bank.hasItem("gold bar")){
                             Rs2Bank.withdrawItemAll("gold bar");
-                            sleepUntil(() -> Inventory.hasItem("gold bar"));
+                            sleepUntil(() -> Rs2Inventory.hasItem("gold bar"));
                         } else {
                             Microbot.getNotifier().notify("Run out of Materials");
                             shutdown();

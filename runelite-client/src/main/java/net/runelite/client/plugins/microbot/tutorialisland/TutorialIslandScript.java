@@ -10,7 +10,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.dialogues.Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -192,7 +192,7 @@ public class TutorialIslandScript extends Script {
             return;
         }
         if (Microbot.getVarbitPlayerValue(281) == 3) {
-            Rs2Widget.clickWidget(10747944);
+            Rs2Widget.clickWidget(10747945);
             sleep(1000);
             turnOffMusic();
             Microbot.getMouse().scrollDown(new Point(800, 800));
@@ -207,7 +207,7 @@ public class TutorialIslandScript extends Script {
     }
 
     public void SurvivalGuide() {
-        if (Inventory.contains("Shrimps")) return;
+        if (Rs2Inventory.contains("Shrimps")) return;
         if (Microbot.getVarbitPlayerValue(281) == 10) {
             DoorToSurvivalGuide();
         } else if (Microbot.getVarbitPlayerValue(281) == 20) { // SURVIVAL EXPERT
@@ -219,36 +219,36 @@ public class TutorialIslandScript extends Script {
                 || Microbot.getVarbitPlayerValue(281) == 70
                 || Microbot.getVarbitPlayerValue(281) == 80
                 || Microbot.getVarbitPlayerValue(281) == 90) { // FISHING + woodcutting + cooking
-            if (!Inventory.contains("Raw shrimps")) {
+            if (!Rs2Inventory.contains("Raw shrimps")) {
                 ClickContinue();
                 sleep(1000);
-                Rs2Widget.clickWidget(10747958);
+                Rs2Widget.clickWidget(10747959);
                 sleep(1000);
                 Rs2Npc.interact(3317, "Net");
-                sleepUntil(() -> Inventory.contains("Raw shrimps"));
+                sleepUntil(() -> Rs2Inventory.contains("Raw shrimps"));
             } else {
                 if (Microbot.getVarbitPlayerValue(281) < 90) {
-                    if (!Inventory.contains("Bronze axe")) {
-                        Rs2Widget.clickWidget(10747956);
+                    if (!Rs2Inventory.contains("Bronze axe")) {
+                        Rs2Widget.clickWidget(10747957);
                         if (!isInDialogue()) {
                             InteractWithNpc(8503);
                         } else {
                             ClickContinue();
                             ClickContinue();
                         }
-                    } else if (!Inventory.contains("Logs") && Microbot.getClient().getSkillExperience(Skill.WOODCUTTING) == 0) {
+                    } else if (!Rs2Inventory.contains("Logs") && Microbot.getClient().getSkillExperience(Skill.WOODCUTTING) == 0) {
                         CutTree();
-                    } else if (Inventory.contains("Logs")) {
+                    } else if (Rs2Inventory.contains("Logs")) {
                         LightFire();
                     }
-                } else if (Microbot.getVarbitPlayerValue(281) == 90 && Inventory.contains("Raw shrimps")) {
-                    if (!Inventory.contains("Logs") && !Rs2GameObject.exists(26185))
+                } else if (Microbot.getVarbitPlayerValue(281) == 90 && Rs2Inventory.contains("Raw shrimps")) {
+                    if (!Rs2Inventory.contains("Logs") && !Rs2GameObject.exists(26185))
                         CutTree();
                     if (!Rs2GameObject.exists(26185))
                         LightFire();
-                    Inventory.interact("Use", "Raw shrimps");
+                    Rs2Inventory.use("Raw shrimps");
                     Rs2GameObject.interact(26185, "Use");
-                    sleepUntil(() -> Inventory.contains("Shrimps"));
+                    sleepUntil(() -> Rs2Inventory.contains("Shrimps"));
                 }
             }
         }
@@ -266,7 +266,7 @@ public class TutorialIslandScript extends Script {
                 sleepUntil(() -> isInDialogue());
             }
         } else if (Microbot.getVarbitPlayerValue(281) == 630) {
-            Rs2Widget.clickWidget(164, 57); //switchToMagicTab
+            Rs2Widget.clickWidget(164, 58); //switchToMagicTab
         } else if (Microbot.getVarbitPlayerValue(281) == 640) {
             Rs2Npc.interact(3309, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) == 650) {
@@ -297,11 +297,11 @@ public class TutorialIslandScript extends Script {
             Microbot.getWalker().walkTo(new WorldPoint(3124, 3106, 0));
             Rs2Npc.interact(3319, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) == 560) {
-            Rs2Widget.clickWidget(10747960); //switchToPrayerTab
+            Rs2Widget.clickWidget(10747961); //switchToPrayerTab
         } else if (Microbot.getVarbitPlayerValue(281) == 570) {
             Rs2Npc.interact(3319, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) == 580) {
-            Rs2Widget.clickWidget(164, 45); //switchToFriendsTab
+            Rs2Widget.clickWidget(164, 46); //switchToFriendsTab
         } else if (Microbot.getVarbitPlayerValue(281) == 600) {
             Rs2Npc.interact(3319, "Talk-to");
         }
@@ -321,7 +321,7 @@ public class TutorialIslandScript extends Script {
             Microbot.getWalker().walkTo(new WorldPoint(3127, 3123, 0));
             Rs2Npc.interact(3310, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) == 531) {
-            Rs2Widget.clickWidget(10747942); //switchToAccountManagementTab
+            Rs2Widget.clickWidget(10747943); //switchToAccountManagementTab
         } else if (Microbot.getVarbitPlayerValue(281) == 532) {
             Rs2Npc.interact(3310, "Talk-to");
         }
@@ -333,12 +333,13 @@ public class TutorialIslandScript extends Script {
             if (Microbot.getVarbitPlayerValue(281) == 500) {
                 Rs2GameObject.interact("Ladder","Climb-up");
                 sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 500);
+                return;
             }
             if (Microbot.getVarbitPlayerValue(281) == 480 || Microbot.getVarbitPlayerValue(281) == 490) { // killl rat with range
                 Actor rat = Microbot.getClient().getLocalPlayer().getInteracting();
                 if (rat != null && rat.getName().equalsIgnoreCase("giant rat")) return;
-                Inventory.interact("Wield", "Shortbow");
-                Inventory.interact("Wield", "Bronze arrow");
+                Rs2Inventory.wield( "Shortbow");
+                Rs2Inventory.wield("Bronze arrow");
                 Rs2Npc.attack("Giant rat");
                 return;
             }
@@ -350,10 +351,10 @@ public class TutorialIslandScript extends Script {
                 sleepUntil(() -> !isInDialogue());
                 return;
             }
-            if (Microbot.getVarbitPlayerValue(281) >= 420) {
+            if (Microbot.getVarbitPlayerValue(281) > 420) {
                 if (Microbot.getClient().getLocalPlayer().isInteracting() || Rs2Player.isAnimating()) return;
-                if (Rs2Equipment.hasEquipped("Bronze sword")) {
-                    Rs2Widget.clickWidget(10747955);
+                if (Rs2Equipment.isWearing("Bronze sword")) {
+                    Rs2Widget.clickWidget(10747956);
                     WorldPoint worldPoint = new WorldPoint(3105, 9517, 0);
                     if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(worldPoint) > 2)
                         Microbot.getWalker().walkTo(worldPoint);
@@ -365,9 +366,22 @@ public class TutorialIslandScript extends Script {
                 } else {
                     Rs2Tab.switchToInventoryTab();
                     sleep(500);
-                    Rs2Equipment.equipItem("Bronze sword");
+                    Rs2Inventory.wield("Bronze sword");
                     sleep(500);
-                    Rs2Equipment.equipItem("Wooden shield");
+                    Rs2Inventory.wield("Wooden shield");
+                }
+                return;
+            }
+            if (Microbot.getVarbitPlayerValue(281) == 420) {
+                Rs2Tab.switchToInventoryTab();
+                sleep(500);
+                Rs2Inventory.wield("Bronze sword");
+                sleep(500);
+                Rs2Inventory.wield("Wooden shield");
+                NPC npc = Rs2Npc.getNpc("Combat Instructor");
+                if (Rs2Npc.interact(npc, "Talk-to")) {
+                    sleep(1000);
+                    sleepUntil(() -> !isInDialogue());
                 }
                 return;
             }
@@ -380,8 +394,8 @@ public class TutorialIslandScript extends Script {
                 return;
             }
             if (Microbot.getVarbitPlayerValue(281) == 390 || Microbot.getVarbitPlayerValue(281) == 400 || Microbot.getVarbitPlayerValue(281) == 405) {
-                if (Rs2Widget.getWidget(84, 1) == null && Rs2Equipment.hasEquipped("Bronze sword")) {
-                    Rs2Widget.clickWidget(10747959);
+                if (Rs2Widget.getWidget(84, 1) == null && !Rs2Equipment.isWearing("Bronze dagger")) {
+                    Rs2Widget.clickWidget(10747960);
                     sleep(1000);
                     Rs2Widget.clickWidget(25362433);
                     sleepUntil(() ->Rs2Widget.getWidget(84, 1) != null);
@@ -394,7 +408,7 @@ public class TutorialIslandScript extends Script {
             }
             Microbot.getWalker().walkTo(new WorldPoint(random(3106, 3108), random(9508, 9510), 0));
             sleep(500);
-            sleepUntil(() -> Rs2Player.isWalking());
+            sleepUntil(Rs2Player::isWalking);
             NPC npc = Rs2Npc.getNpc("Combat Instructor");
             if (Rs2Npc.interact(npc, "Talk-to")) {
                 sleep(1000);
@@ -411,38 +425,38 @@ public class TutorialIslandScript extends Script {
             Rs2Npc.interact(npc, "Talk-to");
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
         } else {
-            if (Inventory.contains("Bronze dagger")) {
+            if (Rs2Inventory.contains("Bronze dagger")) {
                 Rs2GameObject.interact(ObjectID.GATE_9718, "Open");
                 sleepUntil(() -> Microbot.getVarbitPlayerValue(281) > 360);
                 return;
             }
-            if (Inventory.contains("Bronze bar") && Inventory.contains("Hammer")) {
+            if (Rs2Inventory.contains("Bronze bar") && Rs2Inventory.contains("Hammer")) {
                 Rs2GameObject.interact("Anvil", "Smith");
                 sleepUntil(() -> Rs2Widget.getWidget(312, 1) != null);
                 Rs2Widget.clickWidget("Bronze dagger");
-                sleepUntil(() -> Inventory.contains("Bronze dagger"));
+                sleepUntil(() -> Rs2Inventory.contains("Bronze dagger"));
                 return;
             }
-            if (Inventory.contains("Bronze bar") && !Inventory.contains("Hammer")) {
+            if (Rs2Inventory.contains("Bronze bar") && !Rs2Inventory.contains("Hammer")) {
                 if (isInDialogue()) return;
                 NPC npc = Rs2Npc.getNpc(3311);
                 Rs2Npc.interact(npc, "Talk-to");
                 sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
                 return;
             }
-            if (Inventory.contains("Bronze pickaxe") && (!Inventory.contains("Copper ore") || !Inventory.contains("Tin ore"))) {
-                if (!Inventory.contains("Copper ore")) {
+            if (Rs2Inventory.contains("Bronze pickaxe") && (!Rs2Inventory.contains("Copper ore") || !Rs2Inventory.contains("Tin ore"))) {
+                if (!Rs2Inventory.contains("Copper ore")) {
                     Rs2GameObject.interact(10079, "Mine");
-                    sleepUntil(() -> Inventory.contains("Copper ore"));
+                    sleepUntil(() -> Rs2Inventory.contains("Copper ore"));
                 }
-                if (!Inventory.contains("Tin ore")) {
+                if (!Rs2Inventory.contains("Tin ore")) {
                     Rs2GameObject.interact(10080, "Mine");
-                    sleepUntil(() -> Inventory.contains("Tin ore"));
+                    sleepUntil(() -> Rs2Inventory.contains("Tin ore"));
                 }
-            } else if (Inventory.contains("Copper ore") && Inventory.contains("Tin ore")) {
-                Inventory.interact("Tin ore");
+            } else if (Rs2Inventory.contains("Copper ore") && Rs2Inventory.contains("Tin ore")) {
+                Rs2Inventory.interact("Tin ore");
                 Rs2GameObject.interact("Furnace");
-                sleepUntil(() ->  Inventory.contains("Bronze bar"));
+                sleepUntil(() ->  Rs2Inventory.contains("Bronze bar"));
             }
         }
     }
@@ -458,7 +472,7 @@ public class TutorialIslandScript extends Script {
             Rs2Npc.interact(npc, "Talk-to");
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
             Rs2Tab.switchToQuestTab();
-            Rs2Widget.clickWidget(10747957);
+            Rs2Widget.clickWidget(10747958);
         } else {
             Rs2GameObject.interact(9726, "Climb-down");
             sleep(2000);
@@ -481,15 +495,15 @@ public class TutorialIslandScript extends Script {
             NPC npc = Rs2Npc.getNpc(3305);
             Rs2Npc.interact(npc, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) >= 150 && Microbot.getVarbitPlayerValue(281) < 200) {
-            if (!Inventory.contains("Bread dough") && !Inventory.contains("Bread")) {
-                Inventory.interact("Bucket of water");
-                Inventory.interact("Pot of flour");
-                sleepUntil(() -> Inventory.contains("Dough"));
-            } else if (Inventory.contains("Bread dough")) {
-                Inventory.interact("Bread dough");
+            if (!Rs2Inventory.contains("Bread dough") && !Rs2Inventory.contains("Bread")) {
+                Rs2Inventory.interact("Bucket of water");
+                Rs2Inventory.interact("Pot of flour");
+                sleepUntil(() -> Rs2Inventory.contains("Dough"));
+            } else if (Rs2Inventory.contains("Bread dough")) {
+                Rs2Inventory.interact("Bread dough");
                 Rs2GameObject.interact(9736, "Use");
-                sleepUntil(() -> Inventory.contains("Bread"));
-            } else if (Inventory.contains("Bread")) {
+                sleepUntil(() -> Rs2Inventory.contains("Bread"));
+            } else if (Rs2Inventory.contains("Bread")) {
                 if (Rs2GameObject.interact(9710, "Open")) {
                     sleep(2000);
                     Rs2Tab.switchToMusicTab();
@@ -500,9 +514,8 @@ public class TutorialIslandScript extends Script {
 
     public void LightFire() {
         if (Rs2GameObject.findObjectById(26185) == null && Rs2GameObject.findObjectByLocation(Microbot.getClient().getLocalPlayer().getWorldLocation()) == null) {
-            Inventory.interact("Logs");
-            Inventory.interact("Tinderbox");
-            sleepUntil(() -> !Inventory.hasItem("Logs"));
+            Rs2Inventory.combine("Logs", "Tinderbox");
+            sleepUntil(() -> !Rs2Inventory.hasItem("Logs"));
         } else {
             Microbot.getWalker().walkTo(Rs2Npc.getNpc(8503));
         }
@@ -510,7 +523,7 @@ public class TutorialIslandScript extends Script {
 
     public void CutTree() {
         Rs2GameObject.interact("Tree", "Chop down");
-        sleepUntil(() -> Inventory.hasItem("Logs") && !Rs2Player.isAnimating());
+        sleepUntil(() -> Rs2Inventory.hasItem("Logs") && !Rs2Player.isAnimating());
     }
 
     private void SurvivalExpert() {

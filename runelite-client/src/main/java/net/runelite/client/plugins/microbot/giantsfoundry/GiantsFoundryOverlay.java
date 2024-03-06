@@ -42,7 +42,7 @@ public class GiantsFoundryOverlay extends OverlayPanel {
                 .build());
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Progress:")
-                .right(Integer.toString(GiantsFoundryState.getProgressAmount()) + "/1000" )
+                .right(GiantsFoundryState.getProgressAmount() + "/1000" )
                 .build());
         return super.render(graphics);
     }

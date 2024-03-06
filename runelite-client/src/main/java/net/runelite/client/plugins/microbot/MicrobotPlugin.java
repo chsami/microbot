@@ -4,8 +4,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
@@ -33,18 +31,12 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.event.EventSelector;
-import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
-import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -53,7 +45,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -132,7 +123,7 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setEventHandler(new EventHandler());
         Microbot.setSpriteManager(spriteManager);
         Microbot.setDisableWalkerUpdate(disableWalkerUpdate);
-
+        Microbot.setPluginManager(pluginManager);
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }
@@ -145,7 +136,7 @@ public class MicrobotPlugin extends Plugin {
 
         BreakHandlerScript.initBreakHandler("Microbot", false);
 
-        Rs2NpcManager.loadJson();
+        //TODO: Rs2NpcManager.loadJson();
 
         for (Plugin plugin : pluginManager.getPlugins()) {
             if (plugin.getClass() == SummerGardenPlugin.class) {
@@ -171,48 +162,21 @@ public class MicrobotPlugin extends Plugin {
 
 
     @Subscribe
-    public void onMenuEntryAdded(MenuEntryAdded event) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-
-        final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
-
-        Rs2Npc.handleMenuSwapper(event.getMenuEntry());
-        Rs2GameObject.handleMenuSwapper(event.getMenuEntry());
-        Rs2GroundItem.handleMenuSwapper(event.getMenuEntry());
-        Rs2Prayer.handleMenuSwapper(event.getMenuEntry());
-        Rs2Magic.handleMenuSwapper(event.getMenuEntry());
-        Rs2Equipment.handleMenuSwapper(event.getMenuEntry());
-        Microbot.getWalker().handleMenuSwapper(event.getMenuEntry());
-        Inventory.handleMenuSwapper(event.getMenuEntry());
-        Rs2Bank.handleMenuSwapper(event.getMenuEntry());
-        Rs2Widget.handleMenuSwapper(event.getMenuEntry());
-        //Rs2Inventory.handleMenuSwapper(event.getMenuEntry());
-
-        if (Rs2Menu.getOption().length() > 0) {
-            final MenuEntry[] menuEntries = client.getMenuEntries();
-            client.setMenuEntries(new MenuEntry[]{});
-            if (!Rs2Menu.getName().isEmpty()) {
-                if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals(Rs2Menu.getOption().toLowerCase()) && x.getTarget() != null &&
-                        x.getTarget().toLowerCase().split(">")[1] != null && x.getTarget().toLowerCase().split(">")[1].equals(Rs2Menu.getName().toLowerCase()))) {
-                    client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals(Rs2Menu.getOption().toLowerCase()) && x.getTarget() != null &&
-                            x.getTarget().toLowerCase().split(">")[1] != null && x.getTarget().toLowerCase().split(">")[1].equals(Rs2Menu.getName().toLowerCase())).toArray(MenuEntry[]::new));
-                }
-            } else {
-                if (Arrays.stream(menuEntries).anyMatch(x -> x.getOption() != null && x.getOption().toLowerCase().equals(Rs2Menu.getOption().toLowerCase()))) {
-                    client.setMenuEntries(Arrays.stream(menuEntries).filter(x -> x.getOption().toLowerCase().equals(Rs2Menu.getOption().toLowerCase())).toArray(MenuEntry[]::new));
-                }
-            }
-        }
-    }
-
-    @Subscribe
     public void onStatChanged(StatChanged statChanged) {
         Microbot.setIsGainingExp(true);
     }
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
-        Rs2Bank.storeBankItemsInMemory(event);
-        Inventory.storeInventoryItemsInMemory(event);
+        if (event.getContainerId() == InventoryID.BANK.getId()) {
+            Rs2Bank.storeBankItemsInMemory(event);
+        }
+        if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
+            Rs2Inventory.storeInventoryItemsInMemory(event);
+        }
+        if (event.getContainerId() == InventoryID.EQUIPMENT.getId()) {
+            Rs2Equipment.storeEquipmentItemsInMemory(event);
+        }
     }
 
     @Subscribe
@@ -287,7 +251,7 @@ public class MicrobotPlugin extends Plugin {
 
             List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
 
-            if (Arrays.stream(event.getMenuEntries()).anyMatch(x -> x.getOption().toLowerCase().equals("pickpocket"))) {
+            if (Arrays.stream(event.getMenuEntries()).anyMatch(x -> x.getOption().equalsIgnoreCase("pickpocket"))) {
                 leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
                         .setOption(thievingScript == null ? "Start AutoThiever" : "Stop AutoThiever")
                         .setType(MenuAction.RUNELITE)

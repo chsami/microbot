@@ -5,6 +5,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.Weigher;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import net.runelite.client.plugins.microbot.util.walker.Util;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +14,6 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPInputStream;
-import net.runelite.client.plugins.microbot.util.walker.Util;
 
 public abstract class SplitFlagMap {
     private static final int MAXIMUM_SIZE = 20 * 1024 * 1024;
