@@ -20,6 +20,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
@@ -392,11 +393,11 @@ public class VorkathScript extends Script {
 
     public static void togglePrayer(boolean onOff) {
         if (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) >= 77) {
-            Rs2Prayer.toggle(Prayer.RIGOUR, onOff);
+            Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, onOff);
         } else {
-            Rs2Prayer.toggle(Prayer.EAGLE_EYE, onOff);
+            Rs2Prayer.toggle(Rs2PrayerEnum.EAGLE_EYE, onOff);
         }
-        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, onOff);
+        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, onOff);
     }
 
     private void handleRedBall() {
@@ -409,7 +410,7 @@ public class VorkathScript extends Script {
 
     private static void handlePrayer() {
         drinkPrayer();
-        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, true);
+        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true);
         togglePrayer(true);
     }
 
@@ -493,7 +494,7 @@ public class VorkathScript extends Script {
         executeAcidWalk(43, 54, () -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneX() < 48 || (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.findObjectById(ObjectID.ACID_POOL_32000) == null));
         executeAcidWalk(51, 54, () -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneX() > 48 || (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.findObjectById(ObjectID.ACID_POOL_32000) == null));
 
-        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, false);
+        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, false);
 
         acidPools.clear();
         Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_32000).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));

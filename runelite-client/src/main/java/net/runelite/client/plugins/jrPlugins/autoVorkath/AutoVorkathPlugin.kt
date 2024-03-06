@@ -26,6 +26,7 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction
 import javax.inject.Inject
 
@@ -162,18 +163,18 @@ class AutoVorkathPlugin : Plugin() {
                 when (botState) {
                     State.RANGE -> if ((clientThread.runOnClientThread { client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 0 }) || previousBotState != State.RANGE) {
                         previousBotState = State.RANGE
-                        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, true)
+                        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true)
                         if (config.ACTIVATERIGOUR()) {
-                            Rs2Prayer.toggle(Prayer.RIGOUR, true)
+                            Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, true)
                         }
                         walkToCenterLocation(isPlayerInCenterLocation())
                     }
 
                     State.ZOMBIFIED_SPAWN -> if (previousBotState != State.ZOMBIFIED_SPAWN) {
                         previousBotState = State.ZOMBIFIED_SPAWN
-                        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, false)
+                        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, false)
                         if (config.ACTIVATERIGOUR()) {
-                            Rs2Prayer.toggle(Prayer.RIGOUR, false)
+                            Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, false)
                         }
                         eatAt(75)
                         while (Rs2Npc.getNpc("Zombified Spawn") == null) {
@@ -266,9 +267,9 @@ class AutoVorkathPlugin : Plugin() {
                     else -> botState = State.NONE
                 }
             } else if (Rs2Npc.getNpc("vorkath") == null || needsToBank || vorkath.isDead || !vorkath.isInteracting) {
-                Rs2Prayer.toggle(Prayer.PROTECT_RANGE, false)
+                Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, false)
                 if (config.ACTIVATERIGOUR()) {
-                    Rs2Prayer.toggle(Prayer.RIGOUR, false)
+                    Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, false)
                 }
                 Rs2Player.toggleRunEnergy(true)
                 // Bank
@@ -286,9 +287,9 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     private fun acidWalk() {
-        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, false)
+        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, false)
         if (config.ACTIVATERIGOUR()) {
-            Rs2Prayer.toggle(Prayer.RIGOUR, false)
+            Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, false)
         }
         var clickedTile: WorldPoint
         var toggle = true

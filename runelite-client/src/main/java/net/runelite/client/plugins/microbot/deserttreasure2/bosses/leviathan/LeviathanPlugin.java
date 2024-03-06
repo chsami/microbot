@@ -12,6 +12,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -73,11 +74,11 @@ public class LeviathanPlugin extends Plugin {
         if (event.getProjectile().getRemainingCycles() < 10) {
             if (projectile.getId() == meleeProjectile)
             {
-                Rs2Prayer.toggle(Prayer.PROTECT_MELEE, true);
+                Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
             } else if (projectile.getId() == mageProjectile) {
-                Rs2Prayer.toggle(Prayer.PROTECT_MAGIC, true);
+                Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, true);
             } else if (projectile.getId() == rangeProjectile) {
-                Rs2Prayer.toggle(Prayer.PROTECT_RANGE, true);
+                Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true);
             }
         }
     }

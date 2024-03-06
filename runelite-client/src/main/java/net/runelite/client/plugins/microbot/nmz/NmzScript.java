@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -62,7 +63,7 @@ public class NmzScript extends Script {
     public void handleOutsideNmz() {
         boolean hasStartedDream = Microbot.getVarbitValue(3946) > 0;
         if (config.togglePrayerPotions())
-            Rs2Prayer.toggle(Prayer.PROTECT_MELEE, false);
+            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, false);
         if (!hasStartedDream) {
             startNmzDream();
         } else {
@@ -85,7 +86,7 @@ public class NmzScript extends Script {
     public void handleInsideNmz() {
         prayerPotionScript.run();
         if (config.togglePrayerPotions())
-            Rs2Prayer.toggle(Prayer.PROTECT_MELEE, true);
+            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
         useZapperIfConfigured();
         useOverloadPotion();
         manageLocatorOrb();
@@ -136,9 +137,9 @@ public class NmzScript extends Script {
 
     public void randomlyToggleRapidHeal() {
         if (Random.random(1, 50) == 2) {
-            Rs2Prayer.toggle(Prayer.RAPID_HEAL, true);
+            Rs2Prayer.toggle(Rs2PrayerEnum.RAPID_HEAL, true);
             sleep(300, 600);
-            Rs2Prayer.toggle(Prayer.RAPID_HEAL, false);
+            Rs2Prayer.toggle(Rs2PrayerEnum.RAPID_HEAL, false);
         }
     }
 
