@@ -608,6 +608,10 @@ public class ClientUI
 				if (configManager.getConfiguration(CONFIG_GROUP, CONFIG_CLIENT_MAXIMIZED) != null)
 				{
 					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+					// According to the documentation of JFrame#setExtendedState, if the frame isn't visible, a window
+					// state change event isn't guaranteed to be fired. Since RuneLite's custom chrome borders rely on a
+					// state change listener, borders need to be applied manually when maximizing prior to setVisible
+					applyCustomChromeBorder();
 				}
 			}
 			else
@@ -1303,8 +1307,10 @@ public class ClientUI
 	{
 		// Force heavy-weight popups/tooltips.
 		// Prevents them from being obscured by the game applet.
-		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-		ToolTipManager.sharedInstance().setInitialDelay(300);
+		var tooltipManager = ToolTipManager.sharedInstance();
+		tooltipManager.setLightWeightPopupEnabled(false);
+		tooltipManager.setInitialDelay(300);
+		tooltipManager.setDismissDelay(10_000);
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
 		// Do not fill in background on repaint. Reduces flickering when
