@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor
 enum class CROSSBOW(private val crossbowName: String) {
     DRAGON_HUNTER_CROSSBOW("Dragon hunter crossbow"),
     RUNE_CROSSBOW("Rune crossbow"),
+    ARMADYL_CROSSBOW("Armadyl crossbow"),
     DRAGON_CROSSBOW("Dragon crossbow");
 
     override fun toString(): String {

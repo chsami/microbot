@@ -1,3 +1,7 @@
+/**
+ * Credits to Jrod7938
+ */
+
 package net.runelite.client.plugins.microbot.vorkath;
 
 import lombok.Getter;
@@ -54,10 +58,6 @@ public class VorkathScript extends Script {
 
     State state = State.BANKING;
 
-    private final int rangeProjectileId = 1477;
-    private final int magicProjectileId = 393;
-    private final int purpleProjectileId = 1471;
-    private final int blueProjectileId = 1479;
     private final int whiteProjectileId = 395;
     private final int redProjectileId = 1481;
     @Getter

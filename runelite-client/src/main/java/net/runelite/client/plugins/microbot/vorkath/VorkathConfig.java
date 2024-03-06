@@ -96,7 +96,7 @@ public interface VorkathConfig extends Config {
             position = 1,
             section = equipmentSection
     )
-    default net.runelite.client.plugins.jrPlugins.autoVorkath.enums.CROSSBOW CROSSBOW() {
+    default CROSSBOW CROSSBOW() {
         return CROSSBOW.DRAGON_HUNTER_CROSSBOW;
     }
 
