@@ -3,7 +3,7 @@ package net.runelite.client.plugins.nateplugins.skilling.natewinemaker;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -18,11 +18,11 @@ public class WineScript extends Script {
 
             try {
                 if (Microbot.pauseAllScripts) return;
-                if (Inventory.getAmountForItem("grapes") > 0 && (Inventory.getAmountForItem("jug of water") > 0)) {
-                    Inventory.useItemOnItem("jug of water", "grapes");
+                if (Rs2Inventory.count("grapes") > 0 && (Rs2Inventory.count("jug of water") > 0)) {
+                    Rs2Inventory.combine("jug of water", "grapes");
                     sleepUntil(() -> Rs2Widget.getWidget(17694734) != null);
                     keyPress('1');
-                    sleepUntil(() -> !Inventory.hasItem("jug of water"),25000);
+                    sleepUntil(() -> !Rs2Inventory.hasItem("jug of water"),25000);
                 } else {
                     bank();
                 }
@@ -39,9 +39,9 @@ public class WineScript extends Script {
             Rs2Bank.depositAll();
             if(Rs2Bank.hasItem("jug of water") &&  Rs2Bank.hasItem("grapes")) {
                 Rs2Bank.withdrawX(true, "jug of water", 14);
-                sleepUntil(() -> Inventory.hasItem("jug of water"));
+                sleepUntil(() -> Rs2Inventory.hasItem("jug of water"));
                 Rs2Bank.withdrawX(true, "grapes", 14);
-                sleepUntil(() -> Inventory.hasItem("grapes"));
+                sleepUntil(() -> Rs2Inventory.hasItem("grapes"));
             } else {
                 Microbot.getNotifier().notify("Run out of Materials");
                 shutdown();

@@ -8,7 +8,6 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
 import net.runelite.client.plugins.microbot.crafting.enums.Glass;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;

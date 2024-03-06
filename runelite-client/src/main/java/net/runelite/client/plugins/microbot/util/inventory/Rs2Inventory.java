@@ -115,9 +115,9 @@ public class Rs2Inventory {
      * @param secondary The secondary item.
      * @return True if the combine operation was successful, false otherwise.
      */
-    public static boolean combine(Item primary, Item secondary) {
-        boolean primaryItemInteracted = use(primary.getId());
-        boolean secondaryItemInteracted = use(secondary.getId());
+    public static boolean combine(Rs2Item primary, Rs2Item secondary) {
+        boolean primaryItemInteracted = use(primary);
+        boolean secondaryItemInteracted = use(secondary);
         return primaryItemInteracted && secondaryItemInteracted;
     }
 
@@ -209,6 +209,15 @@ public class Rs2Inventory {
      */
     public static int count(int id) {
         return (int) items().stream().filter(x -> x.id == id).count();
+    }
+
+    /**
+     * Counts the number of items in the inventory
+     *
+     * @return The count of items
+     */
+    public static int count() {
+        return items().size();
     }
 
     /**

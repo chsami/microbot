@@ -9,7 +9,7 @@ import static net.runelite.client.plugins.microbot.util.globval.VarbitValues.QUI
 
 public class Rs2Prayer {
 
-    public static void fastPray(Prayer name, boolean onOff) {
+    public static void toggle(Prayer name, boolean onOff) {
         final int varBit = name.getVarbit();
         if(!onOff) {
             if (Microbot.getClientThread().runOnClientThread(() ->

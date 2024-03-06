@@ -2,7 +2,7 @@ package net.runelite.client.plugins.nateplugins.skilling.arrowmaker;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -40,8 +40,8 @@ public class ArrowScript extends Script {
     }
 
     private void checkAndUseItem(String item1, String item2) {
-        if (Inventory.getAmountForItem(item1) > 0 && Inventory.getAmountForItem(item2) > 0) {
-            Inventory.useItemOnItem(item1, item2);
+        if (Rs2Inventory.count(item1) > 0 && Rs2Inventory.count(item2) > 0) {
+            Rs2Inventory.combine(item1, item2);
             handleSleep();
         }
     }

@@ -22,7 +22,6 @@ import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
@@ -390,11 +389,11 @@ public class VorkathScript extends Script {
 
     public static void togglePrayer(boolean onOff) {
         if (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) >= 77) {
-            Rs2Prayer.fastPray(Prayer.RIGOUR, onOff);
+            Rs2Prayer.toggle(Prayer.RIGOUR, onOff);
         } else {
-            Rs2Prayer.fastPray(Prayer.EAGLE_EYE, onOff);
+            Rs2Prayer.toggle(Prayer.EAGLE_EYE, onOff);
         }
-        Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, onOff);
+        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, onOff);
     }
 
     private void handleRedBall() {
@@ -407,7 +406,7 @@ public class VorkathScript extends Script {
 
     private static void handlePrayer() {
         drinkPrayer();
-        Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true);
+        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, true);
         togglePrayer(true);
     }
 

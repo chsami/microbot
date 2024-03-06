@@ -14,7 +14,7 @@ import net.runelite.client.plugins.griffinplugins.util.helpers.WoodcuttingHelper
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 
 class WoodcuttingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
     private val varrockWestTreeWorldArea = WorldArea(3159, 3388, 13, 25, 0)
@@ -110,10 +110,10 @@ class WoodcuttingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer
     }
 
     private fun runChoppingState(treeName: String, itemId: Int) {
-        val countBefore = Inventory.getInventoryItems().count { it.itemId == itemId }
+        val countBefore = Rs2Inventory.count(itemId)
 
         if (WoodcuttingHelper.findAndChopTree(treeName)) {
-            val countAfter = Inventory.getInventoryItems().count { it.itemId == itemId }
+            val countAfter = Rs2Inventory.count(itemId)
             TrainerThread.count += countAfter - countBefore
         }
 
@@ -122,7 +122,7 @@ class WoodcuttingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer
 
     private fun runBankingState() {
         if (config.collectItems()) {
-            if (Inventory.isFull()) {
+            if (Rs2Inventory.isFull()) {
                 Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
                 TrainerInterruptor.sleep(400, 600)
 
@@ -136,7 +136,7 @@ class WoodcuttingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer
                 TrainerInterruptor.sleep(200)
             }
         } else {
-            Inventory.dropAll()
+            Rs2Inventory.dropAll()
         }
 
         scriptState = ScriptState.CHECKING_AREA

@@ -74,11 +74,11 @@ public class LeviathanPlugin extends Plugin {
         if (event.getProjectile().getRemainingCycles() < 10) {
             if (projectile.getId() == meleeProjectile)
             {
-                Rs2Prayer.fastPray(Prayer.PROTECT_MELEE, true);
+                Rs2Prayer.toggle(Prayer.PROTECT_MELEE, true);
             } else if (projectile.getId() == mageProjectile) {
-                Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, true);
+                Rs2Prayer.toggle(Prayer.PROTECT_MAGIC, true);
             } else if (projectile.getId() == rangeProjectile) {
-                Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true);
+                Rs2Prayer.toggle(Prayer.PROTECT_RANGE, true);
             }
         }
     }

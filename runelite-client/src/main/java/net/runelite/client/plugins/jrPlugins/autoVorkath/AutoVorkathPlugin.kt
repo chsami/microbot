@@ -163,18 +163,18 @@ class AutoVorkathPlugin : Plugin() {
                 when (botState) {
                     State.RANGE -> if ((clientThread.runOnClientThread { client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 0 }) || previousBotState != State.RANGE) {
                         previousBotState = State.RANGE
-                        Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true)
+                        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, true)
                         if (config.ACTIVATERIGOUR()) {
-                            Rs2Prayer.fastPray(Prayer.RIGOUR, true)
+                            Rs2Prayer.toggle(Prayer.RIGOUR, true)
                         }
                         walkToCenterLocation(isPlayerInCenterLocation())
                     }
 
                     State.ZOMBIFIED_SPAWN -> if (previousBotState != State.ZOMBIFIED_SPAWN) {
                         previousBotState = State.ZOMBIFIED_SPAWN
-                        Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
+                        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, false)
                         if (config.ACTIVATERIGOUR()) {
-                            Rs2Prayer.fastPray(Prayer.RIGOUR, false)
+                            Rs2Prayer.toggle(Prayer.RIGOUR, false)
                         }
                         eatAt(75)
                         while (Rs2Npc.getNpc("Zombified Spawn") == null) {
@@ -205,7 +205,7 @@ class AutoVorkathPlugin : Plugin() {
 
                     State.ACID -> if (doesProjectileExistById(acidProjectileId) || doesProjectileExistById(
                             acidRedProjectileId
-                        ) || Rs2GameObject.findObject(ObjectID.ACID_POOL) != null
+                        ) || Rs2GameObject.findObjectById(ObjectID.ACID_POOL) != null
                     ) {
                         previousBotState = State.ACID
                         acidWalk()
@@ -267,9 +267,9 @@ class AutoVorkathPlugin : Plugin() {
                     else -> botState = State.NONE
                 }
             } else if (Rs2Npc.getNpc("vorkath") == null || needsToBank || vorkath.isDead || !vorkath.isInteracting) {
-                Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
+                Rs2Prayer.toggle(Prayer.PROTECT_RANGE, false)
                 if (config.ACTIVATERIGOUR()) {
-                    Rs2Prayer.fastPray(Prayer.RIGOUR, false)
+                    Rs2Prayer.toggle(Prayer.RIGOUR, false)
                 }
                 Rs2Player.toggleRunEnergy(true)
                 // Bank
@@ -287,9 +287,9 @@ class AutoVorkathPlugin : Plugin() {
     }
 
     private fun acidWalk() {
-        Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false)
+        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, false)
         if (config.ACTIVATERIGOUR()) {
-            Rs2Prayer.fastPray(Prayer.RIGOUR, false)
+            Rs2Prayer.toggle(Prayer.RIGOUR, false)
         }
         var clickedTile: WorldPoint
         var toggle = true

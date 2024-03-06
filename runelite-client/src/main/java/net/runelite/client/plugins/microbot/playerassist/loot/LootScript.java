@@ -10,7 +10,7 @@ import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 
 import java.awt.*;
@@ -28,7 +28,7 @@ public class LootScript extends Script {
     public void run(ItemSpawned itemSpawned) {
         mainScheduledFuture = scheduledExecutorService.schedule((() -> {
             if (!super.run()) return;
-            if (Microbot.getClientThread().runOnClientThread(() -> Inventory.isFull())) return;
+            if (Microbot.getClientThread().runOnClientThread(Rs2Inventory::isFull)) return;
             final ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemSpawned.getItem().getId()));
             for (String item : lootItems) {
                 LocalPoint itemLocation = itemSpawned.getTile().getLocalLocation();

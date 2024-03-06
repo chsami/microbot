@@ -31,7 +31,8 @@ public class NmzScript extends Script {
     public static PrayerPotionScript prayerPotionScript;
 
     public boolean canStartNmz() {
-        return Rs2Inventory.count("overload (4)") == config.overloadPotionAmount() && Rs2Inventory.count("absorption (4)") == config.absorptionPotionAmount();
+        return Rs2Inventory.count("overload (4)") == config.overloadPotionAmount() && Rs2Inventory.count("absorption (4)") == config.absorptionPotionAmount() ||
+                (Rs2Inventory.hasItem("prayer potion") && config.togglePrayerPotions());
     }
 
 
@@ -42,7 +43,7 @@ public class NmzScript extends Script {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
             try {
-                if (Random.random(1, 20) == 1) {
+                if (Random.random(1, 50) == 1) {
                     Microbot.getMouse().clickFast(Random.random(0, 500), Random.random(0, 500), true);
                 }
                 boolean isOutsideNmz = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2602, 3116, 0)) < 20;
@@ -61,6 +62,8 @@ public class NmzScript extends Script {
 
     public void handleOutsideNmz() {
         boolean hasStartedDream = Microbot.getVarbitValue(3946) > 0;
+        if (config.togglePrayerPotions())
+            Rs2Prayer.toggle(Prayer.PROTECT_MELEE, false);
         if (!hasStartedDream) {
             startNmzDream();
         } else {
@@ -82,6 +85,8 @@ public class NmzScript extends Script {
 
     public void handleInsideNmz() {
         prayerPotionScript.run();
+        if (config.togglePrayerPotions())
+            Rs2Prayer.toggle(Prayer.PROTECT_MELEE, true);
         useZapperIfConfigured();
         useOverloadPotion();
         manageLocatorOrb();
@@ -132,9 +137,9 @@ public class NmzScript extends Script {
 
     public void randomlyToggleRapidHeal() {
         if (Random.random(1, 50) == 2) {
-            Rs2Prayer.fastPray(Prayer.RAPID_HEAL, true);
+            Rs2Prayer.toggle(Prayer.RAPID_HEAL, true);
             sleep(300, 600);
-            Rs2Prayer.fastPray(Prayer.RAPID_HEAL, false);
+            Rs2Prayer.toggle(Prayer.RAPID_HEAL, false);
         }
     }
 

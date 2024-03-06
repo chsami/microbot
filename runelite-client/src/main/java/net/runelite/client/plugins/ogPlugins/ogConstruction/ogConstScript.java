@@ -3,14 +3,11 @@ package net.runelite.client.plugins.ogPlugins.ogConstruction;
 import net.runelite.api.ObjectID;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.runelite.client.config.Config;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -21,6 +18,8 @@ import net.runelite.client.plugins.ogPlugins.ogConstruction.enums.Furniture;
 
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class ogConstScript extends Script {
@@ -129,7 +128,7 @@ public class ogConstScript extends Script {
         if(logging){System.out.println("===========================DESTROY FUNCTION CALLED===========================");}
         if(logging){System.out.println("Destroying:" + furniture.getBuiltID());}
         if(furniture.getBuiltID() == ObjectID.DOOR_13344 &&
-                !Inventory.hasItemAmount(furniture.getPlankNeeded(), furniture.getPlankAmountNeeded()) &&
+                !Rs2Inventory.hasItemAmount(furniture.getPlankNeeded(), furniture.getPlankAmountNeeded()) &&
                 !checkIfButlerHere() &&
                 !(currentGameTick > gameTickLastSentButler + (butler.getTicksNeededToBank() + 2))){
                     if(logging){System.out.println("Sleeping until: checkButlerNearPlayer");}
@@ -216,7 +215,7 @@ public class ogConstScript extends Script {
             gameTickLastSentButler = currentGameTick;
         }
         Rs2Tab.switchToInventoryTab();
-        sleepUntil(() -> Inventory.hasItemAmount(furniture.getPlankNeeded(), furniture.getPlankAmountNeeded()) || checkButlerNearPlayer(),Random.random(10000,13000));
+        sleepUntil(() -> Rs2Inventory.hasItemAmount(furniture.getPlankNeeded(), furniture.getPlankAmountNeeded()) || checkButlerNearPlayer(),Random.random(10000,13000));
     }
     //TODO Update butlers fetch to correct planks if needed - more regex
     private void updateButlerAction(){}
@@ -283,17 +282,17 @@ public class ogConstScript extends Script {
         Microbot.status = "Calculating State";
         if(logging){System.out.println("===========================CALC STATE FUNCTION CALLED===========================");}
         if(Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(2176)) == 0){ status = State.ENABLE_BUILDING_MODE; }
-        else if(!(Inventory.hasItemAmountStackable(furniture.getNotedPlankNameNeeded(),furniture.getPlankAmountNeeded()) || Inventory.hasItemAmountStackable("Coins",10000))){status = State.LOGOUT;}
+        else if(!(Rs2Inventory.hasItemAmount(furniture.getNotedPlankNameNeeded(),furniture.getPlankAmountNeeded(), true) || Rs2Inventory.hasItemAmount("Coins",10000, true))){status = State.LOGOUT;}
         else if(moneyBagTopUpNeeded()){status = State.FILL_MONEY_BAG;}
         else if(Rs2GameObject.findObjectByIdAndDistance(furniture.getBuiltID(),20) != null){status = State.DESTROY;}
-        else if(!Inventory.hasItemAmount(furniture.getPlankNeeded(),(furniture.getPlankAmountNeeded()*2)+1) && (currentGameTick > gameTickLastSentButler + (butler.getTicksNeededToBank() + 2) )){status = State.SEND_BUTLER;}
-        else if(Rs2GameObject.findObjectByIdAndDistance(furniture.getUnBuiltID(),20) != null && Inventory.hasItemAmount(furniture.getPlankNeeded(), furniture.getPlankAmountNeeded())){status = State.BUILDING;}
+        else if(!Rs2Inventory.hasItemAmount(furniture.getPlankNeeded(),(furniture.getPlankAmountNeeded()*2)+1) && (currentGameTick > gameTickLastSentButler + (butler.getTicksNeededToBank() + 2) )){status = State.SEND_BUTLER;}
+        else if(Rs2GameObject.findObjectByIdAndDistance(furniture.getUnBuiltID(),20) != null && Rs2Inventory.hasItemAmount(furniture.getPlankNeeded(), furniture.getPlankAmountNeeded())){status = State.BUILDING;}
         if(logging){System.out.println("Calculating State: " + status.name());}
         if(logging){System.out.println("Current Game Tick: " + currentGameTick);}
         if(logging){System.out.println("Game Tick last sent butler: " + gameTickLastSentButler);}
         if(logging){System.out.println("Should send butler: " + (currentGameTick > gameTickLastSentButler + (butler.getTicksNeededToBank() + 2)));}
-        if(logging){System.out.println("Calculating Noted Planks: " + Inventory.hasItemAmountStackable(furniture.getNotedPlankNameNeeded(), furniture.getPlankAmountNeeded()));}
-        if(logging){System.out.println("Calculating Coins: " + Inventory.hasItemAmountStackable("Coins",10000));}
+        if(logging){System.out.println("Calculating Noted Planks: " + Rs2Inventory.hasItemAmount(furniture.getNotedPlankNameNeeded(), furniture.getPlankAmountNeeded(), true));}
+        if(logging){System.out.println("Calculating Coins: " + Rs2Inventory.hasItemAmount("Coins",10000, true));}
         if(logging){System.out.println("Need to refill money bag?: " + (moneyBagRefillThreshold >= coinsLeftInMoneyBag) );}
         if(logging){System.out.println("Refill amount: " + moneyBagRefillThreshold);}
         if(logging){System.out.println("Money Bag amount: " + coinsLeftInMoneyBag);}

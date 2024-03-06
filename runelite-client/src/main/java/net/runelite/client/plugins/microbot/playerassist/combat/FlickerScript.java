@@ -65,21 +65,21 @@ public class FlickerScript extends Script {
                     switch (prayFlickAttackStyle) {
                         case MAGE:
                             prayFlickAttackStyle = null;
-                            Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, true);
+                            Rs2Prayer.toggle(Prayer.PROTECT_MAGIC, true);
                             sleep(400);
-                            Rs2Prayer.fastPray(Prayer.PROTECT_MAGIC, false);
+                            Rs2Prayer.toggle(Prayer.PROTECT_MAGIC, false);
                             break;
                         case MELEE:
                             prayFlickAttackStyle = null;
-                            Rs2Prayer.fastPray(Prayer.PROTECT_MELEE, true);
+                            Rs2Prayer.toggle(Prayer.PROTECT_MELEE, true);
                             sleep(400);
-                            Rs2Prayer.fastPray(Prayer.PROTECT_MELEE, false);
+                            Rs2Prayer.toggle(Prayer.PROTECT_MELEE, false);
                             break;
                         case RANGED:
                             prayFlickAttackStyle = null;
-                            Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, true);
+                            Rs2Prayer.toggle(Prayer.PROTECT_RANGE, true);
                             sleep(400);
-                            Rs2Prayer.fastPray(Prayer.PROTECT_RANGE, false);
+                            Rs2Prayer.toggle(Prayer.PROTECT_RANGE, false);
                             break;
                     }
                 }

@@ -16,7 +16,7 @@ import net.runelite.client.plugins.griffinplugins.util.helpers.WorldHelper
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 
 class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
@@ -116,8 +116,7 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
                 val playerCount = players
                     .filterNotNull()
                     .filter { otherPlayer: Player -> otherPlayer.id != player.id }
-                    .filter { otherPlayer: Player -> worldArea.contains(player.worldLocation) }
-                    .count()
+                    .count { _: Player -> worldArea.contains(player.worldLocation) }
 
                 if (config.hopWorlds() && playerCount > config.maxPlayers()) {
                     WorldHelper.hopToWorldWithoutPlayersInArea(
@@ -139,10 +138,10 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
     }
 
     private fun runMiningState(oreName: String, oreId: Int) {
-        val beforeCount = Inventory.getInventoryItems().count { item -> item.itemId == oreId }
+        val beforeCount = Rs2Inventory.count(oreId)
 
         if (MiningHelper.findAndMineOre(oreName)) {
-            val afterCount = Inventory.getInventoryItems().count { item -> item.itemId == oreId }
+            val afterCount = Rs2Inventory.count(oreId)
             if (afterCount > beforeCount) {
                 TrainerThread.count++
             }
@@ -153,7 +152,7 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
 
     private fun runBankingState() {
         if (config.keepOre()) {
-            if (Inventory.isFull()) {
+            if (Rs2Inventory.isFull()) {
                 Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
                 TrainerInterruptor.sleep(400, 600)
 
@@ -167,7 +166,7 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
                 TrainerInterruptor.sleep(200)
             }
         } else {
-            Inventory.dropAll()
+            Rs2Inventory.dropAll()
         }
 
         scriptState = ScriptState.CHECKING_AREA

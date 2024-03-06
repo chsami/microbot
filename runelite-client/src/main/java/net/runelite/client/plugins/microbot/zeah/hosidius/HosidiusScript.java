@@ -8,7 +8,8 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
@@ -85,7 +86,7 @@ public class HosidiusScript extends Script {
     public void fertiliser() {
         String saltpetre = "saltpetre";
         String compost = "compost";
-        if (!Inventory.hasItem(saltpetre) || !Inventory.hasItem(compost)) {
+        if (!Rs2Inventory.hasItem(saltpetre) || !Rs2Inventory.hasItem(compost)) {
             Rs2Bank.openBank();
             if (Rs2Bank.isOpen()) {
                 Rs2Bank.depositAll();
@@ -94,15 +95,18 @@ public class HosidiusScript extends Script {
                 Rs2Bank.closeBank();
             }
         } else {
-            if (!Inventory.isFull()) {
+            if (!Rs2Inventory.isFull()) {
                 Microbot.getNotifier().notify("Hosidius script has finished");
                 shutDown();
                 return;
             }
             if (!Rs2Bank.isOpen()) {
-                while (Inventory.hasItem(saltpetre) && Inventory.hasItem(compost)) {
+                while (Rs2Inventory.hasItem(saltpetre) && Rs2Inventory.hasItem(compost)) {
                     for (int i = 0; i < 14; i++) {
-                        Inventory.useItemOnItemSlot(i, i + 14, 300, 600);
+                        Rs2Item rs2Item1 = Rs2Inventory.getItemInSlot(i);
+                        Rs2Item rs2Item2 = Rs2Inventory.getItemInSlot(i + 14);
+                        Rs2Inventory.combine(rs2Item1, rs2Item2);
+                        sleep(400, 600);
                     }
                     sleep(1000);
                 }

@@ -5,7 +5,7 @@ import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterrup
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
-import net.runelite.client.plugins.microbot.util.inventory.Inventory
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.models.RS2Item
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab
@@ -46,7 +46,7 @@ class ItemHelper {
                         return false
                     }
 
-                    if (Inventory.isFull()) {
+                    if (Rs2Inventory.isFull()) {
                         return true
                     }
 
@@ -57,7 +57,7 @@ class ItemHelper {
                             Microbot.getWalkerForKotlin().hybridWalkTo(rsGroundItem.tile.worldLocation)
                         }
 
-                        val inventoryCount = Inventory.count()
+                        val inventoryCount = Rs2Inventory.count()
                         if (Rs2GroundItem.interact(rsGroundItem)) {
                             if (!standingOnItem) {
                                 TrainerInterruptor.sleepUntilTrue({ !Rs2Player.isWalking() }, 50, 3000)
@@ -65,7 +65,7 @@ class ItemHelper {
 
                             TrainerInterruptor.sleepUntilTrue({ !Rs2Player.isWalking() && !Rs2Player.isInteracting() }, 100, 1000 * 10)
                             TrainerInterruptor.sleepUntilTrue({ hasItemAtWorldPoint(rsGroundItem.item.id, rsGroundItem.tile.worldLocation) }, 100, 1000 * 5)
-                            TrainerInterruptor.sleepUntilTrue({ Inventory.count() == inventoryCount + 1 }, 100, 1000 * 5)
+                            TrainerInterruptor.sleepUntilTrue({ Rs2Inventory.count() == inventoryCount + 1 }, 100, 1000 * 5)
                         }
                     }
                 }
@@ -88,8 +88,8 @@ class ItemHelper {
 
                 Microbot.status = "Equipping item ${itemPair.first}"
                 if (!Rs2Equipment.hasEquipped(itemPair.first)) {
-                    Inventory.getInventoryItem(itemPair.first)?.let {
-                        Microbot.getMouseForKotlin().click(it.bounds)
+                    Rs2Inventory.get(itemPair.first)?.let {
+                        Rs2Inventory.interact(it)
                         TrainerInterruptor.sleepUntilTrue({ Rs2Equipment.hasEquipped(itemPair.first) }, 100, 3000)
                     }
                 }

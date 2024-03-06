@@ -1,11 +1,12 @@
 package net.runelite.client.plugins.microbot.util.grandexchange;
 
 import net.runelite.api.NPC;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -62,7 +63,7 @@ public class GrandExchange {
     public static boolean openExchange() {
         Microbot.status = "Opening Grand Exchange";
         try {
-            if (Inventory.isUsingItem())
+            if (Rs2Inventory.isItemSelected())
                 Microbot.getMouse().click();
             if (isOpen()) return true;
             NPC npc = Rs2Npc.getNpc("Grand Exchange Clerk");
@@ -87,10 +88,10 @@ public class GrandExchange {
     }
 
     /**
-     * @param itemName
-     * @param searchTerm
-     * @param price
-     * @param quantity
+     * @param itemName name of the item
+     * @param searchTerm search term
+     * @param price price of the item to buy
+     * @param quantity quantity of item to buy
      * @return true if item has been bought succesfully
      */
     public static boolean buyItem(String itemName, String searchTerm, int price, int quantity) {
@@ -146,14 +147,14 @@ public class GrandExchange {
 
     /**
      * Sell item to the grand exchange
-     * @param itemName
-     * @param quantity
-     * @param price
+     * @param itemName name of the item to sell
+     * @param quantity quantity of the item to sell
+     * @param price price of the item to sell
      * @return
      */
     public static boolean sellItem(String itemName, int quantity, int price) {
         try {
-            if (!Inventory.hasItem(itemName)) return false;
+            if (!Rs2Inventory.hasItem(itemName)) return false;
 
             if (!isOpen()) {
                 openExchange();
@@ -165,7 +166,7 @@ public class GrandExchange {
 
             Microbot.getMouse().click(sellOffer.getBounds());
             sleepUntil(GrandExchange::isOfferTextVisible, 5000);
-            Inventory.useItemFast(itemName, "Offer");
+            Rs2Inventory.interact(itemName, "Offer");
             sleepUntil(() -> Rs2Widget.hasWidget("actively traded price"));
             sleep(300, 600);
             Widget pricePerItemButtonX = getPricePerItemButton_X();
@@ -207,7 +208,7 @@ public class GrandExchange {
         if (isAllSlotsEmpty()) {
             return true;
         }
-        if (Inventory.isFull()) {
+        if (Rs2Inventory.isFull()) {
             if (Rs2Bank.useBank()) {
                 Rs2Bank.depositAll();
             }
@@ -231,7 +232,7 @@ public class GrandExchange {
     }
 
     public static Pair<Widget, Integer> getSearchResultWidget(String search) {
-        Widget parent = Microbot.getClient().getWidget(WidgetInfo.CHATBOX_GE_SEARCH_RESULTS);
+        Widget parent = Microbot.getClient().getWidget(ComponentID.CHATBOX_GE_SEARCH_RESULTS);
 
         if (parent == null || parent.getChildren() == null) return null;
 
@@ -264,7 +265,7 @@ public class GrandExchange {
     }
 
     private static Widget getOfferContainer() {
-        return Microbot.getClient().getWidget(WidgetInfo.GRAND_EXCHANGE_OFFER_CONTAINER);
+        return Microbot.getClient().getWidget(ComponentID.GRAND_EXCHANGE_OFFER_CONTAINER);
     }
 
     public static Widget getQuantityButton_Minus() {

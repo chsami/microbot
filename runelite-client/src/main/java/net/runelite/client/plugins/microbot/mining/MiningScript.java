@@ -3,7 +3,7 @@ package net.runelite.client.plugins.microbot.mining;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,8 +19,8 @@ public class MiningScript extends Script {
 
                 if (Microbot.isAnimating()) return;
 
-                if (Inventory.isFull()) {
-                    Inventory.dropAll();
+                if (Rs2Inventory.isFull()) {
+                    Rs2Inventory.dropAll();
                     return;
                 }
 
