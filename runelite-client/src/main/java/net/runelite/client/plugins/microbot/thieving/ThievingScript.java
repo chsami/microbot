@@ -24,6 +24,9 @@ public class ThievingScript extends Script {
 
     public static double version = 1.0;
 
+    List<String> supportedFoods = new ArrayList<>(Arrays
+            .asList("monkfish", "lobster", "bass", "tuna", "swordfish", "salmon", "trout"));
+
     public boolean run(ThievingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
@@ -52,7 +55,7 @@ public class ThievingScript extends Script {
                     Rs2Inventory.dropAllExcept(x -> x.slot <= 8);
                 }
                 if (Rs2Inventory.hasItemAmount("coin pouch", 28, true)) {
-                    Rs2Inventory.interact("coin pouch");
+                    Rs2Inventory.interact("coin pouch", "open-all");
                 }
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > config.hitpoints()) {
                     if (random(1, 10) == 2)
@@ -77,8 +80,7 @@ public class ThievingScript extends Script {
         return true;
     }
 
-    List<String> supportedFoods = new ArrayList<>(Arrays
-            .asList("monkfish", "lobster", "bass", "tuna", "swordfish", "salmon", "trout"));
+
 
     public boolean run(net.runelite.api.NPC npc) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -114,7 +116,7 @@ public class ThievingScript extends Script {
                     Rs2Inventory.dropAllExcept(x -> x.slot <= 8);
                 }
                 if (Rs2Inventory.hasItemAmount("coin pouch", 28)) {
-                    Rs2Inventory.interact("coin pouch");
+                    Rs2Inventory.interact("coin pouch", "open-all");
                 }
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > 20) {
                     if (random(1, 10) == 2)
