@@ -9,9 +9,12 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.danplugins.fishing.threetickbarb.tickmanipulation.CutEatTickManipulationData;
+import net.runelite.client.plugins.danplugins.fishing.threetickbarb.tickmanipulation.TickManipulationData;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
@@ -44,6 +47,10 @@ public class ThreeTickBarb extends Plugin {
     private ThreeTickBarbOverlay threeTickBarbOverlay;
     @Inject
     private Notifier notifier;
+    @Inject
+    private EventBus eventBus;
+    @Inject
+    private ThreeTickBarbConfig config;
 
     private boolean enabled;
     private boolean inProgress;
@@ -51,6 +58,7 @@ public class ThreeTickBarb extends Plugin {
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
 
     ThreeTickFishingState state = ThreeTickFishingState.Idle;
+    TickManipulationData tickManipulationData;
 
     @Provides
     ThreeTickBarbConfig getConfig(ConfigManager manager) {
@@ -70,6 +78,9 @@ public class ThreeTickBarb extends Plugin {
             expstarted = Microbot.getClient().getSkillExperience(Skill.FISHING);
             startinglevel = Microbot.getClient().getRealSkillLevel(Skill.FISHING);
             timeBegan = System.currentTimeMillis();
+            tickManipulationData = getTickManipulationData();
+
+            eventBus.register(tickManipulationData);
             if (overlayManager != null) {
                 overlayManager.add(threeTickBarbOverlay);
             }
@@ -103,7 +114,7 @@ public class ThreeTickBarb extends Plugin {
     private void useGuam() {
         inProgress = true;
         sleep(13, 167);
-        Rs2Inventory.use("Guam leaf");
+        tickManipulationData.getFirstTickRunnable().run();
 
         state = ThreeTickFishingState.UseTarAndDrop;
         inProgress = false;
@@ -113,11 +124,12 @@ public class ThreeTickBarb extends Plugin {
         inProgress = true;
         sleep(18, 132);
 
-        Rs2Inventory.use(ItemID.SWAMP_TAR);
+        tickManipulationData.getSecondTickRunnable().run();
 
-        Rs2Inventory.drop(ItemID.LEAPING_TROUT);
-        Rs2Inventory.drop(ItemID.LEAPING_SALMON);
-        Rs2Inventory.drop(ItemID.LEAPING_STURGEON);
+        for (Integer itemId : tickManipulationData.getItemIdsToDrop())
+        {
+            Rs2Inventory.interact(itemId, "drop");
+        }
 
         state = ThreeTickFishingState.ClickFishingSpot;
         inProgress = false;
@@ -152,7 +164,7 @@ public class ThreeTickBarb extends Plugin {
     @Override
     protected void shutDown() {
         enabled = false;
-
+        eventBus.unregister(tickManipulationData);
         state = ThreeTickFishingState.Idle;
         overlayManager.remove(threeTickBarbOverlay);
     }
@@ -165,5 +177,18 @@ public class ThreeTickBarb extends Plugin {
 
     private NPC getFishingSpot() {
         return Rs2Npc.getNpc("Fishing spot");
+    }
+
+    private TickManipulationData getTickManipulationData()
+    {
+        {
+            final TickManipulationData normalMethod = config.tickManipulateMode().getTickManipulationData();
+            if (config.cutEat())
+            {
+                return new CutEatTickManipulationData(normalMethod);
+            }
+
+            return normalMethod;
+        }
     }
 }

@@ -4,8 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.jrPlugins.autoVorkath.CROSSBOW;
-import net.runelite.client.plugins.jrPlugins.autoVorkath.STAFF;
+import net.runelite.client.plugins.jrPlugins.autoVorkath.enums.CROSSBOW;
 
 @ConfigGroup("Vorkath Config")
 public interface VorkathConfig extends Config {
@@ -97,8 +96,8 @@ public interface VorkathConfig extends Config {
             position = 1,
             section = equipmentSection
     )
-    default net.runelite.client.plugins.jrPlugins.autoVorkath.CROSSBOW CROSSBOW() {
-        return CROSSBOW.ARMADYL_CROSSBOW;
+    default net.runelite.client.plugins.jrPlugins.autoVorkath.enums.CROSSBOW CROSSBOW() {
+        return CROSSBOW.DRAGON_HUNTER_CROSSBOW;
     }
 
     @ConfigItem(
