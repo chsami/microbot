@@ -3,7 +3,7 @@ package net.runelite.client.plugins.microbot.util.prayer;
 import net.runelite.api.Varbits;
 import net.runelite.api.annotations.Varbit;
 
-public enum Prayer {
+public enum Rs2PrayerEnum {
     THICK_SKIN("Thick Skin", 35454985, 1, Varbits.PRAYER_THICK_SKIN),
     BURST_STRENGTH("Burst of Strength", 35454986, 4, Varbits.PRAYER_BURST_OF_STRENGTH),
     CLARITY_THOUGHT("Clarity of Thought", 35454987, 7, Varbits.PRAYER_CLARITY_OF_THOUGHT),
@@ -40,7 +40,7 @@ public enum Prayer {
 
     private final int pVar;
 
-    Prayer(String name, int index, int level, int pVar){
+    Rs2PrayerEnum(String name, int index, int level, int pVar){
         this.name = name;
         this.index = index;
         this.level = level;

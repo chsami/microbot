@@ -8,7 +8,6 @@ import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyle;
 import net.runelite.client.plugins.microbot.playerassist.model.Monster;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
-import net.runelite.client.plugins.microbot.util.prayer.Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 
 import java.util.ArrayList;

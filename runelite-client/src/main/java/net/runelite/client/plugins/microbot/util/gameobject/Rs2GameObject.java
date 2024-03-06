@@ -618,6 +618,35 @@ public class Rs2GameObject {
         return Arrays.stream(tile.getGameObjects()).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
+    public static List<GameObject> getGameObjects(int id) {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        if (tiles == null) return new ArrayList<>();
+
+        int z = Microbot.getClient().getPlane();
+        List<GameObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+                for (GameObject tileObject : tile.getGameObjects()) {
+                    if (tileObject != null
+                            && tileObject.getSceneMinLocation().equals(tile.getSceneLocation()) && tileObject.getId() == id)
+                        tileObjects.add(tileObject);
+                }
+            }
+        }
+
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
+                .collect(Collectors.toList());
+    }
+
     public static List<GameObject> getGameObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();

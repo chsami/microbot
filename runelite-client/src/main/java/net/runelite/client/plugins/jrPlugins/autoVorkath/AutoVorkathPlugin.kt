@@ -25,7 +25,6 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
-import net.runelite.client.plugins.microbot.util.prayer.Prayer
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction
 import javax.inject.Inject

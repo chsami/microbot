@@ -1,7 +1,9 @@
 package net.runelite.client.plugins.microbot.vorkath;
 
+import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -17,14 +19,16 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.prayer.Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.MicrobotInventorySetup.doesEquipmentMatch;
 import static net.runelite.client.plugins.microbot.util.MicrobotInventorySetup.doesInventoryMatch;
@@ -55,17 +59,16 @@ public class VorkathScript extends Script {
     private final int blueProjectileId = 1479;
     private final int whiteProjectileId = 395;
     private final int redProjectileId = 1481;
-    private final int acidProjectileId = 1483;
+    @Getter
+    public final int acidProjectileId = 1483;
     private final int acidRedProjectileId = 1482;
-
-    private WorldPoint centerTile;
-    private WorldPoint rightTile;
-    private WorldPoint leftTile;
     NPC vorkath;
     boolean hasEquipment = false;
     boolean hasInventory = false;
     boolean init = true;
     public static VorkathConfig config;
+    @Getter
+    private HashSet<WorldPoint> acidPools = new HashSet<>();
 
     public boolean run(VorkathConfig config) {
         Microbot.enableAutoRunOn = false;
@@ -460,6 +463,26 @@ public class VorkathScript extends Script {
         Rs2Player.waitForWalking();
     }
 
+    WorldPoint findSafeTiles() {
+        WorldPoint vorkath = Rs2Npc.getNpc("vorkath").getWorldLocation();
+        WorldPoint swPoint = new WorldPoint(vorkath.getX() + 1, vorkath.getY() - 8, 0);
+        WorldArea wooxWalkArea = new WorldArea(swPoint, 5, 1);
+
+        List<WorldPoint> safeTiles = wooxWalkArea.toWorldPointList().stream().filter(this::isTileSafe).collect(Collectors.toList());
+
+        // Find the closest safe tile by x-coordinate to the player
+        return safeTiles.stream().min(Comparator.comparingInt(tile -> Math.abs(tile.getX() - Microbot.getClient().getLocalPlayer().getWorldLocation().getX()))).orElse(null);
+    }
+
+
+    boolean isTileSafe(WorldPoint tile) {
+        return !acidPools.contains(tile)
+                && !acidPools.contains(new WorldPoint(tile.getX(), tile.getY() + 1, tile.getPlane()))
+                && !acidPools.contains(new WorldPoint(tile.getX(), tile.getY() + 2, tile.getPlane()))
+                && !acidPools.contains(new WorldPoint(tile.getX(), tile.getY() + 3, tile.getPlane()));
+
+    }
+
     private void handleAcidWalk() {
         if (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.findObjectById(ObjectID.ACID_POOL_32000) == null) {
             Rs2Npc.attack("Vorkath");
@@ -469,6 +492,33 @@ public class VorkathScript extends Script {
 
         executeAcidWalk(43, 54, () -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneX() < 48 || (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.findObjectById(ObjectID.ACID_POOL_32000) == null));
         executeAcidWalk(51, 54, () -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneX() > 48 || (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.findObjectById(ObjectID.ACID_POOL_32000) == null));
+
+        Rs2Prayer.toggle(Prayer.PROTECT_RANGE, false);
+
+        acidPools.clear();
+        Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_32000).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
+        Rs2GameObject.getGameObjects(ObjectID.ACID_POOL).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
+        Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_37991).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
+
+        WorldPoint safeTile = findSafeTiles();
+        WorldPoint playerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
+
+        if (safeTile != null) {
+            if (playerLocation.equals(safeTile)) {
+                Rs2Npc.attack("vorkath");
+            } else {
+                eatAt(50);
+                Microbot.getWalkerForKotlin().walkFastLocal(
+                        LocalPoint.fromScene(safeTile.getX(), safeTile.getY())
+                );
+            }
+        } else {
+//            EthanApiPlugin.sendClientMessage("NO SAFE TILES! TELEPORTING TF OUT!");
+//            teleToHouse();
+//            changeStateTo(State.WALKING_TO_BANK, 1);
+//            return;
+        }
+
     }
 
     public void executeAcidWalk(int x, int y, BooleanSupplier awaitedCondition) {
@@ -482,6 +532,7 @@ public class VorkathScript extends Script {
             sleep(400);
         }
     }
+
 
     /**
      * Equipment + inventory

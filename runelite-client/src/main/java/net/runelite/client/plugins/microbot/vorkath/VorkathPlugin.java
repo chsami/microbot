@@ -2,11 +2,13 @@ package net.runelite.client.plugins.microbot.vorkath;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ProjectileMoved;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.microbot.playerassist.combat.PrayerPotionScript;
-import net.runelite.client.plugins.microbot.util.prayer.Prayer;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -20,6 +22,8 @@ import java.awt.*;
 )
 @Slf4j
 public class VorkathPlugin extends Plugin {
+    @Inject
+    Client client;
     @Inject
     private VorkathConfig config;
     @Provides
@@ -46,5 +50,13 @@ public class VorkathPlugin extends Plugin {
     protected void shutDown() {
         vorkathScript.shutdown();
         overlayManager.remove(exampleOverlay);
+    }
+
+    @Subscribe
+    public void onProjectileMoved(ProjectileMoved e)
+    {
+        if (e.getProjectile().getId() == vorkathScript.getAcidProjectileId()) {
+            vorkathScript.getAcidPools().add(WorldPoint.fromLocal(client, e.getPosition()));
+        }
     }
 }

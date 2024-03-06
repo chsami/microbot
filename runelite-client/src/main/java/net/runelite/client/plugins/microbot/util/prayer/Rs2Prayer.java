@@ -9,9 +9,13 @@ import static net.runelite.client.plugins.microbot.util.globval.VarbitValues.QUI
 
 public class Rs2Prayer {
 
-    public static void toggle(Prayer name, boolean onOff) {
+    public static void toggle(Rs2PrayerEnum name) {
+        Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
+    }
+
+    public static void toggle(Rs2PrayerEnum name, boolean on) {
         final int varBit = name.getVarbit();
-        if(!onOff) {
+        if(!on) {
             if (Microbot.getClientThread().runOnClientThread(() ->
                     Microbot.getClient().getVarbitValue(varBit) == 0)) return;
         } else {
@@ -19,6 +23,12 @@ public class Rs2Prayer {
                     Microbot.getClient().getVarbitValue(varBit) == 1)) return;
         }
         Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
+    }
+
+    public static boolean isPrayerActive(Rs2PrayerEnum name) {
+        final int varBit = name.getVarbit();
+        return Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().getVarbitValue(varBit) == 1);
     }
 
     public static boolean isQuickPrayerEnabled() {
