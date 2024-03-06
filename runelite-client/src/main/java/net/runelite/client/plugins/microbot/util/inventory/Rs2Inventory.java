@@ -1384,6 +1384,7 @@ public class Rs2Inventory {
                 || action.equalsIgnoreCase("view")
                 || action.equalsIgnoreCase("bury")
                 || action.equalsIgnoreCase("feel")
+                || action.equalsIgnoreCase("open-all")
                 || action.equalsIgnoreCase("break")) {
             index = 2;
         } else if (action.equalsIgnoreCase("wield")

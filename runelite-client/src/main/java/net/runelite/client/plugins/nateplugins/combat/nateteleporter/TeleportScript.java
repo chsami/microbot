@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import java.util.concurrent.TimeUnit;
@@ -24,11 +25,9 @@ public class TeleportScript extends Script {
             try {
                 if (!config.highAlchemy() && (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts)) return;
 
-                Rs2Tab.switchToMagicTab();
-
                 Microbot.status = "current tab: " + Rs2Tab.getCurrentTab();
                 if (config.highAlchemy()) {
-                    sleep(600, 800);
+                    Rs2Player.waitForAnimation();
 
                     Rs2Item item = Rs2Inventory.get(config.highAlchemyItem());
                     if (item == null) {
@@ -36,8 +35,6 @@ public class TeleportScript extends Script {
                         return;
                     }
                     Rs2Magic.highAlch(item);
-
-                    sleep(300, 500);
                 }
 
                 if (config.SPELL().getTeleport().getLevel() > Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC)) {
