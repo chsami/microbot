@@ -36,7 +36,7 @@ public class FoodScript extends Script {
                 if (!config.toggleFood()) return;
                 if (Rs2Inventory.hasItem("empty vial"))
                     Rs2Inventory.drop("empty vial");
-                double treshHold = (double) (Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) * Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS)) / 100;
+                double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
                 if (Rs2Equipment.isWearingFullGuthan()) {
                     if (treshHold > 80) //only unequip guthans if we have more than 80% hp
                         unEquipGuthans();
