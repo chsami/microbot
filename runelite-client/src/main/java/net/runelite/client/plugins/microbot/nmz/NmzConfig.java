@@ -114,7 +114,7 @@ public interface NmzConfig extends Config {
     }
     @ConfigItem(
             keyName = "Random Mouse Movements",
-            name = "",
+            name = "Random Mouse Movements",
             description = "Random Mouse Movements",
             position = 6,
             section = generalSection
