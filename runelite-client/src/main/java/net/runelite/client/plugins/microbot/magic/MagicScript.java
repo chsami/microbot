@@ -32,12 +32,8 @@ public class MagicScript extends Script {
     }
 
     public void boltEnchanting() {
-        if (Microbot.getMouse().mousePositions.isEmpty()) {
-            final Point point = new Point((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY());
-            Microbot.getMouse().click(point);
-        } else {
-            Microbot.getMouse().click(Microbot.getMouse().mousePositions.stream().findFirst().get());
-        }
+        final Point point = new Point((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY());
+        Microbot.getMouse().click(point);
         VirtualKeyboard.keyHold(KeyEvent.VK_SPACE);
         sleep(400, 10000);
     }
@@ -45,7 +41,7 @@ public class MagicScript extends Script {
     private void highAlch() {
         Widget highAlch = Microbot.getClient().getWidget(14286888);
         if (Microbot.getClient().isWidgetSelected())
-            Microbot.getMouse().clickFast();
+            Microbot.getMouse().click();
         if (highAlch == null || Microbot.getClientThread().runOnClientThread(highAlch::isHidden)) {
             Rs2Tab.switchToMagicTab();
             return;

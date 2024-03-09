@@ -394,7 +394,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItem(boolean checkInv, String name) {
-        if (checkInv && !hasItem(name)) return;
+        if (checkInv && !Rs2Inventory.hasItem(name)) return;
         withdrawOne(name);
     }
 
@@ -439,7 +439,7 @@ public class Rs2Bank {
      * @param amount amount to withdraw
      */
     public static void withdrawX(boolean checkInv, int id, int amount) {
-        if (checkInv && !hasItem(id)) return;
+        if (checkInv && !Rs2Inventory.hasItem(id)) return;
         withdrawX(id, amount);
     }
     /**
@@ -511,7 +511,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItemAll(boolean checkInv, String name) {
-        if (checkInv && !hasItem(name)) return;
+        if (checkInv && !Rs2Inventory.hasItem(name)) return;
         withdrawItemAll(name);
     }
 

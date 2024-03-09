@@ -1318,7 +1318,7 @@ public class Rs2Inventory {
 
     /**
      *
-     * @param name
+     * @param name item name
      */
     public static void wield(String name) {
         invokeMenu(get(name), "wield");
@@ -1326,7 +1326,15 @@ public class Rs2Inventory {
 
     /**
      *
-     * @param id
+     * @param name item name
+     */
+    public static void wear(String name) {
+        invokeMenu(get(name), "wear");
+    }
+
+    /**
+     *
+     * @param id item id
      */
     public static void equip(int id) {
         wield(id);
@@ -1334,10 +1342,18 @@ public class Rs2Inventory {
 
     /**
      *
-     * @param id
+     * @param id item id
      */
     public static void wield(int id) {
         invokeMenu(get(id), "wield");
+    }
+
+    /**
+     *
+     * @param id item id
+     */
+    public static void wear(int id) {
+        invokeMenu(get(id), "wear");
     }
 
     /**
@@ -1391,7 +1407,7 @@ public class Rs2Inventory {
                 || action.equalsIgnoreCase("wear")
                 || action.equalsIgnoreCase("check steps")) {
             index = 3;
-        } else if (action.equalsIgnoreCase("fill")) {
+        } else if (action.equalsIgnoreCase("fill") || action.equalsIgnoreCase("guzzle") ) {
             index = 4;
         } else if (action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("rub")
                 || action.equalsIgnoreCase("refund") || action.equalsIgnoreCase("commune")

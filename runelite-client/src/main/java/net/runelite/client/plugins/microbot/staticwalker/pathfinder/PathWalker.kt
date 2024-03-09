@@ -6,11 +6,7 @@ import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
-import java.awt.Shape
 import kotlin.random.Random
 
 class PathWalker(private val nodes: List<PathNode>) {
@@ -30,8 +26,8 @@ class PathWalker(private val nodes: List<PathNode>) {
         enabled = true
         isInterrupted = false
 
-        val maxSkipDistance = 12
-        val minSkipDistance = 6
+        val maxSkipDistance = 16
+        val minSkipDistance = 10
         var currentSkipDistance = Random.nextInt(minSkipDistance, maxSkipDistance)
 
 
@@ -42,7 +38,7 @@ class PathWalker(private val nodes: List<PathNode>) {
         val player = Microbot.getClientForKotlin().localPlayer
 
         for (currentNode in nodes) {
-
+            println(currentNode.worldLocation)
             if (isInterrupted) {
                 enabled = false
                 return
@@ -104,7 +100,7 @@ class PathWalker(private val nodes: List<PathNode>) {
             val distance = previousNode.worldLocation.distanceTo(currentNode.worldLocation)
             if (distance >= currentSkipDistance) {
                 val minimapPoint = getMinimapPoint(currentNode.worldLocation) ?: continue
-                clickPointWhileRunning(minimapPoint, currentNode)
+                clickPointWhileRunning(minimapPoint, currentNode, currentSkipDistance)
                 previousNode = currentNode
                 currentSkipDistance = Random.nextInt(minSkipDistance, maxSkipDistance)
             }
@@ -126,15 +122,14 @@ class PathWalker(private val nodes: List<PathNode>) {
         Global.sleepUntilTrue({ !Rs2Player.isWalking() && !Rs2Player.isAnimating() }, 200, 1000 * 30)
     }
 
-    private fun clickPointWhileRunning(minimapPoint: Point, node: PathNode) {
+    private fun clickPointWhileRunning(minimapPoint: Point, node: PathNode, currentSkipDistance: Int) {
         val player = Microbot.getClientForKotlin().localPlayer
         Microbot.getMouseForKotlin().click(minimapPoint)
         Global.sleep(1000)
         Global.sleepUntilTrue({
             val distanceToTarget = player.worldLocation.distanceTo(node.worldLocation)
-            val isStill = !Rs2Player.isWalking() && !Rs2Player.isAnimating()
-            val nearTile = distanceToTarget <= 2
-            isStill || nearTile
+            val nearTile = distanceToTarget <= currentSkipDistance
+            nearTile
         }, 200, 1000 * 30)
     }
 
@@ -151,14 +146,6 @@ class PathWalker(private val nodes: List<PathNode>) {
         val success = operateTransport(transport)
         if (!success) {
             return false
-        } else {
-            if (Rs2Widget.hasWidget("Climb up or down")) {
-                if (transport.action.equals("climb-up", true)) {
-                    VirtualKeyboard.typeString("1");
-                } else {
-                    VirtualKeyboard.typeString("2");
-                }
-            }
         }
 
         Global.sleep(1000)
@@ -177,14 +164,14 @@ class PathWalker(private val nodes: List<PathNode>) {
 
     private fun operateTransport(pathTransport: PathTransport): Boolean {
         val player = Microbot.getClientForKotlin().localPlayer
-        val clickableShape: Shape? = findTransportObjectShape(pathTransport.objectId)
+        val clickableTile: TileObject? = findTransportObjectShape(pathTransport.objectId)
 
-        if (clickableShape == null) {
+        if (clickableTile == null) {
             println("No transport ID: ${pathTransport.objectId}, at location: ${pathTransport.startPathNode.worldLocation}")
 
         } else {
             println("Operating on Transport: ${pathTransport.objectId}, with action: ${pathTransport.action}")
-            interactUsingAction(clickableShape, pathTransport.action)
+            interactUsingAction(clickableTile, pathTransport.action)
             Global.sleepUntilTrue({ findTransportObjectShape(pathTransport.objectId) == null }, 200, 3000)
         }
 
@@ -208,7 +195,7 @@ class PathWalker(private val nodes: List<PathNode>) {
         return true
     }
 
-    private fun findTransportObjectShape(objectId: Int): Shape? {
+    private fun findTransportObjectShape(objectId: Int): TileObject? {
         val player = Microbot.getClientForKotlin().localPlayer
 
         val allTransportGameObjects = Rs2GameObject.getGameObjects()
@@ -226,22 +213,22 @@ class PathWalker(private val nodes: List<PathNode>) {
         var transportGameObject: GameObject? = null
         var transportWallObject: WallObject? = null
         var transportGroundObject: GroundObject? = null
-        var clickableShape: Shape? = null
+        var clickableTile: TileObject? = null
 
 
         for (i in 1..6) {
             if (transportGameObject != null) {
-                clickableShape = transportGameObject.canvasTilePoly
+                clickableTile = transportGameObject
                 break
             }
 
             if (transportWallObject != null) {
-                clickableShape = transportWallObject.convexHull?.bounds
+                clickableTile = transportWallObject
                 break
             }
 
             if (transportGroundObject != null) {
-                clickableShape = transportGroundObject.convexHull?.bounds
+                clickableTile = transportGroundObject
                 break
             }
 
@@ -258,11 +245,11 @@ class PathWalker(private val nodes: List<PathNode>) {
                 .minByOrNull { groundObject: GroundObject -> groundObject.worldLocation.distanceTo(player.worldLocation) }
         }
 
-        return clickableShape
+        return clickableTile
     }
 
-    private fun interactUsingAction(transportObjectShape: Shape, action: String): Boolean {
-        Rs2Menu.doAction(action, transportObjectShape)
+    private fun interactUsingAction(clickableTile: TileObject, action: String): Boolean {
+        Rs2GameObject.interact(clickableTile, action);
         return true
     }
 

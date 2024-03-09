@@ -82,9 +82,9 @@ public class ogBlastFurnaceScript extends Script {
     private void calcState(){
         Microbot.status = "Calculating State";
         if(barSelected == Bars.SILVER_BAR || barSelected == Bars.GOLD_BAR){
-            if(Rs2Inventory.isFull() && getBFPrimaryOre() > 20 && getBFBars() > 20){;botState = State.TO_MUCH_SUPPLIES;}
+            if(getBFBars() >= 26){botState = State.RETRIEVING_ORE;}
+            else if(Rs2Inventory.isFull() && getBFPrimaryOre() > 20 && getBFBars() > 20){;botState = State.TO_MUCH_SUPPLIES;}
             else if(Rs2Inventory.hasItem(barSelected.getBarID()) || ((getBFBars() < 26 || getBFPrimaryOre() < 26) && !Rs2Inventory.hasItem(barSelected.getPrimaryOre()))){;botState = State.BANKING;}
-            else if(getBFBars() >= 26 && getBFPrimaryOre() >= 26){botState = State.RETRIEVING_ORE;}
             else if(Rs2Inventory.hasItem(barSelected.getPrimaryOre())) {botState = State.LOADING_ORE;}
             else {botState = State.WAITING;}
         }
@@ -97,15 +97,17 @@ public class ogBlastFurnaceScript extends Script {
                 sleepUntil(() -> !Rs2Inventory.hasItem(barSelected.getPrimaryOre()), 20000);
                 callAFK(36,1000,3000);
                 if(!Rs2Inventory.hasItem(barSelected.getPrimaryOre())){
+                    callAFK(100,3000,4000);
                     walkToDispenser();
                 }
             }
         }
     }
     private void walkToDispenser() {
+        callAFK(100,9000,9900);
         if(Random.random(1,5) == 3){
             iceGlovesEquip();
-            sleep(120,200);
+            sleep(120,400);
             Microbot.getWalker().walkCanvas(new WorldPoint(1940,4962,0));
             callAFK(36,1000,6183);
             sleepUntil(this::playerAtRetrieveLocation);
@@ -116,28 +118,39 @@ public class ogBlastFurnaceScript extends Script {
             sleepUntil(this::playerAtRetrieveLocation);
             sleep(120,200);
             iceGlovesEquip();
-            sleep(120,200);
+            sleep(120,400);
         }
     }
     private void retrieveBars() {
+        callAFK(100,5000,6000);
         Microbot.status = "Retrieving Bars";
-        sleep(140,170);
         iceGlovesEquip();
+        sleep(200,400);
+        sleep(300,600);
         if(getBFDispenserState() == 1){sleepUntil(() -> getBFDispenserState() == 2 || getBFDispenserState() == 3);}
+        callAFK(100,6000,8000);
         Rs2GameObject.interact(9092);
-        sleepUntil(() -> Rs2Widget.findWidget("How many would you like to take?") != null);
-        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+        if (Rs2GameObject.interact(9092, "Take")) {
+            sleepUntil(() -> Rs2Widget.hasWidget("How many would you like to take?"));
+            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+            sleepUntil(() -> !Rs2Inventory.hasItem("gold bar"),60000);
+        }
+        if (Rs2Widget.hasWidget("Gold bar")) {
+            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+        }
         sleep(40,90);
         if(barSelected == Bars.GOLD_BAR){
             goldGlovesEquip();
             sleep(120,200);
         }
+        System.out.println("later on" + getBFDispenserState());
         sleepUntil(() -> Rs2Inventory.hasItem(barSelected.getBarID()));
     }
     private void restock() {
         openChest();
         callAFK(27,1000,6000);
-        sleepUntil(Rs2Bank::isOpen);
+        //sleepUntil(Rs2Bank::isOpen);
+
         if( Rs2Bank.isOpen()) {
             if(Rs2Inventory.hasItem(barSelected.getBarID())){
                 //TODO Fix useItemAction
@@ -146,11 +159,10 @@ public class ogBlastFurnaceScript extends Script {
             }
 //            Rs2Bank.scrollTo(Rs2Widget.findWidget(barName())); // FIXME: HONESTLY THIS IS SO OLD IT DOESN'T EVEN WORK
             if( getStamEffect() <= 10|| getRunEnergy() <= 40){stamPotUp();}
-            Microbot.getMouse().click(Rs2Widget.findWidgetExact(barName()).getBounds());
-            sleepUntil(() -> Rs2Inventory.hasItem(ItemID.GOLD_ORE));
+            Rs2Bank.withdrawItemAll("Gold ore");
+            // sleepUntil(() -> Rs2Inventory.hasItem("Gold ore"));
             sleep(50,80);
-            VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
-            sleepUntil(() -> !Rs2Bank.isOpen());
+            Rs2Bank.closeBank();
         }
     }
     private String barName() {
@@ -160,7 +172,7 @@ public class ogBlastFurnaceScript extends Script {
             case (ItemID.SILVER_BAR):
                 return "Silver Bar";
         }
-            return "";
+        return "";
     }
     private void depositOverflow() {
         openChest();

@@ -1,12 +1,8 @@
 package net.runelite.client.plugins.microbot.util.security;
 
-import net.runelite.api.GameState;
 import net.runelite.client.config.ConfigProfile;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.globval.GlobalWidgetInfo;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldRegion;
@@ -61,12 +57,6 @@ public class Login {
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
         sleep(300);
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
-    }
-
-    public boolean activateCondition() {
-        GameState idx = Microbot.getClient().getGameState();
-        return ((Rs2Menu.getIndex("Play") == 0 || (idx == GameState.LOGIN_SCREEN || idx == GameState.LOGGING_IN)) && activeProfile.getName() != null)
-                || (idx == GameState.LOGGED_IN && Rs2Widget.getWidget(GlobalWidgetInfo.LOGIN_MOTW_TEXT.getPackedId(), 0) != null);
     }
 
     public void setWorld(int worldNumber) {

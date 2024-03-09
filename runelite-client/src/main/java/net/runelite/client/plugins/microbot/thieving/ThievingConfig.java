@@ -5,6 +5,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.thieving.enums.ThievingNpc;
+import net.runelite.client.plugins.microbot.util.misc.Food;
 
 @ConfigGroup("Thieving")
 public interface ThievingConfig extends Config {
@@ -17,7 +18,7 @@ public interface ThievingConfig extends Config {
     )
     default String GUIDE() {
         return "Start near any of the npc\n" +
-                "Script only supports monkfish\n" +
+                "Script default food is monkfish\n" +
                 "Script will walk to bank if out of food\n"+
                 "Script supports dodgy necklace";
     }
@@ -51,5 +52,17 @@ public interface ThievingConfig extends Config {
     default int hitpoints()
     {
         return 20;
+    }
+
+    @ConfigItem(
+            keyName = "Food",
+            name = "Food",
+            description = "type of food",
+            position = 3,
+            section = generalSection
+    )
+    default Food food()
+    {
+        return Food.MONKFISH;
     }
 }

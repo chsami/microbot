@@ -112,4 +112,15 @@ public interface NmzConfig extends Config {
     {
         return false;
     }
+    @ConfigItem(
+            keyName = "Random Mouse Movements",
+            name = "",
+            description = "Random Mouse Movements",
+            position = 6,
+            section = generalSection
+    )
+    default boolean randomMouseMovements()
+    {
+        return true;
+    }
 }

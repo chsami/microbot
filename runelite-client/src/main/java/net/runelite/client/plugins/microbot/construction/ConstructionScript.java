@@ -11,7 +11,6 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -104,7 +103,7 @@ public class ConstructionScript extends Script {
     private void build() {
         TileObject oakLarderSpace = getOakLarderSpace();
         if (oakLarderSpace == null) return;
-        if (Rs2Menu.doAction("Build", oakLarderSpace.getCanvasTilePoly())) {
+        if (Rs2GameObject.interact(oakLarderSpace, "Build")) {
             sleepUntilOnClientThread(() -> hasFurnitureInterfaceOpen(), 5000);
             VirtualKeyboard.keyPress('2');
             sleepUntilOnClientThread(() -> getOakLarder() != null, 5000);
@@ -114,7 +113,7 @@ public class ConstructionScript extends Script {
     private void remove() {
         TileObject oaklarder = getOakLarder();
         if (oaklarder == null) return;
-        if (Rs2Menu.doAction("Remove", oaklarder.getCanvasTilePoly())) {
+        if (Rs2GameObject.interact(oaklarder, "Remove")) {
             sleepUntilOnClientThread(() -> hasRemoveLarderInterfaceOpen(), 5000);
             VirtualKeyboard.keyPress('1');
             sleepUntilOnClientThread(() -> getOakLarderSpace() != null, 5000);
@@ -141,7 +140,7 @@ public class ConstructionScript extends Script {
                 Microbot.getMouse().click(callServantWidget.getCanvasLocation());
         }
 
-        if (Rs2Menu.doAction("Talk-to", butler.getCanvasTilePoly())) {
+        if (Rs2Npc.interact(butler, "Talk-to")) {
             sleep(1200, 2000);
             if (hasDialogueOptionToUnnote()) {
                 VirtualKeyboard.keyPress('1');

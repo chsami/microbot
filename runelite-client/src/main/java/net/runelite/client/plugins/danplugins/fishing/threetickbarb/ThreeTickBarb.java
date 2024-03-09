@@ -3,7 +3,10 @@ package net.runelite.client.plugins.danplugins.fishing.threetickbarb;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.NPC;
+import net.runelite.api.Skill;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.Notifier;
@@ -17,7 +20,6 @@ import net.runelite.client.plugins.danplugins.fishing.threetickbarb.tickmanipula
 import net.runelite.client.plugins.danplugins.fishing.threetickbarb.tickmanipulation.TickManipulationData;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -27,7 +29,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
 import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 @PluginDescriptor(
@@ -142,20 +143,6 @@ public class ThreeTickBarb extends Plugin {
         NPC fishingSpot = getFishingSpot();
 
         Rs2Npc.interact(fishingSpot, "Use-rod");
-
-        state = ThreeTickFishingState.UseGuam;
-        inProgress = false;
-    }
-
-    private void locateFishingSpot(NPC fishingSpot) {
-        inProgress = true;
-        sleep(11, 254);
-
-        Rs2Menu.doAction("Use-rod", fishingSpot.getCanvasTilePoly());
-        sleepUntilOnClientThread(() -> {
-            int distance = fishingSpot.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
-            return distance <= 1;
-        });
 
         state = ThreeTickFishingState.UseGuam;
         inProgress = false;
