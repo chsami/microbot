@@ -51,9 +51,12 @@ public class GriffinTrainerOverlay extends OverlayPanel {
     }
 
     private void drawMouse(Graphics2D graphics) {
-        Point cursorPosition = Microbot.getMouse().getLastMousePosition();
+        // Mocrosoft uncommented this as we no longer use getLastMousePosition
+        // The new api basically uses invokes instead of mouse
+        // therefor this is not really needed anymore
+       /* Point cursorPosition = Microbot.getMouse().getLastMousePosition();
         if (cursorPosition == null) return;
         graphics.setColor(Color.RED);
-        graphics.fillOval(cursorPosition.getX() - 5, cursorPosition.getY() - 5, 10, 10);
+        graphics.fillOval(cursorPosition.getX() - 5, cursorPosition.getY() - 5, 10, 10);*/
     }
 }

@@ -43,8 +43,8 @@ public class NmzScript extends Script {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
             try {
-                if (Random.random(1, 50) == 1) {
-                    Microbot.getMouse().clickFast(Random.random(0, 500), Random.random(0, 500), true);
+                if (Random.random(1, 50) == 1 && config.randomMouseMovements()) {
+                    Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()), true);
                 }
                 boolean isOutsideNmz = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2602, 3116, 0)) < 20;
                 useOverload = Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) == Microbot.getClient().getRealSkillLevel(Skill.RANGED);
@@ -125,6 +125,16 @@ public class NmzScript extends Script {
         if (Rs2Inventory.hasItem(ItemID.LOCATOR_ORB)) {
             handleLocatorOrbUsage();
             randomlyToggleRapidHeal();
+        } else if (Rs2Inventory.hasItem(ItemID.DWARVEN_ROCK_CAKE_7510)) {
+            handleDwarvenRockCake();
+            randomlyToggleRapidHeal();
+        }
+    }
+
+    private void handleDwarvenRockCake() {
+        if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > Random.random(1, 5) && !useOverload
+                && Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) != Microbot.getClient().getRealSkillLevel(Skill.RANGED)) {
+            Rs2Inventory.interact(ItemID.DWARVEN_ROCK_CAKE_7510, "guzzle");
         }
     }
 
@@ -195,9 +205,13 @@ public class NmzScript extends Script {
     public void consumeEmptyVial() {
         final int EMPTY_VIAL = 26291;
         Rs2GameObject.interact(EMPTY_VIAL, "drink");
-        Widget widget = Rs2Widget.getWidget(129, 0);
+        Widget widget = Rs2Widget.getWidget(129, 6);
+        System.out.println(Microbot.getClientThread().runOnClientThread(widget::isHidden));
         if (widget != null && !Microbot.getClientThread().runOnClientThread(widget::isHidden)) {
-            Rs2Widget.clickWidgetFast(8454150, MenuAction.WIDGET_CONTINUE);
+            Rs2Widget.clickWidget(widget.getId());
+            sleep(300);
+            Rs2Widget.clickWidget(widget.getId());
+            //Rs2Widget.clickWidgetFast(8454150, MenuAction.WIDGET_CONTINUE);
             // MenuEntryImpl(getOption=Continue, getTarget=, getIdentifier=0, getType=WIDGET_CONTINUE, getParam0=-1, getParam1=8454150, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)
             sleep(5000);
         }

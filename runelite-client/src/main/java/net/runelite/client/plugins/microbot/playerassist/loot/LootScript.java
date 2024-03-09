@@ -11,7 +11,6 @@ import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -34,17 +33,10 @@ public class LootScript extends Script {
                 LocalPoint itemLocation = itemSpawned.getTile().getLocalLocation();
                 int distance = itemSpawned.getTile().getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
                 if (item.equalsIgnoreCase(itemComposition.getName()) && distance < 14) {
-                    LocalPoint groundPoint = LocalPoint.fromWorld(Microbot.getClient(), itemSpawned.getTile().getWorldLocation());
-                    Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), groundPoint, itemSpawned.getTile().getItemLayer().getHeight());
-                    if (Rs2Camera.isTileOnScreen(itemLocation)) {
-                        if (Rs2Menu.doAction("Take", poly, item.toLowerCase())) {
-                            Microbot.pauseAllScripts = true;
-                            sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation() == itemSpawned.getTile().getWorldLocation(), 5000);
-                            Microbot.pauseAllScripts = false;
-                        }
-                    } else {
-                        Rs2Camera.turnTo(itemLocation);
-                    }
+                    Rs2GroundItem.interact(item, "Take");
+                    Microbot.pauseAllScripts = true;
+                    sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation() == itemSpawned.getTile().getWorldLocation(), 5000);
+                    Microbot.pauseAllScripts = false;
                 }
             }
         }), 2000, TimeUnit.MILLISECONDS);

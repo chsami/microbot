@@ -24,9 +24,6 @@ public class ThievingScript extends Script {
 
     public static double version = 1.0;
 
-    List<String> supportedFoods = new ArrayList<>(Arrays
-            .asList("monkfish", "lobster", "bass", "tuna", "swordfish", "salmon", "trout"));
-
     public boolean run(ThievingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
@@ -34,20 +31,20 @@ public class ThievingScript extends Script {
                 List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
                 if (foods.isEmpty()) {
 
-                    if (Rs2Inventory.getEmptySlots() > 3) {
+                    if (Rs2Inventory.size() > 3) {
                         Rs2Inventory.dropAllExcept(x -> x.slot <= 3);
                         return;
                     }
                     if (Rs2Bank.walkToBank()) {
                         Rs2Bank.useBank();
-                        Rs2Bank.withdrawX(true, "monkfish", 5);
+                        Rs2Bank.withdrawX(true, config.food().getName(), 5);
                         final Rs2Item amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
                         if (amulet == null) {
                             Rs2Bank.withdrawItem(true, "dodgy necklace");
                         }
                         Rs2Bank.closeBank();
                         sleep(1000, 2000);
-                        Rs2Inventory.use(ItemID.DODGY_NECKLACE);
+                        Rs2Inventory.wield("dodgy necklace");
                     }
                     return;
                 }
@@ -61,67 +58,6 @@ public class ThievingScript extends Script {
                     if (random(1, 10) == 2)
                         sleepUntil(() -> TimersPlugin.t == null || !TimersPlugin.t.render());
                     if (Rs2Npc.interact(config.THIEVING_NPC().getName(), "pickpocket")) {
-                        sleep(300, 600);
-                    }
-                } else {
-
-                    for (Rs2Item food : foods) {
-                        Rs2Inventory.interact(food, "eat");
-                        if (random(1, 10) == 2) { //double eat
-                            Rs2Inventory.interact(food, "eat");
-                        }
-                        break;
-                    }
-                }
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        }, 0, 600, TimeUnit.MILLISECONDS);
-        return true;
-    }
-
-
-
-    public boolean run(net.runelite.api.NPC npc) {
-        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            try {
-                List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
-                if (foods.isEmpty()) {
-
-                    if (Rs2Inventory.isSlotsEmpty(0, 1, 2)) {
-                        Rs2Inventory.dropAllExcept(x -> x.slot < 3);
-                        return;
-                    }
-                    if (Rs2Bank.walkToBank()) {
-                        Rs2Bank.useBank();
-                        for (String supportedFood: supportedFoods) {
-                            if (!Microbot
-                                    .getClientThread()
-                                    .runOnClientThread(Rs2Inventory::getInventoryFood).isEmpty())
-                                break;
-                            Rs2Bank.withdrawX(true, supportedFood, 5);
-                        }
-                        final Rs2Item amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
-                        if (amulet == null) {
-                            Rs2Bank.withdrawItem(true, "dodgy necklace");
-                        }
-                        Rs2Bank.closeBank();
-                        sleep(1000, 2000);
-                        Rs2Inventory.use(ItemID.DODGY_NECKLACE);
-                    }
-                    return;
-                }
-                if (Rs2Inventory.isFull()) {
-                    Rs2Inventory.dropAllExcept(x -> x.slot <= 8);
-                }
-                if (Rs2Inventory.hasItemAmount("coin pouch", 28)) {
-                    Rs2Inventory.interact("coin pouch", "open-all");
-                }
-                if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > 20) {
-                    if (random(1, 10) == 2)
-                        sleepUntil(() -> TimersPlugin.t == null || !TimersPlugin.t.render());
-                    if (Rs2Npc.interact(npc.getName(), "pickpocket")) {
                         sleep(300, 600);
                     }
                 } else {

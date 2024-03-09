@@ -192,7 +192,6 @@ public class MicrobotPlugin extends Plugin {
         {
             if (thievingScript == null) {
                 thievingScript = new ThievingScript();
-                thievingScript.run(npc);
             } else {
                 thievingScript.shutdown();
                 thievingScript = null;

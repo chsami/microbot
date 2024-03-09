@@ -33,11 +33,6 @@ public class ogRunecraftingOverlay extends OverlayPanel {
                     .left(Microbot.status)
                     .build());
 
-            for (Point point: Microbot.getMouse().mousePositions) {
-                graphics.setColor(Color.RED);
-                graphics.drawString("x", point.getX(), point.getY());
-            }
-
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }

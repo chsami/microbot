@@ -11,7 +11,6 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.menu.Rs2Menu;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -83,7 +82,9 @@ public class TannerScript extends Script {
             if (Rs2Widget.hasWidget("What hides would you like tanning?")) {
                 Widget widget = Rs2Widget.findWidget((config.HIDE_TYPE().getWidgetName()));
                 if (widget != null) {
-                    Rs2Menu.doAction("Tan <col=ff7000>All", widget.getCanvasLocation());
+                    // TODO: needs to be reworked to specificy all option
+                    Microbot.showMessage("needs to be reworked to specificy all option");
+                    //Rs2Widget.clickWidget(widget.getId(), "all");
                     sleepUntil(() -> Rs2Inventory.hasItem(config.HIDE_TYPE().getItemName()));
                 }
             } else {
@@ -91,7 +92,9 @@ public class TannerScript extends Script {
                     sleepUntil(() -> Rs2Widget.hasWidget("What hides would you like tanning?"));
                     Widget widget = Rs2Widget.findWidget((config.HIDE_TYPE().getWidgetName()));
                     if (widget != null) {
-                        Rs2Menu.doAction("Tan <col=ff7000>All", widget.getCanvasLocation());
+                        // TODO: needs to be reworked to specificy all option
+                        Microbot.showMessage("needs to be reworked to specificy all option");
+                        //Rs2Widget.clickWidget(widget.getId(), "all");
                         sleepUntil(() -> Rs2Inventory.hasItem(config.HIDE_TYPE().getItemName()));
                     }
                 }

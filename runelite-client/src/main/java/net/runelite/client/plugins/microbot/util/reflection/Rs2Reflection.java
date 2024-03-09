@@ -136,6 +136,7 @@ public class Rs2Reflection {
 
         doAction.setAccessible(true);
         Microbot.getClientThread().runOnClientThread(() -> doAction.invoke(null, param0, param1, opcode, identifier, itemId, option, target, x, y));
+        System.out.println("[INVOKE] => param0: " + param0 + " param1: " + param1 + " opcode: " + opcode + " id: " + identifier + " itemid: " + itemId);
         doAction.setAccessible(false);
     }
 }

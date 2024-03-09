@@ -7,13 +7,16 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -51,7 +54,10 @@ public class ExampleScript extends Script {
                 //sleepUntil(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() <= 55);
 //                Rs2Magic.castOn(MagicAction.EARTH_BOLT, Rs2Npc.getNpc("guard"));
                 long startTime = System.currentTimeMillis();
-                MicrobotInventorySetup.loadInventory("vorkath");
+
+
+                Rs2Bank.openBank();
+                Rs2Bank.depositAll("gold bar");
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
                 System.out.println(totalTime);
