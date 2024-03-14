@@ -26,90 +26,111 @@ package net.runelite.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import okhttp3.*;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import javax.inject.Inject;
-import javax.inject.Named;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
-class SessionClient
-{
-	private final OkHttpClient client;
-	private final HttpUrl sessionUrl;
-	private final Gson gson;
+class SessionClient {
+    private final OkHttpClient client;
+    private final HttpUrl sessionUrl;
+    private final Gson gson;
 
-	@Inject
-	private SessionClient(OkHttpClient client, @Named("runelite.session") HttpUrl sessionUrl, Gson gson)
-	{
-		this.client = client;
-		this.sessionUrl = sessionUrl;
-		this.gson = gson;
-	}
+    //TODO: put this in the runelite.properties
+    private final String microbotApiUrl = "https://microbot-api.azurewebsites.net/api";
 
-	UUID open() throws IOException
-	{
-		HttpUrl url = sessionUrl.newBuilder()
-			.build();
+    @Inject
+    private SessionClient(OkHttpClient client, @Named("runelite.session") HttpUrl sessionUrl, Gson gson) {
+        this.client = client;
+        this.sessionUrl = sessionUrl;
+        this.gson = gson;
+    }
 
-		Request request = new Request.Builder()
-			.post(RequestBody.create(null, new byte[0]))
-			.url(url)
-			.build();
+    UUID microbotOpen() throws IOException {
+        try (Response response = client.newCall(new Request.Builder().url(microbotApiUrl + "/session").build()).execute()) {
+            ResponseBody body = response.body();
 
-		try (Response response = client.newCall(request).execute())
-		{
-			ResponseBody body = response.body();
+            InputStream in = body.byteStream();
+            return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), UUID.class);
+        } catch (JsonParseException | IllegalArgumentException ex) // UUID.fromString can throw IllegalArgumentException
+        {
+            throw new IOException(ex);
+        }
+    }
 
-			InputStream in = body.byteStream();
-			return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), UUID.class);
-		}
-		catch (JsonParseException | IllegalArgumentException ex) // UUID.fromString can throw IllegalArgumentException
-		{
-			throw new IOException(ex);
-		}
-	}
+    void microbotPing(UUID uuid, boolean loggedIn) throws IOException {
+        try (Response response = client.newCall(new Request.Builder().url(microbotApiUrl + "/session?sessionId=" + uuid.toString()
+                + "&isLoggedIn=" + loggedIn
+                + "&version=1.10.24" ).build()).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unsuccessful ping");
+            }
+        }
+    }
 
-	void ping(UUID uuid, boolean loggedIn) throws IOException
-	{
-		HttpUrl url = sessionUrl.newBuilder()
-			.addPathSegment("ping")
-			.addQueryParameter("session", uuid.toString())
-			.addQueryParameter("logged-in", String.valueOf(loggedIn))
-			.build();
+    void microbotDelete(UUID uuid) throws IOException {
+        Request request = new Request.Builder()
+                .delete()
+                .url(microbotApiUrl + "/session?sessionId=" + uuid)
+                .build();
 
-		Request request = new Request.Builder()
-			.post(RequestBody.create(null, new byte[0]))
-			.url(url)
-			.build();
+        client.newCall(request).execute().close();
+    }
 
-		try (Response response = client.newCall(request).execute())
-		{
-			if (!response.isSuccessful())
-			{
-				throw new IOException("Unsuccessful ping");
-			}
-		}
-	}
+    UUID open() throws IOException {
+        HttpUrl url = sessionUrl.newBuilder()
+                .build();
 
-	void delete(UUID uuid) throws IOException
-	{
-		HttpUrl url = sessionUrl.newBuilder()
-			.addQueryParameter("session", uuid.toString())
-			.build();
+        Request request = new Request.Builder()
+                .post(RequestBody.create(null, new byte[0]))
+                .url(url)
+                .build();
 
-		Request request = new Request.Builder()
-			.delete()
-			.url(url)
-			.build();
+        try (Response response = client.newCall(request).execute()) {
+            ResponseBody body = response.body();
 
-		client.newCall(request).execute().close();
-	}
+            InputStream in = body.byteStream();
+            return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), UUID.class);
+        } catch (JsonParseException | IllegalArgumentException ex) // UUID.fromString can throw IllegalArgumentException
+        {
+            throw new IOException(ex);
+        }
+    }
+
+    void ping(UUID uuid, boolean loggedIn) throws IOException {
+        HttpUrl url = sessionUrl.newBuilder()
+                .addPathSegment("ping")
+                .addQueryParameter("session", uuid.toString())
+                .addQueryParameter("logged-in", String.valueOf(loggedIn))
+                .build();
+
+        Request request = new Request.Builder()
+                .post(RequestBody.create(null, new byte[0]))
+                .url(url)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unsuccessful ping");
+            }
+        }
+    }
+
+    void delete(UUID uuid) throws IOException {
+        HttpUrl url = sessionUrl.newBuilder()
+                .addQueryParameter("session", uuid.toString())
+                .build();
+
+        Request request = new Request.Builder()
+                .delete()
+                .url(url)
+                .build();
+
+        client.newCall(request).execute().close();
+    }
 }

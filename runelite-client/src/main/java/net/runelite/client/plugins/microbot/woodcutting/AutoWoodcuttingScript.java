@@ -24,7 +24,7 @@ public class AutoWoodcuttingScript extends Script {
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
                 if (Rs2Inventory.isFull()) {
                     if (config.hasAxeInventory()) {
-                        Rs2Inventory.drop(x -> x.slot > 0);
+                        Rs2Inventory.dropAll(x -> x.slot > 0);
                     } else {
                         Rs2Inventory.dropAll();
                     }

@@ -40,11 +40,21 @@ import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
+import net.runelite.http.api.RuneLiteAPI;
+import net.runelite.http.api.worlds.WorldResult;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,7 +107,6 @@ public class MicrobotPlugin extends Plugin {
 
     @Inject
     private Rs2NpcManager rs2NpcManager;
-
 
     private Plugin summerGardenPlugin = null;
 

@@ -13,6 +13,7 @@ public class Rs2Item {
     public String name;
     String[] actions;
     boolean isStackable;
+    boolean isNoted;
     public Rs2Item(Item item, ItemComposition itemComposition, int slot) {
         this.id = item.getId();
         this.quantity = item.getQuantity();
@@ -20,6 +21,7 @@ public class Rs2Item {
         this.actions = itemComposition.getInventoryActions();
         this.slot = slot;
         this.isStackable = itemComposition.isStackable();
+        this.isNoted = itemComposition.getNote() == 799;
     }
     public Rs2Item(Widget item, int slot) {
         this.id = item.getItemId();

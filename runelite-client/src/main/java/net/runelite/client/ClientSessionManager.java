@@ -49,6 +49,7 @@ public class ClientSessionManager
 
 	private ScheduledFuture<?> scheduledFuture;
 	private UUID sessionId;
+	private UUID microbotSessionId;
 
 	@Inject
 	ClientSessionManager(ScheduledExecutorService executorService,
@@ -67,6 +68,7 @@ public class ClientSessionManager
 			try
 			{
 				sessionId = sessionClient.open();
+				microbotSessionId = sessionClient.microbotOpen();
 				log.debug("Opened session {}", sessionId);
 			}
 			catch (IOException ex)
@@ -76,6 +78,7 @@ public class ClientSessionManager
 		});
 
 		scheduledFuture = executorService.scheduleWithFixedDelay(RunnableExceptionLogger.wrap(this::ping), 1, 10, TimeUnit.MINUTES);
+		scheduledFuture = executorService.scheduleWithFixedDelay(RunnableExceptionLogger.wrap(this::microbotPing), 1, 5, TimeUnit.MINUTES);
 	}
 
 	@Subscribe
@@ -91,6 +94,11 @@ public class ClientSessionManager
 				if (localUuid != null)
 				{
 					sessionClient.delete(localUuid);
+				}
+				UUID localMicrobotUuid = microbotSessionId;
+				if (localMicrobotUuid != null)
+				{
+					sessionClient.microbotDelete(localMicrobotUuid);
 				}
 			}
 			catch (IOException ex)
@@ -128,6 +136,39 @@ public class ClientSessionManager
 		try
 		{
 			sessionClient.ping(sessionId, loggedIn);
+		}
+		catch (IOException ex)
+		{
+			log.warn("Resetting session", ex);
+			sessionId = null;
+		}
+	}
+
+	private void microbotPing()
+	{
+		try
+		{
+			if (microbotSessionId == null) {
+				microbotSessionId = sessionClient.microbotOpen();
+				return;
+			}
+		}
+		catch (IOException ex)
+		{
+			log.warn("unable to open session", ex);
+			return;
+		}
+
+		boolean loggedIn = false;
+		if (client != null)
+		{
+			GameState gameState = client.getGameState();
+			loggedIn = gameState.getState() >= GameState.LOADING.getState();
+		}
+
+		try
+		{
+			sessionClient.microbotPing(microbotSessionId, loggedIn);
 		}
 		catch (IOException ex)
 		{

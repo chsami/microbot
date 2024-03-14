@@ -32,15 +32,6 @@ public class AutoLoginScript extends Script {
                     } else {
                         new Login(autoLoginConfig.world());
                     }
-                    if (Microbot.getClient().getLoginIndex() == 10) {
-                        int loginScreenWidth = 804;
-                        int startingWidth = (Microbot.getClient().getCanvasWidth() / 2) - (loginScreenWidth / 2);
-                        Microbot.getMouse().click(365 + startingWidth, 250); //clicks a button "OK" when you've been disconnected
-                    } else if (Microbot.getClient().getLoginIndex() == 9) {
-                        int loginScreenWidth = 804;
-                        int startingWidth = (Microbot.getClient().getCanvasWidth() / 2) - (loginScreenWidth / 2);
-                        Microbot.getMouse().click(365 + startingWidth, 300); //clicks a button "OK" when you've been disconnected
-                    }
                     sleep(5000);
                 }
 

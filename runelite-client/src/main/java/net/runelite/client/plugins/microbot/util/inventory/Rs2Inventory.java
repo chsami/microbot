@@ -502,7 +502,7 @@ public class Rs2Inventory {
      * @return The item with the specified name, or null if not found.
      */
     public static Rs2Item get(String name) {
-        return items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).findFirst().orElse(null);
+        return get(name, false);
     }
 
     /**
@@ -1273,6 +1273,18 @@ public class Rs2Inventory {
     }
 
     /**
+     * Uses the item with the specified name in the inventory.
+     *
+     * @param name The name of the item to use.
+     * @return True if the item is successfully used, false otherwise.
+     */
+    public static boolean useUnNoted(String name) {
+        Rs2Item item = items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase()) && !x.isNoted).findFirst().orElse(null);
+        if (item == null) return false;
+        return interact(item, "Use");
+    }
+
+    /**
      * Uses the item with the specified ID in the inventory.
      *
      * @param id The ID of the item to use.
@@ -1357,6 +1369,33 @@ public class Rs2Inventory {
     }
 
     /**
+     * use unnoted inventory item on ingame object
+     * @param item name of the item to use
+     * @param objectID to use item on
+     * @return
+     */
+    public static boolean useUnNotedItemOnObject(String item, int objectID) {
+        if (Rs2Bank.isOpen()) return false;
+        useUnNoted(item);
+        Rs2GameObject.interact(objectID);
+        return true;
+    }
+
+    /**
+     * use unnoted inventory item on ingame object
+     * @param item name of the item to use
+     * @param object to use item on
+     * @return
+     */
+    public static boolean useUnNotedItemOnObject(String item, TileObject object) {
+        if (Rs2Bank.isOpen()) return false;
+        boolean selected = useUnNoted(item);
+        if (!selected) return false;
+        Rs2GameObject.interact(object);
+        return true;
+    }
+
+    /**
      * use inventory item on ingame object
      * @param item
      * @param objectID
@@ -1367,6 +1406,46 @@ public class Rs2Inventory {
         use(item);
         Rs2GameObject.interact(objectID);
         return true;
+    }
+
+    public static Rs2Item getNotedItem(String name, boolean exact) {
+        if (exact)
+            return items().stream().filter(x -> x.name.equalsIgnoreCase(name) && x.isNoted).findFirst().orElse(null);
+        else
+            return items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase()) && x.isNoted).findFirst().orElse(null);
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     */
+    public static boolean hasNotedItem(String name) {
+        return getNotedItem(name, false) != null;
+    }
+    /**
+     *
+     * @param name
+     * @param exact
+     * @return
+     */
+    public static boolean hasNotedItem(String name, boolean exact) {
+        return getNotedItem(name, exact) != null;
+    }
+
+    public static Rs2Item getUnNotedItem(String name, boolean exact) {
+        if (exact)
+            return items().stream().filter(x -> x.name.equalsIgnoreCase(name) && !x.isNoted).findFirst().orElse(null);
+        else
+            return items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase()) && !x.isNoted).findFirst().orElse(null);
+    }
+
+    public static boolean hasUnNotedItem(String name) {
+        return getUnNotedItem(name, false) != null;
+    }
+
+    public static boolean hasUnNotedItem(String name, boolean exact) {
+        return getUnNotedItem(name, exact) != null;
     }
 
     /**

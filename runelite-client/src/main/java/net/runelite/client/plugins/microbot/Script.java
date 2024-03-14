@@ -125,6 +125,7 @@ public abstract class Script implements IScript {
         VirtualKeyboard.keyPress(c);
     }
 
+    @Deprecated(since="Use Rs2Player.logout()", forRemoval = true)
     public void logout() {
         Rs2Tab.switchToLogout();
         sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.LOGOUT);

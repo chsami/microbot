@@ -162,6 +162,7 @@ public class RuneLite {
         Locale.setDefault(Locale.ENGLISH);
 
         final OptionParser parser = new OptionParser(false);
+        parser.accepts("jagex-launcher", "Enable jagex launcher");
         parser.accepts("developer-mode", "Enable developer tools");
         parser.accepts("debug", "Show extra debugging output");
         parser.accepts("microbot-debug", "Enables debug features for microbot");
@@ -199,6 +200,15 @@ public class RuneLite {
 
         parser.accepts("help", "Show this text").forHelp();
         OptionSet options = parser.parse(args);
+
+        if (!options.has("jagex-launcher")) {
+            File myObj = new File(System.getProperty("user.home") + "/.runelite/credentials.properties");
+            if (myObj.delete()) {
+                System.out.println("Deleted the file: " + myObj.getName());
+            } else {
+                System.out.println("Failed to delete the file.");
+            }
+        }
 
         if (options.has("help")) {
             parser.printHelpOn(System.out);

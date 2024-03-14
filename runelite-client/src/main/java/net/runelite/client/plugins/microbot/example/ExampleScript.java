@@ -14,11 +14,14 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static net.runelite.api.MenuAction.CC_OP;
 
 
 public class ExampleScript extends Script {
@@ -55,9 +58,11 @@ public class ExampleScript extends Script {
 //                Rs2Magic.castOn(MagicAction.EARTH_BOLT, Rs2Npc.getNpc("guard"));
                 long startTime = System.currentTimeMillis();
 
+                System.out.println(Microbot.getClient().getKeyboardIdleTicks());
 
-                Rs2Bank.openBank();
-                Rs2Bank.depositAll("gold bar");
+                //MenuEntryImpl(getOption=Logout, getTarget=, getIdentifier=1, getType=CC_OP, getParam0=-1, getParam1=11927560, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)
+             //   Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
+
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
                 System.out.println(totalTime);
