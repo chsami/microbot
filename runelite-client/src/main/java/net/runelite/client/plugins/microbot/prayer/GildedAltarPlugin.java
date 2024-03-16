@@ -20,6 +20,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
@@ -101,7 +102,9 @@ public class GildedAltarPlugin extends Plugin {
 
         if (skipTicks > 0)
         {
-            skipTicks--;
+            if (Random.random(1, 7) != 2) {
+                skipTicks--;
+            }
             return;
         }
 
@@ -160,8 +163,13 @@ public class GildedAltarPlugin extends Plugin {
 
     public void unnoteBones() {
         if (Microbot.getClient().getWidget(14352385) == null) {
-            Rs2Inventory.use("bones");
-            Rs2Npc.interact("Phials", "Use");
+            if (!Rs2Inventory.isItemSelected()) {
+                Rs2Inventory.use("bones");
+            } else {
+
+                Rs2Npc.interact("Phials", "Use");
+                setSkipTicks(2);
+            }
         } else if (Microbot.getClient().getWidget(14352385) != null) {
             VirtualKeyboard.keyPress('3');
             setSkipTicks(2);
@@ -173,6 +181,7 @@ public class GildedAltarPlugin extends Plugin {
 
         if (!isAdvertismentWidgetOpen) {
             Rs2GameObject.interact(ObjectID.HOUSE_ADVERTISEMENT, "View");
+            setSkipTicks(2);
             return;
         }
 
@@ -187,6 +196,7 @@ public class GildedAltarPlugin extends Plugin {
         if (playerHouse != null) {
             Rs2Reflection.invokeMenu(playerHouse.getIndex(), 3407891, CC_OP.getId(), 1, -1,
                     "", "", (int) playerHouse.getBounds().getCenterX(), (int) playerHouse.getBounds().getCenterY());
+            setSkipTicks(2);
         }
     }
 
@@ -197,7 +207,7 @@ public class GildedAltarPlugin extends Plugin {
         }
         if (altar != null) {
             Rs2Inventory.useUnNotedItemOnObject("bones", altar);
-            setSkipTicks(2);
+            setSkipTicks(1);
         }
     }
 

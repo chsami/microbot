@@ -4,8 +4,10 @@ import net.runelite.api.MenuAction;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -322,7 +324,8 @@ public class Rs2Widget {
         int param1 = widget.getId();
         String option = "Select";
         String target = "";
-        Rs2Reflection.invokeMenu(-1, param1, menuAction.getId(), 0, widget.getItemId(), option, target, -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(-1, param1, menuAction.getId(), 0, widget.getItemId(), target), widget.getBounds());
+       // Rs2Reflection.invokeMenu(-1, param1, menuAction.getId(), 0, widget.getItemId(), option, target, -1, -1);
     }
 
     public static void clickWidgetFast(Widget widget, int param0, int identifier) {
@@ -330,14 +333,16 @@ public class Rs2Widget {
         String option = "Select";
         String target = "";
         MenuAction menuAction = MenuAction.CC_OP;
-        Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), target), widget.getBounds());
+       // Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
     }
 
     public static void clickWidgetFast(Widget widget, int param0, int identifier, MenuAction menuAction) {
         int param1 = widget.getId();
         String option = "Select";
         String target = "";
-        Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), target), widget.getBounds());
+       // Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
     }
 
     public static void clickWidgetFast(Widget widget, int param0) {

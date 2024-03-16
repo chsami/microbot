@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -15,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 import org.apache.commons.lang3.NotImplementedException;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Inventory {
 
@@ -91,6 +94,7 @@ public class Rs2Inventory {
      */
     public static boolean combine(int primaryItemId, int secondaryItemId) {
         boolean primaryItemInteracted = use(primaryItemId);
+        sleep(100);
         boolean secondaryItemInteracted = use(secondaryItemId);
         return primaryItemInteracted && secondaryItemInteracted;
     }
@@ -104,6 +108,7 @@ public class Rs2Inventory {
      */
     public static boolean combine(String primaryItemName, String secondaryItemName) {
         boolean primaryItemInteracted = use(primaryItemName);
+        sleep(100);
         boolean secondaryItemInteracted = use(secondaryItemName);
         return primaryItemInteracted && secondaryItemInteracted;
     }
@@ -117,6 +122,7 @@ public class Rs2Inventory {
      */
     public static boolean combine(Rs2Item primary, Rs2Item secondary) {
         boolean primaryItemInteracted = use(primary);
+        sleep(100);
         boolean secondaryItemInteracted = use(secondary);
         return primaryItemInteracted && secondaryItemInteracted;
     }
@@ -1389,8 +1395,9 @@ public class Rs2Inventory {
      */
     public static boolean useUnNotedItemOnObject(String item, TileObject object) {
         if (Rs2Bank.isOpen()) return false;
-        boolean selected = useUnNoted(item);
-        if (!selected) return false;
+        useUnNoted(item);
+        sleep(100);
+        if (!isItemSelected()) return false;
         Rs2GameObject.interact(object);
         return true;
     }
@@ -1404,6 +1411,8 @@ public class Rs2Inventory {
     public static boolean useItemOnObject(int item, int objectID) {
         if (Rs2Bank.isOpen()) return false;
         use(item);
+        sleep(100);
+        if (!isItemSelected()) return false;
         Rs2GameObject.interact(objectID);
         return true;
     }
@@ -1510,8 +1519,8 @@ public class Rs2Inventory {
             identifier = 1;
             param1 = 30605312;
         }
-
-        Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
     }
 
     private static Widget getInventory() {
@@ -1533,3 +1542,7 @@ public class Rs2Inventory {
         });
     }
 }
+
+
+
+

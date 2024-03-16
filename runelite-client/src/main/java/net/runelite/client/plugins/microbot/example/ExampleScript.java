@@ -1,10 +1,13 @@
 package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
+import net.runelite.api.TileObject;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -20,8 +23,10 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 
 import static net.runelite.api.MenuAction.CC_OP;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 
 public class ExampleScript extends Script {
@@ -41,27 +46,28 @@ public class ExampleScript extends Script {
                  * Rs2Bank
                  * etc...
                  */
-//                var vorkath = Rs2Npc.getNpc(NpcID.VORKATH_8059);
-//               var centerTile =
-//                        new WorldPoint(vorkath.getWorldLocation().getX() + 3, vorkath.getWorldLocation().getY() - 5, vorkath.getWorldLocation().getPlane());
-//                Microbot.getWalker().walkFastCanvas(centerTile);
-//               // System.out.println(vorkath.getHealthRatio());
-//                System.out.println(Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY());
-                // System.out.println(Rs2Equipment.isWearing("diamond dragon bolts"));
-                //System.out.println(Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(Rs2Npc.getNpc("vorkath").getWorldLocation()));
-//                Microbot.getWalkerForKotlin().walkFastLocal(
-//                        LocalPoint.fromScene(48, 54)
-//                );
-//                sleep(400, 600);
-//                System.out.println(Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY());
-                //sleepUntil(() -> Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() <= 55);
-//                Rs2Magic.castOn(MagicAction.EARTH_BOLT, Rs2Npc.getNpc("guard"));
+
                 long startTime = System.currentTimeMillis();
+//                TileObject altar = Rs2GameObject.findObjectById(ObjectID.ALTAR_40878);
+//                if (altar == null) {
+//                    altar = Rs2GameObject.findObjectById(ObjectID.ALTAR_13197);
+//                }
+//                if (altar != null) {
+//                    //Rs2GameObject.interact(altar);
+//                    Rs2Inventory.useUnNotedItemOnObject("bones", altar);
+//                }
+                Rs2Inventory.use("bones");
+//                while (!Rs2Inventory.isItemSelected()) {
+//                    System.out.println("item not selected");
+//                }
+//                BooleanSupplier s = Rs2Inventory::isItemSelected;
+//                do {
+//                    System.out.println("item not selected");
+//                } while (!s.getAsBoolean());
+                Global.sleepUntil(Rs2Inventory::isItemSelected);
+                System.out.println("item selected!!!");
+                Rs2Inventory.use("bones");
 
-                System.out.println(Microbot.getClient().getKeyboardIdleTicks());
-
-                //MenuEntryImpl(getOption=Logout, getTarget=, getIdentifier=1, getType=CC_OP, getParam0=-1, getParam1=11927560, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)
-             //   Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;

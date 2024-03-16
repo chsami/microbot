@@ -5,6 +5,8 @@ import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.widgets.Widget;
 
+import java.awt.*;
+
 public class Rs2Item {
     public  int id;
     public  int quantity;

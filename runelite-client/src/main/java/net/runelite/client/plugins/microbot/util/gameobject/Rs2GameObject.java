@@ -5,9 +5,12 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -828,7 +831,9 @@ public class Rs2GameObject {
                 menuAction = MenuAction.GAME_OBJECT_FIFTH_OPTION;
             }
 
-            Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), object.getId(),-1, "", "", -1, -1);
+            Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(),-1, objComp.getName()), new Rectangle(object.getCanvasTilePoly().getBounds()));
+
+            //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), object.getId(),-1, "", "", -1, -1);
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());

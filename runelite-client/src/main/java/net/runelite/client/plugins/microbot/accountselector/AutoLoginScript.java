@@ -13,10 +13,6 @@ public class AutoLoginScript extends Script {
 
     public boolean run(AutoLoginConfig autoLoginConfig) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!Microbot.isLoggedIn() && Microbot.pauseAllScripts) {
-                Microbot.pauseAllScripts = false;
-            }
-
             if (Microbot.pauseAllScripts)
                 return;
 

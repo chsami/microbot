@@ -12,10 +12,11 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
+import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
@@ -52,8 +53,9 @@ public class Rs2Bank {
         if (container == ComponentID.BANK_INVENTORY_ITEM_CONTAINER) {
             identifier = identifier + 1;
         }
+        Microbot.doInvoke(new NewMenuEntry(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
        // MenuEntryImpl(getOption=Wear, getTarget=<col=ff9040>Amulet of glory(4)</col>, getIdentifier=9, getType=CC_OP_LOW_PRIORITY, getParam0=1, getParam1=983043, getItemId=1712, isForceLeftClick=false, isDeprioritized=false)
-        Rs2Reflection.invokeMenu(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, "Withdraw-1", rs2Item.name, -1, -1);
+        // Rs2Reflection.invokeMenu(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, "Withdraw-1", rs2Item.name, -1, -1);
     }
 
     /**
@@ -394,7 +396,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItem(boolean checkInv, String name) {
-        if (checkInv && !Rs2Inventory.hasItem(name)) return;
+        if (checkInv && !Rs2Bank.hasItem(name)) return;
         withdrawOne(name);
     }
 
@@ -439,7 +441,7 @@ public class Rs2Bank {
      * @param amount amount to withdraw
      */
     public static void withdrawX(boolean checkInv, int id, int amount) {
-        if (checkInv && !Rs2Inventory.hasItem(id)) return;
+        if (checkInv && !Rs2Bank.hasItem(id)) return;
         withdrawX(id, amount);
     }
     /**
@@ -511,7 +513,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItemAll(boolean checkInv, String name) {
-        if (checkInv && !Rs2Inventory.hasItem(name)) return;
+        if (checkInv && !Rs2Bank.hasItem(name)) return;
         withdrawItemAll(name);
     }
 

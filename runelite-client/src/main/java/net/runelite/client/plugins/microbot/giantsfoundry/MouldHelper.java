@@ -6,9 +6,11 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.giantsfoundry.enums.CommissionType;
 import net.runelite.client.plugins.microbot.giantsfoundry.enums.Mould;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
+import java.awt.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -55,8 +57,12 @@ public class MouldHelper {
             bestWidget.setTextColor(GREEN);
         }
 
-        Rs2Reflection.invokeMenu(bestIndex * 17, MOULD_LIST_PARENT, MenuAction.CC_OP.getId(), 1,
-                -1, "Select", "", (int) bestWidget.getBounds().getCenterX(), (int ) bestWidget.getBounds().getCenterY());
+        if (bestWidget != null) {
+            Microbot.doInvoke(new NewMenuEntry(bestIndex * 17, MOULD_LIST_PARENT, MenuAction.CC_OP.getId(), 1, -1, "Select"),
+                    bestWidget.getBounds());
+        }
+      //  Rs2Reflection.invokeMenu(bestIndex * 17, MOULD_LIST_PARENT, MenuAction.CC_OP.getId(), 1,
+      //         -1, "Select", "", (int) bestWidget.getBounds().getCenterX(), (int ) bestWidget.getBounds().getCenterY());
         sleep(800, 1200);
     }
 

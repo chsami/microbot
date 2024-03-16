@@ -3,7 +3,12 @@ package net.runelite.client.plugins.microbot;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ProfileManager;
@@ -17,18 +22,28 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScri
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 public class Microbot {
+    public static MenuEntry targetMenu;
     @Getter
     @Setter
     private static EventHandler eventHandler;
@@ -194,6 +209,7 @@ public class Microbot {
         });
     }
 
+
     public static CopyOnWriteArrayList<Rs2Item> updateItemContainer(int id, ItemContainerChanged e) {
         if (e.getContainerId() == id) {
             CopyOnWriteArrayList<Rs2Item> list = new CopyOnWriteArrayList<>();
@@ -222,5 +238,44 @@ public class Microbot {
 
     public static void startPlugin(Plugin plugin) {
 
+    }
+
+    public static Point calculateClickingPoint(Rectangle rect) {
+        int x = (int)(rect.getX() + (double) Random.random((int)rect.getWidth() / 6 * -1, (int)rect.getWidth() / 6) + rect.getWidth() / 2.0);
+        int y = (int)(rect.getY() + (double)Random.random((int)rect.getHeight() / 6 * -1, (int)rect.getHeight() / 6) + rect.getHeight() / 2.0);
+        return new Point(x, y);
+    }
+
+    public static void doInvoke(MenuEntry entry, Rectangle rectangle) {
+        targetMenu = entry;
+        int viewportHeight = client.getViewportHeight();
+        int viewportWidth = client.getViewportWidth();
+        if (!(rectangle.getX() > (double)viewportWidth) && !(rectangle.getY() > (double)viewportHeight) && !(rectangle.getX() < 0.0) && !(rectangle.getY() < 0.0)) {
+            click(rectangle);
+        }
+    }
+
+    public static void click(Rectangle rectangle) {
+
+        Point point = calculateClickingPoint(rectangle);
+        if (client.isStretchedEnabled()) {
+            Dimension stretched = client.getStretchedDimensions();
+            Dimension real = client.getRealDimensions();
+            double width = (double)stretched.width / real.getWidth();
+            double height = (double)stretched.height / real.getHeight();
+            point = new Point((int)((double)point.getX() * width), (int)((double)point.getY() * height));
+        }
+
+        mouseEvent(504, point);
+        mouseEvent(505, point);
+        mouseEvent(503, point);
+        mouseEvent(501, point);
+        mouseEvent(502, point);
+        mouseEvent(500, point);
+    }
+
+    private static void mouseEvent(int id, Point point) {
+        MouseEvent e = new MouseEvent(client.getCanvas(), id, System.currentTimeMillis(), 0, point.getX(), point.getY(), 1, false, 1);
+        client.getCanvas().dispatchEvent(e);
     }
 }

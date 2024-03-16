@@ -10,6 +10,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.util.Notificatio
 import net.runelite.client.plugins.envisionplugins.breakhandler.util.TimeManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.http.api.worlds.WorldRegion;
 
@@ -156,7 +157,7 @@ public class BreakHandlerScript extends Script {
                         );
 
                         if (Microbot.isLoggedIn()) {
-                            logout();
+                            Rs2Player.logout();
                         }
 
                         SwingUtilities.invokeLater(() -> CurrentTimesBreakPanel.setDurationTextField(breakTimeManager.orElseThrow().getSecondsUntil()));
