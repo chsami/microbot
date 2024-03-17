@@ -195,7 +195,7 @@ public class Walker {
     public boolean hybridWalkTo(WorldPoint target, boolean useNearest) {
         Player player = Microbot.getClient().getLocalPlayer();
         List<PathNode> nodes = getPath(player.getWorldLocation(), target, useNearest);
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5)
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5 && canReach(target))
             return true;
 
         if (nodes.isEmpty()) {
