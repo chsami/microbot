@@ -5,6 +5,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
@@ -829,6 +830,10 @@ public class Rs2GameObject {
                 menuAction = MenuAction.GAME_OBJECT_FOURTH_OPTION;
             } else if (index == 4) {
                 menuAction = MenuAction.GAME_OBJECT_FIFTH_OPTION;
+            }
+
+            if (!Rs2Camera.isTileOnScreen(object.getLocalLocation())) {
+                Rs2Camera.turnTo(object);
             }
 
             Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(),-1, objComp.getName()), new Rectangle(object.getCanvasTilePoly().getBounds()));
