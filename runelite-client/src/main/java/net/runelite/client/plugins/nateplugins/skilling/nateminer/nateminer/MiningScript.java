@@ -21,22 +21,16 @@ public class MiningScript extends Script {
             try {
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
 
-                breakHandlerExecutor.sendDiscordNotificationBeforeBreak(
-                        new String[]{"Mining: " + MiningOverlay.getExpGained()},
-                        new String[]{"NONE"},
-                        "WIP");
 
-                breakHandlerExecutor.breakOrExecute(() -> {
-                    if (Rs2Inventory.isFull()) {
-                        if (config.hasPickaxeInventory()) {
-                            Rs2Inventory.drop(x -> x.slot == 0);
-                        } else {
-                            Rs2Inventory.dropAll();
-                        }
-                        return;
+                if (Rs2Inventory.isFull()) {
+                    if (config.hasPickaxeInventory()) {
+                        Rs2Inventory.drop(x -> x.slot == 0);
+                    } else {
+                        Rs2Inventory.dropAll();
                     }
-                    Rs2GameObject.interact(config.ORE().getName());
-                });
+                    return;
+                }
+                Rs2GameObject.interact(config.ORE().getName());
 
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
