@@ -17,6 +17,8 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
@@ -26,7 +28,7 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 
 @SuppressWarnings("unused")
 public class Rs2Bank {
-    public static CopyOnWriteArrayList<Rs2Item> bankItems = new CopyOnWriteArrayList<>();
+    public static List<Rs2Item> bankItems = new ArrayList<Rs2Item>();
     private static final int X_AMOUNT_VARBIT = 3960;
     private static final int SELECTED_OPTION_VARBIT = 6590;
     private static final int HANDLE_X_SET = 5;
@@ -862,7 +864,7 @@ public class Rs2Bank {
      * @param e The event containing the latest bank items.
      */
     public static void storeBankItemsInMemory(ItemContainerChanged e) {
-        CopyOnWriteArrayList<Rs2Item> list = updateItemContainer(InventoryID.BANK.getId(), e);
+        List<Rs2Item> list = updateItemContainer(InventoryID.BANK.getId(), e);
         if (list != null)
             bankItems = list;
     }
