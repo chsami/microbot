@@ -210,9 +210,9 @@ public class Microbot {
     }
 
 
-    public static CopyOnWriteArrayList<Rs2Item> updateItemContainer(int id, ItemContainerChanged e) {
+    public static List<Rs2Item> updateItemContainer(int id, ItemContainerChanged e) {
         if (e.getContainerId() == id) {
-            CopyOnWriteArrayList<Rs2Item> list = new CopyOnWriteArrayList<>();
+            List<Rs2Item> list = new ArrayList<>();
             int i = -1;
             for (Item item : e.getItemContainer().getItems()) {
                 if (item == null) {
