@@ -38,18 +38,19 @@ public class Rs2Inventory {
         return Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
     }
 
-    public static CopyOnWriteArrayList<Rs2Item> inventoryItems = new CopyOnWriteArrayList<>();
+    public static List<Rs2Item> inventoryItems = new ArrayList<>();
 
 
     public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == InventoryID.INVENTORY.getId() && e.getItemContainer() != null) {
-            inventoryItems = new CopyOnWriteArrayList<>();
+            List<Rs2Item> _inventoryItems = new ArrayList<>();
             for (int i = 0; i < e.getItemContainer().getItems().length; i++) {
                 Item item = inventory().getItems()[i];
                 if (item.getId() == -1) continue;
                 ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(item.getId()));
-                inventoryItems.add(new Rs2Item(item, itemComposition, i));
+                _inventoryItems.add(new Rs2Item(item, itemComposition, i));
             }
+            inventoryItems = _inventoryItems;
         }
     }
 
@@ -615,7 +616,7 @@ public class Rs2Inventory {
             }
         }
 
-        Rs2Item item = get(name, true);
+        Rs2Item item = get(name, exact);
         if (item == null) return false;
         return item.quantity >= amount;
     }
