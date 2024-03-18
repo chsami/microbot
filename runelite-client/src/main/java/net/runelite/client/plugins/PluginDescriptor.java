@@ -24,11 +24,7 @@
  */
 package net.runelite.client.plugins;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
@@ -46,6 +42,7 @@ public @interface PluginDescriptor
 	public String Engin = "<html>[<font color=#b8f704>E</font>]";
 	public String Envision = "<html>[<font color=#c0c0c0>E</font>] ";
 	public String Spaghetti = "<html>[<font color=#DAD420>S</font>] ";
+	public String SaCo = "<html>[<font color=#0d937b>S</font>] ";
 	String name();
 
 	/**
