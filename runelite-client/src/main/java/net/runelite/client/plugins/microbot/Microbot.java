@@ -160,7 +160,7 @@ public class Microbot {
     public static boolean isLoggedIn() {
         if (client == null) return false;
         GameState idx = client.getGameState();
-        return idx != GameState.LOGIN_SCREEN;
+        return idx == GameState.LOGGED_IN;
     }
 
     public static boolean hasLevel(int levelRequired, Skill skill) {
