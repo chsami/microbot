@@ -11,7 +11,8 @@ public interface GildedAltarConfig extends Config {
             keyName = "House Config",
             name = "House Config",
             description = "Choose your house config",
-            position = 0
+            position = 0,
+            hidden = true
     )
     default HOUSETABS_CONFIG HouseConfig()
     {
