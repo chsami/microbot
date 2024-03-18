@@ -85,6 +85,7 @@ public class QuestScript extends Script {
                     if (!itemsMissing.isEmpty()) {
                         Rs2Bank.useBank();
                         Rs2Bank.depositAll();
+                        sleepUntil(Rs2Inventory::isEmpty);
                         for (ItemRequirement itemRequirement : itemsMissing) {
                             if (!Rs2Bank.hasItem(itemRequirement.getId())) {
                                 if (grandExchangeItems.stream().noneMatch(x -> x.getId() == itemRequirement.getId())) {
@@ -92,6 +93,7 @@ public class QuestScript extends Script {
                                 }
                             } else {
                                 Rs2Bank.withdrawX(true, itemRequirement.getName(), itemRequirement.getQuantity());
+                                sleep(600);
                             }
                         }
                     }
