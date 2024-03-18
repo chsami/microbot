@@ -24,7 +24,7 @@ public class MiningScript extends Script {
 
                 if (Rs2Inventory.isFull()) {
                     if (config.hasPickaxeInventory()) {
-                        Rs2Inventory.drop(x -> x.slot == 0);
+                        Rs2Inventory.dropAll(x -> x.slot > 0);
                     } else {
                         Rs2Inventory.dropAll();
                     }
