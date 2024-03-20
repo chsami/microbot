@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
@@ -55,7 +56,7 @@ public class Rs2Bank {
         if (container == ComponentID.BANK_INVENTORY_ITEM_CONTAINER) {
             identifier = identifier + 1;
         }
-        Microbot.doInvoke(new NewMenuEntry(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        Microbot.doInvoke(new NewMenuEntry(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
        // MenuEntryImpl(getOption=Wear, getTarget=<col=ff9040>Amulet of glory(4)</col>, getIdentifier=9, getType=CC_OP_LOW_PRIORITY, getParam0=1, getParam1=983043, getItemId=1712, isForceLeftClick=false, isDeprioritized=false)
         // Rs2Reflection.invokeMenu(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, "Withdraw-1", rs2Item.name, -1, -1);
     }
@@ -844,6 +845,8 @@ public class Rs2Bank {
      * @return true if player location is less than 4 tiles away from the bank location
      */
     public static boolean walkToBank() {
+        if (Rs2Bank.isOpen()) return true;
+        Rs2Player.toggleRunEnergy(true);
         BankLocation bankLocation = getNearestBank();
         Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;

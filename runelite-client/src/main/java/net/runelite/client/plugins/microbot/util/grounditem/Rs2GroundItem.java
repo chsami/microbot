@@ -18,6 +18,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+
 public class Rs2GroundItem {
 
     private static boolean interact(RS2Item rs2Item, String action) {
@@ -221,6 +223,7 @@ public class Rs2GroundItem {
                     Microbot.getItemManager().getItemPrice(rs2Item.getItem().getId()) * rs2Item.getTileItem().getQuantity());
             if (totalPrice >= value) {
                 interact(rs2Item);
+                sleep(150, 600);
                 return true;
             }
         }

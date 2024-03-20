@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.prayer;
 
 import net.runelite.api.MenuAction;
+import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
@@ -39,5 +40,9 @@ public class Rs2Prayer {
 
     public static boolean isQuickPrayerEnabled() {
         return Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_ENABLED.getValue();
+    }
+
+    public static boolean isOutOfPrayer() {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= 0;
     }
 }

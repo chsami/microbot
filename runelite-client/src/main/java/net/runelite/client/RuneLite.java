@@ -201,7 +201,7 @@ public class RuneLite {
         parser.accepts("help", "Show this text").forHelp();
         OptionSet options = parser.parse(args);
 
-        if (!options.has("clean-jagex-launcher")) {
+        if (options.has("clean-jagex-launcher")) {
             File myObj = new File(System.getProperty("user.home") + "/.runelite/credentials.properties");
             if (myObj.delete()) {
                 System.out.println("Deleted the file: " + myObj.getName());

@@ -241,6 +241,7 @@ public class Microbot {
     }
 
     public static Point calculateClickingPoint(Rectangle rect) {
+        if (rect.getX() == 1 && rect.getY() == 1) return new Point(1, 1);
         int x = (int)(rect.getX() + (double) Random.random((int)rect.getWidth() / 6 * -1, (int)rect.getWidth() / 6) + rect.getWidth() / 2.0);
         int y = (int)(rect.getY() + (double)Random.random((int)rect.getHeight() / 6 * -1, (int)rect.getHeight() / 6) + rect.getHeight() / 2.0);
         return new Point(x, y);

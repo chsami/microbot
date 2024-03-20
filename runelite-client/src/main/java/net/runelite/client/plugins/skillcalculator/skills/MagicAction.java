@@ -29,6 +29,7 @@ import lombok.Getter;
 import net.runelite.api.MenuAction;
 import net.runelite.api.SpriteID;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 @AllArgsConstructor
 @Getter
@@ -54,20 +55,20 @@ public enum MagicAction implements SkillAction
 	LOW_LEVEL_ALCHEMY("Low Level Alchemy", 21, 31, SpriteID.SPELL_LOW_LEVEL_ALCHEMY, false, 14286867, MenuAction.WIDGET_TARGET),
 	WATER_BOLT("Water Bolt", 23, 16.5f, SpriteID.SPELL_WATER_BOLT, false, 14286868, MenuAction.WIDGET_TARGET),
 	ENCHANT_PEARL_BOLT("Enchant Pearl Bolt", 24, 29, SpriteID.SPELL_ENCHANT_CROSSBOW_BOLT, true, -1, null),
-	VARROCK_TELEPORT("Varrock Teleport", 25, 35, SpriteID.SPELL_VARROCK_TELEPORT, false, 14286869, null),
-	ENCHANT_EMERALD_JEWELLERY("Enchant Emerald Jewellery", 27, 37, SpriteID.SPELL_LVL_2_ENCHANT, false, 14286870, null),
+	VARROCK_TELEPORT("Varrock Teleport", 25, 35, SpriteID.SPELL_VARROCK_TELEPORT, false, 14286871, null),
+	ENCHANT_EMERALD_JEWELLERY("Enchant Emerald Jewellery", 27, 37, SpriteID.SPELL_LVL_2_ENCHANT, false, 14286872, null),
 	ENCHANT_EMERALD_BOLT("Enchant Emerald Bolt", 27, 37, SpriteID.SPELL_ENCHANT_CROSSBOW_BOLT, true, -1, null),
 	MIND_ALTAR_TELEPORT("Mind Altar Teleport", 28, 22, SpriteID.SPELL_MIND_ALTAR_TELEPORT, true, -1, null),
 	ENCHANT_TOPAZ_BOLT("Enchant Topaz Bolt", 29, 33, SpriteID.SPELL_ENCHANT_CROSSBOW_BOLT, true, -1, null),
-	EARTH_BOLT("Earth Bolt", 29, 19.5f, SpriteID.SPELL_EARTH_BOLT, false, 14286871, MenuAction.WIDGET_TARGET),
-	LUMBRIDGE_TELEPORT("Lumbridge Teleport", 31, 41, SpriteID.SPELL_LUMBRIDGE_TELEPORT, false, 14286872, null),
-	TELEKINETIC_GRAB("Telekinetic Grab", 33, 43, SpriteID.SPELL_TELEKINETIC_GRAB, false, 14286873, MenuAction.WIDGET_TARGET),
+	EARTH_BOLT("Earth Bolt", 29, 19.5f, SpriteID.SPELL_EARTH_BOLT, false, 14286873, MenuAction.WIDGET_TARGET),
+	LUMBRIDGE_TELEPORT("Lumbridge Teleport", 31, 41, SpriteID.SPELL_LUMBRIDGE_TELEPORT, false, 14286874, null),
+	TELEKINETIC_GRAB("Telekinetic Grab", 33, 43, SpriteID.SPELL_TELEKINETIC_GRAB, false, 14286875, MenuAction.WIDGET_TARGET),
 	RESPAWN_TELEPORT("Respawn Teleport", 34, 27, SpriteID.SPELL_RESPAWN_TELEPORT, true, -1, null),
-	FIRE_BOLT("Fire Bolt", 35, 22.5f, SpriteID.SPELL_FIRE_BOLT, false, 14286874, MenuAction.WIDGET_TARGET),
+	FIRE_BOLT("Fire Bolt", 35, 22.5f, SpriteID.SPELL_FIRE_BOLT, false, 14286876, MenuAction.WIDGET_TARGET),
 	GHOSTLY_GRASP("Ghostly Grasp", 35, 22.5f, SpriteID.SPELL_GHOSTLY_GRASP, true, -1, null),
-	FALADOR_TELEPORT("Falador Teleport", 37, 48, SpriteID.SPELL_FALADOR_TELEPORT, false, 14286875, null),
+	FALADOR_TELEPORT("Falador Teleport", 37, 48, SpriteID.SPELL_FALADOR_TELEPORT, false, 14286877, null),
 	RESURRECT_LESSER_THRALL("Resurrect Lesser Thrall", 38, 55, SpriteID.SPELL_RESURRECT_LESSER_GHOST, true, -1, null),
-	CRUMBLE_UNDEAD("Crumble Undead", 39, 24.5f, SpriteID.SPELL_CRUMBLE_UNDEAD, false, 14286876, MenuAction.WIDGET_TARGET),
+	CRUMBLE_UNDEAD("Crumble Undead", 39, 24.5f, SpriteID.SPELL_CRUMBLE_UNDEAD, false, 14286878, MenuAction.WIDGET_TARGET),
 	SALVE_GRAVEYARD_TELEPORT("Salve Graveyard Teleport", 40, 30, SpriteID.SPELL_SALVE_GRAVEYARD_TELEPORT, true, -1, null),
 	TELEPORT_TO_HOUSE("Teleport To House", 40, 30, SpriteID.SPELL_TELEPORT_TO_HOUSE, true, 14286877, null),
 	ADEPT_REANIMATION("Adept Reanimation", 41, 80, SpriteID.SPELL_ADEPT_REANIMATION, true, -1, null),
@@ -235,5 +236,9 @@ public enum MagicAction implements SkillAction
 	public boolean isMembers(final ItemManager itemManager)
 	{
 		return isMembers();
+	}
+
+	public int getWidgetId() {
+		return Rs2Widget.findWidget(name).getId();
 	}
 }

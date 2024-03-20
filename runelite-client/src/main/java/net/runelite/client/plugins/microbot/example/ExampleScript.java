@@ -15,10 +15,14 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -48,26 +52,7 @@ public class ExampleScript extends Script {
                  */
 
                 long startTime = System.currentTimeMillis();
-//                TileObject altar = Rs2GameObject.findObjectById(ObjectID.ALTAR_40878);
-//                if (altar == null) {
-//                    altar = Rs2GameObject.findObjectById(ObjectID.ALTAR_13197);
-//                }
-//                if (altar != null) {
-//                    //Rs2GameObject.interact(altar);
-//                    Rs2Inventory.useUnNotedItemOnObject("bones", altar);
-//                }
-                Rs2Inventory.use("bones");
-//                while (!Rs2Inventory.isItemSelected()) {
-//                    System.out.println("item not selected");
-//                }
-//                BooleanSupplier s = Rs2Inventory::isItemSelected;
-//                do {
-//                    System.out.println("item not selected");
-//                } while (!s.getAsBoolean());
-                Global.sleepUntil(Rs2Inventory::isItemSelected);
-                System.out.println("item selected!!!");
-                Rs2Inventory.use("bones");
-
+                Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, Rs2Npc.getNpc("guard"));
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;

@@ -27,6 +27,8 @@ public class Rs2Magic {
 
     public static void cast(MagicAction magicSpell) {
         MenuAction menuAction;
+        Rs2Tab.switchToMagicTab();
+        sleep(150, 300);
         if (magicSpell.getWidgetAction() == null) {
             if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")) {
                 menuAction = MenuAction.CC_OP;
@@ -47,6 +49,7 @@ public class Rs2Magic {
     public static void castOn(MagicAction magicSpell, Actor actor) {
         if (actor == null) return;
         cast(magicSpell);
+        sleep(300, 600);
         if (actor instanceof NPC) {
             Rs2Npc.interact((NPC) actor);
         } else {
