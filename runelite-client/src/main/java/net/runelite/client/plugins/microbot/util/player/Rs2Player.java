@@ -9,6 +9,7 @@ import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -142,9 +143,11 @@ public class Rs2Player {
         if (widget == null) return false;
         if (Microbot.getClient().getEnergy() > 1000 && toggle) {
             Microbot.getMouse().click(widget.getCanvasLocation());
+            Global.sleep(150, 300);
             return true;
         } else if (!toggle) {
             Microbot.getMouse().click(widget.getCanvasLocation());
+            Global.sleep(150, 300);
             return true;
         }
         return false;

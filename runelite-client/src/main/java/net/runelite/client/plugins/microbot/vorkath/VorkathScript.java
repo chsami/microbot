@@ -11,10 +11,8 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -59,7 +57,7 @@ enum State {
 public class VorkathScript extends Script {
     public static double version = 1.0;
 
-    State state = State.BANKING;
+    State state = State.ZOMBIE_SPAWN;
 
     private final int whiteProjectileId = 395;
     private final int redProjectileId = 1481;
@@ -141,6 +139,10 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case TELEPORT_TO_RELLEKKA:
+                        if (!Rs2Inventory.hasItem("Rellekka teleport")) {
+                            state = State.BANKING;
+                            return;
+                        }
                         if (Rs2Bank.isOpen()) {
                             Rs2Bank.closeBank();
                             sleepUntil(() -> !Rs2Bank.isOpen());
@@ -155,7 +157,6 @@ public class VorkathScript extends Script {
                         break;
                     case WALK_TO_VORKATH_ISLAND:
                         Rs2Player.toggleRunEnergy(true);
-                        sleep(150, 300);
                         Microbot.getWalker().walkTo(new WorldPoint(2640, 3693, 0));
                         net.runelite.api.NPC torfin = Rs2Npc.getNpc(NpcID.TORFINN_10405);
                         if (torfin != null) {
@@ -202,9 +203,7 @@ public class VorkathScript extends Script {
                             state = State.LOOT_ITEMS;
                             sleep(300, 600);
                             Rs2Inventory.wield("ruby dragon bolts");
-                            sleep(600);
                             togglePrayer(false);
-                            sleep(150, 300);
                             sleepUntil(() -> Rs2GroundItem.exists("Superior dragon bones", 20), 15000);
                         }
                         if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) <= 0) {
@@ -234,6 +233,7 @@ public class VorkathScript extends Script {
                         handleRedBall();
                         if (doesProjectileExistById(whiteProjectileId)) {
                             state = State.ZOMBIE_SPAWN;
+                            Rs2Tab.switchToMagicTab();
                         }
                         if ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
                             state = State.ACID;
@@ -253,25 +253,19 @@ public class VorkathScript extends Script {
                         );
                         NPC zombieSpawn = Rs2Npc.getNpc("Zombified Spawn");
                         if (zombieSpawn != null) {
-                            while (Rs2Npc.getNpc("Zombified Spawn") != null) {
-                                if (Rs2Npc.getNpc("Zombified Spawn").isDead()) {
-                                    eatAt(60);
-                                    togglePrayer(true);
-                                    state = State.FIGHT_VORKATH;
-                                    break;
-                                }
+                            while (Rs2Npc.getNpc("Zombified Spawn") != null && !Rs2Npc.getNpc("Zombified Spawn").isDead()
+                                    && !doesProjectileExistById(146)) {
                                 if (config.SLAYERSTAFF().toString().equals("Cast")) {
-                                    System.out.println("crumble undead!!!!!!!!!");
                                     Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, zombieSpawn);
-                                    eatAt(60);
-                                    togglePrayer(true);
-                                    state = State.FIGHT_VORKATH;
                                 } else {
                                     Rs2Inventory.wield(config.SLAYERSTAFF().toString());
                                     Rs2Npc.attack("Zombified Spawn");
-                                    sleep(600);
                                 }
                             }
+                            eatAt(60);
+                            togglePrayer(true);
+                            Rs2Tab.switchToInventoryTab();
+                            state = State.FIGHT_VORKATH;
                         }
                         break;
                     case ACID:
@@ -287,7 +281,6 @@ public class VorkathScript extends Script {
                             }
                         }
                         togglePrayer(false);
-                        sleep(150, 300);
                         boolean vorkathHead = Rs2GroundItem.loot("Vorkath's head", 20);
                         boolean itemsLeft = Rs2GroundItem.lootAllItemBasedOnValue(5000, 20) || Rs2GroundItem.exists("Vorkath's head", 20);
                         int foodInventorySize = Rs2Inventory.getInventoryFood().size();
@@ -311,13 +304,10 @@ public class VorkathScript extends Script {
                         break;
                     case TELEPORT_AWAY:
                         togglePrayer(false);
-                        sleep(150, 300);
                         Rs2Player.toggleRunEnergy(true);
-                        sleep(150, 300);
                         boolean reachedDestination = Rs2Bank.walkToBank();
                         if (reachedDestination) {
                             Rs2Inventory.wield("ruby dragon bolts");
-                            sleep(150, 300);
                             healAndDrinkPrayerPotion();
                             state = State.BANKING;
                         }
@@ -436,7 +426,6 @@ public class VorkathScript extends Script {
 
     private void handlePrayer() {
         drinkPrayer();
-        sleep(150, 300);
         togglePrayer(true);
     }
 
@@ -470,7 +459,6 @@ public class VorkathScript extends Script {
                 if (missingHitpoints >= 40 && Rs2Inventory.get("Cooked karambwan") != null) {
                     //double eat
                     Rs2Inventory.interact(food, "eat");
-                    sleep(300);
                     Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
                 } else {
                     Rs2Inventory.interact(food, "eat");

@@ -66,7 +66,7 @@ class SessionClient {
     void microbotPing(UUID uuid, boolean loggedIn) throws IOException {
         try (Response response = client.newCall(new Request.Builder().url(microbotApiUrl + "/session?sessionId=" + uuid.toString()
                 + "&isLoggedIn=" + loggedIn
-                + "&version=1.10.24" ).build()).execute()) {
+                + "&version=1.10.25" ).build()).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Unsuccessful ping");
             }

@@ -2,13 +2,9 @@ package net.runelite.client.plugins.microbot;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.widgets.ComponentID;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ProfileManager;
@@ -23,9 +19,7 @@ import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
@@ -34,13 +28,11 @@ import net.runelite.http.api.worlds.World;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.function.Supplier;
+
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class Microbot {
     public static MenuEntry targetMenu;
@@ -273,6 +265,10 @@ public class Microbot {
         mouseEvent(501, point);
         mouseEvent(502, point);
         mouseEvent(500, point);
+
+        if (!Microbot.getClient().isClientThread()) {
+            sleep(150, 300);
+        }
     }
 
     private static void mouseEvent(int id, Point point) {

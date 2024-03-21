@@ -4,6 +4,7 @@ import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.TileObject;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
@@ -52,8 +53,10 @@ public class ExampleScript extends Script {
                  */
 
                 long startTime = System.currentTimeMillis();
+                Microbot.getWalkerForKotlin().walkFastLocal(
+                        LocalPoint.fromScene(48, 58)
+                );
                 Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, Rs2Npc.getNpc("guard"));
-
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
                 System.out.println(totalTime);
@@ -61,7 +64,7 @@ public class ExampleScript extends Script {
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
     }
 
