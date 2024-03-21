@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
@@ -36,19 +37,33 @@ import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
+import net.runelite.http.api.RuneLiteAPI;
+import net.runelite.http.api.worlds.WorldResult;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static net.runelite.api.widgets.WidgetInfo.WORLD_SWITCHER_LIST;
 
 @PluginDescriptor(
         name = PluginDescriptor.Default + "Microbot",
@@ -97,7 +112,6 @@ public class MicrobotPlugin extends Plugin {
 
     @Inject
     private Rs2NpcManager rs2NpcManager;
-
 
     private Plugin summerGardenPlugin = null;
 
@@ -292,12 +306,6 @@ public class MicrobotPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onMenuOptionClicked(MenuOptionClicked event)
-    {
-         System.out.println(event.getMenuEntry());
-    }
-
-    @Subscribe
     protected void onClientTick(ClientTick t) {
         if (!pluginManager.isActive(summerGardenPlugin) && summerGardenScript != null) {
             summerGardenScript.shutdown();
@@ -308,6 +316,41 @@ public class MicrobotPlugin extends Plugin {
             summerGardenScript.run(configManager.getConfig(SummerGardenConfig.class), chatMessageManager);
             startPlugin(summerGardenPlugin);
         }
+    }
+
+    @Subscribe(priority = 999)
+    private void onMenuEntryAdded(MenuEntryAdded event) {
+        if (Microbot.targetMenu != null && event.getType() != Microbot.targetMenu.getType().getId()) {
+            this.client.setMenuEntries(new MenuEntry[]{});
+        }
+       // if (event.getType() != MenuAction.CC_OP.getId() || event.getActionParam1() != WORLD_SWITCHER_LIST.getId() && event.getActionParam1() != 11927560 && event.getActionParam1() != 4522007 && event.getActionParam1() != 24772686) {
+            if (Microbot.targetMenu != null) {
+                MenuEntry entry =
+                        this.client.createMenuEntry(-1)
+                                .setOption(Microbot.targetMenu.getOption())
+                                .setTarget(Microbot.targetMenu.getTarget())
+                                .setIdentifier(Microbot.targetMenu.getIdentifier())
+                                .setType(Microbot.targetMenu.getType())
+                                .setParam0(Microbot.targetMenu.getParam0())
+                                .setParam1(Microbot.targetMenu.getParam1())
+                                .setForceLeftClick(true);
+
+                if (Microbot.targetMenu.getItemId() > 0) {
+                    try {
+                        Rs2Reflection.setItemId(entry, Microbot.targetMenu.getItemId());
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                this.client.setMenuEntries(new MenuEntry[] {entry});
+            }
+        //}
+    }
+
+    @Subscribe
+    private void onMenuOptionClicked(MenuOptionClicked event) {
+        Microbot.targetMenu = null;
+        System.out.println(event.getMenuEntry());
     }
 
     @SneakyThrows

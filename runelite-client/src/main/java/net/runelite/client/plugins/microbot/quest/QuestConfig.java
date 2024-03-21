@@ -15,6 +15,13 @@ public interface QuestConfig extends Config {
             closedByDefault = false
     )
     String staticWalkerSection = "staticWalkerSection";
+    @ConfigSection(
+            name = "Items",
+            description = "Options for items",
+            position = 1,
+            closedByDefault = false
+    )
+    String itemSection = "itemSection";
     @ConfigItem(
             keyName = "HybridWalking",
             name = "Enable Hybrid Walking",
@@ -34,6 +41,16 @@ public interface QuestConfig extends Config {
             position = 1
     )
     default boolean useNearest() {
+        return false;
+    }
+    @ConfigItem(
+            keyName = "UseGrandExchange",
+            name = "Use grand exchange",
+            description = "Allow bot to buy items through the grand exchange",
+            section = itemSection,
+            position = 1
+    )
+    default boolean useGrandExchange() {
         return false;
     }
 }

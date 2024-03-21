@@ -52,6 +52,10 @@ public class LootScript extends Script {
                 }
             }
             if (!config.toggleLootItems()) return;
+            for (String specialItem : Arrays.asList("Giant key")) {
+                if (Rs2GroundItem.loot(specialItem, 13, 14))
+                    break;
+            }
             boolean result = Rs2GroundItem.lootItemBasedOnValue(config.priceOfItemsToLoot(), 14);
             if (result) {
                 Global.sleep(2000, 4000);

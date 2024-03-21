@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -88,6 +89,8 @@ public abstract class Script implements IScript {
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
             Microbot.getNotifier().notify("Shutdown script");
             mainScheduledFuture.cancel(true);
+            Microbot.getWalker().pathfinder = new Pathfinder();
+            Microbot.pauseAllScripts = false;
         }
     }
 
@@ -102,14 +105,11 @@ public abstract class Script implements IScript {
             VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         }
         Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
-        if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(() -> clickHereToPlayButton.isHidden())) {
+        if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden)) {
             Rs2Widget.clickWidget(clickHereToPlayButton.getId());
         }
 
         if (Microbot.pauseAllScripts)
-            return false;
-
-        if (Microbot.getWalker() != null && Microbot.getWalker().getPathfinder() != null && !Microbot.getWalker().getPathfinder().isDone())
             return false;
 
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
@@ -125,6 +125,7 @@ public abstract class Script implements IScript {
         VirtualKeyboard.keyPress(c);
     }
 
+    @Deprecated(since="Use Rs2Player.logout()", forRemoval = true)
     public void logout() {
         Rs2Tab.switchToLogout();
         sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.LOGOUT);

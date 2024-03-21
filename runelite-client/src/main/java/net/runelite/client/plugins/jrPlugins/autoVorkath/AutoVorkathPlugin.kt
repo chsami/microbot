@@ -27,7 +27,7 @@ import net.runelite.client.plugins.PluginDescriptor.JR
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
-import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchange
+import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
@@ -642,7 +642,7 @@ class AutoVorkathPlugin : Plugin() {
 
     private fun inGE(): Boolean = Rs2Npc.getNpc("Grand Exchange Clerk") != null
 
-    private fun geIsOpen(): Boolean = GrandExchange.isOpen()
+    private fun geIsOpen(): Boolean = Rs2GrandExchange.isOpen()
 
     private fun isMoving(): Boolean = Rs2Player.isMoving() || clientThread.runOnClientThread { client.localPlayer.animation != -1 }
     private fun needsToDrinkPrayer(): Boolean = clientThread.runOnClientThread { client.getBoostedSkillLevel(Skill.PRAYER) <= 70 }

@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.grandexchange;
 
+import net.runelite.api.GrandExchangeOfferState;
 import net.runelite.api.NPC;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
@@ -9,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
-public class GrandExchange {
+public class Rs2GrandExchange {
 
     public static final int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_1 = 30474265;
     public static final int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_10 = 30474265;
@@ -69,7 +71,7 @@ public class GrandExchange {
             NPC npc = Rs2Npc.getNpc("Grand Exchange Clerk");
             if (npc == null) return false;
             Rs2Npc.interact(npc, "exchange");
-            sleepUntil(GrandExchange::isOpen, 5000);
+            sleepUntil(Rs2GrandExchange::isOpen, 5000);
             return false;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -99,29 +101,39 @@ public class GrandExchange {
             if (!isOpen()) {
                 openExchange();
             }
-            GrandExchangeSlots availableSlot = getAvailableSlot();
-            Widget buyOffer = getOfferBuyButton(availableSlot);
+
+            Pair<GrandExchangeSlots, Integer> slot = getAvailableSlot();
+            if (slot.getLeft() == null) {
+                if (hasBoughtOffer()) {
+                    collectToBank();
+                }
+                return false;
+            }
+            Widget buyOffer = getOfferBuyButton(slot.getLeft());
             if (buyOffer == null) return false;
 
             Rs2Widget.clickWidgetFast(buyOffer);
-            sleepUntil(GrandExchange::isOfferTextVisible, 5000);
+            sleepUntil(Rs2GrandExchange::isOfferTextVisible, 5000);
             sleepUntil(() -> Rs2Widget.hasWidget("What would you like to buy?"));
             VirtualKeyboard.typeString(searchTerm);
-            sleepUntil(() -> Rs2Widget.getWidget(10616882) != null, 5000); //GE Search Results
+            sleepUntil(() -> !Rs2Widget.hasWidget("Start typing the name"), 5000); //GE Search Results
+            sleep(1200);
             Pair<Widget, Integer> itemResult = getSearchResultWidget(itemName);
             if (itemResult != null) {
                 Rs2Widget.clickWidgetFast(itemResult.getLeft(), itemResult.getRight(), 1);
-                sleep(1000);
+                sleepUntil(() -> getPricePerItemButton_X() != null);
             }
             Widget pricePerItemButtonX = getPricePerItemButton_X();
             if (pricePerItemButtonX != null) {
                 System.out.println("tried to click widget");
+                sleep(2000);
+                Microbot.getMouse().click(pricePerItemButtonX.getBounds());
                 Microbot.getMouse().click(pricePerItemButtonX.getBounds());
                 sleepUntil(() -> Rs2Widget.getWidget(162, 41) != null, 5000); //GE Enter Price
                 sleep(1000);
                 VirtualKeyboard.typeString(Integer.toString(price));
                 VirtualKeyboard.enter();
-                sleep(300, 500);
+                sleep(2000);
                 if (quantity > 1) {
                     Widget quantityButtonX = getQuantityButton_X();
                     Microbot.getMouse().click(quantityButtonX.getBounds());
@@ -133,6 +145,10 @@ public class GrandExchange {
                     sleep(1000);
                 }
                 Microbot.getMouse().click(getConfirm().getBounds());
+                sleepUntil(() -> Rs2Widget.hasWidget("Your offer is much higher"), 2000);
+                if (Rs2Widget.hasWidget("Your offer is much higher")) {
+                    Rs2Widget.clickWidget("Yes");
+                }
                 return true;
             } else {
                 System.out.println("unable to find widget setprice.");
@@ -159,13 +175,13 @@ public class GrandExchange {
             if (!isOpen()) {
                 openExchange();
             }
-            GrandExchangeSlots availableSlot = getAvailableSlot();
-            Widget sellOffer = getOfferSellButton(availableSlot);
+            Pair<GrandExchangeSlots, Integer> slot = getAvailableSlot();
+            Widget sellOffer = getOfferSellButton(slot.getLeft());
 
             if (sellOffer == null) return false;
 
             Microbot.getMouse().click(sellOffer.getBounds());
-            sleepUntil(GrandExchange::isOfferTextVisible, 5000);
+            sleepUntil(Rs2GrandExchange::isOfferTextVisible, 5000);
             Rs2Inventory.interact(itemName, "Offer");
             sleepUntil(() -> Rs2Widget.hasWidget("actively traded price"));
             sleep(300, 600);
@@ -216,7 +232,7 @@ public class GrandExchange {
         if (!isOpen()) {
             openExchange();
         }
-        sleepUntil(GrandExchange::isOpen);
+        sleepUntil(Rs2GrandExchange::isOpen);
         Rs2Widget.clickWidgetFast(
                 COLLECT_BUTTON, collectToBank ? 2 : 1);
         sleepUntil(() -> Rs2Widget.getWidget(COLLECT_BUTTON).isSelfHidden());
@@ -407,20 +423,31 @@ public class GrandExchange {
         return Optional.ofNullable(parent).map(p -> p.getChild(1)).orElse(null);
     }
 
-    public static GrandExchangeSlots getAvailableSlot() {
-        return Arrays.stream(GrandExchangeSlots.values())
-                .filter(GrandExchange::isSlotAvailable)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public static long getAmountAvailableSlots() {
-        return Arrays.stream(GrandExchangeSlots.values())
-                .filter(GrandExchange::isSlotAvailable)
-                .count();
+    public static Pair<GrandExchangeSlots, Integer> getAvailableSlot() {
+        int maxSlots = getMaxSlots();
+        int slotsAvailable = 0;
+        GrandExchangeSlots availableSlot = null;
+        for (int i = 0; i < maxSlots; i++) {
+            GrandExchangeSlots slot = GrandExchangeSlots.values()[i];
+            if (Rs2GrandExchange.isSlotAvailable(slot)) {
+                if (availableSlot == null) {
+                    availableSlot = slot;
+                }
+                slotsAvailable++;
+            }
+        }
+        return Pair.of(availableSlot, slotsAvailable);
     }
 
     public static boolean isAllSlotsEmpty() {
-        return getAmountAvailableSlots() == Arrays.stream(GrandExchangeSlots.values()).count();
+        return getAvailableSlot().getRight() == Arrays.stream(GrandExchangeSlots.values()).count();
+    }
+
+    public static boolean hasBoughtOffer() {
+        return Arrays.stream(Microbot.getClient().getGrandExchangeOffers()).anyMatch(x -> x.getState() == GrandExchangeOfferState.BOUGHT);
+    }
+
+    private static int getMaxSlots() {
+        return Rs2Player.isMember() ? 8: 3;
     }
 }

@@ -37,10 +37,6 @@ public class StaticWalkerScript extends Script {
                     shutdown();
                 }
 
-                if (failCount >= maxFails) {
-                    shutdown();
-                }
-
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }

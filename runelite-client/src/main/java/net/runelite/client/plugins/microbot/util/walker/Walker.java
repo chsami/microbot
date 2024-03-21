@@ -12,12 +12,14 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.staticwalker.pathfinder.*;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.PathfinderConfig;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +96,8 @@ public class Walker {
         int canvasX = canv != null ? canv.getX() : -1;
         int canvasY = canv != null ? canv.getY() : -1;
 
-        Rs2Reflection.invokeMenu(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here", "", -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        //Rs2Reflection.invokeMenu(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here", "", -1, -1);
 
         return worldPoint;
     }
@@ -107,7 +110,8 @@ public class Walker {
         int canvasX = canv != null ? canv.getX() : -1;
         int canvasY = canv != null ? canv.getY() : -1;
 
-        Rs2Reflection.invokeMenu(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here", "", -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        //Rs2Reflection.invokeMenu(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here", "", -1, -1);
     }
 
     public void walkFastCanvas(WorldPoint worldPoint) {
@@ -123,7 +127,8 @@ public class Walker {
         if (canvasX == -1 && canvasY == -1) {
             Rs2Camera.turnTo(localPoint);
         }
-        Rs2Reflection.invokeMenu(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here", "", -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        //Rs2Reflection.invokeMenu(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here", "", -1, -1);
     }
 
     public WorldPoint walkCanvas(WorldPoint worldPoint) {
@@ -190,7 +195,7 @@ public class Walker {
     public boolean hybridWalkTo(WorldPoint target, boolean useNearest) {
         Player player = Microbot.getClient().getLocalPlayer();
         List<PathNode> nodes = getPath(player.getWorldLocation(), target, useNearest);
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5)
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5 && canReach(target))
             return true;
 
         if (nodes.isEmpty()) {

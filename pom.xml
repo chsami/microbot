@@ -28,7 +28,7 @@
 
 	<groupId>net.runelite</groupId>
 	<artifactId>runelite-parent</artifactId>
-	<version>1.10.24-SNAPSHOT</version>
+	<version>1.10.25-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>RuneLite</name>
@@ -48,6 +48,7 @@
 		<glslang.path></glslang.path>
 
 		<rs.version>220</rs.version>
+		<kotlin.version>1.9.0</kotlin.version>
 	</properties>
 
 	<licenses>
@@ -182,15 +183,32 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib-jdk8</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-test</artifactId>
+			<version>${kotlin.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib-jdk8</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib-jdk8</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<release>11</release>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -232,26 +250,26 @@
 					</execution>
 				</executions>
 			</plugin>
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-javadoc-plugin</artifactId>-->
-<!--				<version>3.5.0</version>-->
-<!--				<configuration>-->
-<!--					&lt;!&ndash; Javadoc the delombok sources &ndash;&gt;-->
-<!--					<sourcepath>${project.build.directory}/delombok</sourcepath>-->
-<!--				</configuration>-->
-<!--				&lt;!&ndash; maven-release-plugin runs maven-javadoc-plugin:jar as one of its-->
-<!--				     release steps, so we will run it as well for the CI. Note this-->
-<!--				     defaults to disabled due to the maven.javadoc.skip property above. &ndash;&gt;-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<id>attach-javadocs</id>-->
-<!--						<goals>-->
-<!--							<goal>jar</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
+			<!--			<plugin>-->
+			<!--				<groupId>org.apache.maven.plugins</groupId>-->
+			<!--				<artifactId>maven-javadoc-plugin</artifactId>-->
+			<!--				<version>3.5.0</version>-->
+			<!--				<configuration>-->
+			<!--					&lt;!&ndash; Javadoc the delombok sources &ndash;&gt;-->
+			<!--					<sourcepath>${project.build.directory}/delombok</sourcepath>-->
+			<!--				</configuration>-->
+			<!--				&lt;!&ndash; maven-release-plugin runs maven-javadoc-plugin:jar as one of its-->
+			<!--				     release steps, so we will run it as well for the CI. Note this-->
+			<!--				     defaults to disabled due to the maven.javadoc.skip property above. &ndash;&gt;-->
+			<!--				<executions>-->
+			<!--					<execution>-->
+			<!--						<id>attach-javadocs</id>-->
+			<!--						<goals>-->
+			<!--							<goal>jar</goal>-->
+			<!--						</goals>-->
+			<!--					</execution>-->
+			<!--				</executions>-->
+			<!--			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
@@ -279,6 +297,61 @@
 						<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
 					</sourceDirectories>
 					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jetbrains.kotlin</groupId>
+				<artifactId>kotlin-maven-plugin</artifactId>
+				<version>${kotlin.version}</version>
+				<executions>
+					<execution>
+						<id>compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>test-compile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>test-compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<jvmTarget>1.8</jvmTarget>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<phase>none</phase>
+					</execution>
+					<execution>
+						<id>default-testCompile</id>
+						<phase>none</phase>
+					</execution>
+					<execution>
+						<id>compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>testCompile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<release>11</release>
 				</configuration>
 			</plugin>
 		</plugins>

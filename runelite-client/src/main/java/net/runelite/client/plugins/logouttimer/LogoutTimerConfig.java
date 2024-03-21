@@ -44,6 +44,6 @@ public interface LogoutTimerConfig extends Config
 	@Range(min = 5, max = 25)
 	default int getIdleTimeout()
 	{
-		return 5;
+		return 25;
 	}
 }

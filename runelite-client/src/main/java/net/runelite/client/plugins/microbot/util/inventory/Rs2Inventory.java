@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -15,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 import org.apache.commons.lang3.NotImplementedException;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Inventory {
 
@@ -35,18 +38,19 @@ public class Rs2Inventory {
         return Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
     }
 
-    public static CopyOnWriteArrayList<Rs2Item> inventoryItems = new CopyOnWriteArrayList<>();
+    public static List<Rs2Item> inventoryItems = new ArrayList<>();
 
 
     public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == InventoryID.INVENTORY.getId() && e.getItemContainer() != null) {
-            inventoryItems = new CopyOnWriteArrayList<>();
+            List<Rs2Item> _inventoryItems = new ArrayList<>();
             for (int i = 0; i < e.getItemContainer().getItems().length; i++) {
                 Item item = inventory().getItems()[i];
                 if (item.getId() == -1) continue;
                 ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(item.getId()));
-                inventoryItems.add(new Rs2Item(item, itemComposition, i));
+                _inventoryItems.add(new Rs2Item(item, itemComposition, i));
             }
+            inventoryItems = _inventoryItems;
         }
     }
 
@@ -91,6 +95,7 @@ public class Rs2Inventory {
      */
     public static boolean combine(int primaryItemId, int secondaryItemId) {
         boolean primaryItemInteracted = use(primaryItemId);
+        sleep(100);
         boolean secondaryItemInteracted = use(secondaryItemId);
         return primaryItemInteracted && secondaryItemInteracted;
     }
@@ -104,6 +109,7 @@ public class Rs2Inventory {
      */
     public static boolean combine(String primaryItemName, String secondaryItemName) {
         boolean primaryItemInteracted = use(primaryItemName);
+        sleep(100);
         boolean secondaryItemInteracted = use(secondaryItemName);
         return primaryItemInteracted && secondaryItemInteracted;
     }
@@ -117,6 +123,7 @@ public class Rs2Inventory {
      */
     public static boolean combine(Rs2Item primary, Rs2Item secondary) {
         boolean primaryItemInteracted = use(primary);
+        sleep(100);
         boolean secondaryItemInteracted = use(secondary);
         return primaryItemInteracted && secondaryItemInteracted;
     }
@@ -502,7 +509,7 @@ public class Rs2Inventory {
      * @return The item with the specified name, or null if not found.
      */
     public static Rs2Item get(String name) {
-        return items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).findFirst().orElse(null);
+        return get(name, false);
     }
 
     /**
@@ -609,7 +616,7 @@ public class Rs2Inventory {
             }
         }
 
-        Rs2Item item = get(name, true);
+        Rs2Item item = get(name, exact);
         if (item == null) return false;
         return item.quantity >= amount;
     }
@@ -1273,6 +1280,18 @@ public class Rs2Inventory {
     }
 
     /**
+     * Uses the item with the specified name in the inventory.
+     *
+     * @param name The name of the item to use.
+     * @return True if the item is successfully used, false otherwise.
+     */
+    public static boolean useUnNoted(String name) {
+        Rs2Item item = items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase()) && !x.isNoted).findFirst().orElse(null);
+        if (item == null) return false;
+        return interact(item, "Use");
+    }
+
+    /**
      * Uses the item with the specified ID in the inventory.
      *
      * @param id The ID of the item to use.
@@ -1357,6 +1376,34 @@ public class Rs2Inventory {
     }
 
     /**
+     * use unnoted inventory item on ingame object
+     * @param item name of the item to use
+     * @param objectID to use item on
+     * @return
+     */
+    public static boolean useUnNotedItemOnObject(String item, int objectID) {
+        if (Rs2Bank.isOpen()) return false;
+        useUnNoted(item);
+        Rs2GameObject.interact(objectID);
+        return true;
+    }
+
+    /**
+     * use unnoted inventory item on ingame object
+     * @param item name of the item to use
+     * @param object to use item on
+     * @return
+     */
+    public static boolean useUnNotedItemOnObject(String item, TileObject object) {
+        if (Rs2Bank.isOpen()) return false;
+        useUnNoted(item);
+        sleep(100);
+        if (!isItemSelected()) return false;
+        Rs2GameObject.interact(object);
+        return true;
+    }
+
+    /**
      * use inventory item on ingame object
      * @param item
      * @param objectID
@@ -1365,8 +1412,50 @@ public class Rs2Inventory {
     public static boolean useItemOnObject(int item, int objectID) {
         if (Rs2Bank.isOpen()) return false;
         use(item);
+        sleep(100);
+        if (!isItemSelected()) return false;
         Rs2GameObject.interact(objectID);
         return true;
+    }
+
+    public static Rs2Item getNotedItem(String name, boolean exact) {
+        if (exact)
+            return items().stream().filter(x -> x.name.equalsIgnoreCase(name) && x.isNoted).findFirst().orElse(null);
+        else
+            return items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase()) && x.isNoted).findFirst().orElse(null);
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     */
+    public static boolean hasNotedItem(String name) {
+        return getNotedItem(name, false) != null;
+    }
+    /**
+     *
+     * @param name
+     * @param exact
+     * @return
+     */
+    public static boolean hasNotedItem(String name, boolean exact) {
+        return getNotedItem(name, exact) != null;
+    }
+
+    public static Rs2Item getUnNotedItem(String name, boolean exact) {
+        if (exact)
+            return items().stream().filter(x -> x.name.equalsIgnoreCase(name) && !x.isNoted).findFirst().orElse(null);
+        else
+            return items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase()) && !x.isNoted).findFirst().orElse(null);
+    }
+
+    public static boolean hasUnNotedItem(String name) {
+        return getUnNotedItem(name, false) != null;
+    }
+
+    public static boolean hasUnNotedItem(String name, boolean exact) {
+        return getUnNotedItem(name, exact) != null;
     }
 
     /**
@@ -1431,8 +1520,8 @@ public class Rs2Inventory {
             identifier = 1;
             param1 = 30605312;
         }
-
-        Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
+        //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
     }
 
     private static Widget getInventory() {
@@ -1454,3 +1543,7 @@ public class Rs2Inventory {
         });
     }
 }
+
+
+
+

@@ -3,12 +3,16 @@ package net.runelite.client.plugins.microbot.quest;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
@@ -19,6 +23,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 
 public class QuestScript extends Script {
     public static double version = 1.0;
@@ -27,6 +32,8 @@ public class QuestScript extends Script {
     public static List<ItemRequirement> itemRequirements = new ArrayList<>();
 
     public static List<ItemRequirement> itemsMissing = new ArrayList<>();
+    public static List<ItemRequirement> grandExchangeItems = new ArrayList<>();
+
 
     private QuestConfig config;
 
@@ -43,33 +50,80 @@ public class QuestScript extends Script {
                         return;
                     }
 
-                    if (Rs2Widget.hasWidget("select an option")) {
+                    if (Rs2Widget.hasWidget("select an option") || Rs2Widget.hasWidget("Start the")) {
                         VirtualKeyboard.keyPress('1');
                         return;
                     }
 
-                    if (!applyStep(null)) return;
-
-                    if (QuestHelperPlugin.getSelectedQuest().getCurrentStep() instanceof ConditionalStep) {
-                        ConditionalStep conditionalStep = (ConditionalStep) QuestHelperPlugin.getSelectedQuest().getCurrentStep();
-                        for (QuestStep step : conditionalStep.getSteps()) {
-                            applyStep(step);
+                    List<ItemRequirement> itemRequirements = new ArrayList<>();
+                    for (PanelDetails panel: QuestHelperPlugin.getSelectedQuest().getCurrentStep().getActiveStep().getQuestHelper().getPanels()) {
+                        if (panel.getHideCondition() == null || !panel.getHideCondition().check(Microbot.getClient())) {
+                            for (QuestStep step : panel.getSteps())
+                            {
+                                if (panel.getRequirements().isEmpty())
+                                    break;
+                                QuestStep newStep = QuestHelperPlugin.getSelectedQuest().getCurrentStep().getActiveStep();
+                                for(String text: newStep.getText()) {
+                                    if (step.getText().contains(text)) {
+                                        for (Requirement requirement: panel.getRequirements()) {
+                                            if (requirement instanceof ItemRequirement)
+                                            {
+                                                itemRequirements.add((ItemRequirement) requirement);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-
-                    for (ItemRequirement itemRequirement : QuestHelperPlugin.getSelectedQuest().getItemRequirements()) {
-                        if (!Rs2Inventory.hasItemAmount(itemRequirement.getId(), itemRequirement.getQuantity())) {
+                    for (ItemRequirement itemRequirement : itemRequirements) {
+                        if (!Rs2Inventory.hasItemAmount(itemRequirement.getId(), itemRequirement.getQuantity()) && itemsMissing.stream().noneMatch(x -> x.getId() == itemRequirement.getId())) {
                             itemsMissing.add(itemRequirement);
                         }
                     }
+
                     if (!itemsMissing.isEmpty()) {
                         Rs2Bank.useBank();
                         Rs2Bank.depositAll();
-                        for (ItemRequirement itemRequirement : QuestScript.itemsMissing) {
-                            Rs2Bank.withdrawX(true, itemRequirement.getName(), itemRequirement.getQuantity());
+                        sleepUntil(Rs2Inventory::isEmpty);
+                        for (ItemRequirement itemRequirement : itemsMissing) {
+                            if (!Rs2Bank.hasItem(itemRequirement.getId())) {
+                                if (grandExchangeItems.stream().noneMatch(x -> x.getId() == itemRequirement.getId())) {
+                                    grandExchangeItems.add(itemRequirement);
+                                }
+                            } else {
+                                Rs2Bank.withdrawX(true, itemRequirement.getName(), itemRequirement.getQuantity());
+                                sleep(600);
+                            }
                         }
                     }
 
+                    if (config.useGrandExchange() && !grandExchangeItems.isEmpty()) {
+                        final List<ItemRequirement> _grandExchangeItems = grandExchangeItems;
+                        for (ItemRequirement itemRequirement : _grandExchangeItems) {
+                            Rs2GrandExchange.buyItem(itemRequirement.getName(), itemRequirement.getName(), 5000, itemRequirement.getQuantity());
+                        }
+                        sleep(2000);
+                        Rs2GrandExchange.collectToBank();
+                        sleepUntil(Rs2GrandExchange::isAllSlotsEmpty);
+                    }
+
+                    if (itemsMissing.isEmpty()) {
+                          if (!applyStep(null)) return;
+
+                        if (QuestHelperPlugin.getSelectedQuest().getCurrentStep() instanceof ConditionalStep) {
+                            QuestStep conditionalStep = QuestHelperPlugin.getSelectedQuest().getCurrentStep().getActiveStep();
+                            applyStep(conditionalStep);
+                            /*for (QuestStep step : conditionalStep.getSteps()) {
+                                applyStep(step);
+                                break;
+                            }*/
+                        } else if (QuestHelperPlugin.getSelectedQuest().getCurrentStep() instanceof NpcStep) {
+                            applyNpcStep(QuestHelperPlugin.getSelectedQuest().getCurrentStep());
+                        }
+                    } else {
+                        reset();
+                    }
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -85,7 +139,9 @@ public class QuestScript extends Script {
     }
 
     public static void reset() {
+        itemsMissing = new ArrayList<>();
         itemRequirements = new ArrayList<>();
+        grandExchangeItems = new ArrayList<>();
     }
 
     public boolean applyStep(QuestStep step) {
@@ -111,8 +167,12 @@ public class QuestScript extends Script {
             questStep = (NpcStep) QuestHelperPlugin.getSelectedQuest().getCurrentStep();
 
         net.runelite.api.NPC npc = Rs2Npc.getNpc(questStep.npcID);
-        if (npc != null) {
+        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Microbot.getWalker().canReach(npc.getWorldLocation())) {
             Rs2Npc.interact(questStep.npcID, "Talk-to");
+        } else if (npc != null && !Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
+            Microbot.getWalker().hybridWalkTo(npc.getWorldLocation(), config.useNearest());
+        } else if (npc != null && !Microbot.getWalker().canReach(npc.getWorldLocation())) {
+            Microbot.getWalker().hybridWalkTo(npc.getWorldLocation(), config.useNearest());
         } else {
             if (questStep.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
                 if (config.enableHybridWalking()) {

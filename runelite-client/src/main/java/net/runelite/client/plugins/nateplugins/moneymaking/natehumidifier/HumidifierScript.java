@@ -37,7 +37,7 @@ public class HumidifierScript extends Script {
             try {
                 boolean hasAstralRunesInInventory = Rs2Inventory.hasItem(ItemID.ASTRAL_RUNE);
                 if (Microbot.pauseAllScripts) return;
-                if (Rs2Inventory.hasItem(config.ITEM().getName())
+                if (Rs2Inventory.hasItem(config.ITEM().getName(), true)
                         && hasAstralRunesInInventory) {
                     Rs2Magic.cast(MagicAction.HUMIDIFY);
                     sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(config.ITEM().getFinished()));

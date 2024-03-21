@@ -12,10 +12,14 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
@@ -25,7 +29,7 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 
 @SuppressWarnings("unused")
 public class Rs2Bank {
-    public static CopyOnWriteArrayList<Rs2Item> bankItems = new CopyOnWriteArrayList<>();
+    public static List<Rs2Item> bankItems = new ArrayList<Rs2Item>();
     private static final int X_AMOUNT_VARBIT = 3960;
     private static final int SELECTED_OPTION_VARBIT = 6590;
     private static final int HANDLE_X_SET = 5;
@@ -52,8 +56,9 @@ public class Rs2Bank {
         if (container == ComponentID.BANK_INVENTORY_ITEM_CONTAINER) {
             identifier = identifier + 1;
         }
+        Microbot.doInvoke(new NewMenuEntry(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
        // MenuEntryImpl(getOption=Wear, getTarget=<col=ff9040>Amulet of glory(4)</col>, getIdentifier=9, getType=CC_OP_LOW_PRIORITY, getParam0=1, getParam1=983043, getItemId=1712, isForceLeftClick=false, isDeprioritized=false)
-        Rs2Reflection.invokeMenu(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, "Withdraw-1", rs2Item.name, -1, -1);
+        // Rs2Reflection.invokeMenu(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, "Withdraw-1", rs2Item.name, -1, -1);
     }
 
     /**
@@ -394,7 +399,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItem(boolean checkInv, String name) {
-        if (checkInv && !Rs2Inventory.hasItem(name)) return;
+        if (checkInv && !Rs2Bank.hasItem(name)) return;
         withdrawOne(name);
     }
 
@@ -439,7 +444,7 @@ public class Rs2Bank {
      * @param amount amount to withdraw
      */
     public static void withdrawX(boolean checkInv, int id, int amount) {
-        if (checkInv && !Rs2Inventory.hasItem(id)) return;
+        if (checkInv && !Rs2Bank.hasItem(id)) return;
         withdrawX(id, amount);
     }
     /**
@@ -511,7 +516,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItemAll(boolean checkInv, String name) {
-        if (checkInv && !Rs2Inventory.hasItem(name)) return;
+        if (checkInv && !Rs2Bank.hasItem(name)) return;
         withdrawItemAll(name);
     }
 
@@ -840,6 +845,8 @@ public class Rs2Bank {
      * @return true if player location is less than 4 tiles away from the bank location
      */
     public static boolean walkToBank() {
+        if (Rs2Bank.isOpen()) return true;
+        Rs2Player.toggleRunEnergy(true);
         BankLocation bankLocation = getNearestBank();
         Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;
@@ -860,7 +867,7 @@ public class Rs2Bank {
      * @param e The event containing the latest bank items.
      */
     public static void storeBankItemsInMemory(ItemContainerChanged e) {
-        CopyOnWriteArrayList<Rs2Item> list = updateItemContainer(InventoryID.BANK.getId(), e);
+        List<Rs2Item> list = updateItemContainer(InventoryID.BANK.getId(), e);
         if (list != null)
             bankItems = list;
     }

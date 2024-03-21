@@ -11,7 +11,6 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -25,9 +24,11 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +57,7 @@ enum State {
 public class VorkathScript extends Script {
     public static double version = 1.0;
 
-    State state = State.BANKING;
+    State state = State.ZOMBIE_SPAWN;
 
     private final int whiteProjectileId = 395;
     private final int redProjectileId = 1481;
@@ -104,6 +105,14 @@ public class VorkathScript extends Script {
                     init = false;
                 }
 
+                if (Rs2Equipment.equipment() == null || Arrays.stream(Rs2Equipment.equipment().getItems()).allMatch(x -> x.getId() == -1))
+                {
+                    state = State.DEAD_WALK;
+                } else if (Rs2Equipment.equipment() != null && Arrays.stream(Rs2Equipment.equipment().getItems()).allMatch(x -> x.getId() > 0) && state == State.DEAD_WALK) {
+                    leaveVorkath();
+                }
+
+
                 switch (state) {
                     case BANKING:
                         hasEquipment = doesEquipmentMatch("vorkath");
@@ -120,6 +129,7 @@ public class VorkathScript extends Script {
                         if (!hasInventory) {
                             sleep(600);
                             hasInventory = MicrobotInventorySetup.loadInventory("vorkath");
+                            sleep(1000);
                         }
                         if (hasEquipment && hasInventory) {
                             healAndDrinkPrayerPotion();
@@ -129,8 +139,13 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case TELEPORT_TO_RELLEKKA:
+                        if (!Rs2Inventory.hasItem("Rellekka teleport")) {
+                            state = State.BANKING;
+                            return;
+                        }
                         if (Rs2Bank.isOpen()) {
                             Rs2Bank.closeBank();
+                            sleepUntil(() -> !Rs2Bank.isOpen());
                         }
                         if (!isCloseToRelleka()) {
                             Rs2Inventory.interact("Rellekka teleport", "break");
@@ -141,6 +156,7 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case WALK_TO_VORKATH_ISLAND:
+                        Rs2Player.toggleRunEnergy(true);
                         Microbot.getWalker().walkTo(new WorldPoint(2640, 3693, 0));
                         net.runelite.api.NPC torfin = Rs2Npc.getNpc(NpcID.TORFINN_10405);
                         if (torfin != null) {
@@ -153,6 +169,7 @@ public class VorkathScript extends Script {
                         break;
                     case WALK_TO_VORKATH:
                         Microbot.getWalker().walkMiniMap(new WorldPoint(2272, 4052, 0));
+                        sleep(1000);
                         TileObject iceChunks = Rs2GameObject.findObjectById(ObjectID.ICE_CHUNKS_31990);
                         if (iceChunks != null) {
                             Rs2GameObject.interact(ObjectID.ICE_CHUNKS_31990, "Climb-over");
@@ -184,11 +201,12 @@ public class VorkathScript extends Script {
                         vorkath = Rs2Npc.getNpc(NpcID.VORKATH_8061);
                         if (vorkath == null || vorkath.isDead()) {
                             state = State.LOOT_ITEMS;
+                            sleep(300, 600);
                             Rs2Inventory.wield("ruby dragon bolts");
                             togglePrayer(false);
                             sleepUntil(() -> Rs2GroundItem.exists("Superior dragon bones", 20), 15000);
                         }
-                        if (Microbot.getClient().getLocalPlayer().isDead()) {
+                        if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) <= 0) {
                             state = State.DEAD_WALK;
                             return;
                         }
@@ -213,8 +231,9 @@ public class VorkathScript extends Script {
                         handlePrayer();
                         eatAt(60);
                         handleRedBall();
-                        if (doesProjectileExistById(whiteProjectileId) || (Rs2Npc.getNpc("Zombified Spawn") != null && !Rs2Npc.getNpc("Zombified Spawn").isDead())) {
+                        if (doesProjectileExistById(whiteProjectileId)) {
                             state = State.ZOMBIE_SPAWN;
+                            Rs2Tab.switchToMagicTab();
                         }
                         if ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
                             state = State.ACID;
@@ -226,33 +245,26 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case ZOMBIE_SPAWN:
-                        if (Rs2Npc.getNpc("Zombified Spawn") != null && Rs2Npc.getNpc("Zombified Spawn").isDead()) {
-                            eatAt(60);
-                            state = State.FIGHT_VORKATH;
-                            return;
-                        }
                         togglePrayer(false);
-                        eatAt(60);
+                        eatAt(80);
                         drinkPrayer();
                         Microbot.getWalkerForKotlin().walkFastLocal(
                                 LocalPoint.fromScene(48, 58)
                         );
-                        sleepUntil(() -> Rs2Npc.getNpc("Zombified Spawn") != null, 10000);
                         NPC zombieSpawn = Rs2Npc.getNpc("Zombified Spawn");
                         if (zombieSpawn != null) {
-                            if (config.SLAYERSTAFF().toString().equals("Cast")) {
-                                System.out.println("Cast crumble undeaad on zombified spawn!");
-                                Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, zombieSpawn);
-                                sleep(600);
-                            } else {
-                                Rs2Inventory.wield(config.SLAYERSTAFF().toString());
-                                Rs2Npc.attack("Zombified Spawn");
-                                sleep(600);
+                            while (Rs2Npc.getNpc("Zombified Spawn") != null && !Rs2Npc.getNpc("Zombified Spawn").isDead()
+                                    && !doesProjectileExistById(146)) {
+                                if (config.SLAYERSTAFF().toString().equals("Cast")) {
+                                    Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, zombieSpawn);
+                                } else {
+                                    Rs2Inventory.wield(config.SLAYERSTAFF().toString());
+                                    Rs2Npc.attack("Zombified Spawn");
+                                }
                             }
-                        }
-                        togglePrayer(true);
-                        if (Rs2Npc.getNpc("Zombified Spawn") == null) {
                             eatAt(60);
+                            togglePrayer(true);
+                            Rs2Tab.switchToInventoryTab();
                             state = State.FIGHT_VORKATH;
                         }
                         break;
@@ -268,6 +280,7 @@ public class VorkathScript extends Script {
                                 Rs2Player.waitForAnimation();
                             }
                         }
+                        togglePrayer(false);
                         boolean vorkathHead = Rs2GroundItem.loot("Vorkath's head", 20);
                         boolean itemsLeft = Rs2GroundItem.lootAllItemBasedOnValue(5000, 20) || Rs2GroundItem.exists("Vorkath's head", 20);
                         int foodInventorySize = Rs2Inventory.getInventoryFood().size();
@@ -275,6 +288,7 @@ public class VorkathScript extends Script {
                         boolean hasSuperAntifire = Rs2Inventory.hasItem("super antifire");
                         boolean hasPrayerPotion = Rs2Inventory.hasItem("prayer potion");
                         boolean hasRangePotion = Rs2Inventory.hasItem(config.rangePotion().toString());
+                        sleep(600, 2000);
 
                         if (!itemsLeft && !vorkathHead) {
                             if (foodInventorySize < 7 || !hasVenom || !hasSuperAntifire || !hasPrayerPotion || !hasRangePotion) {
@@ -289,8 +303,11 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case TELEPORT_AWAY:
+                        togglePrayer(false);
+                        Rs2Player.toggleRunEnergy(true);
                         boolean reachedDestination = Rs2Bank.walkToBank();
                         if (reachedDestination) {
+                            Rs2Inventory.wield("ruby dragon bolts");
                             healAndDrinkPrayerPotion();
                             state = State.BANKING;
                         }
@@ -301,10 +318,9 @@ public class VorkathScript extends Script {
                             torfin = Rs2Npc.getNpc(NpcID.TORFINN_10405);
                             if (torfin != null) {
                                 Rs2Npc.interact(torfin, "Collect");
-                                sleepUntil(() -> Rs2Widget.hasWidget("Retrieval Service"));
+                                sleepUntil(() -> Rs2Widget.hasWidget("Retrieval Service"), 1500);
                                 if (Rs2Widget.hasWidget("I'm afraid I don't have anything")) { // this means we looted all our stuff
                                     leaveVorkath();
-                                    state = State.TELEPORT_AWAY;
                                     return;
                                 }
                                 final int invSize = Rs2Inventory.size();
@@ -321,18 +337,17 @@ public class VorkathScript extends Script {
                                 }
                             }
                         } else {
-                            Microbot.getWalker().hybridWalkTo(WorldDestinations.LUMBRIDGE_BANK.getWorldPoint());
-                            if (!Rs2Bank.isOpen()) {
-                                Rs2Bank.openBank();
-                            } else {
-                                if (Rs2Inventory.hasItem("Rellekka teleport")) {
-                                    Rs2Inventory.interact("Rellekka teleport", "break");
-                                    Rs2Player.waitForAnimation();
-                                } else {
-                                    Rs2Bank.withdrawItem("Rellekka teleport");
-                                    Rs2Bank.closeBank();
-                                }
+                            if (Rs2Inventory.hasItem("Rellekka teleport")) {
+                                Rs2Inventory.interact("Rellekka teleport", "break");
+                                Rs2Player.waitForAnimation();
+                                return;
                             }
+                            Rs2Bank.walkToBank();
+                            Rs2Bank.openBank();
+                            Rs2Bank.withdrawItem("Rellekka teleport");
+                            sleep(150, 400);
+                            Rs2Bank.closeBank();
+                            sleepUntil(() -> Rs2Inventory.hasItem("Rellekka teleport"), 1000);
                         }
                         break;
                 }
@@ -391,7 +406,8 @@ public class VorkathScript extends Script {
         return !drinkRangePotion && !drinkAntiFire && !drinkAntiVenom;
     }
 
-    public static void togglePrayer(boolean onOff) {
+    public void togglePrayer(boolean onOff) {
+        if (Rs2Prayer.isOutOfPrayer()) return;
         if (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) >= 77) {
             Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, onOff);
         } else {
@@ -408,9 +424,8 @@ public class VorkathScript extends Script {
         }
     }
 
-    private static void handlePrayer() {
+    private void handlePrayer() {
         drinkPrayer();
-        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true);
         togglePrayer(true);
     }
 
@@ -444,7 +459,6 @@ public class VorkathScript extends Script {
                 if (missingHitpoints >= 40 && Rs2Inventory.get("Cooked karambwan") != null) {
                     //double eat
                     Rs2Inventory.interact(food, "eat");
-                    sleep(1000);
                     Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
                 } else {
                     Rs2Inventory.interact(food, "eat");
@@ -496,29 +510,28 @@ public class VorkathScript extends Script {
 
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, false);
 
-        acidPools.clear();
-        Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_32000).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
-        Rs2GameObject.getGameObjects(ObjectID.ACID_POOL).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
-        Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_37991).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
-
-        WorldPoint safeTile = findSafeTiles();
-        WorldPoint playerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
-
-        if (safeTile != null) {
-            if (playerLocation.equals(safeTile)) {
-                Rs2Npc.attack("vorkath");
-            } else {
-                eatAt(50);
-                Microbot.getWalkerForKotlin().walkFastLocal(
-                        LocalPoint.fromScene(safeTile.getX(), safeTile.getY())
-                );
-            }
-        } else {
-//            EthanApiPlugin.sendClientMessage("NO SAFE TILES! TELEPORTING TF OUT!");
-//            teleToHouse();
-//            changeStateTo(State.WALKING_TO_BANK, 1);
-//            return;
-        }
+//        acidPools.clear();
+//        Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_32000).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
+//        Rs2GameObject.getGameObjects(ObjectID.ACID_POOL).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
+//        Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_37991).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
+//
+//        WorldPoint safeTile = findSafeTiles();
+//        WorldPoint playerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
+//
+//        if (safeTile != null) {
+//            if (playerLocation.equals(safeTile)) {
+//                Rs2Npc.attack("vorkath");
+//            } else {
+//                eatAt(50);
+//                Microbot.getWalkerForKotlin().walkFastLocal(
+//                        LocalPoint.fromScene(safeTile.getX(), safeTile.getY())
+//                );
+//            }
+//        } else {
+////            teleToHouse();
+////            changeStateTo(State.WALKING_TO_BANK, 1);
+////            return;
+//        }
 
     }
 
@@ -530,7 +543,7 @@ public class VorkathScript extends Script {
             Microbot.getWalkerForKotlin().walkFastLocal(
                     LocalPoint.fromScene(x, y)
             );
-            sleep(400);
+            sleep(200);
         }
     }
 

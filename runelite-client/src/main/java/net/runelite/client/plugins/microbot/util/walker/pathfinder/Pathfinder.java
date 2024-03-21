@@ -67,7 +67,7 @@ public class Pathfinder implements Runnable {
 
 
     public Pathfinder() {
-
+        done = true;
     }
 
     public Pathfinder(PathfinderConfig config) {

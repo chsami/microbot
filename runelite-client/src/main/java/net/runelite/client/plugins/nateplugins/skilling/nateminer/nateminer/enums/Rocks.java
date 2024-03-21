@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Rocks {
     TIN("tin rocks", 1),
+    COPPER("copper rocks", 1),
     IRON("iron rocks", 15),
     COAL("coal rocks", 30);
 

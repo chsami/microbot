@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.Notifier;
@@ -17,6 +18,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScri
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
@@ -24,11 +26,16 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+
 public class Microbot {
+    public static MenuEntry targetMenu;
     @Getter
     @Setter
     private static EventHandler eventHandler;
@@ -145,7 +152,7 @@ public class Microbot {
     public static boolean isLoggedIn() {
         if (client == null) return false;
         GameState idx = client.getGameState();
-        return idx != GameState.LOGIN_SCREEN;
+        return idx == GameState.LOGGED_IN;
     }
 
     public static boolean hasLevel(int levelRequired, Skill skill) {
@@ -194,9 +201,10 @@ public class Microbot {
         });
     }
 
-    public static CopyOnWriteArrayList<Rs2Item> updateItemContainer(int id, ItemContainerChanged e) {
+
+    public static List<Rs2Item> updateItemContainer(int id, ItemContainerChanged e) {
         if (e.getContainerId() == id) {
-            CopyOnWriteArrayList<Rs2Item> list = new CopyOnWriteArrayList<>();
+            List<Rs2Item> list = new ArrayList<>();
             int i = -1;
             for (Item item : e.getItemContainer().getItems()) {
                 if (item == null) {
@@ -222,5 +230,49 @@ public class Microbot {
 
     public static void startPlugin(Plugin plugin) {
 
+    }
+
+    public static Point calculateClickingPoint(Rectangle rect) {
+        if (rect.getX() == 1 && rect.getY() == 1) return new Point(1, 1);
+        int x = (int)(rect.getX() + (double) Random.random((int)rect.getWidth() / 6 * -1, (int)rect.getWidth() / 6) + rect.getWidth() / 2.0);
+        int y = (int)(rect.getY() + (double)Random.random((int)rect.getHeight() / 6 * -1, (int)rect.getHeight() / 6) + rect.getHeight() / 2.0);
+        return new Point(x, y);
+    }
+
+    public static void doInvoke(MenuEntry entry, Rectangle rectangle) {
+        targetMenu = entry;
+        int viewportHeight = client.getViewportHeight();
+        int viewportWidth = client.getViewportWidth();
+        if (!(rectangle.getX() > (double)viewportWidth) && !(rectangle.getY() > (double)viewportHeight) && !(rectangle.getX() < 0.0) && !(rectangle.getY() < 0.0)) {
+            click(rectangle);
+        }
+    }
+
+    public static void click(Rectangle rectangle) {
+
+        Point point = calculateClickingPoint(rectangle);
+        if (client.isStretchedEnabled()) {
+            Dimension stretched = client.getStretchedDimensions();
+            Dimension real = client.getRealDimensions();
+            double width = (double)stretched.width / real.getWidth();
+            double height = (double)stretched.height / real.getHeight();
+            point = new Point((int)((double)point.getX() * width), (int)((double)point.getY() * height));
+        }
+
+        mouseEvent(504, point);
+        mouseEvent(505, point);
+        mouseEvent(503, point);
+        mouseEvent(501, point);
+        mouseEvent(502, point);
+        mouseEvent(500, point);
+
+        if (!Microbot.getClient().isClientThread()) {
+            sleep(150, 300);
+        }
+    }
+
+    private static void mouseEvent(int id, Point point) {
+        MouseEvent e = new MouseEvent(client.getCanvas(), id, System.currentTimeMillis(), 0, point.getX(), point.getY(), 1, false, 1);
+        client.getCanvas().dispatchEvent(e);
     }
 }

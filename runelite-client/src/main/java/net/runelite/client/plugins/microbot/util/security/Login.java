@@ -57,6 +57,15 @@ public class Login {
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
         sleep(300);
         VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        if (Microbot.getClient().getLoginIndex() == 10) {
+            int loginScreenWidth = 804;
+            int startingWidth = (Microbot.getClient().getCanvasWidth() / 2) - (loginScreenWidth / 2);
+            Microbot.getMouse().click(365 + startingWidth, 250); //clicks a button "OK" when you've been disconnected
+        } else if (Microbot.getClient().getLoginIndex() == 9) {
+            int loginScreenWidth = 804;
+            int startingWidth = (Microbot.getClient().getCanvasWidth() / 2) - (loginScreenWidth / 2);
+            Microbot.getMouse().click(365 + startingWidth, 300); //clicks a button "OK" when you've been disconnected
+        }
     }
 
     public void setWorld(int worldNumber) {

@@ -1,17 +1,21 @@
 package net.runelite.client.plugins.microbot.util.magic;
 
 import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import org.apache.commons.lang3.NotImplementedException;
+
+import java.awt.*;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
@@ -23,6 +27,8 @@ public class Rs2Magic {
 
     public static void cast(MagicAction magicSpell) {
         MenuAction menuAction;
+        Rs2Tab.switchToMagicTab();
+        sleep(150, 300);
         if (magicSpell.getWidgetAction() == null) {
             if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")) {
                 menuAction = MenuAction.CC_OP;
@@ -36,19 +42,22 @@ public class Rs2Magic {
         if (magicSpell.getWidgetId() == -1)
             throw new NotImplementedException("This spell has not been configured yet in the MagicAction.java class");
 
-        Rs2Reflection.invokeMenu(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "Cast", "<col=00ff00>" + magicSpell.getName() + "</col>", -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "<col=00ff00>" + magicSpell.getName() + "</col>"), new Rectangle(0, 0, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        //Rs2Reflection.invokeMenu(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "Cast", "<col=00ff00>" + magicSpell.getName() + "</col>", -1, -1);
     }
 
     public static void castOn(MagicAction magicSpell, Actor actor) {
         if (actor == null) return;
         cast(magicSpell);
+        sleep(150, 300);
+        if (!Rs2Camera.isTileOnScreen(actor.getLocalLocation())) {
+            Rs2Camera.turnTo(actor.getLocalLocation());
+            return;
+        }
         if (actor instanceof NPC) {
             Rs2Npc.interact((NPC) actor);
         } else {
-            if (!Rs2Camera.isTileOnScreen(actor.getLocalLocation())) {
-                Rs2Camera.turnTo(actor.getLocalLocation());
-                return;
-            }
+
             Point point = Perspective.localToCanvas(Microbot.getClient(), actor.getLocalLocation(), Microbot.getClient().getPlane());
             Microbot.getMouse().click(point);
         }

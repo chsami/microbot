@@ -1,16 +1,22 @@
 package net.runelite.client.plugins.microbot.util.prayer;
 
 import net.runelite.api.MenuAction;
+import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
+import java.awt.*;
+
+import static net.runelite.api.MenuAction.CC_OP;
 import static net.runelite.api.Varbits.QUICK_PRAYER;
 import static net.runelite.client.plugins.microbot.util.globval.VarbitValues.QUICK_PRAYER_ENABLED;
 
 public class Rs2Prayer {
 
     public static void toggle(Rs2PrayerEnum name) {
-        Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        // Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
     }
 
     public static void toggle(Rs2PrayerEnum name, boolean on) {
@@ -22,7 +28,8 @@ public class Rs2Prayer {
             if (Microbot.getClientThread().runOnClientThread(() ->
                     Microbot.getClient().getVarbitValue(varBit) == 1)) return;
         }
-        Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
+        Microbot.doInvoke(new NewMenuEntry(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        //Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
     }
 
     public static boolean isPrayerActive(Rs2PrayerEnum name) {
@@ -33,5 +40,9 @@ public class Rs2Prayer {
 
     public static boolean isQuickPrayerEnabled() {
         return Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_ENABLED.getValue();
+    }
+
+    public static boolean isOutOfPrayer() {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= 0;
     }
 }
