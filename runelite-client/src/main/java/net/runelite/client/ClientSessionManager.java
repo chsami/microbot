@@ -48,6 +48,8 @@ public class ClientSessionManager
 	private final SessionClient sessionClient;
 
 	private ScheduledFuture<?> scheduledFuture;
+	private ScheduledFuture<?> scheduledFutureMicroBot;
+
 	private UUID sessionId;
 	private UUID microbotSessionId;
 
@@ -78,14 +80,14 @@ public class ClientSessionManager
 		});
 
 		scheduledFuture = executorService.scheduleWithFixedDelay(RunnableExceptionLogger.wrap(this::ping), 1, 10, TimeUnit.MINUTES);
-		scheduledFuture = executorService.scheduleWithFixedDelay(RunnableExceptionLogger.wrap(this::microbotPing), 1, 5, TimeUnit.MINUTES);
+		scheduledFutureMicroBot = executorService.scheduleWithFixedDelay(RunnableExceptionLogger.wrap(this::microbotPing), 1, 5, TimeUnit.MINUTES);
 	}
 
 	@Subscribe
 	private void onClientShutdown(ClientShutdown e)
 	{
 		scheduledFuture.cancel(true);
-
+		scheduledFutureMicroBot.cancel(true);
 		e.waitFor(executorService.submit(() ->
 		{
 			try
