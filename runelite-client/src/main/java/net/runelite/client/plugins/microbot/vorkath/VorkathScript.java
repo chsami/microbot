@@ -165,20 +165,22 @@ public class VorkathScript extends Script {
                         if (Rs2Bank.isOpen()) {
                             Rs2Bank.closeBank();
                             sleepUntil(() -> !Rs2Bank.isOpen());
-                        }
-                        if (!isCloseToRelleka()) {
-                            if(Dialogue.isInDialogue()){
-                                Dialogue.clickContinue();
-                                return;
-                            } else {
-                                Rs2Npc.interact("Sirsal Banker", "bank");
-                                sleepUntil(Dialogue::isInDialogue);
-                                if(Dialogue.isInDialogue()){
+                        } else {
+                            if (!isCloseToRelleka()) {
+                                if (Dialogue.isInDialogue()) {
                                     Dialogue.clickContinue();
                                     return;
+                                } else {
+                                    sleep(300); // Random sleep because it likes clicking during teleport time.
+                                    Rs2Npc.interact("Sirsal Banker", "bank");
+                                    sleepUntil(Dialogue::isInDialogue);
+                                    if (Dialogue.isInDialogue()) {
+                                        Dialogue.clickContinue();
+                                        return;
+                                    }
                                 }
+                                sleepUntil(this::isCloseToRelleka);
                             }
-                            sleepUntil(this::isCloseToRelleka);
                         }
                         if (isCloseToRelleka()) {
                             state = State.WALK_TO_VORKATH_ISLAND;
