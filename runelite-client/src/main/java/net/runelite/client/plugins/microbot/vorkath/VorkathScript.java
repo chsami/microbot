@@ -140,7 +140,9 @@ public class VorkathScript extends Script {
                         hasEquipment = doesEquipmentMatch("vorkath");
                         hasInventory = doesInventoryMatch("vorkath");
                         if (!Rs2Bank.isOpen()) {
-                            Rs2Npc.interact(3472, "bank");
+                            WorldPoint noKickBankWP = new WorldPoint(2099,3920,0);
+                            GameObject noKickBankObj = Rs2GameObject.findObject(16700, noKickBankWP);
+                            Rs2GameObject.interact(noKickBankObj);
                             sleepUntil(Rs2Bank::isOpen);
                         }
                         if (!hasEquipment) {
@@ -167,19 +169,12 @@ public class VorkathScript extends Script {
                             sleepUntil(() -> !Rs2Bank.isOpen());
                         } else {
                             if (!isCloseToRelleka()) {
-                                if (Dialogue.isInDialogue()) {
+                                Rs2Npc.interact("Sirsal Banker", "bank");
+                                sleepUntil(Dialogue::isInDialogue);
+                                while(Dialogue.isInDialogue()){
                                     Dialogue.clickContinue();
-                                    return;
-                                } else {
-                                    sleep(300); // Random sleep because it likes clicking during teleport time.
-                                    Rs2Npc.interact("Sirsal Banker", "bank");
-                                    sleepUntil(Dialogue::isInDialogue);
-                                    if (Dialogue.isInDialogue()) {
-                                        Dialogue.clickContinue();
-                                        return;
-                                    }
+                                    sleepUntil(this::isCloseToRelleka); // This is very slow. Someone better than me will have to fix it.
                                 }
-                                sleepUntil(this::isCloseToRelleka);
                             }
                         }
                         if (isCloseToRelleka()) {
