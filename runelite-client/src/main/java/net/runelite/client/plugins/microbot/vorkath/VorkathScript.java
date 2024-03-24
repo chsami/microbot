@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.dialogues.Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -51,7 +52,8 @@ enum State {
     ACID,
     LOOT_ITEMS,
     TELEPORT_AWAY,
-    DEAD_WALK
+    DEAD_WALK,
+    AT_HOUSE
 }
 
 public class VorkathScript extends Script {
@@ -67,6 +69,7 @@ public class VorkathScript extends Script {
     NPC vorkath;
     boolean hasEquipment = false;
     boolean hasInventory = false;
+    private boolean inHouse(){ return Rs2GameObject.findObject("ornate pool of rejuvenation") != null;}
     boolean init = true;
     public static VorkathConfig config;
     @Getter
@@ -84,6 +87,9 @@ public class VorkathScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (init) {
+                    if(inHouse()){
+                        state = State.AT_HOUSE;
+                    }
                     if (Rs2Npc.getNpc(NpcID.VORKATH_8061) != null) {
                         state = State.FIGHT_VORKATH;
                     }
@@ -114,11 +120,30 @@ public class VorkathScript extends Script {
 
 
                 switch (state) {
+                    case AT_HOUSE:
+                        int missingHitpoints = Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
+                        int missingPrayer = Microbot.getClient().getRealSkillLevel(Skill.PRAYER) - Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER);
+                        if(missingHitpoints > 0 || missingPrayer > 0){
+                            Rs2GameObject.interact("Ornate Pool of Rejuvenation", "drink");
+                            sleepUntil(() -> missingHitpoints == 0 && missingPrayer == 0);
+                        } else {
+                            if(inHouse()) {
+                                Rs2GameObject.interact("Lunar Isle Portal", "Enter");
+                                sleepUntil(() -> !inHouse());
+                            } else {
+                                 state = State.BANKING;
+                            }
+                        }
+                        break;
+
                     case BANKING:
                         hasEquipment = doesEquipmentMatch("vorkath");
                         hasInventory = doesInventoryMatch("vorkath");
                         if (!Rs2Bank.isOpen()) {
-                            Rs2Bank.openBank();
+                            WorldPoint noKickBankWP = new WorldPoint(2099,3920,0);
+                            GameObject noKickBankObj = Rs2GameObject.findObject(16700, noKickBankWP);
+                            Rs2GameObject.interact(noKickBankObj); // Will miss the first time every time, I don't know why.
+                            sleepUntil(Rs2Bank::isOpen);
                         }
                         if (!hasEquipment) {
                             Rs2Bank.depositAll();
@@ -139,17 +164,18 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case TELEPORT_TO_RELLEKKA:
-                        if (!Rs2Inventory.hasItem("Rellekka teleport")) {
-                            state = State.BANKING;
-                            return;
-                        }
                         if (Rs2Bank.isOpen()) {
                             Rs2Bank.closeBank();
                             sleepUntil(() -> !Rs2Bank.isOpen());
-                        }
-                        if (!isCloseToRelleka()) {
-                            Rs2Inventory.interact("Rellekka teleport", "break");
-                            sleepUntil(this::isCloseToRelleka);
+                        } else {
+                            if (!isCloseToRelleka()) {
+                                Rs2Npc.interact("Sirsal Banker", "bank");
+                                sleepUntil(Dialogue::isInDialogue);
+                                while(Dialogue.isInDialogue()){
+                                    Dialogue.clickContinue();
+                                    sleepUntil(this::isCloseToRelleka, 300); // Band-aid solution
+                                }
+                            }
                         }
                         if (isCloseToRelleka()) {
                             state = State.WALK_TO_VORKATH_ISLAND;
@@ -217,6 +243,9 @@ public class VorkathScript extends Script {
                         }
                         if (Microbot.getClient().getLocalPlayer().getInteracting() == null || Microbot.getClient().getLocalPlayer().getInteracting().getName() == null ||
                                 !Microbot.getClient().getLocalPlayer().getInteracting().getName().equalsIgnoreCase("vorkath")) {
+                            if(Rs2Inventory.contains("dragon crossbow")){
+                                Rs2Inventory.equip("dragon crossbow");
+                            }
                             Rs2Npc.attack("Vorkath");
                         }
                         if (Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() >= 59) {
@@ -265,7 +294,12 @@ public class VorkathScript extends Script {
                             eatAt(60);
                             togglePrayer(true);
                             Rs2Tab.switchToInventoryTab();
+                            if (zombieSpawn.isDead()){
+                                if(Rs2Inventory.contains("Dragon crossbow")) {
+                                    Rs2Inventory.wield("Dragon crossbow");
+                                }
                             state = State.FIGHT_VORKATH;
+                        }
                         }
                         break;
                     case ACID:
@@ -282,7 +316,7 @@ public class VorkathScript extends Script {
                         }
                         togglePrayer(false);
                         boolean vorkathHead = Rs2GroundItem.loot("Vorkath's head", 20);
-                        boolean itemsLeft = Rs2GroundItem.lootAllItemBasedOnValue(5000, 20) || Rs2GroundItem.exists("Vorkath's head", 20);
+                        boolean itemsLeft = Rs2GroundItem.lootAllItemBasedOnValue(1500, 20) || Rs2GroundItem.exists("Vorkath's head", 20);
                         int foodInventorySize = Rs2Inventory.getInventoryFood().size();
                         boolean hasVenom = Rs2Inventory.hasItem("venom");
                         boolean hasSuperAntifire = Rs2Inventory.hasItem("super antifire");
@@ -305,11 +339,10 @@ public class VorkathScript extends Script {
                     case TELEPORT_AWAY:
                         togglePrayer(false);
                         Rs2Player.toggleRunEnergy(true);
-                        boolean reachedDestination = Rs2Bank.walkToBank();
+                        boolean reachedDestination = inHouse();
                         if (reachedDestination) {
                             Rs2Inventory.wield("ruby dragon bolts");
-                            healAndDrinkPrayerPotion();
-                            state = State.BANKING;
+                            state = State.AT_HOUSE;
                         }
                         break;
                     case DEAD_WALK:
