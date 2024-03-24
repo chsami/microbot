@@ -173,8 +173,8 @@ public class VorkathScript extends Script {
                                 sleepUntil(Dialogue::isInDialogue);
                                 while(Dialogue.isInDialogue()){
                                     Dialogue.clickContinue();
+                                    sleepUntil(this::isCloseToRelleka, 300); // Band-aid solution
                                 }
-                                sleepUntil(this::isCloseToRelleka);
                             }
                         }
                         if (isCloseToRelleka()) {
