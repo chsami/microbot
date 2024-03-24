@@ -142,7 +142,7 @@ public class VorkathScript extends Script {
                         if (!Rs2Bank.isOpen()) {
                             WorldPoint noKickBankWP = new WorldPoint(2099,3920,0);
                             GameObject noKickBankObj = Rs2GameObject.findObject(16700, noKickBankWP);
-                            Rs2GameObject.interact(noKickBankObj);
+                            Rs2GameObject.interact(noKickBankObj); // Will miss the first time every time, I don't know why.
                             sleepUntil(Rs2Bank::isOpen);
                         }
                         if (!hasEquipment) {
@@ -173,8 +173,8 @@ public class VorkathScript extends Script {
                                 sleepUntil(Dialogue::isInDialogue);
                                 while(Dialogue.isInDialogue()){
                                     Dialogue.clickContinue();
-                                    sleepUntil(this::isCloseToRelleka); // This is very slow. Someone better than me will have to fix it.
                                 }
+                                sleepUntil(this::isCloseToRelleka);
                             }
                         }
                         if (isCloseToRelleka()) {
