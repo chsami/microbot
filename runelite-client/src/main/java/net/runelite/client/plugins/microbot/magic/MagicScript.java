@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -39,7 +40,8 @@ public class MagicScript extends Script {
     }
 
     private void highAlch() {
-        Widget highAlch = Microbot.getClient().getWidget(14286888);
+        Rs2Tab.switchToMagicTab();
+        Widget highAlch = Rs2Widget.findWidget("high level alchemy");
         if (Microbot.getClient().isWidgetSelected())
             Microbot.getMouse().click();
         if (highAlch == null || Microbot.getClientThread().runOnClientThread(highAlch::isHidden)) {

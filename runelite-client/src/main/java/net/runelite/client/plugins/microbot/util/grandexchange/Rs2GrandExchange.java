@@ -7,6 +7,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -449,5 +450,9 @@ public class Rs2GrandExchange {
 
     private static int getMaxSlots() {
         return Rs2Player.isMember() ? 8: 3;
+    }
+
+    public static boolean walkToGrandExchange() {
+        return Microbot.getWalker().hybridWalkTo(BankLocation.GRAND_EXCHANGE.getWorldPoint());
     }
 }

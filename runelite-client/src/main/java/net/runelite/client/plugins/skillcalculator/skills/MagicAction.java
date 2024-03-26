@@ -90,7 +90,7 @@ public enum MagicAction implements SkillAction
 	SHADOW_RUSH("Shadow Rush", 52, 31, SpriteID.SPELL_SHADOW_RUSH, true, 14286936, MenuAction.WIDGET_TARGET),
 	EARTH_BLAST("Earth Blast", 53, 31.5f, SpriteID.SPELL_EARTH_BLAST, false, 14286887, MenuAction.WIDGET_TARGET),
 	PADDEWWA_TELEPORT("Paddewwa Teleport", 54, 64, SpriteID.SPELL_PADDEWWA_TELEPORT, true, 14286940, null),
-	HIGH_LEVEL_ALCHEMY("High Level Alchemy", 55, 65, SpriteID.SPELL_HIGH_LEVEL_ALCHEMY, false, 14286888, MenuAction.WIDGET_TARGET),
+	HIGH_LEVEL_ALCHEMY("High Level Alchemy", 55, 65, SpriteID.SPELL_HIGH_LEVEL_ALCHEMY, false, 14286892, MenuAction.WIDGET_TARGET),
 	CHARGE_WATER_ORB("Charge Water Orb", 56, 66, SpriteID.SPELL_CHARGE_WATER_ORB, true, 14286889, MenuAction.WIDGET_TARGET),
 	BLOOD_RUSH("Blood Rush", 56, 33, SpriteID.SPELL_BLOOD_RUSH, true, 14286928, MenuAction.WIDGET_TARGET),
 	SKELETAL_GRASP("Skeletal Grasp", 56, 33, SpriteID.SPELL_SKELETAL_GRASP, true, -1, null),

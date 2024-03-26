@@ -22,7 +22,7 @@ public class TutorialIslandOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + TutorialIslandScript.version)
+                    .text("Micro TutorialIsland V" + TutorialIslandScript.version)
                     .color(Color.GREEN)
                     .build());
 
