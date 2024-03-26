@@ -169,12 +169,12 @@ public class VorkathScript extends Script {
                             sleepUntil(() -> !Rs2Bank.isOpen());
                         } else {
                             if (!isCloseToRelleka()) {
-                                Rs2Npc.interact("Sirsal Banker", "bank");
-                                sleepUntil(Dialogue::isInDialogue);
                                 while(Dialogue.isInDialogue()){
                                     Dialogue.clickContinue();
                                     sleepUntil(this::isCloseToRelleka, 300); // Band-aid solution
                                 }
+                                Rs2Npc.interact("Sirsal Banker", "bank");
+                                sleepUntil(Dialogue::isInDialogue);
                             }
                         }
                         if (isCloseToRelleka()) {
@@ -287,7 +287,7 @@ public class VorkathScript extends Script {
                                 if (config.SLAYERSTAFF().toString().equals("Cast")) {
                                     Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, zombieSpawn);
                                 } else {
-                                    Rs2Inventory.wield(config.SLAYERSTAFF().toString());
+                                    Rs2Inventory.wield(config.SLAYERSTAFF().toString()); // TODO: Ensure crumble undead is casting.
                                     Rs2Npc.attack("Zombified Spawn");
                                 }
                             }
