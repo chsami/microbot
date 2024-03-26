@@ -85,7 +85,6 @@ public class FletchingScript extends Script {
         Rs2Bank.openBank();
 
         // make sure there's no long bows left
-        do {
             if (config.fletchingMode() == FletchingMode.STRUNG) {
                 Rs2Bank.depositAll();
             } else if (config.fletchingMode() == FletchingMode.PROGRESSIVE) {
@@ -96,10 +95,6 @@ public class FletchingScript extends Script {
                 // make sure there's no long bows left
                 Rs2Bank.depositAll(config.fletchingItem().getContainsInventoryName());
             }
-
-            sleepUntil(() -> !Rs2Inventory.hasItem(config.fletchingItem().getContainsInventoryName()), 10000);
-
-        } while (Rs2Inventory.hasItem(config.fletchingItem().getContainsInventoryName()));
 
 
         if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(primaryItemToFletch) && !Rs2Inventory.hasItem(primaryItemToFletch)) {

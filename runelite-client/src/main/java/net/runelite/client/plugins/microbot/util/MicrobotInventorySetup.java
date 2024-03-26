@@ -36,7 +36,7 @@ public class MicrobotInventorySetup {
             for (int i = 0; i < inventorySetup.getInventory().size(); i++) {
                 InventorySetupsItem inventorySetupsItem = inventorySetup.getInventory().get(i);
                 if (inventorySetupsItem.getId() == -1) continue;
-                if (!Rs2Bank.hasBankItem(inventorySetupsItem.getName())) {
+                if (!Rs2Bank.hasBankItem(inventorySetupsItem.getName(), inventorySetupsItem.getQuantity())) {
                     Microbot.pauseAllScripts = true;
                     Microbot.showMessage("Bank is missing the following item " + inventorySetupsItem.getName());
                     break;

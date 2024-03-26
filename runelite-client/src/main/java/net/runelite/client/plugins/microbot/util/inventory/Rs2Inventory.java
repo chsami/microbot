@@ -6,6 +6,7 @@ import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -1340,6 +1341,7 @@ public class Rs2Inventory {
      * @param name item name
      */
     public static void wield(String name) {
+        if (Rs2Equipment.isWearing(name, true)) return;
         invokeMenu(get(name), "wield");
     }
 

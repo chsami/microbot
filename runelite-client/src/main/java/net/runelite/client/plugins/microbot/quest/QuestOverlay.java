@@ -23,7 +23,7 @@ public class QuestOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + QuestScript.version)
+                    .text("Micro Quester V" + QuestScript.version)
                     .color(Color.GREEN)
                     .build());
 

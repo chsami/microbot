@@ -215,8 +215,10 @@ public class RuneLite {
             System.exit(0);
         }
 
+        final Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        logger.setLevel(Level.INFO);
+
         if (options.has("debug")) {
-            final Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
             logger.setLevel(Level.DEBUG);
         }
 

@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap
 import kotlin.random.Random
 
 class PathWalker(private val nodes: List<PathNode>) {
@@ -26,8 +27,8 @@ class PathWalker(private val nodes: List<PathNode>) {
         enabled = true
         isInterrupted = false
 
-        val maxSkipDistance = 16
-        val minSkipDistance = 10
+        val maxSkipDistance = 12
+        val minSkipDistance = 4
         var currentSkipDistance = Random.nextInt(minSkipDistance, maxSkipDistance)
 
 
@@ -54,6 +55,7 @@ class PathWalker(private val nodes: List<PathNode>) {
             if (index + 1 <= upperBound) {
                 nextNode = nodes.get(index + 1)
             }
+            Rs2GameObject.getWallObjects()
 
             // if we are at the last node, just click it
             if (isLastNode) {
@@ -62,6 +64,8 @@ class PathWalker(private val nodes: List<PathNode>) {
                 previousNode = currentNode
                 continue
             }
+
+
 
             // if we have a transport, use it
             if (currentNode.pathTransports.isNotEmpty()) {
@@ -99,8 +103,7 @@ class PathWalker(private val nodes: List<PathNode>) {
             // if our current distance is greater than the max skip distance, walk to it
             val distance = previousNode.worldLocation.distanceTo(currentNode.worldLocation)
             if (distance >= currentSkipDistance) {
-                val minimapPoint = getMinimapPoint(currentNode.worldLocation) ?: continue
-                clickPointWhileRunning(minimapPoint, currentNode, currentSkipDistance)
+                clickPointWhileRunning(currentNode.worldLocation, currentNode, currentSkipDistance)
                 previousNode = currentNode
                 currentSkipDistance = Random.nextInt(minSkipDistance, maxSkipDistance)
             }
@@ -122,15 +125,16 @@ class PathWalker(private val nodes: List<PathNode>) {
         Global.sleepUntilTrue({ !Rs2Player.isWalking() && !Rs2Player.isAnimating() }, 200, 1000 * 30)
     }
 
-    private fun clickPointWhileRunning(minimapPoint: Point, node: PathNode, currentSkipDistance: Int) {
+    private fun clickPointWhileRunning(worldPoint: WorldPoint, node: PathNode, currentSkipDistance: Int) {
         val player = Microbot.getClientForKotlin().localPlayer
-        Microbot.getMouseForKotlin().click(minimapPoint)
+        Microbot.getWalkerForKotlin().walkFastCanvas(worldPoint);
         Global.sleep(1000)
         Global.sleepUntilTrue({
             val distanceToTarget = player.worldLocation.distanceTo(node.worldLocation)
             val nearTile = distanceToTarget <= currentSkipDistance
+            Microbot.getWalkerForKotlin().walkFastCanvas(worldPoint);
             nearTile
-        }, 200, 1000 * 30)
+        }, Random.nextInt(800, 2400), 1000 * 30)
     }
 
     private fun handleTransport(pathNode: PathNode, nextNode: PathNode): Boolean {

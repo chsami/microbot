@@ -246,6 +246,10 @@ public class Rs2Npc {
         return interact(npc, action);
     }
 
+    public static boolean attack(NPC npc) {
+        return interact(npc, "attack");
+    }
+
     public static boolean attack(int npcId) {
         NPC npc = getNpc(npcId);
 

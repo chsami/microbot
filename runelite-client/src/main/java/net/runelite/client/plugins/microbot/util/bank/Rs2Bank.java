@@ -125,7 +125,17 @@ public class Rs2Bank {
      * @return boolean
      */
     public static boolean hasBankItem(String name) {
-        return findBankItem(name, false) != null;
+        return findBankItem(name, false, 1) != null;
+    }
+
+    /**
+     * check if the player has a bank item identified by exact name.
+     *
+     * @param name the item name
+     * @return boolean
+     */
+    public static boolean hasBankItem(String name, int amount) {
+        return findBankItem(name, false, amount) != null;
     }
 
     /**
@@ -803,6 +813,19 @@ public class Rs2Bank {
      */
     @SuppressWarnings("UnnecessaryLocalVariable")
     private static Rs2Item findBankItem(String name, boolean exact) {
+        return findBankItem(name, exact, 1);
+    }
+
+    /**
+     * Finds an item in the bank based on its name.
+     *
+     * @param name The name of the item.
+     * @param exact If true, requires an exact name match.
+     * @param amount the amount needed to find in the bank
+     * @return The item widget, or null if the item isn't found.
+     */
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    private static Rs2Item findBankItem(String name, boolean exact, int amount) {
         if (bankItems == null) return null;
         if (bankItems.stream().findAny().isEmpty()) return null;
 
@@ -811,6 +834,9 @@ public class Rs2Bank {
         Rs2Item bankItem = bankItems.stream().filter(x -> exact
                 ? x.name.equalsIgnoreCase(lowerCaseName)
                 : x.name.toLowerCase().contains(lowerCaseName)).findFirst().orElse(null);
+
+        if (bankItem == null || bankItem.quantity  < amount)
+            return null;
 
         return bankItem;
     }
@@ -849,7 +875,7 @@ public class Rs2Bank {
         Rs2Player.toggleRunEnergy(true);
         BankLocation bankLocation = getNearestBank();
         Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
-        return bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;
+        return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;
     }
 
     /**
