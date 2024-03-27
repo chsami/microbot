@@ -600,10 +600,6 @@ public class ClientUI
 						frame.setLocationRelativeTo(frame.getOwner());
 					}
 				}
-				else
-				{
-					frame.setLocationRelativeTo(frame.getOwner());
-				}
 
 				if (configManager.getConfiguration(CONFIG_GROUP, CONFIG_CLIENT_MAXIMIZED) != null)
 				{
@@ -614,14 +610,11 @@ public class ClientUI
 					applyCustomChromeBorder();
 				}
 			}
-			else
-			{
-				frame.setLocationRelativeTo(frame.getOwner());
-			}
 
 			if (!appliedSize)
 			{
 				applyGameSize(true);
+				frame.setLocationRelativeTo(frame.getOwner());
 			}
 
 			// Show frame
