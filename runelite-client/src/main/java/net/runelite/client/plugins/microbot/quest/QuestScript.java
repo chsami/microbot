@@ -1,12 +1,14 @@
 package net.runelite.client.plugins.microbot.quest;
 
 import net.runelite.api.ItemComposition;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
+import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -45,7 +47,9 @@ public class QuestScript extends Script {
             if (!super.run()) return;
             try {
                 if (QuestHelperPlugin.getSelectedQuest() != null && !Microbot.getClientThread().runOnClientThread(() -> QuestHelperPlugin.getSelectedQuest().isCompleted())) {
-                    if (Rs2Widget.hasWidget("select an option") || Rs2Widget.hasWidget("Start ")) {
+                    Widget widget = Rs2Widget.findWidget("Start ");
+                    if (Rs2Widget.hasWidget("select an option") || (widget != null &&
+                            Microbot.getClientThread().runOnClientThread( () -> widget.getParent().getId()) != 10616888)) {
                         VirtualKeyboard.keyPress('1');
                         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
@@ -73,7 +77,7 @@ public class QuestScript extends Script {
                         }
                     }
 
-                    List<ItemRequirement> itemRequirements = new ArrayList<>();
+                   /* List<ItemRequirement> itemRequirements = new ArrayList<>();
                     for (PanelDetails panel: QuestHelperPlugin.getSelectedQuest().getCurrentStep().getActiveStep().getQuestHelper().getPanels()) {
                         if (panel.getHideCondition() == null || !panel.getHideCondition().check(Microbot.getClient())) {
                             for (QuestStep step : panel.getSteps())
@@ -93,19 +97,19 @@ public class QuestScript extends Script {
                                 }
                             }
                         }
-                    }
+                    }*/
 
 
 
-                    for (ItemRequirement itemRequirement : itemRequirements) {
+                   /* for (ItemRequirement itemRequirement : itemRequirements) {
                         ItemComposition item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(itemRequirement.getId()));
                         if (!item.isTradeable()) continue;
                         if (!Rs2Inventory.hasItemAmount(itemRequirement.getId(), itemRequirement.getQuantity()) && itemsMissing.stream().noneMatch(x -> x.getId() == itemRequirement.getId())) {
                             itemsMissing.add(itemRequirement);
                         }
-                    }
+                    }*/
 
-                    if (!itemsMissing.isEmpty()) {
+                   /* if (!itemsMissing.isEmpty()) {
                         Rs2Bank.useBank();
                         Rs2Bank.depositAll();
                         sleepUntil(Rs2Inventory::isEmpty);
@@ -120,15 +124,15 @@ public class QuestScript extends Script {
                                 sleep(600);
                             }
                         }
-                    }
+                    }*/
 
                     boolean hasAllItems = true;
-                    for (ItemRequirement itemMissing: itemsMissing) {
+                    /*for (ItemRequirement itemMissing: itemsMissing) {
                         if (!Rs2Inventory.hasItemAmount(itemMissing.getId(), itemMissing.getQuantity())) {
                             hasAllItems = false;
                             break;
                         }
-                    }
+                    }*/
 
                     if (config.useGrandExchange() && !grandExchangeItems.isEmpty()) {
                         if (!Rs2GrandExchange.walkToGrandExchange()) return;
@@ -219,6 +223,12 @@ public class QuestScript extends Script {
     public boolean applyObjectStep(ObjectStep step) {
         boolean success = Rs2GameObject.interact(step.objectID, true);
         if (!success) {
+            for (int objectId: step.getAlternateObjectIDs()) {
+                success = Rs2GameObject.interact(objectId, true);
+                if (success) break;
+            }
+        }
+        if (!success) {
             if (step.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
                 if (config.enableHybridWalking()) {
                     Microbot.getWalker().hybridWalkTo(step.getWorldPoint(), config.useNearest());
@@ -238,8 +248,19 @@ public class QuestScript extends Script {
             {
                 if (requirement instanceof ItemRequirement) {
                     ItemRequirement itemRequirement = (ItemRequirement) requirement;
-                    if (itemRequirement.shouldHighlightInInventory(Microbot.getClient()) && itemRequirement.getAllIds().contains(item.id)) {
-                        Rs2Inventory.use(item.id);
+
+                    if (itemRequirement.getAllIds().contains(item.id)) {
+                        if (itemRequirement.shouldHighlightInInventory(Microbot.getClient())) {
+                            Rs2Inventory.use(item.id);
+                        }
+                    }
+
+                    if (!itemRequirement.getAllIds().contains(item.id) && conditionalStep.getWorldPoint() != null) {
+                        if (Microbot.getWalker().canReach(conditionalStep.getWorldPoint())) {
+                            Rs2GroundItem.loot(itemRequirement.getId());
+                        } else {
+                            Microbot.getWalker().hybridWalkTo(conditionalStep.getWorldPoint());
+                        }
                         return true;
                     }
                 }
