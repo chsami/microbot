@@ -258,6 +258,17 @@ public class Walker {
         return pathfinder.getPath().get(pathfinder.getPath().size() - 1).position.equals(target);
     }
 
+    public boolean canReach(WorldPoint target, int objectSize) {
+        WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
+
+        pathfinder = new Pathfinder(pathfinderConfig, start, target, true);
+        setupPathfinderDefaults();
+
+        sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
+
+        return pathfinder.getPath().get(pathfinder.getPath().size() - 1).position.distanceTo2D(target) <= objectSize;
+    }
+
     public long getReachDistance(WorldPoint target) {
         WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
