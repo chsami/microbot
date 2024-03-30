@@ -13,7 +13,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 @PluginDescriptor(
-        name = "<html>[<font color=#FF7F7F>F</font>] Event Dismiss</html>"",
+        name = "<html>[<font color=#FF7F7F>F</font>] Event Dismiss</html>",
         description = "F126's Random Event Dismisser",
         tags = {"random", "events", "microbot", "f126"},
         enabledByDefault = false
