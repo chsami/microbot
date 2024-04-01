@@ -428,8 +428,7 @@ public class VorkathScript extends Script {
     }
 
     private void handleRedBall() {
-        if (Microbot.getClient().getLocalPlayer().getIdlePoseAnimation() == 1 ||
-                doesProjectileExistById(redProjectileId)) {
+        if (doesProjectileExistById(redProjectileId)) {
             redBallWalk();
             Rs2Npc.attack("Vorkath");
         }
