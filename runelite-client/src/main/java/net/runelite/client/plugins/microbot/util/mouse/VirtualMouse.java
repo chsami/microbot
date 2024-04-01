@@ -71,7 +71,8 @@ public class VirtualMouse extends Mouse {
         long time = System.currentTimeMillis();
 
         MouseEvent mouseMove = new MouseEvent(getCanvas(), MouseEvent.MOUSE_MOVED, time, 0, point.getX(), point.getY(), 1, false, MouseEvent.BUTTON1);
-        Microbot.getEventHandler().dispatchUnblockedEvent(mouseMove);
+
+        getCanvas().dispatchEvent(mouseMove);
 
         return this;
     }
@@ -80,7 +81,8 @@ public class VirtualMouse extends Mouse {
         long time = System.currentTimeMillis();
 
         MouseEvent mouseMove = new MouseEvent(getCanvas(), MouseEvent.MOUSE_MOVED, time, 0, (int) rect.getCenterX(), (int) rect.getCenterY(), 1, false, MouseEvent.BUTTON1);
-        Microbot.getEventHandler().dispatchUnblockedEvent(mouseMove);
+
+        getCanvas().dispatchEvent(mouseMove);
 
         return this;
     }
@@ -90,7 +92,9 @@ public class VirtualMouse extends Mouse {
         Point point = new Point((int) polygon.getBounds().getCenterX(), (int) polygon.getBounds().getCenterY());
 
         MouseEvent mouseMove = new MouseEvent(getCanvas(), MouseEvent.MOUSE_MOVED, time, 0, point.getX(), point.getY(), 1, false, MouseEvent.BUTTON1);
-        Microbot.getEventHandler().dispatchUnblockedEvent(mouseMove);
+
+        getCanvas().dispatchEvent(mouseMove);
+
 
         return this;
     }
@@ -104,7 +108,8 @@ public class VirtualMouse extends Mouse {
             MouseEvent mouseScroll = new MouseWheelEvent(getCanvas(), MouseEvent.MOUSE_WHEEL, time, 0, point.getX(), point.getY(), 0, false,
                     0, 10, 2);
 
-            Microbot.getEventHandler().dispatchUnblockedEvent(mouseScroll);
+        getCanvas().dispatchEvent(mouseScroll);
+
 
         }, random(40, 100), TimeUnit.MILLISECONDS);
         return this;
@@ -116,7 +121,7 @@ public class VirtualMouse extends Mouse {
         MouseEvent mouseScroll = new MouseWheelEvent(getCanvas(), MouseEvent.MOUSE_WHEEL, time, 0, point.getX(), point.getY(), 0, false,
                 0, -10, -2);
 
-        Microbot.getEventHandler().dispatchUnblockedEvent(mouseScroll);
+        getCanvas().dispatchEvent(mouseScroll);
 
         return this;
     }
@@ -143,6 +148,6 @@ public class VirtualMouse extends Mouse {
 
         MouseEvent e = new MouseEvent(Microbot.getClient().getCanvas(), id, System.currentTimeMillis(), 0, point.getX(), point.getY(), 1, false, button);
 
-        Microbot.getClient().getCanvas().dispatchEvent(e);
+        getCanvas().dispatchEvent(e);
     }
 }

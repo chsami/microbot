@@ -23,7 +23,8 @@ public class VirtualKeyboard {
 
             KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_UNDEFINED, word.charAt(i));
 
-            Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
+            getCanvas().dispatchEvent(keyEvent);
+
             Global.sleep(100, 200);
         }
 
@@ -35,7 +36,8 @@ public class VirtualKeyboard {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_UNDEFINED, key);
 
-        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
+        getCanvas().dispatchEvent(keyEvent);
+
     }
 
     public static void holdShift() {
@@ -43,7 +45,8 @@ public class VirtualKeyboard {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_SHIFT, CHAR_UNDEFINED);
 
-        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
+        getCanvas().dispatchEvent(keyEvent);
+
     }
 
     public static void releaseShift() {
@@ -51,14 +54,16 @@ public class VirtualKeyboard {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_SHIFT);
 
-        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
+        getCanvas().dispatchEvent(keyEvent);
+
     }
 
     public static void keyHold(int key) {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, key);
 
-        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
+        getCanvas().dispatchEvent(keyEvent);
+
     }
 
     public static void keyRelease(int key) {
@@ -66,7 +71,8 @@ public class VirtualKeyboard {
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis() + randomizer, 0, key);
 
-        Microbot.getEventHandler().dispatchUnblockedEvent(keyEvent);
+        getCanvas().dispatchEvent(keyEvent);
+
     }
 
     public static void keyPress(int key) {
