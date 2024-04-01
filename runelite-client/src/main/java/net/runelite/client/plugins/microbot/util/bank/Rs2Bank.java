@@ -874,7 +874,7 @@ public class Rs2Bank {
         if (Rs2Bank.isOpen()) return true;
         Rs2Player.toggleRunEnergy(true);
         BankLocation bankLocation = getNearestBank();
-        Microbot.getWalker().walkTo(bankLocation.getWorldPoint());
+        Microbot.getWalker().hybridWalkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;
     }
 
