@@ -96,7 +96,8 @@ public class ClientUI
 
 	private final RuneLiteConfig config;
 	private final MouseManager mouseManager;
-	private final Applet client;
+	@Getter
+	private static Applet client;
 	private final ConfigManager configManager;
 	private final Provider<ClientThread> clientThreadProvider;
 	private final EventBus eventBus;

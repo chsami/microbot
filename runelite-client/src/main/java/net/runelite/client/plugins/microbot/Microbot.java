@@ -16,7 +16,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
-import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
@@ -36,9 +35,6 @@ import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class Microbot {
     public static MenuEntry targetMenu;
-    @Getter
-    @Setter
-    private static EventHandler eventHandler;
     @Getter
     @Setter
     private static Mouse mouse;
