@@ -9,7 +9,8 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -33,19 +34,26 @@ public class MicrobotInventorySetup {
             if (!getInventorySetup(name)) {
                 return false;
             }
-            for (int i = 0; i < inventorySetup.getInventory().size(); i++) {
-                InventorySetupsItem inventorySetupsItem = inventorySetup.getInventory().get(i);
+            Map<Integer, List<InventorySetupsItem>> groupedByItems = inventorySetup.getInventory().stream().collect(Collectors.groupingBy(InventorySetupsItem::getId));
+            for (Integer key: groupedByItems.keySet()) {
+                InventorySetupsItem inventorySetupsItem = groupedByItems.get(key).get(0);
                 if (inventorySetupsItem.getId() == -1) continue;
-                if (!Rs2Bank.hasBankItem(inventorySetupsItem.getName(), inventorySetupsItem.getQuantity())) {
+                int withdrawQuantity = -1;
+                if (groupedByItems.get(key).size() == 1) {
+                    withdrawQuantity = groupedByItems.get(key).get(0).getQuantity();
+                } else {
+                    withdrawQuantity = groupedByItems.get(key).size();
+                }
+                if (!Rs2Bank.hasBankItem(inventorySetupsItem.getName(), withdrawQuantity)) {
                     Microbot.pauseAllScripts = true;
                     Microbot.showMessage("Bank is missing the following item " + inventorySetupsItem.getName());
                     break;
                 }
                 if (inventorySetupsItem.isFuzzy()) {
-                    Rs2Bank.withdrawX(inventorySetupsItem.getName(), inventorySetupsItem.getQuantity());
+                    Rs2Bank.withdrawX(inventorySetupsItem.getName(), withdrawQuantity);
                 } else {
-                    if (inventorySetupsItem.getQuantity() > 1) {
-                        Rs2Bank.withdrawX(inventorySetupsItem.getId(), inventorySetupsItem.getQuantity());
+                    if (withdrawQuantity > 1) {
+                        Rs2Bank.withdrawX(inventorySetupsItem.getId(), withdrawQuantity);
                         sleep(100, 250);
                     } else {
                         Rs2Bank.withdrawItem(inventorySetupsItem.getId());
@@ -119,21 +127,24 @@ public class MicrobotInventorySetup {
         inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
         if (inventorySetup == null) return false;
 
-        for (int i = 0; i < inventorySetup.getInventory().size(); i++) {
-            InventorySetupsItem inventorySetupsItem = inventorySetup.getInventory().get(i);
-            Rs2Item rsItem = Rs2Inventory.getItemInSlot(i);
-            if (rsItem == null) return false;
-            if (inventorySetupsItem.isFuzzy()) {
-                if (!inventorySetupsItem.getName().contains(name))
-                    return false;
+        Map<Integer, List<InventorySetupsItem>> groupedByItems = inventorySetup.getInventory().stream().collect(Collectors.groupingBy(InventorySetupsItem::getId));
+        boolean found = true;
+        for (Integer key: groupedByItems.keySet()) {
+            InventorySetupsItem inventorySetupsItem = groupedByItems.get(key).get(0);
+            if (inventorySetupsItem.getId() == -1) continue;
+            int withdrawQuantity = -1;
+            boolean isStackable = false;
+            if (groupedByItems.get(key).size() == 1) {
+                withdrawQuantity = groupedByItems.get(key).get(0).getQuantity();
+                isStackable = withdrawQuantity > 1;
             } else {
-                if (rsItem.id != inventorySetupsItem.getId()) {
-                    return false;
-                }
+                withdrawQuantity = groupedByItems.get(key).size();
             }
+            if (!Rs2Inventory.hasItemAmount(inventorySetupsItem.getName(), withdrawQuantity, isStackable))
+                found = false;
         }
 
-        return true;
+        return found;
     }
 
     public static boolean doesEquipmentMatch(String name) {
@@ -141,6 +152,19 @@ public class MicrobotInventorySetup {
         if (inventorySetup == null) return false;
         for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
             if (inventorySetupsItem.getId() == -1) continue;
+            if (Rs2Equipment.isWearing(inventorySetupsItem.getName(), true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean doesEquipmentMatch(String name, String ignoreItem) {
+        inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        if (inventorySetup == null) return false;
+        for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
+            if (inventorySetupsItem.getId() == -1) continue;
+            if (inventorySetupsItem.getName().contains(ignoreItem)) continue;
             if (!Rs2Equipment.isWearing(inventorySetupsItem.getName(), true)) {
                 return false;
             }

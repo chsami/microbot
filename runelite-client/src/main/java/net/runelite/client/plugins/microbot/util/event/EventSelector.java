@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.event;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
@@ -22,6 +23,7 @@ public class EventSelector {
 
     public EventSelector(ClientToolbar clientToolbar) {
         this.clientToolbar = clientToolbar;
+        startUp();
     }
 
     public void startUp() {
@@ -30,26 +32,19 @@ public class EventSelector {
         addAndRemoveButtons();
     }
 
-
-    public void shutDown() {
-        clientToolbar.removeNavigation(enableButton);
-        clientToolbar.removeNavigation(disableButton);
-    }
-
     private void addAndRemoveButtons() {
         clientToolbar.removeNavigation(enableButton);
         clientToolbar.removeNavigation(disableButton);
-        clientToolbar.addNavigation(Microbot.getEventHandler().isBlocked() ? enableButton : disableButton);
+        clientToolbar.addNavigation(!ClientUI.getClient().isEnabled() ? enableButton : disableButton);
     }
 
     public void enableClick() {
-        Microbot.getEventHandler().setBlocked(false);
+        ClientUI.getClient().setEnabled(true);
         addAndRemoveButtons();
-        Microbot.getEventHandler().regainFocus();
     }
 
     public void disableClick() {
-        Microbot.getEventHandler().setBlocked(true);
+        ClientUI.getClient().setEnabled(false);
         addAndRemoveButtons();
     }
 }

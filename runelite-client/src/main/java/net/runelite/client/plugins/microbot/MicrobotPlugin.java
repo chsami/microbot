@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
@@ -30,7 +29,6 @@ import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenPl
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
-import net.runelite.client.plugins.microbot.util.event.EventHandler;
 import net.runelite.client.plugins.microbot.util.event.EventSelector;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
@@ -42,28 +40,16 @@ import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
-import net.runelite.http.api.RuneLiteAPI;
-import net.runelite.http.api.worlds.WorldResult;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-
-import static net.runelite.api.widgets.WidgetInfo.WORLD_SWITCHER_LIST;
 
 @PluginDescriptor(
         name = PluginDescriptor.Default + "Microbot",
@@ -119,7 +105,6 @@ public class MicrobotPlugin extends Plugin {
     public CookingScript cookingScript;
     public MiningScript miningScript;
     public SummerGardenScript summerGardenScript;
-    private EventSelector eventSelector;
 
     QuestScript questScript;
     @Override
@@ -134,7 +119,6 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setNpcManager(npcManager);
         Microbot.setWalker(new Walker());
         Microbot.setMouse(new VirtualMouse());
-        Microbot.setEventHandler(new EventHandler());
         Microbot.setSpriteManager(spriteManager);
         Microbot.setDisableWalkerUpdate(disableWalkerUpdate);
         Microbot.setPluginManager(pluginManager);
@@ -142,8 +126,7 @@ public class MicrobotPlugin extends Plugin {
             overlayManager.add(microbotOverlay);
         }
 
-        eventSelector = new EventSelector(clientToolbar);
-        eventSelector.startUp();
+        new EventSelector(clientToolbar);
 
         WorldDataDownloader worldDataDownloader = new WorldDataDownloader();
         worldDataDownloader.run();
@@ -161,7 +144,6 @@ public class MicrobotPlugin extends Plugin {
 
     protected void shutDown() {
         BreakHandlerScript.disableParentPlugin();
-        eventSelector.shutDown();
         overlayManager.remove(microbotOverlay);
         Microbot.setWalker(null);
         if (cookingScript != null) {
