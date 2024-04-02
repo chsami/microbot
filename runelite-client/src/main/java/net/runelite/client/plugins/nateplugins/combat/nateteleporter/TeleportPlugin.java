@@ -58,10 +58,6 @@ public class TeleportPlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        expstarted = Microbot.getClient().getSkillExperience(Skill.MAGIC);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.MAGIC);
-        timeBegan = System.currentTimeMillis();
-       // teleportamount = getAmount("law rune");
         if (overlayManager != null) {
             overlayManager.add(teleportOverlay);
         }
