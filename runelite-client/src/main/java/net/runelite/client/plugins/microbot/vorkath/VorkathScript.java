@@ -28,10 +28,7 @@ import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
@@ -109,7 +106,7 @@ public class VorkathScript extends Script {
                 if (!doesEquipmentMatch("vorkath", "dragon bolt"))
                 {
                     state = State.DEAD_WALK;
-                } else if (state == State.DEAD_WALK) {
+                } else if (state == State.DEAD_WALK && Rs2Inventory.hasItem(config.teleportMode().getItemName())) {
                     leaveVorkath();
                 }
 
@@ -214,6 +211,7 @@ public class VorkathScript extends Script {
                         }
                         if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) <= 0) {
                             state = State.DEAD_WALK;
+                            Rs2Equipment.equipmentItems = new ArrayList<>();
                             return;
                         }
                         if (Rs2Inventory.getInventoryFood().isEmpty()) {
@@ -224,8 +222,6 @@ public class VorkathScript extends Script {
                                 return;
                             }
                         }
-                        if (config.SLAYERSTAFF() != STAFF.CAST)
-                            Rs2Inventory.wield(config.CROSSBOW().name());
                         if (Microbot.getClient().getLocalPlayer().getInteracting() == null || Microbot.getClient().getLocalPlayer().getInteracting().getName() == null ||
                                 !Microbot.getClient().getLocalPlayer().getInteracting().getName().equalsIgnoreCase("vorkath")) {
                             Rs2Npc.attack("Vorkath");
@@ -266,12 +262,7 @@ public class VorkathScript extends Script {
                         if (zombieSpawn != null) {
                             while (Rs2Npc.getNpc("Zombified Spawn") != null && !Rs2Npc.getNpc("Zombified Spawn").isDead()
                                     && !doesProjectileExistById(146)) {
-                                if (config.SLAYERSTAFF().toString().equals("Cast")) {
                                     Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, zombieSpawn);
-                                } else {
-                                    Rs2Inventory.wield(config.SLAYERSTAFF().toString());
-                                    Rs2Npc.attack("Zombified Spawn");
-                                }
                             }
                             eatAt(75);
                             togglePrayer(true);
@@ -310,7 +301,7 @@ public class VorkathScript extends Script {
                                         LocalPoint.fromScene(48, 58)
                                 );
                                 Rs2Player.waitForWalking();
-                                state = State.PREPARE_FIGHT;
+                                calculateState();
                             }
                         }
                         break;
@@ -348,6 +339,7 @@ public class VorkathScript extends Script {
                                 }
                             }
                         } else {
+                            togglePrayer(false);
                             if (Rs2Inventory.hasItem("Rellekka teleport")) {
                                 Rs2Inventory.interact("Rellekka teleport", "break");
                                 Rs2Player.waitForAnimation();
@@ -389,11 +381,13 @@ public class VorkathScript extends Script {
     }
 
     private void leaveVorkath() {
-        togglePrayer(false);
-        Rs2Player.toggleRunEnergy(true);
-        state = State.TELEPORT_AWAY;
-        Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
-        Rs2Player.waitForAnimation();
+        if (Rs2Inventory.hasItem(config.teleportMode().getItemName())) {
+            togglePrayer(false);
+            Rs2Player.toggleRunEnergy(true);
+            state = State.TELEPORT_AWAY;
+            Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
+            Rs2Player.waitForAnimation();
+        }
     }
 
     private boolean drinkPotions() {
