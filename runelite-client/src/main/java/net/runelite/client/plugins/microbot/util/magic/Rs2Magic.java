@@ -28,6 +28,7 @@ public class Rs2Magic {
     public static void cast(MagicAction magicSpell) {
         MenuAction menuAction;
         Rs2Tab.switchToMagicTab();
+        Microbot.status = "Casting " + magicSpell.getName();
         sleep(150, 300);
         if (magicSpell.getWidgetAction() == null) {
             if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")) {
@@ -76,7 +77,11 @@ public class Rs2Magic {
 
 
     public static void highAlch(Rs2Item item, boolean exact) {
-        Rs2Tab.switchToMagicTab();
+        sleepUntil(() -> {
+            Rs2Tab.switchToMagicTab();
+            sleep(50, 150);
+            return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
+        });
         Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
         alch(highAlch, item);
     }
@@ -105,8 +110,10 @@ public class Rs2Magic {
         sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY), 5000);
         sleep(300, 600);
         if (item == null) {
+            Microbot.status = "Alching x: " + point.getX() + " y: " + point.getY();
             Microbot.getMouse().click(point);
         } else {
+            Microbot.status = "Alching " + item.name;
             Rs2Inventory.interact(item, "cast");
         }
     }
