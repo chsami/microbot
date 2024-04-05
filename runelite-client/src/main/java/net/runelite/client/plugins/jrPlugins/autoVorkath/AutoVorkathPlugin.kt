@@ -44,7 +44,7 @@ import kotlin.math.abs
 
 
 @PluginDescriptor(
-    name = JR + "Auto Vorkath",
+    name = JR + " - [Deprecated] Auto Vorkath",
     description = "JR - Auto Vorkath",
     tags = ["vorkath", "auto", "auto prayer", "mule", "trade"],
     enabledByDefault = false
