@@ -566,8 +566,6 @@ public class WorldArea
 
 	private static boolean hasLineOfSightTo(Client client, Tile from, Tile to)
 	{
-		// Thanks to Henke for this method :)
-
 		if (from.getPlane() != to.getPlane())
 		{
 			return false;

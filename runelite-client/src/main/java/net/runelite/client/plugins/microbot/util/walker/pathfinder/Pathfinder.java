@@ -16,12 +16,13 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.magic.Teleport;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Spells;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Transport;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.microbot.vorkath.Teleport;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
@@ -111,12 +112,12 @@ public class Pathfinder implements Runnable {
         if (useTransport && start.distanceTo(target) > teleportThreshHoldDistance) {
             Rs2Tab.switchToInventoryTab();
 
-            Teleport shortestPathSpell = null;
+            Rs2Spells shortestPathSpell = null;
             JewelleryLocationEnum shortestPathJewellery = null;
             boolean hasTablet = false;
 
             // Teleport spells logic
-            for (Teleport teleport : Teleport.values()) {
+            for (Rs2Spells teleport : Rs2Spells.values()) {
                 if (teleport.getDestination().distanceTo2D(target) > tunnel.destination.distanceTo2D(target))
                     continue;
                 if (shortestPathSpell != null && shortestPathSpell.getDestination().distanceTo2D(target) <= teleport.getDestination().distanceTo2D(target))
@@ -169,7 +170,7 @@ public class Pathfinder implements Runnable {
         run();
     }
 
-    private void useTeleport(Teleport shortestPathSpell, boolean hasTablet) {
+    private void useTeleport(Rs2Spells shortestPathSpell, boolean hasTablet) {
         //no need to teleport if we are close enough
         if (shortestPathSpell.getDestination().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 10)
             return;

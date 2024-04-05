@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
@@ -116,6 +117,7 @@ public class Walker {
     }
 
     public void walkFastCanvas(WorldPoint worldPoint) {
+        Rs2Player.toggleRunEnergy(true);
         LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
         if (!Calculations.tileOnScreen(localPoint)) {
             Microbot.getWalker().walkMiniMap(worldPoint); //use minimap if tile is not on screen
