@@ -4,11 +4,11 @@ import net.runelite.api.Actor;
 import net.runelite.api.MenuAction;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -29,7 +29,7 @@ public class Rs2Npc {
     }
 
     public static NPC validateInteractable(NPC npc) {
-        if(npc != null) {
+        if (npc != null) {
             Microbot.getWalker().walkTo(npc.getWorldLocation());
             Rs2Camera.turnTo(npc);
             return npc;
@@ -209,7 +209,7 @@ public class Rs2Npc {
                 //Rs2Reflection.invokeMenu(0, 0, menuAction.getId(), npc.getIndex(),-1, action, "", -1, -1);
             }
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
 
@@ -272,5 +272,14 @@ public class Rs2Npc {
         NPC npc = getNpc(npcName);
 
         return interact(npc, "pickpocket");
+    }
+
+    public static boolean hasLineOfSight(NPC npc) {
+        if (npc == null) return false;
+        return new WorldArea(
+                npc.getWorldLocation(),
+                npc.getComposition().getSize(),
+                npc.getComposition().getSize())
+                .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
     }
 }
