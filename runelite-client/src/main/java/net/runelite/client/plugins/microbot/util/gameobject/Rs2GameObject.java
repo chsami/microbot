@@ -17,8 +17,12 @@ import java.util.stream.Collectors;
 
 public class Rs2GameObject {
     public static boolean interact(WorldPoint worldPoint) {
+        return interact(worldPoint, "");
+    }
+
+    public static boolean interact(WorldPoint worldPoint, String action) {
         TileObject gameObject = findObjectByLocation(worldPoint);
-        return clickObject(gameObject);
+        return clickObject(gameObject, action);
     }
 
     public static boolean interact(GameObject gameObject) {
