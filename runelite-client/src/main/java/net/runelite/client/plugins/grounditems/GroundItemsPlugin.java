@@ -346,6 +346,7 @@ public class GroundItemsPlugin extends Plugin
 		if (groundItem != null)
 		{
 			groundItem.setQuantity(groundItem.getQuantity() + diff);
+			groundItem.reset();
 		}
 
 		handleLootbeam(tile.getWorldLocation());
