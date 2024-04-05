@@ -1,27 +1,18 @@
 package net.runelite.client.plugins.microbot.util.gameobject;
 
-import net.runelite.api.GameObject;
 import net.runelite.api.TileObject;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.client.plugins.cannon.CannonPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Cannon {
-
-    protected static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
     public static boolean repair() {
         TileObject brokenCannon = Rs2GameObject.findObjectById(14916);

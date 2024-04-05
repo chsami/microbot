@@ -17,7 +17,7 @@ public class CannonScript extends Script {
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!super.run()) return;
+                if (!super.run() || !config.toggleCannon()) return;
                if (Rs2Cannon.repair())
                    return;
                Rs2Cannon.refill();

@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.nateplugins.combat.nateteleporter;
 
+import net.runelite.api.Actor;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
@@ -70,7 +71,11 @@ public class MagicScript extends Script {
                     Rs2Magic.cast(config.MODE().getSpell().getSpell());
                     sleep(100, 300);
                     if (!config.MODE().toString().contains("teleport")) {
-                        Rs2Npc.interact(config.NPC(), "");
+                        net.runelite.api.NPC npc = (net.runelite.api.NPC) Microbot.getClient().getLocalPlayer().getInteracting();
+                        if (npc != null && npc.getName().equals(config.NPC()))
+                            Rs2Npc.interact(npc, "");
+                        else
+                            Rs2Npc.interact(config.NPC(), "");
                     }
                 }
             } catch (Exception ex) {
