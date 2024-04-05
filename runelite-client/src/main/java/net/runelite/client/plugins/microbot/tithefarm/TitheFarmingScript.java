@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.tithefarm.models.TitheFarmPlant;
 import net.runelite.client.plugins.microbot.util.dialogues.Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -166,7 +167,8 @@ public class TitheFarmingScript extends Script {
         if (!Microbot.isLoggedIn()) return false;
         state = STARTING;
         plants = new ArrayList<>();
-        initialFruit = Rs2Inventory.get(TitheFarmMaterial.getSeedForLevel().getFruitId()).quantity;
+        Rs2Item rs2ItemSeed = Rs2Inventory.get(TitheFarmMaterial.getSeedForLevel().getFruitId());
+        initialFruit = rs2ItemSeed == null ? 0 : rs2ItemSeed.quantity;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
@@ -298,7 +300,7 @@ public class TitheFarmingScript extends Script {
         }
 
         if (plant.isValidToWater()) {
-            clickPatch(plant);
+            clickPatch(plant, "water");
             sleepUntil(Rs2Player::isAnimating, config.sleepAfterWateringSeed());
             if (Rs2Player.isAnimating()) {
                 sleepUntil(() -> plants.stream().noneMatch(x -> x.getIndex() == finalPlant.getIndex() && x.isValidToWater()));
@@ -308,7 +310,7 @@ public class TitheFarmingScript extends Script {
 
 
         if (plant.isValidToHarvest()) {
-            clickPatch(plant);
+            clickPatch(plant, "harvest");
             sleepUntil(Rs2Player::isAnimating, config.sleepAfterHarvestingSeed());
             if (Rs2Player.isAnimating()) {
                 sleepUntil(() -> plants.stream().anyMatch(x -> x.getIndex() == finalPlant.getIndex() && x.isEmptyPatch()));
@@ -351,8 +353,19 @@ public class TitheFarmingScript extends Script {
                 plant.regionY,
                 Microbot.getClient().getPlane());
 
-        Point point = Calculations.worldToCanvas(worldPoint.getX(), worldPoint.getY());
-        Microbot.getMouse().click(point);
+        Rs2GameObject.interact(worldPoint);
+
+        //Point point = Calculations.worldToCanvas(worldPoint.getX(), worldPoint.getY());
+        //Microbot.getMouse().click(point);
+    }
+
+    private static void clickPatch(TitheFarmPlant plant, String action) {
+        WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
+                plant.regionX,
+                plant.regionY,
+                Microbot.getClient().getPlane());
+
+        Rs2GameObject.interact(worldPoint, action);
     }
 
     private static void DropFertiliser() {

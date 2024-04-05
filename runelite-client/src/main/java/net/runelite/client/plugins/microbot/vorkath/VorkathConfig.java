@@ -80,16 +80,6 @@ public interface VorkathConfig extends Config {
     )
     default PRAYER_POTION prayerPotion() { return PRAYER_POTION.PRAYER; }
     @ConfigItem(
-            keyName = "slayersStaff",
-            name = "Slayers Staff",
-            description = "Choose your slayers staff",
-            position = 0,
-            section = equipmentSection
-    )
-    default STAFF SLAYERSTAFF() {
-        return STAFF.SLAYER_STAFF;
-    }
-    @ConfigItem(
             keyName = "crossbow",
             name = "Crossbow",
             description = "Choose your crossbow",
