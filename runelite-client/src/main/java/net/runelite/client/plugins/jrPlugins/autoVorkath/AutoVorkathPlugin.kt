@@ -47,7 +47,8 @@ import kotlin.math.abs
     name = JR + " - [Deprecated] Auto Vorkath",
     description = "JR - Auto Vorkath",
     tags = ["vorkath", "auto", "auto prayer", "mule", "trade"],
-    enabledByDefault = false
+    enabledByDefault = false,
+    hidden = true
 )
 class AutoVorkathPlugin : Plugin() {
     @Inject
