@@ -179,6 +179,7 @@ public class SandCrabScript extends Script {
         for (Player player : Microbot.getClient().getPlayers()) {
             if (player.getWorldLocation().distanceTo(worldPoint) > 2)
                 continue;
+            if (player == Microbot.getClient().getLocalPlayer()) continue;
             if (!player.isInteracting()) continue;
             return true;
         }
