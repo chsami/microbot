@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot;
 
+import lombok.Getter;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
@@ -31,6 +33,9 @@ public abstract class Script implements IScript {
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
     }
+
+    @Getter
+    protected WorldPoint initialPlayerLocation;
 
     public void sleep(int time) {
         long startTime = System.currentTimeMillis();
@@ -116,6 +121,11 @@ public abstract class Script implements IScript {
 
         if (!hasRunEnergy && useStaminaPotsIfNeeded) {
             Rs2Inventory.use("Stamina potion");
+        }
+
+        if (Microbot.isLoggedIn()) {
+            if (initialPlayerLocation == null)
+                initialPlayerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
         }
 
         return true;
