@@ -156,6 +156,7 @@ public class Microbot {
     }
 
     public static void hopToWorld(int worldNumber) {
+        if (Microbot.getClient().getLocalPlayer() != null && Microbot.getClient().getLocalPlayer().isInteracting()) return;
         if (quickHopTargetWorld != null || Microbot.getClient().getGameState() != GameState.LOGGED_IN) return;
         if (Microbot.getClient().getWorld() == worldNumber) {
             return;
