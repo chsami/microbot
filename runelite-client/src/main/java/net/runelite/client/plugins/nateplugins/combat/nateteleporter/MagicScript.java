@@ -24,14 +24,12 @@ public class MagicScript extends Script {
     public static double version = 1.7;
 
 
-    WorldPoint initialPlayerLocation;
     public boolean run(MagicConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
 
-            if (initialPlayerLocation == null)
-                initialPlayerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
+
 
             try {
                 if (!config.highAlchemy() && (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts)) return;
