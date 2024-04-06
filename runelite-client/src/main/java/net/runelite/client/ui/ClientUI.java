@@ -264,7 +264,7 @@ public class ClientUI
 				return false;
 			}
 
-			frame.setTitle(title + " - " + name);
+			frame.setTitle(title);
 			return true;
 		});
 	}
@@ -1142,7 +1142,7 @@ public class ClientUI
 
 			if (player != null && player.getName() != null)
 			{
-				frame.setTitle(title + " - " + player.getName());
+				frame.setTitle(title);
 			}
 		}
 		else

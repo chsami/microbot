@@ -32,14 +32,13 @@ import java.lang.annotation.*;
 public @interface PluginDescriptor
 {
 	public String Nate = "<html>[<font color=orange>N</font>] ";
-	public String Mocrosoft = "<html>[<font color=purple>M</font>] ";
+	public String Mocrosoft = "<html>[<font color=#b8f704M>M</font>] ";
 	public String JR = "<html>[<font color=#54fff9>J</font>] ";
 	public String OG = "<html>[<font color=#FF69B4>O</font>] ";
 	public String Dan = "<html>[<font color=#B22222>D</font>]";
 	public String Kstar = "<html>[<font color=#fcf6bd>K</font>] ";
 	public String Default = "<html>[<font color=green>D</font>] ";
 	public String Griffin = "<html>[<font color=#a78bfa>G</font>] ";
-	public String Engin = "<html>[<font color=#b8f704>E</font>]";
 	public String Envision = "<html>[<font color=#c0c0c0>E</font>] ";
 	public String Spaghetti = "<html>[<font color=#DAD420>S</font>] ";
 	public String SaCo = "<html>[<font color=#0d937b>S</font>] ";
