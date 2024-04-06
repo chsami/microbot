@@ -196,10 +196,21 @@ public class Walker {
     }
 
     public boolean hybridWalkTo(WorldPoint target, boolean useNearest) {
+        return hybridWalkTo(target, useNearest, false);
+    }
+
+    public boolean hybridWalkTo(WorldPoint target, boolean useNearest, boolean accurate) {
         Player player = Microbot.getClient().getLocalPlayer();
         List<PathNode> nodes = getPath(player.getWorldLocation(), target, useNearest);
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5 && canReach(target))
+        if (!accurate && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5 && canReach(target))
             return true;
+        if (accurate && player.getWorldLocation().equals(target))
+            return true;
+
+        if (accurate && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 10) {
+            Microbot.getWalker().walkFastCanvas(target);
+            return false;
+        }
 
         if (nodes.isEmpty()) {
             System.out.println("Static Walker failed to find path, using dynamic walker");
@@ -210,7 +221,7 @@ public class Walker {
             PathWalker pathWalker = new PathWalker(nodes);
             pathWalker.walkPath();
 
-            return player.getWorldLocation().distanceTo(target) <= 3;
+            return accurate ?  player.getWorldLocation().equals(target) : player.getWorldLocation().distanceTo(target) <= 3;
         }
     }
 
