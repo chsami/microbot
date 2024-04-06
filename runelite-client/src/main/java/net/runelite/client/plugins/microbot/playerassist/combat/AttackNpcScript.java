@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class AttackNpcScript extends Script {
                                 && (x.getInteracting() == null  || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && x.getAnimation() == -1 && npcToAttack.equalsIgnoreCase(x.getName())).collect(Collectors.toList());
                 Player player = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer());
-                if (player.isInteracting() || player.getAnimation() != -1) {
+                if (Rs2Combat.inCombat()) {
                     return;
                 }
                 for (NPC npc : attackableNpcs) {

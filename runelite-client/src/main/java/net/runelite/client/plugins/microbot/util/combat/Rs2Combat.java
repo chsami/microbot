@@ -6,11 +6,15 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
+import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
+
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Combat {
     /**
@@ -90,5 +94,18 @@ public class Rs2Combat {
         return Rs2Widget.getChildWidgetSpriteID(widgetId, 0) == 1150;
     }
 
+    public static boolean enableAutoRetialiate() {
+        if (Microbot.getVarbitPlayerValue(172) == 1) {
+            Rs2Tab.switchToCombatOptionsTab();
+            sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.COMBAT, 2000);
+            Rs2Widget.clickWidget(38862878);
+        }
+
+        return Microbot.getVarbitPlayerValue(172) == 0;
+    }
+
+    public static boolean inCombat() {
+        return Microbot.getClient().getLocalPlayer().isInteracting()  || Microbot.getClient().getLocalPlayer().getAnimation() != -1;
+    }
 
 }
