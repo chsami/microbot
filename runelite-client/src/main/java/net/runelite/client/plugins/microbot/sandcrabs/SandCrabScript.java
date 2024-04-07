@@ -53,7 +53,7 @@ public class SandCrabScript extends Script {
             try {
                 long startTime = System.currentTimeMillis();
 
-                Rs2Combat.enableAutoRetialiate();
+               // Rs2Combat.enableAutoRetialiate();
 
                 if (otherPlayerDetected() && !Rs2Combat.inCombat())
                     hijackTimer++;
@@ -69,7 +69,7 @@ public class SandCrabScript extends Script {
                 }
 
                 if (config.useFood()) {
-                    Rs2Player.eatAt(30);
+                    Rs2Player.eatAt(50);
 
                     if (Rs2Inventory.getInventoryFood().isEmpty()) {
                         Microbot.getWalker().hybridWalkTo(new WorldPoint(1720, 3465, 0));
