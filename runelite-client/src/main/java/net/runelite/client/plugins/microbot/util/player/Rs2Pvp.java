@@ -127,7 +127,6 @@ public class Rs2Pvp {
      */
     public static boolean isAttackable() {
         List<Player> players = Rs2Player.getPlayers();
-        System.out.println(players.size());
         for(Player player: players) {
             if (!isAttackable(player)) continue;
             System.out.println("Player: " + player.getName() + " with combat " + player.getCombatLevel() + " detected!");
