@@ -92,7 +92,6 @@ public abstract class Script implements IScript {
 
     public void shutdown() {
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
-            Microbot.getNotifier().notify("Shutdown script");
             mainScheduledFuture.cancel(true);
             Microbot.getWalker().pathfinder = new Pathfinder();
             Microbot.pauseAllScripts = false;
@@ -120,7 +119,7 @@ public abstract class Script implements IScript {
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
         if (!hasRunEnergy && useStaminaPotsIfNeeded) {
-            Rs2Inventory.use("Stamina potion");
+            Rs2Inventory.interact("Stamina potion", "drink");
         }
 
         if (Microbot.isLoggedIn()) {
