@@ -9,7 +9,9 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.sandcrabs.enums.State;
 import net.runelite.client.plugins.microbot.sandcrabs.models.ScanLocation;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -65,6 +67,20 @@ public class SandCrabScript extends Script {
                 if (sandCrabLocations.stream().noneMatch(x -> x.getWorldPoint().equals(Microbot.getClient().getLocalPlayer().getWorldLocation())) && state != State.RESET_AGGRO && state != State.WALK_BACK) {
                     state = State.SCAN_LOCATIONS;
                 }
+
+                if (config.useFood()) {
+                    Rs2Player.eatAt(30);
+
+                    if (Rs2Inventory.getInventoryFood().isEmpty()) {
+                        Microbot.getWalker().hybridWalkTo(new WorldPoint(1720, 3465, 0));
+                        if (Rs2Bank.useBank()) {
+                            Rs2Bank.withdrawAll(config.food().getName());
+                        }
+                        return;
+                    }
+                }
+
+
 
                 switch (state) {
                     case FIGHT:
