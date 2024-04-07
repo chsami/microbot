@@ -48,7 +48,8 @@ public class FoodScript extends Script {
                 List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
                 if (foods == null || foods.isEmpty()) {
                     if (!equipFullGuthans()) {
-                        Microbot.getNotifier().notify("No more food left & no guthans available. Please teleport");
+                        Microbot.showMessage("No more food left & no guthans available. Please teleport");
+                        sleep(5000);
                     }
                     return;
                 }

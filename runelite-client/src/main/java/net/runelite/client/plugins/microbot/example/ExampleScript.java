@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.example;
 
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Skill;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -53,13 +50,11 @@ public class ExampleScript extends Script {
                  */
 
                 long startTime = System.currentTimeMillis();
-                Microbot.getWalkerForKotlin().walkFastLocal(
-                        LocalPoint.fromScene(48, 58)
-                );
-                Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, Rs2Npc.getNpc("guard"));
+                TileObject gameObject = Rs2GameObject.findObjectById(6);
+                System.out.println(((GameObject) gameObject).getModelOrientation());
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
-                System.out.println(totalTime);
+               // System.out.println(totalTime);
 
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());

@@ -35,6 +35,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.*;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.TreeMap;
 
@@ -114,10 +115,41 @@ public class Rs2Pvp {
         if (WorldType.isPvpWorld(Microbot.getClient().getWorldType())) {
             wildernessLevel += 15;
         }
-        if (Microbot.getClient().getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
+        if (Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
             wildernessLevel += getWildernessLevelFrom(Microbot.getClient().getLocalPlayer().getWorldLocation());
         }
         return wildernessLevel != 0 && Math.abs(Microbot.getClient().getLocalPlayer().getCombatLevel() - player.getCombatLevel()) <= wildernessLevel;
+    }
+
+    /**
+     * Determines if another player is attackable based off of wilderness level and combat levels
+     *
+     * @param player the player to determine attackability
+     * @return returns true if the player is attackable, false otherwise
+     */
+    public static boolean isAttackable(Player player, boolean isDeadManworld, boolean isPvpWorld, int wildernessLevel) {
+        return wildernessLevel != 0 && Math.abs(Microbot.getClient().getLocalPlayer().getCombatLevel() - player.getCombatLevel()) <= wildernessLevel;
+    }
+
+    /**
+     * Determines if any player is attackable based off of wilderness level and combat levels
+     * @return
+     */
+    public static boolean isAttackable() {
+        List<Player> players = Rs2Player.getPlayers();
+        int wildernessLevel = 0;
+        boolean isDeadManWorld = WorldType.isDeadmanWorld(Microbot.getClient().getWorldType());
+        boolean isPVPWorld = WorldType.isPvpWorld(Microbot.getClient().getWorldType());
+        if (Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
+            wildernessLevel += getWildernessLevelFrom(Microbot.getClient().getLocalPlayer().getWorldLocation());
+        }
+        for(Player player: players) {
+            if (!isAttackable(player, isDeadManWorld, isPVPWorld, wildernessLevel)) continue;
+            System.out.println("Player: " + player.getName() + " with combat " + player.getCombatLevel() + " detected!");
+            return true;
+        }
+        System.out.println("No attackable players detected...");
+        return false;
     }
 
     public static int calculateRisk(Client client, ItemManager itemManager) {

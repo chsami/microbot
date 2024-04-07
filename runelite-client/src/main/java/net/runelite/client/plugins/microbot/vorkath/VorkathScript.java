@@ -233,7 +233,7 @@ public class VorkathScript extends Script {
                         }
                         drinkPotions();
                         handlePrayer();
-                        eatAt(75);
+                        Rs2Player.eatAt(75);
                         handleRedBall();
                         if (doesProjectileExistById(whiteProjectileId)) {
                             state = State.ZOMBIE_SPAWN;
@@ -253,7 +253,7 @@ public class VorkathScript extends Script {
                             state = State.FIGHT_VORKATH;
                         }
                         togglePrayer(false);
-                        eatAt(80);
+                        Rs2Player.eatAt(80);
                         drinkPrayer();
                         Microbot.getWalkerForKotlin().walkFastLocal(
                                 LocalPoint.fromScene(48, 58)
@@ -264,7 +264,7 @@ public class VorkathScript extends Script {
                                     && !doesProjectileExistById(146)) {
                                     Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, zombieSpawn);
                             }
-                            eatAt(75);
+                            Rs2Player.eatAt(75);
                             togglePrayer(true);
                             Rs2Tab.switchToInventoryTab();
                             state = State.FIGHT_VORKATH;
@@ -278,7 +278,7 @@ public class VorkathScript extends Script {
                         if (Rs2Inventory.isFull()) {
                             boolean hasFood = !Rs2Inventory.getInventoryFood().isEmpty();
                             if (hasFood) {
-                                eatAt(100);
+                                Rs2Player.eatAt(100);
                                 Rs2Player.waitForAnimation();
                             } else {
                                 state = State.PREPARE_FIGHT;
@@ -368,7 +368,7 @@ public class VorkathScript extends Script {
     private void healAndDrinkPrayerPotion() {
         while (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) != Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) && !Rs2Inventory.getInventoryFood().isEmpty()) {
             Rs2Bank.closeBank();
-            eatAt(99);
+            Rs2Player.eatAt(99);
             Rs2Player.waitForAnimation();
             hasInventory = false;
         }
@@ -454,24 +454,6 @@ public class VorkathScript extends Script {
         return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2670, 3634, 0)) < 70;
     }
 
-    private void eatAt(int percentage) {
-        double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
-        int missingHitpoints = Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
-        if (treshHold <= percentage) {
-            List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
-            for (Rs2Item food : foods) {
-                if (missingHitpoints >= 40 && Rs2Inventory.get("Cooked karambwan") != null) {
-                    //double eat
-                    Rs2Inventory.interact(food, "eat");
-                    Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
-                } else {
-                    Rs2Inventory.interact(food, "eat");
-                }
-                break;
-            }
-        }
-    }
-
     private void redBallWalk() {
         WorldPoint currentPlayerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
         WorldPoint sideStepLocation = new WorldPoint(currentPlayerLocation.getX() + 2, currentPlayerLocation.getY(), 0);
@@ -524,7 +506,7 @@ public class VorkathScript extends Script {
             if (playerLocation.equals(safeTile)) {
                 Rs2Npc.attack(vorkath);
             } else {
-                eatAt(75);
+                Rs2Player.eatAt(75);
                 Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), safeTile));
             }
         }
@@ -534,7 +516,7 @@ public class VorkathScript extends Script {
     public void executeAcidWalk(int x, int y, BooleanSupplier awaitedCondition) {
         if (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId)) return;
 
-        eatAt(80);
+        Rs2Player.eatAt(80);
         while (!awaitedCondition.getAsBoolean()) {
             Microbot.getWalkerForKotlin().walkFastLocal(
                     LocalPoint.fromScene(x, y)

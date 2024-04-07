@@ -1,9 +1,8 @@
 package net.runelite.client.plugins.microbot.util.walker;
 
 import lombok.Getter;
-import net.runelite.api.MenuAction;
-import net.runelite.api.Perspective;
-import net.runelite.api.Player;
+import lombok.Setter;
+import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
@@ -14,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.util.walker.pathfinder.Node;
@@ -39,7 +39,6 @@ public class Walker {
     List<Transport> ignoreTransport = new ArrayList();
 
     List<Node> pathOrigin = new ArrayList<>();
-
 
     public Walker() {
         CollisionMap map = new CollisionMap();
@@ -116,6 +115,7 @@ public class Walker {
     }
 
     public void walkFastCanvas(WorldPoint worldPoint) {
+        Rs2Player.toggleRunEnergy(true);
         LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
         if (!Calculations.tileOnScreen(localPoint)) {
             Microbot.getWalker().walkMiniMap(worldPoint); //use minimap if tile is not on screen
@@ -194,10 +194,21 @@ public class Walker {
     }
 
     public boolean hybridWalkTo(WorldPoint target, boolean useNearest) {
+        return hybridWalkTo(target, useNearest, false);
+    }
+
+    public boolean hybridWalkTo(WorldPoint target, boolean useNearest, boolean accurate) {
         Player player = Microbot.getClient().getLocalPlayer();
         List<PathNode> nodes = getPath(player.getWorldLocation(), target, useNearest);
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5 && canReach(target))
+        if (!accurate && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5 && canReach(target))
             return true;
+        if (accurate && player.getWorldLocation().equals(target))
+            return true;
+
+        if (accurate && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 10) {
+            Microbot.getWalker().walkFastCanvas(target);
+            return false;
+        }
 
         if (nodes.isEmpty()) {
             System.out.println("Static Walker failed to find path, using dynamic walker");
@@ -208,7 +219,7 @@ public class Walker {
             PathWalker pathWalker = new PathWalker(nodes);
             pathWalker.walkPath();
 
-            return player.getWorldLocation().distanceTo(target) <= 3;
+            return accurate ?  player.getWorldLocation().equals(target) : player.getWorldLocation().distanceTo(target) <= 3;
         }
     }
 
@@ -238,7 +249,7 @@ public class Walker {
     public boolean walkTo(WorldPoint target, boolean useTransport, boolean useCanvas, WorldArea[] blockingAreas) {
         if (pathfinder != null && !pathfinder.isDone()) return false;
         WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
-
+        PathWalker.Companion.setIsInterrupted(false);
         pathfinder = new Pathfinder(pathfinderConfig, start, target, useTransport, false, useCanvas, blockingAreas);
         setupPathfinderDefaults();
 
@@ -314,4 +325,16 @@ public class Walker {
         sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
         return false;
     }
+    public WorldPoint calculateMapPoint(Point point) {
+        float zoom = Microbot.getClient().getRenderOverview().getWorldMapZoom();
+        RenderOverview renderOverview = Microbot.getClient().getRenderOverview();
+        final WorldPoint mapPoint = new WorldPoint(renderOverview.getWorldMapPosition().getX(), renderOverview.getWorldMapPosition().getY(), 0);
+        final Point middle = Microbot.getWorldMapOverlay().mapWorldPointToGraphicsPoint(mapPoint);
+
+        final int dx = (int) ((point.getX() - middle.getX()) / zoom);
+        final int dy = (int) ((-(point.getY() - middle.getY())) / zoom);
+
+        return mapPoint.dx(dx).dy(dy);
+    }
+
 }

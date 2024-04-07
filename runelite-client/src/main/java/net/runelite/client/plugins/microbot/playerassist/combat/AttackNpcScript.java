@@ -3,10 +3,13 @@ package net.runelite.client.plugins.microbot.playerassist.combat;
 import net.runelite.api.Actor;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
+import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.ArrayList;
@@ -32,6 +35,8 @@ public class AttackNpcScript extends Script {
             try {
                 if (!super.run()) return;
                 if (!config.toggleCombat()) return;
+                double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
+                if (Rs2Inventory.getInventoryFood().isEmpty() && treshHold < 10) return;
                  attackableNpcs =  Microbot.getClient().getNpcs().stream()
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                         .filter(x -> !x.isDead()
@@ -39,8 +44,7 @@ public class AttackNpcScript extends Script {
                                 && (!x.isInteracting() || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && (x.getInteracting() == null  || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && x.getAnimation() == -1 && npcToAttack.equalsIgnoreCase(x.getName())).collect(Collectors.toList());
-                Player player = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer());
-                if (player.isInteracting() || player.getAnimation() != -1) {
+                if (Rs2Combat.inCombat()) {
                     return;
                 }
                 for (NPC npc : attackableNpcs) {
@@ -56,7 +60,7 @@ public class AttackNpcScript extends Script {
                     if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation()))
                         Rs2Camera.turnTo(npc);
 
-                    if (!Microbot.getWalker().canReach(npc.getWorldLocation()))
+                    if (!Rs2Npc.hasLineOfSight(npc))
                         continue;
                     Rs2Npc.interact(npc, "attack");
                     sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);

@@ -242,10 +242,10 @@ public class RuneLite {
 
             ClientUI.proxyMessage = (socksProxy ? "SOCKS" : "HTTP") + " Proxy with address " + options.valueOf(proxyInfo);
 
-            if (httpProxy && proxy.length > 2) {
+            if (httpProxy && proxy.length >= 2) {
                 System.setProperty("http.proxyHost", proxy[0]);
                 System.setProperty("http.proxyPort", proxy[1]);
-            } else if (socksProxy && proxy.length > 2) {
+            } else if (socksProxy && proxy.length >= 2) {
                 System.setProperty("socksProxyHost", proxy[0]);
                 System.setProperty("socksProxyPort", proxy[1]);
             }

@@ -57,11 +57,11 @@ public class GiantsFoundryState {
     }
 
     public static int getHeatAmount() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(VARBIT_HEAT));
+        return Microbot.getVarbitValue(VARBIT_HEAT);
     }
 
     public static int getProgressAmount() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarbitValue(VARBIT_PROGRESS));
+        return Microbot.getVarbitValue(VARBIT_PROGRESS);
     }
 
     public static double getHeatRangeRatio() {

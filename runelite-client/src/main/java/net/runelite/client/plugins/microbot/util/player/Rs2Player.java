@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.util.player;
 
-import net.runelite.api.MenuAction;
-import net.runelite.api.Skill;
-import net.runelite.api.VarPlayer;
-import net.runelite.api.Varbits;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
@@ -12,12 +9,17 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.runelite.api.MenuAction.CC_OP;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
@@ -158,8 +160,34 @@ public class Rs2Player {
     }
 
     public static void logout() {
-        Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        if (Microbot.isLoggedIn())
+            Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
 
         //Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
+    }
+
+    public static void eatAt(int percentage) {
+        double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
+        int missingHitpoints = Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
+        if (treshHold <= percentage) {
+            List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
+            for (Rs2Item food : foods) {
+                if (missingHitpoints >= 40 && Rs2Inventory.get("Cooked karambwan") != null) {
+                    //double eat
+                    Rs2Inventory.interact(food, "eat");
+                    Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
+                } else {
+                    Rs2Inventory.interact(food, "eat");
+                }
+                break;
+            }
+        }
+    }
+
+    public static List<Player> getPlayers() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getPlayers()
+                .stream()
+                .filter(x -> x != Microbot.getClient().getLocalPlayer())
+                .collect(Collectors.toList()));
     }
 }
