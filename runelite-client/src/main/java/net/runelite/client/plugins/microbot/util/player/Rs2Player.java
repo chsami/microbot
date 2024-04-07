@@ -185,8 +185,9 @@ public class Rs2Player {
     }
 
     public static List<Player> getPlayers() {
-        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Microbot.getClient().getCachedPlayers())
-                .filter(x -> x != Microbot.getClient().getLocalPlayer() && x != null)
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getPlayers()
+                .stream()
+                .filter(x -> x != Microbot.getClient().getLocalPlayer())
                 .collect(Collectors.toList()));
     }
 }
