@@ -12,6 +12,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.nio.file.Path;
 
 public class StaticWalkerOverlay extends Overlay {
 
@@ -27,7 +28,7 @@ public class StaticWalkerOverlay extends Overlay {
     }
 
     public static void renderPathWalkerOverlay(Graphics2D graphics) {
-        if (!PathWalker.Companion.getEnabled()) {
+        if (!PathWalker.Companion.getEnabled() || PathWalker.Companion.getIsInterrupted()) {
             return;
         }
 
