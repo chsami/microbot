@@ -35,6 +35,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.*;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.TreeMap;
 
@@ -118,6 +119,22 @@ public class Rs2Pvp {
             wildernessLevel += getWildernessLevelFrom(Microbot.getClient().getLocalPlayer().getWorldLocation());
         }
         return wildernessLevel != 0 && Math.abs(Microbot.getClient().getLocalPlayer().getCombatLevel() - player.getCombatLevel()) <= wildernessLevel;
+    }
+
+    /**
+     * Determines if any player is attackable based off of wilderness level and combat levels
+     * @return
+     */
+    public static boolean isAttackable() {
+        List<Player> players = Rs2Player.getPlayers();
+        System.out.println(players.size());
+        for(Player player: players) {
+            if (!isAttackable(player)) continue;
+            System.out.println("Player: " + player.getName() + " with combat " + player.getCombatLevel() + " detected!");
+            return true;
+        }
+        System.out.println("No attackable players detected...");
+        return false;
     }
 
     public static int calculateRisk(Client client, ItemManager itemManager) {

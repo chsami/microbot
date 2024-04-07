@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.sandcrabs.models.ScanLocation;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -176,7 +177,7 @@ public class SandCrabScript extends Script {
     }
 
     private boolean otherPlayerDetected(WorldPoint worldPoint) {
-        for (Player player : Microbot.getClient().getPlayers()) {
+        for (Player player : Rs2Player.getPlayers()) {
             if (player.getWorldLocation().distanceTo(worldPoint) > 2)
                 continue;
             if (player == Microbot.getClient().getLocalPlayer()) continue;

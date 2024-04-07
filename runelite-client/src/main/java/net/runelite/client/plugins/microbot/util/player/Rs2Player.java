@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.util.player;
 
-import net.runelite.api.MenuAction;
-import net.runelite.api.Skill;
-import net.runelite.api.VarPlayer;
-import net.runelite.api.Varbits;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
@@ -20,7 +17,9 @@ import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.runelite.api.MenuAction.CC_OP;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
@@ -161,7 +160,8 @@ public class Rs2Player {
     }
 
     public static void logout() {
-        Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        if (Microbot.isLoggedIn())
+            Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
 
         //Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
     }
@@ -182,5 +182,11 @@ public class Rs2Player {
                 break;
             }
         }
+    }
+
+    public static List<Player> getPlayers() {
+        return Microbot.getClientThread().runOnClientThread(() -> Arrays.stream(Microbot.getClient().getCachedPlayers())
+                .filter(x -> x != Microbot.getClient().getLocalPlayer() && x != null)
+                .collect(Collectors.toList()));
     }
 }
