@@ -1,9 +1,8 @@
 package net.runelite.client.plugins.microbot.util.walker;
 
 import lombok.Getter;
-import net.runelite.api.MenuAction;
-import net.runelite.api.Perspective;
-import net.runelite.api.Player;
+import lombok.Setter;
+import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
@@ -40,7 +39,6 @@ public class Walker {
     List<Transport> ignoreTransport = new ArrayList();
 
     List<Node> pathOrigin = new ArrayList<>();
-
 
     public Walker() {
         CollisionMap map = new CollisionMap();
@@ -251,7 +249,7 @@ public class Walker {
     public boolean walkTo(WorldPoint target, boolean useTransport, boolean useCanvas, WorldArea[] blockingAreas) {
         if (pathfinder != null && !pathfinder.isDone()) return false;
         WorldPoint start = Microbot.getClient().getLocalPlayer().getWorldLocation();
-
+        PathWalker.Companion.setIsInterrupted(false);
         pathfinder = new Pathfinder(pathfinderConfig, start, target, useTransport, false, useCanvas, blockingAreas);
         setupPathfinderDefaults();
 
@@ -327,4 +325,16 @@ public class Walker {
         sleepUntilOnClientThread(() -> pathfinder.isDone(), 60000);
         return false;
     }
+    public WorldPoint calculateMapPoint(Point point) {
+        float zoom = Microbot.getClient().getRenderOverview().getWorldMapZoom();
+        RenderOverview renderOverview = Microbot.getClient().getRenderOverview();
+        final WorldPoint mapPoint = new WorldPoint(renderOverview.getWorldMapPosition().getX(), renderOverview.getWorldMapPosition().getY(), 0);
+        final Point middle = Microbot.getWorldMapOverlay().mapWorldPointToGraphicsPoint(mapPoint);
+
+        final int dx = (int) ((point.getX() - middle.getX()) / zoom);
+        final int dy = (int) ((-(point.getY() - middle.getY())) / zoom);
+
+        return mapPoint.dx(dx).dy(dy);
+    }
+
 }

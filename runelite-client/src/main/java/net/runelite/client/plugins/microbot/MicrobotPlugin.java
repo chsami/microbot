@@ -3,7 +3,10 @@ package net.runelite.client.plugins.microbot;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
@@ -22,6 +25,7 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScri
 import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.quest.QuestScript;
+import net.runelite.client.plugins.microbot.staticwalker.StaticWalkerScript;
 import net.runelite.client.plugins.microbot.staticwalker.pathfinder.WorldDataDownloader;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenConfig;
@@ -40,6 +44,7 @@ import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
+import net.runelite.client.util.Text;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -48,6 +53,7 @@ import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -91,7 +97,6 @@ public class MicrobotPlugin extends Plugin {
     private SpriteManager spriteManager;
     @Inject
     private WorldMapOverlay worldMapOverlay;
-
     @Inject
     @Named("disableWalkerUpdate")
     private boolean disableWalkerUpdate;
@@ -105,7 +110,7 @@ public class MicrobotPlugin extends Plugin {
     public CookingScript cookingScript;
     public MiningScript miningScript;
     public SummerGardenScript summerGardenScript;
-
+    public StaticWalkerScript staticWalkerScript;
     QuestScript questScript;
     @Override
     protected void startUp() throws AWTException {
@@ -122,6 +127,7 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setSpriteManager(spriteManager);
         Microbot.setDisableWalkerUpdate(disableWalkerUpdate);
         Microbot.setPluginManager(pluginManager);
+        Microbot.setWorldMapOverlay(worldMapOverlay);
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }
@@ -241,6 +247,7 @@ public class MicrobotPlugin extends Plugin {
         MenuEntry[] entries = event.getMenuEntries();
         MenuEntry npcEntry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_NPC).findFirst().orElse(null);
         MenuEntry objectEntry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_OBJECT).findFirst().orElse(null);
+
         if (npcEntry != null) {
             net.runelite.api.NPC npc = Rs2Npc.getNpcByIndex(npcEntry.getIdentifier());
 
@@ -305,6 +312,15 @@ public class MicrobotPlugin extends Plugin {
         if (Microbot.targetMenu != null && event.getType() != Microbot.targetMenu.getType().getId()) {
             this.client.setMenuEntries(new MenuEntry[]{});
         }
+
+        final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
+
+        if (map != null) {
+            if (map.getBounds().contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY())) {
+                addMapMenuEntries(event);
+            }
+        }
+
        // if (event.getType() != MenuAction.CC_OP.getId() || event.getActionParam1() != WORLD_SWITCHER_LIST.getId() && event.getActionParam1() != 11927560 && event.getActionParam1() != 4522007 && event.getActionParam1() != 24772686) {
             if (Microbot.targetMenu != null) {
                 MenuEntry entry =
@@ -349,5 +365,34 @@ public class MicrobotPlugin extends Plugin {
                 System.out.printf("Failed to start plugin: %s%n", p.getName());
             }
         });
+    }
+
+    private Consumer<MenuEntry> worldMapConsumer() {
+        return e ->
+        {
+            if (staticWalkerScript != null) {
+                Microbot.getWalker().interruptStaticWalker();
+                staticWalkerScript.shutdown();
+                staticWalkerScript = null;
+            } else {
+                WorldPoint destination = Microbot.getWalker().calculateMapPoint(client.getMouseCanvasPosition());
+                Microbot.getWalker().hybridWalkTo(destination);
+                staticWalkerScript = new StaticWalkerScript();
+                staticWalkerScript.run(destination);
+            }
+
+        };
+    }
+
+    private void addMapMenuEntries(MenuEntryAdded event) {
+        List<MenuEntry> entries = new LinkedList<>(Arrays.asList(client.getMenuEntries()));
+
+        List<MenuEntry> leftClickMenus = new ArrayList<>(((int) entries.stream().count()) + 2);
+
+        leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
+                .setOption(staticWalkerScript == null ? "Set AutoWalk Target" : "Clear AutoWalk target")
+                .setTarget(event.getTarget())
+                .setType(MenuAction.RUNELITE)
+                .onClick(worldMapConsumer()));
     }
 }

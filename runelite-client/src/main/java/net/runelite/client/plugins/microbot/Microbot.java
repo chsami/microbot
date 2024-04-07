@@ -20,10 +20,12 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.walker.Walker;
+import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
+import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -77,6 +79,9 @@ public class Microbot {
     @Getter
     @Setter
     private static PluginManager pluginManager;
+    @Getter
+    @Setter
+    private static WorldMapOverlay worldMapOverlay;
 
     public static boolean debug = false;
 

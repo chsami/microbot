@@ -31,7 +31,24 @@ public class StaticWalkerScript extends Script {
 
                 }
 
-                if (!Microbot.getWalker().staticWalkTo(destination)) {
+                if (!Microbot.getWalker().hybridWalkTo(destination)) {
+                    failCount++;
+                } else {
+                    shutdown();
+                }
+
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }, 0, 600, TimeUnit.MILLISECONDS);
+        return true;
+    }
+
+    public boolean run(WorldPoint destination) {
+        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (!super.run()) return;
+            try {
+                if (!Microbot.getWalker().hybridWalkTo(destination)) {
                     failCount++;
                 } else {
                     shutdown();

@@ -9,6 +9,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathWalker;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -266,6 +267,8 @@ public class Pathfinder implements Runnable {
     }
 
     public void run() {
+        if (PathWalker.Companion.getIsInterrupted())
+            return;
         if (this.executeWalking) {
             if (Microbot.getClient().getCameraPitch() < 370) {
                 Microbot.getClient().setCameraPitchTarget(Random.random(370, 400));
