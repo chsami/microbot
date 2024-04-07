@@ -15,6 +15,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -84,6 +85,10 @@ public class SandCrabScript extends Script {
 
                 switch (state) {
                     case FIGHT:
+                        if (!Microbot.getClient().getLocalPlayer().isInteracting() && Rs2Combat.inCombat()) {
+                            Rs2Tab.switchToCombatOptionsTab();
+                            Rs2Combat.enableAutoRetialiate();
+                        }
                         if (!isNpcAggressive()) {
                             state = State.AFK;
                         }
