@@ -3,8 +3,10 @@ package net.runelite.client.plugins.microbot;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
@@ -111,7 +113,7 @@ public class MicrobotPlugin extends Plugin {
     public MiningScript miningScript;
     public SummerGardenScript summerGardenScript;
     public StaticWalkerScript staticWalkerScript;
-    QuestScript questScript;
+    private Point lastMenuOpenedPoint;
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -244,6 +246,7 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onMenuOpened(MenuOpened event) {
+        lastMenuOpenedPoint = client.getMouseCanvasPosition();
         MenuEntry[] entries = event.getMenuEntries();
         MenuEntry npcEntry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_NPC).findFirst().orElse(null);
         MenuEntry objectEntry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_OBJECT).findFirst().orElse(null);
@@ -367,6 +370,19 @@ public class MicrobotPlugin extends Plugin {
         });
     }
 
+    private WorldPoint getSelectedWorldPoint() {
+        if (client.getWidget(ComponentID.WORLD_MAP_MAPVIEW) == null) {
+            if (client.getSelectedSceneTile() != null) {
+                return client.isInInstancedRegion() ?
+                        WorldPoint.fromLocalInstance(client, client.getSelectedSceneTile().getLocalLocation()) :
+                        client.getSelectedSceneTile().getWorldLocation();
+            }
+        } else {
+            return Microbot.getWalker().calculateMapPoint(client.isMenuOpen() ? lastMenuOpenedPoint : client.getMouseCanvasPosition());
+        }
+        return null;
+    }
+
     private Consumer<MenuEntry> worldMapConsumer() {
         return e ->
         {
@@ -375,7 +391,7 @@ public class MicrobotPlugin extends Plugin {
                 staticWalkerScript.shutdown();
                 staticWalkerScript = null;
             } else {
-                WorldPoint destination = Microbot.getWalker().calculateMapPoint(client.getMouseCanvasPosition());
+                WorldPoint destination = getSelectedWorldPoint();
                 Microbot.getWalker().hybridWalkTo(destination);
                 staticWalkerScript = new StaticWalkerScript();
                 staticWalkerScript.run(destination);
