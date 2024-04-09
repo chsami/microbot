@@ -5,6 +5,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -95,6 +96,8 @@ public abstract class Script implements IScript {
             mainScheduledFuture.cancel(true);
             Microbot.getWalker().pathfinder = new Pathfinder();
             Microbot.pauseAllScripts = false;
+            ShortestPathPlugin.walkerScript.setTarget(null);
+            ShortestPathPlugin.exit();
         }
     }
 

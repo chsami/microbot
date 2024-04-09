@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
 
 import java.util.*;
@@ -90,7 +91,7 @@ public class Pathfinder implements Runnable {
             visited.set(neighbor.packedPosition);
             if (neighbor instanceof TransportNode) {
                 pending.add(neighbor);
-                ++stats.transportsChecked;
+                stats.transportsChecked.add(WorldPointUtil.unpackWorldPoint(neighbor.packedPosition));
             } else {
                 boundary.addLast(neighbor);
                 ++stats.nodesChecked;
@@ -160,12 +161,14 @@ public class Pathfinder implements Runnable {
 
     public static class PathfinderStats {
         @Getter
-        private int nodesChecked = 0, transportsChecked = 0;
+        private int nodesChecked = 0;
+        @Getter
+        List<WorldPoint> transportsChecked = new ArrayList<>();
         private long startNanos, endNanos;
         private volatile boolean started = false, ended = false;
 
         public int getTotalNodesChecked() {
-            return nodesChecked + transportsChecked;
+            return nodesChecked + transportsChecked.size();
         }
 
         public long getElapsedTimeNanos() {
@@ -175,7 +178,7 @@ public class Pathfinder implements Runnable {
         private void start() {
             started = true;
             nodesChecked = 0;
-            transportsChecked = 0;
+            transportsChecked = new ArrayList<>();
             startNanos = System.nanoTime();
         }
 

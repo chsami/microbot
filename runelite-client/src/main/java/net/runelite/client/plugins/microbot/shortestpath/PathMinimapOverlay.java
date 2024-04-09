@@ -15,8 +15,8 @@ import java.awt.*;
 import java.util.List;
 
 public class PathMinimapOverlay extends Overlay {
-    private static final int TILE_WIDTH = 4;
-    private static final int TILE_HEIGHT = 4;
+    private static final int TILE_WIDTH = 2;
+    private static final int TILE_HEIGHT = 2;
 
     private final Client client;
     private final ShortestPathPlugin plugin;
@@ -34,6 +34,8 @@ public class PathMinimapOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        if (ShortestPathPlugin.getPathfinder() == null)
+            return null;
         if (!config.drawMinimap() || plugin.getPathfinder() == null) {
             return null;
         }

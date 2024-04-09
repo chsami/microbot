@@ -2,12 +2,15 @@ package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -19,6 +22,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
@@ -50,8 +54,7 @@ public class ExampleScript extends Script {
                  */
 
                 long startTime = System.currentTimeMillis();
-                TileObject gameObject = Rs2GameObject.findObjectById(6);
-                System.out.println(((GameObject) gameObject).getModelOrientation());
+                Rs2Walker.walkTo(new WorldPoint(3157, 3436, 0));
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
                // System.out.println(totalTime);
@@ -59,26 +62,13 @@ public class ExampleScript extends Script {
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 100, TimeUnit.MILLISECONDS);
+        }, 0, 2000, TimeUnit.MILLISECONDS);
         return true;
     }
 
-    private void eatAt(int percentage) {
-        double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
-        int missingHitpoints = Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
-        if (treshHold < percentage) {
-            List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
-            for (Rs2Item food : foods) {
-                if (missingHitpoints >= 40) {
-                    //double eat
-                    Rs2Inventory.interact(food, "eat");
-                    sleep(1000);
-                    Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
-                } else {
-                    Rs2Inventory.interact(food, "eat");
-                }
-                break;
-            }
-        }
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        ShortestPathPlugin.walkerScript.shutdown();
     }
 }

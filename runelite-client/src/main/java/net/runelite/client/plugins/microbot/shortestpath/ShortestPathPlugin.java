@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -61,7 +62,7 @@ public class ShortestPathPlugin extends Plugin {
     private static final String TARGET = ColorUtil.wrapWithColorTag("Target", JagexColors.MENU_TARGET);
     private static final String TRANSPORT = ColorUtil.wrapWithColorTag("Transport", JagexColors.MENU_TARGET);
     private static final String WALK_HERE = "Walk here";
-    private static final BufferedImage MARKER_IMAGE = ImageUtil.loadImageResource(ShortestPathPlugin.class, "marker.png");
+    public static final BufferedImage MARKER_IMAGE = ImageUtil.loadImageResource(ShortestPathPlugin.class, "marker.png");
 
     @Inject
     private Client client;
@@ -101,24 +102,37 @@ public class ShortestPathPlugin extends Plugin {
     private WorldMapOverlay worldMapOverlay;
 
     private Point lastMenuOpenedPoint;
-    private WorldMapPoint marker;
+    @Getter
+    @Setter
+    private static WorldMapPoint marker;
     private WorldPoint transportStart;
-    private WorldPoint lastLocation = new WorldPoint(0, 0, 0);
+    @Getter
+    @Setter
+    private static WorldPoint lastLocation = new WorldPoint(0, 0, 0);
     private MenuEntry lastClick;
     private Shape minimapClipFixed;
     private Shape minimapClipResizeable;
     private BufferedImage minimapSpriteFixed;
     private BufferedImage minimapSpriteResizeable;
     private Rectangle minimapRectangle = new Rectangle();
+    @Getter
+    @Setter
+    private static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
+    @Getter
+    @Setter
+    private static Future<?> pathfinderFuture;
+    @Getter
+    private static final Object pathfinderMutex = new Object();
+    @Getter
+    @Setter
+    private static Pathfinder pathfinder;
+    @Getter
+    private static PathfinderConfig pathfinderConfig;
+    @Getter
+    @Setter
+    private static boolean startPointSet = false;
 
-    private ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
-    private Future<?> pathfinderFuture;
-    private final Object pathfinderMutex = new Object();
-    @Getter
-    private Pathfinder pathfinder;
-    private PathfinderConfig pathfinderConfig;
-    @Getter
-    private boolean startPointSet = false;
+    public static WalkerScript walkerScript;
 
     @Provides
     public ShortestPathConfig provideConfig(ConfigManager configManager) {
@@ -131,6 +145,8 @@ public class ShortestPathPlugin extends Plugin {
         Map<WorldPoint, List<Transport>> transports = Transport.loadAllFromResources();
 
         pathfinderConfig = new PathfinderConfig(map, transports, client, config);
+
+        walkerScript = new WalkerScript();
 
         overlayManager.add(pathOverlay);
         overlayManager.add(pathMinimapOverlay);
@@ -149,7 +165,10 @@ public class ShortestPathPlugin extends Plugin {
         overlayManager.remove(pathMapOverlay);
         overlayManager.remove(pathMapTooltipOverlay);
         overlayManager.remove(debugOverlayPanel);
+        exit();
+    }
 
+    public static void exit() {
         if (pathfindingExecutor != null) {
             pathfindingExecutor.shutdownNow();
             pathfindingExecutor = null;
@@ -298,7 +317,7 @@ public class ShortestPathPlugin extends Plugin {
         }
     }
 
-    public Map<WorldPoint, List<Transport>> getTransports() {
+    public static Map<WorldPoint, List<Transport>> getTransports() {
         return pathfinderConfig.getTransports();
     }
 
@@ -366,7 +385,7 @@ public class ShortestPathPlugin extends Plugin {
         return null;
     }
 
-    private void setTarget(WorldPoint target) {
+    public void setTarget(WorldPoint target) {
         Player localPlayer = client.getLocalPlayer();
         if (!startPointSet && localPlayer == null) {
             return;

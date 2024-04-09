@@ -582,6 +582,10 @@ public class Rs2GameObject {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(tileObject.getId()));
     }
 
+    public static ObjectComposition convertGameObjectToObjectComposition(int objectId) {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(objectId));
+    }
+
     public static WallObject findDoor(int id) {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();

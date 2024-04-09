@@ -55,7 +55,7 @@ public class RomeoAndJuliet extends BasicQuestHelper
 
 	Requirement inJulietRoom;
 
-	QuestStep talkToRomeo, goUpToJuliet, talkToJuliet, giveLetterToRomeo, talkToLawrence, talkToApothecary, goUpToJuliet2, givePotionToJuliet, finishQuest;
+	QuestStep talkToRomeo, goUpToJuliet, talkToJuliet, giveLetterToRomeo, talkToLawrence, talkToApothecary, givePotionToJuliet, finishQuest;
 
 	//Zones
 	Zone julietRoom;
@@ -81,7 +81,7 @@ public class RomeoAndJuliet extends BasicQuestHelper
 
 		ConditionalStep bringPotionToJuliet = new ConditionalStep(this, talkToApothecary);
 		bringPotionToJuliet.addStep(new Conditions(potion, inJulietRoom), givePotionToJuliet);
-		bringPotionToJuliet.addStep(potion, goUpToJuliet2);
+		bringPotionToJuliet.addStep(potion, givePotionToJuliet);
 
 		steps.put(50, bringPotionToJuliet);
 		steps.put(60, finishQuest);
@@ -126,9 +126,7 @@ public class RomeoAndJuliet extends BasicQuestHelper
 		talkToApothecary = new NpcStep(this, NpcID.APOTHECARY, new WorldPoint(3195, 3405, 0), "Bring the Apothecary cadava berries in south west Varrock.", cadavaBerry);
 		talkToApothecary.addDialogStep("Talk about something else.");
 		talkToApothecary.addDialogStep("Talk about Romeo & Juliet.");
-		goUpToJuliet2 = new ObjectStep(this, ObjectID.STAIRCASE_11797, new WorldPoint(3157, 3436, 0), "Bring the potion to Juliet in the house west of Varrock.", potion);
 		givePotionToJuliet = new NpcStep(this, NpcID.JULIET, new WorldPoint(3158, 3427, 1), "Bring the potion to Juliet in the house west of Varrock.", potion);
-		givePotionToJuliet.addSubSteps(goUpToJuliet2);
 
 		finishQuest = new NpcStep(this, NpcID.ROMEO, new WorldPoint(3211, 3422, 0), "Talk to Romeo in Varrock Square to finish the quest.");
 

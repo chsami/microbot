@@ -7,7 +7,10 @@ import net.runelite.api.Point;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathFinder;
+import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathNode;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -36,8 +39,10 @@ public class PathTileOverlay extends Overlay {
     }
 
     private void renderTransports(Graphics2D graphics) {
+        if (ShortestPathPlugin.getPathfinder() == null)
+            return;
         for (WorldPoint a : plugin.getTransports().keySet()) {
-            drawTile(graphics, a, config.colourTransports(), -1, true);
+            drawTile(graphics, a, config.colourTransports(), -1, true, 0);
 
             Point ca = tileCenter(a);
 
@@ -135,13 +140,19 @@ public class PathTileOverlay extends Overlay {
             int counter = 0;
             if (TileStyle.LINES.equals(config.pathStyle())) {
                 for (int i = 1; i < path.size(); i++) {
-                    drawLine(graphics, path.get(i - 1), path.get(i), color, 1 + counter++);
+                    float step = i / (float) path.size();
+                    Color newColor = generateGradient(step);
+                    newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), 75);
+                    drawLine(graphics, path.get(i - 1), path.get(i), newColor, 1 + counter++);
                     drawTransportInfo(graphics, path.get(i - 1), path.get(i));
                 }
             } else {
                 boolean showTiles = TileStyle.TILES.equals(config.pathStyle());
                 for (int i = 0; i < path.size(); i++) {
-                    drawTile(graphics, path.get(i), color, counter++, showTiles);
+                    float step = i / (float) path.size();
+                    Color newColor = generateGradient(step);
+                    newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), 75);
+                    drawTile(graphics, path.get(i), newColor, counter++, showTiles, step);
                     drawTransportInfo(graphics, path.get(i), (i + 1 == path.size()) ? null : path.get(i + 1));
                 }
             }
@@ -170,7 +181,7 @@ public class PathTileOverlay extends Overlay {
         return new Point(cx, cy);
     }
 
-    private void drawTile(Graphics2D graphics, WorldPoint location, Color color, int counter, boolean draw) {
+    private void drawTile(Graphics2D graphics, WorldPoint location, Color color, int counter, boolean draw, float step) {
         for (WorldPoint point : WorldPoint.toLocalInstance(client, location)) {
             if (point.getPlane() != client.getPlane()) {
                 continue;
@@ -189,6 +200,15 @@ public class PathTileOverlay extends Overlay {
             if (draw) {
                 graphics.setColor(color);
                 graphics.fill(poly);
+                if (step > 0)
+                {
+                    int centerX = (int) poly.getBounds().getCenterX();
+                    int centerY = (int) poly.getBounds().getCenterY();
+                    int percentage = (int) (step * 100);
+
+                    graphics.setColor(Color.WHITE);
+                    graphics.drawString(percentage + "%", centerX - 9, centerY + 5);
+                }
             }
 
             drawCounter(graphics, poly.getBounds().getCenterX(), poly.getBounds().getCenterY(), counter);
@@ -298,5 +318,23 @@ public class PathTileOverlay extends Overlay {
                 }
             }
         }
+    }
+    public static Color generateGradient(float step) {
+        if (step < 0) {
+            step = 0;
+        } else if (step > 1) {
+            step = 1;
+        }
+
+        float[] startComponents = Color.RED.getRGBColorComponents(null);
+        float[] endComponents = Color.GREEN.getRGBColorComponents(null);
+
+        float[] interpolatedComponents = new float[3];
+
+        for (int j = 0; j < 3; j++) {
+            interpolatedComponents[j] = startComponents[j] + step * (endComponents[j] - startComponents[j]);
+        }
+
+        return new Color(interpolatedComponents[0], interpolatedComponents[1], interpolatedComponents[2]);
     }
 }

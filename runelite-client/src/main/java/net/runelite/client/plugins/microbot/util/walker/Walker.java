@@ -198,6 +198,9 @@ public class Walker {
     }
 
     public boolean hybridWalkTo(WorldPoint target, boolean useNearest, boolean accurate) {
+
+        return Rs2Walker.walkTo(target);
+/*
         Player player = Microbot.getClient().getLocalPlayer();
         List<PathNode> nodes = getPath(player.getWorldLocation(), target, useNearest);
         if (!accurate && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) < 5 && canReach(target))
@@ -220,7 +223,7 @@ public class Walker {
             pathWalker.walkPath();
 
             return accurate ?  player.getWorldLocation().equals(target) : player.getWorldLocation().distanceTo(target) <= 3;
-        }
+        }*/
     }
 
     public boolean hybridWalkTo(WorldPoint target) {

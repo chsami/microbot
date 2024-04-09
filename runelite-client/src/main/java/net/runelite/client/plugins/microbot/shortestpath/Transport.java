@@ -116,6 +116,13 @@ public class Transport {
     @Getter
     private String displayInfo;
 
+    @Getter
+    private String action;
+    @Getter
+    private String objectName;
+    @Getter
+    private int objectId;
+
     Transport(final WorldPoint origin, final WorldPoint destination) {
         this.origin = origin;
         this.destination = destination;
@@ -137,6 +144,14 @@ public class Transport {
                 Integer.parseInt(parts_destination[0]),
                 Integer.parseInt(parts_destination[1]),
                 Integer.parseInt(parts_destination[2]));
+
+        try {
+            action = parts[2].split(DELIM)[0];
+            objectId = Integer.parseInt(parts[2].split(DELIM)[parts[2].split(DELIM).length - 1]);
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+
 
         // Skill requirements
         if (parts.length >= 4 && !parts[3].isEmpty()) {

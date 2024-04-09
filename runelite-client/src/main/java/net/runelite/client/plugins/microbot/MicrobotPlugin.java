@@ -46,6 +46,7 @@ import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
+import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.Text;
 
 import javax.inject.Inject;
@@ -105,6 +106,8 @@ public class MicrobotPlugin extends Plugin {
 
     @Inject
     private Rs2NpcManager rs2NpcManager;
+    @Inject
+    private WorldMapPointManager worldMapPointManager;
 
     private Plugin summerGardenPlugin = null;
 
@@ -130,6 +133,7 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setDisableWalkerUpdate(disableWalkerUpdate);
         Microbot.setPluginManager(pluginManager);
         Microbot.setWorldMapOverlay(worldMapOverlay);
+        Microbot.setWorldMapPointManager(worldMapPointManager);
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }

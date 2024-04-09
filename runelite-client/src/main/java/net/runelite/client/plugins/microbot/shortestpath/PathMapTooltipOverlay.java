@@ -41,6 +41,8 @@ public class PathMapTooltipOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        if (ShortestPathPlugin.getPathfinder() == null)
+            return null;
         if (!config.drawMap() || client.getWidget(ComponentID.WORLD_MAP_MAPVIEW) == null) {
             return null;
         }

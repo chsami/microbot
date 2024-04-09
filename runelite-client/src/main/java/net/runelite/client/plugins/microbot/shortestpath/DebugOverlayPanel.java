@@ -38,6 +38,8 @@ public class DebugOverlayPanel extends OverlayPanel {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        if (ShortestPathPlugin.getPathfinder() == null)
+            return null;
         Pathfinder pathfinder = plugin.getPathfinder();
         Pathfinder.PathfinderStats stats;
         if (pathfinder == null || (stats = pathfinder.getStats()) == null) {
@@ -63,7 +65,7 @@ public class DebugOverlayPanel extends OverlayPanel {
         String nodes = Integer.toString(stats.getNodesChecked());
         components.add(makeLine("Nodes:", nodes));
 
-        String transports = Integer.toString(stats.getTransportsChecked());
+        String transports = Integer.toString(stats.getTransportsChecked().size());
         components.add(makeLine("Transports:", transports));
 
         String totalNodes = Integer.toString(stats.getTotalNodesChecked());
