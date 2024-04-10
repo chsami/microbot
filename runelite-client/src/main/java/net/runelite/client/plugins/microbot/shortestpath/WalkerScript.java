@@ -2,25 +2,23 @@ package net.runelite.client.plugins.microbot.shortestpath;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.runelite.api.*;
-import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -28,10 +26,9 @@ import java.util.stream.IntStream;
  */
 public class WalkerScript extends Script {
 
-    public static String version = "1.0";
+    public static String version = "1.1";
 
     /**
-     *
      * @param target
      * @return
      */
@@ -40,7 +37,6 @@ public class WalkerScript extends Script {
     }
 
     /**
-     *
      * @param target
      * @return
      */
@@ -58,6 +54,9 @@ public class WalkerScript extends Script {
                     shutdown();
                     return;
                 }
+                if (!ShortestPathPlugin.getPathfinder().isDone())
+                    return;
+
                 List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
                 int indexOfStartPoint = getClosestTileIndex(path);
                 /**
@@ -97,7 +96,6 @@ public class WalkerScript extends Script {
     }
 
     /**
-     *
      * @param path
      * @param indexOfStartPoint
      * @return
@@ -139,7 +137,6 @@ public class WalkerScript extends Script {
     }
 
     /**
-     *
      * @param path
      * @return
      */
@@ -155,7 +152,6 @@ public class WalkerScript extends Script {
     }
 
     /**
-     *
      * @param start
      */
     public void setStart(WorldPoint start) {
@@ -167,7 +163,6 @@ public class WalkerScript extends Script {
     }
 
     /**
-     *
      * @param target
      */
     public void setTarget(WorldPoint target) {
@@ -206,7 +201,6 @@ public class WalkerScript extends Script {
     }
 
     /**
-     *
      * @param start
      * @param end
      */
@@ -234,6 +228,7 @@ public class WalkerScript extends Script {
 
     /**
      * TODO: REFACTOR DUPLICATE CODE
+     *
      * @param a
      * @param b
      * @return
@@ -337,7 +332,6 @@ public class WalkerScript extends Script {
     }
 
     /**
-     *
      * @param point
      * @return
      */
@@ -350,7 +344,6 @@ public class WalkerScript extends Script {
     }
 
     /**
-     *
      * @param path
      * @param indexOfStartPoint
      * @return
@@ -370,17 +363,20 @@ public class WalkerScript extends Script {
                     }
 
                     for (int i = indexOfStartPoint; i < path.size(); i++) {
-                        if (origin.getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()) continue;
+                        if (origin.getPlane() != Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane())
+                            continue;
                         if (path.stream().noneMatch(x -> x.equals(b.getDestination()))) continue;
 
                         int indexOfOrigin = IntStream.range(0, path.size())
                                 .filter(f -> path.get(f).equals(b.getOrigin()))
                                 .findFirst()
-                                .orElse(0);
+                                .orElse(-1);
                         int indexOfDestination = IntStream.range(0, path.size())
                                 .filter(f -> path.get(f).equals(b.getDestination()))
                                 .findFirst()
-                                .orElse(0);
+                                .orElse(-1);
+                        if (indexOfDestination == -1) continue;
+                        if (indexOfOrigin == -1) continue;
                         if (indexOfDestination < indexOfOrigin) continue;
 
                         if (path.get(i).equals(origin)
@@ -388,6 +384,12 @@ public class WalkerScript extends Script {
                                 || path.get(i).dx(+1).equals(origin)
                                 || path.get(i).dy(-1).equals(origin)
                                 || path.get(i).dy(+1).equals(origin)) {
+
+                            if (b.getDestination().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 20) {
+                                handleTrapdoor(b);
+                            }
+
+
                             Rs2GameObject.interact(b.getObjectId());
                             Rs2Player.waitForWalking();
                             Rs2GameObject.interact(b.getObjectId(), b.getAction());
@@ -397,6 +399,35 @@ public class WalkerScript extends Script {
                     }
                 }
             }
+        }
+        return false;
+    }
+
+    private boolean handleTrapdoor(Transport b) {
+        List<GroundObject> gameObjects = Rs2GameObject.getGroundObjects(25);
+        gameObjects = gameObjects.stream().filter(g -> Rs2GameObject.getObjectIdsByName("trapdoor").stream().anyMatch(x -> g.getId() == x)).collect(Collectors.toList());
+        GroundObject trapdoor = gameObjects
+                .stream()
+                .map(x -> {
+                    ObjectComposition objectComposition = Rs2GameObject.convertGameObjectToObjectComposition(x.getId());
+                    if (objectComposition == null) {
+                        return null;
+                    }
+                    boolean isTrapdoorNearOrigin = x.getWorldLocation().distanceTo(b.getOrigin()) <= 5;
+                    if (!isTrapdoorNearOrigin) {
+                        return null;
+                    }
+                    boolean hasOpenAction = !Arrays.stream(objectComposition.getActions()).filter(Objects::nonNull).filter(o -> o.toLowerCase().contains("open")).findFirst().orElse("").isEmpty();
+                    if (!hasOpenAction) {
+                        return null;
+                    }
+                    return x;
+                }).filter(Objects::nonNull)
+                .findFirst().orElse(null);
+        if (trapdoor != null) {
+            Rs2GameObject.interact(trapdoor, "open");
+            Rs2Player.waitForAnimation();
+            return true;
         }
         return false;
     }
