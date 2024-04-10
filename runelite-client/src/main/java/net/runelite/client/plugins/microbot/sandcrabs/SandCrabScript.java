@@ -89,7 +89,7 @@ public class SandCrabScript extends Script {
                             Rs2Tab.switchToCombatOptionsTab();
                             Rs2Combat.enableAutoRetialiate();
                         }
-                        if (!isNpcAggressive()) {
+                        if (!isNpcAggressive() || afkTimer > 10) {
                             state = State.AFK;
                         }
                         break;
