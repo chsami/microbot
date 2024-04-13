@@ -23,11 +23,13 @@ class MiningHelper {
                 return false
             }
 
-            val nearestOre = objects.minBy { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) }
-            if (nearestOre.worldLocation.distanceTo(player.worldLocation) >= 2) {
-                Microbot.status = "Walking to nearest ${oreName} ore"
-                if (!Rs2Camera.isTileOnScreen(nearestOre.localLocation)) {
-                    Microbot.getWalkerForKotlin().staticWalkTo(nearestOre.worldLocation)
+            val nearestOre = objects.minByOrNull { gameObject: GameObject -> gameObject.worldLocation.distanceTo(player.worldLocation) }
+            if (nearestOre != null) {
+                if (nearestOre.worldLocation.distanceTo(player.worldLocation) >= 2) {
+                    Microbot.status = "Walking to nearest ${oreName} ore"
+                    if (!Rs2Camera.isTileOnScreen(nearestOre.localLocation)) {
+                        Microbot.getWalkerForKotlin().staticWalkTo(nearestOre.worldLocation)
+                    }
                 }
             }
 
@@ -35,8 +37,10 @@ class MiningHelper {
                 return false
             }
 
-            if (!Rs2Camera.isTileOnScreen(nearestOre.localLocation)) {
-                Rs2Camera.turnTo(nearestOre.localLocation)
+            if (nearestOre != null) {
+                if (!Rs2Camera.isTileOnScreen(nearestOre.localLocation)) {
+                    Rs2Camera.turnTo(nearestOre.localLocation)
+                }
             }
 
             val success = Rs2GameObject.interact(nearestOre, "Mine")
@@ -44,15 +48,19 @@ class MiningHelper {
                 return false
             }
 
-            TrainerInterruptor.sleepUntilTrue({ Rs2Player.isAnimating() || Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null }, 100, 3000)
-            if (Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null) {
-                return false
+            if (nearestOre != null) {
+                TrainerInterruptor.sleepUntilTrue({ Rs2Player.isAnimating() || Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null }, 100, 3000)
+            }
+            if (nearestOre != null) {
+                if (Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null) {
+                    return false
+                }
             }
 
             Microbot.status = "Waiting to finish mining ${oreName} ore"
             return TrainerInterruptor.sleepUntilTrue({
                 val doneMining = !Rs2Player.isWalking() && !Rs2Player.isAnimating()
-                val oreDisappeared = Rs2GameObject.findObject(nearestOre.id, nearestOre.worldLocation) == null
+                val oreDisappeared = nearestOre?.let { Rs2GameObject.findObject(it.id, nearestOre.worldLocation) } == null
                 return@sleepUntilTrue doneMining || oreDisappeared
             }, 100, 1000 * 90)
         }

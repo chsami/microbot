@@ -60,7 +60,7 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
         val attackLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.ATTACK)
         val strengthLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.STRENGTH)
         val defenceLevel = Microbot.getClientForKotlin().getRealSkillLevel(Skill.DEFENCE)
-        return listOf(attackLevel, strengthLevel, defenceLevel).min()
+        return minOf(attackLevel, strengthLevel, defenceLevel)
     }
 
     override fun shouldTrain(): Boolean {
