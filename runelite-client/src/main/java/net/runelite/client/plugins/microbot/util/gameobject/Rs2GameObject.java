@@ -862,6 +862,7 @@ public class Rs2GameObject {
             Rs2Walker.walkFastCanvas(object.getWorldLocation());
             return false;
         }
+
         try {
 
             int param0 = 0;
@@ -870,6 +871,8 @@ public class Rs2GameObject {
 
             ObjectComposition objComp = convertGameObjectToObjectComposition(object);
             if (objComp == null) return false;
+
+            Microbot.status = action + " " + objComp.getName();
 
             if (object instanceof GameObject) {
                 GameObject obj = (GameObject) object;

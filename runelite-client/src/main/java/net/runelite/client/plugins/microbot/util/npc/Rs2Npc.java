@@ -185,6 +185,7 @@ public class Rs2Npc {
 
     public static boolean interact(NPC npc, String action) {
         if (npc == null) return false;
+        Microbot.status = action + " " + npc.getName();
         try {
             NPCComposition npcComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(npc.getId()));
 

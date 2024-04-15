@@ -6,6 +6,7 @@ import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.thieving.enums.ThievingNpc;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
@@ -22,7 +23,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class ThievingScript extends Script {
 
-    public static double version = 1.0;
+    public static double version = 1.2;
 
     public boolean run(ThievingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -51,17 +52,17 @@ public class ThievingScript extends Script {
                 if (Rs2Inventory.isFull()) {
                     Rs2Inventory.dropAllExcept(x -> x.slot <= 8);
                 }
-                if (Rs2Inventory.hasItemAmount("coin pouch", 28, true)) {
-                    Rs2Inventory.interact("coin pouch", "open-all");
-                }
+                openCoinPouches(config);
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > config.hitpoints()) {
-                    if (random(1, 10) == 2)
-                        sleepUntil(() -> TimersPlugin.t == null || !TimersPlugin.t.render());
-                    if (Rs2Npc.interact(config.THIEVING_NPC().getName(), "pickpocket")) {
-                        sleep(300, 600);
+                    if (config.THIEVING_NPC() != ThievingNpc.NONE) {
+                        if (random(1, 10) == 2)
+                            sleepUntil(() -> TimersPlugin.t == null || !TimersPlugin.t.render());
+                        if (Rs2Npc.interact(config.THIEVING_NPC().getName(), "pickpocket")) {
+                            Microbot.status = "Pickpocketting " + config.THIEVING_NPC().getName();
+                            sleep(300, 600);
+                        }
                     }
                 } else {
-
                     for (Rs2Item food : foods) {
                         Rs2Inventory.interact(food, "eat");
                         if (random(1, 10) == 2) { //double eat
@@ -75,5 +76,11 @@ public class ThievingScript extends Script {
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    private void openCoinPouches(ThievingConfig config) {
+        if (Rs2Inventory.hasItemAmount("coin pouch", config.coinPouchTreshHold(), true)) {
+            Rs2Inventory.interact("coin pouch", "open-all");
+        }
     }
 }

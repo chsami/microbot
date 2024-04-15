@@ -233,48 +233,6 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onMenuOpened(MenuOpened event) {
-        MenuEntry[] entries = event.getMenuEntries();
-        MenuEntry npcEntry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_NPC).findFirst().orElse(null);
-        MenuEntry objectEntry = Arrays.stream(entries).filter(x -> x.getType() == MenuAction.EXAMINE_OBJECT).findFirst().orElse(null);
-
-        if (npcEntry != null) {
-            net.runelite.api.NPC npc = Rs2Npc.getNpcByIndex(npcEntry.getIdentifier());
-
-            List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
-
-            if (Arrays.stream(event.getMenuEntries()).anyMatch(x -> x.getOption().equalsIgnoreCase("pickpocket"))) {
-                leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
-                        .setOption(thievingScript == null ? "Start AutoThiever" : "Stop AutoThiever")
-                        .setType(MenuAction.RUNELITE)
-                        .onClick(menuActionNpcConsumer(false, npc)));
-            }
-        }
-        if (objectEntry != null) {
-            // Currently only supports alkharid furnace
-            if (objectEntry.getIdentifier() == ObjectID.RANGE_26181) {
-
-                List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
-
-                leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
-                        .setOption(cookingScript == null ? "Start AutoCooker" : "Stop AutoCooker")
-                        .setType(MenuAction.RUNELITE)
-                        .onClick(menuActionCookingConsumer(objectEntry.getIdentifier())));
-            } else if (objectEntry.getIdentifier() == ObjectID.SQIRK_TREE) {
-                List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
-
-                leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
-                        .setOption(summerGardenScript == null ? "Start SummerGarden" : "Stop SummerGarden")
-                        .setType(MenuAction.RUNELITE)
-                        .onClick(menuActionSummerGarden()));
-            } else if (objectEntry.getTarget().toLowerCase().contains("rock")) {
-                List<MenuEntry> leftClickMenus = new ArrayList<>(entries.length + 2);
-
-                leftClickMenus.add(Microbot.getClient().createMenuEntry(0)
-                        .setOption(miningScript == null ? "Start AutoMiner" : "Stop AutoMiner")
-                        .setType(MenuAction.RUNELITE)
-                        .onClick(menuActionMinerConsumer(objectEntry.getIdentifier())));
-            }
-        }
     }
 
     @Subscribe
@@ -300,7 +258,6 @@ public class MicrobotPlugin extends Plugin {
             this.client.setMenuEntries(new MenuEntry[]{});
         }
 
-        // if (event.getType() != MenuAction.CC_OP.getId() || event.getActionParam1() != WORLD_SWITCHER_LIST.getId() && event.getActionParam1() != 11927560 && event.getActionParam1() != 4522007 && event.getActionParam1() != 24772686) {
         if (Microbot.targetMenu != null) {
             MenuEntry entry =
                     this.client.createMenuEntry(-1)
@@ -321,7 +278,6 @@ public class MicrobotPlugin extends Plugin {
             }
             this.client.setMenuEntries(new MenuEntry[]{entry});
         }
-        //}
     }
 
     @Subscribe
