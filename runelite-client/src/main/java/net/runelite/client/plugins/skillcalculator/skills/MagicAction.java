@@ -52,7 +52,7 @@ public enum MagicAction implements SkillAction
 	WIND_BOLT("Wind Bolt", 17, 13.5f, SpriteID.SPELL_WIND_BOLT, false, 14286864, MenuAction.WIDGET_TARGET),
 	CURSE("Curse", 19, 29, SpriteID.SPELL_CURSE, false, 14286865, MenuAction.WIDGET_TARGET),
 	BIND("Bind", 20, 30, SpriteID.SPELL_BIND, false, 14286866, MenuAction.WIDGET_TARGET),
-	LOW_LEVEL_ALCHEMY("Low Level Alchemy", 21, 31, SpriteID.SPELL_LOW_LEVEL_ALCHEMY, false, 14286867, MenuAction.WIDGET_TARGET),
+	LOW_LEVEL_ALCHEMY("Low Level Alchemy", 21, 31, SpriteID.SPELL_LOW_LEVEL_ALCHEMY, false, 14286869, MenuAction.WIDGET_TARGET),
 	WATER_BOLT("Water Bolt", 23, 16.5f, SpriteID.SPELL_WATER_BOLT, false, 14286868, MenuAction.WIDGET_TARGET),
 	ENCHANT_PEARL_BOLT("Enchant Pearl Bolt", 24, 29, SpriteID.SPELL_ENCHANT_CROSSBOW_BOLT, true, -1, null),
 	VARROCK_TELEPORT("Varrock Teleport", 25, 35, SpriteID.SPELL_VARROCK_TELEPORT, false, 14286871, null),

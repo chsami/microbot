@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -64,41 +65,41 @@ public class Rs2Magic {
         }
     }
 
-    public static void highAlch(String itemName, boolean exact) {
-        Rs2Tab.switchToMagicTab();
-        Rs2Item item = Rs2Inventory.get(itemName, exact);
-        Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
-        alch(highAlch, item);
+    public static void alch(String itemName) {
+        Rs2Item item = Rs2Inventory.get(itemName);
+        if (Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 55) {
+            highAlch(item);
+        } else {
+            lowAlch(item);
+        }
     }
 
-    public static void highAlch(String itemName) {
-        highAlch(itemName, false);
+    public static void alch(Rs2Item item) {
+        if (Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 55) {
+            highAlch(item);
+        } else {
+            lowAlch(item);
+        }
     }
 
-
-    public static void highAlch(Rs2Item item, boolean exact) {
+    private static void highAlch(Rs2Item item) {
         sleepUntil(() -> {
             Rs2Tab.switchToMagicTab();
             sleep(50, 150);
             return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
         });
-        Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
+        Widget highAlch = Rs2Widget.findWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getName());
         alch(highAlch, item);
     }
 
-    public static void highAlch(Rs2Item rs2Item) {
-        highAlch(rs2Item, false);
-    }
-
-
-    public static void highAlch() {
-        Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
-        alch(highAlch);
-    }
-
-    public static void lowAlch() {
-        Widget lowAlch = Microbot.getClient().getWidget(MagicAction.LOW_LEVEL_ALCHEMY.getWidgetId());
-        alch(lowAlch);
+    private static void lowAlch(Rs2Item item) {
+        sleepUntil(() -> {
+            Rs2Tab.switchToMagicTab();
+            sleep(50, 150);
+            return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
+        });
+        Widget highAlch = Rs2Widget.findWidget(MagicAction.LOW_LEVEL_ALCHEMY.getName());
+        alch(highAlch, item);
     }
 
     private static void alch(Widget alch, Rs2Item item) {

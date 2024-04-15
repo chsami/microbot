@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MagicScript extends Script {
 
-    public static double version = 1.7;
+    public static double version = 1.8;
 
 
     public boolean run(MagicConfig config) {
@@ -30,17 +30,20 @@ public class MagicScript extends Script {
 
 
             try {
-                if (!config.highAlchemy() && (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts))
+                if (!config.alchemy() && (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts))
                     return;
 
-                if (config.highAlchemy()) {
+                if (config.alchemy()) {
 
-                    Rs2Item item = Rs2Inventory.get(config.highAlchemyItem());
+                    Rs2Item item = Rs2Inventory.get(config.AlchItem());
                     if (item == null) {
-                        Microbot.showMessage("Item: " + config.highAlchemyItem() + " not found in your inventory.");
+                        Microbot.showMessage("Item: " + config.AlchItem() + " not found in your inventory.");
                         return;
                     }
-                    Rs2Magic.highAlch(item);
+
+                    if (config.alchemy()) {
+                        Rs2Magic.alch(item);
+                    }
                     sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC);
                 }
 

@@ -13,6 +13,8 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -25,9 +27,10 @@ import static net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer.isQuick
 import static net.runelite.client.plugins.pestcontrol.Portal.*;
 
 public class PestControlScript extends Script {
-    public static double version = 1.0;
+    public static double version = 1.5;
 
     boolean walkToCenter = false;
+    PestControlConfig config;
 
     private static final Set<Integer> SPINNER_IDS = ImmutableSet.of(
             NpcID.SPINNER,
@@ -61,6 +64,7 @@ public class PestControlScript extends Script {
     final int distanceToPortal = 8;
 
     public boolean run(PestControlConfig config) {
+        this.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
@@ -93,77 +97,25 @@ public class PestControlScript extends Script {
 
                     Rs2Combat.setSpecState(true, 550);
 
-
-                    for (int brawler : BRAWLER_IDS) {
-                        if (!Microbot.getClient().getLocalPlayer().isInteracting())
-                            if (Rs2Npc.interact(brawler, "attack")) {
-                                sleepUntil(() -> !Microbot.getClient().getLocalPlayer().isInteracting());
-                                return;
-                            }
+                    if (handleAttack(PestControlNpc.BRAWLER, purpleHealth, blueHealth, redHealth, yellowHealth, 1)
+                            || handleAttack(PestControlNpc.PORTAL, purpleHealth, blueHealth, redHealth, yellowHealth, 1)
+                            || handleAttack(PestControlNpc.SPINNER, purpleHealth, blueHealth, redHealth, yellowHealth, 1)) {
+                        return;
                     }
 
-
-                    for (int spinner : SPINNER_IDS) {
-                        if (Rs2Npc.interact(spinner, "attack")) {
-                            sleepUntil(() -> !Microbot.getClient().getLocalPlayer().isInteracting());
-                            return;
-                        }
+                    if (handleAttack(PestControlNpc.BRAWLER, purpleHealth, blueHealth, redHealth, yellowHealth, 2)
+                            || handleAttack(PestControlNpc.PORTAL, purpleHealth, blueHealth, redHealth, yellowHealth, 2)
+                            || handleAttack(PestControlNpc.SPINNER, purpleHealth, blueHealth, redHealth, yellowHealth, 2)) {
+                        return;
+                    }
+                    if (handleAttack(PestControlNpc.BRAWLER, purpleHealth, blueHealth, redHealth, yellowHealth, 3)
+                            || handleAttack(PestControlNpc.PORTAL, purpleHealth, blueHealth, redHealth, yellowHealth, 3)
+                            || handleAttack(PestControlNpc.SPINNER, purpleHealth, blueHealth, redHealth, yellowHealth, 3)) {
+                        return;
                     }
 
                     if (Microbot.getClient().getLocalPlayer().isInteracting())
                         return;
-
-                    if (!purpleShield && !purpleHealth.getText().trim().equals("0")) {
-                        if (!Rs2Walker.isCloseToRegion(distanceToPortal, 8, 30)) {
-                            WorldPoint worldPoint = Rs2Walker.walkFastRegion(8, 30);
-                            if (worldPoint == null) {
-                                Rs2Walker.walkFastRegion(30, 32);
-                            }
-                        } else {
-                            if (!Microbot.getClient().getLocalPlayer().isInteracting())
-                                Rs2Npc.attack("portal");
-                        }
-                        return;
-                    }
-
-                    if (!blueShield && !blueHealth.getText().trim().equals("0")) {
-                        if (!Rs2Walker.isCloseToRegion(distanceToPortal, 55, 29)) {
-                            WorldPoint worldPoint = Rs2Walker.walkFastRegion(55, 29);
-                            if (worldPoint == null) {
-                                Rs2Walker.walkFastRegion(30, 32);
-                            }
-                        } else {
-                            if (!Microbot.getClient().getLocalPlayer().isInteracting())
-                                Rs2Npc.attack("portal");
-                        }
-                        return;
-                    }
-
-                    if (!redShield && !redHealth.getText().trim().equals("0")) {
-                        if (!Rs2Walker.isCloseToRegion(distanceToPortal, 22, 12)) {
-                            WorldPoint worldPoint = Rs2Walker.walkFastRegion(22, 12);
-                            if (worldPoint == null) {
-                                Rs2Walker.walkFastRegion(30, 32);
-                            }
-                        } else {
-                            if (!Microbot.getClient().getLocalPlayer().isInteracting())
-                                Rs2Npc.attack("portal");
-                        }
-                        return;
-                    }
-
-                    if (!yellowShield && !yellowHealth.getText().trim().equals("0")) {
-                        if (!Rs2Walker.isCloseToRegion(distanceToPortal, 48, 13)) {
-                            WorldPoint worldPoint = Rs2Walker.walkFastRegion(48, 13);
-                            if (worldPoint == null) {
-                                Rs2Walker.walkFastRegion(30, 32);
-                            }
-                        } else {
-                            if (!Microbot.getClient().getLocalPlayer().isInteracting())
-                                Rs2Npc.attack("portal");
-                        }
-                        return;
-                    }
 
 
                     if (!Microbot.getClient().getLocalPlayer().isInteracting()) {
@@ -194,7 +146,11 @@ public class PestControlScript extends Script {
                         } else {
                             Rs2GameObject.interact(ObjectID.GANGPLANK_14315);
                         }
-                        sleep(3000);
+                        if (config.alchInBoat() && !config.alchItem().equalsIgnoreCase("")) {
+                            Rs2Magic.alch(config.alchItem());
+                        } else {
+                            sleep(3000);
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -208,5 +164,122 @@ public class PestControlScript extends Script {
         super.shutdown();
     }
 
+    private boolean handleAttack(PestControlNpc npcType, Widget purpleHealth, Widget blueHealth, Widget redHealth, Widget yellowHealth, int priority) {
+        if (priority == 1) {
+            if (config.Priority1() == npcType) {
+                if (npcType == PestControlNpc.BRAWLER) {
+                    return attackBrawler();
+                } else if (npcType == PestControlNpc.PORTAL) {
+                    return attackPortals(purpleHealth, blueHealth, redHealth, yellowHealth);
+                } else if (npcType == PestControlNpc.SPINNER) {
+                    return attackSpinner();
+                }
+            }
+        } else if (priority == 2) {
+            if (config.Priority2() == npcType) {
+                if (npcType == PestControlNpc.BRAWLER) {
+                    return attackBrawler();
+                } else if (npcType == PestControlNpc.PORTAL) {
+                    return attackPortals(purpleHealth, blueHealth, redHealth, yellowHealth);
+                } else if (npcType == PestControlNpc.SPINNER) {
+                    return attackSpinner();
+                }
+            }
+        } else {
+            if (config.Priority2() == npcType) {
+                if (npcType == PestControlNpc.BRAWLER) {
+                    return attackBrawler();
+                } else if (npcType == PestControlNpc.PORTAL) {
+                    return attackPortals(purpleHealth, blueHealth, redHealth, yellowHealth);
+                } else if (npcType == PestControlNpc.SPINNER) {
+                    return attackSpinner();
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    private boolean attackPortals(Widget purpleHealth, Widget blueHealth, Widget redHealth, Widget yellowHealth) {
+        if (!purpleShield && !purpleHealth.getText().trim().equals("0")) {
+            if (!Rs2Walker.isCloseToRegion(distanceToPortal, 8, 30)) {
+                WorldPoint worldPoint = Rs2Walker.walkFastRegion(8, 30);
+                if (worldPoint == null) {
+                    Rs2Walker.walkFastRegion(30, 32);
+                    return true;
+                }
+            } else {
+                if (!Microbot.getClient().getLocalPlayer().isInteracting())
+                    return Rs2Npc.attack("portal");
+            }
+            return false;
+        }
+
+        if (!blueShield && !blueHealth.getText().trim().equals("0")) {
+            if (!Rs2Walker.isCloseToRegion(distanceToPortal, 55, 29)) {
+                WorldPoint worldPoint = Rs2Walker.walkFastRegion(55, 29);
+                if (worldPoint == null) {
+                    Rs2Walker.walkFastRegion(30, 32);
+                    return true;
+                }
+            } else {
+                if (!Microbot.getClient().getLocalPlayer().isInteracting())
+                    return Rs2Npc.attack("portal");
+            }
+            return false;
+        }
+
+        if (!redShield && !redHealth.getText().trim().equals("0")) {
+            if (!Rs2Walker.isCloseToRegion(distanceToPortal, 22, 12)) {
+                WorldPoint worldPoint = Rs2Walker.walkFastRegion(22, 12);
+                if (worldPoint == null) {
+                    Rs2Walker.walkFastRegion(30, 32);
+                    return true;
+                }
+            } else {
+                if (!Microbot.getClient().getLocalPlayer().isInteracting())
+                    return Rs2Npc.attack("portal");
+            }
+            return false;
+        }
+
+        if (!yellowShield && !yellowHealth.getText().trim().equals("0")) {
+            if (!Rs2Walker.isCloseToRegion(distanceToPortal, 48, 13)) {
+                WorldPoint worldPoint = Rs2Walker.walkFastRegion(48, 13);
+                if (worldPoint == null) {
+                    Rs2Walker.walkFastRegion(30, 32);
+                    return true;
+                }
+            } else {
+                if (!Microbot.getClient().getLocalPlayer().isInteracting())
+                    return Rs2Npc.attack("portal");
+            }
+            return false;
+        }
+        return false;
+    }
+
+    private boolean attackSpinner() {
+        for (int brawler : SPINNER_IDS) {
+            if (!Microbot.getClient().getLocalPlayer().isInteracting())
+                if (Rs2Npc.interact(brawler, "attack")) {
+                    sleepUntil(() -> !Microbot.getClient().getLocalPlayer().isInteracting());
+                    return true;
+                }
+        }
+        return false;
+    }
+
+    private boolean attackBrawler() {
+        for (int brawler : BRAWLER_IDS) {
+            if (!Microbot.getClient().getLocalPlayer().isInteracting())
+                if (Rs2Npc.interact(brawler, "attack")) {
+                    sleepUntil(() -> !Microbot.getClient().getLocalPlayer().isInteracting());
+                    return true;
+                }
+        }
+        return false;
+    }
 
 }
