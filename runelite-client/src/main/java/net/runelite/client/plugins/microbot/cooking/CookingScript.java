@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -51,7 +52,7 @@ public class CookingScript extends Script {
                 }
 
                 if (Rs2Inventory.hasItem(itemToCook)) {
-                    Microbot.getWalker().walkMiniMap(new WorldPoint(3273 + random(-2, 2), 3180+ random(-2, 2), 0));
+                    Rs2Walker.walkMiniMap(new WorldPoint(3273 + random(-2, 2), 3180+ random(-2, 2), 0));
 
                     TileObject cookingRange = Rs2GameObject.findObjectById(gameObjectId);
                     if (cookingRange != null) {

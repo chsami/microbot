@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -453,6 +454,6 @@ public class Rs2GrandExchange {
     }
 
     public static boolean walkToGrandExchange() {
-        return Microbot.getWalker().hybridWalkTo(BankLocation.GRAND_EXCHANGE.getWorldPoint());
+        return Rs2Walker.walkTo(BankLocation.GRAND_EXCHANGE.getWorldPoint());
     }
 }

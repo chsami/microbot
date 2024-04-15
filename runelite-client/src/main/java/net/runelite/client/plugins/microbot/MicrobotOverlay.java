@@ -2,9 +2,7 @@ package net.runelite.client.plugins.microbot;
 
 import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.mining.MiningScript;
-import net.runelite.client.plugins.microbot.staticwalker.StaticWalkerOverlay;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
-import net.runelite.client.plugins.microbot.util.walker.PathTileOverlay;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -15,19 +13,17 @@ import java.awt.*;
 
 public class MicrobotOverlay extends OverlayPanel {
     MicrobotPlugin plugin;
+
     @Inject
-    MicrobotOverlay(MicrobotPlugin plugin)
-    {
+    MicrobotOverlay(MicrobotPlugin plugin) {
         super(plugin);
         setPosition(OverlayPosition.DYNAMIC);
         this.plugin = plugin;
     }
+
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            PathTileOverlay.render(graphics);
-            StaticWalkerOverlay.renderPathWalkerOverlay(graphics);
-
             if (plugin.thievingScript != null) {
                 drawThievingOverlay();
             }
@@ -40,7 +36,7 @@ public class MicrobotOverlay extends OverlayPanel {
                 drawMiningOverlay();
             }
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         return super.render(graphics);
@@ -73,6 +69,7 @@ public class MicrobotOverlay extends OverlayPanel {
                 .left(Microbot.status)
                 .build());
     }
+
     private void drawMiningOverlay() {
         panelComponent.setPreferredSize(new Dimension(200, 300));
         panelComponent.getChildren().add(TitleComponent.builder()

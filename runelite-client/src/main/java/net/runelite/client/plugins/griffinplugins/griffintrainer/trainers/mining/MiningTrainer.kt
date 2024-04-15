@@ -8,16 +8,17 @@ import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
+import net.runelite.client.plugins.griffinplugins.griffintrainer.WorldDestinations
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
 import net.runelite.client.plugins.griffinplugins.util.helpers.MiningHelper
 import net.runelite.client.plugins.griffinplugins.util.helpers.WorldHelper
 import net.runelite.client.plugins.microbot.Microbot
-import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 
 class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
     private val varrockEastMineWorldArea = WorldArea(3281, 3363, 10, 9, 0)
@@ -107,7 +108,7 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
     private fun runCheckingAreaState(worldArea: WorldArea, worldPoint: WorldPoint) {
         val player = Microbot.getClientForKotlin().localPlayer
         if (!worldArea.contains(player.worldLocation)) {
-            Microbot.getWalkerForKotlin().staticWalkTo(worldPoint)
+            Rs2Walker.walkTo(worldPoint)
         }
 
         if (config.hopWorlds()) {
@@ -153,7 +154,7 @@ class MiningTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
     private fun runBankingState() {
         if (config.keepOre()) {
             if (Rs2Inventory.isFull()) {
-                Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
+                Rs2Walker.walkTo(getBankLocation())
                 TrainerInterruptor.sleep(400, 600)
 
                 Rs2Bank.getNearestBank()

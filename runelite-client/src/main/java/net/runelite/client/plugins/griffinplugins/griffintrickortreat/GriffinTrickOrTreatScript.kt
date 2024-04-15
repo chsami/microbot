@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.griffinplugins.griffintrickortreat
 
-import java.util.concurrent.TimeUnit
 import net.runelite.api.NPC
 import net.runelite.api.coords.WorldArea
 import net.runelite.api.coords.WorldPoint
@@ -10,6 +9,8 @@ import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
+import java.util.concurrent.TimeUnit
 
 class GriffinTrickOrTreatScript : Script() {
     companion object {
@@ -30,7 +31,7 @@ class GriffinTrickOrTreatScript : Script() {
     override fun run(): Boolean {
         scheduledExecutorService.scheduleWithFixedDelay({
             if (!super.run()) return@scheduleWithFixedDelay
-            if (killScript){
+            if (killScript) {
                 shutdown()
                 return@scheduleWithFixedDelay
             }
@@ -41,7 +42,7 @@ class GriffinTrickOrTreatScript : Script() {
                 when (scriptState) {
                     ScriptState.CHECKING -> {
                         if (!varrockCastleArea.contains(player.worldLocation)) {
-                            Microbot.getWalkerForKotlin().staticWalkTo(varrockCastleWorldPoint)
+                            Rs2Walker.walkTo(varrockCastleWorldPoint)
                         }
                         scriptState = ScriptState.FINDING
                     }

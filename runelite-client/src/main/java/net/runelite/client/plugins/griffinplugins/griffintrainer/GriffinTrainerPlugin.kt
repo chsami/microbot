@@ -5,8 +5,6 @@ import net.runelite.client.config.ConfigManager
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginDescriptor.Griffin
-import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathFinder
-import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathWalker
 import net.runelite.client.ui.overlay.OverlayManager
 import javax.inject.Inject
 
@@ -41,7 +39,6 @@ class GriffinTrainerPlugin : Plugin() {
 
     override fun shutDown() {
         TrainerInterruptor.isInterrupted = true
-        PathWalker.interrupt()
 
         trainerThread.interrupt()
         trainerThread.join(5000)
@@ -51,7 +48,6 @@ class GriffinTrainerPlugin : Plugin() {
             trainerThread.stop();
         }
 
-        PathFinder.resetPath()
         overlayManager.remove(overlay)
     }
 }

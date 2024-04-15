@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -30,7 +31,7 @@ public class Rs2Npc {
 
     public static NPC validateInteractable(NPC npc) {
         if (npc != null) {
-            Microbot.getWalker().walkTo(npc.getWorldLocation());
+            Rs2Walker.walkTo(npc.getWorldLocation());
             Rs2Camera.turnTo(npc);
             return npc;
         }

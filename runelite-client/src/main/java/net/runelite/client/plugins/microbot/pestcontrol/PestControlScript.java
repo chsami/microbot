@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.Arrays;
@@ -77,7 +78,7 @@ public class PestControlScript extends Script {
                         }
                     }
                     if (!walkToCenter) {
-                        WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(32, 17);
+                        WorldPoint worldPoint = Rs2Walker.walkFastRegion(32, 17);
                         if (worldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 4) {
                             return;
                         } else {
@@ -113,10 +114,10 @@ public class PestControlScript extends Script {
                         return;
 
                     if (!purpleShield && !purpleHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 8, 30)) {
-                            WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(8, 30);
+                        if (!Rs2Walker.isCloseToRegion(distanceToPortal, 8, 30)) {
+                            WorldPoint worldPoint = Rs2Walker.walkFastRegion(8, 30);
                             if (worldPoint == null) {
-                                Microbot.getWalker().walkFastRegion(30, 32);
+                                Rs2Walker.walkFastRegion(30, 32);
                             }
                         } else {
                             if (!Microbot.getClient().getLocalPlayer().isInteracting())
@@ -126,10 +127,10 @@ public class PestControlScript extends Script {
                     }
 
                     if (!blueShield && !blueHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 55, 29)) {
-                            WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(55, 29);
+                        if (!Rs2Walker.isCloseToRegion(distanceToPortal, 55, 29)) {
+                            WorldPoint worldPoint = Rs2Walker.walkFastRegion(55, 29);
                             if (worldPoint == null) {
-                                Microbot.getWalker().walkFastRegion(30, 32);
+                                Rs2Walker.walkFastRegion(30, 32);
                             }
                         } else {
                             if (!Microbot.getClient().getLocalPlayer().isInteracting())
@@ -139,10 +140,10 @@ public class PestControlScript extends Script {
                     }
 
                     if (!redShield && !redHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 22, 12)) {
-                            WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(22, 12);
+                        if (!Rs2Walker.isCloseToRegion(distanceToPortal, 22, 12)) {
+                            WorldPoint worldPoint = Rs2Walker.walkFastRegion(22, 12);
                             if (worldPoint == null) {
-                                Microbot.getWalker().walkFastRegion(30, 32);
+                                Rs2Walker.walkFastRegion(30, 32);
                             }
                         } else {
                             if (!Microbot.getClient().getLocalPlayer().isInteracting())
@@ -152,10 +153,10 @@ public class PestControlScript extends Script {
                     }
 
                     if (!yellowShield && !yellowHealth.getText().trim().equals("0")) {
-                        if (!Microbot.getWalker().isCloseToRegion(distanceToPortal, 48, 13)) {
-                            WorldPoint worldPoint = Microbot.getWalker().walkFastRegion(48, 13);
+                        if (!Rs2Walker.isCloseToRegion(distanceToPortal, 48, 13)) {
+                            WorldPoint worldPoint = Rs2Walker.walkFastRegion(48, 13);
                             if (worldPoint == null) {
-                                Microbot.getWalker().walkFastRegion(30, 32);
+                                Rs2Walker.walkFastRegion(30, 32);
                             }
                         } else {
                             if (!Microbot.getClient().getLocalPlayer().isInteracting())

@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -115,7 +116,7 @@ public class NmzScript extends Script {
     public void interactWithObject(int objectId) {
         TileObject rs2GameObject = Rs2GameObject.findObjectById(objectId);
         if (rs2GameObject != null) {
-            Microbot.getWalker().walkFastLocal(rs2GameObject.getLocalLocation());
+            Rs2Walker.walkFastLocal(rs2GameObject.getLocalLocation());
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(rs2GameObject.getWorldLocation()) < 5);
             Rs2GameObject.interact(objectId);
         }

@@ -5,6 +5,7 @@ import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterrup
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 
 class WoodcuttingHelper {
 
@@ -25,7 +26,7 @@ class WoodcuttingHelper {
             }
 
             if (nearestTree.worldLocation.distanceTo(player.worldLocation) >= 2) {
-                Microbot.getWalkerForKotlin().staticWalkTo(nearestTree.worldLocation)
+                Rs2Walker.walkTo(nearestTree.worldLocation)
             }
 
             val success = Rs2GameObject.interact(nearestTree, "Chop down")

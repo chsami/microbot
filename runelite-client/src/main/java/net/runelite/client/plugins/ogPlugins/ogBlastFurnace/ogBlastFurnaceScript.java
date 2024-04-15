@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.ogPlugins.ogBlastFurnace.enums.Bars;
 
@@ -108,12 +109,12 @@ public class ogBlastFurnaceScript extends Script {
         if(Random.random(1,5) == 3){
             iceGlovesEquip();
             sleep(120,400);
-            Microbot.getWalker().walkCanvas(new WorldPoint(1940,4962,0));
+            Rs2Walker.walkCanvas(new WorldPoint(1940,4962,0));
             callAFK(36,1000,6183);
             sleepUntil(this::playerAtRetrieveLocation);
             sleep(120,200);
         } else {
-            Microbot.getWalker().walkCanvas(new WorldPoint(1940,4962,0));
+            Rs2Walker.walkCanvas(new WorldPoint(1940,4962,0));
             callAFK(38,1000,6258);
             sleepUntil(this::playerAtRetrieveLocation);
             sleep(120,200);

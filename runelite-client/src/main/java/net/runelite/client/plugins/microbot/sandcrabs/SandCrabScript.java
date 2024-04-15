@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -73,7 +74,7 @@ public class SandCrabScript extends Script {
                     Rs2Player.eatAt(50);
 
                     if (Rs2Inventory.getInventoryFood().isEmpty()) {
-                        Microbot.getWalker().hybridWalkTo(new WorldPoint(1720, 3465, 0));
+                        Rs2Walker.walkTo(new WorldPoint(1720, 3465, 0));
                         if (Rs2Bank.useBank()) {
                             Rs2Bank.withdrawAll(config.food().getName());
                         }
@@ -110,7 +111,8 @@ public class SandCrabScript extends Script {
                         break;
                     case HOP_WORLD:
                         int world = Login.getRandomWorld(true, null);
-                        Microbot.hopToWorld(world);
+                        boolean isHopped = Microbot.hopToWorld(world);
+                        if (!isHopped) return;
                         boolean result = sleepUntil(() -> Rs2Widget.findWidget("Switch World") != null);
                         if (result) {
                             VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
@@ -169,7 +171,7 @@ public class SandCrabScript extends Script {
      * Reset aggro will walk 20 tiles north
      */
     private void resetAggro() {
-        boolean walkedFarEnough = Microbot.getWalker().hybridWalkTo(new WorldPoint(initialPlayerLocation.getX(), initialPlayerLocation.getY() + 40, initialPlayerLocation.getPlane()));
+        boolean walkedFarEnough = Rs2Walker.walkTo(new WorldPoint(initialPlayerLocation.getX(), initialPlayerLocation.getY() + 40, initialPlayerLocation.getPlane()));
         if (!walkedFarEnough) return;
 
         state = State.WALK_BACK;
@@ -179,7 +181,7 @@ public class SandCrabScript extends Script {
      * Walks back to the initial player location when the script started
      */
     private void walkBack() {
-        boolean backToInitialLocation = Microbot.getWalker().hybridWalkTo(initialPlayerLocation, false, true);
+        boolean backToInitialLocation = Rs2Walker.walkTo(initialPlayerLocation);
         if (!backToInitialLocation) return;
 
         resetAfkTimer();
@@ -221,7 +223,7 @@ public class SandCrabScript extends Script {
             state = State.HOP_WORLD;
             return;
         }
-        boolean reachedLocation = Microbot.getWalker().hybridWalkTo(currentScanLocation.getWorldPoint(), false, true);
+        boolean reachedLocation = Rs2Walker.walkTo(currentScanLocation.getWorldPoint());
         if (reachedLocation) {
             if (otherPlayerDetected(currentScanLocation.getWorldPoint())) {
                 currentScanLocation.scanned = true;

@@ -17,7 +17,6 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -25,10 +24,14 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
@@ -103,8 +106,7 @@ public class VorkathScript extends Script {
                     init = false;
                 }
 
-                if (!doesEquipmentMatch("vorkath", "dragon bolt"))
-                {
+                if (!doesEquipmentMatch("vorkath", "dragon bolt")) {
                     state = State.DEAD_WALK;
                 } else if (state == State.DEAD_WALK && Rs2Inventory.hasItem(config.teleportMode().getItemName())) {
                     leaveVorkath();
@@ -158,7 +160,7 @@ public class VorkathScript extends Script {
                         break;
                     case WALK_TO_VORKATH_ISLAND:
                         Rs2Player.toggleRunEnergy(true);
-                        Microbot.getWalker().walkTo(new WorldPoint(2640, 3693, 0));
+                        Rs2Walker.walkTo(new WorldPoint(2640, 3693, 0));
                         net.runelite.api.NPC torfin = Rs2Npc.getNpc(NpcID.TORFINN_10405);
                         if (torfin != null) {
                             Rs2Npc.interact(torfin, "Ungael");
@@ -169,7 +171,7 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case WALK_TO_VORKATH:
-                        Microbot.getWalker().walkMiniMap(new WorldPoint(2272, 4052, 0));
+                        Rs2Walker.walkMiniMap(new WorldPoint(2272, 4052, 0));
                         sleep(1000);
                         TileObject iceChunks = Rs2GameObject.findObjectById(ObjectID.ICE_CHUNKS_31990);
                         if (iceChunks != null) {
@@ -190,7 +192,7 @@ public class VorkathScript extends Script {
                             Rs2Player.waitForWalking();
                             Rs2Npc.interact(NpcID.VORKATH_8059, "Poke");
                             Rs2Player.waitForAnimation(10000);
-                            Microbot.getWalkerForKotlin().walkFastLocal(
+                            Rs2Walker.walkFastLocal(
                                     LocalPoint.fromScene(48, 58)
                             );
                             Rs2Player.waitForWalking();
@@ -227,7 +229,7 @@ public class VorkathScript extends Script {
                             Rs2Npc.attack("Vorkath");
                         }
                         if (Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() >= 59) {
-                            Microbot.getWalkerForKotlin().walkFastLocal(
+                            Rs2Walker.walkFastLocal(
                                     LocalPoint.fromScene(48, 58)
                             );
                         }
@@ -255,14 +257,14 @@ public class VorkathScript extends Script {
                         togglePrayer(false);
                         Rs2Player.eatAt(80);
                         drinkPrayer();
-                        Microbot.getWalkerForKotlin().walkFastLocal(
+                        Rs2Walker.walkFastLocal(
                                 LocalPoint.fromScene(48, 58)
                         );
                         NPC zombieSpawn = Rs2Npc.getNpc("Zombified Spawn");
                         if (zombieSpawn != null) {
                             while (Rs2Npc.getNpc("Zombified Spawn") != null && !Rs2Npc.getNpc("Zombified Spawn").isDead()
                                     && !doesProjectileExistById(146)) {
-                                    Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, zombieSpawn);
+                                Rs2Magic.castOn(MagicAction.CRUMBLE_UNDEAD, zombieSpawn);
                             }
                             Rs2Player.eatAt(75);
                             togglePrayer(true);
@@ -297,7 +299,7 @@ public class VorkathScript extends Script {
                             if (foodInventorySize < 3 || !hasVenom || !hasSuperAntifire || !hasPrayerPotion || !hasRangePotion) {
                                 leaveVorkath();
                             } else {
-                                Microbot.getWalkerForKotlin().walkFastLocal(
+                                Rs2Walker.walkFastLocal(
                                         LocalPoint.fromScene(48, 58)
                                 );
                                 Rs2Player.waitForWalking();
@@ -317,7 +319,7 @@ public class VorkathScript extends Script {
                         break;
                     case DEAD_WALK:
                         if (isCloseToRelleka()) {
-                            Microbot.getWalker().walkTo(new WorldPoint(2640, 3693, 0));
+                            Rs2Walker.walkTo(new WorldPoint(2640, 3693, 0));
                             torfin = Rs2Npc.getNpc(NpcID.TORFINN_10405);
                             if (torfin != null) {
                                 Rs2Npc.interact(torfin, "Collect");
@@ -461,7 +463,7 @@ public class VorkathScript extends Script {
             sideStepLocation = new WorldPoint(currentPlayerLocation.getX() - 2, currentPlayerLocation.getY(), 0);
         }
         final WorldPoint _sideStepLocation = sideStepLocation;
-        Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), _sideStepLocation));
+        Rs2Walker.walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), _sideStepLocation));
         Rs2Player.waitForWalking();
         sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(_sideStepLocation));
     }
@@ -507,7 +509,7 @@ public class VorkathScript extends Script {
                 Rs2Npc.attack(vorkath);
             } else {
                 Rs2Player.eatAt(75);
-                Microbot.getWalkerForKotlin().walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), safeTile));
+                Rs2Walker.walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), safeTile));
             }
         }
 
@@ -518,7 +520,7 @@ public class VorkathScript extends Script {
 
         Rs2Player.eatAt(80);
         while (!awaitedCondition.getAsBoolean()) {
-            Microbot.getWalkerForKotlin().walkFastLocal(
+            Rs2Walker.walkFastLocal(
                     LocalPoint.fromScene(x, y)
             );
             sleep(200);

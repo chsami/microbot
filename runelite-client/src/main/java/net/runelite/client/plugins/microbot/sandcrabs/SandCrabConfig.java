@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.sandcrabs;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
-import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations;
 import net.runelite.client.plugins.microbot.util.misc.Food;
 
 @ConfigGroup("SandCrabPlugin")

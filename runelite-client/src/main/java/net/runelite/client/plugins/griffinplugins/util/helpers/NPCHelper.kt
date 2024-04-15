@@ -4,6 +4,7 @@ import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterrup
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 
 class NPCHelper {
 
@@ -15,7 +16,7 @@ class NPCHelper {
             nearestNpc ?: return false
 
             if (nearestNpc.worldLocation.distanceTo(player.worldLocation) >= 3) {
-                Microbot.getWalkerForKotlin().hybridWalkTo(nearestNpc.worldLocation)
+                Rs2Walker.walkTo(nearestNpc.worldLocation)
             }
 
             if (TrainerInterruptor.isInterrupted) {

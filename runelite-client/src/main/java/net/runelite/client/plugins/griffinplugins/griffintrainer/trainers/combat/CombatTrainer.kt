@@ -9,18 +9,20 @@ import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
+import net.runelite.client.plugins.griffinplugins.griffintrainer.WorldDestinations
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.ItemHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.helpers.NPCHelper
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
 import net.runelite.client.plugins.microbot.Microbot
-import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.Global
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
+import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 
 class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
@@ -31,11 +33,12 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
         SETUP, CHECKING_AREA, FIGHTING, LOOTING, BANKING
     }
 
-    private var scriptState: ScriptState = ScriptState.SETUP
 
     override fun getBankLocation(): WorldPoint {
         return WorldDestinations.LUMBRIDGE_BANK.worldPoint
     }
+
+    private var scriptState: ScriptState = ScriptState.SETUP
 
     override fun getInventoryRequirements(): InventoryRequirements {
         val inventoryRequirements = InventoryRequirements()
@@ -104,7 +107,7 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
     private fun runCheckingAreaState(worldArea: WorldArea, worldPoint: WorldPoint) {
         val player = Microbot.getClientForKotlin().localPlayer
         if (!worldArea.contains(player.worldLocation)) {
-            Microbot.getWalkerForKotlin().staticWalkTo(worldPoint)
+            Rs2Walker.walkTo(worldPoint)
         }
 
 //        if (config.hopWorlds()) {
@@ -162,7 +165,7 @@ class CombatTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(conf
     private fun runBankingState() {
         if (config.collectItems()) {
             if (Rs2Inventory.isFull()) {
-                Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
+                Rs2Walker.walkTo(WorldDestinations.LUMBRIDGE_BANK.worldPoint)
                 TrainerInterruptor.sleep(400, 600)
 
                 Rs2Bank.getNearestBank()

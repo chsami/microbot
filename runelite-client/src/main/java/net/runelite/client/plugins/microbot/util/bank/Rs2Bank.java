@@ -15,6 +15,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
@@ -874,7 +875,7 @@ public class Rs2Bank {
         if (Rs2Bank.isOpen()) return true;
         Rs2Player.toggleRunEnergy(true);
         BankLocation bankLocation = getNearestBank();
-        Microbot.getWalker().hybridWalkTo(bankLocation.getWorldPoint());
+        Rs2Walker.walkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;
     }
 

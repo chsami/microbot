@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.concurrent.TimeUnit;
 
@@ -97,7 +98,7 @@ public class WheatScript extends Script {
             WorldPoint randomTile = wheatArea.toWorldPointList().get(Random.random(0, wheatArea.toWorldPointList().size() - 1));
 
             System.out.println("Walking to Wheat at: " + randomTile);
-            Microbot.getWalker().walkTo(randomTile);
+            Rs2Walker.walkTo(randomTile);
         }
     }
 
@@ -113,7 +114,7 @@ public class WheatScript extends Script {
             }
         } else {
             WorldPoint randomBankPoint = bankArea.toWorldPointList().get(Random.random(0, bankArea.toWorldPointList().size() - 1));
-            Microbot.getWalker().walkTo(randomBankPoint);
+            Rs2Walker.walkTo(randomBankPoint);
         }
     }
 

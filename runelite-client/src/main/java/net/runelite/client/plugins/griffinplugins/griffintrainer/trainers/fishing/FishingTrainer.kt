@@ -7,15 +7,16 @@ import net.runelite.api.coords.WorldPoint
 import net.runelite.client.plugins.griffinplugins.griffintrainer.GriffinTrainerConfig
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerInterruptor
 import net.runelite.client.plugins.griffinplugins.griffintrainer.TrainerThread
+import net.runelite.client.plugins.griffinplugins.griffintrainer.WorldDestinations
 import net.runelite.client.plugins.griffinplugins.griffintrainer.itemsets.GeneralItemSets
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.DynamicItemSet
 import net.runelite.client.plugins.griffinplugins.griffintrainer.models.inventory.InventoryRequirements
 import net.runelite.client.plugins.griffinplugins.griffintrainer.trainers.BaseTrainer
 import net.runelite.client.plugins.griffinplugins.util.helpers.FishingHelper
 import net.runelite.client.plugins.microbot.Microbot
-import net.runelite.client.plugins.microbot.staticwalker.WorldDestinations
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 
 class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(config) {
     private val draynorFishingArea = WorldArea(3084, 3223, 7, 11, 0)
@@ -83,15 +84,33 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
 
         if (minimumSkillLevel < 15) {
             updateCounts("Fishing Shrimp", "Shrimp Caught")
-            processState(draynorFishingArea, draynorFishingPoint, "fishing spot", "small net", listOf(ItemID.RAW_SHRIMPS))
+            processState(
+                draynorFishingArea,
+                draynorFishingPoint,
+                "fishing spot",
+                "small net",
+                listOf(ItemID.RAW_SHRIMPS)
+            )
 
         } else if (minimumSkillLevel < 20) {
             updateCounts("Fishing Shrimp & Anchovies", "Shrimp & Anchovies Caught")
-            processState(draynorFishingArea, draynorFishingPoint, "fishing spot", "small net", listOf(ItemID.RAW_SHRIMPS, ItemID.RAW_ANCHOVIES))
+            processState(
+                draynorFishingArea,
+                draynorFishingPoint,
+                "fishing spot",
+                "small net",
+                listOf(ItemID.RAW_SHRIMPS, ItemID.RAW_ANCHOVIES)
+            )
 
         } else if (minimumSkillLevel < 99) {
             updateCounts("Fishing Trout & Salmon", "Trout & Salmon Caught")
-            processState(barbarianFishingArea, barbarianFishingPoint, "rod fishing spot", "lure", listOf(ItemID.RAW_SALMON, ItemID.RAW_TROUT))
+            processState(
+                barbarianFishingArea,
+                barbarianFishingPoint,
+                "rod fishing spot",
+                "lure",
+                listOf(ItemID.RAW_SALMON, ItemID.RAW_TROUT)
+            )
 
         } else {
             return true
@@ -100,7 +119,13 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
         return false
     }
 
-    private fun processState(worldArea: WorldArea, worldPoint: WorldPoint, npcName: String, actionName: String, itemIds: List<Int>) {
+    private fun processState(
+        worldArea: WorldArea,
+        worldPoint: WorldPoint,
+        npcName: String,
+        actionName: String,
+        itemIds: List<Int>
+    ) {
         when (scriptState) {
             ScriptState.SETUP -> runSetupState()
             ScriptState.CHECKING_AREA -> runCheckingAreaState(worldArea, worldPoint)
@@ -117,7 +142,7 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
     private fun runCheckingAreaState(worldArea: WorldArea, worldPoint: WorldPoint) {
         val player = Microbot.getClientForKotlin().localPlayer
         if (!worldArea.contains(player.worldLocation)) {
-            Microbot.getWalkerForKotlin().staticWalkTo(worldPoint)
+            Rs2Walker.walkTo(worldPoint)
         }
 
         scriptState = ScriptState.FISHING
@@ -144,7 +169,7 @@ class FishingTrainer(private val config: GriffinTrainerConfig) : BaseTrainer(con
     private fun runBankingState(itemIdsToDeposit: List<Int>) {
         if (config.keepFish()) {
             if (Rs2Inventory.isFull()) {
-                Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation(), 0)
+                Rs2Walker.walkTo(getBankLocation())
                 TrainerInterruptor.sleep(400, 600)
 
                 Rs2Bank.getNearestBank()

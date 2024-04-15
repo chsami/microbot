@@ -10,7 +10,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
-import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -38,6 +37,7 @@ public class TannerPlugin extends Plugin {
     TannerConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(TannerConfig.class);
     }
+
     @Inject
     private OverlayManager overlayManager;
     @Inject
@@ -53,7 +53,6 @@ public class TannerPlugin extends Plugin {
         Microbot.setClient(client);
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
-        Microbot.setWalker(new Walker());
         Microbot.setMouse(new VirtualMouse());
         if (overlayManager != null) {
             overlayManager.add(tannerOverlay);

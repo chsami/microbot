@@ -24,6 +24,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction
 import net.runelite.client.ui.overlay.OverlayManager
@@ -144,11 +145,11 @@ class AutoZMIAltar : Plugin() {
         if (config.BANK().bankName == "Edgeville") {
             val bankWorldPoint = WorldPoint(3094, 3491, 0)
             while (client.localPlayer.worldLocation.distanceTo(bankWorldPoint) >= 3 && running) {
-                Microbot.getWalkerForKotlin().walkTo(bankWorldPoint)
+                Rs2Walker.walkTo(bankWorldPoint)
                 sleep(600, 1200)
             }
             try {
-                if (!giantPouchFilled || !largePouchFilled || !mediumPouchFilled || !smallPouchFilled){
+                if (!giantPouchFilled || !largePouchFilled || !mediumPouchFilled || !smallPouchFilled) {
                     Rs2Npc.interact("banker", "bank")
                     while (!Rs2Bank.isOpen()) sleep(700, 800)
                     Rs2Bank.depositAll()
@@ -184,14 +185,14 @@ class AutoZMIAltar : Plugin() {
         val ladderWorldPoint = WorldPoint(2453, 3231, 0)
         val altarWorldPoint = WorldPoint(3056, 5579, 0)
         while (client.localPlayer.worldLocation.distanceTo(ladderWorldPoint) >= 3 && running) {
-            Microbot.getWalkerForKotlin().walkTo(ladderWorldPoint)
+            Rs2Walker.walkTo(ladderWorldPoint)
             sleep(600, 1200)
         }
         Rs2GameObject.interact("Ladder", "Climb")
         sleep(3600, 4200)
         if (config.BANK().bankName == "ZMI Bank") {
             try {
-                if (!giantPouchFilled || !largePouchFilled || !mediumPouchFilled || !smallPouchFilled){
+                if (!giantPouchFilled || !largePouchFilled || !mediumPouchFilled || !smallPouchFilled) {
                     Rs2Npc.interact("Eniola", "bank")
                     while (!Rs2Bank.isOpen()) sleep(700, 800)
                     Rs2Bank.depositAll()
@@ -214,7 +215,7 @@ class AutoZMIAltar : Plugin() {
             }
         }
         while (client.localPlayer.worldLocation.distanceTo(altarWorldPoint) >= 2 && running) {
-            Microbot.getWalkerForKotlin().walkTo(altarWorldPoint)
+            Rs2Walker.walkTo(altarWorldPoint)
             sleep(600, 1200)
         }
         currentState = State.RUNECRAFTING
@@ -258,7 +259,11 @@ class AutoZMIAltar : Plugin() {
     }
 
     private fun fillPouches() {
-        if (Rs2Inventory.hasItem("Giant Pouch") && Rs2Inventory.hasItemAmount("Pure essence", 12) && !giantPouchFilled) {
+        if (Rs2Inventory.hasItem("Giant Pouch") && Rs2Inventory.hasItemAmount(
+                "Pure essence",
+                12
+            ) && !giantPouchFilled
+        ) {
             Rs2Inventory.interact("Giant Pouch", "fill")
             sleep(50, 100)
             giantPouchFilled = true
@@ -268,7 +273,11 @@ class AutoZMIAltar : Plugin() {
             sleep(50, 100)
             smallPouchFilled = true
         }
-        if (Rs2Inventory.hasItem("Medium Pouch") && Rs2Inventory.hasItemAmount("Pure essence", 6) && !mediumPouchFilled) {
+        if (Rs2Inventory.hasItem("Medium Pouch") && Rs2Inventory.hasItemAmount(
+                "Pure essence",
+                6
+            ) && !mediumPouchFilled
+        ) {
             Rs2Inventory.interact("Medium Pouch", "fill")
             sleep(50, 100)
             mediumPouchFilled = true
@@ -303,7 +312,7 @@ class AutoZMIAltar : Plugin() {
             sleep(600, 800)
         }
         if (Rs2Inventory.hasItem("Giant Pouch")) {
-            for (i in 0..1){
+            for (i in 0..1) {
                 Rs2Inventory.interact("Giant Pouch", "Empty")
                 sleep(1200, 1300)
                 Rs2GameObject.interact(29631, "Craft-rune")

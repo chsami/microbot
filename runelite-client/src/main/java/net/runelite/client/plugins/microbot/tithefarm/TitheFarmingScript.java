@@ -20,6 +20,7 @@ import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.time.Instant;
@@ -286,7 +287,7 @@ public class TitheFarmingScript extends Script {
         final TitheFarmPlant finalPlant = plant;
 
         if (plant.getGameObject().getWorldLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) > DISTANCE_TRESHHOLD_MINIMAP_WALK) {
-            Microbot.getWalker().walkMiniMap(plant.getGameObject().getWorldLocation());
+            Rs2Walker.walkMiniMap(plant.getGameObject().getWorldLocation());
             return;
         }
 
@@ -399,7 +400,7 @@ public class TitheFarmingScript extends Script {
     private void walkToBarrel() {
         final GameObject gameObject = Rs2GameObject.findObject("Water barrel");
         if (gameObject.getWorldLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) > DISTANCE_TRESHHOLD_MINIMAP_WALK) {
-            Microbot.getWalker().walkMiniMap(gameObject.getWorldLocation());
+            Rs2Walker.walkMiniMap(gameObject.getWorldLocation());
             sleepUntil(Microbot::isMoving);
         }
         sleepUntil(() -> gameObject.getWorldLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < DISTANCE_TRESHHOLD_MINIMAP_WALK);
