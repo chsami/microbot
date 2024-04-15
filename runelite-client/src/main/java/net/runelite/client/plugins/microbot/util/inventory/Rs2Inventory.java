@@ -1469,6 +1469,9 @@ public class Rs2Inventory {
     private static void invokeMenu(Rs2Item rs2Item, String action) {
         if (rs2Item == null) return;
 
+        Rs2Tab.switchToInventoryTab();
+        Microbot.status = action + " " + rs2Item.name;
+
         int param0;
         int param1;
         int identifier;

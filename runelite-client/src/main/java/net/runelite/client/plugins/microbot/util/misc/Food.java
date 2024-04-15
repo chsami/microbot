@@ -10,6 +10,7 @@ public enum Food {
     ROCKTAIL(15272,23,"Rocktail"),
     MANTA(391,22,"Manta Ray"),
     SHARK(385,20,"Shark"),
+    KARAMBWAN(	3144,18,"Karambwan"),
     LOBSTER(379,12,"Lobster"),
     TROUT(333,7,"Trout"),
     SALMON(329,9,"Salmon"),
@@ -51,10 +52,15 @@ public enum Food {
 
     private int id; private int heal; private String name;
 
-    private Food(int id, int heal, String name) {
+    Food(int id, int heal, String name) {
         this.id = id;
         this.heal = heal;
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (+" + getHeal() + ")";
     }
 
     public int getId() {
@@ -68,4 +74,5 @@ public enum Food {
     public String getName() {
         return name;
     }
+
 }

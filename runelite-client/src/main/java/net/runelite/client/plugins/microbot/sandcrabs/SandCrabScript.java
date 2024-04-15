@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 public class SandCrabScript extends Script {
 
-    public static double version = 1.0;
+    public static double version = 1.3;
 
     public int afkTimer = 0;
     public int hijackTimer = 0;
@@ -49,13 +49,16 @@ public class SandCrabScript extends Script {
             new ScanLocation(new WorldPoint(1738, 3468, 0)));
 
     public boolean run(SandCrabConfig config) {
+        if (config.threeNpcs()) {
+            sandCrabLocations = sandCrabLocations.stream().filter(x -> x.hasThreeNpcs).collect(Collectors.toList());
+        }
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
             try {
                 long startTime = System.currentTimeMillis();
 
-               // Rs2Combat.enableAutoRetialiate();
+               Rs2Combat.enableAutoRetialiate();
 
                 if (otherPlayerDetected() && !Rs2Combat.inCombat())
                     hijackTimer++;
@@ -63,7 +66,12 @@ public class SandCrabScript extends Script {
                     hijackTimer = 0;
 
                 if (hijackTimer > 10) {
-                    state = State.HOP_WORLD;
+                    if (sandCrabLocations.stream().anyMatch(x -> !x.isScanned())) {
+                        state = State.SCAN_LOCATIONS;
+                    } else {
+                        state = State.HOP_WORLD;
+                        resetScanLocations();
+                    }
                 }
 
                 if (sandCrabLocations.stream().noneMatch(x -> x.getWorldPoint().equals(Microbot.getClient().getLocalPlayer().getWorldLocation())) && state != State.RESET_AGGRO && state != State.WALK_BACK) {
@@ -211,9 +219,6 @@ public class SandCrabScript extends Script {
     }
 
     private void scanSandCrabLocations(SandCrabConfig config) {
-        if (config.threeNpcs()) {
-            sandCrabLocations = sandCrabLocations.stream().filter(x -> x.hasThreeNpcs).collect(Collectors.toList());
-        }
         currentScanLocation = sandCrabLocations.stream()
                 .filter(x -> !x.isScanned())
                 .min(Comparator.comparingInt(x -> x.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
