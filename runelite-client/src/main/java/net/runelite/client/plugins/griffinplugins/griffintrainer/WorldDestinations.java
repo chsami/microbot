@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.staticwalker;
+package net.runelite.client.plugins.griffinplugins.griffintrainer;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

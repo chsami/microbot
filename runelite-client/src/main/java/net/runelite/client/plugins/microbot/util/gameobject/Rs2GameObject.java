@@ -5,17 +5,19 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
-import java.util.*;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -57,13 +59,9 @@ public class Rs2GameObject {
         ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
         int objectSize = (objectComposition.getSizeX() + objectComposition.getSizeY()) / 2;
         if (object == null) return false;
-        if (checkCanReach && Microbot.getWalker().canReach(object.getWorldLocation(), objectSize))
+        if (checkCanReach && Rs2Walker.canReach(object.getWorldLocation(), objectSize))
             return clickObject(object);
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 10) {
-            Microbot.getWalker().hybridWalkTo(object.getWorldLocation());
-        } else {
-            Microbot.getWalker().walkTo(object.getWorldLocation());
-        }
+        Rs2Walker.walkTo(object.getWorldLocation());
         return false;
     }
 
@@ -120,7 +118,7 @@ public class Rs2GameObject {
         return findObject(objectName, true);
     }
 
-    @Deprecated(since="Use findObjectById", forRemoval = true)
+    @Deprecated(since = "Use findObjectById", forRemoval = true)
     public static ObjectComposition findObject(int id) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
     }
@@ -347,7 +345,7 @@ public class Rs2GameObject {
                 continue;
             }
 
-            if (compName != null && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
+            if (compName != null && Rs2Walker.canReach(gameObject.getWorldLocation())) {
                 if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
                     return gameObject;
                 } else if (exact && compName.equalsIgnoreCase(objectName)) {
@@ -380,7 +378,7 @@ public class Rs2GameObject {
                 continue;
             }
 
-            if (compName != null && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
+            if (compName != null && Rs2Walker.canReach(gameObject.getWorldLocation())) {
                 if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
                     return gameObject;
                 } else if (exact && compName.equalsIgnoreCase(objectName)) {
@@ -413,7 +411,7 @@ public class Rs2GameObject {
                 continue;
             }
 
-            if (compName != null && Microbot.getWalker().canInteract(gameObject.getWorldLocation())) {
+            if (compName != null && Rs2Walker.canReach(gameObject.getWorldLocation())) {
                 if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
                     return gameObject;
                 } else if (exact && compName.equalsIgnoreCase(objectName)) {
@@ -678,6 +676,7 @@ public class Rs2GameObject {
 
     /**
      * TODO remove this method, maybe use find or get(int id)
+     *
      * @param id
      * @return
      */
@@ -716,6 +715,7 @@ public class Rs2GameObject {
 
     /**
      * TODO: Remove this method
+     *
      * @param distance
      * @param anchorPoint
      * @return
@@ -859,7 +859,7 @@ public class Rs2GameObject {
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
         if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 17) {
-            Microbot.getWalker().walkFastCanvas(object.getWorldLocation());
+            Rs2Walker.walkFastCanvas(object.getWorldLocation());
             return false;
         }
         try {
@@ -924,9 +924,13 @@ public class Rs2GameObject {
 
             if (!Rs2Camera.isTileOnScreen(object.getLocalLocation())) {
                 Rs2Camera.turnTo(object);
+            } else {
+                VirtualKeyboard.keyRelease(KeyEvent.VK_RIGHT);
+                VirtualKeyboard.keyRelease(KeyEvent.VK_LEFT);
+
             }
 
-            Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(),-1, objComp.getName()), new Rectangle(object.getCanvasTilePoly().getBounds()));
+            Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(), -1, objComp.getName()), new Rectangle(object.getCanvasTilePoly().getBounds()));
 
             //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), object.getId(),-1, "", "", -1, -1);
 
@@ -971,5 +975,12 @@ public class Rs2GameObject {
             }
         }
         return ids;
+    }
+
+    private boolean isTileWalkAble(int x, int y) {
+        int[][] flags = Objects.requireNonNull(Microbot.getClient().getCollisionMaps())[Microbot.getClient().getPlane()].getFlags();
+        int data = flags[x][y];
+        Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
+        return !movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_OBJECT) && !movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FULL);
     }
 }

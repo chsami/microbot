@@ -6,6 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 
 class FishingHelper {
     companion object {
@@ -25,7 +26,7 @@ class FishingHelper {
             }
 
             if (!Rs2Camera.isTileOnScreen(nearestNpc.localLocation)) {
-                Microbot.getWalkerForKotlin().staticWalkTo(nearestNpc.worldLocation)
+                Rs2Walker.walkTo(nearestNpc.worldLocation)
             }
 
             if (TrainerInterruptor.isInterrupted) {

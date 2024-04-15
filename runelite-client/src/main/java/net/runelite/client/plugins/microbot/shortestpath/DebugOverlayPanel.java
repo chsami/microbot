@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.shortestpath;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -54,6 +55,10 @@ public class DebugOverlayPanel extends OverlayPanel {
                         .color(Color.ORANGE)
                         .build()
         );
+
+        components.add(separator);
+
+        components.add(makeLine("Microbot status: ", Microbot.status));
 
         components.add(separator);
 

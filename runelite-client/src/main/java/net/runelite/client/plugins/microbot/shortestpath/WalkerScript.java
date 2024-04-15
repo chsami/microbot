@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
 import java.awt.*;
@@ -22,18 +23,28 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- *
+ * This class handles all the complex code for navigating and path finding in osrs
  */
 public class WalkerScript extends Script {
 
-    public static String version = "1.1";
+    public static String version = "1.2";
+
+    int stuckCount = 0;
+
+    WorldPoint lastPosition;
+
+    ShortestPathConfig config;
+
+    public WalkerScript(ShortestPathConfig config) {
+        this.config = config;
+    }
 
     /**
      * @param target
      * @return
      */
     private boolean isNear(WorldPoint target) {
-        return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(target) <= 1;
+        return Microbot.getClient().getLocalPlayer().getWorldLocation().equals(target);
     }
 
     /**
@@ -59,15 +70,7 @@ public class WalkerScript extends Script {
 
                 List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
                 int indexOfStartPoint = getClosestTileIndex(path);
-                /**
-                 * CHECK DOORS
-                 */
-                boolean foundDoor = handleDoors(path, indexOfStartPoint);
-                if (foundDoor)
-                    return;
-                boolean foundTransport = handleTransports(path, indexOfStartPoint);
-                if (foundTransport)
-                    return;
+
                 /**
                  * MAIN WALK LOOP
                  */
@@ -78,14 +81,36 @@ public class WalkerScript extends Script {
                         shutdown();
                         break;
                     }
-                    if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(target) < 12) {
-                        Microbot.getWalker().walkFastCanvas(target);
+
+                    /**
+                     * CHECK DOORS
+                     */
+                    Microbot.status = "Checking for doors...";
+                    boolean foundDoor = handleDoors(path, indexOfStartPoint);
+                    if (foundDoor)
+                        return;
+                    Microbot.status = "Checking for transports...";
+                    boolean foundTransport = handleTransports(path, indexOfStartPoint);
+                    if (foundTransport)
+                        return;
+
+                    if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(target) <= config.reachedDistance()) {
+                        Rs2Walker.walkFastCanvas(target);
                         break;
                     }
-                    if (currentWorldPoint.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) > Random.random(8, 12)) {
-                        Microbot.getWalker().walkMiniMap(currentWorldPoint);
-                        System.out.println("Click minimap!");
+                    if (currentWorldPoint.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) > config.reachedDistance()) {
+                        Rs2Walker.walkMiniMap(currentWorldPoint);
                         sleepUntil(() -> currentWorldPoint.distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < Random.random(3, 6));
+                        //avoid tree attacking you in draynor
+                        if (stuckCount > 5) {
+                            Rs2Walker.walkFastCanvas(currentWorldPoint);
+                            stuckCount = 0;
+                        }
+                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(lastPosition)) {
+                            stuckCount++;
+                        } else {
+                            lastPosition = Microbot.getClient().getLocalPlayer().getWorldLocation();
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -103,16 +128,30 @@ public class WalkerScript extends Script {
     private boolean handleDoors(List<WorldPoint> path, int indexOfStartPoint) {
         for (int i = indexOfStartPoint; i < path.size(); i++) {
             WorldPoint currentWorldPoint = path.get(i);
+            if (path.get(i).distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > config.reachedDistance())
+                continue;
             WorldPoint nextWorldPoint = null;
 
-            if (currentWorldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 12) continue;
+            if (ShortestPathPlugin.getPathfinder() == null) continue;
+
+            if (currentWorldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > config.recalculateDistance())
+                continue;
 
             if (i + 1 < path.size()) {
                 nextWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i + 1);
             }
+            //TODO: figure out how to handle doors being on the next world location instead of the current one
+            //So a could be null because pos a had no object and b could be wallobject because the wallobject comes a tile further
+           /* if (i > 0) {
+                previousWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i -1);
+            }*/
             if (nextWorldPoint == null) continue;
 
             boolean hasDoor = isDoorPresent(currentWorldPoint, nextWorldPoint);
+
+         /*   if (!hasDoor)
+                hasDoor = isDoorPresent(currentWorldPoint, previousWorldPoint);*/
+
             if (hasDoor) {
                 WallObject wallObject = null;
                 Tile currentTile = getTile(currentWorldPoint);
@@ -182,6 +221,7 @@ public class WalkerScript extends Script {
             Microbot.getWorldMapPointManager().remove(ShortestPathPlugin.getMarker());
             ShortestPathPlugin.setMarker(null);
             ShortestPathPlugin.setStartPointSet(false);
+            shutdown();
         } else {
             Microbot.getWorldMapPointManager().removeIf(x -> x == ShortestPathPlugin.getMarker());
             ShortestPathPlugin.setMarker(new WorldMapPoint(target, ShortestPathPlugin.MARKER_IMAGE));
@@ -241,50 +281,53 @@ public class WalkerScript extends Script {
         } else {
             wallObject = null;
         }
-        if (wallObject == null)
-            return false;
+//        if (wallObject == null)
+//            return false;
 
-        ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(wallObject.getId()));
-        if (objectComposition == null) {
-            return false;
-        }
-        boolean found = false;
-        for (String action : objectComposition.getActions()) {
-            if (action != null && action.equals("Open")) {
-                found = true;
-                break;
+        if (wallObject != null) {
+            ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(wallObject.getId()));
+            if (objectComposition == null) {
+                return false;
+            }
+            boolean found = false;
+            for (String action : objectComposition.getActions()) {
+                if (action != null && action.equals("Open")) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+            int orientation = wallObject.getOrientationA();
+            if (orientation == 1) {
+                //blocks west
+                if (a.dx(-1).equals(b)) {
+                    return true;
+                }
+            }
+            if (orientation == 4) {
+                //blocks east
+                if (a.dx(+1).equals(b)) {
+                    return true;
+                }
+            }
+            if (orientation == 2) {
+                //blocks north
+                if (a.dy(1).equals(b)) {
+                    return true;
+                }
+            }
+            if (orientation == 8) {
+                //blocks south
+                return a.dy(-1).equals(b);
             }
         }
-        if (!found) {
-            return false;
-        }
-        int orientation = wallObject.getOrientationA();
-        if (orientation == 1) {
-            //blocks west
-            if (a.dx(-1).equals(b)) {
-                return true;
-            }
-        }
-        if (orientation == 4) {
-            //blocks east
-            if (a.dx(+1).equals(b)) {
-                return true;
-            }
-        }
-        if (orientation == 2) {
-            //blocks north
-            if (a.dy(1).equals(b)) {
-                return true;
-            }
-        }
-        if (orientation == 8) {
-            //blocks south
-            return a.dy(-1).equals(b);
-        }
+
         Tile nextTile = getTile(b);
         WallObject wallObjectb;
         if (nextTile != null) {
-            wallObjectb = currentTile.getWallObject();
+            wallObjectb = nextTile.getWallObject();
         } else {
             wallObjectb = null;
         }
@@ -351,7 +394,7 @@ public class WalkerScript extends Script {
     public boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
         for (WorldPoint a : ShortestPathPlugin.getTransports().keySet()) {
 
-            if (a.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 12) {
+            if (a.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > config.reachedDistance()) {
                 continue;
             }
 
@@ -379,16 +422,15 @@ public class WalkerScript extends Script {
                         if (indexOfOrigin == -1) continue;
                         if (indexOfDestination < indexOfOrigin) continue;
 
-                        if (path.get(i).equals(origin)
-                                || path.get(i).dx(-1).equals(origin)
-                                || path.get(i).dx(+1).equals(origin)
-                                || path.get(i).dy(-1).equals(origin)
-                                || path.get(i).dy(+1).equals(origin)) {
+                        if (path.get(i).equals(origin)) {
 
                             if (b.getDestination().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 20) {
                                 handleTrapdoor(b);
                             }
 
+//                            GameObject gameObject = Rs2GameObject.getGameObject(path.get(i));
+//                            if (gameObject == null || gameObject.getId() != b.getObjectId())
+//                                continue;
 
                             Rs2GameObject.interact(b.getObjectId());
                             Rs2Player.waitForWalking();

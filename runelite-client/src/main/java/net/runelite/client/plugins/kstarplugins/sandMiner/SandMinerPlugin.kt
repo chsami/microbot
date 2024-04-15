@@ -19,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject.findObjectByLocation
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 import net.runelite.client.ui.overlay.OverlayManager
 import java.util.function.BooleanSupplier
 import javax.inject.Inject
@@ -118,20 +119,20 @@ class SandMiner : Plugin() {
         val rocks = listOf(firstRock, secondRock, thirdRock)
         val startingPoint = WorldPoint(3166, 2914, 0)
 
-        if(config.dropClues() && Rs2Inventory.get("geode") != null) {
+        if (config.dropClues() && Rs2Inventory.get("geode") != null) {
             var geode = Rs2Inventory.get("geode").name.substringAfter(">").substringBefore('<')
             Rs2Inventory.drop(geode)
             println(geode)
         }
 
-        if(Rs2Inventory.isFull()) {
+        if (Rs2Inventory.isFull()) {
             currentAction = Action.DEPOSITING
             currentRock = 0
             return
         }
 
         while (client.localPlayer.worldLocation.distanceTo(startingPoint) >= 3 && running) {
-            Microbot.getWalkerForKotlin().walkTo(startingPoint)
+            Rs2Walker.walkTo(startingPoint)
             Global.sleep(600, 1200)
         }
 
@@ -146,7 +147,7 @@ class SandMiner : Plugin() {
     private fun handleDepositing() {
         val grinderWorldPoint = WorldPoint(3165, 2914, 0)
         while (client.localPlayer.worldLocation.distanceTo(grinderWorldPoint) >= 3 && running) {
-            Microbot.getWalkerForKotlin().walkTo(grinderWorldPoint)
+            Rs2Walker.walkTo(grinderWorldPoint)
             Global.sleep(600, 1200)
         }
         Rs2GameObject.interact(26199)

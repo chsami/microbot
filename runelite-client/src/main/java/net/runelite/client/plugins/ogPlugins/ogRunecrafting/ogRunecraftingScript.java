@@ -145,7 +145,7 @@ public class ogRunecraftingScript extends Script {
             sleepUntil(()-> distanceToRuin() < 30,4000);
         }
         sleepUntil(()-> distanceToRuin() < 30);
-        //Microbot.getWalker().walkTo(config.selectAlter().getNextToAlter());
+        //Rs2Walker.walkTo(config.selectAlter().getNextToAlter());
         //sleepUntil(() -> distanceToRuin() < 5);
         //Rs2GameObject.interact(config.selectAlter().getRuinAlterID());
         myInteract();

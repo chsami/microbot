@@ -15,6 +15,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -39,7 +40,7 @@ public class GoldScript extends Script {
                 if (Microbot.pauseAllScripts) return;
 
                 if (hasBars && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(furnaceLocation) > 3) {
-                    Microbot.getWalker().walkTo(furnaceLocation, false);
+                    Rs2Walker.walkTo(furnaceLocation);
                 }
                 if (hasBars && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(furnaceLocation) < 3) {
                     if (Rs2Widget.hasWidget("What would you like to make?")) {
@@ -61,7 +62,7 @@ public class GoldScript extends Script {
                     }
                 }
                 if (!hasBars && !isBankVisible) {
-                    Microbot.getWalker().walkTo(BankLocation.AL_KHARID.getWorldPoint(), false);
+                    Rs2Walker.walkTo(BankLocation.AL_KHARID.getWorldPoint());
                 }
                 if (!hasBars && isBankVisible) {
                     if(Rs2Bank.isOpen()) {

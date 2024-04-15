@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMStatu
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -139,7 +140,7 @@ boolean emptySack = false;
     private boolean walkToMiningSpot() {
         WorldPoint miningWorldPoint = miningSpot.getWorldPoint().get(0);
         if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(miningWorldPoint) > 8) {
-            Microbot.getWalker().walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), miningWorldPoint));
+            Rs2Walker.walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), miningWorldPoint));
             return false;
         }
         return true;
@@ -150,7 +151,7 @@ boolean emptySack = false;
                 .stream()
                 .filter(x -> x.getId() == 26661 || x.getId() == 26662 || x.getId() == 26663 || x.getId() == 26664)
                 .sorted(Comparator.comparingInt(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation())))
-                .filter(x -> Microbot.getWalker().canInteract(x.getWorldLocation()))
+                .filter(x -> Rs2Walker.canReach(x.getWorldLocation()))
                 .findFirst()
                 .orElse(null);
 

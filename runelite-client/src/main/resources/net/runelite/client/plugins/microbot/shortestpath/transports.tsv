@@ -189,9 +189,9 @@
 3079 9770 0	3115 3356 0	Walk-Up Stairs 2617				1	
 3079 9769 0	3115 3356 0	Walk-Up Stairs 2617				1	
 3079 9768 0	3115 3356 0	Walk-Up Stairs 2617				1	
-3123 3360 0	3123 3361 0	Open Door 136				1	
-3123 3361 0	3123 3360 0	Open Door 136				1	
-3109 3353 0	3109 3354 0	Open Large door 135				3	
+3123 3360 0	3123 3361 0	Open Door 136				1
+3123 3361 0	3123 3360 0	Open Door 136				1
+3109 3353 0	3109 3354 0	Open Large door 135				3
 3105 3364 2	3106 3363 1	Climb-down Staircase 9584				1	
 3106 3363 1	3105 3364 2	Climb-up Staircase 11511				1	
 3106 3362 1	3105 3364 2	Climb-up Staircase 11511				1	
@@ -970,10 +970,10 @@
 3097 3432 2	3097 3432 1	Climb-down Ladder 16685					
 							
 # Al Kharid							
-3267 3228 0	3268 3228 0	Open Gate 44051				1	
-3268 3228 0	3267 3228 0	Open Gate 44051				1	
-3267 3227 0	3268 3227 0	Open Gate 44050				1	
-3268 3227 0	3267 3227 0	Open Gate 44050				1	
+3267 3228 0	3268 3228 0	Pay-toll(10gp) Gate 44599				1
+3268 3228 0	3267 3228 0	Pay-toll(10gp) Gate 44599				1
+3267 3227 0	3268 3227 0	Pay-toll(10gp) Gate 44598				1
+3268 3227 0	3267 3227 0	Pay-toll(10gp) Gate 44598				1
 3298 3124 0	3297 3124 0	Open Prison door 2692					
 3297 3124 0	3298 3124 0	Open Prison door 2692					
 3303 3117 0	3304 3115 0	Go-through Shantay pass 4031		1 Shantay pass		2	
@@ -1092,7 +1092,7 @@
 3023 3260 0	3025 3261 1	Climb-up Staircase 9582					
 3026 3247 1	3025 3248 0	Climb-down Staircase 9584					
 3025 3248 0	3026 3247 1	Climb-up Staircase 9582					
-3025 3249 0	3026 3247 1	Climb-up Staircase 9582					
+3025 3249 0	3026 3247 1	Climb-up Staircase 9582
 3018 3231 0	2962 9650 0	Climb-down Manhole 10321					
 2962 9650 0	3018 3233 0	Climb-up Ladder 10309					
 							
@@ -1110,7 +1110,8 @@
 3103 3161 1	3104 3161 0	Climb-down Staircase 12537					
 3104 3161 1	3104 3161 2	Climb-up Staircase 12537					
 3104 3161 2	3104 3161 1	Climb-down Staircase 12538					
-							
+3107 3162 0	3107 3162 0	Open Door 23972
+
 # Taverley Dungeon							
 2884 3398 0	2884 9798 0	Climb-down Ladder 16680					
 2884 9798 0	2884 3398 0	Climb-up Ladder 17385					
@@ -4398,4 +4399,4 @@
 # Zanaris							
 2452 4473 0	3201 3169 0	Use Fairy ring 12094				6	
 3202 3169 0	2452 4473 0	Open Door 2406				6	
-2486 4471 0	3260 3171 0	Use Fairy ring 12003				6	
+2486 4471 0	3260 3171 0	Use Fairy ring 12003				6

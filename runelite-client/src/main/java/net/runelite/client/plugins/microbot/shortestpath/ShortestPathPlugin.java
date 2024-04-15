@@ -8,6 +8,7 @@ import lombok.Setter;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
@@ -25,6 +26,7 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.SplitFlagMap;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.ui.JagexColors;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -47,9 +49,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.regex.Pattern;
 
 @PluginDescriptor(
-    name = "Shortest Path",
-    description = "Draws the shortest path to a chosen destination on the map (right click a spot on the world map to use)",
-    tags = {"pathfinder", "map", "waypoint", "navigation"}
+        name = "Shortest Path",
+        description = "Draws the shortest path to a chosen destination on the map (right click a spot on the world map to use)",
+        tags = {"pathfinder", "map", "waypoint", "navigation"}
 )
 public class ShortestPathPlugin extends Plugin {
     protected static final String CONFIG_GROUP = "shortestpath";
@@ -146,7 +148,7 @@ public class ShortestPathPlugin extends Plugin {
 
         pathfinderConfig = new PathfinderConfig(map, transports, client, config);
 
-        walkerScript = new WalkerScript();
+        walkerScript = new WalkerScript(config);
 
         overlayManager.add(pathOverlay);
         overlayManager.add(pathMinimapOverlay);
@@ -199,7 +201,7 @@ public class ShortestPathPlugin extends Plugin {
 
     public boolean isNearPath(WorldPoint location) {
         if (pathfinder == null || pathfinder.getPath() == null || pathfinder.getPath().isEmpty() ||
-            config.recalculateDistance() < 0 || lastLocation.equals(lastLocation = location)) {
+                config.recalculateDistance() < 0 || lastLocation.equals(lastLocation = location)) {
             return true;
         }
 
@@ -250,7 +252,7 @@ public class ShortestPathPlugin extends Plugin {
         }
 
         WorldPoint currentLocation = client.isInInstancedRegion() ?
-            WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
+                WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
         if (currentLocation.distanceTo(pathfinder.getTarget()) < config.reachedDistance()) {
             setTarget(null);
             return;
@@ -262,6 +264,15 @@ public class ShortestPathPlugin extends Plugin {
                 return;
             }
             restartPathfinding(currentLocation, pathfinder.getTarget());
+        }
+    }
+
+    @Subscribe
+    public void onGameStateChanged(GameStateChanged gameStateChanged) {
+        if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
+            getClientThread().invokeLater(() -> {
+                pathfinderConfig.refresh();
+            });
         }
     }
 
@@ -306,13 +317,13 @@ public class ShortestPathPlugin extends Plugin {
         final Shape minimap = getMinimapClipArea();
 
         if (minimap != null && pathfinder != null &&
-            minimap.contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY())) {
+                minimap.contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY())) {
             addMenuEntry(event, CLEAR, PATH, 0);
         }
 
         if (minimap != null && pathfinder != null &&
-            ("Floating World Map".equals(Text.removeTags(event.getOption())) ||
-             "Close Floating panel".equals(Text.removeTags(event.getOption())))) {
+                ("Floating World Map".equals(Text.removeTags(event.getOption())) ||
+                        "Close Floating panel".equals(Text.removeTags(event.getOption())))) {
             addMenuEntry(event, CLEAR, PATH, 1);
         }
     }
@@ -332,14 +343,14 @@ public class ShortestPathPlugin extends Plugin {
         }
 
         WorldPoint currentLocation = client.isInInstancedRegion() ?
-            WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
+                WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
         if (entry.getOption().equals(ADD_START) && entry.getTarget().equals(TRANSPORT)) {
             transportStart = currentLocation;
         }
 
         if (entry.getOption().equals(ADD_END) && entry.getTarget().equals(TRANSPORT)) {
             WorldPoint transportEnd = client.isInInstancedRegion() ?
-                WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
+                    WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
             System.out.println(transportStart.getX() + " " + transportStart.getY() + " " + transportStart.getPlane() + " " +
                     currentLocation.getX() + " " + currentLocation.getY() + " " + currentLocation.getPlane() + " " +
                     lastClick.getOption() + " " + Text.removeTags(lastClick.getTarget()) + " " + lastClick.getIdentifier()
@@ -356,7 +367,7 @@ public class ShortestPathPlugin extends Plugin {
         }
 
         if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
-            setTarget(getSelectedWorldPoint());
+            Rs2Walker.walkTo(getSelectedWorldPoint());
         }
 
         if (entry.getOption().equals(SET) && entry.getTarget().equals(START)) {
@@ -376,8 +387,8 @@ public class ShortestPathPlugin extends Plugin {
         if (client.getWidget(ComponentID.WORLD_MAP_MAPVIEW) == null) {
             if (client.getSelectedSceneTile() != null) {
                 return client.isInInstancedRegion() ?
-                    WorldPoint.fromLocalInstance(client, client.getSelectedSceneTile().getLocalLocation()) :
-                    client.getSelectedSceneTile().getWorldLocation();
+                        WorldPoint.fromLocalInstance(client, client.getSelectedSceneTile().getLocalLocation()) :
+                        client.getSelectedSceneTile().getWorldLocation();
             }
         } else {
             return calculateMapPoint(client.isMenuOpen() ? lastMenuOpenedPoint : client.getMouseCanvasPosition());
@@ -411,7 +422,7 @@ public class ShortestPathPlugin extends Plugin {
             worldMapPointManager.add(marker);
 
             WorldPoint start = client.isInInstancedRegion() ?
-                WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
+                    WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
             lastLocation = start;
             if (startPointSet && pathfinder != null) {
                 start = pathfinder.getStart();
@@ -485,13 +496,13 @@ public class ShortestPathPlugin extends Plugin {
         }
 
         client.createMenuEntry(position)
-            .setOption(option)
-            .setTarget(target)
-            .setParam0(event.getActionParam0())
-            .setParam1(event.getActionParam1())
-            .setIdentifier(event.getIdentifier())
-            .setType(MenuAction.RUNELITE)
-            .onClick(this::onMenuOptionClicked);
+                .setOption(option)
+                .setTarget(target)
+                .setParam0(event.getActionParam0())
+                .setParam1(event.getActionParam1())
+                .setIdentifier(event.getIdentifier())
+                .setType(MenuAction.RUNELITE)
+                .onClick(this::onMenuOptionClicked);
     }
 
     private Widget getMinimapDrawWidget() {

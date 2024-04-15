@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntiBan
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
 import net.runelite.client.plugins.microbot.util.security.Login
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 
 abstract class BaseTrainer(private val config: GriffinTrainerConfig) {
     abstract fun getBankLocation(): WorldPoint
@@ -62,7 +63,7 @@ abstract class BaseTrainer(private val config: GriffinTrainerConfig) {
 
     fun fetchItemRequirements() {
         if (config.equipGear()) {
-            Microbot.getWalkerForKotlin().staticWalkTo(getBankLocation())
+            Rs2Walker.walkTo(getBankLocation())
             if (!Rs2Bank.isOpen()) {
                 Rs2Bank.openBank()
             }

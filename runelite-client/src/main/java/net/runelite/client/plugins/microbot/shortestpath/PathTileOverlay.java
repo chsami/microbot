@@ -7,10 +7,7 @@ import net.runelite.api.Point;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap;
-import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathFinder;
-import net.runelite.client.plugins.microbot.staticwalker.pathfinder.PathNode;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -200,8 +197,7 @@ public class PathTileOverlay extends Overlay {
             if (draw) {
                 graphics.setColor(color);
                 graphics.fill(poly);
-                if (step > 0)
-                {
+                if (step > 0) {
                     int centerX = (int) poly.getBounds().getCenterX();
                     int centerY = (int) poly.getBounds().getCenterY();
                     int percentage = (int) (step * 100);
@@ -319,6 +315,7 @@ public class PathTileOverlay extends Overlay {
             }
         }
     }
+
     public static Color generateGradient(float step) {
         if (step < 0) {
             step = 0;

@@ -12,7 +12,6 @@ import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
-import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -94,7 +93,6 @@ public abstract class Script implements IScript {
     public void shutdown() {
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
             mainScheduledFuture.cancel(true);
-            Microbot.getWalker().pathfinder = new Pathfinder();
             Microbot.pauseAllScripts = false;
             ShortestPathPlugin.walkerScript.setTarget(null);
             ShortestPathPlugin.exit();
@@ -105,8 +103,6 @@ public abstract class Script implements IScript {
         hasLeveledUp = false;
         if (Microbot.enableAutoRunOn)
             Rs2Player.toggleRunEnergy(true);
-        if (Microbot.getClient().getMinimapZoom() > 2)
-            Microbot.getClient().setMinimapZoom(2);
 
         if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
             VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);

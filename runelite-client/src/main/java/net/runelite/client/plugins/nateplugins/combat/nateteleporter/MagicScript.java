@@ -1,8 +1,6 @@
 package net.runelite.client.plugins.nateplugins.combat.nateteleporter;
 
-import net.runelite.api.Actor;
 import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -14,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.nateplugins.combat.nateteleporter.enums.SPELLS;
 
 import java.util.concurrent.TimeUnit;
@@ -30,9 +29,9 @@ public class MagicScript extends Script {
             if (!Microbot.isLoggedIn()) return;
 
 
-
             try {
-                if (!config.highAlchemy() && (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts)) return;
+                if (!config.highAlchemy() && (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts))
+                    return;
 
                 if (config.highAlchemy()) {
 
@@ -51,7 +50,7 @@ public class MagicScript extends Script {
                     if (Rs2Cannon.repair()) return;
                     if (Rs2Cannon.refill(5)) return;
                     if (Microbot.getClient().getLocalPlayer().getWorldLocation().equals(initialPlayerLocation)) return;
-                    Microbot.getWalker().walkFastCanvas(initialPlayerLocation);
+                    Rs2Walker.walkFastCanvas(initialPlayerLocation);
                 }
 
                 if (config.MODE() == SPELLS.NONE)

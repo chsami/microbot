@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
+import net.runelite.api.WorldType;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
 
@@ -88,6 +90,8 @@ public class CollisionMap {
         for (int i = 0; i < transports.size(); ++i) {
             Transport transport = transports.get(i);
             if (visited.get(transport.getDestination())) continue;
+            if (transport.isMember() && !Microbot.getClient().getWorldType().contains(WorldType.MEMBERS))
+                continue;
             neighbors.add(new TransportNode(transport.getDestination(), node, transport.getWait()));
         }
 

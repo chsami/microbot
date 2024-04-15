@@ -17,6 +17,7 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -79,28 +80,22 @@ public class SummerGardenScript extends Script {
                         if (Rs2Inventory.hasItemAmount("Summer sq'irk", 2, false, true) && Rs2Inventory.count("Summer sq'irkjuice") == 25) {
                             if (isInGarden()) {
                                 botState = BotState.EXIT_GARDEN;
-                            }
-                            else if (isInAlKharid()) {
+                            } else if (isInAlKharid()) {
                                 botState = BotState.MAKE_LAST_JUICE;
                             }
-                        }
-                        else if (Rs2Inventory.hasItem("Summer sq'irkjuice") && isInAlKharid()) {
+                        } else if (Rs2Inventory.hasItem("Summer sq'irkjuice") && isInAlKharid()) {
                             botState = BotState.COMPLETE_AND_RESET;
-                        }
-                        else if (!Rs2Inventory.hasItem("Summer sq'irk")
+                        } else if (!Rs2Inventory.hasItem("Summer sq'irk")
                                 && !Rs2Inventory.hasItemAmount("Beer glass", 25, false, true)
                                 && !Rs2Inventory.hasItem("Summer sq'irkjuice")
                                 && isInAlKharid()) {
                             botState = BotState.RETURN_TO_HOUSE;
                         }
-                    }
-                    else if (botState == BotState.EXIT_GARDEN) {
+                    } else if (botState == BotState.EXIT_GARDEN) {
                         exitGarden();
-                    }
-                    else if (botState == BotState.MAKE_LAST_JUICE) {
+                    } else if (botState == BotState.MAKE_LAST_JUICE) {
                         makeLastJuice();
-                    }
-                    else if (botState == BotState.COMPLETE_AND_RESET) {
+                    } else if (botState == BotState.COMPLETE_AND_RESET) {
                         completeAndReset();
                         if (config.sendInvFullNotification() && !sendRs2InventoryFullNotification) {
                             // this line causes a freeze when using dev mode
@@ -153,7 +148,7 @@ public class SummerGardenScript extends Script {
         //var houseDoorTest = Rs2GameObject.findDoor(OBJECT_HOUSE_DOOR_CLOSED);
 
         LocalPoint doorLp = LocalPoint.fromWorld(Microbot.getClient(), 3321, 3142);
-        if (doorLp == null ) {
+        if (doorLp == null) {
             return null;
         }
 
@@ -191,7 +186,7 @@ public class SummerGardenScript extends Script {
                 return false;
             }
 
-            Microbot.getWalker().walkFastCanvas(WORLD_POINT_INSIDE_HOUSE);
+            Rs2Walker.walkFastCanvas(WORLD_POINT_INSIDE_HOUSE);
             sleepUntil(() -> isInHouseArea(), 5000);
         }
 
@@ -217,8 +212,7 @@ public class SummerGardenScript extends Script {
 
         if (Rs2Inventory.hasItemAmount("Summer sq'irk", 2, false, true)) {
             botState = BotState.MAKE_LAST_JUICE;
-        }
-        else {
+        } else {
             botState = BotState.COMPLETE_AND_RESET;
         }
     }
@@ -290,7 +284,7 @@ public class SummerGardenScript extends Script {
         if (npcOsman == null) {
             var osmanLocalLocation = LocalPoint.fromWorld(Microbot.getClient(), osmanLocation);
             if (osmanLocalLocation != null) {
-                Microbot.getWalker().walkTo(osmanLocation, false);
+                Rs2Walker.walkTo(osmanLocation);
                 return;
             }
             return;
@@ -351,7 +345,7 @@ public class SummerGardenScript extends Script {
         if (!isInHouseArea()) {
             var outsideHouseDoorLocalLocation = LocalPoint.fromWorld(Microbot.getClient(), WORLD_POINT_OUTSIDE_HOUSE_DOOR);
             if (outsideHouseDoorLocalLocation != null && Microbot.getClient().getLocalPlayer().getLocalLocation().distanceTo(outsideHouseDoorLocalLocation) >= MAX_DISTANCE) {
-                Microbot.getWalker().walkTo(WORLD_POINT_OUTSIDE_HOUSE_DOOR, false);
+                Rs2Walker.walkTo(WORLD_POINT_OUTSIDE_HOUSE_DOOR);
                 return;
             }
         }

@@ -6,6 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 
 class MiningHelper {
 
@@ -27,7 +28,7 @@ class MiningHelper {
             if (nearestOre.worldLocation.distanceTo(player.worldLocation) >= 2) {
                 Microbot.status = "Walking to nearest ${oreName} ore"
                 if (!Rs2Camera.isTileOnScreen(nearestOre.localLocation)) {
-                    Microbot.getWalkerForKotlin().staticWalkTo(nearestOre.worldLocation)
+                    Rs2Walker.walkTo(nearestOre.worldLocation)
                 }
             }
 

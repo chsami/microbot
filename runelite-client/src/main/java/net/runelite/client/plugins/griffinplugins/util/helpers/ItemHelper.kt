@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
 import net.runelite.client.plugins.microbot.util.models.RS2Item
 import net.runelite.client.plugins.microbot.util.player.Rs2Player
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
 
 class ItemHelper {
 
@@ -54,7 +55,7 @@ class ItemHelper {
 
                     if (stillExists) {
                         if (rsGroundItem.tile.worldLocation.distanceTo(player.worldLocation) >= 4) {
-                            Microbot.getWalkerForKotlin().hybridWalkTo(rsGroundItem.tile.worldLocation)
+                            Rs2Walker.walkTo(rsGroundItem.tile.worldLocation)
                         }
 
                         val inventoryCount = Rs2Inventory.count()

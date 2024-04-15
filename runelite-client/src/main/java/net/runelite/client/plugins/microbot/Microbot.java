@@ -19,13 +19,11 @@ import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
-import net.runelite.client.plugins.microbot.util.walker.Walker;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
-import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -63,9 +61,6 @@ public class Microbot {
     private static NPCManager npcManager;
     @Getter
     @Setter
-    private static Walker walker;
-    @Getter
-    @Setter
     private static ProfileManager profileManager;
     @Getter
     @Setter
@@ -94,10 +89,6 @@ public class Microbot {
     private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
-
-    public static Walker getWalkerForKotlin() {
-        return walker;
-    }
 
     public static Client getClientForKotlin() {
         return client;
@@ -160,32 +151,35 @@ public class Microbot {
         return Microbot.getClient().getRealSkillLevel(skill) >= levelRequired;
     }
 
-    public static void hopToWorld(int worldNumber) {
-        if (Microbot.getClient().getLocalPlayer() != null && Microbot.getClient().getLocalPlayer().isInteracting()) return;
-        if (quickHopTargetWorld != null || Microbot.getClient().getGameState() != GameState.LOGGED_IN) return;
-        if (Microbot.getClient().getWorld() == worldNumber) {
-            return;
-        }
-        World newWorld = Microbot.getWorldService().getWorlds().findWorld(worldNumber);
-        if (newWorld == null) {
-            Microbot.getNotifier().notify("Invalid World");
-            System.out.println("Tried to hop to an invalid world");
-            return;
-        }
-        final net.runelite.api.World rsWorld = Microbot.getClient().createWorld();
-        quickHopTargetWorld = rsWorld;
-        rsWorld.setActivity(newWorld.getActivity());
-        rsWorld.setAddress(newWorld.getAddress());
-        rsWorld.setId(newWorld.getId());
-        rsWorld.setPlayerCount(newWorld.getPlayers());
-        rsWorld.setLocation(newWorld.getLocation());
-        rsWorld.setTypes(WorldUtil.toWorldTypes(newWorld.getTypes()));
-        if (rsWorld == null) {
-            return;
-        }
-        Microbot.getClient().openWorldHopper();
-        Microbot.getClient().hopToWorld(rsWorld);
-        quickHopTargetWorld = null;
+    public static boolean hopToWorld(int worldNumber) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            if (Microbot.getClient().getLocalPlayer() != null && Microbot.getClient().getLocalPlayer().isInteracting()) return false;
+            if (quickHopTargetWorld != null || Microbot.getClient().getGameState() != GameState.LOGGED_IN)  return false;
+            if (Microbot.getClient().getWorld() == worldNumber) {
+                return false;
+            }
+            World newWorld = Microbot.getWorldService().getWorlds().findWorld(worldNumber);
+            if (newWorld == null) {
+                Microbot.getNotifier().notify("Invalid World");
+                System.out.println("Tried to hop to an invalid world");
+                return false;
+            }
+            final net.runelite.api.World rsWorld = Microbot.getClient().createWorld();
+            quickHopTargetWorld = rsWorld;
+            rsWorld.setActivity(newWorld.getActivity());
+            rsWorld.setAddress(newWorld.getAddress());
+            rsWorld.setId(newWorld.getId());
+            rsWorld.setPlayerCount(newWorld.getPlayers());
+            rsWorld.setLocation(newWorld.getLocation());
+            rsWorld.setTypes(WorldUtil.toWorldTypes(newWorld.getTypes()));
+            if (rsWorld == null) {
+                return false;
+            }
+            Microbot.getClient().openWorldHopper();
+            Microbot.getClient().hopToWorld(rsWorld);
+            quickHopTargetWorld = null;
+            return true;
+        });
     }
 
     public static void showMessage(String message) {
@@ -247,6 +241,8 @@ public class Microbot {
         int viewportWidth = client.getViewportWidth();
         if (!(rectangle.getX() > (double)viewportWidth) && !(rectangle.getY() > (double)viewportHeight) && !(rectangle.getX() < 0.0) && !(rectangle.getY() < 0.0)) {
             click(rectangle);
+        } else {
+            click(new Rectangle(1, 1));
         }
     }
 

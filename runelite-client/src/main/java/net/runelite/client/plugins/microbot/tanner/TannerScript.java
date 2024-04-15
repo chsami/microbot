@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -67,7 +68,7 @@ public class TannerScript extends Script {
                     }
                     if (!Rs2Bank.hasItem(config.HIDE_TYPE().getItemName())) {
                         Rs2Bank.closeBank();
-                        logout();
+                        Rs2Player.logout();
                         shutdown();
                         return;
                     }
@@ -76,7 +77,7 @@ public class TannerScript extends Script {
             }
         }
         if (hasHides && !isTannerVisibleOnScreen) {
-            Microbot.getWalker().walkTo(tannerLocation, false);
+            Rs2Walker.walkTo(tannerLocation);
         }
         if (hasHides && isTannerVisibleOnScreen) {
             if (Rs2Widget.hasWidget("What hides would you like tanning?")) {
@@ -101,7 +102,7 @@ public class TannerScript extends Script {
             }
         }
         if (!hasHides && !isBankVisible) {
-            Microbot.getWalker().walkTo(BankLocation.AL_KHARID.getWorldPoint(), false);
+            Rs2Walker.walkTo(BankLocation.AL_KHARID.getWorldPoint());
         }
     }
 }

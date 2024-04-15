@@ -3,8 +3,10 @@ package net.runelite.client.plugins.microbot.shortestpath;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import net.runelite.api.Quest;
+import net.runelite.api.QuestState;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.Microbot;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -122,6 +124,8 @@ public class Transport {
     private String objectName;
     @Getter
     private int objectId;
+    @Getter
+    private boolean isMember;
 
     Transport(final WorldPoint origin, final WorldPoint destination) {
         this.origin = origin;
@@ -198,6 +202,12 @@ public class Transport {
         isSpiritTree = TransportType.SPIRIT_TREE.equals(transportType);
         isTeleportationLever = TransportType.TELEPORTATION_LEVER.equals(transportType);
         isTeleportationPortal = TransportType.TELEPORTATION_PORTAL.equals(transportType);
+        isMember = TransportType.TELEPORTATION_LEVER.equals(transportType)
+                ||  TransportType.SPIRIT_TREE.equals(transportType)
+                || TransportType.GNOME_GLIDER.equals(transportType)
+                || TransportType.CANOE.equals(transportType)
+                || isAgilityShortcut
+                || isGrappleShortcut;
     }
 
     /**
@@ -306,5 +316,14 @@ public class Transport {
         SPIRIT_TREE,
         TELEPORTATION_LEVER,
         TELEPORTATION_PORTAL
+    }
+
+    private static boolean completedQuests(Transport transport) {
+        for (Quest quest : transport.getQuests()) {
+            if (!QuestState.FINISHED.equals(quest.getState(Microbot.getClient()))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

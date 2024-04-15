@@ -17,6 +17,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.NameGenerator;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
@@ -260,7 +261,7 @@ public class TutorialIslandScript extends Script {
         if (Microbot.getVarbitPlayerValue(281) == 610 || Microbot.getVarbitPlayerValue(281) == 620) {
             WorldPoint worldPoint = new WorldPoint(3135, 3088, 0);
             if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(worldPoint) > 2) {
-                Microbot.getWalker().walkTo(worldPoint);
+                Rs2Walker.walkTo(worldPoint);
             } else {
                 Rs2Npc.interact(3309, "Talk-to");
                 sleepUntil(() -> isInDialogue());
@@ -294,7 +295,7 @@ public class TutorialIslandScript extends Script {
     public void PrayerGuide() {
         if (isInDialogue()) return;
         if (Microbot.getVarbitPlayerValue(281) == 640 || Microbot.getVarbitPlayerValue(281) == 550 || Microbot.getVarbitPlayerValue(281) == 540) {
-            Microbot.getWalker().walkTo(new WorldPoint(3124, 3106, 0));
+            Rs2Walker.walkTo(new WorldPoint(3124, 3106, 0));
             Rs2Npc.interact(3319, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) == 560) {
             Rs2Widget.clickWidget(10747961); //switchToPrayerTab
@@ -318,7 +319,7 @@ public class TutorialIslandScript extends Script {
             Rs2GameObject.interact(26815);
             sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 520);
         } else if (Microbot.getVarbitPlayerValue(281) == 525) {
-            Microbot.getWalker().walkTo(new WorldPoint(3127, 3123, 0));
+            Rs2Walker.walkTo(new WorldPoint(3127, 3123, 0));
             Rs2Npc.interact(3310, "Talk-to");
         } else if (Microbot.getVarbitPlayerValue(281) == 531) {
             Rs2Widget.clickWidget(10747943); //switchToAccountManagementTab
@@ -344,7 +345,7 @@ public class TutorialIslandScript extends Script {
                 return;
             }
             if (Microbot.getVarbitPlayerValue(281) == 470) {
-                Microbot.getWalker().walkTo(new WorldPoint(3109, 9511, 0));
+                Rs2Walker.walkTo(new WorldPoint(3109, 9511, 0));
                 NPC npc = Rs2Npc.getNpc("Combat Instructor");
                 Rs2Npc.interact(npc, "Talk-to");
                 sleep(1000);
@@ -357,7 +358,7 @@ public class TutorialIslandScript extends Script {
                     Rs2Widget.clickWidget(10747956);
                     WorldPoint worldPoint = new WorldPoint(3105, 9517, 0);
                     if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(worldPoint) > 2)
-                        Microbot.getWalker().walkTo(worldPoint);
+                        Rs2Walker.walkTo(worldPoint);
                     else {
                         NPC npc = Rs2Npc.getNpc("Giant rat");
                         Rs2Npc.interact(npc, "Attack");
@@ -406,7 +407,7 @@ public class TutorialIslandScript extends Script {
                     return;
                 }
             }
-            Microbot.getWalker().walkTo(new WorldPoint(random(3106, 3108), random(9508, 9510), 0));
+            Rs2Walker.walkTo(new WorldPoint(random(3106, 3108), random(9508, 9510), 0));
             sleep(500);
             sleepUntil(Rs2Player::isWalking);
             NPC npc = Rs2Npc.getNpc("Combat Instructor");
@@ -420,7 +421,7 @@ public class TutorialIslandScript extends Script {
     public void MiningGuide() {
         if (Microbot.getVarbitPlayerValue(281) == 260) {
             if (isInDialogue()) return;
-            Microbot.getWalker().walkTo(new WorldPoint(random(3082, 3085), random(9502, 9505), 0));
+            Rs2Walker.walkTo(new WorldPoint(random(3082, 3085), random(9502, 9505), 0));
             NPC npc = Rs2Npc.getNpc(3311);
             Rs2Npc.interact(npc, "Talk-to");
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == npc);
@@ -463,7 +464,7 @@ public class TutorialIslandScript extends Script {
 
     public void QuestGuide() {
         if (Microbot.getVarbitPlayerValue(281) == 200 || Microbot.getVarbitPlayerValue(281) == 210) {
-            Microbot.getWalker().walkTo(new WorldPoint(random(3083, 3086), random(3127, 3129), 0));
+            Rs2Walker.walkTo(new WorldPoint(random(3083, 3086), random(3127, 3129), 0));
             Rs2GameObject.interact(9716, "Open");
             sleep(600, 1200);
         } else if (Microbot.getVarbitPlayerValue(281) != 250) {
@@ -517,7 +518,10 @@ public class TutorialIslandScript extends Script {
             Rs2Inventory.combine("Logs", "Tinderbox");
             sleepUntil(() -> !Rs2Inventory.hasItem("Logs"));
         } else {
-            Microbot.getWalker().walkTo(Rs2Npc.getNpc(8503));
+            NPC npc = Rs2Npc.getNpc(8503);
+            if (npc != null) {
+                Rs2Walker.walkTo(npc.getWorldLocation());
+            }
         }
     }
 
@@ -542,7 +546,7 @@ public class TutorialIslandScript extends Script {
     public boolean InteractWithNpc(int id) {
         NPC npc = Rs2Npc.getNpc(id);
         if (npc == null) return false;
-        if (!Microbot.getWalker().canReach(npc.getWorldLocation())) {
+        if (!Rs2Walker.canReach(npc.getWorldLocation())) {
             return false;
         }
         return Rs2Npc.interact(npc, "Talk-to");
@@ -551,7 +555,7 @@ public class TutorialIslandScript extends Script {
     public boolean InteractWithNpc(int id, String interaction) {
         NPC npc = Rs2Npc.getNpc(id);
         if (npc == null) return false;
-        if (!Microbot.getWalker().canReach(npc.getWorldLocation())) {
+        if (!Rs2Walker.canReach(npc.getWorldLocation())) {
             return false;
         }
         return Rs2Npc.interact(npc, interaction);
