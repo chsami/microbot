@@ -42,9 +42,9 @@ public class SandCrabScript extends Script {
     List<ScanLocation> sandCrabLocations = Arrays.asList(new ScanLocation(new WorldPoint(1843, 3462, 0)),
             new ScanLocation(new WorldPoint(1833, 3458, 0)),
             new ScanLocation(new WorldPoint(1790, 3468, 0)),
-            new ScanLocation(new WorldPoint(1776, 3468, 0)),
-            new ScanLocation(new WorldPoint(1773, 3461, 0)),
-            new ScanLocation(new WorldPoint(1765, 3468, 0)),
+            new ScanLocation(new WorldPoint(1776, 3468, 0), true),
+            new ScanLocation(new WorldPoint(1773, 3461, 0), true),
+            new ScanLocation(new WorldPoint(1765, 3468, 0), true),
             new ScanLocation(new WorldPoint(1749, 3469, 0)),
             new ScanLocation(new WorldPoint(1738, 3468, 0)));
 
@@ -90,7 +90,7 @@ public class SandCrabScript extends Script {
                             Rs2Tab.switchToCombatOptionsTab();
                             Rs2Combat.enableAutoRetialiate();
                         }
-                        if (!isNpcAggressive()) {
+                        if (!isNpcAggressive() || afkTimer > 10) {
                             state = State.AFK;
                         }
                         break;
@@ -131,7 +131,7 @@ public class SandCrabScript extends Script {
                         }
                         break;
                     case SCAN_LOCATIONS:
-                        scanSandCrabLocations();;
+                        scanSandCrabLocations(config);
                         break;
                 }
 
@@ -210,7 +210,10 @@ public class SandCrabScript extends Script {
         return false;
     }
 
-    private void scanSandCrabLocations() {
+    private void scanSandCrabLocations(SandCrabConfig config) {
+        if (config.threeNpcs()) {
+            sandCrabLocations = sandCrabLocations.stream().filter(x -> x.hasThreeNpcs).collect(Collectors.toList());
+        }
         currentScanLocation = sandCrabLocations.stream()
                 .filter(x -> !x.isScanned())
                 .min(Comparator.comparingInt(x -> x.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))

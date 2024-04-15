@@ -29,4 +29,15 @@ public interface SandCrabConfig extends Config {
         return Food.MONKFISH;
     }
 
+    @ConfigItem(
+            keyName = "threeNpcs",
+            name = "Three Sand Crab Spots",
+            description = "Only use the sandcrabs spots that have 3 npcs",
+            position = 1
+    )
+    default boolean threeNpcs()
+    {
+        return false;
+    }
+
 }
