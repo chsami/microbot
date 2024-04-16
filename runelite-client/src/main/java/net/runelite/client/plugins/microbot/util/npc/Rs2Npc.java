@@ -4,7 +4,9 @@ import net.runelite.api.Actor;
 import net.runelite.api.MenuAction;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -260,7 +262,6 @@ public class Rs2Npc {
 
     public static boolean attack(String npcName) {
         NPC npc = getNpc(npcName);
-
         return interact(npc, "attack");
     }
 
@@ -283,5 +284,15 @@ public class Rs2Npc {
                 npc.getComposition().getSize(),
                 npc.getComposition().getSize())
                 .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+    }
+
+    public static WorldPoint getWorldLocation(NPC npc) {
+        if (Microbot.getClient().isInInstancedRegion()) {
+            LocalPoint l = LocalPoint.fromWorld(Microbot.getClient(), npc.getWorldLocation());
+            WorldPoint npcInstancedWorldLocation = WorldPoint.fromLocalInstance(Microbot.getClient(), l);
+            return npcInstancedWorldLocation;
+        } else {
+            return npc.getWorldLocation();
+        }
     }
 }
