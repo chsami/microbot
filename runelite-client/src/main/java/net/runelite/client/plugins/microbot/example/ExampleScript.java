@@ -1,15 +1,23 @@
 package net.runelite.client.plugins.microbot.example;
 
+import net.runelite.api.MenuAction;
+import net.runelite.api.Perspective;
+import net.runelite.api.Point;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.envisionplugins.breakhandler.util.Login;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
+import java.awt.*;
 import java.util.concurrent.TimeUnit;
+
+import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.isCloseToRegion;
 
 
 public class ExampleScript extends Script {
@@ -31,8 +39,8 @@ public class ExampleScript extends Script {
                  */
 
                 long startTime = System.currentTimeMillis();
-                int world = Login.getRandomWorld(false, null);
-                Microbot.hopToWorld(world);
+                boolean result = isCloseToRegion(5, 53, 29);
+                System.out.println(result);
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
                 System.out.println("Total time for loop " + totalTime);
@@ -47,6 +55,5 @@ public class ExampleScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
-        ShortestPathPlugin.walkerScript.shutdown();
     }
 }
