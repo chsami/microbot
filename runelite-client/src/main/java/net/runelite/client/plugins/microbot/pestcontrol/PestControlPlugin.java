@@ -8,12 +8,15 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.pestcontrol.Portal;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static net.runelite.client.plugins.microbot.pestcontrol.PestControlScript.portals;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Pest Control",
@@ -62,16 +65,16 @@ public class PestControlPlugin extends Plugin {
             if (matcher.lookingAt()) {
                 switch (matcher.group(1)) {
                     case "purple":
-                        PestControlScript.setPurpleShield(false);
+                        portals.stream().filter(x -> x == Portal.PURPLE).findFirst().get().setHasShield(false);
                         break;
                     case "blue":
-                        PestControlScript.setBlueShield(false);
+                        portals.stream().filter(x -> x == Portal.BLUE).findFirst().get().setHasShield(false);
                         break;
                     case "red":
-                        PestControlScript.setRedShield(false);
+                        portals.stream().filter(x -> x == Portal.RED).findFirst().get().setHasShield(false);
                         break;
                     case "yellow":
-                        PestControlScript.setYellowShield(false);
+                        portals.stream().filter(x -> x == Portal.YELLOW).findFirst().get().setHasShield(false);
                         break;
                 }
             }

@@ -63,4 +63,24 @@ public interface PestControlConfig extends Config {
     default String alchItem() {
         return "";
     }
+
+    @ConfigItem(
+            keyName = "QuickPrayer",
+            name = "Enable QuickPrayer",
+            description = "Enables quick prayer",
+            position = 7
+    )
+    default boolean quickPrayer() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "Special Attack",
+            name = "Use Special Attack on %",
+            description = "What percentage to use Special Attack",
+            position = 8
+    )
+    default int specialAttackPercentage() {
+        return 100;
+    }
 }

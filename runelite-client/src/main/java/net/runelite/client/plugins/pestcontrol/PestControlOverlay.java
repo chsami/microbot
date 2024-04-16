@@ -32,6 +32,8 @@ import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
+
+import static net.runelite.client.plugins.microbot.pestcontrol.PestControlScript.portals;
 import static net.runelite.client.plugins.pestcontrol.Portal.BLUE;
 import static net.runelite.client.plugins.pestcontrol.Portal.PURPLE;
 import static net.runelite.client.plugins.pestcontrol.Portal.RED;
@@ -106,10 +108,10 @@ public class PestControlOverlay extends Overlay
 		PortalContext yellow = game.getYellow();
 		PortalContext red = game.getRed();
 
-		Widget purpleHealth = client.getWidget(PURPLE.getHitpoints());
-		Widget blueHealth = client.getWidget(BLUE.getHitpoints());
-		Widget yellowHealth = client.getWidget(YELLOW.getHitpoints());
-		Widget redHealth = client.getWidget(RED.getHitpoints());
+		Widget purpleHealth = portals.stream().filter(x -> x == PURPLE).findFirst().get().getHitPoints();
+		Widget blueHealth = portals.stream().filter(x -> x == BLUE).findFirst().get().getHitPoints();
+		Widget yellowHealth = portals.stream().filter(x -> x == YELLOW).findFirst().get().getHitPoints();
+		Widget redHealth = portals.stream().filter(x -> x == RED).findFirst().get().getHitPoints();
 
 		// Check for dead portals
 		if (isZero(purpleHealth))
@@ -175,7 +177,7 @@ public class PestControlOverlay extends Overlay
 	{
 		Widget shield = client.getWidget(portal.getShield());
 		Widget icon = client.getWidget(portal.getIcon());
-		Widget hp = client.getWidget(portal.getHitpoints());
+		Widget hp = portal.getHitPoints();
 
 		Widget bar = client.getWidget(ComponentID.PEST_CONTROL_ACTIVITY_BAR).getChild(0);
 
