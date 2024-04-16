@@ -5,6 +5,7 @@ import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
@@ -89,6 +90,7 @@ public class Rs2Magic {
             return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
         });
         Widget highAlch = Rs2Widget.findWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getName());
+        if (highAlch.getSpriteId() != 41) return;
         alch(highAlch, item);
     }
 
@@ -98,8 +100,9 @@ public class Rs2Magic {
             sleep(50, 150);
             return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
         });
-        Widget highAlch = Rs2Widget.findWidget(MagicAction.LOW_LEVEL_ALCHEMY.getName());
-        alch(highAlch, item);
+        Widget lowAlch = Rs2Widget.findWidget(MagicAction.LOW_LEVEL_ALCHEMY.getName());
+        if (lowAlch.getSpriteId() != 25) return;
+        alch(lowAlch, item);
     }
 
     private static void alch(Widget alch, Rs2Item item) {
