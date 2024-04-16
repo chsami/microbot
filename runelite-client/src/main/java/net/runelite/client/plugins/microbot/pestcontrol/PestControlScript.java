@@ -51,7 +51,7 @@ public class PestControlScript extends Script {
     );
 
     final int distanceToPortal = 8;
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     public static List<Portal> portals = List.of(PURPLE, BLUE, RED, YELLOW);
 
