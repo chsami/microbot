@@ -74,7 +74,7 @@ public class SandCrabScript extends Script {
                     }
                 }
 
-                if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentScanLocation.getWorldPoint()) > 10 && (state != State.RESET_AGGRO || state != State.WALK_BACK)) {
+                if (currentScanLocation != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentScanLocation.getWorldPoint()) > 10 && (state != State.RESET_AGGRO || state != State.WALK_BACK)) {
                     state = State.WALK_BACK;
                     resetAggro();
                     resetAfkTimer();
@@ -234,20 +234,24 @@ public class SandCrabScript extends Script {
             state = State.HOP_WORLD;
             return;
         }
-        boolean reachedLocation = Rs2Walker.walkTo(currentScanLocation.getWorldPoint());
-        if (reachedLocation) {
-            if (otherPlayerDetected(currentScanLocation.getWorldPoint())) {
-                currentScanLocation.scanned = true;
-            } else {
-                initialPlayerLocation = currentScanLocation.getWorldPoint();
-                state = State.FIGHT;
+        //If the currentScan location is far away, we walk to it first
+        if (currentScanLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 10) {
+            boolean reachedLocation = Rs2Walker.walkTo(currentScanLocation.getWorldPoint());
+            if (!reachedLocation) {
+                if (currentScanLocation.triedWalking > 20) { //something went wrong, just skip this location
+                    currentScanLocation.scanned = true;
+                } else {
+                    currentScanLocation.triedWalking++;
+                }
             }
+        }
+        //check if there are other players on our spot
+        if (otherPlayerDetected(currentScanLocation.getWorldPoint())) {
+            currentScanLocation.scanned = true;
         } else {
-            if (currentScanLocation.triedWalking > 20) { //something went wrong, just skip this location
-                currentScanLocation.scanned = true;
-            } else {
-                currentScanLocation.triedWalking++;
-            }
+            Rs2Walker.walkTo(currentScanLocation.getWorldPoint());
+            initialPlayerLocation = currentScanLocation.getWorldPoint();
+            state = State.FIGHT;
         }
     }
 
