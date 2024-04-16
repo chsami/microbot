@@ -22,6 +22,7 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
@@ -49,9 +50,11 @@ import java.util.concurrent.ThreadFactory;
 import java.util.regex.Pattern;
 
 @PluginDescriptor(
-        name = "Shortest Path",
+        name = PluginDescriptor.Mocrosoft + "Web Walker",
         description = "Draws the shortest path to a chosen destination on the map (right click a spot on the world map to use)",
-        tags = {"pathfinder", "map", "waypoint", "navigation"}
+        tags = {"pathfinder", "map", "waypoint", "navigation", "microbot"},
+        enabledByDefault = true,
+        alwaysOn = true
 )
 public class ShortestPathPlugin extends Plugin {
     protected static final String CONFIG_GROUP = "shortestpath";
@@ -74,7 +77,7 @@ public class ShortestPathPlugin extends Plugin {
     private ClientThread clientThread;
 
     @Inject
-    private ShortestPathConfig config;
+    public ShortestPathConfig config;
 
     @Inject
     private OverlayManager overlayManager;
@@ -134,8 +137,6 @@ public class ShortestPathPlugin extends Plugin {
     @Setter
     private static boolean startPointSet = false;
 
-    public static WalkerScript walkerScript;
-
     @Provides
     public ShortestPathConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(ShortestPathConfig.class);
@@ -148,7 +149,7 @@ public class ShortestPathPlugin extends Plugin {
 
         pathfinderConfig = new PathfinderConfig(map, transports, client, config);
 
-        walkerScript = new WalkerScript(config);
+        Rs2Walker.setConfig(config);
 
         overlayManager.add(pathOverlay);
         overlayManager.add(pathMinimapOverlay);
@@ -172,6 +173,7 @@ public class ShortestPathPlugin extends Plugin {
 
     public static void exit() {
         if (pathfindingExecutor != null) {
+            Rs2Walker.setTarget(null);
             pathfindingExecutor.shutdownNow();
             pathfindingExecutor = null;
         }
@@ -255,6 +257,8 @@ public class ShortestPathPlugin extends Plugin {
                 WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
         if (currentLocation.distanceTo(pathfinder.getTarget()) < config.reachedDistance()) {
             setTarget(null);
+            Microbot.getClientThread().scheduledFuture.cancel(true);
+            System.out.println("Web Walker finished with reachedDistance " + config.reachedDistance());
             return;
         }
 

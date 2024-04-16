@@ -186,7 +186,7 @@ public interface ShortestPathConfig extends Config {
         section = sectionSettings
     )
     default int reachedDistance() {
-        return 5;
+        return 10;
     }
 
     @ConfigItem(
