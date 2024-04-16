@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.player;
 
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
@@ -155,10 +156,6 @@ public class Rs2Player {
         return false;
     }
 
-    public static WorldPoint getWorldLocation() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation());
-    }
-
     public static void logout() {
         if (Microbot.isLoggedIn())
             Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
@@ -189,5 +186,15 @@ public class Rs2Player {
                 .stream()
                 .filter(x -> x != Microbot.getClient().getLocalPlayer())
                 .collect(Collectors.toList()));
+    }
+
+    public static WorldPoint getWorldLocation() {
+        if (Microbot.getClient().isInInstancedRegion()) {
+            LocalPoint l = LocalPoint.fromWorld(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation());
+            WorldPoint playerInstancedWorldLocation = WorldPoint.fromLocalInstance(Microbot.getClient(), l);
+            return playerInstancedWorldLocation;
+        } else {
+            return Microbot.getClient().getLocalPlayer().getWorldLocation();
+        }
     }
 }
