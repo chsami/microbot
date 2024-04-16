@@ -74,6 +74,12 @@ public class SandCrabScript extends Script {
                     }
                 }
 
+                if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentScanLocation.getWorldPoint()) > 10 && (state != State.RESET_AGGRO || state != State.WALK_BACK)) {
+                    state = State.WALK_BACK;
+                    resetAggro();
+                    resetAfkTimer();
+                }
+
                 if (sandCrabLocations.stream().noneMatch(x -> x.getWorldPoint().equals(Microbot.getClient().getLocalPlayer().getWorldLocation())) && state != State.RESET_AGGRO && state != State.WALK_BACK) {
                     state = State.SCAN_LOCATIONS;
                 }
