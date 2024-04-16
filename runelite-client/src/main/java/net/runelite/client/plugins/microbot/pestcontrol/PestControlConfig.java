@@ -13,7 +13,7 @@ public interface PestControlConfig extends Config {
             position = 1
     )
     default String GUIDE() {
-        return "Start near a boat of your combat level. Make sure your minimap is zoomed out all the way out. ENABLE THE GPU PLUGIN with render distance > 50 ";
+        return "Start near a boat of your combat level";
     }
 
     @ConfigItem(
