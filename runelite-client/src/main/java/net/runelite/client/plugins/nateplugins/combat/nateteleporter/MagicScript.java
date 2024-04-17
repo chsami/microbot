@@ -38,6 +38,7 @@ public class MagicScript extends Script {
                     Rs2Item item = Rs2Inventory.get(config.AlchItem());
                     if (item == null) {
                         Microbot.showMessage("Item: " + config.AlchItem() + " not found in your inventory.");
+                        sleep(5000);
                         return;
                     }
 

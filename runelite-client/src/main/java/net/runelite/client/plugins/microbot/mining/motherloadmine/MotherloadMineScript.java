@@ -151,7 +151,7 @@ boolean emptySack = false;
                 .stream()
                 .filter(x -> x.getId() == 26661 || x.getId() == 26662 || x.getId() == 26663 || x.getId() == 26664)
                 .sorted(Comparator.comparingInt(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation())))
-                .filter(x -> Rs2Walker.canReach(x.getWorldLocation()))
+                .filter(x -> Rs2GameObject.hasLineOfSight(x))
                 .findFirst()
                 .orElse(null);
 

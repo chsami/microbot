@@ -183,17 +183,13 @@ public class Microbot {
     }
 
     public static void showMessage(String message) {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        executor.submit(() -> {
-            try {
-                SwingUtilities.invokeAndWait(() ->
-                {
-                    JOptionPane.showConfirmDialog(null, message, "Message",
-                            JOptionPane.DEFAULT_OPTION);
-                });
-            } catch(Exception ex) {
-                System.out.println(ex.getMessage());
-            }
+        Microbot.getClientThread().runOnSeperateThread(() -> {
+            SwingUtilities.invokeAndWait(() ->
+            {
+                JOptionPane.showConfirmDialog(null, message, "Message",
+                        JOptionPane.DEFAULT_OPTION);
+            });
+            return null;
         });
     }
 

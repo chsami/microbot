@@ -1,19 +1,34 @@
 package net.runelite.client.plugins.microbot.util.camera;
 
 import net.runelite.api.Actor;
+import net.runelite.api.Perspective;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.math.Calculations;
 
 import java.awt.event.KeyEvent;
 
-import static net.runelite.client.plugins.microbot.util.math.Calculations.angleToTile;
+public class Rs2Camera {
 
-public class Rs2Camera extends Script {
+    public static int angleToTile(Actor t) {
+        int angle = (int) Math.toDegrees(Math.atan2(t.getWorldLocation().getY() - Microbot.getClient().getLocalPlayer().getWorldLocation().getY(),
+                t.getWorldLocation().getX() - Microbot.getClient().getLocalPlayer().getWorldLocation().getX()));
+        return angle >= 0 ? angle : 360 + angle;
+    }
+
+    public static int angleToTile(TileObject t) {
+        int angle = (int) Math.toDegrees(Math.atan2(t.getWorldLocation().getY() - Microbot.getClient().getLocalPlayer().getWorldLocation().getY(),
+                t.getWorldLocation().getX() - Microbot.getClient().getLocalPlayer().getWorldLocation().getX()));
+        return angle >= 0 ? angle : 360 + angle;
+    }
+
+    public static int angleToTile(LocalPoint localPoint) {
+        int angle = (int) Math.toDegrees(Math.atan2(localPoint.getY() - Microbot.getClient().getLocalPlayer().getWorldLocation().getY(),
+                localPoint.getX() - Microbot.getClient().getLocalPlayer().getWorldLocation().getX()));
+        return angle >= 0 ? angle : 360 + angle;
+    }
 
     public static void turnTo(final Actor actor) {
         int angle = getCharacterAngle(actor);
@@ -65,11 +80,11 @@ public class Rs2Camera extends Script {
         if (getAngleTo(degrees) > 5) {
             VirtualKeyboard.keyHold(KeyEvent.VK_LEFT);
             Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT),
-                    () -> Calculations.tileOnScreen(actor), 10);
+                    () -> Perspective.localToCanvas(Microbot.getClient(), actor.getLocalLocation(), Microbot.getClient().getPlane()) != null, 10);
         } else if (getAngleTo(degrees) < -5) {
             VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
             Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
-                    () -> Calculations.tileOnScreen(actor), 10);
+                    () -> Perspective.localToCanvas(Microbot.getClient(), actor.getLocalLocation(), Microbot.getClient().getPlane()) != null, 10);
         }
     }
 
@@ -77,11 +92,11 @@ public class Rs2Camera extends Script {
         if (getAngleTo(degrees) > 5) {
             VirtualKeyboard.keyHold(KeyEvent.VK_LEFT);
             Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT),
-                    () -> Calculations.tileOnScreen(tileObject), 600);
+                    () -> Perspective.localToCanvas(Microbot.getClient(), tileObject.getLocalLocation(), Microbot.getClient().getPlane()) != null, 600);
         } else if (getAngleTo(degrees) < -5) {
             VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
             Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
-                    () -> Calculations.tileOnScreen(tileObject), 600);
+                    () -> Perspective.localToCanvas(Microbot.getClient(), tileObject.getLocalLocation(), Microbot.getClient().getPlane()) != null, 600);
         }
     }
 
@@ -89,11 +104,11 @@ public class Rs2Camera extends Script {
         if (getAngleTo(degrees) > 5) {
             VirtualKeyboard.keyHold(KeyEvent.VK_LEFT);
             Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT),
-                    () -> Calculations.tileOnScreen(localPoint), 600);
+                    () -> Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane()) != null, 600);
         } else if (getAngleTo(degrees) < -5) {
             VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
             Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
-                    () -> Calculations.tileOnScreen(localPoint), 600);
+                    () -> Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane()) != null, 600);
         }
     }
 
@@ -119,7 +134,7 @@ public class Rs2Camera extends Script {
         int adjustedPitch = currentPitch - minPitch;
         int adjustedMaxPitch = maxPitch - minPitch;
 
-        return (float)adjustedPitch / (float)adjustedMaxPitch;
+        return (float) adjustedPitch / (float) adjustedMaxPitch;
     }
 
     public static int getAngleTo(int degrees) {
@@ -142,15 +157,10 @@ public class Rs2Camera extends Script {
     }
 
     public static boolean isTileOnScreen(TileObject tileObject) {
-        return Calculations.tileOnScreen(tileObject);
+        return Perspective.localToCanvas(Microbot.getClient(), tileObject.getLocalLocation(), Microbot.getClient().getPlane()) != null;
     }
 
     public static boolean isTileOnScreen(LocalPoint localPoint) {
-        return Calculations.tileOnScreen(localPoint);
-    }
-
-    @Override
-    public boolean run() {
-        return true;
+        return Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane()) != null;
     }
 }

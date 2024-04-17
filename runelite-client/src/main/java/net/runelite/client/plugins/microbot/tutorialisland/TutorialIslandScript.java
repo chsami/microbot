@@ -546,7 +546,7 @@ public class TutorialIslandScript extends Script {
     public boolean InteractWithNpc(int id) {
         NPC npc = Rs2Npc.getNpc(id);
         if (npc == null) return false;
-        if (!Rs2Walker.canReach(npc.getWorldLocation())) {
+        if (!Rs2Npc.hasLineOfSight(npc)) {
             return false;
         }
         return Rs2Npc.interact(npc, "Talk-to");
@@ -555,7 +555,7 @@ public class TutorialIslandScript extends Script {
     public boolean InteractWithNpc(int id, String interaction) {
         NPC npc = Rs2Npc.getNpc(id);
         if (npc == null) return false;
-        if (!Rs2Walker.canReach(npc.getWorldLocation())) {
+        if (!Rs2Npc.hasLineOfSight(npc)) {
             return false;
         }
         return Rs2Npc.interact(npc, interaction);

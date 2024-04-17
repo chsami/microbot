@@ -137,11 +137,11 @@ public class QuestScript extends Script {
 
     public boolean applyNpcStep(NpcStep step) {
         net.runelite.api.NPC npc = Rs2Npc.getNpc(step.npcID);
-        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Walker.canReach(npc.getWorldLocation())) {
+        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Npc.hasLineOfSight(npc)) {
             Rs2Npc.interact(step.npcID, "Talk-to");
         } else if (npc != null && !Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
             Rs2Walker.walkTo(npc.getWorldLocation());
-        } else if (npc != null && !Rs2Walker.canReach(npc.getWorldLocation())) {
+        } else if (npc != null && !Rs2Npc.hasLineOfSight(npc)) {
             Rs2Walker.walkTo(npc.getWorldLocation());
         } else {
             if (step.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {

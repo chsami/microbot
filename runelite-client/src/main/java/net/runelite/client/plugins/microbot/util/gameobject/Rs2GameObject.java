@@ -56,10 +56,8 @@ public class Rs2GameObject {
 
     public static boolean interact(int id, boolean checkCanReach) {
         TileObject object = findObjectById(id);
-        ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
-        int objectSize = (objectComposition.getSizeX() + objectComposition.getSizeY()) / 2;
         if (object == null) return false;
-        if (checkCanReach && Rs2Walker.canReach(object.getWorldLocation(), objectSize))
+        if (checkCanReach && Rs2GameObject.hasLineOfSight(object))
             return clickObject(object);
         Rs2Walker.walkTo(object.getWorldLocation());
         return false;
@@ -345,7 +343,7 @@ public class Rs2GameObject {
                 continue;
             }
 
-            if (compName != null && Rs2Walker.canReach(gameObject.getWorldLocation())) {
+            if (compName != null && Rs2GameObject.hasLineOfSight(gameObject)) {
                 if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
                     return gameObject;
                 } else if (exact && compName.equalsIgnoreCase(objectName)) {
@@ -378,7 +376,7 @@ public class Rs2GameObject {
                 continue;
             }
 
-            if (compName != null && Rs2Walker.canReach(gameObject.getWorldLocation())) {
+            if (compName != null && Rs2GameObject.hasLineOfSight(gameObject)) {
                 if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
                     return gameObject;
                 } else if (exact && compName.equalsIgnoreCase(objectName)) {
@@ -411,7 +409,7 @@ public class Rs2GameObject {
                 continue;
             }
 
-            if (compName != null && Rs2Walker.canReach(gameObject.getWorldLocation())) {
+            if (compName != null && Rs2GameObject.hasLineOfSight(gameObject)) {
                 if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
                     return gameObject;
                 } else if (exact && compName.equalsIgnoreCase(objectName)) {

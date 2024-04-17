@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
@@ -12,7 +13,6 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.math.Calculations;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -26,7 +26,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static net.runelite.client.plugins.microbot.util.Global.*;
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Walker {
     static int stuckCount = 0;
@@ -38,6 +39,7 @@ public class Rs2Walker {
         if (Rs2Player.getWorldLocation().distanceTo(target) <= 1) {
             return true;
         }
+        if (ShortestPathPlugin.getMarker() != null) return false;
         setTarget(target);
         Microbot.getClientThread().runOnSeperateThread(() -> {
             while (true) {
@@ -62,7 +64,7 @@ public class Rs2Walker {
                 List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
                 int indexOfStartPoint = getClosestTileIndex(path);
 
-                sleep(50, 150);
+                //sleep(50, 150);
 
                 //TODO: investigate why this happens
                 if (Rs2Player.getWorldLocation().distanceTo(target) == 0)
@@ -89,6 +91,7 @@ public class Rs2Walker {
                         Rs2Walker.walkFastCanvas(target);
                         break;
                     }
+                    System.out.println(currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()));
                     if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance()) {
                         // InstancedRegions require localPoint instead of worldpoint to navigate
                         if (Microbot.getClient().isInInstancedRegion()) {
@@ -129,7 +132,7 @@ public class Rs2Walker {
         if (Microbot.getClient().getMinimapZoom() > 2)
             Microbot.getClient().setMinimapZoom(2);
 
-        Point point = Calculations.worldToMinimap(worldPoint.getX(), worldPoint.getY());
+        Point point = Rs2MiniMap.worldToMinimap(worldPoint);
 
         if (point == null) return false;
 
@@ -172,7 +175,7 @@ public class Rs2Walker {
     }
 
     public static WorldPoint walkCanvas(WorldPoint worldPoint) {
-        Point point = Calculations.worldToCanvas(worldPoint.getX(), worldPoint.getY());
+        Point point = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromWorld(Microbot.getClient(), worldPoint), Microbot.getClient().getPlane());
 
         if (point == null) return null;
 
@@ -182,20 +185,11 @@ public class Rs2Walker {
     }
 
     public static boolean canReach(WorldPoint target) {
-
-        setTarget(target);
-
-        sleepUntilOnClientThread(() -> ShortestPathPlugin.getPathfinder().isDone(), 60000);
-
-        return ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1).distanceTo(target) <= 1;
-    }
-
-    public static boolean canReach(WorldPoint target, int objectSize) {
-        setTarget(target);
-
-        sleepUntilOnClientThread(() -> ShortestPathPlugin.getPathfinder().isDone(), 60000);
-
-        return ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1).distanceTo2D(target) <= objectSize;
+        return new WorldArea(
+                target,
+                1,
+                1)
+                .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
     }
 
     public static boolean isCloseToRegion(int distance, int regionX, int regionY) {
@@ -224,9 +218,10 @@ public class Rs2Walker {
     private static boolean handleDoors(List<WorldPoint> path, int indexOfStartPoint) {
         for (int i = indexOfStartPoint; i < path.size(); i++) {
             WorldPoint currentWorldPoint = path.get(i);
+            //TODO: Make this more efficient, something like only calculate tile on screen?
 
-            if (currentWorldPoint.distanceTo(Rs2Player.getWorldLocation()) > config.recalculateDistance())
-                continue;
+//            if (currentWorldPoint.distanceTo(Rs2Player.getWorldLocation()) > config.recalculateDistance())
+//                continue;
 
             WorldPoint nextWorldPoint = null;
 
@@ -261,7 +256,6 @@ public class Rs2Walker {
                 }
                 if (wallObject != null) {
                     Rs2GameObject.interact(wallObject);
-                    Rs2Player.waitForWalking();
                     return true;
                 }
                 return false;
@@ -496,9 +490,10 @@ public class Rs2Walker {
     public static boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
         for (WorldPoint a : ShortestPathPlugin.getTransports().keySet()) {
 
-            if (a.distanceTo(Rs2Player.getWorldLocation()) > config.recalculateDistance()) {
-                continue;
-            }
+            //TODO: Make this more efficient, something like only calculate tile on screen?
+//            if (a.distanceTo(Rs2Player.getWorldLocation()) > config.recalculateDistance()) {
+//                continue;
+//            }
 
             for (Transport b : ShortestPathPlugin.getTransports().getOrDefault(a, new ArrayList<>())) {
                 for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), b.getOrigin())) {
