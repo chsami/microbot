@@ -27,6 +27,7 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.SplitFlagMap;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.ui.JagexColors;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -48,6 +49,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Web Walker",
@@ -253,22 +255,21 @@ public class ShortestPathPlugin extends Plugin {
             return;
         }
 
-        WorldPoint currentLocation = client.isInInstancedRegion() ?
-                WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
-        if (currentLocation.distanceTo(pathfinder.getTarget()) < config.reachedDistance()) {
+
+        if (Rs2Walker.isNear(pathfinder.getTarget())) {
             setTarget(null);
             Microbot.getClientThread().scheduledFuture.cancel(true);
             System.out.println("Web Walker finished with reachedDistance " + config.reachedDistance());
             return;
         }
 
-        if (!startPointSet && !isNearPath(currentLocation)) {
+        /*if (!startPointSet && !isNearPath(currentLocation)) {
             if (config.cancelInstead()) {
                 setTarget(null);
                 return;
             }
             restartPathfinding(currentLocation, pathfinder.getTarget());
-        }
+        }*/
     }
 
     @Subscribe

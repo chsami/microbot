@@ -956,6 +956,14 @@ public class Rs2GameObject {
         return true;
     }
 
+    public static boolean hasLineOfSight(WorldPoint worldPoint) {
+        return new WorldArea(
+                worldPoint,
+                1,
+                1)
+                .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+    }
+
     @SneakyThrows
     public static List<Integer> getObjectIdsByName(String name) {
         List<Integer> ids = new ArrayList<>();

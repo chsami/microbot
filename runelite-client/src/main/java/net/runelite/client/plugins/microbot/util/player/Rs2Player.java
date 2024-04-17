@@ -197,4 +197,8 @@ public class Rs2Player {
             return Microbot.getClient().getLocalPlayer().getWorldLocation();
         }
     }
+
+    public static LocalPoint getLocalLocation() {
+        return Microbot.getClient().getLocalPlayer().getLocalLocation();
+    }
 }
