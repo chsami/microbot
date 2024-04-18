@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
@@ -679,6 +680,10 @@ public class Rs2GameObject {
      * @return
      */
     public static List<GameObject> getGameObjects(int id) {
+        return getGameObjects(id, Rs2Player.getWorldLocation());
+    }
+
+    public static List<GameObject> getGameObjects(int id, WorldPoint anchorPoint) {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
@@ -703,47 +708,12 @@ public class Rs2GameObject {
 
         return tileObjects.stream()
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(anchorPoint)))
                 .collect(Collectors.toList());
     }
 
     public static List<GameObject> getGameObjects() {
         return getGameObjectsWithinDistance(Constants.SCENE_SIZE);
-    }
-
-    /**
-     * TODO: Remove this method
-     *
-     * @param distance
-     * @param anchorPoint
-     * @return
-     */
-    public static List<GameObject> getGameObjects(int distance, WorldPoint anchorPoint) {
-        Scene scene = Microbot.getClient().getScene();
-        Tile[][][] tiles = scene.getTiles();
-
-        int z = Microbot.getClient().getPlane();
-        List<GameObject> tileObjects = new ArrayList<>();
-        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
-            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
-                Tile tile = tiles[z][x][y];
-
-                if (tile == null) {
-                    continue;
-                }
-                for (GameObject tileObject : tile.getGameObjects()) {
-                    if (tileObject != null
-                            && tileObject.getSceneMinLocation().equals(tile.getSceneLocation())
-                            && tileObject.getWorldLocation().distanceTo2D(anchorPoint) <= distance)
-                        tileObjects.add(tileObject);
-                }
-            }
-        }
-
-        return tileObjects.stream()
-                .filter(Objects::nonNull)
-                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
-                .collect(Collectors.toList());
     }
 
     public static List<GameObject> getGameObjectsWithinDistance(int distance) {

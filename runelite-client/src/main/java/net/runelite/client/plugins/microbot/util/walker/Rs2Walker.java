@@ -28,7 +28,6 @@ import java.util.stream.IntStream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
-import static net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject.findObjectById;
 
 public class Rs2Walker {
     static int stuckCount = 0;
@@ -72,7 +71,6 @@ public class Rs2Walker {
                 List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
                 int indexOfStartPoint = getClosestTileIndex(path);
                 lastPosition = Rs2Player.getWorldLocation();
-                boolean didWalk = false;
 
                 //TODO: investigate why this happens, most likely this thread is never shut down properly and target will keep the old target location
                 // for now we'll use this fix
@@ -113,7 +111,8 @@ public class Rs2Walker {
                         break;
 
                     System.out.println(currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()));
-                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance()) {
+                    sleep(50, 100);
+                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance() || idle > 50) {
                         // InstancedRegions require localPoint instead of worldpoint to navigate
                         if (Microbot.getClient().isInInstancedRegion()) {
                             Rs2Walker.walkFastCanvas(currentWorldPoint);
@@ -127,6 +126,8 @@ public class Rs2Walker {
                     }
                     idle++;
                 }
+
+
 
                 // try to walk through canvas if we are doing nothing
                 if (idle > 50) {
@@ -143,8 +144,8 @@ public class Rs2Walker {
 
 
     public static boolean walkMiniMap(WorldPoint worldPoint) {
-        if (Microbot.getClient().getMinimapZoom() > 2)
-            Microbot.getClient().setMinimapZoom(2);
+        if (Microbot.getClient().getMinimapZoom() != 5)
+            Microbot.getClient().setMinimapZoom(5);
 
         Point point = Rs2MiniMap.worldToMinimap(worldPoint);
 
@@ -323,7 +324,8 @@ public class Rs2Walker {
                     start = ShortestPathPlugin.getPathfinder().getStart();
                 }
                 restartPathfinding(start, target);
-                Microbot.getClientThread().scheduledFuture.cancel(true);
+                if (Microbot.getClientThread().scheduledFuture != null)
+                    Microbot.getClientThread().scheduledFuture.cancel(true);
             }
         }
 
@@ -484,13 +486,8 @@ public class Rs2Walker {
          * @param indexOfStartPoint
          * @return
          */
-        public static boolean handleTransports (List < WorldPoint > path,int indexOfStartPoint){
-            for (WorldPoint a : ShortestPathPlugin.getTransports().keySet()) {
-
-                //TODO: Make this more efficient, something like only calculate tile on screen?
-                if (a.distanceTo(Rs2Player.getWorldLocation()) > 12) {
-                    continue;
-                }
+        public static boolean handleTransports (List<WorldPoint> path,int indexOfStartPoint){
+            for (WorldPoint a : ShortestPathPlugin.getTransports().keySet().stream().filter(x -> x.distanceTo(Rs2Player.getWorldLocation()) <= 12).collect(Collectors.toList())) {
 
                 for (Transport b : ShortestPathPlugin.getTransports().getOrDefault(a, new ArrayList<>())) {
                     for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), b.getOrigin())) {
@@ -522,16 +519,18 @@ public class Rs2Walker {
                                     handleTrapdoor(b);
                                 }
 
-                                TileObject object = findObjectById(b.getObjectId());
+                                GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
 
-                                if (Rs2GameObject.hasLineOfSight(object)) {
-                                    Rs2GameObject.interact(object, b.getAction());
-                                    sleep(1200, 1600);
-                                } else {
-                                    Rs2Walker.walkFastCanvas(path.get(i));
-                                    sleep(1200, 1600);
+                                if (gameObject != null && gameObject.getId() == b.getObjectId()) {
+                                    if (Rs2GameObject.hasLineOfSight(gameObject)) {
+                                        Rs2GameObject.interact(gameObject, b.getAction());
+                                        sleep(1200, 1600);
+                                        return true;
+                                    } else {
+                                        Rs2Walker.walkFastCanvas(path.get(i));
+                                        sleep(1200, 1600);
+                                    }
                                 }
-                                return false;
                             }
 
                         }

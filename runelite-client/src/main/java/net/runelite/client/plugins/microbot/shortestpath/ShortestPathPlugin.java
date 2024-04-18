@@ -257,7 +257,7 @@ public class ShortestPathPlugin extends Plugin {
 
 
         if (Rs2Walker.isNear(pathfinder.getTarget())) {
-            setTarget(null);
+            Rs2Walker.setTarget(null);
             Microbot.getClientThread().scheduledFuture.cancel(true);
             System.out.println("Web Walker finished with reachedDistance " + config.reachedDistance());
             return;
@@ -380,7 +380,7 @@ public class ShortestPathPlugin extends Plugin {
         }
 
         if (entry.getOption().equals(CLEAR) && entry.getTarget().equals(PATH)) {
-            setTarget(null);
+            Rs2Walker.setTarget(null);
         }
 
         if (entry.getType() != MenuAction.WALK) {
