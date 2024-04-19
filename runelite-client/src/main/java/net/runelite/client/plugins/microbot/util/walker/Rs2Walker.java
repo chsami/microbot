@@ -26,8 +26,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2Walker {
     static int stuckCount = 0;
@@ -112,29 +111,24 @@ public class Rs2Walker {
 
                     System.out.println(currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()));
                     sleep(50, 100);
-                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance() || idle > 50) {
+                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > 8) {
                         // InstancedRegions require localPoint instead of worldpoint to navigate
                         if (Microbot.getClient().isInInstancedRegion()) {
                             Rs2Walker.walkFastCanvas(currentWorldPoint);
                             sleep(600, 1000);
                         } else {
                             Rs2Walker.walkMiniMap(currentWorldPoint);
-                            sleepUntil(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < Random.random(config.reachedDistance(), config.recalculateDistance()));
+                            sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < Random.random(3, 6), 100, 3000);
+                            break;
                         }
                         //avoid tree attacking you in draynor
                         checkIfStuck();
                     }
-                    idle++;
                 }
 
-
-
-                // try to walk through canvas if we are doing nothing
-                if (idle > 50) {
-                    System.out.println("Walk fast canvas");
-                    Rs2Walker.walkFastCanvas(target);
-                    Rs2Player.waitForWalking();
-                    idle = 0;
+                if (Rs2Player.getWorldLocation().distanceTo(target) < 10) {
+                    Rs2Walker.walkMiniMap(target);
+                    sleep(600, 1200);
                 }
             }
             return true;
@@ -297,6 +291,8 @@ public class Rs2Walker {
             if (!ShortestPathPlugin.isStartPointSet() && localPlayer == null) {
                 return;
             }
+
+            System.out.println(target == null ? "REESEEETT" : "RECALC");
 
             if (target == null) {
                 synchronized (ShortestPathPlugin.getPathfinderMutex()) {

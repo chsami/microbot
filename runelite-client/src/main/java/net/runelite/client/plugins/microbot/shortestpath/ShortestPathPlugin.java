@@ -255,21 +255,20 @@ public class ShortestPathPlugin extends Plugin {
             return;
         }
 
-
-        if (Rs2Walker.isNear(pathfinder.getTarget())) {
-            Rs2Walker.setTarget(null);
+        if (Rs2Player.getWorldLocation().distanceTo(pathfinder.getTarget()) < config.reachedDistance()) {
+            setTarget(null);
             Microbot.getClientThread().scheduledFuture.cancel(true);
             System.out.println("Web Walker finished with reachedDistance " + config.reachedDistance());
             return;
         }
 
-        /*if (!startPointSet && !isNearPath(currentLocation)) {
+        if (!startPointSet && !isNearPath(Rs2Player.getWorldLocation())) {
             if (config.cancelInstead()) {
                 setTarget(null);
                 return;
             }
-            restartPathfinding(currentLocation, pathfinder.getTarget());
-        }*/
+            restartPathfinding(Rs2Player.getWorldLocation(), pathfinder.getTarget());
+        }
     }
 
     @Subscribe

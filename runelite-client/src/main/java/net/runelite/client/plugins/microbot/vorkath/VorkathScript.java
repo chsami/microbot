@@ -171,8 +171,7 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case WALK_TO_VORKATH:
-                        Rs2Walker.walkMiniMap(new WorldPoint(2272, 4052, 0));
-                        sleep(1000);
+                        Rs2Walker.walkTo(new WorldPoint(2272, 4052, 0));
                         TileObject iceChunks = Rs2GameObject.findObjectById(ObjectID.ICE_CHUNKS_31990);
                         if (iceChunks != null) {
                             Rs2GameObject.interact(ObjectID.ICE_CHUNKS_31990, "Climb-over");
@@ -216,9 +215,9 @@ public class VorkathScript extends Script {
                             Rs2Equipment.equipmentItems = new ArrayList<>();
                             return;
                         }
-                        if (Rs2Inventory.getInventoryFood().isEmpty()) {
+                        if (!Rs2Inventory.getInventoryFood().isEmpty()) {
                             double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
-                            if (treshHold < 50) {
+                            if (treshHold > 50) {
                                 state = State.TELEPORT_AWAY;
                                 leaveVorkath();
                                 return;
@@ -386,9 +385,10 @@ public class VorkathScript extends Script {
         if (Rs2Inventory.hasItem(config.teleportMode().getItemName())) {
             togglePrayer(false);
             Rs2Player.toggleRunEnergy(true);
-            state = State.TELEPORT_AWAY;
             Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
             Rs2Player.waitForAnimation();
+            sleepUntil(() -> !Microbot.getClient().isInInstancedRegion());
+            state = State.TELEPORT_AWAY;
         }
     }
 
