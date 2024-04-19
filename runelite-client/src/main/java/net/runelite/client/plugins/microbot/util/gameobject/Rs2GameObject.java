@@ -80,12 +80,6 @@ public class Rs2GameObject {
         return clickObject(object, action);
     }
 
-    public static TileObject interactAndGetObject(int id) {
-        TileObject object = findObjectById(id);
-        clickObject(object);
-        return object;
-    }
-
     public static boolean interact(int[] objectIds, String action) {
         for (int objectId : objectIds) {
             if (interact(objectId, action)) return true;
@@ -95,11 +89,6 @@ public class Rs2GameObject {
 
     public static boolean interact(String objectName) {
         GameObject object = findObject(objectName, true);
-        return clickObject(object);
-    }
-
-    public static boolean interactByOptionName(String action) {
-        GameObject object = findObjectByOption(action);
         return clickObject(object);
     }
 
@@ -262,7 +251,7 @@ public class Rs2GameObject {
         }
 
 
-        return Arrays.stream(tileObjects.toArray(new DecorativeObject[tileObjects.size()]))
+        return Arrays.stream(tileObjects.toArray(new DecorativeObject[0]))
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
@@ -296,18 +285,6 @@ public class Rs2GameObject {
         return null;
     }
 
-    public static List<ObjectComposition> getGameObjectsComposition() {
-        List<GameObject> gameObjects = getGameObjects();
-        List<ObjectComposition> objectCompositions = new ArrayList<>();
-
-        if (gameObjects == null) return null;
-
-        for (net.runelite.api.GameObject gameObject : gameObjects) {
-            objectCompositions.add(convertGameObjectToObjectComposition(gameObject));
-        }
-        return objectCompositions;
-    }
-
     public static ObjectComposition findObjectComposition(int id) {
 
         List<GameObject> gameObjects = getGameObjects();
@@ -336,40 +313,7 @@ public class Rs2GameObject {
             if (objComp == null) {
                 continue;
             }
-            String compName = null;
-
-            try {
-                compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
-            } catch (Exception e) {
-                continue;
-            }
-
-            if (compName != null && Rs2GameObject.hasLineOfSight(gameObject)) {
-                if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
-                    return gameObject;
-                } else if (exact && compName.equalsIgnoreCase(objectName)) {
-                    return gameObject;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public static GameObject findObject(String objectName, boolean exact, int distance) {
-        List<GameObject> gameObjects = getGameObjects(distance, Microbot.getClient().getLocalPlayer().getWorldLocation());
-
-        if (gameObjects == null) {
-            return null;
-        }
-
-        for (GameObject gameObject : gameObjects) {
-            ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
-
-            if (objComp == null) {
-                continue;
-            }
-            String compName = null;
+            String compName;
 
             try {
                 compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
@@ -402,7 +346,7 @@ public class Rs2GameObject {
             if (objComp == null) {
                 continue;
             }
-            String compName = null;
+            String compName;
 
             try {
                 compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
@@ -423,23 +367,9 @@ public class Rs2GameObject {
     }
 
     public static boolean hasAction(ObjectComposition objComp, String action) {
-        boolean result = false;
+        boolean result;
 
         result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
-        if (!result) {
-            try {
-                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase(action));
-            } catch (Exception ex) {
-                //do nothing
-            }
-        }
-        return result;
-    }
-
-    public static boolean hasAction(GameObject gameObject, String action) {
-        ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
-
-        boolean result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
         if (!result) {
             try {
                 result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase(action));
@@ -486,35 +416,6 @@ public class Rs2GameObject {
                 }
             } catch (Exception ex) {
                 // do nothing
-            }
-        }
-
-        return null;
-    }
-
-    public static GameObject findObjectByOption(String action) {
-        return findObjectByOption(action, true);
-    }
-
-    public static GameObject findObjectByOption(String optionName, boolean exact) {
-        List<GameObject> gameObjects = getGameObjects();
-
-        if (gameObjects.isEmpty()) return null;
-
-        for (net.runelite.api.GameObject gameObject : gameObjects) {
-
-            ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
-
-            if (objComp == null) continue;
-
-            if (exact) {
-                if (Arrays.stream(objComp.getActions()).filter(Objects::nonNull).anyMatch((action) -> action.equalsIgnoreCase(optionName))) {
-                    return gameObject;
-                }
-            } else {
-                if (Arrays.stream(objComp.getActions()).filter(Objects::nonNull).anyMatch((action) -> action.toLowerCase().contains(optionName.toLowerCase()))) {
-                    return gameObject;
-                }
             }
         }
 
@@ -572,10 +473,6 @@ public class Rs2GameObject {
         return null;
     }
 
-    public static GameObject findBank(String action) {
-        return findObjectByOption(action, false);
-    }
-
     public static TileObject findObject(int[] ids) {
         TileObject tileObject = null;
         for (int id :
@@ -593,12 +490,6 @@ public class Rs2GameObject {
 
     public static ObjectComposition convertGameObjectToObjectComposition(int objectId) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(objectId));
-    }
-
-    public static ObjectComposition convertGameObjectToObjectComposition(WorldPoint worldPoint) {
-        GameObject object = getGameObject(worldPoint);
-        if (object == null) return null;
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(object.getId()));
     }
 
     public static WallObject findDoor(int id) {
@@ -658,9 +549,15 @@ public class Rs2GameObject {
         Tile[][][] tiles = scene.getTiles();
 
         int z = Microbot.getClient().getPlane();
-        Tile tile = tiles[z][localPoint.getSceneX()][localPoint.getSceneY()];
+        Tile tile = null;
+        if (localPoint != null) {
+            tile = tiles[z][localPoint.getSceneX()][localPoint.getSceneY()];
+        }
 
-        return Arrays.stream(tile.getGameObjects()).filter(Objects::nonNull).findFirst().orElse(null);
+        if (tile != null) {
+            return Arrays.stream(tile.getGameObjects()).filter(Objects::nonNull).findFirst().orElse(null);
+        }
+        return null;
     }
 
     public static GameObject getGameObject(LocalPoint localPoint) {
@@ -833,8 +730,8 @@ public class Rs2GameObject {
 
         try {
 
-            int param0 = 0;
-            int param1 = 0;
+            int param0;
+            int param1;
             MenuAction menuAction = MenuAction.WALK;
 
             ObjectComposition objComp = convertGameObjectToObjectComposition(object);
@@ -924,14 +821,6 @@ public class Rs2GameObject {
                     .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
         }
         return true;
-    }
-
-    public static boolean hasLineOfSight(WorldPoint worldPoint) {
-        return new WorldArea(
-                worldPoint,
-                1,
-                1)
-                .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
     }
 
     @SneakyThrows
