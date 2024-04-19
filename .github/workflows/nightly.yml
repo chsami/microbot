@@ -1,9 +1,5 @@
 name: Nightly release
 
-on:
-  schedule:
-    - cron: "0 0 * * *"
-
 jobs:
   build:
     runs-on: ubuntu-latest  # You can choose a different runner if needed
