@@ -71,8 +71,6 @@ public class MWintertodtScript extends Script {
                     sleep(1600, 2000);
                     return;
                 }
-                System.out.println("AFTER LEAVE AND PROGRESS");
-
 
                 if (!config.fletchRoots() && Rs2Inventory.hasItem(ItemID.KNIFE)) {
                     Rs2Inventory.drop(ItemID.KNIFE);
@@ -180,7 +178,6 @@ public class MWintertodtScript extends Script {
                     case CHOP_ROOTS:
                         if (!isWintertodtAlive) {
                             state = State.BANKING;
-                            System.out.println("BANKING!");
                             return;
                         }
                         if (Rs2Inventory.hasItem(ItemID.BRUMA_KINDLING)
