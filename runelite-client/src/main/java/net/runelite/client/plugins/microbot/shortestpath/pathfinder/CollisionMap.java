@@ -4,6 +4,7 @@ import net.runelite.api.WorldType;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -128,7 +129,7 @@ public class CollisionMap {
             int neighborPacked = packedPointFromOrdinal(node.packedPosition, d);
             if (visited.get(neighborPacked)) continue;
 
-            if (traversable[i]) {
+            if (traversable[i] && z == Rs2Player.getWorldLocation().getPlane()) {
                 neighbors.add(new Node(neighborPacked, node));
             } else if (Math.abs(d.x + d.y) == 1 && isBlocked(x + d.x, y + d.y, z)) {
                 @SuppressWarnings("unchecked") // Casting EMPTY_LIST to List<Transport> is safe here

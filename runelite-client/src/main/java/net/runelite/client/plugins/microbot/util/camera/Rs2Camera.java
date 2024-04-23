@@ -7,7 +7,9 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class Rs2Camera {
@@ -33,16 +35,22 @@ public class Rs2Camera {
     public static void turnTo(final Actor actor) {
         int angle = getCharacterAngle(actor);
         setAngle(angle, actor);
+        VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT);
+        VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT);
     }
 
     public static void turnTo(final TileObject tileObject) {
         int angle = getObjectAngle(tileObject);
         setAngle(angle, tileObject);
+        VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT);
+        VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT);
     }
 
     public static void turnTo(final LocalPoint localPoint) {
         int angle = angleToTile(localPoint);
         setAngle(angle, localPoint);
+        VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT);
+        VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT);
     }
 
     public static int getCharacterAngle(Actor actor) {
@@ -157,10 +165,26 @@ public class Rs2Camera {
     }
 
     public static boolean isTileOnScreen(TileObject tileObject) {
-        return Perspective.localToCanvas(Microbot.getClient(), tileObject.getLocalLocation(), Microbot.getClient().getPlane()) != null;
+        int viewportHeight = Microbot.getClient().getViewportHeight();
+        int viewportWidth = Microbot.getClient().getViewportWidth();
+
+
+        Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), tileObject.getLocalLocation());
+
+        if (poly == null) return false;
+
+        return poly.getBounds2D().getX() <= viewportWidth && poly.getBounds2D().getY() <= viewportHeight;
     }
 
     public static boolean isTileOnScreen(LocalPoint localPoint) {
-        return Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane()) != null;
+        int viewportHeight = Microbot.getClient().getViewportHeight();
+        int viewportWidth = Microbot.getClient().getViewportWidth();
+
+
+        Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), localPoint);
+
+        if (poly == null) return false;
+
+        return poly.getBounds2D().getX() <= viewportWidth && poly.getBounds2D().getY() <= viewportHeight;
     }
 }

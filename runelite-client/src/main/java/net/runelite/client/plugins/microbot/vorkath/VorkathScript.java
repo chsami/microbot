@@ -72,6 +72,8 @@ public class VorkathScript extends Script {
     @Getter
     private HashSet<WorldPoint> acidPools = new HashSet<>();
 
+    String primaryBolts;
+
     private void calculateState() {
         if (Rs2Npc.getNpc(NpcID.VORKATH_8061) != null) {
             state = State.FIGHT_VORKATH;
@@ -103,15 +105,16 @@ public class VorkathScript extends Script {
                 if (!Microbot.isLoggedIn()) return;
                 if (init) {
                     calculateState();
-                    init = false;
                 }
 
-                if (!doesEquipmentMatch("vorkath", "dragon bolt")) {
+                if (!init && !doesEquipmentMatch("vorkath", primaryBolts)) {
                     state = State.DEAD_WALK;
                 } else if (state == State.DEAD_WALK && Rs2Inventory.hasItem(config.teleportMode().getItemName())) {
                     leaveVorkath();
                 }
 
+
+                init = false;
 
                 switch (state) {
                     case BANKING:
@@ -205,7 +208,7 @@ public class VorkathScript extends Script {
                         if (vorkath == null || vorkath.isDead()) {
                             state = State.LOOT_ITEMS;
                             sleep(300, 600);
-                            Rs2Inventory.wield("ruby dragon bolts");
+                            Rs2Inventory.wield(primaryBolts);
                             togglePrayer(false);
                             sleepUntil(() -> Rs2GroundItem.exists("Superior dragon bones", 20), 15000);
                             return;
@@ -215,7 +218,7 @@ public class VorkathScript extends Script {
                             Rs2Equipment.equipmentItems = new ArrayList<>();
                             return;
                         }
-                        if (!Rs2Inventory.getInventoryFood().isEmpty()) {
+                        if (Rs2Inventory.getInventoryFood().isEmpty()) {
                             double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
                             if (treshHold > 50) {
                                 state = State.TELEPORT_AWAY;
@@ -243,10 +246,11 @@ public class VorkathScript extends Script {
                         if ((doesProjectileExistById(acidProjectileId) || doesProjectileExistById(acidRedProjectileId))) {
                             state = State.ACID;
                         }
-                        if (vorkath.getHealthRatio() < 60 && vorkath.getHealthRatio() != -1 && !Rs2Equipment.isWearing("diamond dragon bolts")) {
-                            Rs2Inventory.wield("diamond dragon bolts");
-                        } else if (vorkath.getHealthRatio() >= 60 && !Rs2Equipment.isWearing("ruby dragon bolts")) {
-                            Rs2Inventory.wield("ruby dragon bolts");
+                        if (vorkath.getHealthRatio() < 60 && vorkath.getHealthRatio() != -1 && !Rs2Equipment.isWearing(config.secondaryBolts())) {
+                            primaryBolts = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO).name;
+                            Rs2Inventory.wield(config.secondaryBolts());
+                        } else if (vorkath.getHealthRatio() >= 60 && !Rs2Equipment.isWearing(primaryBolts)) {
+                            Rs2Inventory.wield(primaryBolts);
                         }
                         break;
                     case ZOMBIE_SPAWN:
@@ -311,7 +315,7 @@ public class VorkathScript extends Script {
                         Rs2Player.toggleRunEnergy(true);
                         boolean reachedDestination = Rs2Bank.walkToBank();
                         if (reachedDestination) {
-                            Rs2Inventory.wield("ruby dragon bolts");
+                            Rs2Inventory.wield(primaryBolts);
                             healAndDrinkPrayerPotion();
                             state = State.BANKING;
                         }
@@ -453,7 +457,7 @@ public class VorkathScript extends Script {
 
     private boolean isCloseToRelleka() {
         if (Microbot.getClient().getLocalPlayer() == null) return false;
-        return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2670, 3634, 0)) < 70;
+        return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2670, 3634, 0)) < 80;
     }
 
     private void redBallWalk() {

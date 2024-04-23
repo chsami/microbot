@@ -369,6 +369,8 @@ public class Rs2GameObject {
     public static boolean hasAction(ObjectComposition objComp, String action) {
         boolean result;
 
+        if (objComp == null) return false;
+
         result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
         if (!result) {
             try {

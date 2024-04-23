@@ -100,6 +100,11 @@ public class Rs2Player {
         sleepUntil(() -> !Rs2Player.isWalking());
     }
 
+    public static void waitForWalking(int time) {
+        sleepUntil(Rs2Player::isWalking);
+        sleepUntil(() -> !Rs2Player.isWalking(), time);
+    }
+
     public static void waitForAnimation() {
         sleepUntil(Rs2Player::isAnimating);
         sleepUntil(() -> !Rs2Player.isAnimating());
@@ -163,22 +168,22 @@ public class Rs2Player {
         //Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
     }
 
-    public static void eatAt(int percentage) {
+    public static boolean eatAt(int percentage) {
         double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
         int missingHitpoints = Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
         if (treshHold <= percentage) {
-            List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
+            List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
             for (Rs2Item food : foods) {
                 if (missingHitpoints >= 40 && Rs2Inventory.get("Cooked karambwan") != null) {
                     //double eat
                     Rs2Inventory.interact(food, "eat");
-                    Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
+                    return Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
                 } else {
-                    Rs2Inventory.interact(food, "eat");
+                    return Rs2Inventory.interact(food, "eat");
                 }
-                break;
             }
         }
+        return false;
     }
 
     public static List<Player> getPlayers() {
@@ -197,8 +202,12 @@ public class Rs2Player {
             return Microbot.getClient().getLocalPlayer().getWorldLocation();
         }
     }
-
     public static LocalPoint getLocalLocation() {
         return Microbot.getClient().getLocalPlayer().getLocalLocation();
+    }
+
+    public static boolean isFullHealth() {
+        return Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS)
+                == Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
     }
 }

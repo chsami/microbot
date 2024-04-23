@@ -268,7 +268,6 @@ public class ConfigManager
 
 			if (profile.isSync())
 			{
-				log.info("Active remote profile '{}' lost due to session close, converting to a local profile.", profile.getName());
 				profile.setSync(false);
 				profile.setRev(-1L);
 			}
@@ -348,7 +347,7 @@ public class ConfigManager
 			{
 				String targetProfileName = "default";
 
-				log.info("Performing migration of config from {} to profile '{}'", configFile.getName(), targetProfileName);
+//				log.info("Performing migration of config from {} to profile '{}'", configFile.getName(), targetProfileName);
 
 				ConfigProfile targetProfile = lock.createProfile(targetProfileName);
 				profiles.forEach(p -> p.setActive(false));
@@ -526,7 +525,7 @@ public class ConfigManager
 			{
 				if (p.isInternal())
 				{
-					log.debug("Profile '{}' (sync: {}, active: {}, id: {}, internal)", p.getName(), p.isSync(), p.getId(), p.isActive());
+//					log.debug("Profile '{}' (sync: {}, active: {}, id: {}, internal)", p.getName(), p.isSync(), p.getId(), p.isActive());
 
 					if (p.getName().equals(RSPROFILE_NAME))
 					{
@@ -536,7 +535,7 @@ public class ConfigManager
 					continue;
 				}
 
-				log.info("Profile '{}' (sync: {}, active: {}, id: {})", p.getName(), p.isSync(), p.isActive(), p.getId());
+//				log.info("Profile '{}' (sync: {}, active: {}, id: {})", p.getName(), p.isSync(), p.isActive(), p.getId());
 
 				// --profile
 				if (configProfileName != null)
@@ -558,7 +557,7 @@ public class ConfigManager
 
 			if (profile != null)
 			{
-				log.info("Using profile: {} ({})", profile.getName(), profile.getId());
+//				log.info("Using profile: {} ({})", profile.getName(), profile.getId());
 			}
 			else
 			{
@@ -676,11 +675,11 @@ public class ConfigManager
 
 		if (profile.getRev() == remoteProfile.getRev())
 		{
-			log.info("Profile '{}' is up to date", profile.getName());
+//			log.info("Profile '{}' is up to date", profile.getName());
 		}
 		else
 		{
-			log.info("Loading remote configuration for profile '{}'", profile.getName());
+//			log.info("Loading remote configuration for profile '{}'", profile.getName());
 
 			try
 			{

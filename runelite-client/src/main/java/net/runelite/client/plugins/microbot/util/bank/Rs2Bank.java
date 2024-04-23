@@ -360,6 +360,7 @@ public class Rs2Bank {
     public static void depositAll() {
         Microbot.status = "Deposit all";
         if (Rs2Inventory.isEmpty()) return;
+        if (!Rs2Bank.isOpen()) return;
 
         Widget widget = Rs2Widget.findWidget(SpriteID.BANK_DEPOSIT_INVENTORY, null);
         if (widget == null) return;

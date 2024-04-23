@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Teleport {
-    CONSTRUCTION_CAPE("Construction cape (t)", "teleport"),
-    HOUSE_TAB("Teleport to house", "break"),
     VARROCK_TAB("Varrock teleport", "break");
 
     private final String itemName;

@@ -81,7 +81,7 @@ public class PestControlScript extends Script {
                     }
                     if (!walkToCenter) {
                         WorldPoint worldPoint = WorldPoint.fromRegion(Rs2Player.getWorldLocation().getRegionID(), 32, 17, Microbot.getClient().getPlane());
-                        Rs2Walker.walkTo(worldPoint);
+                        Rs2Walker.walkTo(worldPoint, 3);
                         if (worldPoint.distanceTo(Rs2Player.getWorldLocation()) > 4) {
                             return;
                         } else {
@@ -91,10 +91,9 @@ public class PestControlScript extends Script {
 
                     Rs2Combat.setSpecState(true, config.specialAttackPercentage() * 10);
                     Widget activity = Rs2Widget.getWidget(26738700); //145 = 100%
-                    if (activity != null && activity.getChild(0).getWidth() <= 20) {
+                    if (activity != null && activity.getChild(0).getWidth() <= 20 && !Rs2Combat.inCombat()) {
                         net.runelite.api.NPC[] npcs = Rs2Npc.getAttackableNpcs();
                         Rs2Npc.attack(Arrays.stream(npcs).findFirst().get().getId());
-                        sleep(1200, 2400);
                         return;
                     }
 
@@ -224,7 +223,7 @@ public class PestControlScript extends Script {
         for (Portal portal : portals) {
             if (!portal.isHasShield() && !portal.getHitPoints().getText().trim().equals("0") && closestAttackablePortal == portal) {
                 if (!Rs2Walker.isCloseToRegion(distanceToPortal, portal.getRegionX(), portal.getRegionY())) {
-                    Rs2Walker.walkTo(WorldPoint.fromRegion(Rs2Player.getWorldLocation().getRegionID(), portal.getRegionX(), portal.getRegionY(), Microbot.getClient().getPlane()));
+                    Rs2Walker.walkTo(WorldPoint.fromRegion(Rs2Player.getWorldLocation().getRegionID(), portal.getRegionX(), portal.getRegionY(), Microbot.getClient().getPlane()), 5);
                 } else {
                     if (!Microbot.getClient().getLocalPlayer().isInteracting()) {
                         net.runelite.api.NPC npcPortal = Rs2Npc.getNpc("portal");

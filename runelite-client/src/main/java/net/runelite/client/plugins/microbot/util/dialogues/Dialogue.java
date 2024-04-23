@@ -18,4 +18,5 @@ public class Dialogue {
     public static boolean hasSelectAnOption() {
         return Rs2Widget.hasWidget("Select an Option");
     }
+
 }

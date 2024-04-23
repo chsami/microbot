@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -35,11 +36,17 @@ public class Rs2Walker {
     public static ShortestPathConfig config;
     static int idle = 0;
 
+    static WorldPoint currentTarget;
+
     public static boolean walkTo(WorldPoint target) {
-        if (Rs2Player.getWorldLocation().distanceTo(target) <= 1) {
+        return walkTo(target, 6);
+    }
+
+    public static boolean walkTo(WorldPoint target, int distance) {
+        if (Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
             return true;
         }
-        if (ShortestPathPlugin.getMarker() != null) return false;
+        if (currentTarget != null && currentTarget.equals(target) && ShortestPathPlugin.getMarker() != null) return false;
         setTarget(target);
         stuckCount = 0;
         idle = 0;
@@ -50,6 +57,8 @@ public class Rs2Walker {
                     break;
                 }
                 if (ShortestPathPlugin.getPathfinder() == null) {
+                    if (ShortestPathPlugin.getMarker() == null)
+                        break;
                     Microbot.status = "Waiting for pathfinder...";
                     continue;
                 }
@@ -111,7 +120,7 @@ public class Rs2Walker {
 
                     System.out.println(currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()));
                     sleep(50, 100);
-                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > 8) {
+                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
                         // InstancedRegions require localPoint instead of worldpoint to navigate
                         if (Microbot.getClient().isInInstancedRegion()) {
                             Rs2Walker.walkFastCanvas(currentWorldPoint);
@@ -247,9 +256,9 @@ public class Rs2Walker {
             }
         }
 
-        if (wallObject != null && Rs2Player.getWorldLocation().distanceTo(wallObject.getWorldLocation()) < 10) {
+        if (wallObject != null && Rs2Camera.isTileOnScreen(wallObject)) {
             Rs2GameObject.interact(wallObject);
-            sleep(1200, 1600);
+            Rs2Player.waitForWalking();
             return true;
         }
         return false;
@@ -293,6 +302,8 @@ public class Rs2Walker {
             }
 
             System.out.println(target == null ? "REESEEETT" : "RECALC");
+
+            currentTarget = target;
 
             if (target == null) {
                 synchronized (ShortestPathPlugin.getPathfinderMutex()) {
@@ -517,7 +528,7 @@ public class Rs2Walker {
 
                                 GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
 
-                                if (gameObject != null && gameObject.getId() == b.getObjectId()) {
+                                if (gameObject != null && gameObject.getId() == b.getObjectId() && Rs2Camera.isTileOnScreen(gameObject)) {
                                     if (Rs2GameObject.hasLineOfSight(gameObject)) {
                                         Rs2GameObject.interact(gameObject, b.getAction());
                                         sleep(1200, 1600);

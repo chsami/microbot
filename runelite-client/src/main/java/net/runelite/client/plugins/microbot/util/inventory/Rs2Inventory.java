@@ -1479,7 +1479,6 @@ public class Rs2Inventory {
         MenuAction menuAction = MenuAction.CC_OP;
         ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
         int index = 0;
-
         if (isItemSelected()) {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
         } else if (action.equalsIgnoreCase("use")) {
@@ -1495,7 +1494,8 @@ public class Rs2Inventory {
                 || action.equalsIgnoreCase("bury")
                 || action.equalsIgnoreCase("feel")
                 || action.equalsIgnoreCase("open-all")
-                || action.equalsIgnoreCase("break")) {
+                || action.equalsIgnoreCase("break")
+                || action.equalsIgnoreCase("open")) {
             index = 2;
         } else if (action.equalsIgnoreCase("wield")
                 || action.equalsIgnoreCase("wear")

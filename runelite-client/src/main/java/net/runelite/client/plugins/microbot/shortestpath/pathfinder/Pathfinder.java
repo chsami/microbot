@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.*;
 
@@ -80,6 +81,10 @@ public class Pathfinder implements Runnable {
         List<Node> nodes = map.getNeighbors(node, visited, config);
         for (int i = 0; i < nodes.size(); ++i) {
             Node neighbor = nodes.get(i);
+            final int x = WorldPointUtil.unpackWorldX(neighbor.packedPosition);
+            final int y = WorldPointUtil.unpackWorldY(neighbor.packedPosition);
+            final int z = WorldPointUtil.unpackWorldPlane(neighbor.packedPosition);
+
             if (neighbor.packedPosition == targetPacked) {
                 return neighbor;
             }

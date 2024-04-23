@@ -30,7 +30,7 @@ public class AttackNpcScript extends Script {
     boolean clicked = false;
 
     public void run(PlayerAssistConfig config) {
-        String npcToAttack = Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).findFirst().get();
+        List<String> npcsToAttack = Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList());
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
@@ -43,7 +43,7 @@ public class AttackNpcScript extends Script {
                                 && x.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < config.attackRadius()
                                 && (!x.isInteracting() || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && (x.getInteracting() == null  || x.getInteracting() == Microbot.getClient().getLocalPlayer())
-                                && x.getAnimation() == -1 && npcToAttack.equalsIgnoreCase(x.getName())).collect(Collectors.toList());
+                                && x.getAnimation() == -1 && npcsToAttack.stream().anyMatch(n -> n.equalsIgnoreCase(x.getName()))).collect(Collectors.toList());
                 if (Rs2Combat.inCombat()) {
                     return;
                 }
@@ -53,7 +53,7 @@ public class AttackNpcScript extends Script {
                             || npc.isDead()
                             || (npc.getInteracting() != null && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
                             || (npc.isInteracting()  && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
-                            || !npc.getName().equalsIgnoreCase(npcToAttack))
+                            || npcsToAttack.stream().noneMatch(n -> npc.getName().equalsIgnoreCase(n)))
                         break;
                     if (npc.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > config.attackRadius())
                         break;

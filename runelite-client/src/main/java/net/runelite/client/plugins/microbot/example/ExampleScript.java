@@ -9,14 +9,19 @@ import net.runelite.client.plugins.envisionplugins.breakhandler.util.Login;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
+import static net.runelite.client.plugins.microbot.util.camera.Rs2Camera.isTileOnScreen;
 import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.isCloseToRegion;
 
 
@@ -39,8 +44,9 @@ public class ExampleScript extends Script {
                  */
 
                 long startTime = System.currentTimeMillis();
-                boolean result = isCloseToRegion(5, 53, 29);
-                System.out.println(result);
+
+                System.out.println(Rs2Walker.walkTo(new WorldPoint(3212, 3494, 0)));
+
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
                 System.out.println("Total time for loop " + totalTime);
@@ -48,7 +54,7 @@ public class ExampleScript extends Script {
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 2000, TimeUnit.MILLISECONDS);
+        }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
     }
 

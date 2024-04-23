@@ -89,6 +89,17 @@ public interface VorkathConfig extends Config {
     default CROSSBOW CROSSBOW() {
         return CROSSBOW.DRAGON_HUNTER_CROSSBOW;
     }
+    @ConfigItem(
+            keyName = "Secondary bolt",
+            name = "Secondary Bolts",
+            description = "Secondary Bolts to Equip when vorkath is lower health",
+            position = 2,
+            section = equipmentSection
+    )
+    default String secondaryBolts()
+    {
+        return "diamond dragon bolts (e)";
+    }
 
     @ConfigItem(
             keyName = "Price of items to loot",
@@ -101,5 +112,7 @@ public interface VorkathConfig extends Config {
     {
         return 5000;
     }
+
+
 
 }
