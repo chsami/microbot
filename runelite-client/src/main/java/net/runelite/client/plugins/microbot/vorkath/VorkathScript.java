@@ -413,7 +413,7 @@ public class VorkathScript extends Script {
 
     public void togglePrayer(boolean onOff) {
         if (Rs2Prayer.isOutOfPrayer()) return;
-        if (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) >= 77) {
+        if (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) >= 74) {
             Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, onOff);
         } else {
             Rs2Prayer.toggle(Rs2PrayerEnum.EAGLE_EYE, onOff);
