@@ -435,6 +435,11 @@ public class Rs2Bank {
         withdrawOne(name, false);
     }
 
+    public static void withdrawOne(String name, int sleepTime) {
+        withdrawOne(name, false);
+        sleep(sleepTime);
+    }
+
     /**
      * withdraw x amount of items identified by its ItemWidget.
      *

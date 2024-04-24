@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,6 +44,18 @@ public class Rs2Npc {
     public static List<NPC> getNpcsForPlayer() {
         List<NPC> npcs = Microbot.getClient().getNpcs().stream()
                 .filter(x -> x.getInteracting() == Microbot.getClient().getLocalPlayer())
+                .sorted(Comparator
+                        .comparingInt(value -> value
+                                .getLocalLocation()
+                                .distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                .collect(Collectors.toList());
+
+        return npcs;
+    }
+
+    public static List<NPC> getNpcsForPlayer(String name) {
+        List<NPC> npcs = Microbot.getClient().getNpcs().stream()
+                .filter(x -> x.getInteracting() == Microbot.getClient().getLocalPlayer() && x.getName().equalsIgnoreCase(name))
                 .sorted(Comparator
                         .comparingInt(value -> value
                                 .getLocalLocation()
@@ -143,7 +156,7 @@ public class Rs2Npc {
                 return null;
             else
                 return npcs.stream()
-                        .filter(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(name))
+                        .filter(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(name) && !x.isDead())
                         .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                         .orElse(null);
 
@@ -262,7 +275,20 @@ public class Rs2Npc {
 
     public static boolean attack(String npcName) {
         NPC npc = getNpc(npcName);
+        if (npc.isInteracting() && !Rs2Player.isInMulti()) return false;
         return interact(npc, "attack");
+    }
+
+    public static boolean attack(List<String> npcNames) {
+        for (String npcName : npcNames) {
+            NPC npc = getNpc(npcName);
+            if (npc == null) continue;
+            if (!hasLineOfSight(npc)) return false;
+            if (npc.isInteracting() && !Rs2Player.isInMulti()) return false;
+
+            return interact(npc, "attack");
+        }
+        return false;
     }
 
     public static boolean interact(String npcName, String action) {

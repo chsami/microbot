@@ -909,7 +909,6 @@ public class Rs2Inventory {
         invokeMenu(rs2Item, action);
         return true;
     }
-
     /**
      * Interacts with an item in the inventory using the first available action based on the specified filter.
      *
@@ -1495,13 +1494,15 @@ public class Rs2Inventory {
                 || action.equalsIgnoreCase("feel")
                 || action.equalsIgnoreCase("open-all")
                 || action.equalsIgnoreCase("break")
-                || action.equalsIgnoreCase("open")) {
+                || action.equalsIgnoreCase("open")
+                || (action.equalsIgnoreCase("fill") && rs2Item.name.contains("coffin"))){
             index = 2;
         } else if (action.equalsIgnoreCase("wield")
                 || action.equalsIgnoreCase("wear")
                 || action.equalsIgnoreCase("check steps")) {
             index = 3;
-        } else if (action.equalsIgnoreCase("fill") || action.equalsIgnoreCase("guzzle") ) {
+        } else if (action.equalsIgnoreCase("fill") || action.equalsIgnoreCase("guzzle")
+                || action.equalsIgnoreCase("configure")) {
             index = 4;
         } else if (action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("rub")
                 || action.equalsIgnoreCase("refund") || action.equalsIgnoreCase("commune")

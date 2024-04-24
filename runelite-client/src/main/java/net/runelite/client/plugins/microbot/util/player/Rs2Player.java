@@ -9,6 +9,7 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.globval.VarbitValues;
 import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
@@ -209,5 +210,9 @@ public class Rs2Player {
     public static boolean isFullHealth() {
         return Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS)
                 == Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
+    }
+
+    public static boolean isInMulti() {
+        return Microbot.getVarbitValue(Varbits.MULTICOMBAT_AREA) == VarbitValues.INSIDE_MULTICOMBAT_ZONE.getValue();
     }
 }

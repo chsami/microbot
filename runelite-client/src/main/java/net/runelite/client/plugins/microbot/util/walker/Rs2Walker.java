@@ -43,7 +43,7 @@ public class Rs2Walker {
     }
 
     public static boolean walkTo(WorldPoint target, int distance) {
-        if (Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
+        if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
             return true;
         }
         if (currentTarget != null && currentTarget.equals(target) && ShortestPathPlugin.getMarker() != null) return false;
@@ -120,14 +120,15 @@ public class Rs2Walker {
 
                     System.out.println(currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()));
                     sleep(50, 100);
-                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
+                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance()
+                            || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
                         // InstancedRegions require localPoint instead of worldpoint to navigate
                         if (Microbot.getClient().isInInstancedRegion()) {
                             Rs2Walker.walkFastCanvas(currentWorldPoint);
                             sleep(600, 1000);
                         } else {
                             Rs2Walker.walkMiniMap(currentWorldPoint);
-                            sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < Random.random(3, 6), 100, 3000);
+                            sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < Random.random(2, 4), 100, 3000);
                             break;
                         }
                         //avoid tree attacking you in draynor

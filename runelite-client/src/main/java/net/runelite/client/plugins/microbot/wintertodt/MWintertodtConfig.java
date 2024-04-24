@@ -24,13 +24,13 @@ public interface MWintertodtConfig extends Config {
     @ConfigSection(
             name = "Food",
             description = "Food",
-            position = 0
+            position = 1
     )
     String foodSection = "Food";
     @ConfigSection(
             name = "Brazier",
             description = "Braziers are found in the four corners of the Wintertodt's prison north of the Wintertodt Camp. They can be fueled using bruma roots or bruma kindling in order to drain the Wintertodt's energy.",
-            position = 0
+            position = 2
     )
     String brazierSection = "brazier";
 
@@ -138,7 +138,7 @@ public interface MWintertodtConfig extends Config {
             keyName = "Hitpoints Tresshold",
             name = "HP % to run away",
             description = "Runs to the bank if a specific health treshhold is reached and the player does not have any food in their inventory.",
-            position = 3,
+            position = 4,
             section = foodSection
     )
     default int hpTreshhold() {
