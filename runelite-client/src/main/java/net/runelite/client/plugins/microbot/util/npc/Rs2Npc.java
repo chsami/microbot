@@ -283,8 +283,8 @@ public class Rs2Npc {
         for (String npcName : npcNames) {
             NPC npc = getNpc(npcName);
             if (npc == null) continue;
-            if (!hasLineOfSight(npc)) return false;
-            if (npc.isInteracting() && !Rs2Player.isInMulti()) return false;
+            if (!hasLineOfSight(npc)) continue;
+            if (npc.isInteracting() && !Rs2Player.isInMulti()) continue;
 
             return interact(npc, "attack");
         }

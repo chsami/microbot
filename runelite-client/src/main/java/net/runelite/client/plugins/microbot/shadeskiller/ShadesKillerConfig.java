@@ -76,6 +76,18 @@ public interface ShadesKillerConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "SpecialAttack",
+            name = "Special Attack %",
+            description = "At what percentage should the bot use special attack?",
+            position = 4,
+            section = generalSection
+    )
+    default int specialAttack()
+    {
+        return 55;
+    }
+
+    @ConfigItem(
             keyName = "Food",
             name = "Food",
             description = "Select the type of food to use",
@@ -153,7 +165,7 @@ public interface ShadesKillerConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "TeleportToAction",
+            keyName = "TeleportToBank",
             name = "Teleport To bank action",
             description = "Action used on the teleport item",
             position = 3,

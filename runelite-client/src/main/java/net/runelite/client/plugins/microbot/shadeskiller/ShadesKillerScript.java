@@ -58,7 +58,7 @@ public class ShadesKillerScript extends Script {
         Rs2Bank.withdrawOne(config.teleportItemToBank(), Random.random(100, 600));
         Rs2Bank.withdrawX(config.food().getName(), config.foodAmount());
         withdrawCoffin();
-        sleep(100, 600);
+        sleep(800, 1200);
     }
 
     private void emptyCoffin() {
@@ -68,6 +68,7 @@ public class ShadesKillerScript extends Script {
         }
         Rs2Bank.closeBank();
         sleepUntil(() -> !Rs2Bank.isOpen());
+        sleep(800, 1200);
         Rs2Inventory.interact("coffin", "configure");
         boolean isEmptyCoffin = sleepUntilTrue(() -> Rs2Widget.hasWidget("Empty Coffin."), 100, 3000);
         if (!isEmptyCoffin) return;
@@ -102,7 +103,7 @@ public class ShadesKillerScript extends Script {
                     initScript = false;
                 }
 
-                boolean ate = eatAt(70);
+                boolean ate = eatAt(config.eatAt());
                 if (ate) {
                     resetActions = true;
                 }
@@ -182,7 +183,7 @@ public class ShadesKillerScript extends Script {
                         if (!Rs2Combat.inCombat() && !isLooting) {
                             Rs2Npc.attack(config.SHADES().names);
                         }
-                        Rs2Combat.setSpecState(true, 550);
+                        Rs2Combat.setSpecState(true, config.specialAttack() * 10);
                         if (Rs2Inventory.isFull()) {
                             Rs2Inventory.interact("coffin", "fill");
                             coffinHasItems = true;
