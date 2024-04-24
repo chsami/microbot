@@ -21,6 +21,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
@@ -904,5 +905,18 @@ public class Rs2Bank {
         List<Rs2Item> list = updateItemContainer(InventoryID.BANK.getId(), e);
         if (list != null)
             bankItems = list;
+    }
+
+    public static boolean handleBankPin(String pin) {
+        Widget bankPinWidget = Rs2Widget.getWidget(ComponentID.BANK_PIN_CONTAINER);
+
+        boolean isBankPinVisible = Microbot.getClientThread().runOnClientThread(() -> bankPinWidget != null && !bankPinWidget.isHidden());
+
+        if (isBankPinVisible) {
+            VirtualKeyboard.typeString(pin);
+            VirtualKeyboard.enter();
+            return true;
+        }
+        return false;
     }
 }
