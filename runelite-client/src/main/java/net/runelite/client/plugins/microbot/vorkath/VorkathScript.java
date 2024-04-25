@@ -72,7 +72,7 @@ public class VorkathScript extends Script {
     @Getter
     private HashSet<WorldPoint> acidPools = new HashSet<>();
 
-    String primaryBolts;
+    String primaryBolts = "";
 
     private void calculateState() {
         if (Rs2Npc.getNpc(NpcID.VORKATH_8061) != null) {

@@ -276,8 +276,7 @@ public class Rs2Npc {
 
     public static boolean attack(String npcName) {
         NPC npc = getNpc(npcName);
-        if (npc.isInteracting() && !Rs2Player.isInMulti()) return false;
-        return interact(npc, "attack");
+        return attack(Arrays.asList(npcName));
     }
 
     public static boolean attack(List<String> npcNames) {
