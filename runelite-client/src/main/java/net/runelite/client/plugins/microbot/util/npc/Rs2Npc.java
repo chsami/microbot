@@ -9,6 +9,7 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -284,7 +285,9 @@ public class Rs2Npc {
             NPC npc = getNpc(npcName);
             if (npc == null) continue;
             if (!hasLineOfSight(npc)) continue;
-            if (npc.isInteracting() && !Rs2Player.isInMulti()) continue;
+            if (Rs2Combat.inCombat()) continue;
+            if (npc.isInteracting() && npc.getInteracting() != Microbot.getClient().getLocalPlayer() && !Rs2Player.isInMulti())
+                continue;
 
             return interact(npc, "attack");
         }
