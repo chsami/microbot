@@ -115,6 +115,7 @@ public class ShadesKillerScript extends Script {
     public boolean run(ShadesKillerConfig config) {
         this.config = config;
         initScript = true;
+        state = State.BANKING;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
