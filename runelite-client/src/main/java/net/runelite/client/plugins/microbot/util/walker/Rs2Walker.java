@@ -46,7 +46,7 @@ public class Rs2Walker {
         if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
             return true;
         }
-        if (currentTarget != null && currentTarget.equals(target) && ShortestPathPlugin.getMarker() != null) return false;
+        if (currentTarget != null && currentTarget.equals(target) && ShortestPathPlugin.getMarker() != null && !Microbot.getClientThread().scheduledFuture.isDone()) return false;
         setTarget(target);
         stuckCount = 0;
         idle = 0;
