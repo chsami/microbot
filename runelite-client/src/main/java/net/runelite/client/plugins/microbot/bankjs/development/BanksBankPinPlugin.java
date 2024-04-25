@@ -14,7 +14,7 @@ import java.awt.*;
         name = PluginDescriptor.Bank + "Bank's BankPin",
         description = "Auto completes bank pin",
         tags = {"bank pin", "bank.js"},
-        enabledByDefault = false
+        enabledByDefault = true
 )
 @Slf4j
 public class BanksBankPinPlugin extends Plugin {
@@ -37,9 +37,6 @@ public class BanksBankPinPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
-        if (overlayManager != null) {
-            overlayManager.add(banksBankPinOverlay);
-        }
         banksBankPinScript.run(config);
     }
 
