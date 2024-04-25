@@ -128,7 +128,7 @@ public class Rs2Walker {
                             sleep(600, 1000);
                         } else {
                             Rs2Walker.walkMiniMap(currentWorldPoint);
-                            sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < Random.random(2, 4), 100, 3000);
+                            sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < Random.random(3, 5), 100, 3000);
                             break;
                         }
                         //avoid tree attacking you in draynor

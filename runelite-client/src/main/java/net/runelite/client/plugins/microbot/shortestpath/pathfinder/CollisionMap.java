@@ -129,7 +129,7 @@ public class CollisionMap {
             int neighborPacked = packedPointFromOrdinal(node.packedPosition, d);
             if (visited.get(neighborPacked)) continue;
 
-            if (traversable[i] && z == Rs2Player.getWorldLocation().getPlane()) {
+            if (traversable[i]) {
                 neighbors.add(new Node(neighborPacked, node));
             } else if (Math.abs(d.x + d.y) == 1 && isBlocked(x + d.x, y + d.y, z)) {
                 @SuppressWarnings("unchecked") // Casting EMPTY_LIST to List<Transport> is safe here
