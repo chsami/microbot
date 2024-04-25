@@ -16,6 +16,8 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.shadeskiller.enums.State.USE_TELEPORT_TO_BANK;
@@ -28,7 +30,7 @@ public class ShadesKillerScript extends Script {
     public static State state = State.BANKING;
 
     ShadesKillerConfig config;
-    String key = "Silver key crimson";
+    List<String> keys = Arrays.asList("Silver key crimson", "Silver key red", "Silver key brown", "Silver key black", "Silver key purple");
 
     boolean initScript = false;
     boolean resetActions = false;
@@ -42,23 +44,46 @@ public class ShadesKillerScript extends Script {
         }
     }
 
+    private String getKeyInBank() {
+        for (String key: keys) {
+            if (Rs2Bank.hasItem(key))
+                return key;
+        }
+        return "";
+    }
+
+    private String getKeyInInventory() {
+        for (String key: keys) {
+            if (Rs2Inventory.hasItem(key))
+                return key;
+        }
+        return "";
+    }
+
     private boolean hasRequiredItemsToKillShades() {
-        return Rs2Inventory.hasItem(key)
+        return Rs2Inventory.hasItem(getKeyInInventory())
                 && Rs2Inventory.hasItem(config.teleportItemToShades())
                 && Rs2Inventory.hasItem(config.teleportItemToBank())
                 && Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount());
     }
 
-    private void withdrawRequiredItems() {
+    private boolean withdrawRequiredItems() {
         sleepUntil(() -> Rs2Bank.isOpen());
         Rs2Bank.depositAll();
         sleep(600, 1000);
+        String key = getKeyInBank();
+        if (key.equals("")) {
+            Microbot.showMessage("You are missing a silver key.");
+            sleep(5000);
+            return false;
+        }
         Rs2Bank.withdrawOne(key, Random.random(100, 600));
         Rs2Bank.withdrawOne(config.teleportItemToShades(), Random.random(100, 600));
         Rs2Bank.withdrawOne(config.teleportItemToBank(), Random.random(100, 600));
         Rs2Bank.withdrawX(config.food().getName(), config.foodAmount());
         withdrawCoffin();
         sleep(800, 1200);
+        return true;
     }
 
     private void emptyCoffin() {
@@ -140,7 +165,8 @@ public class ShadesKillerScript extends Script {
                             return;
                         }
                         if (Rs2Bank.isOpen()) {
-                            withdrawRequiredItems();
+                            boolean result = withdrawRequiredItems();
+                            if (!result) return;
                             Rs2Bank.closeBank();
                             sleepUntil(() -> !Rs2Bank.isOpen());
                         }
