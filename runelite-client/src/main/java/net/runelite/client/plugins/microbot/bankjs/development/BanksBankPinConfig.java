@@ -1,9 +1,9 @@
-package net.runelite.client.plugins.microbot.bankjs.BanksBankStander;
+package net.runelite.client.plugins.microbot.bankjs.development;
 
 import net.runelite.client.config.*;
 
 @ConfigGroup("example")
-public interface BanksBankStanderConfig extends Config {
+public interface BanksBankPinConfig extends Config {
 
     @ConfigSection(
             name = "Item Settings",
@@ -15,15 +15,19 @@ public interface BanksBankStanderConfig extends Config {
 
     // Items
     @ConfigItem(
-            keyName = "First Item",
-            name = "First Item",
-            description = "Sets First Item, use either Item ID or Item Name",
+            keyName = "First Item ID",
+            name = "First Item ID",
+            description = "Sets First Item ID",
             position = 0,
             section = itemSection
     )
+    @Range(
+            min = 0,
+            max = 99999
+    )
 
-    default String firstItemIdentifier() {
-        return "Knife";
+    default int firstItemId() {
+        return 0;
     }
 
     @ConfigItem(
@@ -35,7 +39,7 @@ public interface BanksBankStanderConfig extends Config {
     )
     @Range(
             min = 1,
-            max = 27
+            max = 28
     )
 
     default int firstItemQuantity() {
@@ -43,15 +47,19 @@ public interface BanksBankStanderConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "Second Item",
-            name = "Second Item",
-            description = "Sets Second Item, use either Item ID or Item Name",
+            keyName = "Second Item ID",
+            name = "Second Item ID",
+            description = "Sets Second Item ID",
             position = 0,
             section = itemSection
     )
+    @Range(
+            min = 0,
+            max = 99999
+    )
 
-    default String secondItemIdentifier() {
-        return "Logs";
+    default int secondItemId() {
+        return 0;
     }
 
     @ConfigItem(
@@ -63,11 +71,11 @@ public interface BanksBankStanderConfig extends Config {
     )
     @Range(
             min = 1,
-            max = 27
+            max = 28
     )
 
     default int secondItemQuantity() {
-        return 27;
+        return 1;
     }
 
     @ConfigSection(
@@ -140,7 +148,8 @@ public interface BanksBankStanderConfig extends Config {
                 "\nKnife Item ID = 946" +
                 "\nGlassblowing Pipe Item ID = 1785" +
                 "\nFor Bug reports & Future updates, my discord is Bank.js" +
-                "\nor find me in the Microbot discord.";
+                "\nor find my in the Microbot discord."
+                ;
     }
 
 

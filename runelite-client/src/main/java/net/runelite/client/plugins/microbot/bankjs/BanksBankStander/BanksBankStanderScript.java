@@ -15,13 +15,15 @@ public class BanksBankStanderScript extends Script {
     @Inject
     private BanksBankStanderConfig config;
 
-    public static double version = 1.0;
+    public static double version = 1.1;
     private CurrentStatus currentStatus = CurrentStatus.FETCH_SUPPLIES;
 
-    private int firstItemId;
+    String firstItemIdentifier;
     private int firstItemQuantity;
-    private int secondItemId;
+    private Integer firstItemId;
+    String secondItemIdentifier;
     private int secondItemQuantity;
+    private Integer secondItemId;
     private int sleepMin;
     private int sleepMax;
     private int sleepTarget;
@@ -30,13 +32,24 @@ public class BanksBankStanderScript extends Script {
         this.config = config; // Initialize the config object before accessing its parameters
 
         // Initialize other variables
-        firstItemId = config.firstItemId();
+        firstItemIdentifier = config.firstItemIdentifier();
         firstItemQuantity = config.firstItemQuantity();
-        secondItemId = config.secondItemId();
+        secondItemIdentifier = config.secondItemIdentifier();
         secondItemQuantity = config.secondItemQuantity();
         sleepMin = config.sleepMin();
         sleepMax = config.sleepMax();
         sleepTarget = config.sleepTarget();
+
+        // Determine whether the first & second item is the ID or Name.
+        firstItemId = TryParseInt(config.firstItemIdentifier());
+        secondItemId = TryParseInt(config.secondItemIdentifier());
+
+        // Print the types of firstItemIdentifier and firstItemId
+        System.out.println("Type of firstItemIdentifier: " + firstItemIdentifier.getClass().getSimpleName());
+        System.out.println("Type of firstItemId: " + (firstItemId != null ? firstItemId.getClass().getSimpleName() : "null"));
+        // Print the types of secondItemIdentifier and secondItemId
+        System.out.println("Type of secondItemIdentifier: " + secondItemIdentifier.getClass().getSimpleName());
+        System.out.println("Type of secondItemId: " + (secondItemId != null ? secondItemId.getClass().getSimpleName() : "null"));
 
         Microbot.enableAutoRunOn = false;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -54,8 +67,23 @@ public class BanksBankStanderScript extends Script {
 
     private boolean hasItems() {
         // Check if the player has the required quantity of both items using the configuration
-        return Rs2Inventory.hasItemAmount(firstItemId, firstItemQuantity) &&
-                Rs2Inventory.hasItemAmount(secondItemId, secondItemQuantity);
+        if (firstItemId != null && secondItemId != null) {
+            // User has inputted the item id for both items.
+            return Rs2Inventory.hasItemAmount(firstItemId, firstItemQuantity) &&
+                    Rs2Inventory.hasItemAmount(secondItemId, secondItemQuantity);
+        } else {
+            // Check the type of first item identifier
+            if (firstItemId != null) {
+                // User has inputted the item id for the first item and item identifier for the second item.
+                return Rs2Inventory.hasItemAmount(firstItemId, firstItemQuantity) &&
+                        Rs2Inventory.hasItemAmount(secondItemIdentifier, secondItemQuantity);
+
+            } else {
+                // User has inputted the item identifier for the first item and item id for the second item.
+                return Rs2Inventory.hasItemAmount(firstItemIdentifier, firstItemQuantity) &&
+                        Rs2Inventory.hasItemAmount(secondItemId, secondItemQuantity);
+            }
+        }
     }
 
 
@@ -71,17 +99,33 @@ public class BanksBankStanderScript extends Script {
                 // Deposit All if bank is already open
                 Rs2Bank.depositAll();
             }
-            if (Rs2Bank.hasItem(firstItemId)) {
-                // Withdraw Item 1 Qty
-                Rs2Bank.withdrawX(firstItemId, firstItemQuantity);
+            // Check the type of first item identifier
+            if (firstItemId != null) {
+                // User has inputted the item id for the first item.
+                if (Rs2Bank.hasItem(firstItemId)) {
+                    // Withdraw Item 1 Qty
+                    Rs2Bank.withdrawX(firstItemId, firstItemQuantity);
+                }
             } else {
-                // Microbot.showMessage("Ran out of Item 1!");
+                // User has inputted the item identifier for the first item.
+                if (Rs2Bank.hasItem(firstItemIdentifier)) {
+                    // Withdraw Item 1 Qty
+                    Rs2Bank.withdrawX(firstItemIdentifier, firstItemQuantity);
+                }
             }
-            if (Rs2Bank.hasItem(secondItemId)) {
-                // Withdraw Item 2 Qty
-                Rs2Bank.withdrawX(secondItemId, secondItemQuantity);
+            // Check the type of second item identifier
+            if (secondItemId != null) {
+                // User has inputted the item id for the second item.
+                if (Rs2Bank.hasItem(secondItemId)) {
+                    // Withdraw Item 2 Qty
+                    Rs2Bank.withdrawX(secondItemId, secondItemQuantity);
+                }
             } else {
-                // Microbot.showMessage("Ran out of Item 2!");
+                // User has inputted the item identifier for the second item.
+                if (Rs2Bank.hasItem(secondItemIdentifier)) {
+                    // Withdraw Item 2 Qty
+                    Rs2Bank.withdrawX(secondItemIdentifier, secondItemQuantity);
+                }
             }
 
             // Close Bank
@@ -103,7 +147,23 @@ public class BanksBankStanderScript extends Script {
         }
 
         // Combine the two items together
-        Rs2Inventory.combine(firstItemId, secondItemId);
+        if (firstItemId != null && secondItemId != null) {
+            // User has inputted the item id for both items.
+            Rs2Inventory.combine(firstItemId, secondItemId);
+        } else if (firstItemId != null) {
+            // User has inputted the item id for the first item and item identifier for the second item.
+            //Rs2Inventory.combine(firstItemId, secondItemIdentifier);
+            Rs2Inventory.use(firstItemId);
+            Rs2Inventory.use(secondItemIdentifier);
+        } else if (secondItemId != null) {
+            // User has inputted the item id for the second item and item identifier for the first item.
+            Rs2Inventory.use(firstItemIdentifier);
+            Rs2Inventory.use(secondItemId);
+            // Rs2Inventory.combine(firstItemIdentifier, secondItemId);
+        } else {
+            // User has inputted the item identifier for both items.
+            Rs2Inventory.combine(firstItemIdentifier, secondItemIdentifier);
+        }
 
         // Introduce some sleeps for synchronization
         sleep(600);
@@ -112,7 +172,7 @@ public class BanksBankStanderScript extends Script {
         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         sleep(4000);
         // Sleep until animation is finished or item is no longer in inventory
-        sleepUntil(() -> !Microbot.isGainingExp || !Rs2Inventory.hasItem(secondItemId), 30000);
+        sleepUntil(() -> !Rs2Inventory.hasItem(secondItemId != null ? String.valueOf(secondItemId) : secondItemIdentifier), 120000);
 
         sleep(calculateSleepDuration());
         // Update current status to indicate fetching supplies next
@@ -141,5 +201,15 @@ public class BanksBankStanderScript extends Script {
         } while (sleepDuration < sleepMin || sleepDuration > sleepMax); // Ensure the duration is within the specified range
 
         return sleepDuration;
+    }
+
+    // method to parse string to integer, returns null if parsing fails
+    public static Integer TryParseInt(String text) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException ex) {
+            System.out.println("Failed to Parse Int from Item");
+            return null;
+        }
     }
 }
