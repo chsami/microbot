@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.util.npc;
 
-import net.runelite.api.Actor;
-import net.runelite.api.MenuAction;
-import net.runelite.api.NPC;
-import net.runelite.api.NPCComposition;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -322,5 +319,14 @@ public class Rs2Npc {
         } else {
             return npc.getWorldLocation();
         }
+    }
+
+    /**
+     *
+     * @param player
+     * @return
+     */
+    public static List<NPC> getNpcsAttackingPlayer(Player player) {
+        return Arrays.stream(getNpcs()).filter(x -> x.getInteracting() != null && x.getInteracting() == player).collect(Collectors.toList());
     }
 }
