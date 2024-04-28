@@ -15,7 +15,6 @@ public class SafeSpot extends Script {
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-            if (!config.safeSpot()) return;
             try {
 
                 if (currentSafeSpot == null)

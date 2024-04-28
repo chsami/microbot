@@ -22,7 +22,8 @@ import java.awt.*;
         name = PluginDescriptor.Mocrosoft + "Leviathan",
         description = "Microbot Leviathan plugin",
         tags = {"Leviathan", "microbot", "boss"},
-        enabledByDefault = false
+        enabledByDefault = false,
+        hidden = true
 )
 @Slf4j
 public class LeviathanPlugin extends Plugin {

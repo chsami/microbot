@@ -36,7 +36,7 @@ public abstract class Script implements IScript {
     }
 
     @Getter
-    protected WorldPoint initialPlayerLocation;
+    protected static WorldPoint initialPlayerLocation;
 
     public void sleep(int time) {
         long startTime = System.currentTimeMillis();
@@ -98,6 +98,7 @@ public abstract class Script implements IScript {
             ShortestPathPlugin.exit();
             if (Microbot.getClientThread().scheduledFuture != null)
                 Microbot.getClientThread().scheduledFuture.cancel(true);
+            initialPlayerLocation = null;
         }
     }
 

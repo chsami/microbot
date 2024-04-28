@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.nateplugins.moneymaking.natepieshells;
 
-import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -29,24 +28,6 @@ public class PieScript extends Script {
                     totalPieShellsMade += 14;   // rough example, but you get the point
                     return;
                 } else {
-                    /**
-                     *  Break handler logic:
-                     *      First check to see if the Run Time Timer has finished running
-                     *      Then notify that a break can be started
-                     *      Finally lets wait until the break is over.
-                     */
-                    if (BreakHandlerScript.getHasRunTimeTimerFinished()) {
-                        BreakHandlerScript.setSkillExperienceGained(new String[]{"NONE"});
-                        BreakHandlerScript.setResourcesGained(new String[]{
-                                "Pie Shells: " + totalPieShellsMade
-                        });
-                        BreakHandlerScript.setGpGained("WIP");
-
-                        BreakHandlerScript.setLetBreakHandlerStartBreak(true);
-                        sleepUntil(BreakHandlerScript::getIsBreakOver);
-                        BreakHandlerScript.setLetBreakHandlerStartBreak(false);
-                    }
-
                     bank();
                 }
             } catch (Exception ex) {

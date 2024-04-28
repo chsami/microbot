@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.nateplugins.skilling.natefishing;
 
 import net.runelite.api.NPC;
-import net.runelite.client.plugins.envisionplugins.breakhandler.util.BreakHandlerExecutor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;

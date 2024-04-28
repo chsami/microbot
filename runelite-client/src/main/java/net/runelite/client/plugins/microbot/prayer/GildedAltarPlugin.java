@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import static net.runelite.api.MenuAction.CC_OP;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Default + "Gilded Altar",
+        name = PluginDescriptor.Mocrosoft + "Gilded Altar",
         description = "Gilded Altar plugin",
         tags = {"prayer", "microbot"},
         enabledByDefault = false

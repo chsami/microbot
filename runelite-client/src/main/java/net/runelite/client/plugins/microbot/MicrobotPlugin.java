@@ -18,7 +18,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
-import net.runelite.client.plugins.envisionplugins.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.mining.MiningScript;
 import net.runelite.client.plugins.microbot.thieving.ThievingScript;
@@ -127,8 +126,6 @@ public class MicrobotPlugin extends Plugin {
 
         new EventSelector(clientToolbar);
 
-        BreakHandlerScript.initBreakHandler("Microbot", false);
-
         //TODO: Rs2NpcManager.loadJson();
 
         for (Plugin plugin : pluginManager.getPlugins()) {
@@ -139,7 +136,6 @@ public class MicrobotPlugin extends Plugin {
     }
 
     protected void shutDown() {
-        BreakHandlerScript.disableParentPlugin();
         overlayManager.remove(microbotOverlay);
         if (cookingScript != null) {
             cookingScript.shutdown();

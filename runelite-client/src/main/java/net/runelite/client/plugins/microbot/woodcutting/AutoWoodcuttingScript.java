@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.woodcutting;
 
+import net.runelite.api.GameObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -15,7 +16,6 @@ public class AutoWoodcuttingScript extends Script {
     public static double version = 1.2;
 
     public boolean run(AutoWoodcuttingConfig config) {
-        WorldPoint startPoint = Microbot.getClient().getLocalPlayer().getWorldLocation();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
@@ -30,7 +30,7 @@ public class AutoWoodcuttingScript extends Script {
                     }
                     return;
                 }
-                var tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), startPoint);
+                GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), getInitialPlayerLocation());
 
                 if (tree != null){
                     Rs2GameObject.interact(tree, config.TREE().getAction());

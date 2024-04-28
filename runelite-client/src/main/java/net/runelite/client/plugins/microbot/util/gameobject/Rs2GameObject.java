@@ -334,7 +334,7 @@ public class Rs2GameObject {
     }
 
     public static GameObject findObject(String objectName, boolean exact, int distance, WorldPoint anchorPoint) {
-        List<GameObject> gameObjects = getGameObjects(distance, anchorPoint);
+        List<GameObject> gameObjects = getGameObjectsWithinDistance(distance, anchorPoint);
 
         if (gameObjects == null) {
             return null;
@@ -354,7 +354,7 @@ public class Rs2GameObject {
                 continue;
             }
 
-            if (compName != null && Rs2GameObject.hasLineOfSight(gameObject)) {
+            if (compName != null) {
                 if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
                     return gameObject;
                 } else if (exact && compName.equalsIgnoreCase(objectName)) {
@@ -616,13 +616,17 @@ public class Rs2GameObject {
     }
 
     public static List<GameObject> getGameObjectsWithinDistance(int distance) {
+        return getGameObjectsWithinDistance(distance, Rs2Player.getWorldLocation());
+    }
+
+    public static List<GameObject> getGameObjectsWithinDistance(int distance, WorldPoint anchorPoint) {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
         int z = Microbot.getClient().getPlane();
         List<GameObject> tileObjects = new ArrayList<>();
-        for (int x = 0; x < distance; ++x) {
-            for (int y = 0; y < distance; ++y) {
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
                 Tile tile = tiles[z][x][y];
 
                 if (tile == null) {
@@ -630,7 +634,8 @@ public class Rs2GameObject {
                 }
                 for (GameObject tileObject : tile.getGameObjects()) {
                     if (tileObject != null
-                            && tileObject.getSceneMinLocation().equals(tile.getSceneLocation()))
+                            && tileObject.getSceneMinLocation().equals(tile.getSceneLocation())
+                    && anchorPoint.distanceTo(tileObject.getWorldLocation()) <= distance)
                         tileObjects.add(tileObject);
                 }
             }

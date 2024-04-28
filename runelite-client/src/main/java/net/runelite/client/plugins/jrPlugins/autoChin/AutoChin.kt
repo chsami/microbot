@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 @PluginDescriptor(
     name = JR + "Auto Chinchompa",
-    description = "JR - Automatically catches chinchompas",
+    description = "JR - Automatically catches red chinchompas",
     tags = ["chinchompas", "hunter", "auto", "catching", "jr", "JR", "microbot"],
     enabledByDefault = false
 )

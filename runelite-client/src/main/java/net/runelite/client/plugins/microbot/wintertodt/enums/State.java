@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.wintertodt.enums;
 
 public enum State {
+    GLOBAL,
     BANKING,
     ENTER_ROOM,
     WAITING,
