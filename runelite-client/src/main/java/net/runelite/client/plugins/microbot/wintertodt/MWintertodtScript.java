@@ -157,14 +157,14 @@ public class MWintertodtScript extends Script {
                             resetActions = false;
                         }
                         break;
-                    case FIX_BRAZIER: // TODO: fix this state
-                        if (hasFixAction == false) {
-                            state = state.BURN_LOGS;
-                            return;
-                        }
-                        Rs2GameObject.interact(brazier);
-                        Rs2Player.waitForAnimation();
-                        break;
+//                    case FIX_BRAZIER: // TODO: fix this state
+//                        if (hasFixAction == false) {
+//                            state = state.BURN_LOGS;
+//                            return;
+//                        }
+//                        Rs2GameObject.interact(brazier);
+//                        Rs2Player.waitForAnimation();
+//                        break;
                 }
 
                 long endTime = System.currentTimeMillis();
@@ -280,9 +280,9 @@ public class MWintertodtScript extends Script {
         if (!config.fletchRoots() && Rs2Inventory.hasItem(ItemID.KNIFE)) {
             Rs2Inventory.drop(ItemID.KNIFE);
         }
-        if (!config.fixBrazier() && Rs2Inventory.hasItem(ItemID.HAMMER)) {
-            Rs2Inventory.drop(ItemID.HAMMER);
-        }
+//        if (!config.fixBrazier() && Rs2Inventory.hasItem(ItemID.HAMMER)) {
+//            Rs2Inventory.drop(ItemID.HAMMER);
+//        }
         if (Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH) && Rs2Inventory.hasItem(ItemID.TINDERBOX)) {
             Rs2Inventory.drop(ItemID.TINDERBOX);
         }
@@ -354,9 +354,9 @@ public class MWintertodtScript extends Script {
         if (!Rs2Bank.isOpen()) return true;
         Rs2Bank.depositAll();
         int foodCount = (int) Rs2Inventory.getInventoryFood().stream().count();
-        if (config.fixBrazier()) {
-            Rs2Bank.withdrawX(true, "hammer", 1);
-        }
+//        if (config.fixBrazier()) {
+//            Rs2Bank.withdrawX(true, "hammer", 1);
+//        }
         if (!Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH)) {
             Rs2Bank.withdrawX(true, "tinderbox", 1);
         }
