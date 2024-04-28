@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
@@ -55,6 +56,7 @@ public class MWintertodtScript extends Script {
 
                 if (config.axeInInventory() && axe.equals("") && !Rs2Inventory.hasItem("axe")) {
                     Microbot.showMessage("It seems that you selected axeInInventory option but no axe was found in your inventory.");
+                    sleep(5000);
                     return;
                 }
 
@@ -178,6 +180,7 @@ public class MWintertodtScript extends Script {
 
     private void handleMainLoop() {
         if (isWintertodtAlmostDead()) {
+            setLockState(State.BURN_LOGS, false);
             if (shouldBurnLogs()) return;
         } else {
             if (shouldChopRoots()) return;
@@ -207,7 +210,6 @@ public class MWintertodtScript extends Script {
 
     private static boolean shouldFletchRoots() {
         if (!config.fletchRoots()) return false;
-        if (!Rs2Inventory.isFull()) return false;
         if (!Rs2Inventory.hasItem(ItemID.BRUMA_ROOT)) {
             setLockState(State.FLETCH_LOGS, false);
             return false;
@@ -281,6 +283,9 @@ public class MWintertodtScript extends Script {
         if (!config.fixBrazier() && Rs2Inventory.hasItem(ItemID.HAMMER)) {
             Rs2Inventory.drop(ItemID.HAMMER);
         }
+        if (Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH) && Rs2Inventory.hasItem(ItemID.TINDERBOX)) {
+            Rs2Inventory.drop(ItemID.TINDERBOX);
+        }
     }
 
     @Override
@@ -317,7 +322,9 @@ public class MWintertodtScript extends Script {
         {
             if (!resetActions && graphicsObject.getId() == 502
                     && WorldPoint.fromLocalInstance(Microbot.getClient(),
-                    graphicsObject.getLocation()).distanceTo(Rs2Player.getWorldLocation()) < 4) {
+                    graphicsObject.getLocation()).distanceTo(Rs2Player.getWorldLocation()) == 1) {
+                System.out.println(WorldPoint.fromLocalInstance(Microbot.getClient(),
+                        graphicsObject.getLocation()).distanceTo(Rs2Player.getWorldLocation()));
                 //walk south
                 Rs2Walker.walkFastCanvas(new WorldPoint(Rs2Player.getWorldLocation().getX(), Rs2Player.getWorldLocation().getY() - 1, Rs2Player.getWorldLocation().getPlane()));
                 Rs2Player.waitForWalking(4000);
@@ -350,7 +357,9 @@ public class MWintertodtScript extends Script {
         if (config.fixBrazier()) {
             Rs2Bank.withdrawX(true, "hammer", 1);
         }
-        Rs2Bank.withdrawX(true, "tinderbox", 1);
+        if (!Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH)) {
+            Rs2Bank.withdrawX(true, "tinderbox", 1);
+        }
         if (config.fletchRoots()) {
             Rs2Bank.withdrawX(true, "knife", 1);
         }

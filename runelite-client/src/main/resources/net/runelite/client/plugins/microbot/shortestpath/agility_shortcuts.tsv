@@ -47,12 +47,12 @@
 2556 3075 0	2556 3074 1	Grapple Wall 17047	39 Agility;21 Ranged;38 Strength				
 2872 3671 0	2869 3671 0	Climb Rocks 16521	41 Agility				
 2869 3671 0	2872 3671 0	Climb Rocks 16521	41 Agility				
-3070 3260 0	3064 3260 0	Climb-into Underwall tunnel 19036	42 Agility		Diary		
-3065 3260 0	3071 3260 0	Climb-into Underwall tunnel 19032	42 Agility		Diary		
-3069 3261 0	3064 3260 0	Climb-into Underwall tunnel 19036	42 Agility		Diary		
-3066 3261 0	3071 3260 0	Climb-into Underwall tunnel 19032	42 Agility		Diary		
-3069 3259 0	3064 3260 0	Climb-into Underwall tunnel 19036	42 Agility		Diary		
-3067 3260 0	3071 3260 0	Climb-into Underwall tunnel 19032	42 Agility		Diary		
+3070 3260 0	3064 3260 0	Climb-into Underwall tunnel 19036	100 Agility		Diary
+3065 3260 0	3071 3260 0	Climb-into Underwall tunnel 19032	100 Agility		Diary
+3069 3261 0	3064 3260 0	Climb-into Underwall tunnel 19036	100 Agility		Diary
+3066 3261 0	3071 3260 0	Climb-into Underwall tunnel 19032	100 Agility		Diary
+3069 3259 0	3064 3260 0	Climb-into Underwall tunnel 19036	100 Agility		Diary
+3067 3260 0	3071 3260 0	Climb-into Underwall tunnel 19032	100 Agility		Diary
 3035 9806 0	3028 9806 0	Squeeze-through Crevice 16543	42 Agility				
 3028 9806 0	3035 9806 0	Squeeze-through Crevice 16543	42 Agility				
 2878 3665 0	2878 3668 0	Climb Rocks 16522	43 Agility				
