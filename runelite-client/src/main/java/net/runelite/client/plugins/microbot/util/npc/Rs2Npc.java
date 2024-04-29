@@ -14,11 +14,10 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class Rs2Npc {
@@ -120,22 +119,20 @@ public class Rs2Npc {
         return npcs.toArray(new NPC[npcs.size()]);
     }
 
-    public static NPC[] getAttackableNpcs() {
-        List<NPC> npcs = Microbot.getClient().getNpcs().stream()
-                .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead() && !npc.isInteracting())
-                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                .collect(Collectors.toList());
-
-        return npcs.toArray(new NPC[npcs.size()]);
+    public static Stream<NPC> getAttackableNpcs() {
+        Stream<NPC> npcs = Microbot.getClient().getNpcs().stream()
+                .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead())
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
+        if (!Rs2Player.isInMulti()) {
+            npcs = npcs.filter((npc) -> !npc.isInteracting());
+        }
+        return npcs;
     }
 
-    public static NPC[] getAttackableNpcs(String name) {
-        List<NPC> npcs = Microbot.getClient().getNpcs().stream()
-                .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead() && npc.getName().toLowerCase().equals(name) && !npc.isInteracting())
-                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                .collect(Collectors.toList());
-
-        return npcs.toArray(new NPC[npcs.size()]);
+    public static Stream<NPC> getAttackableNpcs(String name) {
+        Stream<NPC> npcs = getAttackableNpcs()
+                .filter(x -> x.getName().equalsIgnoreCase(name));
+        return npcs;
     }
 
     public static NPC[] getPestControlPortals() {

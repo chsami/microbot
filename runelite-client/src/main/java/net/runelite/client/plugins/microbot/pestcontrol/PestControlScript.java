@@ -1,10 +1,7 @@
 package net.runelite.client.plugins.microbot.pestcontrol;
 
 import com.google.common.collect.ImmutableSet;
-import net.runelite.api.NPCComposition;
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Skill;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -23,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer.isQuickPrayerEnabled;
 import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.distanceToRegion;
@@ -92,8 +90,8 @@ public class PestControlScript extends Script {
                     Rs2Combat.setSpecState(true, config.specialAttackPercentage() * 10);
                     Widget activity = Rs2Widget.getWidget(26738700); //145 = 100%
                     if (activity != null && activity.getChild(0).getWidth() <= 20 && !Rs2Combat.inCombat()) {
-                        net.runelite.api.NPC[] npcs = Rs2Npc.getAttackableNpcs();
-                        Rs2Npc.attack(Arrays.stream(npcs).findFirst().get().getId());
+                        Stream<NPC> npcs = Rs2Npc.getAttackableNpcs();
+                        Rs2Npc.attack(npcs.findFirst().get().getId());
                         return;
                     }
 
@@ -124,8 +122,6 @@ public class PestControlScript extends Script {
                             || handleAttack(PestControlNpc.SPINNER, 3)) {
                         return;
                     }
-
-
                     net.runelite.api.NPC portal = Arrays.stream(Rs2Npc.getPestControlPortals()).findFirst().orElse(null);
                     if (portal != null) {
                         if (Rs2Npc.attack(portal.getId())) {
@@ -133,8 +129,8 @@ public class PestControlScript extends Script {
                         }
                     } else {
                         if (!Microbot.getClient().getLocalPlayer().isInteracting()) {
-                            net.runelite.api.NPC[] npcs = Rs2Npc.getAttackableNpcs();
-                            Rs2Npc.attack(Arrays.stream(npcs).findFirst().get().getId());
+                            Stream<net.runelite.api.NPC> npcs = Rs2Npc.getAttackableNpcs();
+                            Rs2Npc.attack(npcs.findFirst().get().getId());
                         }
                     }
 
