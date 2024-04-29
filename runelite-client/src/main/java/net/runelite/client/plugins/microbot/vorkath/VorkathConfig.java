@@ -15,8 +15,9 @@ public interface VorkathConfig extends Config {
             position = 0
     )
     default String GUIDE() {
-        return "Use the equipment inventory plugin to setup your plugin and give it a name\n" +
-                "Make sure to have a bank and all the logs in your bank";
+        return "1.Use the equipment inventory plugin to setup your plugin and give it the name 'vorkath'\n" +
+                "More information about inventory plugin: https://github.com/dillydill123/inventory-setups?tab=readme-ov-file#creating-a-new-setup" +
+                "2.Make sure to start at a bank";
     }
 
     @ConfigSection(
@@ -47,10 +48,18 @@ public interface VorkathConfig extends Config {
     @ConfigSection(
             name = "Teleports",
             description = "Teleports",
-            position = 2,
+            position = 4,
             closedByDefault = false
     )
     String teleportSection = "Teleports";
+
+    @ConfigSection(
+            name = "Prayers",
+            description = "Prayers",
+            position = 5,
+            closedByDefault = false
+    )
+    String prayerSection = "Prayers";
 
     @ConfigItem(
             keyName = "Teleport",
@@ -102,4 +111,14 @@ public interface VorkathConfig extends Config {
         return 5000;
     }
 
+    @ConfigItem(
+            keyName = "Rigour",
+            name = "Rigour",
+            description = "Activate Rigour? (Make sure you have it unlocked and have 74 prayer!)",
+            position = 4,
+            section = prayerSection
+    )
+    default boolean activateRigour() {
+        return false;
+    }
 }

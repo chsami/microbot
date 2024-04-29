@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum STAFF {
-    CAST("Cast"),
-    SLAYER_STAFF("Slayer's Staff"),
-    SLAYER_STAFF_E("Slayer's Staff (e)");
+    CAST("Cast");
 
     private final String staffName;
 

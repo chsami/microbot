@@ -391,21 +391,19 @@ public class VorkathScript extends Script {
     }
 
     private boolean drinkPotions() {
+        if (Rs2Player.isAnimating()) return false;
         boolean drinkRangePotion = config.rangePotion().getPotionName().contains("divine") ? !Rs2Player.hasDivineBastionActive() && !Rs2Player.hasDivineRangedActive() : !Rs2Player.hasRangingPotionActive();
         boolean drinkAntiFire = !Rs2Player.hasAntiFireActive() && !Rs2Player.hasSuperAntiFireActive();
         boolean drinkAntiVenom = !Rs2Player.hasAntiVenomActive();
 
         if (drinkRangePotion) {
             Rs2Inventory.interact(config.rangePotion().toString(), "drink");
-            Rs2Player.waitForAnimation(2000);
         }
         if (drinkAntiFire) {
             Rs2Inventory.interact("super antifire", "drink");
-            Rs2Player.waitForAnimation(2000);
         }
         if (drinkAntiVenom) {
             Rs2Inventory.interact("venom", "drink");
-            Rs2Player.waitForAnimation(2000);
         }
 
         return !drinkRangePotion && !drinkAntiFire && !drinkAntiVenom;
@@ -413,7 +411,7 @@ public class VorkathScript extends Script {
 
     public void togglePrayer(boolean onOff) {
         if (Rs2Prayer.isOutOfPrayer()) return;
-        if (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) >= 74) {
+        if (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) >= 74 && Microbot.getClient().getRealSkillLevel(Skill.DEFENCE) >= 70 && config.activateRigour()) {
             Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, onOff);
         } else {
             Rs2Prayer.toggle(Rs2PrayerEnum.EAGLE_EYE, onOff);
