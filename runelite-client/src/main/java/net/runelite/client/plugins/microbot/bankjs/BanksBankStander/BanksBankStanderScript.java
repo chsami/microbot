@@ -69,20 +69,24 @@ public class BanksBankStanderScript extends Script {
         // Check if the player has the required quantity of both items using the configuration
         if (firstItemId != null && secondItemId != null) {
             // User has inputted the item id for both items.
+            System.out.println("Checking for items by ID...");
             return Rs2Inventory.hasItemAmount(firstItemId, firstItemQuantity) &&
                     Rs2Inventory.hasItemAmount(secondItemId, secondItemQuantity);
+        } else if (firstItemId != null) {
+            // User has inputted the item id for the first item and item identifier for the second item.
+            System.out.println("Checking for first item by ID and second item by identifier...");
+            return Rs2Inventory.hasItemAmount(firstItemId, firstItemQuantity) &&
+                    Rs2Inventory.hasItemAmount(secondItemIdentifier, secondItemQuantity);
+        } else if (secondItemId != null) {
+            // User has inputted the item id for the second item and item identifier for the first item.
+            System.out.println("Checking for second item by ID and first item by identifier...");
+            return Rs2Inventory.hasItemAmount(firstItemIdentifier, firstItemQuantity) &&
+                    Rs2Inventory.hasItemAmount(secondItemId, secondItemQuantity);
         } else {
-            // Check the type of first item identifier
-            if (firstItemId != null) {
-                // User has inputted the item id for the first item and item identifier for the second item.
-                return Rs2Inventory.hasItemAmount(firstItemId, firstItemQuantity) &&
-                        Rs2Inventory.hasItemAmount(secondItemIdentifier, secondItemQuantity);
-
-            } else {
-                // User has inputted the item identifier for the first item and item id for the second item.
-                return Rs2Inventory.hasItemAmount(firstItemIdentifier, firstItemQuantity) &&
-                        Rs2Inventory.hasItemAmount(secondItemId, secondItemQuantity);
-            }
+            // User has inputted the item identifier for both items.
+            System.out.println("Checking for items by identifier...");
+            return Rs2Inventory.hasItemAmount(firstItemIdentifier, firstItemQuantity) &&
+                    Rs2Inventory.hasItemAmount(secondItemIdentifier, secondItemQuantity);
         }
     }
 
@@ -138,7 +142,6 @@ public class BanksBankStanderScript extends Script {
         return true;
     }
 
-
     private boolean combineItems() {
         // Check if we have the items, if not, fetch them
         if (!hasItems()) {
@@ -146,23 +149,23 @@ public class BanksBankStanderScript extends Script {
             return false; // Return false to indicate that items are being fetched
         }
 
-        // Combine the two items together
+        // Combine items based on the type of identifiers
         if (firstItemId != null && secondItemId != null) {
-            // User has inputted the item id for both items.
-            Rs2Inventory.combine(firstItemId, secondItemId);
+            // If both IDs are not null, use IDs for both items
+            Rs2Inventory.use(firstItemId);
+            Rs2Inventory.use(secondItemId);
         } else if (firstItemId != null) {
-            // User has inputted the item id for the first item and item identifier for the second item.
-            //Rs2Inventory.combine(firstItemId, secondItemIdentifier);
+            // If only firstItemId is not null, use it and secondItemIdentifier
             Rs2Inventory.use(firstItemId);
             Rs2Inventory.use(secondItemIdentifier);
         } else if (secondItemId != null) {
-            // User has inputted the item id for the second item and item identifier for the first item.
+            // If only secondItemId is not null, use it and firstItemIdentifier
             Rs2Inventory.use(firstItemIdentifier);
             Rs2Inventory.use(secondItemId);
-            // Rs2Inventory.combine(firstItemIdentifier, secondItemId);
         } else {
-            // User has inputted the item identifier for both items.
-            Rs2Inventory.combine(firstItemIdentifier, secondItemIdentifier);
+            // If both IDs are null, use identifiers for both items
+            Rs2Inventory.use(firstItemIdentifier);
+            Rs2Inventory.use(secondItemIdentifier);
         }
 
         // Introduce some sleeps for synchronization
@@ -172,7 +175,7 @@ public class BanksBankStanderScript extends Script {
         VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
         sleep(4000);
         // Sleep until animation is finished or item is no longer in inventory
-        sleepUntil(() -> !Rs2Inventory.hasItem(secondItemId != null ? String.valueOf(secondItemId) : secondItemIdentifier), 120000);
+        sleepUntil(() -> !Rs2Inventory.hasItem(secondItemIdentifier != null ? String.valueOf(secondItemId) : secondItemIdentifier), 40000);
 
         sleep(calculateSleepDuration());
         // Update current status to indicate fetching supplies next
@@ -208,7 +211,7 @@ public class BanksBankStanderScript extends Script {
         try {
             return Integer.parseInt(text);
         } catch (NumberFormatException ex) {
-            System.out.println("Failed to Parse Int from Item");
+            System.out.println("Could not Parse Int from Item, using Name Instead");
             return null;
         }
     }
