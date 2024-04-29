@@ -4,7 +4,6 @@ import net.runelite.api.WorldType;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -137,6 +136,8 @@ public class CollisionMap {
                 for (int t = 0; t < neighborTransports.size(); ++t) {
                     Transport transport = neighborTransports.get(t);
                     if (visited.get(transport.getOrigin())) continue;
+                    if (transport.isMember() && !Microbot.getClient().getWorldType().contains(WorldType.MEMBERS))
+                        continue;
                     neighbors.add(new Node(transport.getOrigin(), node));
                 }
             }

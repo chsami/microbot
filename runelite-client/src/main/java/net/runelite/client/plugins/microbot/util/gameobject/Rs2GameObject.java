@@ -851,11 +851,4 @@ public class Rs2GameObject {
         }
         return ids;
     }
-
-    private boolean isTileWalkAble(int x, int y) {
-        int[][] flags = Objects.requireNonNull(Microbot.getClient().getCollisionMaps())[Microbot.getClient().getPlane()].getFlags();
-        int data = flags[x][y];
-        Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
-        return !movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_OBJECT) && !movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FULL);
-    }
 }
