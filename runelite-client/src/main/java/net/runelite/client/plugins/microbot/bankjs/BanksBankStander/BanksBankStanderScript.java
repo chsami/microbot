@@ -1,10 +1,12 @@
 package net.runelite.client.plugins.microbot.bankjs.BanksBankStander;
 
+import net.runelite.api.ItemComposition;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import javax.inject.Inject;
 import java.awt.event.KeyEvent;
@@ -51,11 +53,10 @@ public class BanksBankStanderScript extends Script {
         System.out.println("Type of secondItemIdentifier: " + secondItemIdentifier.getClass().getSimpleName());
         System.out.println("Type of secondItemId: " + (secondItemId != null ? secondItemId.getClass().getSimpleName() : "null"));
 
-        Microbot.enableAutoRunOn = false;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (!Microbot.isLoggedIn()) return;
             try {
                 //start
-                fetchItems();
                 combineItems();
 
             } catch (Exception ex) {
@@ -70,23 +71,23 @@ public class BanksBankStanderScript extends Script {
         if (firstItemId != null && secondItemId != null) {
             // User has inputted the item id for both items.
             System.out.println("Checking for items by ID...");
-            return Rs2Inventory.hasItemAmount(firstItemId, firstItemQuantity) &&
-                    Rs2Inventory.hasItemAmount(secondItemId, secondItemQuantity);
+            return Rs2Inventory.hasItem(firstItemId) &&
+                    Rs2Inventory.hasItem(secondItemId);
         } else if (firstItemId != null) {
             // User has inputted the item id for the first item and item identifier for the second item.
             System.out.println("Checking for first item by ID and second item by identifier...");
-            return Rs2Inventory.hasItemAmount(firstItemId, firstItemQuantity) &&
-                    Rs2Inventory.hasItemAmount(secondItemIdentifier, secondItemQuantity);
+            return Rs2Inventory.hasItem(firstItemId) &&
+                    Rs2Inventory.hasItem(secondItemIdentifier);
         } else if (secondItemId != null) {
             // User has inputted the item id for the second item and item identifier for the first item.
             System.out.println("Checking for second item by ID and first item by identifier...");
-            return Rs2Inventory.hasItemAmount(firstItemIdentifier, firstItemQuantity) &&
-                    Rs2Inventory.hasItemAmount(secondItemId, secondItemQuantity);
+            return Rs2Inventory.hasItem(firstItemIdentifier) &&
+                    Rs2Inventory.hasItem(secondItemId);
         } else {
             // User has inputted the item identifier for both items.
             System.out.println("Checking for items by identifier...");
-            return Rs2Inventory.hasItemAmount(firstItemIdentifier, firstItemQuantity) &&
-                    Rs2Inventory.hasItemAmount(secondItemIdentifier, secondItemQuantity);
+            return Rs2Inventory.hasItem(firstItemIdentifier) &&
+                    Rs2Inventory.hasItem(secondItemIdentifier);
         }
     }
 
@@ -97,10 +98,13 @@ public class BanksBankStanderScript extends Script {
             if (!Rs2Bank.isOpen()) {
                 // Open Bank
                 Rs2Bank.useBank();
-                // Deposit All if bank is not already open
-                Rs2Bank.depositAll();
+            }
+            sleepUntil(() -> Rs2Bank.isOpen());
+            if (firstItemId != null && secondItemId != null) {
+                Rs2Bank.depositAllExcept(firstItemId, secondItemId);
+            } else if (firstItemId == null && secondItemId == null){
+                Rs2Bank.depositAllExcept(firstItemIdentifier, secondItemIdentifier);
             } else {
-                // Deposit All if bank is already open
                 Rs2Bank.depositAll();
             }
             // Check the type of first item identifier
@@ -108,13 +112,13 @@ public class BanksBankStanderScript extends Script {
                 // User has inputted the item id for the first item.
                 if (Rs2Bank.hasItem(firstItemId)) {
                     // Withdraw Item 1 Qty
-                    Rs2Bank.withdrawX(firstItemId, firstItemQuantity);
+                    Rs2Bank.withdrawX(true, firstItemId, firstItemQuantity);
                 }
             } else {
                 // User has inputted the item identifier for the first item.
                 if (Rs2Bank.hasItem(firstItemIdentifier)) {
                     // Withdraw Item 1 Qty
-                    Rs2Bank.withdrawX(firstItemIdentifier, firstItemQuantity);
+                    Rs2Bank.withdrawX(true, firstItemIdentifier, firstItemQuantity);
                 }
             }
             // Check the type of second item identifier
@@ -122,21 +126,25 @@ public class BanksBankStanderScript extends Script {
                 // User has inputted the item id for the second item.
                 if (Rs2Bank.hasItem(secondItemId)) {
                     // Withdraw Item 2 Qty
-                    Rs2Bank.withdrawX(secondItemId, secondItemQuantity);
+                    Rs2Bank.withdrawX(true, secondItemId, secondItemQuantity);
                 }
             } else {
                 // User has inputted the item identifier for the second item.
                 if (Rs2Bank.hasItem(secondItemIdentifier)) {
                     // Withdraw Item 2 Qty
-                    Rs2Bank.withdrawX(secondItemIdentifier, secondItemQuantity);
+                    Rs2Bank.withdrawX(true, secondItemIdentifier, secondItemQuantity);
                 }
             }
 
-            // Close Bank
-            Rs2Bank.closeBank();
-            currentStatus = CurrentStatus.COMBINE_ITEMS; // Set status to COMBINE_ITEMS after fetching items
+            sleepUntil(() -> hasItems());
 
-            sleep(600);
+            if (hasItems()) {
+                // Close Bank
+                Rs2Bank.closeBank();
+                sleepUntil(() -> !Rs2Bank.isOpen());
+                currentStatus = CurrentStatus.COMBINE_ITEMS; // Set status to COMBINE_ITEMS after fetching items
+                return true;
+            }
         }
 
         return true;
@@ -145,9 +153,15 @@ public class BanksBankStanderScript extends Script {
     private boolean combineItems() {
         // Check if we have the items, if not, fetch them
         if (!hasItems()) {
-            fetchItems();
+            boolean fetchedItems = fetchItems();
+            if (!fetchedItems) {
+                Microbot.showMessage("Unsufficient items found.");
+                sleep(5000);
+            }
             return false; // Return false to indicate that items are being fetched
         }
+
+        if (Microbot.isAnimating() || Microbot.isGainingExp) return false;
 
         // Combine items based on the type of identifiers
         if (firstItemId != null && secondItemId != null) {
@@ -169,7 +183,7 @@ public class BanksBankStanderScript extends Script {
         }
 
         // Introduce some sleeps for synchronization
-        sleep(600);
+        sleep(1200);
 
         // Simulate a key press (e.g., pressing SPACE)
         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
