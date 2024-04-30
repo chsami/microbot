@@ -4,7 +4,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 
 import javax.inject.Inject;
 import java.awt.event.KeyEvent;
@@ -172,7 +172,7 @@ public class BanksBankStanderScript extends Script {
         sleep(600);
 
         // Simulate a key press (e.g., pressing SPACE)
-        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
         sleep(4000);
         // Sleep until animation is finished or item is no longer in inventory
         sleepUntil(() -> !Rs2Inventory.hasItem(secondItemIdentifier != null ? String.valueOf(secondItemId) : secondItemIdentifier), 40000);
