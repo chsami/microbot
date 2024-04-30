@@ -24,7 +24,7 @@ public class VirtualMouse extends Mouse {
     public VirtualMouse() {
         super();
         this.scheduledExecutorService = Executors.newScheduledThreadPool(10);
-        getCanvas().setFocusable(false);
+        //getCanvas().setFocusable(false);
     }
 
     public Mouse click(Point point, boolean rightClick) {
