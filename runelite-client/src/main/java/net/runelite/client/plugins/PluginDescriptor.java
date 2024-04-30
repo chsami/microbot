@@ -29,65 +29,68 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-public @interface PluginDescriptor
-{
-	public String Nate = "<html>[<font color=orange>N</font>] ";
-	public String Mocrosoft = "<html>[<font color=#b8f704M>M</font>] ";
-	public String JR = "<html>[<font color=#54fff9>J</font>] ";
-	public String OG = "<html>[<font color=#FF69B4>O</font>] ";
-	public String Dan = "<html>[<font color=#B22222>D</font>]";
-	public String Kstar = "<html>[<font color=#fcf6bd>K</font>] ";
-	public String Default = "<html>[<font color=green>D</font>] ";
-	public String Griffin = "<html>[<font color=#a78bfa>G</font>] ";
-	public String Envision = "<html>[<font color=#c0c0c0>E</font>] ";
-	public String Spaghetti = "<html>[<font color=#DAD420>S</font>] ";
-	public String SaCo = "<html>[<font color=#0d937b>S</font>] ";
-	String name();
+public @interface PluginDescriptor {
+    public String Nate = "<html>[<font color=orange>N</font>] ";
+    public String Mocrosoft = "<html>[<font color=#b8f704M>M</font>] ";
+    public String JR = "<html>[<font color=#54fff9>J</font>] ";
+    public String OG = "<html>[<font color=#FF69B4>O</font>] ";
+    public String Dan = "<html>[<font color=#B22222>D</font>]";
+    public String Kstar = "<html>[<font color=#fcf6bd>K</font>] ";
+    public String Default = "<html>[<font color=green>D</font>] ";
+    public String Griffin = "<html>[<font color=#a78bfa>G</font>] ";
+    public String Envision = "<html>[<font color=#c0c0c0>E</font>] ";
+    public String Spaghetti = "<html>[<font color=#DAD420>S</font>] ";
+    public String SaCo = "<html>[<font color=#0d937b>S</font>] ";
+    public String Bank = "<html>[<font color=#9900ff>B</font>] ";
 
-	/**
-	 * Internal name used in the config.
-	 */
-	String configName() default "";
+    String name();
 
-	/**
-	 * A short, one-line summary of the plugin.
-	 */
-	String description() default "";
+    /**
+     * Internal name used in the config.
+     */
+    String configName() default "";
 
-	/**
-	 * A list of plugin keywords, used (together with the name) when searching for plugins.
-	 * Each tag should not contain any spaces, and should be fully lowercase.
-	 */
-	String[] tags() default {};
+    /**
+     * A short, one-line summary of the plugin.
+     */
+    String description() default "";
 
-	/**
-	 * A list of plugin names that are mutually exclusive with this plugin. Any plugins
-	 * with a name or conflicts value that matches this will be disabled when this plugin
-	 * is started
-	 */
-	String[] conflicts() default {};
+    /**
+     * A list of plugin keywords, used (together with the name) when searching for plugins.
+     * Each tag should not contain any spaces, and should be fully lowercase.
+     */
+    String[] tags() default {};
 
-	/**
-	 * If this plugin should be defaulted to on. Plugin-Hub plugins should always
-	 * have this set to true (the default), since having them off by defaults means
-	 * the user has to install the plugin, then separately enable it, which is confusing.
-	 */
-	boolean enabledByDefault() default true;
-	/**
-	 * always on
-	 */
-	boolean alwaysOn() default false;
-	/**
-	 * Whether or not plugin is hidden from configuration panel
-	 */
-	boolean hidden() default false;
+    /**
+     * A list of plugin names that are mutually exclusive with this plugin. Any plugins
+     * with a name or conflicts value that matches this will be disabled when this plugin
+     * is started
+     */
+    String[] conflicts() default {};
 
-	boolean developerPlugin() default false;
+    /**
+     * If this plugin should be defaulted to on. Plugin-Hub plugins should always
+     * have this set to true (the default), since having them off by defaults means
+     * the user has to install the plugin, then separately enable it, which is confusing.
+     */
+    boolean enabledByDefault() default true;
 
-	/**
-	 * If this plugin should be loaded when there is no {@link net.runelite.api.Client}
-	 */
-	boolean loadWhenOutdated() default false;
+    /**
+     * always on
+     */
+    boolean alwaysOn() default false;
 
-	boolean loadInSafeMode() default true;
+    /**
+     * Whether or not plugin is hidden from configuration panel
+     */
+    boolean hidden() default false;
+
+    boolean developerPlugin() default false;
+
+    /**
+     * If this plugin should be loaded when there is no {@link net.runelite.api.Client}
+     */
+    boolean loadWhenOutdated() default false;
+
+    boolean loadInSafeMode() default true;
 }
