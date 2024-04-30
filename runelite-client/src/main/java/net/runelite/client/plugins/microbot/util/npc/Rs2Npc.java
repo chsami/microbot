@@ -252,6 +252,10 @@ public class Rs2Npc {
         return interact(npc, "");
     }
 
+    public static boolean interact(int id) {
+        return interact(id, "");
+    }
+
     public static boolean interact(int npcId, String action) {
         NPC npc = getNpc(npcId);
 
