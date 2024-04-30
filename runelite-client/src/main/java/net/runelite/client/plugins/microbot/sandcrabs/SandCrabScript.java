@@ -11,7 +11,7 @@ import net.runelite.client.plugins.microbot.sandcrabs.models.ScanLocation;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Login;
@@ -129,7 +129,7 @@ public class SandCrabScript extends Script {
                         if (!isHopped) return;
                         boolean result = sleepUntil(() -> Rs2Widget.findWidget("Switch World") != null);
                         if (result) {
-                            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                             sleepUntil(() -> Microbot.getClient().getGameState() == GameState.HOPPING);
                             sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
                             if (timesHopped > 10) {

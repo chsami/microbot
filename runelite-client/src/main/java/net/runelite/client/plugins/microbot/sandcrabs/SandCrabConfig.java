@@ -3,7 +3,7 @@ package net.runelite.client.plugins.microbot.sandcrabs;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
-import net.runelite.client.plugins.microbot.util.misc.Food;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 
 @ConfigGroup("SandCrabPlugin")
 public interface SandCrabConfig extends Config {
@@ -24,9 +24,9 @@ public interface SandCrabConfig extends Config {
             description = "type of food",
             position = 1
     )
-    default Food food()
+    default Rs2Food food()
     {
-        return Food.MONKFISH;
+        return Rs2Food.MONKFISH;
     }
 
     @ConfigItem(

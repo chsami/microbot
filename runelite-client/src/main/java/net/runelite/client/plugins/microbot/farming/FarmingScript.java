@@ -34,7 +34,7 @@ import net.runelite.client.plugins.microbot.farming.enums.FarmingState;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -114,7 +114,7 @@ public class FarmingScript extends Script {
 
                         sleepUntil(() -> Rs2Widget.hasWidget("spirit tree locations"));
 
-                        VirtualKeyboard.typeString("2");
+                        Rs2Keyboard.typeString("2");
 
                         sleepUntil(() -> !isInGrandExchange.getAsBoolean());
 
@@ -202,7 +202,7 @@ public class FarmingScript extends Script {
                 } else if (Rs2GameObject.hasAction(tree, "chop down")) {
                     Rs2Npc.interact(npcId, "pay");
                     sleepUntil(() -> Rs2Widget.hasWidget("pay 200 coins"));
-                    VirtualKeyboard.typeString("1");
+                    Rs2Keyboard.typeString("1");
                     // sleepUntil(() -> !Rs2GameObject.hasAction(tree, "chop down")); -> this crashes the client for some reason
                 } else {
                     //pay protect tree

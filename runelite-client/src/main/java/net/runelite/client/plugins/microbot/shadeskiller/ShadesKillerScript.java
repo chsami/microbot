@@ -8,7 +8,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -106,7 +106,7 @@ public class ShadesKillerScript extends Script {
             }
             return;
         }
-        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
         Rs2Bank.openBank();
         sleepUntil(() -> Rs2Bank.isOpen());
         Rs2Bank.depositAll("fiyr remains");

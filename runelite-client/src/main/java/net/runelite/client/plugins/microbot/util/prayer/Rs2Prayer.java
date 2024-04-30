@@ -4,13 +4,11 @@ import net.runelite.api.MenuAction;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
 import java.awt.*;
 
-import static net.runelite.api.MenuAction.CC_OP;
 import static net.runelite.api.Varbits.QUICK_PRAYER;
-import static net.runelite.client.plugins.microbot.util.globval.VarbitValues.QUICK_PRAYER_ENABLED;
+import static net.runelite.client.plugins.microbot.globval.VarbitValues.QUICK_PRAYER_ENABLED;
 
 public class Rs2Prayer {
 

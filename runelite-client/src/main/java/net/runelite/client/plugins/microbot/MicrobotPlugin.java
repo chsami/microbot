@@ -26,10 +26,8 @@ import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenPl
 import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
-import net.runelite.client.plugins.microbot.util.event.EventSelector;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
@@ -43,9 +41,6 @@ import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 
 @PluginDescriptor(
@@ -124,7 +119,7 @@ public class MicrobotPlugin extends Plugin {
             overlayManager.add(microbotOverlay);
         }
 
-        new EventSelector(clientToolbar);
+        new InputSelector(clientToolbar);
 
         //TODO: Rs2NpcManager.loadJson();
 

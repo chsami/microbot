@@ -5,7 +5,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.shadeskiller.enums.Shades;
-import net.runelite.client.plugins.microbot.util.misc.Food;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 
 @ConfigGroup("ShadesKiller")
 public interface ShadesKillerConfig extends Config {
@@ -94,8 +94,8 @@ public interface ShadesKillerConfig extends Config {
             position = 1,
             section = foodSection
     )
-    default Food food() {
-        return Food.MONKFISH;
+    default Rs2Food food() {
+        return Rs2Food.MONKFISH;
     }
 
     @ConfigItem(

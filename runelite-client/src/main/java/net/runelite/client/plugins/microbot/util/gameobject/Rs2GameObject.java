@@ -5,10 +5,9 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
@@ -800,8 +799,8 @@ public class Rs2GameObject {
             if (!Rs2Camera.isTileOnScreen(object.getLocalLocation())) {
                 Rs2Camera.turnTo(object);
             } else {
-                VirtualKeyboard.keyRelease(KeyEvent.VK_RIGHT);
-                VirtualKeyboard.keyRelease(KeyEvent.VK_LEFT);
+                Rs2Keyboard.keyRelease(KeyEvent.VK_RIGHT);
+                Rs2Keyboard.keyRelease(KeyEvent.VK_LEFT);
 
             }
 

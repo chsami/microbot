@@ -11,7 +11,7 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -21,8 +21,6 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
 import static net.runelite.api.widgets.ComponentID.BANK_ITEM_CONTAINER;
@@ -266,8 +264,8 @@ public class Rs2Bank {
             invokeMenu(HANDLE_X_UNSET, rs2Item);
 
             sleep(1200);
-            VirtualKeyboard.typeString(String.valueOf(amount));
-            VirtualKeyboard.enter();
+            Rs2Keyboard.typeString(String.valueOf(amount));
+            Rs2Keyboard.enter();
             sleepUntil(() -> Rs2Inventory.hasItem(rs2Item.id), 2500);
         }
     }
@@ -913,8 +911,8 @@ public class Rs2Bank {
         boolean isBankPinVisible = Microbot.getClientThread().runOnClientThread(() -> bankPinWidget != null && !bankPinWidget.isHidden());
 
         if (isBankPinVisible) {
-            VirtualKeyboard.typeString(pin);
-            VirtualKeyboard.enter();
+            Rs2Keyboard.typeString(pin);
+            Rs2Keyboard.enter();
             return true;
         }
         return false;

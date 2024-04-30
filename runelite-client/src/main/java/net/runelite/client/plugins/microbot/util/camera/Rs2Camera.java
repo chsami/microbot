@@ -6,8 +6,7 @@ import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -35,22 +34,22 @@ public class Rs2Camera {
     public static void turnTo(final Actor actor) {
         int angle = getCharacterAngle(actor);
         setAngle(angle, actor);
-        VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT);
-        VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT);
+        Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT);
+        Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT);
     }
 
     public static void turnTo(final TileObject tileObject) {
         int angle = getObjectAngle(tileObject);
         setAngle(angle, tileObject);
-        VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT);
-        VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT);
+        Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT);
+        Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT);
     }
 
     public static void turnTo(final LocalPoint localPoint) {
         int angle = angleToTile(localPoint);
         setAngle(angle, localPoint);
-        VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT);
-        VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT);
+        Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT);
+        Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT);
     }
 
     public static int getCharacterAngle(Actor actor) {
@@ -73,12 +72,12 @@ public class Rs2Camera {
 
     public static void setAngle(int degrees) {
         if (getAngleTo(degrees) > 5) {
-            VirtualKeyboard.keyHold(KeyEvent.VK_LEFT);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_LEFT);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT),
                     () -> Math.abs(getAngleTo(degrees)) <= 5, 10);
         } else if (getAngleTo(degrees) < -5) {
-            VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
                     () -> Math.abs(getAngleTo(degrees)) <= 5, 10);
         }
     }
@@ -86,36 +85,36 @@ public class Rs2Camera {
 
     public static void setAngle(int degrees, Actor actor) {
         if (getAngleTo(degrees) > 5) {
-            VirtualKeyboard.keyHold(KeyEvent.VK_LEFT);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_LEFT);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT),
                     () -> Perspective.localToCanvas(Microbot.getClient(), actor.getLocalLocation(), Microbot.getClient().getPlane()) != null, 10);
         } else if (getAngleTo(degrees) < -5) {
-            VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
                     () -> Perspective.localToCanvas(Microbot.getClient(), actor.getLocalLocation(), Microbot.getClient().getPlane()) != null, 10);
         }
     }
 
     public static void setAngle(int degrees, TileObject tileObject) {
         if (getAngleTo(degrees) > 5) {
-            VirtualKeyboard.keyHold(KeyEvent.VK_LEFT);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_LEFT);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT),
                     () -> Perspective.localToCanvas(Microbot.getClient(), tileObject.getLocalLocation(), Microbot.getClient().getPlane()) != null, 600);
         } else if (getAngleTo(degrees) < -5) {
-            VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
                     () -> Perspective.localToCanvas(Microbot.getClient(), tileObject.getLocalLocation(), Microbot.getClient().getPlane()) != null, 600);
         }
     }
 
     public static void setAngle(int degrees, LocalPoint localPoint) {
         if (getAngleTo(degrees) > 5) {
-            VirtualKeyboard.keyHold(KeyEvent.VK_LEFT);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_LEFT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_LEFT);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT),
                     () -> Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane()) != null, 600);
         } else if (getAngleTo(degrees) < -5) {
-            VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
                     () -> Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane()) != null, 600);
         }
     }
@@ -124,12 +123,12 @@ public class Rs2Camera {
         float currentPitchPercentage = cameraPitchPercentage();
 
         if (currentPitchPercentage < percentage) {
-            VirtualKeyboard.keyHold(KeyEvent.VK_UP);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_UP),
+            Rs2Keyboard.keyHold(KeyEvent.VK_UP);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_UP),
                     () -> cameraPitchPercentage() >= percentage, 600);
         } else {
-            VirtualKeyboard.keyHold(KeyEvent.VK_RIGHT);
-            Global.awaitExecutionUntil(() -> VirtualKeyboard.keyRelease((char) KeyEvent.VK_RIGHT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
                     () -> cameraPitchPercentage() <= percentage, 600);
         }
     }

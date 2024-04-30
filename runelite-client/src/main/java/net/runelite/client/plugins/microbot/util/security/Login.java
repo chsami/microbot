@@ -2,7 +2,7 @@ package net.runelite.client.plugins.microbot.util.security;
 
 import net.runelite.client.config.ConfigProfile;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldRegion;
@@ -40,7 +40,7 @@ public class Login {
             Microbot.getMouse().click(365 + startingWidth, 308); //clicks a button "OK" when you've been disconnected
             sleep(600);
         }
-        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        Rs2Keyboard.keyPress(KeyEvent.VK_ENTER);
         sleep(600);
         try {
             setWorld(world);
@@ -54,9 +54,9 @@ public class Login {
             throw new RuntimeException(e);
         }
         sleep(300);
-        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        Rs2Keyboard.keyPress(KeyEvent.VK_ENTER);
         sleep(300);
-        VirtualKeyboard.keyPress(KeyEvent.VK_ENTER);
+        Rs2Keyboard.keyPress(KeyEvent.VK_ENTER);
         if (Microbot.getClient().getLoginIndex() == 10) {
             int loginScreenWidth = 804;
             int startingWidth = (Microbot.getClient().getCanvasWidth() / 2) - (loginScreenWidth / 2);

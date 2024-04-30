@@ -10,7 +10,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -48,13 +48,13 @@ public class QuestScript extends Script {
                     Widget widget = Rs2Widget.findWidget("Start ");
                     if (Rs2Widget.hasWidget("select an option") && QuestHelperPlugin.getSelectedQuest().getQuest().getId() != Quest.COOKS_ASSISTANT.getId() || (widget != null &&
                             Microbot.getClientThread().runOnClientThread(() -> widget.getParent().getId()) != 10616888)) {
-                        VirtualKeyboard.keyPress('1');
-                        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                        Rs2Keyboard.keyPress('1');
+                        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
                     }
 
                     if (Rs2Widget.hasWidget("click here to continue")) {
-                        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
                     }
 

@@ -11,7 +11,7 @@ import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -79,7 +79,7 @@ public class MWintertodtScript extends Script {
                 }
 
                 if (Rs2Widget.hasWidget("Leave and lose all progress")) {
-                    VirtualKeyboard.typeString("1");
+                    Rs2Keyboard.typeString("1");
                     sleep(1600, 2000);
                     return;
                 }

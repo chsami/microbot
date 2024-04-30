@@ -10,7 +10,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -67,7 +67,7 @@ public class CookingScript extends Script {
                             sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694734) != null);
                             sleep(600, 1600);
                         }
-                        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         sleep(5000);
                         while (true) {
                             long rawFoodCount = Rs2Inventory.get(itemToCook).quantity;

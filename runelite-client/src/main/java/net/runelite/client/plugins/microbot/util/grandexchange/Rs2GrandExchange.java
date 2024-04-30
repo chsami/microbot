@@ -9,7 +9,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -117,7 +117,7 @@ public class Rs2GrandExchange {
             Rs2Widget.clickWidgetFast(buyOffer);
             sleepUntil(Rs2GrandExchange::isOfferTextVisible, 5000);
             sleepUntil(() -> Rs2Widget.hasWidget("What would you like to buy?"));
-            VirtualKeyboard.typeString(searchTerm);
+            Rs2Keyboard.typeString(searchTerm);
             sleepUntil(() -> !Rs2Widget.hasWidget("Start typing the name"), 5000); //GE Search Results
             sleep(1200);
             Pair<Widget, Integer> itemResult = getSearchResultWidget(itemName);
@@ -133,17 +133,17 @@ public class Rs2GrandExchange {
                 Microbot.getMouse().click(pricePerItemButtonX.getBounds());
                 sleepUntil(() -> Rs2Widget.getWidget(162, 41) != null, 5000); //GE Enter Price
                 sleep(1000);
-                VirtualKeyboard.typeString(Integer.toString(price));
-                VirtualKeyboard.enter();
+                Rs2Keyboard.typeString(Integer.toString(price));
+                Rs2Keyboard.enter();
                 sleep(2000);
                 if (quantity > 1) {
                     Widget quantityButtonX = getQuantityButton_X();
                     Microbot.getMouse().click(quantityButtonX.getBounds());
                     sleepUntil(() -> Rs2Widget.getWidget(162, 41) != null, 5000); //GE Enter Price/Quantity
                     sleep(600, 1000);
-                    VirtualKeyboard.typeString(Integer.toString(quantity));
+                    Rs2Keyboard.typeString(Integer.toString(quantity));
                     sleep(500, 750);
-                    VirtualKeyboard.enter();
+                    Rs2Keyboard.enter();
                     sleep(1000);
                 }
                 Microbot.getMouse().click(getConfirm().getBounds());
@@ -192,17 +192,17 @@ public class Rs2GrandExchange {
                 Microbot.getMouse().click(pricePerItemButtonX.getBounds());
                 sleepUntil(() -> Rs2Widget.getWidget(162, 41) != null, 5000); //GE Enter Price
                 sleep(1000);
-                VirtualKeyboard.typeString(Integer.toString(price));
-                VirtualKeyboard.enter();
+                Rs2Keyboard.typeString(Integer.toString(price));
+                Rs2Keyboard.enter();
                 sleep(300, 500);
                 if (quantity > 1) {
                     Widget quantityButtonX = getQuantityButton_X();
                     Microbot.getMouse().click(quantityButtonX.getBounds());
                     sleepUntil(() -> Rs2Widget.getWidget(162, 41) != null, 5000); //GE Enter Price/Quantity
                     sleep(600, 1000);
-                    VirtualKeyboard.typeString(Integer.toString(quantity));
+                    Rs2Keyboard.typeString(Integer.toString(quantity));
                     sleep(500, 750);
-                    VirtualKeyboard.enter();
+                    Rs2Keyboard.enter();
                     sleep(1000);
                 }
                 Microbot.getMouse().click(getConfirm().getBounds());

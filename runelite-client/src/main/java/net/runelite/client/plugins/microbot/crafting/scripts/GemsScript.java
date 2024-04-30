@@ -6,7 +6,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
@@ -45,7 +45,7 @@ public class GemsScript extends Script {
                     Rs2Inventory.use("chisel");
                     Rs2Inventory.use(uncutGemName);
                     sleep(600);
-                    VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                    Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                     sleep(4000);
                     sleepUntil(() -> !Microbot.isGainingExp || !Rs2Inventory.hasItem(uncutGemName), 30000);
                 }

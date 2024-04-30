@@ -18,10 +18,10 @@ import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global.sleep
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank
-import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker
@@ -246,15 +246,15 @@ class AutoZMIAltar : Plugin() {
         Rs2Magic.cast(MagicAction.NPC_CONTACT)
         sleep(1000, 1200)
         Rs2Widget.clickWidget("Dark Mage")
-        while (!Dialogue.isInDialogue()) sleep(200, 300)
-        Dialogue.clickContinue()
+        while (!Rs2Dialogue.isInDialogue()) sleep(200, 300)
+        Rs2Dialogue.clickContinue()
         sleep(2000, 2200)
-        VirtualKeyboard.typeString("2")
+        Rs2Keyboard.typeString("2")
         sleep(1000, 1200)
-        while (!Dialogue.isInDialogue()) sleep(200, 300)
-        Dialogue.clickContinue()
-        Dialogue.clickContinue()
-        VirtualKeyboard.typeString("2")
+        while (!Rs2Dialogue.isInDialogue()) sleep(200, 300)
+        Rs2Dialogue.clickContinue()
+        Rs2Dialogue.clickContinue()
+        Rs2Keyboard.typeString("2")
         currentState = State.BANKING
     }
 

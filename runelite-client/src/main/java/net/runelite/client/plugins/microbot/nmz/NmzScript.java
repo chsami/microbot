@@ -9,7 +9,7 @@ import net.runelite.client.plugins.microbot.playerassist.combat.PrayerPotionScri
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
@@ -102,8 +102,8 @@ public class NmzScript extends Script {
         sleepUntil(() -> Rs2Widget.hasWidget("Click here to continue"));
         Rs2Widget.clickWidget("Click here to continue");
         sleepUntil(() -> Rs2Widget.hasWidget("Agree to pay"));
-        VirtualKeyboard.typeString("1");
-        VirtualKeyboard.enter();
+        Rs2Keyboard.typeString("1");
+        Rs2Keyboard.enter();
     }
 
     public void useZapperIfConfigured() {
@@ -184,8 +184,8 @@ public class NmzScript extends Script {
         String storeWidgetText = "Store all your ";
         sleepUntil(() -> Rs2Widget.hasWidget(storeWidgetText));
         if (Rs2Widget.hasWidget(storeWidgetText)) {
-            VirtualKeyboard.typeString("1");
-            VirtualKeyboard.enter();
+            Rs2Keyboard.typeString("1");
+            Rs2Keyboard.enter();
             sleepUntil(() -> !Rs2Inventory.hasItem(objectId));
         }
     }
@@ -197,8 +197,8 @@ public class NmzScript extends Script {
         String widgetText = "How many doses of ";
         sleepUntil(() -> Rs2Widget.hasWidget(widgetText));
         if (Rs2Widget.hasWidget(widgetText)) {
-            VirtualKeyboard.typeString(Integer.toString(requiredAmount * 4));
-            VirtualKeyboard.enter();
+            Rs2Keyboard.typeString(Integer.toString(requiredAmount * 4));
+            Rs2Keyboard.enter();
             sleepUntil(() -> Rs2Inventory.count(itemName) == requiredAmount);
         }
     }

@@ -15,7 +15,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -302,7 +302,7 @@ public class SummerGardenScript extends Script {
             var npcDialogueText = Microbot.getClient().getWidget(WidgetInfo.DIALOG_NPC_TEXT);
             if (npcDialogueText != null && npcDialogueText.getText().equals("Hello again.")) {
                 if (Rs2Widget.hasWidget("Click here to continue")) {
-                    VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                    Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                 }
             }
 
@@ -322,7 +322,7 @@ public class SummerGardenScript extends Script {
             if (playerDialogueText != null) {
                 if (playerDialogueText.getText().equals("I'd like to talk about sq'irks.") || playerDialogueText.getText().equals("I have some sq'irk juice for you.")) {
                     if (Rs2Widget.hasWidget("Click here to continue")) {
-                        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                     }
                 }
             }
@@ -332,7 +332,7 @@ public class SummerGardenScript extends Script {
             if (npcDialogueSpriteText != null) {
                 if (npcDialogueSpriteText.getText().contains("Osman imparts some Thieving advice to you as a<br>reward for the sq'irk juice.")) {
                     if (Rs2Widget.hasWidget("Click here to continue")) {
-                        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         botState = BotState.RETURN_TO_HOUSE;
                     }
                 }

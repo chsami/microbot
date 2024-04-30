@@ -32,19 +32,11 @@ public class ExampleScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-                /*
-                 * Important classes:
-                 * Inventory
-                 * Rs2GameObject
-                 * Rs2GroundObject
-                 * Rs2NPC
-                 * Rs2Bank
-                 * etc...
-                 */
 
                 long startTime = System.currentTimeMillis();
 
-                System.out.println(Rs2Walker.walkTo(new WorldPoint(3212, 3494, 0)));
+                //SCRIPT CODE COMES HERE
+                Rs2Npc.attack("man");
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;

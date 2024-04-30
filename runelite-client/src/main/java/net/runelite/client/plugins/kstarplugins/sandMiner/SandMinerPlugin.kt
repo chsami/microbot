@@ -15,7 +15,7 @@ import net.runelite.client.plugins.PluginDescriptor
 import net.runelite.client.plugins.PluginDescriptor.Kstar
 import net.runelite.client.plugins.microbot.Microbot
 import net.runelite.client.plugins.microbot.util.Global
-import net.runelite.client.plugins.microbot.util.dialogues.Dialogue
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject.findObjectByLocation
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory
@@ -151,7 +151,7 @@ class SandMiner : Plugin() {
             Global.sleep(600, 1200)
         }
         Rs2GameObject.interact(26199)
-        Global.sleepUntil(BooleanSupplier { Dialogue.isInDialogue() })
+        Global.sleepUntil(BooleanSupplier { Rs2Dialogue.isInDialogue() })
         Global.sleep(1200, 1800)
         currentAction = Action.MINING
     }

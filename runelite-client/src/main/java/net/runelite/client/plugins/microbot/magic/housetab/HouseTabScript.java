@@ -9,7 +9,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.magic.housetab.enums.HOUSETABS_CONFIG;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -164,7 +164,7 @@ public class HouseTabScript extends Script {
 
         sleep(2500, 5000);
         if (Microbot.getClient().getWidget(14352385) != null) {
-            VirtualKeyboard.keyPress('3');
+            Rs2Keyboard.keyPress('3');
             sleep(300, 380);
         }
     }
@@ -223,8 +223,8 @@ public class HouseTabScript extends Script {
                                     Rs2Widget.clickWidget(config.housePlayerName());
                                 } else {
                                     if (Rs2Widget.hasWidget("Enter name")) {
-                                        VirtualKeyboard.typeString(config.housePlayerName());
-                                        VirtualKeyboard.enter();
+                                        Rs2Keyboard.typeString(config.housePlayerName());
+                                        Rs2Keyboard.enter();
                                     }
                                 }
                             }

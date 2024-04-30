@@ -4,7 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.microbot.util.misc.Food;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 import net.runelite.client.plugins.microbot.wintertodt.enums.Brazier;
 
 @ConfigGroup("wintertodt")
@@ -108,8 +108,8 @@ public interface MWintertodtConfig extends Config {
             position = 1,
             section = foodSection
     )
-    default Food food() {
-        return Food.MONKFISH;
+    default Rs2Food food() {
+        return Rs2Food.MONKFISH;
     }
 
     @ConfigItem(

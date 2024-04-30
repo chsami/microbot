@@ -5,7 +5,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.thieving.enums.ThievingNpc;
-import net.runelite.client.plugins.microbot.util.misc.Food;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 
 @ConfigGroup("Thieving")
 public interface ThievingConfig extends Config {
@@ -64,9 +64,9 @@ public interface ThievingConfig extends Config {
             position = 2,
             section = foodAndHitpoints
     )
-    default Food food()
+    default Rs2Food food()
     {
-        return Food.MONKFISH;
+        return Rs2Food.MONKFISH;
     }
 
 

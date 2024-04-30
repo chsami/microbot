@@ -7,11 +7,11 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.dialogues.Dialogue;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.NameGenerator;
@@ -24,8 +24,8 @@ import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.clickContinue;
-import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.isInDialogue;
+import static net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue.clickContinue;
+import static net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue.isInDialogue;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.hideRoofs;
 import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.turnOffMusic;
@@ -48,14 +48,14 @@ public class TutorialIslandScript extends Script {
                     case NAME:
                         String name = new NameGenerator(random(3, 6)).getName() + new NameGenerator(random(3, 6)).getName();
                         Rs2Widget.clickWidget(36569095);
-                        VirtualKeyboard.typeString(name);
+                        Rs2Keyboard.typeString(name);
                         Rs2Widget.clickWidget("Look up name");
                         sleepUntil(() -> Rs2Widget.hasWidget("Set name"));
                         sleep(4000);
                         if (Rs2Widget.hasWidget("Sorry")) {
                             Rs2Widget.clickWidget(36569095);
                             for (int i = 0; i < name.length(); i++) {
-                                VirtualKeyboard.keyPress(KeyEvent.VK_BACK_SPACE);
+                                Rs2Keyboard.keyPress(KeyEvent.VK_BACK_SPACE);
                                 sleep(300, 600);
                             }
                         } else {
@@ -189,7 +189,7 @@ public class TutorialIslandScript extends Script {
         NPC npc = Rs2Npc.getNpc(3308);
         if (isInDialogue()) return;
         if (Rs2Widget.getWidget(219, 1) != null) {
-            VirtualKeyboard.typeString(Integer.toString(random(1, 3)));
+            Rs2Keyboard.typeString(Integer.toString(random(1, 3)));
             return;
         }
         if (Microbot.getVarbitPlayerValue(281) == 3) {
@@ -279,10 +279,10 @@ public class TutorialIslandScript extends Script {
             }
             if (Rs2Widget.hasWidget("Do you want to go to the mainland?")) {
                 Rs2Widget.clickWidget(14352385);
-                VirtualKeyboard.typeString("1");
+                Rs2Keyboard.typeString("1");
             } else if (Rs2Widget.hasWidget("Select an option")) {
                 if (Rs2Widget.hasWidget("No, I'm not planning to do that")) {
-                    VirtualKeyboard.typeString("3");
+                    Rs2Keyboard.typeString("3");
                 } else {
                     Rs2Widget.clickWidget("Yes, send me to the mainland");
                 }
@@ -403,7 +403,7 @@ public class TutorialIslandScript extends Script {
                     sleep(1000);
                     Rs2Widget.clickWidget("Bronze dagger");
                     sleep(1000);
-                    VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
+                    Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
                     return;
                 }
             }
@@ -485,7 +485,7 @@ public class TutorialIslandScript extends Script {
         if (Microbot.getVarbitPlayerValue(281) == 120) {
             hideRoofs();
             sleep(600);
-            VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
+            Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
             Rs2GameObject.interact(ObjectID.GATE_9470, "Open");
             sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 120);
         } else if (Microbot.getVarbitPlayerValue(281) == 130) {
@@ -539,7 +539,7 @@ public class TutorialIslandScript extends Script {
     }
 
     public void ClickContinue() {
-        Dialogue.clickContinue();
+        Rs2Dialogue.clickContinue();
     }
 
 
