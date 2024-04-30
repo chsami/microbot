@@ -1,6 +1,6 @@
 # Installation
 
-### 1.Download the client & Java
+### 1.Download the client & Java - Windows
 
 You can watch this video to help you startup the client.
 
@@ -24,5 +24,10 @@ If you don't have java installed yet, watch the youtube video: https://www.youtu
 
 Simply replace the Official RuneLite.jar with the microbot.jar and make sure the name is the same!! After that you can start up the jagex launcher and select runelite, this will startup microbot.
 
+### 4.Run Microbot on Linux
+
+* Make sure you have Java installed, get it from your package manager. Run the "shaded" .jar from the nightly build with java --jar client-1.10.26-SNAPSHOT-shaded.jar
+* If you have a Jagex account, download and run Bolt launcher (https://github.com/Adamcake/Bolt). After signing in, run the "shaded" .jar by enabling "Use custom RuneLite JAR" and navigating to the Microbot .jar.
+* Download and extract the RuneLite AppImage. Replace RuneLite.jar with the Microbot one. Run RuneLite
 
 **Are you stuck? Join our [Discord](https://discord.gg/zaGrfqFEWE) server.**
