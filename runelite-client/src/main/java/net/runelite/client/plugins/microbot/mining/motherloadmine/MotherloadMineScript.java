@@ -140,7 +140,7 @@ boolean emptySack = false;
     private boolean walkToMiningSpot() {
         WorldPoint miningWorldPoint = miningSpot.getWorldPoint().get(0);
         if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(miningWorldPoint) > 8) {
-            Rs2Walker.walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), miningWorldPoint));
+            Rs2Walker.walkTo(miningWorldPoint);
             return false;
         }
         return true;

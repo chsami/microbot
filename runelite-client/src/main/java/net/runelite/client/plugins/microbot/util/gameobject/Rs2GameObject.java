@@ -830,7 +830,7 @@ public class Rs2GameObject {
     }
 
     public static boolean hasLineOfSight(TileObject tileObject) {
-        if (tileObject == null) return true;
+        if (tileObject == null) return false;
         if (tileObject instanceof GameObject) {
             GameObject gameObject = (GameObject) tileObject;
             WorldPoint worldPoint = WorldPoint.fromScene(Microbot.getClient(), gameObject.getSceneMinLocation().getX(), gameObject.getSceneMinLocation().getY(), gameObject.getPlane());
@@ -839,8 +839,14 @@ public class Rs2GameObject {
                     gameObject.sizeX(),
                     gameObject.sizeY())
                     .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+        } else {
+            WallObject wallObject = (WallObject) tileObject;
+            return new WorldArea(
+                    tileObject.getWorldLocation(),
+                    2,
+                    2)
+                    .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
         }
-        return true;
     }
 
     @SneakyThrows
