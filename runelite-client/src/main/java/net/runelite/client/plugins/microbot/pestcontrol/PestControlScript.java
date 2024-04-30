@@ -98,6 +98,7 @@ public class PestControlScript extends Script {
                     net.runelite.api.NPC brawler = Rs2Npc.getNpc("brawler");
                     if (brawler != null && Rs2Npc.getWorldLocation(brawler).distanceTo(Rs2Player.getWorldLocation()) < 3) {
                         Rs2Npc.attack(brawler);
+                        sleepUntil(() -> !Rs2Combat.inCombat());
                         return;
                     }
 
@@ -213,6 +214,19 @@ public class PestControlScript extends Script {
         return closestPortal.getKey();
     }
 
+    private static boolean attackPortal() {
+        if (!Microbot.getClient().getLocalPlayer().isInteracting()) {
+            net.runelite.api.NPC npcPortal = Rs2Npc.getNpc("portal");
+            NPCComposition npc = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(npcPortal.getId()));
+            if (Arrays.stream(npc.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("attack"))) {
+                return Rs2Npc.attack("portal");
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
 
     private boolean attackPortals() {
         Portal closestAttackablePortal = getClosestAttackablePortal();
@@ -220,16 +234,9 @@ public class PestControlScript extends Script {
             if (!portal.isHasShield() && !portal.getHitPoints().getText().trim().equals("0") && closestAttackablePortal == portal) {
                 if (!Rs2Walker.isCloseToRegion(distanceToPortal, portal.getRegionX(), portal.getRegionY())) {
                     Rs2Walker.walkTo(WorldPoint.fromRegion(Rs2Player.getWorldLocation().getRegionID(), portal.getRegionX(), portal.getRegionY(), Microbot.getClient().getPlane()), 5);
+                    attackPortal();
                 } else {
-                    if (!Microbot.getClient().getLocalPlayer().isInteracting()) {
-                        net.runelite.api.NPC npcPortal = Rs2Npc.getNpc("portal");
-                        NPCComposition npc = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(npcPortal.getId()));
-                        if (Arrays.stream(npc.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("attack"))) {
-                            return Rs2Npc.attack("portal");
-                        } else {
-                            return false;
-                        }
-                    }
+                    attackPortal();
                 }
                 return true;
             }
