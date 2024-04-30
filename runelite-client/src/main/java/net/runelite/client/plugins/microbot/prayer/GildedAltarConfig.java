@@ -8,21 +8,20 @@ import net.runelite.client.plugins.microbot.magic.housetab.enums.HOUSETABS_CONFI
 @ConfigGroup("GildedAltar")
 public interface GildedAltarConfig extends Config {
     @ConfigItem(
-            keyName = "House Config",
-            name = "House Config",
-            description = "Choose your house config",
-            position = 0,
-            hidden = true
+            keyName = "Guide",
+            name = "How to use",
+            description = "How to use the script",
+            position = 0
     )
-    default HOUSETABS_CONFIG HouseConfig()
+    default String GUIDE()
     {
-        return HOUSETABS_CONFIG.HOUSE_ADVERTISEMENT;
+        return "This only supports house advertisements. Use this script in w330";
     }
 
     @ConfigItem(
             keyName = "Player Name",
-            name = "Player Name",
-            description = "Choose the player name's house",
+            name = "Player Name Houses",
+            description = "Choose the player name's house comma seperated",
             position = 1
     )
     default String housePlayerName()
