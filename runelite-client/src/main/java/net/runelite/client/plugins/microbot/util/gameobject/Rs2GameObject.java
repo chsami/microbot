@@ -188,6 +188,20 @@ public class Rs2GameObject {
         return null;
     }
 
+    public static TileObject findGameObjectByLocation(WorldPoint worldPoint) {
+
+        List<GameObject> gameObjects = getGameObjects();
+
+        if (gameObjects == null) return null;
+
+        for (net.runelite.api.GameObject gameObject : gameObjects) {
+            if (gameObject.getWorldLocation().equals(worldPoint))
+                return gameObject;
+        }
+
+        return null;
+    }
+
     public static TileObject findObjectByIdAndDistance(int id, int distance) {
 
         List<GameObject> gameObjects = getGameObjects(distance);
