@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMStatu
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.Collections;
@@ -43,8 +44,7 @@ boolean emptySack = false;
                 timeBegan = System.currentTimeMillis();
             }
             try {
-                if (Microbot.isAnimating() || Microbot.getClient().getLocalPlayer().isInteracting()) {
-                    sleep(2000);
+                if (Microbot.isAnimating() || Microbot.getClient().getLocalPlayer().isInteracting() || Microbot.isGainingExp) {
                     return;
                 }
 
@@ -71,6 +71,10 @@ boolean emptySack = false;
                     }
                 }
 
+                if (Rs2Inventory.hasItem("coal") && Rs2Inventory.isFull()) {
+                    status = MLMStatus.BANKING;
+                }
+
                 switch (status) {
                     case IDLE:
                         //antiban
@@ -95,9 +99,13 @@ boolean emptySack = false;
                         status = MLMStatus.IDLE;
                         break;
                     case FIXING_WATERWHEEL:
-                            Rs2GameObject.interact(ObjectID.BROKEN_STRUT);
+                        Rs2Walker.walkTo(new WorldPoint(3741, 5666, 0));
+                        if (Rs2GameObject.interact(ObjectID.BROKEN_STRUT)) {
+                            sleepUntil(() -> Microbot.isGainingExp);
+                        }
                         break;
                     case DEPOSIT_HOPPER:
+                        Rs2Walker.walkTo(new WorldPoint(3748, 5674, 0));
                         if (Rs2GameObject.interact(ObjectID.HOPPER_26674)) {
                             sleepUntil(() -> !Rs2Inventory.isFull());
                             if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > 50) {
@@ -106,6 +114,7 @@ boolean emptySack = false;
                         }
                         break;
                     case BANKING:
+                        Rs2Walker.walkTo(new WorldPoint(3759, 5666, 0));
                         bank();
                         break;
                 }
@@ -122,6 +131,11 @@ boolean emptySack = false;
             sleepUntil(Rs2Bank::isOpen);
             Rs2Bank.depositAll();
             sleep(100, 300);
+            if (!Rs2Bank.hasItem("hammer") && !Rs2Inventory.hasItem("hammer")) {
+                Microbot.showMessage("No hammer found in the bank.");
+                sleep(5000);
+                return;
+            }
             Rs2Bank.withdrawOne("hammer", true);
             sleep(600);
         }
@@ -139,10 +153,7 @@ boolean emptySack = false;
 
     private boolean walkToMiningSpot() {
         WorldPoint miningWorldPoint = miningSpot.getWorldPoint().get(0);
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(miningWorldPoint) > 8) {
-            Rs2Walker.walkTo(miningWorldPoint);
-            return false;
-        }
+        Rs2Walker.walkTo(miningWorldPoint);
         return true;
     }
 
@@ -151,11 +162,14 @@ boolean emptySack = false;
                 .stream()
                 .filter(x -> x.getId() == 26661 || x.getId() == 26662 || x.getId() == 26663 || x.getId() == 26664)
                 .sorted(Comparator.comparingInt(x -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(x.getWorldLocation())))
-                .filter(x -> Rs2GameObject.hasLineOfSight(x))
+                .filter(Rs2GameObject::hasLineOfSight)
                 .findFirst()
                 .orElse(null);
 
-        if (closest == null) return true;
+        if (closest == null && !Microbot.isGainingExp) {
+            walkToMiningSpot();
+            return false;
+        }
 
         Rs2GameObject.interact(closest);
 
