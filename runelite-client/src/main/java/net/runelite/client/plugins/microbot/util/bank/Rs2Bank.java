@@ -20,7 +20,10 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
 import static net.runelite.api.widgets.ComponentID.BANK_ITEM_CONTAINER;
@@ -310,25 +313,38 @@ public class Rs2Bank {
      * deposit all items identified by its ItemWidget
      *
      * @param rs2Item item to deposit
+     * @returns did deposit anything
      */
-    private static void depositAll(Rs2Item rs2Item) {
-        if (!isOpen()) return;
-        if (rs2Item == null) return;
-        if (!Rs2Inventory.hasItem(rs2Item.id)) return;
+    private static boolean depositAll(Rs2Item rs2Item) {
+        if (!isOpen()) return false;
+        if (rs2Item == null) return false;
+        if (!Rs2Inventory.hasItem(rs2Item.id)) return false;
         container = BANK_INVENTORY_ITEM_CONTAINER;
 
         invokeMenu(HANDLE_ALL, rs2Item);
+        return true;
     }
 
     /**
      * deposit all items identified by its id
      *
      * @param id searches based on the id
+     * @return true if anything deposited
      */
-    public static void depositAll(int id) {
+    public static boolean depositAll(int id) {
         Rs2Item rs2Item = Rs2Inventory.get(id);
-        if (rs2Item == null) return;
-        depositAll(rs2Item);
+        if (rs2Item == null) return false;
+        return depositAll(rs2Item);
+    }
+
+    public static boolean depositAll(Predicate<Rs2Item> predicate) {
+        for (Rs2Item item :
+                Rs2Inventory.items().stream().filter(predicate).collect(Collectors.toList())) {
+            if (item == null) continue;
+            depositAll(item);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -367,6 +383,15 @@ public class Rs2Bank {
         Microbot.getMouse().click(widget.getBounds());
         sleepUntil(Rs2Inventory::isEmpty);
     }
+
+    public static boolean depositAllExcept(Integer...ids) {
+        return depositAll(x -> Arrays.stream(ids).noneMatch(id -> id == x.id));
+    }
+
+    public static boolean depositAllExcept(String...names) {
+        return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+    }
+
 
 
     /**
