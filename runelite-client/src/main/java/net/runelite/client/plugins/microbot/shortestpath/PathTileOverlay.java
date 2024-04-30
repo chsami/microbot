@@ -271,6 +271,8 @@ public class PathTileOverlay extends Overlay {
     }
 
     private void drawTransportInfo(Graphics2D graphics, WorldPoint location, WorldPoint locationEnd) {
+        if (location == null || locationEnd == null)
+            return;
         if (!config.showTransportInfo()) {
             return;
         }
