@@ -31,16 +31,12 @@ public class Rs2Magic {
         Microbot.status = "Casting " + magicSpell.getName();
         sleep(150, 300);
         int identifier = 1;
-        if (magicSpell.getWidgetAction() == null) {
-            if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")
-                    || magicSpell.getName().toLowerCase().contains("Bones to")) {
-                menuAction = MenuAction.CC_OP;
-                identifier = 0;
-            } else {
-                menuAction = MenuAction.WIDGET_TARGET;
-            }
+        if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")
+                || magicSpell.getName().toLowerCase().contains("Bones to")) {
+            menuAction = MenuAction.CC_OP;
+            identifier = 0;
         } else {
-            menuAction = magicSpell.getWidgetAction();
+            menuAction = MenuAction.WIDGET_TARGET;
         }
 
         if (magicSpell.getWidgetId() == -1)

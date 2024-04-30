@@ -227,7 +227,6 @@ public enum MagicAction implements SkillAction
 	private final float xp;
 	private final int sprite;
 	private final boolean isMembers;
-	private final MenuAction widgetAction;
 
 	@Override
 	public String getName(final ItemManager itemManager)
