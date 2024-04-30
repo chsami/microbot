@@ -30,9 +30,12 @@ public class Rs2Magic {
         Rs2Tab.switchToMagicTab();
         Microbot.status = "Casting " + magicSpell.getName();
         sleep(150, 300);
+        int identifier = 1;
         if (magicSpell.getWidgetAction() == null) {
-            if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")) {
+            if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")
+                    || magicSpell.getName().toLowerCase().contains("Bones to")) {
                 menuAction = MenuAction.CC_OP;
+                identifier = 0;
             } else {
                 menuAction = MenuAction.WIDGET_TARGET;
             }
@@ -43,7 +46,7 @@ public class Rs2Magic {
         if (magicSpell.getWidgetId() == -1)
             throw new NotImplementedException("This spell has not been configured yet in the MagicAction.java class");
 
-        Microbot.doInvoke(new NewMenuEntry(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "<col=00ff00>" + magicSpell.getName() + "</col>"), new Rectangle(0, 0, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        Microbot.doInvoke(new NewMenuEntry(-1, magicSpell.getWidgetId(), menuAction.getId(), identifier, -1, "<col=00ff00>" + magicSpell.getName() + "</col>"), new Rectangle(0, 0, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
         //Rs2Reflection.invokeMenu(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "Cast", "<col=00ff00>" + magicSpell.getName() + "</col>", -1, -1);
     }
 
