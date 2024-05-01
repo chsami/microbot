@@ -453,7 +453,7 @@ public class GroundItemsPlugin extends Plugin
 			.height(tile.getItemLayer().getHeight())
 			.tradeable(itemComposition.isTradeable())
 //			.ownership(item.getOwnership())
-			.isPrivate(item.isPrivate())
+//			.isPrivate(item.isPrivate())
 			.spawnTime(Instant.now())
 			.stackable(itemComposition.isStackable())
 			.despawnTime(Duration.of(despawnTime, RSTimeUnit.GAME_TICKS))
