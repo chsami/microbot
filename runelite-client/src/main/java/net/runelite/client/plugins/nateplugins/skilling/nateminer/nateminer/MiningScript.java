@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.nateplugins.skilling.nateminer.nateminer;
 
-import net.runelite.client.plugins.envisionplugins.breakhandler.util.BreakHandlerExecutor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -12,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 public class MiningScript extends Script {
 
     public static double version = 1.3;
-    BreakHandlerExecutor breakHandlerExecutor = new BreakHandlerExecutor();
 
     public boolean run(MiningConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {

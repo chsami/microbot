@@ -8,21 +8,16 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
-import net.runelite.client.plugins.microbot.util.models.RS2Item;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.microbot.util.widget.models.ItemWidget;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -909,7 +904,6 @@ public class Rs2Inventory {
         invokeMenu(rs2Item, action);
         return true;
     }
-
     /**
      * Interacts with an item in the inventory using the first available action based on the specified filter.
      *
@@ -1469,52 +1463,39 @@ public class Rs2Inventory {
     private static void invokeMenu(Rs2Item rs2Item, String action) {
         if (rs2Item == null) return;
 
+        Rs2Tab.switchToInventoryTab();
+        Microbot.status = action + " " + rs2Item.name;
+
         int param0;
         int param1;
-        int identifier;
-        String target;
+        int identifier = 3;
         MenuAction menuAction = MenuAction.CC_OP;
         ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
-        int index = 0;
+        if (!action.isEmpty()) {
+            String[] actions;
+            actions = itemComposition.getInventoryActions();
 
+            for (int i = 0; i < actions.length; i++) {
+                if (action.equalsIgnoreCase(actions[i])) {
+                    identifier = i + 2;
+                    break;
+                }
+            }
+        }
+        param0 = rs2Item.slot;
+        if (Rs2Bank.isOpen()) {
+            identifier += 6;
+            param1 = 983043;
+        } else {
+            param1 = 9764864;
+        }
         if (isItemSelected()) {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
         } else if (action.equalsIgnoreCase("use")) {
             menuAction = MenuAction.WIDGET_TARGET;
         } else if (action.equalsIgnoreCase("cast")) {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
-        } else if(itemComposition.getName().contains("pouch") && action.equalsIgnoreCase("empty")) {
-            index = 1;
-        } else if (action.equalsIgnoreCase("drink")
-                || action.equalsIgnoreCase("read")
-                || action.equalsIgnoreCase("eat")
-                || action.equalsIgnoreCase("view")
-                || action.equalsIgnoreCase("bury")
-                || action.equalsIgnoreCase("feel")
-                || action.equalsIgnoreCase("open-all")
-                || action.equalsIgnoreCase("break")) {
-            index = 2;
-        } else if (action.equalsIgnoreCase("wield")
-                || action.equalsIgnoreCase("wear")
-                || action.equalsIgnoreCase("check steps")) {
-            index = 3;
-        } else if (action.equalsIgnoreCase("fill") || action.equalsIgnoreCase("guzzle") ) {
-            index = 4;
-        } else if (action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("rub")
-                || action.equalsIgnoreCase("refund") || action.equalsIgnoreCase("commune")
-                || action.equalsIgnoreCase("extinguish")
-                || (action.equalsIgnoreCase("check") && rs2Item.id == ItemID.GRICOLLERS_CAN)) {
-            index = 6;
-        } else if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("destroy")) {
-            index = 7;
-        } else if (action.equalsIgnoreCase("examine")) {
-            index = 10;
         }
-
-        identifier = index;
-        param0 = rs2Item.slot;
-        param1 = 9764864;
-        target = "<col=ff9040>" + itemComposition.getName() + "</col>";
 
 
         //grandexchange inventory

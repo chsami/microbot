@@ -5,13 +5,13 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
-import net.runelite.client.plugins.microbot.util.walker.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -35,7 +35,7 @@ public abstract class Script implements IScript {
     }
 
     @Getter
-    protected WorldPoint initialPlayerLocation;
+    protected static WorldPoint initialPlayerLocation;
 
     public void sleep(int time) {
         long startTime = System.currentTimeMillis();
@@ -93,8 +93,11 @@ public abstract class Script implements IScript {
     public void shutdown() {
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
             mainScheduledFuture.cancel(true);
-            Microbot.getWalker().pathfinder = new Pathfinder();
             Microbot.pauseAllScripts = false;
+            ShortestPathPlugin.exit();
+            if (Microbot.getClientThread().scheduledFuture != null)
+                Microbot.getClientThread().scheduledFuture.cancel(true);
+            initialPlayerLocation = null;
         }
     }
 
@@ -102,11 +105,9 @@ public abstract class Script implements IScript {
         hasLeveledUp = false;
         if (Microbot.enableAutoRunOn)
             Rs2Player.toggleRunEnergy(true);
-        if (Microbot.getClient().getMinimapZoom() > 2)
-            Microbot.getClient().setMinimapZoom(2);
 
         if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
-            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
         }
         Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
         if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden)) {
@@ -131,7 +132,7 @@ public abstract class Script implements IScript {
     }
 
     public void keyPress(char c) {
-        VirtualKeyboard.keyPress(c);
+        Rs2Keyboard.keyPress(c);
     }
 
     @Deprecated(since="Use Rs2Player.logout()", forRemoval = true)

@@ -20,9 +20,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Mocrosoft + "PlayerAssistant",
-        description = "Microbot playerassistant plugin",
-        tags = {"assist", "microbot", "misc", "combat"},
+        name = PluginDescriptor.Mocrosoft + "AIO Fighter",
+        description = "Microbot Fighter plugin",
+        tags = {"fight", "microbot", "misc", "combat", "playerassistant"},
         enabledByDefault = false
 )
 public class PlayerAssistPlugin extends Plugin {
@@ -49,9 +49,6 @@ public class PlayerAssistPlugin extends Plugin {
     private final FlickerScript flickerScript = new FlickerScript();
     private final UseSpecialAttackScript useSpecialAttackScript = new UseSpecialAttackScript();
     private final AntiPoisonScript antiPoisonScript = new AntiPoisonScript();
-
-
-    private final ExecutorService executor = Executors.newFixedThreadPool(1);
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -64,8 +61,8 @@ public class PlayerAssistPlugin extends Plugin {
         combatPotion.run(config);
         foodScript.run(config);
         prayerPotionScript.run(config);
-        safeSpotScript.run(config);
-        flickerScript.run(config);
+//        safeSpotScript.run(config); // TODO: safespot
+//        flickerScript.run(config); // TODO: pray flick
         useSpecialAttackScript.run(config);
         antiPoisonScript.run(config);
     }
@@ -93,13 +90,13 @@ public class PlayerAssistPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick gameTick) {
-        if (config.prayFlick())
-            executor.submit(flickerScript::onGameTick);
+//        if (config.prayFlick())
+//            executor.submit(flickerScript::onGameTick);
     }
 
     @Subscribe
     public void onNpcDespawned(NpcDespawned npcDespawned) {
-        if (config.prayFlick())
-            executor.submit(() -> flickerScript.onNpcDespawned(npcDespawned));
+//        if (config.prayFlick())
+//            executor.submit(() -> flickerScript.onNpcDespawned(npcDespawned));
     }
 }

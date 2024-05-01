@@ -13,7 +13,8 @@ import java.awt.*;
         name = PluginDescriptor.Mocrosoft + "Dashboard",
         description = "Microbot Dashboard Plugin",
         tags = {"dashboard", "microbot"},
-        enabledByDefault = false
+        enabledByDefault = false,
+        hidden = true
 )
 @Slf4j
 public class DashboardPlugin extends Plugin {

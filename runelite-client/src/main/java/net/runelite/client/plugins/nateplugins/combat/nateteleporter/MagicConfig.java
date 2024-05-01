@@ -40,24 +40,24 @@ public interface MagicConfig extends Config {
         return "";
     }
     @ConfigItem(
-            keyName = "High Alchemy",
-            name = "High Alchemy",
-            description = "High alchemy",
+            keyName = "Alchemy",
+            name = "High/Low Alchemy",
+            description = "High/Low alchemy based on your magic level",
             position = 2,
             section = generalSection
     )
-    default boolean highAlchemy()
+    default boolean alchemy()
     {
         return false;
     }
     @ConfigItem(
-            keyName = "High Alchemy item",
-            name = "High Alchemy item",
-            description = "Name of the item to highalch",
+            keyName = "Alch item",
+            name = "Alch item",
+            description = "Name of the item to alch",
             position = 3,
             section = generalSection
     )
-    default String highAlchemyItem()
+    default String AlchItem()
     {
         return "";
     }

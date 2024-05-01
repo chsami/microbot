@@ -4,9 +4,9 @@ import net.runelite.api.VarClientInt;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.globval.VarcIntValues;
-import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.globval.VarcIntValues;
+import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -57,7 +57,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.INVENTORY) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4678)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4678)));
         return getCurrentTab() == InterfaceTab.INVENTORY;
     }
 
@@ -65,7 +65,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.COMBAT) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4675)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4675)));
         return getCurrentTab() == InterfaceTab.COMBAT;
     }
 
@@ -73,7 +73,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.SKILLS) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4676)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4676)));
         return getCurrentTab() == InterfaceTab.SKILLS;
     }
 
@@ -81,7 +81,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.QUESTS) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4677)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4677)));
         return getCurrentTab() == InterfaceTab.QUESTS;
     }
 
@@ -90,7 +90,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.EQUIPMENT) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4679)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4679)));
         return getCurrentTab() == InterfaceTab.EQUIPMENT;
     }
 
@@ -98,7 +98,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.PRAYER) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4680)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4680)));
         return getCurrentTab() == InterfaceTab.PRAYER;
     }
 
@@ -106,7 +106,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.MAGIC) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4682)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4682)));
         return getCurrentTab() == InterfaceTab.MAGIC;
     }
 
@@ -114,7 +114,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.CHAT) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4683)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4683)));
         return getCurrentTab() == InterfaceTab.CHAT;
     }
 
@@ -122,7 +122,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.FRIENDS) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4684)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4684)));
         return getCurrentTab() == InterfaceTab.FRIENDS;
     }
 
@@ -130,7 +130,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.ACC_MAN) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(6517)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(6517)));
         return getCurrentTab() == InterfaceTab.ACC_MAN;
     }
 
@@ -139,7 +139,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.SETTINGS) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4686)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4686)));
         return getCurrentTab() == InterfaceTab.SETTINGS;
     }
 
@@ -147,7 +147,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.EMOTES) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4687)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4687)));
         return getCurrentTab() == InterfaceTab.EMOTES;
     }
 
@@ -155,7 +155,7 @@ public class Rs2Tab {
         if (getCurrentTab() == InterfaceTab.MUSIC) {
             return true;
         }
-        VirtualKeyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4688)));
+        Rs2Keyboard.keyPress(getKeyBind(Microbot.getVarbitValue(4688)));
         return getCurrentTab() == InterfaceTab.MUSIC;
     }
 

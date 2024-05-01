@@ -11,8 +11,9 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.ogPlugins.ogBlastFurnace.enums.Bars;
 
@@ -108,12 +109,12 @@ public class ogBlastFurnaceScript extends Script {
         if(Random.random(1,5) == 3){
             iceGlovesEquip();
             sleep(120,400);
-            Microbot.getWalker().walkCanvas(new WorldPoint(1940,4962,0));
+            Rs2Walker.walkCanvas(new WorldPoint(1940,4962,0));
             callAFK(36,1000,6183);
             sleepUntil(this::playerAtRetrieveLocation);
             sleep(120,200);
         } else {
-            Microbot.getWalker().walkCanvas(new WorldPoint(1940,4962,0));
+            Rs2Walker.walkCanvas(new WorldPoint(1940,4962,0));
             callAFK(38,1000,6258);
             sleepUntil(this::playerAtRetrieveLocation);
             sleep(120,200);
@@ -132,11 +133,11 @@ public class ogBlastFurnaceScript extends Script {
         Rs2GameObject.interact(9092);
         if (Rs2GameObject.interact(9092, "Take")) {
             sleepUntil(() -> Rs2Widget.hasWidget("How many would you like to take?"));
-            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
             sleepUntil(() -> !Rs2Inventory.hasItem("gold bar"),60000);
         }
         if (Rs2Widget.hasWidget("Gold bar")) {
-            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
         }
         sleep(40,90);
         if(barSelected == Bars.GOLD_BAR){
@@ -181,7 +182,7 @@ public class ogBlastFurnaceScript extends Script {
         Rs2Bank.depositAll(barSelected.getBarID());
         Rs2Bank.depositAll(barSelected.getPrimaryOre());
         sleep(50,80);
-        VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
+        Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
 
     }
     private void callAFK(int chance, int min, int max){

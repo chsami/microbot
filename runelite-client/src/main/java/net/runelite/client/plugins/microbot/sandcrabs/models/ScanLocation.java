@@ -9,8 +9,15 @@ public class ScanLocation {
     public boolean scanned;
     public int triedWalking = 0;
 
+    public boolean hasThreeNpcs = false;
+
     public ScanLocation(WorldPoint worldPoint) {
         this.worldPoint = worldPoint;
+    }
+
+    public ScanLocation(WorldPoint worldPoint, boolean hasThreeNpcs) {
+        this.worldPoint = worldPoint;
+        this.hasThreeNpcs = hasThreeNpcs;
     }
 
     public void reset() {

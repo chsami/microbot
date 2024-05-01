@@ -6,10 +6,9 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.NPC;
 import net.runelite.api.ObjectID;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -139,7 +138,7 @@ public class Rs2Reflection {
         doAction.setAccessible(true);
         Microbot.getClientThread().runOnClientThread(() -> doAction.invoke(null, param0, param1, opcode, identifier, itemId, option, target, x, y));
         if (Microbot.getClient().getKeyboardIdleTicks() > Random.random(5000, 10000)) {
-            VirtualKeyboard.keyPress(KeyEvent.VK_BACK_SPACE);
+            Rs2Keyboard.keyPress(KeyEvent.VK_BACK_SPACE);
         }
         System.out.println("[INVOKE] => param0: " + param0 + " param1: " + param1 + " opcode: " + opcode + " id: " + identifier + " itemid: " + itemId);
         doAction.setAccessible(false);

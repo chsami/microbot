@@ -34,8 +34,9 @@ import net.runelite.client.plugins.microbot.farming.enums.FarmingState;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 
@@ -102,7 +103,7 @@ public class FarmingScript extends Script {
 
                 } else if (state == FarmingState.FARMING_GNOME_STRONHOLD) {
                     if (isInGrandExchange.getAsBoolean()) {
-                        boolean isNearSpiritTreeGrandExchange = Microbot.getWalker().walkTo(SPIRIT_TREE_GRAND_EXCHANGE, false);
+                        boolean isNearSpiritTreeGrandExchange = Rs2Walker.walkTo(SPIRIT_TREE_GRAND_EXCHANGE);
 
                         if (!isNearSpiritTreeGrandExchange)
                             return;
@@ -113,7 +114,7 @@ public class FarmingScript extends Script {
 
                         sleepUntil(() -> Rs2Widget.hasWidget("spirit tree locations"));
 
-                        VirtualKeyboard.typeString("2");
+                        Rs2Keyboard.typeString("2");
 
                         sleepUntil(() -> !isInGrandExchange.getAsBoolean());
 
@@ -121,7 +122,7 @@ public class FarmingScript extends Script {
 
 
                     } else {
-                        boolean isNearTreePatchGnomeStronghold = Microbot.getWalker().walkTo(TREE_RUN_GNOME_STRONDHOLD, false);
+                        boolean isNearTreePatchGnomeStronghold = Rs2Walker.walkTo(TREE_RUN_GNOME_STRONDHOLD);
                         if (!isNearTreePatchGnomeStronghold)
                             return;
 
@@ -134,7 +135,7 @@ public class FarmingScript extends Script {
                         sleep(sleepBetweenTeleports);
                         return;
                     }
-                    boolean isNearVarrockPatch = Microbot.getWalker().walkTo(TREE_RUN_VARROCK, false);
+                    boolean isNearVarrockPatch = Rs2Walker.walkTo(TREE_RUN_VARROCK);
 
                     if (!isNearVarrockPatch)
                         return;
@@ -147,7 +148,7 @@ public class FarmingScript extends Script {
                         sleep(sleepBetweenTeleports);
                         return;
                     }
-                    boolean isNearFaladorPatch = Microbot.getWalker().walkTo(TREE_RUN_FALADOR, false);
+                    boolean isNearFaladorPatch = Rs2Walker.walkTo(TREE_RUN_FALADOR);
 
                     if (!isNearFaladorPatch)
                         return;
@@ -162,7 +163,7 @@ public class FarmingScript extends Script {
                         return;
                     }
 
-                    boolean isNearLumbridgePatch = Microbot.getWalker().walkTo(TREE_RUN_LUMBRIDGE, false);
+                    boolean isNearLumbridgePatch = Rs2Walker.walkTo(TREE_RUN_LUMBRIDGE);
 
                     if (!isNearLumbridgePatch)
                         return;
@@ -176,7 +177,7 @@ public class FarmingScript extends Script {
                         return;
                     }
 
-                    boolean isNearGeBank = Microbot.getWalker().walkTo(BankLocation.GRAND_EXCHANGE.getWorldPoint()); //walk to ge bank
+                    boolean isNearGeBank = Rs2Walker.walkTo(BankLocation.GRAND_EXCHANGE.getWorldPoint()); //walk to ge bank
 
                     if (isNearGeBank) {
                         shutdown();
@@ -201,7 +202,7 @@ public class FarmingScript extends Script {
                 } else if (Rs2GameObject.hasAction(tree, "chop down")) {
                     Rs2Npc.interact(npcId, "pay");
                     sleepUntil(() -> Rs2Widget.hasWidget("pay 200 coins"));
-                    VirtualKeyboard.typeString("1");
+                    Rs2Keyboard.typeString("1");
                     // sleepUntil(() -> !Rs2GameObject.hasAction(tree, "chop down")); -> this crashes the client for some reason
                 } else {
                     //pay protect tree

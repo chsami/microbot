@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.tithefarm;
 
 import net.runelite.api.GameObject;
 import net.runelite.api.ItemID;
-import net.runelite.api.Point;
 import net.runelite.api.WallObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -11,15 +10,15 @@ import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmLanes;
 import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmMaterial;
 import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmState;
 import net.runelite.client.plugins.microbot.tithefarm.models.TitheFarmPlant;
-import net.runelite.client.plugins.microbot.util.dialogues.Dialogue;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
-import net.runelite.client.plugins.microbot.util.math.Calculations;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.time.Instant;
@@ -30,7 +29,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmState.*;
-import static net.runelite.client.plugins.microbot.util.dialogues.Dialogue.hasSelectAnOption;
+import static net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue.hasSelectAnOption;
 
 /**
  * TODO list:
@@ -174,14 +173,14 @@ public class TitheFarmingScript extends Script {
                 if (!super.run()) return;
 
                 //Dialogue stuff only applicable if you enter for the first time
-                if (Dialogue.isInDialogue()) {
-                    Dialogue.clickContinue();
+                if (Rs2Dialogue.isInDialogue()) {
+                    Rs2Dialogue.clickContinue();
                     sleep(400, 600);
                     return;
                 }
 
                 if (hasSelectAnOption()) {
-                    VirtualKeyboard.typeString("3");
+                    Rs2Keyboard.typeString("3");
                     sleep(1500, 1800);
                     return;
                 }
@@ -286,7 +285,7 @@ public class TitheFarmingScript extends Script {
         final TitheFarmPlant finalPlant = plant;
 
         if (plant.getGameObject().getWorldLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) > DISTANCE_TRESHHOLD_MINIMAP_WALK) {
-            Microbot.getWalker().walkMiniMap(plant.getGameObject().getWorldLocation());
+            Rs2Walker.walkMiniMap(plant.getGameObject().getWorldLocation());
             return;
         }
 
@@ -399,7 +398,7 @@ public class TitheFarmingScript extends Script {
     private void walkToBarrel() {
         final GameObject gameObject = Rs2GameObject.findObject("Water barrel");
         if (gameObject.getWorldLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) > DISTANCE_TRESHHOLD_MINIMAP_WALK) {
-            Microbot.getWalker().walkMiniMap(gameObject.getWorldLocation());
+            Rs2Walker.walkMiniMap(gameObject.getWorldLocation());
             sleepUntil(Microbot::isMoving);
         }
         sleepUntil(() -> gameObject.getWorldLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < DISTANCE_TRESHHOLD_MINIMAP_WALK);
@@ -420,9 +419,9 @@ public class TitheFarmingScript extends Script {
         if (!result) return;
         keyPress(TitheFarmMaterial.getSeedForLevel().getOption());
         sleep(1000);
-        VirtualKeyboard.typeString(String.valueOf(Random.random(1000, 10000)));
+        Rs2Keyboard.typeString(String.valueOf(Random.random(1000, 10000)));
         sleep(600);
-        VirtualKeyboard.enter();
+        Rs2Keyboard.enter();
         sleepUntil(() -> Rs2Inventory.hasItem(TitheFarmMaterial.getSeedForLevel().getName()));
     }
 

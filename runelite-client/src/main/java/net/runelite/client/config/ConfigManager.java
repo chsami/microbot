@@ -29,6 +29,40 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.gson.Gson;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -110,6 +144,8 @@ public class ConfigManager
 	// null => we need to make a new profile
 	@Nullable
 	private String rsProfileKey;
+
+	private final Map<Type, Serializer<?>> serializers = Collections.synchronizedMap(new WeakHashMap<>());
 
 	@Inject
 	private ConfigManager(
@@ -268,7 +304,6 @@ public class ConfigManager
 
 			if (profile.isSync())
 			{
-				log.info("Active remote profile '{}' lost due to session close, converting to a local profile.", profile.getName());
 				profile.setSync(false);
 				profile.setRev(-1L);
 			}
@@ -348,7 +383,7 @@ public class ConfigManager
 			{
 				String targetProfileName = "default";
 
-				log.info("Performing migration of config from {} to profile '{}'", configFile.getName(), targetProfileName);
+//				log.info("Performing migration of config from {} to profile '{}'", configFile.getName(), targetProfileName);
 
 				ConfigProfile targetProfile = lock.createProfile(targetProfileName);
 				profiles.forEach(p -> p.setActive(false));
@@ -526,7 +561,7 @@ public class ConfigManager
 			{
 				if (p.isInternal())
 				{
-					log.debug("Profile '{}' (sync: {}, active: {}, id: {}, internal)", p.getName(), p.isSync(), p.getId(), p.isActive());
+//					log.debug("Profile '{}' (sync: {}, active: {}, id: {}, internal)", p.getName(), p.isSync(), p.getId(), p.isActive());
 
 					if (p.getName().equals(RSPROFILE_NAME))
 					{
@@ -536,7 +571,7 @@ public class ConfigManager
 					continue;
 				}
 
-				log.info("Profile '{}' (sync: {}, active: {}, id: {})", p.getName(), p.isSync(), p.isActive(), p.getId());
+//				log.info("Profile '{}' (sync: {}, active: {}, id: {})", p.getName(), p.isSync(), p.isActive(), p.getId());
 
 				// --profile
 				if (configProfileName != null)
@@ -558,7 +593,7 @@ public class ConfigManager
 
 			if (profile != null)
 			{
-				log.info("Using profile: {} ({})", profile.getName(), profile.getId());
+//				log.info("Using profile: {} ({})", profile.getName(), profile.getId());
 			}
 			else
 			{
@@ -676,11 +711,11 @@ public class ConfigManager
 
 		if (profile.getRev() == remoteProfile.getRev())
 		{
-			log.info("Profile '{}' is up to date", profile.getName());
+//			log.info("Profile '{}' is up to date", profile.getName());
 		}
 		else
 		{
-			log.info("Loading remote configuration for profile '{}'", profile.getName());
+//			log.info("Loading remote configuration for profile '{}'", profile.getName());
 
 			try
 			{
@@ -1194,6 +1229,27 @@ public class ConfigManager
 				return gson.fromJson(str, parameterizedType);
 			}
 		}
+		if (type instanceof Class)
+		{
+			Class<?> clazz = (Class<?>) type;
+			ConfigSerializer configSerializer = clazz.getAnnotation(ConfigSerializer.class);
+			if (configSerializer != null)
+			{
+				Class<? extends Serializer<?>> serializerClass = configSerializer.value();
+				Serializer<?> serializer = serializers.get(type);
+				if (serializer == null)
+				{
+					// Guice holds references to all jitted types.
+					// To allow class unloading, use a temporary child injector
+					// and use it to get the instance, and cache it a weak map.
+					serializer = RuneLite.getInjector()
+						.createChildInjector()
+						.getInstance(serializerClass);
+					serializers.put(type, serializer);
+				}
+				return serializer.deserialize(str);
+			}
+		}
 		return str;
 	}
 
@@ -1248,6 +1304,23 @@ public class ConfigManager
 		if (object instanceof Set)
 		{
 			return gson.toJson(object, Set.class);
+		}
+		if (object != null)
+		{
+			ConfigSerializer configSerializer = object.getClass().getAnnotation(ConfigSerializer.class);
+			if (configSerializer != null)
+			{
+				Class<? extends Serializer<?>> serializerClass = configSerializer.value();
+				Serializer serializer = serializers.get(serializerClass);
+				if (serializer == null)
+				{
+					serializer = RuneLite.getInjector()
+						.createChildInjector()
+						.getInstance(serializerClass);
+					serializers.put(serializerClass, serializer);
+				}
+				return serializer.serialize(object);
+			}
 		}
 		return object == null ? null : object.toString();
 	}

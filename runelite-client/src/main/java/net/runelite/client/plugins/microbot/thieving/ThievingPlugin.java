@@ -41,8 +41,6 @@ public class ThievingPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
-        expstarted = Microbot.getClient().getSkillExperience(Skill.THIEVING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.THIEVING);
         timeBegan = System.currentTimeMillis();
         if (overlayManager != null) {
             overlayManager.add(thievingOverlay);

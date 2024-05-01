@@ -14,15 +14,12 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -35,7 +32,7 @@ import java.util.stream.Collectors;
 import static net.runelite.api.MenuAction.CC_OP;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Default + "Gilded Altar",
+        name = PluginDescriptor.Mocrosoft + "Gilded Altar",
         description = "Gilded Altar plugin",
         tags = {"prayer", "microbot"},
         enabledByDefault = false
@@ -171,7 +168,7 @@ public class GildedAltarPlugin extends Plugin {
                 setSkipTicks(2);
             }
         } else if (Microbot.getClient().getWidget(14352385) != null) {
-            VirtualKeyboard.keyPress('3');
+            Rs2Keyboard.keyPress('3');
             setSkipTicks(2);
         }
     }

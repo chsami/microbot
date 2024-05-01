@@ -9,7 +9,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.construction.enums.ConstructionState;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -105,7 +105,7 @@ public class ConstructionScript extends Script {
         if (oakLarderSpace == null) return;
         if (Rs2GameObject.interact(oakLarderSpace, "Build")) {
             sleepUntilOnClientThread(() -> hasFurnitureInterfaceOpen(), 5000);
-            VirtualKeyboard.keyPress('2');
+            Rs2Keyboard.keyPress('2');
             sleepUntilOnClientThread(() -> getOakLarder() != null, 5000);
         }
     }
@@ -115,7 +115,7 @@ public class ConstructionScript extends Script {
         if (oaklarder == null) return;
         if (Rs2GameObject.interact(oaklarder, "Remove")) {
             sleepUntilOnClientThread(() -> hasRemoveLarderInterfaceOpen(), 5000);
-            VirtualKeyboard.keyPress('1');
+            Rs2Keyboard.keyPress('1');
             sleepUntilOnClientThread(() -> getOakLarderSpace() != null, 5000);
         }
     }
@@ -143,13 +143,13 @@ public class ConstructionScript extends Script {
         if (Rs2Npc.interact(butler, "Talk-to")) {
             sleep(1200, 2000);
             if (hasDialogueOptionToUnnote()) {
-                VirtualKeyboard.keyPress('1');
+                Rs2Keyboard.keyPress('1');
                 sleepUntilOnClientThread(() -> !hasDialogueOptionToUnnote());
             } else if (hasPayButlerDialogue()) {
-                VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                 sleep(1200, 2000);
                 if (hasDialogueOptionToPay()) {
-                    VirtualKeyboard.keyPress('1');
+                    Rs2Keyboard.keyPress('1');
                 }
             }
         }

@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.player;
 
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
@@ -8,16 +9,13 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
-import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.globval.VarbitValues;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
-import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,6 +97,11 @@ public class Rs2Player {
         sleepUntil(() -> !Rs2Player.isWalking());
     }
 
+    public static void waitForWalking(int time) {
+        sleepUntil(Rs2Player::isWalking);
+        sleepUntil(() -> !Rs2Player.isWalking(), time);
+    }
+
     public static void waitForAnimation() {
         sleepUntil(Rs2Player::isAnimating);
         sleepUntil(() -> !Rs2Player.isAnimating());
@@ -155,10 +158,6 @@ public class Rs2Player {
         return false;
     }
 
-    public static WorldPoint getWorldLocation() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation());
-    }
-
     public static void logout() {
         if (Microbot.isLoggedIn())
             Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
@@ -166,22 +165,22 @@ public class Rs2Player {
         //Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
     }
 
-    public static void eatAt(int percentage) {
+    public static boolean eatAt(int percentage) {
         double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
         int missingHitpoints = Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
         if (treshHold <= percentage) {
-            List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
+            List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
             for (Rs2Item food : foods) {
                 if (missingHitpoints >= 40 && Rs2Inventory.get("Cooked karambwan") != null) {
                     //double eat
                     Rs2Inventory.interact(food, "eat");
-                    Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
+                    return Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
                 } else {
-                    Rs2Inventory.interact(food, "eat");
+                    return Rs2Inventory.interact(food, "eat");
                 }
-                break;
             }
         }
+        return false;
     }
 
     public static List<Player> getPlayers() {
@@ -189,5 +188,27 @@ public class Rs2Player {
                 .stream()
                 .filter(x -> x != Microbot.getClient().getLocalPlayer())
                 .collect(Collectors.toList()));
+    }
+
+    public static WorldPoint getWorldLocation() {
+        if (Microbot.getClient().isInInstancedRegion()) {
+            LocalPoint l = LocalPoint.fromWorld(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation());
+            WorldPoint playerInstancedWorldLocation = WorldPoint.fromLocalInstance(Microbot.getClient(), l);
+            return playerInstancedWorldLocation;
+        } else {
+            return Microbot.getClient().getLocalPlayer().getWorldLocation();
+        }
+    }
+    public static LocalPoint getLocalLocation() {
+        return Microbot.getClient().getLocalPlayer().getLocalLocation();
+    }
+
+    public static boolean isFullHealth() {
+        return Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS)
+                == Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
+    }
+
+    public static boolean isInMulti() {
+        return Microbot.getVarbitValue(Varbits.MULTICOMBAT_AREA) == VarbitValues.INSIDE_MULTICOMBAT_ZONE.getValue();
     }
 }

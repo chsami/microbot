@@ -202,11 +202,13 @@ public class RuneLite {
         OptionSet options = parser.parse(args);
 
         if (options.has("clean-jagex-launcher")) {
+            System.out.println("clean-jagex-launcher option is enabled. This will delete your credentials.properties file to allow logging in with a username/password");
+            System.out.println("You can disable this in your run configuration by removing -clean-jagex-launcher");
             File myObj = new File(System.getProperty("user.home") + "/.runelite/credentials.properties");
             if (myObj.delete()) {
-                System.out.println("Deleted the file: " + myObj.getName());
+                System.out.println("Succesfully Deleted the file: " + myObj.getName());
             } else {
-                System.out.println("Failed to delete the file.");
+                System.out.println("Credentials.properties file was not found.");
             }
         }
 

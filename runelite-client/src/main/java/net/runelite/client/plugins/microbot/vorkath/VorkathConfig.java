@@ -4,7 +4,6 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.jrPlugins.autoVorkath.enums.CROSSBOW;
 
 @ConfigGroup("Vorkath Config")
 public interface VorkathConfig extends Config {
@@ -97,6 +96,17 @@ public interface VorkathConfig extends Config {
     )
     default CROSSBOW CROSSBOW() {
         return CROSSBOW.DRAGON_HUNTER_CROSSBOW;
+    }
+    @ConfigItem(
+            keyName = "Secondary bolt",
+            name = "Secondary Bolts",
+            description = "Secondary Bolts to Equip when vorkath is lower health",
+            position = 2,
+            section = equipmentSection
+    )
+    default String secondaryBolts()
+    {
+        return "diamond dragon bolts (e)";
     }
 
     @ConfigItem(

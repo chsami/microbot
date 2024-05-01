@@ -7,6 +7,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.ogPlugins.ogFiremaking.enums.FiremakingStatus;
 import net.runelite.client.plugins.ogPlugins.ogFiremaking.enums.Logs;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -52,7 +53,7 @@ public class ogFiremakingScript extends Script {
                 if(doesNeedReturn(config) && !isClosetoBanker(SelectedBanker)){
                     WorldPoint[] returnPoints = config.selectedLocation().getReturnPoints();
                     WorldPoint goBack = returnPoints[Random.random(0,returnPoints.length)];
-                    Microbot.getWalker().walkCanvas(goBack);
+                    Rs2Walker.walkCanvas(goBack);
                     sleepUntil(()-> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(goBack) <= 4);
                     sleep(1800,2500);
                 }
@@ -83,10 +84,10 @@ public class ogFiremakingScript extends Script {
             WorldPoint[] startPositions = config.selectedLocation().getFiremakingStartingSpots();
             while(startPoint == lastSpot || startPoint == secondToLastSpot){startPoint = startPositions[Random.random(0,startPositions.length)];}
             //Updated BEWARE!!!
-            Microbot.getWalker().walkMiniMap(startPoint);
+            Rs2Walker.walkMiniMap(startPoint);
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(startPositions[0]) < 1,10000);
             if (Rs2GameObject.findObject(ObjectID.FIRE_26185, startPoint) == null) {
-             Microbot.getWalker().walkCanvas(startPoint);
+             Rs2Walker.walkCanvas(startPoint);
              sleepUntil(()->Microbot.getClient().getLocalPlayer().getWorldLocation().equals(startPoint),10000);
                 firemakingStatus = FiremakingStatus.FIREMAKING;
                 if(lastSpot != null){secondToLastSpot = lastSpot;}

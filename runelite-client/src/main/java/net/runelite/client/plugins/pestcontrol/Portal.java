@@ -26,19 +26,22 @@ package net.runelite.client.plugins.pestcontrol;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import net.runelite.api.annotations.Component;
 import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 @AllArgsConstructor
 @Getter
 @ToString
 public enum Portal
 {
-	PURPLE(ComponentID.PEST_CONTROL_PURPLE_SHIELD, ComponentID.PEST_CONTROL_PURPLE_HEALTH, ComponentID.PEST_CONTROL_PURPLE_ICON),
-	BLUE(ComponentID.PEST_CONTROL_BLUE_SHIELD, ComponentID.PEST_CONTROL_BLUE_HEALTH, ComponentID.PEST_CONTROL_BLUE_ICON),
-	YELLOW(ComponentID.PEST_CONTROL_YELLOW_SHIELD, ComponentID.PEST_CONTROL_YELLOW_HEALTH, ComponentID.PEST_CONTROL_YELLOW_ICON),
-	RED(ComponentID.PEST_CONTROL_RED_SHIELD, ComponentID.PEST_CONTROL_RED_HEALTH, ComponentID.PEST_CONTROL_RED_ICON);
+	PURPLE(ComponentID.PEST_CONTROL_PURPLE_SHIELD, ComponentID.PEST_CONTROL_PURPLE_HEALTH, ComponentID.PEST_CONTROL_PURPLE_ICON, true, 8, 30),
+	BLUE(ComponentID.PEST_CONTROL_BLUE_SHIELD, ComponentID.PEST_CONTROL_BLUE_HEALTH, ComponentID.PEST_CONTROL_BLUE_ICON, true, 55, 29),
+	YELLOW(ComponentID.PEST_CONTROL_YELLOW_SHIELD, ComponentID.PEST_CONTROL_YELLOW_HEALTH, ComponentID.PEST_CONTROL_YELLOW_ICON, true, 48, 13),
+	RED(ComponentID.PEST_CONTROL_RED_SHIELD, ComponentID.PEST_CONTROL_RED_HEALTH, ComponentID.PEST_CONTROL_RED_ICON, true, 22, 12);
 
 	@Component
 	private final int shield;
@@ -46,4 +49,24 @@ public enum Portal
 	private final int hitpoints;
 	@Component
 	private final int icon;
+	@Setter
+	public boolean hasShield;
+
+	private final int regionX;
+	private final int regionY;
+
+	@Override
+	public String toString() {
+		return this.name();
+	}
+
+	public Widget getHitPoints() {
+		return  Rs2Widget.getWidget(hitpoints);
+	}
+
+	public boolean isAttackAble() {
+		return !hasShield && getHitPoints() != null && !getHitPoints().getText().trim().equals("0");
+	}
+
+
 }

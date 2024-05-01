@@ -88,7 +88,7 @@ import static net.runelite.client.plugins.inventorysetups.ui.InventorySetupsRune
 
 
 @PluginDescriptor(
-		name = "Inventory Setups",
+		name = PluginDescriptor.Mocrosoft + "Inventory Setups",
 		description = "Save gear setups for specific activities"
 )
 

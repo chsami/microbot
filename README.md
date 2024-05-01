@@ -5,18 +5,120 @@ Microbot is an opensource automated oldschool runescape client based on runelite
  
 If you have any questions, please join our [Discord](https://discord.gg/zaGrfqFEWE) server.
 
-Documentation coming soon.
+# I Want To Bot
+
+## Non jagex account
+
+Here is a youtube video on how to setup the bot from scratch
+
+https://www.youtube.com/watch?v=EbtdZnxq5iw
+
+## Jagex Account
+
+If you don't have java installed yet, watch the youtube video: https://www.youtube.com/watch?v=EbtdZnxq5iw
+
+1) Simply login with the jagex launcher for the first time. This will create a token for your account. Close everything after succesfully login in through the jagex launcher. 
+2) Open the shaded.jar from microbot and this should prompt you with the jagex account to login.
+
+## Jagex Launcher
+
+If you don't have java installed yet, watch the youtube video: https://www.youtube.com/watch?v=EbtdZnxq5iw
+
+Simply replace the Official RuneLite.jar with the microbot.jar and make sure the name is the same!! After that you can start up the jagex launcher and select runelite, this will startup microbot.
+
+![img_2.png](img_2.png)
+
+# I Want To Develop
+
+## First Time Running the project as a Developer?
+
+Make sure to follow this guide if it's your first time running the project
+
+https://github.com/runelite/runelite/wiki/Building-with-IntelliJ-IDEA
+
 
 ## Project Layout
 
-- [cache](cache/src/main/java/net/runelite/cache) - Libraries used for reading/writing cache files, as well as the data in it
-- [runelite-api](runelite-api/src/main/java/net/runelite/api) - RuneLite API, interfaces for accessing the client
-- [runelite-client](runelite-client/src/main/java/net/runelite/client) - Game client with plugins
+Under the Microbot Plugin you'll find a util folder that has all the utility classes which make it easier to interact with the game
 
-## Usage
+Utility Classes are prefixed with Rs2. So for player it is Rs2Player. Npcs is Rs2Npc and so on...
 
-Open the project in your IDE as a Maven project, build the root module and then run the RuneLite class in runelite-client.  
-For more information visit the [RuneLite Wiki](https://github.com/runelite/runelite/wiki).
+If you can't find a specific thing in a utility class you can always call the Microbot object which has access to every object runelite exposes. So to get the location of a player you can do
+
+```java 
+Microbot.getClient().getLocalPlayer().getWorldLocation()
+```
+
+
+![img.png](img.png)
+
+## ExampleScript
+
+There is an example script which you can use to play around with the api.
+
+![img_1.png](img_1.png)
+
+How does the example script look like?
+
+```java
+public class ExampleScript extends Script {
+public static double version = 1.0;
+
+    public boolean run(ExampleConfig config) {
+        Microbot.enableAutoRunOn = false;
+        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (!super.run()) return;
+            try {
+                /*
+                 * Important classes:
+                 * Inventory
+                 * Rs2GameObject
+                 * Rs2GroundObject
+                 * Rs2NPC
+                 * Rs2Bank
+                 * etc...
+                 */
+
+                long startTime = System.currentTimeMillis();
+                
+                //YOUR CODE COMES HERE
+                Rs2Npc.attack("guard");
+                
+                long endTime = System.currentTimeMillis();
+                long totalTime = endTime - startTime;
+                System.out.println("Total time for loop " + totalTime);
+
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }, 0, 2000, TimeUnit.MILLISECONDS);
+        return true;
+    }
+
+    @Override
+    public void shutdown() {
+        super.shutdown();
+    }
+}
+```
+
+All our scripts exist of Config. This is the settings for a specific script
+Overlay, this is a visual overlay for a specific script
+Plugin which handles the code for starting and stopping the script
+Script which handles all of the code the bot has to execute.
+
+Inside the startup of a plugin we can call the script code like this:
+
+```java
+@Override
+protected void startUp() throws AWTException {
+if (overlayManager != null) {
+overlayManager.add(exampleOverlay);
+}
+//CALL YOUR SCRIPT.RUN
+exampleScript.run(config);
+}
+```
 
 ### License
 

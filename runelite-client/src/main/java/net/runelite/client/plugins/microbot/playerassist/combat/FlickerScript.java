@@ -30,7 +30,6 @@ public class FlickerScript extends Script {
         monsters.add(new Monster(3274, 426));
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-            if (!config.prayFlick()) return;
             try {
 
                 List<NPC> npcs = Rs2Npc.getNpcsForPlayer();

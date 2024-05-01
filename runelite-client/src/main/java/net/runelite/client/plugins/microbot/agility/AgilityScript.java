@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -142,7 +143,7 @@ public class AgilityScript extends Script {
                     currentObstacle = 0;
                     LocalPoint startCourseLocal = LocalPoint.fromWorld(Microbot.getClient(), startCourse);
                     if (playerLocation.distanceTo(startCourseLocal) >= MAX_DISTANCE) {
-                        Microbot.getWalker().walkTo(startCourse, false);
+                        Rs2Walker.walkTo(startCourse);
                         return;
                     }
                 }

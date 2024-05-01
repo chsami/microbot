@@ -1,6 +1,13 @@
 package net.runelite.client.plugins.microbot.playerassist;
 
+import net.runelite.api.Client;
+import net.runelite.api.Perspective;
+import net.runelite.api.Point;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.model.Monster;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -12,24 +19,44 @@ import java.awt.*;
 
 import static net.runelite.client.plugins.microbot.playerassist.combat.AttackNpcScript.attackableNpcs;
 import static net.runelite.client.plugins.microbot.playerassist.combat.FlickerScript.currentMonstersAttackingUs;
+import static net.runelite.client.ui.overlay.OverlayUtil.*;
 
 public class PlayerAssistOverlay extends OverlayPanel {
 
     private final ModelOutlineRenderer modelOutlineRenderer;
+    private int diameter = 100;
+    private Color borderColor = Color.WHITE;
+    private Stroke stroke = new BasicStroke(1);
+    private static final Color WHITE_TRANSLUCENT = new Color(0, 255, 255, 127);
+    PlayerAssistConfig config;
 
     @Inject
-    private PlayerAssistOverlay(ModelOutlineRenderer modelOutlineRenderer) {
+    private PlayerAssistOverlay(ModelOutlineRenderer modelOutlineRenderer, PlayerAssistConfig config) {
         this.modelOutlineRenderer = modelOutlineRenderer;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
         setPriority(OverlayPriority.HIGH);
         setNaughty();
+        this.config = config;
     }
 
 
     @Override
     public Dimension render(Graphics2D graphics) {
         if (attackableNpcs == null) return null;
+
+
+        net.runelite.api.Point loc = Perspective.localToCanvas(Microbot.getClient(), Rs2Player.getLocalLocation(), Rs2Player.getWorldLocation().getPlane(), 150);
+
+        LocalPoint lp =  LocalPoint.fromWorld(Microbot.getClient(), Script.getInitialPlayerLocation());
+        if (lp != null) {
+            Polygon poly = Perspective.getCanvasTileAreaPoly(Microbot.getClient(), lp, config.attackRadius() * 2);
+
+            if (poly != null)
+            {
+                renderPolygon(graphics, poly, WHITE_TRANSLUCENT);
+            }
+        }
 
         for (net.runelite.api.NPC npc :
                 attackableNpcs) {
@@ -60,5 +87,14 @@ public class PlayerAssistOverlay extends OverlayPanel {
         }
 
         return super.render(graphics);
+    }
+
+    public static void renderMinimapRect(Client client, Graphics2D graphics, Point center, int width, int height, Color color) {
+        double angle = client.getCameraYawTarget() * Math.PI / 1024.0d;
+
+        graphics.setColor(color);
+        graphics.rotate(angle, center.getX(), center.getY());
+        graphics.fillRect(center.getX() - width / 2, center.getY() - height / 2, width, height);
+        graphics.rotate(-angle, center.getX(), center.getY());
     }
 }

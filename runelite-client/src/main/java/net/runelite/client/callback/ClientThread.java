@@ -31,9 +31,7 @@ import net.runelite.api.Client;
 
 import javax.inject.Singleton;
 import java.util.Iterator;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 import java.util.function.BooleanSupplier;
 
 @Singleton
@@ -42,6 +40,9 @@ public class ClientThread
 {
 	private final ConcurrentLinkedQueue<BooleanSupplier> invokes = new ConcurrentLinkedQueue<>();
 	private final ConcurrentLinkedQueue<BooleanSupplier> invokesAtTickEnd = new ConcurrentLinkedQueue<>();
+
+	protected ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+	public Future<?> scheduledFuture;
 
 	@Inject
 	private Client client;
@@ -61,6 +62,13 @@ public class ClientThread
 		invoke(task);
 		return (T) task.get();
 	}
+
+	@SneakyThrows
+	public void runOnSeperateThread(Callable method) {
+		if (scheduledFuture != null && !scheduledFuture.isDone()) return;
+		scheduledFuture = scheduledExecutorService.submit(() -> method.call());
+	}
+
 
 	/**
 	 * Will run r on the game thread, at an unspecified point in the future.

@@ -152,11 +152,11 @@ public class MicrobotInventorySetup {
         if (inventorySetup == null) return false;
         for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
             if (inventorySetupsItem.getId() == -1) continue;
-            if (Rs2Equipment.isWearing(inventorySetupsItem.getName(), true)) {
-                return true;
+            if (!Rs2Equipment.isWearing(inventorySetupsItem.getName(), true)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public static boolean doesEquipmentMatch(String name, String ignoreItem) {

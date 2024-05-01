@@ -33,6 +33,7 @@ public class FoodScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
+                if (!Microbot.isLoggedIn()) return;
                 if (!config.toggleFood()) return;
                 if (Rs2Inventory.hasItem("empty vial"))
                     Rs2Inventory.drop("empty vial");
