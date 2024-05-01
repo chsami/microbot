@@ -1483,6 +1483,9 @@ public class Rs2Inventory {
             }
         }
         param0 = rs2Item.slot;
+        if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty")) {
+            identifier++;
+        }
         if (Rs2Bank.isOpen()) {
             identifier += 6;
             param1 = 983043;
