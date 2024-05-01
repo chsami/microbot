@@ -39,7 +39,7 @@ public class PestControlOverlay  extends OverlayPanel {
                 for(Portal portal: portals) {
                     if (portal.getHitPoints() == null) continue;
                     panelComponent.getChildren().add(LineComponent.builder()
-                            .left(portal.toString() + " - ❤️" + portal.getHitPoints().getText() + " - ⚔️ " + portal.isAttackAble())
+                            .left(portal.toString() + " - H" + portal.getHitPoints().getText() + " - A " + portal.isAttackAble())
                             .build());
                 }
             }

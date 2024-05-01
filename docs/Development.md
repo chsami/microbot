@@ -30,32 +30,32 @@ Everything that will help you make scripts is under the **util** folder
 
 Everything that will help you make scripts is under the **util** folder
 
-* Rs2AntiBan
-* Rs2Bank
-* Rs2Camera
-* Rs2Combat
-* Rs2Dialogues
-* Rs2Equipment
-* Rs2Cannon
-* Rs2GameObject
-* Rs2GroundItem
-* Rs2Inventory
-* Rs2Keyboard
-* Rs2Magic
-* Rs2Spells
-* Rs2Food
-* Rs2Npc
-* Rs2Player
-* Rs2Pvp
-* Rs2Prayer
-* Rs2Reflection
-* Rs2Settings
-* Rs2Tab
-* Rs2Walker
-* Rs2MiniMap
-* Rs2Widget
+- **API**
+  * [Rs2Bank](api/apidocs/net/runelite/client/plugins/microbot/util/bank/Rs2Bank.html)
+  * [Rs2Camera](api/apidocs/net/runelite/client/plugins/microbot/util/camera/Rs2Camera.html)
+  * [Rs2Combat](api/apidocs/net/runelite/client/plugins/microbot/util/combat/Rs2Combat.html)
+  * [Rs2Dialogues](api/apidocs/net/runelite/client/plugins/microbot/util/dialogues/Rs2Dialogues.html)
+  * [Rs2Equipment](api/apidocs/net/runelite/client/plugins/microbot/util/equipment/Rs2Equipment.html)
+  * [Rs2Cannon](api/apidocs/net/runelite/client/plugins/microbot/util/gameobject/Rs2Cannon.html)
+  * [Rs2GameObject](api/apidocs/net/runelite/client/plugins/microbot/util/gameobject/Rs2GameObject.html)
+  * [Rs2GroundItem](api/apidocs/net/runelite/client/plugins/microbot/util/grounditem/Rs2GroundItem.html)
+  * [Rs2Inventory](api/apidocs/net/runelite/client/plugins/microbot/util/inventory/Rs2Inventory.html)
+  * [Rs2KeyBoard](api/apidocs/net/runelite/client/plugins/microbot/util/keyboard/Rs2Keyboard.html)
+  * [Rs2Magic](api/apidocs/net/runelite/client/plugins/microbot/util/magic/Rs2Magic.html)
+  * [Rs2Spells](api/apidocs/net/runelite/client/plugins/microbot/util/magic/Rs2Spells.html)
+  * [Rs2Food](api/apidocs/net/runelite/client/plugins/microbot/util/misc/Rs2Food.html)
+  * [Rs2Npc](api/apidocs/net/runelite/client/plugins/microbot/util/npc/Rs2Npc.html)
+  * [Rs2Player](api/apidocs/net/runelite/client/plugins/microbot/util/player/Rs2Player.html)
+  * [Rs2Pvp](api/apidocs/net/runelite/client/plugins/microbot/util/player/Rs2Pvp.html)
+  * [Rs2Prayer](api/apidocs/net/runelite/client/plugins/microbot/util/prayer/Rs2Prayer.html)
+  * [Rs2Reflection](api/apidocs/net/runelite/client/plugins/microbot/util/prayer/Rs2Reflection.html)
+  * [Rs2Settings](api/apidocs/net/runelite/client/plugins/microbot/util/settings/Rs2Settings.html)
+  * [Rs2Tab](api/apidocs/net/runelite/client/plugins/microbot/util/tabs/Rs2Settings.html)
+  * [Rs2Walker](api/apidocs/net/runelite/client/plugins/microbot/util/walker/Rs2Settings.html)
+  * [Rs2Minimap](api/apidocs/net/runelite/client/plugins/microbot/util/walker/Rs2Settings.html)
+  * [Rs2Widget](api/apidocs/net/runelite/client/plugins/microbot/util/widget/Rs2Widget.html)
 
-## Examples
+## Example Script
 
 Inside the microbot plugin folder you'll see a folder called "example"
 
@@ -65,70 +65,17 @@ You can open the examplescript.java. This is the main file we'll be working in.
 
 ![img_6.png](img_6.png)
 
-### Combat
-
----
-
-Lets try to make a script that attacks a man.
-
 ![img_7.png](img_7.png)
 
-To attack an npc we'll have to look into our Rs2Npc utility class.
+### Combat
 
-
-```java
-Rs2Npc.attack("man")
-```
-
-Our example script should look like this now.
-
-```java
-public class ExampleScript extends Script {
-    public static double version = 1.0;
-
-    public boolean run(ExampleConfig config) {
-        Microbot.enableAutoRunOn = false;
-        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            try {
-
-                long startTime = System.currentTimeMillis();
-
-                //SCRIPT CODE COMES HERE
-
-                long endTime = System.currentTimeMillis();
-                long totalTime = endTime - startTime;
-                System.out.println("Total time for loop " + totalTime);
-
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
-        return true;
-    }
-
-    @Override
-    public void shutdown() {
-        super.shutdown();
-    }
-}
-```
-
-The script should now attack the man
-
-![img_9.png](img_9.png)
-
-Congratulations, you just made a simple auto fighter! 🥳🥳
+* [Fighter Script Example](combat.md)
 
 ### Skills
-
-* Fishing
 
 Coming soon!
 
 ### Utility
-
-* Alching
 
 Coming soon!
 

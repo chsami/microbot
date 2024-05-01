@@ -1,19 +1,29 @@
-- [Getting started](/general/algorithm/README.md)
-    - 数据结构
-        - [stack](/general/algorithm/data-structures/stack/README.zh-CN.md)
-        - [queue](/general/algorithm/data-structures/queue/README.zh-CN.md)
-        - list
-            - [linked-list](/general/algorithm/data-structures/linked-list/README.zh-CN.md)
-            - [doubly-linked-list](/general/algorithm/data-structures/doubly-linked-list/README.zh-CN.md)
-        - [tree](/general/algorithm/data-structures/tree/README.zh-CN.md)
-            - [binary search tree](/general/algorithm/data-structures/tree/binary-search-tree/README.md)
-            - [red black tree](/general/algorithm/data-structures/tree/red-black-tree/README.md)
-        - [heap](/general/algorithm/data-structures/heap/README.zh-CN.md)
-        - [hash-table](/general/algorithm/data-structures/hash-table/README.md)
-        - [graph](/general/algorithm/data-structures/graph/README.zh-CN.md)
-    - 算法
-        - [排序算法](/general/algorithm/algorithms/sorting.md)
-- [设计模式](/general/design-pattern/README.md)
-- 网络
-    - [协议模型](/general/network/protocol-model.md)
-    - [TCP/IP](/general/network/tcp-ip.md)
+- **Start botting**
+    - Install Microbot
+- [**Development**](Development.md)
+    - **API**
+      * [Rs2Bank](api/apidocs/net/runelite/client/plugins/microbot/util/bank/Rs2Bank.html)
+      * [Rs2Camera](api/apidocs/net/runelite/client/plugins/microbot/util/camera/Rs2Camera.html)
+      * [Rs2Combat](api/apidocs/net/runelite/client/plugins/microbot/util/combat/Rs2Combat.html)
+      * [Rs2Dialogues](api/apidocs/net/runelite/client/plugins/microbot/util/dialogues/Rs2Dialogues.html)
+      * [Rs2Equipment](api/apidocs/net/runelite/client/plugins/microbot/util/equipment/Rs2Equipment.html)
+      * [Rs2Cannon](api/apidocs/net/runelite/client/plugins/microbot/util/gameobject/Rs2Cannon.html)
+      * [Rs2GameObject](api/apidocs/net/runelite/client/plugins/microbot/util/gameobject/Rs2GameObject.html)
+      * [Rs2GroundItem](api/apidocs/net/runelite/client/plugins/microbot/util/grounditem/Rs2GroundItem.html)
+      * [Rs2Inventory](api/apidocs/net/runelite/client/plugins/microbot/util/inventory/Rs2Inventory.html)
+      * [Rs2KeyBoard](api/apidocs/net/runelite/client/plugins/microbot/util/keyboard/Rs2Keyboard.html)
+      * [Rs2Magic](api/apidocs/net/runelite/client/plugins/microbot/util/magic/Rs2Magic.html)
+      * [Rs2Spells](api/apidocs/net/runelite/client/plugins/microbot/util/magic/Rs2Spells.html)
+      * [Rs2Food](api/apidocs/net/runelite/client/plugins/microbot/util/misc/Rs2Food.html)
+      * [Rs2Npc](api/apidocs/net/runelite/client/plugins/microbot/util/npc/Rs2Npc.html)
+      * [Rs2Player](api/apidocs/net/runelite/client/plugins/microbot/util/player/Rs2Player.html)
+      * [Rs2Pvp](api/apidocs/net/runelite/client/plugins/microbot/util/player/Rs2Pvp.html)
+      * [Rs2Prayer](api/apidocs/net/runelite/client/plugins/microbot/util/prayer/Rs2Prayer.html)
+      * [Rs2Reflection](api/apidocs/net/runelite/client/plugins/microbot/util/prayer/Rs2Reflection.html)
+      * [Rs2Settings](api/apidocs/net/runelite/client/plugins/microbot/util/settings/Rs2Settings.html)
+      * [Rs2Tab](api/apidocs/net/runelite/client/plugins/microbot/util/tabs/Rs2Settings.html)
+      * [Rs2Walker](api/apidocs/net/runelite/client/plugins/microbot/util/walker/Rs2Settings.html)
+      * [Rs2Minimap](api/apidocs/net/runelite/client/plugins/microbot/util/walker/Rs2Settings.html)
+      * [Rs2Widget](api/apidocs/net/runelite/client/plugins/microbot/util/widget/Rs2Widget.html)
+    - **Script Examples**
+        * [Fighter Script](combat.md)

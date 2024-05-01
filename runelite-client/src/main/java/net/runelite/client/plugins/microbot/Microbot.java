@@ -89,20 +89,6 @@ public class Microbot {
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
 
-    public static Client getClientForKotlin() {
-        return client;
-    }
-
-    public static ClientThread getClientThreadForKotlin() {
-        return clientThread;
-    }
-
-    public static Mouse getMouseForKotlin() { return mouse; }
-    public static WorldService getWorldServiceForKotlin() { return worldService; }
-
-    public static Notifier getNotifierForKotlin() { return notifier; }
-    public static boolean getDisableWalkerUpdateForKotlin() { return disableWalkerUpdate; }
-
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
