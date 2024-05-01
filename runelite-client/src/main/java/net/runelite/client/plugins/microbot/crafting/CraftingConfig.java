@@ -7,6 +7,7 @@ import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.crafting.enums.Activities;
 import net.runelite.client.plugins.microbot.crafting.enums.Gems;
 import net.runelite.client.plugins.microbot.crafting.enums.Glass;
+import net.runelite.client.plugins.microbot.crafting.enums.Staffs;
 
 @ConfigGroup(CraftingConfig.GROUP)
 public interface CraftingConfig extends Config {
@@ -80,5 +81,24 @@ public interface CraftingConfig extends Config {
     default Glass glassType()
     {
         return Glass.PROGRESSIVE;
+    }
+
+    @ConfigSection(
+            name = "Staffs",
+            description = "Config for staff making",
+            position = 2
+    )
+    String staffSection = "staff";
+
+    @ConfigItem(
+            keyName = "Staffs",
+            name = "Staffs",
+            description = "Choose the type of battlestaff to make",
+            position = 0,
+            section = staffSection
+    )
+    default Staffs staffType()
+    {
+        return Staffs.PROGRESSIVE;
     }
 }
