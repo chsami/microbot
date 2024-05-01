@@ -10,7 +10,8 @@ public enum Activities {
     // TODO: Should refactor the default option, now this runs a leather script
     DEFAULT("Default script"),
     GEM_CUTTING("Cutting gems"),
-    GLASSBLOWING("Glassblowing");
+    GLASSBLOWING("Glassblowing"),
+    STAFF_MAKING("Staff making");
 
     private final String name;
 
