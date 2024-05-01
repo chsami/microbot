@@ -43,18 +43,6 @@ public interface BanksBankStanderConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "First Item Action",
-            name = "First Item Action",
-            description = "Sets First Item's Action.",
-            position = 0,
-            section = itemSection
-    )
-
-    default String firstItemAction() {
-        return "";
-    }
-
-    @ConfigItem(
             keyName = "Second Item",
             name = "Second Item",
             description = "Sets Second Item, use either Item ID or Item Name",
