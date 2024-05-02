@@ -24,11 +24,11 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2GrandExchange {
 
-    public static final int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_1 = 30474265;
     public static final int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_10 = 30474265;
     public static final int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_100 = 30474265;
     public static final int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_1000 = 30474265;
     public static final int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_X = 30474265;
+    public static final int GRAND_EXCHANGE_OFFER_CONTAINER_QTY_1 = 30474265;
     public static final int COLLECT_BUTTON = 30474246;
 
     /**
@@ -43,6 +43,7 @@ public class Rs2GrandExchange {
 
     /**
      * check if the grand exchange screen is open
+     *
      * @return
      */
     public static boolean isOpen() {
@@ -52,6 +53,7 @@ public class Rs2GrandExchange {
 
     /**
      * check if the ge offerscreen is open
+     *
      * @return
      */
     public static boolean isOfferScreenOpen() {
@@ -61,6 +63,7 @@ public class Rs2GrandExchange {
 
     /**
      * Opens the grand exchange
+     *
      * @return
      */
     public static boolean openExchange() {
@@ -91,10 +94,10 @@ public class Rs2GrandExchange {
     }
 
     /**
-     * @param itemName name of the item
+     * @param itemName   name of the item
      * @param searchTerm search term
-     * @param price price of the item to buy
-     * @param quantity quantity of item to buy
+     * @param price      price of the item to buy
+     * @param quantity   quantity of item to buy
      * @return true if item has been bought succesfully
      */
     public static boolean buyItem(String itemName, String searchTerm, int price, int quantity) {
@@ -164,9 +167,10 @@ public class Rs2GrandExchange {
 
     /**
      * Sell item to the grand exchange
+     *
      * @param itemName name of the item to sell
      * @param quantity quantity of the item to sell
-     * @param price price of the item to sell
+     * @param price    price of the item to sell
      * @return
      */
     public static boolean sellItem(String itemName, int quantity, int price) {
@@ -218,6 +222,7 @@ public class Rs2GrandExchange {
 
     /**
      * Collect all the grand exchange slots to the bank or inventory
+     *
      * @param collectToBank
      * @return
      */
@@ -449,7 +454,7 @@ public class Rs2GrandExchange {
     }
 
     private static int getMaxSlots() {
-        return Rs2Player.isMember() ? 8: 3;
+        return Rs2Player.isMember() ? 8 : 3;
     }
 
     public static boolean walkToGrandExchange() {
