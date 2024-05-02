@@ -119,6 +119,16 @@ public class Rs2Npc {
         return npcs.toArray(new NPC[npcs.size()]);
     }
 
+
+    public static NPC[] nameContains(String name) {
+        return Microbot.getClient().getNpcs().stream().filter(value -> value.getName() != null && value.getName().contains(name)).toArray(NPC[]::new);
+    }
+    public static NPC[] nameContainsNoCase(String name) {
+        return Microbot.getClient().getNpcs().stream().filter(value -> value.getName() != null && value.getName().toLowerCase().contains(name)).toArray(NPC[]::new);
+    }
+
+
+
     public static Stream<NPC> getAttackableNpcs() {
         Stream<NPC> npcs = Microbot.getClient().getNpcs().stream()
                 .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead())
