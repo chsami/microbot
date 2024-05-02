@@ -27,6 +27,7 @@ import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenSc
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -41,7 +42,10 @@ import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.function.Consumer;
+
+import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
 
 @PluginDescriptor(
         name = PluginDescriptor.Default + "Microbot",
@@ -158,6 +162,11 @@ public class MicrobotPlugin extends Plugin {
         }
         if (event.getContainerId() == InventoryID.EQUIPMENT.getId()) {
             Rs2Equipment.storeEquipmentItemsInMemory(event);
+        }
+        if (event.getContainerId() == 4) {
+            //Code for Bank's Rs2Shop
+            java.util.List<Rs2Item> shopItems = updateItemContainer(4, event);
+            System.out.println(shopItems.size());
         }
     }
 
