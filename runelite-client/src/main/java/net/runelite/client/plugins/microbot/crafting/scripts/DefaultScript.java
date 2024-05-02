@@ -5,7 +5,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
 import java.awt.event.KeyEvent;
@@ -33,7 +33,7 @@ public class DefaultScript extends Script {
                     } else if (Rs2Inventory.hasItem(leather)) {
                         Rs2Bank.closeBank();
                         Rs2Inventory.combine("needle", leather);
-                        VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         sleep(3000);
                     } else {
                         shutDown();

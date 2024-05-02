@@ -5,13 +5,13 @@ import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
-import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -30,20 +30,19 @@ public class Rs2Magic {
         Rs2Tab.switchToMagicTab();
         Microbot.status = "Casting " + magicSpell.getName();
         sleep(150, 300);
-        if (magicSpell.getWidgetAction() == null) {
-            if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")) {
-                menuAction = MenuAction.CC_OP;
-            } else {
-                menuAction = MenuAction.WIDGET_TARGET;
-            }
+        int identifier = 1;
+        if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")
+                || magicSpell.getName().toLowerCase().contains("Bones to")) {
+            menuAction = MenuAction.CC_OP;
+            identifier = 0;
         } else {
-            menuAction = magicSpell.getWidgetAction();
+            menuAction = MenuAction.WIDGET_TARGET;
         }
 
         if (magicSpell.getWidgetId() == -1)
             throw new NotImplementedException("This spell has not been configured yet in the MagicAction.java class");
 
-        Microbot.doInvoke(new NewMenuEntry(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "<col=00ff00>" + magicSpell.getName() + "</col>"), new Rectangle(0, 0, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        Microbot.doInvoke(new NewMenuEntry(-1, magicSpell.getWidgetId(), menuAction.getId(), identifier, -1, "<col=00ff00>" + magicSpell.getName() + "</col>"), new Rectangle(0, 0, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
         //Rs2Reflection.invokeMenu(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "Cast", "<col=00ff00>" + magicSpell.getName() + "</col>", -1, -1);
     }
 
@@ -64,41 +63,43 @@ public class Rs2Magic {
         }
     }
 
-    public static void highAlch(String itemName, boolean exact) {
-        Rs2Tab.switchToMagicTab();
-        Rs2Item item = Rs2Inventory.get(itemName, exact);
-        Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
-        alch(highAlch, item);
+    public static void alch(String itemName) {
+        Rs2Item item = Rs2Inventory.get(itemName);
+        if (Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 55) {
+            highAlch(item);
+        } else {
+            lowAlch(item);
+        }
     }
 
-    public static void highAlch(String itemName) {
-        highAlch(itemName, false);
+    public static void alch(Rs2Item item) {
+        if (Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 55) {
+            highAlch(item);
+        } else {
+            lowAlch(item);
+        }
     }
 
-
-    public static void highAlch(Rs2Item item, boolean exact) {
+    private static void highAlch(Rs2Item item) {
         sleepUntil(() -> {
             Rs2Tab.switchToMagicTab();
             sleep(50, 150);
             return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
         });
-        Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
+        Widget highAlch = Rs2Widget.findWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getName());
+        if (highAlch.getSpriteId() != 41) return;
         alch(highAlch, item);
     }
 
-    public static void highAlch(Rs2Item rs2Item) {
-        highAlch(rs2Item, false);
-    }
-
-
-    public static void highAlch() {
-        Widget highAlch = Microbot.getClient().getWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getWidgetId());
-        alch(highAlch);
-    }
-
-    public static void lowAlch() {
-        Widget lowAlch = Microbot.getClient().getWidget(MagicAction.LOW_LEVEL_ALCHEMY.getWidgetId());
-        alch(lowAlch);
+    private static void lowAlch(Rs2Item item) {
+        sleepUntil(() -> {
+            Rs2Tab.switchToMagicTab();
+            sleep(50, 150);
+            return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
+        });
+        Widget lowAlch = Rs2Widget.findWidget(MagicAction.LOW_LEVEL_ALCHEMY.getName());
+        if (lowAlch.getSpriteId() != 25) return;
+        alch(lowAlch, item);
     }
 
     private static void alch(Widget alch, Rs2Item item) {

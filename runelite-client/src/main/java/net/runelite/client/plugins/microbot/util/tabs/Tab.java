@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.util.tabs;
 
-import net.runelite.client.plugins.microbot.util.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 
 @Deprecated(since = "Use Rs2Tab instead", forRemoval = true)
 public class Tab {

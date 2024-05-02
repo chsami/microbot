@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ThievingNpc {
+    NONE("None", 0),
     MEN("man", 1),
     WOMAN("woman", 1),
     FARMER("farmer", 10),

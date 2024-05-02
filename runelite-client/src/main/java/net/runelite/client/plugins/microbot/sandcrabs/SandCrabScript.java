@@ -4,7 +4,6 @@ import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.envisionplugins.breakhandler.util.Login;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.sandcrabs.enums.State;
@@ -12,10 +11,12 @@ import net.runelite.client.plugins.microbot.sandcrabs.models.ScanLocation;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 
 public class SandCrabScript extends Script {
 
-    public static double version = 1.0;
+    public static double version = 1.3;
 
     public int afkTimer = 0;
     public int hijackTimer = 0;
@@ -41,20 +42,23 @@ public class SandCrabScript extends Script {
     List<ScanLocation> sandCrabLocations = Arrays.asList(new ScanLocation(new WorldPoint(1843, 3462, 0)),
             new ScanLocation(new WorldPoint(1833, 3458, 0)),
             new ScanLocation(new WorldPoint(1790, 3468, 0)),
-            new ScanLocation(new WorldPoint(1776, 3468, 0)),
-            new ScanLocation(new WorldPoint(1773, 3461, 0)),
-            new ScanLocation(new WorldPoint(1765, 3468, 0)),
+            new ScanLocation(new WorldPoint(1776, 3468, 0), true),
+            new ScanLocation(new WorldPoint(1773, 3461, 0), true),
+            new ScanLocation(new WorldPoint(1765, 3468, 0), true),
             new ScanLocation(new WorldPoint(1749, 3469, 0)),
             new ScanLocation(new WorldPoint(1738, 3468, 0)));
 
     public boolean run(SandCrabConfig config) {
+        if (config.threeNpcs()) {
+            sandCrabLocations = sandCrabLocations.stream().filter(x -> x.hasThreeNpcs).collect(Collectors.toList());
+        }
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
             try {
                 long startTime = System.currentTimeMillis();
 
-               // Rs2Combat.enableAutoRetialiate();
+               Rs2Combat.enableAutoRetialiate();
 
                 if (otherPlayerDetected() && !Rs2Combat.inCombat())
                     hijackTimer++;
@@ -62,7 +66,18 @@ public class SandCrabScript extends Script {
                     hijackTimer = 0;
 
                 if (hijackTimer > 10) {
-                    state = State.HOP_WORLD;
+                    if (sandCrabLocations.stream().anyMatch(x -> !x.isScanned())) {
+                        state = State.SCAN_LOCATIONS;
+                    } else {
+                        state = State.HOP_WORLD;
+                        resetScanLocations();
+                    }
+                }
+
+                if (currentScanLocation != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentScanLocation.getWorldPoint()) > 10 && (state != State.RESET_AGGRO || state != State.WALK_BACK)) {
+                    state = State.WALK_BACK;
+                    resetAggro();
+                    resetAfkTimer();
                 }
 
                 if (sandCrabLocations.stream().noneMatch(x -> x.getWorldPoint().equals(Microbot.getClient().getLocalPlayer().getWorldLocation())) && state != State.RESET_AGGRO && state != State.WALK_BACK) {
@@ -73,7 +88,7 @@ public class SandCrabScript extends Script {
                     Rs2Player.eatAt(50);
 
                     if (Rs2Inventory.getInventoryFood().isEmpty()) {
-                        Microbot.getWalker().hybridWalkTo(new WorldPoint(1720, 3465, 0));
+                        Rs2Walker.walkTo(new WorldPoint(1720, 3465, 0));
                         if (Rs2Bank.useBank()) {
                             Rs2Bank.withdrawAll(config.food().getName());
                         }
@@ -89,7 +104,7 @@ public class SandCrabScript extends Script {
                             Rs2Tab.switchToCombatOptionsTab();
                             Rs2Combat.enableAutoRetialiate();
                         }
-                        if (!isNpcAggressive()) {
+                        if (!isNpcAggressive() || afkTimer > 10) {
                             state = State.AFK;
                         }
                         break;
@@ -110,10 +125,11 @@ public class SandCrabScript extends Script {
                         break;
                     case HOP_WORLD:
                         int world = Login.getRandomWorld(true, null);
-                        Microbot.hopToWorld(world);
+                        boolean isHopped = Microbot.hopToWorld(world);
+                        if (!isHopped) return;
                         boolean result = sleepUntil(() -> Rs2Widget.findWidget("Switch World") != null);
                         if (result) {
-                            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                             sleepUntil(() -> Microbot.getClient().getGameState() == GameState.HOPPING);
                             sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
                             if (timesHopped > 10) {
@@ -129,7 +145,7 @@ public class SandCrabScript extends Script {
                         }
                         break;
                     case SCAN_LOCATIONS:
-                        scanSandCrabLocations();;
+                        scanSandCrabLocations(config);
                         break;
                 }
 
@@ -169,7 +185,7 @@ public class SandCrabScript extends Script {
      * Reset aggro will walk 20 tiles north
      */
     private void resetAggro() {
-        boolean walkedFarEnough = Microbot.getWalker().hybridWalkTo(new WorldPoint(initialPlayerLocation.getX(), initialPlayerLocation.getY() + 40, initialPlayerLocation.getPlane()));
+        boolean walkedFarEnough = Rs2Walker.walkTo(new WorldPoint(initialPlayerLocation.getX(), initialPlayerLocation.getY() + 40, initialPlayerLocation.getPlane()));
         if (!walkedFarEnough) return;
 
         state = State.WALK_BACK;
@@ -179,7 +195,7 @@ public class SandCrabScript extends Script {
      * Walks back to the initial player location when the script started
      */
     private void walkBack() {
-        boolean backToInitialLocation = Microbot.getWalker().hybridWalkTo(initialPlayerLocation, false, true);
+        boolean backToInitialLocation = Rs2Walker.walkTo(initialPlayerLocation);
         if (!backToInitialLocation) return;
 
         resetAfkTimer();
@@ -208,7 +224,7 @@ public class SandCrabScript extends Script {
         return false;
     }
 
-    private void scanSandCrabLocations() {
+    private void scanSandCrabLocations(SandCrabConfig config) {
         currentScanLocation = sandCrabLocations.stream()
                 .filter(x -> !x.isScanned())
                 .min(Comparator.comparingInt(x -> x.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
@@ -218,20 +234,24 @@ public class SandCrabScript extends Script {
             state = State.HOP_WORLD;
             return;
         }
-        boolean reachedLocation = Microbot.getWalker().hybridWalkTo(currentScanLocation.getWorldPoint(), false, true);
-        if (reachedLocation) {
-            if (otherPlayerDetected(currentScanLocation.getWorldPoint())) {
-                currentScanLocation.scanned = true;
-            } else {
-                initialPlayerLocation = currentScanLocation.getWorldPoint();
-                state = State.FIGHT;
+        //If the currentScan location is far away, we walk to it first
+        if (currentScanLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 10) {
+            boolean reachedLocation = Rs2Walker.walkTo(currentScanLocation.getWorldPoint());
+            if (!reachedLocation) {
+                if (currentScanLocation.triedWalking > 20) { //something went wrong, just skip this location
+                    currentScanLocation.scanned = true;
+                } else {
+                    currentScanLocation.triedWalking++;
+                }
             }
+        }
+        //check if there are other players on our spot
+        if (otherPlayerDetected(currentScanLocation.getWorldPoint())) {
+            currentScanLocation.scanned = true;
         } else {
-            if (currentScanLocation.triedWalking > 20) { //something went wrong, just skip this location
-                currentScanLocation.scanned = true;
-            } else {
-                currentScanLocation.triedWalking++;
-            }
+            Rs2Walker.walkTo(currentScanLocation.getWorldPoint());
+            initialPlayerLocation = currentScanLocation.getWorldPoint();
+            state = State.FIGHT;
         }
     }
 

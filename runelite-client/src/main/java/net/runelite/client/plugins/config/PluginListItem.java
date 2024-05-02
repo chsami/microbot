@@ -55,7 +55,6 @@ import net.runelite.client.util.SwingUtil;
 
 class PluginListItem extends JPanel implements SearchablePlugin
 {
-	private static final ImageIcon CONFIG_ICON;
 	private static final ImageIcon ON_STAR;
 	private static final ImageIcon OFF_STAR;
 
@@ -72,9 +71,7 @@ class PluginListItem extends JPanel implements SearchablePlugin
 
 	static
 	{
-		BufferedImage configIcon = ImageUtil.loadImageResource(ConfigPanel.class, "config_edit_icon.png");
 		BufferedImage onStar = ImageUtil.loadImageResource(ConfigPanel.class, "star_on.png");
-		CONFIG_ICON = new ImageIcon(configIcon);
 		ON_STAR = new ImageIcon(onStar);
 
 		BufferedImage offStar = ImageUtil.luminanceScale(
@@ -132,9 +129,9 @@ class PluginListItem extends JPanel implements SearchablePlugin
 		add(buttonPanel, BorderLayout.LINE_END);
 
 		JMenuItem configMenuItem = null;
-		if (pluginConfig.hasConfigurables())
+		if (pluginConfig.getConfigDescriptor() != null)
 		{
-			JButton configButton = new JButton(CONFIG_ICON);
+			JButton configButton = new JButton(ConfigPanel.CONFIG_ICON);
 			SwingUtil.removeButtonDecorations(configButton);
 			configButton.setPreferredSize(new Dimension(25, 0));
 			configButton.setVisible(false);
@@ -142,7 +139,7 @@ class PluginListItem extends JPanel implements SearchablePlugin
 
 			configButton.addActionListener(e ->
 			{
-				configButton.setIcon(CONFIG_ICON);
+				configButton.setIcon(ConfigPanel.CONFIG_ICON);
 				openGroupConfigPanel();
 			});
 

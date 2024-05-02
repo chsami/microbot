@@ -1,19 +1,19 @@
 package net.runelite.client.plugins.microbot.util.settings;
 
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
-import static net.runelite.client.plugins.microbot.util.globval.VarbitIndices.TOGGLE_ROOFS;
+import static net.runelite.client.plugins.microbot.globval.VarbitIndices.TOGGLE_ROOFS;
 
 public class Rs2Settings {
     public static boolean enableDropShiftSetting() {
         if (Rs2Widget.hasWidget("Click here to continue")) {
-            VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
         }
         final int DROP_SHIFT_SETTING = 5542;
         if (Microbot.getVarbitValue(DROP_SHIFT_SETTING) == 0) {
@@ -28,7 +28,7 @@ public class Rs2Settings {
                 sleep(600);
                 Rs2Widget.clickWidget("Shift click to drop items");
                 sleep(600);
-                VirtualKeyboard.keyPress(KeyEvent.VK_ESCAPE);
+                Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
                 Rs2Tab.switchToInventoryTab();
             }
         }

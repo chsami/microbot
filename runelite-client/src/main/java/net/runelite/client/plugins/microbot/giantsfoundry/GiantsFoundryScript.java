@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.giantsfoundry;
 
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.GameObject;
-import net.runelite.api.ItemComposition;
 import net.runelite.api.ObjectComposition;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -13,7 +12,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -37,7 +36,7 @@ public class GiantsFoundryScript extends Script {
                 if (GiantsFoundryState.getProgressAmount() == 1000) {
                     handIn();
                     sleep(600, 1200);
-                    VirtualKeyboard.keyPress(KeyEvent.VK_SPACE);
+                    Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                 } else {
                     if (weapon != null) {
                         handleTemperature();
@@ -147,14 +146,14 @@ public class GiantsFoundryScript extends Script {
         if (Rs2Inventory.hasItem("steel bar") && !canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Fill");
             sleepUntil(() -> Rs2Widget.findWidget("What metal would you like to add?", null) != null, 5000);
-            VirtualKeyboard.keyPress('3');
+            Rs2Keyboard.keyPress('3');
             sleepUntil(() -> !Rs2Inventory.hasItem("steel bar"), 5000);
         }
         if (Rs2Inventory.hasItem("mithril bar") && !canPour()) {
             Rs2GameObject.interact(CRUCIBLE, "Fill");
             sleepUntil(() -> Rs2Widget.findWidget("What metal would you like to add?", null) != null, 5000);
             sleep(600, 1200);
-            VirtualKeyboard.keyPress('4');
+            Rs2Keyboard.keyPress('4');
             sleepUntil(() -> !Rs2Inventory.hasItem("mithril bar"), 5000);
         }
         if (canPour()) {

@@ -4,6 +4,7 @@ import net.runelite.api.ItemComposition;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 
+@Deprecated(since="use inventory.rs2item")
 public class RS2Item {
     private final ItemComposition item;
     private final Tile tile;
