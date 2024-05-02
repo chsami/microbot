@@ -16,9 +16,9 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Nate +"Magic Plugin",
-        description = "Nate's Magic plugin",
-        tags = {"Magic", "nate", "combat"},
+        name = PluginDescriptor.Nate +"JAD Plugin",
+        description = "Nate's prayer plugin",
+        tags = {"JAD", "nate", "prayer"},
         enabledByDefault = false
 )
 @Slf4j
@@ -40,7 +40,7 @@ public class PrayerPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private PrayerOverlay teleportOverlay;
+    private PrayerOverlay prayerOverlay;
 
     @Inject
     PrayerScript prayerScript;
@@ -54,13 +54,13 @@ public class PrayerPlugin extends Plugin {
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
         if (overlayManager != null) {
-            overlayManager.add(teleportOverlay);
+            overlayManager.add(prayerOverlay);
         }
         prayerScript.run(config);
     }
 
     protected void shutDown() {
         prayerScript.shutdown();
-        overlayManager.remove(teleportOverlay);
+        overlayManager.remove(prayerOverlay);
     }
 }
