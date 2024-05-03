@@ -25,8 +25,12 @@ public class GiantsFoundryOverlay extends OverlayPanel {
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
+                .left("Current state:")
+                .right(GiantsFoundryScript.state.toString())
+                .build());
+        panelComponent.getChildren().add(LineComponent.builder()
                 .left("Heat change needed:")
-                .right(Integer.toString(GiantsFoundryState.getHeatChangeNeeded()))
+                .right(GiantsFoundryState.getHeatChangeNeeded().getName())
                 .build());
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Current heat section:")

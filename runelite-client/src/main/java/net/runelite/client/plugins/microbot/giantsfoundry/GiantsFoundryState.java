@@ -166,121 +166,68 @@ public class GiantsFoundryState {
         return Heat.NONE;
     }
 
-    public static int getHeatChangeNeeded() {
+    public static Heat getHeatChangeNeeded() {
         int useWaterFall = 0;
         int useLavaPool = 1;
         int idle = -1;
         int heat = getHeatAmount();
-        if (getCurrentStage() == null) return -1;
+        if (getCurrentStage() == null) return Heat.NONE;
         Heat requiredHeat = getCurrentStage().getHeat();
         int actionsLeft = GiantsFoundryState.getActionsForHeatLevel();
-        if (GiantsFoundryScript.isHeatingUp) {
-            if (actionsLeft < 8)
-                return useLavaPool;
-            return idle;
-        } else if (GiantsFoundryScript.isCoolingDown) {
-            if (actionsLeft < 8)
-                return useWaterFall;
-            return idle;
-        } else {
-            if (actionsLeft > 0 && actionsLeft < 3) {
-                switch (requiredHeat) {
-                    case LOW:
-                    case HIGH:
-                        return useLavaPool;
-                    case MED:
-                        return useWaterFall;
-                }
-            } else if (actionsLeft >= 3) {
-                return idle;
-            } else {
-                switch (requiredHeat) {
-                    case LOW:
-                        int[] low = getLowHeatRange();
-                        if (heat < low[0]) {
-                            return useLavaPool;
-                        }
-                        if (heat > low[1]) {
-                            return useWaterFall;
-                        }
-                        break;
-                    case MED:
-                        int[] med = getMedHeatRange();
-                        if (heat < med[0]) {
-                            return useLavaPool;
-                        }
-                        if (heat > med[1]) {
-                            return useWaterFall;
-                        }
-                        break;
-                    case HIGH:
-                        int[] high = getHighHeatRange();
-                        if (heat < high[0]) {
-                            return useLavaPool;
-                        }
-                        if (heat > high[1]) {
-                            return useWaterFall;
-                        }
-                        break;
-                }
-            }
-        }
 
-        return idle;
-       /* switch (requiredHeat) {
-            case LOW:
-                int[] low = getLowHeatRange();
-                if (GiantsFoundryScript.isHeatingUp) {
-                    if (heat > (low[1] - 50) && heat < low[1] || heat > low[1] || heat < low[0]) {
-                        GiantsFoundryScript.isHeatingUp = false;
-                    }
-                    return 1;
-                } else {
-                    if (heat > (low[1])) {
-                        return 0;//cool
-                    } else if (heat < (low[0] + 50)) {
-                        return 1;//heat
-                    }
-                }
-                break;
-            case MED:
-                int[] med = getMedHeatRange();
-                if (GiantsFoundryScript.isCoolingDown) {
-                    if (heat < (med[0] + 50) && heat > med[0] || heat < med[0] || heat > med[1]) {
-                        GiantsFoundryScript.isCoolingDown = false;
-                    }
-                    return 0;
-                } else {
-                    if (heat > (med[1] - 50)) {
-                        return 0;//cool
-                    } else if (heat < med[0]) {
-                        return 1;//heat
-                    }
-                }
-
-                break;
-            case HIGH:
-                int[] high = getHighHeatRange(); // 600
-                if (GiantsFoundryScript.isHeatingUp) {// 708 - 958
-                    if (heat > (high[1] - 50) && heat < high[1] || heat > high[1] || heat < high[0]) {
-                        GiantsFoundryScript.isHeatingUp = false;
-                    }
-                    return 1;
-                } else {
-                    if (heat > high[1]) {
-                        return 0;//cool
-                    } else if (heat < (high[0] + 50)) {
-                        return 1;//heat
-                    }
-                }
-
-                break;
-            default:
-                if (heat < 20) return 0;
-                if (heat > 970) return 1;
-                return -1;
-        }
-        return -1;*/
+        return getCurrentStage().getHeat();
+//        if (GiantsFoundryScript.isHeatingUp) {
+//            if (actionsLeft < 8)
+//                return useLavaPool;
+//            return idle;
+//        } else if (GiantsFoundryScript.isCoolingDown) {
+//            if (actionsLeft < 8)
+//                return useWaterFall;
+//            return idle;
+//        } else {
+//            if (actionsLeft > 0 && actionsLeft < 3) {
+//                switch (requiredHeat) {
+//                    case LOW:
+//                    case HIGH:
+//                        return useLavaPool;
+//                    case MED:
+//                        return useWaterFall;
+//                }
+//            } else if (actionsLeft >= 3) {
+//                return idle;
+//            } else {
+//                switch (requiredHeat) {
+//                    case LOW:
+//                        int[] low = getLowHeatRange();
+//                        if (heat < low[0]) {
+//                            return useLavaPool;
+//                        }
+//                        if (heat > low[1]) {
+//                            return useWaterFall;
+//                        }
+//                        break;
+//                    case MED:
+//                        int[] med = getMedHeatRange();
+//                        if (heat < med[0]) {
+//                            return useLavaPool;
+//                        }
+//                        if (heat > med[1]) {
+//                            return useWaterFall;
+//                        }
+//                        break;
+//                    case HIGH:
+//                        int[] high = getHighHeatRange();
+//                        if (heat < high[0]) {
+//                            return useLavaPool;
+//                        }
+//                        if (heat > high[1]) {
+//                            return useWaterFall;
+//                        }
+//                        break;
+//                }
+//            }
+//        }
+//        return idle;
     }
 
 
