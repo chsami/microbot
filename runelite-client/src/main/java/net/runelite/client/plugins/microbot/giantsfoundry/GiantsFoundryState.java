@@ -127,11 +127,11 @@ public class GiantsFoundryState {
     public static GameObject getStageObject(Stage stage) {
         switch (stage) {
             case TRIP_HAMMER:
-                return Rs2GameObject.findObject("trip hammer");
+                return Rs2GameObject.get("trip hammer");
             case GRINDSTONE:
-                return Rs2GameObject.findObject("grindstone");
+                return Rs2GameObject.get("grindstone");
             case POLISHING_WHEEL:
-                return Rs2GameObject.findObject("polishing wheel");
+                return Rs2GameObject.get("polishing wheel");
         }
         return null;
     }

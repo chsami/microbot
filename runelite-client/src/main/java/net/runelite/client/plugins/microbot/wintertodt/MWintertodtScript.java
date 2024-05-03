@@ -118,6 +118,8 @@ public class MWintertodtScript extends Script {
                             state = State.WAITING;
                         }
                         break;
+
+
                     case WAITING:
                         walkToBrazier();
                         shouldLightBrazier(isWintertodtAlive, needBanking, fireBrazier, brazier);

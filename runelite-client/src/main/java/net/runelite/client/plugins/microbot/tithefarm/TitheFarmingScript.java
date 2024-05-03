@@ -396,7 +396,7 @@ public class TitheFarmingScript extends Script {
     }
 
     private void walkToBarrel() {
-        final GameObject gameObject = Rs2GameObject.findObject("Water barrel");
+        final GameObject gameObject = Rs2GameObject.get("Water barrel");
         if (gameObject.getWorldLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) > DISTANCE_TRESHHOLD_MINIMAP_WALK) {
             Rs2Walker.walkMiniMap(gameObject.getWorldLocation());
             sleepUntil(Microbot::isMoving);
