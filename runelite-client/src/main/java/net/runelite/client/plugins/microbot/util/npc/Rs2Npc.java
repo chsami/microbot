@@ -14,8 +14,10 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,15 +41,13 @@ public class Rs2Npc {
     }
 
     public static List<NPC> getNpcsForPlayer() {
-        List<NPC> npcs = Microbot.getClient().getNpcs().stream()
+        return Microbot.getClient().getNpcs().stream()
                 .filter(x -> x.getInteracting() == Microbot.getClient().getLocalPlayer())
                 .sorted(Comparator
                         .comparingInt(value -> value
                                 .getLocalLocation()
                                 .distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                 .collect(Collectors.toList());
-
-        return npcs;
     }
 
     public static List<NPC> getNpcsForPlayer(String name) {
@@ -111,12 +111,40 @@ public class Rs2Npc {
         return health;
     }
 
-    public static NPC[] getNpcs() {
-        List<NPC> npcs = Microbot.getClient().getNpcs().stream()
-                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                .collect(Collectors.toList());
+    /**
+     * @return
+     */
+    public static Stream<NPC> getNpcs() {
+        Stream<NPC> npcs = Microbot.getClient().getNpcs().stream()
+                .filter(x -> x != null && x.getName() != null && !x.isDead())
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
 
-        return npcs.toArray(new NPC[npcs.size()]);
+        return npcs;
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public static Stream<NPC> getNpcs(String name) {
+        return getNpcs(name, true);
+    }
+
+    /**
+     * @param name
+     * @param exact
+     * @return
+     */
+    public static Stream<NPC> getNpcs(String name, boolean exact) {
+        Stream<NPC> npcs = getNpcs();
+
+        if (exact) {
+            npcs = npcs.filter(x -> x.getName().equalsIgnoreCase(name));
+        } else {
+            npcs = npcs.filter(x -> x.getName().toLowerCase().contains(name.toLowerCase()));
+        }
+
+        return npcs;
     }
 
     public static Stream<NPC> getAttackableNpcs() {
@@ -130,9 +158,8 @@ public class Rs2Npc {
     }
 
     public static Stream<NPC> getAttackableNpcs(String name) {
-        Stream<NPC> npcs = getAttackableNpcs()
+        return getAttackableNpcs()
                 .filter(x -> x.getName().equalsIgnoreCase(name));
-        return npcs;
     }
 
     public static NPC[] getPestControlPortals() {
@@ -145,51 +172,27 @@ public class Rs2Npc {
     }
 
     public static NPC getNpc(String name) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            List<NPC> npcs = Arrays.stream(getNpcs()).collect(Collectors.toList());
-            if (npcs.isEmpty())
-                return null;
-            else
-                return npcs.stream()
-                        .filter(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(name) && !x.isDead())
-                        .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .orElse(null);
-
-        });
+        return getNpc(name, true);
     }
 
-    public static List<NPC> getNpcs(String name) {
-        List<NPC> npcs = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcs().stream()
-                .filter(x -> x != null && x.getName().equalsIgnoreCase(name))
-                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                .collect(Collectors.toList()));
-
-        return npcs;
+    public static NPC getNpc(String name, boolean exact) {
+        return getNpcs(name, exact)
+                .findFirst()
+                .orElse(null);
     }
 
     public static NPC getNpc(int id) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            List<NPC> npcs = Arrays.stream(getNpcs()).collect(Collectors.toList());
-            if (npcs.isEmpty())
-                return null;
-            else
-                return npcs.stream()
-                        .filter(x -> x != null && x.getId() == id)
-                        .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
-                        .orElse(null);
-        });
+        return getNpcs()
+                .filter(x -> x.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
     public static Optional<NPC> getNpc(int id, List<Integer> excludedIndexes) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            List<NPC> npcs = Arrays.stream(getNpcs()).collect(Collectors.toList());
-            if (npcs.isEmpty())
-                return Optional.empty();
-            else
-                return npcs.stream()
-                        .filter(x -> x != null && x.getId() == id && !excludedIndexes.contains(x.getIndex()))
-                        .min(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
-        });
+        return getNpcs()
+                .filter(x -> x != null && x.getId() == id && !excludedIndexes.contains(x.getIndex()))
+                .min(Comparator.comparingInt(value ->
+                        value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
     }
 
 
@@ -273,7 +276,6 @@ public class Rs2Npc {
     }
 
     public static boolean attack(String npcName) {
-        NPC npc = getNpc(npcName);
         return attack(Arrays.asList(npcName));
     }
 
@@ -303,6 +305,10 @@ public class Rs2Npc {
         return interact(npc, "pickpocket");
     }
 
+    public static boolean pickpocket(NPC npc) {
+        return interact(npc, "pickpocket");
+    }
+
     public static boolean hasLineOfSight(NPC npc) {
         if (npc == null) return false;
         return new WorldArea(
@@ -323,11 +329,10 @@ public class Rs2Npc {
     }
 
     /**
-     *
      * @param player
      * @return
      */
     public static List<NPC> getNpcsAttackingPlayer(Player player) {
-        return Arrays.stream(getNpcs()).filter(x -> x.getInteracting() != null && x.getInteracting() == player).collect(Collectors.toList());
+        return getNpcs().filter(x -> x.getInteracting() != null && x.getInteracting() == player).collect(Collectors.toList());
     }
 }
