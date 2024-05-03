@@ -115,9 +115,10 @@ public class Rs2Npc {
      * @return
      */
     public static Stream<NPC> getNpcs() {
-        Stream<NPC> npcs = Microbot.getClient().getNpcs().stream()
+        Stream<NPC> npcs = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcs().stream()
                 .filter(x -> x != null && x.getName() != null && !x.isDead())
-                .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
+                .sorted(Comparator.comparingInt(value -> value.getLocalLocation()
+                        .distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation()))));
 
         return npcs;
     }
