@@ -26,28 +26,11 @@ public class MotherloadMineOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            xpGained = Microbot.getClient().getSkillExperience(Skill.MINING) - expstarted;
-            int xpPerHour = (int)( xpGained / ((System.currentTimeMillis() - timeBegan) / 3600000.0D));
-            nextLevelXp = XP_TABLE[Microbot.getClient().getRealSkillLevel(Skill.MINING) + 1];
-            xpTillNextLevel = nextLevelXp - Microbot.getClient().getSkillExperience(Skill.MINING);
-            if (xpGained >= 1)
-            {
-                timeTNL = (long) ((xpTillNextLevel / xpPerHour) * 3600000);
-            }
             panelComponent.setPreferredLocation(new Point(80, 8));
             panelComponent.setPreferredSize(new Dimension(275, 700));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Pay-dirt mining v" + MiningScript.version)
                     .color(Color.GREEN)
-                    .build());
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Mining Exp Gained (hr): " + (xpGained)  + " ("+xpPerHour+")")
-                    .build());
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Mining Levels Gained: " + ( Microbot.getClient().getRealSkillLevel(Skill.MINING) - startinglevel))
-                    .build());
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Time till next level: " + PaintFormat.ft(timeTNL))
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(status.toString())
