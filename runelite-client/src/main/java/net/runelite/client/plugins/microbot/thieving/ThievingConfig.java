@@ -84,4 +84,16 @@ public interface ThievingConfig extends Config {
         return 28;
     }
 
+    @ConfigItem(
+            keyName = "KeepItem",
+            name = "Keep items above value",
+            description = "Keep items above the gp value",
+            position = 1,
+            section = coinPouchSection
+    )
+    default int keepItemsAboveValue()
+    {
+        return 10000;
+    }
+
 }

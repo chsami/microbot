@@ -14,7 +14,8 @@ public enum ThievingNpc {
     ROGUE("rogue", 32),
     MASTER_FARMER("master farmer", 38),
     GUARD("guard", 40),
-    ARDOUGNE_KNIGHT("knight of ardougne", 55);
+    ARDOUGNE_KNIGHT("knight of ardougne", 55),
+    ELVES("Elves", 85);
 
     private final String name;
     private final int thievingLevel;

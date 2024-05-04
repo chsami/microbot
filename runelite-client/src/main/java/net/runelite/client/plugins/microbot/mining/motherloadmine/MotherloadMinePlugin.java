@@ -34,7 +34,7 @@ public class MotherloadMinePlugin extends Plugin {
     @Override
     protected void startUp() throws AWTException {
         overlayManager.add(motherloadMineOverlay);
-        motherloadMineScript.run();
+        motherloadMineScript.run(config);
     }
 
     protected void shutDown() {

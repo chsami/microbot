@@ -23,7 +23,7 @@ public class FishingScript extends Script {
             if (!super.run()) return;
 
             try {
-                    if (Microbot.isMoving() || Microbot.isAnimating()) {
+                    if (Rs2Player.isMoving() || Rs2Player.isAnimating()) {
                         return;
                     }
                     if (Random.random(1, 300) == 2) {
@@ -37,10 +37,8 @@ public class FishingScript extends Script {
                     if (Rs2Inventory.isFull()) {
                         if (config.Fish().getName().equals("shrimp")) {
                             Rs2Inventory.dropAll(x -> x.slot > 0);
-                            return;
                         } else {
                             Rs2Inventory.dropAll(x -> x.slot > 4);
-                            return;
                         }
 
                     } else {

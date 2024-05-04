@@ -19,6 +19,7 @@ public class GemsScript extends Script {
     public boolean run(CraftingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
+            if (!Microbot.isLoggedIn()) return;
             try {
                 if (!Microbot.hasLevel(config.gemType().getLevelRequired(), Skill.CRAFTING)) {
                     Microbot.showMessage("Crafting level to low to craft " + config.gemType().getName());
