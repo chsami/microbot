@@ -184,15 +184,26 @@ public interface PlayerAssistConfig extends Config {
         return true;
     }
     @ConfigItem(
-            keyName = "Price of items to loot",
-            name = "Price of items to loot",
-            description = "Price of items to loot comma seperated",
+            keyName = "Min Price of items to loot",
+            name = "Min. Price of items to loot",
+            description = "Min. Price of items to loot",
             position = 1,
             section = lootSection
     )
-    default int priceOfItemsToLoot()
+    default int minPriceOfItemsToLoot()
     {
-        return 10000;
+        return 5000;
+    }
+    @ConfigItem(
+            keyName = "Max Price of items to loot",
+            name = "Max. Price of items to loot",
+            description = "Max. Price of items to loot default is set to 10M",
+            position = 1,
+            section = lootSection
+    )
+    default int maxPriceOfItemsToLoot()
+    {
+        return 10000000;
     }
     @ConfigItem(
             keyName = "Loot arrows",
