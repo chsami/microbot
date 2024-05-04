@@ -167,7 +167,7 @@ public class SandCrabScript extends Script {
      * @return true if npc is aggressive
      */
     private boolean isNpcAggressive() {
-        List<NPC> npcs = Rs2Npc.getNpcs("Sandy rocks");
+        List<NPC> npcs = Rs2Npc.getNpcs("Sandy rocks").collect(Collectors.toList());
         if (npcs.isEmpty()) {
             return false;
         }
