@@ -2,12 +2,10 @@
 
 ### 1.Download the client & Java - Windows
 
-You can watch this video to help you startup the client.
-
-[![Watch the video](img_2.png)](https://youtu.be/v=EbtdZnxq5iw&t=0s)
-
 You can visit https://github.com/chsami/microbot/releases and download the latest client snapshot **SHADED** release build.
 You will also see nightly builds, these are unstable development builds, you can try them out if you want but we recommend you always use the release build to avoid any bugs
+
+[![Watch the video](img_2.png)](https://youtu.be/v=EbtdZnxq5iw&t=0s)
 
 ![img_1.png](img_1.png)
 
