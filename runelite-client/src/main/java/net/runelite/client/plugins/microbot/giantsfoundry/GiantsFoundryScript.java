@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.giantsfoundry;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.GameObject;
 import net.runelite.api.ObjectComposition;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -24,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryState.*;
-import static net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryState.getHeatAmount;
 import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.getEquippedItem;
 
 public class GiantsFoundryScript extends Script {
@@ -36,13 +36,17 @@ public class GiantsFoundryScript extends Script {
 
     public static State state;
     static GiantsFoundryConfig config;
+
     public boolean run(GiantsFoundryConfig config) {
         this.config = config;
-        state = State.CRAFTING_WEAPON;
-        doAction = true;
+        setState(State.CRAFTING_WEAPON, true);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
+            if (!Microbot.isLoggedIn()) {
+                setState(state, true);
+                sleep(2000);
+                return;
+            }
             try {
                 final Rs2Item weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
                 final Rs2Item shield = getEquippedItem(EquipmentInventorySlot.SHIELD);
@@ -215,23 +219,33 @@ public class GiantsFoundryScript extends Script {
 
         calculateGameState();
 
-        if (!doAction && !BonusWidget.isActive()) return;
 
-        doAction = false;
+        Stage stage = GiantsFoundryState.getCurrentStage();
+        if (stage == null) return;
 
         switch (state) {
             case HEATING:
+                boolean isAtLavaTile = Rs2Player.getWorldLocation().equals(new WorldPoint(3371, 11497, 0))
+                        || Rs2Player.getWorldLocation().equals(new WorldPoint(3371, 11498, 0));
+                if (!doAction && isAtLavaTile) return;
                 Rs2GameObject.interact(LAVA_POOL, "Heat-preform");
                 Rs2Player.waitForAnimation();
                 break;
             case COOLING_DOWN:
+                boolean isAtWaterFallTile = Rs2Player.getWorldLocation().equals(new WorldPoint(3360, 11489, 0));
+                if (!doAction && isAtWaterFallTile) return;
                 Rs2GameObject.interact(WATERFALL, "Cool-preform");
                 Rs2Player.waitForAnimation();
                 break;
             case CRAFTING_WEAPON:
+                boolean isAtStageTile = stage != null
+                        && Rs2Player.getWorldLocation().equals(stage.getLocation());
+                if (!doAction && !BonusWidget.isActive() && isAtStageTile) return;
                 craftWeapon();
                 break;
         }
+
+        doAction = false;
 
     }
 
