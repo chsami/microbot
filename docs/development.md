@@ -76,7 +76,7 @@ To attack an npc we'll have to look into our Rs2Npc utility class.
 
 
 ```java
-Rs2Npc.attack("man")
+Rs2Npc.attack("man");
 ```
 
 Our example script should look like this now.
@@ -94,7 +94,8 @@ public class ExampleScript extends Script {
                 long startTime = System.currentTimeMillis();
 
                 //SCRIPT CODE COMES HERE
-
+                Rs2Npc.attack("man");
+                
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
                 System.out.println("Total time for loop " + totalTime);
@@ -113,7 +114,9 @@ public class ExampleScript extends Script {
 }
 ```
 
-The script should now attack the man
+The script should now attack the man when you turn on the "example" plugin
+
+![img_22.png](img_22.png)
 
 ![img_9.png](img_9.png)
 
