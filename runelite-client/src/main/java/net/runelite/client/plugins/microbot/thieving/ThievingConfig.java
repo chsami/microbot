@@ -69,6 +69,18 @@ public interface ThievingConfig extends Config {
         return Rs2Food.MONKFISH;
     }
 
+    @ConfigItem(
+            keyName = "FoodAmount",
+            name = "Food Amount",
+            description = "Amount of food to withdraw from bank",
+            position = 2,
+            section = foodAndHitpoints
+    )
+    default int foodAmount()
+    {
+        return 5;
+    }
+
 
     String coinPouchSection = "COIN POUCH";
 

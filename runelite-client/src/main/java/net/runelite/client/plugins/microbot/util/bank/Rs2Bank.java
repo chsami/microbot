@@ -138,6 +138,16 @@ public class Rs2Bank {
      * @return boolean
      */
     public static boolean hasBankItem(String name, int amount) {
+        return hasBankItem(name, amount, false);
+    }
+
+    /**
+     * check if the player has a bank item identified by exact name.
+     *
+     * @param name the item name
+     * @return boolean
+     */
+    public static boolean hasBankItem(String name, int amount, boolean exact) {
         return findBankItem(name, false, amount) != null;
     }
 
