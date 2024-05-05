@@ -115,11 +115,20 @@ public class VorkathScript extends Script {
                     leaveVorkath();
                 }
 
+                if (Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
+                    state = State.TELEPORT_AWAY;
+                }
+
 
                 init = false;
 
                 switch (state) {
                     case BANKING:
+                        if (Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
+                            Microbot.showMessage("Out of ammo!");
+                            sleep(5000);
+                            return;
+                        }
                         if (isCloseToRelleka() && Rs2Inventory.count() >= 27) {
                             state = State.WALK_TO_VORKATH_ISLAND;
                         }
@@ -315,9 +324,9 @@ public class VorkathScript extends Script {
                     case TELEPORT_AWAY:
                         togglePrayer(false);
                         Rs2Player.toggleRunEnergy(true);
+                        Rs2Inventory.wield(primaryBolts);
                         boolean reachedDestination = Rs2Bank.walkToBank();
                         if (reachedDestination) {
-                            Rs2Inventory.wield(primaryBolts);
                             healAndDrinkPrayerPotion();
                             state = State.BANKING;
                         }

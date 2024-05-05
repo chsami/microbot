@@ -241,7 +241,7 @@ public class Microbot {
         mouseEvent(500, point);
 
         if (!Microbot.getClient().isClientThread()) {
-            sleep(100, 200);
+            sleep(50, 100);
         }
     }
 
