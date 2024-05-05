@@ -1496,10 +1496,9 @@ public class Rs2Inventory {
         int param1;
         int identifier = 3;
         MenuAction menuAction = MenuAction.CC_OP;
-        ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
         if (!action.isEmpty()) {
             String[] actions;
-            actions = itemComposition.getInventoryActions();
+            actions = rs2Item.actions;
 
             for (int i = 0; i < actions.length; i++) {
                 if (action.equalsIgnoreCase(actions[i])) {

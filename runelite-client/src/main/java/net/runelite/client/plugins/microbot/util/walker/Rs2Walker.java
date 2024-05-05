@@ -121,7 +121,6 @@ public class Rs2Walker {
                         break;
 
                     System.out.println(currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()));
-                    sleep(50, 100);
                     if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance()
                             || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
                         // InstancedRegions require localPoint instead of worldpoint to navigate
@@ -130,7 +129,8 @@ public class Rs2Walker {
                             sleep(600, 1000);
                         } else {
                             Rs2Walker.walkMiniMap(currentWorldPoint);
-                            sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < Random.random(3, 5), 100, 3000);
+                            int randomInt = Random.random(3, 5);
+                            sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < randomInt, 100, 2000);
                             break;
                         }
                         //avoid tree attacking you in draynor
