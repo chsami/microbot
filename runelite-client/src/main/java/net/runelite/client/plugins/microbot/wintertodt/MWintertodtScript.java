@@ -67,7 +67,7 @@ public class MWintertodtScript extends Script {
                 GameObject brazier = Rs2GameObject.findObject(BRAZIER_29312, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
                 boolean hasFixAction = brazier != null && Rs2GameObject.hasAction(Rs2GameObject.convertGameObjectToObjectComposition(brazier), "fix");
                 GameObject fireBrazier = Rs2GameObject.findObject(ObjectID.BURNING_BRAZIER_29314, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
-                boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount())
+                boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true)
                         && Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < config.hpTreshhold();
                 Widget wintertodtHealthbar = Rs2Widget.getWidget(25952276);
 
@@ -336,11 +336,11 @@ public class MWintertodtScript extends Script {
     }
 
     private boolean handleBankLogic(MWintertodtConfig config) {
-        if (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName())) {
+        if (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName(), true)) {
             eatAt(99);
             return true;
         }
-        if (Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount())) {
+        if (Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), true)) {
             state = State.ENTER_ROOM;
             return true;
         }
@@ -368,13 +368,13 @@ public class MWintertodtScript extends Script {
         if (config.axeInInventory()) {
             Rs2Bank.withdrawX(true, axe, 1);
         }
-        if (!Rs2Bank.hasBankItem(config.food().getName(), config.foodAmount())) {
+        if (!Rs2Bank.hasBankItem(config.food().getName(), config.foodAmount(), true)) {
             Microbot.showMessage("Insufficient food supply");
             Microbot.pauseAllScripts = true;
             return true;
         }
         Rs2Bank.withdrawX(config.food().getName(), config.foodAmount() - foodCount);
-        sleepUntil(() -> Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount()));
+        sleepUntil(() -> Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true));
         return false;
     }
 }

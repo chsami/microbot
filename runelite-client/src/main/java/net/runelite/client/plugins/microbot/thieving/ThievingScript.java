@@ -31,7 +31,7 @@ public class ThievingScript extends Script {
                     Microbot.status = "Getting food from bank...";
                     if (Rs2Bank.walkToBank()) {
                         Rs2Bank.useBank();
-                        Rs2Bank.withdrawX(true, config.food().getName(), 5);
+                        Rs2Bank.withdrawX(true, config.food().getName(), config.foodAmount(), true);
                         final Rs2Item amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
                         if (amulet == null) {
                             Rs2Bank.withdrawItem(true, "dodgy necklace");

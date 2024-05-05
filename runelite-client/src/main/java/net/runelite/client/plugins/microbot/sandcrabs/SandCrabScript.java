@@ -90,7 +90,7 @@ public class SandCrabScript extends Script {
                     if (Rs2Inventory.getInventoryFood().isEmpty()) {
                         Rs2Walker.walkTo(new WorldPoint(1720, 3465, 0));
                         if (Rs2Bank.useBank()) {
-                            Rs2Bank.withdrawAll(config.food().getName());
+                            Rs2Bank.withdrawAll(config.food().getName(), true);
                         }
                         return;
                     }
