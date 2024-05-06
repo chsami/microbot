@@ -32,6 +32,7 @@ import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -166,7 +167,8 @@ public class MicrobotPlugin extends Plugin {
         if (event.getContainerId() == 4) {
             //Code for Bank's Rs2Shop
             java.util.List<Rs2Item> shopItems = updateItemContainer(4, event);
-            System.out.println(shopItems.size());
+            //  System.out.println(shopItems.size());
+            Rs2Shop.storeShopItemsInMemory(event);
         }
     }
 
