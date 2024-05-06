@@ -54,13 +54,15 @@ public class MWintertodtScript extends Script {
 
                 long startTime = System.currentTimeMillis();
 
-                if (config.axeInInventory() && axe.equals("") && !Rs2Inventory.hasItem("axe")) {
-                    Microbot.showMessage("It seems that you selected axeInInventory option but no axe was found in your inventory.");
-                    sleep(5000);
-                    return;
+                if (config.axeInInventory()) {
+                    if (!Rs2Inventory.hasItem("axe")) {
+                        Microbot.showMessage("It seems that you selected axeInInventory option but no axe was found in your inventory.");
+                        sleep(5000);
+                        return;
+                    }
+                    axe = Rs2Inventory.get("axe").name;
                 }
 
-                axe = Rs2Inventory.get("axe").name;
 
                 boolean wintertodtRespawning = Rs2Widget.hasWidget("returns in");
                 boolean isWintertodtAlive = Rs2Widget.hasWidget("Wintertodt's Energy");
@@ -244,7 +246,6 @@ public class MWintertodtScript extends Script {
     }
 
     private boolean shouldChopRoots() {
-        //issue here
         if (Rs2Inventory.isFull()) {
             if (state == State.CHOP_ROOTS) {
                 setLockState(State.CHOP_ROOTS, false);
