@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
@@ -340,7 +341,7 @@ public class Rs2Inventory {
      */
     public static boolean dropAll(Integer... ids) {
         for (Rs2Item item :
-        items().stream().filter(x -> Arrays.stream(ids).anyMatch(id -> id == x.id)).collect(Collectors.toList())) {
+                items().stream().filter(x -> Arrays.stream(ids).anyMatch(id -> id == x.id)).collect(Collectors.toList())) {
             if (item == null) continue;
             invokeMenu(item, "Drop");
             sleep(300, 600);
@@ -501,6 +502,7 @@ public class Rs2Inventory {
     /**
      * Gets the item in the inventory with the specified name.
      * this method ignores casing
+     *
      * @param name The name to match.
      * @return The item with the specified name, or null if not found.
      */
@@ -511,6 +513,7 @@ public class Rs2Inventory {
     /**
      * Gets the item in the inventory with the specified name.
      * this method ignores casing
+     *
      * @param name The name to match.
      * @return The item with the specified name, or null if not found.
      */
@@ -544,7 +547,7 @@ public class Rs2Inventory {
     /**
      * Checks if the player has a certain quantity of an item.
      *
-     * @param id The id of the item to check.
+     * @param id     The id of the item to check.
      * @param amount The desired quantity of the item.
      * @return True if the player has the specified quantity of the item, false otherwise.
      */
@@ -561,8 +564,8 @@ public class Rs2Inventory {
     /**
      * Checks if the player has a certain quantity of an item.
      *
-     * @param id The id of the item to check.
-     * @param amount The desired quantity of the item.
+     * @param id        The id of the item to check.
+     * @param amount    The desired quantity of the item.
      * @param stackable A boolean indicating if the item is stackable.
      * @return True if the player has the specified quantity of the item, false otherwise.
      */
@@ -574,7 +577,7 @@ public class Rs2Inventory {
     /**
      * Checks if the player has a certain quantity of an item.
      *
-     * @param name The name of the item to check.
+     * @param name   The name of the item to check.
      * @param amount The desired quantity of the item.
      * @return True if the player has the specified quantity of the item, false otherwise.
      */
@@ -585,8 +588,8 @@ public class Rs2Inventory {
     /**
      * Checks if the player has a certain quantity of an item.
      *
-     * @param name The name of the item to check.
-     * @param amount The desired quantity of the item.
+     * @param name      The name of the item to check.
+     * @param amount    The desired quantity of the item.
      * @param stackable A boolean indicating if the item is stackable.
      * @return True if the player has the specified quantity of the item, false otherwise.
      */
@@ -597,10 +600,10 @@ public class Rs2Inventory {
     /**
      * Checks if the player has a certain quantity of an item.
      *
-     * @param name The name of the item to check.
-     * @param amount The desired quantity of the item.
+     * @param name      The name of the item to check.
+     * @param amount    The desired quantity of the item.
      * @param stackable A boolean indicating if the item is stackable.
-     * @param exact A boolean indicating whether the check should be exact or partial for non-stackable items.
+     * @param exact     A boolean indicating whether the check should be exact or partial for non-stackable items.
      * @return True if the player has the specified quantity of the item, false otherwise.
      */
     public static boolean hasItemAmount(String name, int amount, boolean stackable, boolean exact) {
@@ -618,7 +621,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param id
      * @return boolean
      */
@@ -627,7 +629,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param name
      * @return boolean
      */
@@ -636,7 +637,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param name
      * @return boolean
      */
@@ -645,7 +645,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param names
      * @return boolean
      */
@@ -663,18 +662,18 @@ public class Rs2Inventory {
         return items().stream()
                 .filter(x -> x.slot == slot)
                 .map(x -> x.actions)
-                .findFirst().orElse(new String[] {});
+                .findFirst().orElse(new String[]{});
     }
 
     public static List<Rs2Item> getInventoryFood() {
         return items().stream()
-                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a!= null && a.equalsIgnoreCase("eat")))
+                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")))
                 .collect(Collectors.toList());
     }
 
     public static List<Rs2Item> getPotions() {
         return items().stream()
-                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a!= null && a.equalsIgnoreCase("drink")))
+                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a != null && a.equalsIgnoreCase("drink")))
                 .collect(Collectors.toList());
     }
 
@@ -896,14 +895,15 @@ public class Rs2Inventory {
     public static boolean interact(String name, String action, boolean exact) {
         Rs2Item rs2Item;
         if (exact) {
-             rs2Item = items().stream().filter(x -> x.name.equalsIgnoreCase(name.toLowerCase())).findFirst().orElse(null);
+            rs2Item = items().stream().filter(x -> x.name.equalsIgnoreCase(name.toLowerCase())).findFirst().orElse(null);
         } else {
-             rs2Item = items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).findFirst().orElse(null);
+            rs2Item = items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).findFirst().orElse(null);
         }
         if (rs2Item == null) return false;
         invokeMenu(rs2Item, action);
         return true;
     }
+
     /**
      * Interacts with an item in the inventory using the first available action based on the specified filter.
      *
@@ -1052,8 +1052,8 @@ public class Rs2Inventory {
 
         if (inventory == null) return false;
 
-        for (int slot:
-             slots) {
+        for (int slot :
+                slots) {
             if (slot > inventory.getDynamicChildren().length) return false;
         }
 
@@ -1323,7 +1323,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param name
      */
     public static void equip(String name) {
@@ -1331,7 +1330,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param name item name
      */
     public static void wield(String name) {
@@ -1340,7 +1338,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param name item name
      */
     public static void wear(String name) {
@@ -1348,7 +1345,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param id item id
      */
     public static void equip(int id) {
@@ -1356,7 +1352,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param id item id
      */
     public static void wield(int id) {
@@ -1364,7 +1359,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param id item id
      */
     public static void wear(int id) {
@@ -1373,7 +1367,8 @@ public class Rs2Inventory {
 
     /**
      * use unnoted inventory item on ingame object
-     * @param item name of the item to use
+     *
+     * @param item     name of the item to use
      * @param objectID to use item on
      * @return
      */
@@ -1386,7 +1381,8 @@ public class Rs2Inventory {
 
     /**
      * use unnoted inventory item on ingame object
-     * @param item name of the item to use
+     *
+     * @param item   name of the item to use
      * @param object to use item on
      * @return
      */
@@ -1401,6 +1397,7 @@ public class Rs2Inventory {
 
     /**
      * use inventory item on ingame object
+     *
      * @param item
      * @param objectID
      * @return
@@ -1422,15 +1419,14 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param name
      * @return
      */
     public static boolean hasNotedItem(String name) {
         return getNotedItem(name, false) != null;
     }
+
     /**
-     *
      * @param name
      * @param exact
      * @return
@@ -1458,7 +1454,7 @@ public class Rs2Inventory {
      * Method executes menu actions
      *
      * @param rs2Item Current item to interact with
-     * @param action Action used on the item
+     * @param action  Action used on the item
      */
     private static void invokeMenu(Rs2Item rs2Item, String action) {
         if (rs2Item == null) return;
@@ -1506,6 +1502,39 @@ public class Rs2Inventory {
             identifier = 1;
             param1 = 30605312;
         }
+
+        // Shop Inventory
+        switch (action) {
+            case "Value":
+                // Logic to check Value of item
+                identifier = 1;
+                param1 = 19726336;
+            case "Sell 1":
+                // Logic to sell one item
+                identifier = 2;
+                param1 = 19726336;
+                break;
+            case "Sell 5":
+                // Logic to sell five items
+                identifier = 3;
+                param1 = 19726336;
+                break;
+            case "Sell 10":
+                // Logic to sell ten items
+                identifier = 4;
+                param1 = 19726336;
+                break;
+            case "Sell 50":
+                // Logic to sell fifty items
+                identifier = 5;
+                param1 = 19726336;
+                break;
+            default:
+                System.out.println(action);
+                throw new IllegalArgumentException("Invalid action");
+
+        }
+
         Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
         //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
     }
@@ -1528,6 +1557,38 @@ public class Rs2Inventory {
             return null;
         });
     }
+
+    /**
+     * Sell item to the shop
+     *
+     * @param itemName item to sell
+     * @param quantity STRING quantity of items to sell
+     * @return true if the item was successfully sold, false otherwise
+     */
+    public static boolean sellItem(String itemName, String quantity) {
+        try {
+            // Retrieve Rs2Item object corresponding to the item name
+            Rs2Item rs2Item = items().stream()
+                    .filter(item -> item.name.equalsIgnoreCase(itemName))
+                    .findFirst().orElse(null);
+
+            if (rs2Item == null) {
+                System.out.println("Item not found in inventory.");
+                return false;
+            }
+
+            String action = "Sell ";
+            String actionAndQuantity = (action + quantity);
+
+            invokeMenu(rs2Item, actionAndQuantity);
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
+    }
+
+
 }
 
 
