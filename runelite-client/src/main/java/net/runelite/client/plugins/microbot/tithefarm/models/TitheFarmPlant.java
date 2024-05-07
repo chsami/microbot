@@ -27,7 +27,9 @@ package net.runelite.client.plugins.microbot.tithefarm.models;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.GameObject;
+import net.runelite.api.GroundObject;
 import net.runelite.api.ObjectID;
+import net.runelite.api.TileObject;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.tithefarm.TitheFarmingScript;
 import net.runelite.client.plugins.microbot.tithefarm.enums.TitheFarmMaterial;
@@ -59,7 +61,7 @@ public class TitheFarmPlant {
 
     @Getter
     @Setter
-    private GameObject gameObject;
+    private TileObject gameObject;
 
     public int regionX;
     public int regionY;
@@ -67,7 +69,7 @@ public class TitheFarmPlant {
     public TitheFarmPlant(int regionX, int regionY, int index) {
         this.planted = Instant.now();
         this.state = TitheFarmPlantState.UNWATERED;
-        this.gameObject = (GameObject) Rs2GameObject.findObjectByLocation(fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(), regionX, regionY, 0));
+        this.gameObject = Rs2GameObject.findGameObjectByLocation(fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(), regionX, regionY, 0));
         this.regionX = regionX;
         this.regionY = regionY;
         this.index = index;

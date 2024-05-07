@@ -1508,7 +1508,7 @@ public class Rs2Inventory {
             }
         }
         param0 = rs2Item.slot;
-        if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty")) {
+        if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")) {
             identifier++;
         }
         if (Rs2Bank.isOpen()) {

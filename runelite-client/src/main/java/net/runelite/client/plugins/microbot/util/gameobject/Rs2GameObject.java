@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
@@ -875,5 +876,12 @@ public class Rs2GameObject {
             }
         }
         return ids;
+    }
+
+    @Nullable
+    public static ObjectComposition getObjectComposition(int id)
+    {
+        ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
+        return objectComposition.getImpostorIds() == null ? objectComposition : objectComposition.getImpostor();
     }
 }
