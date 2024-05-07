@@ -192,11 +192,8 @@ public class Rs2Player {
 
     public static WorldPoint getWorldLocation() {
         if (Microbot.getClient().isInInstancedRegion()) {
-            WorldPoint playerInstancedWorldLocation =  WorldPoint.fromLocal(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getLocalLocation());
             LocalPoint l = LocalPoint.fromWorld(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation());
-            //in some instances areas like (tithe farm) the conversion is not needed
-            if (Microbot.getClient().getLocalPlayer().getLocalLocation().equals(l)) return Microbot.getClient().getLocalPlayer().getWorldLocation();
-            playerInstancedWorldLocation = WorldPoint.fromLocalInstance(Microbot.getClient(), l);
+            WorldPoint playerInstancedWorldLocation = WorldPoint.fromLocalInstance(Microbot.getClient(), l);
             return playerInstancedWorldLocation;
         } else {
             return Microbot.getClient().getLocalPlayer().getWorldLocation();
