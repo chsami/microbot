@@ -1533,6 +1533,34 @@ public class Rs2Inventory {
             param1 = 30605312;
         }
 
+        // Shop Inventory
+        switch (action) {
+            case "Value":
+                // Logic to check Value of item
+                identifier = 1;
+                param1 = 19726336;
+            case "Sell 1":
+                // Logic to sell one item
+                identifier = 2;
+                param1 = 19726336;
+                break;
+            case "Sell 5":
+                // Logic to sell five items
+                identifier = 3;
+                param1 = 19726336;
+                break;
+            case "Sell 10":
+                // Logic to sell ten items
+                identifier = 4;
+                param1 = 19726336;
+                break;
+            case "Sell 50":
+                // Logic to sell fifty items
+                identifier = 5;
+                param1 = 19726336;
+                break;
+        }
+
         Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
         //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
     }
