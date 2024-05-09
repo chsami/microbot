@@ -33,7 +33,6 @@ public class ThievingScript extends Script {
                     if (Rs2Bank.walkToBank()) {
                         Rs2Bank.useBank();
                         Rs2Bank.withdrawX(true, config.food().getName(), config.foodAmount(), true);
-                        final Rs2Item amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
                         if (!Rs2Equipment.isWearing("dodgy necklace")) {
                             Rs2Bank.withdrawItem(true, "dodgy necklace");
                         }
