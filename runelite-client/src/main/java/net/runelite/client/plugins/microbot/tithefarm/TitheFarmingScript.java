@@ -201,6 +201,7 @@ public class TitheFarmingScript extends Script {
                         }
                         break;
                     case STARTING:
+                        Rs2Player.toggleRunEnergy(true);
                         Rs2Tab.switchToInventoryTab();
                         init(config);
                         validateInventory();
@@ -285,7 +286,11 @@ public class TitheFarmingScript extends Script {
         final TitheFarmPlant finalPlant = plant;
 
         if (plant.getGameObject().getWorldLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) > DISTANCE_TRESHHOLD_MINIMAP_WALK) {
-            Rs2Walker.walkMiniMap(plant.getGameObject().getWorldLocation());
+            WorldPoint w = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
+                    plant.regionX,
+                    plant.regionY,
+                    Microbot.getClient().getPlane());
+            Rs2Walker.walkMiniMap(w, 1);
             return;
         }
 

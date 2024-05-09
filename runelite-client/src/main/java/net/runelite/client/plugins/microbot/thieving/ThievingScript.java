@@ -6,6 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.thieving.enums.ThievingNpc;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -32,8 +33,7 @@ public class ThievingScript extends Script {
                     if (Rs2Bank.walkToBank()) {
                         Rs2Bank.useBank();
                         Rs2Bank.withdrawX(true, config.food().getName(), config.foodAmount(), true);
-                        final Rs2Item amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
-                        if (amulet == null) {
+                        if (!Rs2Equipment.isWearing("dodgy necklace")) {
                             Rs2Bank.withdrawItem(true, "dodgy necklace");
                         }
                         Rs2Bank.closeBank();

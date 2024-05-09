@@ -136,9 +136,10 @@ public class PestControlScript extends Script {
                     }
 
                 } else {
+                    Rs2Walker.setTarget(null);
                     resetPortals();
                     walkToCenter = false;
-                    sleep(Random.random(1600, 2000));
+                    sleep(Random.random(1600, 1800));
                     if (!isInBoat) {
                         if (Microbot.getClient().getLocalPlayer().getCombatLevel() >= 100) {
                             Rs2GameObject.interact(ObjectID.GANGPLANK_25632);

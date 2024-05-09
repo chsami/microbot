@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
@@ -1508,7 +1509,7 @@ public class Rs2Inventory {
             }
         }
         param0 = rs2Item.slot;
-        if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty")) {
+        if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")) {
             identifier++;
         }
         if (Rs2Bank.isOpen()) {
@@ -1531,6 +1532,7 @@ public class Rs2Inventory {
             identifier = 1;
             param1 = 30605312;
         }
+
         Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
         //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
     }
@@ -1553,6 +1555,37 @@ public class Rs2Inventory {
             return null;
         });
     }
+
+    /**
+     * Sell item to the shop
+     *
+     * @param itemName item to sell
+     * @param quantity STRING quantity of items to sell
+     * @return true if the item was successfully sold, false otherwise
+     */
+    public static boolean sellItem(String itemName, String quantity) {
+        try {
+            // Retrieve Rs2Item object corresponding to the item name
+            Rs2Item rs2Item = items().stream()
+                    .filter(item -> item.name.equalsIgnoreCase(itemName))
+                    .findFirst().orElse(null);
+
+            if (rs2Item == null) {
+                System.out.println("Item not found in inventory.");
+                return false;
+            }
+
+            String action = "Sell ";
+            String actionAndQuantity = (action + quantity);
+            invokeMenu(rs2Item, actionAndQuantity);
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
+    }
+
+
 }
 
 
