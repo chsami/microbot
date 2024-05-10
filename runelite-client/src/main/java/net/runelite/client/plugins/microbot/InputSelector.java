@@ -40,11 +40,13 @@ public class InputSelector {
 
     public void enableClick() {
         ClientUI.getClient().setEnabled(true);
+        Microbot.getClient().getCanvas().setFocusable(true);
         addAndRemoveButtons();
     }
 
     public void disableClick() {
         ClientUI.getClient().setEnabled(false);
+        Microbot.getClient().getCanvas().setFocusable(false);
         addAndRemoveButtons();
     }
 }

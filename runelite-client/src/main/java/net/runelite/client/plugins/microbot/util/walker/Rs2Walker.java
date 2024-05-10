@@ -146,7 +146,7 @@ public class Rs2Walker {
                     System.out.println("sleep walk minimap");
                 }
             }
-            return true;
+            return Rs2Player.getWorldLocation().distanceTo(target) < distance;
         });
         return false;
     }
