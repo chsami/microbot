@@ -148,7 +148,7 @@ public class Rs2Bank {
      * @return boolean
      */
     public static boolean hasBankItem(String name, int amount, boolean exact) {
-        return findBankItem(name, false, amount) != null;
+        return findBankItem(name, exact, amount) != null;
     }
 
     /**
