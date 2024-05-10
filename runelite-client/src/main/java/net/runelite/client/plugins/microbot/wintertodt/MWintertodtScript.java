@@ -29,7 +29,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static double version = 1.0;
+    public static double version = 1.4;
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -67,10 +67,10 @@ public class MWintertodtScript extends Script {
                 boolean wintertodtRespawning = Rs2Widget.hasWidget("returns in");
                 boolean isWintertodtAlive = Rs2Widget.hasWidget("Wintertodt's Energy");
                 GameObject brazier = Rs2GameObject.findObject(BRAZIER_29312, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
-                boolean hasFixAction = brazier != null && Rs2GameObject.hasAction(Rs2GameObject.convertGameObjectToObjectComposition(brazier), "fix");
                 GameObject fireBrazier = Rs2GameObject.findObject(ObjectID.BURNING_BRAZIER_29314, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
-                boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true)
-                        && Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < config.hpTreshhold();
+                boolean playerIsLowHealth = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) <= config.hpTreshhold();
+                boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, false)
+                        && playerIsLowHealth;
                 Widget wintertodtHealthbar = Rs2Widget.getWidget(25952276);
 
                 if (wintertodtHealthbar != null && isWintertodtAlive) {
@@ -337,7 +337,7 @@ public class MWintertodtScript extends Script {
     }
 
     private boolean handleBankLogic(MWintertodtConfig config) {
-        if (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName(), true)) {
+        if (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName(), false)) {
             eatAt(99);
             return true;
         }
@@ -374,7 +374,7 @@ public class MWintertodtScript extends Script {
             Microbot.pauseAllScripts = true;
             return true;
         }
-        Rs2Bank.withdrawX(config.food().getName(), config.foodAmount() - foodCount);
+        Rs2Bank.withdrawX(config.food().getId(), config.foodAmount() - foodCount);
         sleepUntil(() -> Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true));
         return false;
     }
