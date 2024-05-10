@@ -217,9 +217,18 @@ public class GiantsFoundryScript extends Script {
 
     public void handleGameLoop() {
 
-        calculateGameState();
-
-
+        int remainingDuration = GiantsFoundryState.heatingCoolingState.getRemainingDuration();
+        int change = GiantsFoundryState.getHeatChangeNeeded();
+        if (remainingDuration == 0 && change == 0 && state != State.CRAFTING_WEAPON) {
+            setState(State.CRAFTING_WEAPON);
+        }
+        if (remainingDuration != 0) return;
+        
+        if (change < 0) {
+            setState(State.COOLING_DOWN);
+        } else if (change > 0) {
+            setState(State.HEATING);
+        }
         Stage stage = GiantsFoundryState.getCurrentStage();
         if (stage == null) return;
 
@@ -229,13 +238,19 @@ public class GiantsFoundryScript extends Script {
                         || Rs2Player.getWorldLocation().equals(new WorldPoint(3371, 11498, 0));
                 if (!doAction && isAtLavaTile) return;
                 Rs2GameObject.interact(LAVA_POOL, "Heat-preform");
-                Rs2Player.waitForAnimation();
+                GiantsFoundryState.heatingCoolingState.stop();
+                GiantsFoundryState.heatingCoolingState.setup(7, 0, "heats");
+                GiantsFoundryState.heatingCoolingState.start(GiantsFoundryState.getHeatAmount());
+                sleepUntil(() -> GiantsFoundryState.heatingCoolingState.getRemainingDuration() <= 1);
                 break;
             case COOLING_DOWN:
                 boolean isAtWaterFallTile = Rs2Player.getWorldLocation().equals(new WorldPoint(3360, 11489, 0));
                 if (!doAction && isAtWaterFallTile) return;
                 Rs2GameObject.interact(WATERFALL, "Cool-preform");
-                Rs2Player.waitForAnimation();
+                GiantsFoundryState.heatingCoolingState.stop();
+                GiantsFoundryState.heatingCoolingState.setup(-7, 0, "cools");
+                GiantsFoundryState.heatingCoolingState.start(GiantsFoundryState.getHeatAmount());
+                sleepUntil(() -> GiantsFoundryState.heatingCoolingState.getRemainingDuration() <= 1);
                 break;
             case CRAFTING_WEAPON:
                 boolean isAtStageTile = stage != null
@@ -249,53 +264,7 @@ public class GiantsFoundryScript extends Script {
 
     }
 
-    private void calculateGameState() {
-        int actionsLeft = GiantsFoundryState.getActionsForHeatLevel();
-        Heat currentHeat = GiantsFoundryState.getCurrentHeat();
-        Heat requiredHeat = GiantsFoundryState.getCurrentStage().getHeat();
 
-        if (currentHeat == requiredHeat) {
-            if (actionsLeft > 8 && state != State.CRAFTING_WEAPON) {
-                setState(State.CRAFTING_WEAPON);
-                return;
-            } else if (state == State.CRAFTING_WEAPON && actionsLeft > 3) {
-                return;
-            }
-        }
-
-        switch (currentHeat) {
-            case LOW:
-                if (requiredHeat != Heat.LOW) {
-                    setState(State.HEATING);
-                }
-                break;
-            case MED:
-                if (requiredHeat == Heat.HIGH) {
-                    setState(State.HEATING);
-                } else {
-                    setState(State.COOLING_DOWN);
-                }
-                break;
-            case HIGH:
-                if (requiredHeat != Heat.HIGH) {
-                    setState(State.COOLING_DOWN);
-                }
-                break;
-            case NONE:
-                int currentHeatAmount = getHeatAmount();
-                int[] low = getLowHeatRange();
-                int[] med = getMedHeatRange();
-                int[] high = getHighHeatRange();
-                if ((currentHeatAmount <= low[1]) ||
-                        ((currentHeatAmount >= low[1] && currentHeatAmount <= med[0]) && (requiredHeat == Heat.HIGH || requiredHeat == Heat.MED || requiredHeat == Heat.NONE)) ||
-                        ((currentHeatAmount >= med[1] && currentHeatAmount <= high[0]) && requiredHeat == Heat.HIGH || requiredHeat == Heat.NONE)) {
-                    setState(State.HEATING);
-                } else {
-                    setState(State.COOLING_DOWN);
-                }
-                break;
-        }
-    }
 
     public void craftWeapon() {
         Stage stage = GiantsFoundryState.getCurrentStage();

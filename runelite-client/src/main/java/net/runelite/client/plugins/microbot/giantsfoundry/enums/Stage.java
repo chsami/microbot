@@ -17,4 +17,14 @@ public enum Stage
     private final int progressPerAction;
     private final int heatChange;
     private final WorldPoint location;
+
+    public boolean isHeating()
+    {
+        return heatChange > 0;
+    }
+
+    public boolean isCooling()
+    {
+        return heatChange < 0;
+    }
 }
