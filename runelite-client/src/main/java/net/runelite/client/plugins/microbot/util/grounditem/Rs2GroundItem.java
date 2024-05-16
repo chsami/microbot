@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.grounditem;
 
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.grounditems.GroundItem;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -10,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
 import java.awt.*;
@@ -203,10 +205,13 @@ public class Rs2GroundItem {
                 Rs2GroundItem.getAll(range)
         );
         for (RS2Item rs2Item : groundItems) {
-            if (Rs2Inventory.isFull(rs2Item.getItem().getName())) return false;
+            if (Rs2Inventory.isFull(rs2Item.getItem().getName())) continue;
+            if (!hasLineOfSight(rs2Item.getTile())) continue;
             long totalPrice = (long) Microbot.getClientThread().runOnClientThread(() ->
                     Microbot.getItemManager().getItemPrice(rs2Item.getItem().getId()) * rs2Item.getTileItem().getQuantity());
             if (totalPrice >= value) {
+                if (Rs2Inventory.isFull() && Rs2Player.eatAt(100))
+                    Rs2Player.waitForAnimation();
                 return interact(rs2Item);
             }
         }
@@ -218,10 +223,13 @@ public class Rs2GroundItem {
                 Rs2GroundItem.getAll(range)
         );
         for (RS2Item rs2Item : groundItems) {
-            if (Rs2Inventory.isFull(rs2Item.getItem().getName())) return false;
+            if (Rs2Inventory.isFull(rs2Item.getItem().getName())) continue;
+            if (!hasLineOfSight(rs2Item.getTile())) continue;
             long totalPrice = (long) Microbot.getClientThread().runOnClientThread(() ->
                     Microbot.getItemManager().getItemPrice(rs2Item.getItem().getId()) * rs2Item.getTileItem().getQuantity());
             if (totalPrice >= minValue && totalPrice <= maxValue) {
+                if (Rs2Inventory.isFull() && Rs2Player.eatAt(100))
+                    Rs2Player.waitForAnimation();
                 return interact(rs2Item);
             }
         }
@@ -368,5 +376,14 @@ public class Rs2GroundItem {
             }
         }
         return false;
+    }
+
+    public static boolean hasLineOfSight(Tile tile) {
+        if (tile == null) return false;
+        return new WorldArea(
+                tile.getWorldLocation(),
+                1,
+                1)
+                .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
     }
 }

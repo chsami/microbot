@@ -870,7 +870,6 @@ public class Rs2GameObject {
                     gameObject.sizeY())
                     .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
         } else {
-            WallObject wallObject = (WallObject) tileObject;
             return new WorldArea(
                     tileObject.getWorldLocation(),
                     2,
