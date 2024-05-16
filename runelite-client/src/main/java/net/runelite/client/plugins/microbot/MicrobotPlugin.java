@@ -155,7 +155,7 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
-        //System.out.println("Event Container ID: " + event.getContainerId());
+        System.out.println("Event Container ID: " + event.getContainerId());
 
         if (event.getContainerId() == InventoryID.BANK.getId()) {
             Rs2Bank.storeBankItemsInMemory(event);
@@ -167,6 +167,12 @@ public class MicrobotPlugin extends Plugin {
             Rs2Equipment.storeEquipmentItemsInMemory(event);
         }
 
+        if (event.getContainerId() == 64) { // Mage Guild Shop
+            //Code for Bank's Rs2Shop
+            java.util.List<Rs2Item> shopItems = updateItemContainer(64, event);
+            System.out.println(shopItems.size());
+            Rs2Shop.storeShopItemsInMemory(event, 64);
+        }
         if (event.getContainerId() == 435) { // Charter Shop
             //Code for Bank's Rs2Shop
             java.util.List<Rs2Item> shopItems = updateItemContainer(435, event);
