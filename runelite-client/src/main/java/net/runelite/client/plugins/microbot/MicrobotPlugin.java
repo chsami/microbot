@@ -155,6 +155,8 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
+        //System.out.println("Event Container ID: " + event.getContainerId());
+
         if (event.getContainerId() == InventoryID.BANK.getId()) {
             Rs2Bank.storeBankItemsInMemory(event);
         }
@@ -167,12 +169,41 @@ public class MicrobotPlugin extends Plugin {
         if (event.getContainerId() == 4) {
             //Code for Bank's Rs2Shop
             java.util.List<Rs2Item> shopItems = updateItemContainer(4, event);
+<<<<<<< HEAD
             Rs2Shop.storeShopItemsInMemory(event);
+=======
+            //System.out.println(shopItems.size());
+            Rs2Shop.storeShopItemsInMemory(event, 4);
+>>>>>>> f050d0f78 (Added More Shops)
         }
-        if (event.getContainerId() == 5) {
+        if (event.getContainerId() == 435) { // Charter Shop
             //Code for Bank's Rs2Shop
+<<<<<<< HEAD
             java.util.List<Rs2Item> shopItems = updateItemContainer(5, event);
             Rs2Shop.storeShopItemsInMemory(event);
+=======
+            java.util.List<Rs2Item> shopItems = updateItemContainer(435, event);
+            System.out.println(shopItems.size());
+            Rs2Shop.storeShopItemsInMemory(event, 435);
+        }
+        if (event.getContainerId() == 131) { // Lundail Rune Shop
+            //Code for Bank's Rs2Shop
+            java.util.List<Rs2Item> shopItems = updateItemContainer(131, event);
+            System.out.println(shopItems.size());
+            Rs2Shop.storeShopItemsInMemory(event, 131);
+        }
+        if (event.getContainerId() == 419) { // Baba Yaga Rune Shop
+            //Code for Bank's Rs2Shop
+            java.util.List<Rs2Item> shopItems = updateItemContainer(419, event);
+            System.out.println(shopItems.size());
+            Rs2Shop.storeShopItemsInMemory(event, 419);
+        }
+        if (event.getContainerId() == 318) { // Ordan (Blast Furnace Shop)
+            //Code for Bank's Rs2Shop
+            java.util.List<Rs2Item> shopItems = updateItemContainer(318, event);
+            System.out.println(shopItems.size());
+            Rs2Shop.storeShopItemsInMemory(event, 318);
+>>>>>>> f050d0f78 (Added More Shops)
         }
     }
 
