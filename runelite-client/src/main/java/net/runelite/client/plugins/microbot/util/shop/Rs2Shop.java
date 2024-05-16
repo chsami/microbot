@@ -141,20 +141,21 @@ public class Rs2Shop {
      *
      * @param e The event containing the latest shop items.
      */
-    public static void storeShopItemsInMemory(ItemContainerChanged e) {
-        List<Rs2Item> list = updateItemContainer(4, e);
+    public static void storeShopItemsInMemory(ItemContainerChanged e, int id) {
+        List<Rs2Item> list = updateItemContainer(id, e);
         if (list != null) {
             System.out.println("Storing shopItems");
             shopItems = list;
 
-            /* Print each item's name
+            /*Print each item's name
             System.out.println("Shop items:");
             for (Rs2Item item : shopItems) {
                 System.out.println(item.name);
                 System.out.println(item.quantity);
                 System.out.println(item.slot);
             }
-             */
+            */
+
         }
     }
 
