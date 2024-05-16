@@ -166,22 +166,9 @@ public class MicrobotPlugin extends Plugin {
         if (event.getContainerId() == InventoryID.EQUIPMENT.getId()) {
             Rs2Equipment.storeEquipmentItemsInMemory(event);
         }
-        if (event.getContainerId() == 4) {
-            //Code for Bank's Rs2Shop
-            java.util.List<Rs2Item> shopItems = updateItemContainer(4, event);
-<<<<<<< HEAD
-            Rs2Shop.storeShopItemsInMemory(event);
-=======
-            //System.out.println(shopItems.size());
-            Rs2Shop.storeShopItemsInMemory(event, 4);
->>>>>>> f050d0f78 (Added More Shops)
-        }
+
         if (event.getContainerId() == 435) { // Charter Shop
             //Code for Bank's Rs2Shop
-<<<<<<< HEAD
-            java.util.List<Rs2Item> shopItems = updateItemContainer(5, event);
-            Rs2Shop.storeShopItemsInMemory(event);
-=======
             java.util.List<Rs2Item> shopItems = updateItemContainer(435, event);
             System.out.println(shopItems.size());
             Rs2Shop.storeShopItemsInMemory(event, 435);
@@ -203,7 +190,6 @@ public class MicrobotPlugin extends Plugin {
             java.util.List<Rs2Item> shopItems = updateItemContainer(318, event);
             System.out.println(shopItems.size());
             Rs2Shop.storeShopItemsInMemory(event, 318);
->>>>>>> f050d0f78 (Added More Shops)
         }
     }
 
