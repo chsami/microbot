@@ -167,7 +167,11 @@ public class MicrobotPlugin extends Plugin {
         if (event.getContainerId() == 4) {
             //Code for Bank's Rs2Shop
             java.util.List<Rs2Item> shopItems = updateItemContainer(4, event);
-            //  System.out.println(shopItems.size());
+            Rs2Shop.storeShopItemsInMemory(event);
+        }
+        if (event.getContainerId() == 5) {
+            //Code for Bank's Rs2Shop
+            java.util.List<Rs2Item> shopItems = updateItemContainer(5, event);
             Rs2Shop.storeShopItemsInMemory(event);
         }
     }
