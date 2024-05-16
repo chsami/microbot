@@ -20,6 +20,7 @@ public interface ThievingConfig extends Config {
         return "Start near any of the npc\n" +
                 "Script default food is monkfish\n" +
                 "Script will walk to bank if out of food\n"+
+                "Make sure to start the script wearing dodgy necklace\n"+
                 "Script supports dodgy necklace\n"+
                 "Use Open CoinPouch Helper";
     }
@@ -69,6 +70,18 @@ public interface ThievingConfig extends Config {
         return Rs2Food.MONKFISH;
     }
 
+    @ConfigItem(
+            keyName = "FoodAmount",
+            name = "Food Amount",
+            description = "Amount of food to withdraw from bank",
+            position = 2,
+            section = foodAndHitpoints
+    )
+    default int foodAmount()
+    {
+        return 5;
+    }
+
 
     String coinPouchSection = "COIN POUCH";
 
@@ -82,6 +95,18 @@ public interface ThievingConfig extends Config {
     default int coinPouchTreshHold()
     {
         return 28;
+    }
+
+    @ConfigItem(
+            keyName = "KeepItem",
+            name = "Keep items above value",
+            description = "Keep items above the gp value",
+            position = 1,
+            section = coinPouchSection
+    )
+    default int keepItemsAboveValue()
+    {
+        return 10000;
     }
 
 }

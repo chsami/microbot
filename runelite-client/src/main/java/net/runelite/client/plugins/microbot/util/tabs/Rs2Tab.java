@@ -53,7 +53,6 @@ public class Rs2Tab {
     }
 
     public static boolean switchToInventoryTab() {
-        if (Rs2Bank.isOpen()) return true;
         if (getCurrentTab() == InterfaceTab.INVENTORY) {
             return true;
         }

@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.MicrobotInventorySetup.doesEquipmentMatch;
 import static net.runelite.client.plugins.microbot.util.MicrobotInventorySetup.doesInventoryMatch;
+import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.interact;
 
 
 enum State {
@@ -113,11 +115,20 @@ public class VorkathScript extends Script {
                     leaveVorkath();
                 }
 
+                if (Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
+                    state = State.TELEPORT_AWAY;
+                }
+
 
                 init = false;
 
                 switch (state) {
                     case BANKING:
+                        if (Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
+                            Microbot.showMessage("Out of ammo!");
+                            sleep(5000);
+                            return;
+                        }
                         if (isCloseToRelleka() && Rs2Inventory.count() >= 27) {
                             state = State.WALK_TO_VORKATH_ISLAND;
                         }
@@ -190,9 +201,9 @@ public class VorkathScript extends Script {
                         boolean result = drinkPotions();
 
                         if (result) {
-                            Rs2Npc.interact(NpcID.VORKATH_8059, "Poke");
+                            interact(NpcID.VORKATH_8059, "Poke");
                             Rs2Player.waitForWalking();
-                            Rs2Npc.interact(NpcID.VORKATH_8059, "Poke");
+                            interact(NpcID.VORKATH_8059, "Poke");
                             Rs2Player.waitForAnimation(10000);
                             Rs2Walker.walkFastLocal(
                                     LocalPoint.fromScene(48, 58)
@@ -228,7 +239,7 @@ public class VorkathScript extends Script {
                         }
                         if (Microbot.getClient().getLocalPlayer().getInteracting() == null || Microbot.getClient().getLocalPlayer().getInteracting().getName() == null ||
                                 !Microbot.getClient().getLocalPlayer().getInteracting().getName().equalsIgnoreCase("vorkath")) {
-                            Rs2Npc.attack("Vorkath");
+                            Rs2Npc.interact("Vorkath", "attack");
                         }
                         if (Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() >= 59) {
                             Rs2Walker.walkFastLocal(
@@ -313,9 +324,9 @@ public class VorkathScript extends Script {
                     case TELEPORT_AWAY:
                         togglePrayer(false);
                         Rs2Player.toggleRunEnergy(true);
+                        Rs2Inventory.wield(primaryBolts);
                         boolean reachedDestination = Rs2Bank.walkToBank();
                         if (reachedDestination) {
-                            Rs2Inventory.wield(primaryBolts);
                             healAndDrinkPrayerPotion();
                             state = State.BANKING;
                         }
@@ -325,7 +336,7 @@ public class VorkathScript extends Script {
                             Rs2Walker.walkTo(new WorldPoint(2640, 3693, 0));
                             torfin = Rs2Npc.getNpc(NpcID.TORFINN_10405);
                             if (torfin != null) {
-                                Rs2Npc.interact(torfin, "Collect");
+                                interact(torfin, "Collect");
                                 sleepUntil(() -> Rs2Widget.hasWidget("Retrieval Service"), 1500);
                                 if (Rs2Widget.hasWidget("I'm afraid I don't have anything")) { // this means we looted all our stuff
                                     return;
@@ -412,6 +423,9 @@ public class VorkathScript extends Script {
             Rs2Inventory.interact("venom", "drink");
         }
 
+        if (!Rs2Combat.inCombat() && state == State.PREPARE_FIGHT)
+            Rs2Player.waitForAnimation();
+
         return !drinkRangePotion && !drinkAntiFire && !drinkAntiVenom;
     }
 
@@ -428,7 +442,7 @@ public class VorkathScript extends Script {
     private void handleRedBall() {
         if (doesProjectileExistById(redProjectileId)) {
             redBallWalk();
-            Rs2Npc.attack("Vorkath");
+            Rs2Npc.interact("Vorkath", "attack");
         }
     }
 
@@ -491,7 +505,7 @@ public class VorkathScript extends Script {
 
     private void handleAcidWalk() {
         if (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_32000).isEmpty()) {
-            Rs2Npc.attack("Vorkath");
+            Rs2Npc.interact("Vorkath", "attack");
             state = State.FIGHT_VORKATH;
             acidPools.clear();
             return;

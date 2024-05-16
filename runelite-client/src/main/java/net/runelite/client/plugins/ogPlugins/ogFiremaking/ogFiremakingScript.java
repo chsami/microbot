@@ -17,7 +17,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
 import java.util.concurrent.TimeUnit;
 public class ogFiremakingScript extends Script {
-    public static double version = 1.0;
+    public static double version = 1.1;
     private boolean hasTinderBox() {return Rs2Inventory.hasItem("tinderbox");}
     private boolean doesNeedReturn(ogFiremakingConfig config){ if(config.selectedLocation().getReturnPoints() != null){return true;} return false;}
     private boolean hasLogs(){if (Rs2Inventory.hasItemAmount(calcedLogs.getItemID(), 27)) {return true;} else{return false;}}
@@ -84,7 +84,7 @@ public class ogFiremakingScript extends Script {
             WorldPoint[] startPositions = config.selectedLocation().getFiremakingStartingSpots();
             while(startPoint == lastSpot || startPoint == secondToLastSpot){startPoint = startPositions[Random.random(0,startPositions.length)];}
             //Updated BEWARE!!!
-            Rs2Walker.walkMiniMap(startPoint);
+            Rs2Walker.walkMiniMap(startPoint, 1);
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(startPositions[0]) < 1,10000);
             if (Rs2GameObject.findObject(ObjectID.FIRE_26185, startPoint) == null) {
              Rs2Walker.walkCanvas(startPoint);

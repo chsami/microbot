@@ -127,11 +127,11 @@ public class GiantsFoundryState {
     public static GameObject getStageObject(Stage stage) {
         switch (stage) {
             case TRIP_HAMMER:
-                return Rs2GameObject.findObject("trip hammer");
+                return Rs2GameObject.get("trip hammer");
             case GRINDSTONE:
-                return Rs2GameObject.findObject("grindstone");
+                return Rs2GameObject.get("grindstone");
             case POLISHING_WHEEL:
-                return Rs2GameObject.findObject("polishing wheel");
+                return Rs2GameObject.get("polishing wheel");
         }
         return null;
     }
@@ -166,121 +166,57 @@ public class GiantsFoundryState {
         return Heat.NONE;
     }
 
-    public static int getHeatChangeNeeded() {
-        int useWaterFall = 0;
-        int useLavaPool = 1;
-        int idle = -1;
-        int heat = getHeatAmount();
-        if (getCurrentStage() == null) return -1;
-        Heat requiredHeat = getCurrentStage().getHeat();
-        int actionsLeft = GiantsFoundryState.getActionsForHeatLevel();
-        if (GiantsFoundryScript.isHeatingUp) {
-            if (actionsLeft < 8)
-                return useLavaPool;
-            return idle;
-        } else if (GiantsFoundryScript.isCoolingDown) {
-            if (actionsLeft < 8)
-                return useWaterFall;
-            return idle;
-        } else {
-            if (actionsLeft > 0 && actionsLeft < 3) {
-                switch (requiredHeat) {
-                    case LOW:
-                    case HIGH:
-                        return useLavaPool;
-                    case MED:
-                        return useWaterFall;
-                }
-            } else if (actionsLeft >= 3) {
-                return idle;
-            } else {
-                switch (requiredHeat) {
-                    case LOW:
-                        int[] low = getLowHeatRange();
-                        if (heat < low[0]) {
-                            return useLavaPool;
-                        }
-                        if (heat > low[1]) {
-                            return useWaterFall;
-                        }
-                        break;
-                    case MED:
-                        int[] med = getMedHeatRange();
-                        if (heat < med[0]) {
-                            return useLavaPool;
-                        }
-                        if (heat > med[1]) {
-                            return useWaterFall;
-                        }
-                        break;
-                    case HIGH:
-                        int[] high = getHighHeatRange();
-                        if (heat < high[0]) {
-                            return useLavaPool;
-                        }
-                        if (heat > high[1]) {
-                            return useWaterFall;
-                        }
-                        break;
-                }
-            }
-        }
+    /**
+     * Get the amount of progress each stage needs
+     */
+    public static double getProgressPerStage() {
+        return 1000d / getStages().size();
+    }
 
-        return idle;
-       /* switch (requiredHeat) {
+    public static int getActionsLeftInStage() {
+        int progress = getProgressAmount();
+        double progressPerStage = getProgressPerStage();
+        double progressTillNext = progressPerStage - progress % progressPerStage;
+
+        Stage current = getCurrentStage();
+        return (int) Math.ceil(progressTillNext / current.getProgressPerAction());
+    }
+
+    public static Heat getHeatStage()
+    {
+        if (getCurrentStage() == null) return Heat.NONE;
+
+        return getCurrentStage().getHeat();
+
+}
+
+    public static int getHeatChangeNeeded()
+    {
+        Heat requiredHeat = getCurrentStage().getHeat();
+        int heat = getHeatAmount();
+
+        int[] range;
+        switch (requiredHeat)
+        {
             case LOW:
-                int[] low = getLowHeatRange();
-                if (GiantsFoundryScript.isHeatingUp) {
-                    if (heat > (low[1] - 50) && heat < low[1] || heat > low[1] || heat < low[0]) {
-                        GiantsFoundryScript.isHeatingUp = false;
-                    }
-                    return 1;
-                } else {
-                    if (heat > (low[1])) {
-                        return 0;//cool
-                    } else if (heat < (low[0] + 50)) {
-                        return 1;//heat
-                    }
-                }
+                range = getLowHeatRange();
                 break;
             case MED:
-                int[] med = getMedHeatRange();
-                if (GiantsFoundryScript.isCoolingDown) {
-                    if (heat < (med[0] + 50) && heat > med[0] || heat < med[0] || heat > med[1]) {
-                        GiantsFoundryScript.isCoolingDown = false;
-                    }
-                    return 0;
-                } else {
-                    if (heat > (med[1] - 50)) {
-                        return 0;//cool
-                    } else if (heat < med[0]) {
-                        return 1;//heat
-                    }
-                }
-
+                range = getMedHeatRange();
                 break;
             case HIGH:
-                int[] high = getHighHeatRange(); // 600
-                if (GiantsFoundryScript.isHeatingUp) {// 708 - 958
-                    if (heat > (high[1] - 50) && heat < high[1] || heat > high[1] || heat < high[0]) {
-                        GiantsFoundryScript.isHeatingUp = false;
-                    }
-                    return 1;
-                } else {
-                    if (heat > high[1]) {
-                        return 0;//cool
-                    } else if (heat < (high[0] + 50)) {
-                        return 1;//heat
-                    }
-                }
-
+                range = getHighHeatRange();
                 break;
             default:
-                if (heat < 20) return 0;
-                if (heat > 970) return 1;
-                return -1;
+                return 0;
         }
-        return -1;*/
+
+        if (heat < range[0])
+            return range[0] - heat;
+        else if (heat > range[1])
+            return range[1] - heat;
+        else
+            return 0;
     }
 
 
@@ -321,4 +257,5 @@ public class GiantsFoundryState {
 
         return actions;
     }
+    public static HeatActionStateMachine heatingCoolingState = new HeatActionStateMachine();
 }

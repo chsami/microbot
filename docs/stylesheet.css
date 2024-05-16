@@ -24,8 +24,8 @@ body {
 iframe {
     margin:0;
     padding:0;
-    height:100%;
-    width:100%;
+    min-width: 500px !important;
+    height: 300px !important;
     overflow-y:scroll;
     border:none;
 }

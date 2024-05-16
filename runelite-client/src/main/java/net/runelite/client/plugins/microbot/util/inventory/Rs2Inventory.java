@@ -5,10 +5,10 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Inventory {
 
@@ -427,6 +426,38 @@ public class Rs2Inventory {
         for (Rs2Item item :
                 items().stream().filter(predicate).collect(Collectors.toList())) {
             if (item == null) continue;
+            invokeMenu(item, "Drop");
+            sleep(300, 600);
+        }
+        return true;
+    }
+
+    /**
+     * Drop all items that fall under the gpValue
+     *
+     * @param gpValue minimum amount of gp required to not drop the item
+     * @return
+     */
+    public static boolean dropAllExcept(int gpValue) {
+        return dropAllExcept(gpValue, false);
+    }
+
+    /**
+     * Drop all items that fall under the gpValue
+     *
+     * @param gpValue    minimum amount of gp required to not drop the item
+     * @param ignoreFood
+     * @return
+     */
+    public static boolean dropAllExcept(int gpValue, boolean ignoreFood) {
+        for (Rs2Item item :
+                new ArrayList<>(items())) {
+            if (item == null) continue;
+            if (ignoreFood && item.isFood()) continue;
+            long totalPrice = (long) Microbot.getClientThread().runOnClientThread(() ->
+                    Microbot.getItemManager().getItemPrice(item.id) * item.quantity);
+            if (totalPrice >= gpValue) continue;
+
             invokeMenu(item, "Drop");
             sleep(300, 600);
         }
@@ -1466,10 +1497,9 @@ public class Rs2Inventory {
         int param1;
         int identifier = 3;
         MenuAction menuAction = MenuAction.CC_OP;
-        ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(rs2Item.id));
         if (!action.isEmpty()) {
             String[] actions;
-            actions = itemComposition.getInventoryActions();
+            actions = rs2Item.actions;
 
             for (int i = 0; i < actions.length; i++) {
                 if (action.equalsIgnoreCase(actions[i])) {
@@ -1479,7 +1509,7 @@ public class Rs2Inventory {
             }
         }
         param0 = rs2Item.slot;
-        if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty")) {
+        if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")) {
             identifier++;
         }
         if (Rs2Bank.isOpen()) {
@@ -1529,10 +1559,6 @@ public class Rs2Inventory {
                 identifier = 5;
                 param1 = 19726336;
                 break;
-            default:
-                System.out.println(action);
-                throw new IllegalArgumentException("Invalid action");
-
         }
 
         Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
@@ -1579,7 +1605,6 @@ public class Rs2Inventory {
 
             String action = "Sell ";
             String actionAndQuantity = (action + quantity);
-
             invokeMenu(rs2Item, actionAndQuantity);
             return true;
         } catch (Exception ex) {

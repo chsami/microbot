@@ -64,7 +64,7 @@ public class ShadesKillerScript extends Script {
         return Rs2Inventory.hasItem(getKeyInInventory())
                 && Rs2Inventory.hasItem(config.teleportItemToShades())
                 && Rs2Inventory.hasItem(config.teleportItemToBank())
-                && Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount());
+                && Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true);
     }
 
     private boolean withdrawRequiredItems() {
@@ -80,7 +80,7 @@ public class ShadesKillerScript extends Script {
         Rs2Bank.withdrawOne(key, Random.random(100, 600));
         Rs2Bank.withdrawOne(config.teleportItemToShades(), Random.random(100, 600));
         Rs2Bank.withdrawOne(config.teleportItemToBank(), Random.random(100, 600));
-        Rs2Bank.withdrawX(config.food().getName(), config.foodAmount());
+        Rs2Bank.withdrawX(true, config.food().getName(), config.foodAmount(), true);
         withdrawCoffin();
         sleep(800, 1200);
         return true;
@@ -138,8 +138,6 @@ public class ShadesKillerScript extends Script {
                     state = USE_TELEPORT_TO_BANK;
                 }
 
-                System.out.println(Rs2Inventory.hasItem(config.food().getName()));
-
                 switch (state) {
                     case BANKING:
                         if (hasRequiredItemsToKillShades()) {
@@ -153,10 +151,10 @@ public class ShadesKillerScript extends Script {
                         }
                         if (!Rs2Player.isFullHealth()) {
                             Rs2Bank.depositAll();
-                            Rs2Bank.withdrawX(config.food().getName(), config.foodAmount());
+                            Rs2Bank.withdrawX(true, config.food().getName(), config.foodAmount(), true);
                             Rs2Bank.closeBank();
                             sleep(1200);
-                            while (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName())) {
+                            while (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName(), true)) {
                                 eatAt(99);
                                 Rs2Player.waitForAnimation();
                             }

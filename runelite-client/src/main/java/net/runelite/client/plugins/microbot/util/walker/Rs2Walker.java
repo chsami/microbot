@@ -58,6 +58,7 @@ public class Rs2Walker {
                     setTarget(null);
                     break;
                 }
+                System.out.println(ShortestPathPlugin.getPathfinder());
                 if (ShortestPathPlugin.getPathfinder() == null) {
                     if (ShortestPathPlugin.getMarker() == null)
                         break;
@@ -121,7 +122,6 @@ public class Rs2Walker {
                         break;
 
                     System.out.println(currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()));
-                    sleep(50, 100);
                     if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance()
                             || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
                         // InstancedRegions require localPoint instead of worldpoint to navigate
@@ -130,7 +130,8 @@ public class Rs2Walker {
                             sleep(600, 1000);
                         } else {
                             Rs2Walker.walkMiniMap(currentWorldPoint);
-                            sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < Random.random(3, 5), 100, 3000);
+                            int randomInt = Random.random(3, 5);
+                            sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < randomInt, 100, 2000);
                             break;
                         }
                         //avoid tree attacking you in draynor
@@ -139,19 +140,20 @@ public class Rs2Walker {
                 }
 
                 if (Rs2Player.getWorldLocation().distanceTo(target) < 10) {
+                    System.out.println("walk minimap");
                     Rs2Walker.walkMiniMap(target);
                     sleep(600, 1200);
+                    System.out.println("sleep walk minimap");
                 }
             }
-            return true;
+            return Rs2Player.getWorldLocation().distanceTo(target) < distance;
         });
         return false;
     }
 
-
-    public static boolean walkMiniMap(WorldPoint worldPoint) {
-        if (Microbot.getClient().getMinimapZoom() != 5)
-            Microbot.getClient().setMinimapZoom(5);
+    public static boolean walkMiniMap(WorldPoint worldPoint, int zoomDistance) {
+        if (Microbot.getClient().getMinimapZoom() != zoomDistance)
+            Microbot.getClient().setMinimapZoom(zoomDistance);
 
         Point point = Rs2MiniMap.worldToMinimap(worldPoint);
 
@@ -160,6 +162,11 @@ public class Rs2Walker {
         Microbot.getMouse().click(point);
 
         return true;
+    }
+
+
+    public static boolean walkMiniMap(WorldPoint worldPoint) {
+        return walkMiniMap(worldPoint, 5);
     }
 
     /**
@@ -313,6 +320,7 @@ public class Rs2Walker {
                     ShortestPathPlugin.getPathfinder().cancel();
                 }
                 ShortestPathPlugin.setPathfinder(null);
+                System.out.println("reset path finder!");
             }
 
             Microbot.getWorldMapPointManager().remove(ShortestPathPlugin.getMarker());
@@ -382,14 +390,15 @@ public class Rs2Walker {
 //        if (wallObject == null)
 //            return false;
 
+        System.out.println("checking door: " + a + " b " + b);
         if (wallObject != null) {
-            ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(wallObject.getId()));
+            ObjectComposition objectComposition = Rs2GameObject.getObjectComposition(wallObject.getId());
             if (objectComposition == null) {
                 return false;
             }
             boolean found = false;
             for (String action : objectComposition.getActions()) {
-                if (action != null && action.equals("Open")) {
+                if (action != null && (action.equals("Open") || action.contains("pay-toll"))) {
                     found = true;
                     break;
                 }
@@ -432,13 +441,13 @@ public class Rs2Walker {
         if (wallObjectb == null) {
             return false;
         }
-        ObjectComposition objectCompositionb = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(wallObjectb.getId()));
+        ObjectComposition objectCompositionb = Rs2GameObject.getObjectComposition(wallObjectb.getId());
         if (objectCompositionb == null) {
             return false;
         }
         boolean foundb = false;
         for (String action : objectCompositionb.getActions()) {
-            if (action != null && action.equals("Open")) {
+            if (action != null && (action.equals("Open") || action.contains("pay-toll"))) {
                 foundb = true;
                 break;
             }

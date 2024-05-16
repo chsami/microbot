@@ -29,7 +29,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static double version = 1.0;
+    public static double version = 1.4;
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -54,21 +54,23 @@ public class MWintertodtScript extends Script {
 
                 long startTime = System.currentTimeMillis();
 
-                if (config.axeInInventory() && axe.equals("") && !Rs2Inventory.hasItem("axe")) {
-                    Microbot.showMessage("It seems that you selected axeInInventory option but no axe was found in your inventory.");
-                    sleep(5000);
-                    return;
+                if (config.axeInInventory()) {
+                    if (!Rs2Inventory.hasItem("axe")) {
+                        Microbot.showMessage("It seems that you selected axeInInventory option but no axe was found in your inventory.");
+                        sleep(5000);
+                        return;
+                    }
+                    axe = Rs2Inventory.get("axe").name;
                 }
 
-                axe = Rs2Inventory.get("axe").name;
 
                 boolean wintertodtRespawning = Rs2Widget.hasWidget("returns in");
                 boolean isWintertodtAlive = Rs2Widget.hasWidget("Wintertodt's Energy");
                 GameObject brazier = Rs2GameObject.findObject(BRAZIER_29312, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
-                boolean hasFixAction = brazier != null && Rs2GameObject.hasAction(Rs2GameObject.convertGameObjectToObjectComposition(brazier), "fix");
                 GameObject fireBrazier = Rs2GameObject.findObject(ObjectID.BURNING_BRAZIER_29314, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
-                boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount())
-                        && Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < config.hpTreshhold();
+                boolean playerIsLowHealth = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) <= config.hpTreshhold();
+                boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, false)
+                        && playerIsLowHealth;
                 Widget wintertodtHealthbar = Rs2Widget.getWidget(25952276);
 
                 if (wintertodtHealthbar != null && isWintertodtAlive) {
@@ -118,6 +120,8 @@ public class MWintertodtScript extends Script {
                             state = State.WAITING;
                         }
                         break;
+
+
                     case WAITING:
                         walkToBrazier();
                         shouldLightBrazier(isWintertodtAlive, needBanking, fireBrazier, brazier);
@@ -242,7 +246,6 @@ public class MWintertodtScript extends Script {
     }
 
     private boolean shouldChopRoots() {
-        //issue here
         if (Rs2Inventory.isFull()) {
             if (state == State.CHOP_ROOTS) {
                 setLockState(State.CHOP_ROOTS, false);
@@ -334,11 +337,11 @@ public class MWintertodtScript extends Script {
     }
 
     private boolean handleBankLogic(MWintertodtConfig config) {
-        if (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName())) {
+        if (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName(), false)) {
             eatAt(99);
             return true;
         }
-        if (Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount())) {
+        if (Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), true)) {
             state = State.ENTER_ROOM;
             return true;
         }
@@ -366,13 +369,13 @@ public class MWintertodtScript extends Script {
         if (config.axeInInventory()) {
             Rs2Bank.withdrawX(true, axe, 1);
         }
-        if (!Rs2Bank.hasBankItem(config.food().getName(), config.foodAmount())) {
+        if (!Rs2Bank.hasBankItem(config.food().getName(), config.foodAmount(), true)) {
             Microbot.showMessage("Insufficient food supply");
             Microbot.pauseAllScripts = true;
             return true;
         }
-        Rs2Bank.withdrawX(config.food().getName(), config.foodAmount() - foodCount);
-        sleepUntil(() -> Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount()));
+        Rs2Bank.withdrawX(config.food().getId(), config.foodAmount() - foodCount);
+        sleepUntil(() -> Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true));
         return false;
     }
 }

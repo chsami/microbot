@@ -16,4 +16,14 @@ public interface MotherloadMineConfig extends Config {
     default String GUIDE() {
         return "1. Have a hammer in your inventory \n2. Start near the bank chest in motherload mine";
     }
+
+    @ConfigItem(
+            keyName = "PickAxeInInventory",
+            name = "Pick Axe In Inventory?",
+            description = "Pick Axe in inventory?",
+            position = 1
+    )
+    default boolean pickAxeInInventory() {
+        return false;
+    }
 }

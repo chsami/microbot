@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
@@ -75,7 +76,7 @@ public class Rs2GameObject {
     }
 
     public static boolean interact(String name, String action) {
-        TileObject object = findObject(name);
+        TileObject object = get(name);
         return clickObject(object, action);
     }
 
@@ -86,23 +87,19 @@ public class Rs2GameObject {
         return false;
     }
 
-    public static boolean interact(String objectName) {
-        GameObject object = findObject(objectName, true);
+    public static boolean interact(String name) {
+        GameObject object = get(name, true);
         return clickObject(object);
     }
 
-    public static boolean interact(String objectName, boolean exact) {
-        GameObject object = findObject(objectName, exact);
+    public static boolean interact(String name, boolean exact) {
+        GameObject object = get(name, exact);
         return clickObject(object);
     }
 
-    public static boolean interact(String objectName, String action, boolean exact) {
-        GameObject object = findObject(objectName, exact);
+    public static boolean interact(String name, String action, boolean exact) {
+        GameObject object = get(name, exact);
         return clickObject(object, action);
-    }
-
-    public static GameObject findObject(String objectName) {
-        return findObject(objectName, true);
     }
 
     @Deprecated(since = "Use findObjectById", forRemoval = true)
@@ -312,33 +309,43 @@ public class Rs2GameObject {
         return null;
     }
 
+    public static GameObject get(String name) {
+        return get(name, false);
+    }
 
-    public static GameObject findObject(String objectName, boolean exact) {
+    public static GameObject get(String name, boolean exact) {
+        name = name.toLowerCase();
+        // add underscore because the OBJECTID static list contains _ instead of spaces
+        List<Integer> ids = getObjectIdsByName(name.replace(" ", "_"));
         List<GameObject> gameObjects = getGameObjects();
 
         if (gameObjects == null) {
             return null;
         }
 
-        for (GameObject gameObject : gameObjects) {
-            ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
+        for (int id : ids) {
+            for (GameObject gameObject: gameObjects) {
+                if (gameObject.getId() == id) {
+                    ObjectComposition objComp = convertGameObjectToObjectComposition(id);
 
-            if (objComp == null) {
-                continue;
-            }
-            String compName;
+                    if (objComp == null) {
+                        continue;
+                    }
+                    String compName;
 
-            try {
-                compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
-            } catch (Exception e) {
-                continue;
-            }
+                    try {
+                        compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
+                    } catch (Exception e) {
+                        continue;
+                    }
 
-            if (compName != null && Rs2GameObject.hasLineOfSight(gameObject)) {
-                if (!exact && compName.toLowerCase().contains(objectName.toLowerCase())) {
-                    return gameObject;
-                } else if (exact && compName.equalsIgnoreCase(objectName)) {
-                    return gameObject;
+                    if (compName != null) {
+                        if (!exact && compName.toLowerCase().contains(name)) {
+                            return gameObject;
+                        } else if (exact && compName.equalsIgnoreCase(name)) {
+                            return gameObject;
+                        }
+                    }
                 }
             }
         }
@@ -625,7 +632,30 @@ public class Rs2GameObject {
     }
 
     public static List<GameObject> getGameObjects() {
-        return getGameObjectsWithinDistance(Constants.SCENE_SIZE);
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        int z = Microbot.getClient().getPlane();
+        List<GameObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+                for (GameObject tileObject : tile.getGameObjects()) {
+                    if (tileObject != null
+                            && tileObject.getSceneMinLocation().equals(tile.getSceneLocation()))
+                        tileObjects.add(tileObject);
+                }
+            }
+        }
+
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())))
+                .collect(Collectors.toList());
     }
 
     public static List<GameObject> getGameObjectsWithinDistance(int distance) {
@@ -869,5 +899,12 @@ public class Rs2GameObject {
             }
         }
         return ids;
+    }
+
+    @Nullable
+    public static ObjectComposition getObjectComposition(int id)
+    {
+        ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
+        return objectComposition.getImpostorIds() == null ? objectComposition : objectComposition.getImpostor();
     }
 }

@@ -46,9 +46,10 @@ public abstract class Script implements IScript {
 
     public void sleep(int start, int end) {
         long startTime = System.currentTimeMillis();
+        int randTime = Random.random(start, end);
         do {
             Microbot.status = "[Sleeping] between " + start + " ms and " + end + " ms";
-        } while (System.currentTimeMillis() - startTime < Random.random(start, end));
+        } while (System.currentTimeMillis() - startTime < randTime);
     }
 
     public ScheduledFuture<?> keepExecuteUntil(Runnable callback, BooleanSupplier awaitedCondition, int time) {

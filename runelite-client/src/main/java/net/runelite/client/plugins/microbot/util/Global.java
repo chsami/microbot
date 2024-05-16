@@ -25,18 +25,21 @@ public class Global {
     }
 
     public static void sleep(int start) {
-        if (!Microbot.getClient().isClientThread()) {
-            long startTime = System.currentTimeMillis();
-            do {
-            } while (System.currentTimeMillis() - startTime < start);
+        if (Microbot.getClient().isClientThread()) return;
+        try {
+            Thread.sleep(start);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public static void sleep(int start, int end) {
-        if (Microbot.getClient().isClientThread()) return;
-        long startTime = System.currentTimeMillis();
-        do {
-        } while (System.currentTimeMillis() - startTime < Random.random(start, end));
+        int randomSleep = Random.random(start, end);
+        try {
+            Thread.sleep(randomSleep);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void sleepUntil(BooleanSupplier awaitedCondition) {

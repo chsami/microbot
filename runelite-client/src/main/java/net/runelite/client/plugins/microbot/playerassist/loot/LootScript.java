@@ -56,7 +56,7 @@ public class LootScript extends Script {
                 if (Rs2GroundItem.loot(specialItem, 13, 14))
                     break;
             }
-            boolean result = Rs2GroundItem.lootItemBasedOnValue(config.priceOfItemsToLoot(), 14);
+            boolean result = Rs2GroundItem.lootItemBasedOnValue(config.minPriceOfItemsToLoot(), config.maxPriceOfItemsToLoot(), 14);
             if (result) {
                 Global.sleep(2000, 4000);
                 Microbot.pauseAllScripts = false;
