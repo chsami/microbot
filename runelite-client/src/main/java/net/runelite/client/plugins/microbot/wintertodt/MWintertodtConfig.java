@@ -135,13 +135,13 @@ public interface MWintertodtConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "Hitpoints Tresshold",
+            keyName = "Hitpoints Threshold",
             name = "HP % to run away",
-            description = "Runs to the bank if a specific health treshhold is reached and the player does not have any food in their inventory.",
+            description = "Runs to the bank if a specific health threshold is reached and the player does not have any food in their inventory.",
             position = 4,
             section = foodSection
     )
-    default int hpTreshhold() {
+    default int hpThreshold() {
         return 30;
     }
 

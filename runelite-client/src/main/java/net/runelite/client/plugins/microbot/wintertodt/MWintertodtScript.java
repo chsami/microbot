@@ -68,7 +68,7 @@ public class MWintertodtScript extends Script {
                 boolean isWintertodtAlive = Rs2Widget.hasWidget("Wintertodt's Energy");
                 GameObject brazier = Rs2GameObject.findObject(BRAZIER_29312, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
                 GameObject fireBrazier = Rs2GameObject.findObject(ObjectID.BURNING_BRAZIER_29314, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
-                boolean playerIsLowHealth = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) <= config.hpTreshhold();
+                boolean playerIsLowHealth = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) <= config.hpThreshold();
                 boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, false)
                         && playerIsLowHealth;
                 Widget wintertodtHealthbar = Rs2Widget.getWidget(25952276);
@@ -99,6 +99,13 @@ public class MWintertodtScript extends Script {
                     }
                 } else {
                     handleMainLoop();
+                }
+
+                double hp_percentage = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
+                if ((hp_percentage < config.hpThreshold()) && (!Rs2Inventory.hasItem(config.food().getName())))
+                { // We are out of food and have low health - go to bank.
+                    System.out.println("No food and not enough health - running away! Back to the bank.");
+                    state=State.BANKING;
                 }
 
                 //todo: hasFixAction is not working?
@@ -173,7 +180,7 @@ public class MWintertodtScript extends Script {
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
-                 System.out.println("Total time for loop " + totalTime);
+                // System.out.println("Total time for loop " + totalTime);
 
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
