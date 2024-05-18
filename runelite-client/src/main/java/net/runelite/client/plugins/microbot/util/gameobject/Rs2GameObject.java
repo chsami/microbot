@@ -201,7 +201,7 @@ public class Rs2GameObject {
 
     public static TileObject findObjectByIdAndDistance(int id, int distance) {
 
-        List<GameObject> gameObjects = getGameObjects(distance);
+        List<GameObject> gameObjects = getGameObjectsWithinDistance(distance);
 
         for (net.runelite.api.GameObject gameObject : gameObjects) {
             if (gameObject.getId() == id)
