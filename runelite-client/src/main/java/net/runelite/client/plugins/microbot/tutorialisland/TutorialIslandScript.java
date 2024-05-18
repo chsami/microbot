@@ -364,8 +364,7 @@ public class TutorialIslandScript extends Script {
                 // If we don't have a particular point, we can be on the other
                 // side of the gate and try to talk to him infinitely!!
                 WorldPoint combatTutorLoc = new WorldPoint(3109,9511,0);
-                sleepUntil(() -> Rs2Walker.walkTo(combatTutorLoc));
-                sleepUntil(() -> (Rs2Player.getWorldLocation() == combatTutorLoc));
+                sleepUntil(() -> Rs2Walker.walkTo(combatTutorLoc) && (Rs2Player.getWorldLocation() == combatTutorLoc)));
                 NPC npc = Rs2Npc.getNpc("Combat Instructor");
                 Rs2Npc.interact(npc, "Talk-to");
                 sleep(1000);
@@ -582,14 +581,3 @@ public class TutorialIslandScript extends Script {
         return Rs2Widget.clickWidget(getFlashyWidget(spriteid));
 
     }
-
-    public void flashyError() {
-        System.out.println("Something is terribly wrong.");
-        Microbot.pauseAllScripts = true;
-        shutdown();
-    }
-
-    public void outputVarbit() {
-        System.out.println("Out varbit value: " + Microbot.getVarbitPlayerValue(281));
-    }
-}
