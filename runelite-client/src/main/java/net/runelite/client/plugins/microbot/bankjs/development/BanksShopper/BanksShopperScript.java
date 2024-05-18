@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.bankjs.development.BanksShopper;
 
+import net.runelite.api.GameState;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -7,11 +8,16 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 // import net.runelite.client.plugins.microbot.util.keyboard.VirtualKeyboard;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.security.Login;
+import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
+import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
 public class BanksShopperScript extends Script {
@@ -20,7 +26,7 @@ public class BanksShopperScript extends Script {
     @Inject
     private OverlayManager overlayManager;
 
-    public static double version = 1.0;
+    public static double version = 1.1;
 
     public boolean run(BanksShopperConfig config) {
         this.config = config;
@@ -56,7 +62,18 @@ public class BanksShopperScript extends Script {
                     } else {
                         // Stock level dropped below minimum, pause or stop execution
                         System.out.println("Stock level dropped below minimum threshold.");
+                        Rs2Shop.closeShop();
+                        sleep(2400, 4800);
                         // This is where we need to hop worlds.
+                        int world = Login.getRandomWorld(true, null);
+                        boolean isHopped = Microbot.hopToWorld(world);
+                        if (!isHopped) return;
+                        boolean result = sleepUntil(() -> Rs2Widget.findWidget("Switch World") != null);
+                        if (result) {
+                            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+                            sleepUntil(() -> Microbot.getClient().getGameState() == GameState.HOPPING);
+                            sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
+                        }
                     }
                 } else {
                     System.out.println("Shop is not open");
