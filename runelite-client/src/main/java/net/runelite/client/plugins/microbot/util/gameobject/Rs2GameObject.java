@@ -201,7 +201,7 @@ public class Rs2GameObject {
 
     public static TileObject findObjectByIdAndDistance(int id, int distance) {
 
-        List<GameObject> gameObjects = getGameObjects(distance);
+        List<GameObject> gameObjects = getGameObjectsWithinDistance(distance);
 
         for (net.runelite.api.GameObject gameObject : gameObjects) {
             if (gameObject.getId() == id)
@@ -870,7 +870,6 @@ public class Rs2GameObject {
                     gameObject.sizeY())
                     .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
         } else {
-            WallObject wallObject = (WallObject) tileObject;
             return new WorldArea(
                     tileObject.getWorldLocation(),
                     2,

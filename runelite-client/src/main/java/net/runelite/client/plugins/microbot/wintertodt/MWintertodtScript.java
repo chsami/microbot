@@ -92,13 +92,15 @@ public class MWintertodtScript extends Script {
                 shouldEat();
                 dodgeOrbDamage();
 
-                if (!isWintertodtAlive) {
-                    if (state != State.ENTER_ROOM && state != State.WAITING && state != State.BANKING) {
-                        setLockState(State.GLOBAL, false);
-                        changeState(State.BANKING);
+                if (!needBanking) {
+                    if (!isWintertodtAlive) {
+                        if (state != State.ENTER_ROOM && state != State.WAITING && state != State.BANKING) {
+                            setLockState(State.GLOBAL, false);
+                            changeState(State.BANKING);
+                        }
+                    } else {
+                        handleMainLoop();
                     }
-                } else {
-                    handleMainLoop();
                 }
 
                 //todo: hasFixAction is not working?
@@ -110,8 +112,9 @@ public class MWintertodtScript extends Script {
                 switch (state) {
                     case BANKING:
                         if (handleBankLogic(config)) return;
-
-                        changeState(State.ENTER_ROOM);
+                        if (Rs2Player.isFullHealth() && Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true)) {
+                            changeState(State.ENTER_ROOM);
+                        }
                         break;
                     case ENTER_ROOM:
                         if (!wintertodtRespawning && !isWintertodtAlive) {

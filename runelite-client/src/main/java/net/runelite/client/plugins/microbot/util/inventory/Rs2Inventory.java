@@ -1513,7 +1513,11 @@ public class Rs2Inventory {
             identifier++;
         }
         if (Rs2Bank.isOpen()) {
-            identifier += 6;
+            if (action.equalsIgnoreCase("eat")) {
+                identifier += 7;
+            } else {
+                identifier += 6;
+            }
             param1 = 983043;
         } else {
             param1 = 9764864;
