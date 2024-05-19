@@ -364,10 +364,10 @@ public class MWintertodtScript extends Script {
 //            Rs2Bank.withdrawX(true, "hammer", 1);
 //        }
         if (!Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH)) {
-            Rs2Bank.withdrawX(true, "tinderbox", 1);
+            Rs2Bank.withdrawX(true, "tinderbox", 1, true);
         }
         if (config.fletchRoots()) {
-            Rs2Bank.withdrawX(true, "knife", 1);
+            Rs2Bank.withdrawX(true, "knife", 1, true);
         }
         if (config.axeInInventory()) {
             Rs2Bank.withdrawX(true, axe, 1);
