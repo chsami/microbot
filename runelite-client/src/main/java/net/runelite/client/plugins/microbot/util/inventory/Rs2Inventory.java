@@ -439,21 +439,21 @@ public class Rs2Inventory {
      * @return
      */
     public static boolean dropAllExcept(int gpValue) {
-        return dropAllExcept(gpValue, false);
+        return dropAllExcept(gpValue, List.of());
     }
 
     /**
      * Drop all items that fall under the gpValue
      *
      * @param gpValue    minimum amount of gp required to not drop the item
-     * @param ignoreFood
+     * @param ignoreItems List of items to not drop
      * @return
      */
-    public static boolean dropAllExcept(int gpValue, boolean ignoreFood) {
+    public static boolean dropAllExcept(int gpValue, List<String> ignoreItems) {
         for (Rs2Item item :
                 new ArrayList<>(items())) {
             if (item == null) continue;
-            if (ignoreFood && item.isFood()) continue;
+            if (ignoreItems.stream().anyMatch(x -> x.equalsIgnoreCase(item.name))) continue;
             long totalPrice = (long) Microbot.getClientThread().runOnClientThread(() ->
                     Microbot.getItemManager().getItemPrice(item.id) * item.quantity);
             if (totalPrice >= gpValue) continue;
@@ -1364,6 +1364,7 @@ public class Rs2Inventory {
      * @param name item name
      */
     public static void wield(String name) {
+        if (!Rs2Inventory.hasItem(name)) return;
         if (Rs2Equipment.isWearing(name, true)) return;
         invokeMenu(get(name), "wield");
     }

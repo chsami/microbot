@@ -14,7 +14,8 @@ public interface ThievingConfig extends Config {
             keyName = "guide",
             name = "How to use",
             description = "How to use this plugin",
-            position = 1
+            position = 0,
+            section = generalSection
     )
     default String GUIDE() {
         return "Start near any of the npc\n" +
@@ -25,10 +26,9 @@ public interface ThievingConfig extends Config {
                 "Use Open CoinPouch Helper";
     }
     @ConfigSection(
-            name = "General",
-            description = "General",
-            position = 0,
-            closedByDefault = false
+            name = "general",
+            description = "general",
+            position = 0
     )
     String generalSection = "general";
 
@@ -44,14 +44,19 @@ public interface ThievingConfig extends Config {
         return ThievingNpc.NONE;
     }
 
-    String foodAndHitpoints = "FOOD & Hitpoints";
+    @ConfigSection(
+            name = "Food",
+            description = "Food",
+            position = 1
+    )
+    String food = "Food";
 
     @ConfigItem(
             keyName = "Hitpoints",
-            name = "Hitpoints treshhold",
+            name = "Hitpoints treshhold %",
             description = "Use food at certain hitpoint treshhold",
             position = 1,
-            section = foodAndHitpoints
+            section = food
     )
     default int hitpoints()
     {
@@ -63,7 +68,7 @@ public interface ThievingConfig extends Config {
             name = "Food",
             description = "type of food",
             position = 2,
-            section = foodAndHitpoints
+            section = food
     )
     default Rs2Food food()
     {
@@ -75,15 +80,19 @@ public interface ThievingConfig extends Config {
             name = "Food Amount",
             description = "Amount of food to withdraw from bank",
             position = 2,
-            section = foodAndHitpoints
+            section = food
     )
     default int foodAmount()
     {
         return 5;
     }
 
-
-    String coinPouchSection = "COIN POUCH";
+    @ConfigSection(
+            name = "Coin pouch & Items",
+            description = "Coin pouch & Items",
+            position = 2
+    )
+    String coinPouchSection = "Coin pouch & Items";
 
     @ConfigItem(
             keyName = "Coin Pouch TreshHold",
@@ -107,6 +116,30 @@ public interface ThievingConfig extends Config {
     default int keepItemsAboveValue()
     {
         return 10000;
+    }
+
+    @ConfigItem(
+            keyName = "DodgyNecklaceAmount",
+            name = "Dodgy necklace Amount",
+            description = "Amount of dodgy necklace to withdraw from bank",
+            position = 1,
+            section = coinPouchSection
+    )
+    default int dodgyNecklaceAmount()
+    {
+        return 5;
+    }
+
+    @ConfigItem(
+            keyName = "DoNotDropitemList",
+            name = "Do not drop item list",
+            description = "Do not drop item list comma seperated",
+            position = 1,
+            section = coinPouchSection
+    )
+    default String DoNotDropItemList()
+    {
+        return "";
     }
 
 }

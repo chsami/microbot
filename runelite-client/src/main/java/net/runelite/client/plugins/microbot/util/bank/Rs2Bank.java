@@ -50,8 +50,8 @@ public class Rs2Bank {
     /**
      * Executes menu swapping for a specific rs2Item and entry index.
      *
-     * @param entryIndex     The index of the entry to swap.
-     * @param rs2Item        The ItemWidget associated with the menu swap.
+     * @param entryIndex The index of the entry to swap.
+     * @param rs2Item    The ItemWidget associated with the menu swap.
      */
     public static void invokeMenu(int entryIndex, Rs2Item rs2Item) {
         int identifier = entryIndex;
@@ -60,7 +60,7 @@ public class Rs2Bank {
             identifier = identifier + 1;
         }
         Microbot.doInvoke(new NewMenuEntry(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
-       // MenuEntryImpl(getOption=Wear, getTarget=<col=ff9040>Amulet of glory(4)</col>, getIdentifier=9, getType=CC_OP_LOW_PRIORITY, getParam0=1, getParam1=983043, getItemId=1712, isForceLeftClick=false, isDeprioritized=false)
+        // MenuEntryImpl(getOption=Wear, getTarget=<col=ff9040>Amulet of glory(4)</col>, getIdentifier=9, getType=CC_OP_LOW_PRIORITY, getParam0=1, getParam1=983043, getItemId=1712, isForceLeftClick=false, isDeprioritized=false)
         // Rs2Reflection.invokeMenu(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, "Withdraw-1", rs2Item.name, -1, -1);
     }
 
@@ -154,7 +154,7 @@ public class Rs2Bank {
     /**
      * check if the player has a bank item identified by exact name.
      *
-     * @param name the item name
+     * @param name  the item name
      * @param exact exact search based on equalsIgnoreCase
      * @return boolean
      */
@@ -229,7 +229,7 @@ public class Rs2Bank {
      * 'handleAmount' method to deposit the specified amount of the item into the inventory.
      *
      * @param rs2Item item to handle
-     * @param amount amount to deposit
+     * @param amount  amount to deposit
      */
     private static void depositX(Rs2Item rs2Item, int amount) {
         if (!isOpen()) return;
@@ -248,8 +248,8 @@ public class Rs2Bank {
      * If it doesn't match, it executes the menu swapper with the HANDLE_X_UNSET option,
      * enters the specified amount using the VirtualKeyboard, and presses Enter.
      *
-     * @param rs2Item         The item to handle.
-     * @param amount    The desired amount to set.
+     * @param rs2Item The item to handle.
+     * @param amount  The desired amount to set.
      */
     private static void handleAmount(Rs2Item rs2Item, int amount) {
         handleAmount(rs2Item, amount, false);
@@ -263,9 +263,9 @@ public class Rs2Bank {
      * If it doesn't match, it executes the menu swapper with the HANDLE_X_UNSET option,
      * enters the specified amount using the VirtualKeyboard, and presses Enter.
      *
-     * @param rs2Item         The item to handle.
-     * @param amount    The desired amount to set.
-     * @param safe      will wait for item to appear in inventory before continuing if set to true
+     * @param rs2Item The item to handle.
+     * @param amount  The desired amount to set.
+     * @param safe    will wait for item to appear in inventory before continuing if set to true
      */
     private static void handleAmount(Rs2Item rs2Item, int amount, boolean safe) {
         int inventorySize = Rs2Inventory.size();
@@ -361,7 +361,7 @@ public class Rs2Bank {
      * deposit all items identified by its name
      * set exact to true if you want to be identified by its exact name
      *
-     * @param name name to search
+     * @param name  name to search
      * @param exact does an exact search equalsIgnoreCase
      */
     public static void depositAll(String name, boolean exact) {
@@ -394,14 +394,13 @@ public class Rs2Bank {
         sleepUntil(Rs2Inventory::isEmpty);
     }
 
-    public static boolean depositAllExcept(Integer...ids) {
+    public static boolean depositAllExcept(Integer... ids) {
         return depositAll(x -> Arrays.stream(ids).noneMatch(id -> id == x.id));
     }
 
-    public static boolean depositAllExcept(String...names) {
+    public static boolean depositAllExcept(String... names) {
         return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
     }
-
 
 
     /**
@@ -477,8 +476,8 @@ public class Rs2Bank {
     /**
      * withdraw x amount of items identified by its ItemWidget.
      *
-     * @param rs2Item      Item to handle
-     * @param amount int
+     * @param rs2Item Item to handle
+     * @param amount  int
      */
     private static void withdrawXItem(Rs2Item rs2Item, int amount) {
         if (!isOpen()) return;
@@ -488,21 +487,25 @@ public class Rs2Bank {
 
         handleAmount(rs2Item, amount);
     }
+
     /**
      * Checks inventory before withdrawing item
+     *
      * @param checkInv check inventory before withdrawing item
-     * @param id item id
-     * @param amount amount to withdraw
+     * @param id       item id
+     * @param amount   amount to withdraw
      */
     public static void withdrawX(boolean checkInv, int id, int amount) {
         if (checkInv && !Rs2Bank.hasItem(id)) return;
         withdrawX(id, amount);
     }
+
     /**
      * Checks inventory before withdrawing item
+     *
      * @param checkInv check inventory before withdrawing item
-     * @param name item name
-     * @param amount amount to withdraw
+     * @param name     item name
+     * @param amount   amount to withdraw
      */
     public static void withdrawX(boolean checkInv, String name, int amount) {
         withdrawX(checkInv, name, amount, false);
@@ -510,10 +513,11 @@ public class Rs2Bank {
 
     /**
      * Checks inventory before withdrawing item
+     *
      * @param checkInv check inventory before withdrawing item
-     * @param name item name
-     * @param amount amount to withdraw
-     * @param exact exact search based on equalsIgnoreCase
+     * @param name     item name
+     * @param amount   amount to withdraw
+     * @param exact    exact search based on equalsIgnoreCase
      */
     public static void withdrawX(boolean checkInv, String name, int amount, boolean exact) {
         if (checkInv && Rs2Inventory.hasItem(name)) return;
@@ -523,7 +527,7 @@ public class Rs2Bank {
     /**
      * withdraw x amount of items identified by its id.
      *
-     * @param id item id to search
+     * @param id     item id to search
      * @param amount amount to withdraw
      */
     public static void withdrawX(int id, int amount) {
@@ -534,9 +538,9 @@ public class Rs2Bank {
      * withdraw x amount of items identified by its name.
      * set exact to true if you want to identify an item by its exact name.
      *
-     * @param name item name to search
+     * @param name   item name to search
      * @param amount amount to withdraw
-     * @param exact exact search based on equalsIgnoreCase
+     * @param exact  exact search based on equalsIgnoreCase
      */
     private static void withdrawX(String name, int amount, boolean exact) {
         withdrawXItem(findBankItem(name, exact), amount);
@@ -545,7 +549,7 @@ public class Rs2Bank {
     /**
      * withdraw x amount of items identified by its name
      *
-     * @param name item name to search
+     * @param name   item name to search
      * @param amount amount to withdraw
      */
     public static void withdrawX(String name, int amount) {
@@ -588,7 +592,7 @@ public class Rs2Bank {
      * withdraw all items identified by its name
      * set the boolean exact to true if you want to identify the item by the exact name
      *
-     * @param name item name to search
+     * @param name  item name to search
      * @param exact exact search based on equalsIgnoreCase
      */
     public static void withdrawAll(String name, boolean exact) {
@@ -629,7 +633,7 @@ public class Rs2Bank {
     /**
      * wear an item identified by its exact name.
      *
-     * @param name item name to search
+     * @param name  item name to search
      * @param exact exact search based on equalsIgnoreCase
      */
     public static void wearItem(String name, boolean exact) {
@@ -719,7 +723,7 @@ public class Rs2Bank {
     }
 
     /**
-     * Opens the bank using the nearest NPC named "banker".
+     * Opens the bank searching for bank booth first, then chest and lastly npc
      *
      * @return True if bank was successfully opened, otherwise false.
      */
@@ -729,26 +733,26 @@ public class Rs2Bank {
             if (Microbot.getClient().isWidgetSelected())
                 Microbot.getMouse().click();
             if (isOpen()) return true;
-            NPC npc = Rs2Npc.getNpc("banker");
-            if (npc == null) {
-                GameObject bank = Rs2GameObject.findBank();
-                if (bank == null) {
-                    GameObject chest = Rs2GameObject.findChest();
-                    if (chest == null) return false;
-                    Rs2GameObject.interact(chest, "use");
+            boolean action;
+            GameObject bank = Rs2GameObject.findBank();
+            if (bank == null) {
+                GameObject chest = Rs2GameObject.findChest();
+                if (chest == null) {
+                    NPC npc = Rs2Npc.getNpc("banker");
+                    if (npc == null) return false;
+                    action = Rs2Npc.interact(npc, "bank");
                 } else {
-                    Rs2GameObject.interact(bank, "bank");
+                    action = Rs2GameObject.interact(chest, "use");
                 }
-                sleepUntil(Rs2Bank::isOpen);
-                return Rs2Bank.isOpen();
+            } else {
+                action = Rs2GameObject.interact(bank, "bank");
             }
-            boolean action = Rs2Npc.interact(npc, "bank");
+            sleepUntil(Rs2Bank::isOpen);
             if (action) {
                 sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
                 sleep(600, 1000);
-                return true;
             }
-            return false;
+            return action;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -848,7 +852,7 @@ public class Rs2Bank {
     /**
      * Finds an item in the bank based on its name.
      *
-     * @param name The name of the item.
+     * @param name  The name of the item.
      * @param exact If true, requires an exact name match.
      * @return The item widget, or null if the item isn't found.
      */
@@ -860,8 +864,8 @@ public class Rs2Bank {
     /**
      * Finds an item in the bank based on its name.
      *
-     * @param name The name of the item.
-     * @param exact If true, requires an exact name match.
+     * @param name   The name of the item.
+     * @param exact  If true, requires an exact name match.
      * @param amount the amount needed to find in the bank
      * @return The item widget, or null if the item isn't found.
      */
@@ -876,7 +880,7 @@ public class Rs2Bank {
                 ? x.name.equalsIgnoreCase(lowerCaseName)
                 : x.name.toLowerCase().contains(lowerCaseName)).findFirst().orElse(null);
 
-        if (bankItem == null || bankItem.quantity  < amount)
+        if (bankItem == null || bankItem.quantity < amount)
             return null;
 
         return bankItem;
