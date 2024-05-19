@@ -16,7 +16,7 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 public class HumidifierScript extends Script {
 
-    public static double version = 1.5;
+    public static double version = 1.6;
     private static long itemsProcessed = 0;
     public static String itemsProcessedMessage = "";
     public static String profitMessage = "Calculating...";
@@ -33,7 +33,7 @@ public class HumidifierScript extends Script {
         itemsProcessedMessage = config.ITEM().getFinished() + " processed: " + itemsProcessed;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-
+            if (!Microbot.isLoggedIn()) return;
             try {
                 boolean hasAstralRunesInInventory = Rs2Inventory.hasItem(ItemID.ASTRAL_RUNE);
                 if (Microbot.pauseAllScripts) return;

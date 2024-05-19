@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static net.runelite.api.ObjectID.BRAZIER_29312;
 import static net.runelite.api.ObjectID.BURNING_BRAZIER_29314;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
 
 
@@ -101,6 +102,8 @@ public class MWintertodtScript extends Script {
                     } else {
                         handleMainLoop();
                     }
+                } else {
+                    setLockState(State.BANKING, false);
                 }
 
                 //todo: hasFixAction is not working?
@@ -111,7 +114,7 @@ public class MWintertodtScript extends Script {
 
                 switch (state) {
                     case BANKING:
-                        if (handleBankLogic(config)) return;
+                        if (!handleBankLogic(config)) return;
                         if (Rs2Player.isFullHealth() && Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true)) {
                             changeState(State.ENTER_ROOM);
                         }
@@ -364,10 +367,10 @@ public class MWintertodtScript extends Script {
 //            Rs2Bank.withdrawX(true, "hammer", 1);
 //        }
         if (!Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH)) {
-            Rs2Bank.withdrawX(true, "tinderbox", 1);
+            Rs2Bank.withdrawX(true, "tinderbox", 1, true);
         }
         if (config.fletchRoots()) {
-            Rs2Bank.withdrawX(true, "knife", 1);
+            Rs2Bank.withdrawX(true, "knife", 1, true);
         }
         if (config.axeInInventory()) {
             Rs2Bank.withdrawX(true, axe, 1);
@@ -378,7 +381,6 @@ public class MWintertodtScript extends Script {
             return true;
         }
         Rs2Bank.withdrawX(config.food().getId(), config.foodAmount() - foodCount);
-        sleepUntil(() -> Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true));
-        return false;
+        return sleepUntilTrue(() -> Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, true), 100, 5000);
     }
 }

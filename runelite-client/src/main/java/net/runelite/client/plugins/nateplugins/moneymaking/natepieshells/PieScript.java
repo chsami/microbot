@@ -16,7 +16,7 @@ public class PieScript extends Script {
     public boolean run(PieConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-
+            if (!Microbot.isLoggedIn()) return;
             try {
                 if (Microbot.pauseAllScripts) return;
                 if (Rs2Inventory.count("pie dish") > 0 && (Rs2Inventory.count("pastry dough") > 0)) {

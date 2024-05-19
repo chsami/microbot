@@ -21,7 +21,7 @@ public class FishingScript extends Script {
     public boolean run(FishingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-
+            if (!Microbot.isLoggedIn()) return;
             try {
                     if (Rs2Player.isMoving() || Rs2Player.isAnimating()) {
                         return;

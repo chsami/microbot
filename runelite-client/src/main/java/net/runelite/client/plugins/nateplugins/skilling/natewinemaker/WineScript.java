@@ -15,7 +15,7 @@ public class WineScript extends Script {
     public boolean run(WineConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-
+            if (!Microbot.isLoggedIn()) return;
             try {
                 if (Microbot.pauseAllScripts) return;
                 if (Rs2Inventory.count("grapes") > 0 && (Rs2Inventory.count("jug of water") > 0)) {
