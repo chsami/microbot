@@ -107,9 +107,9 @@ public class ShadesKillerScript extends Script {
             }
             return;
         }
-        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+        Rs2Widget.clickWidget(17694738);
         Rs2Bank.openBank();
-        sleepUntil(() -> Rs2Bank.isOpen());
+        sleepUntil(Rs2Bank::isOpen);
         Rs2Bank.depositAll("fiyr remains");
     }
 

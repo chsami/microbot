@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 public class Rs2Dialogue {
 
     public static boolean isInDialogue() {
-        return Rs2Widget.hasWidget("Click here to continue") || Rs2Widget.hasWidget("please wait...");
+        return Rs2Widget.isWidgetVisible(231, 0) || Rs2Widget.isWidgetVisible(217, 0);
     }
     public static void clickContinue() {
         if (Rs2Widget.hasWidget("Click here to continue"))
