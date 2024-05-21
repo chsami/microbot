@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -1443,6 +1444,27 @@ public class Rs2Inventory {
         return true;
     }
 
+    /**
+     *
+     * @param itemId
+     * @param npcID
+     * @return
+     */
+    public static boolean useItemOnNpc(int itemId, int npcID) {
+        if (Rs2Bank.isOpen()) return false;
+        use(itemId);
+        sleep(100);
+        if (!isItemSelected()) return false;
+        Rs2Npc.interact(npcID);
+        return true;
+    }
+
+    /**
+     *
+     * @param name
+     * @param exact
+     * @return
+     */
     public static Rs2Item getNotedItem(String name, boolean exact) {
         if (exact)
             return items().stream().filter(x -> x.name.equalsIgnoreCase(name) && x.isNoted).findFirst().orElse(null);
