@@ -18,6 +18,6 @@ public interface ConstructionConfig extends Config {
     )
     default String GUIDE()
     {
-        return "This script only supports oak larder with a butler.";
+        return "This script only supports oak larder with a demon butler.";
     }
 }

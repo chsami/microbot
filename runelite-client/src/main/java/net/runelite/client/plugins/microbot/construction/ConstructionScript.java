@@ -1,12 +1,11 @@
 package net.runelite.client.plugins.microbot.construction;
 
-import net.runelite.api.NPC;
-import net.runelite.api.SpriteID;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.construction.enums.ConstructionState;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
@@ -38,7 +37,7 @@ public class ConstructionScript extends Script {
     }
 
     public boolean hasDialogueOptionToUnnote() {
-        return Rs2Widget.findWidget("Fetch", null) != null;
+        return Rs2Widget.findWidget("Un-note", null) != null;
     }
 
     public boolean hasPayButlerDialogue() {
@@ -61,6 +60,7 @@ public class ConstructionScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             super.run();
             try {
+                Rs2Tab.switchToInventoryTab();
                 calculateState();
                 if (state == ConstructionState.Build) {
                     build();
@@ -86,7 +86,7 @@ public class ConstructionScript extends Script {
         TileObject oakLarderSpace = getOakLarderSpace();
         TileObject oakLarder = getOakLarder();
         NPC butler = getButler();
-        boolean hasRequiredPlanks = Rs2Inventory.hasItemAmount(8778, Random.random(8, 16)); //oak plank
+        boolean hasRequiredPlanks = Rs2Inventory.hasItemAmount(ItemID.OAK_PLANK, Random.random(8, 16)); //oak plank
         if (oakLarderSpace == null && oakLarder != null) {
             state = ConstructionState.Remove;
         } else if (oakLarderSpace != null && oakLarder == null && hasRequiredPlanks) {
@@ -140,12 +140,24 @@ public class ConstructionScript extends Script {
                 Microbot.getMouse().click(callServantWidget.getCanvasLocation());
         }
 
-        if (Rs2Npc.interact(butler, "Talk-to")) {
+
+        if (Rs2Dialogue.isInDialogue() || Rs2Npc.interact(butler, "Talk-to")) {
+            sleep(1200);
+            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
             sleep(1200, 2000);
-            if (hasDialogueOptionToUnnote()) {
+            if (Rs2Widget.findWidget("Go to the bank...", null) != null) {
+                Rs2Inventory.useItemOnNpc(ItemID.OAK_PLANK + 1, butler.getId()); // + 1  for noted item
+                sleepUntilOnClientThread(() -> Rs2Widget.hasWidget("Dost thou wish me to exchange that certificate"));
+                Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+                sleepUntilOnClientThread(() -> Rs2Widget.hasWidget("Select an option"));
+                Rs2Keyboard.typeString("1");
+                sleepUntilOnClientThread(() -> Rs2Widget.hasWidget("Enter amount:"));
+                Rs2Keyboard.typeString("28");
+                Rs2Keyboard.enter();
+            } else if (hasDialogueOptionToUnnote()) {
                 Rs2Keyboard.keyPress('1');
                 sleepUntilOnClientThread(() -> !hasDialogueOptionToUnnote());
-            } else if (hasPayButlerDialogue()) {
+            } else if (hasPayButlerDialogue() || hasDialogueOptionToPay()) {
                 Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                 sleep(1200, 2000);
                 if (hasDialogueOptionToPay()) {
