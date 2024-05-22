@@ -1,28 +1,17 @@
 package net.runelite.client.plugins.microbot.bossassist;
 
-import net.runelite.api.Animation;
-import net.runelite.api.NPC;
+
 import net.runelite.api.NpcID;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.bossassist.models.BossMonster;
 import net.runelite.client.plugins.microbot.bossassist.models.DAMAGE_PRAYERS;
 import net.runelite.client.plugins.microbot.bossassist.models.PrayStyle;
-import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyle;
-import net.runelite.client.plugins.microbot.playerassist.model.Monster;
-import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
-import net.runelite.client.plugins.microbot.util.npc.Rs2NpcStats;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
-import static net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager.attackStyleMap;
 
 
 public class BossAssistScript extends Script {
@@ -34,16 +23,12 @@ public class BossAssistScript extends Script {
     public PrayStyle prayStyle;
     public BossAssistConfig config;
 
-
     public boolean run(BossAssistConfig config) {
         Microbot.enableAutoRunOn = false;
         this.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             try {
-
-                long startTime = System.currentTimeMillis();
-
                 if (config.isScurriousOn()) {
                     if (currentTarget == null) {
                         // Construct the boss with the needed data to use auto pray
@@ -59,9 +44,16 @@ public class BossAssistScript extends Script {
                         System.out.println("Current prayer style " + prayStyle);
                         System.out.println("Current animmation of scurry " + currentTarget.npc.getAnimation());
 
+                        if(currentTarget.npc.isDead()) {
+                            System.out.println("Boss is dead resetting");
+                            handleScurryPrayersAuto(false);
+                            prayStyle = null;
+                            sleepUntil(() -> isNearNPC(NpcID.SCURRIUS_7222));
+                        }
+
                         switch (config.PRAYER_MODE()) {
                             case AUTO: {
-                                handleScurryPrayersAuto();
+                                handleScurryPrayersAuto(true);
                             }
                             case FLICK: {
 
@@ -74,11 +66,6 @@ public class BossAssistScript extends Script {
                 } else {
                     currentBoss = BOSS.NONE;
                 }
-
-
-                long endTime = System.currentTimeMillis();
-                long totalTime = endTime - startTime;
-                System.out.println("Total time for loop " + totalTime);
 
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -93,31 +80,31 @@ public class BossAssistScript extends Script {
         return boss != null;
     }
 
-    private void handleScurryPrayersAuto () {
+    private void handleScurryPrayersAuto (boolean on) {
         int currentAnimation = currentTarget.npc.getAnimation();
-        if (currentTarget.attackAnimMelee == currentTarget.npc.getAnimation() || (prayStyle == PrayStyle.MELEE && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_MELEE))) {
-            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
+        if ((currentTarget.attackAnimMelee == currentTarget.npc.getAnimation()  && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_MELEE)) || (prayStyle == PrayStyle.MELEE && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_MELEE))) {
+            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, on);
             prayStyle = PrayStyle.MELEE;
         }
-        if (currentAnimation == currentTarget.attackAnimRange || (prayStyle == PrayStyle.RANGED && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_RANGE))) {
-            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true);
+        if ((currentAnimation == currentTarget.attackAnimRange && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_RANGE)) || (prayStyle == PrayStyle.RANGED && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_RANGE))) {
+            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, on);
             prayStyle = PrayStyle.RANGED;
 
         }
-        if (currentAnimation == currentTarget.attackAnimMage || (prayStyle == PrayStyle.MAGE && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_MAGIC))) {
-            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, true);
+        if ((currentAnimation == currentTarget.attackAnimMage && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_MAGIC))|| (prayStyle == PrayStyle.MAGE && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_MAGIC))) {
+            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, on);
             prayStyle = PrayStyle.MAGE;
         }
 
         if(config.DAMAGE_PRAYER() != DAMAGE_PRAYERS.NONE) {
             if(config.DAMAGE_PRAYER() == DAMAGE_PRAYERS.PIETY && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PIETY)) {
-                Rs2Prayer.toggle(Rs2PrayerEnum.PIETY, true);
+                Rs2Prayer.toggle(Rs2PrayerEnum.PIETY, on);
             }
             if(config.DAMAGE_PRAYER() == DAMAGE_PRAYERS.AUGURY && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.AUGURY)) {
-                Rs2Prayer.toggle(Rs2PrayerEnum.AUGURY, true);
+                Rs2Prayer.toggle(Rs2PrayerEnum.AUGURY, on);
             }
             if(config.DAMAGE_PRAYER() == DAMAGE_PRAYERS.RIGOUR && !Rs2Prayer.isPrayerActive(Rs2PrayerEnum.RIGOUR)) {
-                Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, true);
+                Rs2Prayer.toggle(Rs2PrayerEnum.RIGOUR, on);
             }
         }
     }
