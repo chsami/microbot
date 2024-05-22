@@ -43,6 +43,13 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.RuneLite;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -147,23 +154,27 @@ public class ProfileManager {
             return createProfile(name, System.nanoTime());
         }
 
-        public ConfigProfile findProfile(String name) {
-            for (ConfigProfile configProfile : profiles) {
-                if (configProfile.getName().equals(name)) {
-                    return configProfile;
-                }
-            }
-            return null;
-        }
+		public ConfigProfile findProfile(String name)
+		{
+			return findProfile((profile) -> profile.getName().equals(name));
+		}
 
-        public ConfigProfile findProfile(long id) {
-            for (ConfigProfile configProfile : profiles) {
-                if (configProfile.getId() == id) {
-                    return configProfile;
-                }
-            }
-            return null;
-        }
+		public ConfigProfile findProfile(long id)
+		{
+			return findProfile((profile) -> profile.getId() == id);
+		}
+
+		public ConfigProfile findProfile(Predicate<ConfigProfile> condition)
+		{
+			for (ConfigProfile configProfile: profiles)
+			{
+				if (condition.test(configProfile))
+				{
+					return configProfile;
+				}
+			}
+			return null;
+		}
 
         public void removeProfile(long id) {
             // keep the properties around on disk as a backup. If this profile is active on another client

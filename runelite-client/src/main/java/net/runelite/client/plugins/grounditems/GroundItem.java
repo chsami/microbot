@@ -80,7 +80,7 @@ public class GroundItem
 
 	boolean isMine()
 	{
-		return ownership != OWNERSHIP_OTHER;
+		return ownership == OWNERSHIP_SELF || ownership == OWNERSHIP_GROUP;
 	}
 
 	void reset()
