@@ -204,7 +204,7 @@ public class VorkathScript extends Script {
                             interact(NpcID.VORKATH_8059, "Poke");
                             Rs2Player.waitForAnimation(10000);
                             Rs2Walker.walkFastLocal(
-                                    LocalPoint.fromScene(48, 58)
+                                    LocalPoint.fromScene(48, 58, Microbot.getClient().getTopLevelWorldView().getScene())
                             );
                             Rs2Player.waitForWalking();
                             handlePrayer();
@@ -241,7 +241,7 @@ public class VorkathScript extends Script {
                         }
                         if (Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() >= 59) {
                             Rs2Walker.walkFastLocal(
-                                    LocalPoint.fromScene(48, 58)
+                                    LocalPoint.fromScene(48, 58, Microbot.getClient().getTopLevelWorldView().getScene())
                             );
                         }
                         drinkPotions();
@@ -270,7 +270,7 @@ public class VorkathScript extends Script {
                         Rs2Player.eatAt(80);
                         drinkPrayer();
                         Rs2Walker.walkFastLocal(
-                                LocalPoint.fromScene(48, 58)
+                                LocalPoint.fromScene(48, 58, Microbot.getClient().getTopLevelWorldView().getScene())
                         );
                         NPC zombieSpawn = Rs2Npc.getNpc("Zombified Spawn");
                         if (zombieSpawn != null) {
@@ -312,7 +312,7 @@ public class VorkathScript extends Script {
                                 leaveVorkath();
                             } else {
                                 Rs2Walker.walkFastLocal(
-                                        LocalPoint.fromScene(48, 58)
+                                        LocalPoint.fromScene(48, 58, Microbot.getClient().getTopLevelWorldView().getScene())
                                 );
                                 Rs2Player.waitForWalking();
                                 calculateState();
@@ -537,7 +537,7 @@ public class VorkathScript extends Script {
         Rs2Player.eatAt(80);
         while (!awaitedCondition.getAsBoolean()) {
             Rs2Walker.walkFastLocal(
-                    LocalPoint.fromScene(x, y)
+                    LocalPoint.fromScene(x, y, Microbot.getClient().getTopLevelWorldView().getScene())
             );
             sleep(200);
         }

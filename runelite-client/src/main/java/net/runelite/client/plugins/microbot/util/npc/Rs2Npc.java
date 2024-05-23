@@ -281,7 +281,7 @@ public class Rs2Npc {
                 npc.getWorldLocation(),
                 npc.getComposition().getSize(),
                 npc.getComposition().getSize())
-                .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
     }
 
     public static WorldPoint getWorldLocation(NPC npc) {
