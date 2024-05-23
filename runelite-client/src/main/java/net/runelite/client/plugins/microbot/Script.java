@@ -41,7 +41,7 @@ public abstract class Script implements IScript {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
     }
 
@@ -50,7 +50,7 @@ public abstract class Script implements IScript {
         try {
             Thread.sleep(randTime);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
     }
 

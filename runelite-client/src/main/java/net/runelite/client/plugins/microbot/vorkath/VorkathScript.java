@@ -57,7 +57,7 @@ enum State {
 }
 
 public class VorkathScript extends Script {
-    public static double version = 1.0;
+    public static String version = "1.1.1";
 
     State state = State.ZOMBIE_SPAWN;
 
@@ -115,16 +115,13 @@ public class VorkathScript extends Script {
                     leaveVorkath();
                 }
 
-                if (Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
+                if (state == State.FIGHT_VORKATH  && Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
                     state = State.TELEPORT_AWAY;
                 }
 
-
-                init = false;
-
                 switch (state) {
                     case BANKING:
-                        if (Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
+                        if (!init && Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
                             Microbot.showMessage("Out of ammo!");
                             sleep(5000);
                             return;
@@ -196,6 +193,7 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case PREPARE_FIGHT:
+                        primaryBolts = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO).name;
                         Rs2Player.toggleRunEnergy(false);
 
                         boolean result = drinkPotions();
@@ -206,7 +204,7 @@ public class VorkathScript extends Script {
                             interact(NpcID.VORKATH_8059, "Poke");
                             Rs2Player.waitForAnimation(10000);
                             Rs2Walker.walkFastLocal(
-                                    LocalPoint.fromScene(48, 58)
+                                    LocalPoint.fromScene(48, 58, Microbot.getClient().getTopLevelWorldView().getScene())
                             );
                             Rs2Player.waitForWalking();
                             handlePrayer();
@@ -243,7 +241,7 @@ public class VorkathScript extends Script {
                         }
                         if (Microbot.getClient().getLocalPlayer().getLocalLocation().getSceneY() >= 59) {
                             Rs2Walker.walkFastLocal(
-                                    LocalPoint.fromScene(48, 58)
+                                    LocalPoint.fromScene(48, 58, Microbot.getClient().getTopLevelWorldView().getScene())
                             );
                         }
                         drinkPotions();
@@ -265,14 +263,14 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case ZOMBIE_SPAWN:
-                        if (vorkath.isDead()) {
+                        if (Rs2Npc.getNpc(NpcID.VORKATH_8061) == null) {
                             state = State.FIGHT_VORKATH;
                         }
                         togglePrayer(false);
                         Rs2Player.eatAt(80);
                         drinkPrayer();
                         Rs2Walker.walkFastLocal(
-                                LocalPoint.fromScene(48, 58)
+                                LocalPoint.fromScene(48, 58, Microbot.getClient().getTopLevelWorldView().getScene())
                         );
                         NPC zombieSpawn = Rs2Npc.getNpc("Zombified Spawn");
                         if (zombieSpawn != null) {
@@ -314,7 +312,7 @@ public class VorkathScript extends Script {
                                 leaveVorkath();
                             } else {
                                 Rs2Walker.walkFastLocal(
-                                        LocalPoint.fromScene(48, 58)
+                                        LocalPoint.fromScene(48, 58, Microbot.getClient().getTopLevelWorldView().getScene())
                                 );
                                 Rs2Player.waitForWalking();
                                 calculateState();
@@ -370,6 +368,8 @@ public class VorkathScript extends Script {
                         }
                         break;
                 }
+
+                init = false;
 
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -537,7 +537,7 @@ public class VorkathScript extends Script {
         Rs2Player.eatAt(80);
         while (!awaitedCondition.getAsBoolean()) {
             Rs2Walker.walkFastLocal(
-                    LocalPoint.fromScene(x, y)
+                    LocalPoint.fromScene(x, y, Microbot.getClient().getTopLevelWorldView().getScene())
             );
             sleep(200);
         }

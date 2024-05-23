@@ -411,6 +411,6 @@ public class Rs2GroundItem {
                 tile.getWorldLocation(),
                 1,
                 1)
-                .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
     }
 }

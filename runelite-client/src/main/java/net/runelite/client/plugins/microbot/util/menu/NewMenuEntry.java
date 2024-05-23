@@ -102,6 +102,16 @@ public class NewMenuEntry implements MenuEntry {
         return this;
     }
 
+    @Override
+    public int getWorldViewId() {
+        return 0;
+    }
+
+    @Override
+    public MenuEntry setWorldViewId(int worldViewId) {
+        return null;
+    }
+
     public boolean isDeprioritized() {
         return false;
     }
