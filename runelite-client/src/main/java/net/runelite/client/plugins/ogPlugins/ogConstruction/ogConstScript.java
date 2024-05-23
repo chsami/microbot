@@ -156,7 +156,7 @@ public class ogConstScript extends Script {
     private void fillMoneyBag(){
         Microbot.status = "Checking Servant's Moneybag";
         if(logging){System.out.println("===========================FILL MONEYBAG FUNCTION CALLED===========================");}
-        Rs2GameObject.interact(ObjectID.SERVANTS_MONEYBAG, "Use");
+        Rs2GameObject.interact(ObjectID.SERVANTS_MONEY_BAG, "Use");
         sleepUntil(()-> Rs2Widget.findWidget("The moneybag ") != null,Random.random(5000,9000));
         if(Rs2Widget.findWidget("The moneybag ") != null){
             if(Random.random(1,100) == 3){
