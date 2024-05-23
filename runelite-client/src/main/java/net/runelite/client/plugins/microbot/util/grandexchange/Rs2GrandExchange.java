@@ -221,6 +221,38 @@ public class Rs2GrandExchange {
         return false;
     }
 
+    public static boolean sellItemUnder5Percent(String itemName, int quantity) {
+        try {
+            if (!Rs2Inventory.hasItem(itemName)) return false;
+
+            if (!isOpen()) {
+                openExchange();
+            }
+            Pair<GrandExchangeSlots, Integer> slot = getAvailableSlot();
+            Widget sellOffer = getOfferSellButton(slot.getLeft());
+
+            if (sellOffer == null) return false;
+
+            Microbot.getMouse().click(sellOffer.getBounds());
+            sleepUntil(Rs2GrandExchange::isOfferTextVisible, 5000);
+            Rs2Inventory.interact(itemName, "Offer");
+            sleepUntil(() -> Rs2Widget.hasWidget("actively traded price"));
+            sleep(300, 600);
+            Widget pricePerItemButton5Percent = getPricePerItemButton_Minus_5Percent();
+            if (pricePerItemButton5Percent != null) {
+                Microbot.getMouse().click(pricePerItemButton5Percent.getBounds());
+                Microbot.getMouse().click(getConfirm().getBounds());
+                sleepUntil(() -> !isOfferTextVisible());
+                return true;
+            } else {
+                System.out.println("unable to find widget setprice.");
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+
     /**
      * Collect all the grand exchange slots to the bank or inventory
      *
@@ -452,6 +484,10 @@ public class Rs2GrandExchange {
 
     public static boolean hasBoughtOffer() {
         return Arrays.stream(Microbot.getClient().getGrandExchangeOffers()).anyMatch(x -> x.getState() == GrandExchangeOfferState.BOUGHT);
+    }
+
+    public static boolean hasSoldOffer() {
+        return Arrays.stream(Microbot.getClient().getGrandExchangeOffers()).anyMatch(x -> x.getState() == GrandExchangeOfferState.SOLD);
     }
 
     private static int getMaxSlots() {
