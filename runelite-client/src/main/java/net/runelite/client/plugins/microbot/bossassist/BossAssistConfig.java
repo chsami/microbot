@@ -5,7 +5,9 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.bossassist.models.DAMAGE_PRAYERS;
+import net.runelite.client.plugins.microbot.bossassist.models.INSTANCES;
 import net.runelite.client.plugins.microbot.bossassist.models.PRAY_MODE;
+import net.runelite.client.plugins.microbot.bossassist.models.SPEC_WEAPON;
 
 @ConfigGroup("Boss Assist")
 public interface BossAssistConfig extends Config {
@@ -37,6 +39,23 @@ public interface BossAssistConfig extends Config {
     )
     String scurriousSection = "scurrious";
 
+    @ConfigSection(
+            name = "Deranged Archaeologist",
+            description = "Settings for the Deranged Archaeologist assist",
+            position = 3,
+            closedByDefault = true
+    )
+    String derangedarchaeologist = "deranged archaeologist";
+
+    @ConfigSection(
+            name = "Obor",
+            description = "Settings for the Obor assist",
+            position = 4,
+            closedByDefault = true
+    )
+    String obor = "obor";
+
+
     @ConfigItem(
             keyName = "Scurrius",
             name = "Enabled",
@@ -49,6 +68,52 @@ public interface BossAssistConfig extends Config {
         return false;
     }
 
+    @ConfigItem(
+            keyName = "instancescurry",
+            name = "Instance type",
+            description = "Choose your instance",
+            position = 2,
+            section = scurriousSection
+    )
+    default INSTANCES GET_INSTANCE() {
+        return INSTANCES.PRIVATE;
+    }
+
+    @ConfigItem(
+            keyName = "specscurry",
+            name = "Special weapon",
+            description = "Choose your spec weapon",
+            position = 3,
+            section = scurriousSection
+    )
+    default SPEC_WEAPON SPEC_WEAPON() {
+        return SPEC_WEAPON.NONE;
+    }
+
+
+    @ConfigItem(
+            keyName = "DerangedArcheo",
+            name = "Enabled",
+            description = "Enable this if you want to assist against Deranged Archaeologist",
+            position = 1,
+            section = derangedarchaeologist
+    )
+    default boolean isArcheoOn()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "Obor",
+            name = "Enabled",
+            description = "Enable this if you want to assist against Obor",
+            position = 1,
+            section = obor
+    )
+    default boolean isOborOn()
+    {
+        return false;
+    }
 
     @ConfigItem(
             keyName = "prayermode",

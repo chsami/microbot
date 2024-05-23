@@ -13,6 +13,11 @@ public class BossMonster {
     public boolean delete;
     public int lastAttack = 0;
 
+    // Mostly used for bosses that dont require multiple prayer uses
+    public BossMonster(int id) {
+        this.id = id;
+    }
+
     // Constructor with ID and Melee attack animation
     public BossMonster(int id, int attackAnimMelee) {
         this.id = id;

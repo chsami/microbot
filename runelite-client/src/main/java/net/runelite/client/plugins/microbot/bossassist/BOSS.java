@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum BOSS {
     NONE("None"),
+    DERANGED_ARCHEOLGIST("Deranged Archaeologist"),
+    OBOR("Obor"),
     SCURRIUS("Scurrius");
 
     private final String bossName;
