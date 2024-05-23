@@ -302,7 +302,7 @@ public class MicrobotPlugin extends Plugin {
                 try {
                     Rs2Reflection.setItemId(entry, Microbot.targetMenu.getItemId());
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
+                    System.out.println(e.getMessage());
                 }
             }
             this.client.setMenuEntries(new MenuEntry[]{entry});
