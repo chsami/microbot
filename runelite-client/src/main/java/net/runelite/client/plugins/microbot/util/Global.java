@@ -29,7 +29,7 @@ public class Global {
         try {
             Thread.sleep(start);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
     }
 
@@ -38,7 +38,7 @@ public class Global {
         try {
             Thread.sleep(randomSleep);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
     }
 
