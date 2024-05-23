@@ -16,6 +16,7 @@ import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
+import java.util.Arrays;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
@@ -32,9 +33,9 @@ public class Rs2Magic {
         sleep(150, 300);
         int identifier = 1;
         if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")
-                || magicSpell.getName().toLowerCase().contains("Bones to")) {
+                || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
             menuAction = MenuAction.CC_OP;
-            identifier = 0;
+            identifier = isLunar() ? 1 : 0;
         } else {
             menuAction = MenuAction.WIDGET_TARGET;
         }
@@ -121,5 +122,17 @@ public class Rs2Magic {
 
     private static void alch(Widget alch) {
         alch(alch, null);
+    }
+
+    public static boolean isLunar() {
+        return Microbot.getVarbitValue(Varbits.SPELLBOOK) == 2;
+    }
+
+    public static boolean isAncient() {
+        return Microbot.getVarbitValue(Varbits.SPELLBOOK) == 1;
+    }
+
+    public static boolean isModern() {
+        return Microbot.getVarbitValue(Varbits.SPELLBOOK) == 0;
     }
 }

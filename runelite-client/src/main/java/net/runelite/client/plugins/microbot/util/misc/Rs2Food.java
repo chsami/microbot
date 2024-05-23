@@ -10,7 +10,7 @@ public enum Rs2Food {
     ROCKTAIL(15272,23,"Rocktail"),
     MANTA(391,22,"Manta Ray"),
     SHARK(385,20,"Shark"),
-    KARAMBWAN(	3144,18,"Karambwan"),
+    KARAMBWAN(	3144,18,"Cooked karambwan"),
     LOBSTER(379,12,"Lobster"),
     TROUT(333,7,"Trout"),
     SALMON(329,9,"Salmon"),

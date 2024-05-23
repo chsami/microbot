@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ public class LootScript extends Script {
             }
             boolean result = Rs2GroundItem.lootItemBasedOnValue(config.minPriceOfItemsToLoot(), config.maxPriceOfItemsToLoot(), 14);
             if (result) {
-                Global.sleep(2000, 4000);
+                Rs2Player.waitForWalking();
                 Microbot.pauseAllScripts = false;
             }
         }), 0, 2000, TimeUnit.MILLISECONDS);

@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.concurrent.TimeUnit;
@@ -36,7 +37,7 @@ public class WheatScript extends Script {
             if (!Microbot.isLoggedIn()) return;
             if (bankingCountDown == 0 || pickingCountdown == 0) {
                 System.out.println("Bot is stuck, logging out: banking " + bankingCountDown + ", picking " + pickingCountdown);
-                logout();
+                Rs2Player.logout();
                 shutdown();
             }
             try {

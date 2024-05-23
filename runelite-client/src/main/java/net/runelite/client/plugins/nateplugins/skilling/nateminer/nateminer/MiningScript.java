@@ -15,7 +15,7 @@ public class MiningScript extends Script {
     public boolean run(MiningConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-
+            if (!Microbot.isLoggedIn()) return;
             try {
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
 
