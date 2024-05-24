@@ -31,4 +31,4 @@ jobs:
           prerelease: false
           title: "Release Build"
           files: |
-            /home/runner/work/microbot/microbot/runelite-client/target/*.jar
+            /home/runner/work/microbot/microbot/runelite-client/target/microbot-*.jar
