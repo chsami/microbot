@@ -895,13 +895,13 @@ public class Rs2GameObject {
                     worldPoint,
                     gameObject.sizeX(),
                     gameObject.sizeY())
-                    .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
         } else {
             return new WorldArea(
                     tileObject.getWorldLocation(),
                     2,
                     2)
-                    .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
         }
     }
 

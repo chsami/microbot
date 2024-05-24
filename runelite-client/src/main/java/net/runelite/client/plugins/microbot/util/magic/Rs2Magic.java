@@ -33,7 +33,7 @@ public class Rs2Magic {
         sleep(150, 300);
         int identifier = 1;
         if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")
-                || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x.equalsIgnoreCase("cast"))) {
+                || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
             menuAction = MenuAction.CC_OP;
             identifier = isLunar() ? 1 : 0;
         } else {
