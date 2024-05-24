@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -439,21 +440,21 @@ public class Rs2Inventory {
      * @return
      */
     public static boolean dropAllExcept(int gpValue) {
-        return dropAllExcept(gpValue, false);
+        return dropAllExcept(gpValue, List.of());
     }
 
     /**
      * Drop all items that fall under the gpValue
      *
      * @param gpValue    minimum amount of gp required to not drop the item
-     * @param ignoreFood
+     * @param ignoreItems List of items to not drop
      * @return
      */
-    public static boolean dropAllExcept(int gpValue, boolean ignoreFood) {
+    public static boolean dropAllExcept(int gpValue, List<String> ignoreItems) {
         for (Rs2Item item :
                 new ArrayList<>(items())) {
             if (item == null) continue;
-            if (ignoreFood && item.isFood()) continue;
+            if (ignoreItems.stream().anyMatch(x -> x.equalsIgnoreCase(item.name))) continue;
             long totalPrice = (long) Microbot.getClientThread().runOnClientThread(() ->
                     Microbot.getItemManager().getItemPrice(item.id) * item.quantity);
             if (totalPrice >= gpValue) continue;
@@ -1364,6 +1365,7 @@ public class Rs2Inventory {
      * @param name item name
      */
     public static void wield(String name) {
+        if (!Rs2Inventory.hasItem(name)) return;
         if (Rs2Equipment.isWearing(name, true)) return;
         invokeMenu(get(name), "wield");
     }
@@ -1442,6 +1444,27 @@ public class Rs2Inventory {
         return true;
     }
 
+    /**
+     *
+     * @param itemId
+     * @param npcID
+     * @return
+     */
+    public static boolean useItemOnNpc(int itemId, int npcID) {
+        if (Rs2Bank.isOpen()) return false;
+        use(itemId);
+        sleep(100);
+        if (!isItemSelected()) return false;
+        Rs2Npc.interact(npcID);
+        return true;
+    }
+
+    /**
+     *
+     * @param name
+     * @param exact
+     * @return
+     */
     public static Rs2Item getNotedItem(String name, boolean exact) {
         if (exact)
             return items().stream().filter(x -> x.name.equalsIgnoreCase(name) && x.isNoted).findFirst().orElse(null);
@@ -1513,7 +1536,11 @@ public class Rs2Inventory {
             identifier++;
         }
         if (Rs2Bank.isOpen()) {
-            identifier += 6;
+            if (action.equalsIgnoreCase("eat")) {
+                identifier += 7;
+            } else {
+                identifier += 6;
+            }
             param1 = 983043;
         } else {
             param1 = 9764864;

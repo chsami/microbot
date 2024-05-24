@@ -10,7 +10,7 @@ public enum SmithableBars {
     IRON_BAR("Iron bar", "1 Iron ore", 15, 12.5),
     STEEL_BAR("Steel bar", "1 Iron ore and 2 Coal", 30, 17.5),
     MITHRIL_BAR("Mithril bar", "1 Mithril ore and 4 Coal", 50, 30),
-    ADAMANT_BAR("Adamant bar", "1 Adamantite ore and 6 Coal", 70, 37.5),
+    ADAMANT_BAR("Adamantite bar", "1 Adamantite ore and 6 Coal", 70, 37.5),
     RUNE_BAR("Runite bar", "1 Runite ore and 8 Coal", 85, 50);
 
     private final String name;

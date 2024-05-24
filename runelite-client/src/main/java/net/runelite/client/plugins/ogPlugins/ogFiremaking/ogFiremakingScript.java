@@ -116,7 +116,7 @@ public class ogFiremakingScript extends Script {
                 sleep(30,120);
                 Rs2Inventory.use(getLog.getName());
                 sleepUntil(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation() == 823, 5000);
-                sleep(30,80);
+                sleep(300);
             }
             callAFK(34,50,400);
         }

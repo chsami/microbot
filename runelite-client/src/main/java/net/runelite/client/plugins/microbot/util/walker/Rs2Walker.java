@@ -191,7 +191,7 @@ public class Rs2Walker {
             LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
             canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
         } else {
-            canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY()), Microbot.getClient().getPlane());
+            canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY(), Microbot.getClient().getTopLevelWorldView().getScene()), Microbot.getClient().getPlane());
 
         }
 
@@ -217,7 +217,7 @@ public class Rs2Walker {
                 target,
                 1,
                 1)
-                .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
     }
 
     public static boolean isCloseToRegion(int distance, int regionX, int regionY) {
@@ -309,8 +309,6 @@ public class Rs2Walker {
         if (!ShortestPathPlugin.isStartPointSet() && localPlayer == null) {
             return;
         }
-
-        System.out.println(target == null ? "REESEEETT" : "RECALC");
 
         currentTarget = target;
 
@@ -505,7 +503,11 @@ public class Rs2Walker {
      * @return
      */
     public static boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
-        for (WorldPoint a : ShortestPathPlugin.getTransports().keySet().stream().filter(x -> x.distanceTo(Rs2Player.getWorldLocation()) <= 12).collect(Collectors.toList())) {
+        for (WorldPoint a : ShortestPathPlugin.getTransports().keySet()
+                .stream()
+                .filter(x -> x.distanceTo(Rs2Player.getWorldLocation()) <= 12)
+                .sorted(Comparator.comparingInt(worldPoint -> worldPoint.distanceTo(Rs2Player.getWorldLocation())))
+                .collect(Collectors.toList())) {
 
             for (Transport b : ShortestPathPlugin.getTransports().getOrDefault(a, new ArrayList<>())) {
                 for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), b.getOrigin())) {
@@ -547,6 +549,21 @@ public class Rs2Walker {
                                 } else {
                                     Rs2Walker.walkFastCanvas(path.get(i));
                                     sleep(1200, 1600);
+                                }
+                            } else {
+                                GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
+                                if (groundObject != null && groundObject.getId() == b.getObjectId() && Rs2Camera.isTileOnScreen(groundObject)) {
+                                    if (Rs2GameObject.hasLineOfSight(groundObject)) {
+                                        Rs2GameObject.interact(groundObject, b.getAction());
+                                        if (b.isAgilityShortcut()) {
+                                            Rs2Player.waitForAnimation();
+                                        }
+                                        sleep(1200, 1600);
+                                        return true;
+                                    } else {
+                                        Rs2Walker.walkFastCanvas(path.get(i));
+                                        sleep(1200, 1600);
+                                    }
                                 }
                             }
                         }

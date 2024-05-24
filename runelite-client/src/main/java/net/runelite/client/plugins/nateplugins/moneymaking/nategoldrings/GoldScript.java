@@ -29,7 +29,7 @@ public class GoldScript extends Script {
     public boolean run(GoldConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
-
+            if (!Microbot.isLoggedIn()) return;
             try {
                 Rs2Widget goldring = (Rs2Widget) Microbot.getClient().getWidget(446,7);
                 TileObject furnace = (TileObject) Rs2GameObject.findObjectById(24009);

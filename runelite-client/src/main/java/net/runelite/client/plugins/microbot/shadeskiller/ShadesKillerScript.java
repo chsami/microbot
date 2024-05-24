@@ -87,6 +87,7 @@ public class ShadesKillerScript extends Script {
     }
 
     private void emptyCoffin() {
+        if (!config.useCoffin()) return;
         if (!Rs2Inventory.hasItem("coffin")) {
             Rs2Bank.depositAll();
             Rs2Bank.withdrawOne("coffin");
@@ -106,9 +107,9 @@ public class ShadesKillerScript extends Script {
             }
             return;
         }
-        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+        Rs2Widget.clickWidget(17694738);
         Rs2Bank.openBank();
-        sleepUntil(() -> Rs2Bank.isOpen());
+        sleepUntil(Rs2Bank::isOpen);
         Rs2Bank.depositAll("fiyr remains");
     }
 
@@ -159,7 +160,7 @@ public class ShadesKillerScript extends Script {
                                 Rs2Player.waitForAnimation();
                             }
                         }
-                        if (coffinHasItems) {
+                        if (coffinHasItems && config.useCoffin()) {
                             emptyCoffin();
                             return;
                         }
@@ -198,6 +199,7 @@ public class ShadesKillerScript extends Script {
                         break;
                     case FIGHT_SHADES:
                         boolean isLooting = Rs2GroundItem.lootAtGePrice(config.priceOfItemsToLoot());
+                        if (isLooting) return;
                         net.runelite.api.NPC npc = Rs2Npc.getNpcsForPlayer(config.SHADES().names.get(0)).stream().findFirst().orElse(null);
                         //if npc is attacking us, then attack back
                         if (npc != null && !Microbot.getClient().getLocalPlayer().isInteracting()) {
@@ -209,13 +211,15 @@ public class ShadesKillerScript extends Script {
                             Rs2Npc.attack(config.SHADES().names);
                         }
                         Rs2Combat.setSpecState(true, config.specialAttack() * 10);
-                        if (Rs2Inventory.isFull()) {
+                        if (Rs2Inventory.isFull() && config.useCoffin()) {
                             Rs2Inventory.interact("coffin", "fill");
                             coffinHasItems = true;
                             boolean isInventoryNoLongerFull = sleepUntilTrue(() -> !Rs2Inventory.isFull(), 100, 2000);
-                            if (!isInventoryNoLongerFull) {
+                            if (!isInventoryNoLongerFull && Rs2Inventory.getInventoryFood().isEmpty()) {
                                 state = USE_TELEPORT_TO_BANK;
                             }
+                        } else if (Rs2Inventory.isFull() && Rs2Inventory.getInventoryFood().isEmpty()) {
+                            state = USE_TELEPORT_TO_BANK;
                         }
                         break;
                 }

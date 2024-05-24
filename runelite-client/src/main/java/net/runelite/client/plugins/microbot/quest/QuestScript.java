@@ -3,9 +3,11 @@ package net.runelite.client.plugins.microbot.quest;
 import net.runelite.api.NPC;
 import net.runelite.api.Quest;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -53,7 +55,7 @@ public class QuestScript extends Script {
                         return;
                     }
 
-                    if (Rs2Widget.hasWidget("click here to continue")) {
+                    if (Rs2Dialogue.isInDialogue()) {
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
                     }

@@ -201,7 +201,7 @@ public class Rs2GameObject {
 
     public static TileObject findObjectByIdAndDistance(int id, int distance) {
 
-        List<GameObject> gameObjects = getGameObjects(distance);
+        List<GameObject> gameObjects = getGameObjectsWithinDistance(distance);
 
         for (net.runelite.api.GameObject gameObject : gameObjects) {
             if (gameObject.getId() == id)
@@ -592,6 +592,33 @@ public class Rs2GameObject {
         return Arrays.stream(tile.getGameObjects()).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
+    public static List<GroundObject> getGroundObjects(int id, WorldPoint anchorPoint) {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        if (tiles == null) return new ArrayList<>();
+
+        int z = Microbot.getClient().getPlane();
+        List<GroundObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null || tile.getGroundObject() == null) {
+                    continue;
+                }
+                if (tile.getGroundObject().getId() == id) {
+                    tileObjects.add(tile.getGroundObject());
+                }
+            }
+        }
+
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(anchorPoint)))
+                .collect(Collectors.toList());
+    }
+
     /**
      * TODO remove this method, maybe use find or get(int id)
      *
@@ -868,14 +895,13 @@ public class Rs2GameObject {
                     worldPoint,
                     gameObject.sizeX(),
                     gameObject.sizeY())
-                    .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
         } else {
-            WallObject wallObject = (WallObject) tileObject;
             return new WorldArea(
                     tileObject.getWorldLocation(),
                     2,
                     2)
-                    .hasLineOfSightTo(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
         }
     }
 

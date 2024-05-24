@@ -243,4 +243,8 @@ public enum MagicAction implements SkillAction
 	public int getWidgetId() {
 		return Rs2Widget.findWidget(name, Arrays.stream(Rs2Widget.getWidget(218, 0).getStaticChildren()).collect(Collectors.toList())).getId();
 	}
+
+	public String[] getActions() {
+		return Rs2Widget.findWidget(name, Arrays.stream(Rs2Widget.getWidget(218, 0).getStaticChildren()).collect(Collectors.toList())).getActions();
+	}
 }

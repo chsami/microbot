@@ -38,18 +38,20 @@ public abstract class Script implements IScript {
     protected static WorldPoint initialPlayerLocation;
 
     public void sleep(int time) {
-        long startTime = System.currentTimeMillis();
-        do {
-            Microbot.status = "[Sleeping] for " + time + " ms";
-        } while (System.currentTimeMillis() - startTime < time);
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void sleep(int start, int end) {
-        long startTime = System.currentTimeMillis();
         int randTime = Random.random(start, end);
-        do {
-            Microbot.status = "[Sleeping] between " + start + " ms and " + end + " ms";
-        } while (System.currentTimeMillis() - startTime < randTime);
+        try {
+            Thread.sleep(randTime);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public ScheduledFuture<?> keepExecuteUntil(Runnable callback, BooleanSupplier awaitedCondition, int time) {

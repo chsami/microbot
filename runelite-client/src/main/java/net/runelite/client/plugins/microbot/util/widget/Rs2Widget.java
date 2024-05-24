@@ -52,6 +52,9 @@ public class Rs2Widget {
     public static boolean isWidgetVisible(WidgetInfo wiget) {
         return !Microbot.getClientThread().runOnClientThread(() -> Objects.requireNonNull(Microbot.getClient().getWidget(wiget)).isHidden());
     }
+    public static boolean isWidgetVisible(int widgetId, int childId) {
+        return !Microbot.getClientThread().runOnClientThread(() ->  getWidget(widgetId, childId) == null || getWidget(widgetId, childId).isHidden());
+    }
     public static Widget getWidget(WidgetInfo wiget) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(wiget));
     }
