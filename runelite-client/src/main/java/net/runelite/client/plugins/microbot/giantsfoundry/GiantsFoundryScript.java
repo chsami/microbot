@@ -38,13 +38,13 @@ public class GiantsFoundryScript extends Script {
         this.config = config;
         setState(State.CRAFTING_WEAPON, true);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) {
-                setState(state, true);
-                sleep(2000);
-                return;
-            }
             try {
+                if (!super.run()) return;
+                if (!Microbot.isLoggedIn()) {
+                    setState(state, true);
+                    sleep(2000);
+                    return;
+                }
                 final Rs2Item weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
                 final Rs2Item shield = getEquippedItem(EquipmentInventorySlot.SHIELD);
                 if ((weapon != null || shield != null) && !weapon.name.equalsIgnoreCase("preform")) {

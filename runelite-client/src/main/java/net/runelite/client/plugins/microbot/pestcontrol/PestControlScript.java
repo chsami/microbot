@@ -62,8 +62,9 @@ public class PestControlScript extends Script {
     public boolean run(PestControlConfig config) {
         this.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
                 if (Microbot.getClient().getMinimapZoom() != 2.0) {
                     Microbot.getClient().setMinimapZoom(2.0);
                 }

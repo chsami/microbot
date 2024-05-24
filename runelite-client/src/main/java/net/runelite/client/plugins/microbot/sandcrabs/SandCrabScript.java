@@ -53,9 +53,10 @@ public class SandCrabScript extends Script {
             sandCrabLocations = sandCrabLocations.stream().filter(x -> x.hasThreeNpcs).collect(Collectors.toList());
         }
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+
                 long startTime = System.currentTimeMillis();
 
                Rs2Combat.enableAutoRetialiate();

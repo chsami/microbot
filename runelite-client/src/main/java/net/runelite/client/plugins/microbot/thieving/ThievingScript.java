@@ -27,8 +27,10 @@ public class ThievingScript extends Script {
     public boolean run(ThievingConfig config) {
         this.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+
                 List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
 
                 if (foods.isEmpty()) {

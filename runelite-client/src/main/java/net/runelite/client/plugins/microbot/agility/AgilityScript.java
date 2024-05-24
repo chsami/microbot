@@ -102,11 +102,13 @@ public class AgilityScript extends Script {
         currentObstacle = 0;
         init(config);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (startCourse == null) {
-                Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
-            }
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+                if (startCourse == null) {
+                    Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
+                }
+
                 final List<RS2Item> marksOfGrace = AgilityPlugin.getMarksOfGrace();
                 final LocalPoint playerLocation = Microbot.getClient().getLocalPlayer().getLocalLocation();
                 final WorldPoint playerWorldLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();

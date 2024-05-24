@@ -41,9 +41,9 @@ public class NmzScript extends Script {
         NmzScript.config = config;
         prayerPotionScript = new PrayerPotionScript();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
                 if (Random.random(1, 50) == 1 && config.randomMouseMovements()) {
                     Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()), true);
                 }

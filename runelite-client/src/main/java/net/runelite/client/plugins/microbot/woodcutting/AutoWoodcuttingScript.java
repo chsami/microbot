@@ -17,9 +17,10 @@ public class AutoWoodcuttingScript extends Script {
 
     public boolean run(AutoWoodcuttingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+
                 if (Rs2Equipment.isWearing("Dragon axe"))
                     Rs2Combat.setSpecState(true, 1000);
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;

@@ -27,8 +27,9 @@ public class TannerScript extends Script {
 
     public boolean run(TannerConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
 
                 if (config.LOCATION() == Location.AL_KHARID)
                     tanInAlkharid(config);

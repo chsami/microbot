@@ -14,8 +14,9 @@ public class SafeSpot extends Script {
 
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
 
                 if (currentSafeSpot == null)
                     currentSafeSpot = Microbot.getClient().getLocalPlayer().getWorldLocation();
