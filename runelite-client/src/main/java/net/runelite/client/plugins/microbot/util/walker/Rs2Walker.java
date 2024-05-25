@@ -27,8 +27,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2Walker {
     static int stuckCount = 0;
@@ -58,7 +57,6 @@ public class Rs2Walker {
                     setTarget(null);
                     break;
                 }
-                System.out.println(ShortestPathPlugin.getPathfinder());
                 if (ShortestPathPlugin.getPathfinder() == null) {
                     if (ShortestPathPlugin.getMarker() == null)
                         break;
@@ -83,8 +81,6 @@ public class Rs2Walker {
                 int indexOfStartPoint = getClosestTileIndex(path);
                 lastPosition = Rs2Player.getWorldLocation();
 
-                //TODO: investigate why this happens, most likely this thread is never shut down properly and target will keep the old target location
-                // for now we'll use this fix
                 if (Rs2Player.getWorldLocation().distanceTo(target) == 0)
                     break;
 
@@ -213,11 +209,16 @@ public class Rs2Walker {
     }
 
     public static boolean canReach(WorldPoint target) {
-        return new WorldArea(
+        setTarget(target);
+        sleepUntil(() -> ShortestPathPlugin.getPathfinder().isDone());
+        boolean result = ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1).equals(target)
+                && new WorldArea(
                 target,
                 1,
                 1)
                 .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+        setTarget(null);
+        return result;
     }
 
     public static boolean isCloseToRegion(int distance, int regionX, int regionY) {
