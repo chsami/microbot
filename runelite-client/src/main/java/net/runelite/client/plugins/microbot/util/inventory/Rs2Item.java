@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.microbot.Microbot;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -28,7 +29,9 @@ public class Rs2Item {
         this.slot = slot;
         this.isStackable = itemComposition.isStackable();
         this.isNoted = itemComposition.getNote() == 799;
-        this.isTradeable = itemComposition.isTradeable();
+        this.isTradeable = this.isNoted
+                ? Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(this.id - 1)).isTradeable()
+                : itemComposition.isTradeable();
     }
     public Rs2Item(Widget item, int slot) {
         this.id = item.getItemId();
