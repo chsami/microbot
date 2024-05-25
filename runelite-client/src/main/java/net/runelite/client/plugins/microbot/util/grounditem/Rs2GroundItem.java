@@ -348,6 +348,7 @@ public class Rs2GroundItem {
         return false;
     }
 
+    @Deprecated(since="1.0.0")
     public static boolean interact(String itemName, String action, int x, int y) {
         RS2Item[] itemsAtTile = getAllAt(x, y);
         if (itemsAtTile != null) {
@@ -360,6 +361,7 @@ public class Rs2GroundItem {
         return false;
     }
 
+    @Deprecated(since="1.0.0")
     public static boolean interact(int itemId, String action, int x, int y) {
         RS2Item[] itemsAtTile = getAllAt(x, y);
         if (itemsAtTile != null) {
@@ -393,6 +395,7 @@ public class Rs2GroundItem {
         return false;
     }
 
+    @Deprecated(since="1.0.0")
     public static boolean exists(String itemName, int x, int y) {
         RS2Item[] itemsAtTile = getAllAt(x, y);
         if (itemsAtTile != null) {

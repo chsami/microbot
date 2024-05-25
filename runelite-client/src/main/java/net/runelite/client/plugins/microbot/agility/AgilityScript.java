@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.awt.*;
@@ -99,6 +100,7 @@ public class AgilityScript extends Script {
     }
 
     public boolean run(MicroAgilityConfig config) {
+        Microbot.enableAutoRunOn = true;
         currentObstacle = 0;
         init(config);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -153,16 +155,11 @@ public class AgilityScript extends Script {
                 if (!marksOfGrace.isEmpty()) {
                     for (RS2Item markOfGraceTile : marksOfGrace) {
                         if (Microbot.getClient().getPlane() != markOfGraceTile.getTile().getPlane()) continue;
-                        //seers needs 7, falador needs 5 for the distance to
-                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(markOfGraceTile.getTile().getWorldLocation()) > 7)
+                        if (!Rs2Walker.canReach(markOfGraceTile.getTile().getWorldLocation()))
                             continue;
                         Rs2GroundItem.loot(markOfGraceTile.getItem().getId());
-                        sleepUntil(() -> markOfGraceTile.getTile().getGroundItems() == null || markOfGraceTile.getTile().getGroundItems().isEmpty());
-                        if (!marksOfGrace.isEmpty()) {
-                            Rs2GroundItem.loot(markOfGraceTile.getItem().getId());
-                            sleepUntil(() -> markOfGraceTile.getTile().getGroundItems() == null || markOfGraceTile.getTile().getGroundItems().isEmpty());
-                        }
-                        break;
+                        Rs2Player.waitForWalking();
+                        return;
                     }
                 }
 
