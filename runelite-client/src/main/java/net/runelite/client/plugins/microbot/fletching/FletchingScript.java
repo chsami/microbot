@@ -115,7 +115,7 @@ public class FletchingScript extends Script {
         }
 
         if (!Rs2Inventory.hasItem(primaryItemToFletch)) {
-            Rs2Bank.withdrawX(true, primaryItemToFletch, fletchingMode.getAmount());
+            Rs2Bank.withdrawX(true, primaryItemToFletch, fletchingMode.getAmount(), true);
             sleepUntil(() -> Rs2Inventory.hasItem(primaryItemToFletch));
         }
 
