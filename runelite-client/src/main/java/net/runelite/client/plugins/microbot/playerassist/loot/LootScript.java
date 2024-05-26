@@ -27,18 +27,23 @@ public class LootScript extends Script {
 
     public void run(ItemSpawned itemSpawned) {
         mainScheduledFuture = scheduledExecutorService.schedule((() -> {
-            if (!super.run()) return;
-            if (Microbot.getClientThread().runOnClientThread(Rs2Inventory::isFull)) return;
-            final ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemSpawned.getItem().getId()));
-            for (String item : lootItems) {
-                LocalPoint itemLocation = itemSpawned.getTile().getLocalLocation();
-                int distance = itemSpawned.getTile().getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
-                if (item.equalsIgnoreCase(itemComposition.getName()) && distance < 14) {
-                    Rs2GroundItem.interact(item, "Take");
-                    Microbot.pauseAllScripts = true;
-                    sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation() == itemSpawned.getTile().getWorldLocation(), 5000);
-                    Microbot.pauseAllScripts = false;
+            try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+                if (Microbot.getClientThread().runOnClientThread(Rs2Inventory::isFull)) return;
+                final ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemSpawned.getItem().getId()));
+                for (String item : lootItems) {
+                    LocalPoint itemLocation = itemSpawned.getTile().getLocalLocation();
+                    int distance = itemSpawned.getTile().getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
+                    if (item.equalsIgnoreCase(itemComposition.getName()) && distance < 14) {
+                        Rs2GroundItem.interact(item, "Take");
+                        Microbot.pauseAllScripts = true;
+                        sleepUntilOnClientThread(() -> Microbot.getClient().getLocalPlayer().getWorldLocation() == itemSpawned.getTile().getWorldLocation(), 5000);
+                        Microbot.pauseAllScripts = false;
+                    }
                 }
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
             }
         }), 2000, TimeUnit.MILLISECONDS);
     }

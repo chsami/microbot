@@ -4,6 +4,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,12 +29,15 @@ public class MiningScript extends Script {
                     }
                     return;
                 }
-                Rs2GameObject.interact(config.ORE().getName());
+                boolean result = Rs2GameObject.interact(config.ORE().getName());
+                if (result) {
+                    Rs2Player.waitForAnimation();
+                }
 
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
     }
 }

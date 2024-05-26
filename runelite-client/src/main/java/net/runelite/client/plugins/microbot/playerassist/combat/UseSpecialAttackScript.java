@@ -14,6 +14,7 @@ public class UseSpecialAttackScript extends Script {
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (!config.useSpecialAttack()) return;
                 Widget specialAttackOrb = Rs2Widget.getWidget(160, 35);

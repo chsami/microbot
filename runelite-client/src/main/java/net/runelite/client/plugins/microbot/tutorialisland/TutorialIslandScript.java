@@ -38,8 +38,10 @@ public class TutorialIslandScript extends Script {
     public boolean run(TutorialIslandConfig config) {
         Microbot.enableAutoRunOn = false;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+
                 CalculateStatus();
 
                 ClickContinue();

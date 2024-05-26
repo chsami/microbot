@@ -15,6 +15,7 @@ public class DefaultScript extends Script {
     public boolean run(CraftingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (Random.random(1, 255) == 2)
                     sleep(3000, 60000);

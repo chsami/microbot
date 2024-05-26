@@ -38,13 +38,13 @@ public class GiantsFoundryScript extends Script {
         this.config = config;
         setState(State.CRAFTING_WEAPON, true);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) {
-                setState(state, true);
-                sleep(2000);
-                return;
-            }
             try {
+                if (!super.run()) return;
+                if (!Microbot.isLoggedIn()) {
+                    setState(state, true);
+                    sleep(2000);
+                    return;
+                }
                 final Rs2Item weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
                 final Rs2Item shield = getEquippedItem(EquipmentInventorySlot.SHIELD);
                 if ((weapon != null || shield != null) && !weapon.name.equalsIgnoreCase("preform")) {
@@ -52,8 +52,8 @@ public class GiantsFoundryScript extends Script {
                     sleep(5000);
                     return;
                 }
-                if (!Rs2Equipment.isWearing("ice gloves")) {
-                    Microbot.showMessage(("Please start by wearing ice gloves."));
+                if (!Rs2Equipment.isWearing("ice gloves") && !Rs2Equipment.isWearing("smiths gloves")) {
+                    Microbot.showMessage(("Please start by wearing ice gloves or smiths gloves."));
                     sleep(5000);
                     return;
                 }

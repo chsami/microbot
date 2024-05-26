@@ -21,6 +21,7 @@ public class HosidiusScript extends Script {
     public boolean run(HosidiusConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (Microbot.getVarbitValue(hosidiousFavour) < 50) {
                     plough(); //south east field the middle plough

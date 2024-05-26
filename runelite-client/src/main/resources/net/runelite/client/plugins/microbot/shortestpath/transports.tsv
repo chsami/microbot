@@ -914,8 +914,9 @@
 3175 3421 1	3175 3421 0	Climb-down Ladder 11802					
 3267 3379 0	3269 3379 1	Climb-up Ladder 11794					
 3267 3379 1	3267 3379 0	Climb-down Ladder 11795					
-3237 9858 0	3236 3458 0	Climb-up Ladder 11806					
-3236 3458 0	3237 9858 0	Climb-down Manhole 882					
+3237 9858 0	3236 3458 0	Climb-up Ladder 11806
+3236 3458 0	3237 9858 0	Open Manhole 881
+3236 3458 0	3237 9858 0	Climb-down Manhole 882
 							
 # Stronghold of Security							
 3081 3421 0	1859 5243 0	Climb-down Entrance 20790					
