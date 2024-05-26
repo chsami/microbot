@@ -232,6 +232,11 @@ public class Rs2Npc {
 
     public static boolean attack(int npcId) {
         NPC npc = getNpc(npcId);
+        if (npc == null) return false;
+        if (!hasLineOfSight(npc)) return false;
+        if (Rs2Combat.inCombat()) return false;
+        if (npc.isInteracting() && npc.getInteracting() != Microbot.getClient().getLocalPlayer() && !Rs2Player.isInMulti())
+            return false;
 
         return interact(npc, "attack");
     }
