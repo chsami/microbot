@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static net.runelite.api.MenuAction.CC_OP;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 
 
 public class Rs2Player {
@@ -93,22 +94,26 @@ public class Rs2Player {
     }
 
     public static void waitForWalking() {
-        sleepUntil(Rs2Player::isWalking);
+        boolean result = sleepUntilTrue(Rs2Player::isWalking, 100, 5000);
+        if (!result) return;
         sleepUntil(() -> !Rs2Player.isWalking());
     }
 
     public static void waitForWalking(int time) {
-        sleepUntil(Rs2Player::isWalking);
+        boolean result = sleepUntilTrue(Rs2Player::isWalking, 100, time);
+        if (!result) return;
         sleepUntil(() -> !Rs2Player.isWalking(), time);
     }
 
     public static void waitForAnimation() {
-        sleepUntil(Rs2Player::isAnimating);
+        boolean result = sleepUntilTrue(Rs2Player::isAnimating, 100, 5000);
+        if (!result) return;
         sleepUntil(() -> !Rs2Player.isAnimating());
     }
 
     public static void waitForAnimation(int time) {
-        sleepUntil(Rs2Player::isAnimating, time);
+        boolean result = sleepUntilTrue(Rs2Player::isAnimating, 100, time);
+        if (!result) return;
         sleepUntil(() -> !Rs2Player.isAnimating(), time);
     }
 
