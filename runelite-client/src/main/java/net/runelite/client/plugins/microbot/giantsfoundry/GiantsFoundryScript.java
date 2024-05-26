@@ -52,8 +52,8 @@ public class GiantsFoundryScript extends Script {
                     sleep(5000);
                     return;
                 }
-                if (!Rs2Equipment.isWearing("ice gloves")) {
-                    Microbot.showMessage(("Please start by wearing ice gloves."));
+                if (!Rs2Equipment.isWearing("ice gloves") && !Rs2Equipment.isWearing("smiths gloves")) {
+                    Microbot.showMessage(("Please start by wearing ice gloves or smiths gloves."));
                     sleep(5000);
                     return;
                 }
