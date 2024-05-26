@@ -75,4 +75,28 @@ public interface MicroAgilityConfig extends Config {
     {
         return 5000;
     }
+
+    @ConfigItem(
+            keyName = "Alchemy",
+            name = "Alch",
+            description = "Use Low/High Alchemy while doing agility",
+            position = 5,
+            section = generalSection
+    )
+    default boolean alchemy()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "item",
+            name = "Item To Alch",
+            description = "Item to alch",
+            position = 5,
+            section = generalSection
+    )
+    default String item()
+    {
+        return "";
+    }
 }
