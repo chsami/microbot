@@ -64,24 +64,33 @@ public class Rs2Magic {
         }
     }
 
+    public static void alch(String itemName, int sleepMin, int sleepMax) {
+        Rs2Item item = Rs2Inventory.get(itemName);
+        if (Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 55) {
+            highAlch(item, sleepMin, sleepMax);
+        } else {
+            lowAlch(item, sleepMin, sleepMax);
+        }
+    }
+
     public static void alch(String itemName) {
         Rs2Item item = Rs2Inventory.get(itemName);
         if (Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 55) {
-            highAlch(item);
+            highAlch(item, 300, 600);
         } else {
-            lowAlch(item);
+            lowAlch(item, 300, 600);
         }
     }
 
     public static void alch(Rs2Item item) {
         if (Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 55) {
-            highAlch(item);
+            highAlch(item, 300, 600);
         } else {
-            lowAlch(item);
+            lowAlch(item, 300, 600);
         }
     }
 
-    private static void highAlch(Rs2Item item) {
+    private static void highAlch(Rs2Item item, int sleepMin, int sleepMax) {
         sleepUntil(() -> {
             Rs2Tab.switchToMagicTab();
             sleep(50, 150);
@@ -89,10 +98,10 @@ public class Rs2Magic {
         });
         Widget highAlch = Rs2Widget.findWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getName());
         if (highAlch.getSpriteId() != 41) return;
-        alch(highAlch, item);
+        alch(highAlch, item, sleepMin, sleepMax);
     }
 
-    private static void lowAlch(Rs2Item item) {
+    private static void lowAlch(Rs2Item item, int sleepMin, int sleepMax) {
         sleepUntil(() -> {
             Rs2Tab.switchToMagicTab();
             sleep(50, 150);
@@ -100,17 +109,17 @@ public class Rs2Magic {
         });
         Widget lowAlch = Rs2Widget.findWidget(MagicAction.LOW_LEVEL_ALCHEMY.getName());
         if (lowAlch.getSpriteId() != 25) return;
-        alch(lowAlch, item);
+        alch(lowAlch, item, sleepMin, sleepMax);
     }
 
-    private static void alch(Widget alch, Rs2Item item) {
+    private static void alch(Widget alch, Rs2Item item, int sleepMin, int sleepMax) {
         if (alch == null) return;
         Point point = new Point((int) alch.getBounds().getCenterX(), (int) alch.getBounds().getCenterY());
         sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC), 5000);
-        sleep(300, 600);
+        sleep(sleepMin, sleepMax);
         Microbot.getMouse().click(point);
         sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY), 5000);
-        sleep(300, 600);
+        sleep(sleepMin, sleepMax);
         if (item == null) {
             Microbot.status = "Alching x: " + point.getX() + " y: " + point.getY();
             Microbot.getMouse().click(point);
@@ -121,7 +130,7 @@ public class Rs2Magic {
     }
 
     private static void alch(Widget alch) {
-        alch(alch, null);
+        alch(alch, null, 300, 600);
     }
 
     public static boolean isLunar() {
