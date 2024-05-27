@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Inventory {
 
@@ -37,9 +38,15 @@ public class Rs2Inventory {
 
     public static List<Rs2Item> inventoryItems = new ArrayList<>();
 
+    private static boolean isTrackingInventory = false;
+    private static boolean isInventoryChanged = false;
+
 
     public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == InventoryID.INVENTORY.getId() && e.getItemContainer() != null) {
+            if (isTrackingInventory) {
+                isInventoryChanged = true;
+            }
             List<Rs2Item> _inventoryItems = new ArrayList<>();
             for (int i = 0; i < e.getItemContainer().getItems().length; i++) {
                 Item item = inventory().getItems()[i];
@@ -1640,6 +1647,18 @@ public class Rs2Inventory {
         }
     }
 
+    public static boolean waitForInventoryChanges() {
+        isTrackingInventory = true;
+        sleepUntil(() -> isInventoryChanged);
+        if (isInventoryChanged) {
+            isTrackingInventory = false;
+            isInventoryChanged = false;
+            return true;
+        }
+        isTrackingInventory = false;
+        isInventoryChanged = false;
+        return isInventoryChanged;
+    }
 
 }
 

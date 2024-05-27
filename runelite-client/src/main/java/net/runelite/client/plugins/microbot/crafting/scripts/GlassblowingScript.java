@@ -35,11 +35,11 @@ public class GlassblowingScript extends Script {
             calculateItemToCraft();
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (config.Afk() && Random.random(1, 100) == 2)
-                sleep(1000, 60000);
             try {
-
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+                if (config.Afk() && Random.random(1, 100) == 2)
+                    sleep(1000, 60000);
                 if (config.glassType() == Glass.PROGRESSIVE) {
                     itemToCraft = model.getItemToCraft();
                 } else {

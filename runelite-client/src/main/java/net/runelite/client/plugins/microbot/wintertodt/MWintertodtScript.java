@@ -49,9 +49,9 @@ public class MWintertodtScript extends Script {
         this.config = config;
         state = State.BANKING;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
 
                 long startTime = System.currentTimeMillis();
 

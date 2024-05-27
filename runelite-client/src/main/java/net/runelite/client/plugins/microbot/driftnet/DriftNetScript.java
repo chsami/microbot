@@ -24,8 +24,9 @@ public class DriftNetScript extends Script {
 
     public boolean run(DriftNetConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
 
                 if (!Rs2Inventory.hasItem(ItemID.DRIFT_NET)) {
                     Rs2GameObject.interact(ObjectID.ANNETTE, "Nets");

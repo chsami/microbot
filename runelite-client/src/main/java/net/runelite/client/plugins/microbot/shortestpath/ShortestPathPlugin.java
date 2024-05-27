@@ -254,7 +254,9 @@ public class ShortestPathPlugin extends Plugin {
 
         if (Rs2Player.getWorldLocation().distanceTo(pathfinder.getTarget()) < config.reachedDistance()) {
             setTarget(null);
-            Microbot.getClientThread().scheduledFuture.cancel(true);
+            if (Microbot.getClientThread().scheduledFuture != null) {
+                Microbot.getClientThread().scheduledFuture.cancel(true);
+            }
             System.out.println("Web Walker finished with reachedDistance " + config.reachedDistance());
             return;
         }

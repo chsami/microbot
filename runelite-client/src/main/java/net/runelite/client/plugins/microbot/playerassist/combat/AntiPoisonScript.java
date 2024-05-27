@@ -15,6 +15,7 @@ public class AntiPoisonScript extends Script {
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (!config.useAntiPoison()) return;
                 if (Rs2Player.hasAntiPoisonActive()) {

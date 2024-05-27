@@ -69,8 +69,10 @@ public class FarmingScript extends Script {
 
     public boolean run(FarmingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+
                 if (state == FarmingState.RESET) {
                     if (!isInGrandExchange.getAsBoolean()) {
                         Microbot.getNotifier().notify("Start the script in the grand exchange.");

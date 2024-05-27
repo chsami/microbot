@@ -22,13 +22,15 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
+import static net.runelite.client.plugins.microbot.util.Global.*;
+
+
 
 public class Rs2Walker {
     static int stuckCount = 0;
@@ -38,6 +40,8 @@ public class Rs2Walker {
     static int idle = 0;
 
     static WorldPoint currentTarget;
+
+    private static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
 
     public static boolean walkTo(WorldPoint target) {
         return walkTo(target, 6);
@@ -58,7 +62,6 @@ public class Rs2Walker {
                     setTarget(null);
                     break;
                 }
-                System.out.println(ShortestPathPlugin.getPathfinder());
                 if (ShortestPathPlugin.getPathfinder() == null) {
                     if (ShortestPathPlugin.getMarker() == null)
                         break;
@@ -83,8 +86,6 @@ public class Rs2Walker {
                 int indexOfStartPoint = getClosestTileIndex(path);
                 lastPosition = Rs2Player.getWorldLocation();
 
-                //TODO: investigate why this happens, most likely this thread is never shut down properly and target will keep the old target location
-                // for now we'll use this fix
                 if (Rs2Player.getWorldLocation().distanceTo(target) == 0)
                     break;
 
@@ -192,7 +193,6 @@ public class Rs2Walker {
             canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
         } else {
             canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY(), Microbot.getClient().getTopLevelWorldView().getScene()), Microbot.getClient().getPlane());
-
         }
 
         int canvasX = canv != null ? canv.getX() : -1;
@@ -212,12 +212,18 @@ public class Rs2Walker {
         return worldPoint;
     }
 
-    public static boolean canReach(WorldPoint target) {
-        return new WorldArea(
-                target,
-                1,
-                1)
-                .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+    // takes an avg 200-300 ms
+    public static boolean canReach(WorldPoint worldPoint, int sizeX, int sizeY) {
+        Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
+        pathfindingExecutor.submit(pathfinder);
+        sleepUntil(pathfinder::isDone);
+        boolean result = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 2, 2)
+                .intersectsWith(new WorldArea(worldPoint, sizeX + 2, sizeY + 2));
+        return result;
+    }
+
+    public static boolean canReach(WorldPoint worldPoint) {
+        return canReach(worldPoint, 1, 1);
     }
 
     public static boolean isCloseToRegion(int distance, int regionX, int regionY) {

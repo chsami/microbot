@@ -102,9 +102,10 @@ public class VorkathScript extends Script {
         hasInventory = false;
         this.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
                 if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+
                 if (init) {
                     calculateState();
                 }

@@ -170,6 +170,7 @@ public class TitheFarmingScript extends Script {
         initialFruit = rs2ItemSeed == null ? 0 : rs2ItemSeed.quantity;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
 
                 //Dialogue stuff only applicable if you enter for the first time
