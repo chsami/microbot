@@ -159,6 +159,8 @@ public interface PlayerAssistConfig extends Config {
             position = 4,
             section = foodAndPotionsSection
     )
+
+
     default boolean useAntiPoison()
     {
         return false;
@@ -212,6 +214,16 @@ public interface PlayerAssistConfig extends Config {
             position = 2,
             section = lootSection
     )
+
+    default boolean toggleBuryBones() { return false; }
+    @ConfigItem(
+            keyName = "Bury Bones",
+            name = "Bury Bones",
+            description = "Bury Bones",
+            position = 3,
+            section = lootSection
+    )
+
     default boolean toggleLootArrows()
     {
         return true;

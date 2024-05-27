@@ -716,6 +716,13 @@ public class Rs2Inventory {
                 .collect(Collectors.toList());
     }
 
+    // get bones with the action "bury"
+    public static List<Rs2Item> getBones() {
+        return items().stream()
+                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a != null && a.equalsIgnoreCase("bury")))
+                .collect(Collectors.toList());
+    }
+
     /**
      * Gets the count of empty slots in your inventory.
      *
