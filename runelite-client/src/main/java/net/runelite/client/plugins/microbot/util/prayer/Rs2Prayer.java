@@ -38,6 +38,17 @@ public class Rs2Prayer {
         return Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_ENABLED.getValue();
     }
 
+
+    public static boolean toggleQuickPrayer(boolean on) {
+        boolean bit = Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_ENABLED.getValue();
+
+        if (Rs2Widget.isHidden(10485779)) return false;
+        if (on == bit) return true;
+
+        Microbot.doInvoke(new NewMenuEntry(-1, 10485779, MenuAction.CC_OP.getId(), 1, -1, "Quick-prayers"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        return true;
+    }
+
     public static boolean isOutOfPrayer() {
         return Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= 0;
     }
