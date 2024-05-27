@@ -5,6 +5,7 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class Rs2Equipment {
     public static ItemContainer equipment() {
         return Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT);
     }
+
     public static List<Rs2Item> equipmentItems = new ArrayList<>();
 
     public static void storeEquipmentItemsInMemory(ItemContainerChanged e) {
@@ -33,7 +35,7 @@ public class Rs2Equipment {
             }
             equipmentItems = _equipmentItems;
         }
-}
+    }
 
     public static void useRingAction(JewelleryLocationEnum jewelleryLocationEnum) {
         if (!hasEquippedSlot(EquipmentInventorySlot.RING)) {
@@ -57,15 +59,36 @@ public class Rs2Equipment {
     }
 
 
-    public static Rs2Item getEquippedItem(EquipmentInventorySlot slot) {
+    public static Rs2Item get(EquipmentInventorySlot slot) {
         return equipmentItems.stream().filter(x -> x.slot == slot.getSlotIdx()).findFirst().orElse(null);
     }
 
-    @Deprecated(since="Use isWearing", forRemoval = true)
+    public static Rs2Item get(int id) {
+        return equipmentItems.stream().filter(x -> x.id == id).findFirst().orElse(null);
+    }
+
+    public static Rs2Item get(String name, boolean exact) {
+        if (exact) {
+            return equipmentItems.stream().filter(x -> x.name.equalsIgnoreCase(name))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return equipmentItems.stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase()))
+                .findFirst()
+                .orElse(null);
+
+    }
+
+    public static Rs2Item get(String name) {
+        return get(name, false);
+    }
+
+
+    @Deprecated(since = "Use isWearing", forRemoval = true)
     public static boolean hasEquipped(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             for (EquipmentInventorySlot value : EquipmentInventorySlot.values()) {
-                Rs2Item item = getEquippedItem(value);
+                Rs2Item item = get(value);
                 if (item == null) continue;
                 if (item.name.equalsIgnoreCase(itemName)) {
                     return true;
@@ -78,7 +101,7 @@ public class Rs2Equipment {
     public static boolean hasEquippedContains(String itemName) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             for (EquipmentInventorySlot value : EquipmentInventorySlot.values()) {
-                Rs2Item item = getEquippedItem(value);
+                Rs2Item item = get(value);
                 if (item == null) continue;
                 if (item.name.toLowerCase().contains(itemName.toLowerCase())) {
                     return true;
@@ -120,13 +143,13 @@ public class Rs2Equipment {
     }
 
     public static boolean isEquipped(int id, EquipmentInventorySlot slot) {
-        final Rs2Item item = getEquippedItem(slot);
+        final Rs2Item item = get(slot);
 
         return item != null && item.id == id;
     }
 
     public static boolean isEquipped(String name, EquipmentInventorySlot slot, boolean exact) {
-        final Rs2Item item = getEquippedItem(slot);
+        final Rs2Item item = get(slot);
         if (exact) {
             return item != null && item.name.equalsIgnoreCase(name);
         } else {
@@ -180,4 +203,86 @@ public class Rs2Equipment {
         return false;
     }
 
+    public static boolean interact(int id, String action) {
+        Rs2Item item = get(id);
+        if (item != null) {
+            invokeMenu(item, action);
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean interact(String name, String action) {
+        Rs2Item item = get(name);
+        if (item != null) {
+            invokeMenu(item, action);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param name
+     * @param action
+     * @param exact  name of the item
+     * @return
+     */
+    public static boolean interact(String name, String action, boolean exact) {
+        Rs2Item item = get(name, exact);
+        if (item != null) {
+            invokeMenu(item, action);
+            return true;
+        }
+        return false;
+    }
+
+    private static void invokeMenu(Rs2Item rs2Item, String action) {
+        if (rs2Item == null) return;
+
+        Rs2Tab.switchToEquipmentTab();
+        Microbot.status = action + " " + rs2Item.name;
+
+        int param0 = -1;
+        int param1 = -1;
+        int identifier = 0;
+        MenuAction menuAction = MenuAction.CC_OP;
+        if (!action.isEmpty()) {
+            List<String> actions = rs2Item.getEquipmentActions();
+
+            for (int i = 0; i < actions.size(); i++) {
+                if (action.equalsIgnoreCase(actions.get(i))) {
+                    identifier = i + 2;
+                    break;
+                }
+            }
+        }
+
+        if (rs2Item.getSlot() == EquipmentInventorySlot.CAPE.getSlotIdx()) {
+            param1 = 25362448;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.HEAD.getSlotIdx()) {
+            param1 = 25362447;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.AMMO.getSlotIdx()) {
+            param1 = 25362457;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.AMULET.getSlotIdx()) {
+            param1 = 25362449;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.WEAPON.getSlotIdx()) {
+            param1 = 25362450;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.BODY.getSlotIdx()) {
+            param1 = 25362451;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.SHIELD.getSlotIdx()) {
+            param1 = 25362452;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.LEGS.getSlotIdx()) {
+            param1 = 25362453;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.GLOVES.getSlotIdx()) {
+            param1 = 25362454;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.BOOTS.getSlotIdx()) {
+            param1 = 25362455;
+        } else if (rs2Item.getSlot() == EquipmentInventorySlot.RING.getSlotIdx()) {
+            param1 = 25362456;
+        }
+
+
+        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, -1, rs2Item.name), new Rectangle(0, 0, 1, 1));
+        //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
+    }
 }
