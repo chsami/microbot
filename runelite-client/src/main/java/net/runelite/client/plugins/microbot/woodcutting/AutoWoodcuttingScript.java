@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AutoWoodcuttingScript extends Script {
 
-    public static double version = 1.3;
+    public static double version = 1.5;
 
     public boolean run(AutoWoodcuttingConfig config) {
         if (config.hopWhenPlayerDetected()) {
@@ -23,8 +23,8 @@ public class AutoWoodcuttingScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-                if (config.hopWhenPlayerDetected() && !Microbot.getClient().getPlayers().isEmpty()) {
-                    Rs2Player.logout();
+                if (config.hopWhenPlayerDetected()) {
+                    Rs2Player.logoutIfPlayerDetected(1, 10);
                     return;
                 }
 
