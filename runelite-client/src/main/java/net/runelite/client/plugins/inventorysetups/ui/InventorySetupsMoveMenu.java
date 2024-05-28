@@ -25,7 +25,7 @@
 package net.runelite.client.plugins.inventorysetups.ui;
 
 
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsSortingID;
 
 import javax.swing.*;
@@ -33,9 +33,9 @@ import javax.swing.*;
 public class InventorySetupsMoveMenu<T> extends JPopupMenu
 {
 	private final InventorySetupsPluginPanel panel;
-	private final InventorySetupsPlugin plugin;
+	private final MInventorySetupsPlugin plugin;
 
-	public InventorySetupsMoveMenu(final InventorySetupsPlugin plugin, final InventorySetupsPluginPanel panel, InventorySetupsMoveHandler<T> moveHandler, final String type, final T datum)
+	public InventorySetupsMoveMenu(final MInventorySetupsPlugin plugin, final InventorySetupsPluginPanel panel, InventorySetupsMoveHandler<T> moveHandler, final String type, final T datum)
 	{
 		this.panel = panel;
 		this.plugin = plugin;

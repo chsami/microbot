@@ -11,27 +11,27 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Mocrosoft + "Quester",
+        name = PluginDescriptor.Mocrosoft + "MQuester",
         description = "Microbot quest plugin",
         tags = {"quest", "microbot"},
         enabledByDefault = false
 )
 @Slf4j
-public class QuestPlugin extends Plugin {
+public class MQuestPlugin extends Plugin {
     @Inject
-    private QuestConfig config;
+    private MQuestConfig config;
     @Provides
-    QuestConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(QuestConfig.class);
+    MQuestConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(MQuestConfig.class);
     }
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private QuestOverlay exampleOverlay;
+    private MQuestOverlay exampleOverlay;
 
     @Inject
-    QuestScript questScript;
+    MQuestScript questScript;
 
 
     @Override

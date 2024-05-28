@@ -24,14 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.steps.playermadesteps;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import lombok.Getter;
 import net.runelite.client.config.ConfigManager;
 
 public class RuneliteConfigSetter
 {
 	@Getter
-	protected final String CONFIG_GROUP = QuestHelperConfig.QUEST_BACKGROUND_GROUP;
+	protected final String CONFIG_GROUP = MQuestHelperConfig.QUEST_BACKGROUND_GROUP;
 
 	protected final String runeliteIdentifier;
 

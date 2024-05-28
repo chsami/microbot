@@ -25,7 +25,7 @@
 package net.runelite.client.plugins.questhelper.banktab;
 
 import net.runelite.client.plugins.questhelper.QuestBank;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
@@ -42,11 +42,11 @@ import java.util.stream.Collectors;
 
 public class QuestHelperBankTagService
 {
-	private final QuestHelperPlugin plugin;
+	private final MQuestHelperPlugin plugin;
 	private final QuestBank questBank;
 
 	@Inject
-	public QuestHelperBankTagService(QuestHelperPlugin plugin, QuestBank questBank)
+	public QuestHelperBankTagService(MQuestHelperPlugin plugin, QuestBank questBank)
 	{
 		this.plugin = plugin;
 		this.questBank = questBank;

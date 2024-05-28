@@ -24,14 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.steps.choice;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.api.widgets.Widget;
 
 public class DialogChoiceChange extends DialogChoiceStep
 {
 	private final String textChange;
 
-	public DialogChoiceChange(QuestHelperConfig config, String choice, String textChange)
+	public DialogChoiceChange(MQuestHelperConfig config, String choice, String textChange)
 	{
 		super(config, choice);
 		this.textChange = textChange;

@@ -25,7 +25,7 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.theeyesofglouphrie;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
@@ -651,7 +651,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
+	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
 	{
 		if (currentStep != null)
 		{
@@ -660,7 +660,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -669,7 +669,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -678,7 +678,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{

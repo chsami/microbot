@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.questhelpers;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
@@ -47,7 +47,7 @@ public abstract class ComplexStateQuestHelper extends QuestHelper
 	}
 
 	@Override
-	public void startUp(QuestHelperConfig config)
+	public void startUp(MQuestHelperConfig config)
 	{
 		step = loadStep();
 		this.config = config;

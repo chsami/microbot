@@ -26,7 +26,7 @@
  */
 package net.runelite.client.plugins.questhelper.overlays;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestDebugRenderer;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -38,11 +38,11 @@ import java.awt.*;
 
 public class QuestHelperDebugOverlay extends OverlayPanel implements QuestDebugRenderer
 {
-	private final QuestHelperPlugin plugin;
+	private final MQuestHelperPlugin plugin;
 	private QuestHelper quest;
 
 	@Inject
-	public QuestHelperDebugOverlay(QuestHelperPlugin plugin)
+	public QuestHelperDebugOverlay(MQuestHelperPlugin plugin)
 	{
 		this.plugin = plugin;
 		this.quest = plugin.getSelectedQuest();
@@ -62,7 +62,7 @@ public class QuestHelperDebugOverlay extends OverlayPanel implements QuestDebugR
 	}
 
 	@Override
-	public void renderDebugOverlay(Graphics graphics, QuestHelperPlugin plugin, PanelComponent panelComponent)
+	public void renderDebugOverlay(Graphics graphics, MQuestHelperPlugin plugin, PanelComponent panelComponent)
 	{
 		QuestHelper currentQuest = plugin.getSelectedQuest();
 		if ((quest == null || (currentQuest != quest)) && currentQuest != null)

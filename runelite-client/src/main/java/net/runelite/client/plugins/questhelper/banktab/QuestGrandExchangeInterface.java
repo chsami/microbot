@@ -26,7 +26,7 @@
  */
 package net.runelite.client.plugins.questhelper.banktab;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.*;
@@ -60,11 +60,11 @@ public class QuestGrandExchangeInterface
 	private Widget grandExchangeTitle;
 
 	private final Client client;
-	private final QuestHelperPlugin questHelper;
+	private final MQuestHelperPlugin questHelper;
 	private final ClientThread clientThread;
 
 	@Inject
-	public QuestGrandExchangeInterface(Client client, QuestHelperPlugin questHelper, ClientThread clientThread)
+	public QuestGrandExchangeInterface(Client client, MQuestHelperPlugin questHelper, ClientThread clientThread)
 	{
 		this.client = client;
 		this.questHelper = questHelper;

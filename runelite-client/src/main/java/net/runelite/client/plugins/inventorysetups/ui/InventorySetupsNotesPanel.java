@@ -29,7 +29,7 @@ import lombok.Setter;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
@@ -54,7 +54,7 @@ public class InventorySetupsNotesPanel extends InventorySetupsContainerPanel
 	@Setter
 	private InventorySetup currentInventorySetup;
 
-	InventorySetupsNotesPanel(ItemManager itemManager, InventorySetupsPlugin plugin)
+	InventorySetupsNotesPanel(ItemManager itemManager, MInventorySetupsPlugin plugin)
 	{
 		super(itemManager, plugin, "Notes");
 	}
