@@ -35,7 +35,6 @@ public class Rs2Magic {
         if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")
                 || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
             menuAction = MenuAction.CC_OP;
-            identifier = isLunar() ? 1 : 0;
         } else {
             menuAction = MenuAction.WIDGET_TARGET;
         }
