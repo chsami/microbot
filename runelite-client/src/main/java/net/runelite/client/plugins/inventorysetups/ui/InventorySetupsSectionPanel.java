@@ -39,12 +39,12 @@ import java.util.Set;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin.CONFIG_KEY_UNASSIGNED_MAXIMIZED;
-import static net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin.MAX_SETUP_NAME_LENGTH;
+import static net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin.CONFIG_KEY_UNASSIGNED_MAXIMIZED;
+import static net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin.MAX_SETUP_NAME_LENGTH;
 
 public class InventorySetupsSectionPanel extends JPanel implements InventorySetupsValidName, InventorySetupsMoveHandler<InventorySetupsSection>
 {
-	protected final InventorySetupsPlugin plugin;
+	protected final MInventorySetupsPlugin plugin;
 	protected final InventorySetupsPluginPanel panel;
 	private final InventorySetupsSection section;
 
@@ -62,24 +62,24 @@ public class InventorySetupsSectionPanel extends JPanel implements InventorySetu
 
 	static
 	{
-		final BufferedImage minMaxSectionImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "down_arrow.png");
+		final BufferedImage minMaxSectionImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "down_arrow.png");
 		final BufferedImage minMaxSectionHoverImg = ImageUtil.luminanceOffset(minMaxSectionImg, -150);
 		MIN_MAX_SECTION_ICON = new ImageIcon(minMaxSectionImg);
 		MIN_MAX_SECTION_HOVER_ICON = new ImageIcon(minMaxSectionHoverImg);
 
-		final BufferedImage noMinMaxSectionImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "right_arrow.png");
+		final BufferedImage noMinMaxSectionImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "right_arrow.png");
 		final BufferedImage noMaxSectionHoverImg = ImageUtil.luminanceOffset(noMinMaxSectionImg, -150);
 		NO_MIN_MAX_SECTION_ICON = new ImageIcon(noMinMaxSectionImg);
 		NO_MIN_MAX_SECTION_HOVER_ICON = new ImageIcon(noMaxSectionHoverImg);
 	}
 
-	InventorySetupsSectionPanel(InventorySetupsPlugin plugin,
-								InventorySetupsPluginPanel panel,
-								InventorySetupsSection section,
-								boolean forceMaximization, boolean allowEdits,
-								final Set<String> setupNamesToBeDisplayed,
-								Set<String> setupsInSection,
-								final java.util.List<InventorySetup> originalFilteredSetups)
+	InventorySetupsSectionPanel(MInventorySetupsPlugin plugin,
+                                InventorySetupsPluginPanel panel,
+                                InventorySetupsSection section,
+                                boolean forceMaximization, boolean allowEdits,
+                                final Set<String> setupNamesToBeDisplayed,
+                                Set<String> setupsInSection,
+                                final java.util.List<InventorySetup> originalFilteredSetups)
 	{
 		this.plugin = plugin;
 		this.panel = panel;
@@ -310,7 +310,7 @@ public class InventorySetupsSectionPanel extends JPanel implements InventorySetu
 		constraints.gridy++;
 	}
 
-	public static JPanel createIconPanelGrid(final InventorySetupsPlugin plugin, final InventorySetupsPluginPanel panel, final List<InventorySetup> setups, int maxColSize, final Set<String> whitelistedNames, final InventorySetupsSection section, boolean allowEditable)
+	public static JPanel createIconPanelGrid(final MInventorySetupsPlugin plugin, final InventorySetupsPluginPanel panel, final List<InventorySetup> setups, int maxColSize, final Set<String> whitelistedNames, final InventorySetupsSection section, boolean allowEditable)
 	{
 		int added = 0;
 		int width = 0;

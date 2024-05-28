@@ -44,6 +44,7 @@ public class NmzScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+                Rs2Combat.enableAutoRetialiate();
                 if (Random.random(1, 50) == 1 && config.randomMouseMovements()) {
                     Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()), true);
                 }
@@ -205,16 +206,14 @@ public class NmzScript extends Script {
 
     public void consumeEmptyVial() {
         final int EMPTY_VIAL = 26291;
-        Rs2GameObject.interact(EMPTY_VIAL, "drink");
+        if (Microbot.getClientThread().runOnClientThread(() -> Rs2Widget.getWidget(129, 6) == null || Rs2Widget.getWidget(129, 6).isHidden())) {
+            Rs2GameObject.interact(EMPTY_VIAL, "drink");
+        }
         Widget widget = Rs2Widget.getWidget(129, 6);
-        System.out.println(Microbot.getClientThread().runOnClientThread(widget::isHidden));
-        if (widget != null && !Microbot.getClientThread().runOnClientThread(widget::isHidden)) {
+        if (!Microbot.getClientThread().runOnClientThread(widget::isHidden)) {
             Rs2Widget.clickWidget(widget.getId());
             sleep(300);
             Rs2Widget.clickWidget(widget.getId());
-            //Rs2Widget.clickWidgetFast(8454150, MenuAction.WIDGET_CONTINUE);
-            // MenuEntryImpl(getOption=Continue, getTarget=, getIdentifier=0, getType=WIDGET_CONTINUE, getParam0=-1, getParam1=8454150, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)
-            sleep(5000);
         }
     }
 

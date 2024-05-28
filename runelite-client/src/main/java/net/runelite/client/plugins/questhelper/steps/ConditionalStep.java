@@ -25,7 +25,7 @@
 package net.runelite.client.plugins.questhelper.steps;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
@@ -306,7 +306,7 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 
 	// This should only have been called from a parent ConditionalStep, so default the additional text to the passed in text
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
+	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
 	{
 		List<Requirement> allRequirements = new ArrayList<>(additionalRequirements);
 		allRequirements.addAll(requirements);
@@ -321,7 +321,7 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -330,7 +330,7 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -339,7 +339,7 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{

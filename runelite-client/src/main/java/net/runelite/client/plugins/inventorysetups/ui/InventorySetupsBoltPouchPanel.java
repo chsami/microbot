@@ -27,7 +27,7 @@ package net.runelite.client.plugins.inventorysetups.ui;/*
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsSlotID;
 
 import java.util.Arrays;
@@ -48,7 +48,7 @@ public class InventorySetupsBoltPouchPanel extends InventorySetupsAmmunitionPane
 
 	public static final List<Integer> BOLT_POUCH_BOLT_VARBIT_IDS = Arrays.asList(BOLT_POUCH_BOLT1, BOLT_POUCH_BOLT2, BOLT_POUCH_BOLT3, BOLT_POUCH_EXTRA_AMMO);
 
-	InventorySetupsBoltPouchPanel(ItemManager itemManager, InventorySetupsPlugin plugin)
+	InventorySetupsBoltPouchPanel(ItemManager itemManager, MInventorySetupsPlugin plugin)
 	{
 		super(itemManager, plugin, "Bolt Pouch");
 	}

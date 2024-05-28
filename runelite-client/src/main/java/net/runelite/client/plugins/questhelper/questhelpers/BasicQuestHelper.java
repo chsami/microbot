@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.questhelpers;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
@@ -50,7 +50,7 @@ public abstract class BasicQuestHelper extends QuestHelper
 	}
 
 	@Override
-	public void startUp(QuestHelperConfig config)
+	public void startUp(MQuestHelperConfig config)
 	{
 		steps = loadSteps();
 		this.config = config;

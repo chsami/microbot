@@ -1,15 +1,18 @@
 package net.runelite.client.plugins.microbot.util.player;
 
-import net.runelite.api.*;
+import net.runelite.api.Player;
+import net.runelite.api.Skill;
+import net.runelite.api.VarPlayer;
+import net.runelite.api.Varbits;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.globval.VarbitValues;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
-import net.runelite.client.plugins.microbot.globval.VarbitValues;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -17,6 +20,8 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static net.runelite.api.MenuAction.CC_OP;
@@ -63,6 +68,9 @@ public class Rs2Player {
     public static boolean hasAntiPoisonActive() {
         return antiPoisonTime > 0;
     }
+
+    private static final Map<Player, Long> playerDetectionTimes = new ConcurrentHashMap<>();
+
     public static void handlePotionTimers(VarbitChanged event) {
         if (event.getVarbitId() == Varbits.ANTIFIRE) {
             antiFireTime = event.getValue();
@@ -168,6 +176,65 @@ public class Rs2Player {
             Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
 
         //Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
+    }
+
+    /**
+     *
+     * @param amountOfPlayers to detect before triggering logout
+     * @param time in milliseconds
+     * @param distance from the player
+     * @return
+     */
+    public static boolean logoutIfPlayerDetected(int amountOfPlayers, int time, int distance) {
+        List<Player> players = Microbot.getClient().getPlayers();
+        long currentTime = System.currentTimeMillis();
+
+        if (distance > 0) {
+            players = players.stream()
+                    .filter(x -> x != null && x.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) <= distance)
+                    .collect(Collectors.toList());
+        }
+        if (time > 0 && players.size() > amountOfPlayers) {
+            // Update detection times for currently detected players
+            for (Player player : players) {
+                playerDetectionTimes.putIfAbsent(player, currentTime);
+            }
+
+            // Remove players who are no longer detected
+            playerDetectionTimes.keySet().retainAll(players);
+
+            // Check if any player has been detected for longer than the specified time
+            for (Player player : players) {
+                long detectionTime = playerDetectionTimes.getOrDefault(player, 0L);
+                if (currentTime - detectionTime >= time) { // convert time to milliseconds
+                    logout();
+                    return true;
+                }
+            }
+        } else if (players.size() >= amountOfPlayers) {
+            logout();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param amountOfPlayers
+     * @param time
+     * @return
+     */
+    public static boolean logoutIfPlayerDetected(int amountOfPlayers, int time) {
+        return logoutIfPlayerDetected(amountOfPlayers, time, 0);
+    }
+
+    /**
+     *
+     * @param amountOfPlayers
+     * @return
+     */
+    public static boolean logoutIfPlayerDetected(int amountOfPlayers) {
+        return logoutIfPlayerDetected(amountOfPlayers, 0, 0);
     }
 
     public static boolean eatAt(int percentage) {

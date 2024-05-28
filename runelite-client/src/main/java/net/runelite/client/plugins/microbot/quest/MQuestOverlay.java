@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.quest;
 
-import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -10,9 +9,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class QuestOverlay extends OverlayPanel {
+public class MQuestOverlay extends OverlayPanel {
     @Inject
-    QuestOverlay(QuestPlugin plugin)
+    MQuestOverlay(MQuestPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -23,7 +22,7 @@ public class QuestOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Quester V" + QuestScript.version)
+                    .text("Micro Quester V" + MQuestScript.version)
                     .color(Color.GREEN)
                     .build());
 
