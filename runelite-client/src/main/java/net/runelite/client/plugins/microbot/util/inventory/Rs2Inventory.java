@@ -1532,7 +1532,7 @@ public class Rs2Inventory {
 
             for (int i = 0; i < actions.length; i++) {
                 if (action.equalsIgnoreCase(actions[i])) {
-                    identifier = i + 2;
+                    identifier = i + 1;
                     break;
                 }
             }
