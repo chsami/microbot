@@ -1,8 +1,13 @@
 package net.runelite.client.plugins.microbot.playerassist;
 
 import com.google.inject.Provides;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Hitsplat;
+import net.runelite.api.HitsplatID;
+import net.runelite.api.NPC;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.HitsplatApplied;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -12,6 +17,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -25,6 +31,7 @@ import java.util.concurrent.Executors;
         tags = {"fight", "microbot", "misc", "combat", "playerassistant"},
         enabledByDefault = false
 )
+@Slf4j
 public class PlayerAssistPlugin extends Plugin {
     @Inject
     private PlayerAssistConfig config;
@@ -58,12 +65,12 @@ public class PlayerAssistPlugin extends Plugin {
         }
         lootScript.run(config);
         cannonScript.run(config);
+        flickerScript.run(config);
         attackNpc.run(config);
         combatPotion.run(config);
         foodScript.run(config);
         prayerPotionScript.run(config);
 //        safeSpotScript.run(config); // TODO: safespot
-//        flickerScript.run(config); // TODO: pray flick
         useSpecialAttackScript.run(config);
         antiPoisonScript.run(config);
         buryBoneScript.run(config);
@@ -93,13 +100,24 @@ public class PlayerAssistPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick gameTick) {
-//        if (config.prayFlick())
-//            executor.submit(flickerScript::onGameTick);
+       //execute flicker script
+        flickerScript.onGameTick();
     }
 
     @Subscribe
     public void onNpcDespawned(NpcDespawned npcDespawned) {
-//        if (config.prayFlick())
-//            executor.submit(() -> flickerScript.onNpcDespawned(npcDespawned));
+        flickerScript.onNpcDespawned(npcDespawned);
+    }
+    @Subscribe
+    public void onHitsplatApplied(HitsplatApplied event){
+        if (event.getActor().getInteracting() != Microbot.getClient().getLocalPlayer()) return;
+        final Hitsplat hitsplat = event.getHitsplat();
+        if ((hitsplat.getHitsplatType() == HitsplatID.BLOCK_ME || hitsplat.getHitsplatType() == HitsplatID.DAMAGE_ME) && event.getActor() instanceof NPC) {
+            Rs2Prayer.disableAllPrayers();
+            if(config.toggleQuickPrayFlick())
+                Rs2Prayer.toggleQuickPrayer(false);
+            flickerScript.resetLastAttack();
+
+        }
     }
 }

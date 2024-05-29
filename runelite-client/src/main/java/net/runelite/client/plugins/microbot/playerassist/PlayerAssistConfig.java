@@ -224,9 +224,57 @@ public interface PlayerAssistConfig extends Config {
             section = lootSection
     )
 
+
     default boolean toggleLootArrows()
     {
         return true;
     }
+
+    //Prayer section
+    @ConfigSection(
+            name = "Prayer",
+            description = "Prayer",
+            position = 4,
+            closedByDefault = false
+    )
+    String prayerSection = "Prayer";
+
+    //Use quick prayer
+    @ConfigItem(
+            keyName = "Use prayer",
+            name = "Use prayer",
+            description = "Use prayer",
+            position = 0,
+            section = prayerSection
+    )
+    default boolean togglePrayer()
+    { return false; }
+
+    //Flick quick prayer
+    @ConfigItem(
+            keyName = "Pray flick",
+            name = "Flick quick prayer",
+            description = "Flick quick prayer, works with lazy flick",
+            position = 1,
+            section = prayerSection
+    )
+    default boolean toggleQuickPrayFlick()
+    {
+        return false;
+    }
+    //Lazy flick
+    @ConfigItem(
+            keyName = "Lazy flick",
+            name = "Lazy flick",
+            description = "Will flick correct prayer when npc is about to attack you",
+            position = 2,
+            section = prayerSection
+    )
+    default boolean toggleLazyFlick()
+    {
+        return false;
+    }
+
 }
+
 
