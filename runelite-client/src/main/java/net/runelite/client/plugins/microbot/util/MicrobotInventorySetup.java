@@ -148,7 +148,11 @@ public class MicrobotInventorySetup {
 
     public static boolean doesEquipmentMatch(String name) {
         inventorySetup = MInventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
-        if (inventorySetup == null) return false;
+        if (inventorySetup == null) {
+            Microbot.showMessage("Inventory setup with name " + name + " has not found been found. Please make this inventory setup.");
+            sleep(5000);
+            return false;
+        }
         for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
             if (inventorySetupsItem.getId() == -1) continue;
             if (!Rs2Equipment.isWearing(inventorySetupsItem.getName(), true)) {
@@ -160,7 +164,11 @@ public class MicrobotInventorySetup {
 
     public static boolean doesEquipmentMatch(String name, String ignoreItem) {
         inventorySetup = MInventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
-        if (inventorySetup == null) return false;
+        if (inventorySetup == null) {
+            Microbot.showMessage("Inventory setup with name " + name + " has not found been found. Please make this inventory setup.");
+            sleep(5000);
+            return false;
+        }
         for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
             if (inventorySetupsItem.getId() == -1) continue;
             if (inventorySetupsItem.getName().contains(ignoreItem)) continue;

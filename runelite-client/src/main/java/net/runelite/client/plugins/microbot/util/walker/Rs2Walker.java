@@ -122,7 +122,6 @@ public class Rs2Walker {
                     if (doorOrTransportResult)
                         break;
 
-                    System.out.println(currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()));
                     if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance()
                             || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
                         // InstancedRegions require localPoint instead of worldpoint to navigate
@@ -324,7 +323,6 @@ public class Rs2Walker {
                     ShortestPathPlugin.getPathfinder().cancel();
                 }
                 ShortestPathPlugin.setPathfinder(null);
-                System.out.println("reset path finder!");
             }
 
             Microbot.getWorldMapPointManager().remove(ShortestPathPlugin.getMarker());
@@ -394,7 +392,6 @@ public class Rs2Walker {
 //        if (wallObject == null)
 //            return false;
 
-        System.out.println("checking door: " + a + " b " + b);
         if (wallObject != null) {
             ObjectComposition objectComposition = Rs2GameObject.getObjectComposition(wallObject.getId());
             if (objectComposition == null) {
