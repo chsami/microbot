@@ -50,7 +50,7 @@ public class Rs2Item {
                 : itemComposition.isTradeable();
         Widget widget = Rs2Widget.getWidget(ComponentID.INVENTORY_CONTAINER).getChild(slot);
         if (widget != null) {
-            this.inventoryActions = Rs2Widget.getWidget(ComponentID.INVENTORY_CONTAINER).getChild(slot).getActions();
+            this.inventoryActions = widget.getName().isBlank() ? itemComposition.getInventoryActions() : Rs2Widget.getWidget(ComponentID.INVENTORY_CONTAINER).getChild(slot).getActions();
         }
         addEquipmentActions(itemComposition);
     }
