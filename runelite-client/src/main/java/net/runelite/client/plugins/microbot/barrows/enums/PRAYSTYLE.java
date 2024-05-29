@@ -1,11 +1,12 @@
-package net.runelite.client.plugins.microbot.bossassist.models;
+package net.runelite.client.plugins.microbot.barrows.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum PrayStyle {
+public enum PRAYSTYLE {
+    OFF ("No prayer needed"),
     MAGE("Pray mage"),
     RANGED("Pray ranged"),
     MELEE("Pray melee");

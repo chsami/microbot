@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum SPEC_WEAPON {
-    NONE("No spec", 101),
-    DRAGON_DAGGER ("Dragon dagger", 25),
-    BANDOS_GODSWORD("Bandos godsword", 50);
+    NONE("No spec", 1001),
+    DRAGON_DAGGER ("Dragon dagger", 250),
+    BANDOS_GODSWORD("Bandos godsword", 500);
 
     private final String name;
 

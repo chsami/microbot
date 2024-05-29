@@ -27,6 +27,7 @@ public class StaffScript extends Script {
     ProgressiveStaffmakingModel model = new ProgressiveStaffmakingModel();
 
     String battleStaff = "Battlestaff";
+    int battleStaffId = 1391;
     Staffs itemToCraft;
 
     public void run(CraftingConfig config) {
@@ -67,7 +68,7 @@ public class StaffScript extends Script {
         Rs2Bank.depositAll(itemToCraft.getItemName());
         sleepUntilOnClientThread(() -> !Rs2Inventory.hasItem(itemToCraft.getItemName()));
 
-        Rs2Bank.withdrawX(true, battleStaff, 14);
+        Rs2Bank.withdrawX(true, battleStaffId, 14);
         sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(battleStaff));
 
         verifyItemInBank(itemToCraft.getOrb());

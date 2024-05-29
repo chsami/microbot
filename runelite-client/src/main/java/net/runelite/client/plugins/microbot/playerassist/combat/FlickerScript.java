@@ -28,7 +28,8 @@ public class FlickerScript extends Script {
     AttackStyle prayFlickAttackStyle = null;
 
     public boolean run(PlayerAssistConfig config) {
-        monsters.add(new Monster(3274, 426));
+        //monsters.add(new Monster(3274, 426));
+        Rs2NpcManager.loadJson();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
@@ -37,15 +38,16 @@ public class FlickerScript extends Script {
                 List<NPC> npcs = Rs2Npc.getNpcsForPlayer();
 
 
-                //keep track of which monsters still have aggro on the player
-                for (Monster monster : currentMonstersAttackingUs) {
-                    if (!npcs.stream().anyMatch(x -> x.getIndex() == monster.npc.getIndex()))
-                        monster.delete = true;
-                }
 
-                currentMonstersAttackingUs = currentMonstersAttackingUs.stream().filter(x -> !x.delete).collect(Collectors.toList());
 
                 for (NPC npc : npcs) {
+                    if (npc == null
+                            || npc.getAnimation() != -1
+                            || npc.isDead()
+                            || (npc.getInteracting() != null && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
+                            || (npc.isInteracting() && npc.getInteracting() != Microbot.getClient().getLocalPlayer()))
+                        break;
+
                     Monster currentMonster = currentMonstersAttackingUs.stream().filter(x -> x.npc.getIndex() == npc.getIndex()).findFirst().orElse(null);
                     String attackAnimation = Rs2NpcManager.attackAnimationMap.get(npc.getId());
                     if (attackAnimation == null || attackAnimation.isEmpty()) continue;
