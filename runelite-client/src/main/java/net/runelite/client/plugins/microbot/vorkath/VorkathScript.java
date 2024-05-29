@@ -13,7 +13,6 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -426,7 +425,7 @@ public class VorkathScript extends Script {
             Rs2Inventory.interact("venom", "drink");
         }
 
-        if (!Rs2Combat.inCombat() && state == State.PREPARE_FIGHT)
+        if (!Microbot.getClient().getLocalPlayer().isInteracting() && state == State.PREPARE_FIGHT)
             Rs2Player.waitForAnimation();
 
         return !drinkRangePotion && !drinkAntiFire && !drinkAntiVenom;
