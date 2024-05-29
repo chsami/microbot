@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.requirements;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.components.LineComponent;
 
@@ -79,7 +79,7 @@ public abstract class AbstractRequirement implements Requirement
 	}
 
 	@Override
-	public List<LineComponent> getDisplayTextWithChecks(Client client, QuestHelperConfig config)
+	public List<LineComponent> getDisplayTextWithChecks(Client client, MQuestHelperConfig config)
 	{
 		if (getOverlayReplacement() != null && !this.check(client))
 		{
@@ -88,7 +88,7 @@ public abstract class AbstractRequirement implements Requirement
 		return getOverlayDisplayText(client, config);
 	}
 
-	protected List<LineComponent> getOverlayDisplayText(Client client, QuestHelperConfig config)
+	protected List<LineComponent> getOverlayDisplayText(Client client, MQuestHelperConfig config)
 	{
 		if (!shouldDisplayText(client))
 		{

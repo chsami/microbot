@@ -48,7 +48,7 @@ public class QuestBank
 	private final Client client;
 	private final Gson gson;
 
-	private static final String CONFIG_GROUP = QuestHelperConfig.QUEST_HELPER_GROUP;
+	private static final String CONFIG_GROUP = MQuestHelperConfig.QUEST_HELPER_GROUP;
 	private static final String BANK_KEY = "bankitems";
 
 	private List<Item> bankItems;

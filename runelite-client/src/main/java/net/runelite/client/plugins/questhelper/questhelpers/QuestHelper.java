@@ -73,7 +73,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 
 	@Getter
 	@Setter
-	protected QuestHelperConfig config;
+	protected MQuestHelperConfig config;
 
 	@Inject
 	private EventBus eventBus;
@@ -90,7 +90,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 
 	@Setter
 	@Getter
-	protected QuestHelperPlugin questHelperPlugin;
+	protected MQuestHelperPlugin questHelperPlugin;
 
 	@Override
 	public void configure(Binder binder)
@@ -99,7 +99,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 
 	public abstract void init();
 
-	public abstract void startUp(QuestHelperConfig config);
+	public abstract void startUp(MQuestHelperConfig config);
 
 	public void shutDown()
 	{
@@ -113,7 +113,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 
 	public abstract boolean updateQuest();
 
-	public void debugStartup(QuestHelperConfig config)
+	public void debugStartup(MQuestHelperConfig config)
 	{
 	}
 
@@ -190,7 +190,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 	}
 
 	@Override
-	public void renderDebugOverlay(Graphics graphics, QuestHelperPlugin plugin, PanelComponent panelComponent)
+	public void renderDebugOverlay(Graphics graphics, MQuestHelperPlugin plugin, PanelComponent panelComponent)
 	{
 		if (!plugin.isDeveloperMode())
 		{

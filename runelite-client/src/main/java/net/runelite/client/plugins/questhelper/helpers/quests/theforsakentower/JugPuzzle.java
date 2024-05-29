@@ -25,7 +25,7 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.theforsakentower;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
@@ -290,7 +290,7 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
+	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
 	{
 		if (currentStep != null)
 		{
@@ -299,7 +299,7 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -308,7 +308,7 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -317,7 +317,7 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{

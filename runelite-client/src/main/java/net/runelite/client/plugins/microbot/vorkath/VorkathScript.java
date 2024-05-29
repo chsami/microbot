@@ -34,7 +34,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.MicrobotInventorySetup.doesEquipmentMatch;
@@ -116,13 +115,13 @@ public class VorkathScript extends Script {
                     leaveVorkath();
                 }
 
-                if (state == State.FIGHT_VORKATH  && Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
+                if (state == State.FIGHT_VORKATH  && Rs2Equipment.get(EquipmentInventorySlot.AMMO) == null) {
                     state = State.TELEPORT_AWAY;
                 }
 
                 switch (state) {
                     case BANKING:
-                        if (!init && Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO) == null) {
+                        if (!init && Rs2Equipment.get(EquipmentInventorySlot.AMMO) == null) {
                             Microbot.showMessage("Out of ammo!");
                             sleep(5000);
                             return;
@@ -194,7 +193,7 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case PREPARE_FIGHT:
-                        primaryBolts = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO).name;
+                        primaryBolts = Rs2Equipment.get(EquipmentInventorySlot.AMMO).name;
                         Rs2Player.toggleRunEnergy(false);
 
                         boolean result = drinkPotions();
@@ -257,7 +256,7 @@ public class VorkathScript extends Script {
                             state = State.ACID;
                         }
                         if (vorkath.getHealthRatio() < 60 && vorkath.getHealthRatio() != -1 && !Rs2Equipment.isWearing(config.secondaryBolts())) {
-                            primaryBolts = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.AMMO).name;
+                            primaryBolts = Rs2Equipment.get(EquipmentInventorySlot.AMMO).name;
                             Rs2Inventory.wield(config.secondaryBolts());
                         } else if (vorkath.getHealthRatio() >= 60 && !Rs2Equipment.isWearing(primaryBolts)) {
                             Rs2Inventory.wield(primaryBolts);
@@ -401,7 +400,14 @@ public class VorkathScript extends Script {
         if (Rs2Inventory.hasItem(config.teleportMode().getItemName())) {
             togglePrayer(false);
             Rs2Player.toggleRunEnergy(true);
-            Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
+            switch(config.teleportMode()) {
+                case VARROCK_TAB:
+                    Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
+                    break;
+                case CRAFTING_CAPE:
+                    Rs2Equipment.interact("crafting cape", "teleport");
+                    break;
+            }
             Rs2Player.waitForAnimation();
             sleepUntil(() -> !Microbot.getClient().isInInstancedRegion());
             state = State.TELEPORT_AWAY;
@@ -531,31 +537,4 @@ public class VorkathScript extends Script {
         }
 
     }
-
-    public void executeAcidWalk(int x, int y, BooleanSupplier awaitedCondition) {
-        if (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId)) return;
-
-        Rs2Player.eatAt(80);
-        while (!awaitedCondition.getAsBoolean()) {
-            Rs2Walker.walkFastLocal(
-                    LocalPoint.fromScene(x, y, Microbot.getClient().getTopLevelWorldView().getScene())
-            );
-            sleep(200);
-        }
-    }
-
-
-    /**
-     * Equipment + inventory
-     * Relleka teleport
-     * Walk to npc on dock
-     * travel to npc on dock
-     * walk to stone & skip stone
-     * pot up & pray & wake up vorkath
-     * kill
-     * loot
-     * varrock teleport
-     * walk to bank
-     * repeat
-     */
 }

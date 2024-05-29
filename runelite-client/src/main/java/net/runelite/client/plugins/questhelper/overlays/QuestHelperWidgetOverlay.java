@@ -27,7 +27,7 @@ package net.runelite.client.plugins.questhelper.overlays;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -39,10 +39,10 @@ import java.awt.*;
 
 public class QuestHelperWidgetOverlay extends Overlay
 {
-	private final QuestHelperPlugin plugin;
+	private final MQuestHelperPlugin plugin;
 
 	@Inject
-	public QuestHelperWidgetOverlay(QuestHelperPlugin plugin)
+	public QuestHelperWidgetOverlay(MQuestHelperPlugin plugin)
 	{
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);

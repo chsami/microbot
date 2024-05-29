@@ -26,7 +26,7 @@ package net.runelite.client.plugins.inventorysetups.ui;
 
 
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsSection;
 
 import javax.swing.*;
@@ -37,18 +37,18 @@ import java.util.List;
 public class InventorySetupsPanel extends JPanel implements InventorySetupsMoveHandler<InventorySetup>
 {
 
-	protected final InventorySetupsPlugin plugin;
+	protected final MInventorySetupsPlugin plugin;
 	protected final InventorySetupsPluginPanel panel;
 	protected final InventorySetup inventorySetup;
 	protected InventorySetupsSection section;
 	protected final JPopupMenu popupMenu;
 
-	InventorySetupsPanel(InventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section)
+	InventorySetupsPanel(MInventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section)
 	{
 		this(plugin, panel, invSetup, section, true);
 	}
 
-	InventorySetupsPanel(InventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section, boolean allowEditable)
+	InventorySetupsPanel(MInventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section, boolean allowEditable)
 	{
 		this.plugin = plugin;
 		this.panel = panel;

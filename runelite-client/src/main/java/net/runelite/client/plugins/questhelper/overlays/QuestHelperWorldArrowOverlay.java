@@ -25,7 +25,7 @@
  */
 package net.runelite.client.plugins.questhelper.overlays;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -36,10 +36,10 @@ import java.awt.*;
 
 public class QuestHelperWorldArrowOverlay extends Overlay
 {
-	private final QuestHelperPlugin plugin;
+	private final MQuestHelperPlugin plugin;
 
 	@Inject
-	public QuestHelperWorldArrowOverlay(QuestHelperPlugin plugin)
+	public QuestHelperWorldArrowOverlay(MQuestHelperPlugin plugin)
 	{
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);

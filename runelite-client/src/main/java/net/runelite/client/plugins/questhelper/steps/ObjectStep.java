@@ -25,8 +25,8 @@
 package net.runelite.client.plugins.questhelper.steps;
 
 import lombok.Getter;
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.overlay.DirectionArrow;
@@ -47,7 +47,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static net.runelite.client.plugins.questhelper.QuestHelperConfig.ObjectHighlightStyle.OUTLINE;
+import static net.runelite.client.plugins.questhelper.MQuestHelperConfig.ObjectHighlightStyle.OUTLINE;
 
 public class ObjectStep extends DetailedQuestStep
 {
@@ -258,7 +258,7 @@ public class ObjectStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		super.makeWorldOverlayHint(graphics, plugin);
 		if (objects.isEmpty())
@@ -296,7 +296,7 @@ public class ObjectStep extends DetailedQuestStep
 
 				Color configColor = getQuestHelper().getConfig().targetOverlayColor();
 
-				QuestHelperConfig.ObjectHighlightStyle highlightStyle = visibilityHelper.isObjectVisible(tileObject)
+				MQuestHelperConfig.ObjectHighlightStyle highlightStyle = visibilityHelper.isObjectVisible(tileObject)
 					? questHelper.getConfig().highlightStyleObjects()
 					: OUTLINE;
 

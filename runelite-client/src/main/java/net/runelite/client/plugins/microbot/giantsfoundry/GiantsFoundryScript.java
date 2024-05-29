@@ -21,8 +21,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryState.*;
-import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.getEquippedItem;
+import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.get;
 
 public class GiantsFoundryScript extends Script {
 
@@ -45,8 +44,8 @@ public class GiantsFoundryScript extends Script {
                     sleep(2000);
                     return;
                 }
-                final Rs2Item weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
-                final Rs2Item shield = getEquippedItem(EquipmentInventorySlot.SHIELD);
+                final Rs2Item weapon = get(EquipmentInventorySlot.WEAPON);
+                final Rs2Item shield = get(EquipmentInventorySlot.SHIELD);
                 if ((weapon != null || shield != null) && !weapon.name.equalsIgnoreCase("preform")) {
                     Microbot.showMessage(("Please start the script without any weapon or shield in your equipment slot."));
                     sleep(5000);

@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.sinsofthefather;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
@@ -338,7 +338,7 @@ public class DoorPuzzleStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		Widget panels = client.getWidget(665, 32);
 		if (result != null && panels != null)
@@ -363,17 +363,17 @@ public class DoorPuzzleStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 	}
 
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirement)
+	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirement)
 	{
 		super.makeOverlayHint(panelComponent, plugin, additionalText, requirement);
 		Widget panels = client.getWidget(665, 32);

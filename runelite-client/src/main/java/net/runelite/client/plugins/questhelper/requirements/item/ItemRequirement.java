@@ -33,10 +33,9 @@ import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.questhelper.ItemCollections;
 import net.runelite.client.plugins.questhelper.QuestBank;
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
@@ -283,7 +282,7 @@ public class ItemRequirement extends AbstractRequirement
 	}
 
 	@Override
-	protected List<LineComponent> getOverlayDisplayText(Client client, QuestHelperConfig config)
+	protected List<LineComponent> getOverlayDisplayText(Client client, MQuestHelperConfig config)
 	{
 		List<LineComponent> lines = new ArrayList<>();
 
@@ -347,7 +346,7 @@ public class ItemRequirement extends AbstractRequirement
 	}
 
 	@Override
-	public Color getColor(Client client, QuestHelperConfig config)
+	public Color getColor(Client client, MQuestHelperConfig config)
 	{
 		Color color = config.failColour();
 		if (!this.isActualItem())
@@ -386,7 +385,7 @@ public class ItemRequirement extends AbstractRequirement
 	}
 
 	public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
-										 List<Item> bankItems, QuestHelperConfig config)
+										 List<Item> bankItems, MQuestHelperConfig config)
 	{
 		Color color = config.failColour();
 		if (!this.isActualItem())
@@ -410,7 +409,7 @@ public class ItemRequirement extends AbstractRequirement
 	}
 
 	protected ArrayList<LineComponent> getAdditionalText(Client client, boolean includeTooltip,
-														 QuestHelperConfig config)
+														 MQuestHelperConfig config)
 	{
 		Color equipColor = config.passColour();
 
