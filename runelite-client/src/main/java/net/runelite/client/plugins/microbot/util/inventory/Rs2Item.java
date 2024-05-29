@@ -4,10 +4,7 @@ import lombok.Getter;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ParamID;
-import net.runelite.api.widgets.ComponentID;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,10 +45,7 @@ public class Rs2Item {
         this.isTradeable = this.isNoted
                 ? Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(this.id - 1)).isTradeable()
                 : itemComposition.isTradeable();
-        Widget widget = Rs2Widget.getWidget(ComponentID.INVENTORY_CONTAINER).getChild(slot);
-        if (widget != null) {
-            this.inventoryActions = widget.getName().isBlank() ? itemComposition.getInventoryActions() : Rs2Widget.getWidget(ComponentID.INVENTORY_CONTAINER).getChild(slot).getActions();
-        }
+        this.inventoryActions = itemComposition.getInventoryActions();
         addEquipmentActions(itemComposition);
     }
 

@@ -1533,12 +1533,11 @@ public class Rs2Inventory {
         MenuAction menuAction = MenuAction.CC_OP;
 
         if (!action.isEmpty()) {
-            String[] actions;
-            actions = rs2Item.getInventoryActions();
+            String[] actions = rs2Item.getInventoryActions();
 
             for (int i = 0; i < actions.length; i++) {
                 if (action.equalsIgnoreCase(actions[i])) {
-                    identifier = i + 1;
+                    identifier = i + 2;
                     break;
                 }
             }
