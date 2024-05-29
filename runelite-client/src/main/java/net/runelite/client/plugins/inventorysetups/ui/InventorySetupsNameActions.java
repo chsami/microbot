@@ -26,7 +26,7 @@ package net.runelite.client.plugins.inventorysetups.ui;
 
 import lombok.Getter;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsDisplayAttributes;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsValidName;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
@@ -69,7 +69,7 @@ public class InventorySetupsNameActions<T extends InventorySetupsDisplayAttribut
 	private final InventorySetupsValidName validNameImplementer;
 
 	public InventorySetupsNameActions(final T datum,
-									  final InventorySetupsPlugin plugin,
+									  final MInventorySetupsPlugin plugin,
 									  final InventorySetupsPluginPanel panel,
 									  final InventorySetupsValidName validNameImplementer,
 									  final JPopupMenu movePopupMenu, int maxLength,

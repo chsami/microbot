@@ -45,7 +45,7 @@ public class InventorySetupsInventoryPanel extends InventorySetupsContainerPanel
 	private final InventorySetupsRunePouchPanel runePouchPanel;
 	private final InventorySetupsBoltPouchPanel boltPouchPanel;
 
-	InventorySetupsInventoryPanel(final ItemManager itemManager, final InventorySetupsPlugin plugin,
+	InventorySetupsInventoryPanel(final ItemManager itemManager, final MInventorySetupsPlugin plugin,
 								  final InventorySetupsRunePouchPanel runePouchPanel,
 								  final InventorySetupsBoltPouchPanel boltPouchPanel)
 	{

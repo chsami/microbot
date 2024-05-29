@@ -49,7 +49,8 @@ public class Rs2GrandExchange {
      */
     public static boolean isOpen() {
         Microbot.status = "Checking if Grand Exchange is open";
-        return Rs2Widget.getWidget(WidgetInfo.GRAND_EXCHANGE_WINDOW_CONTAINER) != null;
+        return !Microbot.getClientThread().runOnClientThread(() ->  Rs2Widget.getWidget(WidgetInfo.GRAND_EXCHANGE_WINDOW_CONTAINER) == null
+                || Rs2Widget.getWidget(WidgetInfo.GRAND_EXCHANGE_WINDOW_CONTAINER).isHidden());
     }
 
     /**

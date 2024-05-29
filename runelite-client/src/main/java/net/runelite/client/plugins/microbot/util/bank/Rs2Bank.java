@@ -901,6 +901,7 @@ public class Rs2Bank {
         }
         WorldPoint local = new WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(), y, Microbot.getClient().getPlane());
         for (BankLocation bankLocation : BankLocation.values()) {
+            if (!bankLocation.hasRequirements()) continue;
             double currDist = local.distanceTo2D(bankLocation.getWorldPoint());
             if (nearest == null || currDist < dist) {
                 dist = currDist;

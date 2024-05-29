@@ -22,13 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin.CONFIG_GROUP;
+import static net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin.CONFIG_GROUP;
 
 @Slf4j
 public class InventorySetupsPersistentDataManager
 {
 
-	private final InventorySetupsPlugin plugin;
+	private final MInventorySetupsPlugin plugin;
 	private final InventorySetupsPluginPanel panel;
 	private final ConfigManager configManager;
 	private final InventorySetupsCache cache;
@@ -44,7 +44,7 @@ public class InventorySetupsPersistentDataManager
 	public static final String CONFIG_KEY_SECTIONS = "sections";
 
 	@Inject
-	public InventorySetupsPersistentDataManager(final InventorySetupsPlugin plugin,
+	public InventorySetupsPersistentDataManager(final MInventorySetupsPlugin plugin,
 												final InventorySetupsPluginPanel panel,
 												final ConfigManager manager,
 												final InventorySetupsCache cache,

@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin.*;
+import static net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin.*;
 
 
 // The main panel of the plugin that contains all viewing components
@@ -120,18 +120,18 @@ public class InventorySetupsPluginPanel extends PluginPanel
 
 	private int overviewPanelScrollPosition;
 
-	private final InventorySetupsPlugin plugin;
+	private final MInventorySetupsPlugin plugin;
 
 	@Getter
 	private List<InventorySetup> filteredInventorysetups;
 
 	static
 	{
-		final BufferedImage helpIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "help_button.png");
+		final BufferedImage helpIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "help_button.png");
 		HELP_ICON = new ImageIcon(helpIcon);
 		HELP_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(helpIcon, 0.53f));
 
-		final BufferedImage sectionIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "section_mode_icon.png");
+		final BufferedImage sectionIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "section_mode_icon.png");
 		final BufferedImage sectionIconHover = ImageUtil.luminanceOffset(sectionIcon, -150);
 		SECTION_VIEW_ICON = new ImageIcon(sectionIcon);
 		SECTION_VIEW_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(sectionIcon, 0.53f));
@@ -139,19 +139,19 @@ public class InventorySetupsPluginPanel extends PluginPanel
 		NO_SECTION_VIEW_ICON = new ImageIcon(sectionIconHover);
 		NO_SECTION_VIEW_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(sectionIconHover, -100));
 
-		final BufferedImage standardIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "standard_mode_icon.png");
+		final BufferedImage standardIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "standard_mode_icon.png");
 		STANDARD_VIEW_ICON = new ImageIcon(standardIcon);
 		STANDARD_VIEW_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(standardIcon, -100));
 
-		final BufferedImage compactIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "compact_mode_icon.png");
+		final BufferedImage compactIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "compact_mode_icon.png");
 		COMPACT_VIEW_ICON = new ImageIcon(compactIcon);
 		COMPACT_VIEW_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(compactIcon, 0.53f));
 
-		final BufferedImage iconIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "icon_mode_icon.png");
+		final BufferedImage iconIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "icon_mode_icon.png");
 		ICON_VIEW_ICON = new ImageIcon(iconIcon);
 		ICON_VIEW_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(iconIcon, 0.53f));
 
-		final BufferedImage alphabeticalIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "alphabetical_icon.png");
+		final BufferedImage alphabeticalIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "alphabetical_icon.png");
 		final BufferedImage alphabeticalIconHover = ImageUtil.luminanceOffset(alphabeticalIcon, -150);
 		ALPHABETICAL_ICON = new ImageIcon(alphabeticalIcon);
 		ALPHABETICAL_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(alphabeticalIcon, 0.53f));
@@ -159,26 +159,26 @@ public class InventorySetupsPluginPanel extends PluginPanel
 		NO_ALPHABETICAL_ICON = new ImageIcon(alphabeticalIconHover);
 		NO_ALPHABETICAL_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(alphabeticalIconHover, -100));
 
-		final BufferedImage addIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "add_icon.png");
+		final BufferedImage addIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "add_icon.png");
 		ADD_ICON = new ImageIcon(addIcon);
 		ADD_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(addIcon, 0.53f));
 
-		final BufferedImage importIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "import_icon.png");
+		final BufferedImage importIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "import_icon.png");
 		IMPORT_ICON = new ImageIcon(importIcon);
 		IMPORT_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(importIcon, 0.53f));
 
-		final BufferedImage updateIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "update_icon.png");
+		final BufferedImage updateIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "update_icon.png");
 		UPDATE_ICON = new ImageIcon(updateIcon);
 		UPDATE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(updateIcon, 0.53f));
 
-		final BufferedImage backIcon = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "back_arrow_icon.png");
+		final BufferedImage backIcon = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "back_arrow_icon.png");
 		BACK_ICON = new ImageIcon(backIcon);
 		BACK_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(backIcon, 0.53f));
 
 		MAIN_TITLE = "Inventory Setups";
 	}
 
-	public InventorySetupsPluginPanel(final InventorySetupsPlugin plugin, final ItemManager itemManager)
+	public InventorySetupsPluginPanel(final MInventorySetupsPlugin plugin, final ItemManager itemManager)
 	{
 		super(false);
 		this.currentSelectedSetup = null;
