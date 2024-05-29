@@ -65,12 +65,12 @@ public class PlayerAssistPlugin extends Plugin {
         }
         lootScript.run(config);
         cannonScript.run(config);
-        flickerScript.run(config);
         attackNpc.run(config);
         combatPotion.run(config);
         foodScript.run(config);
         prayerPotionScript.run(config);
 //        safeSpotScript.run(config); // TODO: safespot
+        flickerScript.run(config);
         useSpecialAttackScript.run(config);
         antiPoisonScript.run(config);
         buryBoneScript.run(config);
@@ -101,12 +101,14 @@ public class PlayerAssistPlugin extends Plugin {
     @Subscribe
     public void onGameTick(GameTick gameTick) {
        //execute flicker script
-        flickerScript.onGameTick();
+        if(config.togglePrayer())
+            flickerScript.onGameTick();
     }
 
     @Subscribe
     public void onNpcDespawned(NpcDespawned npcDespawned) {
-        flickerScript.onNpcDespawned(npcDespawned);
+        if(config.togglePrayer())
+            flickerScript.onNpcDespawned(npcDespawned);
     }
     @Subscribe
     public void onHitsplatApplied(HitsplatApplied event){

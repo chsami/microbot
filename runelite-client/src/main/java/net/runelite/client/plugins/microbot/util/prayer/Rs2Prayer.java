@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.microbot.util.prayer;
 
 import net.runelite.api.MenuAction;
-import net.runelite.api.Prayer;
 import net.runelite.api.Skill;
-import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -14,7 +12,7 @@ import java.util.Arrays;
 
 import static net.runelite.api.Varbits.QUICK_PRAYER;
 import static net.runelite.client.plugins.microbot.globval.VarbitValues.QUICK_PRAYER_ENABLED;
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
+
 
 /**
  * This class provides utility methods for managing prayers in the game.

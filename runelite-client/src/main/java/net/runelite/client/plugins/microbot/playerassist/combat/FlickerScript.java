@@ -45,7 +45,7 @@ public class FlickerScript extends Script {
         Rs2NpcManager.loadJson();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!Microbot.isLoggedIn() || !super.run()) return;
+                if (!Microbot.isLoggedIn() || !super.run() || !config.togglePrayer()) return;
 
                 npcs = Rs2Npc.getNpcsForPlayer();
                 usePrayer = config.togglePrayer();
@@ -92,6 +92,7 @@ public class FlickerScript extends Script {
                 prayerToToggle = Rs2PrayerEnum.PROTECT_RANGE;
                 break;
             default:
+                prayFlickAttackStyle = null;
                 Rs2Prayer.toggleQuickPrayer(true);
                 sleep(350, 400);
                 Rs2Prayer.toggleQuickPrayer(false);
@@ -159,7 +160,7 @@ public class FlickerScript extends Script {
 
         for (NPC npc : npcs) {
             Monster currentMonster = currentMonstersAttackingUs.stream().filter(x -> x.npc.getIndex() == npc.getIndex()).findFirst().orElse(null);
-            AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(attackStyleMap.get(npc.getId()));
+            AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(Rs2NpcManager.getAttackStyle(npc.getId()));
 
             if (currentMonster != null) {
                 if (!npc.isDead() && currentMonster.lastAttack <= 0)

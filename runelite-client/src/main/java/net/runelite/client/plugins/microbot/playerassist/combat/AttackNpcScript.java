@@ -74,8 +74,8 @@ public class AttackNpcScript extends Script {
 
                     Rs2Npc.interact(npc, "attack");
 
-                    if(config.togglePrayer()&& !config.toggleQuickPrayFlick()){
-                        AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(attackStyleMap.get(npc.getId()));
+                    if(config.togglePrayer() && !config.toggleQuickPrayFlick()){
+                        AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(Rs2NpcManager.getAttackStyle(npc.getId()));
                         if (attackStyle != null) {
                             switch (attackStyle) {
                                 case MAGE:
@@ -92,7 +92,7 @@ public class AttackNpcScript extends Script {
 
                         }
                     }
-                    else if(config.togglePrayer()&& config.toggleQuickPrayFlick()){
+                    if(config.togglePrayer() && config.toggleQuickPrayFlick()){
                         Rs2Prayer.toggleQuickPrayer(true);
                     }
 
