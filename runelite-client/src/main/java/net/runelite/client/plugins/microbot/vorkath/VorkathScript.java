@@ -299,7 +299,7 @@ public class VorkathScript extends Script {
                         int foodInventorySize = Rs2Inventory.getInventoryFood().size();
                         boolean hasVenom = Rs2Inventory.hasItem("venom");
                         boolean hasSuperAntifire = Rs2Inventory.hasItem("super antifire");
-                        boolean hasPrayerPotion = Rs2Inventory.hasItem("prayer potion");
+                        boolean hasPrayerPotion = Rs2Inventory.hasItem(config.prayerPotion().getPotionName());
                         boolean hasRangePotion = Rs2Inventory.hasItem(config.rangePotion().toString());
                         sleep(600, 2000);
                         if (!Rs2GroundItem.isItemBasedOnValueOnGround(config.priceOfItemsToLoot(), 20) && !Rs2GroundItem.exists("Vorkath's head", 20)) {
@@ -377,13 +377,13 @@ public class VorkathScript extends Script {
      * will heal and drink pray pots
      */
     private void healAndDrinkPrayerPotion() {
-        while (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) != Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) && !Rs2Inventory.getInventoryFood().isEmpty()) {
+        while (Rs2Player.isFullHealth() && !Rs2Inventory.getInventoryFood().isEmpty()) {
             Rs2Bank.closeBank();
             Rs2Player.eatAt(99);
             Rs2Player.waitForAnimation();
             hasInventory = false;
         }
-        while (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) != Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) && Rs2Inventory.hasItem("prayer potion")) {
+        while (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) != Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) && Rs2Inventory.hasItem(config.prayerPotion().toString())) {
             Rs2Bank.closeBank();
             Rs2Inventory.interact(config.prayerPotion().toString(), "drink");
             Rs2Player.waitForAnimation();
