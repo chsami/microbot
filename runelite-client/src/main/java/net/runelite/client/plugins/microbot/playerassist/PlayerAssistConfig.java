@@ -35,8 +35,8 @@ public interface PlayerAssistConfig extends Config {
                 "5. You can turn auto attack NPC off if you have a cannon.\n" +
                 "6. PrayFlick should work at the moment.\n" +
                 "7. SafeSpot & auto loot arrows might act funny and are not tested thoroughly. Use at your own risk!\n" +
-                "8. Right-click the ground to select the center tile.\n" +
-                "s9. Right-click NPCs to add them to the attack list.";
+                "8. Shift Right-click the ground to select the center tile.\n" +
+                "9. Shift Right-click NPCs to add them to the attack list.";
     }
 
     @ConfigSection(
