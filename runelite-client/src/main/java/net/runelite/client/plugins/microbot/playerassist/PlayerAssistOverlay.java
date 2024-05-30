@@ -48,7 +48,7 @@ public class PlayerAssistOverlay extends OverlayPanel {
 
         net.runelite.api.Point loc = Perspective.localToCanvas(Microbot.getClient(), Rs2Player.getLocalLocation(), Rs2Player.getWorldLocation().getPlane(), 150);
 
-        LocalPoint lp =  LocalPoint.fromWorld(Microbot.getClient(), Script.getInitialPlayerLocation());
+        LocalPoint lp =  LocalPoint.fromWorld(Microbot.getClient(), config.centerLocation());
         if (lp != null) {
             Polygon poly = Perspective.getCanvasTileAreaPoly(Microbot.getClient(), lp, config.attackRadius() * 2);
 

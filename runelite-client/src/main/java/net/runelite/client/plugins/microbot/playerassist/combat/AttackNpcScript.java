@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.playerassist.combat;
 
-import com.sun.jdi.Mirror;
 import net.runelite.api.Actor;
 import net.runelite.api.NPC;
 import net.runelite.api.Skill;
@@ -22,9 +21,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-
-import static net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager.attackStyleMap;
 
 public class AttackNpcScript extends Script {
 
@@ -38,21 +36,22 @@ public class AttackNpcScript extends Script {
 
     public void run(PlayerAssistConfig config) {
         Rs2NpcManager.loadJson();
-        List<String> npcsToAttack = Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList());
+        AtomicReference<List<String>> npcsToAttack = new AtomicReference<>(Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList()));
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (!config.toggleCombat()) return;
+                npcsToAttack.set(Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList()));
                 double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
                 if (Rs2Inventory.getInventoryFood().isEmpty() && treshHold < 10) return;
                 attackableNpcs = Microbot.getClient().getNpcs().stream()
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                         .filter(x -> !x.isDead()
-                                && x.getWorldLocation().distanceTo(getInitialPlayerLocation()) < config.attackRadius()
+                                && x.getWorldLocation().distanceTo(config.centerLocation()) < config.attackRadius()
                                 && (!x.isInteracting() || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && (x.getInteracting() == null || x.getInteracting() == Microbot.getClient().getLocalPlayer())
-                                && x.getAnimation() == -1 && npcsToAttack.stream().anyMatch(n -> n.equalsIgnoreCase(x.getName()))).collect(Collectors.toList());
+                                && x.getAnimation() == -1 && npcsToAttack.get().stream().anyMatch(n -> n.equalsIgnoreCase(x.getName()))).collect(Collectors.toList());
                 if (Rs2Combat.inCombat()) {
                     return;
                 }
@@ -62,9 +61,9 @@ public class AttackNpcScript extends Script {
                             || npc.isDead()
                             || (npc.getInteracting() != null && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
                             || (npc.isInteracting() && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
-                            || npcsToAttack.stream().noneMatch(n -> npc.getName().equalsIgnoreCase(n)))
+                            || npcsToAttack.get().stream().noneMatch(n -> npc.getName().equalsIgnoreCase(n)))
                         break;
-                    if (npc.getWorldLocation().distanceTo(getInitialPlayerLocation()) > config.attackRadius())
+                    if (npc.getWorldLocation().distanceTo(config.centerLocation()) > config.attackRadius())
                         break;
                     if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation()))
                         Rs2Camera.turnTo(npc);

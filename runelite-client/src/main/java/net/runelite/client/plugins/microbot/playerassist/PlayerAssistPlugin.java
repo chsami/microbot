@@ -2,13 +2,13 @@ package net.runelite.client.plugins.microbot.playerassist;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Hitsplat;
-import net.runelite.api.HitsplatID;
-import net.runelite.api.NPC;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.HitsplatApplied;
-import net.runelite.api.events.NpcDespawned;
+import net.runelite.api.*;
+import net.runelite.api.Point;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.*;
+import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.worldmap.WorldMap;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -18,12 +18,17 @@ import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.ui.JagexColors;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.util.ColorUtil;
+import net.runelite.client.util.Text;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "AIO Fighter",
@@ -35,6 +40,8 @@ import java.util.concurrent.Executors;
 public class PlayerAssistPlugin extends Plugin {
     @Inject
     private PlayerAssistConfig config;
+    @Inject
+    private ConfigManager configManager;
 
     @Provides
     PlayerAssistConfig provideConfig(ConfigManager configManager) {
@@ -45,6 +52,15 @@ public class PlayerAssistPlugin extends Plugin {
     private OverlayManager overlayManager;
     @Inject
     private PlayerAssistOverlay playerAssistOverlay;
+
+    private static final String SET = "Set";
+    private static final String TARGET = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
+    private static final String ADD_TO = "Add to Fight:";
+    private static final String REMOVE_FROM = "Remove from Fight:";
+    private static final String WALK_HERE = "Walk here";
+    private static final String ATTACK = "Attack";
+    private MenuEntry lastClick;
+    private Point lastMenuOpenedPoint;
 
     private final CannonScript cannonScript = new CannonScript();
     private final AttackNpcScript attackNpc = new AttackNpcScript();
@@ -91,6 +107,35 @@ public class PlayerAssistPlugin extends Plugin {
         overlayManager.remove(playerAssistOverlay);
     }
 
+    private void setCenter(WorldPoint worldPoint)
+    {
+        configManager.setConfiguration(
+                "PlayerAssistant",
+                "centerLocation",
+                worldPoint
+        );
+    }
+    private void addNpcToList(String npcName) {
+        configManager.setConfiguration(
+                "PlayerAssistant",
+                "monster",
+                config.attackableNpcs() + npcName + ","
+        );
+    }
+    private void removeNpcFromList(String npcName) {
+        configManager.setConfiguration(
+                "PlayerAssistant",
+                "monster",
+                Arrays.stream(config.attackableNpcs().split(","))
+                        .filter(n -> !n.equalsIgnoreCase(npcName))
+                        .collect(Collectors.joining(","))
+        );
+    }
+
+    private String getNpcNameFromMenuEntry(String menuTarget) {
+        return menuTarget.replaceAll("<[^>]*>|\\(.*\\)", "").trim();
+    }
+
     @Subscribe
     public void onChatMessage(ChatMessage event) {
         if (event.getMessage().contains("reach that")) {
@@ -114,12 +159,129 @@ public class PlayerAssistPlugin extends Plugin {
     public void onHitsplatApplied(HitsplatApplied event){
         if (event.getActor().getInteracting() != Microbot.getClient().getLocalPlayer()) return;
         final Hitsplat hitsplat = event.getHitsplat();
-        if ((hitsplat.getHitsplatType() == HitsplatID.BLOCK_ME || hitsplat.getHitsplatType() == HitsplatID.DAMAGE_ME) && event.getActor() instanceof NPC) {
+        if ((hitsplat.getHitsplatType() == HitsplatID.BLOCK_ME || hitsplat.getHitsplatType() == HitsplatID.DAMAGE_ME) && event.getActor() instanceof NPC && config.togglePrayer()) {
             Rs2Prayer.disableAllPrayers();
             if(config.toggleQuickPrayFlick())
                 Rs2Prayer.toggleQuickPrayer(false);
             flickerScript.resetLastAttack();
 
         }
+    }
+    @Subscribe
+    public void onMenuOpened(MenuOpened event) {
+        lastMenuOpenedPoint = Microbot.getClient().getMouseCanvasPosition();
+    }
+    @Subscribe
+    private void onMenuEntryAdded(MenuEntryAdded event) {
+        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
+            addMenuEntry(event, SET, TARGET, 1);
+        }
+        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(ATTACK) && config.attackableNpcs().contains(getNpcNameFromMenuEntry(Text.removeTags(event.getTarget())))) {
+            addMenuEntry(event, REMOVE_FROM, event.getTarget(), 1);
+        }
+        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(ATTACK) && !config.attackableNpcs().contains(getNpcNameFromMenuEntry(Text.removeTags(event.getTarget())))) {
+            addMenuEntry(event, ADD_TO, event.getTarget(), 1);
+        }
+
+    }
+
+    private WorldPoint getSelectedWorldPoint() {
+        if (Microbot.getClient().getWidget(ComponentID.WORLD_MAP_MAPVIEW) == null) {
+            if (Microbot.getClient().getSelectedSceneTile() != null) {
+                return Microbot.getClient().isInInstancedRegion() ?
+                        WorldPoint.fromLocalInstance(Microbot.getClient(), Microbot.getClient().getSelectedSceneTile().getLocalLocation()) :
+                        Microbot.getClient().getSelectedSceneTile().getWorldLocation();
+            }
+        } else {
+            return calculateMapPoint(Microbot.getClient().isMenuOpen() ? lastMenuOpenedPoint : Microbot.getClient().getMouseCanvasPosition());
+        }
+        return null;
+    }
+    public WorldPoint calculateMapPoint(Point point) {
+        WorldMap worldMap = Microbot.getClient().getWorldMap();
+        float zoom = worldMap.getWorldMapZoom();
+        final WorldPoint mapPoint = new WorldPoint(worldMap.getWorldMapPosition().getX(), worldMap.getWorldMapPosition().getY(), 0);
+        final Point middle = mapWorldPointToGraphicsPoint(mapPoint);
+
+        if (point == null || middle == null) {
+            return null;
+        }
+
+        final int dx = (int) ((point.getX() - middle.getX()) / zoom);
+        final int dy = (int) ((-(point.getY() - middle.getY())) / zoom);
+
+        return mapPoint.dx(dx).dy(dy);
+    }
+    public Point mapWorldPointToGraphicsPoint(WorldPoint worldPoint) {
+        WorldMap worldMap = Microbot.getClient().getWorldMap();
+
+        float pixelsPerTile = worldMap.getWorldMapZoom();
+
+        Widget map = Microbot.getClient().getWidget(ComponentID.WORLD_MAP_MAPVIEW);
+        if (map != null) {
+            Rectangle worldMapRect = map.getBounds();
+
+            int widthInTiles = (int) Math.ceil(worldMapRect.getWidth() / pixelsPerTile);
+            int heightInTiles = (int) Math.ceil(worldMapRect.getHeight() / pixelsPerTile);
+
+            Point worldMapPosition = worldMap.getWorldMapPosition();
+
+            int yTileMax = worldMapPosition.getY() - heightInTiles / 2;
+            int yTileOffset = (yTileMax - worldPoint.getY() - 1) * -1;
+            int xTileOffset = worldPoint.getX() + widthInTiles / 2 - worldMapPosition.getX();
+
+            int xGraphDiff = ((int) (xTileOffset * pixelsPerTile));
+            int yGraphDiff = (int) (yTileOffset * pixelsPerTile);
+
+            yGraphDiff -= pixelsPerTile - Math.ceil(pixelsPerTile / 2);
+            xGraphDiff += pixelsPerTile - Math.ceil(pixelsPerTile / 2);
+
+            yGraphDiff = worldMapRect.height - yGraphDiff;
+            yGraphDiff += (int) worldMapRect.getY();
+            xGraphDiff += (int) worldMapRect.getX();
+
+            return new Point(xGraphDiff, yGraphDiff);
+        }
+        return null;
+    }
+    private void onMenuOptionClicked(MenuEntry entry) {
+
+
+
+        if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
+            setCenter(getSelectedWorldPoint());
+        }
+
+
+
+        if (entry.getType() != MenuAction.WALK) {
+            lastClick = entry;
+        }
+    }
+    @Subscribe
+    private void onMenuOptionClicked(MenuOptionClicked event)
+    {
+        if (event.getMenuOption().equals(ADD_TO)) {
+            addNpcToList(getNpcNameFromMenuEntry(event.getMenuTarget()));
+        }
+        if (event.getMenuOption().equals(REMOVE_FROM)) {
+            removeNpcFromList(getNpcNameFromMenuEntry(event.getMenuTarget()));
+        }
+    }
+    private void addMenuEntry(MenuEntryAdded event, String option, String target, int position) {
+        List<MenuEntry> entries = new LinkedList<>(Arrays.asList(Microbot.getClient().getMenuEntries()));
+
+        if (entries.stream().anyMatch(e -> e.getOption().equals(option) && e.getTarget().equals(target))) {
+            return;
+        }
+
+        Microbot.getClient().createMenuEntry(position)
+                .setOption(option)
+                .setTarget(target)
+                .setParam0(event.getActionParam0())
+                .setParam1(event.getActionParam1())
+                .setIdentifier(event.getIdentifier())
+                .setType(MenuAction.RUNELITE)
+                .onClick(this::onMenuOptionClicked);
     }
 }

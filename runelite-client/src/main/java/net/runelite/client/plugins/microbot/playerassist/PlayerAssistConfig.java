@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.playerassist;
 
-import net.runelite.client.config.Config;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.config.*;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
@@ -25,12 +26,17 @@ public interface PlayerAssistConfig extends Config {
             position = 0,
             section = generalSection
     )
-    default String GUIDE()
-    {
-        return "This plugin allows for semi afk.\n 1.Make sure to place cannon first before starting the plugin \n" +
-                "\n 2. Use food also supports guthan healing, the shield weapon is default set to dragon defender \n" +
-                " 3. Use antiPosion supports any potion with 'poison' in the name\n 4. Items to loot are comma seperated strings \n 5. You can turn auto attack npc off if you have a cannon \n " +
-                " 6. PrayFlick does not work at the moment \n 7. SafeSpot & auto loot arrows might act funny and is not tested throughly. Use @ own risk!";
+    default String GUIDE() {
+        return "This plugin allows for semi afk.\n" +
+                "1. Make sure to place the cannon first before starting the plugin.\n" +
+                "2. Use food also supports Guthan's healing, the shield weapon is default set to Dragon Defender.\n" +
+                "3. Use antiPoison supports any potion with 'poison' in the name.\n" +
+                "4. Items to loot are comma-separated strings.\n" +
+                "5. You can turn auto attack NPC off if you have a cannon.\n" +
+                "6. PrayFlick should work at the moment.\n" +
+                "7. SafeSpot & auto loot arrows might act funny and are not tested thoroughly. Use at your own risk!\n" +
+                "8. Right-click the ground to select the center tile.\n" +
+                "s9. Right-click NPCs to add them to the attack list.";
     }
 
     @ConfigSection(
@@ -54,7 +60,7 @@ public interface PlayerAssistConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "Attackable Npcs",
+            keyName = "monster",
             name = "Attackable npcs",
             description = "List of attackable npcs",
             position = 1,
@@ -273,6 +279,18 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleLazyFlick()
     {
         return false;
+    }
+
+    //hidden config item for center location
+    @ConfigItem(
+            keyName = "centerLocation",
+            name = "Center Location",
+            description = "Center Location",
+            hidden = true
+    )
+    default WorldPoint centerLocation()
+    {
+        return new WorldPoint(0, 0, 0);
     }
 
 }
