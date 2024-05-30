@@ -79,7 +79,6 @@ public class NmzScript extends Script {
             if (canStartNmz()) {
                 consumeEmptyVial();
             } else {
-                Microbot.showMessage("Bot can't start because your overloads or absorption potions do not match the configured number in your plugin settings.");
                 sleep(2000);
             }
         }

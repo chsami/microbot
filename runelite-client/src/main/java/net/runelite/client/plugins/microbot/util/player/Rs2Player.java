@@ -239,17 +239,10 @@ public class Rs2Player {
 
     public static boolean eatAt(int percentage) {
         double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
-        int missingHitpoints = Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
         if (treshHold <= percentage) {
             List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
-            for (Rs2Item food : foods) {
-                if (missingHitpoints >= 40 && Rs2Inventory.get("Cooked karambwan") != null) {
-                    //double eat
-                    Rs2Inventory.interact(food, "eat");
-                    return Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
-                } else {
-                    return Rs2Inventory.interact(food, "eat");
-                }
+            if (!foods.isEmpty()) {
+                return Rs2Inventory.interact(foods.get(0), "eat");
             }
         }
         return false;

@@ -26,11 +26,11 @@ public class Rs2Equipment {
             for (int i = 0; i < e.getItemContainer().getItems().length; i++) {
                 Item item = equipment().getItems()[i];
                 if (item.getId() == -1) continue;
-                ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(item.getId()));
                 int finalI = i;
                 Optional<EquipmentInventorySlot> equipmentSlot = Arrays.stream(EquipmentInventorySlot.values()).filter(x -> x.getSlotIdx() == finalI).findFirst();
                 if (equipmentSlot.isEmpty()) continue;
                 int slot = equipmentSlot.get().getSlotIdx();
+                ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(item.getId()));
                 _equipmentItems.add(new Rs2Item(item, itemComposition, slot));
             }
             equipmentItems = _equipmentItems;
