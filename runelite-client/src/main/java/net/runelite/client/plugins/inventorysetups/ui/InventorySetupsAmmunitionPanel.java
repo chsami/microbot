@@ -28,7 +28,7 @@ package net.runelite.client.plugins.inventorysetups.ui;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsSlotID;
 import net.runelite.client.ui.ColorScheme;
 
@@ -49,7 +49,7 @@ public abstract class InventorySetupsAmmunitionPanel extends InventorySetupsCont
 
 	private List<Boolean> ammoSlotsAddedToPanel;
 
-	InventorySetupsAmmunitionPanel(ItemManager itemManager, InventorySetupsPlugin plugin, String captionText)
+	InventorySetupsAmmunitionPanel(ItemManager itemManager, MInventorySetupsPlugin plugin, String captionText)
 	{
 		super(itemManager, plugin, captionText);
 	}

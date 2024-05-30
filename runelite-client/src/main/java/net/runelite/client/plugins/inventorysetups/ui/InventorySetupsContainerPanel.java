@@ -42,12 +42,12 @@ public abstract class InventorySetupsContainerPanel extends JPanel
 
 	protected boolean isHighlighted;
 
-	protected final InventorySetupsPlugin plugin;
+	protected final MInventorySetupsPlugin plugin;
 
 	@Getter(AccessLevel.PROTECTED)
 	private final JPanel containerSlotsPanel;
 
-	InventorySetupsContainerPanel(final ItemManager itemManager, final InventorySetupsPlugin plugin, String captionText)
+	InventorySetupsContainerPanel(final ItemManager itemManager, final MInventorySetupsPlugin plugin, String captionText)
 	{
 		this.itemManager = itemManager;
 		this.plugin = plugin;

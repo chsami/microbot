@@ -60,6 +60,24 @@ The `Rs2Player` class is responsible for managing the player's state and interac
 ### `isInMulti`
 - **Returns**: `boolean` - True if the player is in a multi-combat area.
 
+### `logoutIfPlayerDetected`
+- **Parameters**:
+  - `amountOfPlayers`: `int` - Amount of players to detect before logging out.
+- **Returns**: `boolean` - True if a player is detected.
+
+### `logoutIfPlayerDetected`
+- **Parameters**:
+  - `amountOfPlayers`: `int` - Amount of players to detect before logging out.
+  - `time`: `int` - The time in milliseconds for a player to be detected before logging out.
+- **Returns**: `boolean` - True if a player is detected.
+
+### `logoutIfPlayerDetected`
+- **Parameters**:
+  - `amountOfPlayers`: `int` - Amount of players to detect before logging out.
+  - `time`: `int` - The time in milliseconds for a player to be detected before logging out.
+  - `distance`: `int` - The distance between a player required before logging out.
+- **Returns**: `boolean` - True if a player is detected.
+
 ## Remarks
 - **Game Interaction**: This class provides critical functionalities for interacting with various game mechanics, from potion effects to player movement.
 - **Utility Methods**: Includes utilities for waiting on player actions (like walking or animation), which are essential for coordinating tasks in automation scripts.

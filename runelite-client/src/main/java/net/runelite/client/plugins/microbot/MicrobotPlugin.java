@@ -155,7 +155,6 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
-        System.out.println("Event Container ID: " + event.getContainerId());
 
         if (event.getContainerId() == InventoryID.BANK.getId()) {
             Rs2Bank.storeBankItemsInMemory(event);
@@ -170,31 +169,26 @@ public class MicrobotPlugin extends Plugin {
         if (event.getContainerId() == 64) { // Mage Guild Shop
             //Code for Bank's Rs2Shop
             java.util.List<Rs2Item> shopItems = updateItemContainer(64, event);
-            System.out.println(shopItems.size());
             Rs2Shop.storeShopItemsInMemory(event, 64);
         }
         if (event.getContainerId() == 435) { // Charter Shop
             //Code for Bank's Rs2Shop
             java.util.List<Rs2Item> shopItems = updateItemContainer(435, event);
-            System.out.println(shopItems.size());
             Rs2Shop.storeShopItemsInMemory(event, 435);
         }
         if (event.getContainerId() == 131) { // Lundail Rune Shop
             //Code for Bank's Rs2Shop
             java.util.List<Rs2Item> shopItems = updateItemContainer(131, event);
-            System.out.println(shopItems.size());
             Rs2Shop.storeShopItemsInMemory(event, 131);
         }
         if (event.getContainerId() == 419) { // Baba Yaga Rune Shop
             //Code for Bank's Rs2Shop
             java.util.List<Rs2Item> shopItems = updateItemContainer(419, event);
-            System.out.println(shopItems.size());
             Rs2Shop.storeShopItemsInMemory(event, 419);
         }
         if (event.getContainerId() == 318) { // Ordan (Blast Furnace Shop)
             //Code for Bank's Rs2Shop
             java.util.List<Rs2Item> shopItems = updateItemContainer(318, event);
-            System.out.println(shopItems.size());
             Rs2Shop.storeShopItemsInMemory(event, 318);
         }
     }

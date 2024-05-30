@@ -25,7 +25,7 @@
 package net.runelite.client.plugins.questhelper.steps.choice;
 
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 
 public class WidgetChoiceStep
 {
-	protected final QuestHelperConfig config;
+	protected final MQuestHelperConfig config;
 
 	@Getter
 	private final String choice;
@@ -69,7 +69,7 @@ public class WidgetChoiceStep
 	@Getter
 	private int groupIdForChecking;
 
-	public WidgetChoiceStep(QuestHelperConfig config, String choice, int groupId, int childId)
+	public WidgetChoiceStep(MQuestHelperConfig config, String choice, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = choice;
@@ -80,7 +80,7 @@ public class WidgetChoiceStep
 		this.pattern = null;
 	}
 
-	public WidgetChoiceStep(QuestHelperConfig config, int groupId, int childId)
+	public WidgetChoiceStep(MQuestHelperConfig config, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = null;
@@ -91,7 +91,7 @@ public class WidgetChoiceStep
 		this.pattern = null;
 	}
 
-	public WidgetChoiceStep(QuestHelperConfig config, Pattern pattern, int groupId, int childId)
+	public WidgetChoiceStep(MQuestHelperConfig config, Pattern pattern, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = null;
@@ -102,7 +102,7 @@ public class WidgetChoiceStep
 		this.pattern = pattern;
 	}
 
-	public WidgetChoiceStep(QuestHelperConfig config, int choiceId, int groupId, int childId)
+	public WidgetChoiceStep(MQuestHelperConfig config, int choiceId, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = null;
@@ -112,7 +112,7 @@ public class WidgetChoiceStep
 		this.childId = childId;
 	}
 
-	public WidgetChoiceStep(QuestHelperConfig config, int choiceId, String choice, int groupId, int childId)
+	public WidgetChoiceStep(MQuestHelperConfig config, int choiceId, String choice, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = choice;
@@ -122,7 +122,7 @@ public class WidgetChoiceStep
 		this.childId = childId;
 	}
 
-	public WidgetChoiceStep(QuestHelperConfig config, int choiceId, Pattern pattern, int groupId, int childId)
+	public WidgetChoiceStep(MQuestHelperConfig config, int choiceId, Pattern pattern, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = null;

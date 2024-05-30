@@ -26,7 +26,7 @@ package net.runelite.client.plugins.inventorysetups.ui;
 
 
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsSection;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsValidName;
 import net.runelite.client.ui.ColorScheme;
@@ -40,7 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-import static net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin.MAX_SETUP_NAME_LENGTH;
+import static net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin.MAX_SETUP_NAME_LENGTH;
 
 // Standard panel for inventory setups, which contains all the configuration buttons
 public class InventorySetupsStandardPanel extends InventorySetupsPanel implements InventorySetupsValidName
@@ -96,7 +96,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 
 	static
 	{
-		final BufferedImage bankFilterImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "filter_icon.png");
+		final BufferedImage bankFilterImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "filter_icon.png");
 		final BufferedImage bankFilterHover = ImageUtil.luminanceOffset(bankFilterImg, -150);
 		BANK_FILTER_ICON = new ImageIcon(bankFilterImg);
 		BANK_FILTER_HOVER_ICON = new ImageIcon(bankFilterHover);
@@ -104,7 +104,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_BANK_FILTER_ICON = new ImageIcon(bankFilterHover);
 		NO_BANK_FILTER_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(bankFilterHover, -100));
 
-		final BufferedImage unorderedHighlightImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "unordered_highlight_icon.png");
+		final BufferedImage unorderedHighlightImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "unordered_highlight_icon.png");
 		final BufferedImage unorderedHighlightHover = ImageUtil.luminanceOffset(unorderedHighlightImg, -150);
 		UNORDERED_HIGHLIGHT_ICON = new ImageIcon(unorderedHighlightImg);
 		UNORDERED_HIGHLIGHT_HOVER_ICON = new ImageIcon(unorderedHighlightHover);
@@ -112,7 +112,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_UNORDERED_HIGHLIGHT_ICON = new ImageIcon(unorderedHighlightHover);
 		NO_UNORDERED_HIGHLIGHT_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(unorderedHighlightHover, -100));
 
-		final BufferedImage favoriteImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "favorite_icon.png");
+		final BufferedImage favoriteImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "favorite_icon.png");
 		final BufferedImage favoriteHover = ImageUtil.luminanceOffset(favoriteImg, -150);
 		FAVORITE_ICON = new ImageIcon(favoriteImg);
 		FAVORITE_HOVER_ICON = new ImageIcon(favoriteHover);
@@ -120,7 +120,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_FAVORITE_ICON = new ImageIcon(favoriteHover);
 		NO_FAVORITE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(favoriteHover, -100));
 
-		final BufferedImage highlightToggleImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "highlight_icon.png");
+		final BufferedImage highlightToggleImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "highlight_icon.png");
 		final BufferedImage highlightToggleHover = ImageUtil.luminanceOffset(highlightToggleImg, -150);
 		TOGGLE_HIGHLIGHT_ICON = new ImageIcon(highlightToggleImg);
 		TOGGLE_HIGHLIGHT_HOVER_ICON = new ImageIcon(highlightToggleHover);
@@ -128,7 +128,7 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_TOGGLE_HIGHLIGHT_ICON = new ImageIcon(highlightToggleHover);
 		NO_TOGGLE_HIGHLIGHT_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(highlightToggleHover, -100));
 
-		final BufferedImage highlightImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "highlight_color_icon.png");
+		final BufferedImage highlightImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "highlight_color_icon.png");
 		final BufferedImage highlightHover = ImageUtil.luminanceOffset(highlightImg, -150);
 		HIGHLIGHT_COLOR_ICON = new ImageIcon(highlightImg);
 		HIGHLIGHT_COLOR_HOVER_ICON = new ImageIcon(highlightHover);
@@ -136,17 +136,17 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		NO_HIGHLIGHT_COLOR_ICON = new ImageIcon(highlightHover);
 		NO_HIGHLIGHT_COLOR_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(highlightHover, -100));
 
-		final BufferedImage viewImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "visible_icon.png");
+		final BufferedImage viewImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "visible_icon.png");
 		final BufferedImage viewImgHover = ImageUtil.luminanceOffset(viewImg, -150);
 		VIEW_SETUP_ICON = new ImageIcon(viewImg);
 		VIEW_SETUP_HOVER_ICON = new ImageIcon(viewImgHover);
 
-		final BufferedImage exportImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "export_icon.png");
+		final BufferedImage exportImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "export_icon.png");
 		final BufferedImage exportImgHover = ImageUtil.luminanceOffset(exportImg, -150);
 		EXPORT_ICON = new ImageIcon(exportImg);
 		EXPORT_HOVER_ICON = new ImageIcon(exportImgHover);
 
-		final BufferedImage deleteImg = ImageUtil.loadImageResource(InventorySetupsPlugin.class, "delete_icon.png");
+		final BufferedImage deleteImg = ImageUtil.loadImageResource(MInventorySetupsPlugin.class, "delete_icon.png");
 		DELETE_ICON = new ImageIcon(deleteImg);
 		DELETE_HOVER_ICON = new ImageIcon(ImageUtil.luminanceOffset(deleteImg, -100));
 
@@ -154,12 +154,12 @@ public class InventorySetupsStandardPanel extends InventorySetupsPanel implement
 		DISPLAY_COLOR_HOVER_ICON = new ImageIcon(highlightHover);
 	}
 
-	InventorySetupsStandardPanel(InventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section)
+	InventorySetupsStandardPanel(MInventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section)
 	{
 		this(plugin, panel, invSetup, section, true);
 	}
 
-	InventorySetupsStandardPanel(InventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section, boolean allowEditable)
+	InventorySetupsStandardPanel(MInventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section, boolean allowEditable)
 	{
 		super(plugin, panel, invSetup, section, allowEditable);
 

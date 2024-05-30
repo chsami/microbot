@@ -24,7 +24,6 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.cooksassistant;
 
-import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.questhelper.QuestDescriptor;
 import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;

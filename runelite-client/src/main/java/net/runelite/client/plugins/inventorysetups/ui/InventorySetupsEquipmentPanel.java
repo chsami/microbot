@@ -29,7 +29,7 @@ import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsSlotID;
 import net.runelite.client.ui.ColorScheme;
 
@@ -44,7 +44,7 @@ public class InventorySetupsEquipmentPanel extends InventorySetupsContainerPanel
 {
 	private Map<EquipmentInventorySlot, InventorySetupsSlot> equipmentSlots;
 
-	InventorySetupsEquipmentPanel(final ItemManager itemManager, final InventorySetupsPlugin plugin)
+	InventorySetupsEquipmentPanel(final ItemManager itemManager, final MInventorySetupsPlugin plugin)
 	{
 		super(itemManager, plugin, "Equipment");
 	}

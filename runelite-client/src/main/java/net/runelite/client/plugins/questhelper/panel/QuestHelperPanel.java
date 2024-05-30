@@ -25,8 +25,8 @@
 package net.runelite.client.plugins.questhelper.panel;
 
 import net.runelite.client.plugins.questhelper.Icon;
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
@@ -77,7 +77,7 @@ public class QuestHelperPanel extends PluginPanel
 
 	private final ArrayList<QuestSelectPanel> questSelectPanels = new ArrayList<>();
 
-	QuestHelperPlugin questHelperPlugin;
+	MQuestHelperPlugin questHelperPlugin;
 
 	private static final ImageIcon DISCORD_ICON;
 	private static final ImageIcon GITHUB_ICON;
@@ -92,7 +92,7 @@ public class QuestHelperPanel extends PluginPanel
 		SETTINGS_ICON = Icon.SETTINGS.getIcon(img -> ImageUtil.resizeImage(img, 16, 16));
 	}
 
-	public QuestHelperPanel(QuestHelperPlugin questHelperPlugin)
+	public QuestHelperPanel(MQuestHelperPlugin questHelperPlugin)
 	{
 		super(false);
 
@@ -273,7 +273,7 @@ public class QuestHelperPanel extends PluginPanel
 		showMatchingQuests("");
 
 		// Filters
-		filterDropdown = makeNewDropdown(QuestHelperConfig.QuestFilter.displayFilters(), "filterListBy");
+		filterDropdown = makeNewDropdown(MQuestHelperConfig.QuestFilter.displayFilters(), "filterListBy");
 		JPanel filtersPanel = makeDropdownPanel(filterDropdown, "Filters");
 		filtersPanel.setPreferredSize(new Dimension(PANEL_WIDTH, DROPDOWN_HEIGHT));
 
@@ -281,7 +281,7 @@ public class QuestHelperPanel extends PluginPanel
 		JPanel difficultyPanel = makeDropdownPanel(difficultyDropdown, "Difficulty");
 		difficultyPanel.setPreferredSize(new Dimension(PANEL_WIDTH, DROPDOWN_HEIGHT));
 
-		orderDropdown = makeNewDropdown(QuestHelperConfig.QuestOrdering.values(), "orderListBy");
+		orderDropdown = makeNewDropdown(MQuestHelperConfig.QuestOrdering.values(), "orderListBy");
 		JPanel orderPanel = makeDropdownPanel(orderDropdown, "Ordering");
 		orderPanel.setPreferredSize(new Dimension(PANEL_WIDTH, DROPDOWN_HEIGHT));
 
@@ -343,7 +343,7 @@ public class QuestHelperPanel extends PluginPanel
 			if (e.getStateChange() == ItemEvent.SELECTED)
 			{
 				Enum source = (Enum) e.getItem();
-				questHelperPlugin.getConfigManager().setConfiguration(QuestHelperConfig.QUEST_HELPER_GROUP, key,
+				questHelperPlugin.getConfigManager().setConfiguration(MQuestHelperConfig.QUEST_HELPER_GROUP, key,
 					source);
 			}
 		});
@@ -386,7 +386,7 @@ public class QuestHelperPanel extends PluginPanel
 	}
 
 	public void refresh(List<QuestHelper> questHelpers, boolean loggedOut,
-						Map<QuestHelperQuest, QuestState> completedQuests, QuestHelperConfig.QuestFilter... questFilters)
+						Map<QuestHelperQuest, QuestState> completedQuests, MQuestHelperConfig.QuestFilter... questFilters)
 	{
 		questSelectPanels.forEach(questListPanel::remove);
 		questSelectPanels.clear();
@@ -397,7 +397,7 @@ public class QuestHelperPanel extends PluginPanel
 
 		if (questFilters.length > 0)
 		{
-			for (QuestHelperConfig.QuestFilter questFilter : questFilters)
+			for (MQuestHelperConfig.QuestFilter questFilter : questFilters)
 			{
 				List<QuestHelper> filterList = questHelpers.stream()
 					.filter(questFilter)

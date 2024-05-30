@@ -29,7 +29,7 @@ import net.runelite.api.Varbits;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsSlotID;
 
 import java.util.Arrays;
@@ -46,7 +46,7 @@ public class InventorySetupsRunePouchPanel extends InventorySetupsAmmunitionPane
 
 	public static final List<Integer> RUNE_POUCH_RUNE_VARBITS = Arrays.asList(Varbits.RUNE_POUCH_RUNE1, Varbits.RUNE_POUCH_RUNE2, Varbits.RUNE_POUCH_RUNE3, Varbits.RUNE_POUCH_RUNE4);
 
-	InventorySetupsRunePouchPanel(ItemManager itemManager, InventorySetupsPlugin plugin)
+	InventorySetupsRunePouchPanel(ItemManager itemManager, MInventorySetupsPlugin plugin)
 	{
 		super(itemManager, plugin, "Rune Pouch");
 	}

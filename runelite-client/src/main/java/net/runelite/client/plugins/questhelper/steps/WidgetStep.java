@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import lombok.Setter;
 import net.runelite.api.widgets.Widget;
@@ -52,7 +52,7 @@ public class WidgetStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 		for (WidgetDetails widgetDetail : widgetDetails)

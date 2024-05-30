@@ -69,7 +69,7 @@ public enum Icon
 	 */
 	public BufferedImage getImage()
 	{
-		return ImageUtil.loadImageResource(QuestHelperPlugin.class, file);
+		return ImageUtil.loadImageResource(MQuestHelperPlugin.class, file);
 	}
 
 	/**

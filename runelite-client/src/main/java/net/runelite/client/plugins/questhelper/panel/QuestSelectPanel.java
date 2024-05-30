@@ -25,7 +25,7 @@
 package net.runelite.client.plugins.questhelper.panel;
 
 import net.runelite.client.plugins.questhelper.Icon;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import lombok.Getter;
 import net.runelite.api.QuestState;
@@ -47,7 +47,7 @@ public class QuestSelectPanel extends JPanel
 
 	private static final ImageIcon START_ICON = Icon.START.getIcon();
 
-	public QuestSelectPanel(QuestHelperPlugin questHelperPlugin, QuestHelperPanel questHelperPanel, QuestHelper questHelper, QuestState questState)
+	public QuestSelectPanel(MQuestHelperPlugin questHelperPlugin, QuestHelperPanel questHelperPanel, QuestHelper questHelper, QuestState questState)
 	{
 		this.questHelper = questHelper;
 

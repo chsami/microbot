@@ -28,10 +28,10 @@ import net.runelite.client.config.*;
 
 import java.awt.*;
 
-import static net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin.*;
+import static net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin.*;
 
-@ConfigGroup(InventorySetupsPlugin.CONFIG_GROUP)
-public interface InventorySetupsConfig extends Config
+@ConfigGroup(MInventorySetupsPlugin.CONFIG_GROUP)
+public interface MInventorySetupsConfig extends Config
 {
 
 	@ConfigSection(

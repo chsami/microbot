@@ -60,6 +60,8 @@ public class MagicScript extends Script {
                 if (config.MODE() == SPELLS.NONE)
                     return;
 
+                Rs2Tab.switchToMagicTab();
+
                 Widget widget = Microbot.getClient().getWidget(config.MODE().getSpell().getSpell().getWidgetId());
 
                 if (config.MODE().getSpell().getLevel() > Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC)) {

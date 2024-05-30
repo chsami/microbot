@@ -25,7 +25,7 @@
 package net.runelite.client.plugins.questhelper.requirements.item;
 
 import net.runelite.client.plugins.questhelper.KeyringCollection;
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
@@ -103,7 +103,7 @@ public class KeyringRequirement extends ItemRequirement
 
 	@Override
 	public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
-										 List<Item> bankItems, QuestHelperConfig config)
+										 List<Item> bankItems, MQuestHelperConfig config)
 	{
 		Color color = config.failColour();
 		if (!this.isActualItem())

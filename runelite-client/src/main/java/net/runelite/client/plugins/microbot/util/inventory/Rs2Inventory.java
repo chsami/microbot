@@ -11,7 +11,6 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
@@ -700,19 +699,24 @@ public class Rs2Inventory {
     public static String[] getActionsForSlot(int slot) {
         return items().stream()
                 .filter(x -> x.slot == slot)
-                .map(x -> x.actions)
-                .findFirst().orElse(new String[]{});
+                .map(x -> x.getInventoryActions())
+                .findFirst().orElse(new String[] {});
     }
 
     public static List<Rs2Item> getInventoryFood() {
-        return items().stream()
-                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")))
+        long startTime = System.currentTimeMillis();
+        List<Rs2Item> items = items().stream()
+                .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")))
                 .collect(Collectors.toList());
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        System.out.println("Total time for loopz " + totalTime);
+        return items;
     }
 
     public static List<Rs2Item> getPotions() {
         return items().stream()
-                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a != null && a.equalsIgnoreCase("drink")))
+                .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("drink")))
                 .collect(Collectors.toList());
     }
 
@@ -1281,7 +1285,7 @@ public class Rs2Inventory {
 
         if (item == null) return false;
         if (action == null || action.isEmpty())
-            action = Arrays.stream(item.actions).findFirst().orElse("");
+            action = Arrays.stream(item.getInventoryActions()).findFirst().orElse("");
 
         return interact(item.id, action);
     }
@@ -1527,9 +1531,9 @@ public class Rs2Inventory {
         int param1;
         int identifier = 3;
         MenuAction menuAction = MenuAction.CC_OP;
+
         if (!action.isEmpty()) {
-            String[] actions;
-            actions = rs2Item.actions;
+            String[] actions = rs2Item.getInventoryActions();
 
             for (int i = 0; i < actions.length; i++) {
                 if (action.equalsIgnoreCase(actions[i])) {
@@ -1538,6 +1542,7 @@ public class Rs2Inventory {
                 }
             }
         }
+
         param0 = rs2Item.slot;
         if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")) {
             identifier++;

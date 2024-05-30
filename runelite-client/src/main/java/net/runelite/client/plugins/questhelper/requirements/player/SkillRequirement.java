@@ -27,8 +27,8 @@
 
 package net.runelite.client.plugins.questhelper.requirements.player;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class SkillRequirement extends AbstractRequirement
 	private boolean canBeBoosted;
 	private String displayText;
 	private Boosts boosts;
-	private QuestHelperPlugin questHelperPlugin;
+	private MQuestHelperPlugin questHelperPlugin;
 	private Boosts selectedSkill;
 	private int currentSkill;
 	private int highestBoost;
@@ -116,7 +116,7 @@ public class SkillRequirement extends AbstractRequirement
 		return skillLevel >= requiredLevel;
 	}
 
-	public boolean checkRange(Skill skill, int requiredLevel, Client client, QuestHelperConfig config)
+	public boolean checkRange(Skill skill, int requiredLevel, Client client, MQuestHelperConfig config)
 	{
 		for (Boosts boostSkills : boosts.values())
 		{
@@ -137,7 +137,7 @@ public class SkillRequirement extends AbstractRequirement
 		return requiredLevel - highestBoost <= currentSkill;
 	}
 
-	public int checkBoosted(Client client, QuestHelperConfig config)
+	public int checkBoosted(Client client, MQuestHelperConfig config)
 	{
 		int skillLevel = canBeBoosted ? Math.max(client.getBoostedSkillLevel(skill), client.getRealSkillLevel(skill)) :
 			client.getRealSkillLevel(skill);
@@ -175,7 +175,7 @@ public class SkillRequirement extends AbstractRequirement
 	}
 
 	@Override
-	public Color getColor(Client client, QuestHelperConfig config)
+	public Color getColor(Client client, MQuestHelperConfig config)
 	{
 		switch (checkBoosted(client, config)){
 			case 1:

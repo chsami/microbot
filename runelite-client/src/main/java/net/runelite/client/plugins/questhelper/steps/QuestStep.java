@@ -27,7 +27,7 @@ package net.runelite.client.plugins.questhelper.steps;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Module;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.QuestVarbits;
 import net.runelite.client.plugins.questhelper.VisibilityHelper;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
@@ -349,7 +349,7 @@ public abstract class QuestStep implements Module
 		addWidgetLastLoadedCondition(widgetValue, widgetGroupID, widgetChildID, choiceValue, 219, 1);
 	}
 
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
+	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
 	{
 		addTitleToPanel(panelComponent);
 
@@ -396,23 +396,23 @@ public abstract class QuestStep implements Module
 		this.iconItemID = iconItemID;
 	}
 
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 	}
 
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 	}
 
-	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 	}
 
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 	}
 
-	public void makeDirectionOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeDirectionOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 	}
 

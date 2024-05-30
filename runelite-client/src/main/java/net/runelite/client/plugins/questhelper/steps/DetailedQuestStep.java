@@ -27,10 +27,8 @@ package net.runelite.client.plugins.questhelper.steps;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.quest.QuestScript;
 import net.runelite.client.plugins.questhelper.QuestBank;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.QuestHelperWorldMapPoint;
 import net.runelite.client.plugins.questhelper.QuestTile;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
@@ -245,7 +243,7 @@ public class DetailedQuestStep extends QuestStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (client.getLocalPlayer() == null)
 		{
@@ -280,7 +278,7 @@ public class DetailedQuestStep extends QuestStep
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (client.getLocalPlayer() == null)
 		{
@@ -299,7 +297,7 @@ public class DetailedQuestStep extends QuestStep
 	}
 
 	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (client.getLocalPlayer() == null)
 		{
@@ -373,7 +371,7 @@ public class DetailedQuestStep extends QuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (hideRequirements)
 		{
@@ -383,7 +381,7 @@ public class DetailedQuestStep extends QuestStep
 		renderInventory(graphics);
 	}
 
-	public void makeDirectionOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeDirectionOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		if (!hideMinimapLines)
 		{
@@ -446,7 +444,7 @@ public class DetailedQuestStep extends QuestStep
 	}
 
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
+	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
 	{
 		super.makeOverlayHint(panelComponent, plugin, additionalText, new ArrayList<>());
 

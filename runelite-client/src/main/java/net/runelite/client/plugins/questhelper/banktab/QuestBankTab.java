@@ -29,7 +29,7 @@
 package net.runelite.client.plugins.questhelper.banktab;
 
 import com.google.common.primitives.Shorts;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.api.widgets.*;
@@ -89,13 +89,13 @@ public class QuestBankTab
 	@Inject
 	private QuestGrandExchangeInterface geButtonWidget;
 
-	private final QuestHelperPlugin questHelper;
+	private final MQuestHelperPlugin questHelper;
 
 	private final HashMap<Widget, BankTabItem> widgetItems = new HashMap<>();
 
 	private final HashMap<BankWidget, BankWidget> fakeToRealItem = new HashMap<>();
 
-	public QuestBankTab(QuestHelperPlugin questHelperPlugin)
+	public QuestBankTab(MQuestHelperPlugin questHelperPlugin)
 	{
 		questHelper = questHelperPlugin;
 	}
