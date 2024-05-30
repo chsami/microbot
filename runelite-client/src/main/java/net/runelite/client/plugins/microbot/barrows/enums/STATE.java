@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum STATE {
     BANKING,
-
+    ERROR,
+    WALKING,
+    CALCULATING,
     FIGHTHING_DHAROK,
     FIGHTHING_AHRIM,
     FIGHTHING_TORAG,

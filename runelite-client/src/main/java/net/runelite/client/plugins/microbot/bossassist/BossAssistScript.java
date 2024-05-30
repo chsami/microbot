@@ -210,7 +210,7 @@ public class BossAssistScript extends Script {
         }
 
         int currentSpecEnergy = Microbot.getClient().getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
-        if(currentSpecEnergy >= config.SPEC_WEAPON().getSpecEnergy() && Rs2Equipment.getEquippedItem(EquipmentInventorySlot.WEAPON).name != config.SPEC_WEAPON().getName()) {
+        if(currentSpecEnergy >= config.SPEC_WEAPON().getSpecEnergy() && Rs2Equipment.get(EquipmentInventorySlot.WEAPON).name != config.SPEC_WEAPON().getName()) {
             Rs2Inventory.wield(config.SPEC_WEAPON().getName());
             toggleSpecialAttack();
             if(Rs2Combat.getSpecState()) {
@@ -218,7 +218,7 @@ public class BossAssistScript extends Script {
             }
 
         }
-        else if (currentSpecEnergy >= config.SPEC_WEAPON().getSpecEnergy() && Rs2Equipment.getEquippedItem(EquipmentInventorySlot.WEAPON).name == config.SPEC_WEAPON().getName()) {
+        else if (currentSpecEnergy >= config.SPEC_WEAPON().getSpecEnergy() && Rs2Equipment.get(EquipmentInventorySlot.WEAPON).name == config.SPEC_WEAPON().getName()) {
             toggleSpecialAttack();
             if(Rs2Combat.getSpecState()) {
                 Rs2Npc.interact(currentTarget.id, "attack");

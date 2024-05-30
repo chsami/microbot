@@ -45,7 +45,7 @@ public class Rs2Prayer {
 
         boolean isQuickPrayerSet = Microbot.getVarbitValue(4102) > 0;
         if (!isQuickPrayerSet) return false;
-        
+
         if (Rs2Widget.isHidden(10485779)) return false;
         if (on == bit) return true;
 
