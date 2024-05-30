@@ -51,7 +51,7 @@ enum State {
 }
 
 public class VorkathScript extends Script {
-    public static String version = "1.1.2";
+    public static String version = "1.1.3";
 
     State state = State.ZOMBIE_SPAWN;
 

@@ -34,7 +34,7 @@ public class GemsScript extends Script {
                         Rs2Bank.depositAll(config.gemType().getName());
                         if(Rs2Bank.hasItem(uncutGemName)) {
                             Rs2Bank.withdrawItem(true, "chisel");
-                            Rs2Bank.withdrawItemAll(true, uncutGemName);
+                            Rs2Bank.withdrawAll(true, uncutGemName);
                         } else{
                             Microbot.showMessage("Run out of Materials");
                             shutdown();

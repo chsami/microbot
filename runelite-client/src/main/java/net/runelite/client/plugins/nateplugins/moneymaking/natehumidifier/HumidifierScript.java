@@ -75,11 +75,11 @@ public class HumidifierScript extends Script {
             }
 
             if (!hasAstralRunes) {
-                Rs2Bank.withdrawItemAll(true, "astral rune");
+                Rs2Bank.withdrawAll(true, "astral rune");
                 sleepUntil(() -> Rs2Inventory.hasItem(ItemID.ASTRAL_RUNE));
             }
 
-            Rs2Bank.withdrawItemAll(true, config.ITEM().getName());
+            Rs2Bank.withdrawAll(true, config.ITEM().getName(), true);
             sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(config.ITEM().getName()));
             Rs2Bank.closeBank();
             sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());
