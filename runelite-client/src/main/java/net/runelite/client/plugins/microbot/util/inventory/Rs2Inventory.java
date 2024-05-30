@@ -710,7 +710,6 @@ public class Rs2Inventory {
                 .collect(Collectors.toList());
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
-        System.out.println("Total time for loopz " + totalTime);
         return items;
     }
 
