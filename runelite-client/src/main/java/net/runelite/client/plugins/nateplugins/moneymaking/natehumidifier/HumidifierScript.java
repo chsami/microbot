@@ -16,7 +16,7 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 public class HumidifierScript extends Script {
 
-    public static double version = 1.6;
+    public static String version = "1.6.1";
     private static long itemsProcessed = 0;
     public static String itemsProcessedMessage = "";
     public static String profitMessage = "Calculating...";
