@@ -51,4 +51,16 @@ public interface AutoWoodcuttingConfig extends Config {
     {
         return Integer.MAX_VALUE;
     }
+
+    @ConfigItem(
+            keyName = "Hop",
+            name = "Autohop when player detected",
+            description = "Auto hop when a nearby player is detected",
+            position = 2,
+            section = generalSection
+    )
+    default boolean hopWhenPlayerDetected()
+    {
+        return false;
+    }
 }

@@ -33,8 +33,8 @@ public class AttackNpcScript extends Script {
         List<String> npcsToAttack = Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList());
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!super.run()) return;
                 if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
                 if (!config.toggleCombat()) return;
                 double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
                 if (Rs2Inventory.getInventoryFood().isEmpty() && treshHold < 10) return;

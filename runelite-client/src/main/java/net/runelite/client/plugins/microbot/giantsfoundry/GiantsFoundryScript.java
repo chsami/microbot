@@ -21,8 +21,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryState.*;
-import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.getEquippedItem;
+import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.get;
 
 public class GiantsFoundryScript extends Script {
 
@@ -38,22 +37,22 @@ public class GiantsFoundryScript extends Script {
         this.config = config;
         setState(State.CRAFTING_WEAPON, true);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) {
-                setState(state, true);
-                sleep(2000);
-                return;
-            }
             try {
-                final Rs2Item weapon = getEquippedItem(EquipmentInventorySlot.WEAPON);
-                final Rs2Item shield = getEquippedItem(EquipmentInventorySlot.SHIELD);
+                if (!super.run()) return;
+                if (!Microbot.isLoggedIn()) {
+                    setState(state, true);
+                    sleep(2000);
+                    return;
+                }
+                final Rs2Item weapon = get(EquipmentInventorySlot.WEAPON);
+                final Rs2Item shield = get(EquipmentInventorySlot.SHIELD);
                 if ((weapon != null || shield != null) && !weapon.name.equalsIgnoreCase("preform")) {
                     Microbot.showMessage(("Please start the script without any weapon or shield in your equipment slot."));
                     sleep(5000);
                     return;
                 }
-                if (!Rs2Equipment.isWearing("ice gloves")) {
-                    Microbot.showMessage(("Please start by wearing ice gloves."));
+                if (!Rs2Equipment.isWearing("ice gloves") && !Rs2Equipment.isWearing("smiths gloves")) {
+                    Microbot.showMessage(("Please start by wearing ice gloves or smiths gloves."));
                     sleep(5000);
                     return;
                 }

@@ -37,20 +37,20 @@ public class FletchingScript extends Script {
     public void run(FletchingConfig config) {
         fletchingMode = config.fletchingMode();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!Microbot.isLoggedIn())
-                return;
-
-            if (fletchingMode == FletchingMode.PROGRESSIVE && model.getFletchingItem() == null)
-                calculateItemToFletch();
-
-            if (!super.run()) return;
-
-            if (!configChecks(config)) return;
-
-            if (config.Afk() && Random.random(1, 100) == 2)
-                sleep(1000, 60000);
-
             try {
+                if (!Microbot.isLoggedIn())
+                    return;
+
+                if (fletchingMode == FletchingMode.PROGRESSIVE && model.getFletchingItem() == null)
+                    calculateItemToFletch();
+
+                if (!super.run()) return;
+
+                if (!configChecks(config)) return;
+
+                if (config.Afk() && Random.random(1, 100) == 2)
+                    sleep(1000, 60000);
+
                 boolean hasRequirementsToFletch;
                 boolean hasRequirementsToBank;
                 primaryItemToFletch = fletchingMode.getItemName();
@@ -115,7 +115,7 @@ public class FletchingScript extends Script {
         }
 
         if (!Rs2Inventory.hasItem(primaryItemToFletch)) {
-            Rs2Bank.withdrawX(true, primaryItemToFletch, fletchingMode.getAmount());
+            Rs2Bank.withdrawX(true, primaryItemToFletch, fletchingMode.getAmount(), true);
             sleepUntil(() -> Rs2Inventory.hasItem(primaryItemToFletch));
         }
 

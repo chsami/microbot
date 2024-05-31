@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps.choice;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
@@ -37,7 +37,7 @@ public class WidgetLastState extends WidgetChoiceStep
 	@Getter
 	private String lastVersionSeen;
 
-	public WidgetLastState(QuestHelperConfig config, String text, int groupId, int childId)
+	public WidgetLastState(MQuestHelperConfig config, String text, int groupId, int childId)
 	{
 		super(config, text, groupId, childId);
 	}

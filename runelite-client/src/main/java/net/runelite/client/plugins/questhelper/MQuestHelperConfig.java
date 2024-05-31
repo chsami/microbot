@@ -40,7 +40,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @ConfigGroup("questhelper")
-public interface QuestHelperConfig extends Config
+public interface MQuestHelperConfig extends Config
 {
 	String QUEST_HELPER_GROUP = "questhelper";
 	String QUEST_BACKGROUND_GROUP = "questhelpervars";

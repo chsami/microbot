@@ -55,7 +55,7 @@ import static net.runelite.client.ui.PluginPanel.PANEL_WIDTH;
 
 public class QuestOverviewPanel extends JPanel
 {
-	private final QuestHelperPlugin questHelperPlugin;
+	private final MQuestHelperPlugin questHelperPlugin;
 	public QuestHelper currentQuest;
 
 	private final JPanel questStepsContainer = new JPanel();
@@ -99,7 +99,7 @@ public class QuestOverviewPanel extends JPanel
 
 	private final List<QuestRequirementPanel> requirementPanels = new ArrayList<>();
 
-	public QuestOverviewPanel(QuestHelperPlugin questHelperPlugin)
+	public QuestOverviewPanel(MQuestHelperPlugin questHelperPlugin)
 	{
 		super();
 		this.questHelperPlugin = questHelperPlugin;
@@ -210,11 +210,11 @@ public class QuestOverviewPanel extends JPanel
 			if (e.getStateChange() == ItemEvent.SELECTED)
 			{
 				Enum source = (Enum) e.getItem();
-				questHelperPlugin.getConfigManager().setRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, key,
+				questHelperPlugin.getConfigManager().setRSProfileConfiguration(MQuestHelperConfig.QUEST_BACKGROUND_GROUP, key,
 					source);
 			}
 		});
-		String currentVal =  questHelperPlugin.getConfigManager().getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, key);
+		String currentVal =  questHelperPlugin.getConfigManager().getRSProfileConfiguration(MQuestHelperConfig.QUEST_BACKGROUND_GROUP, key);
 		for (Enum value : values)
 		{
 			if (value.name().equals(currentVal))

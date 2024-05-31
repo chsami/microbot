@@ -79,12 +79,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @PluginDescriptor(
-	name = "Quest Helper",
+	name = "Microbot Quest Helper",
 	description = "Helps you with questing",
-	tags = { "quest", "helper", "overlay" }
+	tags = { "quest", "helper", "overlay" },
+	enabledByDefault = true
 )
 @Slf4j
-public class QuestHelperPlugin extends Plugin
+public class MQuestHelperPlugin extends Plugin
 {
 	private static final int[] QUESTLIST_WIDGET_IDS = new int[]
 		{
@@ -185,7 +186,7 @@ public class QuestHelperPlugin extends Plugin
 
 	@Getter
 	@Inject
-	private QuestHelperConfig config;
+	private MQuestHelperConfig config;
 
 	@Getter
 	private static QuestHelper selectedQuest = null;
@@ -240,9 +241,9 @@ public class QuestHelperPlugin extends Plugin
 	private int lastTickBankUpdated = -1;
 
 	@Provides
-	QuestHelperConfig getConfig(ConfigManager configManager)
+	MQuestHelperConfig getConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(QuestHelperConfig.class);
+		return configManager.getConfig(MQuestHelperConfig.class);
 	}
 
 	@Override
@@ -457,12 +458,12 @@ public class QuestHelperPlugin extends Plugin
 			}
 		});
 
-		if (event.getGroup().equals(QuestHelperConfig.QUEST_BACKGROUND_GROUP))
+		if (event.getGroup().equals(MQuestHelperConfig.QUEST_BACKGROUND_GROUP))
 		{
 			clientThread.invokeLater(this::updateQuestList);
 		}
 
-		if (!event.getGroup().equals(QuestHelperConfig.QUEST_HELPER_GROUP))
+		if (!event.getGroup().equals(MQuestHelperConfig.QUEST_HELPER_GROUP))
 		{
 			return;
 		}
@@ -994,15 +995,15 @@ public class QuestHelperPlugin extends Plugin
 			Predicate<QuestHelper> pred = (questHelper) -> false;
 			if (config.highlightNeededQuestItems())
 			{
-				pred = pred.or(QuestHelperConfig.QuestFilter.QUEST);
+				pred = pred.or(MQuestHelperConfig.QuestFilter.QUEST);
 			}
 			if (config.highlightNeededMiniquestItems())
 			{
-				pred = pred.or(QuestHelperConfig.QuestFilter.MINIQUEST);
+				pred = pred.or(MQuestHelperConfig.QuestFilter.MINIQUEST);
 			}
 			if (config.highlightNeededAchievementDiaryItems())
 			{
-				pred = pred.or(QuestHelperConfig.QuestFilter.ACHIEVEMENT_DIARY);
+				pred = pred.or(MQuestHelperConfig.QuestFilter.ACHIEVEMENT_DIARY);
 			}
 
 			List<QuestHelper> filteredQuests = QuestHelperQuest.getQuestHelpers()

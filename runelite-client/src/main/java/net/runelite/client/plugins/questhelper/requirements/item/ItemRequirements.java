@@ -26,7 +26,7 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import lombok.Getter;
@@ -108,14 +108,14 @@ public class ItemRequirements extends ItemRequirement
 	}
 
 	@Override
-	public Color getColor(Client client, QuestHelperConfig config)
+	public Color getColor(Client client, MQuestHelperConfig config)
 	{
 		return this.check(client, true) ? config.passColour() : config.failColour();
 	}
 
 	@Override
 	public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
-										 List<Item> bankItems, QuestHelperConfig config)
+										 List<Item> bankItems, MQuestHelperConfig config)
 	{
 		Color color = config.failColour();
 		if (!this.isActualItem() && this.getItemRequirements() == null)

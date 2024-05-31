@@ -118,9 +118,10 @@ public class ShadesKillerScript extends Script {
         initScript = true;
         state = State.BANKING;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+
                 long startTime = System.currentTimeMillis();
 
                 if (initScript) {

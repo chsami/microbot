@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.runelite;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import lombok.Getter;
@@ -38,7 +38,7 @@ import java.util.Map;
 public class RuneliteRequirement extends AbstractRequirement
 {
 	@Getter
-	protected final String CONFIG_GROUP = QuestHelperConfig.QUEST_BACKGROUND_GROUP;
+	protected final String CONFIG_GROUP = MQuestHelperConfig.QUEST_BACKGROUND_GROUP;
 
 	protected final String displayText;
 	protected final String runeliteIdentifier;

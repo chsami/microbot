@@ -13,15 +13,12 @@ public class AutoLoginScript extends Script {
 
     public boolean run(AutoLoginConfig autoLoginConfig) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (Microbot.pauseAllScripts)
-                return;
-
-            Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
-            if (Microbot.getClientThread().runOnClientThread(() -> clickHereToPlayButton != null && !clickHereToPlayButton.isHidden())) {
-                Rs2Widget.clickWidget(clickHereToPlayButton.getId());
-            }
-
             try {
+                if (Microbot.pauseAllScripts)
+                    return;
+
+                if (!super.run()) return;
+
                 if (Microbot.getClient().getGameState() == GameState.LOGIN_SCREEN) {
                     if (autoLoginConfig.useRandomWorld()) {
                         new Login(Login.getRandomWorld(autoLoginConfig.isMember()));

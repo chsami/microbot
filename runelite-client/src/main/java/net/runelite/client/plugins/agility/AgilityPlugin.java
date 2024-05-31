@@ -244,7 +244,14 @@ public class AgilityPlugin extends Plugin
 		final TileItem item = itemDespawned.getItem();
 		final Tile tile = itemDespawned.getTile();
 
-		marksOfGrace.remove(tile);
+		RS2Item markOfGraceTile = marksOfGrace.stream()
+				.filter(x -> x.getTile().getWorldLocation().equals(tile.getWorldLocation()))
+				.findFirst()
+				.orElse(null);
+
+		if (markOfGraceTile != null) {
+			marksOfGrace.remove(markOfGraceTile);
+		}
 
 		if (item.getId() == ItemID.STICK && stickTile == tile)
 		{

@@ -2,12 +2,11 @@ package net.runelite.client.plugins.microbot.util;
 
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,7 +17,7 @@ public class MicrobotInventorySetup {
     static InventorySetup inventorySetup;
 
     private static boolean getInventorySetup(String name) {
-        inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        inventorySetup = MInventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
         if (inventorySetup == null) {
             Microbot.showMessage("Inventory load with name " + name + " not found!");
             Microbot.pauseAllScripts = true;
@@ -124,7 +123,7 @@ public class MicrobotInventorySetup {
     }
 
     public static boolean doesInventoryMatch(String name) {
-        inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        inventorySetup = MInventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
         if (inventorySetup == null) return false;
 
         Map<Integer, List<InventorySetupsItem>> groupedByItems = inventorySetup.getInventory().stream().collect(Collectors.groupingBy(InventorySetupsItem::getId));
@@ -148,8 +147,12 @@ public class MicrobotInventorySetup {
     }
 
     public static boolean doesEquipmentMatch(String name) {
-        inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
-        if (inventorySetup == null) return false;
+        inventorySetup = MInventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        if (inventorySetup == null) {
+            Microbot.showMessage("Inventory setup with name " + name + " has not found been found. Please make this inventory setup.");
+            sleep(5000);
+            return false;
+        }
         for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
             if (inventorySetupsItem.getId() == -1) continue;
             if (!Rs2Equipment.isWearing(inventorySetupsItem.getName(), true)) {
@@ -160,8 +163,12 @@ public class MicrobotInventorySetup {
     }
 
     public static boolean doesEquipmentMatch(String name, String ignoreItem) {
-        inventorySetup = InventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
-        if (inventorySetup == null) return false;
+        inventorySetup = MInventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        if (inventorySetup == null) {
+            Microbot.showMessage("Inventory setup with name " + name + " has not found been found. Please make this inventory setup.");
+            sleep(5000);
+            return false;
+        }
         for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
             if (inventorySetupsItem.getId() == -1) continue;
             if (inventorySetupsItem.getName().contains(ignoreItem)) continue;

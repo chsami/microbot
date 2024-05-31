@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.inventorysetups.ui;
 
 
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.util.LinkBrowser;
@@ -10,13 +10,13 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-import static net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin.SUGGESTION_LINK;
-import static net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin.TUTORIAL_LINK;
+import static net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin.SUGGESTION_LINK;
+import static net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin.TUTORIAL_LINK;
 
 public class InventorySetupsUpdateNewsPanel extends JPanel
 {
 
-	InventorySetupsUpdateNewsPanel(InventorySetupsPlugin plugin, InventorySetupsPluginPanel panel)
+	InventorySetupsUpdateNewsPanel(MInventorySetupsPlugin plugin, InventorySetupsPluginPanel panel)
 	{
 		final JLabel welcomeText = new JLabel("Inventory Setups " + plugin.getCurrentVersionString());
 		welcomeText.setFont(FontManager.getRunescapeBoldFont());

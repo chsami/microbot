@@ -88,12 +88,13 @@ import static net.runelite.client.plugins.inventorysetups.ui.InventorySetupsRune
 
 
 @PluginDescriptor(
-		name = PluginDescriptor.Mocrosoft + "Inventory Setups",
-		description = "Save gear setups for specific activities"
+		name = PluginDescriptor.Mocrosoft + "MInventory Setups",
+		description = "Save gear setups for specific activities",
+		enabledByDefault = true
 )
 
 @Slf4j
-public class InventorySetupsPlugin extends Plugin
+public class MInventorySetupsPlugin extends Plugin
 {
 
 	public static final String CONFIG_GROUP = "inventorysetups";
@@ -150,7 +151,7 @@ public class InventorySetupsPlugin extends Plugin
 
 	@Inject
 	@Getter
-	private InventorySetupsConfig config;
+	private MInventorySetupsConfig config;
 
 	@Inject
 	private Gson gson;
@@ -303,9 +304,9 @@ public class InventorySetupsPlugin extends Plugin
 	}
 
 	@Provides
-	InventorySetupsConfig getConfig(ConfigManager configManager)
+	MInventorySetupsConfig getConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(InventorySetupsConfig.class);
+		return configManager.getConfig(MInventorySetupsConfig.class);
 	}
 
 	@Subscribe

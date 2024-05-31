@@ -176,7 +176,7 @@ public class HerbRun extends ComplexStateQuestHelper
 
 		seed = new ItemRequirement("Seeds of your choice", ItemID.GUAM_SEED);
 
-		String seedName = configManager.getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS);
+		String seedName = configManager.getRSProfileConfiguration(MQuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS);
 
 		if (seedName != null)
 		{
@@ -185,12 +185,12 @@ public class HerbRun extends ComplexStateQuestHelper
 				seed.setId(Seed.valueOf(seedName).seedID);
 			} catch (IllegalArgumentException err)
 			{
-				questHelperPlugin.getConfigManager().setRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS, Seed.GUAM);
+				questHelperPlugin.getConfigManager().setRSProfileConfiguration(MQuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS, Seed.GUAM);
 			}
 			seed.setName(Text.titleCase(Seed.valueOf(seedName)) + " seed");
 		} else
 		{
-			questHelperPlugin.getConfigManager().setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS, Seed.GUAM);
+			questHelperPlugin.getConfigManager().setConfiguration(MQuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS, Seed.GUAM);
 		}
 		compost = new ItemRequirement("Compost", ItemCollections.COMPOST);
 
@@ -333,7 +333,7 @@ public class HerbRun extends ComplexStateQuestHelper
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if (!event.getGroup().equals(QuestHelperConfig.QUEST_BACKGROUND_GROUP))
+		if (!event.getGroup().equals(MQuestHelperConfig.QUEST_BACKGROUND_GROUP))
 		{
 			return;
 		}
@@ -348,7 +348,7 @@ public class HerbRun extends ComplexStateQuestHelper
 				questHelperPlugin.refreshBank();
 			} catch (IllegalArgumentException err)
 			{
-				questHelperPlugin.getConfigManager().setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS, Seed.GUAM);
+				questHelperPlugin.getConfigManager().setConfiguration(MQuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS, Seed.GUAM);
 			}
 		}
 		if (event.getKey().equals(GRACEFUL_OR_FARMING))

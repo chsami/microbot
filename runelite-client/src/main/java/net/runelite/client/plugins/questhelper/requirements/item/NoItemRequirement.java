@@ -26,7 +26,7 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.client.plugins.questhelper.requirements.util.ItemSlots;
 import net.runelite.api.Client;
 
@@ -62,7 +62,7 @@ public class NoItemRequirement extends ItemRequirement
 	}
 
 	@Override
-	public Color getColor(Client client, QuestHelperConfig config)
+	public Color getColor(Client client, MQuestHelperConfig config)
 	{
 		return check(client) ? config.passColour() : config.failColour();
 	}

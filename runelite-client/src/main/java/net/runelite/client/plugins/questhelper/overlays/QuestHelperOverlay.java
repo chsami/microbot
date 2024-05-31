@@ -27,7 +27,7 @@
  */
 package net.runelite.client.plugins.questhelper.overlays;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPriority;
@@ -40,10 +40,10 @@ public class QuestHelperOverlay extends OverlayPanel
 {
 	public static final Color TITLED_CONTENT_COLOR = new Color(190, 190, 190);
 
-	private final QuestHelperPlugin plugin;
+	private final MQuestHelperPlugin plugin;
 
 	@Inject
-	public QuestHelperOverlay(QuestHelperPlugin plugin)
+	public QuestHelperOverlay(MQuestHelperPlugin plugin)
 	{
 		this.plugin = plugin;
 		setPriority(OverlayPriority.HIGHEST);
