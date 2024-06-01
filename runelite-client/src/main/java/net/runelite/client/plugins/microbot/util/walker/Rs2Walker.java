@@ -7,16 +7,21 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
 import java.awt.*;
@@ -24,6 +29,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -532,6 +538,190 @@ public class Rs2Walker {
                         if (indexOfDestination == -1) continue;
                         if (indexOfOrigin == -1) continue;
                         if (indexOfDestination < indexOfOrigin) continue;
+
+                        // Handle Gliders
+                        if (b.isGnomeGlider()) {
+                            int TA_QUIR_PRIW = 9043972;
+                            int SINDARPOS = 9043975;
+                            int LEMANTO_ANDRA = 904978;
+                            int KAR_HEWO = 9043981;
+                            int GANDIUS = 9043984;
+                            int OOKOOKOLLY_UNDRI = 9043993;
+
+                            System.out.println("We're trying to use a Glider");
+                            System.out.println("Action: " + b.getAction());
+                            System.out.println("Hashcode: " + b.hashCode());
+                            System.out.println("Origin: " + b.getOrigin());
+                            System.out.println("Destination: " + b.getDestination());
+                            System.out.println("Display Information: " + b.getDisplayInfo());
+                            System.out.println("Object/NPC ID: " + b.getObjectId());
+
+                            NPC gliderNPC = Rs2Npc.getNpc(b.getObjectId());
+
+                            if (gliderNPC != null) {
+                                System.out.println("Found NPC: " + gliderNPC.getName() + " at location: " + gliderNPC.getWorldLocation());
+
+                                if (Rs2Camera.isTileOnScreen(gliderNPC.getLocalLocation())) {
+                                    if (Rs2Npc.hasLineOfSight(gliderNPC)) {
+                                        System.out.println("Interacting with NPC: " + gliderNPC.getName());
+                                        Rs2Npc.interact(gliderNPC.getName(), b.getAction());
+                                        sleep(1200, 1600);
+
+                                        switch (b.getDisplayInfo()) {
+                                            case "Gandius":
+                                                Rs2Widget.clickWidget(GANDIUS);
+                                            case "Sindarpos":
+                                                Rs2Widget.clickWidget(SINDARPOS);
+                                            case "Kar-Hewo":
+                                                Rs2Widget.clickWidget(KAR_HEWO);
+                                            case "Gnome Stronghold":
+                                                Rs2Widget.clickWidget(TA_QUIR_PRIW);
+                                            case "Lemanto Andra":
+                                                Rs2Widget.clickWidget(LEMANTO_ANDRA);
+                                            case "Ookookolly Undri":
+                                                Rs2Widget.clickWidget(OOKOOKOLLY_UNDRI);
+                                        }
+
+                                        sleep(2400, 3600);
+                                        return true;
+                                    } else {
+                                        System.out.println("Walking to NPC: " + gliderNPC.getName());
+                                        Rs2Walker.walkFastCanvas(path.get(i));
+                                        sleep(1200, 1600);
+                                    }
+                                } else {
+                                    System.out.println("NPC is not on screen, walking to location");
+                                    Rs2Walker.walkFastCanvas(path.get(i));
+                                    sleep(1200, 1600);
+                                }
+                            } else {
+                                System.out.println("Could not find NPC with ID: " + b.getObjectId());
+                            }
+                        }
+
+                        if (b.isFairyRing()) {
+                            Widget SLOT_ONE;
+                            Widget SLOT_TWO;
+                            Widget SLOT_THREE;
+                            Widget FAIRY_RING_TELEPORT_BUTTON = Rs2Widget.getWidget(26083354);
+
+                            Widget SLOT_ONE_CW_ROT = Rs2Widget.getWidget(26083347);
+                            Widget SLOT_ONE_ACW_ROT = Rs2Widget.getWidget(26083348);
+                            Widget SLOT_TWO_CW_ROT = Rs2Widget.getWidget(26083349);
+                            Widget SLOT_TWO_ACW_ROT = Rs2Widget.getWidget(26083350);
+                            Widget SLOT_THREE_CW_ROT = Rs2Widget.getWidget(26083351);
+                            Widget SLOT_THREE_ACW_ROT = Rs2Widget.getWidget(26083352);
+
+                            Map<Character, Integer> rotationMap = new HashMap<>() {{
+                                put('A', 0);
+                                put('B', 512);
+                                put('C', 1024);
+                                put('D', 1536);
+                                put('I', 0);
+                                put('J', 512);
+                                put('K', 1024);
+                                put('L', 1536);
+                                put('P', 0);
+                                put('Q', 512);
+                                put('R', 1024);
+                                put('S', 1536);
+                            }};
+
+                            System.out.println("We're trying to use a Fairy Ring");
+                            System.out.println("Transport Code: " + b.getDisplayInfo());
+                            String transportCode = b.getDisplayInfo();
+
+                            if (Rs2Equipment.isWearing("Dramen Staff") || Rs2Equipment.isWearing("Lunar Staff")) {
+                                Rs2GameObject.interact(29495, "configure");
+                            } else if (Rs2Inventory.hasItem("Dramen Staff")) {
+                                Rs2Inventory.equip("Dramen Staff");
+                                Rs2GameObject.interact(29495, "configure");
+                            } else if (Rs2Inventory.hasItem("Lunar Staff")) {
+                                Rs2Inventory.equip("Lunar Staff");
+                                Rs2GameObject.interact(29495, "configure");
+                            }
+                            sleep(2400, 3000);
+
+                            // Determine the desired rotation
+                            int desiredRotationSlotOne = rotationMap.get(transportCode.charAt(0));
+                            int desiredRotationSlotTwo = rotationMap.get(transportCode.charAt(1));
+                            int desiredRotationSlotThree = rotationMap.get(transportCode.charAt(2));
+                            System.out.println("Desired Slot rotations: " + desiredRotationSlotOne + " " + desiredRotationSlotTwo + " " + desiredRotationSlotThree);
+
+                            // Function to determine rotation direction
+                            BiFunction<Integer, Integer, String> rotationDirection = (current, desired) -> {
+                                // Calculate the number of steps in both directions
+                                int stepsACW = ((desired - current + 2048) % 2048) / 512;
+                                int stepsCW = ((current - desired + 2048) % 2048) / 512;
+
+                                System.out.println("CW Steps: " + stepsCW);
+                                System.out.println("ACW Steps: " + stepsACW);
+
+                                return stepsCW <= stepsACW ? "CW" : "ACW";
+                            };
+
+                            // Rotate SLOT ONE to the desired letter
+                            while (true) {
+                                SLOT_ONE = Rs2Widget.getWidget(26083331); // Refresh widget
+                                int currentRotationSlotOne = SLOT_ONE.getRotationY();
+                                System.out.println("Current Slot 1 RotY: " + currentRotationSlotOne);
+                                if (currentRotationSlotOne == desiredRotationSlotOne) {
+                                    break;
+                                }
+                                String direction = rotationDirection.apply(currentRotationSlotOne, desiredRotationSlotOne);
+                                if (direction.equals("CW")) {
+                                    System.out.println("Rotating Slot 1 CW");
+                                    Rs2Widget.clickWidget(SLOT_ONE_CW_ROT.getId());
+                                } else {
+                                    System.out.println("Rotating Slot 1 ACW");
+                                    Rs2Widget.clickWidget(SLOT_ONE_ACW_ROT.getId());
+                                }
+                                sleep(1200, 1800); // Maintain sleep time for better synchronization
+                            }
+
+                            // Rotate SLOT TWO to the desired letter
+                            while (true) {
+                                SLOT_TWO = Rs2Widget.getWidget(26083332); // Refresh widget
+                                int currentRotationSlotTwo = SLOT_TWO.getRotationY();
+                                System.out.println("Current Slot 2 RotY: " + currentRotationSlotTwo);
+                                if (currentRotationSlotTwo == desiredRotationSlotTwo) {
+                                    break;
+                                }
+                                String direction = rotationDirection.apply(currentRotationSlotTwo, desiredRotationSlotTwo);
+                                if (direction.equals("CW")) {
+                                    System.out.println("Rotating Slot 2 CW");
+                                    Rs2Widget.clickWidget(SLOT_TWO_CW_ROT.getId());
+                                } else {
+                                    System.out.println("Rotating Slot 2 ACW");
+                                    Rs2Widget.clickWidget(SLOT_TWO_ACW_ROT.getId());
+                                }
+                                sleep(1200, 1800); // Maintain sleep time for better synchronization
+                            }
+
+                            // Rotate SLOT THREE to the desired letter
+                            while (true) {
+                                SLOT_THREE = Rs2Widget.getWidget(26083333); // Refresh widget
+                                int currentRotationSlotThree = SLOT_THREE.getRotationY();
+                                System.out.println("Current Slot 3 RotY: " + currentRotationSlotThree);
+                                if (currentRotationSlotThree == desiredRotationSlotThree) {
+                                    break;
+                                }
+                                String direction = rotationDirection.apply(currentRotationSlotThree, desiredRotationSlotThree);
+                                if (direction.equals("CW")) {
+                                    System.out.println("Rotating Slot 3 CW");
+                                    Rs2Widget.clickWidget(SLOT_THREE_CW_ROT.getId());
+                                } else {
+                                    System.out.println("Rotating Slot 3 ACW");
+                                    Rs2Widget.clickWidget(SLOT_THREE_ACW_ROT.getId());
+                                }
+                                sleep(1200, 1800); // Maintain sleep time for better synchronization
+                            }
+
+                            // Once all slots are correctly set, click the teleport button
+                            Rs2Widget.clickWidget(FAIRY_RING_TELEPORT_BUTTON.getId());
+                            sleep(1200, 1600);
+                        }
+
 
                         if (path.get(i).equals(origin)) {
 

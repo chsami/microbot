@@ -446,7 +446,7 @@ public class Rs2Inventory {
     /**
      * Drop all items that fall under the gpValue
      *
-     * @param gpValue    minimum amount of gp required to not drop the item
+     * @param gpValue     minimum amount of gp required to not drop the item
      * @param ignoreItems List of items to not drop
      * @return
      */
@@ -1445,7 +1445,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param itemId
      * @param npcID
      * @return
@@ -1460,7 +1459,21 @@ public class Rs2Inventory {
     }
 
     /**
-     *
+     * @param itemId
+     * @param npc    for using items on specific NPCs rather than generalised.
+     * @return for banks Slayer - using items on Lizards/Gargoyles etc.
+     */
+    public static boolean useItemOnNpc(int itemId, NPC npc) {
+        if (Rs2Bank.isOpen()) return false;
+        use(itemId);
+        sleep(100);
+        if (!isItemSelected()) return false;
+        Rs2Npc.interact(npc);
+        sleep(1200);
+        return true;
+    }
+
+    /**
      * @param name
      * @param exact
      * @return
