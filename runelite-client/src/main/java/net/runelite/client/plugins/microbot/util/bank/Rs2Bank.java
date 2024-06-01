@@ -118,7 +118,17 @@ public class Rs2Bank {
      * @return boolean
      */
     public static boolean hasItem(String name) {
-        return findBankItem(name) != null;
+        return hasItem(name, false);
+    }
+
+    /**
+     *
+     * @param name
+     * @param exact
+     * @return
+     */
+    public static boolean hasItem(String name, boolean exact) {
+        return findBankItem(name, exact) != null;
     }
 
     /**
@@ -570,13 +580,28 @@ public class Rs2Bank {
         invokeMenu(HANDLE_ALL, rs2Item);
     }
 
-    public static void withdrawItemAll(boolean checkInv, String name) {
-        if (checkInv && !Rs2Bank.hasItem(name)) return;
-        withdrawItemAll(name);
+    public static void withdrawAll(boolean checkInv, String name) {
+        withdrawAll(checkInv, name, false);
     }
 
-    public static void withdrawItemAll(String name) {
-        withdrawAll(name);
+    /**
+     * withdraw all items identified by its name.
+     * @param checkInv check if item is already in inventory
+     * @param name item name
+     * @param exact name
+     */
+    public static void withdrawAll(boolean checkInv, String name, boolean exact) {
+        if (checkInv && !Rs2Bank.hasItem(name, exact)) return;
+        Rs2Item item = findBankItem(name, exact);
+        withdrawAll(item);
+    }
+
+    /**
+     *
+     * @param name
+     */
+    public static void withdrawAll(String name) {
+        withdrawAll(false, name, false);
     }
 
     /**
@@ -597,15 +622,6 @@ public class Rs2Bank {
      */
     public static void withdrawAll(String name, boolean exact) {
         withdrawAll(findBankItem(name, exact));
-    }
-
-    /**
-     * withdraw all items identified by its name
-     *
-     * @param name item name to search
-     */
-    public static void withdrawAll(String name) {
-        withdrawAll(findBankItem(name, false));
     }
 
     /**

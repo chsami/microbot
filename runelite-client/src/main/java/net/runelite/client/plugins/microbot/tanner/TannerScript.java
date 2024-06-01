@@ -58,7 +58,7 @@ public class TannerScript extends Script {
             if (Rs2Bank.isOpen()) {
 
                 if (!hasMoney) {
-                    Rs2Bank.withdrawItemAll(false,"Coins");
+                    Rs2Bank.withdrawAll(false,"Coins");
                 }
 
                 if (!hasHides || !hasRunEnergy) {
@@ -73,7 +73,7 @@ public class TannerScript extends Script {
                         shutdown();
                         return;
                     }
-                    Rs2Bank.withdrawItemAll(false, config.HIDE_TYPE().getItemName());
+                    Rs2Bank.withdrawAll(false, config.HIDE_TYPE().getItemName());
                 }
             }
         }

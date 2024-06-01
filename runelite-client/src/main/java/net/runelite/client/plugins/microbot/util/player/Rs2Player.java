@@ -269,8 +269,7 @@ public class Rs2Player {
     }
 
     public static boolean isFullHealth() {
-        return Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS)
-                == Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
+        return Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) >= Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
     }
 
     public static boolean isInMulti() {

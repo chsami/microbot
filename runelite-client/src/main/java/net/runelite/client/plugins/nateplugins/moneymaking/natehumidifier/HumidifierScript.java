@@ -16,7 +16,7 @@ import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 public class HumidifierScript extends Script {
 
-    public static double version = 1.6;
+    public static String version = "1.6.1";
     private static long itemsProcessed = 0;
     public static String itemsProcessedMessage = "";
     public static String profitMessage = "Calculating...";
@@ -75,11 +75,11 @@ public class HumidifierScript extends Script {
             }
 
             if (!hasAstralRunes) {
-                Rs2Bank.withdrawItemAll(true, "astral rune");
+                Rs2Bank.withdrawAll(true, "astral rune");
                 sleepUntil(() -> Rs2Inventory.hasItem(ItemID.ASTRAL_RUNE));
             }
 
-            Rs2Bank.withdrawItemAll(true, config.ITEM().getName());
+            Rs2Bank.withdrawAll(true, config.ITEM().getName(), true);
             sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(config.ITEM().getName()));
             Rs2Bank.closeBank();
             sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());
