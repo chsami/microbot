@@ -4,6 +4,7 @@ import net.runelite.api.MenuAction;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
 
@@ -36,6 +37,20 @@ public class Rs2Prayer {
 
     public static boolean isQuickPrayerEnabled() {
         return Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_ENABLED.getValue();
+    }
+
+
+    public static boolean toggleQuickPrayer(boolean on) {
+        boolean bit = Microbot.getVarbitValue(QUICK_PRAYER) == QUICK_PRAYER_ENABLED.getValue();
+
+        boolean isQuickPrayerSet = Microbot.getVarbitValue(4102) > 0;
+        if (!isQuickPrayerSet) return false;
+
+        if (Rs2Widget.isHidden(10485779)) return false;
+        if (on == bit) return true;
+
+        Microbot.doInvoke(new NewMenuEntry(-1, 10485779, MenuAction.CC_OP.getId(), 1, -1, "Quick-prayers"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        return true;
     }
 
     public static boolean isOutOfPrayer() {
