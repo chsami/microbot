@@ -82,7 +82,7 @@ class sHunterScript extends Script {
   def main(client: Client, config: sHunterConfig): Boolean = {
     println("Starting..1232131312313")
     if (!isLoggedIn()) {
-      return true
+      return 
     }
     // This is repulsive, excuse the mess.
     val initialLoc = Rs2Player.getWorldLocation
@@ -103,6 +103,10 @@ class sHunterScript extends Script {
   }
 
   // TO-DO SPONGE
+   // TRACKING WILL FIND IMPOSTER ID'S BUT FIGURING OUT HOW WE'RE GONNA ACTUALLY TRACK THE BRUSH
+   // IS REALLY HARD XD WE COULD JUST CLICK ON ALL BRUSHES WITH RING OF PURSUIT
+   // BUT THATS LAME AS FUCK!!!!!!!!!!!!!!!
+   //
   /*
 /// main tracking //
   ///////////////
@@ -134,9 +138,11 @@ class sHunterScript extends Script {
     val ourTrack = tracks.filter(x => Rs2GameObject.getGameObjectsWithinDistance(1,x.getWorldLocation).filter(x => x.getId == 19427) != null  )
   }
 */
-// main sally //
-  ///////////
 
+
+   // salammander catching //
+
+   
   // this may be terrible but i have no idea what to do here lol
   // it works tho
   class trapId(config: sHunterConfig) extends sHunterConfig {
@@ -144,6 +150,8 @@ class sHunterScript extends Script {
     val fulltrap: Int = config.salamanderMode().getFullTrap
   }
 
+
+   
   def sallyCatcher(loc: WorldPoint, trapsLocs: List[WorldPoint], trapId: trapId): Unit = {
    println("trap: " + trapId.opentrap)
     println("Sally Catcher")
@@ -185,7 +193,7 @@ class sHunterScript extends Script {
         case _ => println("")
         }
       )
-
+    // debug prints abound
     println("Case cleared")
   }
 
@@ -212,6 +220,7 @@ class sHunterScript extends Script {
   }
 
 
+   // grab our trap
 
   def getTrap(trap: GameObject) {
     println("Setting Trap")
@@ -222,13 +231,13 @@ class sHunterScript extends Script {
     }
     sleep(700)
     sleepUntil(() => Rs2GameObject.interact(trap))
+   
     val sallyCount = Rs2Inventory.count("salamander")
     // animation for getting traps is wonky and stops animating after run
     // this is the best we got :/
     sleepUntil(() => !Rs2Player.isMoving)
     sleep(500,750)
     sleepUntil(() => !Rs2Player.isAnimating)
-    println("Sally count 2: " + sallyCount + " " + Rs2Inventory.count("salamander"))
     sleep(1650, 2550)
   }
     // grab ropes and fishing net, could be prettier and more consistent.
@@ -238,6 +247,7 @@ class sHunterScript extends Script {
       println("found an empty trap...")
       Rs2GroundItem.interact("rope", "Take", groundXY.head, groundXY.last)
       sleepUntil(() => ropeCount < Rs2Inventory.count(ItemID.ROPE))
+      // this sucks vv
       sleep(1200,1750)
       // idk what replaced this interact() vvv
       Rs2GroundItem.interact("small fishing net", "Take", groundXY.head, groundXY.last)
@@ -255,12 +265,14 @@ class sHunterScript extends Script {
    Rs2GameObject.getGameObjectsWithinDistance(10,loc).filter(x => (x.getId == traps.opentrap) || (x.getId == traps.fulltrap)).toList
   }
 
+   // reloading our traps objectid's at worldpoint where traps were initially found
   def updateTraps(trapsLocs: List[WorldPoint]): List[GameObject] = {
     print("UPDATING")
     trapsLocs.take(checkTraps()).map(x => Rs2GameObject.getGameObject(x))
   }
 
   // Checking for items at all X(-1 -> 1), Y(-1 -> 1) for supplied (empty) traps
+   // this could be reduced to one for loop probably but it works and im lazy atm
   def checkGround(trap: GameObject): List[Int] = {
     val trapLoc = trap.getWorldLocation
     println("X: " + trapLoc.getX + " Y : " + trapLoc.getY)
