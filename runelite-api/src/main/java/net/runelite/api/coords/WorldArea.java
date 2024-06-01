@@ -30,12 +30,6 @@ import net.runelite.api.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import lombok.Getter;
-import net.runelite.api.CollisionData;
-import net.runelite.api.CollisionDataFlag;
-import net.runelite.api.Point;
-import net.runelite.api.Tile;
-import net.runelite.api.WorldView;
 
 /**
  * Represents an area on the world.
@@ -720,5 +714,16 @@ public class WorldArea
 		}
 
 		return list;
+	}
+
+	/**
+	 * Custom method for microbot
+	 * @param other
+	 * @return
+	 */
+	public boolean intersectsWith2D(WorldArea other)
+	{
+		Point distances = getAxisDistances(other);
+		return distances.getX() + distances.getY() == 0;
 	}
 }

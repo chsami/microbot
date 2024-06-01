@@ -212,17 +212,27 @@ public class Rs2Walker {
     }
 
     // takes an avg 200-300 ms
+    // Used mainly for agility, might have to tweak this for other stuff
     public static boolean canReach(WorldPoint worldPoint, int sizeX, int sizeY) {
         Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
         pathfindingExecutor.submit(pathfinder);
         sleepUntil(pathfinder::isDone);
-        boolean result = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 2, 2)
-                .intersectsWith(new WorldArea(worldPoint, sizeX + 2, sizeY + 2));
+        WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 3, 3);
+        WorldArea objectArea = new WorldArea(worldPoint, sizeX + 2, sizeY + 2);
+        boolean result = pathArea
+                .intersectsWith2D(objectArea);
         return result;
     }
 
     public static boolean canReach(WorldPoint worldPoint) {
-        return canReach(worldPoint, 1, 1);
+        Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
+        pathfindingExecutor.submit(pathfinder);
+        sleepUntil(pathfinder::isDone);
+        WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 1, 1);
+        WorldArea objectArea = new WorldArea(worldPoint, 1, 1);
+        boolean result = pathArea
+                .intersectsWith2D(objectArea);
+        return result;
     }
 
     public static boolean isCloseToRegion(int distance, int regionX, int regionY) {
