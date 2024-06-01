@@ -1547,6 +1547,9 @@ public class Rs2Inventory {
         if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")) {
             identifier++;
         }
+        if (action.equalsIgnoreCase("release")) {
+            identifier = 7;
+        }
         if (Rs2Bank.isOpen()) {
             if (action.equalsIgnoreCase("eat")) {
                 identifier += 7;

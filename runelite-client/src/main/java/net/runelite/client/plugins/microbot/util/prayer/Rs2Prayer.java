@@ -4,6 +4,7 @@ import net.runelite.api.MenuAction;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
 
