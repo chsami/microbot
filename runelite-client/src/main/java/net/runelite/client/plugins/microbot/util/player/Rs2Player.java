@@ -275,4 +275,15 @@ public class Rs2Player {
     public static boolean isInMulti() {
         return Microbot.getVarbitValue(Varbits.MULTICOMBAT_AREA) == VarbitValues.INSIDE_MULTICOMBAT_ZONE.getValue();
     }
+
+    public static boolean drinkPrayerPotionAt(int prayerPoints) {
+        if  (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= prayerPoints) {
+            return Rs2Inventory.interact("prayer potion", "drink");
+        }
+        return false;
+    }
+
+    public static boolean hasPrayerPoints() {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) > 0;
+    }
 }
