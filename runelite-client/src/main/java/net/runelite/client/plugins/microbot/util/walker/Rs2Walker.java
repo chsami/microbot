@@ -225,7 +225,14 @@ public class Rs2Walker {
     }
 
     public static boolean canReach(WorldPoint worldPoint) {
-        return canReach(worldPoint, 1, 1);
+        Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
+        pathfindingExecutor.submit(pathfinder);
+        sleepUntil(pathfinder::isDone);
+        WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 1, 1);
+        WorldArea objectArea = new WorldArea(worldPoint, 1, 1);
+        boolean result = pathArea
+                .intersectsWith2D(objectArea);
+        return result;
     }
 
     public static boolean isCloseToRegion(int distance, int regionX, int regionY) {
