@@ -10,7 +10,6 @@ import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
-import net.runelite.client.ui.overlay.components.TitleComponent;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -30,11 +29,6 @@ public class MicrobotOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         panelComponent.setPreferredSize(new Dimension(200, 300));
-        panelComponent.getChildren().add(TitleComponent.builder()
-                .text("Dangerous tiles: " + Rs2Tile.getDangerousGraphicsObjectTiles().size())
-                .color(Color.GREEN)
-                .build());
-
 
         for (Pair<WorldPoint, Integer> dangerousTile : Rs2Tile.getDangerousGraphicsObjectTiles()) {
             drawTile(graphics, dangerousTile.getKey(), Color.RED, dangerousTile.getValue().toString());
