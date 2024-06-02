@@ -42,6 +42,7 @@ public @interface PluginDescriptor {
     public String Spaghetti = "<html>[<font color=#DAD420>S</font>] ";
     public String SaCo = "<html>[<font color=#0d937b>S</font>] ";
     public String Bank = "<html>[<font color=#9900ff>B</font>] ";
+    public String Forn = "<html>[<font color=#AF2B1E>F</font>] ";
 
     String name();
 
