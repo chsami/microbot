@@ -181,8 +181,6 @@ public class AgilityScript extends Script {
                                 .filter(x -> x.getOperationX().check(Rs2Player.getWorldLocation().getX(), x.getRequiredX()) && x.getOperationY().check(Rs2Player.getWorldLocation().getY(), x.getRequiredY()))
                                 .map(AgilityObstacleModel::getObjectID).collect(Collectors.toList()));
 
-                        System.out.println(gameObject.getId());
-
                         if (gameObject == null) {
                             System.out.println("NO agility obstacle found.");
                         }

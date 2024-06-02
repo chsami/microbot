@@ -28,7 +28,6 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.RuneLiteProperties;
 import net.runelite.client.util.VerificationException;
 import net.runelite.http.api.RuneLiteAPI;
 import okhttp3.*;
@@ -88,7 +87,7 @@ public class ExternalPluginClient
 		HttpUrl manifest = pluginHubBase
 			.newBuilder()
 			.addPathSegment("manifest")
-			.addPathSegment(RuneLiteProperties.getPluginHubVersion().replace("-SNAPSHOT","") + "_" + name + ".js")
+			.addPathSegment("1.10.31" + "_" + name + ".js")
 			.build();
 		try (Response res = okHttpClient.newCall(new Request.Builder().url(manifest).build()).execute())
 		{

@@ -4,6 +4,7 @@ import net.runelite.api.MenuAction;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
@@ -19,6 +20,7 @@ public class Rs2Prayer {
     }
 
     public static void toggle(Rs2PrayerEnum name, boolean on) {
+        if (!Rs2Player.hasPrayerPoints()) return;
         final int varBit = name.getVarbit();
         if(!on) {
             if (Microbot.getVarbitValue(varBit) == 0) return;
