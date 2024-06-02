@@ -51,7 +51,7 @@ enum State {
 }
 
 public class VorkathScript extends Script {
-    public static String version = "1.1.3";
+    public static String version = "1.1.4";
 
     State state = State.ZOMBIE_SPAWN;
 
@@ -111,6 +111,7 @@ public class VorkathScript extends Script {
                 }
 
                 if (state == State.FIGHT_VORKATH  && Rs2Equipment.get(EquipmentInventorySlot.AMMO) == null) {
+                    leaveVorkath();
                     state = State.TELEPORT_AWAY;
                 }
 
@@ -377,7 +378,7 @@ public class VorkathScript extends Script {
      * will heal and drink pray pots
      */
     private void healAndDrinkPrayerPotion() {
-        while (Rs2Player.isFullHealth() && !Rs2Inventory.getInventoryFood().isEmpty()) {
+        while (!Rs2Player.isFullHealth() && !Rs2Inventory.getInventoryFood().isEmpty()) {
             Rs2Bank.closeBank();
             Rs2Player.eatAt(99);
             Rs2Player.waitForAnimation();
