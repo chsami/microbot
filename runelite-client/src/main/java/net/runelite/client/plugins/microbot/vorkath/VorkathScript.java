@@ -111,6 +111,7 @@ public class VorkathScript extends Script {
                 }
 
                 if (state == State.FIGHT_VORKATH  && Rs2Equipment.get(EquipmentInventorySlot.AMMO) == null) {
+                    leaveVorkath();
                     state = State.TELEPORT_AWAY;
                 }
 
