@@ -56,10 +56,5 @@ public class FornBirdhouseRunsPlugin extends Plugin {
     protected void shutDown() {
         fornBirdhouseRunsScript.shutdown();
         overlayManager.remove(fornBirdhouseRunsOverlay);
-        try {
-            pluginManager.stopPlugin(this);
-        } catch (PluginInstantiationException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
