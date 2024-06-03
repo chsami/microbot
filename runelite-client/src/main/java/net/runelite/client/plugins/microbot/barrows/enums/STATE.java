@@ -6,15 +6,16 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum STATE {
+    IDLE,
     BANKING,
     ERROR,
     WALKING,
     CALCULATING,
-    FIGHTHING_DHAROK,
-    FIGHTHING_AHRIM,
-    FIGHTHING_TORAG,
-    FIGHTHING_GUTHAN,
-    FIGHTHING_KARIL,
-    FIGHTHING_VERAC,
+    SEARCHING_GRAVE,
+    DIGGING,
+
+    LEAVING_CRYPT,
+
+    FIGHTHING;
 
 }

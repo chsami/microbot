@@ -19,4 +19,8 @@ public class Rs2Dialogue {
         return Rs2Widget.hasWidget("Select an Option");
     }
 
+    public static void selectOption() {
+        Rs2Keyboard.keyPress(KeyEvent.VK_1);
+    }
+
 }

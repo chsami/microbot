@@ -6,7 +6,7 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
 @ConfigGroup("Barrows")
-public interface BarrowsConfig extends Config {
+public interface AutoBarrowsConfig extends Config {
     @ConfigItem(
             keyName = "guide",
             name = "How to use",
@@ -14,7 +14,7 @@ public interface BarrowsConfig extends Config {
             position = 0
     )
     default String GUIDE() {
-        return "TODO Write this XD";
+        return "TODO: Write this XD";
     }
 
     @ConfigSection(

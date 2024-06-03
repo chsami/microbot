@@ -1,31 +1,32 @@
 package net.runelite.client.plugins.microbot.barrows;
 
-import net.runelite.api.NpcID;
+import net.runelite.api.Varbits;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.derangedarchaeologist.DerangedAchaeologistPlugin;
-import net.runelite.client.plugins.microbot.vorkath.VorkathScript;
+import net.runelite.client.plugins.microbot.barrows.models.TheBarrowsBrothers;
+import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.Map;
 
-public class BarrowsOverlay  extends OverlayPanel{
+public class AutoBarrowsOverlay  extends OverlayPanel{
 
-    BarrowsPlugin plugin;
+    private static final DecimalFormat REWARD_POTENTIAL_FORMATTER = new DecimalFormat("##0.00%");
+
+
+    AutoBarrowsPlugin plugin;
     @Inject
-    BarrowsOverlay(BarrowsPlugin plugin)
+    AutoBarrowsOverlay(AutoBarrowsPlugin plugin)
     {
         super(plugin);
         this.plugin = plugin;
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
-        setPriority(OverlayPriority.HIGH);
-
     }
 
 
@@ -35,8 +36,8 @@ public class BarrowsOverlay  extends OverlayPanel{
         panelComponent.getChildren().clear();
 
         panelComponent.getChildren().add(TitleComponent.builder()
-                .text("Pumsters Barrows V" + BarrowsScript.version)
-                .color(Color.GREEN)
+                .text("Auto Barrows V" + AutoBarrowsScript.version)
+                .color(Color.blue)
                 .build());
 
 
@@ -61,28 +62,58 @@ public class BarrowsOverlay  extends OverlayPanel{
                 .right(nextCrypt)
                 .build());
 
-        // Add the status of each Barrows Brother to the panel
-        Map<Integer, Boolean> barrowsBrothersStatus = plugin.getBarrowsBrothersStatus();
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("In Crypt: ")
+                .right(String.valueOf(plugin.isInCrypt()))
+                .build());
 
-        addBrotherStatus(barrowsBrothersStatus, NpcID.AHRIM_THE_BLIGHTED, "Ahrim");
-        addBrotherStatus(barrowsBrothersStatus, NpcID.DHAROK_THE_WRETCHED, "Dharok");
-        addBrotherStatus(barrowsBrothersStatus, NpcID.GUTHAN_THE_INFESTED, "Guthan");
-        addBrotherStatus(barrowsBrothersStatus, NpcID.KARIL_THE_TAINTED, "Karil");
-        addBrotherStatus(barrowsBrothersStatus, NpcID.TORAG_THE_CORRUPTED, "Torag");
-        addBrotherStatus(barrowsBrothersStatus, NpcID.VERAC_THE_DEFILED, "Verac");
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Prayer: ")
+                .right(String.valueOf(plugin.recommendedPrayer.getAction()))
+                .build());
+
+
+        final int rewardPotential = rewardPotential();
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Potential")
+                .right(REWARD_POTENTIAL_FORMATTER.format(rewardPotential / 1012f))
+                .rightColor(rewardPotential >= 756 && rewardPotential < 881 ? Color.GREEN : rewardPotential < 631 ? Color.WHITE : Color.YELLOW)
+                .build());
+
+
+        for (TheBarrowsBrothers brother : TheBarrowsBrothers.values())
+        {
+            final boolean brotherSlain = Microbot.getClient().getVarbitValue(brother.getKilledVarbit()) > 0;
+            String slain = brotherSlain ? "\u2713" : "\u2717";
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left(brother.getName())
+                    .right(slain)
+                    .rightFont(FontManager.getDefaultFont())
+                    .rightColor(brotherSlain ? Color.GREEN : Color.RED)
+                    .build());
+        }
+
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(plugin.barrowsScript.state.toString())
                     .build());
 
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left(Microbot.status.toString())
+                .build());
+
         return panelComponent.render(graphics);
     }
 
-    private void addBrotherStatus(Map<Integer, Boolean> statusMap, int npcId, String name) {
-        boolean isAlive = statusMap.getOrDefault(npcId, true);
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left(name)
-                .right(isAlive ? "Alive" : "Dead")
-                .build());
+    private int rewardPotential()
+    {
+        // this is from [proc,barrows_overlay_reward]
+        int brothers = Microbot.getClient().getVarbitValue(Varbits.BARROWS_KILLED_AHRIM)
+                + Microbot.getClient().getVarbitValue(Varbits.BARROWS_KILLED_DHAROK)
+                + Microbot.getClient().getVarbitValue(Varbits.BARROWS_KILLED_GUTHAN)
+                + Microbot.getClient().getVarbitValue(Varbits.BARROWS_KILLED_KARIL)
+                + Microbot.getClient().getVarbitValue(Varbits.BARROWS_KILLED_TORAG)
+                + Microbot.getClient().getVarbitValue(Varbits.BARROWS_KILLED_VERAC);
+        return Microbot.getClient().getVarbitValue(Varbits.BARROWS_REWARD_POTENTIAL) + brothers * 2;
     }
 
 //    @Override
