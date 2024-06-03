@@ -30,9 +30,9 @@ public class ExampleScript extends Script {
     public boolean run(ExampleConfig config) {
         Microbot.enableAutoRunOn = false;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
-
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
                 long startTime = System.currentTimeMillis();
 
                 //SCRIPT CODE COMES HERE

@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.betweenarock;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
@@ -197,7 +197,7 @@ public class PuzzleStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())

@@ -25,10 +25,8 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.quest.QuestScript;
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.overlay.DirectionArrow;
@@ -54,9 +52,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.questhelper.overlays.QuestHelperWorldOverlay.IMAGE_Z_OFFSET;
 
@@ -231,7 +226,7 @@ public class NpcStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		npcs.removeIf(npc -> npc.getId() == -1);
 
@@ -254,7 +249,7 @@ public class NpcStep extends DetailedQuestStep
 
 			if (questHelper.getConfig().showSymbolOverlay())
 			{
-				int zOffset = questHelper.getConfig().highlightStyleNpcs() == QuestHelperConfig.NpcHighlightStyle.TILE
+				int zOffset = questHelper.getConfig().highlightStyleNpcs() == MQuestHelperConfig.NpcHighlightStyle.TILE
 					? IMAGE_Z_OFFSET
 					: (npc.getLogicalHeight() / 2);
 

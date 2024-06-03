@@ -15,6 +15,7 @@ public class DefaultScript extends Script {
     public boolean run(CraftingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (Random.random(1, 255) == 2)
                     sleep(3000, 60000);
@@ -27,9 +28,9 @@ public class DefaultScript extends Script {
                         sleepUntil(() -> Rs2Bank.isOpen(), 5000);
                         if (!Rs2Bank.isOpen()) return;
                         Rs2Bank.withdrawItem(true, "needle");
-                        Rs2Bank.withdrawItemAll(true, "thread");
+                        Rs2Bank.withdrawAll(true, "thread");
                         if (!Rs2Inventory.hasItem("needle") || !Rs2Inventory.hasItem("thread")) return;
-                        Rs2Bank.withdrawItemAll(leather);
+                        Rs2Bank.withdrawAll(leather);
                     } else if (Rs2Inventory.hasItem(leather)) {
                         Rs2Bank.closeBank();
                         Rs2Inventory.combine("needle", leather);
@@ -41,7 +42,7 @@ public class DefaultScript extends Script {
                 } else {
                     Rs2Bank.openBank();
                     Rs2Bank.depositAll(craftedItem);
-                    Rs2Bank.withdrawItemAll(leather);
+                    Rs2Bank.withdrawAll(leather);
                     Rs2Bank.closeBank();
                 }
             } catch (Exception ex) {

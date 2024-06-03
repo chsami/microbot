@@ -29,9 +29,9 @@ public class CookingScript extends Script {
 
     public boolean run(int gameObjectId) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
-
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
                 String itemToCook = getItemToCook();
 
                 if (!Rs2Inventory.isFull() || !Rs2Inventory.hasItem(itemToCook)) {
@@ -47,7 +47,7 @@ public class CookingScript extends Script {
                             return;
                         }
                         Rs2Bank.depositAll();
-                        Rs2Bank.withdrawItemAll(true, itemToCook);
+                        Rs2Bank.withdrawAll(true, itemToCook);
                     }
                 }
 

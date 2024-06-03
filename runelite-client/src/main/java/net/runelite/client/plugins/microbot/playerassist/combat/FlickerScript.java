@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.playerassist.combat;
 
 import net.runelite.api.NPC;
 import net.runelite.api.events.NpcDespawned;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyle;
@@ -29,8 +30,9 @@ public class FlickerScript extends Script {
     public boolean run(PlayerAssistConfig config) {
         monsters.add(new Monster(3274, 426));
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
 
                 List<NPC> npcs = Rs2Npc.getNpcsForPlayer();
 

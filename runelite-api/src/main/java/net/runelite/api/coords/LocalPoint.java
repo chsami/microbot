@@ -76,19 +76,21 @@ public class LocalPoint
 	 *
 	 * @return coordinate if the tile is in the world view, otherwise null
 	 */
+	@Nullable
 	public static LocalPoint fromWorld(WorldView wv, WorldPoint world)
 	{
 		if (wv.getPlane() != world.getPlane())
 		{
 			return null;
 		}
-		return fromWorld(wv.getScene(), world.getX(), world.getY());
+		return fromWorld(wv, world.getX(), world.getY());
 	}
 
 	@Deprecated
+	@Nullable
 	public static LocalPoint fromWorld(Client client, int x, int y)
 	{
-		return fromWorld(client.getTopLevelWorldView().getScene(), x, y);
+		return fromWorld(client.getTopLevelWorldView(), x, y);
 	}
 
 	/**
@@ -99,9 +101,18 @@ public class LocalPoint
 	 * @param y      y-axis coordinate of the tile
 	 * @return coordinate if the tile is in the current scene, otherwise null
 	 */
+	@Nullable
 	public static LocalPoint fromWorld(WorldView wv, int x, int y)
 	{
-		return fromWorld(wv.getScene(), x, y);
+		if (!WorldPoint.isInScene(wv, x, y))
+		{
+			return null;
+		}
+
+		int baseX = wv.getBaseX();
+		int baseY = wv.getBaseY();
+
+		return fromScene(x - baseX, y - baseY, wv);
 	}
 
 	/**
@@ -112,6 +123,7 @@ public class LocalPoint
 	 * @param y      y-axis coordinate of the tile
 	 * @return coordinate if the tile is in the current scene, otherwise null
 	 */
+	@Nullable
 	public static LocalPoint fromWorld(Scene scene, int x, int y)
 	{
 		if (!WorldPoint.isInScene(scene, x, y))
@@ -159,6 +171,23 @@ public class LocalPoint
 	 * @param y      y-axis coordinate of the tile in Scene coords
 	 * @return true coordinate of the tile
 	 */
+	@Deprecated
+	public static LocalPoint fromScene(int x, int y)
+	{
+		return new LocalPoint(
+			(x << Perspective.LOCAL_COORD_BITS) + (1 << Perspective.LOCAL_COORD_BITS - 1),
+			(y << Perspective.LOCAL_COORD_BITS) + (1 << Perspective.LOCAL_COORD_BITS - 1)
+		);
+	}
+
+	/**
+	 * Gets the coordinate at the center of the passed tile.
+	 *
+	 * @param x      x-axis coordinate of the tile in Scene coords
+	 * @param y      y-axis coordinate of the tile in Scene coords
+	 * @param scene  scene containing the tile
+	 * @return true coordinate of the tile
+	 */
 	public static LocalPoint fromScene(int x, int y, Scene scene)
 	{
 		return new LocalPoint(
@@ -168,6 +197,23 @@ public class LocalPoint
 		);
 	}
 
+
+	/**
+	 * Gets the coordinate at the center of the passed tile.
+	 *
+	 * @param x      x-axis coordinate of the tile in Scene coords
+	 * @param y      y-axis coordinate of the tile in Scene coords
+	 * @param wv     wv containing the tile
+	 * @return true coordinate of the tile
+	 */
+	public static LocalPoint fromScene(int x, int y, WorldView wv)
+	{
+		return new LocalPoint(
+			(x << Perspective.LOCAL_COORD_BITS) + (1 << Perspective.LOCAL_COORD_BITS - 1),
+			(y << Perspective.LOCAL_COORD_BITS) + (1 << Perspective.LOCAL_COORD_BITS - 1),
+			wv.getId()
+		);
+	}
 
 	/**
 	 * Gets the x-axis coordinate in scene space (tiles).

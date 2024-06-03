@@ -1,7 +1,5 @@
-package net.runelite.client.plugins.microbot.quest;
+package net.runelite.client.plugins.microbot.scurrius;
 
-import net.runelite.api.Point;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -10,9 +8,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class QuestOverlay extends OverlayPanel {
+public class ScurriusOverlay extends OverlayPanel {
     @Inject
-    QuestOverlay(QuestPlugin plugin)
+    ScurriusOverlay(ScurriusPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -23,14 +21,14 @@ public class QuestOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Quester V" + QuestScript.version)
+                    .text("Micro Scurrius V" + ScurriusScript.version)
                     .color(Color.GREEN)
                     .build());
 
             panelComponent.getChildren().add(LineComponent.builder().build());
 
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left(Microbot.status)
+                    .left(ScurriusScript.state.toString())
                     .build());
 
 

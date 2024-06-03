@@ -25,8 +25,8 @@
  */
 package net.runelite.client.plugins.questhelper.overlays;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
@@ -45,10 +45,10 @@ public class QuestHelperWorldOverlay extends Overlay
 {
 	public static final int IMAGE_Z_OFFSET = 30;
 
-	private final QuestHelperPlugin plugin;
+	private final MQuestHelperPlugin plugin;
 
 	@Inject
-	public QuestHelperWorldOverlay(QuestHelperPlugin plugin)
+	public QuestHelperWorldOverlay(MQuestHelperPlugin plugin)
 	{
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
@@ -59,9 +59,9 @@ public class QuestHelperWorldOverlay extends Overlay
 	public Dimension render(Graphics2D graphics)
 	{
 		boolean noOverlaysDrawn = !plugin.getConfig().showSymbolOverlay()
-			&& plugin.getConfig().highlightStyleGroundItems() == QuestHelperConfig.GroundItemHighlightStyle.NONE
-			&& plugin.getConfig().highlightStyleNpcs() == QuestHelperConfig.NpcHighlightStyle.NONE
-			&& plugin.getConfig().highlightStyleObjects() == QuestHelperConfig.ObjectHighlightStyle.NONE;
+			&& plugin.getConfig().highlightStyleGroundItems() == MQuestHelperConfig.GroundItemHighlightStyle.NONE
+			&& plugin.getConfig().highlightStyleNpcs() == MQuestHelperConfig.NpcHighlightStyle.NONE
+			&& plugin.getConfig().highlightStyleObjects() == MQuestHelperConfig.ObjectHighlightStyle.NONE;
 		if (noOverlaysDrawn)
 		{
 			return null;

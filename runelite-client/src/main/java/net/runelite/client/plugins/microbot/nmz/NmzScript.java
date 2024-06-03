@@ -41,9 +41,10 @@ public class NmzScript extends Script {
         NmzScript.config = config;
         prayerPotionScript = new PrayerPotionScript();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+                Rs2Combat.enableAutoRetialiate();
                 if (Random.random(1, 50) == 1 && config.randomMouseMovements()) {
                     Microbot.getMouse().click(Random.random(0, Microbot.getClient().getCanvasWidth()), Random.random(0, Microbot.getClient().getCanvasHeight()), true);
                 }
@@ -78,7 +79,6 @@ public class NmzScript extends Script {
             if (canStartNmz()) {
                 consumeEmptyVial();
             } else {
-                Microbot.showMessage("Bot can't start because your overloads or absorption potions do not match the configured number in your plugin settings.");
                 sleep(2000);
             }
         }
@@ -187,6 +187,7 @@ public class NmzScript extends Script {
             Rs2Keyboard.typeString("1");
             Rs2Keyboard.enter();
             sleepUntil(() -> !Rs2Inventory.hasItem(objectId));
+            Rs2Inventory.dropAll(itemName);
         }
     }
 
@@ -205,16 +206,14 @@ public class NmzScript extends Script {
 
     public void consumeEmptyVial() {
         final int EMPTY_VIAL = 26291;
-        Rs2GameObject.interact(EMPTY_VIAL, "drink");
+        if (Microbot.getClientThread().runOnClientThread(() -> Rs2Widget.getWidget(129, 6) == null || Rs2Widget.getWidget(129, 6).isHidden())) {
+            Rs2GameObject.interact(EMPTY_VIAL, "drink");
+        }
         Widget widget = Rs2Widget.getWidget(129, 6);
-        System.out.println(Microbot.getClientThread().runOnClientThread(widget::isHidden));
-        if (widget != null && !Microbot.getClientThread().runOnClientThread(widget::isHidden)) {
+        if (!Microbot.getClientThread().runOnClientThread(widget::isHidden)) {
             Rs2Widget.clickWidget(widget.getId());
             sleep(300);
             Rs2Widget.clickWidget(widget.getId());
-            //Rs2Widget.clickWidgetFast(8454150, MenuAction.WIDGET_CONTINUE);
-            // MenuEntryImpl(getOption=Continue, getTarget=, getIdentifier=0, getType=WIDGET_CONTINUE, getParam0=-1, getParam1=8454150, getItemId=-1, isForceLeftClick=false, isDeprioritized=false)
-            sleep(5000);
         }
     }
 

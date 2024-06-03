@@ -1,15 +1,18 @@
 package net.runelite.client.plugins.microbot.util.player;
 
-import net.runelite.api.*;
+import net.runelite.api.Player;
+import net.runelite.api.Skill;
+import net.runelite.api.VarPlayer;
+import net.runelite.api.Varbits;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.globval.VarbitValues;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
-import net.runelite.client.plugins.microbot.globval.VarbitValues;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -17,10 +20,13 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static net.runelite.api.MenuAction.CC_OP;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 
 
 public class Rs2Player {
@@ -62,6 +68,9 @@ public class Rs2Player {
     public static boolean hasAntiPoisonActive() {
         return antiPoisonTime > 0;
     }
+
+    private static final Map<Player, Long> playerDetectionTimes = new ConcurrentHashMap<>();
+
     public static void handlePotionTimers(VarbitChanged event) {
         if (event.getVarbitId() == Varbits.ANTIFIRE) {
             antiFireTime = event.getValue();
@@ -93,22 +102,26 @@ public class Rs2Player {
     }
 
     public static void waitForWalking() {
-        sleepUntil(Rs2Player::isWalking);
+        boolean result = sleepUntilTrue(Rs2Player::isWalking, 100, 5000);
+        if (!result) return;
         sleepUntil(() -> !Rs2Player.isWalking());
     }
 
     public static void waitForWalking(int time) {
-        sleepUntil(Rs2Player::isWalking);
+        boolean result = sleepUntilTrue(Rs2Player::isWalking, 100, time);
+        if (!result) return;
         sleepUntil(() -> !Rs2Player.isWalking(), time);
     }
 
     public static void waitForAnimation() {
-        sleepUntil(Rs2Player::isAnimating);
+        boolean result = sleepUntilTrue(Rs2Player::isAnimating, 100, 5000);
+        if (!result) return;
         sleepUntil(() -> !Rs2Player.isAnimating());
     }
 
     public static void waitForAnimation(int time) {
-        sleepUntil(Rs2Player::isAnimating, time);
+        boolean result = sleepUntilTrue(Rs2Player::isAnimating, 100, time);
+        if (!result) return;
         sleepUntil(() -> !Rs2Player.isAnimating(), time);
     }
 
@@ -165,19 +178,71 @@ public class Rs2Player {
         //Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
     }
 
+    /**
+     *
+     * @param amountOfPlayers to detect before triggering logout
+     * @param time in milliseconds
+     * @param distance from the player
+     * @return
+     */
+    public static boolean logoutIfPlayerDetected(int amountOfPlayers, int time, int distance) {
+        List<Player> players = Microbot.getClient().getPlayers();
+        long currentTime = System.currentTimeMillis();
+
+        if (distance > 0) {
+            players = players.stream()
+                    .filter(x -> x != null && x.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) <= distance)
+                    .collect(Collectors.toList());
+        }
+        if (time > 0 && players.size() > amountOfPlayers) {
+            // Update detection times for currently detected players
+            for (Player player : players) {
+                playerDetectionTimes.putIfAbsent(player, currentTime);
+            }
+
+            // Remove players who are no longer detected
+            playerDetectionTimes.keySet().retainAll(players);
+
+            // Check if any player has been detected for longer than the specified time
+            for (Player player : players) {
+                long detectionTime = playerDetectionTimes.getOrDefault(player, 0L);
+                if (currentTime - detectionTime >= time) { // convert time to milliseconds
+                    logout();
+                    return true;
+                }
+            }
+        } else if (players.size() >= amountOfPlayers) {
+            logout();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param amountOfPlayers
+     * @param time
+     * @return
+     */
+    public static boolean logoutIfPlayerDetected(int amountOfPlayers, int time) {
+        return logoutIfPlayerDetected(amountOfPlayers, time, 0);
+    }
+
+    /**
+     *
+     * @param amountOfPlayers
+     * @return
+     */
+    public static boolean logoutIfPlayerDetected(int amountOfPlayers) {
+        return logoutIfPlayerDetected(amountOfPlayers, 0, 0);
+    }
+
     public static boolean eatAt(int percentage) {
         double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
-        int missingHitpoints = Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) - Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
         if (treshHold <= percentage) {
             List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
-            for (Rs2Item food : foods) {
-                if (missingHitpoints >= 40 && Rs2Inventory.get("Cooked karambwan") != null) {
-                    //double eat
-                    Rs2Inventory.interact(food, "eat");
-                    return Rs2Inventory.interact(Rs2Inventory.get("Cooked karambwan"), "eat");
-                } else {
-                    return Rs2Inventory.interact(food, "eat");
-                }
+            if (!foods.isEmpty()) {
+                return Rs2Inventory.interact(foods.get(0), "eat");
             }
         }
         return false;
@@ -204,11 +269,21 @@ public class Rs2Player {
     }
 
     public static boolean isFullHealth() {
-        return Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS)
-                == Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
+        return Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) >= Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
     }
 
     public static boolean isInMulti() {
         return Microbot.getVarbitValue(Varbits.MULTICOMBAT_AREA) == VarbitValues.INSIDE_MULTICOMBAT_ZONE.getValue();
+    }
+
+    public static boolean drinkPrayerPotionAt(int prayerPoints) {
+        if  (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= prayerPoints) {
+            return Rs2Inventory.interact("prayer potion", "drink");
+        }
+        return false;
+    }
+
+    public static boolean hasPrayerPoints() {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) > 0;
     }
 }

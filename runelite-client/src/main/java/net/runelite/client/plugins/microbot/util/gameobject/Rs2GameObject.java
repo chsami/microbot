@@ -323,30 +323,31 @@ public class Rs2GameObject {
             return null;
         }
 
-        for (int id : ids) {
-            for (GameObject gameObject: gameObjects) {
-                if (gameObject.getId() == id) {
-                    ObjectComposition objComp = convertGameObjectToObjectComposition(id);
+        GameObject gameObject = gameObjects.stream()
+                .filter(x -> ids.stream().anyMatch(id -> id == x.getId()))
+                .min(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(Rs2Player.getWorldLocation())))
+                .orElse(null);
 
-                    if (objComp == null) {
-                        continue;
-                    }
-                    String compName;
+        if (gameObject == null) return null;
 
-                    try {
-                        compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
-                    } catch (Exception e) {
-                        continue;
-                    }
+        ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject.getId());
 
-                    if (compName != null) {
-                        if (!exact && compName.toLowerCase().contains(name)) {
-                            return gameObject;
-                        } else if (exact && compName.equalsIgnoreCase(name)) {
-                            return gameObject;
-                        }
-                    }
-                }
+        if (objComp == null) {
+            return null;
+        }
+        String compName = null;
+
+        try {
+            compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        if (compName != null) {
+            if (!exact && compName.toLowerCase().contains(name)) {
+                return gameObject;
+            } else if (exact && compName.equalsIgnoreCase(name)) {
+                return gameObject;
             }
         }
 
@@ -495,11 +496,36 @@ public class Rs2GameObject {
         return null;
     }
 
+    public static TileObject findObject(List<Integer> ids) {
+        int distance = 0;
+        TileObject tileObject = null;
+        for (int id : ids) {
+            TileObject object = findObjectById(id);
+            if (object == null) continue;
+            if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance || tileObject == null) {
+                if (Rs2Player.getWorldLocation().getPlane() != object.getPlane()) continue;
+                if (object instanceof GroundObject && !Rs2Walker.canReach(object.getWorldLocation()))
+                    continue;
+
+                if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY()))
+                    continue;
+                tileObject = object;
+                distance = Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation());
+            }
+        }
+        return tileObject;
+    }
+
     public static TileObject findObject(int[] ids) {
+        int distance = 0;
         TileObject tileObject = null;
         for (int id :
                 ids) {
-            tileObject = findObjectById(id);
+            TileObject object = findObjectById(id);
+            if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance || tileObject == null) {
+                tileObject = object;
+                distance = Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation());
+            }
         }
         return tileObject;
     }

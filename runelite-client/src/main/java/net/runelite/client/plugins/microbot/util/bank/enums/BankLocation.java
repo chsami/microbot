@@ -2,7 +2,10 @@ package net.runelite.client.plugins.microbot.util.bank.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 
 @Getter
 @RequiredArgsConstructor
@@ -82,7 +85,19 @@ public enum BankLocation {
     WOODCUTTING_GUILD(new WorldPoint(1591, 3479, 0)),
     YANILLE(new WorldPoint(2613, 3093, 0)),
     ZANARIS(new WorldPoint(2383, 4458, 0)),
-    ZEAH_SAND_BANK(new WorldPoint(1719, 3465, 0));
+    ZEAH_SAND_BANK(new WorldPoint(1719, 3465, 0)),
+    PORT_KHAZARD(new WorldPoint(2664, 3161, 0)),
+    CRAFTING_GUILD(new WorldPoint(2936, 3281, 0));
 
     private final WorldPoint worldPoint;
+
+    public boolean hasRequirements() {
+        if (this == CRAFTING_GUILD) {
+            boolean hasLineOfSight = Microbot.getClient().getLocalPlayer().getWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), worldPoint);
+            if (hasLineOfSight) return true;
+            return Microbot.getClient().getRealSkillLevel(Skill.CRAFTING) >= 40
+                    && (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron"));
+        }
+        return true;
+    }
 }

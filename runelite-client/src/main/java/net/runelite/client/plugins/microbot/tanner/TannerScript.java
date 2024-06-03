@@ -27,8 +27,9 @@ public class TannerScript extends Script {
 
     public boolean run(TannerConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
 
                 if (config.LOCATION() == Location.AL_KHARID)
                     tanInAlkharid(config);
@@ -57,7 +58,7 @@ public class TannerScript extends Script {
             if (Rs2Bank.isOpen()) {
 
                 if (!hasMoney) {
-                    Rs2Bank.withdrawItemAll(false,"Coins");
+                    Rs2Bank.withdrawAll(false,"Coins");
                 }
 
                 if (!hasHides || !hasRunEnergy) {
@@ -72,7 +73,7 @@ public class TannerScript extends Script {
                         shutdown();
                         return;
                     }
-                    Rs2Bank.withdrawItemAll(false, config.HIDE_TYPE().getItemName());
+                    Rs2Bank.withdrawAll(false, config.HIDE_TYPE().getItemName());
                 }
             }
         }

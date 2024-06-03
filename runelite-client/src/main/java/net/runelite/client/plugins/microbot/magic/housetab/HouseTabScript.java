@@ -169,11 +169,10 @@ public class HouseTabScript extends Script {
         }
     }
 
-    long currentInventoryCount = 0;
-
     public boolean run(HouseTabConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (!hasSoftClayNoted() || !hasLawRune()) {
                     shutdown();

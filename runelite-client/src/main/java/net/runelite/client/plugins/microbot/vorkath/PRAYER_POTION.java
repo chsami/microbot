@@ -8,7 +8,8 @@ import lombok.val;
 @RequiredArgsConstructor
 public enum PRAYER_POTION {
     PRAYER("prayer potion"),
-    SUPER_RESTORE("Super restore potion");
+    SUPER_RESTORE("Super restore"),
+    MOONLIGHT_MOTH_MIX("Moonlight moth mix");
 
     private final String potionName;
 

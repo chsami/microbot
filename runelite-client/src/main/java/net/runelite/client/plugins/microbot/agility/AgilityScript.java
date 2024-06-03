@@ -11,11 +11,12 @@ import net.runelite.client.plugins.agility.Obstacles;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.agility.models.AgilityObstacleModel;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.awt.*;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.GNOME_STRONGHOLD_AGILITY_COURSE;
@@ -30,7 +32,7 @@ import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.GNOME_S
 public class AgilityScript extends Script {
 
     public static double version = 1.0;
-    final int MAX_DISTANCE = 2350;
+    final int MAX_DISTANCE = 2300;
 
     public List<AgilityObstacleModel> draynorCourse = new ArrayList<>();
     public List<AgilityObstacleModel> alkharidCourse = new ArrayList<>();
@@ -93,43 +95,32 @@ public class AgilityScript extends Script {
                 startCourse = new WorldPoint(2729, 3486, 0);
                 break;
             case POLLNIVNEACH_ROOFTOP_COURSE:
-                startCourse = new WorldPoint(3351,2961,0);
+                startCourse = new WorldPoint(3351, 2961, 0);
                 break;
         }
     }
 
     public boolean run(MicroAgilityConfig config) {
+        Microbot.enableAutoRunOn = true;
         currentObstacle = 0;
         init(config);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (startCourse == null) {
-                Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
-            }
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+                if (startCourse == null) {
+                    Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
+                    return;
+                }
+
                 final List<RS2Item> marksOfGrace = AgilityPlugin.getMarksOfGrace();
                 final LocalPoint playerLocation = Microbot.getClient().getLocalPlayer().getLocalLocation();
                 final WorldPoint playerWorldLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
                 // Eat food.
-                if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) > config.hitpoints()) {
-                    if (random(1, 10) == 2 && config.pauseRandomly()) {
-                        sleep(random(config.pauseMinTime(), config.pauseMaxTime()));
-                    }
-                }
-                else if (config.hitpoints() > 0) {
-                    List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
-                    if (foods.isEmpty()) {
-                        return;
-                    }
-
-                    for (Rs2Item food : foods) {
-                        Rs2Inventory.interact(food, "eat");
-                        if (random(1, 10) == 2) { //double eat
-                            Rs2Inventory.interact(food, "eat");
-                        }
-                        break;
-                    }
+                Rs2Player.eatAt(config.hitpoints());
+                if (random(1, 10) == 2 && config.pauseRandomly()) {
+                    sleep(random(config.pauseMinTime(), config.pauseMaxTime()));
                 }
 
                 if (Microbot.isMoving()) return;
@@ -139,28 +130,27 @@ public class AgilityScript extends Script {
                     currentObstacle = 0;
                 }
 
-                if (Microbot.getClient().getPlane() == 0 && playerWorldLocation.distanceTo(startCourse) > 6 && config.agilityCourse() != GNOME_STRONGHOLD_AGILITY_COURSE) {
+                if (Microbot.getClient().getTopLevelWorldView().getPlane() == 0 && playerWorldLocation.distanceTo(startCourse) > 6 && config.agilityCourse() != GNOME_STRONGHOLD_AGILITY_COURSE) {
                     currentObstacle = 0;
                     LocalPoint startCourseLocal = LocalPoint.fromWorld(Microbot.getClient(), startCourse);
                     if (playerLocation.distanceTo(startCourseLocal) >= MAX_DISTANCE) {
-                        Rs2Walker.walkTo(startCourse);
+                        if (config.alchemy()) {
+                            Rs2Magic.alch(config.item(), 50, 100);
+                        }
+                        Rs2Walker.walkTo(startCourse, 8);
                         return;
                     }
                 }
 
                 if (!marksOfGrace.isEmpty()) {
                     for (RS2Item markOfGraceTile : marksOfGrace) {
-                        if (Microbot.getClient().getPlane() != markOfGraceTile.getTile().getPlane()) continue;
-                        //seers needs 7, falador needs 5 for the distance to
-                        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(markOfGraceTile.getTile().getWorldLocation()) > 7)
+                        if (Microbot.getClient().getTopLevelWorldView().getPlane() != markOfGraceTile.getTile().getPlane())
+                            continue;
+                        if (!Rs2Walker.canReach(markOfGraceTile.getTile().getWorldLocation()))
                             continue;
                         Rs2GroundItem.loot(markOfGraceTile.getItem().getId());
-                        sleepUntil(() -> markOfGraceTile.getTile().getGroundItems() == null || markOfGraceTile.getTile().getGroundItems().isEmpty());
-                        if (!marksOfGrace.isEmpty()) {
-                            Rs2GroundItem.loot(markOfGraceTile.getItem().getId());
-                            sleepUntil(() -> markOfGraceTile.getTile().getGroundItems() == null || markOfGraceTile.getTile().getGroundItems().isEmpty());
-                        }
-                        break;
+                        Rs2Player.waitForWalking();
+                        return;
                     }
                 }
 
@@ -171,7 +161,7 @@ public class AgilityScript extends Script {
                     Obstacle obstacle = entry.getValue();
 
                     Tile tile = obstacle.getTile();
-                    if (tile.getPlane() == Microbot.getClient().getPlane()
+                    if (tile.getPlane() == Microbot.getClient().getTopLevelWorldView().getPlane()
                             && object.getLocalLocation().distanceTo(playerLocation) < MAX_DISTANCE) {
                         // This assumes that the obstacle is not clickable.
                         if (Obstacles.TRAP_OBSTACLE_IDS.contains(object.getId())) {
@@ -182,13 +172,35 @@ public class AgilityScript extends Script {
                             return;
                         }
 
-                        AgilityObstacleModel courseObstacle = getCurrentCourse(config).get(currentObstacle);
                         final int agilityExp = Microbot.getClient().getSkillExperience(Skill.AGILITY);
-                        //exception for weird objects
-                        if (Rs2GameObject.interact(courseObstacle.getObjectID())) {
+
+                        List<AgilityObstacleModel> courses = getCurrentCourse(config);
+
+
+                        TileObject gameObject = Rs2GameObject.findObject(courses.stream()
+                                .filter(x -> x.getOperationX().check(Rs2Player.getWorldLocation().getX(), x.getRequiredX()) && x.getOperationY().check(Rs2Player.getWorldLocation().getY(), x.getRequiredY()))
+                                .map(AgilityObstacleModel::getObjectID).collect(Collectors.toList()));
+
+                        if (gameObject == null) {
+                            System.out.println("NO agility obstacle found.");
+                        }
+
+                        if (config.alchemy()) {
+                            Rs2Magic.alch(config.item(), 50, 100);
+                        }
+
+                        if (!Rs2Camera.isTileOnScreen(gameObject)) {
+                            Rs2Walker.walkMiniMap(gameObject.getWorldLocation());
+                        }
+
+                        if (Rs2GameObject.interact(gameObject)) {
                             if (waitForAgilityObstabcleToFinish(agilityExp))
                                 break;
                         }
+
+                        //AgilityObstacleModel courseObstacle = getCurrentCourse(config).get(currentObstacle);
+                        //exception for weird objects
+
 
                         if (Obstacles.PORTAL_OBSTACLE_IDS.contains(object.getId())) {
                             //empty for now
@@ -207,15 +219,12 @@ public class AgilityScript extends Script {
         super.shutdown();
     }
 
-    private boolean waitForAgilityObstabcleToFinish(int agilityExp) {
-        sleepUntilOnClientThread(() -> agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY)
-                || (Microbot.getClient().getPlane() == 0 && currentObstacle != 0), 15000);
-        sleepUntilOnClientThread(() -> !Microbot.isMoving() && !Microbot.isAnimating(), 10000);
+    private boolean waitForAgilityObstabcleToFinish(final int agilityExp) {
+        sleepUntilOnClientThread(() -> agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY), 10000);
 
 
-        if (agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY) || Microbot.getClient().getPlane() == 0) {
+        if (agilityExp != Microbot.getClient().getSkillExperience(Skill.AGILITY) || Microbot.getClient().getTopLevelWorldView().getPlane() == 0) {
             currentObstacle++;
-            sleep(400, 800);
             return true;
         }
         return false;

@@ -6,7 +6,7 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
 @ConfigGroup("quest")
-public interface QuestConfig extends Config {
+public interface MQuestConfig extends Config {
 
     @ConfigSection(
             name = "Static Walker",

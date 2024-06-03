@@ -4,7 +4,7 @@ package net.runelite.client.plugins.inventorysetups.ui;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.ItemID;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsSection;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.AsyncBufferedImage;
@@ -17,12 +17,12 @@ import java.awt.event.MouseEvent;
 
 public class InventorySetupsIconPanel extends InventorySetupsPanel
 {
-	InventorySetupsIconPanel(InventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section)
+	InventorySetupsIconPanel(MInventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section)
 	{
 		this(plugin, panel, invSetup, section, true);
 	}
 
-	InventorySetupsIconPanel(InventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section, boolean allowEditable)
+	InventorySetupsIconPanel(MInventorySetupsPlugin plugin, InventorySetupsPluginPanel panel, InventorySetup invSetup, InventorySetupsSection section, boolean allowEditable)
 	{
 		super(plugin, panel, invSetup, section, allowEditable);
 

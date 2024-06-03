@@ -28,7 +28,7 @@ package net.runelite.client.plugins.inventorysetups.ui;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
-import net.runelite.client.plugins.inventorysetups.InventorySetupsPlugin;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsSlotID;
 import net.runelite.client.ui.ColorScheme;
 
@@ -43,7 +43,7 @@ public class InventorySetupsAdditionalItemsPanel extends InventorySetupsContaine
 {
 	private final List<InventorySetupsSlot> additionalFilteredSlots;
 
-	InventorySetupsAdditionalItemsPanel(ItemManager itemManager, InventorySetupsPlugin plugin)
+	InventorySetupsAdditionalItemsPanel(ItemManager itemManager, MInventorySetupsPlugin plugin)
 	{
 		super(itemManager, plugin, "Additional Filtered Items");
 		additionalFilteredSlots = new ArrayList<>();

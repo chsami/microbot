@@ -1,25 +1,33 @@
 package net.runelite.client.plugins.microbot.woodcutting;
 
 import net.runelite.api.GameObject;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.concurrent.TimeUnit;
 
 public class AutoWoodcuttingScript extends Script {
 
-    public static double version = 1.3;
+    public static double version = 1.5;
 
     public boolean run(AutoWoodcuttingConfig config) {
+        if (config.hopWhenPlayerDetected()) {
+            Microbot.showMessage("Make sure autologin plugin is enabled and randomWorld checkbox is checked!");
+        }
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
+                if (config.hopWhenPlayerDetected()) {
+                    Rs2Player.logoutIfPlayerDetected(1, 10);
+                    return;
+                }
+
                 if (Rs2Equipment.isWearing("Dragon axe"))
                     Rs2Combat.setSpecState(true, 1000);
                 if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
@@ -41,7 +49,7 @@ public class AutoWoodcuttingScript extends Script {
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        }, 0, 500, TimeUnit.MILLISECONDS);
         return true;
     }
 }

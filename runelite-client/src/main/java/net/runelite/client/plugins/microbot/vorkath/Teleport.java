@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Teleport {
-    VARROCK_TAB("Varrock teleport", "break");
+    VARROCK_TAB("Varrock teleport", "break"),
+    CRAFTING_CAPE("Crafting Cape", "break");
 
-    private final String itemName;
+
+    ;private final String itemName;
     private final String action;
 
     @Override

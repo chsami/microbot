@@ -18,9 +18,9 @@ public class GemsScript extends Script {
 
     public boolean run(CraftingConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
                 if (!Microbot.hasLevel(config.gemType().getLevelRequired(), Skill.CRAFTING)) {
                     Microbot.showMessage("Crafting level to low to craft " + config.gemType().getName());
                     shutdown();
@@ -34,7 +34,7 @@ public class GemsScript extends Script {
                         Rs2Bank.depositAll(config.gemType().getName());
                         if(Rs2Bank.hasItem(uncutGemName)) {
                             Rs2Bank.withdrawItem(true, "chisel");
-                            Rs2Bank.withdrawItemAll(true, uncutGemName);
+                            Rs2Bank.withdrawAll(true, uncutGemName);
                         } else{
                             Microbot.showMessage("Run out of Materials");
                             shutdown();

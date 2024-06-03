@@ -11,7 +11,6 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
@@ -25,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Inventory {
 
@@ -37,9 +37,15 @@ public class Rs2Inventory {
 
     public static List<Rs2Item> inventoryItems = new ArrayList<>();
 
+    private static boolean isTrackingInventory = false;
+    private static boolean isInventoryChanged = false;
+
 
     public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == InventoryID.INVENTORY.getId() && e.getItemContainer() != null) {
+            if (isTrackingInventory) {
+                isInventoryChanged = true;
+            }
             List<Rs2Item> _inventoryItems = new ArrayList<>();
             for (int i = 0; i < e.getItemContainer().getItems().length; i++) {
                 Item item = inventory().getItems()[i];
@@ -693,19 +699,23 @@ public class Rs2Inventory {
     public static String[] getActionsForSlot(int slot) {
         return items().stream()
                 .filter(x -> x.slot == slot)
-                .map(x -> x.actions)
-                .findFirst().orElse(new String[]{});
+                .map(x -> x.getInventoryActions())
+                .findFirst().orElse(new String[] {});
     }
 
     public static List<Rs2Item> getInventoryFood() {
-        return items().stream()
-                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")))
+        long startTime = System.currentTimeMillis();
+        List<Rs2Item> items = items().stream()
+                .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")))
                 .collect(Collectors.toList());
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        return items;
     }
 
     public static List<Rs2Item> getPotions() {
         return items().stream()
-                .filter(x -> Arrays.stream(x.actions).anyMatch(a -> a != null && a.equalsIgnoreCase("drink")))
+                .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("drink")))
                 .collect(Collectors.toList());
     }
 
@@ -1274,7 +1284,7 @@ public class Rs2Inventory {
 
         if (item == null) return false;
         if (action == null || action.isEmpty())
-            action = Arrays.stream(item.actions).findFirst().orElse("");
+            action = Arrays.stream(item.getInventoryActions()).findFirst().orElse("");
 
         return interact(item.id, action);
     }
@@ -1520,9 +1530,9 @@ public class Rs2Inventory {
         int param1;
         int identifier = 3;
         MenuAction menuAction = MenuAction.CC_OP;
+
         if (!action.isEmpty()) {
-            String[] actions;
-            actions = rs2Item.actions;
+            String[] actions = rs2Item.getInventoryActions();
 
             for (int i = 0; i < actions.length; i++) {
                 if (action.equalsIgnoreCase(actions[i])) {
@@ -1531,6 +1541,7 @@ public class Rs2Inventory {
                 }
             }
         }
+
         param0 = rs2Item.slot;
         if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")) {
             identifier++;
@@ -1640,6 +1651,18 @@ public class Rs2Inventory {
         }
     }
 
+    public static boolean waitForInventoryChanges() {
+        isTrackingInventory = true;
+        sleepUntil(() -> isInventoryChanged);
+        if (isInventoryChanged) {
+            isTrackingInventory = false;
+            isInventoryChanged = false;
+            return true;
+        }
+        isTrackingInventory = false;
+        isInventoryChanged = false;
+        return isInventoryChanged;
+    }
 
 }
 

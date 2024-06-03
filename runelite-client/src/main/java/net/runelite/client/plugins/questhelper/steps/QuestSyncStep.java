@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.QuestWidgets;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
@@ -46,7 +46,7 @@ public class QuestSyncStep extends QuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
 	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 

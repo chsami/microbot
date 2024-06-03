@@ -26,7 +26,7 @@
  */
 package net.runelite.client.plugins.questhelper.requirements;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
 import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -55,7 +55,7 @@ public interface Requirement
 	{
 		if (check(client))
 		{
-			configManager.setRSProfileConfiguration(QuestHelperConfig.QUEST_HELPER_GROUP, configName, value);
+			configManager.setRSProfileConfiguration(MQuestHelperConfig.QUEST_HELPER_GROUP, configName, value);
 			return true;
 		}
 		return false;
@@ -83,7 +83,7 @@ public interface Requirement
 	 * @param client client to check
 	 * @return the {@link Color} to use
 	 */
-	default Color getColor(Client client, QuestHelperConfig config)
+	default Color getColor(Client client, MQuestHelperConfig config)
 	{
 		return check(client) ? config.passColour() : config.failColour();
 	}
@@ -128,7 +128,7 @@ public interface Requirement
 	default void setUrlSuffix(@Nullable String urlSuffix) {}
 	
 
-	default List<LineComponent> getDisplayTextWithChecks(Client client, QuestHelperConfig config)
+	default List<LineComponent> getDisplayTextWithChecks(Client client, MQuestHelperConfig config)
 	{
 		List<LineComponent> lines = new ArrayList<>();
 

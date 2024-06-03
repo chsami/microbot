@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.playerassist.combat;
 
 import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.api.ItemComposition;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -13,7 +12,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.getEquippedItem;
+import static net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment.get;
 
 public class FoodScript extends Script {
 
@@ -32,8 +31,8 @@ public class FoodScript extends Script {
         shieldName = "";
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!super.run()) return;
                 if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
                 if (!config.toggleFood()) return;
                 if (Rs2Inventory.hasItem("empty vial"))
                     Rs2Inventory.drop("empty vial");
@@ -84,35 +83,35 @@ public class FoodScript extends Script {
     }
 
     private boolean equipFullGuthans() {
-        Rs2Item shield = getEquippedItem(EquipmentInventorySlot.SHIELD);
+        Rs2Item shield = get(EquipmentInventorySlot.SHIELD);
         if (shield != null)
             shieldName = shield.name;
 
         if (!Rs2Equipment.hasGuthanWeaponEquiped()) {
             Rs2Item spearWidget = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.get("guthan's warspear"));
             if (spearWidget == null) return false;
-            Rs2Item weapon = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.WEAPON);
+            Rs2Item weapon = Rs2Equipment.get(EquipmentInventorySlot.WEAPON);
             weaponname = weapon != null ? weapon.name : "";
             Rs2Inventory.equip(spearWidget.name);
         }
         if (!Rs2Equipment.hasGuthanBodyEquiped()) {
             Rs2Item bodyWidget = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.get("guthan's platebody"));
             if (bodyWidget == null) return false;
-            Rs2Item body = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.BODY);
+            Rs2Item body = Rs2Equipment.get(EquipmentInventorySlot.BODY);
             bodyName = body != null ? body.name : "";
             Rs2Inventory.equip(bodyWidget.name);
         }
         if (!Rs2Equipment.hasGuthanLegsEquiped()) {
             Rs2Item legsWidget = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.get("guthan's chainskirt"));
             if (legsWidget == null) return false;
-            Rs2Item legs = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.LEGS);
+            Rs2Item legs = Rs2Equipment.get(EquipmentInventorySlot.LEGS);
             legsName = legs != null ? legs.name : "";
             Rs2Inventory.equip(legsWidget.name);
         }
         if (!Rs2Equipment.hasGuthanHelmEquiped()) {
             Rs2Item helmWidget = Microbot.getClientThread().runOnClientThread(() -> Rs2Inventory.get("guthan's helm"));
             if (helmWidget == null) return false;
-            Rs2Item helm = Rs2Equipment.getEquippedItem(EquipmentInventorySlot.HEAD);
+            Rs2Item helm = Rs2Equipment.get(EquipmentInventorySlot.HEAD);
             helmName = helm != null ? helm.name : "";
             Rs2Inventory.equip(helmWidget.name);
         }

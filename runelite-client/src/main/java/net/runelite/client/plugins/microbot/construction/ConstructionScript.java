@@ -58,8 +58,9 @@ public class ConstructionScript extends Script {
 
     public boolean run(ConstructionConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            super.run();
             try {
+                if (!Microbot.isLoggedIn()) return;
+                if (!super.run()) return;
                 Rs2Tab.switchToInventoryTab();
                 calculateState();
                 if (state == ConstructionState.Build) {

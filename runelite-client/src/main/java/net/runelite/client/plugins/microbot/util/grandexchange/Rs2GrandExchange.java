@@ -49,7 +49,8 @@ public class Rs2GrandExchange {
      */
     public static boolean isOpen() {
         Microbot.status = "Checking if Grand Exchange is open";
-        return Rs2Widget.getWidget(WidgetInfo.GRAND_EXCHANGE_WINDOW_CONTAINER) != null;
+        return !Microbot.getClientThread().runOnClientThread(() ->  Rs2Widget.getWidget(WidgetInfo.GRAND_EXCHANGE_WINDOW_CONTAINER) == null
+                || Rs2Widget.getWidget(WidgetInfo.GRAND_EXCHANGE_WINDOW_CONTAINER).isHidden());
     }
 
     /**
@@ -221,7 +222,11 @@ public class Rs2GrandExchange {
         return false;
     }
 
-    public static boolean sellItemUnder5Percent(String itemName, int quantity) {
+    public static boolean sellItemUnder5Percent(String itemName) {
+        return sellItemUnder5Percent(itemName, false);
+    }
+
+    public static boolean sellItemUnder5Percent(String itemName, boolean exact) {
         try {
             if (!Rs2Inventory.hasItem(itemName)) return false;
 
@@ -235,7 +240,7 @@ public class Rs2GrandExchange {
 
             Microbot.getMouse().click(sellOffer.getBounds());
             sleepUntil(Rs2GrandExchange::isOfferTextVisible, 5000);
-            Rs2Inventory.interact(itemName, "Offer");
+            Rs2Inventory.interact(itemName, "Offer", exact);
             sleepUntil(() -> Rs2Widget.hasWidget("actively traded price"));
             sleep(300, 600);
             Widget pricePerItemButton5Percent = getPricePerItemButton_Minus_5Percent();
@@ -413,7 +418,7 @@ public class Rs2GrandExchange {
     public static Widget getConfirm() {
         var parent = getOfferContainer();
 
-        return Optional.ofNullable(parent).map(p -> p.getChild(54)).orElse(null);
+        return Rs2Widget.findWidget("Confirm", Arrays.stream(parent.getDynamicChildren()).collect(Collectors.toList()), true);
     }
 
     public static boolean isOfferTextVisible() {
