@@ -55,6 +55,7 @@ public class AutoBarrowsScript extends Script {
                     case DIGGING: {
                         if(isInCrypt()) {
                             state = STATE.SEARCHING_GRAVE;
+                            break;
                         }
 
                         if(Rs2Inventory.contains("Spade")) {
