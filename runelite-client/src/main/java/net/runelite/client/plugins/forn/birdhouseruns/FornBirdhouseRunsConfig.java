@@ -25,9 +25,10 @@ public interface FornBirdhouseRunsConfig extends Config {
         return "Start next to a bank\n" +
             "Have the following in your bank:\n" +
             "1. Digsite pendant\n" +
-            "2. Runes for Varrock tele \n\n" +
+            "2. Runes for Varrock tele if teleporting \n\n" +
             "Equip graceful option will bank equipped \n" +
-            "Otherwise will use current equipped gear except amulet";
+            "Otherwise will use current equipped gear except amulet \n" +
+            "Have to turn off manually after run";
     }
 
     @ConfigSection(
