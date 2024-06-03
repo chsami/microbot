@@ -68,7 +68,7 @@ public class ogFiremakingScript extends Script {
                     }
                     if(!hasLogs()){
                         if(!Rs2Bank.hasItem(calcedLogs.getName())){Microbot.getNotifier().notify("Get more "+calcedLogs.getName()+" ya bum!");super.shutdown();}
-                        Rs2Bank.withdrawItemAll(true, calcedLogs.getName());
+                        Rs2Bank.withdrawAll(true, calcedLogs.getName());
                         sleepUntil(this::hasLogs);
                         callAFK(67,50,786);
                         sleep(30,80);

@@ -69,7 +69,7 @@ public class GoldScript extends Script {
                         Rs2Bank.depositAll("gold ring");
                         sleepUntil(() -> !Rs2Inventory.hasItem("gold ring"));
                         if(Rs2Bank.hasItem("gold bar")){
-                            Rs2Bank.withdrawItemAll("gold bar");
+                            Rs2Bank.withdrawAll("gold bar");
                             sleepUntil(() -> Rs2Inventory.hasItem("gold bar"));
                         } else {
                             Microbot.getNotifier().notify("Run out of Materials");

@@ -138,7 +138,7 @@ public class FletchingScript extends Script {
             if (fletchingMode == FletchingMode.STRUNG)
                 Rs2Bank.withdrawX(true, secondaryItemToFletch, fletchingMode.getAmount());
             else
-                Rs2Bank.withdrawItemAll(secondaryItemToFletch);
+                Rs2Bank.withdrawAll(secondaryItemToFletch);
 
             sleepUntil(() -> Rs2Inventory.hasItem(finalSecondaryItemToFletch), 2000);
         } while (!Rs2Inventory.hasItem(finalSecondaryItemToFletch));
