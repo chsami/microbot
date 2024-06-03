@@ -47,7 +47,6 @@ public class FornBirdhouseRunsScript extends Script {
                             Rs2Bank.depositAll();
                             if (config.GRACEFUL()) {
                                 Rs2Bank.depositEquipment();
-                                sleep(200);
                                 equipGraceful();
                             }
                             withdrawDigsitePendant();
@@ -214,7 +213,9 @@ public class FornBirdhouseRunsScript extends Script {
         if (Rs2Inventory.hasItem(ItemID.CLOCKWORK)) {
             botStatus = status;
         }
-        else if (!Microbot.isMoving() && !Microbot.isAnimating() && !Microbot.getClient().getLocalPlayer().isInteracting()) {
+        else if (!Microbot.isMoving() &&
+            !Microbot.isAnimating() &&
+            !Microbot.getClient().getLocalPlayer().isInteracting()) {
             Rs2GameObject.interact(itemId, "empty");
         }
     }
