@@ -17,7 +17,7 @@ public class SafeSpot extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-                if (!config.toggleSafeSpot()) return;
+                if (!config.toggleSafeSpot() && !Microbot.isMoving()) return;
                 currentSafeSpot = config.safeSpot();
                 //check if the current safespot is default value
                 if (currentSafeSpot.getX() == 0 && currentSafeSpot.getY() == 0) {
