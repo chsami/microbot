@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.awt.*;
 
 import static net.runelite.api.Varbits.QUICK_PRAYER;
+import static net.runelite.client.plugins.microbot.globval.VarbitIndices.SELECTED_QUICK_PRAYERS;
 import static net.runelite.client.plugins.microbot.globval.VarbitValues.QUICK_PRAYER_ENABLED;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
@@ -32,6 +33,10 @@ public class Rs2Prayer {
         //Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
     }
 
+    public static boolean isQuickPrayerSet(Rs2PrayerEnum prayer) {
+        int selectedQuickPrayersVarbit = Microbot.getVarbitValue(SELECTED_QUICK_PRAYERS);
+        return (selectedQuickPrayersVarbit & (1 << prayer.getQuickPrayerIndex())) != 0;
+    }
     public static boolean isPrayerActive(Rs2PrayerEnum name) {
         final int varBit = name.getVarbit();
         return Microbot.getClientThread().runOnClientThread(() ->
@@ -51,6 +56,7 @@ public class Rs2Prayer {
         sleepUntil(() -> !Rs2Widget.isHidden(5046276));
 
         for (Rs2PrayerEnum prayer : prayers) {
+            if(isQuickPrayerSet(prayer)) continue;
             Microbot.doInvoke(new NewMenuEntry(prayer.getName(),prayer.getQuickPrayerIndex(), 5046276, MenuAction.CC_OP.getId(), 1, -1, "Toggle"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
         }
 
