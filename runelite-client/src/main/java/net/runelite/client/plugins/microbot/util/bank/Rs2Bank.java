@@ -358,13 +358,15 @@ public class Rs2Bank {
     }
 
     public static boolean depositAll(Predicate<Rs2Item> predicate) {
-        for (Rs2Item item :
-                Rs2Inventory.items().stream().filter(predicate).collect(Collectors.toList())) {
+        boolean result = false;
+        List<Rs2Item> items = Rs2Inventory.items().stream().filter(predicate).distinct().collect(Collectors.toList());
+        for (Rs2Item item : items) {
             if (item == null) continue;
             depositAll(item);
-            return true;
+            sleep(300, 600);
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
@@ -939,6 +941,25 @@ public class Rs2Bank {
         Microbot.status = "Walking to nearest bank " + bankLocation.toString();
         Rs2Walker.walkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
+    }
+
+    /**
+     * Walk to the closest bank
+     *
+     * @return true if player location is less than 4 tiles away from the bank location
+     */
+    public static boolean walkToBankAndUseBank() {
+        if (Rs2Bank.isOpen()) return true;
+        Rs2Player.toggleRunEnergy(true);
+        BankLocation bankLocation = getNearestBank();
+        Microbot.status = "Walking to nearest bank " + bankLocation.toString();
+        boolean result = bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
+        if (result) {
+            return Rs2Bank.useBank();
+        } else {
+            Rs2Walker.walkTo(bankLocation.getWorldPoint());
+        }
+        return false;
     }
 
     /**
