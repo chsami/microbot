@@ -5,6 +5,7 @@ import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
+import net.runelite.client.util.QuantityFormatter;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -31,11 +32,18 @@ public class BanksShopperOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
                     .build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Total gp items bought " + formattedProfit())
+                    .build());
 
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         return super.render(graphics);
+    }
+
+    public static String formattedProfit() {
+        return QuantityFormatter.quantityToRSDecimalStack(BanksShopperScript.getProfit(), true);
     }
 }
