@@ -232,16 +232,45 @@ public class Rs2GroundItem {
         return false;
     }
 
+
+    /**
+     * This is an overloaded method that calls the original method with a default value for the antiLureProtection parameter.
+     * It is used to loot items based on their value within a specified range.
+     *
+     * @param minValue The minimum value of the items to be looted.
+     * @param maxValue The maximum value of the items to be looted.
+     * @param range The range within which to search for items.
+     * @return true if an item was successfully looted, false otherwise.
+     */
     public static boolean lootItemBasedOnValue(int minValue, int maxValue, int range) {
+        return lootItemBasedOnValue(minValue, maxValue, range, false);
+    }
+
+    /**
+     * This method is used to loot items based on their value within a specified range.
+     * It also includes an anti-lure protection mechanism that can be toggled on or off.
+     *
+     * @param minValue The minimum value of the items to be looted.
+     * @param maxValue The maximum value of the items to be looted.
+     * @param range The range within which to search for items.
+     * @param antiLureProtection A boolean flag that, when true, prevents the looting of items that are owned and dropped by other players.
+     * @return true if an item was successfully looted, false otherwise.
+     */
+    public static boolean lootItemBasedOnValue(int minValue, int maxValue, int range, boolean antiLureProtection) {
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
                 Rs2GroundItem.getAll(range)
         );
         final int invSize = Rs2Inventory.size();
         for (RS2Item rs2Item : groundItems) {
+            // Skip this item if it is owned by another player and anti-lure protection is enabled
+            if(rs2Item.getTileItem().getOwnership() == 3 && antiLureProtection) continue;
+            // Skip this item if the inventory is already full with this item
             if (Rs2Inventory.isFull(rs2Item.getItem().getName())) continue;
+            // Skip this item if it is not in line of sight
             if (!hasLineOfSight(rs2Item.getTile())) continue;
             long totalPrice = (long) Microbot.getClientThread().runOnClientThread(() ->
                     Microbot.getItemManager().getItemPrice(rs2Item.getItem().getId()) * rs2Item.getTileItem().getQuantity());
+            // If the total price of this item is within the specified range, attempt to loot it
             if (totalPrice >= minValue && totalPrice <= maxValue) {
                 if (Rs2Inventory.isFull()) {
                     if (Rs2Player.eatAt(100)) {
@@ -262,6 +291,7 @@ public class Rs2GroundItem {
         }
         return false;
     }
+
 
     public static boolean isItemBasedOnValueOnGround(int value, int range) {
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->

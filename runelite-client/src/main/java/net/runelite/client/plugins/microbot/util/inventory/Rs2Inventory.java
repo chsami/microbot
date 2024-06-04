@@ -726,6 +726,12 @@ public class Rs2Inventory {
                 .filter(x -> Arrays.stream(x.inventoryActions).anyMatch(a -> a != null && a.equalsIgnoreCase("bury")))
                 .collect(Collectors.toList());
     }
+    // get items with the action "scatter"
+    public static List<Rs2Item> getAshes() {
+        return items().stream()
+                .filter(x -> Arrays.stream(x.inventoryActions).anyMatch(a -> a != null && a.equalsIgnoreCase("scatter")))
+                .collect(Collectors.toList());
+    }
 
     /**
      * Gets the count of empty slots in your inventory.

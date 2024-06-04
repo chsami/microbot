@@ -72,7 +72,7 @@ public class PlayerAssistPlugin extends Plugin {
     private final FlickerScript flickerScript = new FlickerScript();
     private final UseSpecialAttackScript useSpecialAttackScript = new UseSpecialAttackScript();
     private final AntiPoisonScript antiPoisonScript = new AntiPoisonScript();
-    private final BuryBoneScript buryBoneScript = new BuryBoneScript();
+    private final BuryScatterScript buryScatterScript = new BuryScatterScript();
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -89,7 +89,7 @@ public class PlayerAssistPlugin extends Plugin {
         flickerScript.run(config);
         useSpecialAttackScript.run(config);
         antiPoisonScript.run(config);
-        buryBoneScript.run(config);
+        buryScatterScript.run(config);
     }
 
     protected void shutDown() {
@@ -103,7 +103,7 @@ public class PlayerAssistPlugin extends Plugin {
         flickerScript.shutdown();
         useSpecialAttackScript.shutdown();
         antiPoisonScript.shutdown();
-        buryBoneScript.shutdown();
+        buryScatterScript.shutdown();
         overlayManager.remove(playerAssistOverlay);
     }
 

@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.playerassist.loot;
 
 import net.runelite.api.ItemComposition;
 import net.runelite.api.Perspective;
+import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -25,11 +26,14 @@ public class LootScript extends Script {
 
     }
 
+
     public void run(ItemSpawned itemSpawned) {
         mainScheduledFuture = scheduledExecutorService.schedule((() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+                // This makes sure that the bot don't get tricked by other players dropping items
+                if(itemSpawned.getItem().getOwnership() == TileItem.OWNERSHIP_GROUP) return;
                 if (Microbot.getClientThread().runOnClientThread(Rs2Inventory::isFull)) return;
                 final ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemSpawned.getItem().getId()));
                 for (String item : lootItems) {
@@ -62,7 +66,8 @@ public class LootScript extends Script {
                 if (Rs2GroundItem.loot(specialItem, 13, 14))
                     break;
             }
-            boolean result = Rs2GroundItem.lootItemBasedOnValue(config.minPriceOfItemsToLoot(), config.maxPriceOfItemsToLoot(), 14);
+
+            boolean result = Rs2GroundItem.lootItemBasedOnValue(config.minPriceOfItemsToLoot(), config.maxPriceOfItemsToLoot(), 14, true);
             if (result) {
                 Rs2Player.waitForWalking();
                 Microbot.pauseAllScripts = false;
@@ -70,6 +75,7 @@ public class LootScript extends Script {
         }), 0, 2000, TimeUnit.MILLISECONDS);
         return true;
     }
+
 
     public void shutdown() {
         super.shutdown();

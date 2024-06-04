@@ -220,8 +220,11 @@ public interface PlayerAssistConfig extends Config {
             position = 2,
             section = lootSection
     )
+    default boolean toggleLootArrows()
+    {
+        return true;
+    }
 
-    default boolean toggleBuryBones() { return false; }
     @ConfigItem(
             keyName = "Bury Bones",
             name = "Bury Bones",
@@ -229,12 +232,20 @@ public interface PlayerAssistConfig extends Config {
             position = 3,
             section = lootSection
     )
+    default boolean toggleBuryBones() { return false; }
+    // toggle scatter
+
+    @ConfigItem(
+            keyName = "Scatter",
+            name = "Scatter",
+            description = "Scatter ashes",
+            position = 4,
+            section = lootSection
+    )
+    default boolean toggleScatter() { return false; }
 
 
-    default boolean toggleLootArrows()
-    {
-        return true;
-    }
+
 
     //Prayer section
     @ConfigSection(
