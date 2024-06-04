@@ -47,7 +47,7 @@ public class CookingScript extends Script {
                             return;
                         }
                         Rs2Bank.depositAll();
-                        Rs2Bank.withdrawItemAll(true, itemToCook);
+                        Rs2Bank.withdrawAll(true, itemToCook);
                     }
                 }
 

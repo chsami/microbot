@@ -18,35 +18,24 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
-import net.runelite.client.plugins.microbot.cooking.CookingScript;
-import net.runelite.client.plugins.microbot.mining.MiningScript;
-import net.runelite.client.plugins.microbot.thieving.ThievingScript;
-import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenConfig;
-import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenPlugin;
-import net.runelite.client.plugins.microbot.thieving.summergarden.SummerGardenScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.function.Consumer;
-
-import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
 
 @PluginDescriptor(
         name = PluginDescriptor.Default + "Microbot",
@@ -88,21 +77,11 @@ public class MicrobotPlugin extends Plugin {
     private SpriteManager spriteManager;
     @Inject
     private WorldMapOverlay worldMapOverlay;
-    @Inject
-    @Named("disableWalkerUpdate")
-    private boolean disableWalkerUpdate;
 
     @Inject
     private Rs2NpcManager rs2NpcManager;
     @Inject
     private WorldMapPointManager worldMapPointManager;
-
-    private Plugin summerGardenPlugin = null;
-
-    public ThievingScript thievingScript;
-    public CookingScript cookingScript;
-    public MiningScript miningScript;
-    public SummerGardenScript summerGardenScript;
 
     @Override
     protected void startUp() throws AWTException {
@@ -116,7 +95,6 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setNpcManager(npcManager);
         Microbot.setMouse(new VirtualMouse());
         Microbot.setSpriteManager(spriteManager);
-        Microbot.setDisableWalkerUpdate(disableWalkerUpdate);
         Microbot.setPluginManager(pluginManager);
         Microbot.setWorldMapOverlay(worldMapOverlay);
         Microbot.setWorldMapPointManager(worldMapPointManager);
@@ -127,24 +105,10 @@ public class MicrobotPlugin extends Plugin {
         new InputSelector(clientToolbar);
 
         //TODO: Rs2NpcManager.loadJson();
-
-        for (Plugin plugin : pluginManager.getPlugins()) {
-            if (plugin.getClass() == SummerGardenPlugin.class) {
-                summerGardenPlugin = plugin;
-            }
-        }
     }
 
     protected void shutDown() {
         overlayManager.remove(microbotOverlay);
-        if (cookingScript != null) {
-            cookingScript.shutdown();
-            cookingScript = null;
-        }
-        if (thievingScript != null) {
-            thievingScript.shutdown();
-            thievingScript = null;
-        }
     }
 
 
@@ -158,38 +122,12 @@ public class MicrobotPlugin extends Plugin {
 
         if (event.getContainerId() == InventoryID.BANK.getId()) {
             Rs2Bank.storeBankItemsInMemory(event);
-        }
-        if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
+        } else if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
             Rs2Inventory.storeInventoryItemsInMemory(event);
-        }
-        if (event.getContainerId() == InventoryID.EQUIPMENT.getId()) {
+        } else if (event.getContainerId() == InventoryID.EQUIPMENT.getId()) {
             Rs2Equipment.storeEquipmentItemsInMemory(event);
-        }
-
-        if (event.getContainerId() == 64) { // Mage Guild Shop
-            //Code for Bank's Rs2Shop
-            java.util.List<Rs2Item> shopItems = updateItemContainer(64, event);
-            Rs2Shop.storeShopItemsInMemory(event, 64);
-        }
-        if (event.getContainerId() == 435) { // Charter Shop
-            //Code for Bank's Rs2Shop
-            java.util.List<Rs2Item> shopItems = updateItemContainer(435, event);
-            Rs2Shop.storeShopItemsInMemory(event, 435);
-        }
-        if (event.getContainerId() == 131) { // Lundail Rune Shop
-            //Code for Bank's Rs2Shop
-            java.util.List<Rs2Item> shopItems = updateItemContainer(131, event);
-            Rs2Shop.storeShopItemsInMemory(event, 131);
-        }
-        if (event.getContainerId() == 419) { // Baba Yaga Rune Shop
-            //Code for Bank's Rs2Shop
-            java.util.List<Rs2Item> shopItems = updateItemContainer(419, event);
-            Rs2Shop.storeShopItemsInMemory(event, 419);
-        }
-        if (event.getContainerId() == 318) { // Ordan (Blast Furnace Shop)
-            //Code for Bank's Rs2Shop
-            java.util.List<Rs2Item> shopItems = updateItemContainer(318, event);
-            Rs2Shop.storeShopItemsInMemory(event, 318);
+        } else {
+            Rs2Shop.storeShopItemsInMemory(event, event.getContainerId());
         }
     }
 
@@ -201,59 +139,6 @@ public class MicrobotPlugin extends Plugin {
         }
     }
 
-    private Consumer<MenuEntry> menuActionNpcConsumer(boolean shift, net.runelite.api.NPC npc) {
-        return e ->
-        {
-            if (thievingScript == null) {
-                thievingScript = new ThievingScript();
-            } else {
-                thievingScript.shutdown();
-                thievingScript = null;
-            }
-        };
-    }
-
-    private Consumer<MenuEntry> menuActionCookingConsumer(int gameObjectId) {
-        return e ->
-        {
-            if (cookingScript == null) {
-                cookingScript = new CookingScript();
-                cookingScript.run(gameObjectId);
-            } else {
-                cookingScript.shutdown();
-                cookingScript = null;
-            }
-        };
-    }
-
-    private Consumer<MenuEntry> menuActionMinerConsumer(int gameObjectId) {
-        return e ->
-        {
-            if (miningScript == null) {
-                miningScript = new MiningScript();
-                miningScript.run(gameObjectId);
-            } else {
-                miningScript.shutdown();
-                miningScript = null;
-            }
-        };
-    }
-
-    private Consumer<MenuEntry> menuActionSummerGarden() {
-        return e ->
-        {
-            if (summerGardenScript == null) {
-                summerGardenScript = new SummerGardenScript();
-                summerGardenScript.run(configManager.getConfig(SummerGardenConfig.class), chatMessageManager);
-                startPlugin(summerGardenPlugin);
-
-            } else {
-                summerGardenScript.shutdown();
-                summerGardenScript = null;
-            }
-        };
-    }
-
     @Subscribe
     public void onMenuOpened(MenuOpened event) {
     }
@@ -261,18 +146,6 @@ public class MicrobotPlugin extends Plugin {
     @Subscribe
     public void onVarbitChanged(VarbitChanged event) {
         Rs2Player.handlePotionTimers(event);
-    }
-
-    @Subscribe
-    protected void onClientTick(ClientTick t) {
-        if (!pluginManager.isActive(summerGardenPlugin) && summerGardenScript != null) {
-            summerGardenScript.shutdown();
-            summerGardenScript = null;
-        } else if (pluginManager.isActive(summerGardenPlugin) && summerGardenScript == null) {
-            summerGardenScript = new SummerGardenScript();
-            summerGardenScript.run(configManager.getConfig(SummerGardenConfig.class), chatMessageManager);
-            startPlugin(summerGardenPlugin);
-        }
     }
 
     @Subscribe(priority = 999)
@@ -320,5 +193,17 @@ public class MicrobotPlugin extends Plugin {
                 System.out.printf("Failed to start plugin: %s%n", p.getName());
             }
         });
+    }
+
+    @Subscribe
+    public void onGraphicsObjectCreated(GraphicsObjectCreated event)
+    {
+        final GraphicsObject graphicsObject = event.getGraphicsObject();
+        int SCURRIUS_FALLING_ROCKS = 2644;
+        if (graphicsObject.getId() == SCURRIUS_FALLING_ROCKS) {
+            Rs2Tile.init();
+            int ticks = 8;
+            Rs2Tile.addDangerousGraphicsObjectTile(graphicsObject, 600 * ticks);
+        }
     }
 }

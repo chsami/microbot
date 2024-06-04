@@ -73,7 +73,7 @@ public class GlassblowingScript extends Script {
 
         verifyItemInBank(moltenGlass);
 
-        Rs2Bank.withdrawItemAll(true, moltenGlass);
+        Rs2Bank.withdrawAll(true, moltenGlass);
         sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(moltenGlass));
 
         sleep(600, 3000);

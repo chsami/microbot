@@ -121,13 +121,13 @@ public class MicroAgilityPlugin extends Plugin {
 
         // Pollnivneach
         agilityScript.polnivCourse.add(new AgilityObstacleModel(BASKET_14935));
-        agilityScript.polnivCourse.add(new AgilityObstacleModel(MARKET_STALL_14936));
+        agilityScript.polnivCourse.add(new AgilityObstacleModel(MARKET_STALL_14936, -1, 2969, Operation.GREATER, Operation.LESS));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(BANNER_14937));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(GAP_14938));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14939));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(ROUGH_WALL_14940));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(MONKEYBARS));
-        agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14944));
+        agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14944, -1, 2996, Operation.GREATER, Operation.LESS));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(DRYING_LINE));
 
         agilityScript.run(config);

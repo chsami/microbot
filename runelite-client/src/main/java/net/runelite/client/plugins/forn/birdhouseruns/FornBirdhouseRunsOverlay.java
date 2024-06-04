@@ -1,16 +1,15 @@
-package net.runelite.client.plugins.microbot.scurrius;
+package net.runelite.client.plugins.forn.birdhouseruns;
 
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
 
-public class ScurriusOverlay extends OverlayPanel {
+public class FornBirdhouseRunsOverlay extends OverlayPanel {
     @Inject
-    ScurriusOverlay(ScurriusPlugin plugin)
+    FornBirdhouseRunsOverlay(FornBirdhouseRunsPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -21,14 +20,8 @@ public class ScurriusOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Scurrius V" + ScurriusScript.version)
+                    .text("Status: " + FornBirdhouseRunsInfo.botStatus.toString().replace("_", " "))
                     .color(Color.GREEN)
-                    .build());
-
-            panelComponent.getChildren().add(LineComponent.builder().build());
-
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left(ScurriusScript.state.toString())
                     .build());
 
 

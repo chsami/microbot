@@ -187,6 +187,7 @@ public class NmzScript extends Script {
             Rs2Keyboard.typeString("1");
             Rs2Keyboard.enter();
             sleepUntil(() -> !Rs2Inventory.hasItem(objectId));
+            Rs2Inventory.dropAll(itemName);
         }
     }
 

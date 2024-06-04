@@ -160,7 +160,7 @@ public class ogBlastFurnaceScript extends Script {
             }
 //            Rs2Bank.scrollTo(Rs2Widget.findWidget(barName())); // FIXME: HONESTLY THIS IS SO OLD IT DOESN'T EVEN WORK
             if( getStamEffect() <= 10|| getRunEnergy() <= 40){stamPotUp();}
-            Rs2Bank.withdrawItemAll("Gold ore");
+            Rs2Bank.withdrawAll("Gold ore");
             // sleepUntil(() -> Rs2Inventory.hasItem("Gold ore"));
             sleep(50,80);
             Rs2Bank.closeBank();
