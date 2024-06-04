@@ -11,6 +11,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.worldmap.WorldMap;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -54,7 +55,9 @@ public class PlayerAssistPlugin extends Plugin {
     private PlayerAssistOverlay playerAssistOverlay;
 
     private static final String SET = "Set";
-    private static final String TARGET = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
+    private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
+    // SAFE_SPOT = "Safe Spot";
+    private static final String SAFE_SPOT = ColorUtil.wrapWithColorTag("Safe Spot", JagexColors.CHAT_PRIVATE_MESSAGE_TEXT_TRANSPARENT_BACKGROUND);
     private static final String ADD_TO = "Add to Fight:";
     private static final String REMOVE_FROM = "Remove from Fight:";
     private static final String WALK_HERE = "Walk here";
@@ -85,7 +88,7 @@ public class PlayerAssistPlugin extends Plugin {
         combatPotion.run(config);
         foodScript.run(config);
         prayerPotionScript.run(config);
-//        safeSpotScript.run(config); // TODO: safespot
+        safeSpotScript.run(config); // TODO: safespot
         flickerScript.run(config);
         useSpecialAttackScript.run(config);
         antiPoisonScript.run(config);
@@ -112,6 +115,15 @@ public class PlayerAssistPlugin extends Plugin {
         configManager.setConfiguration(
                 "PlayerAssistant",
                 "centerLocation",
+                worldPoint
+        );
+    }
+    // set safe spot
+    private void setSafeSpot(WorldPoint worldPoint)
+    {
+        configManager.setConfiguration(
+                "PlayerAssistant",
+                "safeSpotLocation",
                 worldPoint
         );
     }
@@ -142,6 +154,18 @@ public class PlayerAssistPlugin extends Plugin {
             AttackNpcScript.skipNpc();
         }
     }
+    // on setting change
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event) {
+        if (event.getKey().equals("Safe Spot")) {
+
+            if (!config.toggleSafeSpot()) {
+                // reset safe spot to default
+                setSafeSpot(new WorldPoint(0, 0, 0));
+            }
+        }
+    }
+
 
     @Subscribe
     public void onGameTick(GameTick gameTick) {
@@ -174,7 +198,10 @@ public class PlayerAssistPlugin extends Plugin {
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event) {
         if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
-            addMenuEntry(event, SET, TARGET, 1);
+            addMenuEntry(event, SET, CENTER_TILE, 1);
+        }
+        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty() && config.toggleSafeSpot()) {
+            addMenuEntry(event, SET, SAFE_SPOT, 1);
         }
         if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(ATTACK) && config.attackableNpcs().contains(getNpcNameFromMenuEntry(Text.removeTags(event.getTarget())))) {
             addMenuEntry(event, REMOVE_FROM, event.getTarget(), 1);
@@ -233,8 +260,8 @@ public class PlayerAssistPlugin extends Plugin {
             int xGraphDiff = ((int) (xTileOffset * pixelsPerTile));
             int yGraphDiff = (int) (yTileOffset * pixelsPerTile);
 
-            yGraphDiff -= pixelsPerTile - Math.ceil(pixelsPerTile / 2);
-            xGraphDiff += pixelsPerTile - Math.ceil(pixelsPerTile / 2);
+            yGraphDiff -= (int) (pixelsPerTile - Math.ceil(pixelsPerTile / 2));
+            xGraphDiff += (int) (pixelsPerTile - Math.ceil(pixelsPerTile / 2));
 
             yGraphDiff = worldMapRect.height - yGraphDiff;
             yGraphDiff += (int) worldMapRect.getY();
@@ -248,8 +275,11 @@ public class PlayerAssistPlugin extends Plugin {
 
 
 
-        if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
+        if (entry.getOption().equals(SET) && entry.getTarget().equals(CENTER_TILE)) {
             setCenter(getSelectedWorldPoint());
+        }
+        if (entry.getOption().equals(SET) && entry.getTarget().equals(SAFE_SPOT)) {
+            setSafeSpot(getSelectedWorldPoint());
         }
 
 
@@ -258,6 +288,8 @@ public class PlayerAssistPlugin extends Plugin {
             lastClick = entry;
         }
     }
+
+
     @Subscribe
     private void onMenuOptionClicked(MenuOptionClicked event)
     {

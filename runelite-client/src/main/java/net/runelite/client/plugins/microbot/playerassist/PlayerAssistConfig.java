@@ -93,6 +93,18 @@ public interface PlayerAssistConfig extends Config {
     {
         return false;
     }
+    //safe spot
+    @ConfigItem(
+            keyName = "Safe Spot",
+            name = "Safe Spot",
+            description = "Right-click the ground to select the safe spot tile",
+            position = 4,
+            section = combatSection
+    )
+    default boolean toggleSafeSpot()
+    {
+        return false;
+    }
 
     @ConfigItem(
             keyName = "Cannon",
@@ -300,6 +312,18 @@ public interface PlayerAssistConfig extends Config {
             hidden = true
     )
     default WorldPoint centerLocation()
+    {
+        return new WorldPoint(0, 0, 0);
+    }
+
+    //hidden config item for safe spot location
+    @ConfigItem(
+            keyName = "safeSpotLocation",
+            name = "Safe Spot Location",
+            description = "Safe Spot Location",
+            hidden = true
+    )
+    default WorldPoint safeSpot()
     {
         return new WorldPoint(0, 0, 0);
     }

@@ -17,11 +17,14 @@ public class SafeSpot extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+                if (!config.toggleSafeSpot()) return;
+                currentSafeSpot = config.safeSpot();
+                //check if the current safespot is default value
+                if (currentSafeSpot.getX() == 0 && currentSafeSpot.getY() == 0) {
+                    return;
+                }
 
-                if (currentSafeSpot == null)
-                    currentSafeSpot = Microbot.getClient().getLocalPlayer().getWorldLocation();
-
-                if (currentSafeSpot != null && currentSafeSpot.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 2) {
+                if (currentSafeSpot.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 0) {
                     Rs2Walker.walkMiniMap(currentSafeSpot);
                 }
 
@@ -36,6 +39,5 @@ public class SafeSpot extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
-        currentSafeSpot = null;
     }
 }
