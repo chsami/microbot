@@ -10,7 +10,6 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-@Slf4j
 public class BuryScatterScript extends Script {
 public boolean run(PlayerAssistConfig config) {
     mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -28,9 +27,6 @@ public boolean run(PlayerAssistConfig config) {
 }
 
 private void processItems(boolean toggle, List<Rs2Item> items, String action) {
-    log.info("Processing items: " + items.size());
-    log.info("Action: " + action);
-    log.info("Toggle: " + toggle);
     if (!toggle || items == null || items.isEmpty()) return;
     Rs2Inventory.interact(items.get(0), action);
     Rs2Player.waitForAnimation();
