@@ -12,29 +12,30 @@ public class SafeSpot extends Script {
 
     public WorldPoint currentSafeSpot = null;
 
-    public boolean run(PlayerAssistConfig config) {
-        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            try {
-                if (!Microbot.isLoggedIn()) return;
-                if (!super.run()) return;
-                if (!config.toggleSafeSpot() && !Microbot.isMoving()) return;
-                currentSafeSpot = config.safeSpot();
-                //check if the current safespot is default value
-                if (currentSafeSpot.getX() == 0 && currentSafeSpot.getY() == 0) {
-                    return;
-                }
+public boolean run(PlayerAssistConfig config) {
+    mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+        try {
+            if (!Microbot.isLoggedIn() || !super.run() || !config.toggleSafeSpot() || Microbot.isMoving()) return;
 
-                if (currentSafeSpot.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 0) {
-                    Rs2Walker.walkMiniMap(currentSafeSpot);
-                }
+            currentSafeSpot = config.safeSpot();
+            if (isDefaultSafeSpot(currentSafeSpot) || isPlayerAtSafeSpot(currentSafeSpot)) return;
 
+            Rs2Walker.walkMiniMap(currentSafeSpot);
 
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        }, 0, 600, TimeUnit.MILLISECONDS);
-        return true;
-    }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }, 0, 600, TimeUnit.MILLISECONDS);
+    return true;
+}
+
+private boolean isDefaultSafeSpot(WorldPoint safeSpot) {
+    return safeSpot.getX() == 0 && safeSpot.getY() == 0;
+}
+
+private boolean isPlayerAtSafeSpot(WorldPoint safeSpot) {
+    return safeSpot.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 0;
+}
 
     @Override
     public void shutdown() {
