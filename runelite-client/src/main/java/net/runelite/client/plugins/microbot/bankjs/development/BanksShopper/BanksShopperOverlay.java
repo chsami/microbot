@@ -11,9 +11,12 @@ import javax.inject.Inject;
 import java.awt.*;
 
 public class BanksShopperOverlay extends OverlayPanel {
+    private final BanksShopperConfig config;
+
     @Inject
-    BanksShopperOverlay(BanksShopperPlugin plugin) {
+    BanksShopperOverlay(BanksShopperPlugin plugin, BanksShopperConfig config) {
         super(plugin);
+        this.config = config;
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }
@@ -32,10 +35,11 @@ public class BanksShopperOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
                     .build());
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Total gp items bought " + formattedProfit())
-                    .build());
-
+            if (config.action() == Actions.BUY) {
+                panelComponent.getChildren().add(LineComponent.builder()
+                        .left("Total gp items bought " + formattedProfit())
+                        .build());
+            }
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());

@@ -33,7 +33,6 @@ public class BanksShopperScript extends Script {
         Microbot.pauseAllScripts = false;
 
         Actions selectedAction = config.action();
-        String action = selectedAction.toString();
 
         Quantities selectedQuantity = config.quantity();
         String quantity = selectedQuantity.toString();
@@ -52,7 +51,8 @@ public class BanksShopperScript extends Script {
             try {
                 if (!super.run()) return;
                 if (!Microbot.isLoggedIn()) return;
-                if (!Rs2Inventory.hasItem(itemNames.toArray(String[]::new)) && action.equalsIgnoreCase("Sell")) {
+
+                if (!Rs2Inventory.hasItem(itemNames.toArray(String[]::new)) && selectedAction == Actions.SELL) {
                     Microbot.status = "[Shutting down] - Reason: Not enough supplies.";
                     Microbot.showMessage(Microbot.status);
                     Rs2Shop.closeShop();
@@ -73,23 +73,30 @@ public class BanksShopperScript extends Script {
                     }
                     return;
                 }
+
                 Rs2Walker.walkTo(getInitialPlayerLocation());
                 Rs2Shop.openShop(npcName);
                 sleepUntil(() -> Rs2Shop.isOpen(), Random.random(600, 1000));
+
                 boolean allOutOfStock = true;
                 boolean successfullAction = false;
+
                 if (Rs2Shop.isOpen()) {
+
                     for (String itemName : itemNames) {
                         if (Microbot.pauseAllScripts) break;
-                        // check stock before buying/selling
-                        if (action.equalsIgnoreCase("Buy")) {
-                            if (!Rs2Shop.hasMinimumStock(itemName, minimumStock)) continue;
-                            successfullAction = processBuyAction(itemName, quantity);
-                        } else if (action.equalsIgnoreCase("Sell")) {
-                            if (Rs2Shop.hasMinimumStock(itemName, minimumStock)) continue;
-                            successfullAction = processSellAction(itemName, quantity);
-                        } else {
-                            System.out.println("Invalid action specified in config.");
+
+                        switch(selectedAction) {
+                            case BUY:
+                                if (!Rs2Shop.hasMinimumStock(itemName, minimumStock)) continue;
+                                successfullAction = processBuyAction(itemName, quantity);
+                                break;
+                            case SELL:
+                                if (Rs2Shop.hasMinimumStock(itemName, minimumStock)) continue;
+                                successfullAction = processSellAction(itemName, quantity);
+                                break;
+                            default:
+                                System.out.println("Invalid action specified in config.");
                         }
 
                         allOutOfStock = false;
@@ -98,6 +105,7 @@ public class BanksShopperScript extends Script {
                             sleep(300, 1200); // this sleep is required to avoid buying items super fast
                         }
                     }
+
                     if (allOutOfStock) {
                         // All items are out of stock, hop world
                         hopWorld();

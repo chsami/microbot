@@ -109,7 +109,7 @@ public interface BanksShopperConfig extends Config {
     }
 
     @ConfigItem(
-            position = 1,
+            position = 3,
             keyName = "logout",
             name = "Logout when out of supply",
             description = "Logout",
