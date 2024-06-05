@@ -359,16 +359,39 @@ public class Rs2Bank {
         return depositAll(rs2Item);
     }
 
-    public static boolean depositAll(Predicate<Rs2Item> filter) {
+    public static boolean depositAll(Predicate<Rs2Item> filter, boolean delay) {
         List<Rs2Item> itemsToDeposit = Rs2Inventory.all(filter)
                 .stream()
                 .filter(Objects::nonNull)
                 .filter(Predicates.distinctByProperty(Rs2Item::getName))
                 .collect(Collectors.toList());
 
-        itemsToDeposit.forEach(Rs2Bank::depositAll);
+        for (Rs2Item item : itemsToDeposit) {
+            Rs2Bank.depositAll(item);
+            if (delay) {
+                sleep(300, 450);
+            }
+        }
+        sleepUntil(() -> !isDepositing(filter));
+
         return !itemsToDeposit.isEmpty();
     }
+    //overload method to deposit all items without delay
+    public static boolean depositAll(Predicate<Rs2Item> filter) {
+        return depositAll(filter, false);
+    }
+
+    // boolean to determine if we still have items to deposit
+    private static boolean isDepositing(Predicate<Rs2Item> filter) {
+        List<Rs2Item> itemsToDeposit = Rs2Inventory.all(filter)
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(Predicates.distinctByProperty(Rs2Item::getName))
+                .collect(Collectors.toList());
+
+        return !itemsToDeposit.isEmpty();
+    }
+
 
     /**
      * deposit all items identified by its name
@@ -407,12 +430,52 @@ public class Rs2Bank {
         sleepUntil(Rs2Inventory::isEmpty);
     }
 
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified IDs.
+     * This method uses a lambda function to filter out the items with the specified IDs from the deposit operation.
+     *
+     * @param ids The IDs of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
     public static boolean depositAllExcept(Integer... ids) {
         return depositAll(x -> Arrays.stream(ids).noneMatch(id -> id == x.id));
     }
 
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified IDs.
+     * This method uses a lambda function to filter out the items with the specified IDs from the deposit operation.
+     * It also allows for a delay between deposit operations.
+     *
+     * @param delay If true, a delay is added between deposit operations.
+     * @param ids The IDs of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
+    public static boolean depositAllExcept(boolean delay, Integer... ids) {
+        return depositAll(x -> Arrays.stream(ids).noneMatch(id -> id == x.id), delay);
+    }
+
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified names.
+     * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
+     *
+     * @param names The names of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
     public static boolean depositAllExcept(String... names) {
         return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+    }
+
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified names.
+     * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
+     * It also allows for a delay between deposit operations.
+     *
+     * @param delay If true, a delay is added between deposit operations.
+     * @param names The names of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
+    public static boolean depositAllExcept(boolean delay,String... names) {
+        return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)), delay);
     }
 
 
