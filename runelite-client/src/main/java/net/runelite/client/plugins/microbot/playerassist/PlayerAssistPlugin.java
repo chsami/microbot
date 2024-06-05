@@ -16,8 +16,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "AIO Fighter",

@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.inventory;
 
+import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
@@ -39,7 +40,6 @@ public class Rs2Inventory {
 
     private static boolean isTrackingInventory = false;
     private static boolean isInventoryChanged = false;
-
 
     public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == InventoryID.INVENTORY.getId() && e.getItemContainer() != null) {
@@ -1372,33 +1372,39 @@ public class Rs2Inventory {
     }
 
     /**
-     * @param name item name
+     *
+     * @param name
+     * @return
      */
-    public static void wield(String name) {
-        if (!Rs2Inventory.hasItem(name)) return;
-        if (Rs2Equipment.isWearing(name, true)) return;
+    public static boolean wield(String name) {
+        if (!Rs2Inventory.hasItem(name)) return false;
+        if (Rs2Equipment.isWearing(name, true)) return false;
         invokeMenu(get(name), "wield");
+        return true;
     }
 
     /**
      * @param name item name
      */
-    public static void wear(String name) {
-        invokeMenu(get(name), "wear");
+    public static boolean wear(String name) {
+        return wield(name);
     }
 
     /**
      * @param id item id
      */
-    public static void equip(int id) {
-        wield(id);
+    public static boolean equip(int id) {
+        return wield(id);
     }
 
     /**
      * @param id item id
      */
-    public static void wield(int id) {
+    public static boolean wield(int id) {
+        if (!Rs2Inventory.hasItem(id)) return false;
+        if (Rs2Equipment.isWearing(id)) return false;
         invokeMenu(get(id), "wield");
+        return true;
     }
 
     /**

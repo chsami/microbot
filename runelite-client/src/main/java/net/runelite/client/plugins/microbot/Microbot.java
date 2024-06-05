@@ -14,6 +14,7 @@ import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
+import net.runelite.client.plugins.microbot.configs.SpecialAttackConfigs;
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -28,7 +29,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -88,6 +92,8 @@ public class Microbot {
     private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
+    @Getter
+    private static SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
@@ -95,12 +101,13 @@ public class Microbot {
                 != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
 
+    @Deprecated(since="1.2.4 - use Rs2Player variant", forRemoval = true)
     public static boolean isMoving() {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
                 != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
 
-
+    @Deprecated(since="1.2.4 - use Rs2Player variant", forRemoval = true)
     public static boolean isAnimating() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
     }
@@ -250,3 +257,4 @@ public class Microbot {
         client.getCanvas().dispatchEvent(e);
     }
 }
+

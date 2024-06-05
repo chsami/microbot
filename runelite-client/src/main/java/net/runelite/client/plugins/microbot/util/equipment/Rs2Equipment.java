@@ -157,7 +157,6 @@ public class Rs2Equipment {
         }
     }
 
-
     public static boolean hasGuthanWeaponEquiped() {
         return isEquipped("guthan's warspear", EquipmentInventorySlot.WEAPON);
     }
@@ -234,6 +233,10 @@ public class Rs2Equipment {
             return true;
         }
         return false;
+    }
+
+    public static boolean isWearingShield() {
+        return equipmentItems.stream().anyMatch(x -> x.getSlot() == EquipmentInventorySlot.SHIELD.getSlotIdx());
     }
 
     private static void invokeMenu(Rs2Item rs2Item, String action) {

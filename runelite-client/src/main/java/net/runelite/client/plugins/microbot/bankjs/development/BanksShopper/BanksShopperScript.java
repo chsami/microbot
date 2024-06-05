@@ -120,6 +120,12 @@ public class BanksShopperScript extends Script {
         return true;
     }
 
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        Microbot.pauseAllScripts = true;
+    }
+
     /**
      * Hops to a new world
      */
