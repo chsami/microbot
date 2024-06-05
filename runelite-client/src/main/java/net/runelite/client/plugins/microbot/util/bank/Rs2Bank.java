@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Predicates;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -22,6 +23,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -357,14 +359,15 @@ public class Rs2Bank {
         return depositAll(rs2Item);
     }
 
-    public static boolean depositAll(Predicate<Rs2Item> predicate) {
-        for (Rs2Item item :
-                Rs2Inventory.items().stream().filter(predicate).collect(Collectors.toList())) {
-            if (item == null) continue;
-            depositAll(item);
-            return true;
-        }
-        return false;
+    public static boolean depositAll(Predicate<Rs2Item> filter) {
+        List<Rs2Item> itemsToDeposit = Rs2Inventory.all(filter)
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(Predicates.distinctByProperty(Rs2Item::getName))
+                .collect(Collectors.toList());
+
+        itemsToDeposit.forEach(Rs2Bank::depositAll);
+        return !itemsToDeposit.isEmpty();
     }
 
     /**
@@ -939,6 +942,12 @@ public class Rs2Bank {
         Microbot.status = "Walking to nearest bank " + bankLocation.toString();
         Rs2Walker.walkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
+    }
+    //Distance to bank
+    public static boolean isNearBank(int distance) {
+        BankLocation bankLocation = getNearestBank();
+        int distanceToBank = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(bankLocation.getWorldPoint());
+        return distanceToBank <= distance;
     }
 
     /**
