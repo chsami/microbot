@@ -194,7 +194,7 @@ public class SandCrabScript extends Script {
      * Reset aggro will walk 20 tiles north
      */
     private void resetAggro() {
-        boolean walkedFarEnough = Rs2Walker.walkTo(new WorldPoint(initialPlayerLocation.getX(), initialPlayerLocation.getY() + 40, initialPlayerLocation.getPlane()), 4);
+        boolean walkedFarEnough = Rs2Walker.walkTo(new WorldPoint(initialPlayerLocation.getX(), initialPlayerLocation.getY() + 25, initialPlayerLocation.getPlane()), 4);
         if (!walkedFarEnough) return;
 
         state = State.WALK_BACK;
