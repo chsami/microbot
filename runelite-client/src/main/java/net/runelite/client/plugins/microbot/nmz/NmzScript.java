@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.nmz;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
@@ -31,6 +33,10 @@ public class NmzScript extends Script {
     public static boolean useOverload = false;
 
     public static PrayerPotionScript prayerPotionScript;
+
+    @Getter
+    @Setter
+    private static boolean hasSurge = false;
 
     public boolean canStartNmz() {
         return Rs2Inventory.count("overload (4)") == config.overloadPotionAmount() && Rs2Inventory.count("absorption (4)") == config.absorptionPotionAmount() ||
@@ -91,7 +97,7 @@ public class NmzScript extends Script {
         prayerPotionScript.run();
         if (config.togglePrayerPotions())
             Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
-        if (!useOrbs()) {
+        if (!useOrbs() && config.walkToCenter()) {
             walkToCenter();
         }
         useOverloadPotion();
@@ -102,7 +108,7 @@ public class NmzScript extends Script {
     private void walkToCenter() {
         WorldPoint center = new WorldPoint(Random.random(2270, 2276), Random.random(4693, 4696), 0);
         if (center.distanceTo(Rs2Player.getWorldLocation()) > 4) {
-            Rs2Walker.walkTo(center, 4);
+            Rs2Walker.walkTo(center, 5);
         }
     }
 

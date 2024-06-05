@@ -63,6 +63,8 @@ public class PlayerAssistPlugin extends Plugin {
 //        flickerScript.run(config); // TODO: pray flick
         useSpecialAttackScript.run(config);
         antiPoisonScript.run(config);
+        Microbot.getSpecialAttackConfigs()
+                .setSpecialAttack(true);
     }
 
     protected void shutDown() {

@@ -123,4 +123,15 @@ public interface NmzConfig extends Config {
     {
         return true;
     }
+    @ConfigItem(
+            keyName = "Walk to center",
+            name = "Walk to center",
+            description = "Walk to center of nmz",
+            position = 7,
+            section = generalSection
+    )
+    default boolean walkToCenter()
+    {
+        return true;
+    }
 }

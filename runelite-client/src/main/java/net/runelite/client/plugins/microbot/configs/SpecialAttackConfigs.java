@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.nmz.NmzScript;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -86,8 +87,12 @@ public class SpecialAttackConfigs {
         if (name.isEmpty()) return false;
         if (Rs2Equipment.isWearingShield() && is2H && Rs2Inventory.isFull()) return false;
 
-        if (Rs2Combat.getSpecEnergy() < specEnergy) {
-            if (currentEquipment != null) {
+        if (Rs2Combat.getSpecEnergy() < specEnergy && !NmzScript.isHasSurge()) {
+            if (currentEquipment == null) {
+                currentEquipment = new ArrayList<>();
+                currentEquipment.addAll(Rs2Equipment.equipmentItems);
+            }
+            if (currentEquipment.get(EquipmentInventorySlot.WEAPON.getSlotIdx()).id != Rs2Equipment.get(EquipmentInventorySlot.WEAPON).id) {
                 Rs2Item weapon = currentEquipment
                         .stream()
                         .filter(x -> x.getSlot() == EquipmentInventorySlot.WEAPON.getSlotIdx())
@@ -103,26 +108,14 @@ public class SpecialAttackConfigs {
                     Rs2Inventory.wear(shield.name);
                 }
                 if (weapon != null) {
-                    boolean hasWear = Rs2Inventory.wear(Objects.requireNonNull(weapon).name);
-                    if (hasWear) {
-                        currentEquipment = null;
-                    }
+                    Rs2Inventory.wear(Objects.requireNonNull(weapon).name);
                 }
             }
             return false;
         }
 
-        storeCurrentEquipmentInMemory();
-
         boolean didInteract = Rs2Inventory.wear(name);
         if (didInteract) sleep(600);
         return Rs2Combat.setSpecState(true, specEnergy);
-    }
-
-    private static void storeCurrentEquipmentInMemory() {
-        if (currentEquipment == null) {
-            currentEquipment = new ArrayList<>();
-            currentEquipment.addAll(Rs2Equipment.equipmentItems);
-        }
     }
 }
