@@ -93,7 +93,7 @@ public class Microbot {
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
     @Getter
-    private static SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
+    private static final SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
