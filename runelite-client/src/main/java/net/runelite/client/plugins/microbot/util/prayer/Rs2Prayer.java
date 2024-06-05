@@ -56,22 +56,6 @@ public class Rs2Prayer {
         return true;
     }
 
-    public static boolean setQuickPrayers(Rs2PrayerEnum[] prayers) {
-        if (Rs2Widget.isHidden(10485779)) return false;
-
-        // Open the menu
-        Microbot.doInvoke(new NewMenuEntry("Setup",-1, 10485779, MenuAction.CC_OP.getId(), 2, -1, "Quick-prayers"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
-
-        sleepUntil(() -> !Rs2Widget.isHidden(5046276));
-
-        for (Rs2PrayerEnum prayer : prayers) {
-            Microbot.doInvoke(new NewMenuEntry(prayer.getName(),prayer.getQuickPrayerIndex(), 5046276, MenuAction.CC_OP.getId(), 1, -1, "Toggle"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
-        }
-
-        Microbot.doInvoke(new NewMenuEntry("Done",-1, 5046277, MenuAction.CC_OP.getId(), 1, -1, ""), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
-        return true;
-    }
-
 
 
     public static boolean isOutOfPrayer() {
