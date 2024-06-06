@@ -48,7 +48,7 @@ public class Rs2Walker {
     }
 
     public static boolean walkTo(WorldPoint target, int distance) {
-        if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
+        if (Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
             return true;
         }
         if (currentTarget != null && currentTarget.equals(target) && ShortestPathPlugin.getMarker() != null && !Microbot.getClientThread().scheduledFuture.isDone())
@@ -139,7 +139,7 @@ public class Rs2Walker {
                     }
                 }
 
-                if (Rs2Player.getWorldLocation().distanceTo(target) < 10) {
+                if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
                     System.out.println("walk minimap");
                     Rs2Walker.walkMiniMap(target);
                     sleep(600, 1200);
@@ -281,7 +281,7 @@ public class Rs2Walker {
             }
         }
 
-        if (wallObject != null && Rs2Camera.isTileOnScreen(wallObject)) {
+        if (wallObject != null) {
             Rs2GameObject.interact(wallObject);
             Rs2Player.waitForWalking();
             return true;
@@ -555,7 +555,7 @@ public class Rs2Walker {
 
                             GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
 
-                            if (gameObject != null && gameObject.getId() == b.getObjectId() && Rs2Camera.isTileOnScreen(gameObject)) {
+                            if (gameObject != null && gameObject.getId() == b.getObjectId()) {
                                 if (Rs2GameObject.hasLineOfSight(gameObject)) {
                                     Rs2GameObject.interact(gameObject, b.getAction());
                                     sleep(1200, 1600);

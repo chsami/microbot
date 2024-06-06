@@ -204,7 +204,7 @@ public class SandCrabScript extends Script {
      * Walks back to the initial player location when the script started
      */
     private void walkBack() {
-        boolean backToInitialLocation = Rs2Walker.walkTo(initialPlayerLocation, 1);
+        boolean backToInitialLocation = Rs2Walker.walkTo(initialPlayerLocation, 0);
         if (!backToInitialLocation) return;
 
         resetAfkTimer();
@@ -258,7 +258,7 @@ public class SandCrabScript extends Script {
         if (otherPlayerDetected(currentScanLocation.getWorldPoint())) {
             currentScanLocation.scanned = true;
         } else {
-            Rs2Walker.walkTo(currentScanLocation.getWorldPoint(), 1);
+            Rs2Walker.walkTo(currentScanLocation.getWorldPoint(), 0);
             initialPlayerLocation = currentScanLocation.getWorldPoint();
             state = State.FIGHT;
         }

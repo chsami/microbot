@@ -487,7 +487,7 @@ public class VorkathScript extends Script {
         sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(_sideStepLocation));
     }
 
-    WorldPoint findSafeTiles() {
+    WorldPoint findSafeTile() {
         WorldPoint swPoint = new WorldPoint(vorkath.getWorldLocation().getX() + 1, vorkath.getWorldLocation().getY() - 8, 0);
         WorldArea wooxWalkArea = new WorldArea(swPoint, 5, 1);
 
@@ -520,12 +520,12 @@ public class VorkathScript extends Script {
             Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_37991).forEach(tileObject -> acidPools.add(tileObject.getWorldLocation()));
         }
 
-        WorldPoint safeTile = findSafeTiles();
+        WorldPoint safeTile = findSafeTile();
         WorldPoint playerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
         if (safeTile != null) {
             if (playerLocation.equals(safeTile)) {
-                Rs2Npc.attack(vorkath);
+                Rs2Npc.interact(vorkath, "attack");
             } else {
                 Rs2Player.eatAt(75);
                 Rs2Walker.walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), safeTile));

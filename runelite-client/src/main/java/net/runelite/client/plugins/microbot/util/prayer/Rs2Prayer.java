@@ -22,13 +22,15 @@ public class Rs2Prayer {
     }
 
     public static void toggle(Rs2PrayerEnum name, boolean on) {
-        if (!Rs2Player.hasPrayerPoints()) return;
         final int varBit = name.getVarbit();
         if(!on) {
             if (Microbot.getVarbitValue(varBit) == 0) return;
         } else {
             if (Microbot.getVarbitValue(varBit) == 1) return;
         }
+
+        if (!Rs2Player.hasPrayerPoints()) return;
+
         Microbot.doInvoke(new NewMenuEntry(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
         //Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
     }

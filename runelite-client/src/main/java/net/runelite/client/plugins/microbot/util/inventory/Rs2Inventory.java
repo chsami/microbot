@@ -704,12 +704,9 @@ public class Rs2Inventory {
     }
 
     public static List<Rs2Item> getInventoryFood() {
-        long startTime = System.currentTimeMillis();
         List<Rs2Item> items = items().stream()
                 .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")))
                 .collect(Collectors.toList());
-        long endTime = System.currentTimeMillis();
-        long totalTime = endTime - startTime;
         return items;
     }
 
