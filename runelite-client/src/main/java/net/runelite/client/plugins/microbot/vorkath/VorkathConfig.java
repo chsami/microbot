@@ -22,24 +22,21 @@ public interface VorkathConfig extends Config {
     @ConfigSection(
             name = "Loot",
             description = "Loot",
-            position = 3,
-            closedByDefault = false
+            position = 3
     )
     String lootSection = "Loot";
 
     @ConfigSection(
             name = "Teleports",
             description = "Teleports",
-            position = 4,
-            closedByDefault = false
+            position = 4
     )
     String teleportSection = "Teleports";
 
     @ConfigSection(
             name = "Prayers",
             description = "Prayers",
-            position = 5,
-            closedByDefault = false
+            position = 5
     )
     String prayerSection = "Prayers";
 

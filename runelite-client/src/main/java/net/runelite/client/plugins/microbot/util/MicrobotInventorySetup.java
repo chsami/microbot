@@ -171,8 +171,7 @@ public class MicrobotInventorySetup {
             sleep(5000);
             return false;
         }
-        if (!Rs2Equipment.isWearing(
-                inventorySetup.getEquipment().stream().filter(x -> x.getId() != -1).map(x -> x.getName()).collect(Collectors.toList()),
+        if (!Rs2Equipment.isWearing(inventorySetup.getEquipment().stream().filter(x -> x.getId() != -1).map(x -> x.getName()).collect(Collectors.toList()),
                 true,
                 slots)
         ) {
