@@ -9,26 +9,37 @@ import net.runelite.api.events.*;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.worldmap.WorldMap;
+import net.runelite.client.config.ConfigClient;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.ConfigProfile;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.inventorysetups.InventorySetup;
+import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
+import net.runelite.client.plugins.microbot.playerassist.skill.AttackStyleScript;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.JagexColors;
+import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
+import net.runelite.client.util.SwingUtil;
 import net.runelite.client.util.Text;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @PluginDescriptor(
@@ -43,7 +54,6 @@ public class PlayerAssistPlugin extends Plugin {
     private PlayerAssistConfig config;
     @Inject
     private ConfigManager configManager;
-
     @Provides
     PlayerAssistConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(PlayerAssistConfig.class);
@@ -76,6 +86,7 @@ public class PlayerAssistPlugin extends Plugin {
     private final UseSpecialAttackScript useSpecialAttackScript = new UseSpecialAttackScript();
     private final AntiPoisonScript antiPoisonScript = new AntiPoisonScript();
     private final BuryScatterScript buryScatterScript = new BuryScatterScript();
+    private final AttackStyleScript attackStyleScript = new AttackStyleScript();
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -93,6 +104,7 @@ public class PlayerAssistPlugin extends Plugin {
         useSpecialAttackScript.run(config);
         antiPoisonScript.run(config);
         buryScatterScript.run(config);
+        attackStyleScript.run(config);
     }
 
     protected void shutDown() {
@@ -126,6 +138,16 @@ public class PlayerAssistPlugin extends Plugin {
                 "safeSpotLocation",
                 worldPoint
         );
+
+
+    }
+    //set Inventory Setup
+    private void setInventorySetup(InventorySetup inventorySetup) {
+        configManager.setConfiguration(
+                "PlayerAssistant",
+                "inventorySetupHidden",
+                inventorySetup
+        );
     }
     private void addNpcToList(String npcName) {
         configManager.setConfiguration(
@@ -133,6 +155,7 @@ public class PlayerAssistPlugin extends Plugin {
                 "monster",
                 config.attackableNpcs() + npcName + ","
         );
+
     }
     private void removeNpcFromList(String npcName) {
         configManager.setConfiguration(
@@ -157,11 +180,20 @@ public class PlayerAssistPlugin extends Plugin {
     // on setting change
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
+
+
         if (event.getKey().equals("Safe Spot")) {
 
             if (!config.toggleSafeSpot()) {
                 // reset safe spot to default
                 setSafeSpot(new WorldPoint(0, 0, 0));
+            }
+        }
+        if (event.getKey().equals("InventorySetupName")) {
+            InventorySetup inventorySetup = MInventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(config.inventorySetup())).findFirst().orElse(null);
+
+            if (inventorySetup != null) {
+                setInventorySetup(inventorySetup);
             }
         }
     }
