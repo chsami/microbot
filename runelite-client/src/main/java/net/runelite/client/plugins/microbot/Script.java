@@ -100,6 +100,7 @@ public abstract class Script implements IScript {
             if (Microbot.getClientThread().scheduledFuture != null)
                 Microbot.getClientThread().scheduledFuture.cancel(true);
             initialPlayerLocation = null;
+            Microbot.pauseAllScripts = false;
             Microbot.getSpecialAttackConfigs().reset();
         }
     }
@@ -125,11 +126,6 @@ public abstract class Script implements IScript {
 
         if (!hasRunEnergy && useStaminaPotsIfNeeded) {
             Rs2Inventory.interact("Stamina potion", "drink");
-        }
-
-        if (Microbot.isLoggedIn()) {
-            if (initialPlayerLocation == null)
-                initialPlayerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
         }
 
         return true;

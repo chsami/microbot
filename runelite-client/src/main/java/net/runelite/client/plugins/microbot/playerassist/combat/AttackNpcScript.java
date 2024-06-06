@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.playerassist.combat;
 
-import com.sun.jdi.Mirror;
 import net.runelite.api.Actor;
 import net.runelite.api.NPC;
 import net.runelite.api.Skill;
@@ -11,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,12 +30,16 @@ public class AttackNpcScript extends Script {
     boolean clicked = false;
 
     public void run(PlayerAssistConfig config) {
+        initialPlayerLocation = null;
         List<String> npcsToAttack = Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList());
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (!config.toggleCombat()) return;
+                if (initialPlayerLocation == null) {
+                    initialPlayerLocation = Rs2Player.getWorldLocation();
+                }
                 double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
                 if (Rs2Inventory.getInventoryFood().isEmpty() && treshHold < 10) return;
                 attackableNpcs = Microbot.getClient().getNpcs().stream()

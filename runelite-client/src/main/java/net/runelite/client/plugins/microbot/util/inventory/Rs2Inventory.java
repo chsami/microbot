@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.util.inventory;
 
-import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
@@ -398,7 +397,7 @@ public class Rs2Inventory {
                 items().stream().filter(predicate).collect(Collectors.toList())) {
             if (item == null) continue;
             invokeMenu(item, "Drop");
-            sleep(300, 600);
+            sleep(150, 600);
         }
         return true;
     }
@@ -420,7 +419,7 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(String... names) {
-        return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+        return dropAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())));
     }
 
     /**
@@ -452,7 +451,7 @@ public class Rs2Inventory {
     /**
      * Drop all items that fall under the gpValue
      *
-     * @param gpValue    minimum amount of gp required to not drop the item
+     * @param gpValue     minimum amount of gp required to not drop the item
      * @param ignoreItems List of items to not drop
      * @return
      */
@@ -573,6 +572,31 @@ public class Rs2Inventory {
     }
 
     /**
+     * Gets the item in the inventory with one of the specified names.
+     *
+     * @param names The names to match.
+     * @param exact true to match the exact name
+     * @return The item with one of the specified names, or null if not found.
+     */
+    public static Rs2Item get(List<String> names, boolean exact) {
+        if (exact) {
+            return items().stream().filter(x -> names.stream().anyMatch(n -> n.equalsIgnoreCase(x.name))).findFirst().orElse(null);
+        } else {
+            return items().stream().filter(x -> names.stream().anyMatch(n -> n.toLowerCase().contains(x.name.split("\\(")[0].toLowerCase()))).findFirst().orElse(null);
+        }
+    }
+
+    /**
+     * Gets the item in the inventory with one of the specified names.
+     *
+     * @param names The names to match.
+     * @return The item with one of the specified names, or null if not found.
+     */
+    public static Rs2Item get(List<String> names) {
+        return get(names, false);
+    }
+
+    /**
      * Gets the item in the inventory that matches the specified filter criteria.
      *
      * @param predicate The filter to apply.
@@ -690,6 +714,15 @@ public class Rs2Inventory {
         return get(names) != null;
     }
 
+
+    /**
+     * @param names
+     * @return boolean
+     */
+    public static boolean hasItem(List<String> names) {
+        return get(names) != null;
+    }
+
     /**
      * Gets the actions available for the item in the specified slot.
      *
@@ -700,7 +733,7 @@ public class Rs2Inventory {
         return items().stream()
                 .filter(x -> x.slot == slot)
                 .map(x -> x.getInventoryActions())
-                .findFirst().orElse(new String[] {});
+                .findFirst().orElse(new String[]{});
     }
 
     public static List<Rs2Item> getInventoryFood() {
@@ -922,6 +955,21 @@ public class Rs2Inventory {
     public static boolean interact(String name, String action) {
         interact(name, action, false);
         return true;
+    }
+
+    /**
+     * Interacts with an item with the specified name in the inventory using the specified action.
+     *
+     * @param name   The name of the item to interact with.
+     * @param action The action to perform on the item.
+     * @return True if the interaction was successful, false otherwise.
+     */
+    public static boolean interact(List<String> names, String action) {
+        for (String name:names) {
+            if (interact(name, action, false))
+                return true;
+        }
+       return false;
     }
 
     /**
@@ -1369,7 +1417,20 @@ public class Rs2Inventory {
     }
 
     /**
-     *
+     * @param names possible item names to wield
+     * @return
+     */
+    public static boolean wield(String... names) {
+        for (String name : names) {
+            if (!Rs2Inventory.hasItem(name)) continue;
+            if (Rs2Equipment.isWearing(name, true)) return true;
+            invokeMenu(get(name), "wield");
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @param name
      * @return
      */
@@ -1458,7 +1519,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param itemId
      * @param npcID
      * @return
@@ -1473,7 +1533,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param name
      * @param exact
      * @return
@@ -1665,6 +1724,10 @@ public class Rs2Inventory {
         isTrackingInventory = false;
         isInventoryChanged = false;
         return isInventoryChanged;
+    }
+
+    public static boolean dropEmptyVials() {
+        return dropAll("empty vial");
     }
 
 }

@@ -47,8 +47,7 @@ public class NmzScript extends Script {
     public boolean run(NmzConfig config) {
         NmzScript.config = config;
         prayerPotionScript = new PrayerPotionScript();
-        Microbot.getSpecialAttackConfigs()
-                .setSpecialAttack(true);
+        Microbot.getSpecialAttackConfigs().setSpecialAttack(true);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;

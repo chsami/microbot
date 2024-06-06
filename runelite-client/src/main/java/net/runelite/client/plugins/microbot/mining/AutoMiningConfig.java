@@ -1,13 +1,13 @@
-package net.runelite.client.plugins.microbot.woodcutting;
+package net.runelite.client.plugins.microbot.mining;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingTree;
+import net.runelite.client.plugins.microbot.mining.enums.Rocks;
 
-@ConfigGroup("Woodcutting")
-public interface AutoWoodcuttingConfig extends Config {
+@ConfigGroup("Mining")
+public interface AutoMiningConfig extends Config {
     @ConfigSection(
             name = "General",
             description = "General",
@@ -17,15 +17,15 @@ public interface AutoWoodcuttingConfig extends Config {
     String generalSection = "general";
 
     @ConfigItem(
-            keyName = "Tree",
-            name = "Tree",
-            description = "Choose the tree",
+            keyName = "Ore",
+            name = "Ore",
+            description = "Choose the ore",
             position = 0,
             section = generalSection
     )
-    default WoodcuttingTree TREE()
+    default Rocks ORE()
     {
-        return WoodcuttingTree.TREE;
+        return Rocks.TIN;
     }
 
     @ConfigItem(
@@ -38,18 +38,6 @@ public interface AutoWoodcuttingConfig extends Config {
     default int distanceToStray()
     {
         return 20;
-    }
-
-    @ConfigItem(
-            keyName = "Hop",
-            name = "Autohop when player detected",
-            description = "Auto hop when a nearby player is detected",
-            position = 2,
-            section = generalSection
-    )
-    default boolean hopWhenPlayerDetected()
-    {
-        return false;
     }
 
     @ConfigItem(
@@ -71,6 +59,7 @@ public interface AutoWoodcuttingConfig extends Config {
             position = 4
     )
     default String itemsToBank() {
-        return "logs";
+        return "ore";
     }
+
 }

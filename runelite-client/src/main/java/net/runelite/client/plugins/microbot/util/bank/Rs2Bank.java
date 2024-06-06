@@ -702,7 +702,7 @@ public class Rs2Bank {
     public static void withdrawAndEquip(String name) {
         if (Rs2Equipment.isWearing(name)) return;
         withdrawOne(name);
-        sleepUntil(() -> Rs2Inventory.hasItem(name), 1000);
+        sleepUntil(() -> Rs2Inventory.hasItem(name), 1800);
         wearItem(name);
     }
 
@@ -765,9 +765,8 @@ public class Rs2Bank {
             } else {
                 action = Rs2GameObject.interact(bank, "bank");
             }
-            sleepUntil(Rs2Bank::isOpen);
             if (action) {
-                sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 2500);
                 sleep(600, 1000);
             }
             return action;
@@ -993,5 +992,25 @@ public class Rs2Bank {
             return true;
         }
         return false;
+    }
+
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
+        if (Rs2Inventory.isFull()) {
+            boolean isBankOpen = Rs2Bank.walkToBankAndUseBank();
+            if (isBankOpen) {
+                for (String itemName: itemNames) {
+                    Rs2Bank.depositAll(x -> x.name.toLowerCase().contains(itemName));
+                }
+            }
+            return false;
+        }
+
+        final int distance = 4;
+
+        if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > 10) {
+            Rs2Walker.walkTo(initialPlayerLocation, distance);
+        }
+
+        return !Rs2Inventory.isFull() && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
     }
 }

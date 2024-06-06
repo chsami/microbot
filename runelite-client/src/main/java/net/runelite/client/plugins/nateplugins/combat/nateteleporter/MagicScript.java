@@ -24,13 +24,16 @@ public class MagicScript extends Script {
 
 
     public boolean run(MagicConfig config) {
+        initialPlayerLocation = null;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
             if (!Microbot.isLoggedIn()) return;
-
+            if (initialPlayerLocation == null) {
+                initialPlayerLocation = Rs2Player.getWorldLocation();
+            }
 
             try {
-                if (!config.alchemy() && (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts))
+                if (!config.alchemy() && (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts))
                     return;
 
                 if (config.alchemy()) {
@@ -43,7 +46,7 @@ public class MagicScript extends Script {
                     }
 
                     if (config.alchemy()) {
-                        Rs2Magic.alch(item);
+                        Rs2Magic.alch(item.name, 100, 150);
                     }
                     sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC);
                 }
@@ -75,10 +78,12 @@ public class MagicScript extends Script {
                     sleep(100, 300);
                     if (!config.MODE().toString().contains("teleport")) {
                         net.runelite.api.NPC npc = (net.runelite.api.NPC) Microbot.getClient().getLocalPlayer().getInteracting();
-                        if (npc != null && npc.getName().equals(config.NPC()))
+                        if (npc != null && npc.getName().equals(config.NPC()) && Rs2Npc.hasLineOfSight(npc))
                             Rs2Npc.interact(npc, "");
-                        else
-                            Rs2Npc.interact(config.NPC(), "");
+                        else {
+                            npc = Rs2Npc.getNpcInLineOfSight(config.NPC());
+                            Rs2Npc.interact(npc, "");
+                        }
                     }
                 }
             } catch (Exception ex) {

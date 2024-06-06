@@ -49,6 +49,7 @@ public class SandCrabScript extends Script {
             new ScanLocation(new WorldPoint(1738, 3468, 0)));
 
     public boolean run(SandCrabConfig config) {
+        initialPlayerLocation = null;
         if (config.threeNpcs()) {
             sandCrabLocations = sandCrabLocations.stream().filter(x -> x.hasThreeNpcs).collect(Collectors.toList());
         }
@@ -56,7 +57,9 @@ public class SandCrabScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-
+                if (initialPlayerLocation == null) {
+                    initialPlayerLocation = Rs2Player.getWorldLocation();
+                }
                 long startTime = System.currentTimeMillis();
 
                Rs2Combat.enableAutoRetialiate();

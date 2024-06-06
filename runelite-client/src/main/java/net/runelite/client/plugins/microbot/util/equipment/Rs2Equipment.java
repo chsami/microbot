@@ -202,6 +202,20 @@ public class Rs2Equipment {
         return false;
     }
 
+    public static boolean isWearing(List<String> names, boolean exact, List<EquipmentInventorySlot> ignoreSlots) {
+        for (String name : names) {
+            for (EquipmentInventorySlot slot : EquipmentInventorySlot.values()) {
+                if (ignoreSlots.stream().anyMatch(x -> x.getSlotIdx() == slot.getSlotIdx()))
+                    continue;
+                if (!isEquipped(name, slot, exact)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public static boolean interact(int id, String action) {
         Rs2Item item = get(id);
         if (item != null) {

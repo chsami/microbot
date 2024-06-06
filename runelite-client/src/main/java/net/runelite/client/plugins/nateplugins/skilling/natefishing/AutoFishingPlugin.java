@@ -1,9 +1,8 @@
-package net.runelite.client.plugins.nateplugins.skilling.nateminer.nateminer;
+package net.runelite.client.plugins.nateplugins.skilling.natefishing;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Skill;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -12,21 +11,20 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
-import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Nate +"PowerMiner",
-        description = "Nate's PowerMiner plugin",
-        tags = {"Mining", "nate", "skilling"},
+        name = PluginDescriptor.Nate + "Auto Fishing",
+        description = "Nate's Power Fisher plugin",
+        tags = {"Fishing", "nate", "skilling"},
         enabledByDefault = false
 )
 @Slf4j
-public class MiningPlugin extends Plugin {
+public class AutoFishingPlugin extends Plugin {
     @Inject
-    private MiningConfig config;
+    private AutoFishingConfig config;
     @Inject
     private Client client;
     @Inject
@@ -35,17 +33,17 @@ public class MiningPlugin extends Plugin {
     Notifier notifier;
 
     @Provides
-    MiningConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(MiningConfig.class);
+    AutoFishingConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(AutoFishingConfig.class);
     }
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private MiningOverlay miningOverlay;
+    private AutoFishingOverlay fishingOverlay;
 
     @Inject
-    MiningScript miningScript;
+    AutoFishingScript fishingScript;
 
 
     @Override
@@ -55,18 +53,14 @@ public class MiningPlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        expstarted = Microbot.getClient().getSkillExperience(Skill.MINING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.MINING);
-        timeBegan = System.currentTimeMillis();
         if (overlayManager != null) {
-            overlayManager.add(miningOverlay);
+            overlayManager.add(fishingOverlay);
         }
-
-        miningScript.run(config);
+        fishingScript.run(config);
     }
 
     protected void shutDown() {
-        miningScript.shutdown();
-        overlayManager.remove(miningOverlay);
+        fishingScript.shutdown();
+        overlayManager.remove(fishingOverlay);
     }
 }

@@ -47,11 +47,14 @@ public class BanksShopperScript extends Script {
         int minimumStock = config.minimumStock();
 
         Microbot.enableAutoRunOn = false;
+        initialPlayerLocation = null;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
                 if (!Microbot.isLoggedIn()) return;
-
+                if (initialPlayerLocation == null) {
+                    initialPlayerLocation = Rs2Player.getWorldLocation();
+                }
                 if (!Rs2Inventory.hasItem(itemNames.toArray(String[]::new)) && selectedAction == Actions.SELL) {
                     Microbot.status = "[Shutting down] - Reason: Not enough supplies.";
                     Microbot.showMessage(Microbot.status);
