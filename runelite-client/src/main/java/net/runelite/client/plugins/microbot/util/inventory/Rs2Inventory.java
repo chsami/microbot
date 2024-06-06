@@ -19,6 +19,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1533,19 +1534,17 @@ public class Rs2Inventory {
 
         if (!action.isEmpty()) {
             String[] actions = rs2Item.getInventoryActions();
-
             for (int i = 0; i < actions.length; i++) {
                 if (action.equalsIgnoreCase(actions[i])) {
                     identifier = i + 2;
                     break;
                 }
             }
+            if((Objects.equals(actions[1], "Wear") && actions[0]==null) || action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")){
+                identifier++;
+            }
         }
-
         param0 = rs2Item.slot;
-        if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")) {
-            identifier++;
-        }
         if (Rs2Bank.isOpen()) {
             if (action.equalsIgnoreCase("eat")) {
                 identifier += 7;
