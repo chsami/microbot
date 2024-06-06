@@ -5,6 +5,7 @@ import net.runelite.client.config.*;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.plugins.inventorysetups.InventorySetup;
 
 @ConfigGroup(net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig.GROUP)
 public interface PlayerAssistConfig extends Config {
@@ -302,6 +303,124 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleLazyFlick()
     {
         return false;
+    }
+
+    //Skilling section
+    @ConfigSection(
+            name = "Skilling",
+            description = "Skilling",
+            position = 5,
+            closedByDefault = false
+    )
+    String skillingSection = "Combat Skilling";
+
+    //Balance combat skills
+    @ConfigItem(
+            keyName = "balanceCombatSkills",
+            name = "Balance combat skills",
+            description = "Balance combat skills",
+            position = 0,
+            section = skillingSection
+    )
+    default boolean toggleBalanceCombatSkills()
+    {
+        return false;
+    }
+
+    //Avoid Controlled attack style
+    @ConfigItem(
+            keyName = "avoidControlled",
+            name = "No Controlled Attack",
+            description = "Avoid Controlled attack style so you won't accidentally train unwanted combat skills",
+            position = 1,
+            section = skillingSection
+    )
+    default boolean toggleAvoidControlled()
+    {
+        return true;
+    }
+
+    //Attack style change delay (Seconds)
+    @ConfigItem(
+            keyName = "attackStyleChangeDelay",
+            name = "Change Delay",
+            description = "Attack Style Change Delay In Seconds",
+            position = 2,
+            section = skillingSection
+    )
+    default int attackStyleChangeDelay()
+    {
+        return 60*15;
+    }
+
+    //Attack skill target
+    @ConfigItem(
+            keyName = "attackSkillTarget",
+            name = "Attack Level Target",
+            description = "Attack level target",
+            position = 97,
+            section = skillingSection
+    )
+    default int attackSkillTarget()
+    {
+        return 99;
+    }
+    //Strength skill target
+    @ConfigItem(
+            keyName = "strengthSkillTarget",
+            name = "Strength Level Target",
+            description = "Strength level target",
+            position = 98,
+            section = skillingSection
+    )
+    default int strengthSkillTarget()
+    {
+        return 99;
+    }
+    //Defence skill target
+    @ConfigItem(
+            keyName = "defenceSkillTarget",
+            name = "Defence Level Target",
+            description = "Defence level target",
+            position = 99,
+            section = skillingSection
+    )
+    default int defenceSkillTarget()
+    {
+        return 99;
+    }
+
+    //Gear section
+    @ConfigSection(
+            name = "Gear",
+            description = "Gear",
+            position = 55,
+            closedByDefault = false
+    )
+    String gearSection = "Gear";
+    // Inventory setup selection
+    @ConfigItem(
+            keyName = "InventorySetupName",
+            name = "Inventory setup name",
+            description = "Create an inventory setup in the inventory setup plugin and enter the name here",
+            position = 0,
+            section = gearSection
+    )
+    default String inventorySetup()
+    {
+        return "";
+    }
+
+    // Hidden config item for inventory setup
+    @ConfigItem(
+            keyName = "inventorySetupHidden",
+            name = "inventorySetupHidden",
+            description = "inventorySetupHidden",
+            hidden = true
+    )
+    default InventorySetup inventorySetupHidden()
+    {
+        return null;
     }
 
     //hidden config item for center location
