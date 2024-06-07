@@ -274,8 +274,8 @@ public class BlackJackScript extends Script {
                                     Rs2GameObject.interact(config.THUGS().door, "Open");
                                     sleepUntil(() -> !checkCurtain(config.THUGS().door), 5000);
                                     sleep(80,160);
-                                    Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
-                                    sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3345);
+                                    Rs2Walker.walkTo(new WorldPoint(3345,2955,0), 0);
+                                    sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3345);
                                     sleep(80,160);
                                     Rs2GameObject.interact(config.THUGS().door, "Close");
                                     sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
@@ -298,15 +298,15 @@ public class BlackJackScript extends Script {
                                 sleep(120,240);
                                 Rs2Npc.interact(3537, "trade");
                                 sleepUntil(() -> Rs2Shop.isOpen(), 5000);
-                                sleep(80, 160);
+                                sleep(200, 260);
                                 if(Rs2Shop.isOpen()){
                                     if (Rs2Inventory.hasItem(Rs2Inventory.get(emptyJug).name)) {
                                         Rs2Inventory.sellItem(Rs2Inventory.get(emptyJug).name, "50");
                                         sleepUntil(() -> !Rs2Inventory.hasItem(Rs2Inventory.get(emptyJug).name));
-                                        sleep(80, 160);
+                                        sleep(200, 260);
                                         Rs2Shop.closeShop();
                                         sleepUntil(() -> !Rs2Shop.isOpen(), 5000);
-                                        sleep(80, 160);
+                                        sleep(200, 260);
                                     }
                                 }
                             }
