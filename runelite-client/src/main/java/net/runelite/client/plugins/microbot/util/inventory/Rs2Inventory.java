@@ -1331,7 +1331,7 @@ public class Rs2Inventory {
         if (action == null || action.isEmpty())
             action = Arrays.stream(item.getInventoryActions()).findFirst().orElse("");
 
-        return interact(item.id, action);
+        return interact(item, action);
     }
 
     /**
@@ -1609,7 +1609,7 @@ public class Rs2Inventory {
             identifier++;
         }
         if (Rs2Bank.isOpen()) {
-            if (action.equalsIgnoreCase("eat")) {
+            if (action.equalsIgnoreCase("eat") && action.equalsIgnoreCase("fill")) {
                 identifier += 7;
             } else {
                 identifier += 6;
