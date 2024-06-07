@@ -526,6 +526,7 @@ public class BlackJackScript extends Script {
                 waitForNPC(npc);
                 Rs2Player.toggleRunEnergy(true);
             }
+            npcIsTrapped=true;
             return true;
         } else {
             sleep(300,600);
