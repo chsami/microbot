@@ -33,9 +33,10 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 1.0;
+    public static double version = 1.1;
     public static State state = BANKING;
     BlackJackConfig config;
+    boolean firstPlayerOpenCurtain = false;
     boolean initScript = false;
     boolean npcIsTrapped = false;
     boolean knockout = false;
@@ -43,7 +44,6 @@ public class BlackJackScript extends Script {
     static boolean npcsCanSeeEachother = false;
     NPC npc;
     public static List<NPC> npcsInArea = new ArrayList();
-    //public static net.runelite.api.NPC[] countNPCs;
     int g = 0;
     static int playerHit=0;
     int previousHP;
@@ -66,7 +66,6 @@ public class BlackJackScript extends Script {
                 && Rs2Equipment.isWearing("blackjack")
                 && (Rs2Equipment.isWearing(config.teleportItemToBank()) || Rs2Inventory.hasItem(config.teleportItemToBank()))
                 && Rs2Inventory.hasItem(notedWine);
-                //&& Rs2Inventory.hasItem(pollniveachTeleport);
     }
     private boolean withdrawRequiredItems() {
         sleepUntil(() -> Rs2Bank.isOpen());
@@ -85,7 +84,6 @@ public class BlackJackScript extends Script {
         sleep(80, 120);
         Rs2Bank.withdrawX(pollniveachTeleport, 1);//Pollnivneach teleport(make with redirect scroll
         sleepUntil(() -> Rs2Inventory.hasItem(pollniveachTeleport));
-        //sleep(80, 120);
         sleep(800, 1200);
         return true;
     }
@@ -100,8 +98,7 @@ public class BlackJackScript extends Script {
             try {
                 startTime = System.currentTimeMillis();
                 long restartTime = startTime-endTime;
-                System.out.println("Script took "+restartTime+"ms to restart.");
-                System.out.println("initScript is equal to : "+initScript);
+                //System.out.println("Script took "+restartTime+"ms to restart.");
                 //final Rs2Item amulet = getEquippedItem(EquipmentInventorySlot.AMULET);
                 //final Rs2Item blackjack = getEquippedItem(EquipmentInventorySlot.WEAPON);
                 //List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
@@ -151,24 +148,20 @@ public class BlackJackScript extends Script {
                 if(state==BLACKJACK){
                     if(!checkCurtain(config.THUGS().door)) {
                         if (!isPlayerNearby) {
-                            //TODO CHECK NPC COUNT AND RESET!!
                             sleep(120, 240);
                             Rs2GameObject.interact(config.THUGS().door, "Close");
-                            //this will also hyper click?
                             sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
                             bjCycle = 0;
-                            //sleepUntil(() -> !Rs2GameObject.interact(config.THUGS().door, "Close"));
                             sleep(120, 240);
                             if (state == BLACKJACK) {
                                 state = WALK_TO_THUGS;
                             }
                         } else {
-                            //TODO maybe add 1/4 chance to close the door anyways?
                             int r = random(1,4);
-                            if(r==4 && bjCycle==0){
+                            if(r==4 && bjCycle==0 && firstPlayerOpenCurtain){
                                 sleep(400,600);
                                 Rs2GameObject.interact(config.THUGS().door, "Close");
-                                sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
+                                sleepUntil(() -> checkCurtain(config.THUGS().door), 3000);
                                 bjCycle = 0;
                                 sleep(400, 600);
                                 if (state == BLACKJACK) {
@@ -195,6 +188,13 @@ public class BlackJackScript extends Script {
                                     state = BANKING;
                                 }
                             }
+                            if(bjCycle==0 && !firstPlayerOpenCurtain) {
+                                firstPlayerOpenCurtain = true;
+                            }
+                        }
+                    } else {
+                        if(firstPlayerOpenCurtain){
+                            firstPlayerOpenCurtain=false;
                         }
                     }
                 }
@@ -214,46 +214,7 @@ public class BlackJackScript extends Script {
                 }
                 switch (state) {
                     case BANKING:
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        //TODO
-                        System.out.println("state == BANKING");
+                        //System.out.println("state == BANKING");
                         if(inArea(Rs2Player.getWorldLocation(), 3340,2956,3344,2953) && isPlayerNearby){
                             sleep(120,240);
                             Rs2Equipment.interact(config.teleportItemToBank(), config.teleportActionToBank());
@@ -261,7 +222,6 @@ public class BlackJackScript extends Script {
                             sleep(1000, 3000);
                         }
                         // need to teleport to bank
-                        // change to "hasrequireditems()"
                             if(!hasRequiredItems()){
                                 // add config item teleport here
                                 boolean foundBank = Rs2Bank.openBank();
@@ -302,25 +262,16 @@ public class BlackJackScript extends Script {
                         state = UN_NOTING;
                         break;
                     case UN_NOTING:
-                        System.out.println("state == UN_NOTING");
-                        // walk to area to unnote wine, close door behind player.
-                        //3359,2988
-
+                        //System.out.println("state == UN_NOTING");
                         //if(!shopsArea.intersectsWith(Rs2Player.getWorldLocation().toWorldArea())){
-                        //3355, 2992, 3363, 2984
                         //shop location
                         if(!inArea(Rs2Player.getWorldLocation(),3355, 2992, 3363, 2984)){
                             //thugs location
                             if(inArea(Rs2Player.getWorldLocation(), 3340,2956,3344,2953)){
                                 sleep(120,240);
-                                // DANGER! THIS WILL HYPERCLICK!
-                                //if(!Rs2GameObject.interact(config.THUGS().door, "Close")) {
                                 if(checkCurtain(config.THUGS().door)){
                                     sleep(120,240);
-                                    // DANGER! THIS WILL HYPERCLICK!
                                     Rs2GameObject.interact(config.THUGS().door, "Open");
-                                    // DANGER! THIS WILL HYPERCLICK!
-                                    //sleepUntil(() -> !Rs2GameObject.interact(config.THUGS().door, "Open"),5000);
                                     sleepUntil(() -> !checkCurtain(config.THUGS().door), 5000);
                                     sleep(80,160);
                                     Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
@@ -329,15 +280,11 @@ public class BlackJackScript extends Script {
                                     Rs2GameObject.interact(config.THUGS().door, "Close");
                                     sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
                                     sleep(120,240);
-                                    // walk outside of door, then close door.
                                 } else {
-                                    // walk outside of door, then close door.
                                     Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
                                     sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3345);
                                     sleep(80,160);
-                                    // DANGER! THIS WILL HYPERCLICK!
                                     Rs2GameObject.interact(config.THUGS().door, "Close");
-                                    //sleepUntil(() -> !Rs2GameObject.interact(config.THUGS().door, "Close"),5000);
                                     sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
                                     sleep(120,240);
                                 }
@@ -361,20 +308,9 @@ public class BlackJackScript extends Script {
                                         sleepUntil(() -> !Rs2Shop.isOpen(), 5000);
                                         sleep(80, 160);
                                     }
-
                                 }
-
-                                // MenuEntryImpl(getOption=Trade, getTarget=<col=ffff00>Market seller<col=aa6e00> (ID: 3537) (A: -1) (P: 808)</col>, getIdentifier=16235, getType=NPC_THIRD_OPTION, getParam0=0, getParam1=0, getItemId=-1, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
-                                // MenuEntryImpl(getOption=Sell 50<col=ff9040>, getTarget=<col=ff9040>Jug</col>, getIdentifier=5, getType=CC_OP, getParam0=1, getParam1=19726336, getItemId=1935, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
-                                // Run to NPC to sell empty wine jugs,
-
-                                // MenuEntryImpl(getOption=Close, getTarget=, getIdentifier=1, getType=CC_OP, getParam0=11, getParam1=19660801, getItemId=-1, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
                             }
                             if(Rs2Inventory.hasItem(notedWine)){
-                                // MenuEntryImpl(getOption=Use, getTarget=<col=ff9040>Jug of wine</col><col=ffffff> -> <col=ffff00>Banknote Exchange Merchant, getIdentifier=16236, getType=WIDGET_TARGET_ON_NPC, getParam0=0, getParam1=0, getItemId=-1, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
-                                // convert noted wines to real wines via the adjacent NPC
-                                // MenuEntryImpl(getOption=Continue, getTarget=, getIdentifier=0, getType=WIDGET_CONTINUE, getParam0=3, getParam1=14352385, getItemId=-1, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
-                                // MenuEntryImpl(getOption=Use, getTarget=<col=ff9040>Jug of wine</col><col=ffffff> -> <col=ffff00>Banknote Exchange Merchant<col=aa6e00> (ID: 1615) (A: -1) (P: 808)</col>, getIdentifier=16236, getType=WIDGET_TARGET_ON_NPC, getParam0=0, getParam1=0, getItemId=-1, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
                                 if (!Rs2Inventory.isItemSelected()) {
                                     Rs2Inventory.use(notedWine);
                                     sleep(80, 160);
@@ -402,10 +338,9 @@ public class BlackJackScript extends Script {
                         state = WALK_TO_THUGS;
                         break;
                     case WALK_TO_THUGS:
-                        System.out.println("state == WALK_TO_THUGS");
+                        //System.out.println("state == WALK_TO_THUGS");
                         //if (config.THUGS().thugArea.intersectsWith(Rs2Player.getWorldLocation().toWorldArea())) {
                         if (inArea(Rs2Player.getWorldLocation(), 3340,2956,3344,2953)) {
-                            System.out.println("Player is in the correct area");
                             //npcsInArea = Microbot.getClient().getNpcs().stream().filter(x -> x.getWorldLocation().distanceTo(getInitialPlayerLocation()) < 2).collect(Collectors.toList()); ORIGINAL
                             npcsInArea = Microbot.getClient().getNpcs().stream().filter(x ->
                             x.getWorldLocation().getX() >= 3340).filter(x -> x.getWorldLocation().getY() <= 2956).filter(x ->
@@ -413,30 +348,21 @@ public class BlackJackScript extends Script {
                             .collect(Collectors.toList());
                             if(npcsInArea.isEmpty()){
                                 sleep(120,240);
-                                    System.out.println("Walk to thugs, door interact 1");
-                                    // this is "if the door is closed, open it.
                                 if(checkCurtain(config.THUGS().door)) {
                                     Rs2GameObject.interact(config.THUGS().door, "Open");
                                     sleepUntil(() -> !checkCurtain(config.THUGS().door), 5000);
                                     sleep(120, 240);
                                 }
-                                //Rs2GameObject.interact(ObjectID.CURTAIN_1533, "Open", 2);
                                 npcIsTrapped=false;
-                                // bug here, this is opposite where it should be.
                                 state = TRAP_NPC;
-                                //npc = Rs2Npc.getNpc(config.THUGS().displayName);
                                 npc = Rs2Npc.getNpc(config.THUGS().displayName);
                                 return;
                             } else {
-                                System.out.println("found NPCs length == "+npcsInArea.size());
                                 if(npcsInArea.size()>1){
                                     state = LURE_AWAY;
                                     return;
                                 }
                                 sleep(120,240);
-                                System.out.println("Walk to thugs, door interact 2");
-                                // DANGER! FOR SOME REASON THIS WILL HYPER CLICK LIKE THE FURY OF A GOD
-                                //if(!Rs2GameObject.interact(config.THUGS().door, "Close")) {
                                   if(checkCurtain(config.THUGS().door)){//true == door is closed
                                     sleep(120,240);
                                     if (!npcIsTrapped) {
@@ -444,10 +370,6 @@ public class BlackJackScript extends Script {
                                     }
                                       state = BLACKJACK;
                                 } else {
-                                      System.out.println("door interact 2 is false(open)");
-                                    //Rs2GameObject.interact(config.THUGS().door, "Close");
-                                    // change this to "open"?
-                                    //sleepUntil(() -> !Rs2GameObject.interact(config.THUGS().door, "Close"),5000);
                                     npcIsTrapped = true;
                                     state = BLACKJACK;
                                 }
@@ -455,31 +377,24 @@ public class BlackJackScript extends Script {
                                 //npc = Rs2Npc.getNpcs().findFirst().get();
                             }
                         } else {
-                            System.out.println("Player is not in the correct area.");
                             Rs2Walker.walkTo(config.THUGS().location, 0);
                             sleep(120,180);
                             return;
                         }
                         break;
                     case LURE_AWAY:
-                        System.out.println("state == LURE_AWAY");
+                        //System.out.println("state == LURE_AWAY");
                         npc = Rs2Npc.getNpcs().findFirst().get();
-                        // get any npc within the area
-                        // PRIORITY
                         sleep(120,240);
-                        //Rs2Npc.interact(npc, "Lure");
                         if(lure_NPC(npc)){
                             sleep(60, 180);
                             state = RUN_AWAY;
                         }
-                        // add options to go through the dialogue and check that the lure works~
 
                         break;
                     case TRAP_NPC:
-                        System.out.println("state == TRAP_NPC");
+                        //System.out.println("state == TRAP_NPC");
                         if(!npcIsTrapped){
-                            //Rs2Npc.interact(npc, "Lure");
-                            // add options to go through the dialogue and check that the lure works~
                             if(lure_NPC(npc)) {
                                 sleep(60, 180);
                                 state = WALK_TO_THUGS;
@@ -495,14 +410,12 @@ public class BlackJackScript extends Script {
                                 state=BANKING;
                             }
                         } else {
-                            System.out.println("Something is wrong, TRAP_NPC not detecting npcIsTrapped.");
                             state = BLACKJACK;
                             return;
                         }
                         //break;
                     case RUN_AWAY:
-                        System.out.println("state == RUN_AWAY");
-                        // OPEN DOOR, RUN TO LOCATION, WAIT
+                        //System.out.println("state == RUN_AWAY");
                         if(checkCurtain(config.THUGS().door)){
                             sleep(60,90);
                             Rs2GameObject.interact(config.THUGS().door, "Open");
@@ -526,14 +439,11 @@ public class BlackJackScript extends Script {
                         Rs2GameObject.interact(6243,true);
                         sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==0,1000);
                         sleep(120,240);
-                        //Rs2GameObject.interact(new WorldPoint(3353, 2960, 0), "Climb-up");
-                        // sleep until ?
-                        //sleep(1000,2000);
                         state = WALK_TO_THUGS;
                         break;
 
                     case BLACKJACK:
-                        System.out.println("state == BLACKJACK");
+                        //System.out.println("state == BLACKJACK");
                         if(knockout&& g==2){
 
                         }
@@ -547,21 +457,16 @@ public class BlackJackScript extends Script {
                             xpdropstartTime = System.currentTimeMillis();
                             Rs2Npc.interact(npc, "Knock-Out");
                             previousAction=System.currentTimeMillis();
-                            //sleepUntil(() -> bjXPDrop < Microbot.getClient().getSkillExperience(Skill.THIEVING));
-                            //sleepUntil(() -> Microbot.getClient().getLocalPlayer().getAnimation()==401, 20);
-                            // add here ; check for player animation 401?
                             knockout=true;
-                            sleep(60, 90);
+                            sleep(120, 200);
                             endTime = System.currentTimeMillis();
                             ++bjCycle;
                             return;
                         }
-                        if (bjCycle <= 3){
+                        if (bjCycle <= 2){
                             if(knockout){
-                                //sleepUntil(() -> xpDrop < Microbot.getClient().getSkillExperience(Skill.THIEVING), 1000);
                                 sleepUntil(() -> npc.getAnimation()==838, 600);
                             }
-                            //TODO sort by country flag to reduce latency~
                             xpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
                             xpdropstartTime = System.currentTimeMillis();//+random(50,65)
                             followingAction=previousAction+1140+random(50,65);//TODO 60ms is good.70ms starts to miss.50ms decent.
@@ -572,7 +477,7 @@ public class BlackJackScript extends Script {
                                 knockout=false;
                                 sleepUntil(() -> xpDrop < Microbot.getClient().getSkillExperience(Skill.THIEVING), 1000);
                             } else {
-                                System.out.println("reset bjCycle");
+                                //System.out.println("reset bjCycle");
                                 sleep(90,140);
                                 bjCycle=0;
                                 return;
@@ -582,15 +487,15 @@ public class BlackJackScript extends Script {
                             ++bjCycle;
                             return;
                         }
-
+                        sleepUntil(() -> npc.getAnimation()!=838,600);
+                        sleep(120,180);
                         bjCycle=0;
                         break;
 
                 }
                 endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
-                System.out.println("Total time for loop " + totalTime);
-
+                //System.out.println("Total time for loop " + totalTime);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
