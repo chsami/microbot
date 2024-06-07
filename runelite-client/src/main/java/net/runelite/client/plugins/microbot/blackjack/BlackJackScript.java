@@ -273,9 +273,10 @@ public class BlackJackScript extends Script {
                                     sleep(120,240);
                                     Rs2GameObject.interact(config.THUGS().door, "Open");
                                     sleepUntil(() -> !checkCurtain(config.THUGS().door), 5000);
+                                    //TODO need to add something here to make sure the player makes it out of the area.
                                     sleep(80,160);
-                                    Rs2Walker.walkTo(new WorldPoint(3345,2955,0), 0);
-                                    sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3345);
+                                    Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
+                                    sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3346,2000);
                                     sleep(80,160);
                                     Rs2GameObject.interact(config.THUGS().door, "Close");
                                     sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
@@ -405,6 +406,7 @@ public class BlackJackScript extends Script {
                                     h++;
                                 }
                                 if(lure_NPC(npc)){
+                                    //TODO need to add something to wait for npc to be next to the player
                                     return;
                                 }
                                 state=BANKING;
@@ -458,6 +460,7 @@ public class BlackJackScript extends Script {
                             Rs2Npc.interact(npc, "Knock-Out");
                             previousAction=System.currentTimeMillis();
                             knockout=true;
+                            //TODO play around with the timing here to see how long is too long to wait if failed.
                             sleep(120, 200);
                             endTime = System.currentTimeMillis();
                             ++bjCycle;
@@ -561,6 +564,9 @@ public class BlackJackScript extends Script {
                 Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
                 sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3346 && Rs2Player.getWorldLocation().getY()==2955);
                 waitForNPC(npc);
+                Rs2Walker.walkTo(new WorldPoint(3343,2954,0), 0);
+                sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3343 && Rs2Player.getWorldLocation().getY()==2954, 3000);
+                Rs2Player.toggleRunEnergy(true);
                 //TODO above is for if the npc is south of the player.
             } else {
                 Rs2Walker.walkTo(new WorldPoint(3343,2954,0), 0);

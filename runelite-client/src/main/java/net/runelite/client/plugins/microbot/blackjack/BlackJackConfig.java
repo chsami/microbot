@@ -30,9 +30,9 @@ public interface BlackJackConfig extends Config {
                 "a high volume of clicks, and Players\n" +
                 "regularly walk by, either trying to talk\n" +
                 "or opening the curtain to bot check.\n" +
-                "best to start at thugs, with noted wines\n" +
-                "coins, teleport to bank, unnoted wines,\n" +
-                "wearing a blackjack.";
+                "best to start at thugs, with\n" +
+                "noted wines coins, teleport to bank,\n" +
+                "unnoted wines, wearing a blackjack.";
     }
     @ConfigItem(
             keyName = "ThugsToPickpocket",
