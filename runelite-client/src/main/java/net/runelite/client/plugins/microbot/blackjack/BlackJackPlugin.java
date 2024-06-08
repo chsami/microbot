@@ -52,6 +52,7 @@ public class BlackJackPlugin extends Plugin {
         if (event.getHitsplat().isMine())
         {
             if(BlackJackScript.playerHit==0){
+                BlackJackScript.firstHit=true;
                 BlackJackScript.hitsplatStart=System.currentTimeMillis();
             }
             BlackJackScript.playerHit++;

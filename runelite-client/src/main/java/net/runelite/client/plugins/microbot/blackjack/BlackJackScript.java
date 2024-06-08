@@ -32,9 +32,10 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 1.6;
+    public static double version = 1.7;
     public static State state = BANKING;
     BlackJackConfig config;
+    static boolean firstHit=false;
     boolean firstPlayerOpenCurtain = false;
     boolean initScript = false;
     boolean npcIsTrapped = false;
@@ -556,18 +557,21 @@ public class BlackJackScript extends Script {
         //TODO this isn't working correctly...
         if(playerHit>=1){
             //long hitsplatStart = System.currentTimeMillis();
-            //TODO play around with this sleep to see what's the highest tolerance before you're too late to react.
-            sleep(60,120);
             int j = 0;
             int i = random(2, 3);
             int c = 80;
-            while (j<i) {
-                Rs2Npc.interact(npc, "Pickpocket");
-                sleep(c, (int) (c*1.3));
-                c= (int) (c*1.4);
-                ++j;
+            if(playerHit==1 && firstHit) {
+                //TODO play around with this sleep to see what's the highest tolerance before you're too late to react.
+                sleep(60,120);
+                while (j < i) {
+                    Rs2Npc.interact(npc, "Pickpocket");
+                    sleep(c, (int) (c * 1.3));
+                    c = (int) (c * 1.4);
+                    ++j;
+                }
+                firstHit=false;
+                bjCycle = 0;
             }
-            bjCycle = 0;
             if(System.currentTimeMillis()>=(hitsplatStart+600)) {
                 if (playerHit == 1) {
                     playerHit = 0;
