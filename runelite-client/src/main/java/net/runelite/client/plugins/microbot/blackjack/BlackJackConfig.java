@@ -35,10 +35,20 @@ public interface BlackJackConfig extends Config {
                 "unnoted wines, wearing a blackjack.";
     }
     @ConfigItem(
+            keyName = "soundHitSplats",
+            name = "Make noise for hitsplats?",
+            description = "toggles noise for hitsplats",
+            position = 1,
+            section = generalSection
+    )
+    default boolean soundHitSplats() {
+        return true;
+    }
+    @ConfigItem(
             keyName = "ThugsToPickpocket",
             name = "Thug Type",
             description = "Type of thug to pickpocket",
-            position = 1,
+            position = 2,
             section = generalSection
     )
     default Thugs THUGS() {
@@ -48,7 +58,7 @@ public interface BlackJackConfig extends Config {
             keyName = "Eat at",
             name = "Eat at",
             description = "Eat at specific health.",
-            position = 2,
+            position = 3,
             section = generalSection
     )
     default int healAt() {
@@ -58,7 +68,7 @@ public interface BlackJackConfig extends Config {
             keyName = "wearTeleportItem",
             name = "Equip the teleport Item?",
             description = "Does the player wear the teleport item?",
-            position = 3,
+            position = 4,
             section = generalSection
     )
     default boolean wearTeleportItem() {
@@ -68,7 +78,7 @@ public interface BlackJackConfig extends Config {
             keyName = "TeleportBackToBank",
             name = "Teleport item back to bank",
             description = "Item used to teleport back to the bank.",
-            position = 4,
+            position = 5,
             section = generalSection
     )
     default String teleportItemToBank() {
@@ -78,7 +88,7 @@ public interface BlackJackConfig extends Config {
             keyName = "TeleportToBank",
             name = "Teleport To bank action",
             description = "Action used on the teleport item",
-            position = 5,
+            position = 6,
             section = generalSection
     )
     default String teleportActionToBank() {

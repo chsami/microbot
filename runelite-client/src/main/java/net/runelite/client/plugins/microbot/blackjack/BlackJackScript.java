@@ -52,6 +52,7 @@ public class BlackJackScript extends Script {
     int notedWine = 1994;
     int unnotedWine= 1993;
     int pollniveachTeleport = 11743;
+    static long hitsplatStart;
     long xpdropstartTime;
     long startTime;
     long endTime;
@@ -554,7 +555,7 @@ public class BlackJackScript extends Script {
     public void handlePlayerHit(){
         //TODO this isn't working correctly...
         if(playerHit>=1){
-            long hitsplatStart = System.currentTimeMillis();
+            //long hitsplatStart = System.currentTimeMillis();
             //TODO play around with this sleep to see what's the highest tolerance before you're too late to react.
             sleep(60,120);
             int j = 0;
@@ -567,21 +568,17 @@ public class BlackJackScript extends Script {
                 ++j;
             }
             bjCycle = 0;
-            //TODO change this to not sleep, but detect time elapsed since hit.
-            if((hitsplatStart+1250)>System.currentTimeMillis()) {
-                sleep((int) ((hitsplatStart + 1200 + random(50, 65)) - System.currentTimeMillis()));
-                //sleepUntil(() -> (hitsplatStart + 1200 + random(50, 65)<=System.currentTimeMillis(), 5000);
+            if(System.currentTimeMillis()>=(hitsplatStart+600)) {
+                if (playerHit == 1) {
+                    playerHit = 0;
+                } else {
+                    playerHit = 0;
+                    state = RUN_AWAY;
+                    knockout = false;
+                    bjCycle = 0;
+                }
+                previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
             }
-            if(playerHit==1){
-                playerHit=0;
-            } else {
-                playerHit=0;
-                state = RUN_AWAY;
-                knockout = false;
-                bjCycle = 0;
-            }
-            //sleep(600,800);
-            previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
         }
     }
     public static boolean inArea(WorldPoint entity, Area area){

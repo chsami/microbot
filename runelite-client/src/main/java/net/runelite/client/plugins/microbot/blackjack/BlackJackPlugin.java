@@ -50,7 +50,13 @@ public class BlackJackPlugin extends Plugin {
     @Subscribe
     public void onHitsplatApplied(HitsplatApplied event) {
         if (event.getHitsplat().isMine())
-        { BlackJackScript.playerHit++; }
+        {
+            if(BlackJackScript.playerHit==0){
+                BlackJackScript.hitsplatStart=System.currentTimeMillis();
+            }
+            BlackJackScript.playerHit++;
+            if(config.soundHitSplats()) { client.playSoundEffect(3929, 127); }
+        }
     }
     @Subscribe
     public void onChatMessage(ChatMessage chatMessage) {
