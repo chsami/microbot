@@ -92,8 +92,9 @@ public class BlackJackScript extends Script {
         Microbot.enableAutoRunOn = false;
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (!super.run()) return;
+            if (!Microbot.isLoggedIn()){sleep(1000); return;}
             try {
-                if (!super.run()) return;
                 startTime = System.currentTimeMillis();
                 long restartTime = startTime-endTime;
                 //System.out.println("Script took "+restartTime+"ms to restart.");
