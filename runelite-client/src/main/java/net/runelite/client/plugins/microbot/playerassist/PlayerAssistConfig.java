@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.microbot.playerassist;
 
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.config.*;
+import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
@@ -55,8 +55,7 @@ public interface PlayerAssistConfig extends Config {
             position = 0,
             section = combatSection
     )
-    default boolean toggleCombat()
-    {
+    default boolean toggleCombat() {
         return false;
     }
 
@@ -67,8 +66,7 @@ public interface PlayerAssistConfig extends Config {
             position = 1,
             section = combatSection
     )
-    default String attackableNpcs()
-    {
+    default String attackableNpcs() {
         return "";
     }
 
@@ -79,10 +77,10 @@ public interface PlayerAssistConfig extends Config {
             position = 2,
             section = combatSection
     )
-    default int attackRadius()
-    {
+    default int attackRadius() {
         return 10;
     }
+
     @ConfigItem(
             keyName = "Use special attack",
             name = "Use special attack",
@@ -90,10 +88,10 @@ public interface PlayerAssistConfig extends Config {
             position = 3,
             section = combatSection
     )
-    default boolean useSpecialAttack()
-    {
+    default boolean useSpecialAttack() {
         return false;
     }
+
     //safe spot
     @ConfigItem(
             keyName = "Safe Spot",
@@ -102,8 +100,7 @@ public interface PlayerAssistConfig extends Config {
             position = 4,
             section = combatSection
     )
-    default boolean toggleSafeSpot()
-    {
+    default boolean toggleSafeSpot() {
         return false;
     }
 
@@ -114,8 +111,7 @@ public interface PlayerAssistConfig extends Config {
             position = 4,
             section = combatSection
     )
-    default boolean toggleCannon()
-    {
+    default boolean toggleCannon() {
         return false;
     }
 
@@ -134,10 +130,10 @@ public interface PlayerAssistConfig extends Config {
             position = 0,
             section = foodAndPotionsSection
     )
-    default boolean toggleFood()
-    {
+    default boolean toggleFood() {
         return false;
     }
+
     @ConfigItem(
             keyName = "Auto Prayer Potion",
             name = "Auto drink prayer potion",
@@ -145,10 +141,10 @@ public interface PlayerAssistConfig extends Config {
             position = 1,
             section = foodAndPotionsSection
     )
-    default boolean togglePrayerPotions()
-    {
+    default boolean togglePrayerPotions() {
         return false;
     }
+
     @ConfigItem(
             keyName = "Combat potion",
             name = "Auto drink super combat potion",
@@ -156,10 +152,10 @@ public interface PlayerAssistConfig extends Config {
             position = 2,
             section = foodAndPotionsSection
     )
-    default boolean toggleCombatPotion()
-    {
+    default boolean toggleCombatPotion() {
         return false;
     }
+
     @ConfigItem(
             keyName = "Ranging/Bastion potion",
             name = "Auto drink Ranging/Bastion potion",
@@ -167,10 +163,10 @@ public interface PlayerAssistConfig extends Config {
             position = 3,
             section = foodAndPotionsSection
     )
-    default boolean toggleRangingPotion()
-    {
+    default boolean toggleRangingPotion() {
         return false;
     }
+
     @ConfigItem(
             keyName = "Use AntiPoison",
             name = "Use AntiPoison",
@@ -180,8 +176,7 @@ public interface PlayerAssistConfig extends Config {
     )
 
 
-    default boolean useAntiPoison()
-    {
+    default boolean useAntiPoison() {
         return false;
     }
 
@@ -200,10 +195,10 @@ public interface PlayerAssistConfig extends Config {
             position = 0,
             section = lootSection
     )
-    default boolean toggleLootItems()
-    {
+    default boolean toggleLootItems() {
         return true;
     }
+
     @ConfigItem(
             keyName = "Min Price of items to loot",
             name = "Min. Price of items to loot",
@@ -211,10 +206,10 @@ public interface PlayerAssistConfig extends Config {
             position = 1,
             section = lootSection
     )
-    default int minPriceOfItemsToLoot()
-    {
+    default int minPriceOfItemsToLoot() {
         return 5000;
     }
+
     @ConfigItem(
             keyName = "Max Price of items to loot",
             name = "Max. Price of items to loot",
@@ -222,10 +217,10 @@ public interface PlayerAssistConfig extends Config {
             position = 1,
             section = lootSection
     )
-    default int maxPriceOfItemsToLoot()
-    {
+    default int maxPriceOfItemsToLoot() {
         return 10000000;
     }
+
     @ConfigItem(
             keyName = "Loot arrows",
             name = "Auto loot arrows",
@@ -233,8 +228,7 @@ public interface PlayerAssistConfig extends Config {
             position = 2,
             section = lootSection
     )
-    default boolean toggleLootArrows()
-    {
+    default boolean toggleLootArrows() {
         return true;
     }
 
@@ -245,7 +239,9 @@ public interface PlayerAssistConfig extends Config {
             position = 3,
             section = lootSection
     )
-    default boolean toggleBuryBones() { return false; }
+    default boolean toggleBuryBones() {
+        return false;
+    }
     // toggle scatter
 
     @ConfigItem(
@@ -255,9 +251,9 @@ public interface PlayerAssistConfig extends Config {
             position = 4,
             section = lootSection
     )
-    default boolean toggleScatter() { return false; }
-
-
+    default boolean toggleScatter() {
+        return false;
+    }
 
 
     //Prayer section
@@ -277,8 +273,9 @@ public interface PlayerAssistConfig extends Config {
             position = 0,
             section = prayerSection
     )
-    default boolean togglePrayer()
-    { return false; }
+    default boolean togglePrayer() {
+        return false;
+    }
 
     //Flick quick prayer
     @ConfigItem(
@@ -288,10 +285,10 @@ public interface PlayerAssistConfig extends Config {
             position = 1,
             section = prayerSection
     )
-    default boolean toggleQuickPrayFlick()
-    {
+    default boolean toggleQuickPrayFlick() {
         return false;
     }
+
     //Lazy flick
     @ConfigItem(
             keyName = "Lazy flick",
@@ -300,8 +297,7 @@ public interface PlayerAssistConfig extends Config {
             position = 2,
             section = prayerSection
     )
-    default boolean toggleLazyFlick()
-    {
+    default boolean toggleLazyFlick() {
         return false;
     }
 
@@ -322,8 +318,7 @@ public interface PlayerAssistConfig extends Config {
             position = 0,
             section = skillingSection
     )
-    default boolean toggleBalanceCombatSkills()
-    {
+    default boolean toggleBalanceCombatSkills() {
         return false;
     }
 
@@ -335,8 +330,7 @@ public interface PlayerAssistConfig extends Config {
             position = 1,
             section = skillingSection
     )
-    default boolean toggleAvoidControlled()
-    {
+    default boolean toggleAvoidControlled() {
         return true;
     }
 
@@ -348,9 +342,8 @@ public interface PlayerAssistConfig extends Config {
             position = 2,
             section = skillingSection
     )
-    default int attackStyleChangeDelay()
-    {
-        return 60*15;
+    default int attackStyleChangeDelay() {
+        return 60 * 15;
     }
 
     //Attack skill target
@@ -361,10 +354,10 @@ public interface PlayerAssistConfig extends Config {
             position = 97,
             section = skillingSection
     )
-    default int attackSkillTarget()
-    {
+    default int attackSkillTarget() {
         return 99;
     }
+
     //Strength skill target
     @ConfigItem(
             keyName = "strengthSkillTarget",
@@ -373,10 +366,10 @@ public interface PlayerAssistConfig extends Config {
             position = 98,
             section = skillingSection
     )
-    default int strengthSkillTarget()
-    {
+    default int strengthSkillTarget() {
         return 99;
     }
+
     //Defence skill target
     @ConfigItem(
             keyName = "defenceSkillTarget",
@@ -385,8 +378,7 @@ public interface PlayerAssistConfig extends Config {
             position = 99,
             section = skillingSection
     )
-    default int defenceSkillTarget()
-    {
+    default int defenceSkillTarget() {
         return 99;
     }
 
@@ -398,6 +390,7 @@ public interface PlayerAssistConfig extends Config {
             closedByDefault = false
     )
     String gearSection = "Gear";
+
     // Inventory setup selection
     @ConfigItem(
             keyName = "InventorySetupName",
@@ -406,8 +399,7 @@ public interface PlayerAssistConfig extends Config {
             position = 0,
             section = gearSection
     )
-    default String inventorySetup()
-    {
+    default String inventorySetup() {
         return "";
     }
 
@@ -418,8 +410,7 @@ public interface PlayerAssistConfig extends Config {
             description = "inventorySetupHidden",
             hidden = true
     )
-    default InventorySetup inventorySetupHidden()
-    {
+    default InventorySetup inventorySetupHidden() {
         return null;
     }
 
@@ -430,8 +421,7 @@ public interface PlayerAssistConfig extends Config {
             description = "Center Location",
             hidden = true
     )
-    default WorldPoint centerLocation()
-    {
+    default WorldPoint centerLocation() {
         return new WorldPoint(0, 0, 0);
     }
 
@@ -442,8 +432,7 @@ public interface PlayerAssistConfig extends Config {
             description = "Safe Spot Location",
             hidden = true
     )
-    default WorldPoint safeSpot()
-    {
+    default WorldPoint safeSpot() {
         return new WorldPoint(0, 0, 0);
     }
 

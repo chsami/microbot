@@ -3,24 +3,19 @@ package net.runelite.client.plugins.microbot.playerassist.skill;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
-
-enum AttackStyle
-{
+enum AttackStyle {
     ACCURATE("Accurate", Skill.ATTACK),
     AGGRESSIVE("Aggressive", Skill.STRENGTH),
     DEFENSIVE("Defensive", Skill.DEFENCE),
@@ -36,8 +31,7 @@ enum AttackStyle
     @Getter
     private final Skill[] skills;
 
-    AttackStyle(String name, Skill... skills)
-    {
+    AttackStyle(String name, Skill... skills) {
         this.name = name;
         this.skills = skills;
     }
@@ -48,7 +42,7 @@ public class AttackStyleScript extends Script {
 
     private AttackStyle attackStyle;
     private AttackStyle attackStyleToTrain;
-    public int equippedWeaponTypeVarbit;
+    public static int equippedWeaponTypeVarbit;
 
     // Starting skill levels
     private int attackLevel;
@@ -63,57 +57,50 @@ public class AttackStyleScript extends Script {
 
 
     private final Set<Skill> selectedSkills = EnumSet.noneOf(Skill.class);
+
     public boolean run(PlayerAssistConfig config) {
         attackStyleChangeDelay = config.attackStyleChangeDelay();
         currentAttackStyleChangeDelayCounter = 0;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            try {
-                if (!Microbot.isLoggedIn()) return;
-                if(!initializedLevels) {
-                    attackLevel = getSkillLevel(Skill.ATTACK);
-                    strengthLevel = getSkillLevel(Skill.STRENGTH);
-                    defenceLevel = getSkillLevel(Skill.DEFENCE);
-                    initializedLevels = true;
-                }
-                if (!super.run()) return;
-                currentAttackStyleChangeDelayCounter--;
-                //log how many seconds left until we can change attack style
-                log.info("Attack Style Change Delay Counter: {}", currentAttackStyleChangeDelayCounter);
-                if (hasLeveledUp()) {
-                    resetLevels();
-                    log.info("Leveled up, resetting levels and timer.");
-                }
-                if (currentAttackStyleChangeDelayCounter > 0) return;
+            if (!Microbot.isLoggedIn() || !super.run() || currentAttackStyleChangeDelayCounter-- > 0) return;
 
-
-                int attackStyleVarbit = Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE);
-                equippedWeaponTypeVarbit = Microbot.getVarbitValue(Varbits.EQUIPPED_WEAPON_TYPE);
-                int castingModeVarbit = Microbot.getVarbitValue(Varbits.DEFENSIVE_CASTING_MODE);
-                updateAttackStyle(
-                        equippedWeaponTypeVarbit,
-                        attackStyleVarbit,
-                        castingModeVarbit);
-                selectSkills(config);
-
-                WidgetInfo componentsToDisplay = getComponentToDisplay(config);
-                log.info("Attack Style: {}", attackStyle);
-                log.info("Attack Style to Train: {}", attackStyleToTrain);
-                log.info("Selected Skills: {}", selectedSkills);
-                if(attackStyle != attackStyleToTrain) {
-                    if(Rs2Tab.getCurrentTab() != InterfaceTab.COMBAT){
-                        Rs2Tab.switchToCombatOptionsTab();
-                        sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.COMBAT, 2000);
-                    }
-                    log.info("Changing Attack Style to: {}", attackStyleToTrain);
-                    Rs2Combat.setAttackStyle(componentsToDisplay);
-
-                }
-                currentAttackStyleChangeDelayCounter = attackStyleChangeDelay;
-            } catch(Exception ex) {
-                log.error(ex.getMessage());
+            if (!initializedLevels) {
+                initializeLevels();
             }
+
+            if (hasLeveledUp()) {
+                resetLevels();
+                log.info("Leveled up, resetting levels and timer.");
+            }
+
+            int attackStyleVarbit = Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE);
+            equippedWeaponTypeVarbit = Microbot.getVarbitValue(Varbits.EQUIPPED_WEAPON_TYPE);
+            int castingModeVarbit = Microbot.getVarbitValue(Varbits.DEFENSIVE_CASTING_MODE);
+            updateAttackStyle(equippedWeaponTypeVarbit, attackStyleVarbit, castingModeVarbit);
+            selectSkills(config);
+            WidgetInfo componentToDisplay = getComponentToDisplay(config);
+            if (attackStyle != attackStyleToTrain) {
+                changeAttackStyle(config, componentToDisplay);
+            }
+            currentAttackStyleChangeDelayCounter = attackStyleChangeDelay;
         }, 0, 1, TimeUnit.SECONDS);
         return true;
+    }
+
+    private void initializeLevels() {
+        attackLevel = getSkillLevel(Skill.ATTACK);
+        strengthLevel = getSkillLevel(Skill.STRENGTH);
+        defenceLevel = getSkillLevel(Skill.DEFENCE);
+        initializedLevels = true;
+    }
+
+    private void changeAttackStyle(PlayerAssistConfig config,WidgetInfo componentToDisplay) {
+        if (Rs2Tab.getCurrentTab() != InterfaceTab.COMBAT) {
+            Rs2Tab.switchToCombatOptionsTab();
+            sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.COMBAT, 2000);
+        }
+        log.info("Changing Attack Style to: {}", attackStyleToTrain);
+        Rs2Combat.setAttackStyle(componentToDisplay);
     }
 
     // has any of the skills leveled up
@@ -130,66 +117,39 @@ public class AttackStyleScript extends Script {
         defenceLevel = getSkillLevel(Skill.DEFENCE);
         currentAttackStyleChangeDelayCounter = 0;
     }
-    private void updateSelectedSkills(boolean enabled, Skill skill)
-    {
-        if (enabled)
-        {
+
+    private void updateSelectedSkills(boolean enabled, Skill skill) {
+        if (enabled) {
             selectedSkills.add(skill);
-        }
-        else
-        {
+        } else {
             selectedSkills.remove(skill);
         }
     }
-    private void updateAttackStyle(int equippedWeaponType, int attackStyleIndex, int castingMode)
-    {
 
+    private void updateAttackStyle(int equippedWeaponType, int attackStyleIndex, int castingMode) {
         AttackStyle[] attackStyles = getWeaponTypeStyles(equippedWeaponType);
-        if (attackStyleIndex < attackStyles.length)
-        {
-            // from script4525
-            // Even though the client has 5 attack styles for Staffs, only attack styles 0-4 are used, with an additional
-            // casting mode set for defensive casting
-            if (attackStyleIndex == 4)
-            {
-                attackStyleIndex += castingMode;
-            }
-
-            attackStyle = attackStyles[attackStyleIndex];
-            if (attackStyle == null)
-            {
-                attackStyle = AttackStyle.OTHER;
-            }
+        if (attackStyleIndex < attackStyles.length) {
+            attackStyleIndex = (attackStyleIndex == 4) ? attackStyleIndex + castingMode : attackStyleIndex;
+            attackStyle = (attackStyles[attackStyleIndex] != null) ? attackStyles[attackStyleIndex] : AttackStyle.OTHER;
         }
     }
-    private AttackStyle[] getWeaponTypeStyles(int weaponType)
-    {
-        // from script4525
+
+    private AttackStyle[] getWeaponTypeStyles(int weaponType) {
         int weaponStyleEnum = Microbot.getEnum(EnumID.WEAPON_STYLES).getIntValue(weaponType);
         int[] weaponStyleStructs = Microbot.getEnum(weaponStyleEnum).getIntVals();
 
         AttackStyle[] styles = new AttackStyle[weaponStyleStructs.length];
         int i = 0;
-        for (int style : weaponStyleStructs)
-        {
-            StructComposition attackStyleStruct = Microbot.getStructComposition(style);
-            String attackStyleName = attackStyleStruct.getStringValue(ParamID.ATTACK_STYLE_NAME);
-
+        for (int style : weaponStyleStructs) {
+            String attackStyleName = Microbot.getStructComposition(style).getStringValue(ParamID.ATTACK_STYLE_NAME);
             AttackStyle attackStyle = AttackStyle.valueOf(attackStyleName.toUpperCase());
-            if (attackStyle == AttackStyle.OTHER)
-            {
-                // "Other" is used for no style
-                ++i;
-                continue;
-            }
 
-            // "Defensive" is used for Defensive and also Defensive casting
-            if (i == 5 && attackStyle == AttackStyle.DEFENSIVE)
-            {
-                attackStyle = AttackStyle.DEFENSIVE_CASTING;
+            if (attackStyle != AttackStyle.OTHER) {
+                if (i == 5 && attackStyle == AttackStyle.DEFENSIVE) {
+                    attackStyle = AttackStyle.DEFENSIVE_CASTING;
+                }
+                styles[i++] = attackStyle;
             }
-
-            styles[i++] = attackStyle;
         }
         return styles;
     }
@@ -199,6 +159,7 @@ public class AttackStyleScript extends Script {
         log.info("Skill: {}, Level Required: {} Current Level: {}", skill, levelRequired, getSkillLevel(skill));
         return getSkillLevel(skill) < levelRequired;
     }
+
     private void selectSkills(PlayerAssistConfig config) {
         boolean balanceCombatSkills = config.toggleBalanceCombatSkills();
 
@@ -265,9 +226,11 @@ public class AttackStyleScript extends Script {
     private int getSkillLevel(Skill skill) {
         return Microbot.getClient().getRealSkillLevel(skill);
     }
+
     private boolean isSkillControlled(AttackStyle attackStyle) {
         return attackStyle.getSkills().length > 1;
     }
+
     private WidgetInfo getComponentToDisplay(PlayerAssistConfig config) {
         List<WidgetInfo> componentsToDisplay = new ArrayList<>();
         AttackStyle[] attackStyles = getWeaponTypeStyles(equippedWeaponTypeVarbit);
@@ -322,10 +285,11 @@ public class AttackStyleScript extends Script {
             }
         }
         WidgetInfo componentToDisplay = componentsToDisplay.get(random.nextInt(componentsToDisplay.size()));
-        attackStyleToTrain = attackStyles[componentToDisplay.ordinal()-233];
+        attackStyleToTrain = attackStyles[componentToDisplay.ordinal() - 233];
         // Return a random component if the list is not empty, otherwise return null
         return componentToDisplay;
     }
+
     // shutdown
     public void shutdown() {
         super.shutdown();

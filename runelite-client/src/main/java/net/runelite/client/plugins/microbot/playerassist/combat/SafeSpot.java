@@ -20,7 +20,12 @@ public boolean run(PlayerAssistConfig config) {
             currentSafeSpot = config.safeSpot();
             if (isDefaultSafeSpot(currentSafeSpot) || isPlayerAtSafeSpot(currentSafeSpot)) return;
 
-            Rs2Walker.walkMiniMap(currentSafeSpot);
+
+            if(Rs2Walker.walkMiniMap(currentSafeSpot)) {
+                Microbot.pauseAllScripts = true;
+                sleepUntil(() -> isPlayerAtSafeSpot(currentSafeSpot));
+                Microbot.pauseAllScripts = false;
+            }
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
