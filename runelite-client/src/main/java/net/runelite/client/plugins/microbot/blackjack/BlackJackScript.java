@@ -47,6 +47,7 @@ public class BlackJackScript extends Script {
     static int playerHit=0;
     int lureFailed=0;
     int previousHP;
+    static int hitsplatXP;
     int xpDrop;
     int bjCycle = 0;
     int emptyJug = 1935;
@@ -255,6 +256,8 @@ public class BlackJackScript extends Script {
                                     Rs2GameObject.interact(config.THUGS().door, "Close");
                                     sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
                                     sleep(120,240);
+                                    Rs2Player.toggleRunEnergy(true);
+                                    sleep(60,120);
                                 } else {
                                     Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
                                     sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3345);
@@ -330,6 +333,7 @@ public class BlackJackScript extends Script {
                                 }
                                 npcIsTrapped=false;
                                 state = TRAP_NPC;
+                                //TODO make the player walk to the NPC / check that the player can get to the NPC before trying to lure it.
                                 npc = Rs2Npc.getNpc(config.THUGS().displayName);
                                 return;
                             } else {
@@ -554,7 +558,6 @@ public class BlackJackScript extends Script {
         }
     }
     public void handlePlayerHit(){
-        //TODO this isn't working correctly...
         if(playerHit>=1){
             //long hitsplatStart = System.currentTimeMillis();
             int j = 0;
@@ -572,7 +575,10 @@ public class BlackJackScript extends Script {
                 firstHit=false;
                 bjCycle = 0;
             }
-            if(System.currentTimeMillis()>=(hitsplatStart+600)) {
+            //if(System.currentTimeMillis()>=(hitsplatStart+1200)) {
+            if(Microbot.getClient().getLocalPlayer().hasSpotAnim(245)){
+                return;
+                }
                 if (playerHit == 1) {
                     playerHit = 0;
                 } else {
@@ -582,7 +588,7 @@ public class BlackJackScript extends Script {
                     bjCycle = 0;
                 }
                 previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
-            }
+            //}
         }
     }
     public static boolean inArea(WorldPoint entity, Area area){

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.ClientTick;
@@ -13,6 +14,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -51,9 +53,11 @@ public class BlackJackPlugin extends Plugin {
     public void onHitsplatApplied(HitsplatApplied event) {
         if (event.getHitsplat().isMine())
         {
-            if(BlackJackScript.playerHit==0){
+            if(BlackJackScript.playerHit==0 || Microbot.getClient().getSkillExperience(Skill.THIEVING)>BlackJackScript.hitsplatXP){
                 BlackJackScript.firstHit=true;
-                BlackJackScript.hitsplatStart=System.currentTimeMillis();
+                BlackJackScript.hitsplatXP = Microbot.getClient().getSkillExperience(Skill.THIEVING);
+                BlackJackScript.hitsplatStart = System.currentTimeMillis();
+                BlackJackScript.playerHit=0;
             }
             BlackJackScript.playerHit++;
             if(config.soundHitSplats()) { client.playSoundEffect(3929, 127); }
