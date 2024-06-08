@@ -254,6 +254,17 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleScatter() {
         return false;
     }
+    // delayed looting
+    @ConfigItem(
+            keyName = "delayedLooting",
+            name = "Delayed Looting",
+            description = "Lets the loot stay on the ground for a while before picking it up",
+            position = 5,
+            section = lootSection
+    )
+    default boolean toggleDelayedLooting() {
+        return false;
+    }
 
 
     //Prayer section

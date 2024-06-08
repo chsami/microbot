@@ -61,9 +61,10 @@ public class AttackNpcScript extends Script {
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                         .filter(x -> !x.isDead()
                                 && x.getWorldLocation().distanceTo(config.centerLocation()) < config.attackRadius()
-                                && (!x.isInteracting() || x.getInteracting() == Microbot.getClient().getLocalPlayer())
                                 && (x.getInteracting() == null || x.getInteracting() == Microbot.getClient().getLocalPlayer())
-                                && x.getAnimation() == -1 && npcsToAttack.get().stream().anyMatch(n -> n.equalsIgnoreCase(x.getName()))).collect(Collectors.toList());
+                                && x.getAnimation() == -1
+                                && npcsToAttack.get().stream().anyMatch(n -> n.equalsIgnoreCase(x.getName())))
+                        .collect(Collectors.toList());
                 if (Rs2Combat.inCombat()) {
                     return;
                 }
@@ -72,7 +73,6 @@ public class AttackNpcScript extends Script {
                             || npc.getAnimation() != -1
                             || npc.isDead()
                             || (npc.getInteracting() != null && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
-                            || (npc.isInteracting() && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
                             || npcsToAttack.get().stream().noneMatch(n -> npc.getName().equalsIgnoreCase(n)))
                         break;
                     if (npc.getWorldLocation().distanceTo(config.centerLocation()) > config.attackRadius())
@@ -84,7 +84,7 @@ public class AttackNpcScript extends Script {
                         continue;
 
                     Rs2Npc.interact(npc, "attack");
-
+                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
                     if(config.togglePrayer() && !config.toggleQuickPrayFlick()){
                         AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(Rs2NpcManager.getAttackStyle(npc.getId()));
                         if (attackStyle != null) {
@@ -108,7 +108,7 @@ public class AttackNpcScript extends Script {
                     }
 
 
-                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
+
                     break;
                 }
             } catch (Exception ex) {

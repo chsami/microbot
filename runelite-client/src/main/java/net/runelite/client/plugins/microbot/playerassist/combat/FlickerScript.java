@@ -43,7 +43,7 @@ public class FlickerScript extends Script {
         Rs2NpcManager.loadJson();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!Microbot.isLoggedIn() || !super.run() || !config.togglePrayer()) return;
+                if (!Microbot.isLoggedIn() || !config.togglePrayer()) return;
 
                 npcs = Rs2Npc.getNpcsForPlayer();
                 usePrayer = config.togglePrayer();
@@ -121,6 +121,7 @@ public class FlickerScript extends Script {
             resetLastAttack();
             for (Monster currentMonster : currentMonstersAttackingUs) {
                 currentMonster.lastAttack--;
+
 
                 if (currentMonster.lastAttack == 1 && lazyFlick && !currentMonster.npc.isDead()) {
                     if(flickQuickPrayer){
