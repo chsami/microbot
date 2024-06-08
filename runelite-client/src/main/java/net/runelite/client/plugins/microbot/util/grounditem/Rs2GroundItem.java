@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
@@ -264,6 +265,27 @@ public class Rs2GroundItem {
                 groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < range &&
                 (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_GROUP);
 
+        List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
+                .filter(filter)
+                .collect(Collectors.toList());
+
+
+        for (GroundItem groundItem : groundItems) {
+            if (interact(groundItem)) {
+                Microbot.pauseAllScripts = true;
+                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100,5000);
+            }
+        }
+        sleepUntil(() -> !isLooting(filter));
+        return !groundItems.isEmpty();
+    }
+
+    // Loot items based on names
+    public static boolean lootItemsBasedOnNames(int range,boolean antiLureProtection, String... names) {
+        final Predicate<GroundItem> filter = groundItem ->
+                groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < range &&
+                (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
+                Arrays.stream(names).anyMatch(name -> groundItem.getName().toLowerCase().contains(name.toLowerCase()));
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
                 .filter(filter)
                 .collect(Collectors.toList());

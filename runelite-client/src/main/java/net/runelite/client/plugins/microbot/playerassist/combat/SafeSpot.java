@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class SafeSpot extends Script {
 
     public WorldPoint currentSafeSpot = null;
+    private boolean messageShown = false;
 
 public boolean run(PlayerAssistConfig config) {
     mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -18,8 +19,16 @@ public boolean run(PlayerAssistConfig config) {
             if (!Microbot.isLoggedIn() || !super.run() || !config.toggleSafeSpot() || Microbot.isMoving()) return;
 
             currentSafeSpot = config.safeSpot();
-            if (isDefaultSafeSpot(currentSafeSpot) || isPlayerAtSafeSpot(currentSafeSpot)) return;
+            if(isDefaultSafeSpot(currentSafeSpot)){
 
+                if(!messageShown){
+                    Microbot.showMessage("Please set a center location");
+                    messageShown = true;
+                }
+                return;
+            }
+            if (isDefaultSafeSpot(currentSafeSpot) || isPlayerAtSafeSpot(currentSafeSpot)) return;
+            messageShown = false;
 
             if(Rs2Walker.walkMiniMap(currentSafeSpot)) {
                 Microbot.pauseAllScripts = true;

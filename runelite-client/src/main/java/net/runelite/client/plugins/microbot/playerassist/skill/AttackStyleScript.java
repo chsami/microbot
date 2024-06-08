@@ -62,7 +62,8 @@ public class AttackStyleScript extends Script {
         attackStyleChangeDelay = config.attackStyleChangeDelay();
         currentAttackStyleChangeDelayCounter = 0;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!Microbot.isLoggedIn() || !super.run() || currentAttackStyleChangeDelayCounter-- > 0) return;
+            if (!Microbot.isLoggedIn() || !super.run() || disableIfMaxed(config.toggleDisableOnMaxCombat())) return;
+            if(currentAttackStyleChangeDelayCounter-- > 0) return;
 
             if (!initializedLevels) {
                 initializeLevels();
@@ -156,6 +157,11 @@ public class AttackStyleScript extends Script {
 
     // compare Players skill levels to the level target in the config
     private boolean needLevel(int levelRequired, Skill skill) {
+        if(isMaxed()) {
+            log.info("Maxed, switching between any combat style.");
+            return true;
+        }
+
         log.info("Skill: {}, Level Required: {} Current Level: {}", skill, levelRequired, getSkillLevel(skill));
         return getSkillLevel(skill) < levelRequired;
     }
@@ -288,6 +294,12 @@ public class AttackStyleScript extends Script {
         attackStyleToTrain = attackStyles[componentToDisplay.ordinal() - 233];
         // Return a random component if the list is not empty, otherwise return null
         return componentToDisplay;
+    }
+    private boolean isMaxed() {
+        return getSkillLevel(Skill.ATTACK) == 99 && getSkillLevel(Skill.STRENGTH) == 99 && getSkillLevel(Skill.DEFENCE) == 99;
+    }
+    private boolean disableIfMaxed(boolean disable) {
+        return isMaxed() && disable;
     }
 
     // shutdown

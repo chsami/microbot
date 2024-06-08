@@ -334,6 +334,7 @@ public interface PlayerAssistConfig extends Config {
         return true;
     }
 
+
     //Attack style change delay (Seconds)
     @ConfigItem(
             keyName = "attackStyleChangeDelay",
@@ -345,7 +346,17 @@ public interface PlayerAssistConfig extends Config {
     default int attackStyleChangeDelay() {
         return 60 * 15;
     }
-
+    // Disable on Max combat
+    @ConfigItem(
+            keyName = "disableOnMaxCombat",
+            name = "Disable on Max Combat",
+            description = "Disable on Max Combat",
+            position = 3,
+            section = skillingSection
+    )
+    default boolean toggleDisableOnMaxCombat() {
+        return true;
+    }
     //Attack skill target
     @ConfigItem(
             keyName = "attackSkillTarget",

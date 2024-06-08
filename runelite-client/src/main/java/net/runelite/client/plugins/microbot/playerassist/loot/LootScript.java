@@ -11,7 +11,6 @@ import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -54,12 +53,18 @@ public class LootScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay((() -> {
             if (!super.run()) return;
             if (config.toggleLootArrows()) {
-                for (String lootItem : Arrays.asList("bronze arrow", "iron arrow", "steel arrow", "mithril arrow", "adamant arrow", "rune arrow", "dragon arrow")) {
-                    if (Rs2GroundItem.loot(lootItem, 13, 14))
-                        break;
-                }
+                if(Rs2GroundItem.lootItemsBasedOnNames(config.attackRadius(), true,"arrow"))
+                    Microbot.pauseAllScripts = false;
             }
             if (!config.toggleLootItems()) return;
+            if(config.toggleBuryBones()){
+                if(Rs2GroundItem.lootItemsBasedOnNames(config.attackRadius(), true,"bones"))
+                    Microbot.pauseAllScripts = false;
+            }
+            if(config.toggleScatter()){
+                if(Rs2GroundItem.lootItemsBasedOnNames(config.attackRadius(), true,"ashes"))
+                    Microbot.pauseAllScripts = false;
+            }
 
             if(Rs2GroundItem.lootItemBasedOnValue(config.minPriceOfItemsToLoot(), config.maxPriceOfItemsToLoot(), config.attackRadius(), true)) {
                 Microbot.pauseAllScripts = false;

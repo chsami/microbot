@@ -26,12 +26,10 @@ public class AttackStyleMapper {
                 lowerCaseStyle.contains("stab");
 
         // Check for presence of magic-related styles
-        boolean hasMagic = lowerCaseStyle.contains("magic") ||
-                lowerCaseStyle.contains("magical");
+        boolean hasMagic = lowerCaseStyle.contains("magic");
 
         // Check for presence of ranged-related styles
-        boolean hasRanged = lowerCaseStyle.contains("ranged") &&
-                !lowerCaseStyle.contains("magic");
+        boolean hasRanged = lowerCaseStyle.contains("ranged");
 
         // Determine the appropriate AttackStyle based on the presence of different styles
         if (hasMelee && hasMagic && hasRanged) {

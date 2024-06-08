@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager.attackStyleMap;
-
 /**
  * This class is responsible for handling the flicker script in the game.
  * It extends the Script class and overrides its methods to provide the functionality needed.
@@ -120,11 +118,11 @@ public class FlickerScript extends Script {
         if (!usePrayer) return;
 
         if (!currentMonstersAttackingUs.isEmpty()) {
-
+            resetLastAttack();
             for (Monster currentMonster : currentMonstersAttackingUs) {
                 currentMonster.lastAttack--;
 
-                if (currentMonster.lastAttack == 2 && lazyFlick && !currentMonster.npc.isDead()) {
+                if (currentMonster.lastAttack == 1 && lazyFlick && !currentMonster.npc.isDead()) {
                     if(flickQuickPrayer){
                         prayFlickAttackStyle = AttackStyle.MIXED;
                     }

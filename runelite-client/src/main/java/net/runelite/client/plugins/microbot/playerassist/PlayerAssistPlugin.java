@@ -2,16 +2,14 @@ package net.runelite.client.plugins.microbot.playerassist;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.worldmap.WorldMap;
-import net.runelite.client.config.ConfigClient;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.config.ConfigProfile;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
@@ -24,17 +22,12 @@ import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.playerassist.skill.AttackStyleScript;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
-import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.JagexColors;
-import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
-import net.runelite.client.util.SwingUtil;
 import net.runelite.client.util.Text;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -119,7 +112,13 @@ public class PlayerAssistPlugin extends Plugin {
         useSpecialAttackScript.shutdown();
         antiPoisonScript.shutdown();
         buryScatterScript.shutdown();
+        resetLocation();
         overlayManager.remove(playerAssistOverlay);
+    }
+
+    private void resetLocation() {
+        setCenter(new WorldPoint(0, 0, 0));
+        setSafeSpot(new WorldPoint(0, 0, 0));
     }
 
     private void setCenter(WorldPoint worldPoint)
@@ -189,6 +188,12 @@ public class PlayerAssistPlugin extends Plugin {
                 setSafeSpot(new WorldPoint(0, 0, 0));
             }
         }
+        if(event.getKey().equals("Combat")) {
+            if (!config.toggleCombat()) {
+                setCenter(new WorldPoint(0, 0, 0));
+            }
+
+        }
         if (event.getKey().equals("InventorySetupName")) {
             InventorySetup inventorySetup = MInventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(config.inventorySetup())).findFirst().orElse(null);
 
@@ -232,7 +237,7 @@ public class PlayerAssistPlugin extends Plugin {
         if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
             addMenuEntry(event, SET, CENTER_TILE, 1);
         }
-        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty() && config.toggleSafeSpot()) {
+        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
             addMenuEntry(event, SET, SAFE_SPOT, 1);
         }
         if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(ATTACK) && config.attackableNpcs().contains(getNpcNameFromMenuEntry(Text.removeTags(event.getTarget())))) {

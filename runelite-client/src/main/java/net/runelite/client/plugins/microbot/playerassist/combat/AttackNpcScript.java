@@ -34,6 +34,8 @@ public class AttackNpcScript extends Script {
 
     boolean clicked = false;
 
+    boolean messageShown = false;
+
     public void run(PlayerAssistConfig config) {
         Rs2NpcManager.loadJson();
         AtomicReference<List<String>> npcsToAttack = new AtomicReference<>(Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList()));
@@ -45,6 +47,16 @@ public class AttackNpcScript extends Script {
                 npcsToAttack.set(Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList()));
                 double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
                 if (Rs2Inventory.getInventoryFood().isEmpty() && treshHold < 10) return;
+                if(config.centerLocation().getX() == 0 && config.centerLocation().getY() == 0) {
+                    if(!messageShown){
+                        Microbot.showMessage("Please set a center location");
+                        messageShown = true;
+                    }
+
+                return;
+                }
+                messageShown = false;
+
                 attackableNpcs = Microbot.getClient().getNpcs().stream()
                         .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
                         .filter(x -> !x.isDead()
@@ -113,5 +125,7 @@ public class AttackNpcScript extends Script {
         super.shutdown();
         configAttackableNpcs = null;
         clicked = false;
+
+
     }
 }
