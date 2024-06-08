@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.blackjack;
 
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.blackjack.enums.Area;
@@ -20,6 +21,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 1.7;
+    public static double version = 1.9;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -59,9 +61,6 @@ public class BlackJackScript extends Script {
     long startTime;
     long endTime;
     long previousAction;
-    long followingAction;
-    //TODO change how area works to be easier to read.
-    WorldArea shopsArea = new WorldArea(3359,2988,4,4,0);
     WorldPoint shopsLocation = new WorldPoint(3359, 2988, 0);
     private boolean hasRequiredItems() {
         return Rs2Inventory.hasItem("Coins")
@@ -334,7 +333,12 @@ public class BlackJackScript extends Script {
                                 npcIsTrapped=false;
                                 state = TRAP_NPC;
                                 //TODO make the player walk to the NPC / check that the player can get to the NPC before trying to lure it.
-                                npc = Rs2Npc.getNpc(config.THUGS().displayName);
+                                npc = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcs().stream()
+                                        .filter(x -> x != null && x.getName() != null && !x.isDead())
+                                        .filter(x -> Objects.requireNonNull(x.getName()).contains(config.THUGS().displayName))
+                                        .sorted(Comparator.comparingInt(value -> value.getLocalLocation()
+                                        .distanceTo(new LocalPoint(3337,2950,0))))).findFirst().get();
+                                //npc = Rs2Npc.getNpc(config.THUGS().displayName); OLD VERSION
                                 return;
                             } else {
                                 if(npcsInArea.size()>1){
@@ -509,6 +513,7 @@ public class BlackJackScript extends Script {
             sleepUntilTrue(() -> !Rs2Widget.hasWidget("Psst. Come here, I want to show you something."), 100, 3000);
             sleep(120,160);
         } else {
+            //TODO add something here to target a different NPC
             return false;
         }
         boolean lureResult = Rs2Widget.hasWidget("What is it?");
