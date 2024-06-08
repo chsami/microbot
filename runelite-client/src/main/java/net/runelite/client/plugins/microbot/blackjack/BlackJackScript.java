@@ -31,7 +31,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 1.3;
+    public static double version = 1.4;
     public static State state = BANKING;
     BlackJackConfig config;
     boolean firstPlayerOpenCurtain = false;
@@ -43,6 +43,7 @@ public class BlackJackScript extends Script {
     NPC npc;
     public static List<NPC> npcsInArea = new ArrayList();
     static int playerHit=0;
+    int lureFailed=0;
     int previousHP;
     int xpDrop;
     int bjCycle = 0;
@@ -363,18 +364,18 @@ public class BlackJackScript extends Script {
                         //System.out.println("state == TRAP_NPC");
                         if(!npcIsTrapped){
                             if(lure_NPC(npc)) {
+                                if(lureFailed>0){
+                                    lureFailed=0;
+                                }
                                 sleep(60, 180);
                                 state = WALK_TO_THUGS;
                                 return;
                             } else {
-                                int h = 0;
-                                while(!lure_NPC(npc)&&h<4){
-                                    h++;
+                                lureFailed++;
+                                if(lureFailed==5){
+                                    lureFailed=0;
+                                    state = BANKING;
                                 }
-                                if(lure_NPC(npc)){
-                                    return;
-                                }
-                                state=BANKING;
                             }
                         } else {
                             state = BLACKJACK;
