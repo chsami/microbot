@@ -31,7 +31,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 1.4;
+    public static double version = 1.5;
     public static State state = BANKING;
     BlackJackConfig config;
     boolean firstPlayerOpenCurtain = false;
@@ -422,21 +422,20 @@ public class BlackJackScript extends Script {
                             Rs2Npc.interact(npc, "Knock-Out");
                             previousAction=System.currentTimeMillis();
                             knockout=true;
-                            //TODO play around with the timing here to see how long is too long to wait if failed.
-                            sleep(120, 200);
                             endTime = System.currentTimeMillis();
                             ++bjCycle;
                             return;
                         }
-                        if (bjCycle <= 2){
+                        if (bjCycle <= 2 && bjCycle>0){
                             if(knockout){
                                 sleepUntil(() -> npc.getAnimation()==838, 600);
                             }
                             xpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
                             xpdropstartTime = System.currentTimeMillis();//+random(50,65)
-                            followingAction=previousAction+1140+random(50,65);//TODO 60ms is good.70ms starts to miss.50ms decent.
+                            //followingAction=previousAction+1140+random(50,65);//TODO 60ms is good.70ms starts to miss.50ms decent.
                             //TODO change this to calculate the time needed to sleep?
-                            sleepUntil(() -> followingAction<=System.currentTimeMillis(), 5000);
+                            sleep((int) ((previousAction+1140+random(50,65))-System.currentTimeMillis()));
+                            //sleepUntil(() -> followingAction<=System.currentTimeMillis(), 5000);
                             if(npc.getAnimation()==838) {
                                 Rs2Npc.interact(npc, "Pickpocket");
                                 knockout=false;
@@ -548,6 +547,7 @@ public class BlackJackScript extends Script {
         }
     }
     public void handlePlayerHit(){
+        //TODO this isn't working correctly...
         if(playerHit>=1){
             long hitsplatStart = System.currentTimeMillis();
             int j = 0;
