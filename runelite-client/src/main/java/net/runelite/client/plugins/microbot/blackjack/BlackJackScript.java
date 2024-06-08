@@ -90,6 +90,7 @@ public class BlackJackScript extends Script {
         initScript = true;
         state = BANKING;
         Microbot.enableAutoRunOn = false;
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
@@ -170,7 +171,6 @@ public class BlackJackScript extends Script {
                         }
                     }
                 }
-                //player animation is 401 (instead decided to just check if player xp didn't go up.
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) <= config.healAt() || !Rs2Inventory.hasItem(unnotedWine)) {
                     if (!Rs2Inventory.hasItem(unnotedWine)) {
                         if (!Rs2Inventory.hasItem(notedWine)) {
@@ -432,7 +432,9 @@ public class BlackJackScript extends Script {
                             xpdropstartTime = System.currentTimeMillis();//+random(50,65)
                             //followingAction=previousAction+1140+random(50,65);//TODO 60ms is good.70ms starts to miss.50ms decent.
                             //TODO change this to calculate the time needed to sleep?
-                            sleep((int) ((previousAction+1140+random(50,65))-System.currentTimeMillis()));
+                            if((previousAction+1190)>System.currentTimeMillis()) {
+                                sleep((int) ((previousAction + 1140 + random(50, 65)) - System.currentTimeMillis()));
+                            }
                             //sleepUntil(() -> followingAction<=System.currentTimeMillis(), 5000);
                             if(npc.getAnimation()==838) {
                                 Rs2Npc.interact(npc, "Pickpocket");
@@ -560,7 +562,10 @@ public class BlackJackScript extends Script {
                 ++j;
             }
             bjCycle = 0;
-            sleep((int) ((hitsplatStart+900+random(50,65))-System.currentTimeMillis()));
+            if((hitsplatStart+950)>System.currentTimeMillis()) {
+                sleep((int) ((hitsplatStart + 900 + random(50, 65)) - System.currentTimeMillis()));
+                //sleepUntil(() -> (hitsplatStart + 900 + random(50, 65)<=System.currentTimeMillis(), 5000);
+            }
             if(playerHit==1){
                 playerHit=0;
             } else {
