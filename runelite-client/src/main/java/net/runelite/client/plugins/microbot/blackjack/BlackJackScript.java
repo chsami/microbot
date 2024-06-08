@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 2.0;
+    public static double version = 2.1;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -50,6 +50,7 @@ public class BlackJackScript extends Script {
     int lureFailed=0;
     int previousHP;
     static int hitsplatXP;
+    int koXpDrop;
     int xpDrop;
     int bjCycle = 0;
     int emptyJug = 1935;
@@ -399,6 +400,7 @@ public class BlackJackScript extends Script {
                         //break;
                     case RUN_AWAY:
                         //System.out.println("state == RUN_AWAY");
+                        Rs2Player.toggleRunEnergy(true);
                         if(checkCurtain(config.THUGS().door)){
                             sleep(160,190);
                             Rs2GameObject.interact(config.THUGS().door, "Open");
@@ -433,15 +435,19 @@ public class BlackJackScript extends Script {
                         if (bjCycle == 0){
                             previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
                             xpdropstartTime = System.currentTimeMillis();
+                            koXpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
                             Rs2Npc.interact(npc, "Knock-Out");
                             previousAction=System.currentTimeMillis();
-                            knockout=true;
+                            knockout = true;
                             endTime = System.currentTimeMillis();
                             ++bjCycle;
                             return;
                         }
                         if (bjCycle <= 2 && bjCycle>0){
                             if(knockout){
+                                if(koXpDrop==Microbot.getClient().getSkillExperience(Skill.THIEVING)){
+                                    return;
+                                }
                                 sleepUntil(() -> npc.getAnimation()==838, 600);
                             }
                             xpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
