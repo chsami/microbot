@@ -21,6 +21,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 1.5;
+    public static double version = 1.6;
     public static State state = BANKING;
     BlackJackConfig config;
     boolean firstPlayerOpenCurtain = false;
@@ -90,11 +91,13 @@ public class BlackJackScript extends Script {
         initScript = true;
         state = BANKING;
         Microbot.enableAutoRunOn = false;
+        useStaminaPotsIfNeeded = false;
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()){sleep(1000); return;}
+
             try {
+                if (!super.run()) return;
+                if (!Microbot.isLoggedIn()){sleep(1000); return;}
                 startTime = System.currentTimeMillis();
                 long restartTime = startTime-endTime;
                 //System.out.println("Script took "+restartTime+"ms to restart.");
@@ -312,6 +315,7 @@ public class BlackJackScript extends Script {
                         if (inArea(Rs2Player.getWorldLocation(), Area.ThugHut)) {
                             //npcsInArea = Microbot.getClient().getNpcs().stream().filter(x -> x.getWorldLocation().distanceTo(getInitialPlayerLocation()) < 2).collect(Collectors.toList()); ORIGINAL
                             npcsInArea = Microbot.getClient().getNpcs().stream().filter(x ->
+                            Objects.requireNonNull(x.getName()).contains(config.THUGS().displayName)).filter(x ->
                             x.getWorldLocation().getX() >= 3340).filter(x -> x.getWorldLocation().getY() <= 2956).filter(x ->
                             x.getWorldLocation().getX() <= 3344).filter(x -> x.getWorldLocation().getY() >= 2953)
                             .collect(Collectors.toList());
@@ -563,9 +567,10 @@ public class BlackJackScript extends Script {
                 ++j;
             }
             bjCycle = 0;
-            if((hitsplatStart+950)>System.currentTimeMillis()) {
-                sleep((int) ((hitsplatStart + 900 + random(50, 65)) - System.currentTimeMillis()));
-                //sleepUntil(() -> (hitsplatStart + 900 + random(50, 65)<=System.currentTimeMillis(), 5000);
+            //TODO change this to not sleep, but detect time elapsed since hit.
+            if((hitsplatStart+1250)>System.currentTimeMillis()) {
+                sleep((int) ((hitsplatStart + 1200 + random(50, 65)) - System.currentTimeMillis()));
+                //sleepUntil(() -> (hitsplatStart + 1200 + random(50, 65)<=System.currentTimeMillis(), 5000);
             }
             if(playerHit==1){
                 playerHit=0;
