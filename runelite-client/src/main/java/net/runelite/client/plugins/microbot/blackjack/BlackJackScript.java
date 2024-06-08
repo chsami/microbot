@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 2.1;
+    public static double version = 2.2;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -406,7 +406,6 @@ public class BlackJackScript extends Script {
                             Rs2GameObject.interact(config.THUGS().door, "Open");
                             sleepUntil(() ->!checkCurtain(config.THUGS().door));
                             sleep(80,160);
-
                         }
                         Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
                         sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3345 && Rs2Player.getWorldLocation().getY()==2955);
@@ -424,7 +423,7 @@ public class BlackJackScript extends Script {
                         sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==0,8000);
                         sleep(120,240);
                         state = WALK_TO_THUGS;
-                        break;
+                        return;
 
                     case BLACKJACK:
                         //System.out.println("state == BLACKJACK");
@@ -446,6 +445,11 @@ public class BlackJackScript extends Script {
                         if (bjCycle <= 2 && bjCycle>0){
                             if(knockout){
                                 if(koXpDrop==Microbot.getClient().getSkillExperience(Skill.THIEVING)){
+                                    if(playerHit>0) {
+                                        bjCycle=0;
+                                        sleep(220,280);
+                                        return;
+                                    }
                                     return;
                                 }
                                 sleepUntil(() -> npc.getAnimation()==838, 600);
@@ -457,7 +461,6 @@ public class BlackJackScript extends Script {
                             if((previousAction+1190)>System.currentTimeMillis()) {
                                 sleep((int) ((previousAction + 1140 + random(50, 65)) - System.currentTimeMillis()));
                             }
-                            //sleepUntil(() -> followingAction<=System.currentTimeMillis(), 5000);
                             if(npc.getAnimation()==838) {
                                 Rs2Npc.interact(npc, "Pickpocket");
                                 knockout=false;
@@ -571,7 +574,6 @@ public class BlackJackScript extends Script {
     }
     public void handlePlayerHit(){
         if(playerHit>=1){
-            //long hitsplatStart = System.currentTimeMillis();
             int j = 0;
             int i = random(2, 3);
             int c = 80;
@@ -587,8 +589,7 @@ public class BlackJackScript extends Script {
                 firstHit=false;
                 bjCycle = 0;
             }
-            //if(System.currentTimeMillis()>=(hitsplatStart+1200)) {
-            if(Microbot.getClient().getLocalPlayer().hasSpotAnim(245)){
+                if(Microbot.getClient().getLocalPlayer().hasSpotAnim(245)){
                 return;
                 }
                 if (playerHit == 1) {
@@ -600,7 +601,6 @@ public class BlackJackScript extends Script {
                     bjCycle = 0;
                 }
                 previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
-            //}
         }
     }
     public static boolean inArea(WorldPoint entity, Area area){
