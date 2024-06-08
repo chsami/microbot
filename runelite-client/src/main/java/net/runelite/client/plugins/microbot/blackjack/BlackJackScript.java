@@ -399,8 +399,6 @@ public class BlackJackScript extends Script {
                         sleep(120,240);
                         Rs2Walker.walkTo(new WorldPoint(3352,2960,0), 0);
                         sleep(500,800);
-                        //MenuEntryImpl(getOption=Climb-up, getTarget=<col=ffff>Staircase, getIdentifier=6242, getType=GAME_OBJECT_FIRST_OPTION, getParam0=65, getParam1=54, getItemId=-1, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
-                        //MenuEntryImpl(getOption=Climb-down, getTarget=<col=ffff>Staircase, getIdentifier=6243, getType=GAME_OBJECT_FIRST_OPTION, getParam0=65, getParam1=54, getItemId=-1, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
                         Rs2GameObject.interact(6242,true);
                         sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==1,1000);
                         sleep(120,240);
@@ -550,6 +548,8 @@ public class BlackJackScript extends Script {
         //TODO this isn't working correctly...
         if(playerHit>=1){
             long hitsplatStart = System.currentTimeMillis();
+            //TODO play around with this sleep to see what's the highest tolerance before you're too late to react.
+            sleep(60,120);
             int j = 0;
             int i = random(2, 3);
             int c = 80;
@@ -560,8 +560,7 @@ public class BlackJackScript extends Script {
                 ++j;
             }
             bjCycle = 0;
-            long hitsplatEnd=hitsplatStart+700+random(50,65);
-            sleepUntil(() -> hitsplatEnd<=System.currentTimeMillis(), 800);
+            sleep((int) ((hitsplatStart+900+random(50,65))-System.currentTimeMillis()));
             if(playerHit==1){
                 playerHit=0;
             } else {
