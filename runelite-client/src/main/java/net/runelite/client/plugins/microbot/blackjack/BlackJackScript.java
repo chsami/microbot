@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 1.9;
+    public static double version = 2.0;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -400,25 +400,26 @@ public class BlackJackScript extends Script {
                     case RUN_AWAY:
                         //System.out.println("state == RUN_AWAY");
                         if(checkCurtain(config.THUGS().door)){
-                            sleep(60,90);
+                            sleep(160,190);
                             Rs2GameObject.interact(config.THUGS().door, "Open");
                             sleepUntil(() ->!checkCurtain(config.THUGS().door));
                             sleep(80,160);
 
                         }
                         Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
-                        sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3345);
+                        sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3345 && Rs2Player.getWorldLocation().getY()==2955);
                         sleep(60,120);
                         Rs2GameObject.interact(config.THUGS().door, "Close");
                         sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
                         sleep(120,240);
                         Rs2Walker.walkTo(new WorldPoint(3352,2960,0), 0);
-                        sleep(500,800);
+                        sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3347 && Rs2Player.getWorldLocation().getY()>2956, 2000);
+                        sleep(200,300);
                         Rs2GameObject.interact(6242,true);
-                        sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==1,1000);
+                        sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==1,8000);
                         sleep(120,240);
                         Rs2GameObject.interact(6243,true);
-                        sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==0,1000);
+                        sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==0,8000);
                         sleep(120,240);
                         state = WALK_TO_THUGS;
                         break;
