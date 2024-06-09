@@ -110,6 +110,7 @@ public class AgilityScript extends Script {
                 if (!super.run()) return;
                 if (startCourse == null) {
                     Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
+                    sleep(10000);
                     return;
                 }
 
