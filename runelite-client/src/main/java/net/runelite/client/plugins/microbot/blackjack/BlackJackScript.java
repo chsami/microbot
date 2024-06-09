@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 2.7;
+    public static double version = 2.8;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -53,7 +53,9 @@ public class BlackJackScript extends Script {
     static int hitsplatXP;
     int koXpDrop;
     int xpDrop;
-    int hitReactTime=110;
+    int hitReactTime = 110;
+    int pickpomin = 200;
+    int pickpomax = 365;
     static int bjCycle = 0;
     int emptyJug = 1935;
     int notedWine = 1994;
@@ -94,6 +96,9 @@ public class BlackJackScript extends Script {
 
     public boolean run(BlackJackConfig config) {
         this.config = config;
+        hitReactTime = config.maxReactTime();
+        pickpomin = config.minTime();
+        pickpomax = config.maxTime();
         initScript = true;
         state = BANKING;
         Microbot.enableAutoRunOn = false;
@@ -132,8 +137,15 @@ public class BlackJackScript extends Script {
                     if(knockout&&Microbot.getClient().getLocalPlayer().getAnimation()!=401&&!koPassed){
                         hitReactStart=System.currentTimeMillis();
                         sleepUntil(() ->Microbot.getClient().getLocalPlayer().getAnimation()==401, (hitReactTime-10));
+                        if(Microbot.getClient().getLocalPlayer().getAnimation()==401) {
+                            koPassed = true;
+                        }
+                    }
+                    /*
+                    if(knockout&&Microbot.getClient().getLocalPlayer().getAnimation()==401&&!koPassed){
                         koPassed=true;
                     }
+                    */
                     if(!checkCurtain(config.THUGS().door)) {
                         if (!isPlayerNearby) {
                             sleep(120, 240);
@@ -461,10 +473,12 @@ public class BlackJackScript extends Script {
                             xpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
                             xpdropstartTime = System.currentTimeMillis();
                             // 360ms is good.370ms starts to miss.350ms decent. 350~365
-                            int min = 200;
-                            int max = 365;
-                            if((previousAction+1140+min)>System.currentTimeMillis()) {
-                                sleep((int) ((previousAction + 840 + random(min, max)) - System.currentTimeMillis()));
+                            /*
+                            int pickpomin = 200;
+                            int pickpomax = 365;
+                            */
+                            if((previousAction+1140+pickpomin)>System.currentTimeMillis()) {
+                                sleep((int) ((previousAction + 840 + random(pickpomin, pickpomax)) - System.currentTimeMillis()));
                             }
                             if(npc.getAnimation()==838) {
                                 Rs2Npc.interact(npc, "Pickpocket");

@@ -15,6 +15,12 @@ public interface BlackJackConfig extends Config {
             position = 0
     )
     String generalSection = "General";
+    @ConfigSection(
+            name = "System",
+            description = "System",
+            position = 1
+    )
+    String systemSection = "System";
     @ConfigItem(
             keyName = "guide",
             name = "How to use",
@@ -93,5 +99,35 @@ public interface BlackJackConfig extends Config {
     )
     default String teleportActionToBank() {
         return "break";
+    }
+    @ConfigItem(
+            keyName = "PickpocketMinTime",
+            name = "PickpocketMinTime",
+            description = "Minimum time allowed before pickpocket can't pick twice.",
+            position = 0,
+            section = systemSection
+    )
+    default int minTime() {
+        return 200;
+    }
+    @ConfigItem(
+            keyName = "PickpocketMaxTime",
+            name = "PickpocketMaxTime",
+            description = "Maximum time allowed before pickpocket can't pick twice.",
+            position = 1,
+            section = systemSection
+    )
+    default int maxTime() {
+        return 365;
+    }
+    @ConfigItem(
+            keyName = "ReactHitMaxTime",
+            name = "ReactHitMaxTime",
+            description = "Maximum time allowed before reacting to hits fails.",
+            position = 2,
+            section = systemSection
+    )
+    default int maxReactTime() {
+        return 110;
     }
 }
