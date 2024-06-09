@@ -17,8 +17,8 @@ import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -288,7 +288,7 @@ public class Rs2GroundItem {
 
         if (groundItems.size() < minItems || (delayedLooting && calculateDespawnTime(Objects.requireNonNull(groundItems.stream().min(Comparator.comparingInt(Rs2GroundItem::calculateDespawnTime)).orElse(null))) > 150))
             return false;
-
+        Microbot.pauseAllScripts = true;
         groundItems.stream().filter(Rs2GroundItem::interact).forEach(item -> sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100,5000));
 
         sleepUntil(() -> !isLooting(filter));

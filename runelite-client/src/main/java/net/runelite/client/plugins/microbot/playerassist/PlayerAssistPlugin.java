@@ -17,6 +17,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.playerassist.bank.BankerScript;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
@@ -80,6 +81,7 @@ public class PlayerAssistPlugin extends Plugin {
     private final AntiPoisonScript antiPoisonScript = new AntiPoisonScript();
     private final BuryScatterScript buryScatterScript = new BuryScatterScript();
     private final AttackStyleScript attackStyleScript = new AttackStyleScript();
+    private final BankerScript bankerScript = new BankerScript();
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -98,6 +100,7 @@ public class PlayerAssistPlugin extends Plugin {
         antiPoisonScript.run(config);
         buryScatterScript.run(config);
         attackStyleScript.run(config);
+        bankerScript.run(config);
     }
 
     protected void shutDown() {
@@ -112,6 +115,8 @@ public class PlayerAssistPlugin extends Plugin {
         useSpecialAttackScript.shutdown();
         antiPoisonScript.shutdown();
         buryScatterScript.shutdown();
+        attackStyleScript.shutdown();
+        bankerScript.shutdown();
         resetLocation();
         overlayManager.remove(playerAssistOverlay);
     }

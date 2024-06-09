@@ -176,6 +176,14 @@ public class Rs2Bank {
         return findBankItem(name, exact) != null;
     }
 
+    //hasBankItem overload to check with id and amount
+    public static boolean hasBankItem(int id, int amount) {
+        Rs2Item rs2Item = findBankItem(id);
+        if (rs2Item == null) return false;
+        log.info("Item: " + rs2Item.name + " Amount: " + rs2Item.quantity);
+        return findBankItem(Objects.requireNonNull(rs2Item).name, false, amount) != null;
+    }
+
     /**
      * Deposits all equipped items into the bank.
      * This method finds and clicks the "Deposit Equipment" button in the bank interface.

@@ -1,10 +1,7 @@
 package net.runelite.client.plugins.microbot.playerassist;
 
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 
 @ConfigGroup(net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig.GROUP)
@@ -48,6 +45,13 @@ public interface PlayerAssistConfig extends Config {
     )
     String combatSection = "Combat";
 
+    @ConfigSection(
+            name = "Banking",
+            description = "Banking settings",
+            position = 992,
+            closedByDefault = true
+    )
+    String banking = "Banking";
     @ConfigItem(
             keyName = "Combat",
             name = "Auto attack npc",
@@ -424,6 +428,205 @@ public interface PlayerAssistConfig extends Config {
     default String inventorySetup() {
         return "";
     }
+
+    @ConfigItem(
+            keyName = "bank",
+            name = "Bank",
+            description = "If enabled, will bank items when inventory is full. If disabled, will just stop looting",
+            position = 0,
+            section = banking
+    )
+    default boolean bank() {
+        return true;
+    }
+
+    //Minimum free inventory slots to bank
+    @Range(max = 28)
+    @ConfigItem(
+            keyName = "minFreeSlots",
+            name = "Min. free slots",
+            description = "Minimum free inventory slots to bank, if less than this, will bank items",
+            position = 1,
+            section = banking
+    )
+    default int minFreeSlots() {
+        return 5;
+    }
+
+    // checkbox to use stamina potions when banking
+    @ConfigItem(
+            keyName = "useStamina",
+            name = "Use stamina potions",
+            description = "Use stamina potions when banking",
+            position = 2,
+            section = banking
+    )
+    default boolean useStamina() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "staminaValue",
+            name = "Stamina Potions",
+            description = "Amount of stamina potions to withdraw",
+            position = 2,
+            section = banking
+    )
+    default int staminaValue() {
+        return 0;
+    }
+
+    // checkbox to use food when banking
+    @ConfigItem(
+            keyName = "useFood",
+            name = "Use food",
+            description = "Use food when banking",
+            position = 3,
+            section = banking
+    )
+    default boolean useFood() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "foodValue",
+            name = "Food",
+            description = "Amount of food to withdraw",
+            position = 3,
+            section = banking
+    )
+    default int foodValue() {
+        return 0;
+    }
+
+    // checkbox to use restore potions when banking
+    @ConfigItem(
+            keyName = "useRestore",
+            name = "Use restore potions",
+            description = "Use restore potions when banking",
+            position = 4,
+            section = banking
+    )
+    default boolean useRestore() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "restoreValue",
+            name = "Restore Potions",
+            description = "Amount of restore potions to withdraw",
+            position = 4,
+            section = banking
+    )
+    default int restoreValue() {
+        return 0;
+    }
+
+    // checkbox to use prayer potions when banking
+    @ConfigItem(
+            keyName = "usePrayer",
+            name = "Use prayer potions",
+            description = "Use prayer potions when banking",
+            position = 5,
+            section = banking
+    )
+    default boolean usePrayer() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "prayerValue",
+            name = "Prayer Potions",
+            description = "Amount of prayer potions to withdraw",
+            position = 5,
+            section = banking
+    )
+    default int prayerValue() {
+        return 0;
+    }
+
+    // checkbox to use antipoison potions when banking
+    @ConfigItem(
+            keyName = "useAntipoison",
+            name = "Use antipoison potions",
+            description = "Use antipoison potions when banking",
+            position = 6,
+            section = banking
+    )
+    default boolean useAntipoison() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "antipoisonValue",
+            name = "Antipoison Potions",
+            description = "Amount of antipoison potions to withdraw",
+            position = 6,
+            section = banking
+    )
+    default int antipoisonValue() {
+        return 0;
+    }
+
+    // checkbox to use antifire potions when banking
+    @ConfigItem(
+            keyName = "useAntifire",
+            name = "Use antifire potions",
+            description = "Use antifire potions when banking",
+            position = 7,
+            section = banking
+    )
+    default boolean useAntifire() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "antifireValue",
+            name = "Antifire Potions",
+            description = "Amount of antifire potions to withdraw",
+            position = 7,
+            section = banking
+    )
+    default int antifireValue() {
+        return 0;
+    }
+
+    // checkbox to use combat potions when banking
+    @ConfigItem(
+            keyName = "useCombat",
+            name = "Use combat potions",
+            description = "Use combat potions when banking",
+            position = 8,
+            section = banking
+    )
+    default boolean useCombat() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "combatValue",
+            name = "Combat Potions",
+            description = "Amount of combat potions to withdraw",
+            position = 8,
+            section = banking
+    )
+    default int combatValue() {
+        return 0;
+    }
+
+
+    // checkbox to use teleportation items when banking
+    @ConfigItem(
+            keyName = "ignoreTeleport",
+            name = "Ignore Teleport Items",
+            description = "ignore teleport items when banking",
+            position = 9,
+            section = banking
+    )
+    default boolean ignoreTeleport() {
+        return true;
+    }
+
 
     // Hidden config item for inventory setup
     @ConfigItem(
