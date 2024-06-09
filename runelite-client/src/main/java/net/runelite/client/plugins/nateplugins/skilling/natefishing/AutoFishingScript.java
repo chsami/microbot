@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.nateplugins.skilling.natefishing.enums.Fishs;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +20,7 @@ import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.validateInter
 
 public class AutoFishingScript extends Script {
 
-    public static String version = "1.4.0";
+    public static String version = "1.4.1";
 
     public boolean run(AutoFishingConfig config) {
         initialPlayerLocation = null;
@@ -33,7 +34,7 @@ public class AutoFishingScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
-                if (Rs2Player.isMoving() || Rs2Player.isAnimating()) {
+                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || config.Fish() == Fishs.TROUT && !Rs2Inventory.hasItem("feather")) {
                     return;
                 }
 
