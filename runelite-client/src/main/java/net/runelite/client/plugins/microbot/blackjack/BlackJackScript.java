@@ -291,6 +291,7 @@ public class BlackJackScript extends Script {
                                 }
                             }
                             Rs2Walker.walkTo(shopsLocation, 1);
+                            sleepUntil(() -> Rs2Player.getWorldLocation()==shopsLocation);
                             sleep(300,400);
                             return;
                         }
