@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 2.8;
+    public static double version = 2.9;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -384,7 +384,8 @@ public class BlackJackScript extends Script {
                             }
                         } else {
                             Rs2Walker.walkTo(config.THUGS().location, 1);
-                            sleep(120,180);
+                            sleepUntil(() -> Rs2Player.getWorldLocation()==config.THUGS().location);
+                            sleep(320,480);
                             return;
                         }
                         break;
@@ -457,7 +458,7 @@ public class BlackJackScript extends Script {
                             previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
                             xpdropstartTime = System.currentTimeMillis();
                             koXpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
-                            if(System.currentTimeMillis()>(previousAction+random(800,1000)) || !knockout) {
+                            if(System.currentTimeMillis()>(previousAction+random(500,700)) || !knockout ) {
                                 Rs2Npc.interact(npc, "Knock-Out");
                             }
                             previousAction=System.currentTimeMillis();
@@ -466,17 +467,13 @@ public class BlackJackScript extends Script {
                             ++bjCycle;
                             return;
                         }
-                        if (bjCycle <= 2 && bjCycle>0){
+                        if (bjCycle <= 2){
                             if(knockout && !firstHit){
                                 if(npc.getAnimation() != 838) { sleepUntil(() -> npc.getAnimation() == 838, 600); }
                             }
                             xpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
                             xpdropstartTime = System.currentTimeMillis();
                             // 360ms is good.370ms starts to miss.350ms decent. 350~365
-                            /*
-                            int pickpomin = 200;
-                            int pickpomax = 365;
-                            */
                             if((previousAction+1140+pickpomin)>System.currentTimeMillis()) {
                                 sleep((int) ((previousAction + 840 + random(pickpomin, pickpomax)) - System.currentTimeMillis()));
                             }
@@ -494,7 +491,9 @@ public class BlackJackScript extends Script {
                             ++bjCycle;
                             return;
                         }
-                        sleepUntil(() -> npc.getAnimation()!=838,600);
+                        if(npc.getAnimation()==838) {
+                            sleepUntil(() -> npc.getAnimation() != 838, 800);
+                        }
                         sleep(120,180);
                         bjCycle=0;
                         break;
@@ -563,14 +562,14 @@ public class BlackJackScript extends Script {
         return false;
     }
     public boolean lure_NPC(NPC npc){
-        Rs2Player.toggleRunEnergy(false);
         sleep(200,260);
         Rs2Npc.interact(npc, "Lure");
-        boolean lureStarted = sleepUntilTrue(() -> Rs2Widget.hasWidget("Psst. Come here, I want to show you something."), 100, 5000);
+        boolean lureStarted = sleepUntilTrue(() -> Rs2Widget.hasWidget("Psst. Come here, I want to show you something."), 300, 15000);
+        Rs2Player.toggleRunEnergy(false);
         if(lureStarted){
             sleep(120,160);
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-            sleepUntilTrue(() -> !Rs2Widget.hasWidget("Psst. Come here, I want to show you something."), 100, 3000);
+            sleepUntilTrue(() -> !Rs2Widget.hasWidget("Psst. Come here, I want to show you something."), 300, 3000);
             sleep(120,160);
         } else {
             return false;
@@ -578,9 +577,10 @@ public class BlackJackScript extends Script {
         boolean lureResult = Rs2Widget.hasWidget("What is it?");
         if(lureResult){
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-            sleepUntilTrue(() -> !Rs2Widget.hasWidget("What is it?"), 100, 3000);
-            sleep(120,160);
+            sleepUntilTrue(() -> !Rs2Widget.hasWidget("What is it?"), 300, 3000);
+            sleep(320,460);
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+            sleep(320,460);
             Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 1);
             sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3346 && Rs2Player.getWorldLocation().getY()==2955);
             sleep(120,160);
@@ -612,11 +612,11 @@ public class BlackJackScript extends Script {
         long movingStart = System.currentTimeMillis();
         while(npc.getWorldLocation().distanceTo(Rs2Player.getWorldLocation())!=1){
             WorldPoint isMoving = npc.getWorldLocation();
-            sleep(700);
+            sleep(1000);
             if(npc.getWorldLocation()==isMoving){
                 break;
             }
-            if((System.currentTimeMillis()-movingStart)>=5000){
+            if((System.currentTimeMillis()-movingStart)>=15000){
                 break;
             }
         }
