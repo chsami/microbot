@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 2.2;
+    public static double version = 2.3;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -452,7 +452,9 @@ public class BlackJackScript extends Script {
                                     }
                                     return;
                                 }
-                                sleepUntil(() -> npc.getAnimation()==838, 600);
+                                if(npc.getAnimation()!=838) {
+                                    sleepUntil(() -> npc.getAnimation() == 838, 600);
+                                }
                             }
                             xpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
                             xpdropstartTime = System.currentTimeMillis();//+random(50,65)
