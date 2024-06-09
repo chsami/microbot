@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.bank;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
@@ -33,6 +34,7 @@ import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
 @SuppressWarnings("unused")
+@Slf4j
 public class Rs2Bank {
     public static List<Rs2Item> bankItems = new ArrayList<Rs2Item>();
     private static final int X_AMOUNT_VARBIT = 3960;
@@ -365,7 +367,7 @@ public class Rs2Bank {
                 .filter(Objects::nonNull)
                 .filter(Predicates.distinctByProperty(Rs2Item::getName))
                 .collect(Collectors.toList());
-
+        log.info("Items to deposit: " + itemsToDeposit.size());
         for (Rs2Item item : itemsToDeposit) {
             Rs2Bank.depositAll(item);
             if (delay) {
@@ -474,10 +476,16 @@ public class Rs2Bank {
      * @param names The names of the items to be excluded from the deposit.
      * @return true if any items were deposited, false otherwise.
      */
-    public static boolean depositAllExcept(boolean delay,String... names) {
-        return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)), delay);
+    public static boolean depositAllExcept(boolean delay,boolean exact,String... names) {
+        if(!exact)
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.contains(name.toLowerCase())), delay);
+        else
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)), delay);
     }
-
+    // overload
+    public static boolean depositAllExcept(boolean delay,String... names) {
+        return depositAllExcept(delay, false, names);
+    }
 
     /**
      * withdraw one item identified by its ItemWidget.

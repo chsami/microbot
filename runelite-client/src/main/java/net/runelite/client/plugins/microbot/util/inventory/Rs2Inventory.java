@@ -420,7 +420,13 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(String... names) {
+        return dropAllExcept(false, names);
+    }
+    public static boolean dropAllExcept(boolean exact ,String... names) {
+       if(exact)
         return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+         else
+              return dropAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())));
     }
 
     /**

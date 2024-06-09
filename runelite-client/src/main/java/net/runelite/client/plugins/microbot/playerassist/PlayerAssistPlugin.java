@@ -216,12 +216,14 @@ public class PlayerAssistPlugin extends Plugin {
         if(config.togglePrayer())
             flickerScript.onNpcDespawned(npcDespawned);
     }
+
     @Subscribe
     public void onHitsplatApplied(HitsplatApplied event){
         if (event.getActor().getInteracting() != Microbot.getClient().getLocalPlayer()) return;
         final Hitsplat hitsplat = event.getHitsplat();
+
         if ((hitsplat.getHitsplatType() == HitsplatID.BLOCK_ME || hitsplat.getHitsplatType() == HitsplatID.DAMAGE_ME) && event.getActor() instanceof NPC && config.togglePrayer()) {
-            Rs2Prayer.disableAllPrayers();
+            //Rs2Prayer.disableAllPrayers();
             if(config.toggleQuickPrayFlick())
                 Rs2Prayer.toggleQuickPrayer(false);
             flickerScript.resetLastAttack();

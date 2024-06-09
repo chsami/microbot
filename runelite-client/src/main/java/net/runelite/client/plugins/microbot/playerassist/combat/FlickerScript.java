@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.playerassist.combat;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
  * This class is responsible for handling the flicker script in the game.
  * It extends the Script class and overrides its methods to provide the functionality needed.
  */
+@Slf4j
 public class FlickerScript extends Script {
     public static List<Monster> currentMonstersAttackingUs = new ArrayList<>();
     AttackStyle prayFlickAttackStyle = null;
@@ -50,7 +52,6 @@ public class FlickerScript extends Script {
                 lazyFlick = config.toggleLazyFlick();
                 flickQuickPrayer = config.toggleQuickPrayFlick();
                 currentTick = Microbot.getClient().getTickCount();
-
                 // Keep track of which monsters still have aggro on the player
                 currentMonstersAttackingUs.forEach(monster -> {
                     if (npcs.stream().noneMatch(npc -> npc.getIndex() == monster.npc.getIndex())) {
@@ -59,10 +60,10 @@ public class FlickerScript extends Script {
                 });
 
                 currentMonstersAttackingUs.removeIf(monster -> monster.delete);
-
                 if (prayFlickAttackStyle != null) {
                     handlePrayerFlick();
                 }
+
 
             } catch (Exception ex) {
                 System.err.println("Error: " + ex.getMessage());
@@ -77,7 +78,7 @@ public class FlickerScript extends Script {
      */
     private void handlePrayerFlick() {
         lastPrayerTick = currentTick;
-
+        log.info("Ficked on tick: " + Microbot.getClient().getTickCount());
         Rs2PrayerEnum prayerToToggle;
         switch (prayFlickAttackStyle) {
             case MAGE:
@@ -92,15 +93,16 @@ public class FlickerScript extends Script {
             default:
                 prayFlickAttackStyle = null;
                 Rs2Prayer.toggleQuickPrayer(true);
-                sleep(350, 400);
+                sleep(600);
                 Rs2Prayer.toggleQuickPrayer(false);
                 return;
         }
 
         prayFlickAttackStyle = null;
         Rs2Prayer.toggle(prayerToToggle, true);
-        sleep(350, 400);
+        sleep(600);
         Rs2Prayer.toggle(prayerToToggle, false);
+        log.info("Flick ended on tick: " + Microbot.getClient().getTickCount());
     }
 
     /**
@@ -118,19 +120,32 @@ public class FlickerScript extends Script {
         if (!usePrayer) return;
 
         if (!currentMonstersAttackingUs.isEmpty()) {
-            resetLastAttack();
+
             for (Monster currentMonster : currentMonstersAttackingUs) {
                 currentMonster.lastAttack--;
+                resetLastAttack();
+                if(currentMonster.rs2NpcStats.getAttackSpeed() == 4 && currentMonster.lastAttack == 2)
+                {
 
-
-                if (currentMonster.lastAttack == 1 && lazyFlick && !currentMonster.npc.isDead()) {
                     if(flickQuickPrayer){
                         prayFlickAttackStyle = AttackStyle.MIXED;
                     }
                     else
                         prayFlickAttackStyle = currentMonster.attackStyle;
 
+
                 }
+                if (currentMonster.rs2NpcStats.getAttackSpeed() > 4 && currentMonster.lastAttack == 1 && lazyFlick && !currentMonster.npc.isDead()) {
+
+                    if(flickQuickPrayer){
+                        prayFlickAttackStyle = AttackStyle.MIXED;
+                    }
+                    else
+                        prayFlickAttackStyle = currentMonster.attackStyle;
+
+
+                }
+
 
             }
         }
