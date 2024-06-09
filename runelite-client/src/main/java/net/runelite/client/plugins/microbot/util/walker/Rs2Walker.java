@@ -626,10 +626,11 @@ public class Rs2Walker {
      */
     public static boolean isInArea(WorldPoint... worldPoints) {
         WorldPoint playerLocation = Rs2Player.getWorldLocation();
-        return playerLocation.getX() >= worldPoints[0].getX() ||   // NW corner X
-                playerLocation.getX() <= worldPoints[1].getX() ||  // SE corner X
-                playerLocation.getY() <= worldPoints[0].getY() ||  // NW corner Y
-                playerLocation.getY() >= worldPoints[1].getY();    // SE corner Y
+        return  playerLocation.getX() <= worldPoints[0].getX() &&   // NW corner x
+                playerLocation.getY() >= worldPoints[0].getY() &&   // NW corner y
+                playerLocation.getX() >= worldPoints[1].getX() &&   // SE corner x
+                playerLocation.getY() <= worldPoints[1].getY();     // SE corner Y
+               // draws box from 2 points to check against all variations of player X,Y from said points.
     }
     /**
      * Checks if the player's current location is within the specified range from the given center point.
