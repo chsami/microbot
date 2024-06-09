@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 2.3;
+    public static double version = 2.6;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -42,6 +42,7 @@ public class BlackJackScript extends Script {
     boolean initScript = false;
     boolean npcIsTrapped = false;
     boolean knockout = false;
+    static boolean koPassed=false;
     static boolean isPlayerNearby = false;
     static boolean npcsCanSeeEachother = false;
     NPC npc;
@@ -52,7 +53,7 @@ public class BlackJackScript extends Script {
     static int hitsplatXP;
     int koXpDrop;
     int xpDrop;
-    int bjCycle = 0;
+    static int bjCycle = 0;
     int emptyJug = 1935;
     int notedWine = 1994;
     int unnotedWine= 1993;
@@ -126,6 +127,9 @@ public class BlackJackScript extends Script {
                 }
                 handlePlayerHit();
                 if(state==BLACKJACK){
+                    if(knockout&&Microbot.getClient().getLocalPlayer().getAnimation()==401&&!koPassed){
+                        koPassed=true;
+                    }
                     if(!checkCurtain(config.THUGS().door)) {
                         if (!isPlayerNearby) {
                             sleep(120, 240);
@@ -242,6 +246,9 @@ public class BlackJackScript extends Script {
                         break;
                     case UN_NOTING:
                         //System.out.println("state == UN_NOTING");
+                        if (Microbot.getClient().getLocalPlayer().hasSpotAnim(245)) {
+                            sleepUntil(() -> !Microbot.getClient().getLocalPlayer().hasSpotAnim(245),5000);
+                        }
                             if(!inArea(Rs2Player.getWorldLocation(), Area.ShopsArea)){
                               if(inArea(Rs2Player.getWorldLocation(), Area.ThugHut)){
                                 sleep(120,240);
@@ -250,7 +257,7 @@ public class BlackJackScript extends Script {
                                     Rs2GameObject.interact(config.THUGS().door, "Open");
                                     sleepUntil(() -> !checkCurtain(config.THUGS().door), 5000);
                                     sleep(80,160);
-                                    Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
+                                    Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 1);
                                     sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3346,2000);
                                     sleep(80,160);
                                     Rs2GameObject.interact(config.THUGS().door, "Close");
@@ -259,7 +266,7 @@ public class BlackJackScript extends Script {
                                     Rs2Player.toggleRunEnergy(true);
                                     sleep(60,120);
                                 } else {
-                                    Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
+                                    Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 1);
                                     sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3345);
                                     sleep(80,160);
                                     Rs2GameObject.interact(config.THUGS().door, "Close");
@@ -361,7 +368,7 @@ public class BlackJackScript extends Script {
                                 //npc = Rs2Npc.getNpcs().findFirst().get();
                             }
                         } else {
-                            Rs2Walker.walkTo(config.THUGS().location, 0);
+                            Rs2Walker.walkTo(config.THUGS().location, 1);
                             sleep(120,180);
                             return;
                         }
@@ -402,26 +409,26 @@ public class BlackJackScript extends Script {
                         //System.out.println("state == RUN_AWAY");
                         Rs2Player.toggleRunEnergy(true);
                         if(checkCurtain(config.THUGS().door)){
-                            sleep(160,190);
+                            sleep(240,290);
                             Rs2GameObject.interact(config.THUGS().door, "Open");
-                            sleepUntil(() ->!checkCurtain(config.THUGS().door));
-                            sleep(80,160);
+                            sleepUntil(() ->!checkCurtain(config.THUGS().door),3000);
+                            sleep(220,280);
                         }
-                        Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
-                        sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3345 && Rs2Player.getWorldLocation().getY()==2955);
-                        sleep(60,120);
+                        Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 1);
+                        sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3345 && Rs2Player.getWorldLocation().getY()==2955,5000);
+                        sleep(320,380);
                         Rs2GameObject.interact(config.THUGS().door, "Close");
                         sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
-                        sleep(120,240);
-                        Rs2Walker.walkTo(new WorldPoint(3352,2960,0), 0);
+                        sleep(320,380);
+                        Rs2Walker.walkTo(new WorldPoint(3352,2960,0), 1);
                         sleepUntil(() -> Rs2Player.getWorldLocation().getX()>3347 && Rs2Player.getWorldLocation().getY()>2956, 2000);
-                        sleep(200,300);
+                        sleep(300,400);
                         Rs2GameObject.interact(6242,true);
                         sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==1,8000);
-                        sleep(120,240);
+                        sleep(320,380);
                         Rs2GameObject.interact(6243,true);
                         sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==0,8000);
-                        sleep(120,240);
+                        sleep(320,380);
                         state = WALK_TO_THUGS;
                         return;
 
@@ -432,10 +439,13 @@ public class BlackJackScript extends Script {
                             return;
                         }
                         if (bjCycle == 0){
+                            //TODO add something to make record of the player doing the animation for if it passes or fails animation 401
                             previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
                             xpdropstartTime = System.currentTimeMillis();
                             koXpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
-                            Rs2Npc.interact(npc, "Knock-Out");
+                            if(System.currentTimeMillis()>(previousAction+random(800,1000)) || !knockout) {
+                                Rs2Npc.interact(npc, "Knock-Out");
+                            }
                             previousAction=System.currentTimeMillis();
                             knockout = true;
                             endTime = System.currentTimeMillis();
@@ -443,32 +453,22 @@ public class BlackJackScript extends Script {
                             return;
                         }
                         if (bjCycle <= 2 && bjCycle>0){
-                            if(knockout){
-                                if(koXpDrop==Microbot.getClient().getSkillExperience(Skill.THIEVING)){
-                                    if(playerHit>0) {
-                                        bjCycle=0;
-                                        sleep(220,280);
-                                        return;
-                                    }
-                                    return;
-                                }
-                                if(npc.getAnimation()!=838) {
-                                    sleepUntil(() -> npc.getAnimation() == 838, 600);
-                                }
+                            if(knockout && !firstHit){
+                                if(npc.getAnimation() != 838) { sleepUntil(() -> npc.getAnimation() == 838, 600); }
                             }
                             xpDrop = Microbot.getClient().getSkillExperience(Skill.THIEVING);
-                            xpdropstartTime = System.currentTimeMillis();//+random(50,65)
-                            //followingAction=previousAction+1140+random(50,65);//TODO 60ms is good.70ms starts to miss.50ms decent.
-                            //TODO change this to calculate the time needed to sleep?
-                            if((previousAction+1190)>System.currentTimeMillis()) {
-                                sleep((int) ((previousAction + 1140 + random(50, 65)) - System.currentTimeMillis()));
+                            xpdropstartTime = System.currentTimeMillis();
+                            // 360ms is good.370ms starts to miss.350ms decent. 350~365
+                            int min = 200;
+                            int max = 365;
+                            if((previousAction+1140+min)>System.currentTimeMillis()) {
+                                sleep((int) ((previousAction + 840 + random(min, max)) - System.currentTimeMillis()));
                             }
                             if(npc.getAnimation()==838) {
                                 Rs2Npc.interact(npc, "Pickpocket");
                                 knockout=false;
                                 sleepUntil(() -> xpDrop < Microbot.getClient().getSkillExperience(Skill.THIEVING), 1000);
                             } else {
-                                //System.out.println("reset bjCycle");
                                 sleep(90,140);
                                 bjCycle=0;
                                 return;
@@ -493,7 +493,38 @@ public class BlackJackScript extends Script {
         }, 0, 10, TimeUnit.MILLISECONDS);
         return true;
     }
-
+    public void handlePlayerHit(){
+        if(playerHit>=1) {
+            int j = 0;
+            int i = random(2, 3);
+            int c = 120;
+            if (playerHit == 1 && firstHit) {
+                //TODO play around with this sleep to see what's the highest tolerance before you're too late to react.
+                sleep(60, 120);
+                while (j < i) {
+                    Rs2Npc.interact(npc, "Pickpocket");
+                    sleep(c, (int) (c * 1.3));
+                    c = (int) (c * 1.4);
+                    ++j;
+                }
+                knockout=false;
+                firstHit = false;
+                bjCycle = 0;
+            }
+            boolean hasStars = Microbot.getClient().getLocalPlayer().hasSpotAnim(245);
+            if (!hasStars) {
+                if (playerHit == 1) {
+                    playerHit = 0;
+                } else {
+                    playerHit = 0;
+                    state = RUN_AWAY;
+                    knockout = false;
+                    bjCycle = 0;
+                }
+                previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
+            }
+        }
+    }
     public static boolean checkCurtain(WorldPoint a) {
         Tile currentTile = getTile(a);
         WallObject wallObject;
@@ -534,22 +565,22 @@ public class BlackJackScript extends Script {
             sleepUntilTrue(() -> !Rs2Widget.hasWidget("What is it?"), 100, 3000);
             sleep(120,160);
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-            Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
+            Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 1);
             sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3346 && Rs2Player.getWorldLocation().getY()==2955);
             sleep(120,160);
             waitForNPC(npc);
             if(npc.getWorldLocation().getY()<Rs2Player.getWorldLocation().getY()){
-                Rs2Walker.walkTo(new WorldPoint(3346,2959,0), 0);
+                Rs2Walker.walkTo(new WorldPoint(3346,2959,0), 1);
                 sleepUntil(() -> Rs2Player.getWorldLocation().getY()>=2958, 3000);
                 waitForNPC(npc);
-                Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 0);
+                Rs2Walker.walkTo(new WorldPoint(3346,2955,0), 1);
                 sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3346 && Rs2Player.getWorldLocation().getY()==2955);
                 waitForNPC(npc);
-                Rs2Walker.walkTo(new WorldPoint(3343,2954,0), 0);
+                Rs2Walker.walkTo(new WorldPoint(3343,2954,0), 1);
                 sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3343 && Rs2Player.getWorldLocation().getY()==2954, 3000);
                 Rs2Player.toggleRunEnergy(true);
             } else {
-                Rs2Walker.walkTo(new WorldPoint(3343,2954,0), 0);
+                Rs2Walker.walkTo(new WorldPoint(3343,2954,0), 1);
                 sleepUntil(() -> Rs2Player.getWorldLocation().getX()==3343 && Rs2Player.getWorldLocation().getY()==2954, 3000);
                 waitForNPC(npc);
                 Rs2Player.toggleRunEnergy(true);
@@ -574,37 +605,7 @@ public class BlackJackScript extends Script {
             }
         }
     }
-    public void handlePlayerHit(){
-        if(playerHit>=1){
-            int j = 0;
-            int i = random(2, 3);
-            int c = 80;
-            if(playerHit==1 && firstHit) {
-                //TODO play around with this sleep to see what's the highest tolerance before you're too late to react.
-                sleep(60,120);
-                while (j < i) {
-                    Rs2Npc.interact(npc, "Pickpocket");
-                    sleep(c, (int) (c * 1.3));
-                    c = (int) (c * 1.4);
-                    ++j;
-                }
-                firstHit=false;
-                bjCycle = 0;
-            }
-                if(Microbot.getClient().getLocalPlayer().hasSpotAnim(245)){
-                return;
-                }
-                if (playerHit == 1) {
-                    playerHit = 0;
-                } else {
-                    playerHit = 0;
-                    state = RUN_AWAY;
-                    knockout = false;
-                    bjCycle = 0;
-                }
-                previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
-        }
-    }
+
     public static boolean inArea(WorldPoint entity, Area area){
         return (entity.getX() >= area.ax && entity.getY() <= area.ay) && (entity.getX() <= area.bx && entity.getY() >= area.by);
     }

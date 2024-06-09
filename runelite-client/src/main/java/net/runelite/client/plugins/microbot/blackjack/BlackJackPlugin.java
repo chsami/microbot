@@ -53,11 +53,12 @@ public class BlackJackPlugin extends Plugin {
     public void onHitsplatApplied(HitsplatApplied event) {
         if (event.getHitsplat().isMine())
         {
-            if(BlackJackScript.playerHit==0 || Microbot.getClient().getSkillExperience(Skill.THIEVING)>BlackJackScript.hitsplatXP){
+            if(BlackJackScript.playerHit==0 || Microbot.getClient().getSkillExperience(Skill.THIEVING)>BlackJackScript.hitsplatXP || BlackJackScript.koPassed){
                 BlackJackScript.firstHit=true;
                 BlackJackScript.hitsplatXP = Microbot.getClient().getSkillExperience(Skill.THIEVING);
                 BlackJackScript.hitsplatStart = System.currentTimeMillis();
                 BlackJackScript.playerHit=0;
+                BlackJackScript.koPassed=false;
             }
             BlackJackScript.playerHit++;
             if(config.soundHitSplats()) { client.playSoundEffect(3929, 127); }
