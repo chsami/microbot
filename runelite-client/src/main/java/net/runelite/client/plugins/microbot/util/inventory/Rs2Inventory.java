@@ -1609,7 +1609,7 @@ public class Rs2Inventory {
             identifier++;
         }
         if (Rs2Bank.isOpen()) {
-            if (action.equalsIgnoreCase("eat") && action.equalsIgnoreCase("fill")) {
+            if (action.equalsIgnoreCase("eat") || action.equalsIgnoreCase("fill")) {
                 identifier += 7;
             } else {
                 identifier += 6;
@@ -1728,6 +1728,11 @@ public class Rs2Inventory {
 
     public static boolean dropEmptyVials() {
         return dropAll("empty vial");
+    }
+
+    public static boolean isTradeable(int itemId) {
+        ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemId));
+        return itemComposition.isTradeable();
     }
 
 }
