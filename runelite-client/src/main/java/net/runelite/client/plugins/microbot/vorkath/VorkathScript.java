@@ -9,12 +9,14 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.loottracker.LootTrackerRecord;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
@@ -29,7 +31,10 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -45,11 +50,12 @@ enum State {
     ACID,
     LOOT_ITEMS,
     TELEPORT_AWAY,
-    DEAD_WALK
+    DEAD_WALK,
+    SELLING_ITEMS
 }
 
 public class VorkathScript extends Script {
-    public static String version = "1.2.4";
+    public static String version = "1.2.6";
 
     State state = State.ZOMBIE_SPAWN;
 
@@ -69,6 +75,9 @@ public class VorkathScript extends Script {
     String primaryBolts = "";
 
     final String ZOMBIFIED_SPAWN = "Zombified Spawn";
+
+    public int vorkathSessionKills = 0;
+    public int tempVorkathKills = 0;
 
     private void calculateState() {
         if (Rs2Npc.getNpc(NpcID.VORKATH_8061) != null) {
@@ -96,7 +105,9 @@ public class VorkathScript extends Script {
         hasEquipment = false;
         hasInventory = false;
         this.config = config;
+
         Microbot.getSpecialAttackConfigs().setSpecialAttack(true);
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
@@ -113,6 +124,7 @@ public class VorkathScript extends Script {
 
                 switch (state) {
                     case BANKING:
+                        if (checkSellingItems(config)) return;
                         if (!init && Rs2Equipment.get(EquipmentInventorySlot.AMMO) == null) {
                             Microbot.showMessage("Out of ammo!");
                             sleep(5000);
@@ -130,11 +142,11 @@ public class VorkathScript extends Script {
                             Rs2Bank.depositAll();
                             Rs2Bank.depositEquipment();
                             sleep(600);
-                            hasEquipment = MicrobotInventorySetup.loadEquipment("vorkath");
+                            hasEquipment = MicrobotInventorySetup.loadEquipment("vorkath", mainScheduledFuture);
                         }
                         if (!hasInventory && MicrobotInventorySetup.doesEquipmentMatch("vorkath")) {
                             sleep(600);
-                            hasInventory = MicrobotInventorySetup.loadInventory("vorkath");
+                            hasInventory = MicrobotInventorySetup.loadInventory("vorkath", mainScheduledFuture);
                             sleep(1000);
                         }
                         if (hasEquipment && hasInventory) {
@@ -204,6 +216,8 @@ public class VorkathScript extends Script {
                     case FIGHT_VORKATH:
                         vorkath = Rs2Npc.getNpc(NpcID.VORKATH_8061);
                         if (vorkath == null || vorkath.isDead()) {
+                            vorkathSessionKills++;
+                            tempVorkathKills++;
                             state = State.LOOT_ITEMS;
                             sleep(300, 600);
                             Rs2Inventory.wield(primaryBolts);
@@ -351,6 +365,12 @@ public class VorkathScript extends Script {
                             sleepUntil(() -> Rs2Inventory.hasItem("Rellekka teleport"), 1000);
                         }
                         break;
+                    case SELLING_ITEMS:
+                        boolean soldAllItems = Rs2GrandExchange.sellLoot("vorkath");
+                        if (soldAllItems) {
+                            state = State.BANKING;
+                        }
+                        break;
                 }
 
                 init = false;
@@ -360,6 +380,24 @@ public class VorkathScript extends Script {
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    /**
+     * Checks if we have killed x amount of vorkaths based on a config to sell items
+     * @param config
+     * @return true if we need to sell items
+     */
+    private boolean checkSellingItems(VorkathConfig config) {
+        if (tempVorkathKills == 0) return false;
+        LootTrackerRecord lootRecord = Microbot.getAggregateLootRecords("vorkath");
+        if (lootRecord != null) {
+            if (tempVorkathKills % config.SellItemsAtXKills() == 0) {
+                state = State.SELLING_ITEMS;
+                tempVorkathKills = 0;
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void walkToCenter() {

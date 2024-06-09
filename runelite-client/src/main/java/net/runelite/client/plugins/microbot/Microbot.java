@@ -14,6 +14,8 @@ import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
+import net.runelite.client.plugins.loottracker.LootTrackerPlugin;
+import net.runelite.client.plugins.loottracker.LootTrackerRecord;
 import net.runelite.client.plugins.microbot.configs.SpecialAttackConfigs;
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
@@ -255,6 +257,18 @@ public class Microbot {
     private static void mouseEvent(int id, Point point) {
         MouseEvent e = new MouseEvent(client.getCanvas(), id, System.currentTimeMillis(), 0, point.getX(), point.getY(), 1, false, 1);
         client.getCanvas().dispatchEvent(e);
+    }
+
+    public static List<LootTrackerRecord> getAggregateLootRecords() {
+        return LootTrackerPlugin.panel.aggregateRecords;
+    }
+
+    public static LootTrackerRecord getAggregateLootRecords(String npcName) {
+        return getAggregateLootRecords()
+                .stream()
+                .filter(x -> x.getTitle().equalsIgnoreCase(npcName))
+                .findFirst()
+                .orElse(null);
     }
 }
 

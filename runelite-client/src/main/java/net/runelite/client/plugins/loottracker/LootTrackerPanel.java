@@ -25,36 +25,7 @@
  */
 package net.runelite.client.plugins.loottracker;
 
-import static com.google.common.collect.Iterables.concat;
 import com.google.common.collect.Lists;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JToggleButton;
-import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicButtonUI;
-import javax.swing.plaf.basic.BasicToggleButtonUI;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
@@ -66,7 +37,24 @@ import net.runelite.client.util.QuantityFormatter;
 import net.runelite.client.util.SwingUtil;
 import net.runelite.http.api.loottracker.LootRecordType;
 
-class LootTrackerPanel extends PluginPanel
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicButtonUI;
+import javax.swing.plaf.basic.BasicToggleButtonUI;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static com.google.common.collect.Iterables.concat;
+
+public class LootTrackerPanel extends PluginPanel
 {
 	private static final int MAX_LOOT_BOXES = 500;
 
@@ -116,7 +104,7 @@ class LootTrackerPanel extends PluginPanel
 	private final JButton collapseBtn = new JButton();
 
 	// Aggregate of all kills
-	private final List<LootTrackerRecord> aggregateRecords = new ArrayList<>();
+	public final List<LootTrackerRecord> aggregateRecords = new ArrayList<>();
 	// Individual records for the individual kills this session
 	private final List<LootTrackerRecord> sessionRecords = new ArrayList<>();
 	private final List<LootTrackerBox> boxes = new ArrayList<>();

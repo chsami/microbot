@@ -20,7 +20,7 @@ import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.validateInter
 
 public class AutoFishingScript extends Script {
 
-    public static String version = "1.4.1";
+    public static String version = "1.4.0";
 
     public boolean run(AutoFishingConfig config) {
         initialPlayerLocation = null;

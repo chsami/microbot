@@ -65,6 +65,18 @@ public interface VorkathConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "SellItemsAtXKills",
+            name = "Sell items every X kills",
+            description = "Sell items every X kills",
+            position = 1,
+            section = lootSection
+    )
+    default int SellItemsAtXKills()
+    {
+        return 15;
+    }
+
+    @ConfigItem(
             keyName = "Rigour",
             name = "Rigour",
             description = "Activate Rigour? (Make sure you have it unlocked and have 74 prayer!)",

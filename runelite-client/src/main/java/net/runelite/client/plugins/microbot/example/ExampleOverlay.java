@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.microbot.example;
 
-import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -32,6 +32,28 @@ public class ExampleOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
                     .build());
+
+
+            if (ExampleScript.npc != null && ExampleScript.npc.getCanvasTilePoly() != null) {
+                try {
+                    panelComponent.getChildren().add(LineComponent.builder()
+                            .left("Health: " + Rs2Npc.getHealth(ExampleScript.npc))
+                            .build());
+                    panelComponent.getChildren().add(LineComponent.builder()
+                            .left("index: " + ExampleScript.npc.getIndex())
+                            .build());
+                    panelComponent.getChildren().add(LineComponent.builder()
+                            .left("Name: " + ExampleScript.npc.getName())
+                            .build());
+                    panelComponent.getChildren().add(LineComponent.builder()
+                            .left("combat: " + ExampleScript.npc.getCombatLevel())
+                            .build());
+                    graphics.setColor(Color.CYAN);
+                    graphics.draw(ExampleScript.npc.getCanvasTilePoly());
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
 
 
         } catch(Exception ex) {

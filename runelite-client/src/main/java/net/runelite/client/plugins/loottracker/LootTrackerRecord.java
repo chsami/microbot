@@ -29,7 +29,7 @@ import lombok.Value;
 import net.runelite.http.api.loottracker.LootRecordType;
 
 @Value
-class LootTrackerRecord
+public class LootTrackerRecord
 {
 	@NonNull
 	private final String title;

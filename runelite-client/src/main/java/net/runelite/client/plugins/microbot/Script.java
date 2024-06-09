@@ -18,13 +18,12 @@ import java.awt.event.KeyEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 
 public abstract class Script implements IScript {
 
-    protected ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(100);
+    protected ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     protected ScheduledFuture<?> scheduledFuture;
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
@@ -53,19 +52,6 @@ public abstract class Script implements IScript {
             System.out.println(e.getMessage());
         }
     }
-
-    public ScheduledFuture<?> keepExecuteUntil(Runnable callback, BooleanSupplier awaitedCondition, int time) {
-        scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (awaitedCondition.getAsBoolean()) {
-                scheduledFuture.cancel(true);
-                scheduledFuture = null;
-                return;
-            }
-            callback.run();
-        }, 0, time, TimeUnit.MILLISECONDS);
-        return scheduledFuture;
-    }
-
     public boolean sleepUntil(BooleanSupplier awaitedCondition) {
         return sleepUntil(awaitedCondition, 5000);
     }

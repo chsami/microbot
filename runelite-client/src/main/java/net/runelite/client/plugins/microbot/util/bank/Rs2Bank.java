@@ -5,10 +5,13 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.loottracker.LootTrackerItem;
+import net.runelite.client.plugins.loottracker.LootTrackerRecord;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
@@ -38,6 +41,8 @@ public class Rs2Bank {
     private static final int HANDLE_X_SET = 5;
     private static final int HANDLE_X_UNSET = 6;
     private static final int HANDLE_ALL = 7;
+    private static final int WITHDRAW_AS_NOTE_VARBIT = 3958;
+
 
     /**
      * Container describes from what interface the action happens
@@ -122,7 +127,6 @@ public class Rs2Bank {
     }
 
     /**
-     *
      * @param name
      * @param exact
      * @return
@@ -572,14 +576,16 @@ public class Rs2Bank {
      * withdraw all items identified by its ItemWidget.
      *
      * @param rs2Item Item to withdraw
+     * @return
      */
-    private static void withdrawAll(Rs2Item rs2Item) {
-        if (!isOpen()) return;
-        if (rs2Item == null) return;
-        if (Rs2Inventory.isFull()) return;
+    private static boolean withdrawAll(Rs2Item rs2Item) {
+        if (!isOpen()) return false;
+        if (rs2Item == null) return false;
+        if (Rs2Inventory.isFull()) return false;
         container = BANK_ITEM_CONTAINER;
 
         invokeMenu(HANDLE_ALL, rs2Item);
+        return true;
     }
 
     public static void withdrawAll(boolean checkInv, String name) {
@@ -588,9 +594,10 @@ public class Rs2Bank {
 
     /**
      * withdraw all items identified by its name.
+     *
      * @param checkInv check if item is already in inventory
-     * @param name item name
-     * @param exact name
+     * @param name     item name
+     * @param exact    name
      */
     public static void withdrawAll(boolean checkInv, String name, boolean exact) {
         if (checkInv && !Rs2Bank.hasItem(name, exact)) return;
@@ -599,7 +606,6 @@ public class Rs2Bank {
     }
 
     /**
-     *
      * @param name
      */
     public static void withdrawAll(String name) {
@@ -610,9 +616,10 @@ public class Rs2Bank {
      * withdraw all items identified by its id.
      *
      * @param id item id to search
+     * @return
      */
-    public static void withdrawAll(int id) {
-        withdrawAll(findBankItem(id));
+    public static boolean withdrawAll(int id) {
+        return withdrawAll(findBankItem(id));
     }
 
     /**
@@ -998,7 +1005,7 @@ public class Rs2Bank {
         if (Rs2Inventory.isFull()) {
             boolean isBankOpen = Rs2Bank.walkToBankAndUseBank();
             if (isBankOpen) {
-                for (String itemName: itemNames) {
+                for (String itemName : itemNames) {
                     Rs2Bank.depositAll(x -> x.name.toLowerCase().contains(itemName));
                 }
             }
@@ -1012,5 +1019,40 @@ public class Rs2Bank {
         }
 
         return !Rs2Inventory.isFull() && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
+    }
+
+    public static boolean hasWithdrawAsNote() {
+        return Microbot.getVarbitValue(WITHDRAW_AS_NOTE_VARBIT) == 1;
+    }
+
+    public static boolean setWithdrawAsNote() {
+        if (hasWithdrawAsNote()) return true;
+        Rs2Widget.clickWidget(786456);
+        sleep(600);
+        return hasWithdrawAsNote();
+    }
+
+    public static boolean withdrawLootItems(String npcName) {
+        boolean isAtGe = Rs2GrandExchange.walkToGrandExchange();
+        if (isAtGe) {
+            boolean isBankOpen = Rs2Bank.useBank();
+            if (!isBankOpen) return false;
+        }
+        Rs2Bank.depositAll();
+        boolean itemFound = false;
+
+        boolean hasWithdrawAsNote = Rs2Bank.setWithdrawAsNote();
+        if (!hasWithdrawAsNote) return false;
+        for (LootTrackerRecord lootTrackerRecord : Microbot.getAggregateLootRecords()) {
+            if (!lootTrackerRecord.getTitle().equalsIgnoreCase(npcName)) continue;
+            for (LootTrackerItem lootTrackerItem : lootTrackerRecord.getItems()) {
+                if (!Rs2Inventory.isTradeable(lootTrackerItem.getId())) continue;
+                boolean didWithdraw = Rs2Bank.withdrawAll(lootTrackerItem.getId());
+                if (!didWithdraw) continue;
+                itemFound = true;
+            }
+        }
+        Rs2Bank.closeBank();
+        return itemFound;
     }
 }
