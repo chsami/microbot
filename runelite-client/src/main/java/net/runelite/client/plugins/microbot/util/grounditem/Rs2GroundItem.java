@@ -17,8 +17,10 @@ import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
 import java.awt.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -286,11 +288,21 @@ public class Rs2GroundItem {
                 .filter(filter)
                 .collect(Collectors.toList());
 
-        if (groundItems.size() < minItems || (delayedLooting && calculateDespawnTime(Objects.requireNonNull(groundItems.stream().min(Comparator.comparingInt(Rs2GroundItem::calculateDespawnTime)).orElse(null))) > 150))
-            return false;
-        Microbot.pauseAllScripts = true;
-        groundItems.stream().filter(Rs2GroundItem::interact).forEach(item -> sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100,5000));
+        if (groundItems.size() < minItems) return false;
+        if (delayedLooting) {
+            // Get the ground item with the lowest despawn time
+            GroundItem item = groundItems.stream().min(Comparator.comparingInt(Rs2GroundItem::calculateDespawnTime)).orElse(null);
+            assert item != null;
+            if (calculateDespawnTime(item) > 150) return false;
+        }
 
+        for (GroundItem groundItem : groundItems) {
+            if (groundItem.getQuantity() < minItems) continue;
+            if (interact(groundItem)) {
+                Microbot.pauseAllScripts = true;
+                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 5000);
+            }
+        }
         sleepUntil(() -> !isLooting(filter));
         return !groundItems.isEmpty();
     }
