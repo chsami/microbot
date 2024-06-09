@@ -618,6 +618,32 @@ public class Rs2Walker {
         return false;
     }
 
+    /**
+     * Checks if the player's current location is within the specified area defined by the given world points.
+     *
+     * @param worldPoints an array of two world points of the NW and SE corners of the area
+     * @return true if the player's current location is within the specified area, false otherwise
+     */
+    public static boolean isInArea(WorldPoint... worldPoints) {
+        WorldPoint playerLocation = Rs2Player.getWorldLocation();
+        return playerLocation.getX() >= worldPoints[0].getX() ||   // NW corner X
+                playerLocation.getX() <= worldPoints[1].getX() ||  // SE corner X
+                playerLocation.getY() <= worldPoints[0].getY() ||  // NW corner Y
+                playerLocation.getY() >= worldPoints[1].getY();    // SE corner Y
+    }
+    /**
+     * Checks if the player's current location is within the specified range from the given center point.
+     *
+     * @param centerOfArea a WorldPoint which is the center of the desired area,
+     * @param range an int of range to which the boundaries will be drawn in a square,
+     * @return true if the player's current location is within the specified area, false otherwise
+     */
+    public static boolean isInArea(WorldPoint centerOfArea, int range) {
+        WorldPoint nwCorner = new WorldPoint(centerOfArea.getX() + range + range, centerOfArea.getY() - range, centerOfArea.getPlane());
+        WorldPoint seCorner = new WorldPoint(centerOfArea.getX() - range - range, centerOfArea.getY() + range, centerOfArea.getPlane());
+        return isInArea(nwCorner, seCorner); // call to our sibling
+    }
+
     public static boolean isNear() {
         WorldPoint playerLocation = Rs2Player.getWorldLocation();
         int index = IntStream.range(0, ShortestPathPlugin.getPathfinder().getPath().size())
