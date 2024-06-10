@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 2.9;
+    public static double version = 3.0;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -132,7 +132,6 @@ public class BlackJackScript extends Script {
                     }
                     initScript = false;
                 }
-                handlePlayerHit();
                 if(state==BLACKJACK){
                     if(knockout&&Microbot.getClient().getLocalPlayer().getAnimation()!=401&&!koPassed){
                         hitReactStart=System.currentTimeMillis();
@@ -141,6 +140,9 @@ public class BlackJackScript extends Script {
                             koPassed = true;
                         }
                     }
+                }
+                handlePlayerHit();
+                if(state==BLACKJACK){
                     /*
                     if(knockout&&Microbot.getClient().getLocalPlayer().getAnimation()==401&&!koPassed){
                         koPassed=true;
