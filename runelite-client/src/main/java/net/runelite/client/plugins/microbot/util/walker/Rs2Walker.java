@@ -229,8 +229,8 @@ public class Rs2Walker {
         pathfindingExecutor.submit(pathfinder);
         sleepUntil(pathfinder::isDone);
         if (pathfinder.getPath().get(pathfinder.getPath().size() - 1).getPlane() != worldPoint.getPlane()) return false;
-        WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 1, 1);
-        WorldArea objectArea = new WorldArea(worldPoint, 1, 1);
+        WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 2, 2);
+        WorldArea objectArea = new WorldArea(worldPoint, 2, 2);
         boolean result = pathArea
                 .intersectsWith2D(objectArea);
         return result;
