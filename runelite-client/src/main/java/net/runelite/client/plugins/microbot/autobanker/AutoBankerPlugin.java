@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Default + "AutoBanker",
+        name = PluginDescriptor.Mocrosoft + "AutoBanker",
         description = "Automatically banks items and walks back to the original location",
         tags = {"banking", "microbot"},
         enabledByDefault = false
