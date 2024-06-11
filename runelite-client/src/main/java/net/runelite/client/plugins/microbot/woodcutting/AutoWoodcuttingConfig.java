@@ -4,7 +4,9 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingResetOptions;
 import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingTree;
+import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingWalkBack;
 
 @ConfigGroup("Woodcutting")
 public interface AutoWoodcuttingConfig extends Config {
@@ -31,7 +33,7 @@ public interface AutoWoodcuttingConfig extends Config {
             keyName = "DistanceToStray",
             name = "Distance to Stray",
             description = "Set how far you can travel from your initial position in tiles",
-            position = 2,
+            position = 1,
             section = generalSection
     )
     default int distanceToStray()
