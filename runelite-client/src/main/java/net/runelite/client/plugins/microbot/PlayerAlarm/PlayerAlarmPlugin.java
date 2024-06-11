@@ -1,10 +1,6 @@
  package net.runelite.client.plugins.microbot.PlayerAlarm;
- 
+
  import com.google.inject.Provides;
- import java.util.HashMap;
- import java.util.List;
- import java.util.stream.Collectors;
- import javax.inject.Inject;
  import net.runelite.api.Actor;
  import net.runelite.api.Client;
  import net.runelite.api.Player;
@@ -18,8 +14,13 @@
  import net.runelite.client.ui.overlay.OverlayManager;
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
+
+ import javax.inject.Inject;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.stream.Collectors;
  
- @PluginDescriptor(name = "<html>[<font color=#ff00ff>§</font>] " + "Player Alarm")
+ @PluginDescriptor(name = "<html>[<font color=#ff00ff>§</font>] " + "Player Alarm", enabledByDefault = false)
  public class PlayerAlarmPlugin extends Plugin {
    private static final Logger log = LoggerFactory.getLogger(PlayerAlarmPlugin.class);
  
