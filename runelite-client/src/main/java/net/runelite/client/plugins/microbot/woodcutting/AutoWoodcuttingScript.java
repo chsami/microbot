@@ -47,17 +47,17 @@ public class AutoWoodcuttingScript extends Script {
                             Rs2Inventory.dropAll(config.TREE().getLog());
                             break;
                         case BANK:
-                            boolean reachedDestination = Rs2Bank.walkToBank();
-                            if (!reachedDestination) {
-                                sleepUntil(() -> Rs2Player.getWorldLocation() == Rs2Bank.getNearestBank().getWorldPoint());
-                            }
-
                             if (!Rs2Bank.isOpen()) {
-                                Rs2Bank.openBank();
-                                Rs2Bank.depositAll(config.TREE().getLog());
+                                boolean bankIsOnScreen = Rs2Bank.useBank();
+                                if (!bankIsOnScreen) {
+                                    Rs2Bank.walkToBank();
+                                }
                             }
 
                             if (Rs2Bank.isOpen()) {
+                                sleep(Random.random(3600, 4500));
+                                Rs2Bank.depositAll(config.TREE().getLog());
+                                sleep(Random.random(3600, 4500));
                                 Rs2Bank.closeBank();
                                 sleepUntil(() -> !Rs2Bank.isOpen());
                             }
@@ -101,12 +101,12 @@ public class AutoWoodcuttingScript extends Script {
         } else {
             fireSpot = Rs2Player.getWorldLocation();
         }
-        sleepUntil(() -> Rs2Player.getWorldLocation().equals(fireSpot));
+        sleepUntil(() -> Rs2Player.getWorldLocation() == fireSpot);
         if (!isFiremake()) {
             Rs2Inventory.use("tinderbox");
             sleep(Random.random(300, 600));
             Rs2Inventory.use(config.TREE().getLog());
-            sleep(2100);
+            sleep(Random.random(2100, 2700));
         }
         sleepUntil(() -> !isFiremake() && !Rs2Player.isStandingOnGameObject() && !Rs2Player.isStandingOnGroundItem());
         return true;
