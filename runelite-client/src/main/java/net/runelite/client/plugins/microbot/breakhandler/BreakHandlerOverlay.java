@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.example;
+package net.runelite.client.plugins.microbot.breakhandler;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -10,9 +10,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class ExampleOverlay extends OverlayPanel {
+public class BreakHandlerOverlay extends OverlayPanel {
     @Inject
-    ExampleOverlay(ExamplePlugin plugin)
+    BreakHandlerOverlay(BreakHandlerPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -23,7 +23,7 @@ public class ExampleOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + ExampleScript.version)
+                    .text("Micro Example V" + BreakHandlerScript.version)
                     .color(Color.GREEN)
                     .build());
 
@@ -34,22 +34,22 @@ public class ExampleOverlay extends OverlayPanel {
                     .build());
 
 
-            if (ExampleScript.npc != null && ExampleScript.npc.getCanvasTilePoly() != null) {
+            if (BreakHandlerScript.npc != null && BreakHandlerScript.npc.getCanvasTilePoly() != null) {
                 try {
                     panelComponent.getChildren().add(LineComponent.builder()
-                            .left("Health: " + Rs2Npc.getHealth(ExampleScript.npc))
+                            .left("Health: " + Rs2Npc.getHealth(BreakHandlerScript.npc))
                             .build());
                     panelComponent.getChildren().add(LineComponent.builder()
-                            .left("index: " + ExampleScript.npc.getIndex())
+                            .left("index: " + BreakHandlerScript.npc.getIndex())
                             .build());
                     panelComponent.getChildren().add(LineComponent.builder()
-                            .left("Name: " + ExampleScript.npc.getName())
+                            .left("Name: " + BreakHandlerScript.npc.getName())
                             .build());
                     panelComponent.getChildren().add(LineComponent.builder()
-                            .left("combat: " + ExampleScript.npc.getCombatLevel())
+                            .left("combat: " + BreakHandlerScript.npc.getCombatLevel())
                             .build());
                     graphics.setColor(Color.CYAN);
-                    graphics.draw(ExampleScript.npc.getCanvasTilePoly());
+                    graphics.draw(BreakHandlerScript.npc.getCanvasTilePoly());
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());
                 }

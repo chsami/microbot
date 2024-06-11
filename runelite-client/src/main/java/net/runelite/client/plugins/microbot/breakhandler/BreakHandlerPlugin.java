@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.example;
+package net.runelite.client.plugins.microbot.breakhandler;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -17,21 +17,21 @@ import java.awt.*;
         enabledByDefault = false
 )
 @Slf4j
-public class ExamplePlugin extends Plugin {
+public class BreakHandlerPlugin extends Plugin {
     @Inject
-    private ExampleConfig config;
+    private BreakHandlerConfig config;
     @Provides
-    ExampleConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(ExampleConfig.class);
+    BreakHandlerConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(BreakHandlerConfig.class);
     }
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private ExampleOverlay exampleOverlay;
+    private BreakHandlerOverlay exampleOverlay;
 
     @Inject
-    ExampleScript exampleScript;
+    BreakHandlerScript exampleScript;
 
 
     @Override
