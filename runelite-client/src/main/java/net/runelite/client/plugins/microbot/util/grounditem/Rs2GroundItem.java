@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static net.runelite.api.TileItem.OWNERSHIP_GROUP;
+import static net.runelite.api.TileItem.OWNERSHIP_OTHER;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 @Slf4j
@@ -282,7 +283,8 @@ public class Rs2GroundItem {
     public static boolean lootItemBasedOnValue(int minValue, int maxValue, int range, int minItems, boolean delayedLooting, boolean antiLureProtection) {
         Predicate<GroundItem> filter = groundItem -> groundItem.getGePrice() > minValue && groundItem.getGePrice() < maxValue &&
                 groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < range &&
-                (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_GROUP);
+                (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
+                (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_OTHER);
 
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
                 .filter(filter)
@@ -315,7 +317,8 @@ public class Rs2GroundItem {
     public static boolean lootItemsBasedOnNames(int range,boolean antiLureProtection,int minItems,int minQuantity,boolean delayedLooting, String... names) {
         final Predicate<GroundItem> filter = groundItem ->
                 groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < range &&
-                (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
+                        (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
+                        (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_OTHER) &&
                 Arrays.stream(names).anyMatch(name -> groundItem.getName().toLowerCase().contains(name.toLowerCase()));
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
                 .filter(filter)

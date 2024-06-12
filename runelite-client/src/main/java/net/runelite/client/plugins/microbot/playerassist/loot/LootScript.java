@@ -53,20 +53,20 @@ public class LootScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay((() -> {
             if (!super.run()) return;
             if (config.toggleLootArrows()) {
-                if(Rs2GroundItem.lootItemsBasedOnNames(config.attackRadius(), true,1,14,config.toggleDelayedLooting(),"arrow"))
+                if (Rs2GroundItem.lootItemsBasedOnNames(config.attackRadius(), config.toggleOnlyLootMyItems(), 1, 14, config.toggleDelayedLooting(), "arrow"))
                     Microbot.pauseAllScripts = false;
             }
             if (!config.toggleLootItems()) return;
             if(config.toggleBuryBones()){
-                if(Rs2GroundItem.lootItemsBasedOnNames(config.attackRadius(), true,3,1,config.toggleDelayedLooting(),"bones"))
+                if (Rs2GroundItem.lootItemsBasedOnNames(config.attackRadius(), config.toggleOnlyLootMyItems(), 3, 1, config.toggleDelayedLooting(), "bones"))
                     Microbot.pauseAllScripts = false;
             }
             if(config.toggleScatter()){
-                if(Rs2GroundItem.lootItemsBasedOnNames(config.attackRadius(), true,3,1,config.toggleDelayedLooting(),"ashes"))
+                if (Rs2GroundItem.lootItemsBasedOnNames(config.attackRadius(), config.toggleOnlyLootMyItems(), 3, 1, config.toggleDelayedLooting(), "ashes"))
                     Microbot.pauseAllScripts = false;
             }
 
-            if(Rs2GroundItem.lootItemBasedOnValue(config.minPriceOfItemsToLoot(), config.maxPriceOfItemsToLoot(), config.attackRadius(),1,config.toggleDelayedLooting(), true)) {
+            if (Rs2GroundItem.lootItemBasedOnValue(config.minPriceOfItemsToLoot(), config.maxPriceOfItemsToLoot(), config.attackRadius(), 1, config.toggleDelayedLooting(), config.toggleOnlyLootMyItems())) {
                 Microbot.pauseAllScripts = false;
             }
 
