@@ -304,4 +304,9 @@ public class Rs2Player {
     public static int getPoseAnimation() {
         return Microbot.getClient().getLocalPlayer().getPoseAnimation();
     }
+
+    public static QuestState getQuestState(Quest quest) {
+        Client client = Microbot.getClient();
+        return Microbot.getClientThread().runOnClientThread(() -> quest.getState(client));
+    }
 }
