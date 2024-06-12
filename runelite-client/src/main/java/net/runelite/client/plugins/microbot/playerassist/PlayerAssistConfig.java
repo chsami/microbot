@@ -442,14 +442,25 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
+    // Use Inventory Setup
+    @ConfigItem(
+            keyName = "useInventorySetup",
+            name = "Use Inventory Setup",
+            description = "Use Inventory Setup, make sure to select consumables used in the bank section",
+            position = 1,
+            section = gearSection
+    )
+    default boolean useInventorySetup() {
+        return false;
+    }
+
     // Inventory setup selection TODO: Add inventory setup selection
     @ConfigItem(
             keyName = "InventorySetupName",
             name = "Inventory setup name",
             description = "Create an inventory setup in the inventory setup plugin and enter the name here",
-            position = 0,
-            section = gearSection,
-            hidden = true
+            position = 99,
+            section = gearSection
     )
     default String inventorySetup() {
         return "";
