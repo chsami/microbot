@@ -53,25 +53,45 @@ public interface AutoWoodcuttingConfig extends Config {
         return false;
     }
 
-    @ConfigItem(
-            keyName = "UseBank",
-            name = "UseBank",
-            description = "Use bank and walk back to original location",
-            position = 3,
-            section = generalSection
+    @ConfigSection(
+            name = "Reset",
+            description = "Options for clearing logs from inventory",
+            position = 1
     )
-    default boolean useBank()
+    String resetSection = "reset";
+
+    @ConfigItem(
+            keyName = "ItemAction",
+            name = "Item Action",
+            description = "Task to perform with logs",
+            position = 0,
+            section = resetSection
+    )
+    default WoodcuttingResetOptions resetOptions()
     {
-        return false;
+        return WoodcuttingResetOptions.DROP;
     }
 
     @ConfigItem(
             keyName = "ItemsToBank",
             name = "Items to bank (Comma seperated)",
             description = "Items to bank",
-            position = 4
+            position = 1
     )
     default String itemsToBank() {
         return "logs";
     }
+
+    @ConfigItem(
+            keyName = "WalkBack",
+            name = "Walk Back",
+            description = "Walk back the initial spot or last cut down",
+            position = 2,
+            section = resetSection
+    )
+    default WoodcuttingWalkBack walkBack()
+    {
+        return WoodcuttingWalkBack.LAST_LOCATION;
+    }
+
 }

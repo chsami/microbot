@@ -16,8 +16,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.natepainthelper.Info.*;
-
 
 @PluginDescriptor(
         name = PluginDescriptor.Nate +"Arrow Maker",
@@ -57,9 +55,6 @@ public class ArrowPlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        expstarted = Microbot.getClient().getSkillExperience(Skill.FLETCHING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.FLETCHING);
-        timeBegan = System.currentTimeMillis();
         if (overlayManager != null) {
             overlayManager.add(arrowOverlay);
         }

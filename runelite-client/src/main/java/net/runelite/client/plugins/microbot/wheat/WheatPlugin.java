@@ -13,7 +13,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.natepainthelper.Info.timeBegan;
 
 @PluginDescriptor(
         name = PluginDescriptor.SaCo + "Wheat",
@@ -41,7 +40,6 @@ public class WheatPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
-        timeBegan = System.currentTimeMillis();
         WheatScript.profit = 0;
         if (overlayManager != null) {
             overlayManager.add(wheatOverlay);

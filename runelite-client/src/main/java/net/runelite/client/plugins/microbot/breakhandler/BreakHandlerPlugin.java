@@ -11,9 +11,9 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Default + "Example",
-        description = "Microbot example plugin",
-        tags = {"example", "microbot"},
+        name = PluginDescriptor.Default + "BreakHandler",
+        description = "Microbot breakhandler",
+        tags = {"break", "microbot", "breakhandler"},
         enabledByDefault = false
 )
 @Slf4j
@@ -28,22 +28,22 @@ public class BreakHandlerPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private BreakHandlerOverlay exampleOverlay;
+    private BreakHandlerOverlay breakHandlerOverlay;
 
     @Inject
-    BreakHandlerScript exampleScript;
+    BreakHandlerScript breakHandlerScript;
 
 
     @Override
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
-            overlayManager.add(exampleOverlay);
+            overlayManager.add(breakHandlerOverlay);
         }
-        exampleScript.run(config);
+        breakHandlerScript.run(config);
     }
 
     protected void shutDown() {
-        exampleScript.shutdown();
-        overlayManager.remove(exampleOverlay);
+        breakHandlerScript.shutdown();
+        overlayManager.remove(breakHandlerOverlay);
     }
 }

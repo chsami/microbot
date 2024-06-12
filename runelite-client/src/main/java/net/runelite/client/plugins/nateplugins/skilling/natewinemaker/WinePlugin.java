@@ -3,7 +3,6 @@ package net.runelite.client.plugins.nateplugins.skilling.natewinemaker;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Skill;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -15,8 +14,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
-
-import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 
 @PluginDescriptor(
@@ -57,9 +54,6 @@ public class WinePlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        expstarted = Microbot.getClient().getSkillExperience(Skill.COOKING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.COOKING);
-        timeBegan = System.currentTimeMillis();
         if (overlayManager != null) {
             overlayManager.add(wineOverlay);
         }
