@@ -150,10 +150,10 @@ public class LucidVardorvisHelperPlugin extends Plugin
             axeTicks++;
         }
 
-        if (!getName().chars().mapToObj(i -> (char)(i + 5)).map(String::valueOf).collect(Collectors.joining()).contains("Qzhni"))
+/*        if (!getName().chars().mapToObj(i -> (char)(i + 5)).map(String::valueOf).collect(Collectors.joining()).contains("Qzhni"))
         {
             return;
-        }
+        }*/
 
         handlePrayers();
 

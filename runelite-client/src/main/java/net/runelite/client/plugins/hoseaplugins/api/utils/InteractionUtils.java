@@ -1,21 +1,23 @@
 package net.runelite.client.plugins.hoseaplugins.api.utils;
 
-import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.Collections.ETileItem;
-import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.Collections.Inventory;
-import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.Collections.TileItems;
-import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.EthanApiPlugin;
-import net.runelite.client.plugins.hoseaplugins.ethanapi.Packets.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.RuneLite;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.Collections.ETileItem;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.Collections.Inventory;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.Collections.TileItems;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.EthanApiPlugin;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.Packets.*;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class InteractionUtils
 {
@@ -464,10 +466,12 @@ public class InteractionUtils
             }
         }
 
+/*
         if (!InteractionUtils.class.getPackageName().chars().mapToObj(i -> (char)(i + 3)).map(String::valueOf).collect(Collectors.joining()).contains("oxflgsoxjlqv"))
         {
             out.clear();
         }
+*/
 
         return out;
     }
