@@ -38,7 +38,7 @@ import static net.runelite.client.RuneLite.RUNELITE_DIR;
 
 @Slf4j
 @PluginDescriptor(
-        name = "<html><font color=\"#32CD32\">Lucid </font>Gear Swapper</html>",
+        name = PluginDescriptor.Lucid + "Gear Swapper</html>",
         description = "Set-up up to 6 custom gear swaps with customizable hotkeys or trigger them via weapon equip",
         enabledByDefault = false,
         tags = {"gear", "swap", "swapper", "hotkey"}

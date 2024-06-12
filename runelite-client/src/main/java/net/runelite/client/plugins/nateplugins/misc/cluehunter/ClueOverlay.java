@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.nateplugins.misc.cluehunter;
 
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.natepainthelper.PaintFormat;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -10,7 +9,6 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 
 public class ClueOverlay extends OverlayPanel {
@@ -25,15 +23,11 @@ public class ClueOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            long timeElapsed = System.currentTimeMillis() - timeBegan;
 
             panelComponent.setPreferredSize(new Dimension(275, 500));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Nate's Clue Hunter Grabber")
                     .color(Color.magenta)
-                    .build());
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Time Ran: " + PaintFormat.ft(timeElapsed))
                     .build());
 
             panelComponent.getChildren().add(LineComponent.builder()

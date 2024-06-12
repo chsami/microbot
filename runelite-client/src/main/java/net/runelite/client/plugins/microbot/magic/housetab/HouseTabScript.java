@@ -18,7 +18,9 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 
 public class HouseTabScript extends Script {
     public static String version = "1.0";
@@ -235,5 +237,17 @@ public class HouseTabScript extends Script {
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    public ScheduledFuture<?> keepExecuteUntil(Runnable callback, BooleanSupplier awaitedCondition, int time) {
+        scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (awaitedCondition.getAsBoolean()) {
+                scheduledFuture.cancel(true);
+                scheduledFuture = null;
+                return;
+            }
+            callback.run();
+        }, 0, time, TimeUnit.MILLISECONDS);
+        return scheduledFuture;
     }
 }

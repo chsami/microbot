@@ -20,7 +20,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Random;
 
-@PluginDescriptor(name = "<html><font color=\"#32CD32\">Lucid </font>1T Karambwans</html>", description = "It 1 tick cooks karambwans, duh.", enabledByDefault = false)
+@PluginDescriptor(name = PluginDescriptor.Lucid + "1T Karambwans</html>", description = "It 1 tick cooks karambwans, duh.", enabledByDefault = false)
 public class Lucid1TKarambwansPlugin extends Plugin implements KeyListener
 {
 

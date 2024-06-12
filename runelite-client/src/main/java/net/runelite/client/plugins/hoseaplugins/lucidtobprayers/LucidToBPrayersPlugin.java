@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @PluginDescriptor(
-        name = "<html><font color=\"#32CD32\">Lucid </font>ToB Prayers</html>",
+        name = PluginDescriptor.Lucid + "ToB Prayers</html>",
         description = "Helps with prayers (and tick-eating sote ball) at ToB",
         enabledByDefault = false,
         tags = {"prayer", "swap", "tob", "lucid"}

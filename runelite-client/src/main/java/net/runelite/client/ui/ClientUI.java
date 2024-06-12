@@ -164,7 +164,7 @@ public class ClientUI
 		this.clientThreadProvider = clientThreadProvider;
 		this.eventBus = eventBus;
 		this.safeMode = safeMode;
-		this.title = title + (safeMode ? " (safe mode)" : " V" + version);
+		this.title = "Microbot" + (safeMode ? " (safe mode)" : " V" + version);
 
 		normalBoundsTimer = new Timer(250, _ev -> setLastNormalBounds());
 		normalBoundsTimer.setRepeats(false);

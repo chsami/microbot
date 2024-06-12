@@ -43,7 +43,7 @@ import static net.runelite.client.RuneLite.RUNELITE_DIR;
 
 @Slf4j
 @PluginDescriptor(
-        name = "<html><font color=\"#32CD32\">Lucid </font>Hotkeys 1</html>",
+        name = PluginDescriptor.Lucid + "Hotkeys 1</html>",
         description = "Setup hotkeys that can do a variety of different actions.",
         enabledByDefault = false,
         tags = {"hotkeys", "lucid"}

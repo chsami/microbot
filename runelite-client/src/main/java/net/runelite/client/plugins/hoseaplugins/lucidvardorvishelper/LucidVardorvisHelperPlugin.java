@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @PluginDescriptor(
-        name = "<html><font color=\"#32CD32\">Lucid </font>Vardorvis Helper</html>",
+        name = PluginDescriptor.Lucid + "Vardorvis Helper</html>",
         description = "Helps with Vardorvis fight",
         enabledByDefault = false,
         tags = {"vardorvis", "lucid"}

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @PluginDescriptor(
-        name = "<html><font color=\"#32CD32\">Lucid </font>Muspah Helper</html>",
+        name = PluginDescriptor.Lucid + "Muspah Helper</html>",
         description = "Helper plugin for the Phantom Muspah (still in development)",
         enabledByDefault = false,
         tags = {"muspah", "helper"}

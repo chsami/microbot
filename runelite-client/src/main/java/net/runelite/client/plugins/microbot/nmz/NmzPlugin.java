@@ -2,13 +2,16 @@ package net.runelite.client.plugins.microbot.nmz;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.events.ActorDeath;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.combat.PrayerPotionScript;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -24,6 +27,7 @@ import java.awt.*;
 public class NmzPlugin extends Plugin {
     @Inject
     private NmzConfig config;
+
     @Provides
     NmzConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(NmzConfig.class);
@@ -54,14 +58,25 @@ public class NmzPlugin extends Plugin {
     protected void shutDown() {
         nmzScript.shutdown();
         overlayManager.remove(nmzOverlay);
+        NmzScript.setHasSurge(false);
     }
 
     @Subscribe
-    public void onActorDeath(ActorDeath actorDeath)
-    {
+    public void onActorDeath(ActorDeath actorDeath) {
         if (config.stopAfterDeath() && actorDeath.getActor() == Microbot.getClient().getLocalPlayer()) {
-            nmzScript.logout();
+            Rs2Player.logout();
             shutDown();
+        }
+    }
+
+    @Subscribe
+    public void onChatMessage(ChatMessage event) {
+        if (event.getType() == ChatMessageType.GAMEMESSAGE) {
+            if (event.getMessage().equalsIgnoreCase("you feel a surge of special attack power!")) {
+                NmzScript.setHasSurge(true);
+            } else if (event.getMessage().equalsIgnoreCase("your surge of special attack power has ended.")) {
+                NmzScript.setHasSurge(false);
+            }
         }
     }
 }

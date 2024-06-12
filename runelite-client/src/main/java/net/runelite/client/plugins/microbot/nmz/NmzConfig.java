@@ -31,18 +31,6 @@ public interface NmzConfig extends Config {
     String generalSection = "general";
 
     @ConfigItem(
-            keyName = "Use special attack",
-            name = "Use special attack",
-            description = "Use special attack",
-            position = 2,
-            section = generalSection
-    )
-    default boolean useSpecialAttack()
-    {
-        return false;
-    }
-
-    @ConfigItem(
             keyName = "How many overload potions to use",
             name = "How many overload potions to use",
             description = "How many overload potions to use",
@@ -87,7 +75,7 @@ public interface NmzConfig extends Config {
     )
     default boolean useZapper()
     {
-        return true;
+        return false;
     }
 
     @ConfigItem(
@@ -99,7 +87,19 @@ public interface NmzConfig extends Config {
     )
     default boolean useReccurentDamage()
     {
-        return true;
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "Use Power Surge",
+            name = "Use Power Surge",
+            description = "Use power surge for infinite special attack",
+            position = 4,
+            section = generalSection
+    )
+    default boolean usePowerSurge()
+    {
+        return false;
     }
     @ConfigItem(
             keyName = "Auto Prayer Potion",
@@ -120,6 +120,17 @@ public interface NmzConfig extends Config {
             section = generalSection
     )
     default boolean randomMouseMovements()
+    {
+        return true;
+    }
+    @ConfigItem(
+            keyName = "Walk to center",
+            name = "Walk to center",
+            description = "Walk to center of nmz",
+            position = 7,
+            section = generalSection
+    )
+    default boolean walkToCenter()
     {
         return true;
     }

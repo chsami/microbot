@@ -101,6 +101,8 @@ public class PlayerAssistPlugin extends Plugin {
         buryScatterScript.run(config);
         attackStyleScript.run(config);
         bankerScript.run(config);
+        Microbot.getSpecialAttackConfigs()
+                .setSpecialAttack(true);
     }
 
     protected void shutDown() {

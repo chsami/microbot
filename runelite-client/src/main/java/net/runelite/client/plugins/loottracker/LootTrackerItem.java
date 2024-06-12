@@ -32,7 +32,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
-class LootTrackerItem
+public class LootTrackerItem
 {
 	private final int id;
 	private final String name;

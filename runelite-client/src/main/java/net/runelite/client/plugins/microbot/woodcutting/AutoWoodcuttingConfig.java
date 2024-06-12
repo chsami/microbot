@@ -13,8 +13,7 @@ public interface AutoWoodcuttingConfig extends Config {
     @ConfigSection(
             name = "General",
             description = "General",
-            position = 0,
-            closedByDefault = false
+            position = 0
     )
     String generalSection = "general";
 
@@ -39,7 +38,7 @@ public interface AutoWoodcuttingConfig extends Config {
     )
     default int distanceToStray()
     {
-        return Integer.MAX_VALUE;
+        return 20;
     }
 
     @ConfigItem(
@@ -57,8 +56,7 @@ public interface AutoWoodcuttingConfig extends Config {
     @ConfigSection(
             name = "Reset",
             description = "Options for clearing logs from inventory",
-            position = 1,
-            closedByDefault = true
+            position = 1
     )
     String resetSection = "reset";
 
@@ -75,10 +73,20 @@ public interface AutoWoodcuttingConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "ItemsToBank",
+            name = "Items to bank (Comma seperated)",
+            description = "Items to bank",
+            position = 1
+    )
+    default String itemsToBank() {
+        return "logs";
+    }
+
+    @ConfigItem(
             keyName = "WalkBack",
             name = "Walk Back",
             description = "Walk back the initial spot or last cut down",
-            position = 1,
+            position = 2,
             section = resetSection
     )
     default WoodcuttingWalkBack walkBack()
@@ -86,15 +94,4 @@ public interface AutoWoodcuttingConfig extends Config {
         return WoodcuttingWalkBack.LAST_LOCATION;
     }
 
-    @ConfigItem(
-            keyName = "RandomTile",
-            name = "Randomize Return Tile",
-            description = "Tile that you return to will be randomized by 2 tiles",
-            position = 2,
-            section = resetSection
-    )
-    default boolean randomReturnTile()
-    {
-        return false;
-    }
 }

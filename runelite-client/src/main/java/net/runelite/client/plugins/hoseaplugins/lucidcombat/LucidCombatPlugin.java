@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 
 @Slf4j
-@PluginDescriptor(name = "<html><font color=\"#32CD32\">Lucid </font>Combat</html>", description = "Helps with Combat related stuff", enabledByDefault = false)
+@PluginDescriptor(name = PluginDescriptor.Lucid + "Combat</html>", description = "Helps with Combat related stuff", enabledByDefault = false)
 public class LucidCombatPlugin extends Plugin implements KeyListener
 {
 

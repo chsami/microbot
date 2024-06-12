@@ -81,11 +81,25 @@ public class Rs2Magic {
         }
     }
 
+    /**
+     * alch item with minsleep of 300 and maxsleep of 600
+     * @param item
+     */
     public static void alch(Rs2Item item) {
+        alch(item, 300, 600);
+    }
+
+    /**
+     *
+     * @param item
+     * @param sleepMin
+     * @param sleepMax
+     */
+    public static void alch(Rs2Item item, int sleepMin, int sleepMax) {
         if (Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 55) {
-            highAlch(item, 300, 600);
+            highAlch(item, sleepMin, sleepMax);
         } else {
-            lowAlch(item, 300, 600);
+            lowAlch(item, sleepMin, sleepMax);
         }
     }
 

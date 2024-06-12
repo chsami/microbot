@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util;
 
+import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
 import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
@@ -8,7 +9,10 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
@@ -26,7 +30,7 @@ public class MicrobotInventorySetup {
         return true;
     }
 
-    public static boolean loadInventory(String name) {
+    public static boolean loadInventory(String name, ScheduledFuture<?> mainScheduler) {
         Rs2Bank.openBank();
         Rs2Bank.depositAll();
         if (Rs2Bank.isOpen()) {
@@ -34,10 +38,11 @@ public class MicrobotInventorySetup {
                 return false;
             }
             Map<Integer, List<InventorySetupsItem>> groupedByItems = inventorySetup.getInventory().stream().collect(Collectors.groupingBy(InventorySetupsItem::getId));
-            for (Integer key: groupedByItems.keySet()) {
+            for (Integer key : groupedByItems.keySet()) {
+                if (mainScheduler.isCancelled()) break;
                 InventorySetupsItem inventorySetupsItem = groupedByItems.get(key).get(0);
                 if (inventorySetupsItem.getId() == -1) continue;
-                int withdrawQuantity = -1;
+                int withdrawQuantity;
                 if (groupedByItems.get(key).size() == 1) {
                     withdrawQuantity = groupedByItems.get(key).get(0).getQuantity();
                 } else {
@@ -66,7 +71,7 @@ public class MicrobotInventorySetup {
         return doesInventoryMatch(name);
     }
 
-    public static boolean loadEquipment(String name) {
+    public static boolean loadEquipment(String name, ScheduledFuture<?> mainScheduler) {
         Rs2Bank.openBank();
         if (Rs2Bank.isOpen()) {
             if (!getInventorySetup(name)) {
@@ -74,6 +79,7 @@ public class MicrobotInventorySetup {
             }
             if (inventorySetup == null) return false;
             for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
+                if (mainScheduler.isCancelled()) break;
                 if (InventorySetupsItem.itemIsDummy(inventorySetupsItem)) continue;
                 if (inventorySetupsItem.isFuzzy()) {
                     if (!Rs2Bank.hasBankItem(inventorySetupsItem.getName())) {
@@ -102,7 +108,6 @@ public class MicrobotInventorySetup {
                         sleep(100, 250);
                     } else {
                         Rs2Bank.withdrawAndEquip(inventorySetupsItem.getName());
-                        sleep(100, 250);
                     }
                 }
             }
@@ -128,7 +133,7 @@ public class MicrobotInventorySetup {
 
         Map<Integer, List<InventorySetupsItem>> groupedByItems = inventorySetup.getInventory().stream().collect(Collectors.groupingBy(InventorySetupsItem::getId));
         boolean found = true;
-        for (Integer key: groupedByItems.keySet()) {
+        for (Integer key : groupedByItems.keySet()) {
             InventorySetupsItem inventorySetupsItem = groupedByItems.get(key).get(0);
             if (inventorySetupsItem.getId() == -1) continue;
             int withdrawQuantity = -1;
@@ -162,19 +167,18 @@ public class MicrobotInventorySetup {
         return true;
     }
 
-    public static boolean doesEquipmentMatch(String name, String ignoreItem) {
+    public static boolean doesEquipmentMatch(String name, List<EquipmentInventorySlot> slots) {
         inventorySetup = MInventorySetupsPlugin.getInventorySetups().stream().filter(Objects::nonNull).filter(x -> x.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
         if (inventorySetup == null) {
             Microbot.showMessage("Inventory setup with name " + name + " has not found been found. Please make this inventory setup.");
             sleep(5000);
             return false;
         }
-        for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
-            if (inventorySetupsItem.getId() == -1) continue;
-            if (inventorySetupsItem.getName().contains(ignoreItem)) continue;
-            if (!Rs2Equipment.isWearing(inventorySetupsItem.getName(), true)) {
-                return false;
-            }
+        if (!Rs2Equipment.isWearing(inventorySetup.getEquipment().stream().filter(x -> x.getId() != -1).map(x -> x.getName()).collect(Collectors.toList()),
+                true,
+                slots)
+        ) {
+            return false;
         }
         return true;
     }

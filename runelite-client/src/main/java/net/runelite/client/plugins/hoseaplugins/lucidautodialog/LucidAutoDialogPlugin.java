@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @PluginDescriptor(
-        name = "<html><font color=\"#32CD32\">Lucid </font>Auto Dialog</html>",
+        name = PluginDescriptor.Lucid + "Auto Dialog</html>",
         description = "Does various dialog options automatically.",
         enabledByDefault = false,
         tags = {"dialog", "quest", "continue"}

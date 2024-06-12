@@ -21,9 +21,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.natepainthelper.Info.*;
-
-
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Crafting",
         description = "Microbot crafting plugin",
@@ -59,9 +56,6 @@ public class CraftingPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
-        expstarted = Microbot.getClient().getSkillExperience(Skill.CRAFTING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.CRAFTING);
-        timeBegan = System.currentTimeMillis();
         Microbot.pauseAllScripts = false;
         Microbot.setClient(client);
         Microbot.setClientThread(clientThread);

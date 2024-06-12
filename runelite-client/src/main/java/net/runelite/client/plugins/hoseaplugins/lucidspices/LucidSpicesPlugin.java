@@ -26,7 +26,7 @@ import java.util.Random;
 
 @Slf4j
 @PluginDescriptor(
-        name = "<html><font color=\"#32CD32\">Lucid </font>Spices</html>",
+        name = PluginDescriptor.Lucid + "Spices</html>",
         description = "A plugin to help you gather spices for stews and not kill your cat in the process",
         enabledByDefault = false,
         tags = {"lucid", "spice", "spices", "cat", "hellrat"})

@@ -22,6 +22,14 @@ public interface BanksShopperConfig extends Config {
     String itemSection = "itemSection";
 
     @ConfigSection(
+            name = "Bank Settings",
+            description = "Bank Settings",
+            position = 0,
+            closedByDefault = false
+    )
+    String bankSection = "bankSection";
+
+    @ConfigSection(
             name = "Action Settings",
             description = "Action Settings",
             position = 0,
@@ -44,15 +52,15 @@ public interface BanksShopperConfig extends Config {
 
 
     @ConfigItem(
-            keyName = "Item Name",
-            name = "Item Name",
-            description = "Sets Item to Buy or Sell",
+            keyName = "Item Name(s)",
+            name = "Item Name(s)",
+            description = "Sets Item to Buy or Sell. Supports comma seperated values (item1, item2)",
             position = 0,
             section = itemSection
     )
 
-    default String itemName() {
-        return "";
+    default String itemNames() {
+        return "item1,item2,item3";
     }
 
     @ConfigItem(
@@ -87,6 +95,28 @@ public interface BanksShopperConfig extends Config {
     )
     default Quantities quantity() {
         return Quantities.FIFTY;
+    }
+
+    @ConfigItem(
+            position = 1,
+            keyName = "UseBank",
+            name = "Use Bank",
+            description = "Use bank if your inventory is full",
+            section = bankSection
+    )
+    default boolean useBank() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 3,
+            keyName = "logout",
+            name = "Logout when out of supply",
+            description = "Logout",
+            section = actionSection
+    )
+    default boolean logout() {
+        return true;
     }
 
 }
