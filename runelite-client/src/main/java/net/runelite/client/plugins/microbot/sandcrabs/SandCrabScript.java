@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 public class SandCrabScript extends Script {
 
-    public static double version = 1.3;
+    public static String version = "1.4.0";
 
     public int afkTimer = 0;
     public int hijackTimer = 0;
