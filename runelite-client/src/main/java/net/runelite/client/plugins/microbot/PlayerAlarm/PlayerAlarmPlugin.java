@@ -19,7 +19,11 @@
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
  
- @PluginDescriptor(name = "<html>[<font color=#ff00ff>§</font>] " + "Player Alarm")
+ @PluginDescriptor(
+         name = "<html>[<font color=#ff00ff>§</font>] " + "Player Alarm",
+         enabledByDefault = false
+
+ )
  public class PlayerAlarmPlugin extends Plugin {
    private static final Logger log = LoggerFactory.getLogger(PlayerAlarmPlugin.class);
  
