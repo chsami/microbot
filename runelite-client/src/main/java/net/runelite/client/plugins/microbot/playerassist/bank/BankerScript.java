@@ -54,7 +54,7 @@ enum ItemToKeep {
 @Slf4j
 public class BankerScript extends Script {
     PlayerAssistConfig config;
-
+    boolean isBanking = false;
 
     boolean initialized = false;
 
@@ -63,10 +63,14 @@ public class BankerScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
-                if (Microbot.isMoving() || Microbot.isAnimating()) return;
-                if (isUpkeepItemDepleted(config) || Rs2Inventory.count() >= 28 - config.minFreeSlots())
+                if (!config.bank()) return;
+                if (isUpkeepItemDepleted(config) || Rs2Inventory.count() >= 28 - config.minFreeSlots()) {
+                    Microbot.pauseAllScripts = true;
+                    isBanking = true;
                     if (handleBanking())
+                        sleepUntil(() -> !isBanking);
                         Microbot.pauseAllScripts = false;
+                }
                 // Add other conditional checks here as needed
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -144,6 +148,7 @@ public class BankerScript extends Script {
 
                 }
                 if (withdrawUpkeepItems(config)) {
+                    isBanking = false;
                     Rs2Walker.walkTo(config.centerLocation());
                 }
             }

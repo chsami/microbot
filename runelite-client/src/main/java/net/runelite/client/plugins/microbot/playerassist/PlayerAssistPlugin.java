@@ -231,7 +231,7 @@ public class PlayerAssistPlugin extends Plugin {
             //Rs2Prayer.disableAllPrayers();
             if(config.toggleQuickPrayFlick())
                 Rs2Prayer.toggleQuickPrayer(false);
-            flickerScript.resetLastAttack();
+            flickerScript.resetLastAttack(true);
 
         }
     }
