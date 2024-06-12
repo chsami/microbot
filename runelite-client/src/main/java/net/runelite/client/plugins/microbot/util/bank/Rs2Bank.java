@@ -384,10 +384,6 @@ public class Rs2Bank {
         }
         return result;
     }
-    //overload method to deposit all items without delay
-    public static boolean depositAll(Predicate<Rs2Item> filter) {
-        return depositAll(filter, false);
-    }
 
     // boolean to determine if we still have items to deposit
     private static boolean isDepositing(Predicate<Rs2Item> filter) {
@@ -450,19 +446,6 @@ public class Rs2Bank {
     }
 
     /**
-     * Deposits all items in the player's inventory into the bank, except for the items with the specified IDs.
-     * This method uses a lambda function to filter out the items with the specified IDs from the deposit operation.
-     * It also allows for a delay between deposit operations.
-     *
-     * @param delay If true, a delay is added between deposit operations.
-     * @param ids The IDs of the items to be excluded from the deposit.
-     * @return true if any items were deposited, false otherwise.
-     */
-    public static boolean depositAllExcept(boolean delay, Integer... ids) {
-        return depositAll(x -> Arrays.stream(ids).noneMatch(id -> id == x.id), delay);
-    }
-
-    /**
      * Deposits all items in the player's inventory into the bank, except for the items with the specified names.
      * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
      *
@@ -478,19 +461,14 @@ public class Rs2Bank {
      * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
      * It also allows for a delay between deposit operations.
      *
-     * @param delay If true, a delay is added between deposit operations.
      * @param names The names of the items to be excluded from the deposit.
      * @return true if any items were deposited, false otherwise.
      */
-    public static boolean depositAllExcept(boolean delay,boolean exact,String... names) {
+    public static boolean depositAllExcept(boolean exact,String... names) {
         if(!exact)
-            return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.contains(name.toLowerCase())), delay);
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.contains(name.toLowerCase())));
         else
-            return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)), delay);
-    }
-    // overload
-    public static boolean depositAllExcept(boolean delay,String... names) {
-        return depositAllExcept(delay, false, names);
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
     }
 
     /**

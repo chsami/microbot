@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.constants.Constants;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class BankerScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
-                if (Microbot.isMoving() || Microbot.isAnimating()) return;
+                if (Rs2Player.isMoving() || Rs2Player.isAnimating()) return;
                 if (isUpkeepItemDepleted(config) || Rs2Inventory.count() >= 28 - config.minFreeSlots())
                     if (handleBanking())
                         Microbot.pauseAllScripts = false;
@@ -113,7 +114,7 @@ public class BankerScript extends Script {
 
             }
         }
-        return Rs2Bank.depositAllExcept(true, ids.toArray(new Integer[0]));
+        return Rs2Bank.depositAllExcept(ids.toArray(new Integer[0]));
 
     }
 

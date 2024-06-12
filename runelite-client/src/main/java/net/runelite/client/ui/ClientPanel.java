@@ -24,12 +24,12 @@
  */
 package net.runelite.client.ui;
 
-import java.applet.Applet;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import javax.annotation.Nullable;
-import javax.swing.JPanel;
 import net.runelite.api.Constants;
+
+import javax.annotation.Nullable;
+import javax.swing.*;
+import java.applet.Applet;
+import java.awt.*;
 
 final class ClientPanel extends JPanel
 {
