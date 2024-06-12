@@ -338,7 +338,7 @@ public class BanksSlayerScript extends Script {
                 if (lastInteractingNPC != null && !lastInteractingNPC.isDead()) {
                     int currentHealth = getMonsterHealth(lastInteractingNPC);
                     if (currentHealth == -1) {
-                        Rs2Inventory.useItemOnNpc(itemId, lastInteractingNPC.getId());
+                        Rs2Inventory.useItemOnNpc(itemId, monster);
                         sleep(1200);
                         healthHistory.clear(); // Clear the history when item is used
                         lastInteractingNPC = null; // Reset the reference after using the item
