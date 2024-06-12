@@ -129,9 +129,13 @@ public class Rs2Walker {
                             Rs2Walker.walkFastCanvas(currentWorldPoint);
                             sleep(600, 1000);
                         } else {
+                            long movingStart = System.currentTimeMillis();
                             Rs2Walker.walkMiniMap(currentWorldPoint);
                             int randomInt = Random.random(3, 5);
                             sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < randomInt, 100, 2000);
+                            if(System.currentTimeMillis()-movingStart<120){
+                                sleep(600, 1000);
+                            }
                             break;
                         }
                         //avoid tree attacking you in draynor
