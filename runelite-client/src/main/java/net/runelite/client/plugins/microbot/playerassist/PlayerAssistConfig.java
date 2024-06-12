@@ -96,17 +96,6 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
-    //safe spot
-    @ConfigItem(
-            keyName = "Safe Spot",
-            name = "Safe Spot",
-            description = "Right-click the ground to select the safe spot tile",
-            position = 4,
-            section = combatSection
-    )
-    default boolean toggleSafeSpot() {
-        return false;
-    }
 
     @ConfigItem(
             keyName = "Cannon",
@@ -116,6 +105,27 @@ public interface PlayerAssistConfig extends Config {
             section = combatSection
     )
     default boolean toggleCannon() {
+        return false;
+    }
+
+    //Gear section
+    @ConfigSection(
+            name = "Gear",
+            description = "Gear",
+            position = 55,
+            closedByDefault = true
+    )
+    String gearSection = "Gear";
+
+    //safe spot
+    @ConfigItem(
+            keyName = "Safe Spot",
+            name = "Safe Spot",
+            description = "Right-click the ground to select the safe spot tile",
+            position = 5,
+            section = combatSection
+    )
+    default boolean toggleSafeSpot() {
         return false;
     }
 
@@ -270,6 +280,18 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
+    //set center tile manually
+    @ConfigItem(
+            keyName = "Center Tile",
+            name = "Manual Center Tile",
+            description = "Right-click the ground to select the center tile",
+            position = 6,
+            section = combatSection
+    )
+    default boolean toggleCenterTile() {
+        return false;
+    }
+
 
     //Prayer section
     @ConfigSection(
@@ -408,22 +430,26 @@ public interface PlayerAssistConfig extends Config {
         return 99;
     }
 
-    //Gear section
-    @ConfigSection(
-            name = "Gear",
-            description = "Gear",
-            position = 55,
-            closedByDefault = false
+    // only loot my items
+    @ConfigItem(
+            keyName = "onlyLootMyItems",
+            name = "Only Loot My Items",
+            description = "Only loot items that are dropped by you",
+            position = 6,
+            section = lootSection
     )
-    String gearSection = "Gear";
+    default boolean toggleOnlyLootMyItems() {
+        return false;
+    }
 
-    // Inventory setup selection
+    // Inventory setup selection TODO: Add inventory setup selection
     @ConfigItem(
             keyName = "InventorySetupName",
             name = "Inventory setup name",
             description = "Create an inventory setup in the inventory setup plugin and enter the name here",
             position = 0,
-            section = gearSection
+            section = gearSection,
+            hidden = true
     )
     default String inventorySetup() {
         return "";
