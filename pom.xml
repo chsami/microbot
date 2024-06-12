@@ -93,7 +93,7 @@
 			<name>RuneLite</name>
 			<url>https://repo.runelite.net</url>
 			<snapshots>
-				<enabled>false</enabled>
+				<enabled>true</enabled>
 			</snapshots>
 		</repository>
 		<repository>
