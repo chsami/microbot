@@ -64,6 +64,7 @@ public class BankerScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
+                if (!config.bank()) return;
                 if (Rs2Player.isMoving() || Rs2Player.isAnimating()) return;
                 if (isUpkeepItemDepleted(config) || Rs2Inventory.count() >= 28 - config.minFreeSlots())
                     if (handleBanking())
