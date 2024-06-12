@@ -11,10 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Rs2Item {
+    @Getter
     public  int id;
     public  int quantity;
     @Getter
     public int slot = -1;
+    @Getter
     public String name;
     @Getter
     String[] inventoryActions;

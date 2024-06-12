@@ -19,8 +19,12 @@
  import java.util.HashMap;
  import java.util.List;
  import java.util.stream.Collectors;
- 
- @PluginDescriptor(name = "<html>[<font color=#ff00ff>§</font>] " + "Player Alarm", enabledByDefault = false)
+
+ @PluginDescriptor(
+         name = "<html>[<font color=#ff00ff>§</font>] " + "Player Alarm",
+         enabledByDefault = false
+
+ )
  public class PlayerAlarmPlugin extends Plugin {
    private static final Logger log = LoggerFactory.getLogger(PlayerAlarmPlugin.class);
  

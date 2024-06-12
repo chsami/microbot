@@ -11,31 +11,48 @@ import java.util.concurrent.TimeUnit;
 public class SafeSpot extends Script {
 
     public WorldPoint currentSafeSpot = null;
+    private boolean messageShown = false;
 
-    public boolean run(PlayerAssistConfig config) {
-        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            try {
-                if (!Microbot.isLoggedIn()) return;
-                if (!super.run()) return;
+public boolean run(PlayerAssistConfig config) {
+    mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+        try {
+            if (!Microbot.isLoggedIn() || !super.run() || !config.toggleSafeSpot() || Microbot.isMoving()) return;
 
-                if (currentSafeSpot == null)
-                    currentSafeSpot = Microbot.getClient().getLocalPlayer().getWorldLocation();
+            currentSafeSpot = config.safeSpot();
+            if(isDefaultSafeSpot(currentSafeSpot)){
 
-                if (currentSafeSpot != null && currentSafeSpot.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 2) {
-                    Rs2Walker.walkMiniMap(currentSafeSpot);
+                if(!messageShown){
+                    Microbot.showMessage("Please set a center location");
+                    messageShown = true;
                 }
-
-
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                return;
             }
-        }, 0, 600, TimeUnit.MILLISECONDS);
-        return true;
-    }
+            if (isDefaultSafeSpot(currentSafeSpot) || isPlayerAtSafeSpot(currentSafeSpot)) return;
+            messageShown = false;
+
+            if(Rs2Walker.walkMiniMap(currentSafeSpot)) {
+                Microbot.pauseAllScripts = true;
+                sleepUntil(() -> isPlayerAtSafeSpot(currentSafeSpot));
+                Microbot.pauseAllScripts = false;
+            }
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }, 0, 600, TimeUnit.MILLISECONDS);
+    return true;
+}
+
+private boolean isDefaultSafeSpot(WorldPoint safeSpot) {
+    return safeSpot.getX() == 0 && safeSpot.getY() == 0;
+}
+
+private boolean isPlayerAtSafeSpot(WorldPoint safeSpot) {
+    return safeSpot.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 0;
+}
 
     @Override
     public void shutdown() {
         super.shutdown();
-        currentSafeSpot = null;
     }
 }

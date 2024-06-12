@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
+import java.util.Arrays;
 
 import static net.runelite.api.Varbits.QUICK_PRAYER;
 import static net.runelite.client.plugins.microbot.globval.VarbitIndices.SELECTED_QUICK_PRAYERS;
@@ -83,5 +84,11 @@ public class Rs2Prayer {
 
     public static boolean isOutOfPrayer() {
         return Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= 0;
+    }
+    /**
+     * Disables all active prayers.
+     */
+    public static void disableAllPrayers() {
+        Arrays.stream(Rs2PrayerEnum.values()).filter(Rs2Prayer::isPrayerActive).forEach(Rs2Prayer::toggle);
     }
 }
