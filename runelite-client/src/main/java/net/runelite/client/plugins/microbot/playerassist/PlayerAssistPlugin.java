@@ -94,7 +94,7 @@ public class PlayerAssistPlugin extends Plugin {
         combatPotion.run(config);
         foodScript.run(config);
         prayerPotionScript.run(config);
-        safeSpotScript.run(config); // TODO: safespot
+        safeSpotScript.run(config);
         flickerScript.run(config);
         useSpecialAttackScript.run(config);
         antiPoisonScript.run(config);
@@ -230,10 +230,10 @@ public class PlayerAssistPlugin extends Plugin {
         final Hitsplat hitsplat = event.getHitsplat();
 
         if ((hitsplat.getHitsplatType() == HitsplatID.BLOCK_ME || hitsplat.getHitsplatType() == HitsplatID.DAMAGE_ME) && event.getActor() instanceof NPC && config.togglePrayer()) {
-            //Rs2Prayer.disableAllPrayers();
+            Rs2Prayer.disableAllPrayers();
             if(config.toggleQuickPrayFlick())
                 Rs2Prayer.toggleQuickPrayer(false);
-            flickerScript.resetLastAttack();
+            flickerScript.resetLastAttack(true);
 
         }
     }
