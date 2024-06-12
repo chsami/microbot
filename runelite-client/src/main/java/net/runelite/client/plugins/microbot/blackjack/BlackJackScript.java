@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile
 
 
 public class BlackJackScript extends Script {
-    public static double version = 3.0;
+    public static double version = 3.1;
     public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
@@ -532,7 +532,7 @@ public class BlackJackScript extends Script {
             }
             boolean hasStars = Microbot.getClient().getLocalPlayer().hasSpotAnim(245);
             if (!hasStars) {
-                if (playerHit == 1) {
+                if (playerHit <= 1 || Microbot.getClient().getSkillExperience(Skill.THIEVING)>BlackJackScript.hitsplatXP) {
                     playerHit = 0;
                 } else {
                     playerHit = 0;
