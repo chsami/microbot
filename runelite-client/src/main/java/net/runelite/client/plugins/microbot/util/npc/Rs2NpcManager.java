@@ -13,13 +13,20 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class is responsible for managing NPCs in the game.
+ * It provides utility methods for loading NPC data from JSON files and retrieving NPC stats.
+ */
 public class Rs2NpcManager {
     private static final Set<Integer> blacklistXpMultiplier = Set.of(8026, 8058, 8059, 8060, 8061, 7850, 7852, 7853, 7884, 7885, 7849, 7851, 7854, 7855, 7882, 7883, 7886, 7887, 7888, 7889, 494, 6640, 6656, 2042, 2043, 2044);
     private static Map<Integer, Rs2NpcStats> statsMap;
     public static Map<Integer, String> attackStyleMap;
     public static Map<Integer, String> attackAnimationMap;
 
-
+    /**
+     * Loads NPC data from JSON files.
+     * This method should be called before using any other methods in this class.
+     */
     public static void loadJson() {
         if (statsMap != null) {
             return;
@@ -32,9 +39,15 @@ public class Rs2NpcManager {
 
         Type attackAnimationTypeToken = new TypeToken<Map<Integer, String>>() {}.getType();
         attackAnimationMap = loadJsonFile("/npc/npcs_attack_animation.json", attackAnimationTypeToken);
-
     }
 
+    /**
+     * Loads a JSON file and deserializes it into a map.
+     * @param filename The name of the JSON file to load.
+     * @param typeToken The type token of the map.
+     * @param <T> The type of the values in the map.
+     * @return The deserialized map.
+     */
     private static <T> Map<Integer, T> loadJsonFile(String filename, Type typeToken) {
         Gson gson = new Gson();
         try (InputStream inputStream = Rs2NpcStats.class.getResourceAsStream(filename)) {
@@ -48,21 +61,41 @@ public class Rs2NpcManager {
         }
     }
 
+    /**
+     * Retrieves the stats of an NPC.
+     * @param npcId The ID of the NPC.
+     * @return The stats of the NPC, or null if the NPC does not exist.
+     */
     @Nullable
     public static Rs2NpcStats getStats(int npcId) {
         return statsMap.get(npcId);
     }
 
+    /**
+     * Retrieves the health of an NPC.
+     * @param npcId The ID of the NPC.
+     * @return The health of the NPC, or -1 if the NPC does not exist or its health is unknown.
+     */
     public static int getHealth(int npcId) {
         Rs2NpcStats s = statsMap.get(npcId);
         return s != null && s.getHitpoints() != -1 ? s.getHitpoints() : -1;
     }
 
+    /**
+     * Retrieves the attack speed of an NPC.
+     * @param npcId The ID of the NPC.
+     * @return The attack speed of the NPC, or -1 if the NPC does not exist or its attack speed is unknown.
+     */
     public static int getAttackSpeed(int npcId) {
         Rs2NpcStats s = statsMap.get(npcId);
         return s != null && s.getAttackSpeed() != -1 ? s.getAttackSpeed() : -1;
     }
 
+    /**
+     * Retrieves the XP modifier of an NPC.
+     * @param npcId The ID of the NPC.
+     * @return The XP modifier of the NPC, or 1.0 if the NPC does not exist or its XP modifier is unknown.
+     */
     public static double getXpModifier(int npcId) {
         if (blacklistXpMultiplier.contains(npcId)) {
             return 1.0;
@@ -70,5 +103,14 @@ public class Rs2NpcManager {
             Rs2NpcStats s = statsMap.get(npcId);
             return s == null ? 1.0 : s.calculateXpModifier();
         }
+    }
+
+    /**
+     * Retrieves the attack style of an NPC.
+     * @param npcId The ID of the NPC.
+     * @return The attack style of the NPC, or null if the NPC does not exist or its attack style is unknown.
+     */
+    public static String getAttackStyle(int npcId) {
+        return attackStyleMap.get(npcId);
     }
 }

@@ -112,6 +112,12 @@ public class Microbot {
     public static int getVarbitPlayerValue(int varbit) {
         return getClientThread().runOnClientThread(() -> getClient().getVarpValue(varbit));
     }
+    public static EnumComposition getEnum(int id) {
+        return getClientThread().runOnClientThread(() -> getClient().getEnum(id));
+    }
+    public static StructComposition getStructComposition(int structId) {
+        return getClientThread().runOnClientThread(() -> getClient().getStructComposition(structId));
+    }
 
     public static void setIsGainingExp(boolean value) {
         isGainingExp = value;

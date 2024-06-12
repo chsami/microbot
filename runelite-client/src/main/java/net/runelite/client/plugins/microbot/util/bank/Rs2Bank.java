@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.bank;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
@@ -13,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Predicates;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -22,6 +24,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -31,6 +34,7 @@ import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
 @SuppressWarnings("unused")
+@Slf4j
 public class Rs2Bank {
     public static List<Rs2Item> bankItems = new ArrayList<Rs2Item>();
     private static final int X_AMOUNT_VARBIT = 3960;
@@ -170,6 +174,14 @@ public class Rs2Bank {
      */
     public static boolean hasBankItem(String name, boolean exact) {
         return findBankItem(name, exact) != null;
+    }
+
+    //hasBankItem overload to check with id and amount
+    public static boolean hasBankItem(int id, int amount) {
+        Rs2Item rs2Item = findBankItem(id);
+        if (rs2Item == null) return false;
+        log.info("Item: " + rs2Item.name + " Amount: " + rs2Item.quantity);
+        return findBankItem(Objects.requireNonNull(rs2Item).name, false, amount) != null;
     }
 
     /**
@@ -357,15 +369,39 @@ public class Rs2Bank {
         return depositAll(rs2Item);
     }
 
-    public static boolean depositAll(Predicate<Rs2Item> predicate) {
-        for (Rs2Item item :
-                Rs2Inventory.items().stream().filter(predicate).collect(Collectors.toList())) {
-            if (item == null) continue;
-            depositAll(item);
-            return true;
+    public static boolean depositAll(Predicate<Rs2Item> filter, boolean delay) {
+        List<Rs2Item> itemsToDeposit = Rs2Inventory.all(filter)
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(Predicates.distinctByProperty(Rs2Item::getName))
+                .collect(Collectors.toList());
+        log.info("Items to deposit: " + itemsToDeposit.size());
+        for (Rs2Item item : itemsToDeposit) {
+            Rs2Bank.depositAll(item);
+            if (delay) {
+                sleep(300, 450);
+            }
         }
-        return false;
+        sleepUntil(() -> !isDepositing(filter));
+
+        return !itemsToDeposit.isEmpty();
     }
+    //overload method to deposit all items without delay
+    public static boolean depositAll(Predicate<Rs2Item> filter) {
+        return depositAll(filter, false);
+    }
+
+    // boolean to determine if we still have items to deposit
+    private static boolean isDepositing(Predicate<Rs2Item> filter) {
+        List<Rs2Item> itemsToDeposit = Rs2Inventory.all(filter)
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(Predicates.distinctByProperty(Rs2Item::getName))
+                .collect(Collectors.toList());
+
+        return !itemsToDeposit.isEmpty();
+    }
+
 
     /**
      * deposit all items identified by its name
@@ -404,14 +440,60 @@ public class Rs2Bank {
         sleepUntil(Rs2Inventory::isEmpty);
     }
 
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified IDs.
+     * This method uses a lambda function to filter out the items with the specified IDs from the deposit operation.
+     *
+     * @param ids The IDs of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
     public static boolean depositAllExcept(Integer... ids) {
         return depositAll(x -> Arrays.stream(ids).noneMatch(id -> id == x.id));
     }
 
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified IDs.
+     * This method uses a lambda function to filter out the items with the specified IDs from the deposit operation.
+     * It also allows for a delay between deposit operations.
+     *
+     * @param delay If true, a delay is added between deposit operations.
+     * @param ids The IDs of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
+    public static boolean depositAllExcept(boolean delay, Integer... ids) {
+        return depositAll(x -> Arrays.stream(ids).noneMatch(id -> id == x.id), delay);
+    }
+
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified names.
+     * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
+     *
+     * @param names The names of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
     public static boolean depositAllExcept(String... names) {
         return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
     }
 
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified names.
+     * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
+     * It also allows for a delay between deposit operations.
+     *
+     * @param delay If true, a delay is added between deposit operations.
+     * @param names The names of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
+    public static boolean depositAllExcept(boolean delay,boolean exact,String... names) {
+        if(!exact)
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.contains(name.toLowerCase())), delay);
+        else
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)), delay);
+    }
+    // overload
+    public static boolean depositAllExcept(boolean delay,String... names) {
+        return depositAllExcept(delay, false, names);
+    }
 
     /**
      * withdraw one item identified by its ItemWidget.
@@ -939,6 +1021,12 @@ public class Rs2Bank {
         Microbot.status = "Walking to nearest bank " + bankLocation.toString();
         Rs2Walker.walkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
+    }
+    //Distance to bank
+    public static boolean isNearBank(int distance) {
+        BankLocation bankLocation = getNearestBank();
+        int distanceToBank = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(bankLocation.getWorldPoint());
+        return distanceToBank <= distance;
     }
 
     /**

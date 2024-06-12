@@ -421,7 +421,13 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(String... names) {
+        return dropAllExcept(false, names);
+    }
+    public static boolean dropAllExcept(boolean exact ,String... names) {
+       if(exact)
         return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+         else
+              return dropAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())));
     }
 
     /**
@@ -717,6 +723,19 @@ public class Rs2Inventory {
     public static List<Rs2Item> getPotions() {
         return items().stream()
                 .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("drink")))
+                .collect(Collectors.toList());
+    }
+
+    // get bones with the action "bury"
+    public static List<Rs2Item> getBones() {
+        return items().stream()
+                .filter(x -> Arrays.stream(x.inventoryActions).anyMatch(a -> a != null && a.equalsIgnoreCase("bury")))
+                .collect(Collectors.toList());
+    }
+    // get items with the action "scatter"
+    public static List<Rs2Item> getAshes() {
+        return items().stream()
+                .filter(x -> Arrays.stream(x.inventoryActions).anyMatch(a -> a != null && a.equalsIgnoreCase("scatter")))
                 .collect(Collectors.toList());
     }
 
