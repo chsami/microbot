@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.example;
 
-import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;

@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
+import java.util.Arrays;
 
 import static net.runelite.api.Varbits.QUICK_PRAYER;
 import static net.runelite.client.plugins.microbot.globval.VarbitIndices.SELECTED_QUICK_PRAYERS;
@@ -22,13 +23,15 @@ public class Rs2Prayer {
     }
 
     public static void toggle(Rs2PrayerEnum name, boolean on) {
-        if (!Rs2Player.hasPrayerPoints()) return;
         final int varBit = name.getVarbit();
         if(!on) {
             if (Microbot.getVarbitValue(varBit) == 0) return;
         } else {
             if (Microbot.getVarbitValue(varBit) == 1) return;
         }
+
+        if (!Rs2Player.hasPrayerPoints()) return;
+
         Microbot.doInvoke(new NewMenuEntry(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
         //Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
     }
@@ -81,5 +84,11 @@ public class Rs2Prayer {
 
     public static boolean isOutOfPrayer() {
         return Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= 0;
+    }
+    /**
+     * Disables all active prayers.
+     */
+    public static void disableAllPrayers() {
+        Arrays.stream(Rs2PrayerEnum.values()).filter(Rs2Prayer::isPrayerActive).forEach(Rs2Prayer::toggle);
     }
 }

@@ -28,6 +28,8 @@ public class PlayerAssistOverlay extends OverlayPanel {
     private Color borderColor = Color.WHITE;
     private Stroke stroke = new BasicStroke(1);
     private static final Color WHITE_TRANSLUCENT = new Color(0, 255, 255, 127);
+    private static final Color RED_TRANSLUCENT = new Color(255, 0, 0, 127);
+
     PlayerAssistConfig config;
 
     @Inject
@@ -48,13 +50,21 @@ public class PlayerAssistOverlay extends OverlayPanel {
 
         net.runelite.api.Point loc = Perspective.localToCanvas(Microbot.getClient(), Rs2Player.getLocalLocation(), Rs2Player.getWorldLocation().getPlane(), 150);
 
-        LocalPoint lp =  LocalPoint.fromWorld(Microbot.getClient(), Script.getInitialPlayerLocation());
+        LocalPoint lp =  LocalPoint.fromWorld(Microbot.getClient(), config.centerLocation());
         if (lp != null) {
             Polygon poly = Perspective.getCanvasTileAreaPoly(Microbot.getClient(), lp, config.attackRadius() * 2);
 
             if (poly != null)
             {
                 renderPolygon(graphics, poly, WHITE_TRANSLUCENT);
+            }
+        }
+        // render safe spot
+        LocalPoint sslp = LocalPoint.fromWorld(Microbot.getClient(), config.safeSpot());
+        if (sslp != null) {
+            Polygon safeSpotPoly = Perspective.getCanvasTileAreaPoly(Microbot.getClient(), sslp, 1);
+            if (safeSpotPoly != null && config.toggleSafeSpot()) {
+                renderPolygon(graphics, safeSpotPoly, RED_TRANSLUCENT);
             }
         }
 

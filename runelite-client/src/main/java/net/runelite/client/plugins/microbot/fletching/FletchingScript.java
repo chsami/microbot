@@ -40,11 +40,11 @@ public class FletchingScript extends Script {
             try {
                 if (!Microbot.isLoggedIn())
                     return;
+                if (!super.run()) return;
 
                 if (fletchingMode == FletchingMode.PROGRESSIVE && model.getFletchingItem() == null)
                     calculateItemToFletch();
 
-                if (!super.run()) return;
 
                 if (!configChecks(config)) return;
 

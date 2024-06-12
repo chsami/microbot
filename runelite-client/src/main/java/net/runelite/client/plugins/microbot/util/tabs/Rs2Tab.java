@@ -210,7 +210,7 @@ public class Rs2Tab {
         if (value == 12) return KeyEvent.VK_F12;
         if (value == 13) return KeyEvent.VK_ESCAPE;
 
-        if (value == 0) {
+        if (value == 0 && Microbot.isLoggedIn()) {
             Microbot.showMessage("Keybinding not found for tab " + tab.getName() + ". Please fill in the keybinding in your settings");
             sleep(5000);
         }

@@ -14,6 +14,9 @@ import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
+import net.runelite.client.plugins.loottracker.LootTrackerPlugin;
+import net.runelite.client.plugins.loottracker.LootTrackerRecord;
+import net.runelite.client.plugins.microbot.configs.SpecialAttackConfigs;
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -28,7 +31,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -88,6 +94,8 @@ public class Microbot {
     private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
+    @Getter
+    private static final SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
@@ -95,12 +103,13 @@ public class Microbot {
                 != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
 
+    @Deprecated(since="1.2.4 - use Rs2Player variant", forRemoval = true)
     public static boolean isMoving() {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
                 != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
 
-
+    @Deprecated(since="1.2.4 - use Rs2Player variant", forRemoval = true)
     public static boolean isAnimating() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
     }
@@ -111,6 +120,12 @@ public class Microbot {
 
     public static int getVarbitPlayerValue(int varbit) {
         return getClientThread().runOnClientThread(() -> getClient().getVarpValue(varbit));
+    }
+    public static EnumComposition getEnum(int id) {
+        return getClientThread().runOnClientThread(() -> getClient().getEnum(id));
+    }
+    public static StructComposition getStructComposition(int structId) {
+        return getClientThread().runOnClientThread(() -> getClient().getStructComposition(structId));
     }
 
     public static void setIsGainingExp(boolean value) {
@@ -249,4 +264,17 @@ public class Microbot {
         MouseEvent e = new MouseEvent(client.getCanvas(), id, System.currentTimeMillis(), 0, point.getX(), point.getY(), 1, false, 1);
         client.getCanvas().dispatchEvent(e);
     }
+
+    public static List<LootTrackerRecord> getAggregateLootRecords() {
+        return LootTrackerPlugin.panel.aggregateRecords;
+    }
+
+    public static LootTrackerRecord getAggregateLootRecords(String npcName) {
+        return getAggregateLootRecords()
+                .stream()
+                .filter(x -> x.getTitle().equalsIgnoreCase(npcName))
+                .findFirst()
+                .orElse(null);
+    }
 }
+

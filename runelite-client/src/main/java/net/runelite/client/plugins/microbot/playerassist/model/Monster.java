@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.playerassist.model;
 
 import net.runelite.api.NPC;
+import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyle;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcStats;
 
@@ -12,6 +13,7 @@ public class Monster {
     public boolean delete;
 
     public int lastAttack = 0;
+    public AttackStyle attackStyle;
 
     public Monster(int npcId, int attackAnim) {
         this.id = npcId;

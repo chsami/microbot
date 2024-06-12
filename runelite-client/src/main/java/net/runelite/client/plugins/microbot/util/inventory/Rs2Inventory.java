@@ -19,6 +19,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,7 +40,6 @@ public class Rs2Inventory {
 
     private static boolean isTrackingInventory = false;
     private static boolean isInventoryChanged = false;
-
 
     public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == InventoryID.INVENTORY.getId() && e.getItemContainer() != null) {
@@ -398,7 +398,7 @@ public class Rs2Inventory {
                 items().stream().filter(predicate).collect(Collectors.toList())) {
             if (item == null) continue;
             invokeMenu(item, "Drop");
-            sleep(300, 600);
+            sleep(150, 600);
         }
         return true;
     }
@@ -420,7 +420,13 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(String... names) {
-        return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+        return dropAllExcept(false, names);
+    }
+    public static boolean dropAllExcept(boolean exact ,String... names) {
+        if(exact)
+            return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+        else
+            return dropAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())));
     }
 
     /**
@@ -452,7 +458,7 @@ public class Rs2Inventory {
     /**
      * Drop all items that fall under the gpValue
      *
-     * @param gpValue    minimum amount of gp required to not drop the item
+     * @param gpValue     minimum amount of gp required to not drop the item
      * @param ignoreItems List of items to not drop
      * @return
      */
@@ -573,6 +579,31 @@ public class Rs2Inventory {
     }
 
     /**
+     * Gets the item in the inventory with one of the specified names.
+     *
+     * @param names The names to match.
+     * @param exact true to match the exact name
+     * @return The item with one of the specified names, or null if not found.
+     */
+    public static Rs2Item get(List<String> names, boolean exact) {
+        if (exact) {
+            return items().stream().filter(x -> names.stream().anyMatch(n -> n.equalsIgnoreCase(x.name))).findFirst().orElse(null);
+        } else {
+            return items().stream().filter(x -> names.stream().anyMatch(n -> n.toLowerCase().contains(x.name.split("\\(")[0].toLowerCase()))).findFirst().orElse(null);
+        }
+    }
+
+    /**
+     * Gets the item in the inventory with one of the specified names.
+     *
+     * @param names The names to match.
+     * @return The item with one of the specified names, or null if not found.
+     */
+    public static Rs2Item get(List<String> names) {
+        return get(names, false);
+    }
+
+    /**
      * Gets the item in the inventory that matches the specified filter criteria.
      *
      * @param predicate The filter to apply.
@@ -690,6 +721,15 @@ public class Rs2Inventory {
         return get(names) != null;
     }
 
+
+    /**
+     * @param names
+     * @return boolean
+     */
+    public static boolean hasItem(List<String> names) {
+        return get(names) != null;
+    }
+
     /**
      * Gets the actions available for the item in the specified slot.
      *
@@ -700,22 +740,32 @@ public class Rs2Inventory {
         return items().stream()
                 .filter(x -> x.slot == slot)
                 .map(x -> x.getInventoryActions())
-                .findFirst().orElse(new String[] {});
+                .findFirst().orElse(new String[]{});
     }
 
     public static List<Rs2Item> getInventoryFood() {
-        long startTime = System.currentTimeMillis();
         List<Rs2Item> items = items().stream()
                 .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")))
                 .collect(Collectors.toList());
-        long endTime = System.currentTimeMillis();
-        long totalTime = endTime - startTime;
         return items;
     }
 
     public static List<Rs2Item> getPotions() {
         return items().stream()
                 .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("drink")))
+                .collect(Collectors.toList());
+    }
+
+    // get bones with the action "bury"
+    public static List<Rs2Item> getBones() {
+        return items().stream()
+                .filter(x -> Arrays.stream(x.inventoryActions).anyMatch(a -> a != null && a.equalsIgnoreCase("bury")))
+                .collect(Collectors.toList());
+    }
+    // get items with the action "scatter"
+    public static List<Rs2Item> getAshes() {
+        return items().stream()
+                .filter(x -> Arrays.stream(x.inventoryActions).anyMatch(a -> a != null && a.equalsIgnoreCase("scatter")))
                 .collect(Collectors.toList());
     }
 
@@ -925,6 +975,21 @@ public class Rs2Inventory {
     public static boolean interact(String name, String action) {
         interact(name, action, false);
         return true;
+    }
+
+    /**
+     * Interacts with an item with the specified name in the inventory using the specified action.
+     *
+     * @param name   The name of the item to interact with.
+     * @param action The action to perform on the item.
+     * @return True if the interaction was successful, false otherwise.
+     */
+    public static boolean interact(List<String> names, String action) {
+        for (String name:names) {
+            if (interact(name, action, false))
+                return true;
+        }
+       return false;
     }
 
     /**
@@ -1286,7 +1351,7 @@ public class Rs2Inventory {
         if (action == null || action.isEmpty())
             action = Arrays.stream(item.getInventoryActions()).findFirst().orElse("");
 
-        return interact(item.id, action);
+        return interact(item, action);
     }
 
     /**
@@ -1372,33 +1437,52 @@ public class Rs2Inventory {
     }
 
     /**
-     * @param name item name
+     * @param names possible item names to wield
+     * @return
      */
-    public static void wield(String name) {
-        if (!Rs2Inventory.hasItem(name)) return;
-        if (Rs2Equipment.isWearing(name, true)) return;
+    public static boolean wield(String... names) {
+        for (String name : names) {
+            if (!Rs2Inventory.hasItem(name)) continue;
+            if (Rs2Equipment.isWearing(name, true)) return true;
+            invokeMenu(get(name), "wield");
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public static boolean wield(String name) {
+        if (!Rs2Inventory.hasItem(name)) return false;
+        if (Rs2Equipment.isWearing(name, true)) return false;
         invokeMenu(get(name), "wield");
+        return true;
     }
 
     /**
      * @param name item name
      */
-    public static void wear(String name) {
-        invokeMenu(get(name), "wear");
+    public static boolean wear(String name) {
+        return wield(name);
     }
 
     /**
      * @param id item id
      */
-    public static void equip(int id) {
-        wield(id);
+    public static boolean equip(int id) {
+        return wield(id);
     }
 
     /**
      * @param id item id
      */
-    public static void wield(int id) {
+    public static boolean wield(int id) {
+        if (!Rs2Inventory.hasItem(id)) return false;
+        if (Rs2Equipment.isWearing(id)) return false;
         invokeMenu(get(id), "wield");
+        return true;
     }
 
     /**
@@ -1455,7 +1539,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param itemId
      * @param npcID
      * @return
@@ -1470,7 +1553,6 @@ public class Rs2Inventory {
     }
 
     /**
-     *
      * @param name
      * @param exact
      * @return
@@ -1540,14 +1622,14 @@ public class Rs2Inventory {
                     break;
                 }
             }
+            if((Objects.equals(actions[1], "Wear") && actions[0]==null) || action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")){
+                identifier++;
+            }
         }
 
         param0 = rs2Item.slot;
-        if (action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")) {
-            identifier++;
-        }
         if (Rs2Bank.isOpen()) {
-            if (action.equalsIgnoreCase("eat")) {
+            if (action.equalsIgnoreCase("eat") || action.equalsIgnoreCase("fill")) {
                 identifier += 7;
             } else {
                 identifier += 6;
@@ -1662,6 +1744,15 @@ public class Rs2Inventory {
         isTrackingInventory = false;
         isInventoryChanged = false;
         return isInventoryChanged;
+    }
+
+    public static boolean dropEmptyVials() {
+        return dropAll("empty vial");
+    }
+
+    public static boolean isTradeable(int itemId) {
+        ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemId));
+        return itemComposition.isTradeable();
     }
 
 }

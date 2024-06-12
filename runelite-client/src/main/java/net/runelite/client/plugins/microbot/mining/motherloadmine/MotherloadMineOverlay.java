@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.mining.motherloadmine;
 
-import net.runelite.api.Skill;
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.mining.MiningScript;
-import net.runelite.client.plugins.natepainthelper.PaintFormat;
+import net.runelite.client.plugins.microbot.mining.AutoMiningScript;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -13,7 +10,6 @@ import javax.inject.Inject;
 import java.awt.*;
 
 import static net.runelite.client.plugins.microbot.mining.motherloadmine.MotherloadMineScript.status;
-import static net.runelite.client.plugins.natepainthelper.Info.*;
 
 
 public class MotherloadMineOverlay extends OverlayPanel {
@@ -29,7 +25,7 @@ public class MotherloadMineOverlay extends OverlayPanel {
             panelComponent.setPreferredLocation(new Point(80, 8));
             panelComponent.setPreferredSize(new Dimension(275, 700));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Pay-dirt mining v" + MiningScript.version)
+                    .text("Pay-dirt mining v" + AutoMiningScript.version)
                     .color(Color.GREEN)
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()

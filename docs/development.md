@@ -51,6 +51,7 @@ Everything that will help you make scripts is under the **util** folder
 ### [Rs2Walker](api/Rs2Walker.md)
 ### [Rs2MiniMap](api/Rs2MiniMap.md)
 ### [Rs2Widget](api/Rs2Widget.md)
+### [Rs2Tile](api/Rs2Tile.md)
 
 ---
 

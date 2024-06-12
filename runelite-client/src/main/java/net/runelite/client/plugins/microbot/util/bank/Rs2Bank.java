@@ -1,18 +1,23 @@
 package net.runelite.client.plugins.microbot.util.bank;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.loottracker.LootTrackerItem;
+import net.runelite.client.plugins.loottracker.LootTrackerRecord;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Predicates;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -22,6 +27,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -31,6 +37,7 @@ import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
 @SuppressWarnings("unused")
+@Slf4j
 public class Rs2Bank {
     public static List<Rs2Item> bankItems = new ArrayList<Rs2Item>();
     private static final int X_AMOUNT_VARBIT = 3960;
@@ -38,6 +45,8 @@ public class Rs2Bank {
     private static final int HANDLE_X_SET = 5;
     private static final int HANDLE_X_UNSET = 6;
     private static final int HANDLE_ALL = 7;
+    private static final int WITHDRAW_AS_NOTE_VARBIT = 3958;
+
 
     /**
      * Container describes from what interface the action happens
@@ -122,7 +131,6 @@ public class Rs2Bank {
     }
 
     /**
-     *
      * @param name
      * @param exact
      * @return
@@ -170,6 +178,14 @@ public class Rs2Bank {
      */
     public static boolean hasBankItem(String name, boolean exact) {
         return findBankItem(name, exact) != null;
+    }
+
+    //hasBankItem overload to check with id and amount
+    public static boolean hasBankItem(int id, int amount) {
+        Rs2Item rs2Item = findBankItem(id);
+        if (rs2Item == null) return false;
+        log.info("Item: " + rs2Item.name + " Amount: " + rs2Item.quantity);
+        return findBankItem(Objects.requireNonNull(rs2Item).name, false, amount) != null;
     }
 
     /**
@@ -358,14 +374,28 @@ public class Rs2Bank {
     }
 
     public static boolean depositAll(Predicate<Rs2Item> predicate) {
-        for (Rs2Item item :
-                Rs2Inventory.items().stream().filter(predicate).collect(Collectors.toList())) {
+        boolean result = false;
+        List<Rs2Item> items = Rs2Inventory.items().stream().filter(predicate).distinct().collect(Collectors.toList());
+        for (Rs2Item item : items) {
             if (item == null) continue;
             depositAll(item);
-            return true;
+            sleep(300, 600);
+            result = true;
         }
-        return false;
+        return result;
     }
+
+    // boolean to determine if we still have items to deposit
+    private static boolean isDepositing(Predicate<Rs2Item> filter) {
+        List<Rs2Item> itemsToDeposit = Rs2Inventory.all(filter)
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(Predicates.distinctByProperty(Rs2Item::getName))
+                .collect(Collectors.toList());
+
+        return !itemsToDeposit.isEmpty();
+    }
+
 
     /**
      * deposit all items identified by its name
@@ -404,14 +434,42 @@ public class Rs2Bank {
         sleepUntil(Rs2Inventory::isEmpty);
     }
 
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified IDs.
+     * This method uses a lambda function to filter out the items with the specified IDs from the deposit operation.
+     *
+     * @param ids The IDs of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
     public static boolean depositAllExcept(Integer... ids) {
         return depositAll(x -> Arrays.stream(ids).noneMatch(id -> id == x.id));
     }
 
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified names.
+     * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
+     *
+     * @param names The names of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
     public static boolean depositAllExcept(String... names) {
         return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
     }
 
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified names.
+     * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
+     * It also allows for a delay between deposit operations.
+     *
+     * @param names The names of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
+    public static boolean depositAllExcept(boolean exact,String... names) {
+        if(!exact)
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.contains(name.toLowerCase())));
+        else
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+    }
 
     /**
      * withdraw one item identified by its ItemWidget.
@@ -570,14 +628,16 @@ public class Rs2Bank {
      * withdraw all items identified by its ItemWidget.
      *
      * @param rs2Item Item to withdraw
+     * @return
      */
-    private static void withdrawAll(Rs2Item rs2Item) {
-        if (!isOpen()) return;
-        if (rs2Item == null) return;
-        if (Rs2Inventory.isFull()) return;
+    private static boolean withdrawAll(Rs2Item rs2Item) {
+        if (!isOpen()) return false;
+        if (rs2Item == null) return false;
+        if (Rs2Inventory.isFull()) return false;
         container = BANK_ITEM_CONTAINER;
 
         invokeMenu(HANDLE_ALL, rs2Item);
+        return true;
     }
 
     public static void withdrawAll(boolean checkInv, String name) {
@@ -586,9 +646,10 @@ public class Rs2Bank {
 
     /**
      * withdraw all items identified by its name.
+     *
      * @param checkInv check if item is already in inventory
-     * @param name item name
-     * @param exact name
+     * @param name     item name
+     * @param exact    name
      */
     public static void withdrawAll(boolean checkInv, String name, boolean exact) {
         if (checkInv && !Rs2Bank.hasItem(name, exact)) return;
@@ -597,7 +658,6 @@ public class Rs2Bank {
     }
 
     /**
-     *
      * @param name
      */
     public static void withdrawAll(String name) {
@@ -608,9 +668,10 @@ public class Rs2Bank {
      * withdraw all items identified by its id.
      *
      * @param id item id to search
+     * @return
      */
-    public static void withdrawAll(int id) {
-        withdrawAll(findBankItem(id));
+    public static boolean withdrawAll(int id) {
+        return withdrawAll(findBankItem(id));
     }
 
     /**
@@ -700,7 +761,7 @@ public class Rs2Bank {
     public static void withdrawAndEquip(String name) {
         if (Rs2Equipment.isWearing(name)) return;
         withdrawOne(name);
-        sleepUntil(() -> Rs2Inventory.hasItem(name), 1000);
+        sleepUntil(() -> Rs2Inventory.hasItem(name), 1800);
         wearItem(name);
     }
 
@@ -763,9 +824,8 @@ public class Rs2Bank {
             } else {
                 action = Rs2GameObject.interact(bank, "bank");
             }
-            sleepUntil(Rs2Bank::isOpen);
             if (action) {
-                sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 5000);
+                sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 2500);
                 sleep(600, 1000);
             }
             return action;
@@ -940,6 +1000,31 @@ public class Rs2Bank {
         Rs2Walker.walkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
     }
+    //Distance to bank
+    public static boolean isNearBank(int distance) {
+        BankLocation bankLocation = getNearestBank();
+        int distanceToBank = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(bankLocation.getWorldPoint());
+        return distanceToBank <= distance;
+    }
+
+    /**
+     * Walk to the closest bank
+     *
+     * @return true if player location is less than 4 tiles away from the bank location
+     */
+    public static boolean walkToBankAndUseBank() {
+        if (Rs2Bank.isOpen()) return true;
+        Rs2Player.toggleRunEnergy(true);
+        BankLocation bankLocation = getNearestBank();
+        Microbot.status = "Walking to nearest bank " + bankLocation.toString();
+        boolean result = bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
+        if (result) {
+            return Rs2Bank.useBank();
+        } else {
+            Rs2Walker.walkTo(bankLocation.getWorldPoint());
+        }
+        return false;
+    }
 
     /**
      * Use bank or chest
@@ -972,5 +1057,60 @@ public class Rs2Bank {
             return true;
         }
         return false;
+    }
+
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
+        if (Rs2Inventory.isFull()) {
+            boolean isBankOpen = Rs2Bank.walkToBankAndUseBank();
+            if (isBankOpen) {
+                for (String itemName : itemNames) {
+                    Rs2Bank.depositAll(x -> x.name.toLowerCase().contains(itemName));
+                }
+            }
+            return false;
+        }
+
+        final int distance = 4;
+
+        if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > 10) {
+            Rs2Walker.walkTo(initialPlayerLocation, distance);
+        }
+
+        return !Rs2Inventory.isFull() && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
+    }
+
+    public static boolean hasWithdrawAsNote() {
+        return Microbot.getVarbitValue(WITHDRAW_AS_NOTE_VARBIT) == 1;
+    }
+
+    public static boolean setWithdrawAsNote() {
+        if (hasWithdrawAsNote()) return true;
+        Rs2Widget.clickWidget(786456);
+        sleep(600);
+        return hasWithdrawAsNote();
+    }
+
+    public static boolean withdrawLootItems(String npcName) {
+        boolean isAtGe = Rs2GrandExchange.walkToGrandExchange();
+        if (isAtGe) {
+            boolean isBankOpen = Rs2Bank.useBank();
+            if (!isBankOpen) return false;
+        }
+        Rs2Bank.depositAll();
+        boolean itemFound = false;
+
+        boolean hasWithdrawAsNote = Rs2Bank.setWithdrawAsNote();
+        if (!hasWithdrawAsNote) return false;
+        for (LootTrackerRecord lootTrackerRecord : Microbot.getAggregateLootRecords()) {
+            if (!lootTrackerRecord.getTitle().equalsIgnoreCase(npcName)) continue;
+            for (LootTrackerItem lootTrackerItem : lootTrackerRecord.getItems()) {
+                if (!Rs2Inventory.isTradeable(lootTrackerItem.getId())) continue;
+                boolean didWithdraw = Rs2Bank.withdrawAll(lootTrackerItem.getId());
+                if (!didWithdraw) continue;
+                itemFound = true;
+            }
+        }
+        Rs2Bank.closeBank();
+        return itemFound;
     }
 }

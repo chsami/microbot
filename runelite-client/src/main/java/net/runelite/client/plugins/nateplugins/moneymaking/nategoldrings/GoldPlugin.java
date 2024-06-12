@@ -16,8 +16,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.natepainthelper.Info.*;
-
 @PluginDescriptor(
         name = PluginDescriptor.Nate +"Gold Ring Maker",
         description = "Nate's Gold Ring Maker",
@@ -56,9 +54,6 @@ public class GoldPlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        expstarted = Microbot.getClient().getSkillExperience(Skill.CRAFTING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.CRAFTING);
-        timeBegan = System.currentTimeMillis();
         if (overlayManager != null) {
             overlayManager.add(goldOverlay);
         }

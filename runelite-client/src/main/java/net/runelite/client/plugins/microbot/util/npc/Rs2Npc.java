@@ -227,11 +227,6 @@ public class Rs2Npc {
     }
 
     public static boolean attack(NPC npc) {
-        return interact(npc, "attack");
-    }
-
-    public static boolean attack(int npcId) {
-        NPC npc = getNpc(npcId);
         if (npc == null) return false;
         if (!hasLineOfSight(npc)) return false;
         if (Rs2Combat.inCombat()) return false;
@@ -239,6 +234,11 @@ public class Rs2Npc {
             return false;
 
         return interact(npc, "attack");
+    }
+
+    public static boolean attack(int npcId) {
+        NPC npc = getNpc(npcId);
+        return attack(npc);
     }
 
     public static boolean attack(String npcName) {
@@ -305,5 +305,26 @@ public class Rs2Npc {
      */
     public static List<NPC> getNpcsAttackingPlayer(Player player) {
         return getNpcs().filter(x -> x.getInteracting() != null && x.getInteracting() == player).collect(Collectors.toList());
+    }
+
+    /**
+     * gets list of npcs within line of sight for a player by name
+     * @param name of the npc
+     * @return list of npcs
+     */
+    public static List<NPC> getNpcsInLineOfSight(String name) {
+        return getNpcs().filter(npc -> hasLineOfSight(npc) && npc.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
+    }
+
+    /**
+     * gets the npc within line of sight for a player by name
+     * @param name of the npc
+     * @return npc
+     */
+    public static NPC getNpcInLineOfSight(String name) {
+        List<NPC> npcsInLineOfSight = getNpcsInLineOfSight(name);
+        if (npcsInLineOfSight.isEmpty()) return null;
+
+        return npcsInLineOfSight.get(0);
     }
 }

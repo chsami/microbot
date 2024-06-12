@@ -48,7 +48,7 @@ public class Rs2Walker {
     }
 
     public static boolean walkTo(WorldPoint target, int distance) {
-        if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
+        if (Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
             return true;
         }
         if (currentTarget != null && currentTarget.equals(target) && ShortestPathPlugin.getMarker() != null && !Microbot.getClientThread().scheduledFuture.isDone())
@@ -129,9 +129,13 @@ public class Rs2Walker {
                             Rs2Walker.walkFastCanvas(currentWorldPoint);
                             sleep(600, 1000);
                         } else {
+                            long movingStart = System.currentTimeMillis();
                             Rs2Walker.walkMiniMap(currentWorldPoint);
                             int randomInt = Random.random(3, 5);
                             sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < randomInt, 100, 2000);
+                            if(System.currentTimeMillis()-movingStart<120){
+                                sleep(600, 1000);
+                            }
                             break;
                         }
                         //avoid tree attacking you in draynor
@@ -139,7 +143,7 @@ public class Rs2Walker {
                     }
                 }
 
-                if (Rs2Player.getWorldLocation().distanceTo(target) < 10) {
+                if (Rs2Player.getWorldLocation().distanceTo(target) < distance || Rs2Player.getWorldLocation().distanceTo(target) == 1) {
                     System.out.println("walk minimap");
                     Rs2Walker.walkMiniMap(target);
                     sleep(600, 1200);
@@ -229,8 +233,8 @@ public class Rs2Walker {
         pathfindingExecutor.submit(pathfinder);
         sleepUntil(pathfinder::isDone);
         if (pathfinder.getPath().get(pathfinder.getPath().size() - 1).getPlane() != worldPoint.getPlane()) return false;
-        WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 1, 1);
-        WorldArea objectArea = new WorldArea(worldPoint, 1, 1);
+        WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 2, 2);
+        WorldArea objectArea = new WorldArea(worldPoint, 2, 2);
         boolean result = pathArea
                 .intersectsWith2D(objectArea);
         return result;
@@ -281,7 +285,7 @@ public class Rs2Walker {
             }
         }
 
-        if (wallObject != null && Rs2Camera.isTileOnScreen(wallObject)) {
+        if (wallObject != null) {
             Rs2GameObject.interact(wallObject);
             Rs2Player.waitForWalking();
             return true;
@@ -555,7 +559,7 @@ public class Rs2Walker {
 
                             GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
 
-                            if (gameObject != null && gameObject.getId() == b.getObjectId() && Rs2Camera.isTileOnScreen(gameObject)) {
+                            if (gameObject != null && gameObject.getId() == b.getObjectId()) {
                                 if (Rs2GameObject.hasLineOfSight(gameObject)) {
                                     Rs2GameObject.interact(gameObject, b.getAction());
                                     sleep(1200, 1600);
@@ -616,6 +620,33 @@ public class Rs2Walker {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Checks if the player's current location is within the specified area defined by the given world points.
+     *
+     * @param worldPoints an array of two world points of the NW and SE corners of the area
+     * @return true if the player's current location is within the specified area, false otherwise
+     */
+    public static boolean isInArea(WorldPoint... worldPoints) {
+        WorldPoint playerLocation = Rs2Player.getWorldLocation();
+        return  playerLocation.getX() <= worldPoints[0].getX() &&   // NW corner x
+                playerLocation.getY() >= worldPoints[0].getY() &&   // NW corner y
+                playerLocation.getX() >= worldPoints[1].getX() &&   // SE corner x
+                playerLocation.getY() <= worldPoints[1].getY();     // SE corner Y
+               // draws box from 2 points to check against all variations of player X,Y from said points.
+    }
+    /**
+     * Checks if the player's current location is within the specified range from the given center point.
+     *
+     * @param centerOfArea a WorldPoint which is the center of the desired area,
+     * @param range an int of range to which the boundaries will be drawn in a square,
+     * @return true if the player's current location is within the specified area, false otherwise
+     */
+    public static boolean isInArea(WorldPoint centerOfArea, int range) {
+        WorldPoint nwCorner = new WorldPoint(centerOfArea.getX() + range + range, centerOfArea.getY() - range, centerOfArea.getPlane());
+        WorldPoint seCorner = new WorldPoint(centerOfArea.getX() - range - range, centerOfArea.getY() + range, centerOfArea.getPlane());
+        return isInArea(nwCorner, seCorner); // call to our sibling
     }
 
     public static boolean isNear() {

@@ -157,7 +157,6 @@ public class Rs2Equipment {
         }
     }
 
-
     public static boolean hasGuthanWeaponEquiped() {
         return isEquipped("guthan's warspear", EquipmentInventorySlot.WEAPON);
     }
@@ -203,6 +202,20 @@ public class Rs2Equipment {
         return false;
     }
 
+    public static boolean isWearing(List<String> names, boolean exact, List<EquipmentInventorySlot> ignoreSlots) {
+        for (String name : names) {
+            for (EquipmentInventorySlot slot : EquipmentInventorySlot.values()) {
+                if (ignoreSlots.stream().anyMatch(x -> x.getSlotIdx() == slot.getSlotIdx()))
+                    continue;
+                if (!isEquipped(name, slot, exact)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public static boolean interact(int id, String action) {
         Rs2Item item = get(id);
         if (item != null) {
@@ -234,6 +247,10 @@ public class Rs2Equipment {
             return true;
         }
         return false;
+    }
+
+    public static boolean isWearingShield() {
+        return equipmentItems.stream().anyMatch(x -> x.getSlot() == EquipmentInventorySlot.SHIELD.getSlotIdx());
     }
 
     private static void invokeMenu(Rs2Item rs2Item, String action) {
