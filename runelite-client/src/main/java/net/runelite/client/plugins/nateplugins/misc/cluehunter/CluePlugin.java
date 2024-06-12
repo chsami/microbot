@@ -15,8 +15,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.natepainthelper.Info.*;
-
 
 @PluginDescriptor(
         name = PluginDescriptor.Nate +"Cluehunter",
@@ -56,7 +54,6 @@ public class CluePlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        timeBegan = System.currentTimeMillis();
         if (overlayManager != null) {
             overlayManager.add(clueOverlay);
         }

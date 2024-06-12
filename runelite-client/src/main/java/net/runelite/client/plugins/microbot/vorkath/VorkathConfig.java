@@ -20,43 +20,23 @@ public interface VorkathConfig extends Config {
     }
 
     @ConfigSection(
-            name = "Potions",
-            description = "Potions",
-            position = 1,
-            closedByDefault = false
-    )
-    String potionSection = "potions";
-
-
-    @ConfigSection(
-            name = "Equipment",
-            description = "Equipment",
-            position = 2,
-            closedByDefault = false
-    )
-    String equipmentSection = "Equipment";
-
-    @ConfigSection(
             name = "Loot",
             description = "Loot",
-            position = 3,
-            closedByDefault = false
+            position = 3
     )
     String lootSection = "Loot";
 
     @ConfigSection(
             name = "Teleports",
             description = "Teleports",
-            position = 4,
-            closedByDefault = false
+            position = 4
     )
     String teleportSection = "Teleports";
 
     @ConfigSection(
             name = "Prayers",
             description = "Prayers",
-            position = 5,
-            closedByDefault = false
+            position = 5
     )
     String prayerSection = "Prayers";
 
@@ -71,43 +51,6 @@ public interface VorkathConfig extends Config {
     {
         return Teleport.VARROCK_TAB;
     }
-    @ConfigItem(
-            keyName = "rangePotion",
-            name = "Ranging Potion",
-            description = "What Ranging potion to use?",
-            position = 1,
-            section = potionSection
-    )
-    default RANGE_POTION rangePotion() { return RANGE_POTION.DIVINE_RANGING_POTION; }
-    @ConfigItem(
-            keyName = "prayerPotion",
-            name = "Prayer Potion",
-            description = "What Prayer potion to use?",
-            position = 2,
-            section = potionSection
-    )
-    default PRAYER_POTION prayerPotion() { return PRAYER_POTION.PRAYER; }
-    @ConfigItem(
-            keyName = "crossbow",
-            name = "Crossbow",
-            description = "Choose your crossbow",
-            position = 1,
-            section = equipmentSection
-    )
-    default CROSSBOW CROSSBOW() {
-        return CROSSBOW.DRAGON_HUNTER_CROSSBOW;
-    }
-    @ConfigItem(
-            keyName = "Secondary bolt",
-            name = "Secondary Bolts",
-            description = "Secondary Bolts to Equip when vorkath is lower health",
-            position = 2,
-            section = equipmentSection
-    )
-    default String secondaryBolts()
-    {
-        return "diamond dragon bolts (e)";
-    }
 
     @ConfigItem(
             keyName = "Price of items to loot",
@@ -119,6 +62,18 @@ public interface VorkathConfig extends Config {
     default int priceOfItemsToLoot()
     {
         return 5000;
+    }
+
+    @ConfigItem(
+            keyName = "SellItemsAtXKills",
+            name = "Sell items every X kills",
+            description = "Sell items every X kills",
+            position = 1,
+            section = lootSection
+    )
+    default int SellItemsAtXKills()
+    {
+        return 15;
     }
 
     @ConfigItem(

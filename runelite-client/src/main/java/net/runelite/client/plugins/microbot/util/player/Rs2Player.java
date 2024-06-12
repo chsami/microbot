@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.util.player;
 
-import net.runelite.api.Player;
-import net.runelite.api.Skill;
-import net.runelite.api.VarPlayer;
-import net.runelite.api.Varbits;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
@@ -13,12 +10,15 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.VarbitValues;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -285,5 +285,28 @@ public class Rs2Player {
 
     public static boolean hasPrayerPoints() {
         return Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) > 0;
+    }
+
+    public static boolean isStandingOnGameObject() {
+        WorldPoint playerPoint = getWorldLocation();
+        return Rs2GameObject.getGameObject(playerPoint) != null && Rs2GroundItem.getAllAt(getWorldLocation().getX(), getWorldLocation().getY()) != null;
+    }
+
+    public static boolean isStandingOnGroundItem() {
+        WorldPoint playerPoint = getWorldLocation();
+        return Arrays.stream(Rs2GroundItem.getAllAt(playerPoint.getX(), playerPoint.getY())).findAny().isPresent();
+    }
+
+    public static int getAnimation() {
+        return Microbot.getClient().getLocalPlayer().getAnimation();
+    }
+
+    public static int getPoseAnimation() {
+        return Microbot.getClient().getLocalPlayer().getPoseAnimation();
+    }
+
+    public static QuestState getQuestState(Quest quest) {
+        Client client = Microbot.getClient();
+        return Microbot.getClientThread().runOnClientThread(() -> quest.getState(client));
     }
 }

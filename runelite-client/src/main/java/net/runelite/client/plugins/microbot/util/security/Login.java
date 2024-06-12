@@ -51,7 +51,7 @@ public class Login {
         try {
             Microbot.getClient().setPassword(Encryption.decrypt(password));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("no password has been set in the profile");
         }
         sleep(300);
         Rs2Keyboard.keyPress(KeyEvent.VK_ENTER);

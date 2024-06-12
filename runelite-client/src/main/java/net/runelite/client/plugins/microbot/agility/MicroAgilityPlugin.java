@@ -51,8 +51,8 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.draynorCourse.add(new AgilityObstacleModel(TIGHTROPE));
         agilityScript.draynorCourse.add(new AgilityObstacleModel(TIGHTROPE_11406));
         agilityScript.draynorCourse.add(new AgilityObstacleModel(NARROW_WALL));
-        agilityScript.draynorCourse.add(new AgilityObstacleModel(WALL_11630, -1, 3256, Operation.GREATER, Operation.GREATER));
-        agilityScript.draynorCourse.add(new AgilityObstacleModel(GAP_11631, -1, 3256, Operation.GREATER, Operation.LESS));
+        agilityScript.draynorCourse.add(new AgilityObstacleModel(WALL_11630, -1, 3256, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.draynorCourse.add(new AgilityObstacleModel(GAP_11631, -1, 3256, Operation.GREATER, Operation.LESS_EQUAL));
         agilityScript.draynorCourse.add(new AgilityObstacleModel(CRATE_11632));
 
         // Al Kharid
@@ -72,8 +72,8 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.varrockCourse.add(new AgilityObstacleModel(WALL_14832));
         agilityScript.varrockCourse.add(new AgilityObstacleModel(GAP_14833)); // this obstacle doesn't always work for some reason
         agilityScript.varrockCourse.add(new AgilityObstacleModel(GAP_14834));
-        agilityScript.varrockCourse.add(new AgilityObstacleModel(GAP_14835, -1, 3402, Operation.GREATER, Operation.LESS));
-        agilityScript.varrockCourse.add(new AgilityObstacleModel(LEDGE_14836, -1, 3408, Operation.GREATER, Operation.LESS));
+        agilityScript.varrockCourse.add(new AgilityObstacleModel(GAP_14835, -1, 3402, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.varrockCourse.add(new AgilityObstacleModel(LEDGE_14836, -1, 3408, Operation.GREATER, Operation.LESS_EQUAL));
         agilityScript.varrockCourse.add(new AgilityObstacleModel(EDGE));
 
         //gnome stronghold
@@ -100,14 +100,14 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.faladorCourse.add(new AgilityObstacleModel(ROUGH_WALL_14898));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(TIGHTROPE_14899));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(HAND_HOLDS_14901));
-        agilityScript.faladorCourse.add(new AgilityObstacleModel(GAP_14903, -1, 3358, Operation.GREATER, Operation.LESS));
+        agilityScript.faladorCourse.add(new AgilityObstacleModel(GAP_14903, -1, 3358, Operation.GREATER, Operation.LESS_EQUAL));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(GAP_14904));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(TIGHTROPE_14905));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(TIGHTROPE_14911));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(GAP_14919));
-        agilityScript.faladorCourse.add(new AgilityObstacleModel(LEDGE_14920, 3016, -1, Operation.GREATER, Operation.GREATER));
-        agilityScript.faladorCourse.add(new AgilityObstacleModel(LEDGE_14921, -1, 3343, Operation.GREATER, Operation.GREATER));
-        agilityScript.faladorCourse.add(new AgilityObstacleModel(LEDGE_14922, -1, 3335, Operation.GREATER, Operation.GREATER));
+        agilityScript.faladorCourse.add(new AgilityObstacleModel(LEDGE_14920, 3016, -1, Operation.GREATER_EQUAL, Operation.GREATER));
+        agilityScript.faladorCourse.add(new AgilityObstacleModel(LEDGE_14921, -1, 3343, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.faladorCourse.add(new AgilityObstacleModel(LEDGE_14922, -1, 3335, Operation.GREATER, Operation.GREATER_EQUAL));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(LEDGE_14924, 3017, -1, Operation.LESS, Operation.GREATER));
         agilityScript.faladorCourse.add(new AgilityObstacleModel(EDGE_14925));
 
@@ -121,13 +121,13 @@ public class MicroAgilityPlugin extends Plugin {
 
         // Pollnivneach
         agilityScript.polnivCourse.add(new AgilityObstacleModel(BASKET_14935));
-        agilityScript.polnivCourse.add(new AgilityObstacleModel(MARKET_STALL_14936, -1, 2969, Operation.GREATER, Operation.LESS));
+        agilityScript.polnivCourse.add(new AgilityObstacleModel(MARKET_STALL_14936, -1, 2969, Operation.GREATER, Operation.LESS_EQUAL));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(BANNER_14937));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(GAP_14938));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14939));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(ROUGH_WALL_14940));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(MONKEYBARS));
-        agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14944, -1, 2996, Operation.GREATER, Operation.LESS));
+        agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14944, -1, 2996, Operation.GREATER, Operation.LESS_EQUAL));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(DRYING_LINE));
 
         agilityScript.run(config);

@@ -101,6 +101,8 @@ public class PlayerAssistPlugin extends Plugin {
         buryScatterScript.run(config);
         attackStyleScript.run(config);
         bankerScript.run(config);
+        Microbot.getSpecialAttackConfigs()
+                .setSpecialAttack(true);
     }
 
     protected void shutDown() {
@@ -231,7 +233,7 @@ public class PlayerAssistPlugin extends Plugin {
             //Rs2Prayer.disableAllPrayers();
             if(config.toggleQuickPrayFlick())
                 Rs2Prayer.toggleQuickPrayer(false);
-            flickerScript.resetLastAttack(true);
+            flickerScript.resetLastAttack();
 
         }
     }

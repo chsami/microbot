@@ -5,8 +5,8 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -18,13 +18,12 @@ import java.awt.event.KeyEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 
 public abstract class Script implements IScript {
 
-    protected ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(100);
+    protected ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     protected ScheduledFuture<?> scheduledFuture;
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
@@ -53,19 +52,6 @@ public abstract class Script implements IScript {
             System.out.println(e.getMessage());
         }
     }
-
-    public ScheduledFuture<?> keepExecuteUntil(Runnable callback, BooleanSupplier awaitedCondition, int time) {
-        scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (awaitedCondition.getAsBoolean()) {
-                scheduledFuture.cancel(true);
-                scheduledFuture = null;
-                return;
-            }
-            callback.run();
-        }, 0, time, TimeUnit.MILLISECONDS);
-        return scheduledFuture;
-    }
-
     public boolean sleepUntil(BooleanSupplier awaitedCondition) {
         return sleepUntil(awaitedCondition, 5000);
     }
@@ -96,16 +82,18 @@ public abstract class Script implements IScript {
     public void shutdown() {
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
             mainScheduledFuture.cancel(true);
-            Microbot.pauseAllScripts = false;
             ShortestPathPlugin.exit();
             if (Microbot.getClientThread().scheduledFuture != null)
                 Microbot.getClientThread().scheduledFuture.cancel(true);
             initialPlayerLocation = null;
+            Microbot.pauseAllScripts = false;
+            Microbot.getSpecialAttackConfigs().reset();
         }
     }
 
     public boolean run() {
         hasLeveledUp = false;
+        Microbot.getSpecialAttackConfigs().useSpecWeapon();
         if (Microbot.enableAutoRunOn)
             Rs2Player.toggleRunEnergy(true);
 
@@ -124,11 +112,6 @@ public abstract class Script implements IScript {
 
         if (!hasRunEnergy && useStaminaPotsIfNeeded) {
             Rs2Inventory.interact("Stamina potion", "drink");
-        }
-
-        if (Microbot.isLoggedIn()) {
-            if (initialPlayerLocation == null)
-                initialPlayerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
         }
 
         return true;

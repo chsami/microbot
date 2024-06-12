@@ -170,22 +170,13 @@ public class FlickerScript extends Script {
      * This method is responsible for resetting the last attack of each NPC.
      * It also handles the addition and removal of monsters from the list of monsters attacking the player.
      */
-
     public void resetLastAttack() {
-        resetLastAttack(false);
-    }
-
-    public void resetLastAttack(boolean forceReset) {
 
         for (NPC npc : npcs) {
             Monster currentMonster = currentMonstersAttackingUs.stream().filter(x -> x.npc.getIndex() == npc.getIndex()).findFirst().orElse(null);
             AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(Rs2NpcManager.getAttackStyle(npc.getId()));
 
             if (currentMonster != null) {
-                if (forceReset) {
-                    currentMonster.lastAttack = currentMonster.rs2NpcStats.getAttackSpeed();
-                    log.info("Force reset");
-                }
                 if (!npc.isDead() && currentMonster.lastAttack <= 0)
                     currentMonster.lastAttack = currentMonster.rs2NpcStats.getAttackSpeed();
                 if (currentMonster.lastAttack <= -currentMonster.rs2NpcStats.getAttackSpeed() / 2){

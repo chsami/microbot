@@ -110,6 +110,7 @@ public class AgilityScript extends Script {
                 if (!super.run()) return;
                 if (startCourse == null) {
                     Microbot.showMessage("Agility course: " + config.agilityCourse().name() + " is not supported.");
+                    sleep(10000);
                     return;
                 }
 
@@ -123,8 +124,8 @@ public class AgilityScript extends Script {
                     sleep(random(config.pauseMinTime(), config.pauseMaxTime()));
                 }
 
-                if (Microbot.isMoving()) return;
-                if (Microbot.isAnimating()) return;
+                if (Rs2Player.isMoving()) return;
+                if (Rs2Player.isAnimating()) return;
 
                 if (currentObstacle >= getCurrentCourse(config).size()) {
                     currentObstacle = 0;
@@ -133,7 +134,7 @@ public class AgilityScript extends Script {
                 if (Microbot.getClient().getTopLevelWorldView().getPlane() == 0 && playerWorldLocation.distanceTo(startCourse) > 6 && config.agilityCourse() != GNOME_STRONGHOLD_AGILITY_COURSE) {
                     currentObstacle = 0;
                     LocalPoint startCourseLocal = LocalPoint.fromWorld(Microbot.getClient(), startCourse);
-                    if (playerLocation.distanceTo(startCourseLocal) >= MAX_DISTANCE) {
+                    if (startCourseLocal == null || playerLocation.distanceTo(startCourseLocal) >= MAX_DISTANCE) {
                         if (config.alchemy()) {
                             Rs2Magic.alch(config.item(), 50, 100);
                         }
@@ -183,6 +184,7 @@ public class AgilityScript extends Script {
 
                         if (gameObject == null) {
                             System.out.println("NO agility obstacle found.");
+                            return;
                         }
 
                         if (config.alchemy()) {

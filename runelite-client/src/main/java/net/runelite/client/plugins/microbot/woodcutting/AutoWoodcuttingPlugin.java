@@ -2,25 +2,24 @@ package net.runelite.client.plugins.microbot.woodcutting;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import net.runelite.api.Skill;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.accountselector.AutoLoginConfig;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
 
-import static net.runelite.client.plugins.natepainthelper.Info.*;
-
 @PluginDescriptor(
-        name = PluginDescriptor.Mocrosoft + "Woodcutting",
+        name = PluginDescriptor.Mocrosoft + "Auto Woodcutting",
         description = "Microbot woodcutting plugin",
         tags = {"Woodcutting", "microbot", "skilling"},
         enabledByDefault = false
@@ -57,9 +56,6 @@ public class AutoWoodcuttingPlugin extends Plugin {
         Microbot.setClientThread(clientThread);
         Microbot.setNotifier(notifier);
         Microbot.setMouse(new VirtualMouse());
-        expstarted = Microbot.getClient().getSkillExperience(Skill.WOODCUTTING);
-        startinglevel = Microbot.getClient().getRealSkillLevel(Skill.WOODCUTTING);
-        timeBegan = System.currentTimeMillis();
         if (overlayManager != null) {
             overlayManager.add(woodcuttingOverlay);
         }
@@ -69,5 +65,12 @@ public class AutoWoodcuttingPlugin extends Plugin {
     protected void shutDown() {
         autoWoodcuttingScript.shutdown();
         overlayManager.remove(woodcuttingOverlay);
+    }
+
+    @Subscribe
+    public void onChatMessage(ChatMessage chatMessage) {
+        if (chatMessage.getType() == ChatMessageType.GAMEMESSAGE && chatMessage.getMessage().contains("you can't light a fire here.")) {
+            autoWoodcuttingScript.cannotLightFire = true;
+        }
     }
 }
