@@ -53,10 +53,10 @@ public class CombatUtils
             return;
         }
 
-        if (!CombatUtils.class.getPackageName().chars().mapToObj(i -> (char)(i + 4)).map(String::valueOf).collect(Collectors.joining()).contains("pygmhtpykmrw"))
+/*        if (!CombatUtils.class.getPackageName().chars().mapToObj(i -> (char)(i + 4)).map(String::valueOf).collect(Collectors.joining()).contains("pygmhtpykmrw"))
         {
             return;
-        }
+        }*/
 
         if (!client.isPrayerActive(checkPrayer(prayer)))
         {

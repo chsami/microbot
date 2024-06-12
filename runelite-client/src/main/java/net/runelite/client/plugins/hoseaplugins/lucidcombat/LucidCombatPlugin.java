@@ -1,18 +1,15 @@
 package net.runelite.client.plugins.hoseaplugins.lucidcombat;
 
-import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.Collections.ETileItem;
-import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.EthanApiPlugin;
-import net.runelite.client.plugins.hoseaplugins.ethanapi.Packets.MousePackets;
 import com.google.inject.Provides;
-import net.runelite.client.plugins.hoseaplugins.api.item.SlottedItem;
-import net.runelite.client.plugins.hoseaplugins.api.spells.Runes;
-import net.runelite.client.plugins.hoseaplugins.api.spells.WidgetInfo;
-import net.runelite.client.plugins.hoseaplugins.api.utils.*;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.*;
+import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.MenuOpened;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -23,16 +20,21 @@ import net.runelite.client.input.KeyListener;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.hoseaplugins.api.item.SlottedItem;
+import net.runelite.client.plugins.hoseaplugins.api.spells.Runes;
+import net.runelite.client.plugins.hoseaplugins.api.spells.WidgetInfo;
+import net.runelite.client.plugins.hoseaplugins.api.utils.*;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.Collections.ETileItem;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.EthanApiPlugin;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.Packets.MousePackets;
 import net.runelite.client.ui.overlay.OverlayManager;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -1140,10 +1142,10 @@ public class LucidCombatPlugin extends Plugin implements KeyListener
 
     private boolean waitingForFinisher()
     {
-        if (!getName().chars().mapToObj(i -> (char)(i + 3)).map(String::valueOf).collect(Collectors.joining()).contains("Oxflg"))
+/*        if (!getName().chars().mapToObj(i -> (char)(i + 3)).map(String::valueOf).collect(Collectors.joining()).contains("Oxflg"))
         {
             return true;
-        }
+        }*/
 
         if (client.getLocalPlayer().getInteracting() == null || client.getLocalPlayer().getInteracting().getName() == null)
         {
