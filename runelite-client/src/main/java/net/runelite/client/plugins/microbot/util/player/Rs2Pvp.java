@@ -1,4 +1,5 @@
-package net.runelite.client.plugins.microbot.util.player;/*
+package net.runelite.client.plugins.microbot.util.player;
+/*
  * Copyright (c) 2019, PKLite
  * Copyright (c) 2020, ThatGamerBlue <thatgamerblue@gmail.com>
  * All rights reserved.
