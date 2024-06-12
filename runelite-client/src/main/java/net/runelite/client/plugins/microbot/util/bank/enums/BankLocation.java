@@ -2,10 +2,13 @@ package net.runelite.client.plugins.microbot.util.bank.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.runelite.api.Quest;
+import net.runelite.api.QuestState;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 @Getter
 @RequiredArgsConstructor
@@ -97,6 +100,8 @@ public enum BankLocation {
             if (hasLineOfSight) return true;
             return Microbot.getClient().getRealSkillLevel(Skill.CRAFTING) >= 40
                     && (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron"));
+        } else if (this == LUMBRIDGE_BASEMENT) {
+            return Rs2Player.getQuestState(Quest.RECIPE_FOR_DISASTER__ANOTHER_COOKS_QUEST) == QuestState.FINISHED;
         }
         return true;
     }
