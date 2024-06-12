@@ -367,7 +367,7 @@ public class EthanApiPlugin extends Plugin {
         return null;
     }
 
-    public int getFirstFreeSlot(WidgetInfo container) {
+    public static int getFirstFreeSlot(WidgetInfo container) {
         Widget[] items = client.getWidget(container).getDynamicChildren();
         for (int i = 0; i < items.length; i++) {
             if (items[i].getItemId() == 6512) {
@@ -378,7 +378,7 @@ public class EthanApiPlugin extends Plugin {
     }
 
     @Deprecated
-    public int getEmptySlots(WidgetInfo widgetInfo) {
+    public static int getEmptySlots(WidgetInfo widgetInfo) {
         List<Widget> inventoryItems = Arrays.asList(client.getWidget(widgetInfo.getId()).getDynamicChildren());
         return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
     }
@@ -389,7 +389,7 @@ public class EthanApiPlugin extends Plugin {
     }
 
     @Deprecated
-    public TileObject findObject(String objectName) {
+    public static TileObject findObject(String objectName) {
         ArrayList<TileObject> validObjects = new ArrayList<>();
         for (Tile[][] tile : client.getScene().getTiles()) {
             for (Tile[] tiles : tile) {
@@ -451,7 +451,7 @@ public class EthanApiPlugin extends Plugin {
     }
 
     @Deprecated
-    public TileObject findObject(int id) {
+    public static TileObject findObject(int id) {
         ArrayList<TileObject> validObjects = new ArrayList<>();
         Arrays.stream(client.getScene().getTiles()).flatMap(Arrays::stream).flatMap(Arrays::stream).filter(Objects::nonNull).filter(tile -> tile.getGameObjects() != null && tile.getGameObjects().length != 0).forEach(tile ->
         {
@@ -465,7 +465,7 @@ public class EthanApiPlugin extends Plugin {
     }
 
     @Deprecated
-    public Widget getItemFromList(int[] list, WidgetInfo container) {
+    public static Widget getItemFromList(int[] list, WidgetInfo container) {
         for (int i : list) {
             Widget item = getItem(i, container);
             if (item != null) {
@@ -476,7 +476,7 @@ public class EthanApiPlugin extends Plugin {
     }
 
     @Deprecated
-    public int checkIfWearing(int[] ids) {
+    public static int checkIfWearing(int[] ids) {
 
         if (client.getItemContainer(InventoryID.EQUIPMENT) != null) {
             Item[] equipment = client.getItemContainer(InventoryID.EQUIPMENT).getItems();
