@@ -24,37 +24,13 @@
  */
 package net.runelite.client.plugins.hoseaplugins.inferno;
 
-import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.EthanApiPlugin;
 import com.google.inject.Provides;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-
-import net.runelite.client.plugins.hoseaplugins.api.Weapon;
-import net.runelite.client.plugins.hoseaplugins.api.WeaponType;
-import net.runelite.client.plugins.hoseaplugins.api.utils.CombatUtils;
-import net.runelite.client.plugins.hoseaplugins.api.utils.EquipmentUtils;
-import net.runelite.client.plugins.hoseaplugins.api.utils.MessageUtils;
-import net.runelite.client.plugins.hoseaplugins.api.utils.NpcUtils;
-import net.runelite.client.plugins.hoseaplugins.inferno.displaymodes.InfernoPrayerDisplayMode;
-import net.runelite.client.plugins.hoseaplugins.inferno.displaymodes.InfernoSafespotDisplayMode;
-import net.runelite.client.plugins.hoseaplugins.inferno.displaymodes.InfernoWaveDisplayMode;
-import net.runelite.client.plugins.hoseaplugins.inferno.displaymodes.InfernoZukShieldDisplayMode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.AnimationChanged;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.NpcDespawned;
-import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -62,13 +38,29 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.hoseaplugins.api.Weapon;
+import net.runelite.client.plugins.hoseaplugins.api.utils.CombatUtils;
+import net.runelite.client.plugins.hoseaplugins.api.utils.EquipmentUtils;
+import net.runelite.client.plugins.hoseaplugins.api.utils.MessageUtils;
+import net.runelite.client.plugins.hoseaplugins.api.utils.NpcUtils;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.EthanApiPlugin.EthanApiPlugin;
+import net.runelite.client.plugins.hoseaplugins.inferno.displaymodes.InfernoPrayerDisplayMode;
+import net.runelite.client.plugins.hoseaplugins.inferno.displaymodes.InfernoSafespotDisplayMode;
+import net.runelite.client.plugins.hoseaplugins.inferno.displaymodes.InfernoWaveDisplayMode;
+import net.runelite.client.plugins.hoseaplugins.inferno.displaymodes.InfernoZukShieldDisplayMode;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import org.apache.commons.lang3.ArrayUtils;
-import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @PluginDescriptor(
-	name = "<html><font color=\"#32CD32\">xKylee </font>Inferno+</html>",
+	name = PluginDescriptor.xKylee + "Inferno+</html>",
 	enabledByDefault = false,
 	description = "Inferno helper",
 	tags = {"combat", "overlay", "pve", "pvm"}

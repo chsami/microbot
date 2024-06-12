@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@PluginDescriptor(name = "<html><font color=\"#32CD32\">Lucid </font>Scurrius Helper</html>", description = "Dodges Scurrius' falling ceiling attack and re-attacks")
+@PluginDescriptor(name = PluginDescriptor.Lucid + "Scurrius Helper</html>", description = "Dodges Scurrius' falling ceiling attack and re-attacks")
 public class LucidScurriusHelperPlugin extends Plugin
 {
 

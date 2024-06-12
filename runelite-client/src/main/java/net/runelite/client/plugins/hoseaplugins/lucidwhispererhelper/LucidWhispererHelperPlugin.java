@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @PluginDescriptor(
-        name = "<html><font color=\"#32CD32\">Lucid </font>Whisperer Helper</html>",
+        name = PluginDescriptor.Lucid + "Whisperer Helper</html>",
         description = "Auto-prays against whisperer and more",
         enabledByDefault = false,
         tags = {"whisperer", "dt2"}

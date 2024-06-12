@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@PluginDescriptor(name = "<html><font color=\"#32CD32\">Lucid </font>Duke Helper</html>", description = "Auto-prayers and other helper features and overlays for Duke Succ", enabledByDefault = false, tags = {"succ", "duke", "lucid", "helper"})
+@PluginDescriptor(name = PluginDescriptor.Lucid + "Duke Helper</html>", description = "Auto-prayers and other helper features and overlays for Duke Succ", enabledByDefault = false, tags = {"succ", "duke", "lucid", "helper"})
 public class DukeHelperPlugin extends Plugin
 {
     @Inject
