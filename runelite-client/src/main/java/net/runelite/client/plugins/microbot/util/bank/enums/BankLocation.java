@@ -101,38 +101,39 @@ public enum BankLocation {
         switch (this){
             case CRAFTING_GUILD:
                 if (hasLineOfSight) return true;
-                return Rs2Player.getRealSkillLevel(Skill.CRAFTING) >= 40
-                        && (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron"));
+                return  Rs2Player.checkSkillRequirement(Skill.CRAFTING, 40, false) &&
+                        (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron"));
             case LUMBRIDGE_BASEMENT:
                 return Rs2Player.getQuestState(Quest.RECIPE_FOR_DISASTER__ANOTHER_COOKS_QUEST) == QuestState.FINISHED;
             case COOKS_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
-                boolean hasVarrockHardDiary = Microbot.getVarbitValue(Varbits.DIARY_VARROCK_HARD)  == 1;
-                boolean hasMaxedCooking = Rs2Player.getRealSkillLevel(Skill.COOKING) >= 99;
+                boolean hasVarrockHardDiary = Microbot.getVarbitValue(Varbits.DIARY_VARROCK_HARD) == 1;
+                boolean hasMaxedCooking = Rs2Player.checkSkillRequirement(Skill.COOKING, 99, false);
                 boolean isWearingCooksGuild = Rs2Equipment.isWearing("chef's hat") ||
                         (Rs2Equipment.isWearing("cooking cape") || Rs2Equipment.isWearing("cooking hood")) ||
                         (Rs2Equipment.isWearing("max cape") || Rs2Equipment.isWearing("max hood")) ||
                         (Rs2Equipment.isWearing("varrock armour 3") || Rs2Equipment.isWearing("varrock armour 4"));
                 return Rs2Player.isMember() && isWearingCooksGuild && (hasVarrockHardDiary || hasMaxedCooking);
             case WARRIORS_GUILD:
-                if (hasLineOfSight) return true;
-                return (Rs2Player.getRealSkillLevel(Skill.ATTACK) >= 99 || Rs2Player.getRealSkillLevel(Skill.STRENGTH) >= 99) ||
+                if (hasLineOfSight && Rs2Player.isMember()) return true;
+                return Rs2Player.isMember() &&
+                        (Rs2Player.checkSkillRequirement(Skill.ATTACK, 99, false) || Rs2Player.checkSkillRequirement(Skill.STRENGTH, 99, false)) ||
                         (Rs2Player.getRealSkillLevel(Skill.ATTACK) + Rs2Player.getRealSkillLevel(Skill.STRENGTH) >= 130);
             case WOODCUTTING_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
-                return Rs2Player.isMember() && Rs2Player.getBoostedSkillLevel(Skill.WOODCUTTING) >= 60;
+                return Rs2Player.isMember() && Rs2Player.checkSkillRequirement(Skill.WOODCUTTING, 60, true);
             case FARMING_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
-                return Rs2Player.isMember() && Rs2Player.getBoostedSkillLevel(Skill.FARMING) >= 45;
+                return Rs2Player.isMember() && Rs2Player.checkSkillRequirement(Skill.FARMING, 45, true);
             case MINING_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
-                return Rs2Player.isMember() && Rs2Player.getBoostedSkillLevel(Skill.MINING) >= 60;
+                return Rs2Player.isMember() && Rs2Player.checkSkillRequirement(Skill.MINING, 60, true);
             case FISHING_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
-                return Rs2Player.isMember() && Rs2Player.getBoostedSkillLevel(Skill.FISHING) >= 68;
+                return Rs2Player.isMember() && Rs2Player.checkSkillRequirement(Skill.FISHING, 68, true);
             case HUNTERS_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
-                return Rs2Player.isMember() && Rs2Player.getRealSkillLevel(Skill.HUNTER) >= 46;
+                return Rs2Player.isMember() && Rs2Player.checkSkillRequirement(Skill.HUNTER, 46, false);
             default:
                 return true;
         }

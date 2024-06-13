@@ -319,4 +319,10 @@ public class Rs2Player {
         Client client = Microbot.getClient();
         return client.getBoostedSkillLevel(skill);
     }
+
+    public static boolean checkSkillRequirement(Skill skill, int levelRequired, boolean isBoosted){
+        Client client = Microbot.getClient();
+        if (isBoosted) return client.getBoostedSkillLevel(skill) >= levelRequired;
+        return client.getRealSkillLevel(skill) >= levelRequired;
+    }
 }
