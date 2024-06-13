@@ -120,7 +120,7 @@ public enum BankLocation {
                         (Rs2Player.getRealSkillLevel(Skill.ATTACK) + Rs2Player.getRealSkillLevel(Skill.STRENGTH) >= 130);
             case WOODCUTTING_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
-                return Rs2Player.isMember() && Microbot.getClient().getBoostedSkillLevel(Skill.WOODCUTTING) >= 60;
+                return Rs2Player.isMember() && Rs2Player.getBoostedSkillLevel(Skill.WOODCUTTING) >= 60;
             case FARMING_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
                 return Rs2Player.isMember() && Rs2Player.getBoostedSkillLevel(Skill.FARMING) >= 45;
