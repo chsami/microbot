@@ -309,4 +309,14 @@ public class Rs2Player {
         Client client = Microbot.getClient();
         return Microbot.getClientThread().runOnClientThread(() -> quest.getState(client));
     }
+
+    public static int getRealSkillLevel(Skill skill){
+        Client client = Microbot.getClient();
+        return client.getRealSkillLevel(skill);
+    }
+
+    public static int getBoostedSkillLevel(Skill skill){
+        Client client = Microbot.getClient();
+        return client.getBoostedSkillLevel(skill);
+    }
 }
