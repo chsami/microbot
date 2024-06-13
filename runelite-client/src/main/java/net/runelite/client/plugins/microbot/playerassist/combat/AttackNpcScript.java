@@ -83,8 +83,7 @@ public class AttackNpcScript extends Script {
                     if (!Rs2Npc.hasLineOfSight(npc))
                         continue;
 
-                    Rs2Npc.interact(npc, "attack");
-                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
+
                     if(config.togglePrayer() && !config.toggleQuickPrayFlick()){
                         AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(Rs2NpcManager.getAttackStyle(npc.getId()));
                         if (attackStyle != null) {
@@ -106,6 +105,8 @@ public class AttackNpcScript extends Script {
                     if(config.togglePrayer() && config.toggleQuickPrayFlick()){
                         Rs2Prayer.toggleQuickPrayer(true);
                     }
+                    Rs2Npc.interact(npc, "attack");
+                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
 
 
 

@@ -232,14 +232,18 @@ public class PlayerAssistPlugin extends Plugin {
 
     @Subscribe
     public void onHitsplatApplied(HitsplatApplied event){
-        if (event.getActor().getInteracting() != Microbot.getClient().getLocalPlayer()) return;
+        if (event.getActor() != Microbot.getClient().getLocalPlayer()) return;
         final Hitsplat hitsplat = event.getHitsplat();
 
-        if ((hitsplat.getHitsplatType() == HitsplatID.BLOCK_ME || hitsplat.getHitsplatType() == HitsplatID.DAMAGE_ME) && event.getActor() instanceof NPC && config.togglePrayer()) {
+        if ((hitsplat.isMine()) && event.getActor().getInteracting() instanceof NPC && config.togglePrayer()) {
+
+
+            flickerScript.resetLastAttack(true);
+            log.info("Flick ended on tick: " + Microbot.getClient().getTickCount());
             Rs2Prayer.disableAllPrayers();
             if(config.toggleQuickPrayFlick())
                 Rs2Prayer.toggleQuickPrayer(false);
-            flickerScript.resetLastAttack(true);
+
 
         }
     }

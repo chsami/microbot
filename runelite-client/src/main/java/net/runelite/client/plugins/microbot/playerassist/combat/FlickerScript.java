@@ -68,7 +68,7 @@ public class FlickerScript extends Script {
             } catch (Exception ex) {
                 System.err.println("Error: " + ex.getMessage());
             }
-        }, 0, 100, TimeUnit.MILLISECONDS);
+        }, 0, 50, TimeUnit.MILLISECONDS);
         return true;
     }
 
@@ -93,16 +93,12 @@ public class FlickerScript extends Script {
             default:
                 prayFlickAttackStyle = null;
                 Rs2Prayer.toggleQuickPrayer(true);
-                sleep(600);
-                Rs2Prayer.toggleQuickPrayer(false);
                 return;
         }
 
         prayFlickAttackStyle = null;
         Rs2Prayer.toggle(prayerToToggle, true);
-        sleep(600);
-        Rs2Prayer.toggle(prayerToToggle, false);
-        log.info("Flick ended on tick: " + Microbot.getClient().getTickCount());
+
     }
 
     /**
@@ -124,18 +120,8 @@ public class FlickerScript extends Script {
             for (Monster currentMonster : currentMonstersAttackingUs) {
                 currentMonster.lastAttack--;
                 resetLastAttack();
-                if(currentMonster.rs2NpcStats.getAttackSpeed() == 4 && currentMonster.lastAttack == 2)
-                {
 
-                    if(flickQuickPrayer){
-                        prayFlickAttackStyle = AttackStyle.MIXED;
-                    }
-                    else
-                        prayFlickAttackStyle = currentMonster.attackStyle;
-
-
-                }
-                if (currentMonster.rs2NpcStats.getAttackSpeed() > 4 && currentMonster.lastAttack == 1 && lazyFlick && !currentMonster.npc.isDead()) {
+                if (currentMonster.lastAttack == 1 && lazyFlick && !currentMonster.npc.isDead()) {
 
                     if(flickQuickPrayer){
                         prayFlickAttackStyle = AttackStyle.MIXED;
