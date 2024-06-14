@@ -4,6 +4,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.vars.AccountType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -320,9 +321,19 @@ public class Rs2Player {
         return client.getBoostedSkillLevel(skill);
     }
 
-    public static boolean checkSkillRequirement(Skill skill, int levelRequired, boolean isBoosted){
+    public static boolean getSkillRequirement(Skill skill, int levelRequired, boolean isBoosted){
         Client client = Microbot.getClient();
         if (isBoosted) return client.getBoostedSkillLevel(skill) >= levelRequired;
         return client.getRealSkillLevel(skill) >= levelRequired;
+    }
+
+    public static boolean isIronman() {
+        int accountType = Microbot.getVarbitValue(Varbits.ACCOUNT_TYPE);
+        return accountType > 0 && accountType <= 3;
+    }
+
+    public static boolean isGroupIronman(){
+        int accountType = Microbot.getVarbitValue(Varbits.ACCOUNT_TYPE);
+        return accountType >= 4;
     }
 }
