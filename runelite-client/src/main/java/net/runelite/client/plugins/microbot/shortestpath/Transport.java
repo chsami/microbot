@@ -2,15 +2,23 @@ package net.runelite.client.plugins.microbot.shortestpath;
 
 import com.google.common.base.Strings;
 import lombok.Getter;
-import net.runelite.api.Quest;
-import net.runelite.api.QuestState;
-import net.runelite.api.Skill;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.hoseaplugins.ethanapi.PacketUtils.WidgetInfoExtended;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.BooleanSupplier;
+
+import static net.runelite.api.widgets.WidgetInfo.ADVENTURE_LOG;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
 
 /**
  * This class represents a travel point between two WorldPoints.
@@ -326,4 +334,58 @@ public class Transport {
         }
         return true;
     }
+
+    public boolean handleSpiritTree() {
+        // Get Transport Information
+        String displayInfo = this.getDisplayInfo();
+        String objectName = this.getObjectName();
+        int objectId = this.getObjectId();
+        String action = this.getAction();
+        WorldPoint origin = this.getOrigin();
+        WorldPoint destination = this.getDestination();
+
+        System.out.println("Display info: " + displayInfo);
+        System.out.println("Object Name: " + objectName);
+        System.out.println("Object ID: " + objectId);
+        System.out.println("Action: " + action);
+        System.out.println("Origin: " + origin);
+        System.out.println("Destination: " + destination);
+
+        // Check if the widget is already visible
+        if (!Rs2Widget.isHidden(12255232)) {
+            System.out.println("Widget is already visible. Skipping interaction.");
+            char key = displayInfo.charAt(0);
+            System.out.println(key);
+            Rs2Keyboard.keyPress(key);
+            System.out.println("Pressing: " + key);
+            return true;
+        } else {
+            // Find the spirit tree object
+            TileObject spiritTree = Rs2GameObject.findObjectByImposter(objectId, "Travel");
+            if (spiritTree != null) {
+                // Interact with the spirit tree
+                Rs2GameObject.interact(spiritTree);
+
+                // Wait for the widget to become visible
+                boolean widgetVisible = !Rs2Widget.isHidden(12255232);
+
+                if (widgetVisible) {
+                    System.out.println("Widget is now visible.");
+                    char key = displayInfo.charAt(0);
+                    Rs2Keyboard.keyPress(key);
+                    System.out.println("Pressing: " + key);
+                    return true;
+                } else {
+                    System.out.println("Widget did not become visible within the timeout.");
+                    return false;
+                }
+            } else {
+                System.out.println("Spirit tree not found.");
+                return false;
+            }
+        }
+    }
+
+
+
 }
