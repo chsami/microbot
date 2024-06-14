@@ -45,7 +45,7 @@ public class BreakHandlerScript extends Script {
 
                 if (breakIn <= 0 && !Microbot.pauseAllScripts) {
                     Microbot.pauseAllScripts = true;
-                    breakDuration = Random.random(config.timeUntilBreakStart() * 60, config.timeUntilBreakEnd() * 60);
+                    breakDuration = Random.random(config.breakDurationStart() * 60, config.breakDurationEnd() * 60);
                     if (config.logoutAfterBreak())
                         Rs2Player.logout();
                 }

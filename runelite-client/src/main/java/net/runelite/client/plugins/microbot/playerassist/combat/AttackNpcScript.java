@@ -15,7 +15,6 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +47,7 @@ public class AttackNpcScript extends Script {
                 npcsToAttack.set(Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList()));
                 double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
                 if (Rs2Inventory.getInventoryFood().isEmpty() && treshHold < 10) return;
-                if(config.centerLocation().getX() == 0 && config.centerLocation().getY() == 0) {
+                if (config.centerLocation().getX() == 0 && config.centerLocation().getY() == 0 && config.toggleCenterTile()) {
                     if(!messageShown){
                         Microbot.showMessage("Please set a center location");
                         messageShown = true;
@@ -84,8 +83,7 @@ public class AttackNpcScript extends Script {
                     if (!Rs2Npc.hasLineOfSight(npc))
                         continue;
 
-                    Rs2Npc.interact(npc, "attack");
-                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
+
                     if(config.togglePrayer() && !config.toggleQuickPrayFlick()){
                         AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(Rs2NpcManager.getAttackStyle(npc.getId()));
                         if (attackStyle != null) {
@@ -107,6 +105,8 @@ public class AttackNpcScript extends Script {
                     if(config.togglePrayer() && config.toggleQuickPrayFlick()){
                         Rs2Prayer.toggleQuickPrayer(true);
                     }
+                    Rs2Npc.interact(npc, "attack");
+                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
 
 
 

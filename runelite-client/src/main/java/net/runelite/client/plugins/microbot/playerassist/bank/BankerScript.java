@@ -6,6 +6,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.constants.Constants;
+import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -80,6 +81,15 @@ public class BankerScript extends Script {
 
     //check inventory for items and how many of each item
     public boolean withdrawUpkeepItems(PlayerAssistConfig config) {
+        if (config.useInventorySetup() && !MicrobotInventorySetup.doesEquipmentMatch(config.inventorySetup())) {
+            MicrobotInventorySetup.loadEquipment(config.inventorySetup(), mainScheduledFuture);
+        }
+        // use inventory setup if enabled
+        if (config.useInventorySetup()) {
+            MicrobotInventorySetup.loadInventory(config.inventorySetup(), mainScheduledFuture);
+            return true;
+        }
+
         // check for items in inventory
         for (ItemToKeep item : ItemToKeep.values()) {
             if (item.isEnabled(config)) {
@@ -132,6 +142,8 @@ public class BankerScript extends Script {
         return false;
     }
 
+    // Check if any upkeep items are missing based on InventorySetup
+
     public boolean goToBank() {
         WorldPoint bankPoint = Rs2Bank.getNearestBank().getWorldPoint();
         return Rs2Walker.walkTo(bankPoint, 6);
@@ -145,6 +157,7 @@ public class BankerScript extends Script {
                 if (depositAllExcept(config)) {
 
                 }
+
                 if (withdrawUpkeepItems(config)) {
                     Rs2Walker.walkTo(config.centerLocation());
                 }

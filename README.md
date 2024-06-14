@@ -120,6 +120,10 @@ exampleScript.run(config);
 }
 ```
 
+Credits to runelite for making all of this possible <3
+
+https://github.com/runelite/runelite
+
 ### License
 
 RuneLite is licensed under the BSD 2-clause license. See the license header in the respective file to be sure.
