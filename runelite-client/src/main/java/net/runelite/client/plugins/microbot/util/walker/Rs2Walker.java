@@ -558,7 +558,7 @@ public class Rs2Walker {
                             }
 
                             if (b.isSpiritTree()) {
-                                b.handleSpiritTree(b);
+                                b.handleSpiritTree();
                             }
 
                             GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
