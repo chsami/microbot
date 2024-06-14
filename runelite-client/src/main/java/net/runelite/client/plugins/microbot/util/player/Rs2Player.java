@@ -322,9 +322,8 @@ public class Rs2Player {
     }
 
     public static boolean getSkillRequirement(Skill skill, int levelRequired, boolean isBoosted){
-        Client client = Microbot.getClient();
-        if (isBoosted) return client.getBoostedSkillLevel(skill) >= levelRequired;
-        return client.getRealSkillLevel(skill) >= levelRequired;
+        if (isBoosted) return getBoostedSkillLevel(skill) >= levelRequired;
+        return getRealSkillLevel(skill) >= levelRequired;
     }
 
     public static boolean isIronman() {
