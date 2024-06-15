@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.playerassist.bank;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
@@ -9,10 +8,9 @@ import net.runelite.client.plugins.microbot.playerassist.constants.Constants;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -64,45 +62,36 @@ public class BankerScript extends Script {
         this.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!Microbot.isLoggedIn()) return;
-                if (!config.bank()) return;
-                if (Rs2Player.isMoving() || Rs2Player.isAnimating()) return;
-                if (isUpkeepItemDepleted(config) || Rs2Inventory.count() >= 28 - config.minFreeSlots())
-                    if (handleBanking())
-                        Microbot.pauseAllScripts = false;
-                // Add other conditional checks here as needed
+                if (Microbot.isLoggedIn() && config.bank() && needsBanking() && handleBanking()) {
+                    Microbot.pauseAllScripts = false;
+                }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 2000, TimeUnit.MILLISECONDS);
+        }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
     }
 
+    public boolean needsBanking() {
+        return isUpkeepItemDepleted(config) || Rs2Inventory.getEmptySlots() <= config.minFreeSlots();
+    }
 
-    //check inventory for items and how many of each item
     public boolean withdrawUpkeepItems(PlayerAssistConfig config) {
-        if (config.useInventorySetup() && !MicrobotInventorySetup.doesEquipmentMatch(config.inventorySetup())) {
-            MicrobotInventorySetup.loadEquipment(config.inventorySetup(), mainScheduledFuture);
-        }
-        // use inventory setup if enabled
         if (config.useInventorySetup()) {
+            if (!MicrobotInventorySetup.doesEquipmentMatch(config.inventorySetup())) {
+                MicrobotInventorySetup.loadEquipment(config.inventorySetup(), mainScheduledFuture);
+            }
             MicrobotInventorySetup.loadInventory(config.inventorySetup(), mainScheduledFuture);
             return true;
         }
 
-        // check for items in inventory
         for (ItemToKeep item : ItemToKeep.values()) {
             if (item.isEnabled(config)) {
                 int count = item.getIds().stream().mapToInt(Rs2Inventory::count).sum();
                 log.info("Item: {} Count: {}", item.name(), count);
                 if (count < item.getValue(config)) {
-                    // withdraw item
-                    // log what we are withdrawing and how many
                     log.info("Withdrawing {} {}(s)", item.getValue(config) - count, item.name());
-                    List<Integer> sortedIds = item.getIds().stream()
-                            .sorted(Comparator.reverseOrder())
-                            .collect(Collectors.toList());
-                    for (int id : sortedIds) {
+                    for (int id : item.getIds().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList())) {
                         log.info("Checking bank for item: {}", id);
                         if (Rs2Bank.hasBankItem(id, item.getValue(config) - count)) {
                             Rs2Bank.withdrawX(true, id, item.getValue(config) - count);
@@ -112,60 +101,37 @@ public class BankerScript extends Script {
                 }
             }
         }
-        return true;
+        return !isUpkeepItemDepleted(config);
     }
 
-    //Deposit all items except for the ones we want to keep
     public boolean depositAllExcept(PlayerAssistConfig config) {
-        List<Integer> ids = new ArrayList<>();
-        for (ItemToKeep item : ItemToKeep.values()) {
-            if (item.isEnabled(config)) {
-                //Convert the list of ids to a ArrayList
-                for (int id : item.getIds()) ids.add(id);
-
-            }
-        }
-        return Rs2Bank.depositAllExcept(ids.toArray(new Integer[0]));
-
+        List<Integer> ids = Arrays.stream(ItemToKeep.values())
+                .filter(item -> item.isEnabled(config))
+                .flatMap(item -> item.getIds().stream())
+                .collect(Collectors.toList());
+        return Rs2Bank.isOpen() && Rs2Bank.depositAllExcept(ids.toArray(new Integer[0]));
     }
 
-    //If any of the items we want to keep are completely depleted
     public boolean isUpkeepItemDepleted(PlayerAssistConfig config) {
-        for (ItemToKeep item : ItemToKeep.values()) {
-            if (item == ItemToKeep.TELEPORT) continue;
-            if (item.isEnabled(config)) {
-                int count = item.getIds().stream().mapToInt(Rs2Inventory::count).sum();
-                if (count == 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return Arrays.stream(ItemToKeep.values())
+                .filter(item -> item != ItemToKeep.TELEPORT && item.isEnabled(config))
+                .anyMatch(item -> item.getIds().stream().mapToInt(Rs2Inventory::count).sum() == 0);
     }
-
-    // Check if any upkeep items are missing based on InventorySetup
 
     public boolean goToBank() {
-        WorldPoint bankPoint = Rs2Bank.getNearestBank().getWorldPoint();
-        return Rs2Walker.walkTo(bankPoint, 6);
+        return Rs2Walker.walkTo(Rs2Bank.getNearestBank().getWorldPoint(), 6);
     }
 
-    // execute banking actions
     public boolean handleBanking() {
         Microbot.pauseAllScripts = true;
-        if (goToBank()) {
-            if (Rs2Bank.openBank()) {
-                if (depositAllExcept(config)) {
-
-                }
-
-                if (withdrawUpkeepItems(config)) {
-                    Rs2Walker.walkTo(config.centerLocation());
-                }
+        if (goToBank() && Rs2Bank.openBank()) {
+            if (depositAllExcept(config) && withdrawUpkeepItems(config)) {
+                Rs2Walker.walkTo(config.centerLocation());
             }
         }
-        return true;
+        return !needsBanking();
     }
+
 
     public void shutdown() {
         super.shutdown();

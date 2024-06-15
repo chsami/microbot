@@ -6,6 +6,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +22,7 @@ public class LootScript extends Script {
     public boolean run(PlayerAssistConfig config) {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run()) return;
+            if (Rs2Inventory.isFull() || Rs2Inventory.getEmptySlots() <= config.minFreeSlots()) return;
 
             lootArrows(config);
 
@@ -40,6 +42,7 @@ public class LootScript extends Script {
                     config.attackRadius(),
                     1,
                     14,
+                    config.minFreeSlots(),
                     config.toggleDelayedLooting(),
                     config.toggleOnlyLootMyItems(),
                     "arrow"
@@ -56,6 +59,7 @@ public class LootScript extends Script {
                     config.attackRadius(),
                     1,
                     1,
+                    config.minFreeSlots(),
                     config.toggleDelayedLooting(),
                     config.toggleOnlyLootMyItems(),
                     "bones"
@@ -72,6 +76,7 @@ public class LootScript extends Script {
                     config.attackRadius(),
                     1,
                     1,
+                    config.minFreeSlots(),
                     config.toggleDelayedLooting(),
                     config.toggleOnlyLootMyItems(),
                     "ashes"
@@ -88,6 +93,7 @@ public class LootScript extends Script {
                 config.maxPriceOfItemsToLoot(),
                 config.attackRadius(),
                 1,
+                config.minFreeSlots(),
                 config.toggleDelayedLooting(),
                 config.toggleOnlyLootMyItems()
         );
