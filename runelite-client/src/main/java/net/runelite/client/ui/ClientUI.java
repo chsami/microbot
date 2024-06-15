@@ -30,6 +30,73 @@ import com.formdev.flatlaf.util.SystemInfo;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
+import java.applet.Applet;
+import java.awt.AWTException;
+import java.awt.Canvas;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.LayoutManager2;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.SystemTray;
+import java.awt.Taskbar;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.desktop.QuitStrategy;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.awt.image.BufferedImage;
+import java.time.Duration;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.function.Function;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRootPane;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.ToolTipManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.event.HyperlinkEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +121,7 @@ import net.runelite.client.input.MouseAdapter;
 import net.runelite.client.input.MouseListener;
 import net.runelite.client.input.MouseManager;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.input.KeyListener;
 import net.runelite.client.ui.laf.RuneLiteLAF;
 import net.runelite.client.ui.laf.RuneLiteRootPaneUI;
 import net.runelite.client.util.*;
@@ -452,6 +520,23 @@ public class ClientUI
 					}
 				});
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this::dispatchWindowKeyEvent);
+
+			frame.addWindowFocusListener(new WindowFocusListener()
+			{
+				@Override
+				public void windowGainedFocus(WindowEvent e)
+				{
+				}
+
+				@Override
+				public void windowLostFocus(WindowEvent e)
+				{
+					for (KeyListener keyListener : keyListeners)
+					{
+						keyListener.focusLost();
+					}
+				}
+			});
 
 			// Add mouse listener
 			final MouseListener mouseListener = new MouseAdapter()

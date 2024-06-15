@@ -387,6 +387,7 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 				client.setDrawCallbacks(this);
 				client.setGpuFlags(DrawCallbacks.GPU
 					| (computeMode == ComputeMode.NONE ? 0 : DrawCallbacks.HILLSKEW)
+					| (config.removeVertexSnapping() ? DrawCallbacks.NO_VERTEX_SNAPPING : 0)
 				);
 				client.setExpandedMapLoading(config.expandedMapLoadingChunks());
 
@@ -525,6 +526,14 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 						client.setGameState(GameState.LOADING);
 					}
 				});
+			}
+			else if (configChanged.getKey().equals("removeVertexSnapping"))
+			{
+				log.debug("Toggle {}", configChanged.getKey());
+				client.setGpuFlags(DrawCallbacks.GPU
+					| (computeMode == ComputeMode.NONE ? 0 : DrawCallbacks.HILLSKEW)
+					| (config.removeVertexSnapping() ? DrawCallbacks.NO_VERTEX_SNAPPING : 0)
+				);
 			}
 		}
 	}

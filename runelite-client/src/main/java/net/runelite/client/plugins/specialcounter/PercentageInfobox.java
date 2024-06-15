@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2024, 1Defence
  * Copyright (c) 2024, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
@@ -22,9 +23,41 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.api;
+package net.runelite.client.plugins.specialcounter;
 
-public interface Projection
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import net.runelite.client.ui.overlay.infobox.InfoBox;
+
+class PercentageInfobox extends InfoBox
 {
-	float[] project(float x, float y, float z);
+	private float percent = 1f;
+
+	PercentageInfobox(BufferedImage image, SpecialCounterPlugin plugin)
+	{
+		super(image, plugin);
+	}
+
+	void mul(float p)
+	{
+		percent *= p;
+	}
+
+	@Override
+	public String getTooltip()
+	{
+		return "Opponent defence has been reduced by " + getText() + ".";
+	}
+
+	@Override
+	public Color getTextColor()
+	{
+		return Color.WHITE;
+	}
+
+	@Override
+	public String getText()
+	{
+		return (int) ((1 - percent) * 100) + "%";
+	}
 }
