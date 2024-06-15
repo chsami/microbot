@@ -9,12 +9,6 @@ import net.runelite.client.plugins.microbot.wintertodt.enums.Brazier;
 
 @ConfigGroup("wintertodt")
 public interface MWintertodtConfig extends Config {
-    //final int FOOD_AMT = 6;
-    //    final String FOOD_TYPE = "monkfish";
-    //    final int HP_TRESHOLD = 30;
-    //    final boolean FLETCH_LOGS = true;
-
-
     @ConfigSection(
             name = "General",
             description = "General",

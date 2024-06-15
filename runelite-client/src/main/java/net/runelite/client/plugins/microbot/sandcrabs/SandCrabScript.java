@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Login;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 
 public class SandCrabScript extends Script {
 
-    public static String version = "1.4.0";
+    public static String version = "1.4.1";
 
     public int afkTimer = 0;
     public int hijackTimer = 0;
@@ -194,10 +195,16 @@ public class SandCrabScript extends Script {
     }
 
     /**
-     * Reset aggro will walk 20 tiles north
+     * Reset aggro will walk 40 tiles north
      */
     private void resetAggro() {
-        boolean walkedFarEnough = Rs2Walker.walkTo(new WorldPoint(initialPlayerLocation.getX(), initialPlayerLocation.getY() + 25, initialPlayerLocation.getPlane()), 4);
+        boolean walkedFarEnough = false;
+        if (Rs2Player.getWorldLocation().getX() > 1805) {
+            walkedFarEnough = Rs2Walker.walkTo(new WorldPoint(Random.random(1844, 1849), 3496, 0));
+        } else {
+            walkedFarEnough= Rs2Walker.walkTo(new WorldPoint(initialPlayerLocation.getX(), initialPlayerLocation.getY() + 40, initialPlayerLocation.getPlane()), 4);
+        }
+
         if (!walkedFarEnough) return;
 
         state = State.WALK_BACK;
