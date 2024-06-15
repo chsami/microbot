@@ -1750,11 +1750,6 @@ public class Rs2Inventory {
         return dropAll("empty vial");
     }
 
-    public static boolean isTradeable(int itemId) {
-        ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemId));
-        return itemComposition.isTradeable();
-    }
-
 }
 
 
