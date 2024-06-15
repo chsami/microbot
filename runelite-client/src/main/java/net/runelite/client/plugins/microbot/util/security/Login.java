@@ -69,15 +69,19 @@ public class Login {
     }
 
     public void setWorld(int worldNumber) {
-        net.runelite.http.api.worlds.World world = Microbot.getWorldService().getWorlds().findWorld(worldNumber);
-        final net.runelite.api.World rsWorld = Microbot.getClient().createWorld();
-        rsWorld.setActivity(world.getActivity());
-        rsWorld.setAddress(world.getAddress());
-        rsWorld.setId(world.getId());
-        rsWorld.setPlayerCount(world.getPlayers());
-        rsWorld.setLocation(world.getLocation());
-        rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
-        Microbot.getClient().changeWorld(rsWorld);
+        try {
+            net.runelite.http.api.worlds.World world = Microbot.getWorldService().getWorlds().findWorld(worldNumber);
+            final net.runelite.api.World rsWorld = Microbot.getClient().createWorld();
+            rsWorld.setActivity(world.getActivity());
+            rsWorld.setAddress(world.getAddress());
+            rsWorld.setId(world.getId());
+            rsWorld.setPlayerCount(world.getPlayers());
+            rsWorld.setLocation(world.getLocation());
+            rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
+            Microbot.getClient().changeWorld(rsWorld);
+        } catch(Exception ex) {
+            System.out.println("Failed to find world");
+        }
     }
 
     public static int getRandomWorld(boolean isMembers) {

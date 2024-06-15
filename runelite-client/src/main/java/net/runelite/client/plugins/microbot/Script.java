@@ -23,7 +23,7 @@ import java.util.function.BooleanSupplier;
 
 public abstract class Script implements IScript {
 
-    protected ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    protected ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
     protected ScheduledFuture<?> scheduledFuture;
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
