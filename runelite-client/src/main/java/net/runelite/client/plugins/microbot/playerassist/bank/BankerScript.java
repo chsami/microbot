@@ -132,6 +132,7 @@ public class BankerScript extends Script {
     //If any of the items we want to keep are completely depleted
     public boolean isUpkeepItemDepleted(PlayerAssistConfig config) {
         for (ItemToKeep item : ItemToKeep.values()) {
+            if (item == ItemToKeep.TELEPORT) continue;
             if (item.isEnabled(config)) {
                 int count = item.getIds().stream().mapToInt(Rs2Inventory::count).sum();
                 if (count == 0) {
