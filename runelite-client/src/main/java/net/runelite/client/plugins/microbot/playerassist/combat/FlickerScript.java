@@ -68,7 +68,7 @@ public class FlickerScript extends Script {
             } catch (Exception ex) {
                 System.err.println("Error: " + ex.getMessage());
             }
-        }, 0, 100, TimeUnit.MILLISECONDS);
+        }, 0, 50, TimeUnit.MILLISECONDS);
         return true;
     }
 
@@ -93,16 +93,12 @@ public class FlickerScript extends Script {
             default:
                 prayFlickAttackStyle = null;
                 Rs2Prayer.toggleQuickPrayer(true);
-                sleep(600);
-                Rs2Prayer.toggleQuickPrayer(false);
                 return;
         }
 
         prayFlickAttackStyle = null;
         Rs2Prayer.toggle(prayerToToggle, true);
-        sleep(600);
-        Rs2Prayer.toggle(prayerToToggle, false);
-        log.info("Flick ended on tick: " + Microbot.getClient().getTickCount());
+
     }
 
     /**
@@ -124,18 +120,8 @@ public class FlickerScript extends Script {
             for (Monster currentMonster : currentMonstersAttackingUs) {
                 currentMonster.lastAttack--;
                 resetLastAttack();
-                if(currentMonster.rs2NpcStats.getAttackSpeed() == 4 && currentMonster.lastAttack == 2)
-                {
 
-                    if(flickQuickPrayer){
-                        prayFlickAttackStyle = AttackStyle.MIXED;
-                    }
-                    else
-                        prayFlickAttackStyle = currentMonster.attackStyle;
-
-
-                }
-                if (currentMonster.rs2NpcStats.getAttackSpeed() > 4 && currentMonster.lastAttack == 1 && lazyFlick && !currentMonster.npc.isDead()) {
+                if (currentMonster.lastAttack == 1 && lazyFlick && !currentMonster.npc.isDead()) {
 
                     if(flickQuickPrayer){
                         prayFlickAttackStyle = AttackStyle.MIXED;
@@ -170,13 +156,16 @@ public class FlickerScript extends Script {
      * This method is responsible for resetting the last attack of each NPC.
      * It also handles the addition and removal of monsters from the list of monsters attacking the player.
      */
-    public void resetLastAttack() {
+    public void resetLastAttack(boolean forceReset) {
 
         for (NPC npc : npcs) {
             Monster currentMonster = currentMonstersAttackingUs.stream().filter(x -> x.npc.getIndex() == npc.getIndex()).findFirst().orElse(null);
             AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(Rs2NpcManager.getAttackStyle(npc.getId()));
 
             if (currentMonster != null) {
+                if (forceReset) {
+                    currentMonster.lastAttack = currentMonster.rs2NpcStats.getAttackSpeed();
+                }
                 if (!npc.isDead() && currentMonster.lastAttack <= 0)
                     currentMonster.lastAttack = currentMonster.rs2NpcStats.getAttackSpeed();
                 if (currentMonster.lastAttack <= -currentMonster.rs2NpcStats.getAttackSpeed() / 2){
@@ -192,6 +181,11 @@ public class FlickerScript extends Script {
                 }
             }
         }
+    }
+
+    // overload
+    public void resetLastAttack() {
+        resetLastAttack(false);
     }
 
 }

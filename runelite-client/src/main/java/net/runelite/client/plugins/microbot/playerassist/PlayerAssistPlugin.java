@@ -22,6 +22,7 @@ import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.playerassist.skill.AttackStyleScript;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.ui.JagexColors;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -88,13 +89,15 @@ public class PlayerAssistPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(playerAssistOverlay);
         }
+        if (!config.toggleCenterTile())
+            setCenter(Rs2Player.getWorldLocation());
         lootScript.run(config);
         cannonScript.run(config);
         attackNpc.run(config);
         combatPotion.run(config);
         foodScript.run(config);
         prayerPotionScript.run(config);
-        safeSpotScript.run(config); // TODO: safespot
+        safeSpotScript.run(config);
         flickerScript.run(config);
         useSpecialAttackScript.run(config);
         antiPoisonScript.run(config);
@@ -196,8 +199,11 @@ public class PlayerAssistPlugin extends Plugin {
             }
         }
         if(event.getKey().equals("Combat")) {
-            if (!config.toggleCombat()) {
+            if (!config.toggleCombat() && config.toggleCenterTile()) {
                 setCenter(new WorldPoint(0, 0, 0));
+            }
+            if (config.toggleCombat() && !config.toggleCenterTile()) {
+                setCenter(Rs2Player.getWorldLocation());
             }
 
         }
@@ -226,14 +232,18 @@ public class PlayerAssistPlugin extends Plugin {
 
     @Subscribe
     public void onHitsplatApplied(HitsplatApplied event){
-        if (event.getActor().getInteracting() != Microbot.getClient().getLocalPlayer()) return;
+        if (event.getActor() != Microbot.getClient().getLocalPlayer()) return;
         final Hitsplat hitsplat = event.getHitsplat();
 
-        if ((hitsplat.getHitsplatType() == HitsplatID.BLOCK_ME || hitsplat.getHitsplatType() == HitsplatID.DAMAGE_ME) && event.getActor() instanceof NPC && config.togglePrayer()) {
-            //Rs2Prayer.disableAllPrayers();
+        if ((hitsplat.isMine()) && event.getActor().getInteracting() instanceof NPC && config.togglePrayer()) {
+
+
+            flickerScript.resetLastAttack(true);
+            log.info("Flick ended on tick: " + Microbot.getClient().getTickCount());
+            Rs2Prayer.disableAllPrayers();
             if(config.toggleQuickPrayFlick())
                 Rs2Prayer.toggleQuickPrayer(false);
-            flickerScript.resetLastAttack();
+
 
         }
     }
@@ -243,7 +253,7 @@ public class PlayerAssistPlugin extends Plugin {
     }
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event) {
-        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
+        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty() && config.toggleCenterTile()) {
             addMenuEntry(event, SET, CENTER_TILE, 1);
         }
         if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
