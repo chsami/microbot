@@ -464,8 +464,8 @@ public class Rs2Bank {
      * @param names The names of the items to be excluded from the deposit.
      * @return true if any items were deposited, false otherwise.
      */
-    public static boolean depositAllExcept(boolean exact,String... names) {
-        if(!exact)
+    public static boolean depositAllExcept(boolean exact, String... names) {
+        if (!exact)
             return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.contains(name.toLowerCase())));
         else
             return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
@@ -1000,6 +1000,7 @@ public class Rs2Bank {
         Rs2Walker.walkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
     }
+
     //Distance to bank
     public static boolean isNearBank(int distance) {
         BankLocation bankLocation = getNearestBank();
@@ -1061,6 +1062,7 @@ public class Rs2Bank {
 
     /**
      * Banks items if your inventory is full. Will walk back to the initialplayerlocation passed as param
+     *
      * @param itemNames
      * @param initialPlayerLocation
      * @return
@@ -1087,6 +1089,7 @@ public class Rs2Bank {
 
     /**
      * Check if "noted" button is toggled on
+     *
      * @return
      */
     public static boolean hasWithdrawAsNote() {
@@ -1095,6 +1098,7 @@ public class Rs2Bank {
 
     /**
      * enable withdraw noted in your bank
+     *
      * @return
      */
     public static boolean setWithdrawAsNote() {
@@ -1103,9 +1107,9 @@ public class Rs2Bank {
         sleep(600);
         return hasWithdrawAsNote();
     }
-
     /**
      * Withdraw items from the lootTrackerPlugin
+     *
      * @param npcName
      * @return
      */
@@ -1123,10 +1127,23 @@ public class Rs2Bank {
         for (LootTrackerRecord lootTrackerRecord : Microbot.getAggregateLootRecords()) {
             if (!lootTrackerRecord.getTitle().equalsIgnoreCase(npcName)) continue;
             for (LootTrackerItem lootTrackerItem : lootTrackerRecord.getItems()) {
-                if (!Rs2Inventory.isTradeable(lootTrackerItem.getId())) continue;
-                boolean didWithdraw = Rs2Bank.withdrawAll(lootTrackerItem.getId());
-                if (!didWithdraw) continue;
-                itemFound = true;
+                int itemId = lootTrackerItem.getId();
+                ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(lootTrackerItem.getId()));
+
+                final boolean isNoted = itemComposition.getNote() == 799;
+                if (!itemComposition.isTradeable() && !isNoted) continue;
+
+                if (isNoted) {
+                    final int unnotedItemId = lootTrackerItem.getId() - 1; //get the unnoted id of the item
+                    itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(unnotedItemId));
+                    if (!itemComposition.isTradeable()) continue;
+                    itemId = unnotedItemId;
+                }
+
+                boolean didWithdraw = Rs2Bank.withdrawAll(itemId);
+                if (didWithdraw) {
+                    itemFound = true;
+                }
             }
         }
         Rs2Bank.closeBank();
