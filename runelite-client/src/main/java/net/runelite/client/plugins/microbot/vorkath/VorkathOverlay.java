@@ -25,7 +25,7 @@ public class VorkathOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            panelComponent.setPreferredSize(new Dimension(200, 300));
+            panelComponent.setPreferredSize(new Dimension(300, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Micro Vorkath V" + VorkathScript.version)
                     .color(Color.GREEN)
@@ -45,7 +45,7 @@ public class VorkathOverlay extends OverlayPanel {
                     .left("Vorkath kills: " + plugin.vorkathScript.vorkathSessionKills)
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Vorkath kills left before selling items: " + plugin.vorkathScript.tempVorkathKills % config.SellItemsAtXKills())
+                    .left("Vorkath kills until selling: " + plugin.vorkathScript.tempVorkathKills % config.SellItemsAtXKills())
                     .build());
 
 
