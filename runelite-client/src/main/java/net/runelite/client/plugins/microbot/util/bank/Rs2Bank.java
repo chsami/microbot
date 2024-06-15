@@ -1059,6 +1059,12 @@ public class Rs2Bank {
         return false;
     }
 
+    /**
+     * Banks items if your inventory is full. Will walk back to the initialplayerlocation passed as param
+     * @param itemNames
+     * @param initialPlayerLocation
+     * @return
+     */
     public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
         if (Rs2Inventory.isFull()) {
             boolean isBankOpen = Rs2Bank.walkToBankAndUseBank();
@@ -1079,10 +1085,18 @@ public class Rs2Bank {
         return !Rs2Inventory.isFull() && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
     }
 
+    /**
+     * Check if "noted" button is toggled on
+     * @return
+     */
     public static boolean hasWithdrawAsNote() {
         return Microbot.getVarbitValue(WITHDRAW_AS_NOTE_VARBIT) == 1;
     }
 
+    /**
+     * enable withdraw noted in your bank
+     * @return
+     */
     public static boolean setWithdrawAsNote() {
         if (hasWithdrawAsNote()) return true;
         Rs2Widget.clickWidget(786456);
@@ -1090,6 +1104,11 @@ public class Rs2Bank {
         return hasWithdrawAsNote();
     }
 
+    /**
+     * Withdraw items from the lootTrackerPlugin
+     * @param npcName
+     * @return
+     */
     public static boolean withdrawLootItems(String npcName) {
         boolean isAtGe = Rs2GrandExchange.walkToGrandExchange();
         if (isAtGe) {
