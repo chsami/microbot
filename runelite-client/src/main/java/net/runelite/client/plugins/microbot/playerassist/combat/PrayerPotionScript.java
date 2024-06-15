@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.playerassist.combat;
 
 import net.runelite.api.Skill;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.nmz.NmzConfig;
@@ -26,7 +25,7 @@ public class PrayerPotionScript extends Script {
                     return;
                 }
                 for (Rs2Item potion: potions) {
-                    if (potion.name.toLowerCase().contains("prayer")) {
+                    if (potion.name.toLowerCase().contains("prayer") || potion.name.toLowerCase().contains("super restore")) {
                         Rs2Inventory.interact(potion, "drink");
                         sleep(1200, 2000);
                         Rs2Inventory.dropAll("Vial");
