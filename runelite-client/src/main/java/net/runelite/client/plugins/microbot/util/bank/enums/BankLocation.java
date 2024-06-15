@@ -101,22 +101,26 @@ public enum BankLocation {
         boolean hasLineOfSight = Microbot.getClient().getLocalPlayer().getWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), worldPoint);
         switch (this) {
             case CRAFTING_GUILD:
-                if (hasLineOfSight) return true;
                 boolean hasFaladorHardDiary = Microbot.getVarbitValue(Varbits.DIARY_FALADOR_HARD) == 1;
-                return Rs2Player.getSkillRequirement(Skill.CRAFTING, 99, false) ||
-                        hasFaladorHardDiary &&
-                        (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron"));
+                boolean hasMaxedCrafting = Rs2Player.getSkillRequirement(Skill.CRAFTING, 99, false);
+                boolean isWearingCraftingGuild = (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron"));
+
+                if (hasLineOfSight && Rs2Player.isMember() && (hasMaxedCrafting || hasFaladorHardDiary)) return true;
+                return Rs2Player.isMember() && isWearingCraftingGuild &&
+                        (hasMaxedCrafting || hasFaladorHardDiary);
             case LUMBRIDGE_BASEMENT:
                 return Rs2Player.isMember() && Rs2Player.getQuestState(Quest.RECIPE_FOR_DISASTER__ANOTHER_COOKS_QUEST) == QuestState.FINISHED;
             case COOKS_GUILD:
-                if (hasLineOfSight && Rs2Player.isMember()) return true;
                 boolean hasVarrockHardDiary = Microbot.getVarbitValue(Varbits.DIARY_VARROCK_HARD) == 1;
                 boolean hasMaxedCooking = Rs2Player.getSkillRequirement(Skill.COOKING, 99, false);
                 boolean isWearingCooksGuild = Rs2Equipment.isWearing("chef's hat") ||
                         (Rs2Equipment.isWearing("cooking cape") || Rs2Equipment.isWearing("cooking hood")) ||
                         (Rs2Equipment.isWearing("max cape") || Rs2Equipment.isWearing("max hood")) ||
                         (Rs2Equipment.isWearing("varrock armour 3") || Rs2Equipment.isWearing("varrock armour 4"));
-                return Rs2Player.isMember() && isWearingCooksGuild && (hasVarrockHardDiary || hasMaxedCooking);
+
+                if (hasLineOfSight && Rs2Player.isMember() && (hasMaxedCooking || hasVarrockHardDiary)) return true;
+                return Rs2Player.isMember() && isWearingCooksGuild &&
+                        (hasVarrockHardDiary || hasMaxedCooking);
             case WARRIORS_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
                 return Rs2Player.isMember() &&
