@@ -102,7 +102,9 @@ public enum BankLocation {
         switch (this) {
             case CRAFTING_GUILD:
                 if (hasLineOfSight) return true;
-                return Rs2Player.getSkillRequirement(Skill.CRAFTING, 40, false) &&
+                boolean hasFaladorHardDiary = Microbot.getVarbitValue(Varbits.DIARY_FALADOR_HARD) == 1;
+                return Rs2Player.getSkillRequirement(Skill.CRAFTING, 99, false) ||
+                        hasFaladorHardDiary &&
                         (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron"));
             case LUMBRIDGE_BASEMENT:
                 return Rs2Player.isMember() && Rs2Player.getQuestState(Quest.RECIPE_FOR_DISASTER__ANOTHER_COOKS_QUEST) == QuestState.FINISHED;
