@@ -2,7 +2,7 @@ package net.runelite.client.plugins.microbot.util.grounditem;
 
 public class LootingParameters {
 
-    private int minValue, maxValue, range, minItems, minQuantity;
+    private int minValue, maxValue, range, minItems, minQuantity, minInvSlots;
     private boolean delayedLooting, antiLureProtection;
     private String[] names;
 
@@ -14,11 +14,12 @@ public class LootingParameters {
      * @param maxValue           The maximum value of the items to be looted.
      * @param range              The range within which the items to be looted are located.
      * @param minItems           The minimum number of items to be looted.
+     * @param minInvSlots        The minimum number of inventory slots to have open.
      * @param delayedLooting     A boolean indicating whether looting should be delayed.
      * @param antiLureProtection A boolean indicating whether anti-lure protection should be enabled.
      */
-    public LootingParameters(int minValue, int maxValue, int range, int minItems, boolean delayedLooting, boolean antiLureProtection) {
-        setValues(minValue, maxValue, range, minItems, 0, delayedLooting, antiLureProtection, null);
+    public LootingParameters(int minValue, int maxValue, int range, int minItems, int minInvSlots, boolean delayedLooting, boolean antiLureProtection) {
+        setValues(minValue, maxValue, range, minItems, 0, minInvSlots, delayedLooting, antiLureProtection, null);
     }
 
     /**
@@ -28,20 +29,22 @@ public class LootingParameters {
      * @param range              The range within which the items to be looted are located.
      * @param minItems           The minimum number of items to be looted.
      * @param minQuantity        The minimum quantity of items to be looted.
+     * @param minInvSlots        The minimum number of inventory slots to have open.
      * @param delayedLooting     A boolean indicating whether looting should be delayed.
      * @param antiLureProtection A boolean indicating whether anti-lure protection should be enabled.
      * @param names              The names of the items to be looted.
      */
-    public LootingParameters(int range, int minItems, int minQuantity, boolean delayedLooting, boolean antiLureProtection, String... names) {
-        setValues(0, 0, range, minItems, minQuantity, delayedLooting, antiLureProtection, names);
+    public LootingParameters(int range, int minItems, int minQuantity, int minInvSlots, boolean delayedLooting, boolean antiLureProtection, String... names) {
+        setValues(0, 0, range, minItems, minQuantity, minInvSlots, delayedLooting, antiLureProtection, names);
     }
 
-    private void setValues(int minValue, int maxValue, int range, int minItems, int minQuantity, boolean delayedLooting, boolean antiLureProtection, String[] names) {
+    private void setValues(int minValue, int maxValue, int range, int minItems, int minQuantity, int minInvSlots, boolean delayedLooting, boolean antiLureProtection, String[] names) {
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.range = range;
         this.minItems = minItems;
         this.minQuantity = minQuantity;
+        this.minInvSlots = minInvSlots;
         this.delayedLooting = delayedLooting;
         this.antiLureProtection = antiLureProtection;
         this.names = names;
@@ -67,6 +70,10 @@ public class LootingParameters {
 
     public int getMinQuantity() {
         return minQuantity;
+    }
+
+    public int getMinInvSlots() {
+        return minInvSlots;
     }
 
     public boolean isDelayedLooting() {
