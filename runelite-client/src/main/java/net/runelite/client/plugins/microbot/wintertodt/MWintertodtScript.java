@@ -71,7 +71,7 @@ public class MWintertodtScript extends Script {
                 GameObject fireBrazier = Rs2GameObject.findObject(ObjectID.BURNING_BRAZIER_29314, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
                 boolean playerIsLowHealth = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) <= config.hpTreshhold();
                 boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), false, false)
-                        && playerIsLowHealth;
+                        && !isWintertodtAlive;
                 Widget wintertodtHealthbar = Rs2Widget.getWidget(25952276);
 
                 if (wintertodtHealthbar != null && isWintertodtAlive) {
