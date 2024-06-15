@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum Rocks {
     TIN("tin rocks", 1),
     COPPER("copper rocks", 1),
+    CLAY("clay rocks", 1),
     IRON("iron rocks", 15),
     SILVER("silver rocks", 20),
     COAL("coal rocks", 30),
