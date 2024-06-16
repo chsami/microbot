@@ -336,6 +336,8 @@ public class Transport {
     }
 
     public boolean handleSpiritTree() {
+        int spiritTreeMenu = 12255232;
+
         // Get Transport Information
         String displayInfo = this.getDisplayInfo();
         String objectName = this.getObjectName();
@@ -352,38 +354,37 @@ public class Transport {
         System.out.println("Destination: " + destination);
 
         // Check if the widget is already visible
-        if (!Rs2Widget.isHidden(12255232)) {
+        if (!Rs2Widget.isHidden(spiritTreeMenu)) {
             System.out.println("Widget is already visible. Skipping interaction.");
             char key = displayInfo.charAt(0);
             System.out.println(key);
             Rs2Keyboard.keyPress(key);
             System.out.println("Pressing: " + key);
             return true;
-        } else {
-            // Find the spirit tree object
-            TileObject spiritTree = Rs2GameObject.findObjectByImposter(objectId, "Travel");
-            if (spiritTree != null) {
-                // Interact with the spirit tree
-                Rs2GameObject.interact(spiritTree);
-
-                // Wait for the widget to become visible
-                boolean widgetVisible = !Rs2Widget.isHidden(12255232);
-
-                if (widgetVisible) {
-                    System.out.println("Widget is now visible.");
-                    char key = displayInfo.charAt(0);
-                    Rs2Keyboard.keyPress(key);
-                    System.out.println("Pressing: " + key);
-                    return true;
-                } else {
-                    System.out.println("Widget did not become visible within the timeout.");
-                    return false;
-                }
-            } else {
-                System.out.println("Spirit tree not found.");
-                return false;
-            }
         }
+
+        // Find the spirit tree object
+        TileObject spiritTree = Rs2GameObject.findObjectByImposter(objectId, "Travel");
+        if (spiritTree == null) {
+            System.out.println("Spirit tree not found.");
+            return false;
+        }
+
+        // Interact with the spirit tree
+        Rs2GameObject.interact(spiritTree);
+
+        // Wait for the widget to become visible
+        boolean widgetVisible = !Rs2Widget.isHidden(spiritTreeMenu);
+        if (!widgetVisible) {
+            System.out.println("Widget did not become visible within the timeout.");
+            return false;
+        }
+
+        System.out.println("Widget is now visible.");
+        char key = displayInfo.charAt(0);
+        Rs2Keyboard.keyPress(key);
+        System.out.println("Pressing: " + key);
+        return true;
     }
 
 
