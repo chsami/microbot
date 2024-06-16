@@ -5,6 +5,16 @@ Microbot is an opensource automated oldschool runescape client based on runelite
  
 If you have any questions, please join our [Discord](https://discord.gg/zaGrfqFEWE) server.
 
+
+## ☕ Buy Me a Coffee
+
+If you enjoy my open source work and would like to support me, consider buying me a coffee! Your support helps me stay caffeinated and motivated to keep improving and creating awesome projects.
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-donate-yellow)](https://www.paypal.com/paypalme/MicrobotBE?country.x=BE&locale.x=nl_NL)
+
+Thank you for your support! 😊
+
+
 # I Want To Bot
 
 ## Non jagex account

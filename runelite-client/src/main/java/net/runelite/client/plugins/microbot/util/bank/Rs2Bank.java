@@ -464,8 +464,8 @@ public class Rs2Bank {
      * @param names The names of the items to be excluded from the deposit.
      * @return true if any items were deposited, false otherwise.
      */
-    public static boolean depositAllExcept(boolean exact,String... names) {
-        if(!exact)
+    public static boolean depositAllExcept(boolean exact, String... names) {
+        if (!exact)
             return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.contains(name.toLowerCase())));
         else
             return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
@@ -1000,6 +1000,7 @@ public class Rs2Bank {
         Rs2Walker.walkTo(bankLocation.getWorldPoint());
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
     }
+
     //Distance to bank
     public static boolean isNearBank(int distance) {
         BankLocation bankLocation = getNearestBank();
@@ -1059,6 +1060,13 @@ public class Rs2Bank {
         return false;
     }
 
+    /**
+     * Banks items if your inventory is full. Will walk back to the initialplayerlocation passed as param
+     *
+     * @param itemNames
+     * @param initialPlayerLocation
+     * @return
+     */
     public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
         if (Rs2Inventory.isFull()) {
             boolean isBankOpen = Rs2Bank.walkToBankAndUseBank();
@@ -1079,17 +1087,32 @@ public class Rs2Bank {
         return !Rs2Inventory.isFull() && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
     }
 
+    /**
+     * Check if "noted" button is toggled on
+     *
+     * @return
+     */
     public static boolean hasWithdrawAsNote() {
         return Microbot.getVarbitValue(WITHDRAW_AS_NOTE_VARBIT) == 1;
     }
 
+    /**
+     * enable withdraw noted in your bank
+     *
+     * @return
+     */
     public static boolean setWithdrawAsNote() {
         if (hasWithdrawAsNote()) return true;
         Rs2Widget.clickWidget(786456);
         sleep(600);
         return hasWithdrawAsNote();
     }
-
+    /**
+     * Withdraw items from the lootTrackerPlugin
+     *
+     * @param npcName
+     * @return
+     */
     public static boolean withdrawLootItems(String npcName) {
         boolean isAtGe = Rs2GrandExchange.walkToGrandExchange();
         if (isAtGe) {
@@ -1104,10 +1127,23 @@ public class Rs2Bank {
         for (LootTrackerRecord lootTrackerRecord : Microbot.getAggregateLootRecords()) {
             if (!lootTrackerRecord.getTitle().equalsIgnoreCase(npcName)) continue;
             for (LootTrackerItem lootTrackerItem : lootTrackerRecord.getItems()) {
-                if (!Rs2Inventory.isTradeable(lootTrackerItem.getId())) continue;
-                boolean didWithdraw = Rs2Bank.withdrawAll(lootTrackerItem.getId());
-                if (!didWithdraw) continue;
-                itemFound = true;
+                int itemId = lootTrackerItem.getId();
+                ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(lootTrackerItem.getId()));
+                if (Arrays.stream(itemComposition.getInventoryActions()).anyMatch(x -> x.equalsIgnoreCase("eat"))) continue;
+                final boolean isNoted = itemComposition.getNote() == 799;
+                if (!itemComposition.isTradeable() && !isNoted) continue;
+
+                if (isNoted) {
+                    final int unnotedItemId = lootTrackerItem.getId() - 1; //get the unnoted id of the item
+                    itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(unnotedItemId));
+                    if (!itemComposition.isTradeable()) continue;
+                    itemId = unnotedItemId;
+                }
+
+                boolean didWithdraw = Rs2Bank.withdrawAll(itemId);
+                if (didWithdraw) {
+                    itemFound = true;
+                }
             }
         }
         Rs2Bank.closeBank();

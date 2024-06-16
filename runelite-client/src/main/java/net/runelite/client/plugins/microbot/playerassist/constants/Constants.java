@@ -251,14 +251,14 @@ public class Constants {
             ItemID.ANTIFIRE_POTION2,
             ItemID.ANTIFIRE_POTION3,
             ItemID.ANTIFIRE_POTION4,
-            ItemID.SUPER_ANTIFIRE_POTION1,
-            ItemID.SUPER_ANTIFIRE_POTION2,
-            ItemID.SUPER_ANTIFIRE_POTION3,
-            ItemID.SUPER_ANTIFIRE_POTION4,
             ItemID.EXTENDED_ANTIFIRE1,
             ItemID.EXTENDED_ANTIFIRE2,
             ItemID.EXTENDED_ANTIFIRE3,
             ItemID.EXTENDED_ANTIFIRE4,
+            ItemID.SUPER_ANTIFIRE_POTION1,
+            ItemID.SUPER_ANTIFIRE_POTION2,
+            ItemID.SUPER_ANTIFIRE_POTION3,
+            ItemID.SUPER_ANTIFIRE_POTION4,
             ItemID.EXTENDED_SUPER_ANTIFIRE1,
             ItemID.EXTENDED_SUPER_ANTIFIRE2,
             ItemID.EXTENDED_SUPER_ANTIFIRE3,
@@ -266,14 +266,14 @@ public class Constants {
     );
 
     public static final Set<Integer> PRAYER_RESTORE_POTION_IDS = ImmutableSet.of(
-            ItemID.PRAYER_POTION1,
-            ItemID.PRAYER_POTION2,
-            ItemID.PRAYER_POTION3,
-            ItemID.PRAYER_POTION4,
             ItemID.SUPER_RESTORE1,
             ItemID.SUPER_RESTORE2,
             ItemID.SUPER_RESTORE3,
-            ItemID.SUPER_RESTORE4
+            ItemID.SUPER_RESTORE4,
+            ItemID.PRAYER_POTION1,
+            ItemID.PRAYER_POTION2,
+            ItemID.PRAYER_POTION3,
+            ItemID.PRAYER_POTION4
     );
 
     public static final Set<Integer> STRENGTH_POTION_IDS = ImmutableSet.of(
