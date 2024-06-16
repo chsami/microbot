@@ -4,6 +4,8 @@ import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -22,6 +24,10 @@ public class MinnowsPlugin extends Plugin {
         return configManager.getConfig(MinnowsConfig.class);
     }*/
 
+    @Inject
+    private OverlayManager overlayManager;
+    @Inject
+    private MinnowsOverlay minnowsOverlay;
 
     @Inject
     MinnowsScript minnowsScript;
@@ -29,10 +35,15 @@ public class MinnowsPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
+        Microbot.pauseAllScripts = false;
+        if (overlayManager != null) {
+            overlayManager.add(minnowsOverlay);
+        }
         minnowsScript.run();
     }
 
     protected void shutDown() {
+        overlayManager.remove(minnowsOverlay);
         minnowsScript.shutdown();
     }
 
