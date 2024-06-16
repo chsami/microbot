@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.playerassist;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.config.*;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
+import net.runelite.client.plugins.microbot.playerassist.enums.PlayStyle;
 
 @ConfigGroup(net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig.GROUP)
 public interface PlayerAssistConfig extends Config {
@@ -16,6 +17,58 @@ public interface PlayerAssistConfig extends Config {
             closedByDefault = false
     )
     String generalSection = "general";
+    @ConfigSection(
+            name = "Combat",
+            description = "Combat",
+            position = 1,
+            closedByDefault = false
+    )
+    String combatSection = "Combat";
+    @ConfigSection(
+            name = "Banking",
+            description = "Banking settings",
+            position = 992,
+            closedByDefault = true
+    )
+    String banking = "Banking";
+    //Gear section
+    @ConfigSection(
+            name = "Gear",
+            description = "Gear",
+            position = 55,
+            closedByDefault = true
+    )
+    String gearSection = "Gear";
+    @ConfigSection(
+            name = "Food & Potions",
+            description = "Food & Potions",
+            position = 2,
+            closedByDefault = false
+    )
+    String foodAndPotionsSection = "Food & Potions";
+    @ConfigSection(
+            name = "Loot",
+            description = "Loot",
+            position = 3,
+            closedByDefault = false
+    )
+    String lootSection = "Loot";
+    //Prayer section
+    @ConfigSection(
+            name = "Prayer",
+            description = "Prayer",
+            position = 4,
+            closedByDefault = false
+    )
+    String prayerSection = "Prayer";
+    //Skilling section
+    @ConfigSection(
+            name = "Skilling",
+            description = "Skilling",
+            position = 5,
+            closedByDefault = false
+    )
+    String skillingSection = "Combat Skilling";
 
     @ConfigItem(
             keyName = "GUIDE",
@@ -34,24 +87,9 @@ public interface PlayerAssistConfig extends Config {
                 "6. PrayFlick should work at the moment.\n" +
                 "7. SafeSpot & auto loot arrows might act funny and are not tested thoroughly. Use at your own risk!\n" +
                 "8. Shift Right-click the ground to select the center tile.\n" +
-                "9. Shift Right-click NPCs to add them to the attack list.";
+                "9. Right-click NPCs to add them to the attack list.";
     }
 
-    @ConfigSection(
-            name = "Combat",
-            description = "Combat",
-            position = 1,
-            closedByDefault = false
-    )
-    String combatSection = "Combat";
-
-    @ConfigSection(
-            name = "Banking",
-            description = "Banking settings",
-            position = 992,
-            closedByDefault = true
-    )
-    String banking = "Banking";
     @ConfigItem(
             keyName = "Combat",
             name = "Auto attack npc",
@@ -96,7 +134,6 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
-
     @ConfigItem(
             keyName = "Cannon",
             name = "Auto reload cannon",
@@ -107,15 +144,6 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleCannon() {
         return false;
     }
-
-    //Gear section
-    @ConfigSection(
-            name = "Gear",
-            description = "Gear",
-            position = 55,
-            closedByDefault = true
-    )
-    String gearSection = "Gear";
 
     //safe spot
     @ConfigItem(
@@ -129,13 +157,17 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
-    @ConfigSection(
-            name = "Food & Potions",
-            description = "Food & Potions",
-            position = 2,
-            closedByDefault = false
+    //PlayStyle
+    @ConfigItem(
+            keyName = "PlayStyle",
+            name = "Play Style",
+            description = "Play Style",
+            position = 6,
+            section = combatSection
     )
-    String foodAndPotionsSection = "Food & Potions";
+    default PlayStyle playStyle() {
+        return PlayStyle.AGGRESSIVE;
+    }
 
     @ConfigItem(
             keyName = "Food",
@@ -194,14 +226,6 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
-    @ConfigSection(
-            name = "Loot",
-            description = "Loot",
-            position = 3,
-            closedByDefault = false
-    )
-    String lootSection = "Loot";
-
     @ConfigItem(
             keyName = "Loot items",
             name = "Auto loot items",
@@ -234,6 +258,7 @@ public interface PlayerAssistConfig extends Config {
     default int maxPriceOfItemsToLoot() {
         return 10000000;
     }
+    // toggle scatter
 
     @ConfigItem(
             keyName = "Loot arrows",
@@ -256,7 +281,6 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleBuryBones() {
         return false;
     }
-    // toggle scatter
 
     @ConfigItem(
             keyName = "Scatter",
@@ -268,6 +292,7 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleScatter() {
         return false;
     }
+
     // delayed looting
     @ConfigItem(
             keyName = "delayedLooting",
@@ -291,16 +316,6 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleCenterTile() {
         return false;
     }
-
-
-    //Prayer section
-    @ConfigSection(
-            name = "Prayer",
-            description = "Prayer",
-            position = 4,
-            closedByDefault = false
-    )
-    String prayerSection = "Prayer";
 
     //Use quick prayer
     @ConfigItem(
@@ -337,15 +352,6 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleLazyFlick() {
         return false;
     }
-
-    //Skilling section
-    @ConfigSection(
-            name = "Skilling",
-            description = "Skilling",
-            position = 5,
-            closedByDefault = false
-    )
-    String skillingSection = "Combat Skilling";
 
     //Balance combat skills
     @ConfigItem(
