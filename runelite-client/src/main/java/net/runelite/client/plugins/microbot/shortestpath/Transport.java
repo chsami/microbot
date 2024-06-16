@@ -4,21 +4,17 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.plugins.hoseaplugins.ethanapi.PacketUtils.WidgetInfoExtended;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.BooleanSupplier;
 
-import static net.runelite.api.widgets.WidgetInfo.ADVENTURE_LOG;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntilOnClientThread;
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 /**
  * This class represents a travel point between two WorldPoints.
@@ -135,6 +131,9 @@ public class Transport {
     @Getter
     private boolean isMember;
 
+    @Getter
+    private String npcName;
+
     Transport(final WorldPoint origin, final WorldPoint destination) {
         this.origin = origin;
         this.destination = destination;
@@ -155,15 +154,16 @@ public class Transport {
         destination = new WorldPoint(
                 Integer.parseInt(parts_destination[0]),
                 Integer.parseInt(parts_destination[1]),
-                Integer.parseInt(parts_destination[2]));
+                Integer.parseInt(parts_origin[2]));
 
         try {
             action = parts[2].split(DELIM)[0];
+            String npcAndObjectId = parts[2].substring(parts[2].indexOf(action) + action.length()).trim();
+            npcName = npcAndObjectId.replaceAll("\\d", "").trim();  // Remove the numbers to get the NPC name
             objectId = Integer.parseInt(parts[2].split(DELIM)[parts[2].split(DELIM).length - 1]);
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }
-
 
         // Skill requirements
         if (parts.length >= 4 && !parts[3].isEmpty()) {
@@ -387,6 +387,73 @@ public class Transport {
         return true;
     }
 
+    public boolean handleGlider() {
+        int gliderMenu = 9043968;
+        int TA_QUIR_PRIW = 9043972;
+        int SINDARPOS = 9043975;
+        int LEMANTO_ANDRA = 9043978;
+        int KAR_HEWO = 9043981;
+        int GANDIUS = 9043984;
+        int OOKOOKOLLY_UNDRI = 9043993;
 
+        // Get Transport Information
+        String displayInfo = this.getDisplayInfo();
+        String objectName = this.getObjectName();
+        String npcName = this.getNpcName();
+        int objectId = this.getObjectId();
+        String action = this.getAction();
+        WorldPoint origin = this.getOrigin();
+        WorldPoint destination = this.getDestination();
 
+        System.out.println("Display info: " + displayInfo);
+        System.out.println("Object Name: " + objectName);
+        System.out.println("NPC Name: " + npcName);
+        System.out.println("Object ID: " + objectId);
+        System.out.println("Action: " + action);
+        System.out.println("Origin: " + origin);
+        System.out.println("Destination: " + destination);
+
+        // Check if the widget is already visible
+        if (!Rs2Widget.isHidden(gliderMenu)) {
+            System.out.println("Widget is already visible. Skipping interaction.");
+            return true;
+        }
+
+        // Find the glider NPC
+        NPC gnome = Rs2Npc.getNpc(npcName);  // Use the NPC name to find the NPC
+        if (gnome == null) {
+            System.out.println("Gnome not found.");
+            return false;
+        }
+
+        // Interact with the gnome glider NPC
+        Rs2Npc.interact(gnome, action);
+
+        sleep(1200,2400);
+
+        // Wait for the widget to become visible
+        boolean widgetVisible = !Rs2Widget.isHidden(gliderMenu);
+        if (!widgetVisible) {
+            System.out.println("Widget did not become visible within the timeout.");
+            return false;
+        }
+
+        System.out.println("Widget is now visible.");
+
+        switch(displayInfo) {
+            case "Kar-Hewo":
+                Rs2Widget.clickWidget(KAR_HEWO);
+            case "Gnome Stronghold":
+                Rs2Widget.clickWidget(TA_QUIR_PRIW);
+            case "Sindarpos":
+                Rs2Widget.clickWidget(SINDARPOS);
+            case "Lemanto Andra":
+                Rs2Widget.clickWidget(LEMANTO_ANDRA);
+            case "Gandius":
+                Rs2Widget.clickWidget(GANDIUS);
+            case "Ookookolly Undri":
+                Rs2Widget.clickWidget(OOKOOKOLLY_UNDRI);
+        }
+        return true;
+    }
 }
