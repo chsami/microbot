@@ -12,3 +12,4 @@ project.properties
 .factorypath
 .DS_Store
 bankjs/development
+.run
