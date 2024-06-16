@@ -119,7 +119,7 @@ public class BankerScript extends Script {
     }
 
     public boolean goToBank() {
-        return Rs2Walker.walkTo(Rs2Bank.getNearestBank().getWorldPoint(), 6);
+        return Rs2Walker.walkTo(Rs2Bank.getNearestBank().getWorldPoint(), 8);
     }
 
     public boolean handleBanking() {
