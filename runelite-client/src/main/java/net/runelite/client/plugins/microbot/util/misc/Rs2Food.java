@@ -48,6 +48,7 @@ public enum Rs2Food {
     ORANGE(2108,2,"Orange"),
     PINEAPPLE_RINGS(2118,2,"Pineapple Rings"),
     PINEAPPLE_CHUNKS(2116,2,"Pineapple Chunks"),
+    JUG_OF_WINE(1993,11,"Jug of wine"),
     PURPLE_SWEETS(10476,3,"Purple Sweets");
 
     private int id; private int heal; private String name;
