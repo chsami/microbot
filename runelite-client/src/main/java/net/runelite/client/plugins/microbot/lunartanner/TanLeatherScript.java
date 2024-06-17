@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.lunartanner;
 
+import java.util.concurrent.TimeUnit;
+
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -8,17 +10,22 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import net.runelite.client.util.QuantityFormatter;
 
-import java.util.concurrent.TimeUnit;
-
 public class TanLeatherScript extends Script {
 
     public static String version = "1.0.0";
-    static long hidesTanned = 0;
     public static String combinedMessage = "";
-
-    private int profitPerHide = 0; // Profit per single hide
+    public static long hidesTanned = 0;
+    private int profitPerHide = 0;
     private long startTime;
+    
+    // State management
+    private enum State {
+        TANNING,
+        BANKING
+    }
 
+    private State currentState = State.TANNING;
+    
     public boolean run(TanLeatherConfig config) {
         startTime = System.currentTimeMillis();
         int unprocessedItemPrice = Microbot.getItemManager().search(config.ITEM().getName()).get(0).getPrice();
@@ -40,16 +47,18 @@ public class TanLeatherScript extends Script {
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }, 0, 300, TimeUnit.MILLISECONDS);
+        }, 0, 50, TimeUnit.MILLISECONDS);
         return true;
     }
 
+    // Calculate the profit and display it
     private void calculateProfitAndDisplay(TanLeatherConfig config) {
         double elapsedHours = (System.currentTimeMillis() - startTime) / 3600000.0;
         int hidesPerHour = (int) (hidesTanned / elapsedHours);
         int totalProfit = profitPerHide * (int)hidesTanned;
         int profitPerHour = profitPerHide * hidesPerHour;
 
+        // Format the message
         combinedMessage = config.ITEM().getFinished() + ": " +
                 QuantityFormatter.quantityToRSDecimalStack((int) hidesTanned) + " (" +
                 QuantityFormatter.quantityToRSDecimalStack(hidesPerHour) + "/hr) | " +
@@ -57,27 +66,31 @@ public class TanLeatherScript extends Script {
                 QuantityFormatter.quantityToRSDecimalStack(profitPerHour) + "/hr)";
     }
 
+    // Bank the finished hide
     private void bank(TanLeatherConfig config) {
-        if (!Rs2Bank.isOpen()) {
-            Rs2Bank.openBank();
-            sleepUntilOnClientThread(Rs2Bank::isOpen);
+        if (currentState != State.BANKING) {
+            currentState = State.BANKING;
+            if (!Rs2Bank.isOpen()) {
+                Rs2Bank.openBank();
+                sleepUntilOnClientThread(Rs2Bank::isOpen);
+            }
+
+            Rs2Bank.depositAll(config.ITEM().getFinished());
+            sleepUntilOnClientThread(() -> !Rs2Inventory.hasItem(config.ITEM().getFinished()));
+
+            if (Rs2Bank.hasItem(config.ITEM().getName())) {
+                Rs2Bank.withdrawAll(config.ITEM().getName());
+                sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(config.ITEM().getName()));
+            } else {
+                shutdown();
+                return;
+            }
+
+            Rs2Bank.closeBank();
+            sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());
+            currentState = State.TANNING;
+            calculateProfitAndDisplay(config);
         }
-
-        Rs2Bank.depositAll(config.ITEM().getFinished());
-        hidesTanned += Rs2Inventory.count(config.ITEM().getName());
-        sleepUntilOnClientThread(() -> !Rs2Inventory.hasItem(config.ITEM().getFinished()));
-
-        if (Rs2Bank.hasItem(config.ITEM().getName())) {
-            Rs2Bank.withdrawAll(config.ITEM().getName());
-        } else {
-            System.out.print("Out of materials");
-            shutdown();
-            return;
-        }
-
-        Rs2Bank.closeBank();
-        sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());
-        calculateProfitAndDisplay(config);
     }
 
     @Override
