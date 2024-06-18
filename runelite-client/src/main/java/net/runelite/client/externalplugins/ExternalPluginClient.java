@@ -87,7 +87,7 @@ public class ExternalPluginClient
 		HttpUrl manifest = pluginHubBase
 			.newBuilder()
 			.addPathSegment("manifest")
-			.addPathSegment("1.10.31" + "_" + name + ".js")
+			.addPathSegment("1.10.32" + "_" + name + ".js")
 			.build();
 		try (Response res = okHttpClient.newCall(new Request.Builder().url(manifest).build()).execute())
 		{
