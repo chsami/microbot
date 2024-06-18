@@ -21,6 +21,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+enum State {
+    RESETTING,
+    WOODCUTTING,
+}
+
 public class AutoWoodcuttingScript extends Script {
 
     public static String version = "1.6.0";
@@ -29,7 +34,7 @@ public class AutoWoodcuttingScript extends Script {
 
     public boolean cannotLightFire = false;
 
-    private boolean isResetting = false;
+    State state = State.WOODCUTTING;
 
     public boolean run(AutoWoodcuttingConfig config) {
         if (config.hopWhenPlayerDetected()) {
@@ -46,62 +51,72 @@ public class AutoWoodcuttingScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
-                if (config.hopWhenPlayerDetected()) {
-                    Rs2Player.logoutIfPlayerDetected(1, 10);
-                    return;
-                }
-
-                if (Rs2Equipment.isWearing("Dragon axe"))
-                    Rs2Combat.setSpecState(true, 1000);
-
                 if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
 
-                if (!Rs2Inventory.isFull() && !isResetting) {
-                    GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), true, getInitialPlayerLocation());
-                    if (tree != null) {
-                        Rs2GameObject.interact(tree, config.TREE().getAction());
-                        if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
-                            returnPoint = Microbot.getClient().getLocalPlayer().getWorldLocation();
-                        }
-                    }
-                    return;
-                } else if(Rs2Inventory.isFull()){
-                    isResetting = true;
-                }
-
-                if(!isResetting)
-                    return;
-
-                switch (config.resetOptions()) {
-                    case DROP:
-                        Rs2Inventory.dropAllExcept("axe", "tinderbox");
-                        isResetting = false;
-                        break;
-                    case BANK:
-                        List<String> itemNames = Arrays.stream(config.itemsToBank().split(",")).map(String::toLowerCase).collect(Collectors.toList());
-
-                        if(!Rs2Bank.walkToAndBankItems(itemNames))
+                switch (state){
+                    case WOODCUTTING:
+                        if (config.hopWhenPlayerDetected()) {
+                            Rs2Player.logoutIfPlayerDetected(1, 10);
                             return;
-
-                        walkBack(config);
-                        isResetting = false;
-                        break;
-                    case FIREMAKE:
-                        do {
-                            burnLog(config);
                         }
-                        while (Rs2Inventory.contains(config.TREE().getLog()));
 
-                        walkBack(config);
-                        isResetting = false;
+                        if (Rs2Equipment.isWearing("Dragon axe"))
+                            Rs2Combat.setSpecState(true, 1000);
+
+                        if(Rs2Inventory.isFull()){
+                            state = State.RESETTING;
+                            return;
+                        }
+
+                        GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), true, getInitialPlayerLocation());
+
+                        if (tree != null) {
+                            Rs2GameObject.interact(tree, config.TREE().getAction());
+                            if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
+                                returnPoint = Microbot.getClient().getLocalPlayer().getWorldLocation();
+                            }
+                        }
+                        break;
+                    case RESETTING:
+                        resetInventory(config);
                         break;
                 }
-
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    private void resetInventory(AutoWoodcuttingConfig config){
+        switch (config.resetOptions()) {
+            case DROP:
+                Rs2Inventory.dropAllExcept("axe", "tinderbox");
+                state = State.WOODCUTTING;
+                break;
+            case BANK:
+                List<String> itemNames = Arrays.stream(config.itemsToBank().split(",")).map(String::toLowerCase).collect(Collectors.toList());
+
+                if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
+                    if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(itemNames, returnPoint))
+                        return;
+                } else {
+                    if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation))
+                        return;
+                }
+
+                state = State.WOODCUTTING;
+                break;
+            case FIREMAKE:
+                do {
+                    burnLog(config);
+                }
+                while (Rs2Inventory.contains(config.TREE().getLog()));
+
+                walkBack(config);
+                state = State.WOODCUTTING;
+                break;
+        }
     }
 
     private boolean burnLog(AutoWoodcuttingConfig config) {
