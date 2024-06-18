@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.bankjs.development.BanksShopper;
+package net.runelite.client.plugins.microbot.bankjs.BanksShopper;
 
 import net.runelite.client.config.*;
 
