@@ -11,5 +11,3 @@ project.properties
 .vscode
 .factorypath
 .DS_Store
-bankjs/development
-.run
