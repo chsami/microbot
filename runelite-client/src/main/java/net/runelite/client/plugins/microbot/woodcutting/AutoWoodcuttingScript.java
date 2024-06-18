@@ -29,6 +29,8 @@ public class AutoWoodcuttingScript extends Script {
 
     public boolean cannotLightFire = false;
 
+    private boolean isResetting = false;
+
     public boolean run(AutoWoodcuttingConfig config) {
         if (config.hopWhenPlayerDetected()) {
             Microbot.showMessage("Make sure autologin plugin is enabled and randomWorld checkbox is checked!");
@@ -54,9 +56,8 @@ public class AutoWoodcuttingScript extends Script {
 
                 if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
 
-
-                if (!Rs2Inventory.isFull()) {
-                    GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), getInitialPlayerLocation());
+                if (!Rs2Inventory.isFull() && !isResetting) {
+                    GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), true, getInitialPlayerLocation());
                     if (tree != null) {
                         Rs2GameObject.interact(tree, config.TREE().getAction());
                         if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
@@ -64,22 +65,26 @@ public class AutoWoodcuttingScript extends Script {
                         }
                     }
                     return;
+                } else if(Rs2Inventory.isFull()){
+                    isResetting = true;
                 }
 
+                if(!isResetting)
+                    return;
 
                 switch (config.resetOptions()) {
                     case DROP:
                         Rs2Inventory.dropAllExcept("axe", "tinderbox");
+                        isResetting = false;
                         break;
                     case BANK:
                         List<String> itemNames = Arrays.stream(config.itemsToBank().split(",")).map(String::toLowerCase).collect(Collectors.toList());
 
-                        if (Rs2Inventory.isFull()) {
-                            if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation))
-                                return;
-                        }
+                        if(!Rs2Bank.walkToAndBankItems(itemNames))
+                            return;
 
                         walkBack(config);
+                        isResetting = false;
                         break;
                     case FIREMAKE:
                         do {
@@ -88,6 +93,7 @@ public class AutoWoodcuttingScript extends Script {
                         while (Rs2Inventory.contains(config.TREE().getLog()));
 
                         walkBack(config);
+                        isResetting = false;
                         break;
                 }
 
@@ -136,11 +142,11 @@ public class AutoWoodcuttingScript extends Script {
     private void walkBack(AutoWoodcuttingConfig config) {
         if (config.walkBack().equals(WoodcuttingWalkBack.INITIAL_LOCATION)) {
             Rs2Walker.walkTo(new WorldPoint(initialPlayerLocation.getX() - Random.random(-1, 1), initialPlayerLocation.getY() - Random.random(-1, 1), initialPlayerLocation.getPlane()));
-            sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(initialPlayerLocation) <= 4);
+            sleepUntilOnClientThread(() -> Rs2Player.getWorldLocation().distanceTo(initialPlayerLocation) <= 4);
         }
         if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
             Rs2Walker.walkTo(new WorldPoint(returnPoint.getX() - Random.random(-1, 1), returnPoint.getY() - Random.random(-1, 1), returnPoint.getPlane()));
-            sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(initialPlayerLocation) <= 4);
+            sleepUntilOnClientThread(() -> Rs2Player.getWorldLocation().distanceTo(initialPlayerLocation) <= 4);
         }
     }
 }
