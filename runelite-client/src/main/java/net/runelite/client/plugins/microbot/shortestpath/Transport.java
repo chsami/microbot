@@ -4,8 +4,12 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -312,6 +316,7 @@ public class Transport {
         return transports;
     }
 
+
     private enum TransportType {
         TRANSPORT,
         AGILITY_SHORTCUT,
@@ -455,5 +460,99 @@ public class Transport {
                 Rs2Widget.clickWidget(OOKOOKOLLY_UNDRI);
         }
         return true;
+    }
+
+    // Constants for widget IDs
+    private static final int FAIRY_RING_ID = 29495;
+    private static final int FAIRY_RING_MENU = 26083328;
+
+    private static final int SLOT_ONE = 26083331;
+    private static final int SLOT_TWO = 26083332;
+    private static final int SLOT_THREE = 26083333;
+    private static final int TELEPORT_BUTTON = 26083354;
+
+    private static final int SLOT_ONE_CW_ROTATION = 26083347;
+    private static final int SLOT_ONE_ACW_ROTATION = 26083348;
+    private static final int SLOT_TWO_CW_ROTATION = 26083349;
+    private static final int SLOT_TWO_ACW_ROTATION = 26083350;
+    private static final int SLOT_THREE_CW_ROTATION = 26083351;
+    private static final int SLOT_THREE_ACW_ROTATION = 26083352;
+
+    public boolean handleFairyRing() {
+        // Get Transport Information
+        String displayInfo = getDisplayInfo();
+        String objectName = getObjectName();
+        int objectId = getObjectId();
+        String action = getAction();
+        WorldPoint origin = getOrigin();
+        WorldPoint destination = getDestination();
+
+        System.out.println("Display info: " + displayInfo);
+        System.out.println("Object Name: " + objectName);
+        System.out.println("Object ID: " + objectId);
+        System.out.println("Action: " + action);
+        System.out.println("Origin: " + origin);
+        System.out.println("Destination: " + destination);
+
+        // Check if the widget is already visible
+        if (!Rs2Widget.isHidden(FAIRY_RING_MENU)) {
+            System.out.println("Widget is already visible. Skipping interaction.");
+            rotateSlotToDesiredRotation(SLOT_ONE, Rs2Widget.getWidget(SLOT_ONE).getRotationY(), getDesiredRotation(getDisplayInfo().charAt(0)), SLOT_ONE_ACW_ROTATION, SLOT_ONE_CW_ROTATION);
+            rotateSlotToDesiredRotation(SLOT_TWO, Rs2Widget.getWidget(SLOT_TWO).getRotationY(), getDesiredRotation(getDisplayInfo().charAt(1)), SLOT_TWO_ACW_ROTATION, SLOT_TWO_CW_ROTATION);
+            rotateSlotToDesiredRotation(SLOT_THREE, Rs2Widget.getWidget(SLOT_THREE).getRotationY(), getDesiredRotation(getDisplayInfo().charAt(2)), SLOT_THREE_ACW_ROTATION, SLOT_THREE_CW_ROTATION);
+            Rs2Widget.clickWidget(TELEPORT_BUTTON);
+            return true;
+        }
+
+        if (Rs2Equipment.isWearing("Dramen staff") || Rs2Equipment.isWearing("Lunar staff")) {
+            System.out.println("Interacting with the fairy ring directly.");
+            Rs2GameObject.interact(FAIRY_RING_ID, "Configure");
+        }
+        return true;
+    }
+
+    private boolean rotateSlotToDesiredRotation(int slotId, int currentRotation, int desiredRotation, int slotAcwRotationId, int slotCwRotationId) {
+        int anticlockwiseTurns = (desiredRotation - currentRotation + 2048) % 2048;
+        int clockwiseTurns = (currentRotation - desiredRotation + 2048) % 2048;
+
+        if (clockwiseTurns <= anticlockwiseTurns) {
+            System.out.println("Rotating slot " + slotId + " clockwise " + (clockwiseTurns / 512) + " times.");
+            for (int i = 0; i < clockwiseTurns / 512; i++) {
+                Rs2Widget.clickWidget(slotCwRotationId);
+                sleep(600, 1200);
+            }
+            return true;
+        } else {
+                System.out.println("Rotating slot " + slotId + " anticlockwise " + (anticlockwiseTurns / 512) + " times.");
+                for (int i = 0; i < anticlockwiseTurns / 512; i++) {
+                    Rs2Widget.clickWidget(slotAcwRotationId);
+                    sleep(600, 1200);
+                }
+                return true;
+            }
+
+    }
+
+    public int getDesiredRotation(char letter) {
+        switch (letter) {
+            case 'A':
+            case 'I':
+            case 'P':
+                return 0;
+            case 'B':
+            case 'J':
+            case 'Q':
+                return 512;
+            case 'C':
+            case 'K':
+            case 'R':
+                return 1024;
+            case 'D':
+            case 'L':
+            case 'S':
+                return 1536;
+            default:
+                return -1;
+        }
     }
 }
