@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.microbot.playerassist;
 
 import com.google.inject.Provides;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
@@ -22,6 +24,7 @@ import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.playerassist.skill.AttackStyleScript;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.ui.JagexColors;
@@ -45,31 +48,18 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class PlayerAssistPlugin extends Plugin {
-    @Inject
-    private PlayerAssistConfig config;
-    @Inject
-    private ConfigManager configManager;
-    @Provides
-    PlayerAssistConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(PlayerAssistConfig.class);
-    }
-
-    @Inject
-    private OverlayManager overlayManager;
-    @Inject
-    private PlayerAssistOverlay playerAssistOverlay;
-
+    public static final String version = "1.0.0";
     private static final String SET = "Set";
     private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
     // SAFE_SPOT = "Safe Spot";
     private static final String SAFE_SPOT = ColorUtil.wrapWithColorTag("Safe Spot", JagexColors.CHAT_PRIVATE_MESSAGE_TEXT_TRANSPARENT_BACKGROUND);
-    private static final String ADD_TO = "Add to Fight:";
-    private static final String REMOVE_FROM = "Remove from Fight:";
+    private static final String ADD_TO = "Start Fighting:";
+    private static final String REMOVE_FROM = "Stop Fighting:";
     private static final String WALK_HERE = "Walk here";
     private static final String ATTACK = "Attack";
-    private MenuEntry lastClick;
-    private Point lastMenuOpenedPoint;
-
+    @Getter
+    @Setter
+    public static int cooldown = 0;
     private final CannonScript cannonScript = new CannonScript();
     private final AttackNpcScript attackNpc = new AttackNpcScript();
     private final CombatPotionScript combatPotion = new CombatPotionScript();
@@ -83,11 +73,31 @@ public class PlayerAssistPlugin extends Plugin {
     private final BuryScatterScript buryScatterScript = new BuryScatterScript();
     private final AttackStyleScript attackStyleScript = new AttackStyleScript();
     private final BankerScript bankerScript = new BankerScript();
+    @Inject
+    private PlayerAssistConfig config;
+    @Inject
+    private ConfigManager configManager;
+    @Inject
+    private OverlayManager overlayManager;
+    @Inject
+    private PlayerAssistOverlay playerAssistOverlay;
+    @Inject
+    private PlayerAssistInfoOverlay playerAssistInfoOverlay;
+    private MenuEntry lastClick;
+    private Point lastMenuOpenedPoint;
+
+    @Provides
+    PlayerAssistConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(PlayerAssistConfig.class);
+    }
+
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
+        cooldown = 0;
         if (overlayManager != null) {
             overlayManager.add(playerAssistOverlay);
+            overlayManager.add(playerAssistInfoOverlay);
         }
         if (!config.toggleCenterTile())
             setCenter(Rs2Player.getWorldLocation());
@@ -124,6 +134,7 @@ public class PlayerAssistPlugin extends Plugin {
         bankerScript.shutdown();
         resetLocation();
         overlayManager.remove(playerAssistOverlay);
+        overlayManager.remove(playerAssistInfoOverlay);
     }
 
     private void resetLocation() {
@@ -219,7 +230,9 @@ public class PlayerAssistPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick gameTick) {
-       //execute flicker script
+        if (cooldown > 0 && !Rs2Combat.inCombat())
+            cooldown--;
+        //execute flicker script
         if(config.togglePrayer())
             flickerScript.onGameTick();
     }
@@ -259,10 +272,10 @@ public class PlayerAssistPlugin extends Plugin {
         if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
             addMenuEntry(event, SET, SAFE_SPOT, 1);
         }
-        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(ATTACK) && config.attackableNpcs().contains(getNpcNameFromMenuEntry(Text.removeTags(event.getTarget())))) {
+        if (event.getOption().equals(ATTACK) && config.attackableNpcs().contains(getNpcNameFromMenuEntry(Text.removeTags(event.getTarget())))) {
             addMenuEntry(event, REMOVE_FROM, event.getTarget(), 1);
         }
-        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(ATTACK) && !config.attackableNpcs().contains(getNpcNameFromMenuEntry(Text.removeTags(event.getTarget())))) {
+        if (event.getOption().equals(ATTACK) && !config.attackableNpcs().contains(getNpcNameFromMenuEntry(Text.removeTags(event.getTarget())))) {
             addMenuEntry(event, ADD_TO, event.getTarget(), 1);
         }
 
