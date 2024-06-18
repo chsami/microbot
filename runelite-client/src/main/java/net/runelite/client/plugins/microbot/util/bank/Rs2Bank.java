@@ -1088,26 +1088,6 @@ public class Rs2Bank {
     }
 
     /**
-     * Banks items if your inventory is full.
-     *
-     * @param itemNames
-     * @return
-     */
-    public static boolean walkToAndBankItems(List<String> itemNames) {
-        if (Rs2Inventory.isFull()) {
-            boolean isBankOpen = Rs2Bank.walkToBankAndUseBank();
-            if (isBankOpen) {
-                for (String itemName : itemNames) {
-                    Rs2Bank.depositAll(x -> x.name.toLowerCase().contains(itemName));
-                }
-            }
-            return false;
-        }
-
-        return !Rs2Inventory.isFull();
-    }
-
-    /**
      * Check if "noted" button is toggled on
      *
      * @return
