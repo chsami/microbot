@@ -477,6 +477,8 @@ public class Transport {
     private static final int SLOT_TWO_ACW_ROTATION = 26083350;
     private static final int SLOT_THREE_CW_ROTATION = 26083351;
     private static final int SLOT_THREE_ACW_ROTATION = 26083352;
+    private static Rs2Item startingWeapon = null;
+    private static int startingWeaponId;
 
     public boolean handleFairyRing() {
         // Get Transport Information
@@ -487,12 +489,21 @@ public class Transport {
         WorldPoint origin = getOrigin();
         WorldPoint destination = getDestination();
 
+        if (startingWeapon == null) {
+
+
+        startingWeapon = Rs2Equipment.get(EquipmentInventorySlot.WEAPON);
+            System.out.println(startingWeapon);
+            startingWeaponId = startingWeapon.getId();
+        }
+
         System.out.println("Display info: " + displayInfo);
         System.out.println("Object Name: " + objectName);
         System.out.println("Object ID: " + objectId);
         System.out.println("Action: " + action);
         System.out.println("Origin: " + origin);
         System.out.println("Destination: " + destination);
+        System.out.println("Starting Weapon ID: " + startingWeaponId);
 
         // Check if the widget is already visible
         if (!Rs2Widget.isHidden(FAIRY_RING_MENU)) {
@@ -501,12 +512,24 @@ public class Transport {
             rotateSlotToDesiredRotation(SLOT_TWO, Rs2Widget.getWidget(SLOT_TWO).getRotationY(), getDesiredRotation(getDisplayInfo().charAt(1)), SLOT_TWO_ACW_ROTATION, SLOT_TWO_CW_ROTATION);
             rotateSlotToDesiredRotation(SLOT_THREE, Rs2Widget.getWidget(SLOT_THREE).getRotationY(), getDesiredRotation(getDisplayInfo().charAt(2)), SLOT_THREE_ACW_ROTATION, SLOT_THREE_CW_ROTATION);
             Rs2Widget.clickWidget(TELEPORT_BUTTON);
+            sleep(1200,1800);
+            if (!Rs2Equipment.isWearing(startingWeaponId)) {
+                sleep(3000,3600); // Required due to long animation time
+                System.out.println("Equipping Starting Weapon: " + startingWeaponId);
+                Rs2Inventory.equip(startingWeaponId);
+            }
             return true;
         }
 
         if (Rs2Equipment.isWearing("Dramen staff") || Rs2Equipment.isWearing("Lunar staff")) {
             System.out.println("Interacting with the fairy ring directly.");
             Rs2GameObject.interact(FAIRY_RING_ID, "Configure");
+        } else if (Rs2Inventory.contains("Dramen staff")) {
+            Rs2Inventory.equip("Dramen staff");
+            sleep(600);
+        } else if (Rs2Inventory.contains("Lunar staff")) {
+            Rs2Inventory.equip("Lunar staff");
+            sleep(600);
         }
         return true;
     }
