@@ -17,7 +17,7 @@ public class TanLeatherScript extends Script {
     public static long hidesTanned = 0;
     private int profitPerHide = 0;
     private long startTime;
-    
+
     // State management
     private enum State {
         TANNING,
@@ -25,7 +25,7 @@ public class TanLeatherScript extends Script {
     }
 
     private State currentState = State.TANNING;
-    
+
     public boolean run(TanLeatherConfig config) {
         startTime = System.currentTimeMillis();
         int unprocessedItemPrice = Microbot.getItemManager().search(config.ITEM().getName()).get(0).getPrice();
@@ -96,6 +96,7 @@ public class TanLeatherScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
-        hidesTanned = 0;
+        hidesTanned = 0; // Reset the count of tanned hides
+        combinedMessage = ""; // Reset the combined message
     }
 }
