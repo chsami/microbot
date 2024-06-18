@@ -143,7 +143,7 @@ public class Rs2Walker {
                     }
                 }
 
-                if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
+                if (Rs2Player.getWorldLocation().distanceTo(target) < distance || Rs2Player.getWorldLocation().distanceTo(target) == 1) {
                     System.out.println("walk minimap");
                     Rs2Walker.walkMiniMap(target);
                     sleep(600, 1200);

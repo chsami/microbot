@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static net.runelite.api.TileItem.OWNERSHIP_GROUP;
+import static net.runelite.api.TileItem.OWNERSHIP_OTHER;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 @Slf4j
@@ -256,40 +257,18 @@ public class Rs2GroundItem {
     }
 
 
-    /**
-     * This is an overloaded method that calls the original method with a default value for the antiLureProtection parameter.
-     * It is used to loot items based on their value within a specified range.
-     *
-     * @param minValue The minimum value of the items to be looted.
-     * @param maxValue The maximum value of the items to be looted.
-     * @param range The range within which to search for items.
-     * @return true if an item was successfully looted, false otherwise.
-     */
-    public static boolean lootItemBasedOnValue(int minValue, int maxValue, int range) {
-        return lootItemBasedOnValue(minValue, maxValue, range, false);
-    }
-
-    /**
-     * This method is used to loot items based on their value within a specified range.
-     * It also includes an anti-lure protection mechanism that can be toggled on or off.
-     *
-     * @param minValue The minimum value of the items to be looted.
-     * @param maxValue The maximum value of the items to be looted.
-     * @param range The range within which to search for items.
-     * @param antiLureProtection A boolean flag that, when true, prevents the looting of items that are owned and dropped by other players.
-     * @return true if an item was successfully looted, false otherwise.
-     */
-    public static boolean lootItemBasedOnValue(int minValue, int maxValue, int range, int minItems, boolean delayedLooting, boolean antiLureProtection) {
-        Predicate<GroundItem> filter = groundItem -> groundItem.getGePrice() > minValue && groundItem.getGePrice() < maxValue &&
-                groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < range &&
-                (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_GROUP);
+    public static boolean lootItemBasedOnValue(LootingParameters params) {
+        Predicate<GroundItem> filter = groundItem -> groundItem.getGePrice() > params.getMinValue() && groundItem.getGePrice() < params.getMaxValue() &&
+                groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < params.getRange() &&
+                (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
+                (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_OTHER);
 
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
                 .filter(filter)
                 .collect(Collectors.toList());
 
-        if (groundItems.size() < minItems) return false;
-        if (delayedLooting) {
+        if (groundItems.size() < params.getMinItems()) return false;
+        if (params.isDelayedLooting()) {
             // Get the ground item with the lowest despawn time
             GroundItem item = groundItems.stream().min(Comparator.comparingInt(Rs2GroundItem::calculateDespawnTime)).orElse(null);
             assert item != null;
@@ -297,7 +276,8 @@ public class Rs2GroundItem {
         }
 
         for (GroundItem groundItem : groundItems) {
-            if (groundItem.getQuantity() < minItems) continue;
+            if (groundItem.getQuantity() < params.getMinItems()) continue;
+            if (Rs2Inventory.getEmptySlots() <= params.getMinInvSlots()) return true;
             if (interact(groundItem)) {
                 Microbot.pauseAllScripts = true;
                 sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 5000);
@@ -306,22 +286,18 @@ public class Rs2GroundItem {
         sleepUntil(() -> !isLooting(filter));
         return !groundItems.isEmpty();
     }
-    // overload
-    public static boolean lootItemBasedOnValue(int minValue, int maxValue, int range, boolean antiLureProtection) {
-        return lootItemBasedOnValue(minValue, maxValue, range,1,false, antiLureProtection);
-    }
 
-    // Loot items based on names
-    public static boolean lootItemsBasedOnNames(int range,boolean antiLureProtection,int minItems,int minQuantity,boolean delayedLooting, String... names) {
+    public static boolean lootItemsBasedOnNames(LootingParameters params) {
         final Predicate<GroundItem> filter = groundItem ->
-                groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < range &&
-                (!antiLureProtection || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
-                Arrays.stream(names).anyMatch(name -> groundItem.getName().toLowerCase().contains(name.toLowerCase()));
+                groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < params.getRange() &&
+                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
+                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_OTHER) &&
+                        Arrays.stream(params.getNames()).anyMatch(name -> groundItem.getName().toLowerCase().contains(name.toLowerCase()));
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
                 .filter(filter)
                 .collect(Collectors.toList());
-        if (groundItems.size() < minItems) return false;
-        if(delayedLooting){
+        if (groundItems.size() < params.getMinItems()) return false;
+        if (params.isDelayedLooting()) {
             // Get the ground item with the lowest despawn time
             GroundItem item = groundItems.stream().min(Comparator.comparingInt(Rs2GroundItem::calculateDespawnTime)).orElse(null);
             assert item != null;
@@ -329,7 +305,8 @@ public class Rs2GroundItem {
         }
 
         for (GroundItem groundItem : groundItems) {
-            if (groundItem.getQuantity() < minQuantity) continue;
+            if (groundItem.getQuantity() < params.getMinQuantity()) continue;
+            if (Rs2Inventory.getEmptySlots() <= params.getMinInvSlots()) return true;
             if (interact(groundItem)) {
                 Microbot.pauseAllScripts = true;
                 sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100,5000);
@@ -338,10 +315,7 @@ public class Rs2GroundItem {
         sleepUntil(() -> !isLooting(filter));
         return !groundItems.isEmpty();
     }
-    // overload
-    public static boolean lootItemsBasedOnNames(int range,boolean antiLureProtection, String... names) {
-        return lootItemsBasedOnNames(range,antiLureProtection,1,1,false,names);
-    }
+
 
     private static boolean isLooting(Predicate<GroundItem> filter) {
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()

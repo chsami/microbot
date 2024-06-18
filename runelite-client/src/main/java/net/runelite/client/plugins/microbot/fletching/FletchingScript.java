@@ -157,9 +157,9 @@ public class FletchingScript extends Script {
         }
         sleepUntil(() -> Rs2Widget.getWidget(17694736) == null);
         if (fletchingMode == FletchingMode.PROGRESSIVE) {
-            sleepUntil(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired()), 60000);
+            sleepUntil(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired()) || hasLeveledUp, 60000);
         } else {
-            sleepUntil(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired()), 60000);
+            sleepUntil(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired()) || hasLeveledUp, 60000);
         }
     }
 

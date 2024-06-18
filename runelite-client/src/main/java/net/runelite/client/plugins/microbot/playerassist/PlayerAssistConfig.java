@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.playerassist;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.config.*;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
+import net.runelite.client.plugins.microbot.playerassist.enums.PlayStyle;
 
 @ConfigGroup(net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig.GROUP)
 public interface PlayerAssistConfig extends Config {
@@ -16,6 +17,58 @@ public interface PlayerAssistConfig extends Config {
             closedByDefault = false
     )
     String generalSection = "general";
+    @ConfigSection(
+            name = "Combat",
+            description = "Combat",
+            position = 1,
+            closedByDefault = false
+    )
+    String combatSection = "Combat";
+    @ConfigSection(
+            name = "Banking",
+            description = "Banking settings",
+            position = 992,
+            closedByDefault = true
+    )
+    String banking = "Banking";
+    //Gear section
+    @ConfigSection(
+            name = "Gear",
+            description = "Gear",
+            position = 55,
+            closedByDefault = true
+    )
+    String gearSection = "Gear";
+    @ConfigSection(
+            name = "Food & Potions",
+            description = "Food & Potions",
+            position = 2,
+            closedByDefault = false
+    )
+    String foodAndPotionsSection = "Food & Potions";
+    @ConfigSection(
+            name = "Loot",
+            description = "Loot",
+            position = 3,
+            closedByDefault = false
+    )
+    String lootSection = "Loot";
+    //Prayer section
+    @ConfigSection(
+            name = "Prayer",
+            description = "Prayer",
+            position = 4,
+            closedByDefault = false
+    )
+    String prayerSection = "Prayer";
+    //Skilling section
+    @ConfigSection(
+            name = "Skilling",
+            description = "Skilling",
+            position = 5,
+            closedByDefault = false
+    )
+    String skillingSection = "Combat Skilling";
 
     @ConfigItem(
             keyName = "GUIDE",
@@ -34,24 +87,9 @@ public interface PlayerAssistConfig extends Config {
                 "6. PrayFlick should work at the moment.\n" +
                 "7. SafeSpot & auto loot arrows might act funny and are not tested thoroughly. Use at your own risk!\n" +
                 "8. Shift Right-click the ground to select the center tile.\n" +
-                "9. Shift Right-click NPCs to add them to the attack list.";
+                "9. Right-click NPCs to add them to the attack list.";
     }
 
-    @ConfigSection(
-            name = "Combat",
-            description = "Combat",
-            position = 1,
-            closedByDefault = false
-    )
-    String combatSection = "Combat";
-
-    @ConfigSection(
-            name = "Banking",
-            description = "Banking settings",
-            position = 992,
-            closedByDefault = true
-    )
-    String banking = "Banking";
     @ConfigItem(
             keyName = "Combat",
             name = "Auto attack npc",
@@ -96,18 +134,6 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
-    //safe spot
-    @ConfigItem(
-            keyName = "Safe Spot",
-            name = "Safe Spot",
-            description = "Right-click the ground to select the safe spot tile",
-            position = 4,
-            section = combatSection
-    )
-    default boolean toggleSafeSpot() {
-        return false;
-    }
-
     @ConfigItem(
             keyName = "Cannon",
             name = "Auto reload cannon",
@@ -119,13 +145,29 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
-    @ConfigSection(
-            name = "Food & Potions",
-            description = "Food & Potions",
-            position = 2,
-            closedByDefault = false
+    //safe spot
+    @ConfigItem(
+            keyName = "Safe Spot",
+            name = "Safe Spot",
+            description = "Right-click the ground to select the safe spot tile",
+            position = 5,
+            section = combatSection
     )
-    String foodAndPotionsSection = "Food & Potions";
+    default boolean toggleSafeSpot() {
+        return false;
+    }
+
+    //PlayStyle
+    @ConfigItem(
+            keyName = "PlayStyle",
+            name = "Play Style",
+            description = "Play Style",
+            position = 6,
+            section = combatSection
+    )
+    default PlayStyle playStyle() {
+        return PlayStyle.AGGRESSIVE;
+    }
 
     @ConfigItem(
             keyName = "Food",
@@ -184,14 +226,6 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
-    @ConfigSection(
-            name = "Loot",
-            description = "Loot",
-            position = 3,
-            closedByDefault = false
-    )
-    String lootSection = "Loot";
-
     @ConfigItem(
             keyName = "Loot items",
             name = "Auto loot items",
@@ -224,6 +258,7 @@ public interface PlayerAssistConfig extends Config {
     default int maxPriceOfItemsToLoot() {
         return 10000000;
     }
+    // toggle scatter
 
     @ConfigItem(
             keyName = "Loot arrows",
@@ -246,7 +281,6 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleBuryBones() {
         return false;
     }
-    // toggle scatter
 
     @ConfigItem(
             keyName = "Scatter",
@@ -258,6 +292,7 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleScatter() {
         return false;
     }
+
     // delayed looting
     @ConfigItem(
             keyName = "delayedLooting",
@@ -270,15 +305,17 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
-
-    //Prayer section
-    @ConfigSection(
-            name = "Prayer",
-            description = "Prayer",
-            position = 4,
-            closedByDefault = false
+    //set center tile manually
+    @ConfigItem(
+            keyName = "Center Tile",
+            name = "Manual Center Tile",
+            description = "Right-click the ground to select the center tile",
+            position = 6,
+            section = combatSection
     )
-    String prayerSection = "Prayer";
+    default boolean toggleCenterTile() {
+        return false;
+    }
 
     //Use quick prayer
     @ConfigItem(
@@ -315,15 +352,6 @@ public interface PlayerAssistConfig extends Config {
     default boolean toggleLazyFlick() {
         return false;
     }
-
-    //Skilling section
-    @ConfigSection(
-            name = "Skilling",
-            description = "Skilling",
-            position = 5,
-            closedByDefault = false
-    )
-    String skillingSection = "Combat Skilling";
 
     //Balance combat skills
     @ConfigItem(
@@ -408,21 +436,36 @@ public interface PlayerAssistConfig extends Config {
         return 99;
     }
 
-    //Gear section
-    @ConfigSection(
-            name = "Gear",
-            description = "Gear",
-            position = 55,
-            closedByDefault = false
+    // only loot my items
+    @ConfigItem(
+            keyName = "onlyLootMyItems",
+            name = "Only Loot My Items",
+            description = "Only loot items that are dropped by you",
+            position = 6,
+            section = lootSection
     )
-    String gearSection = "Gear";
+    default boolean toggleOnlyLootMyItems() {
+        return false;
+    }
 
-    // Inventory setup selection
+    // Use Inventory Setup
+    @ConfigItem(
+            keyName = "useInventorySetup",
+            name = "Use Inventory Setup",
+            description = "Use Inventory Setup, make sure to select consumables used in the bank section",
+            position = 1,
+            section = gearSection
+    )
+    default boolean useInventorySetup() {
+        return false;
+    }
+
+    // Inventory setup selection TODO: Add inventory setup selection
     @ConfigItem(
             keyName = "InventorySetupName",
             name = "Inventory setup name",
             description = "Create an inventory setup in the inventory setup plugin and enter the name here",
-            position = 0,
+            position = 99,
             section = gearSection
     )
     default String inventorySetup() {
