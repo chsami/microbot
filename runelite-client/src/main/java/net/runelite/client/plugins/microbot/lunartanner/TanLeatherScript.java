@@ -33,14 +33,21 @@ public class TanLeatherScript extends Script {
         profitPerHide = processedItemPrice - unprocessedItemPrice;
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!super.run()) return;
-            if (!Microbot.isLoggedIn()) return;
             try {
-                if (Microbot.pauseAllScripts) return;
+                if (!super.run() || !Microbot.isLoggedIn()) return;
                 if (Rs2Inventory.hasItem(config.ITEM().getName(), true)) {
+                    int initialHideCount = Rs2Inventory.count(config.ITEM().getFinished());
                     Rs2Magic.cast(MagicAction.TAN_LEATHER);
-                    sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(config.ITEM().getFinished()));
-                    hidesTanned++;
+
+                    // Wait for the inventory count to change indicating hides have been tanned
+                    while (Rs2Inventory.count(config.ITEM().getFinished()) == initialHideCount) {
+                        // Check the inventory count periodically without sleeping
+                        // You can adjust the delay time based on the frequency of checking
+                        // This loop will exit once the count changes
+                    }
+
+                    int hidesTannedThisAction = Rs2Inventory.count(config.ITEM().getFinished()) - initialHideCount;
+                    hidesTanned += hidesTannedThisAction;
                 } else {
                     bank(config);
                 }
@@ -70,10 +77,7 @@ public class TanLeatherScript extends Script {
     private void bank(TanLeatherConfig config) {
         if (currentState != State.BANKING) {
             currentState = State.BANKING;
-            if (!Rs2Bank.isOpen()) {
-                Rs2Bank.openBank();
-                sleepUntilOnClientThread(Rs2Bank::isOpen);
-            }
+            if (!Rs2Bank.openBank()) return;
 
             Rs2Bank.depositAll(config.ITEM().getFinished());
             sleepUntilOnClientThread(() -> !Rs2Inventory.hasItem(config.ITEM().getFinished()));
@@ -82,12 +86,12 @@ public class TanLeatherScript extends Script {
                 Rs2Bank.withdrawAll(config.ITEM().getName());
                 sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(config.ITEM().getName()));
             } else {
+                Microbot.showMessage("No more " + config.ITEM().getName() + " to tan.");
                 shutdown();
                 return;
             }
 
             Rs2Bank.closeBank();
-            sleepUntilOnClientThread(() -> !Rs2Bank.isOpen());
             currentState = State.TANNING;
             calculateProfitAndDisplay(config);
         }
@@ -98,5 +102,6 @@ public class TanLeatherScript extends Script {
         super.shutdown();
         hidesTanned = 0; // Reset the count of tanned hides
         combinedMessage = ""; // Reset the combined message
+        currentState = State.TANNING; // Reset the current state
     }
 }
