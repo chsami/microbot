@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.bankjs.development.BanksShopper;
+package net.runelite.client.plugins.microbot.bankjs.BanksShopper;
 
 
 import lombok.Getter;
@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Actions {
-    BUY("Buy"),
-    SELL("Sell");
+public enum Quantities {
+    ONE("1"),
+    FIVE("5"),
+    TEN("10"),
+    FIFTY("50");
 
     private final String action;
 

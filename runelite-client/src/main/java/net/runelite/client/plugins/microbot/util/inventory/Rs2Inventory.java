@@ -980,7 +980,7 @@ public class Rs2Inventory {
     /**
      * Interacts with an item with the specified name in the inventory using the specified action.
      *
-     * @param name   The name of the item to interact with.
+     * @param names   The name of the item to interact with.
      * @param action The action to perform on the item.
      * @return True if the interaction was successful, false otherwise.
      */
@@ -1549,6 +1549,20 @@ public class Rs2Inventory {
         sleep(100);
         if (!isItemSelected()) return false;
         Rs2Npc.interact(npcID);
+        return true;
+    }
+
+    /**
+     * @param itemId
+     * @param Npc
+     * @return
+     */
+    public static boolean useItemOnNpc(int itemId, NPC Npc) {
+        if (Rs2Bank.isOpen()) return false;
+        use(itemId);
+        sleep(100);
+        if (!isItemSelected()) return false;
+        Rs2Npc.interact(Npc);
         return true;
     }
 

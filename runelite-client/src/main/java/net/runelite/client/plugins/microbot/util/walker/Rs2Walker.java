@@ -557,6 +557,19 @@ public class Rs2Walker {
                                 handleTrapdoor(b);
                             }
 
+                            if (b.isSpiritTree()) {
+                                b.handleSpiritTree();
+                            }
+
+
+                            if (b.isGnomeGlider()) {
+                                b.handleGlider();
+                            }
+
+                            if (b.isFairyRing()) {
+                                 b.handleFairyRing();
+                            }
+
                             GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
 
                             if (gameObject != null && gameObject.getId() == b.getObjectId()) {
