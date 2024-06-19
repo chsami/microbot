@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.thieving;
 
-import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.thieving.enums.ThievingNpc;
@@ -16,8 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class ThievingScript extends Script {
 
@@ -42,8 +39,8 @@ public class ThievingScript extends Script {
                 }
                 openCoinPouches(config);
                 wearDodgyNecklace();
-                pickpocket();
                 Rs2Player.eatAt(config.hitpoints());
+                pickpocket();
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
