@@ -354,7 +354,7 @@ public class Rs2GameObject {
         return null;
     }
 
-    public static GameObject findObject(String objectName, boolean exact, int distance, WorldPoint anchorPoint) {
+    public static GameObject findObject(String objectName, boolean exact, int distance, boolean hasLineOfSight, WorldPoint anchorPoint) {
         List<GameObject> gameObjects = getGameObjectsWithinDistance(distance, anchorPoint);
 
         if (gameObjects == null) {
@@ -363,6 +363,9 @@ public class Rs2GameObject {
 
         for (GameObject gameObject : gameObjects) {
             ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
+
+            if(hasLineOfSight && !hasLineOfSight(gameObject))
+                continue;
 
             if (objComp == null) {
                 continue;
