@@ -23,7 +23,7 @@ public class CombatPotionScript extends Script {
                 List<Rs2Item> rs2Items = Rs2Inventory.getPotions();
                 for (Rs2Item rs2Item: rs2Items
                 ) {
-                    if (rs2Item.name.contains("combat") || rs2Item.name.contains("ranging") || rs2Item.name.contains("bastion")) {
+                    if (rs2Item.name.toLowerCase().contains("combat") || rs2Item.name.toLowerCase().contains("ranging") || rs2Item.name.toLowerCase().contains("bastion")) {
                         Rs2Inventory.interact(rs2Item, "drink");
                         sleep(1800, 2400);
                         Rs2Inventory.dropAll("Vial");

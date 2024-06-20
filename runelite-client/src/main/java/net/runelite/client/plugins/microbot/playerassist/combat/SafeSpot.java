@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistPlugin;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.Arrays;
@@ -40,7 +41,7 @@ public boolean run(PlayerAssistConfig config) {
                 List<NPC> npcList = Rs2Npc.getNpcsAttackingPlayer(Microbot.getClient().getLocalPlayer());
 
                 //if there is an NPC interacting with us, and we are not Interacting with it, attack it again
-                if (!npcList.isEmpty()) {
+                if (!npcList.isEmpty() && !Rs2Player.isInMulti()) {
                     npcList.forEach(npc -> {
                         if (Microbot.getClient().getLocalPlayer().getInteracting() == null) {
                             if (npcsToAttack.get().contains(npc.getName())) {
@@ -65,7 +66,7 @@ public boolean run(PlayerAssistConfig config) {
                 List<NPC> npcList = Rs2Npc.getNpcsAttackingPlayer(Microbot.getClient().getLocalPlayer());
 
                 //if there is an NPC interacting with us, and we are not Interacting with it, attack it again
-                if (!npcList.isEmpty()) {
+                if (!npcList.isEmpty() && !Rs2Player.isInMulti()) {
                     npcList.forEach(npc -> {
                         if (Microbot.getClient().getLocalPlayer().getInteracting() == null) {
                             if (npcsToAttack.get().contains(npc.getName())) {

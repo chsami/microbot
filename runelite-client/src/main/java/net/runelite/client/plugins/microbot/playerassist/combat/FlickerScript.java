@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyle;
 import net.runelite.client.plugins.microbot.playerassist.enums.AttackStyleMapper;
+import net.runelite.client.plugins.microbot.playerassist.enums.PrayerStyle;
 import net.runelite.client.plugins.microbot.playerassist.model.Monster;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
@@ -33,6 +34,7 @@ public class FlickerScript extends Script {
 
     int lastPrayerTick;
     int currentTick;
+    int tickToFlick;
     List<NPC> npcs;
 
     /**
@@ -46,11 +48,17 @@ public class FlickerScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn() || !config.togglePrayer()) return;
-
+                if (config.prayerStyle() != PrayerStyle.LAZY_FLICK && config.prayerStyle() != PrayerStyle.PERFECT_LAZY_FLICK)
+                    return;
+                if (config.prayerStyle() == PrayerStyle.LAZY_FLICK) {
+                    tickToFlick = 1;
+                }
+                if (config.prayerStyle() == PrayerStyle.PERFECT_LAZY_FLICK) {
+                    tickToFlick = 0;
+                }
                 npcs = Rs2Npc.getNpcsForPlayer();
                 usePrayer = config.togglePrayer();
-                lazyFlick = config.toggleLazyFlick();
-                flickQuickPrayer = config.toggleQuickPrayFlick();
+                flickQuickPrayer = config.toggleQuickPray();
                 currentTick = Microbot.getClient().getTickCount();
                 // Keep track of which monsters still have aggro on the player
                 currentMonstersAttackingUs.forEach(monster -> {
@@ -117,11 +125,12 @@ public class FlickerScript extends Script {
 
         if (!currentMonstersAttackingUs.isEmpty()) {
 
+
             for (Monster currentMonster : currentMonstersAttackingUs) {
                 currentMonster.lastAttack--;
-                resetLastAttack();
 
-                if (currentMonster.lastAttack == 1 && lazyFlick && !currentMonster.npc.isDead()) {
+
+                if (currentMonster.lastAttack == tickToFlick && !currentMonster.npc.isDead()) {
 
                     if(flickQuickPrayer){
                         prayFlickAttackStyle = AttackStyle.MIXED;
@@ -131,7 +140,7 @@ public class FlickerScript extends Script {
 
 
                 }
-
+                resetLastAttack();
 
             }
         }
