@@ -52,7 +52,7 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.draynorCourse.add(new AgilityObstacleModel(TIGHTROPE_11406));
         agilityScript.draynorCourse.add(new AgilityObstacleModel(NARROW_WALL));
         agilityScript.draynorCourse.add(new AgilityObstacleModel(WALL_11630, -1, 3256, Operation.GREATER, Operation.GREATER_EQUAL));
-        agilityScript.draynorCourse.add(new AgilityObstacleModel(GAP_11631, -1, 3256, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.draynorCourse.add(new AgilityObstacleModel(GAP_11631, -1, 3255, Operation.GREATER, Operation.LESS_EQUAL));
         agilityScript.draynorCourse.add(new AgilityObstacleModel(CRATE_11632));
 
         // Al Kharid
