@@ -1,5 +1,8 @@
 package net.runelite.client.plugins.microbot.thieving;
 
+import net.runelite.api.NPC;
+import net.runelite.api.Skill;
+import net.runelite.client.game.npcoverlay.HighlightedNpc;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.thieving.enums.ThievingNpc;
@@ -13,6 +16,7 @@ import net.runelite.client.plugins.timers.TimersPlugin;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,7 @@ public class ThievingScript extends Script {
                 List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
 
                 if (foods.isEmpty()) {
+                    openCoinPouches(config);
                     bank();
                     return;
                 }
@@ -85,13 +90,22 @@ public class ThievingScript extends Script {
     }
 
     private void pickpocket() {
+        if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < config.hitpoints())
+            return;
         if (config.THIEVING_NPC() != ThievingNpc.NONE) {
             sleepUntil(() -> TimersPlugin.t == null || !TimersPlugin.t.render());
             if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
                 handleElves();
             } else {
-                if (Rs2Npc.pickpocket(config.THIEVING_NPC().getName())) {
-                    sleep(50, 250);
+                Map<NPC, HighlightedNpc> highlightedNpcs =  net.runelite.client.plugins.npchighlight.NpcIndicatorsPlugin.getHighlightedNpcs();
+                if (highlightedNpcs.isEmpty()) {
+                    if (Rs2Npc.pickpocket(config.THIEVING_NPC().getName())) {
+                        sleep(50, 250);
+                    }
+                } else {
+                    if (Rs2Npc.pickpocket(highlightedNpcs)) {
+                        sleep(50, 250);
+                    }
                 }
             }
         }

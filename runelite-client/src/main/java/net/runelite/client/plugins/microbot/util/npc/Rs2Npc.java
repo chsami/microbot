@@ -4,6 +4,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.game.npcoverlay.HighlightedNpc;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
@@ -14,10 +15,8 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -274,6 +273,17 @@ public class Rs2Npc {
         }
 
         return interact(npc, "pickpocket");
+    }
+
+    public static boolean pickpocket(Map<NPC, HighlightedNpc> highlightedNpcs) {
+        for (NPC npc: highlightedNpcs.keySet()) {
+            if (!hasLineOfSight(npc)) {
+                Rs2Walker.walkTo(npc.getWorldLocation(), 1);
+                return false;
+            }
+            return interact(npc, "pickpocket");
+        }
+        return false;
     }
 
     public static boolean pickpocket(NPC npc) {
