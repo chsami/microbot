@@ -30,7 +30,7 @@ public class AutoMiningScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
-                GameObject rock = Rs2GameObject.findObject(config.ORE().getName(), true, config.distanceToStray(), getInitialPlayerLocation());
+                GameObject rock = Rs2GameObject.findObject(config.ORE().getName(), true, config.distanceToStray(), true, getInitialPlayerLocation());
 
 
                 List<String> itemNames = Arrays.stream(config.itemsToBank().split(",")).map(String::toLowerCase).collect(Collectors.toList());

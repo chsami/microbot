@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.bankjs.development.BanksShopper;
+package net.runelite.client.plugins.microbot.bankjs.BanksShopper;
 
 import lombok.Getter;
 import net.runelite.api.GameState;
@@ -41,7 +41,7 @@ public class BanksShopperScript extends Script {
         String configItemName = config.itemNames();
 
         List<String> itemNames = Arrays.stream(configItemName.split(","))
-                .map(String::trim) // Trim whitespace from each item name
+                .map(String::toLowerCase)
                 .collect(Collectors.toList());
 
         int minimumStock = config.minimumStock();
@@ -68,11 +68,9 @@ public class BanksShopperScript extends Script {
                 }
                 if (Rs2Inventory.isFull()) {
                     if (config.useBank()) {
-                        Rs2Bank.walkToBankAndUseBank();
-                        if (Rs2Bank.isOpen()) {
-                            addInventoryToProfit();
-                            Rs2Bank.depositAll(x -> itemNames.contains(x.name.toLowerCase()));
-                        }
+                        addInventoryToProfit();
+                        if(!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation))
+                            return;
                     }
                     return;
                 }
