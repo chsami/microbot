@@ -2,6 +2,8 @@ package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +18,11 @@ public class ExampleScript extends Script {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 long startTime = System.currentTimeMillis();
+
+                Rs2GroundItem.lootAllItemBasedOnValue(100, 20);
+
+                Rs2Inventory.interact("bolt", "offer");
+
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
