@@ -4,6 +4,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.config.*;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.microbot.playerassist.enums.PlayStyle;
+import net.runelite.client.plugins.microbot.playerassist.enums.PrayerStyle;
 
 @ConfigGroup(net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig.GROUP)
 public interface PlayerAssistConfig extends Config {
@@ -28,7 +29,7 @@ public interface PlayerAssistConfig extends Config {
             name = "Banking",
             description = "Banking settings",
             position = 992,
-            closedByDefault = true
+            closedByDefault = false
     )
     String banking = "Banking";
     //Gear section
@@ -331,26 +332,41 @@ public interface PlayerAssistConfig extends Config {
 
     //Flick quick prayer
     @ConfigItem(
-            keyName = "Pray flick",
-            name = "Flick quick prayer",
-            description = "Flick quick prayer, works with lazy flick",
+            keyName = "quickPrayer",
+            name = "Quick prayer",
+            description = "Use quick prayer",
             position = 1,
             section = prayerSection
     )
-    default boolean toggleQuickPrayFlick() {
+    default boolean toggleQuickPray() {
         return false;
     }
 
     //Lazy flick
     @ConfigItem(
-            keyName = "Lazy flick",
-            name = "Lazy flick",
-            description = "Will flick correct prayer when npc is about to attack you",
+            keyName = "prayerStyle",
+            name = "Prayer Style",
+            description = "Select type of prayer style to use",
             position = 2,
             section = prayerSection
     )
-    default boolean toggleLazyFlick() {
-        return false;
+    default PrayerStyle prayerStyle() {
+        return PrayerStyle.LAZY_FLICK;
+    }
+
+    //Prayer style guide
+    @ConfigItem(
+            keyName = "prayerStyleGuide",
+            name = "Prayer Style Guide",
+            description = "Prayer Style Guide",
+            position = 3,
+            section = prayerSection
+    )
+    default String prayerStyleGuide() {
+        return "Lazy Flick: Flicks tick before hit\n" +
+                "Perfect Lazy Flick: Flicks on hit\n" +
+                "Continuous: Quick prayer is on when in combat\n" +
+                "Always On: Quick prayer is always on";
     }
 
     //Balance combat skills
@@ -480,7 +496,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default boolean bank() {
-        return true;
+        return false;
     }
 
     //Minimum free inventory slots to bank
@@ -505,7 +521,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default boolean useStamina() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
@@ -528,7 +544,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default boolean useFood() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
@@ -551,7 +567,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default boolean useRestore() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
@@ -574,7 +590,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default boolean usePrayer() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
@@ -597,7 +613,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default boolean useAntipoison() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
@@ -620,7 +636,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default boolean useAntifire() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
@@ -643,7 +659,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default boolean useCombat() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
