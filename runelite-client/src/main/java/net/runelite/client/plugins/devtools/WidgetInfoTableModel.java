@@ -26,16 +26,17 @@ package net.runelite.client.plugins.devtools;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
 import net.runelite.api.Client;
 import net.runelite.api.WidgetNode;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 public class WidgetInfoTableModel extends AbstractTableModel
 {
@@ -148,6 +149,7 @@ public class WidgetInfoTableModel extends AbstractTableModel
 		out.add(new WidgetField<>("SelfHidden", Widget::isSelfHidden, Widget::setHidden, Boolean.class));
 		out.add(new WidgetField<>("Hidden", Widget::isHidden));
 		out.add(new WidgetField<>("Text", Widget::getText, Widget::setText, String.class));
+		out.add(new WidgetField<>("Actions", Widget::getActions));
 		out.add(new WidgetField<>("TextColor",
 			w -> Integer.toString(w.getTextColor(), 16),
 			(w, str) -> w.setTextColor(Integer.parseInt(str, 16)),
