@@ -22,6 +22,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.bank.BankerScript;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.*;
+import net.runelite.client.plugins.microbot.playerassist.enums.PrayerStyle;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.playerassist.skill.AttackStyleScript;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
@@ -48,7 +49,7 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class PlayerAssistPlugin extends Plugin {
-    public static final String version = "1.0.0";
+    public static final String version = "1.1.0";
     private static final String SET = "Set";
     private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
     // SAFE_SPOT = "Safe Spot";
@@ -73,6 +74,7 @@ public class PlayerAssistPlugin extends Plugin {
     private final BuryScatterScript buryScatterScript = new BuryScatterScript();
     private final AttackStyleScript attackStyleScript = new AttackStyleScript();
     private final BankerScript bankerScript = new BankerScript();
+    private final PrayerScript prayerScript = new PrayerScript();
     @Inject
     private PlayerAssistConfig config;
     @Inject
@@ -114,6 +116,7 @@ public class PlayerAssistPlugin extends Plugin {
         buryScatterScript.run(config);
         attackStyleScript.run(config);
         bankerScript.run(config);
+        prayerScript.run(config);
         Microbot.getSpecialAttackConfigs()
                 .setSpecialAttack(true);
     }
@@ -132,6 +135,7 @@ public class PlayerAssistPlugin extends Plugin {
         buryScatterScript.shutdown();
         attackStyleScript.shutdown();
         bankerScript.shutdown();
+        prayerScript.shutdown();
         resetLocation();
         overlayManager.remove(playerAssistOverlay);
         overlayManager.remove(playerAssistInfoOverlay);
@@ -248,13 +252,13 @@ public class PlayerAssistPlugin extends Plugin {
         if (event.getActor() != Microbot.getClient().getLocalPlayer()) return;
         final Hitsplat hitsplat = event.getHitsplat();
 
-        if ((hitsplat.isMine()) && event.getActor().getInteracting() instanceof NPC && config.togglePrayer()) {
+        if ((hitsplat.isMine()) && event.getActor().getInteracting() instanceof NPC && config.togglePrayer() && (config.prayerStyle() == PrayerStyle.LAZY_FLICK) || (config.prayerStyle() == PrayerStyle.PERFECT_LAZY_FLICK)) {
 
 
             flickerScript.resetLastAttack(true);
             log.info("Flick ended on tick: " + Microbot.getClient().getTickCount());
             Rs2Prayer.disableAllPrayers();
-            if(config.toggleQuickPrayFlick())
+            if (config.toggleQuickPray())
                 Rs2Prayer.toggleQuickPrayer(false);
 
 
