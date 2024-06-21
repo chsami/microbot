@@ -24,16 +24,16 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 @Slf4j
 public class MotherloadMineScript extends Script {
-    public static final String version = "1.5.0";
+    public static final String version = "1.5.1";
     private static final WorldArea UPSTAIRS = new WorldArea(new WorldPoint(3747, 5676, 0), 7, 8);
     private static final int UPPER_FLOOR_HEIGHT = -490;
     private static final int SACK_LARGE_SIZE = 162;
     private static final int SACK_SIZE = 81;
     private static final int SACKID = 26688;
-
     public static MLMStatus status = MLMStatus.IDLE;
     public static WallObject oreVein;
     public static MLMMiningSpot miningSpot = MLMMiningSpot.IDLE;
+    private static int maxSackSize;
     private static MotherloadMineConfig config;
 
     private String pickAxeInInventory = "";
@@ -100,8 +100,7 @@ public class MotherloadMineScript extends Script {
 
     private void handleInventory() {
         boolean sackUpgraded = Microbot.getVarbitValue(Varbits.SACK_UPGRADED) == 1;
-        int maxSackSize = sackUpgraded ? SACK_LARGE_SIZE : SACK_SIZE;
-
+        maxSackSize = sackUpgraded ? SACK_LARGE_SIZE : SACK_SIZE;
         if (!Rs2Inventory.hasItem("hammer") || !Rs2Inventory.hasItem(pickAxeInInventory) && config.pickAxeInInventory()) {
             bank();
             return;
@@ -170,7 +169,7 @@ public class MotherloadMineScript extends Script {
         if (!isUpperFloor()) Rs2Walker.walkTo(new WorldPoint(3748, 5674, 0));
         if (Rs2GameObject.interact(ObjectID.HOPPER_26674)) {
             sleepUntil(() -> !Rs2Inventory.isFull());
-            if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > SACK_LARGE_SIZE - 28) {
+            if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > maxSackSize - 28) {
                 emptySack = true;
             }
         }
