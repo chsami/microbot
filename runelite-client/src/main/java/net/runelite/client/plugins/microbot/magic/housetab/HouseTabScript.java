@@ -31,7 +31,7 @@ public class HouseTabScript extends Script {
 
     private final int HOUSE_ADVERTISEMENT_NAME_PARENT_INTERFACE = 3407881;
 
-    private final int HOUSE_TABLET_INTERFACE = 5177359;
+    private final int HOUSE_TABLET_INTERFACE = 26411033;
 
     private final HOUSETABS_CONFIG houseTabConfig;
     private final String[] playerHouses;
@@ -133,8 +133,11 @@ public class HouseTabScript extends Script {
             return;
 
         while (Microbot.getClient().getWidget(HOUSE_TABLET_INTERFACE) != null) {
+            if (mainScheduledFuture.isCancelled()) break;
             Microbot.getMouse()
                     .click(houseTabInterface.getCanvasLocation());
+            sleep(1000, 2000);
+            Rs2Widget.clickWidget(26411022);
             sleep(1000, 2000);
         }
 
@@ -183,51 +186,34 @@ public class HouseTabScript extends Script {
                 if (Microbot.isGainingExp) return;
 
                 Rs2Player.toggleRunEnergy(true);
-                if (Microbot.getClient().getEnergy() < 3000 && !Rs2Widget.hasWidget("house teleport") && Rs2GameObject.findObject(new int[] {ObjectID.FROZEN_ORNATE_POOL_OF_REJUVENATION, ObjectID.POOL_OF_REJUVENATION}) != null) {
+                if (Microbot.getClient().getEnergy() < 3000 && !Rs2Widget.hasWidget("Teleport to House") && Rs2GameObject.findObject(new int[] {ObjectID.FROZEN_ORNATE_POOL_OF_REJUVENATION, ObjectID.POOL_OF_REJUVENATION}) != null) {
                     Rs2GameObject.interact(new int[] {ObjectID.FROZEN_ORNATE_POOL_OF_REJUVENATION, ObjectID.POOL_OF_REJUVENATION}, "drink");
                     return;
                 }
 
-                if (config.HouseConfig() == HOUSETABS_CONFIG.HOUSE_ADVERTISEMENT) {
-                    lookForHouseAdvertisementObject();
-                    lookForPlayerHouse();
+                boolean isInHouse = Rs2GameObject.findObject(new int[] {ObjectID.LECTERN_37349}) != null;
+                if (isInHouse) {
                     lookForLectern();
                     createHouseTablet();
                     leaveHouse();
+                } else {
                     unnoteClay();
-                } else if (config.HouseConfig() == HOUSETABS_CONFIG.FRIENDS_HOUSE) {
-                    boolean isInHouse = Rs2GameObject.findObject(new int[] {ObjectID.LECTERN_37349}) != null;
-                    if (isInHouse) {
-                        if (hasSoftClay()) {
-                            if (!Rs2Widget.hasWidget("house teleport"))
-                                Rs2GameObject.interact("lectern");
-                            sleepUntil(() -> Rs2Widget.hasWidget("house teleport"));
-                            if (!Rs2Widget.hasWidget("house teleport")) return;
-                            Rs2Widget.clickWidget("house teleport");
-                            sleep(4000);
-                            sleepUntil(() -> !hasSoftClay() || !Microbot.isGainingExp, 60000);
-                        } else {
-                            Rs2GameObject.interact(ObjectID.PORTAL_4525, "enter");
-                            sleepUntil(() -> Rs2GameObject.findObjectById(ObjectID.LECTERN_37349) == null);
+                    if (config.ownHouse()) {
+                        if (Rs2GameObject.interact(ObjectID.PORTAL_15478, "Home")) {
+                            sleep(800, 1200);
                         }
-
-                    } else {
-                        if (!Rs2Inventory.isFull()) {
-                            Rs2Inventory.use("soft clay");
-                            if (Rs2Npc.interact("phials", "use"))
-                                sleepUntil(() -> Rs2Widget.hasWidget("select an option"));
-                            Rs2Widget.clickWidget("exchange all");
+                        return;
+                    }
+                    if (Rs2GameObject.interact(ObjectID.PORTAL_15478, "Friend's house")) {
+                        sleepUntil(() -> Rs2Widget.hasWidget("Enter name"));
+                        if (Rs2Widget.hasWidget(config.housePlayerName())) {
+                            Rs2Widget.clickWidget(config.housePlayerName());
+                            sleep(800, 1200);
                         } else {
-                            if (Rs2GameObject.interact(ObjectID.PORTAL_15478, "Friend's house")) {
-                                sleepUntil(() -> Rs2Widget.hasWidget("Enter name"));
-                                if (Rs2Widget.hasWidget("last name")) {
-                                    Rs2Widget.clickWidget(config.housePlayerName());
-                                } else {
-                                    if (Rs2Widget.hasWidget("Enter name")) {
-                                        Rs2Keyboard.typeString(config.housePlayerName());
-                                        Rs2Keyboard.enter();
-                                    }
-                                }
+                            if (Rs2Widget.hasWidget("Enter name")) {
+                                Rs2Keyboard.typeString(config.housePlayerName());
+                                Rs2Keyboard.enter();
+                                sleep(1000, 1800);
                             }
                         }
                     }

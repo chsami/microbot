@@ -4,13 +4,16 @@ import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
@@ -19,7 +22,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -422,8 +424,9 @@ public class Rs2Inventory {
     public static boolean dropAllExcept(String... names) {
         return dropAllExcept(false, names);
     }
-    public static boolean dropAllExcept(boolean exact ,String... names) {
-        if(exact)
+
+    public static boolean dropAllExcept(boolean exact, String... names) {
+        if (exact)
             return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
         else
             return dropAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())));
@@ -762,6 +765,7 @@ public class Rs2Inventory {
                 .filter(x -> Arrays.stream(x.inventoryActions).anyMatch(a -> a != null && a.equalsIgnoreCase("bury")))
                 .collect(Collectors.toList());
     }
+
     // get items with the action "scatter"
     public static List<Rs2Item> getAshes() {
         return items().stream()
@@ -980,16 +984,16 @@ public class Rs2Inventory {
     /**
      * Interacts with an item with the specified name in the inventory using the specified action.
      *
-     * @param name   The name of the item to interact with.
+     * @param names  The name of the item to interact with.
      * @param action The action to perform on the item.
      * @return True if the interaction was successful, false otherwise.
      */
     public static boolean interact(List<String> names, String action) {
-        for (String name:names) {
+        for (String name : names) {
             if (interact(name, action, false))
                 return true;
         }
-       return false;
+        return false;
     }
 
     /**
@@ -1553,6 +1557,20 @@ public class Rs2Inventory {
     }
 
     /**
+     * @param itemId
+     * @param Npc
+     * @return
+     */
+    public static boolean useItemOnNpc(int itemId, NPC Npc) {
+        if (Rs2Bank.isOpen()) return false;
+        use(itemId);
+        sleep(100);
+        if (!isItemSelected()) return false;
+        Rs2Npc.interact(Npc);
+        return true;
+    }
+
+    /**
      * @param name
      * @param exact
      * @return
@@ -1610,34 +1628,42 @@ public class Rs2Inventory {
 
         int param0;
         int param1;
-        int identifier = 3;
+        int identifier = -1;
         MenuAction menuAction = MenuAction.CC_OP;
+        Widget[] inventoryWidgets;
+        param0 = rs2Item.slot;
+        boolean isDepositBoxOpen = !Microbot.getClientThread().runOnClientThread(() -> Rs2Widget.getWidget(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER) == null
+                || Rs2Widget.getWidget(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER).isHidden());
+        if (Rs2Bank.isOpen()) {
+            param1 = ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
+            inventoryWidgets = Rs2Widget.getWidget(ComponentID.BANK_INVENTORY_ITEM_CONTAINER).getChildren();
+        } else if (isDepositBoxOpen) {
+            param1 = ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER;
+            inventoryWidgets = Rs2Widget.getWidget(ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER).getChildren();
+        } else if (Rs2GrandExchange.isOpen()) {
+            param1 = ComponentID.GRAND_EXCHANGE_INVENTORY_INVENTORY_ITEM_CONTAINER;
+            inventoryWidgets = Rs2Widget.getWidget(ComponentID.GRAND_EXCHANGE_INVENTORY_INVENTORY_ITEM_CONTAINER).getChildren();
+        } else if (Rs2Shop.isOpen()) {
+            param1 = 19726336;
+            inventoryWidgets = Rs2Widget.getWidget(19726336).getChildren();
+        } else {
+            param1 = ComponentID.INVENTORY_CONTAINER;
+            inventoryWidgets = Rs2Widget.getWidget(ComponentID.INVENTORY_CONTAINER).getChildren();
+        }
 
         if (!action.isEmpty()) {
-            String[] actions = rs2Item.getInventoryActions();
+            var itemWidget = Arrays.stream(inventoryWidgets).filter(x -> x != null && x.getItemId() == rs2Item.id).findFirst().orElseGet(null);
 
-            for (int i = 0; i < actions.length; i++) {
-                if (action.equalsIgnoreCase(actions[i])) {
-                    identifier = i + 2;
-                    break;
-                }
-            }
-            if((Objects.equals(actions[1], "Wear") && actions[0]==null) || action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")){
-                identifier++;
-            }
+            String[] actions = itemWidget != null && itemWidget.getActions() != null ?
+                    itemWidget.getActions() :
+                    rs2Item.getInventoryActions();
+
+            identifier = indexOfIgnoreCase(stripColTags(actions), action) + 1;
+
+            System.out.println(identifier);
         }
 
-        param0 = rs2Item.slot;
-        if (Rs2Bank.isOpen()) {
-            if (action.equalsIgnoreCase("eat") || action.equalsIgnoreCase("fill")) {
-                identifier += 7;
-            } else {
-                identifier += 6;
-            }
-            param1 = 983043;
-        } else {
-            param1 = 9764864;
-        }
+
         if (isItemSelected()) {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
         } else if (action.equalsIgnoreCase("use")) {
@@ -1646,43 +1672,7 @@ public class Rs2Inventory {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
         }
 
-
-        //grandexchange inventory
-        if (action.equalsIgnoreCase("offer")) {
-            identifier = 1;
-            param1 = 30605312;
-        }
-
-        // Shop Inventory
-        switch (action) {
-            case "Value":
-                // Logic to check Value of item
-                identifier = 1;
-                param1 = 19726336;
-            case "Sell 1":
-                // Logic to sell one item
-                identifier = 2;
-                param1 = 19726336;
-                break;
-            case "Sell 5":
-                // Logic to sell five items
-                identifier = 3;
-                param1 = 19726336;
-                break;
-            case "Sell 10":
-                // Logic to sell ten items
-                identifier = 4;
-                param1 = 19726336;
-                break;
-            case "Sell 50":
-                // Logic to sell fifty items
-                identifier = 5;
-                param1 = 19726336;
-                break;
-        }
-
         Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
-        //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
     }
 
     private static Widget getInventory() {
@@ -1748,6 +1738,35 @@ public class Rs2Inventory {
 
     public static boolean dropEmptyVials() {
         return dropAll("empty vial");
+    }
+
+    private static int indexOfIgnoreCase(String[] sourceList, String searchString) {
+        if (sourceList == null || searchString == null) {
+            return -1;  // or throw an IllegalArgumentException
+        }
+
+        for (int i = 0; i < sourceList.length; i++) {
+            if (sourceList[i] != null && sourceList[i].equalsIgnoreCase(searchString)) {
+                return i;
+            }
+        }
+
+        return -1;  // return -1 if the string is not found
+    }
+
+    private static String[] stripColTags(String[] sourceList) {
+        List<String> resultList = new ArrayList<>();
+        String regex = "<col=[^>]*>";
+
+        for (String item : sourceList) {
+            if (item != null) {
+                resultList.add(item.replaceAll(regex, ""));
+            } else {
+                resultList.add(null); // Handle null elements if needed
+            }
+        }
+
+        return resultList.toArray(String[]::new);
     }
 
 }

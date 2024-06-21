@@ -46,7 +46,6 @@ public class AttackNpcScript extends Script {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (!config.toggleCombat()) return;
-                if (PlayerAssistPlugin.getCooldown() > 0) return;
                 npcsToAttack.set(Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList()));
                 double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
                 if (Rs2Inventory.getInventoryFood().isEmpty() && treshHold < 10) return;
@@ -68,6 +67,7 @@ public class AttackNpcScript extends Script {
                                 && x.getAnimation() == -1
                                 && npcsToAttack.get().stream().anyMatch(n -> n.equalsIgnoreCase(x.getName())))
                         .collect(Collectors.toList());
+                if (PlayerAssistPlugin.getCooldown() > 0) return;
                 if (Rs2Combat.inCombat()) {
                     return;
                 }
@@ -87,7 +87,7 @@ public class AttackNpcScript extends Script {
                         continue;
 
 
-                    if(config.togglePrayer() && !config.toggleQuickPrayFlick()){
+                    if (config.togglePrayer() && !config.toggleQuickPray()) {
                         AttackStyle attackStyle = AttackStyleMapper.mapToAttackStyle(Rs2NpcManager.getAttackStyle(npc.getId()));
                         if (attackStyle != null) {
                             switch (attackStyle) {
@@ -105,7 +105,7 @@ public class AttackNpcScript extends Script {
 
                         }
                     }
-                    if(config.togglePrayer() && config.toggleQuickPrayFlick()){
+                    if (config.togglePrayer() && config.toggleQuickPray()) {
                         Rs2Prayer.toggleQuickPrayer(true);
                     }
                     Rs2Npc.interact(npc, "attack");
