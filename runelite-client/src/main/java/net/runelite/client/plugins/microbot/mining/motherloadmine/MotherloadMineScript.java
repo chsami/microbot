@@ -279,6 +279,7 @@ public class MotherloadMineScript extends Script {
     public void shutdown() {
         oreVein = null;
         miningSpot = MLMMiningSpot.IDLE;
+        Rs2Walker.setTarget(null);
         super.shutdown();
     }
 }
