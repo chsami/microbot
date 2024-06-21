@@ -1622,13 +1622,9 @@ public class Rs2Inventory {
                     break;
                 }
             }
-            if ((Objects.equals(actions[1], "Wear") && actions[0] == null) || action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")) {
+            if((Objects.equals(actions[1], "Wear") && actions[0]==null) || action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")){
                 identifier++;
             }
-            if (action.equalsIgnoreCase("drop") && rs2Item.id == 2875){ // bloated toad
-                identifier=2;
-            }
-
         }
 
         param0 = rs2Item.slot;
