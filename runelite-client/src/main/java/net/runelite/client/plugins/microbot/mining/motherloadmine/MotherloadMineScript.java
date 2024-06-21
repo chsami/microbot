@@ -24,7 +24,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 @Slf4j
 public class MotherloadMineScript extends Script {
-    public static final String version = "1.5.1";
+    public static final String version = "1.5.2";
     private static final WorldArea UPSTAIRS = new WorldArea(new WorldPoint(3747, 5676, 0), 7, 8);
     private static final int UPPER_FLOOR_HEIGHT = -490;
     private static final int SACK_LARGE_SIZE = 162;
@@ -151,7 +151,12 @@ public class MotherloadMineScript extends Script {
                         ItemID.UNCUT_EMERALD, ItemID.UNCUT_RUBY, ItemID.UNCUT_DIAMOND,
                         ItemID.UNCUT_DRAGONSTONE));
             }
-            bank();
+            if (Rs2Inventory.contains(
+                    ItemID.RUNITE_ORE, ItemID.ADAMANTITE_ORE, ItemID.MITHRIL_ORE,
+                    ItemID.GOLD_ORE, ItemID.COAL, ItemID.UNCUT_SAPPHIRE,
+                    ItemID.UNCUT_EMERALD, ItemID.UNCUT_RUBY, ItemID.UNCUT_DIAMOND,
+                    ItemID.UNCUT_DRAGONSTONE))
+                bank();
         }
         emptySack = false;
         status = MLMStatus.IDLE;
