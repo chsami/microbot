@@ -82,10 +82,11 @@ public class Rs2Reflection {
 
     @SneakyThrows
     public static void setItemId(MenuEntry menuEntry, int itemId) throws IllegalAccessException, InvocationTargetException {
-        Arrays.stream(menuEntry.getClass().getMethods())
-                .filter(x -> x.getReturnType().getName().equals("void") && x.getParameters().length > 0 && x.getParameters()[0].getType().getName().equals("int"))
-                .collect(Collectors.toList())
-                .get(0)
+        var list =  Arrays.stream(menuEntry.getClass().getMethods())
+                .filter(x -> x.getName().equals("setItemId"))
+                .collect(Collectors.toList());
+
+         list.get(0)
                 .invoke(menuEntry, itemId); //use the setItemId method through reflection
     }
 
