@@ -26,4 +26,15 @@ public interface MotherloadMineConfig extends Config {
     default boolean pickAxeInInventory() {
         return false;
     }
+
+    // Mine upstairs
+    @ConfigItem(
+            keyName = "MineUpstairs",
+            name = "Mine Upstairs?",
+            description = "Mine upstairs?",
+            position = 2
+    )
+    default boolean mineUpstairs() {
+        return false;
+    }
 }
