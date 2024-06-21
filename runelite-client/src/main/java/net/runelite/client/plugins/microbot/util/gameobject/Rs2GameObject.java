@@ -525,6 +525,7 @@ public class Rs2GameObject {
         for (int id :
                 ids) {
             TileObject object = findObjectById(id);
+            if (object == null) continue;
             if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance || tileObject == null) {
                 tileObject = object;
                 distance = Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation());
