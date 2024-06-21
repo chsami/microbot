@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Default + "Chompy",
+        name = PluginDescriptor.BoredStudent + "Chompy",
         description = "Chompy Hunt plugin - start near some toads with bow and arrows equipped. ",
         tags = {"Chompy", "microbot"},
         enabledByDefault = false
