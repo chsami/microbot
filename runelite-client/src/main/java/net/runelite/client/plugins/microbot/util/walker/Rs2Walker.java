@@ -521,23 +521,36 @@ public class Rs2Walker {
      * @return
      */
     public static boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
+        System.out.println("handleTransports called with path size: " + path.size() + " and indexOfStartPoint: " + indexOfStartPoint);
+
         for (WorldPoint a : ShortestPathPlugin.getTransports().keySet()
                 .stream()
                 .filter(x -> x.distanceTo(Rs2Player.getWorldLocation()) <= 12)
                 .sorted(Comparator.comparingInt(worldPoint -> worldPoint.distanceTo(Rs2Player.getWorldLocation())))
                 .collect(Collectors.toList())) {
 
+            System.out.println("Checking transport starting point: " + a);
+
             for (Transport b : ShortestPathPlugin.getTransports().getOrDefault(a, new ArrayList<>())) {
+                System.out.println("Processing transport from " + b.getOrigin() + " to " + b.getDestination());
+
                 for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), b.getOrigin())) {
+                    System.out.println("Local instance origin: " + origin);
 
                     if (Rs2Player.getWorldLocation().getPlane() != b.getOrigin().getPlane()) {
+                        System.out.println("Skipping transport due to plane mismatch.");
                         continue;
                     }
 
                     for (int i = indexOfStartPoint; i < path.size(); i++) {
-                        if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
+                        if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane()) {
+                            System.out.println("Skipping step due to plane mismatch.");
                             continue;
-                        if (path.stream().noneMatch(x -> x.equals(b.getDestination()))) continue;
+                        }
+                        if (path.stream().noneMatch(x -> x.equals(b.getDestination()))) {
+                            System.out.println("Skipping transport as destination not in path.");
+                            continue;
+                        }
 
                         int indexOfOrigin = IntStream.range(0, path.size())
                                 .filter(f -> path.get(f).equals(b.getOrigin()))
@@ -547,64 +560,114 @@ public class Rs2Walker {
                                 .filter(f -> path.get(f).equals(b.getDestination()))
                                 .findFirst()
                                 .orElse(-1);
-                        if (indexOfDestination == -1) continue;
-                        if (indexOfOrigin == -1) continue;
-                        if (indexOfDestination < indexOfOrigin) continue;
+                        if (indexOfDestination == -1) {
+                            System.out.println("Destination index not found in path.");
+                            continue;
+                        }
+                        if (indexOfOrigin == -1) {
+                            System.out.println("Origin index not found in path.");
+                            continue;
+                        }
+                        if (indexOfDestination < indexOfOrigin) {
+                            System.out.println("Skipping as destination comes before origin in path.");
+                            continue;
+                        }
 
                         if (path.get(i).equals(origin)) {
+                            System.out.println("Player is at transport origin: " + origin);
 
                             if (b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
+                                System.out.println("Handling trapdoor for transport.");
                                 handleTrapdoor(b);
                             }
 
                             if (b.isSpiritTree()) {
+                                System.out.println("Handling spirit tree transport.");
                                 b.handleSpiritTree();
                             }
 
-
                             if (b.isGnomeGlider()) {
+                                System.out.println("Handling gnome glider transport.");
                                 b.handleGlider();
                             }
 
                             if (b.isFairyRing()) {
-                                 b.handleFairyRing();
+                                System.out.println("Handling fairy ring transport.");
+                                b.handleFairyRing();
                             }
 
+                            // Try to interact with GameObject first
                             GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+                            System.out.println("Transport Object Id: " + b.getObjectId());
+                            System.out.println("Transport Origin: " + b.getOrigin());
+                            System.out.println("Found game object: " + (gameObject != null ? gameObject.getId() : "null"));
 
                             if (gameObject != null && gameObject.getId() == b.getObjectId()) {
                                 if (Rs2GameObject.hasLineOfSight(gameObject)) {
+                                    System.out.println("Interacting with game object: " + gameObject.getId());
                                     Rs2GameObject.interact(gameObject, b.getAction());
                                     sleep(1200, 1600);
                                     return true;
                                 } else {
+                                    System.out.println("Walking to canvas for better line of sight.");
                                     Rs2Walker.walkFastCanvas(path.get(i));
                                     sleep(1200, 1600);
                                 }
                             } else {
-                                GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
-                                if (groundObject != null && groundObject.getId() == b.getObjectId() && Rs2Camera.isTileOnScreen(groundObject)) {
-                                    if (Rs2GameObject.hasLineOfSight(groundObject)) {
-                                        Rs2GameObject.interact(groundObject, b.getAction());
-                                        if (b.isAgilityShortcut()) {
-                                            Rs2Player.waitForAnimation();
-                                        }
+                                // If no GameObject is found, try to interact with TileObject
+                                List<TileObject> allTileObjects = Rs2GameObject.getAll();
+                                System.out.println("Total tile objects found: " + allTileObjects.size());
+
+                                TileObject targetObject = allTileObjects.stream()
+                                        .filter(obj -> obj.getId() == b.getObjectId() && obj.getWorldLocation().equals(b.getOrigin()))
+                                        .findFirst()
+                                        .orElse(null);
+                                System.out.println("Found tile object: " + (targetObject != null ? targetObject.getId() : "null"));
+
+                                if (targetObject != null && targetObject.getId() == b.getObjectId()) {
+                                    if (Rs2GameObject.hasLineOfSight(targetObject)) {
+                                        System.out.println("Interacting with tile object: " + targetObject.getId());
+                                        Rs2GameObject.interact(targetObject, b.getAction());
                                         sleep(1200, 1600);
                                         return true;
                                     } else {
+                                        System.out.println("Walking to canvas for better line of sight.");
                                         Rs2Walker.walkFastCanvas(path.get(i));
                                         sleep(1200, 1600);
+                                    }
+                                } else {
+                                    GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
+                                    System.out.println("Found ground object: " + (groundObject != null ? groundObject.getId() : "null"));
+
+                                    if (groundObject != null && groundObject.getId() == b.getObjectId() && Rs2Camera.isTileOnScreen(groundObject)) {
+                                        if (Rs2GameObject.hasLineOfSight(groundObject)) {
+                                            System.out.println("Interacting with ground object: " + groundObject.getId());
+                                            Rs2GameObject.interact(groundObject, b.getAction());
+                                            if (b.isAgilityShortcut()) {
+                                                Rs2Player.waitForAnimation();
+                                            }
+                                            sleep(1200, 1600);
+                                            return true;
+                                        } else {
+                                            System.out.println("Walking to canvas for better line of sight.");
+                                            Rs2Walker.walkFastCanvas(path.get(i));
+                                            sleep(1200, 1600);
+                                        }
+                                    } else {
+                                        System.out.println("No valid game or ground object found to interact with.");
                                     }
                                 }
                             }
                         }
-
                     }
                 }
             }
         }
         return false;
     }
+
+
+
 
     private static boolean handleTrapdoor(Transport b) {
         List<GroundObject> gameObjects = Rs2GameObject.getGroundObjects(25);
