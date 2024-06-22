@@ -158,7 +158,7 @@ public class Transport {
         destination = new WorldPoint(
                 Integer.parseInt(parts_destination[0]),
                 Integer.parseInt(parts_destination[1]),
-                Integer.parseInt(parts_origin[2]));
+                Integer.parseInt(parts_destination[2]));
 
         try {
             action = parts[2].split(DELIM)[0];

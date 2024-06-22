@@ -25,6 +25,7 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.SplitFlagMap;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.ui.JagexColors;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -206,8 +207,9 @@ public class ShortestPathPlugin extends Plugin {
             return true;
         }
 
+        var reachableTiles = Rs2Tile.getReachableTilesFromTile(location, config.recalculateDistance() - 1);
         for (WorldPoint point : pathfinder.getPath()) {
-            if (location.distanceTo2D(point) < config.recalculateDistance()) {
+            if (reachableTiles.containsKey(point)) {
                 return true;
             }
         }

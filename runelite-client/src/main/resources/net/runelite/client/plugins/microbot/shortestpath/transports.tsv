@@ -4408,3 +4408,7 @@
 # Wintertodt
 1630 3968 0	1630 3963 0	Enter Doors of dinh 29322				1
 1630 3963 0	1630 3968 0	Enter Doors of dinh 29322				1
+
+# Camdozaal
+2998 3494 0	2952 5762 0	Enter Ruins Entrance 41357			Below Ice Mountain
+2952 5762 0	2998 3494 0	Exit Ruins Exit 41446			Below Ice Mountain
