@@ -5,6 +5,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.shortestpath.*;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -254,6 +255,9 @@ public class PathfinderConfig {
         if (isQuestLocked && !completedQuests(transport)) {
             return false;
         }
+
+        if (transport.getItems().entrySet().stream().anyMatch(x -> !Rs2Inventory.hasItemAmount(x.getKey(), x.getValue())))
+            return false;
 
         return true;
     }

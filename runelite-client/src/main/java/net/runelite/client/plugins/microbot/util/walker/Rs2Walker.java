@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
@@ -571,6 +572,15 @@ public class Rs2Walker {
                         if (indexOfDestination < indexOfOrigin) continue;
 
                         if (path.get(i).equals(origin)) {
+                            if (b.isShip()){
+                                if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null){
+                                    Rs2Npc.interact(b.getNpcName(), b.getAction());
+                                    sleep(1200, 1600);
+                                } else {
+                                    Rs2Walker.walkFastCanvas(path.get(i));
+                                    sleep(1200, 1600);
+                                }
+                            }
 
                             if (b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
                                 handleTrapdoor(b);

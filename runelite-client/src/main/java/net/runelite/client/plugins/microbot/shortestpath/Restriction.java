@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.shortestpath;
 
 import lombok.Getter;
 import net.runelite.api.Quest;
-import net.runelite.api.QuestState;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

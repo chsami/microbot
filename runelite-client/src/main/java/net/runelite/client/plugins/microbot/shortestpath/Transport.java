@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -41,6 +40,9 @@ public class Transport {
      * The skill levels required to use this transport
      */
     private final int[] skillLevels = new int[Skill.values().length];
+
+    @Getter
+    private final HashMap<String, Integer> items = new HashMap<>();
 
     /**
      * The quests required to use this transport
@@ -186,6 +188,30 @@ public class Transport {
                         break;
                     }
                 }
+            }
+        }
+
+        // Item requirements
+        if (parts.length >= 5 && !parts[4].isEmpty()) {
+            String[] itemRequirements = parts[4].split(";");
+
+            for (String requirement : itemRequirements) {
+                if (requirement.isBlank())
+                    continue;
+
+                int splitIndex = requirement.indexOf(DELIM);
+                int amount;
+                String item;
+
+                try {
+                    amount = Integer.parseInt(requirement.substring(0, splitIndex));
+                    item = requirement.substring(splitIndex + 1);
+                } catch (NumberFormatException e){
+                    amount = 1;
+                    item = requirement;
+                }
+
+                items.put(item, amount);
             }
         }
 
