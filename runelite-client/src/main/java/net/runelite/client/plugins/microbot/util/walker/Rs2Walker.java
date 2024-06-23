@@ -45,6 +45,14 @@ public class Rs2Walker {
 
     private static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
 
+    public static boolean walkTo(int x, int y, int plane) {
+        return walkTo(x, y, plane, 6);
+    }
+
+    public static boolean walkTo(int x, int y, int plane, int distance) {
+        return walkTo(new WorldPoint(x, y, plane), distance);
+    }
+
     public static boolean walkTo(WorldPoint target) {
         return walkTo(target, 6);
     }
