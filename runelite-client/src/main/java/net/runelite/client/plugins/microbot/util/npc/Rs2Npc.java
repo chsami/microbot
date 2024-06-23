@@ -267,6 +267,8 @@ public class Rs2Npc {
     public static boolean pickpocket(String npcName) {
         NPC npc = getNpc(npcName);
 
+        if (npc == null) return false;
+
         if (!hasLineOfSight(npc)) {
             Rs2Walker.walkTo(npc.getWorldLocation(), 1);
             return false;

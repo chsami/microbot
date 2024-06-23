@@ -1745,6 +1745,14 @@ public class Rs2Inventory {
             return -1;  // or throw an IllegalArgumentException
         }
 
+        if (searchString.equalsIgnoreCase("wield") || searchString.equalsIgnoreCase("wear")) {
+            for (int i = 0; i < sourceList.length; i++) {
+                if (sourceList[i] != null && (sourceList[i].equalsIgnoreCase("wield") || sourceList[i].equalsIgnoreCase("wear"))) {
+                    return i;
+                }
+            }
+        }
+
         for (int i = 0; i < sourceList.length; i++) {
             if (sourceList[i] != null && sourceList[i].equalsIgnoreCase(searchString)) {
                 return i;
