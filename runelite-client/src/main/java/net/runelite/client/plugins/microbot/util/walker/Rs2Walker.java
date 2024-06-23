@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
@@ -287,6 +288,16 @@ public class Rs2Walker {
         }
 
         if (wallObject != null) {
+            ObjectComposition objectComposition = Rs2GameObject.getObjectComposition(wallObject.getId());
+
+            for (var action : objectComposition.getActions()){
+                if (action != null && action.contains("Pay-toll")){
+                    Rs2GameObject.interact(wallObject, action);
+                    Rs2Player.waitForWalking();
+                    return true;
+                }
+            }
+
             Rs2GameObject.interact(wallObject);
             Rs2Player.waitForWalking();
             return true;
@@ -422,7 +433,7 @@ public class Rs2Walker {
             }
             boolean found = false;
             for (String action : objectComposition.getActions()) {
-                if (action != null && (action.equals("Open") || action.contains("pay-toll"))) {
+                if (action != null && (action.equals("Open") || action.contains("Pay-toll"))) {
                     found = true;
                     break;
                 }
@@ -433,25 +444,26 @@ public class Rs2Walker {
             int orientation = wallObject.getOrientationA();
             if (orientation == 1) {
                 //blocks west
-                if (a.dx(-1).equals(b)) {
+                if (a.dx(-1).getX() == b.getX()) {
                     return true;
                 }
             }
             if (orientation == 4) {
                 //blocks east
-                if (a.dx(+1).equals(b)) {
+                if (a.dx(+1).getX() == b.getX()) {
                     return true;
                 }
             }
             if (orientation == 2) {
                 //blocks north
-                if (a.dy(1).equals(b)) {
+                if (a.dy(1).getY() == b.getY()) {
                     return true;
                 }
             }
             if (orientation == 8) {
                 //blocks south
-                return a.dy(-1).equals(b);
+                if (a.dy(-1).getY() == b.getY())
+                    return true;
             }
         }
 
@@ -471,7 +483,7 @@ public class Rs2Walker {
         }
         boolean foundb = false;
         for (String action : objectCompositionb.getActions()) {
-            if (action != null && (action.equals("Open") || action.contains("pay-toll"))) {
+            if (action != null && (action.equals("Open") || action.contains("Pay-toll"))) {
                 foundb = true;
                 break;
             }
@@ -482,25 +494,25 @@ public class Rs2Walker {
         int orientationb = wallObjectb.getOrientationA();
         if (orientationb == 1) {
             //blocks east
-            if (b.dx(-1).equals(a)) {
+            if (b.dx(-1).getX() == a.getX()) {
                 return true;
             }
         }
         if (orientationb == 4) {
-            //blocks south
-            if (b.dx(+1).equals(a)) {
+            //blocks west
+            if (b.dx(+1).getX() == a.getX()) {
                 return true;
             }
         }
         if (orientationb == 2) {
             //blocks south
-            if (b.dy(+1).equals(a)) {
+            if (b.dy(+1).getY() == a.getY()) {
                 return true;
             }
         }
         if (orientationb == 8) {
             //blocks north
-            return b.dy(-1).equals(a);
+            return b.dy(-1).getY() == a.getY();
         }
         return false;
     }
@@ -560,6 +572,15 @@ public class Rs2Walker {
                         if (indexOfDestination < indexOfOrigin) continue;
 
                         if (path.get(i).equals(origin)) {
+                            if (b.isShip()){
+                                if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null){
+                                    Rs2Npc.interact(b.getNpcName(), b.getAction());
+                                    sleep(1200, 1600);
+                                } else {
+                                    Rs2Walker.walkFastCanvas(path.get(i));
+                                    sleep(1200, 1600);
+                                }
+                            }
 
                             if (b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
                                 handleTrapdoor(b);
