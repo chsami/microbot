@@ -60,6 +60,7 @@ public class NmzScript extends Script {
                 boolean isOutsideNmz = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(new WorldPoint(2602, 3116, 0)) < 20;
                 useOverload = Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) == Microbot.getClient().getRealSkillLevel(Skill.RANGED);
                 if (isOutsideNmz) {
+                    Rs2Walker.setTarget(null);
                     handleOutsideNmz();
                 } else {
                     handleInsideNmz();

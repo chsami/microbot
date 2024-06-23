@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.magic.housetab;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
-import net.runelite.client.plugins.microbot.magic.housetab.enums.HOUSETABS_CONFIG;
 
 @ConfigGroup(HouseTabConfig.GROUP)
 public interface HouseTabConfig extends Config {
@@ -11,14 +10,14 @@ public interface HouseTabConfig extends Config {
     String GROUP = "HouseTab";
 
     @ConfigItem(
-            keyName = "House Config",
-            name = "House Config",
-            description = "Choose your house config",
+            keyName = "OwnHouse",
+            name = "Own house",
+            description = "Use your own house",
             position = 0
     )
-    default HOUSETABS_CONFIG HouseConfig()
+    default boolean ownHouse()
     {
-        return HOUSETABS_CONFIG.OWN_HOUSE;
+        return false;
     }
 
     @ConfigItem(

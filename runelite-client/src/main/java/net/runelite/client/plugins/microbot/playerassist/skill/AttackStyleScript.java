@@ -40,23 +40,18 @@ enum AttackStyle {
 @Slf4j
 public class AttackStyleScript extends Script {
 
+    public static int equippedWeaponTypeVarbit;
+    private final Set<Skill> selectedSkills = EnumSet.noneOf(Skill.class);
+    boolean initializedLevels = false;
     private AttackStyle attackStyle;
     private AttackStyle attackStyleToTrain;
-    public static int equippedWeaponTypeVarbit;
-
     // Starting skill levels
     private int attackLevel;
     private int strengthLevel;
     private int defenceLevel;
-
     // Time delay to no change attack style to often
     private int attackStyleChangeDelay = 0;
     private int currentAttackStyleChangeDelayCounter = 0;
-
-    boolean initializedLevels = false;
-
-
-    private final Set<Skill> selectedSkills = EnumSet.noneOf(Skill.class);
 
     public boolean run(PlayerAssistConfig config) {
         attackStyleChangeDelay = config.attackStyleChangeDelay();
@@ -304,6 +299,7 @@ public class AttackStyleScript extends Script {
 
     // shutdown
     public void shutdown() {
+        currentAttackStyleChangeDelayCounter = 0;
         super.shutdown();
 
     }

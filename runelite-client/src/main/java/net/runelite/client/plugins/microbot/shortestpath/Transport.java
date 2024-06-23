@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -158,7 +157,7 @@ public class Transport {
         destination = new WorldPoint(
                 Integer.parseInt(parts_destination[0]),
                 Integer.parseInt(parts_destination[1]),
-                Integer.parseInt(parts_origin[2]));
+                Integer.parseInt(parts_destination[2]));
 
         try {
             action = parts[2].split(DELIM)[0];

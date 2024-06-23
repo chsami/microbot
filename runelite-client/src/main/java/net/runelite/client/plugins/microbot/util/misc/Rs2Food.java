@@ -48,6 +48,15 @@ public enum Rs2Food {
     ORANGE(2108,2,"Orange"),
     PINEAPPLE_RINGS(2118,2,"Pineapple Rings"),
     PINEAPPLE_CHUNKS(2116,2,"Pineapple Chunks"),
+    JUG_OF_WINE(1993,11,"Jug of wine"),
+    COOKED_LARUPIA(29146,11,"Cooked larupia"),
+    COOKED_BARBTAILED_KEBBIT(29131,12,"Cooked barb-tailed kebbit"),
+    COOKED_GRAAHK(29149,14,"Cooked graahk"),
+    COOKED_KYATT(29152,17,"Cooked kyatt"),
+    COOKED_PYRE_FOX(29137,19,"Cooked pyre fox"),
+    COOKED_SUNLIGHT_ANTELOPE(29140,21,"Cooked sunlight antelope"),
+    COOKED_DASHING_KEBBIT(29134,23,"Cooked dashing kebbit"),
+    COOKED_MOONLIGHT_ANTELOPE(29143,26,"Cooked moonlight antelope"),
     PURPLE_SWEETS(10476,3,"Purple Sweets");
 
     private int id; private int heal; private String name;

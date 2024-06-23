@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.microbot.thieving;
 
+import net.runelite.api.NPC;
 import net.runelite.api.Skill;
+import net.runelite.client.game.npcoverlay.HighlightedNpc;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.thieving.enums.ThievingNpc;
@@ -10,18 +12,18 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.timers.TimersPlugin;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
-
 public class ThievingScript extends Script {
 
-    public static double version = 1.5;
+    public static String version = "1.5.1";
     ThievingConfig config;
 
     public boolean run(ThievingConfig config) {
@@ -31,19 +33,25 @@ public class ThievingScript extends Script {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
 
-                List<Rs2Item> foods = Microbot.getClientThread().runOnClientThread(Rs2Inventory::getInventoryFood);
+                if (initialPlayerLocation == null) {
+                    initialPlayerLocation = Rs2Player.getWorldLocation();
+                }
+
+                List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
 
                 if (foods.isEmpty()) {
+                    openCoinPouches(config);
+                    dropItems(foods);
                     bank();
                     return;
                 }
                 if (Rs2Inventory.isFull()) {
-                    dropItems();
+                    dropItems(foods);
                 }
                 openCoinPouches(config);
                 wearDodgyNecklace();
-                pickpocket();
                 Rs2Player.eatAt(config.hitpoints());
+                pickpocket();
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
@@ -88,13 +96,24 @@ public class ThievingScript extends Script {
     }
 
     private void pickpocket() {
+        if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < config.hitpoints())
+            return;
         if (config.THIEVING_NPC() != ThievingNpc.NONE) {
             sleepUntil(() -> TimersPlugin.t == null || !TimersPlugin.t.render());
             if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
                 handleElves();
             } else {
-                if (Rs2Npc.pickpocket(config.THIEVING_NPC().getName())) {
-                    sleep(50, 250);
+                Map<NPC, HighlightedNpc> highlightedNpcs =  net.runelite.client.plugins.npchighlight.NpcIndicatorsPlugin.getHighlightedNpcs();
+                if (highlightedNpcs.isEmpty()) {
+                    if (Rs2Npc.pickpocket(config.THIEVING_NPC().getName())) {
+                        sleep(50, 250);
+                    } else {
+                        Rs2Walker.walkTo(initialPlayerLocation);
+                    }
+                } else {
+                    if (Rs2Npc.pickpocket(highlightedNpcs)) {
+                        sleep(50, 250);
+                    }
                 }
             }
         }
@@ -103,7 +122,6 @@ public class ThievingScript extends Script {
     private void bank() {
         Microbot.status = "Getting food from bank...";
         if (Rs2Bank.walkToBank()) {
-            dropItems();
             boolean isBankOpen = Rs2Bank.useBank();
             if (!isBankOpen) return;
             Rs2Bank.depositAll();
@@ -113,8 +131,13 @@ public class ThievingScript extends Script {
         }
     }
 
-    private void dropItems() {
+    private void dropItems(List<Rs2Item> food) {
         List<String> doNotDropItemList = Arrays.stream(config.DoNotDropItemList().split(",")).collect(Collectors.toList());
+
+        List<String> foodNames = food.stream().map(x -> x.name).collect(Collectors.toList());
+
+        doNotDropItemList.addAll(foodNames);
+
         doNotDropItemList.add(config.food().getName());
         doNotDropItemList.add("dodgy necklace");
         Rs2Inventory.dropAllExcept(config.keepItemsAboveValue(), doNotDropItemList);

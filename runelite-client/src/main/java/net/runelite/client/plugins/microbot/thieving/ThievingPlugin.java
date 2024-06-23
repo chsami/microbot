@@ -2,9 +2,13 @@ package net.runelite.client.plugins.microbot.thieving;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.timers.TimersPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -46,5 +50,13 @@ public class ThievingPlugin extends Plugin {
     protected void shutDown() {
         thievingScript.shutdown();
         overlayManager.remove(thievingOverlay);
+    }
+
+    @Subscribe
+    public void onChatMessage(ChatMessage chatMessage)
+    {
+        if (chatMessage.getType() == ChatMessageType.GAMEMESSAGE && chatMessage.getMessage().contains("protects you")) {
+            TimersPlugin.t = null;
+        }
     }
 }

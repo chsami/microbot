@@ -17,6 +17,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
 import java.awt.*;
@@ -300,8 +301,15 @@ public class Rs2Walker {
     public static int getClosestTileIndex(List<WorldPoint> path) {
         WorldPoint startPoint;
 
+        var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 20);
+
         startPoint = path.stream()
-                .min(Comparator.comparingInt(a -> Math.abs(a.distanceTo(Rs2Player.getWorldLocation()))))
+                .min(Comparator.comparingInt(a -> {
+                    if (tiles.containsKey(a))
+                        return tiles.get(a);
+
+                    return Integer.MAX_VALUE;
+                }))
                 .orElse(null);
 
         return IntStream.range(0, path.size())
