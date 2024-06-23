@@ -23,6 +23,7 @@ public enum BankLocation {
     BLAST_MINE(new WorldPoint(1502, 3856, 0)),
     BURGH_DE_ROTT(new WorldPoint(3495, 3212, 0)),
     CAMELOT(new WorldPoint(2725, 3493, 0)),
+    CAMODZAAL(new WorldPoint(2979, 5798, 0)),
     CAM_TORUM(new WorldPoint(1450, 9557, 1)),
     CANIFIS(new WorldPoint(3512, 3480, 0)),
     CASTLE_WARS(new WorldPoint(2443, 3083, 0)),

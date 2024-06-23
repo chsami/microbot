@@ -4,16 +4,11 @@ import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.shortestpath.PrimitiveIntHashMap;
-import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
-import net.runelite.client.plugins.microbot.shortestpath.Transport;
-import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
+import net.runelite.client.plugins.microbot.shortestpath.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PathfinderConfig {
     private static final WorldArea WILDERNESS_ABOVE_GROUND = new WorldArea(2944, 3523, 448, 448, 0);
@@ -24,6 +19,11 @@ public class PathfinderConfig {
     private final Map<WorldPoint, List<Transport>> allTransports;
     @Getter
     private Map<WorldPoint, List<Transport>> transports;
+
+    private final List<Restriction> resourceRestrictions;
+    private List<Restriction> customRestrictions;
+    @Getter
+    private Set<Integer> restrictedPointsPacked;
 
     // Copy of transports with packed positions for the hotpath; lists are not copied and are the same reference in both maps
     @Getter
@@ -54,12 +54,15 @@ public class PathfinderConfig {
     private int woodcuttingLevel;
     private Map<Quest, QuestState> questStates = new HashMap<>();
 
-    public PathfinderConfig(SplitFlagMap mapData, Map<WorldPoint, List<Transport>> transports, Client client,
+    public PathfinderConfig(SplitFlagMap mapData, Map<WorldPoint, List<Transport>> transports, List<Restriction> restrictions, Client client,
                             ShortestPathConfig config) {
         this.mapData = mapData;
         this.map = ThreadLocal.withInitial(() -> new CollisionMap(this.mapData));
         this.allTransports = transports;
         this.transports = new HashMap<>(allTransports.size());
+        this.resourceRestrictions = restrictions;
+        this.customRestrictions = new ArrayList<>();
+        this.restrictedPointsPacked = new HashSet<>();
         this.transportsPacked = new PrimitiveIntHashMap<>(allTransports.size());
         this.client = client;
         this.config = config;
@@ -91,7 +94,9 @@ public class PathfinderConfig {
             prayerLevel = client.getBoostedSkillLevel(Skill.PRAYER);
             woodcuttingLevel = client.getBoostedSkillLevel(Skill.WOODCUTTING);
 
+            questStates.clear();
             refreshTransportData();
+            refreshRestrictionData();
         }
     }
 
@@ -110,9 +115,11 @@ public class PathfinderConfig {
             List<Transport> usableTransports = new ArrayList<>(entry.getValue().size());
             for (Transport transport : entry.getValue()) {
                 for (Quest quest : transport.getQuests()) {
-                    try {
-                        questStates.put(quest, getQuestState(quest));
-                    } catch (NullPointerException ignored) {
+                    if (!questStates.containsKey(quest)) {
+                        try {
+                            questStates.put(quest, getQuestState(quest));
+                        } catch (NullPointerException ignored) {
+                        }
                     }
                 }
 
@@ -124,6 +131,27 @@ public class PathfinderConfig {
             WorldPoint point = entry.getKey();
             transports.put(point, usableTransports);
             transportsPacked.put(WorldPointUtil.packWorldPoint(point), usableTransports);
+        }
+    }
+
+    private void refreshRestrictionData() {
+        if (!Thread.currentThread().equals(client.getClientThread())) {
+            return;
+        }
+
+        restrictedPointsPacked.clear();
+        for (var entry : Stream.concat(resourceRestrictions.stream(), customRestrictions.stream()).collect(Collectors.toList())){
+            for (Quest quest : entry.getQuests()) {
+                if (!questStates.containsKey(quest)){
+                    try {
+                        questStates.put(quest, getQuestState(quest));
+                    } catch (NullPointerException ignored) {
+                    }
+                }
+            }
+
+            if (entry.getQuests().isEmpty() || entry.getQuests().stream().anyMatch(x -> questStates.get(x) != QuestState.FINISHED))
+                restrictedPointsPacked.add(entry.getPackedWorldPoint());
         }
     }
 
@@ -228,5 +256,9 @@ public class PathfinderConfig {
         }
 
         return true;
+    }
+
+    public void setRestrictedTiles(Restriction... restrictions){
+        this.customRestrictions = List.of(restrictions);
     }
 }
