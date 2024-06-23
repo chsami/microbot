@@ -364,7 +364,7 @@ public class Rs2GameObject {
         for (GameObject gameObject : gameObjects) {
             ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
 
-            if(hasLineOfSight && !hasLineOfSight(gameObject))
+            if (hasLineOfSight && !hasLineOfSight(gameObject))
                 continue;
 
             if (objComp == null) {
@@ -479,6 +479,8 @@ public class Rs2GameObject {
 
         ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"chest"}, false);
 
+        possibleBankIds.add(12308); // RFD chest lumbridge basement
+
         for (GameObject gameObject : gameObjects) {
             if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
 
@@ -486,14 +488,20 @@ public class Rs2GameObject {
 
             if (objectComposition == null) continue;
 
-            if (Arrays.stream(objectComposition.getActions())
-                    .noneMatch(action ->
-                            action != null && (
-                                    action.toLowerCase().contains("bank") ||
-                                            action.toLowerCase().contains("collect"))))
-                continue;
+            if (objectComposition.getImpostorIds().length > 0) {
+                if (Arrays.stream(objectComposition.getImpostor().getActions())
+                        .anyMatch(action -> action != null && (
+                                action.toLowerCase().contains("bank") ||
+                                        action.toLowerCase().contains("collect"))))
+                    return gameObject;
+            }
 
-            return gameObject;
+            if (Arrays.stream(objectComposition.getActions())
+                    .anyMatch(action -> action != null && (
+                            action.toLowerCase().contains("bank") ||
+                                    action.toLowerCase().contains("collect"))))
+                return gameObject;
+
         }
 
         return null;
@@ -975,8 +983,7 @@ public class Rs2GameObject {
     }
 
     @Nullable
-    public static ObjectComposition getObjectComposition(int id)
-    {
+    public static ObjectComposition getObjectComposition(int id) {
         ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
         return objectComposition.getImpostorIds() == null ? objectComposition : objectComposition.getImpostor();
     }
