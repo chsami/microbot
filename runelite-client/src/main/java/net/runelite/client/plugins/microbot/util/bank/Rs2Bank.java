@@ -1129,7 +1129,7 @@ public class Rs2Bank {
             for (LootTrackerItem lootTrackerItem : lootTrackerRecord.getItems()) {
                 int itemId = lootTrackerItem.getId();
                 ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(lootTrackerItem.getId()));
-                if (Arrays.stream(itemComposition.getInventoryActions()).anyMatch(x -> x.equalsIgnoreCase("eat"))) continue;
+                if (Arrays.stream(itemComposition.getInventoryActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("eat"))) continue;
                 final boolean isNoted = itemComposition.getNote() == 799;
                 if (!itemComposition.isTradeable() && !isNoted) continue;
 
