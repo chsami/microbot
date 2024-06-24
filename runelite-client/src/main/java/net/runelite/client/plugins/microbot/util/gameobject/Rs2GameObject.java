@@ -55,13 +55,17 @@ public class Rs2GameObject {
         return clickObject(object);
     }
 
+    public static boolean interact(TileObject tileObject, boolean checkCanReach) {
+        if (tileObject == null) return false;
+        if (checkCanReach && Rs2GameObject.hasLineOfSight(tileObject))
+            return clickObject(tileObject);
+        Rs2Walker.walkFastCanvas(tileObject.getWorldLocation());
+        return false;
+    }
+
     public static boolean interact(int id, boolean checkCanReach) {
         TileObject object = findObjectById(id);
-        if (object == null) return false;
-        if (checkCanReach && Rs2GameObject.hasLineOfSight(object))
-            return clickObject(object);
-        Rs2Walker.walkTo(object.getWorldLocation());
-        return false;
+        return interact(object, checkCanReach);
     }
 
 
@@ -848,6 +852,33 @@ public class Rs2GameObject {
                 .collect(Collectors.toList());
     }
 
+    public static List<WallObject> getWallObjects(int id, WorldPoint anchorPoint) {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        if (tiles == null) return new ArrayList<>();
+
+        int z = Microbot.getClient().getPlane();
+        List<WallObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+                    if (tile.getWallObject() != null
+                            && tile.getWallObject().getId() == id)
+                        tileObjects.add(tile.getWallObject());
+            }
+        }
+
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(anchorPoint)))
+                .collect(Collectors.toList());
+    }
+
     // private methods
     private static boolean clickObject(TileObject object) {
         return clickObject(object, "");
@@ -956,7 +987,8 @@ public class Rs2GameObject {
                     tileObject.getWorldLocation(),
                     2,
                     2)
-                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), new WorldArea(Rs2Player.getWorldLocation().getX(),
+                            Rs2Player.getWorldLocation().getY(), 2, 2, Rs2Player.getWorldLocation().getPlane()));
         }
     }
 
