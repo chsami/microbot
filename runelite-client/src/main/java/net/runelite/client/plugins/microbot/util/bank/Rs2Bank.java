@@ -514,12 +514,12 @@ public class Rs2Bank {
     }
 
     public static void withdrawItem(boolean checkInv, int id) {
-        if (checkInv && Rs2Inventory.hasItem(id)) return;
+        if (checkInv &&  Rs2Inventory.hasItem(id)) return;
         withdrawOne(id);
     }
 
     public static void withdrawItem(boolean checkInv, String name) {
-        if (checkInv && !Rs2Bank.hasItem(name)) return;
+        if (checkInv && Rs2Inventory.hasItem(name)) return;
         withdrawOne(name);
     }
 
