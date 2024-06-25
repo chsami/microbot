@@ -358,9 +358,9 @@ public class Rs2GrandExchange {
      * @param npcName
      * @return true if there is no more loot to sell
      */
-    public static boolean sellLoot(String npcName) {
+    public static boolean sellLoot(String npcName, List<String> itemsToNotSell) {
 
-        boolean soldAllItems = Rs2Bank.withdrawLootItems(npcName);
+        boolean soldAllItems = Rs2Bank.withdrawLootItems(npcName, itemsToNotSell);
 
         if (soldAllItems) {
             boolean isSuccess = sellInventory();
