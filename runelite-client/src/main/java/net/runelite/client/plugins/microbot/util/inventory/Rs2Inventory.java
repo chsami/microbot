@@ -654,7 +654,13 @@ public class Rs2Inventory {
      * @return True if the player has the specified quantity of the item, false otherwise.
      */
     public static boolean hasItemAmount(String name, int amount) {
-        return hasItemAmount(name, amount, false);
+        Rs2Item rs2Item = get(name);
+        if (rs2Item == null) return false;
+        if (rs2Item.isStackable) {
+            return rs2Item.quantity >= amount;
+        } else {
+            return items().stream().filter(x -> x.name.equalsIgnoreCase(name)).count() >= amount;
+        }
     }
 
     /**
@@ -1743,6 +1749,14 @@ public class Rs2Inventory {
     private static int indexOfIgnoreCase(String[] sourceList, String searchString) {
         if (sourceList == null || searchString == null) {
             return -1;  // or throw an IllegalArgumentException
+        }
+
+        if (searchString.equalsIgnoreCase("wield") || searchString.equalsIgnoreCase("wear")) {
+            for (int i = 0; i < sourceList.length; i++) {
+                if (sourceList[i] != null && (sourceList[i].equalsIgnoreCase("wield") || sourceList[i].equalsIgnoreCase("wear"))) {
+                    return i;
+                }
+            }
         }
 
         for (int i = 0; i < sourceList.length; i++) {

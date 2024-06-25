@@ -77,6 +77,18 @@ public interface VorkathConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "ItemsToNotSell",
+            name = "Items to not sell",
+            description = "Items to not sell comma seperated",
+            position = 2,
+            section = lootSection
+    )
+    default String ItemsToNotSell()
+    {
+        return "item1,item2";
+    }
+
+    @ConfigItem(
             keyName = "Rigour",
             name = "Rigour",
             description = "Activate Rigour? (Make sure you have it unlocked and have 74 prayer!)",

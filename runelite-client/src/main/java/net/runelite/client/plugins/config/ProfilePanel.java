@@ -314,6 +314,8 @@ class ProfilePanel extends PluginPanel {
 		private final JButton delete;
 		private final JTextField name;
         private final JTextField password;
+        private final JTextField bankPin;
+
 		private final JButton activate;
         private final JPanel expand;
 		private final JPanel buttons;
@@ -355,6 +357,21 @@ class ProfilePanel extends PluginPanel {
                 public void keyPressed(KeyEvent e) {
                     if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                         stopRenamingPassword(true);
+                    }
+                }
+            });
+            bankPin = new JPasswordField();
+            bankPin.setText(profile.getBankPin());
+            bankPin.setEditable(false);
+            bankPin.setEnabled(false);
+            bankPin.setOpaque(false);
+            bankPin.setBorder(null);
+            bankPin.addActionListener(ev -> stopRenamingBankPin(true));
+            bankPin.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                        stopRenamingBankPin(true);
                     }
                 }
             });
@@ -540,6 +557,7 @@ class ProfilePanel extends PluginPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(name, 24, 24, 24)
                                 .addComponent(password, 24, 24, 24)
+                                .addComponent(bankPin, 24, 24, 24)
                                 .addComponent(expand))
                         .addComponent(activate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
@@ -548,6 +566,7 @@ class ProfilePanel extends PluginPanel {
                         .addGroup(layout.createParallelGroup()
                                 .addComponent(name, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
                                 .addComponent(password, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
+                                .addComponent(bankPin, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
                                 .addComponent(expand))
                         .addComponent(activate));
             }
@@ -605,6 +624,8 @@ class ProfilePanel extends PluginPanel {
             name.addMouseMotionListener(expandListener);
             password.addMouseListener(expandListener);
             password.addMouseMotionListener(expandListener);
+            bankPin.addMouseListener(expandListener);
+            bankPin.addMouseMotionListener(expandListener);
             activate.addMouseListener(expandListener);
             activate.addMouseMotionListener(expandListener);
 
@@ -641,6 +662,7 @@ class ProfilePanel extends PluginPanel {
             name.requestFocusInWindow();
             name.selectAll();
             startRenamingPassword();
+            startRenamingBankPin();
         }
 
         private void stopRenaming(boolean save) {
@@ -656,6 +678,7 @@ class ProfilePanel extends PluginPanel {
                 name.setText(profile.getName());
             }
             stopRenamingPassword(save);
+            stopRenamingBankPin(save);
         }
 
 		private void startRenamingPassword()
@@ -666,6 +689,15 @@ class ProfilePanel extends PluginPanel {
 			password.requestFocusInWindow();
 			password.selectAll();
 		}
+
+        private void startRenamingBankPin()
+        {
+            bankPin.setEnabled(true);
+            bankPin.setEditable(true);
+            bankPin.setOpaque(true);
+            bankPin.requestFocusInWindow();
+            bankPin.selectAll();
+        }
 
         private void stopRenamingPassword(boolean save) {
             password.setEditable(false);
@@ -684,6 +716,25 @@ class ProfilePanel extends PluginPanel {
                 renameProfile(profile.getId(), name.getText().trim());
             } else {
                 password.setText(profile.getPassword());
+            }
+        }
+        private void stopRenamingBankPin(boolean save) {
+            bankPin.setEditable(false);
+            bankPin.setEnabled(false);
+            bankPin.setOpaque(false);
+
+            rename.setSelected(false);
+
+            try {
+                configManager.setBankPin(profile, net.runelite.client.plugins.microbot.util.security.Encryption.encrypt(bankPin.getText()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            if (save) {
+                renameProfile(profile.getId(), name.getText().trim());
+            } else {
+                bankPin.setText(profile.getBankPin());
             }
         }
     }

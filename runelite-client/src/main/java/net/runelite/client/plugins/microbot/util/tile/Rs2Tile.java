@@ -147,6 +147,46 @@ public class Rs2Tile {
         return worldPoints;
     }
 
+    public static HashMap<WorldPoint, Integer> getReachableTilesFromTile(WorldPoint tile, int distance){
+        var tileDistances = new HashMap<WorldPoint, Integer>();
+        tileDistances.put(tile, 0);
+
+        for (int i = 0; i < distance + 1; i++){
+            int dist = i;
+            for (var kvp : tileDistances.entrySet().stream().filter(x -> x.getValue() == dist).collect(Collectors.toList())){
+                var point = kvp.getKey();
+                var localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
+
+                if (Microbot.getClient().getCollisionMaps() != null && localPoint != null) {
+                    int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
+                    int data = flags[localPoint.getSceneX()][localPoint.getSceneY()];
+
+                    Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
+
+                    if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FULL)
+                            || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FLOOR)){
+                        tileDistances.remove(point);
+                        continue;
+                    }
+
+                    if (kvp.getValue() >= distance)
+                        continue;
+
+                    if (!movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_EAST))
+                        tileDistances.putIfAbsent(point.dx(1), dist + 1);
+                    if (!movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_WEST))
+                        tileDistances.putIfAbsent(point.dx(-1), dist + 1);
+                    if (!movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_NORTH))
+                        tileDistances.putIfAbsent(point.dy(1), dist + 1);
+                    if (!movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_SOUTH))
+                        tileDistances.putIfAbsent(point.dy(-1), dist + 1);
+                }
+            }
+        }
+
+        return tileDistances;
+    }
+
     public static List<LocalPoint> getTilesAroundPlayer(int radius) {
         List<LocalPoint> localPoints = new ArrayList<>();
         LocalPoint playerLocalPosition = Rs2Player.getLocalLocation();

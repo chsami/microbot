@@ -8,7 +8,6 @@ import net.runelite.client.game.npcoverlay.HighlightedNpc;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -171,13 +170,13 @@ public class Rs2Npc {
 
             MenuAction menuAction = getMenuAction(index);
 
-            if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
+          /*  if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
                 Microbot.getClient().setCameraPitchTarget(Random.random(430, 460));
                 Microbot.getMouse().scrollDown(new net.runelite.api.Point(1, 1));
                 Microbot.getMouse().scrollDown(new net.runelite.api.Point(1, 1));
                 Microbot.getMouse().scrollDown(new net.runelite.api.Point(1, 1));
                 Rs2Camera.turnTo(npc);
-            }
+            }*/
 
             if (menuAction != null) {
                 Microbot.doInvoke(new NewMenuEntry(0, 0, menuAction.getId(), npc.getIndex(), -1, npc.getName()), new Rectangle(npc.getCanvasTilePoly().getBounds()));
@@ -266,6 +265,8 @@ public class Rs2Npc {
 
     public static boolean pickpocket(String npcName) {
         NPC npc = getNpc(npcName);
+
+        if (npc == null) return false;
 
         if (!hasLineOfSight(npc)) {
             Rs2Walker.walkTo(npc.getWorldLocation(), 1);

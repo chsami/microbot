@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.microbot.fishing.minnows;
 
+import com.google.inject.Provides;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -17,21 +19,19 @@ import java.awt.*;
         enabledByDefault = false
 )
 public class MinnowsPlugin extends Plugin {
-/*    @Inject
+    @Inject
+    MinnowsScript minnowsScript;
+    @Inject
     private MinnowsConfig config;
-    @Provides
-    MinnowsConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(MinnowsConfig.class);
-    }*/
-
     @Inject
     private OverlayManager overlayManager;
     @Inject
     private MinnowsOverlay minnowsOverlay;
 
-    @Inject
-    MinnowsScript minnowsScript;
-
+    @Provides
+    MinnowsConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(MinnowsConfig.class);
+    }
 
     @Override
     protected void startUp() throws AWTException {

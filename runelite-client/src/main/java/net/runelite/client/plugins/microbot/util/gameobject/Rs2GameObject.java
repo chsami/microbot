@@ -55,13 +55,22 @@ public class Rs2GameObject {
         return clickObject(object);
     }
 
+    public static boolean interact(TileObject tileObject, String action, boolean checkCanReach) {
+        if (tileObject == null) return false;
+        if (checkCanReach && Rs2GameObject.hasLineOfSight(tileObject))
+            return clickObject(tileObject);
+        Rs2Walker.walkFastCanvas(tileObject.getWorldLocation());
+        return false;
+    }
+
+
+    public static boolean interact(TileObject tileObject, boolean checkCanReach) {
+        return interact(tileObject, "", checkCanReach);
+    }
+
     public static boolean interact(int id, boolean checkCanReach) {
         TileObject object = findObjectById(id);
-        if (object == null) return false;
-        if (checkCanReach && Rs2GameObject.hasLineOfSight(object))
-            return clickObject(object);
-        Rs2Walker.walkTo(object.getWorldLocation());
-        return false;
+        return interact(object, checkCanReach);
     }
 
 
@@ -364,7 +373,7 @@ public class Rs2GameObject {
         for (GameObject gameObject : gameObjects) {
             ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
 
-            if(hasLineOfSight && !hasLineOfSight(gameObject))
+            if (hasLineOfSight && !hasLineOfSight(gameObject))
                 continue;
 
             if (objComp == null) {
@@ -479,6 +488,8 @@ public class Rs2GameObject {
 
         ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"chest"}, false);
 
+        possibleBankIds.add(12308); // RFD chest lumbridge basement
+
         for (GameObject gameObject : gameObjects) {
             if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
 
@@ -486,14 +497,20 @@ public class Rs2GameObject {
 
             if (objectComposition == null) continue;
 
-            if (Arrays.stream(objectComposition.getActions())
-                    .noneMatch(action ->
-                            action != null && (
-                                    action.toLowerCase().contains("bank") ||
-                                            action.toLowerCase().contains("collect"))))
-                continue;
+            if (objectComposition.getImpostorIds().length > 0) {
+                if (Arrays.stream(objectComposition.getImpostor().getActions())
+                        .anyMatch(action -> action != null && (
+                                action.toLowerCase().contains("bank") ||
+                                        action.toLowerCase().contains("collect"))))
+                    return gameObject;
+            }
 
-            return gameObject;
+            if (Arrays.stream(objectComposition.getActions())
+                    .anyMatch(action -> action != null && (
+                            action.toLowerCase().contains("bank") ||
+                                    action.toLowerCase().contains("collect"))))
+                return gameObject;
+
         }
 
         return null;
@@ -840,6 +857,33 @@ public class Rs2GameObject {
                 .collect(Collectors.toList());
     }
 
+    public static List<WallObject> getWallObjects(int id, WorldPoint anchorPoint) {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        if (tiles == null) return new ArrayList<>();
+
+        int z = Microbot.getClient().getPlane();
+        List<WallObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+                    if (tile.getWallObject() != null
+                            && tile.getWallObject().getId() == id)
+                        tileObjects.add(tile.getWallObject());
+            }
+        }
+
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(anchorPoint)))
+                .collect(Collectors.toList());
+    }
+
     // private methods
     private static boolean clickObject(TileObject object) {
         return clickObject(object, "");
@@ -948,7 +992,8 @@ public class Rs2GameObject {
                     tileObject.getWorldLocation(),
                     2,
                     2)
-                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), new WorldArea(Rs2Player.getWorldLocation().getX(),
+                            Rs2Player.getWorldLocation().getY(), 2, 2, Rs2Player.getWorldLocation().getPlane()));
         }
     }
 
@@ -975,8 +1020,7 @@ public class Rs2GameObject {
     }
 
     @Nullable
-    public static ObjectComposition getObjectComposition(int id)
-    {
+    public static ObjectComposition getObjectComposition(int id) {
         ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
         return objectComposition.getImpostorIds() == null ? objectComposition : objectComposition.getImpostor();
     }

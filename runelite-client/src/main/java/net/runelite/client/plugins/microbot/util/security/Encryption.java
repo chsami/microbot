@@ -11,6 +11,7 @@ public class Encryption {
     private static final String ALGORITHM = "AES";
 
     public static String encrypt(String plainText) throws Exception {
+        if (plainText.endsWith("==")) return plainText;
         SecretKeySpec keySpec = new SecretKeySpec("microbot12345678".getBytes(), ALGORITHM);
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, keySpec);
