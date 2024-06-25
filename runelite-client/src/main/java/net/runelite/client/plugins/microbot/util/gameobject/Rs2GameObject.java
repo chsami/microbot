@@ -55,12 +55,17 @@ public class Rs2GameObject {
         return clickObject(object);
     }
 
-    public static boolean interact(TileObject tileObject, boolean checkCanReach) {
+    public static boolean interact(TileObject tileObject, String action, boolean checkCanReach) {
         if (tileObject == null) return false;
         if (checkCanReach && Rs2GameObject.hasLineOfSight(tileObject))
             return clickObject(tileObject);
         Rs2Walker.walkFastCanvas(tileObject.getWorldLocation());
         return false;
+    }
+
+
+    public static boolean interact(TileObject tileObject, boolean checkCanReach) {
+        return interact(tileObject, "", checkCanReach);
     }
 
     public static boolean interact(int id, boolean checkCanReach) {
