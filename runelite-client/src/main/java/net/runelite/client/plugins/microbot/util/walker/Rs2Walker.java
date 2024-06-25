@@ -296,11 +296,19 @@ public class Rs2Walker {
         if (wallObject != null) {
             ObjectComposition objectComposition = Rs2GameObject.getObjectComposition(wallObject.getId());
 
-            for (var action : objectComposition.getActions()) {
-                if (action != null && action.contains("Pay-toll")) {
-                    Rs2GameObject.interact(wallObject, action);
-                    Rs2Player.waitForWalking();
-                    return true;
+            for (var action : objectComposition.getActions()){
+                if(action != null){
+                    if (action.contains("Pay-toll")) {
+                        Rs2GameObject.interact(wallObject, action);
+                        Rs2Player.waitForWalking();
+                        return true;
+                    }
+                    if (action.contains("Pick-lock")) {
+                        Rs2GameObject.interact(wallObject, action);
+                        Rs2Player.waitForWalking();
+                        return true;
+                    }
+
                 }
             }
 
@@ -439,7 +447,7 @@ public class Rs2Walker {
             }
             boolean found = false;
             for (String action : objectComposition.getActions()) {
-                if (action != null && (action.equals("Open") || action.contains("Pay-toll"))) {
+                if (action != null && (action.equals("Open") || action.contains("Pay-toll") || action.contains("Pick-lock"))) {
                     found = true;
                     break;
                 }

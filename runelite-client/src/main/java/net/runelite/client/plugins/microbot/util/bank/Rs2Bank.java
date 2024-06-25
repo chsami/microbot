@@ -991,7 +991,7 @@ public class Rs2Bank {
         BankLocation nearest = null;
         double dist = Double.MAX_VALUE;
         int y = Microbot.getClient().getLocalPlayer().getWorldLocation().getY();
-        boolean isInCave = Microbot.getClient().getLocalPlayer().getWorldLocation().getY() > 9000;
+        boolean isInCave = y > 9000;
         if (isInCave) {
             y -= 6300; //minus -6300 to set y to the surface
         }
@@ -1082,14 +1082,15 @@ public class Rs2Bank {
     }
 
     /**
-     * Banks items if your inventory is full. Will walk back to the initialplayerlocation passed as param
+     * Banks items if your inventory not enough emptyslots. Will walk back to the initialplayerlocation passed as param
      *
      * @param itemNames
      * @param initialPlayerLocation
+     * @param emptySlotCount
      * @return
      */
-    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
-        if (Rs2Inventory.isFull()) {
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount) {
+        if (Rs2Inventory.getEmptySlots() <= emptySlotCount) {
             boolean isBankOpen = Rs2Bank.walkToBankAndUseBank();
             if (isBankOpen) {
                 for (String itemName : itemNames) {
@@ -1105,7 +1106,18 @@ public class Rs2Bank {
             Rs2Walker.walkTo(initialPlayerLocation, distance);
         }
 
-        return !Rs2Inventory.isFull() && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
+        return !(Rs2Inventory.getEmptySlots() <= emptySlotCount) && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
+    }
+
+    /**
+     * Banks items if your inventory is full. Will walk back to the initialplayerlocation passed as param
+     *
+     * @param itemNames
+     * @param initialPlayerLocation
+     * @return
+     */
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
+        return bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation, 0);
     }
 
     /**
