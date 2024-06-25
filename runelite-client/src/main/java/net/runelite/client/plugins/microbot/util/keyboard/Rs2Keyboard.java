@@ -5,8 +5,6 @@ import net.runelite.client.plugins.microbot.util.Global;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.awt.event.KeyEvent.CHAR_UNDEFINED;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
@@ -133,7 +131,11 @@ public class Rs2Keyboard {
     }
 
     public static void enter() {
-        keyHold(KeyEvent.VK_ENTER);
-        keyRelease(KeyEvent.VK_ENTER);
+        keyPress(KeyEvent.VK_ENTER);
+
+        //FIX: this is to avoid automatically login with jagex account when you are on the login screen
+        KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis() , 0, KeyEvent.VK_UNDEFINED, '\n');
+
+        getCanvas().dispatchEvent(keyEvent);
     }
 }
