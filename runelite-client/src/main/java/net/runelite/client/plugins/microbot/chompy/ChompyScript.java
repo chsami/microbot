@@ -3,23 +3,17 @@ package net.runelite.client.plugins.microbot.chompy;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
-import net.runelite.api.TileObject;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.nateplugins.skilling.natefishing.enums.Fishs;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ChompyScript extends Script {
@@ -67,7 +61,8 @@ public class ChompyScript extends Script {
                 }
 
                 if (!Rs2Equipment.hasEquippedSlot(EquipmentInventorySlot.AMMO)) {
-                    System.out.println("No ammo - stopping");
+                    Microbot.showMessage("No ammo - stopping");
+                    sleep(10000);
                     state = ChompyState.STOPPED;
                 }
 
@@ -98,11 +93,13 @@ public class ChompyScript extends Script {
                                     state = ChompyState.FILLING_BELLOWS;
                                 } else {
                                     Microbot.showMessage("You need bellows! Aborting");
+                                    sleep(10000);
                                     state = ChompyState.STOPPED;
                                 }
                             }
                             else if (!Rs2Npc.interact(ID_SWAMP_TOAD, "Inflate")) {
                                 Microbot.showMessage("Could not find toads - aborting");
+                                sleep(10000);
                                 state = ChompyState.STOPPED;
                             }
                         }
