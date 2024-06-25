@@ -79,11 +79,18 @@ public class Rs2Bank {
      * @return true if the bank interface was open and successfully closed, false otherwise.
      */
     public static boolean isOpen() {
-        if (Rs2Widget.hasWidget("Please enter your PIN")) {
-            Microbot.getNotifier().notify("[ATTENTION] Please enter your bankpin so the script can continue.");
-            sleep(5000);
-            return false;
-        }
+//        if (Rs2Widget.hasWidget("Please enter your PIN")) {
+//            try {
+//                if (Login.activeProfile.getBankPin().isEmpty()) {
+//                    Microbot.showMessage("Your bankpin is empty. Please fill this field in your runelite profile.");
+//                    return false;
+//                }
+//                handleBankPin(Encryption.decrypt(Login.activeProfile.getBankPin()));
+//            } catch (Exception e) {
+//                System.out.println("Something went wrong handling bankpin");
+//            }
+//            return false;
+//        }
         return Rs2Widget.findWidget("Rearrange mode", null) != null;
     }
 
@@ -810,7 +817,7 @@ public class Rs2Bank {
             if (Microbot.getClient().isWidgetSelected())
                 Microbot.getMouse().click();
             if (isOpen()) return true;
-            boolean action;
+            boolean action = false;
             GameObject bank = Rs2GameObject.findBank();
             if (bank == null) {
                 GameObject chest = Rs2GameObject.findChest();
@@ -819,10 +826,10 @@ public class Rs2Bank {
                     if (npc == null) return false;
                     action = Rs2Npc.interact(npc, "bank");
                 } else {
-                    action = Rs2GameObject.interact(chest, "use");
+                    //action = Rs2GameObject.interact(chest, "use");
                 }
             } else {
-                action = Rs2GameObject.interact(bank, "bank");
+                //action = Rs2GameObject.interact(bank, "bank");
             }
             if (action) {
                 sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 2500);
@@ -1054,6 +1061,7 @@ public class Rs2Bank {
 
         if (isBankPinVisible) {
             Rs2Keyboard.typeString(pin);
+            sleep(50, 350);
             Rs2Keyboard.enter();
             return true;
         }

@@ -24,13 +24,10 @@
  */
 package net.runelite.client.config;
 
-import java.util.List;
+import lombok.*;
+
 import javax.annotation.Nullable;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import java.util.List;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 @ToString
@@ -44,6 +41,9 @@ public class ConfigProfile
 	@Getter
 	@Setter(AccessLevel.PACKAGE)
 	private String password;
+	@Getter
+	@Setter(AccessLevel.PACKAGE)
+	private String bankPin;
 	@Getter
 	@Setter
 	private boolean sync;
