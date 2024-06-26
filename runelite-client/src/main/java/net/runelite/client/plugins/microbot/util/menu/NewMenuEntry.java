@@ -153,6 +153,12 @@ public class NewMenuEntry implements MenuEntry {
         return itemId;
     }
 
+    @Override
+    public MenuEntry setItemId(int itemId) {
+        this.itemId = itemId;
+        return this;
+    }
+
     @Nullable
     public Widget getWidget() {
         return null;

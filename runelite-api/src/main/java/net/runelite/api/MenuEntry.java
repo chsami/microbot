@@ -138,6 +138,7 @@ public interface MenuEntry
 	 * @param itemId
 	 * @return
 	 */
+	MenuEntry setItemId(int itemId);
 
 
 	/**
