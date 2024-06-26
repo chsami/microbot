@@ -24,17 +24,14 @@
  */
 package net.runelite.client.menus;
 
-import java.util.function.Consumer;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.Actor;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.NPC;
-import net.runelite.api.Player;
+import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
+
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
 
 @EqualsAndHashCode
 public class TestMenuEntry implements MenuEntry
@@ -217,6 +214,12 @@ public class TestMenuEntry implements MenuEntry
 	public int getItemId()
 	{
 		return itemId;
+	}
+
+	@Override
+	public MenuEntry setItemId(int itemId) {
+		this.itemId = itemId;
+		return this;
 	}
 
 	@Nullable
