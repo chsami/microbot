@@ -10,7 +10,10 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 
@@ -43,9 +46,12 @@ public class NatureRuneChestScript extends Script {
                             Rs2Player.logoutIfPlayerDetected(1, 10);
                             return;
                         }
-                        GameObject natureRuneChest = Rs2GameObject.findObject(config.natureRuneChestLocation().getObjectID(), config.distanceToStray(), true, config.natureRuneChestLocation().getWorldPoint());
-                        if (natureRuneChest != null) {
-                            Rs2GameObject.interact(natureRuneChest, "Search for traps");
+                        Optional<GameObject> natureRuneChest = Rs2GameObject.getGameObjects().stream()
+                                        .filter(obj -> obj.getId() == config.natureRuneChestLocation().getObjectID())
+                                        .sorted(Comparator.comparingInt(obj -> Rs2Player.getWorldLocation().distanceTo(obj.getWorldLocation())))
+                                        .findFirst();
+                        if (natureRuneChest.isPresent()) {
+                            Rs2GameObject.interact(natureRuneChest.get(), "Search for traps");
                             sleepUntilTrue(() -> !Rs2Player.isInteracting(), 500, 8000);
                             sleep(Random.random(18000, 20000));
                         }

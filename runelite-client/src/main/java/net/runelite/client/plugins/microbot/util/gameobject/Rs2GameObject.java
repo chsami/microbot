@@ -399,38 +399,6 @@ public class Rs2GameObject {
         return null;
     }
 
-    public static GameObject findObject(int objectID, int distance, boolean hasLineOfSight, WorldPoint anchorPoint) {
-        List<GameObject> gameObjects = getGameObjectsWithinDistance(distance, anchorPoint);
-
-        if (gameObjects == null) {
-            return null;
-        }
-
-        for (GameObject gameObject : gameObjects) {
-            ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
-
-            if (hasLineOfSight && !hasLineOfSight(gameObject))
-                continue;
-
-            if (objComp == null) {
-                continue;
-            }
-            int compID;
-
-            try {
-                compID = objComp.getId();
-            } catch (Exception e) {
-                continue;
-            }
-
-            if (compID != -1 && compID == objectID) {
-                return gameObject;
-            }
-        }
-
-        return null;
-    }
-
     public static boolean hasAction(ObjectComposition objComp, String action) {
         boolean result;
 

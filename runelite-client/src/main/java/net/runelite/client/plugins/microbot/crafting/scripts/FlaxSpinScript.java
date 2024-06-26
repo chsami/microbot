@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.crafting.scripts;
 
 import net.runelite.api.GameObject;
 import net.runelite.api.ItemID;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
@@ -15,7 +16,9 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
@@ -77,9 +80,13 @@ public class FlaxSpinScript extends Script {
                         Rs2Walker.walkTo(config.flaxSpinLocation().getWorldPoint(), 4);
                         sleepUntilTrue(() -> isNearSpinningWheel(config, 4) && !Rs2Player.isMoving(), 600, 300000);
                         if (!isNearSpinningWheel(config, 4)) return;
-                        GameObject spinningWheel = Rs2GameObject.findObject(config.flaxSpinLocation().getObjectID(), 4, false, config.flaxSpinLocation().getWorldPoint());
-                        if (!Rs2GameObject.hasLineOfSight(spinningWheel)) {
+                        Optional<GameObject> spinningWheel = Rs2GameObject.getGameObjects().stream()
+                                .filter(obj -> obj.getId() == config.flaxSpinLocation().getObjectID())
+                                .sorted(Comparator.comparingInt(obj -> Rs2Player.getWorldLocation().distanceTo(obj.getWorldLocation())))
+                                .findFirst();
+                        if (spinningWheel.isEmpty()) {
                             Rs2Walker.walkFastCanvas(config.flaxSpinLocation().getWorldPoint());
+                            return;
                         }
                         state = State.SPINNING;
                         break;
