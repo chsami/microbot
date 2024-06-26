@@ -136,7 +136,7 @@ public class ClientLoader implements Supplier<Applet>
 			ClassLoader classLoader;
 			try (FileChannel lockfile = FileChannel.open(LOCK_FILE.toPath(),
 				StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.WRITE);
-				FileLock flock = lockfile.lock())
+				@SuppressWarnings("PMD.UnusedLocalVariable") FileLock flock = lockfile.lock())
 			{
 				SplashScreen.stage(.05, null, "Downloading Old School RuneScape");
 				try
@@ -241,7 +241,7 @@ public class ClientLoader implements Supplier<Applet>
 		catch (IOException ex)
 		{
 			log.debug("error downloading backup config", ex);
-			throw err; // use error from Jagex's servers
+			throw err; // NOPMD: PreserveStackTrace - use error from Jagex's servers
 		}
 	}
 

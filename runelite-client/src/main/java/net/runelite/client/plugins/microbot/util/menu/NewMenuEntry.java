@@ -2,10 +2,8 @@ package net.runelite.client.plugins.microbot.util.menu;
 
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.function.Consumer;
 
 public class NewMenuEntry implements MenuEntry {

@@ -184,17 +184,19 @@ public class RuneLite {
                 .withValuesConvertedBy(new ConfigFileConverter())
                 .defaultsTo(DEFAULT_SESSION_FILE);
 
-        final ArgumentAcceptingOptionSpec<ClientUpdateCheckMode> updateMode = parser
-                .accepts("rs", "Select client type")
-                .withRequiredArg()
-                .ofType(ClientUpdateCheckMode.class)
-                .defaultsTo(ClientUpdateCheckMode.AUTO)
-                .withValuesConvertedBy(new EnumConverter<ClientUpdateCheckMode>(ClientUpdateCheckMode.class) {
-                    @Override
-                    public ClientUpdateCheckMode convert(String v) {
-                        return super.convert(v.toUpperCase());
-                    }
-                });
+		final ArgumentAcceptingOptionSpec<ClientUpdateCheckMode> updateMode = parser
+			.accepts("rs", "Select client type")
+			.withRequiredArg()
+			.ofType(ClientUpdateCheckMode.class)
+			.defaultsTo(ClientUpdateCheckMode.AUTO)
+			.withValuesConvertedBy(new EnumConverter<>(ClientUpdateCheckMode.class)
+			{
+				@Override
+				public ClientUpdateCheckMode convert(String v)
+				{
+					return super.convert(v.toUpperCase());
+				}
+			});
 
         final OptionSpec<Void> insecureWriteCredentials = parser.accepts("insecure-write-credentials", "Dump authentication tokens from the Jagex Launcher to a text file to be used for development");
 
