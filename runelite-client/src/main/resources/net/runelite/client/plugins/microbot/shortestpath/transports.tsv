@@ -628,6 +628,12 @@
 2570 9668 0	2570 3268 0	Climb-up Ladder 17385				2	
 2571 3267 0	2571 9667 0	Climb-down Ladder 17384				2	
 2571 9667 0	2571 3267 0	Climb-up Ladder 17385				2	
+2674 3299 0	2675 3300 1	Climb-up Staircase 16671				1	
+2675 3300 1	2674 3299 0	Climb-down Staircase 16673				1	
+2674 3304 0	2674 3303 0	Pick-lock Door 11720				2	
+2674 3305 0	2674 3306 0	Pick-lock Door 11719				2	
+2674 3303 0	2674 3304 0	Open Door 11720				1	
+2674 3306 0	2674 3305 0	Open Door 11719				1	
 							
 # West Ardougne							
 2559 3300 0	2556 3300 0	Open Ardougne Wall Door 8739					
