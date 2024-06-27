@@ -81,7 +81,7 @@ public class LootScript extends Script {
                     config.minFreeSlots(),
                     config.toggleDelayedLooting(),
                     config.toggleOnlyLootMyItems(),
-                    "ashes"
+                    " ashes"
             );
             if (Rs2GroundItem.lootItemsBasedOnNames(ashesParams)) {
                 Microbot.pauseAllScripts = false;
