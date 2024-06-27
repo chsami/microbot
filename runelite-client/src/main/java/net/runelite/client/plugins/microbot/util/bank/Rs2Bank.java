@@ -20,6 +20,8 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Predicates;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.security.Encryption;
+import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -80,8 +82,15 @@ public class Rs2Bank {
      */
     public static boolean isOpen() {
         if (Rs2Widget.hasWidget("Please enter your PIN")) {
-            Microbot.getNotifier().notify("[ATTENTION] Please enter your bankpin so the script can continue.");
-            sleep(5000);
+            try {
+                if (Login.activeProfile.getBankPin().isEmpty()) {
+                    Microbot.showMessage("Your bankpin is empty. Please fill this field in your runelite profile.");
+                    return false;
+                }
+                handleBankPin(Encryption.decrypt(Login.activeProfile.getBankPin()));
+            } catch (Exception e) {
+                System.out.println("Something went wrong handling bankpin");
+            }
             return false;
         }
         return Rs2Widget.findWidget("Rearrange mode", null) != null;
@@ -459,6 +468,17 @@ public class Rs2Bank {
     /**
      * Deposits all items in the player's inventory into the bank, except for the items with the specified names.
      * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
+     *
+     * @param names The names of the items to be excluded from the deposit.
+     * @return true if any items were deposited, false otherwise.
+     */
+    public static boolean depositAllExcept(List<String> names) {
+        return depositAll(x -> names.stream().noneMatch(name -> name.equalsIgnoreCase(x.name)));
+    }
+
+    /**
+     * Deposits all items in the player's inventory into the bank, except for the items with the specified names.
+     * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
      * It also allows for a delay between deposit operations.
      *
      * @param names The names of the items to be excluded from the deposit.
@@ -507,12 +527,12 @@ public class Rs2Bank {
     }
 
     public static void withdrawItem(boolean checkInv, int id) {
-        if (checkInv && Rs2Inventory.hasItem(id)) return;
+        if (checkInv &&  Rs2Inventory.hasItem(id)) return;
         withdrawOne(id);
     }
 
     public static void withdrawItem(boolean checkInv, String name) {
-        if (checkInv && !Rs2Bank.hasItem(name)) return;
+        if (checkInv && Rs2Inventory.hasItem(name)) return;
         withdrawOne(name);
     }
 
@@ -550,7 +570,7 @@ public class Rs2Bank {
     private static void withdrawXItem(Rs2Item rs2Item, int amount) {
         if (!isOpen()) return;
         if (rs2Item == null) return;
-        if (Rs2Inventory.isFull()) return;
+        if (Rs2Inventory.isFull() && !Rs2Inventory.hasItem(rs2Item.id) && !rs2Item.isStackable()) return;
         container = BANK_ITEM_CONTAINER;
 
         handleAmount(rs2Item, amount);
@@ -810,7 +830,7 @@ public class Rs2Bank {
             if (Microbot.getClient().isWidgetSelected())
                 Microbot.getMouse().click();
             if (isOpen()) return true;
-            boolean action;
+            boolean action = false;
             GameObject bank = Rs2GameObject.findBank();
             if (bank == null) {
                 GameObject chest = Rs2GameObject.findChest();
@@ -1054,6 +1074,7 @@ public class Rs2Bank {
 
         if (isBankPinVisible) {
             Rs2Keyboard.typeString(pin);
+            sleep(50, 350);
             Rs2Keyboard.enter();
             return true;
         }
@@ -1113,7 +1134,7 @@ public class Rs2Bank {
      * @param npcName
      * @return
      */
-    public static boolean withdrawLootItems(String npcName) {
+    public static boolean withdrawLootItems(String npcName, List<String> itemsToNotSell) {
         boolean isAtGe = Rs2GrandExchange.walkToGrandExchange();
         if (isAtGe) {
             boolean isBankOpen = Rs2Bank.useBank();
@@ -1127,9 +1148,10 @@ public class Rs2Bank {
         for (LootTrackerRecord lootTrackerRecord : Microbot.getAggregateLootRecords()) {
             if (!lootTrackerRecord.getTitle().equalsIgnoreCase(npcName)) continue;
             for (LootTrackerItem lootTrackerItem : lootTrackerRecord.getItems()) {
+                if (itemsToNotSell.stream().anyMatch(x -> x.trim().equalsIgnoreCase(lootTrackerItem.getName()))) continue;
                 int itemId = lootTrackerItem.getId();
                 ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(lootTrackerItem.getId()));
-                if (Arrays.stream(itemComposition.getInventoryActions()).anyMatch(x -> x.equalsIgnoreCase("eat"))) continue;
+                if (Arrays.stream(itemComposition.getInventoryActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("eat"))) continue;
                 final boolean isNoted = itemComposition.getNote() == 799;
                 if (!itemComposition.isTradeable() && !isNoted) continue;
 

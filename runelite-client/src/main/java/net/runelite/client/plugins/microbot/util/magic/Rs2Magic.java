@@ -57,7 +57,6 @@ public class Rs2Magic {
         if (actor instanceof NPC) {
             Rs2Npc.interact((NPC) actor);
         } else {
-
             Point point = Perspective.localToCanvas(Microbot.getClient(), actor.getLocalLocation(), Microbot.getClient().getPlane());
             Microbot.getMouse().click(point);
         }

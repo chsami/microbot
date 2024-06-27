@@ -12,10 +12,10 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
-import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
@@ -32,7 +32,6 @@ import java.util.stream.IntStream;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
 
-
 public class Rs2Walker {
     static int stuckCount = 0;
     static WorldPoint lastPosition;
@@ -43,6 +42,14 @@ public class Rs2Walker {
     static WorldPoint currentTarget;
 
     private static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
+
+    public static boolean walkTo(int x, int y, int plane) {
+        return walkTo(x, y, plane, 6);
+    }
+
+    public static boolean walkTo(int x, int y, int plane, int distance) {
+        return walkTo(new WorldPoint(x, y, plane), distance);
+    }
 
     public static boolean walkTo(WorldPoint target) {
         return walkTo(target, 6);
@@ -134,7 +141,7 @@ public class Rs2Walker {
                             Rs2Walker.walkMiniMap(currentWorldPoint);
                             int randomInt = Random.random(3, 5);
                             sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < randomInt, 100, 2000);
-                            if(System.currentTimeMillis()-movingStart<120){
+                            if (System.currentTimeMillis() - movingStart < 120) {
                                 sleep(600, 1000);
                             }
                             break;
@@ -287,6 +294,16 @@ public class Rs2Walker {
         }
 
         if (wallObject != null) {
+            ObjectComposition objectComposition = Rs2GameObject.getObjectComposition(wallObject.getId());
+
+            for (var action : objectComposition.getActions()) {
+                if (action != null && action.contains("Pay-toll")) {
+                    Rs2GameObject.interact(wallObject, action);
+                    Rs2Player.waitForWalking();
+                    return true;
+                }
+            }
+
             Rs2GameObject.interact(wallObject);
             Rs2Player.waitForWalking();
             return true;
@@ -422,7 +439,7 @@ public class Rs2Walker {
             }
             boolean found = false;
             for (String action : objectComposition.getActions()) {
-                if (action != null && (action.equals("Open") || action.contains("pay-toll"))) {
+                if (action != null && (action.equals("Open") || action.contains("Pay-toll"))) {
                     found = true;
                     break;
                 }
@@ -433,25 +450,26 @@ public class Rs2Walker {
             int orientation = wallObject.getOrientationA();
             if (orientation == 1) {
                 //blocks west
-                if (a.dx(-1).equals(b)) {
+                if (a.dx(-1).getX() == b.getX()) {
                     return true;
                 }
             }
             if (orientation == 4) {
                 //blocks east
-                if (a.dx(+1).equals(b)) {
+                if (a.dx(+1).getX() == b.getX()) {
                     return true;
                 }
             }
             if (orientation == 2) {
                 //blocks north
-                if (a.dy(1).equals(b)) {
+                if (a.dy(1).getY() == b.getY()) {
                     return true;
                 }
             }
             if (orientation == 8) {
                 //blocks south
-                return a.dy(-1).equals(b);
+                if (a.dy(-1).getY() == b.getY())
+                    return true;
             }
         }
 
@@ -471,7 +489,7 @@ public class Rs2Walker {
         }
         boolean foundb = false;
         for (String action : objectCompositionb.getActions()) {
-            if (action != null && (action.equals("Open") || action.contains("pay-toll"))) {
+            if (action != null && (action.equals("Open") || action.contains("Pay-toll"))) {
                 foundb = true;
                 break;
             }
@@ -482,25 +500,25 @@ public class Rs2Walker {
         int orientationb = wallObjectb.getOrientationA();
         if (orientationb == 1) {
             //blocks east
-            if (b.dx(-1).equals(a)) {
+            if (b.dx(-1).getX() == a.getX()) {
                 return true;
             }
         }
         if (orientationb == 4) {
-            //blocks south
-            if (b.dx(+1).equals(a)) {
+            //blocks west
+            if (b.dx(+1).getX() == a.getX()) {
                 return true;
             }
         }
         if (orientationb == 2) {
             //blocks south
-            if (b.dy(+1).equals(a)) {
+            if (b.dy(+1).getY() == a.getY()) {
                 return true;
             }
         }
         if (orientationb == 8) {
             //blocks north
-            return b.dy(-1).equals(a);
+            return b.dy(-1).getY() == a.getY();
         }
         return false;
     }
@@ -560,6 +578,15 @@ public class Rs2Walker {
                         if (indexOfDestination < indexOfOrigin) continue;
 
                         if (path.get(i).equals(origin)) {
+                            if (b.isShip()) {
+                                if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
+                                    Rs2Npc.interact(b.getNpcName(), b.getAction());
+                                    sleep(1200, 1600);
+                                } else {
+                                    Rs2Walker.walkFastCanvas(path.get(i));
+                                    sleep(1200, 1600);
+                                }
+                            }
 
                             if (b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
                                 handleTrapdoor(b);
@@ -569,6 +596,7 @@ public class Rs2Walker {
                                 b.handleSpiritTree();
                             }
 
+
                             if (b.isGnomeGlider()) {
                                 b.handleGlider();
                             }
@@ -577,57 +605,52 @@ public class Rs2Walker {
                                 b.handleFairyRing();
                             }
 
-                            // Add logging for all game objects at the location
-                            System.out.println("Searching for game objects at location: " + b.getOrigin());
-                            List<GameObject> gameObjects = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin());
-                            for (GameObject obj : gameObjects) {
-                                System.out.println("Found game object: " + obj.getId() + " at " + obj.getWorldLocation());
+
+                            GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+
+                            //check game objects
+                            if (gameObject != null && gameObject.getId() == b.getObjectId()) {
+                                boolean interact = Rs2GameObject.interact(gameObject, b.getAction(), true);
+                                if (!interact) {
+                                    Rs2Walker.walkFastCanvas(path.get(i));
+                                    sleep(1600, 2000);
+                                    return false;
+                                }
+                                Rs2Player.waitForWalking();
+                               return true;
                             }
 
-                            GameObject gameObject = gameObjects.stream().findFirst().orElse(null);
-
-                            if (gameObject != null && gameObject.getId() == b.getObjectId()) {
-                                if (Rs2GameObject.hasLineOfSight(gameObject)) {
-                                    System.out.println("Interacting with gameObject: " + gameObject + " With action: " + b.getAction());
-                                    Rs2GameObject.interact(gameObject, b.getAction());
-                                    sleep(1200, 1600);
-                                    return true;
-                                } else {
-                                    System.out.println("No line of sight to gameObject: " + gameObject);
+                            //check wall objects (tunnels)
+                            WallObject wallObject = Rs2GameObject.getWallObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+                            if (Rs2GameObject.hasLineOfSight(wallObject)) {
+                                boolean interact = Rs2GameObject.interact(wallObject, b.getAction(), true);
+                                if (!interact) {
                                     Rs2Walker.walkFastCanvas(path.get(i));
-                                    sleep(1200, 1600);
+                                    sleep(1600, 2000);
+                                    return false;
                                 }
-                            } else {
-                                System.out.println("GameObject not found, checking for ground objects.");
-                                List<GroundObject> groundObjects = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin());
-                                for (GroundObject obj : groundObjects) {
-                                    System.out.println("Found ground object: " + obj.getId() + " at " + obj.getWorldLocation());
+                                Rs2Player.waitForWalking();
+                                return true;
+                            }
+
+                            //check ground objects
+                            GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
+                            if (Rs2GameObject.hasLineOfSight(groundObject)) {
+                                boolean interact = Rs2GameObject.interact(groundObject, b.getAction(), true);
+                                if (!interact) {
+                                    Rs2Walker.walkFastCanvas(path.get(i));
+                                    sleep(1600, 2000);
+                                    return false;
                                 }
-
-                                GroundObject groundObject = groundObjects.stream()
-                                        .filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation()))
-                                        .findFirst().orElse(null);
-
-                                if (groundObject != null && groundObject.getId() == b.getObjectId() && Rs2Camera.isTileOnScreen(groundObject)) {
-                                    if (Rs2GameObject.hasLineOfSight(groundObject)) {
-                                        System.out.println("Interacting with groundObject: " + groundObject + " With action: " + b.getAction());
-                                        Rs2GameObject.interact(groundObject, b.getAction());
-                                        if (b.isAgilityShortcut()) {
-                                            Rs2Player.waitForAnimation();
-                                        }
-                                        sleep(1200, 1600);
-                                        return true;
-                                    } else {
-                                        System.out.println("No line of sight to groundObject: " + groundObject);
-                                        Rs2Walker.walkFastCanvas(path.get(i));
-                                        sleep(1200, 1600);
-                                    }
+                                if (b.isAgilityShortcut()) {
+                                    Rs2Player.waitForAnimation();
                                 } else {
-                                    Rs2GameObject.interact(b.getObjectId());
-                                    System.out.println("GroundObject not found or not on screen: " + b.getObjectId());
+                                    Rs2Player.waitForWalking();
                                 }
+                                return true;
                             }
                         }
+
 
                     }
                 }
@@ -635,8 +658,6 @@ public class Rs2Walker {
         }
         return false;
     }
-
-
 
     private static boolean handleTrapdoor(Transport b) {
         List<GroundObject> gameObjects = Rs2GameObject.getGroundObjects(25);
@@ -675,17 +696,18 @@ public class Rs2Walker {
      */
     public static boolean isInArea(WorldPoint... worldPoints) {
         WorldPoint playerLocation = Rs2Player.getWorldLocation();
-        return  playerLocation.getX() <= worldPoints[0].getX() &&   // NW corner x
+        return playerLocation.getX() <= worldPoints[0].getX() &&   // NW corner x
                 playerLocation.getY() >= worldPoints[0].getY() &&   // NW corner y
                 playerLocation.getX() >= worldPoints[1].getX() &&   // SE corner x
                 playerLocation.getY() <= worldPoints[1].getY();     // SE corner Y
         // draws box from 2 points to check against all variations of player X,Y from said points.
     }
+
     /**
      * Checks if the player's current location is within the specified range from the given center point.
      *
      * @param centerOfArea a WorldPoint which is the center of the desired area,
-     * @param range an int of range to which the boundaries will be drawn in a square,
+     * @param range        an int of range to which the boundaries will be drawn in a square,
      * @return true if the player's current location is within the specified area, false otherwise
      */
     public static boolean isInArea(WorldPoint centerOfArea, int range) {

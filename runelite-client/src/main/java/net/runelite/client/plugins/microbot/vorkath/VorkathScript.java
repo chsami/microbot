@@ -12,7 +12,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.loottracker.LootTrackerRecord;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
+import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -31,10 +31,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -55,7 +52,7 @@ enum State {
 }
 
 public class VorkathScript extends Script {
-    public static String version = "1.2.6";
+    public static String version = "1.3.6";
 
     State state = State.ZOMBIE_SPAWN;
 
@@ -78,6 +75,8 @@ public class VorkathScript extends Script {
 
     public int vorkathSessionKills = 0;
     public int tempVorkathKills = 0;
+
+    Rs2InventorySetup rs2InventorySetup;
 
     private void calculateState() {
         if (Rs2Npc.getNpc(NpcID.VORKATH_8061) != null) {
@@ -114,6 +113,12 @@ public class VorkathScript extends Script {
                 if (!super.run()) return;
 
                 if (init) {
+                    rs2InventorySetup = new Rs2InventorySetup("vorkath", mainScheduledFuture);
+                    if (!rs2InventorySetup.hasSpellBook()) {
+                        Microbot.showMessage("Your spellbook is not matching the inventory setup.");
+                        sleep(10000);
+                        return;
+                    }
                     calculateState();
                     primaryBolts = Rs2Equipment.get(EquipmentInventorySlot.AMMO) != null ? Rs2Equipment.get(EquipmentInventorySlot.AMMO).name : "";
                 }
@@ -133,20 +138,16 @@ public class VorkathScript extends Script {
                         if (isCloseToRelleka() && Rs2Inventory.count() >= 27) {
                             state = State.WALK_TO_VORKATH_ISLAND;
                         }
-                        hasEquipment = MicrobotInventorySetup.doesEquipmentMatch("vorkath");
-                        hasInventory = MicrobotInventorySetup.doesInventoryMatch("vorkath");
+                        hasEquipment = rs2InventorySetup.doesEquipmentMatch();
+                        hasInventory = rs2InventorySetup.doesInventoryMatch();
                         if (!Rs2Bank.isOpen()) {
                             Rs2Bank.walkToBankAndUseBank();
                         }
                         if (!hasEquipment) {
-                            Rs2Bank.depositAll();
-                            Rs2Bank.depositEquipment();
-                            sleep(600);
-                            hasEquipment = MicrobotInventorySetup.loadEquipment("vorkath", mainScheduledFuture);
+                            hasEquipment = rs2InventorySetup.loadEquipment();
                         }
-                        if (!hasInventory && MicrobotInventorySetup.doesEquipmentMatch("vorkath")) {
-                            sleep(600);
-                            hasInventory = MicrobotInventorySetup.loadInventory("vorkath", mainScheduledFuture);
+                        if (!hasInventory && rs2InventorySetup.doesEquipmentMatch()) {
+                            hasInventory = rs2InventorySetup.loadInventory();
                             sleep(1000);
                         }
                         if (hasEquipment && hasInventory) {
@@ -342,12 +343,12 @@ public class VorkathScript extends Script {
                                 sleep(600);
                                 Rs2Widget.clickWidget(39452678);
                                 sleepUntil(() -> Rs2Inventory.size() != invSize);
-                                boolean isWearingOriginalEquipment = MicrobotInventorySetup.wearEquipment("vorkath");
+                                boolean isWearingOriginalEquipment = rs2InventorySetup.wearEquipment();
                                 if (!isWearingOriginalEquipment) {
                                     int finalInvSize = Rs2Inventory.size();
                                     Rs2Widget.clickWidget(39452678);
                                     sleepUntil(() -> Rs2Inventory.size() != finalInvSize);
-                                    MicrobotInventorySetup.wearEquipment("vorkath");
+                                    rs2InventorySetup.wearEquipment();
                                 }
                             }
                         } else {
@@ -366,7 +367,7 @@ public class VorkathScript extends Script {
                         }
                         break;
                     case SELLING_ITEMS:
-                        boolean soldAllItems = Rs2GrandExchange.sellLoot("vorkath");
+                        boolean soldAllItems = Rs2GrandExchange.sellLoot("vorkath", Arrays.stream(config.ItemsToNotSell().split(",")).collect(Collectors.toList()));
                         if (soldAllItems) {
                             state = State.BANKING;
                         }

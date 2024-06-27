@@ -22,6 +22,7 @@ public class Rs2Item {
     String[] inventoryActions;
     @Getter
     List<String> equipmentActions = new ArrayList();
+    @Getter
     boolean isStackable;
     boolean isNoted;
     @Getter

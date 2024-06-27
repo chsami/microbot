@@ -19,20 +19,22 @@ Thank you for your support! 😊
 
 ## Non jagex account
 
-Here is a youtube video on how to setup the bot from scratch
+Here is a youtube video on how to setup the bot from scratch for **NON-JAGEX ACCOUNTS**
 
 https://www.youtube.com/watch?v=EbtdZnxq5iw
 
 ## Jagex Account
 
-If you don't have java installed yet, watch the youtube video: https://www.youtube.com/watch?v=EbtdZnxq5iw
+Follow the runelite wiki for setting up jagex accounts: https://github.com/runelite/runelite/wiki/Using-Jagex-Accounts
+
+After you've done setting it up follow these two steps:
 
 1) Simply login with the jagex launcher for the first time. This will create a token for your account. Close everything after succesfully login in through the jagex launcher. 
-2) Open the shaded.jar from microbot and this should prompt you with the jagex account to login.
+2) Open the microbot.jar from microbot and this should prompt you with the jagex account to login.
 
 ## Jagex Launcher
 
-If you don't have java installed yet, watch the youtube video: https://www.youtube.com/watch?v=EbtdZnxq5iw
+**Disclaimer:** Before you can do this step, you need to have done the following guide: https://github.com/runelite/runelite/wiki/Using-Jagex-Accounts
 
 Simply replace the Official RuneLite.jar with the microbot.jar and make sure the name is the same!! After that you can start up the jagex launcher and select runelite, this will startup microbot.
 

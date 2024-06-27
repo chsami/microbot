@@ -4412,3 +4412,9 @@
 # Camdozaal
 2998 3494 0	2952 5762 0	Enter Ruins Entrance 41357			Below Ice Mountain
 2952 5762 0	2998 3494 0	Exit Ruins Exit 41446			Below Ice Mountain
+
+# Magic guild
+2590 3088 0	2590 3092 1	Climb-up Staircase 15645
+2591 3088 0	2591 3092 1	Climb-up Staircase 15645
+2591 3092 1	2590 3088 0	Climb-down Staircase 15648
+2590 3092 1	2590 3088 0	Climb-down Staircase 15648

@@ -146,8 +146,10 @@ public class ShortestPathPlugin extends Plugin {
     protected void startUp() {
         SplitFlagMap map = SplitFlagMap.fromResources();
         Map<WorldPoint, List<Transport>> transports = Transport.loadAllFromResources();
+        List<Restriction> restrictions = Restriction.loadAllFromResources();
 
-        pathfinderConfig = new PathfinderConfig(map, transports, client, config);
+
+        pathfinderConfig = new PathfinderConfig(map, transports, restrictions, client, config);
 
         Rs2Walker.setConfig(config);
 
