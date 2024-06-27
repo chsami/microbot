@@ -58,7 +58,7 @@ public class Rs2GameObject {
     public static boolean interact(TileObject tileObject, String action, boolean checkCanReach) {
         if (tileObject == null) return false;
         if (checkCanReach && Rs2GameObject.hasLineOfSight(tileObject))
-            return clickObject(tileObject);
+            return clickObject(tileObject, action);
         Rs2Walker.walkFastCanvas(tileObject.getWorldLocation());
         return false;
     }
@@ -497,7 +497,7 @@ public class Rs2GameObject {
 
             if (objectComposition == null) continue;
 
-            if (objectComposition.getImpostorIds().length > 0) {
+            if (objectComposition.getImpostorIds() != null && objectComposition.getImpostorIds().length > 0) {
                 if (Arrays.stream(objectComposition.getImpostor().getActions())
                         .anyMatch(action -> action != null && (
                                 action.toLowerCase().contains("bank") ||
