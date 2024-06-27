@@ -122,6 +122,10 @@ public class Rs2Magic {
         superHeat(item, sleepMin, sleepMax);
     }
 
+    public static void superHeat(Rs2Item item) {
+        superHeat(item, 300, 600);
+    }
+
     public static void superHeat(Rs2Item item, int sleepMin, int sleepMax) {
         sleepUntil(() -> {
             Rs2Tab.switchToMagicTab();
