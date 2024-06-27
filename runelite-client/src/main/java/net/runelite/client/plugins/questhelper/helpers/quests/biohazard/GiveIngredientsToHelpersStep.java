@@ -24,12 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.biohazard;
 
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.Arrays;
+import java.util.Collection;
 import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.api.NpcID;
@@ -38,12 +41,9 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.InteractingChanged;
 import net.runelite.client.eventbus.Subscribe;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 public class GiveIngredientsToHelpersStep extends DetailedOwnerStep
 {
-	DetailedQuestStep giveHopsBroline, giveVinciEthenea, giveChancyHoney;
+	PuzzleWrapperStep giveHopsBroline, giveVinciEthenea, giveChancyHoney;
 
 	ItemRequirement ethenea, liquidHoney, sulphuricBroline;
 
@@ -118,11 +118,17 @@ public class GiveIngredientsToHelpersStep extends DetailedOwnerStep
 		sulphuricBroline = new ItemRequirement("Sulphuric broline", ItemID.SULPHURIC_BROLINE);
 		sulphuricBroline.setTooltip("You can get another from Elena in East Ardougne.");
 
-		giveHopsBroline = new NpcStep(getQuestHelper(), NpcID.HOPS, new WorldPoint(2930, 3220, 0), "Give Hops the Sulphuric Broline.", sulphuricBroline);
+		giveHopsBroline = new PuzzleWrapperStep(getQuestHelper(),
+			new NpcStep(getQuestHelper(), NpcID.HOPS, new WorldPoint(2930, 3220, 0), "Give Hops the Sulphuric Broline.", sulphuricBroline),
+			"Work out what ingredient to give to Hops by talking to them.");
 		giveHopsBroline.addDialogStep("You give him the vial of sulphuric broline...");
-		giveChancyHoney = new NpcStep(getQuestHelper(), NpcID.CHANCY, new WorldPoint(2930, 3220, 0), "Give Chancy the Liquid honey.", liquidHoney);
+		giveChancyHoney = new PuzzleWrapperStep(getQuestHelper(),
+			new NpcStep(getQuestHelper(), NpcID.CHANCY, new WorldPoint(2930, 3220, 0), "Give Chancy the Liquid honey.", liquidHoney),
+			"Work out what ingredient to give to Chancy by talking to them.");
 		giveChancyHoney.addDialogStep("You give him the vial of liquid honey...");
-		giveVinciEthenea = new NpcStep(getQuestHelper(), NpcID.DA_VINCI, new WorldPoint(2930, 3220, 0), "Give Da Vinci the Ethenea.", ethenea);
+		giveVinciEthenea = new PuzzleWrapperStep(getQuestHelper(),
+			new NpcStep(getQuestHelper(), NpcID.DA_VINCI, new WorldPoint(2930, 3220, 0), "Give Da Vinci the Ethenea.", ethenea),
+				"Work out what ingredient to give to Da Vinci by talking to them.");
 		giveVinciEthenea.addDialogStep("You give him the vial of ethenea...");
 	}
 
@@ -132,7 +138,7 @@ public class GiveIngredientsToHelpersStep extends DetailedOwnerStep
 		return Arrays.asList(giveHopsBroline, giveChancyHoney, giveVinciEthenea);
 	}
 
-	public Collection<DetailedQuestStep> getDisplaySteps()
+	public Collection<QuestStep> getDisplaySteps()
 	{
 		return Arrays.asList(giveHopsBroline, giveChancyHoney, giveVinciEthenea);
 	}

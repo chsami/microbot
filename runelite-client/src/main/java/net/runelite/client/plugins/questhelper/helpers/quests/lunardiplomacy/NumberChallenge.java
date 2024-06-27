@@ -5,15 +5,14 @@ import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.ObjectID;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.Subscribe;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ObjectID;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.eventbus.Subscribe;
 
 public class NumberChallenge extends DetailedOwnerStep
 {
@@ -51,7 +50,6 @@ public class NumberChallenge extends DetailedOwnerStep
 		catchStep = new DetailedQuestStep(getQuestHelper(), "Press the numbers to finish the pattern.");
 	}
 
-	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{

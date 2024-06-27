@@ -24,34 +24,43 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.cabinfever;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.CABIN_FEVER
-)
 public class CabinFever extends BasicQuestHelper
 {
 	//Items Required
@@ -84,8 +93,7 @@ public class CabinFever extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -330,7 +338,7 @@ public class CabinFever extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		food = new ItemRequirement("Food", ItemCollections.GOOD_EATING_FOOD, -1);
 		fuse1 = new ItemRequirement("Fuse", ItemID.FUSE);
@@ -384,7 +392,8 @@ public class CabinFever extends BasicQuestHelper
 		cannonballHighlight.setHighlightInInventory(true);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		boatAtDock = new Zone(new WorldPoint(3712, 3488, 0), new WorldPoint(3716, 3507, 2));
 		boatF0 = new Zone(new WorldPoint(1817, 4839, 0), new WorldPoint(1813, 4821, 0));
@@ -444,6 +453,14 @@ public class CabinFever extends BasicQuestHelper
 		usedFuse = new VarbitRequirement(1741, 3);
 		firedCannon = new VarbitRequirement(1746, 1);
 
+
+		// SHOTS CAN FAIL
+		// Second cannonball
+		// 1750 1->2
+
+		// Third succesful shot:
+		// 1750 2->3
+
 		canisterInWrong = new VarbitRequirement(1747, 1);
 
 		// 1752 = num plunder stashed
@@ -452,7 +469,7 @@ public class CabinFever extends BasicQuestHelper
 	public void setupSteps()
 	{
 		talkToBill = new NpcStep(this, NpcID.BILL_TEACH, new WorldPoint(3678, 3494, 0), "Talk to Bill Teach in Port Phasmatys.");
-		talkToBill.addDialogSteps("Yes, I've always wanted to be a pirate!", "Yes, I am a woman of my word.", "Yes, I am a man of my word.");
+		talkToBill.addDialogSteps("Yes.", "Yes, I've always wanted to be a pirate!", "Yes, I am a woman of my word.", "Yes, I am a man of my word.");
 		goOnBillBoat = new ObjectStep(this, ObjectID.GANGPLANK_11209, new WorldPoint(3710, 3496, 0), "Talk to Bill Teach on his boat in Port Phasmatys.");
 		talkToBillOnBoat = new NpcStep(this, NpcID.BILL_TEACH, new WorldPoint(3714, 3496, 1), "Talk to Bill Teach on his boat in Port Phasmatys.");
 		talkToBillOnBoat.addDialogStep("Let's go Cap'n!");
@@ -641,7 +658,7 @@ public class CabinFever extends BasicQuestHelper
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("10,000 Coins", ItemID.COINS_995, 10000),
+				new ItemReward("Coins", ItemID.COINS_995, 10000),
 				new ItemReward("The Book o' Piracy", ItemID.BOOK_O_PIRACY, 1));
 	}
 

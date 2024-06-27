@@ -24,14 +24,12 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.mischelpers.herbrun;
 
-
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.client.plugins.timetracking.Tab;
 import net.runelite.client.plugins.timetracking.farming.CropState;
 import net.runelite.client.plugins.timetracking.farming.Produce;
-
-import javax.annotation.Nullable;
 
 @RequiredArgsConstructor
 @Getter
@@ -2681,7 +2679,7 @@ public enum PatchImplementation
 				return null;
 			}
 		},
-	GIANT_COMPOST(Tab.SPECIAL, "Giant Compost Bin", true)
+	BIG_COMPOST(Tab.SPECIAL, "Big Compost Bin", true)
 		{
 			@Override
 			PatchState forVarbitValue(int value)
@@ -2694,7 +2692,7 @@ public enum PatchImplementation
 				if (value >= 1 && value <= 15)
 				{
 					// Big compost bin[Examine,Dump] 33763..33777
-					return new PatchState(Produce.EMPTY_COMPOST_BIN, CropState.FILLING, value - 1);
+					return new PatchState(Produce.BIG_COMPOST, CropState.FILLING, value - 1);
 				}
 				if (value >= 16 && value <= 30)
 				{

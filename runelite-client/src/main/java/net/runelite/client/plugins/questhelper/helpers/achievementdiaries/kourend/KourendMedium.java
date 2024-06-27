@@ -25,19 +25,16 @@
 
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.kourend;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.Favour;
-import net.runelite.client.plugins.questhelper.requirements.player.FavourRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
@@ -49,17 +46,12 @@ import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.Subscribe;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.KOUREND_MEDIUM
-)
+import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.Subscribe;
 
 public class KourendMedium extends ComplexStateQuestHelper
 {
@@ -72,7 +64,7 @@ public class KourendMedium extends ComplexStateQuestHelper
 
 	// Quests required
 	Requirement fairytaleII, depthsOfDespair, queenOfThieves, taleOfTheRighteous, forsakenTower, ascentOfArceuus,
-		eaglesPeak, arceuusFavour, hosidiusFavour, shayzienFavour, memoirHos, memoirShay, memoirPis, memoirLova,
+		eaglesPeak, memoirHos, memoirShay, memoirPis, memoirLova,
 		memoirArc;
 
 	// Requirements
@@ -98,8 +90,7 @@ public class KourendMedium extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doMedium = new ConditionalStep(this, claimReward);
@@ -151,7 +142,7 @@ public class KourendMedium extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notFairyRing = new VarplayerRequirement(2085, false, 25);
 		notKillLizardman = new VarplayerRequirement(2085, false, 13);
@@ -216,17 +207,14 @@ public class KourendMedium extends ComplexStateQuestHelper
 		ascentOfArceuus = new QuestRequirement(QuestHelperQuest.THE_ASCENT_OF_ARCEUUS, QuestState.FINISHED);
 		eaglesPeak = new QuestRequirement(QuestHelperQuest.EAGLES_PEAK, QuestState.FINISHED);
 
-		arceuusFavour = new FavourRequirement(Favour.ARCEUUS, 60);
-		hosidiusFavour = new FavourRequirement(Favour.HOSIDIUS, 60);
-		shayzienFavour = new FavourRequirement(Favour.SHAYZIEN, 40);
-
 		// Zone requirements
 		inMolchIsland = new ZoneRequirement(molchIsland);
 
 		hasBird = new VarbitRequirement(5983, 1);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		molchIsland = new Zone(new WorldPoint(1360, 3640, 0), new WorldPoint(1376, 3625, 0));
 	}
@@ -285,12 +273,12 @@ public class KourendMedium extends ComplexStateQuestHelper
 
 		// Enter the farming guild
 		enterFarmingGuild = new ObjectStep(this, ObjectID.DOOR_34463, new WorldPoint(1249, 3725, 0),
-			"Enter the Farming Guild.", true, hosidiusFavour);
+			"Enter the Farming Guild.", true);
 		enterFarmingGuild.addAlternateObjects(ObjectID.DOOR_34464);
 
 		// Switch to the Arceuus spellbook via Tyss
 		switchSpellbooks = new NpcStep(this, NpcID.TYSS, new WorldPoint(1712, 3882, 0),
-			"Switch to the Arceuus spellbook via Tyss.", arceuusFavour);
+			"Switch to the Arceuus spellbook via Tyss.");
 		switchSpellbooks.addDialogStep("Can I try the magicks myself?");
 
 		// Repair a crane
@@ -299,7 +287,7 @@ public class KourendMedium extends ComplexStateQuestHelper
 
 		// Deliver some intelligence
 		killGangBoss = new DetailedQuestStep(this,
-			"Kill a gang boss or gang members for intelligence.", combatGear, food, shayzienFavour);
+			"Kill a gang boss or gang members for intelligence.", combatGear, food);
 		deliverIntelligence = new NpcStep(this, NpcID.CAPTAIN_GINEA, new WorldPoint(1504, 3632, 0),
 			"Turn in the intelligence to Captain Ginea.", intelligence);
 		deliverIntelligence.addAlternateNpcs(NpcID.CAPTAIN_GINEA_10931);
@@ -373,9 +361,6 @@ public class KourendMedium extends ComplexStateQuestHelper
 		req.add(new SkillRequirement(Skill.MINING, 42));
 		req.add(new SkillRequirement(Skill.WOODCUTTING, 50, true));
 
-		req.add(arceuusFavour);
-		req.add(hosidiusFavour);
-		req.add(shayzienFavour);
 		req.add(fairytaleII);
 		req.add(depthsOfDespair);
 		req.add(queenOfThieves);
@@ -423,7 +408,7 @@ public class KourendMedium extends ComplexStateQuestHelper
 		allSteps.add(chopMahoganyStep);
 
 		PanelDetails enterFarmingGuildStep = new PanelDetails("Enter The Farming Guild",
-			Collections.singletonList(enterFarmingGuild), new SkillRequirement(Skill.FARMING, 45), hosidiusFavour);
+			Collections.singletonList(enterFarmingGuild), new SkillRequirement(Skill.FARMING, 45));
 		enterFarmingGuildStep.setDisplayCondition(notEnterFarmingGuild);
 		enterFarmingGuildStep.setLockingStep(enterFarmingGuildTask);
 		allSteps.add(enterFarmingGuildStep);
@@ -459,8 +444,7 @@ public class KourendMedium extends ComplexStateQuestHelper
 		repairCraneStep.setLockingStep(repairCraneTask);
 		allSteps.add(repairCraneStep);
 
-		PanelDetails switchSpellbookStep = new PanelDetails("Arceuus Spellbook", Collections.singletonList(switchSpellbooks),
-			arceuusFavour);
+		PanelDetails switchSpellbookStep = new PanelDetails("Arceuus Spellbook", Collections.singletonList(switchSpellbooks));
 		switchSpellbookStep.setDisplayCondition(notSwitchSpellbooks);
 		switchSpellbookStep.setLockingStep(switchSpellbooksTask);
 		allSteps.add(switchSpellbookStep);
@@ -479,7 +463,7 @@ public class KourendMedium extends ComplexStateQuestHelper
 		allSteps.add(subdueWintertodtStep);
 
 		PanelDetails deliverIntelligenceStep = new PanelDetails("Deliver intelligence", Arrays.asList(killGangBoss,
-			deliverIntelligence), combatGear, food, shayzienFavour);
+			deliverIntelligence), combatGear, food);
 		deliverIntelligenceStep.setDisplayCondition(notDeliverIntelligence);
 		deliverIntelligenceStep.setLockingStep(deliverIntelligenceTask);
 		allSteps.add(deliverIntelligenceStep);

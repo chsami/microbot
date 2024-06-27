@@ -24,11 +24,10 @@
  */
 package net.runelite.client.plugins.questhelper.panel;
 
-import lombok.Getter;
-
-import javax.swing.*;
+import java.awt.BorderLayout;
+import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import lombok.Getter;
 
 public class QuestRequirementWrapperPanel extends JPanel
 {

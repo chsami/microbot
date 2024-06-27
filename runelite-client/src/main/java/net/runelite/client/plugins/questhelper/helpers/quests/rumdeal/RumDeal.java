@@ -24,35 +24,43 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.rumdeal;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
+import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.PrayerPointRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.RUM_DEAL
-)
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+
 public class RumDeal extends BasicQuestHelper
 {
 	//Items Required
@@ -78,8 +86,7 @@ public class RumDeal extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -203,7 +210,7 @@ public class RumDeal extends BasicQuestHelper
 		ConditionalStep makeBrewForDonnieStart = new ConditionalStep(this, talkToPete);
 		makeBrewForDonnieStart.addStep(inSpiderRoom, goUpFromSpiders);
 		makeBrewForDonnieStart.addStep(onIslandF1, talkToBraindeathAfterSpider);
-		makeBrewForDonnieStart.addStep(onIslandF2, goDownFromTop);
+		makeBrewForDonnieStart.addStep(onIslandF2, goDownAfterSpider);
 		makeBrewForDonnieStart.addStep(onIslandF0, goUpFromBottom);
 
 		steps.put(16, makeBrewForDonnieStart);
@@ -230,7 +237,7 @@ public class RumDeal extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
@@ -246,7 +253,7 @@ public class RumDeal extends BasicQuestHelper
 		blindweed = new ItemRequirement("Blindweed", ItemID.BLINDWEED);
 		blindweed.setTooltip("You can get another from Captain Braindeath");
 
-		blindweedHighlight = new ItemRequirement("Blindweed", ItemID.BLINDWEED);
+		blindweedHighlight = new ItemRequirement(true, "Blindweed", ItemID.BLINDWEED);
 		blindweedHighlight.setTooltip("You can get another from Captain Braindeath");
 
 		bucket = new ItemRequirement("Bucket", ItemID.BUCKET);
@@ -279,10 +286,11 @@ public class RumDeal extends BasicQuestHelper
 
 		swill = new ItemRequirement("Unsanitary swill", ItemID.UNSANITARY_SWILL);
 
-		prayerPoints47 = new ItemRequirement("47 prayer points", -1, -1);
+		prayerPoints47 = new PrayerPointRequirement(47);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		island = new Zone(new WorldPoint(2110, 5054, 0), new WorldPoint(2178, 5185, 2));
 		islandF0 = new Zone(new WorldPoint(2110, 5054, 0), new WorldPoint(2178, 5185, 0));
@@ -316,7 +324,7 @@ public class RumDeal extends BasicQuestHelper
 	public void setupSteps()
 	{
 		talkToPete = new NpcStep(this, NpcID.PIRATE_PETE, new WorldPoint(3680, 3537, 0), "Talk to Pirate Pete north east of the Ectofuntus.");
-		talkToPete.addDialogSteps("Yes!", "Of course, I fear no demon!", "Nonsense! Keep the money!", "I've decided to help you for free.", "Okay!");
+		talkToPete.addDialogSteps("Yes.", "Yes!", "Of course, I fear no demon!", "Nonsense! Keep the money!", "I've decided to help you for free.", "Okay!");
 		talkToBraindeath = new NpcStep(this, NpcID.CAPTAIN_BRAINDEATH, new WorldPoint(2145, 5108, 1), "Talk to Captain Braindeath.");
 
 		goDownFromTop = new ObjectStep(this, ObjectID.LADDER_10168, new WorldPoint(2163, 5092, 2), "Go down the ladder.");
@@ -390,7 +398,10 @@ public class RumDeal extends BasicQuestHelper
 		talkToBraindeathAfterSpirit = new NpcStep(this, NpcID.CAPTAIN_BRAINDEATH, new WorldPoint(2145, 5108, 1), "Talk to Captain Braindeath.");
 		goDownToSpiders = new ObjectStep(this, ObjectID.LADDER_10168, new WorldPoint(2139, 5105, 1), "Go into the brewery's basement and kill a fever spider. If you're not wearing slayer gloves they'll afflict you with disease.", slayerGloves);
 
-		killSpider = new NpcStep(this, NpcID.FEVER_SPIDER, "Go into the brewery's basement and kill a fever spider. If you're not wearing slayer gloves they'll afflict you with disease.", slayerGloves.equipped());
+		killSpider = new NpcStep(this, NpcID.FEVER_SPIDER,
+			"Go into the brewery's basement and kill a fever spider. " +
+				"If you're not wearing slayer gloves they'll afflict you with disease.", true, slayerGloves.equipped());
+		killSpider.addSubSteps(goDownToSpiders);
 		pickUpCarcass = new ItemStep(this, "Pick up the fever spider body.", spiderCarcass);
 		goUpFromSpidersWithCorpse = new ObjectStep(this, ObjectID.LADDER_10167, new WorldPoint(2139, 5105, 0), "Add the spider body to the hopper on the top floor.", spiderCarcass);
 		goUpToDropSpider = new ObjectStep(this, ObjectID.LADDER_10167, new WorldPoint(2163, 5092, 1), "Add the spider body to the hopper on the top floor.", spiderCarcass);
@@ -486,6 +497,7 @@ public class RumDeal extends BasicQuestHelper
 		req.add(new SkillRequirement(Skill.FARMING, 40, true));
 		req.add(new SkillRequirement(Skill.PRAYER, 47, true));
 		req.add(new SkillRequirement(Skill.SLAYER, 42));
+		req.add(new PrayerPointRequirement(47));
 		return req;
 	}
 }

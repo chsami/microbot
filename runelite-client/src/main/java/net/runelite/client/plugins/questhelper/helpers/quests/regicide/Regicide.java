@@ -24,35 +24,44 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.regicide;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcInteractingRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.REGICIDE
-)
 public class Regicide extends BasicQuestHelper
 {
 	//Items Required
@@ -120,8 +129,7 @@ public class Regicide extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -198,7 +206,7 @@ public class Regicide extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		rope1 = new ItemRequirement("Rope", ItemID.ROPE);
 		rope1.setTooltip("Bring extras as you can fail");
@@ -245,21 +253,12 @@ public class Regicide extends BasicQuestHelper
 		stripOfCloth.setTooltip("Made on a loom with 4 balls of wool.");
 		stripOfCloth.appendToTooltip("There is a loom available at the Falador Farm");
 		pestle = new ItemRequirement("Pestle and mortar", ItemID.PESTLE_AND_MORTAR).isNotConsumed();
-		gloves = new ItemRequirement("Gloves which fully cover your hand", ItemID.LEATHER_GLOVES).isNotConsumed();
-		gloves.addAlternates(ItemID.BARROWS_GLOVES, ItemID.DRAGON_GLOVES, ItemID.RUNE_GLOVES, ItemID.ADAMANT_GLOVES, ItemID.MITHRIL_GLOVES,
-			ItemID.BLACK_GLOVES, ItemID.STEEL_GLOVES, ItemID.IRON_GLOVES, ItemID.BRONZE_GLOVES, ItemID.HARDLEATHER_GLOVES,
-			ItemID.FEROCIOUS_GLOVES, ItemID.GRACEFUL_GLOVES, ItemID.GRANITE_GLOVES, ItemID.GRACEFUL_GLOVES_11859,
-			ItemID.GRACEFUL_GLOVES_13587, ItemID.GRACEFUL_GLOVES_13588, ItemID.GRACEFUL_GLOVES_13599, ItemID.GRACEFUL_GLOVES_13600,
-			ItemID.GRACEFUL_GLOVES_13611, ItemID.GRACEFUL_GLOVES_13612, ItemID.GRACEFUL_GLOVES_13623, ItemID.GRACEFUL_GLOVES_13624,
-			ItemID.GRACEFUL_GLOVES_13635, ItemID.GRACEFUL_GLOVES_13636, ItemID.GRACEFUL_GLOVES_13675, ItemID.GRACEFUL_GLOVES_13676,
-			ItemID.GRACEFUL_GLOVES_21073, ItemID.GRACEFUL_GLOVES_21075, ItemID.GRACEFUL_GLOVES_24755, ItemID.GRACEFUL_GLOVES_24757,
-			ItemID.GRACEFUL_GLOVES_25081, ItemID.GRACEFUL_GLOVES_25083);
-		gloves.setTooltip("The following gloves are valid:");
-		gloves.appendToTooltip("All RFD Gloves");
-		gloves.appendToTooltip("Leather Gloves");
-		gloves.appendToTooltip("Ferocious Gloves");
-		gloves.appendToTooltip("Graceful Gloves");
-		gloves.appendToTooltip("Granite Gloves");
+
+		gloves = new ItemRequirement("Gloves which fully cover your hand", ItemCollections.QUICKLIME_GLOVES).isNotConsumed();
+		gloves.addAlternates(ItemCollections.GRACEFUL_GLOVES);
+		gloves.setUrlSuffix("Quicklime#Gloves");
+		gloves.setTooltip("'Go to wiki..' to see valid options for handling Quicklime");
+
 		pot = new ItemRequirement("Pot", ItemID.POT);
 		cookedRabbit = new ItemRequirement("Cooked rabbit", ItemID.COOKED_RABBIT);
 		cookedRabbit.setTooltip("Raw Rabbit can be killed around Isafdar or purchased from the");
@@ -300,7 +299,8 @@ public class Regicide extends BasicQuestHelper
 			"through Arandar now");
 	}
 
-	private void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		castleFloor2 = new Zone(new WorldPoint(2568, 3283, 1), new WorldPoint(2591, 3310, 1));
 		westArdougne = new Zone(new WorldPoint(2433, 3264, 0), new WorldPoint(2557, 3337, 2));
@@ -914,7 +914,7 @@ public class Regicide extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("15,000 Coins", ItemID.COINS_995, 15000));
+		return Collections.singletonList(new ItemReward("Coins", ItemID.COINS_995, 15000));
 	}
 
 	@Override

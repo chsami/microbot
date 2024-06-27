@@ -27,11 +27,14 @@
 
 package net.runelite.client.plugins.questhelper.helpers.quests.templeoftheeye;
 
-import net.runelite.client.plugins.questhelper.*;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
@@ -42,11 +45,23 @@ import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
-
-import java.util.*;
 
 /*
 VARBITS
@@ -64,9 +79,6 @@ VARBITS
 13759: Guardians of the Rift Tutorial progress
  */
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.TEMPLE_OF_THE_EYE
-)
 public class TempleOfTheEye extends BasicQuestHelper
 {
 	//Items Required
@@ -95,8 +107,7 @@ public class TempleOfTheEye extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -203,7 +214,8 @@ public class TempleOfTheEye extends BasicQuestHelper
 		return steps;
 	}
 
-	public void setupRequirements()
+	@Override
+	protected void setupRequirements()
 	{
 		bucketOfWater = new ItemRequirement("Bucket of water", ItemID.BUCKET_OF_WATER);
 		chisel = new ItemRequirement("Chisel", ItemID.CHISEL);
@@ -231,6 +243,7 @@ public class TempleOfTheEye extends BasicQuestHelper
 		inWizardBasement = new ZoneRequirement(wizardBasement);
 		inWizardFloorOne = new ZoneRequirement(wizardFloorOne);
 		inTempleOfTheEye = new ZoneRequirement(templeOfTheEye);
+		// TODO: this should also consider the mind altar as part of the area
 		inTempleOfTheEyeTutorial = new ZoneRequirement(templeOfTheEye2);
 
 		canTeleportFromHerbert = new VarbitRequirement(13740, 0);
@@ -246,10 +259,12 @@ public class TempleOfTheEye extends BasicQuestHelper
 		tamaraRiftTalk = new VarbitRequirement(13754, 0);
 		cordeliaRiftTalk = new VarbitRequirement(13756, 0);
 
+		// TODO: Seems to be generally done for cutscenes? Happens in Enahkra's Lament
 		mysteriousVisionSeen = new VarbitRequirement(12139, 1);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		abyss = new Zone(new WorldPoint(3010, 4803, 0), new WorldPoint(3070, 4862, 0));
 		wizardBasement = new Zone(new WorldPoint(3094, 9553, 0), new WorldPoint(3125, 9582, 0));

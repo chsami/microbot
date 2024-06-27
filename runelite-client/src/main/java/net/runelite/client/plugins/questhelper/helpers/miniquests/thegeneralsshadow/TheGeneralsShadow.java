@@ -24,35 +24,36 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.miniquests.thegeneralsshadow;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_GENERALS_SHADOW
-)
 public class TheGeneralsShadow extends BasicQuestHelper
 {
 	// Required
@@ -60,15 +61,16 @@ public class TheGeneralsShadow extends BasicQuestHelper
 	ringOfVisibility, ghostspeak, combatGear, coins40, sinSeersNote, ghostlyRobes, serveredLeg;
 
 	// Recommended
-	ItemRequirement kharidTeleport, gnomeTeleport, rellekkaTeleport, karamjaTeleport;
+	ItemRequirement kharidTeleport, gnomeTeleport, rellekkaTeleport, karamjaTeleport, draynorTeleport, camelotTeleport,
+		skillsNecklace;
 
 	Requirement inventorySlot;
 
 	Requirement inGoblinCave, inBouncerCave, inSinRoom, hasNote, givenNote, talkedToGnomeScout,
-		talkedToKaramjaScout, talkedToShantyScout, talkedToFaladorScout;
+		talkedToKaramjaScout, talkedToShantayScout, talkedToFaladorScout;
 
 	QuestStep talkToKhazard, goUpToSeer, talkToSeer, talkToKhazardAfterSeer, talkToKhazardAfterNote,
-		talkToKaramjaScout, talkToGnomeScout, talkToFaladorScout, talkToShantyScout, talkToKhazardAfterScouts,
+		talkToKaramjaScout, talkToGnomeScout, talkToFaladorScout, talkToShantayScout, talkToKhazardAfterScouts,
 		enterCave, enterCrack, killBouncer;
 
 	Zone goblinCave, bouncerCave, sinRoom;
@@ -76,8 +78,7 @@ public class TheGeneralsShadow extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -92,9 +93,9 @@ public class TheGeneralsShadow extends BasicQuestHelper
 		steps.put(10, talkToKhazardAfterNote);
 
 		ConditionalStep goTalkToScouts = new ConditionalStep(this, talkToGnomeScout);
-		goTalkToScouts.addStep(new Conditions(talkedToGnomeScout, talkedToFaladorScout, talkedToShantyScout),
+		goTalkToScouts.addStep(new Conditions(talkedToGnomeScout, talkedToFaladorScout, talkedToShantayScout),
 			talkToKaramjaScout);
-		goTalkToScouts.addStep(new Conditions(talkedToGnomeScout, talkedToFaladorScout), talkToShantyScout);
+		goTalkToScouts.addStep(new Conditions(talkedToGnomeScout, talkedToFaladorScout), talkToShantayScout);
 		goTalkToScouts.addStep(talkedToGnomeScout, talkToFaladorScout);
 		steps.put(15, goTalkToScouts);
 
@@ -109,7 +110,7 @@ public class TheGeneralsShadow extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		ghostlyHood = new ItemRequirement("Ghostly hood", ItemID.GHOSTLY_HOOD, 1, true).isNotConsumed();
 		ghostlyBody = new ItemRequirement("Ghostly robe (top)", ItemID.GHOSTLY_ROBE, 1, true).isNotConsumed();
@@ -128,10 +129,15 @@ public class TheGeneralsShadow extends BasicQuestHelper
 		inventorySlot = new FreeInventorySlotRequirement(1);
 
 		kharidTeleport = new ItemRequirement("Teleport to Al Kharid", ItemCollections.AMULET_OF_GLORIES);
-		gnomeTeleport = new ItemRequirement("Teleport to Tree Gnome Stronghold", -1);
+		gnomeTeleport = new ItemRequirement("Necklace of Passage, or a teleport to Tree Gnome Stronghold", -1);
 		gnomeTeleport.setDisplayItemId(ItemID.SPIRIT_TREE);
+		gnomeTeleport.addAlternates(ItemCollections.NECKLACE_OF_PASSAGES);
 		rellekkaTeleport = new ItemRequirement("Teleports to Rellekka", ItemID.RELLEKKA_TELEPORT, 3);
 		karamjaTeleport = new ItemRequirement("Teleport to Tai Bwo Wannai", ItemID.TAI_BWO_WANNAI_TELEPORT);
+		draynorTeleport = new ItemRequirement("Teleport to Draynor Manor", ItemCollections.AMULET_OF_GLORIES);
+		draynorTeleport.addAlternates(ItemID.DRAYNOR_MANOR_TELEPORT, ItemID.EXPLORERS_RING_2, ItemID.EXPLORERS_RING_3, ItemID.EXPLORERS_RING_4);
+		camelotTeleport = new ItemRequirement("Teleport to Seer's Village", ItemID.CAMELOT_TELEPORT);
+		skillsNecklace = new ItemRequirement("Teleport to Fishing Guild", ItemCollections.SKILLS_NECKLACES);
 
 		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
@@ -141,7 +147,8 @@ public class TheGeneralsShadow extends BasicQuestHelper
 		sinSeersNote = new ItemRequirement("Sin seer's note", ItemID.SIN_SEERS_NOTE);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		sinRoom = new Zone(new WorldPoint(2680, 3460, 1), new WorldPoint(2740, 3490, 1));
 		goblinCave = new Zone(new WorldPoint(2560, 9792, 0), new WorldPoint(2623, 9855, 0));
@@ -158,7 +165,7 @@ public class TheGeneralsShadow extends BasicQuestHelper
 		givenNote = new VarbitRequirement(3335, 2);
 		talkedToGnomeScout = new VarbitRequirement(3332, 1);
 		talkedToFaladorScout = new VarbitRequirement(3333, 1);
-		talkedToShantyScout = new VarbitRequirement(3334, 1);
+		talkedToShantayScout = new VarbitRequirement(3334, 1);
 		talkedToKaramjaScout = new VarbitRequirement(3331, 1);
 
 		// 3336 0->2 attempted to bribe Seer
@@ -186,13 +193,13 @@ public class TheGeneralsShadow extends BasicQuestHelper
 			"Return to General Khazard south east of Rellekka.", ghostlyRobes, ringOfVisibility, ghostspeak);
 
 		talkToGnomeScout = new NpcStep(this, NpcID.SCOUT_3512, new WorldPoint(2458, 3358, 0), "Talk to the scout " +
-			"south of the Tree Gnome Stronghold.", ghostlyRobes, ringOfVisibility, ghostspeak);
+			"near The Outpost, south of the Tree Gnome Stronghold.", ghostlyRobes, ringOfVisibility, ghostspeak);
 
 		talkToFaladorScout = new NpcStep(this, NpcID.SCOUT_3513, new WorldPoint(3073, 3336, 0), "Talk to the scout " +
-			"east of Falador.", ghostlyRobes, ringOfVisibility, ghostspeak);
+			"west of Draynor Manor.", ghostlyRobes, ringOfVisibility, ghostspeak);
 
-		talkToShantyScout = new NpcStep(this, NpcID.SCOUT_3514, new WorldPoint(3304, 3084, 0), "Talk to the scout " +
-			"south of the Shanty Pass.", ghostlyRobes, ringOfVisibility, ghostspeak);
+		talkToShantayScout = new NpcStep(this, NpcID.SCOUT_3514, new WorldPoint(3304, 3084, 0), "Talk to the scout " +
+			"south of the Shantay Pass.", ghostlyRobes, ringOfVisibility, ghostspeak);
 
 		talkToKaramjaScout = new NpcStep(this, NpcID.SCOUT, new WorldPoint(2825, 3053, 0), "Talk to the scout " +
 			"south east of Tai Bwo Wannai.", ghostlyRobes, ringOfVisibility, ghostspeak);
@@ -221,7 +228,8 @@ public class TheGeneralsShadow extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRecommended()
 	{
-		return Arrays.asList(rellekkaTeleport, gnomeTeleport, kharidTeleport, karamjaTeleport);
+		return Arrays.asList(rellekkaTeleport, gnomeTeleport, kharidTeleport, karamjaTeleport, draynorTeleport,
+			camelotTeleport, skillsNecklace);
 	}
 
 
@@ -261,7 +269,7 @@ public class TheGeneralsShadow extends BasicQuestHelper
 			ringOfVisibility, ghostspeak, coins40));
 
 		allSteps.add(new PanelDetails("Finding the Scouts",
-			Arrays.asList(talkToGnomeScout, talkToFaladorScout, talkToShantyScout, talkToKaramjaScout,
+			Arrays.asList(talkToGnomeScout, talkToFaladorScout, talkToShantayScout, talkToKaramjaScout,
 				talkToKhazardAfterScouts), ghostlyRobes, ringOfVisibility, ghostspeak));
 
 		allSteps.add(new PanelDetails("Defeat Bouncer",

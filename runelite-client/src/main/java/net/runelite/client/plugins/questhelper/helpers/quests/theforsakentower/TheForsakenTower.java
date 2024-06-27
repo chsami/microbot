@@ -24,37 +24,41 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.theforsakentower;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.Favour;
-import net.runelite.client.plugins.questhelper.requirements.player.FavourRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetModelRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_FORSAKEN_TOWER
-)
 public class TheForsakenTower extends BasicQuestHelper
 {
 	//Items Required
@@ -81,8 +85,7 @@ public class TheForsakenTower extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -126,7 +129,7 @@ public class TheForsakenTower extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		crank = new ItemRequirement("Generator crank", ItemID.GENERATOR_CRANK);
 		oldNotes = new ItemRequirement("Old notes", ItemID.OLD_NOTES_22774);
@@ -149,7 +152,8 @@ public class TheForsakenTower extends BasicQuestHelper
 		powerPuzzleVisible = new WidgetModelRequirement(624, 2, 0, 36246);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		basement = new Zone(new WorldPoint(1374, 10217, 0), new WorldPoint(1389, 10231, 0));
 		firstFloor = new Zone(new WorldPoint(1376, 3817, 1), new WorldPoint(1388, 3829, 1));
@@ -187,7 +191,7 @@ public class TheForsakenTower extends BasicQuestHelper
 		inspectGenerator = new ObjectStep(this, NullObjectID.NULL_34589, new WorldPoint(1382, 10219, 0), "Inspect the steam generator in the south of the room", crank);
 		inspectGenerator.addDialogStep("Start the generator.");
 
-		doPowerPuzzle = new PowerPuzzle(this);
+		doPowerPuzzle = new PuzzleWrapperStep(this, new PowerPuzzle(this), "Solve the power puzzle.");
 
 		potionPuzzle = new PotionPuzzle(this);
 		potionPuzzle.setLockingCondition(finishedPotionPuzzle);
@@ -214,8 +218,7 @@ public class TheForsakenTower extends BasicQuestHelper
 	@Override
 	public List<Requirement> getGeneralRequirements()
 	{
-		return Arrays.asList(new FavourRequirement(Favour.LOVAKENGJ, 20),
-			new QuestRequirement(QuestHelperQuest.X_MARKS_THE_SPOT, QuestState.FINISHED),
+		return Arrays.asList(new QuestRequirement(QuestHelperQuest.X_MARKS_THE_SPOT, QuestState.FINISHED),
 			new QuestRequirement(QuestHelperQuest.CLIENT_OF_KOUREND, QuestState.FINISHED));
 	}
 
@@ -237,8 +240,7 @@ public class TheForsakenTower extends BasicQuestHelper
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("6000 Coins", ItemID.COINS_995, 6000),
-				new ItemReward("Lovakenj Favour Certificate", 1, 1),
+				new ItemReward("Coins", ItemID.COINS_995, 6000),
 				new ItemReward("A page for Kharedst's memoirs.", ItemID.KHAREDSTS_MEMOIRS, 1));
 	}
 

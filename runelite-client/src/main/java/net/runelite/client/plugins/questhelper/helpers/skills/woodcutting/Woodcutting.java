@@ -25,31 +25,25 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.skills.woodcutting;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.ItemID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.WOODCUTTING
-)
 public class Woodcutting extends ComplexStateQuestHelper
 {
 	//Items Required
@@ -65,7 +59,7 @@ public class Woodcutting extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep fullTraining = new ConditionalStep(this, chopNormalTree);
@@ -76,7 +70,7 @@ public class Woodcutting extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		wc6 = new SkillRequirement(Skill.WOODCUTTING, 6);
 		wc11 = new SkillRequirement(Skill.WOODCUTTING, 11);
@@ -126,7 +120,7 @@ public class Woodcutting extends ComplexStateQuestHelper
 				" them, or bank them.", true, steelAxe, blackAxe, mithrilAxe, adamantAxe
 		);
 
-		chopWillowTrees = new ObjectStep(this, ObjectID.WILLOW_TREE, new WorldPoint(3059, 3253, 0),
+		chopWillowTrees = new ObjectStep(this, ObjectID.WILLOW_TREE_10819, new WorldPoint(3059, 3253, 0),
 			"Chop willow trees east of the Rusty Anchor Inn in Port Sarim until 99 Woodcutting. You can deposit them" +
 				" at the bank deposit box just south on the docks next to the monks." +
 				" If choose to burn the logs as you go or drop them, oak trees gives faster XP until 60 Woodcutting",
@@ -137,8 +131,10 @@ public class Woodcutting extends ComplexStateQuestHelper
 	@Override
 	public List<UnlockReward> getUnlockRewards()
 	{
-		return Collections.singletonList(
-			new UnlockReward("Ability to purchase Woodcutting Cape for 99k")
+		return Arrays.asList(
+			new UnlockReward("Ability to purchase Woodcutting Cape for 99k (requires membership)"),
+			new UnlockReward("Ability to travel the river lum with canoes (requires membership)"),
+			new UnlockReward("Access to the woodcutting guild at lvl 60 (requires membership)")
 		);
 	}
 

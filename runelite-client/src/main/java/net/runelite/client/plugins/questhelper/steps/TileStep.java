@@ -1,14 +1,14 @@
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
 import net.runelite.api.Perspective;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.OverlayUtil;
-
-import java.awt.*;
 
 public class TileStep extends DetailedQuestStep
 {
@@ -19,7 +19,7 @@ public class TileStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		super.makeWorldOverlayHint(graphics, plugin);
 

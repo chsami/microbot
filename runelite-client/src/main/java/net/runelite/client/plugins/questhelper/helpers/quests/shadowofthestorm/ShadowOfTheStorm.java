@@ -24,33 +24,44 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.shadowofthestorm;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.SHADOW_OF_THE_STORM
-)
 public class ShadowOfTheStorm extends BasicQuestHelper
 {
 	//Items Required
@@ -59,7 +70,7 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 		sigilHighlighted, sigil2;
 
 	//Items Recommended
-	ItemRequirement combatGear, coinsForCarpet;
+	ItemRequirement combatGear, coinsForCarpet, alKharidTeleport;
 
 	Requirement inRuin, inThroneRoom,talkedToGolem, talkedToMatthew, inCircleSpot, sigilNearby, evilDaveMoved, baddenMoved,
 		reenMoved, golemMoved, golemRejected, golemReprogrammed,
@@ -84,8 +95,7 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 	public Map<Integer, QuestStep> loadSteps()
 	{
 		Map<Integer, QuestStep> steps = new HashMap<>();
-		setupZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -163,7 +173,8 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 		return steps;
 	}
 
-	private void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		ruin = new Zone(new WorldPoint(2706, 4881, 0), new WorldPoint(2738, 4918, 0));
 		throneRoom = new Zone(new WorldPoint(2709, 4879, 2), new WorldPoint(2731, 4919, 2));
@@ -172,7 +183,7 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		darkItems = new ItemRequirement("pieces of black clothing", ItemID.BLACK_DESERT_SHIRT, 3, true).isNotConsumed().doNotAggregate();
 		darkItems.addAlternates(ItemID.BLACK_DESERT_ROBE, ItemID.BLACK_CHAINBODY, ItemID.BLACK_PLATEBODY, ItemID.BLACK_PLATELEGS, ItemID.BLACK_FULL_HELM, ItemID.BLACK_MED_HELM, ItemID.BLACK_GLOVES, ItemID.PRIEST_GOWN, ItemID.PRIEST_GOWN_428, ItemID.MYSTIC_HAT_DARK,
@@ -210,6 +221,10 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 		book = new ItemRequirement("Demonic tome", ItemID.DEMONIC_TOME);
 		bookHighlighted = new ItemRequirement("Demonic tome", ItemID.DEMONIC_TOME);
 		bookHighlighted.setHighlightInInventory(true);
+
+		// Recommended
+		alKharidTeleport = new ItemRequirement("Al Kharid Teleport", ItemCollections.AMULET_OF_GLORIES);
+		alKharidTeleport.addAlternates(ItemCollections.RING_OF_DUELINGS);
 	}
 
 	private void setupConditions()
@@ -234,10 +249,11 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 	{
 		talkToReen = new NpcStep(this, NpcID.FATHER_REEN, new WorldPoint(3270, 3159, 0), "Talk to Father Reen outside Al Kharid bank.");
 		talkToReen.addDialogStep("That's me!");
+		talkToReen.addDialogStep("Yes.");
 		talkToBadden = new NpcStep(this, NpcID.FATHER_BADDEN, new WorldPoint(3490, 3090, 0), "Talk to Father Badden in Uzer.", silverlight, darkItems);
-		talkToBadden.addDialogSteps("Reen sent me.", "So what do you want me to do?", "How can I do that?");
+		talkToBadden.addDialogSteps("Uzer", "Reen sent me.", "So what do you want me to do?", "How can I do that?");
 		pickMushroom = new ObjectStep(this, ObjectID.BLACK_MUSHROOMS, new WorldPoint(3495, 3088, 0), "Pick up some black mushrooms.");
-		dyeSilverlight = new DetailedQuestStep(this, "Use the black mushrooms on Siverlight.", silverlightHighlighted, blackMushroomHighlighted);
+		dyeSilverlight = new DetailedQuestStep(this, "Use the black mushrooms on Silverlight.", silverlightHighlighted, blackMushroomHighlighted);
 		goIntoRuin = new ObjectStep(this, ObjectID.STAIRCASE_6373, new WorldPoint(3493, 3090, 0), "Enter the Uzer ruins.", silverlightDyedEquipped, darkItems);
 
 		pickUpStrangeImplement = new DetailedQuestStep(this, new WorldPoint(2713, 4913, 0), "Pick up the strange implement in the north west corner of the ruin.", strangeImplement);
@@ -253,7 +269,9 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 		talkToMatthew = new NpcStep(this, NpcID.MATTHEW, new WorldPoint(2727, 4897, 2), "Talk to Matthew.");
 		talkToMatthew.addDialogStep("Do you know what happened to Josef?");
 		smeltSigil = new DetailedQuestStep(this, "Travel to any furnace with the sigil mould and silver bar and smelt a sigil.", silverBar, sigilMould);
+		smeltSigil.addTeleport(alKharidTeleport);
 		talkToGolem = new NpcStep(this, NpcID.CLAY_GOLEM_5136, new WorldPoint(3485, 3088, 0), "Talk to the Golem in Uzer.", silverlightDyed, sigil, combatGear);
+		talkToGolem.addDialogStep("Uzer");
 		talkToGolem.addDialogStep("Did you see anything happen last night?");
 		searchKiln = new SearchKilns(this);
 		readBook = new DetailedQuestStep(this, "Read the book.", bookHighlighted);
@@ -328,7 +346,7 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRecommended()
 	{
-		return Arrays.asList(combatGear, coinsForCarpet);
+		return Arrays.asList(combatGear, coinsForCarpet, alKharidTeleport);
 	}
 
 	@Override
@@ -361,7 +379,7 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 		List<PanelDetails> allSteps = new ArrayList<>();
 
 		allSteps.add(new PanelDetails("Starting off", Collections.singletonList(talkToReen)));
-		allSteps.add(new PanelDetails("Infiltrate the cult", Arrays.asList(talkToBadden, pickMushroom, dyeSilverlight, goIntoRuin, pickUpStrangeImplement, talkToEvilDave, talkToJennifer, talkToMatthew), silverlight, darkItems));
+		allSteps.add(new PanelDetails("Infiltrate the cult", Arrays.asList(talkToBadden, pickMushroom, dyeSilverlight, goIntoRuin, pickUpStrangeImplement, talkToEvilDave, talkToDenath, talkToJennifer, talkToMatthew), silverlight, darkItems));
 		allSteps.add(new PanelDetails("Uncovering the truth", Arrays.asList(smeltSigil, talkToGolem, searchKiln, readBook, talkToMatthewAfterBook, standInCircle, readIncantation), silverBar, silverlightDyed, combatGear));
 		allSteps.add(new PanelDetails("Defeating Agrith-Naar", Arrays.asList(pickUpSigil, leavePortal, pickUpSigil2, tellDaveToReturn, talkToBaddenAfterRitual, talkToReenAfterRitual, talkToTheGolemAfterRitual, useImplementOnGolem, talkToGolemAfterReprogramming,
 			talkToMatthewToStartFight, standInCircleAgain, incantRitual, killDemon, unequipDarklight), silverlightDyed, combatGear));

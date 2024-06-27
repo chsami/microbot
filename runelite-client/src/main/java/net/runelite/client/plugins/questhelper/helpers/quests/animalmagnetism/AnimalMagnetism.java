@@ -25,33 +25,39 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.animalmagnetism;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
+import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.QuestState;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-		quest = QuestHelperQuest.ANIMAL_MAGNETISM
-)
 public class AnimalMagnetism extends BasicQuestHelper
 {
 	//Items Required
@@ -77,8 +83,7 @@ public class AnimalMagnetism extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -129,20 +134,21 @@ public class AnimalMagnetism extends BasicQuestHelper
 		return steps;
 	}
 
-	private void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		ironMine = new Zone(new WorldPoint(2971, 3248, 0), new WorldPoint(2987, 3234, 0));
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		ghostspeak = new ItemRequirement("Ghostspeak amulet", ItemID.GHOSTSPEAK_AMULET).isNotConsumed();
 		ghostspeakEquip = new ItemRequirement("Ghostspeak amulet", ItemID.GHOSTSPEAK_AMULET, 1, true);
 		croneMadeAmulet = new ItemRequirement("Crone-made amulet", ItemID.CRONEMADE_AMULET);
 		ectoToken20 = new ItemRequirement("Ecto-token", ItemID.ECTOTOKEN, 20);
 		undeadChicken2 = new ItemRequirement("Undead chicken", ItemID.UNDEAD_CHICKEN, 2);
-		undeadChicken2.canBeObtainedDuringQuest();
+		undeadChicken2.setTooltip("You will buy the undead chickens from Malcolm.");
 
 		//Magnet
 		ironBar5 = new ItemRequirement("Iron Bar", ItemID.IRON_BAR, 5);
@@ -236,17 +242,14 @@ public class AnimalMagnetism extends BasicQuestHelper
 			"I'd love one, thanks.");
 		cutTree = new NpcStep(this, NpcID.UNDEAD_TREE,
 			"Try to chop an undead tree outside Draynor manor with the Blessed axe until you receive undead twigs.",
-			true,
-			blessedAxe);
+			true, blessedAxe);
 		giveTwigsToAva = new NpcStep(this, NpcID.AVA, new WorldPoint(3093, 3357, 0),
-			"Give the Undead twigs to Ava.",
-			twigs);
+			"Give the Undead twigs to Ava.", twigs);
 
 		getNotesFromAva = new NpcStep(this, NpcID.AVA, new WorldPoint(3093, 3357, 0),
 			"Talk to Ava to receive the research notes.");
-		translateNotes = new PuzzleStep(this, "Translate research notes by clicking on all the highlighted switches.",
-			new PuzzleSolver()::solver,
-			researchNotes);
+		translateNotes = new PuzzleWrapperStep(this, new PuzzleStep(this, "Translate research notes by clicking on all the highlighted switches.",
+			new PuzzleSolver()::solver, researchNotes), "Translate the research notes.");
 		giveNotesToAva = new NpcStep(this, NpcID.AVA, new WorldPoint(3093, 3357, 0),
 			"Give Ava the translated research notes.",
 			translatedNotes);
@@ -327,7 +330,7 @@ public class AnimalMagnetism extends BasicQuestHelper
 				giveAmuletToHusband, talkToAlicesHusband3, buyUndeadChickens, giveChickensToAva),
 			ghostspeak, ectoToken20));
 		allSteps.add(new PanelDetails("Magnet",
-			Arrays.asList(talkToWitch, goToIronMine, useHammerOnMagnet, giveMagnetToAva), ironBar5, hammer, undeadChicken2));
+			Arrays.asList(talkToWitch, goToIronMine, useHammerOnMagnet, giveMagnetToAva), ironBar5, hammer));
 		allSteps.add(new PanelDetails("Undead twigs",
 			Arrays.asList(attemptToCutTree, talkToTurael, cutTree, giveTwigsToAva, getNotesFromAva, translateNotes, giveNotesToAva, buildPattern, giveContainerToAva),
 			mithrilAxe, polishedButtons, hardLeather, holySymbol));

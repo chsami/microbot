@@ -24,48 +24,61 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.monkeymadnessii;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
-import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
+import net.runelite.client.plugins.questhelper.requirements.npc.FollowerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.npc.FollowerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcInteractingRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
+import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.MONKEY_MADNESS_II
-)
 public class MonkeyMadnessII extends BasicQuestHelper
 {
 	//Items Required
 	ItemRequirement lemon, grape, pestle, pickaxe, logs, lightSource, hammerSidebar, hammer, chisel, chiselSidebar, mspeakAmulet, talisman, ninjaGreegree, translationBook,
 		pestleHighlighted, lemonHighlighted, grapesHighlighted, handkerchief, mysteriousNote, mysteriousNoteLemon, mysteriousNoteLemonCandle, brush, scrawledNote, grapeBrush,
 		translatedNote, noCombatItems, talismanOr1000Coins, ninjaGreegreeEquipped, mspeakAmuletEquipped, greegree, kruksPaw, greegreeEquipped, krukGreegree, coins20,
-		chiselHighlighted, deconstructedOnyx, chargedOnyx;
+		chiselHighlighted, deconstructedOnyx, chargedOnyx, climbingBoots;
 
 	//Items Recommended
 	ItemRequirement combatGear, combatGear2, magicLog, food, staminaPotions, prayerPotions, antidote;
@@ -110,8 +123,7 @@ public class MonkeyMadnessII extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		setupConditionalSteps();
@@ -210,9 +222,7 @@ public class MonkeyMadnessII extends BasicQuestHelper
 
 		steps.put(130, talkToNieve);
 
-		ConditionalStep defendingTheTree = new ConditionalStep(this, killGorillasInStronghold);
-		defendingTheTree.addStep(killedGorillas, enterNorthOfTree);
-		steps.put(140, defendingTheTree);
+		steps.put(140, killGorillasInStronghold);
 
 		ConditionalStep goDefeatDemonicAndTorturedGorillas = new ConditionalStep(this, enterNorthOfTree);
 		goDefeatDemonicAndTorturedGorillas.addStep(inCrashSiteCavern, killTorturedAndDemonic);
@@ -237,7 +247,7 @@ public class MonkeyMadnessII extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		strongholdBalloon = new VarbitRequirement(2870, Operation.EQUAL, 1, "Unlocked the Tree Gnome Stronghold balloon route");
 
@@ -279,6 +289,7 @@ public class MonkeyMadnessII extends BasicQuestHelper
 		antidote = new ItemRequirement("Antidote", ItemCollections.ANTIPOISONS, -1);
 		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
+		climbingBoots = new ItemRequirement("Climbing boots", ItemCollections.CLIMBING_BOOTS);
 
 		handkerchief = new ItemRequirement("Handkerchief", ItemID.HANDKERCHIEF);
 		mysteriousNote = new ItemRequirement("Mysterious note", ItemID.MYSTERIOUS_NOTE);
@@ -397,7 +408,8 @@ public class MonkeyMadnessII extends BasicQuestHelper
 		nieveFollowing = new NpcInteractingRequirement(NpcID.NIEVE_7109);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		gloughHouseF1 = new Zone(new WorldPoint(2475, 3461, 1), new WorldPoint(2484, 3465, 1));
 		gloughHouseF2 = new Zone(new WorldPoint(2484, 3462, 2), new WorldPoint(2489, 3467, 2));
@@ -518,14 +530,13 @@ public class MonkeyMadnessII extends BasicQuestHelper
 
 		talkToGarkorAfterKruk = new NpcStep(this, NpcID.GARKOR_7158, new WorldPoint(2807, 2762, 0), "Talk to Garkor on Ape Atoll.");
 
-		enterTrollStronghold = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Enter the Troll Stronghold, ready to fight Kob.");
+		enterTrollStronghold = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0),
+			"Enter the Troll Stronghold, ready to fight Kob.", climbingBoots, combatGear);
 
 		talkToKob = new NpcStep(this, NpcID.KOB, new WorldPoint(2831, 10060, 2), "Talk to Kob with Protect from Melee on, ready to fight.");
-		talkToKob.setWorldMapPoint(new WorldPoint(2962, 10120, 0));
 		talkToKob.addDialogSteps("I know about your deal with the monkeys.", "You won't be around to crush anyone when I'm done with you.", "I accept your challenge.");
 
 		fightKob = new NpcStep(this, NpcID.KOB_7107, new WorldPoint(2831, 10060, 2), "Fight Kob. He can be safespotted from the doorway.");
-		fightKob.setWorldMapPoint(new WorldPoint(2962, 10120, 0));
 
 		if (client.getBoostedSkillLevel(Skill.AGILITY) >= 71)
 		{
@@ -652,7 +663,7 @@ public class MonkeyMadnessII extends BasicQuestHelper
 	@Override
 	public List<String> getCombatRequirements()
 	{
-		return Arrays.asList("Kruk (level 149, flinchable)", "Keef (level 178, safespottable)", "Kob (level 185, safespottable)", "9 Tortured gorillas (level 141)", "2 Demonic Gorillas (level 275)", "Glough (level 378)");
+		return Arrays.asList("Kruk (level 149, flinchable)", "Keef (level 178, safespottable)", "Kob (level 185, safespottable)", "9 Tortured gorillas (level 141)", "2 Demonic Gorillas (level 275)", "Glough (level 431)");
 	}
 
 	@Override
@@ -665,30 +676,30 @@ public class MonkeyMadnessII extends BasicQuestHelper
 	public List<ExperienceReward> getExperienceRewards()
 	{
 		return Arrays.asList(
-				new ExperienceReward(Skill.SLAYER, 80000),
-				new ExperienceReward(Skill.AGILITY, 60000),
-				new ExperienceReward(Skill.THIEVING, 50000),
-				new ExperienceReward(Skill.HUNTER, 50000));
+			new ExperienceReward(Skill.SLAYER, 80000),
+			new ExperienceReward(Skill.AGILITY, 60000),
+			new ExperienceReward(Skill.THIEVING, 50000),
+			new ExperienceReward(Skill.HUNTER, 50000));
 	}
 
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("2 x 50,000 Experience Lamps (Any Combat Skill)", ItemID.ANTIQUE_LAMP, 2), //4447 is placeholder for filter
-				new ItemReward("A Royal Seed Pod", ItemID.ROYAL_SEED_POD, 1),
-				new ItemReward("A pet monkey", ItemID.MONKEY_19556, 1));
+			new ItemReward("50,000 Experience Lamps (Any Combat Skill)", ItemID.ANTIQUE_LAMP, 2), //4447 is placeholder for filter
+			new ItemReward("A Royal Seed Pod", ItemID.ROYAL_SEED_POD, 1),
+			new ItemReward("A pet monkey", ItemID.MONKEY_19556, 1));
 	}
 
 	@Override
 	public List<UnlockReward> getUnlockRewards()
 	{
 		return Arrays.asList(
-				new UnlockReward("Access to Demonic Gorillas"),
-				new UnlockReward("A new Gnome Glider location"),
-				new UnlockReward("Access to a bank on Ape Atoll"),
-				new UnlockReward("Ability to wield the Heavy Ballista"),
-				new UnlockReward("Access to Maniacal Monkey hunting area"));
+			new UnlockReward("Access to Demonic Gorillas"),
+			new UnlockReward("A new Gnome Glider location"),
+			new UnlockReward("Access to a bank on Ape Atoll"),
+			new UnlockReward("Ability to wield the Heavy Ballista"),
+			new UnlockReward("Access to Maniacal Monkey hunting area"));
 	}
 
 	@Override
@@ -707,7 +718,7 @@ public class MonkeyMadnessII extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Going undercover", chapter2Steps, ninjaGreegree, mspeakAmulet, talismanOr1000Coins, lightSource, combatGear, food, prayerPotions, staminaPotions));
 
 		allSteps.add(new PanelDetails("Defeating trolls and ogres",
-			Arrays.asList(enterTrollStronghold, talkToKob, fightKob, talkToKeef, fightKeef), combatGear,
+			Arrays.asList(enterTrollStronghold, talkToKob, fightKob, talkToKeef, fightKeef), combatGear, climbingBoots,
 			coins20.hideConditioned(new SkillRequirement(Skill.AGILITY, 71, true))));
 
 		List<QuestStep> sabotageSteps = QuestUtil.toArrayList(talkToGarkorAfterKeef, findSmith, talkToSmith, talkToGarkorAfterSmith,
@@ -743,7 +754,7 @@ public class MonkeyMadnessII extends BasicQuestHelper
 		req.add(strongholdBalloon);
 		req.add(new QuestRequirement(QuestHelperQuest.THE_EYES_OF_GLOUPHRIE, QuestState.FINISHED));
 		req.add(new VarbitRequirement(QuestVarbits.QUEST_RECIPE_FOR_DISASTER_MONKEY_AMBASSADOR.getId(),
-			Operation.GREATER_EQUAL,  50, "Finished the 'Freeing King Awowogei' subquest of RFD"));
+			Operation.GREATER_EQUAL, 50, "Finished the 'Freeing King Awowogei' subquest of RFD"));
 		req.add(new QuestRequirement(QuestHelperQuest.TROLL_STRONGHOLD, QuestState.FINISHED));
 		req.add(new QuestRequirement(QuestHelperQuest.WATCHTOWER, QuestState.FINISHED));
 		req.add(new SkillRequirement(Skill.SLAYER, 69));

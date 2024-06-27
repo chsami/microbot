@@ -24,18 +24,23 @@
  */
 package net.runelite.client.plugins.questhelper.panel;
 
-import net.runelite.client.plugins.questhelper.Icon;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.managers.QuestManager;
+import net.runelite.client.plugins.questhelper.tools.Icon;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import lombok.Getter;
 import net.runelite.api.QuestState;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class QuestSelectPanel extends JPanel
 {
@@ -45,11 +50,14 @@ public class QuestSelectPanel extends JPanel
 	@Getter
 	private final QuestHelper questHelper;
 
+	private final QuestManager questManager;
+
 	private static final ImageIcon START_ICON = Icon.START.getIcon();
 
-	public QuestSelectPanel(MQuestHelperPlugin questHelperPlugin, QuestHelperPanel questHelperPanel, QuestHelper questHelper, QuestState questState)
+	public QuestSelectPanel(QuestHelperPlugin questHelperPlugin, QuestManager questManager, QuestHelperPanel questHelperPanel, QuestHelper questHelper, QuestState questState)
 	{
 		this.questHelper = questHelper;
+		this.questManager = questManager;
 
 		keywords.addAll(questHelper.getQuest().getKeywords());
 
@@ -68,7 +76,7 @@ public class QuestSelectPanel extends JPanel
 			startButton.setIcon(START_ICON);
 			startButton.addActionListener(e ->
 			{
-				questHelperPlugin.setSidebarSelectedQuest(questHelper);
+				questManager.setSidebarSelectedQuest(questHelper);
 				questHelperPanel.emptyBar();
 			});
 			add(startButton, BorderLayout.LINE_END);
@@ -78,6 +86,7 @@ public class QuestSelectPanel extends JPanel
 	public QuestSelectPanel(String text)
 	{
 		this.questHelper = null;
+		this.questManager = null;
 
 		setLayout(new BorderLayout(3, 3));
 		setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));

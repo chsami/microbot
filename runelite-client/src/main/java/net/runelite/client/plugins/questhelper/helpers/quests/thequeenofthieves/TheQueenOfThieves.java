@@ -24,18 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thequeenofthieves;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.Favour;
-import net.runelite.client.plugins.questhelper.requirements.player.FavourRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
@@ -44,14 +41,20 @@ import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_QUEEN_OF_THIEVES
-)
 public class TheQueenOfThieves extends BasicQuestHelper
 {
 	//Items Required
@@ -72,8 +75,7 @@ public class TheQueenOfThieves extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -128,14 +130,15 @@ public class TheQueenOfThieves extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		stew = new ItemRequirement("Stew", ItemID.STEW);
 		hughesLetter = new ItemRequirement("Letter", ItemID.LETTER_21774);
 		hughesLetter.setTooltip("You can get another letter by searching the chest upstairs in Hughes' house in Kingstown.");
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		warrens = new Zone(new WorldPoint(1728, 10115, 0), new WorldPoint(1814, 10177, 0));
 		kingstown = new Zone(new WorldPoint(1668, 3675, 1), new WorldPoint(1685, 3684, 1));
@@ -218,7 +221,6 @@ public class TheQueenOfThieves extends BasicQuestHelper
 	{
 		return Arrays.asList(
 			new SkillRequirement(Skill.THIEVING, 20),
-			new FavourRequirement(Favour.PISCARILIUS, 20),
 			new QuestRequirement(QuestHelperQuest.CLIENT_OF_KOUREND, QuestState.FINISHED),
 			new QuestRequirement(QuestHelperQuest.X_MARKS_THE_SPOT, QuestState.FINISHED)
 		);
@@ -233,15 +235,14 @@ public class TheQueenOfThieves extends BasicQuestHelper
 	@Override
 	public List<ExperienceReward> getExperienceRewards()
 	{
-		return Collections.singletonList(new ExperienceReward(Skill.THIEVING, 1000));
+		return Collections.singletonList(new ExperienceReward(Skill.THIEVING, 2000));
 	}
 
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-			new ItemReward("2,000 Coins", ItemID.COINS_995, 2000),
-			new ItemReward("A Piscarilius Favour Certificate", 1, 1),
+			new ItemReward("Coins", ItemID.COINS_995, 2000),
 			new ItemReward("A page for Kharedst's Memoirs", ItemID.KHAREDSTS_MEMOIRS, 1));
 	}
 

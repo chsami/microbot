@@ -28,33 +28,39 @@ import com.google.inject.Binder;
 import com.google.inject.CreationException;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import net.runelite.client.plugins.questhelper.*;
+import net.runelite.client.plugins.questhelper.questinfo.ExternalQuestResources;
+import net.runelite.client.plugins.questhelper.questinfo.HelperConfig;
+import net.runelite.client.plugins.questhelper.bank.QuestBank;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.RuneliteObjectManager;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import javax.inject.Inject;
+
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.OwnerStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.client.plugins.questhelper.steps.playermadesteps.extendedruneliteobjects.RuneliteObjectManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.QuestState;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.plugins.questhelper.steps.OwnerStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.PanelComponent;
-
-import javax.inject.Inject;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 
 public abstract class QuestHelper implements Module, QuestDebugRenderer
 {
@@ -73,13 +79,13 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 
 	@Getter
 	@Setter
-	protected MQuestHelperConfig config;
+	protected QuestHelperConfig config;
 
 	@Inject
 	private EventBus eventBus;
 
 	@Getter
-	private static QuestStep currentStep;
+	private QuestStep currentStep;
 
 	@Getter
 	@Setter
@@ -90,7 +96,9 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 
 	@Setter
 	@Getter
-	protected MQuestHelperPlugin questHelperPlugin;
+	protected QuestHelperPlugin questHelperPlugin;
+
+	private boolean hasInitialized;
 
 	@Override
 	public void configure(Binder binder)
@@ -99,7 +107,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 
 	public abstract void init();
 
-	public abstract void startUp(MQuestHelperConfig config);
+	public abstract void startUp(QuestHelperConfig config);
 
 	public void shutDown()
 	{
@@ -113,7 +121,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 
 	public abstract boolean updateQuest();
 
-	public void debugStartup(MQuestHelperConfig config)
+	public void debugStartup(QuestHelperConfig config)
 	{
 	}
 
@@ -190,7 +198,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 	}
 
 	@Override
-	public void renderDebugOverlay(Graphics graphics, MQuestHelperPlugin plugin, PanelComponent panelComponent)
+	public void renderDebugOverlay(Graphics graphics, QuestHelperPlugin plugin, PanelComponent panelComponent)
 	{
 		if (!plugin.isDeveloperMode())
 		{
@@ -212,15 +220,41 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 		);
 	}
 
-	public QuestStep getCurrentStep()  {
-		return currentStep;
-	}
 	public int getVar()
 	{
 		return quest.getVar(client);
 	}
 
-	public abstract void setupRequirements();
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+
+	}
+
+	protected void setupZones()
+	{
+
+	}
+
+	/**
+	 * This method should not be called directly.
+	 * It is used internally by {@link #initializeRequirements()}.
+	 */
+	protected abstract void setupRequirements();
+
+	/**
+	 * The expected interface to be used to initialize Quest Helper's Requirements
+	 *
+	 */
+	public void initializeRequirements()
+	{
+		if (hasInitialized)
+		{
+			return;
+		}
+		setupZones();
+		setupRequirements();
+		hasInitialized = true;
+	}
 
 	public List<ItemRequirement> getItemRequirements()
 	{

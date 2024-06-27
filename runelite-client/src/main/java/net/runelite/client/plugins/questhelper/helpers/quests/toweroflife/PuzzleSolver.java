@@ -24,13 +24,13 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.toweroflife;
 
-import net.runelite.client.plugins.questhelper.steps.WidgetDetails;
+import net.runelite.client.plugins.questhelper.steps.widget.WidgetDetails;
+import java.util.List;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.function.Function;
 
 public class PuzzleSolver

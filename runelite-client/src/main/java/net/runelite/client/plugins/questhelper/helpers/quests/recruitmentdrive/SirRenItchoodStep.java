@@ -27,17 +27,16 @@ package net.runelite.client.plugins.questhelper.helpers.quests.recruitmentdrive;
 
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.Subscribe;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.eventbus.Subscribe;
 
 public class SirRenItchoodStep extends ConditionalStep
 {
@@ -76,7 +75,6 @@ public class SirRenItchoodStep extends ConditionalStep
 		enterDoorcode.updateWord(answer);
 	}
 
-	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{

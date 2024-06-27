@@ -24,36 +24,45 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.inaidofthemyreque;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.player.InInstanceRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.player.InInstanceRequirement;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.util.Spellbook;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.IN_AID_OF_THE_MYREQUE
-)
 public class InAidOfTheMyreque extends BasicQuestHelper
 {
 	//Items Required
@@ -97,8 +106,7 @@ public class InAidOfTheMyreque extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		setupConditionalSteps();
@@ -211,7 +219,7 @@ public class InAidOfTheMyreque extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		food = new ItemRequirement("Any food", ItemCollections.GOOD_EATING_FOOD);
 		foodForChest = new ItemRequirement("Food to put in a chest, multiple pieces in case a Ghast eats some",
@@ -224,7 +232,7 @@ public class InAidOfTheMyreque extends BasicQuestHelper
 		hammer = new ItemRequirement("Hammer", ItemCollections.HAMMER).isNotConsumed();
 		planks11 = new ItemRequirement("Plank", ItemID.PLANK, 11);
 		nails44 = new ItemRequirement("Any nails", ItemCollections.NAILS, 44);
-		swampPaste = new ItemRequirement("Swamp paste", ItemID.SWAMP_PASTE);
+		swampPaste = new ItemRequirement("Swamp paste", ItemID.SWAMP_PASTE, 2);
 		snails10 = new ItemRequirement("Raw snail", ItemID.THIN_SNAIL_MEAT);
 		snails10.addAlternates(ItemID.FAT_SNAIL_MEAT, ItemID.LEAN_SNAIL_MEAT);
 		mackerel10 = new ItemRequirement("Raw mackerel", ItemID.RAW_MACKEREL, 10);
@@ -312,7 +320,8 @@ public class InAidOfTheMyreque extends BasicQuestHelper
 		normalSpellbook = new SpellbookRequirement(Spellbook.NORMAL);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		entranceIsland = new Zone(new WorldPoint(3426, 3430, 0), new WorldPoint(3513, 3464, 0));
 		boatArea = new Zone(new WorldPoint(3480, 3373, 0), new WorldPoint(3530, 3429, 0));

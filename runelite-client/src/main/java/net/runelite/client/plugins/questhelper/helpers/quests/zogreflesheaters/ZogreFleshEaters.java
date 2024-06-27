@@ -24,37 +24,47 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.zogreflesheaters;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.ZOGRE_FLESH_EATERS
-)
 public class ZogreFleshEaters extends BasicQuestHelper
 {
 	//Items Required
@@ -78,8 +88,7 @@ public class ZogreFleshEaters extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -144,7 +153,7 @@ public class ZogreFleshEaters extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		backpack = new ItemRequirement("Ruined backpack", ItemID.RUINED_BACKPACK);
 		backpack.setHighlightInInventory(true);
@@ -186,7 +195,8 @@ public class ZogreFleshEaters extends BasicQuestHelper
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		surface = new Zone(new WorldPoint(2456, 3037, 0), new WorldPoint(2491, 3058, 0));
 		tombF2 = new Zone(new WorldPoint(2434, 9400, 2), new WorldPoint(2494, 9474, 2));
@@ -257,7 +267,8 @@ public class ZogreFleshEaters extends BasicQuestHelper
 		talkToZavistic = new NpcStep(this, NpcID.ZAVISTIC_RARVE, new WorldPoint(2598, 3087, 0), "Talk to Zavistic Rarve at the Yanille Wizards' Guild. If you don't have 66 Magic, ring the bell outside the guild.");
 		talkToZavistic.addDialogStep("I'm here about the sicks...err Zogres");
 
-		goUpToSith = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(2597, 3107, 0), "Go upstairs to Sithik upstairs in north Yanille.");
+		goUpToSith = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(2597, 3107, 0),
+			"Go upstairs and talk to Sithik in the house north of the Wizards' Guild.");
 		talkToSith = new ObjectStep(this, NullObjectID.NULL_6887, new WorldPoint(2591, 3104, 1), "Talk to Sithik Ints in the bed to the west.");
 		talkToSith.addDialogStep("Do you mind if I look around?");
 		goUpToSith.addSubSteps(talkToSith);
@@ -265,7 +276,8 @@ public class ZogreFleshEaters extends BasicQuestHelper
 		searchWardrobe = new ObjectStep(this, ObjectID.WARDROBE_6877, new WorldPoint(2590, 3103, 1), "Search Sithik's wardrobe.");
 		searchCupboard = new ObjectStep(this, ObjectID.CUPBOARD_6876, new WorldPoint(2593, 3105, 1), "Search Sithik's cupboard.");
 
-		goUpToOgreSith = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(2597, 3107, 0), "Go talk to Sithik upstairs in north Yanille.");
+		goUpToOgreSith = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(2597, 3107, 0),
+			"Go upstairs and talk to Sithik in the house north of the Wizards' Guild.");
 
 		searchDrawers = new ObjectStep(this, ObjectID.DRAWERS_6875, new WorldPoint(2593, 3103, 1), "Search Sithik's drawers for more papyrus.");
 		dropPortraitAndSearchDrawers = new ObjectStep(this, ObjectID.DRAWERS_6875, new WorldPoint(2593, 3103, 1), "The portrait drawn is wrong. Drop it and try drawing him again.");
@@ -285,7 +297,8 @@ public class ZogreFleshEaters extends BasicQuestHelper
 		bringSignedPortraitToZavistic.addDialogStep("I'm here about the sicks...err Zogres");
 		bringSignedPortraitToZavistic.addDialogStep("I have some items that I'd like you to look at.");
 
-		goUpToSithAgain = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(2597, 3107, 0), "Go upstairs to Sithik upstairs in north Yanille.", strangePotion);
+		goUpToSithAgain = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(2597, 3107, 0),
+			"Go upstairs and talk to Sithik in the house north of the Wizards' Guild.", strangePotion);
 		usePotionOnTea = new DetailedQuestStep(this, new WorldPoint(2593, 3103, 1), "Use the strange potion on the cup of tea next to Sithik.", strangePotionHighlighted);
 		usePotionOnTea.addIcon(ItemID.STRANGE_POTION);
 

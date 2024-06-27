@@ -28,12 +28,11 @@ import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import java.util.Collections;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
-
-import java.util.Collections;
 
 public class BaxtorianPillar
 {

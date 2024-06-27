@@ -24,34 +24,42 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.taleoftherighteous;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.rewards.ItemReward;
+import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.Favour;
-import net.runelite.client.plugins.questhelper.requirements.player.FavourRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.rewards.ItemReward;
-import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.TALE_OF_THE_RIGHTEOUS
-)
 public class TaleOfTheRighteous extends BasicQuestHelper
 {
 	//Items Required
@@ -75,8 +83,7 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -156,7 +163,7 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		pickaxe = new ItemRequirement("A pickaxe", ItemCollections.PICKAXES).isNotConsumed();
 		rangedWeapon = new ItemRequirement("Any ranged weapon + ammo", -1, -1).isNotConsumed();
@@ -172,7 +179,8 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 		antiPoison = new ItemRequirement("Antipoison for lizardmen", ItemCollections.ANTIPOISONS);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		archive = new Zone(new WorldPoint(1538, 10210, 0), new WorldPoint(1565, 10237, 0));
 		puzzleRoom = new Zone(new WorldPoint(1563, 10186, 0), new WorldPoint(1591, 10213, 0));
@@ -210,19 +218,26 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 			"Talk to Pagida in the Library Historical Archive.");
 		talkToPagida.addDialogStep("I have a question about King Shayzien VII.");
 		talkToPagida.addDialogStep("Yes please.");
-		pushStrangeDeviceWest = new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
-			"Push the Strange Device all the way to the west.");
-		pushStrangeDeviceEast = new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
-			"Push the Strange Device all the way to the east.");
-		attackWithMagic = new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
+		pushStrangeDeviceWest = new PuzzleWrapperStep(this, new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
+			"Push the Strange Device all the way to the west."), "Solve the crystal puzzle.");
+		pushStrangeDeviceEast = new PuzzleWrapperStep(this, new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
+			"Push the Strange Device all the way to the east."), "Solve the crystal puzzle.");
+
+		NpcStep attackWithMagicTrueStep = new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
 			"Attack the Strange Device with magic from the north side.", runesForCombat);
-		attackWithMagic.addIcon(ItemID.MIND_RUNE);
-		attackWithRanged = new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
-			"Attack the Strange Device with ranged from the south side.", rangedWeapon);
-		attackWithRanged.addIcon(ItemID.BRONZE_ARROW);
-		attackWithMelee = new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
+		attackWithMagicTrueStep.addIcon(ItemID.MIND_RUNE);
+		attackWithMagic = new PuzzleWrapperStep(this, attackWithMagicTrueStep, "Solve the crystal puzzle.");
+
+		NpcStep attackWithRangedTrueStep = new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
+		"Attack the Strange Device with ranged from the south side.", rangedWeapon);
+		attackWithRangedTrueStep.addIcon(ItemID.BRONZE_ARROW);
+		attackWithRanged = new PuzzleWrapperStep(this, attackWithRangedTrueStep, "Solve the crystal puzzle.");
+
+		NpcStep attackWithMeleeTrueStep = new NpcStep(this, NpcID.STRANGE_DEVICE, new WorldPoint(1580, 10199, 0),
 			"Attack the Strange Device with melee from the south side.", meleeWeapon);
-		attackWithMelee.addIcon(ItemID.BRONZE_SWORD);
+		attackWithMeleeTrueStep.addIcon(ItemID.BRONZE_SWORD);
+		attackWithMelee = new PuzzleWrapperStep(this, attackWithMeleeTrueStep, "Solve the crystal puzzle.");
+
 		investigateSkeleton = new ObjectStep(this, ObjectID.SKELETON_31962, new WorldPoint(1577, 10213, 0),
 			"Investigate the skeleton in the north cell.");
 
@@ -304,7 +319,6 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 		ArrayList<Requirement> req = new ArrayList<>();
 		req.add(new QuestRequirement(QuestHelperQuest.X_MARKS_THE_SPOT, QuestState.FINISHED));
 		req.add(new QuestRequirement(QuestHelperQuest.CLIENT_OF_KOUREND, QuestState.FINISHED));
-		req.add(new FavourRequirement(Favour.SHAYZIEN, 20));
 		req.add(new SkillRequirement(Skill.STRENGTH, 16));
 		req.add(new SkillRequirement(Skill.MINING, 10));
 		return req;
@@ -328,8 +342,7 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("8,000 Coins", ItemID.COINS_995, 8000),
-				new ItemReward("Shayzien Favour Certificate", 1, 1),
+				new ItemReward("Coins", ItemID.COINS_995, 8000),
 				new ItemReward("A Memoir Page", ItemID.KHAREDSTS_MEMOIRS, 1));
 	}
 

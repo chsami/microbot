@@ -24,21 +24,30 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.fremennik;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.player.SpecialAttackRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.SpecialAttack;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Prayer;
+import net.runelite.api.SpriteID;
+import net.runelite.api.coords.WorldPoint;
 
 public class DagRoute extends ConditionalStep
 {
@@ -148,6 +157,8 @@ public class DagRoute extends ConditionalStep
 		inDagCave10 = new ZoneRequirement(dagCave10);
 		inDagCave11 = new ZoneRequirement(dagCave11);
 		inDagCave12 = new ZoneRequirement(dagCave12);
+
+		specialAttackEnabled = new SpecialAttackRequirement(SpecialAttack.ON);
 	}
 
 	public void setupSteps()

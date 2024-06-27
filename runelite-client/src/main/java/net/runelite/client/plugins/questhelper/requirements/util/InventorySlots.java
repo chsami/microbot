@@ -26,15 +26,14 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.util;
 
-import net.runelite.api.Client;
-import net.runelite.api.InventoryID;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
-
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import net.runelite.api.Client;
+import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
 
 /**
  * Represent the inventories that a client can have.

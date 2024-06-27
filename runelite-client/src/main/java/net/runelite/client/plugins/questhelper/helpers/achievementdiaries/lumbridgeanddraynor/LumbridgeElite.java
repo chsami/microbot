@@ -24,18 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.lumbridgeanddraynor;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestDetails;
 import net.runelite.client.plugins.questhelper.requirements.ComplexRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
@@ -43,20 +40,28 @@ import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.EmoteStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.TileStep;
 import net.runelite.client.plugins.questhelper.steps.emote.QuestEmote;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.Client;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import javax.annotation.Nonnull;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.LUMBRIDGE_ELITE
-)
 public class LumbridgeElite extends ComplexStateQuestHelper
 {
 	// Items required
@@ -83,8 +88,7 @@ public class LumbridgeElite extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doElite = new ConditionalStep(this, claimReward);
@@ -121,7 +125,7 @@ public class LumbridgeElite extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notRichChest = new VarplayerRequirement(1195, false, 4);
 		notMovario = new VarplayerRequirement(1195, false, 5);
@@ -189,7 +193,8 @@ public class LumbridgeElite extends ComplexStateQuestHelper
 		templeOfIkov = new QuestRequirement(QuestHelperQuest.TEMPLE_OF_IKOV, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		waterAltar = new Zone(new WorldPoint(2688, 4863, 0), new WorldPoint(2751, 4800, 0));
 		underground = new Zone(new WorldPoint(3137, 9706, 0), new WorldPoint(3332, 9465, 2));
@@ -277,9 +282,9 @@ public class LumbridgeElite extends ComplexStateQuestHelper
 				new ItemRequirement("Bottom", ItemCollections.EYE_BOTTOM).alsoCheckBank(questBank),
 				new ItemRequirement("Boot", ItemID.BOOTS_OF_THE_EYE)).alsoCheckBank(questBank)
 		));
-		reqs.add(new SkillRequirement(Skill.SMITHING, 88));
+		reqs.add(new SkillRequirement(Skill.SMITHING, 88, true));
 		reqs.add(new SkillRequirement(Skill.STRENGTH, 70));
-		reqs.add(new SkillRequirement(Skill.THIEVING, 78));
+		reqs.add(new SkillRequirement(Skill.THIEVING, 78, true));
 		reqs.add(new SkillRequirement(Skill.WOODCUTTING, 75));
 
 		reqs.add(allQuests);
@@ -314,7 +319,7 @@ public class LumbridgeElite extends ComplexStateQuestHelper
 		List<PanelDetails> allSteps = new ArrayList<>();
 
 		PanelDetails adamantitePlatebodySteps = new PanelDetails("Adamantite Platebody",
-			Arrays.asList(moveToDraySewer, addyPlatebody), new SkillRequirement(Skill.SMITHING, 88),
+			Arrays.asList(moveToDraySewer, addyPlatebody), new SkillRequirement(Skill.SMITHING, 88, true),
 			addyBar.quantity(5), hammer);
 		adamantitePlatebodySteps.setDisplayCondition(notAddyPlatebody);
 		adamantitePlatebodySteps.setLockingStep(addyPlatebodyTask);
@@ -327,7 +332,7 @@ public class LumbridgeElite extends ComplexStateQuestHelper
 		allSteps.add(questCapeEmoteSteps);
 
 		PanelDetails richChestSteps = new PanelDetails("Dorgesh-Kaan Rich Chest", Arrays.asList(moveToUndergroundChest,
-			moveToDorgChest, dorgStairsChest, richChest), new SkillRequirement(Skill.THIEVING, 78), deathToDorg,
+			moveToDorgChest, dorgStairsChest, richChest), new SkillRequirement(Skill.THIEVING, 78, true), deathToDorg,
 			lightsource, lockpick);
 		richChestSteps.setDisplayCondition(notRichChest);
 		richChestSteps.setLockingStep(richChestTask);

@@ -24,36 +24,48 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.lunardiplomacy;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.DigStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.LUNAR_DIPLOMACY
-)
 public class LunarDiplomacy extends BasicQuestHelper
 {
 	//Items Required
@@ -90,14 +102,13 @@ public class LunarDiplomacy extends BasicQuestHelper
 		addToothToPotion, bringPotionToOneiromancer, enterFireAltar, enterWaterAltar, enterAirAltar, enterEarthAltar, useOnEarth, useOnFire,
 		useOnAir, useOnWater, talkToOneiromancerWithStaff, enterMine, smeltBar, makeHelmet, talkToPauline, talkToMeteora, talkToSelene,
 		returnTiaraToMeteora, digForRing, makeClothes, bringItemsToOneiromancer, talkToRimae, pickUpTiara, useVialOnKindling, lightBrazier,
-		useKindlingOnBrazier, talkToEthereal, goToChance, goToMimic, goToRace, goToTrees, goToMemory, goToNumbers, doMemoryChallenge,
-		startTreeChallenge, doRaceChallenge, startNumber, startRace, doTreeChallenge, talkWithEtherealToFight, leaveLecturn, finishQuest;
+		useKindlingOnBrazier, talkToEthereal, goToChance, goToMimic, goToRace, goToTrees, goToMemory, goToNumbers, talkWithEtherealToFight, leaveLecturn, finishQuest;
+
+	QuestStep doMemoryChallenge, startTreeChallenge, doRaceChallenge, startNumber, startRace, doTreeChallenge, doNumberChallenge, doMimicChallenge, doChanceChallenge;;
 
 	NpcStep talkToBentleyToSail, killSuqahForTooth, killSuqahForTiara, fightMe;
 
 	ObjectStep mineOre;
-
-	DetailedOwnerStep doNumberChallenge, doMimicChallenge, doChanceChallenge;
 
 	ConditionalStep returnToMakePotion, returnToTalkToYaga, enteringTheIsland, boardingTheBoat, setSail, returnToOneWithPotion, returnWithStaff, makingHelm,
 		gettingRing, gettingCape, gettingAmulet, gettingClothes;
@@ -110,8 +121,7 @@ public class LunarDiplomacy extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		setupConditionalSteps();
@@ -290,7 +300,7 @@ public class LunarDiplomacy extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		sealOfPassage = new ItemRequirement("Seal of passage", ItemID.SEAL_OF_PASSAGE).isNotConsumed();
 		sealOfPassage.setTooltip("You can get another from Brundt");
@@ -439,7 +449,8 @@ public class LunarDiplomacy extends BasicQuestHelper
 		suqahHide4.addAlternates(ItemID.SUQAH_LEATHER, ItemID.LUNAR_BOOTS, ItemID.LUNAR_LEGS, ItemID.LUNAR_GLOVES, ItemID.LUNAR_TORSO);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		baseOfStairs = new Zone(new WorldPoint(2212, 3794, 0), new WorldPoint(2214, 3795, 0));
 		coveF1 = new Zone(new WorldPoint(2212, 3796, 1), new WorldPoint(2215, 3810, 1));
@@ -546,7 +557,7 @@ public class LunarDiplomacy extends BasicQuestHelper
 	public void setupSteps()
 	{
 		talkToLokar = new NpcStep(this, NpcID.LOKAR_SEARUNNER_6648, new WorldPoint(2620, 3693, 0), "Talk to Lokar Searunner on Rellekka's docks.");
-		talkToLokar.addDialogSteps("You've been away from these parts a while?", "Why did you leave?", "Why not, I've always wondered what the state of my innards are!");
+		talkToLokar.addDialogSteps("Yes.", "You've been away from these parts a while?", "Why did you leave?", "Why not, I've always wondered what the state of my innards are!");
 
 		talkToBrundt = new NpcStep(this, NpcID.BRUNDT_THE_CHIEFTAIN_9263, new WorldPoint(2658, 3667, 0), "Talk to Brundt in Rellekka's longhall.");
 		talkToBrundt.addDialogStep("Ask about a Seal of Passage.");
@@ -683,6 +694,7 @@ public class LunarDiplomacy extends BasicQuestHelper
 		useOnAir = new ObjectStep(this, ObjectID.ALTAR_34760, new WorldPoint(2844, 4834, 0),
 			"Use the staff on the altar.", dramenStaffHighlighted);
 		useOnAir.addIcon(ItemID.DRAMEN_STAFF);
+		enterAirAltar.addSubSteps(useOnAir);
 
 		enterFireAltar = new ObjectStep(this, NullObjectID.NULL_34817, new WorldPoint(3313, 3255, 0),
 			"Enter the Fire Altar and use a partially made lunar staff on it.", fireTalisman, lunarStaffP1);
@@ -690,12 +702,14 @@ public class LunarDiplomacy extends BasicQuestHelper
 		useOnFire = new ObjectStep(this, ObjectID.ALTAR_34764, new WorldPoint(2585, 4838, 0),
 			"Use the staff on the altar.", lunarStaffP1Highlighted);
 		useOnFire.addIcon(ItemID.LUNAR_STAFF__PT1);
+		enterFireAltar.addSubSteps(useOnFire);
 
 		enterWaterAltar = new ObjectStep(this, NullObjectID.NULL_34815, new WorldPoint(3185, 3165, 0),
 			"Enter the Water Altar and use the partially made lunar staff on it.", waterTalisman, lunarStaffP2);
 		enterWaterAltar.addIcon(ItemID.WATER_TALISMAN);
 		useOnWater = new ObjectStep(this, ObjectID.ALTAR_34762, new WorldPoint(2716, 4836, 0), "Use the staff on the altar.", lunarStaffP2Highlighted);
 		useOnWater.addIcon(ItemID.LUNAR_STAFF__PT2);
+		enterWaterAltar.addSubSteps(useOnWater);
 
 		enterEarthAltar = new ObjectStep(this, NullObjectID.NULL_34816, new WorldPoint(3306, 3474, 0),
 			"Enter the Earth Altar and use a partially made lunar staff on it.", earthTalisman, lunarStaffP3);
@@ -703,6 +717,7 @@ public class LunarDiplomacy extends BasicQuestHelper
 		useOnEarth = new ObjectStep(this, ObjectID.ALTAR_34763, new WorldPoint(2658, 4841, 0),
 			"Use the staff on the altar.", lunarStaffP3Highlighted);
 		useOnEarth.addIcon(ItemID.LUNAR_STAFF__PT3);
+		enterEarthAltar.addSubSteps(useOnEarth);
 
 		talkToOneiromancerWithStaff = new NpcStep(this, NpcID.ONEIROMANCER, new WorldPoint(2151, 3867, 0), "Bring the staff to the Oneiromancer in the south east of Lunar Isle.", sealOfPassage, lunarStaff);
 
@@ -711,6 +726,7 @@ public class LunarDiplomacy extends BasicQuestHelper
 		mineOre.addAlternateObjects(ObjectID.STALAGMITES_15250);
 		smeltBar = new DetailedQuestStep(this, "Smelt the ore at a furnace.", lunarOre);
 		makeHelmet = new DetailedQuestStep(this, "Make the lunar helmet on an anvil.", lunarBar, hammer);
+		makeHelmet.addDialogStep("Yes.");
 		talkToPauline = new NpcStep(this, NpcID.PAULINE_POLARIS, new WorldPoint(2070, 3917, 0), "Talk to Pauline Polaris in the west of Lunar Isle's town.", sealOfPassage);
 		talkToPauline.addDialogSteps("Pauline?", "Jane Blud-Hagic-Maid");
 		talkToMeteora = new NpcStep(this, NpcID.METEORA, new WorldPoint(2083, 3890, 0), "Talk to Meteora in the south of Lunar Isle's town.", sealOfPassage);
@@ -746,32 +762,32 @@ public class LunarDiplomacy extends BasicQuestHelper
 			cloakEquipped, amuletEquipped, ringEquipped, lunarStaffEquipped);
 		useKindlingOnBrazier.addIcon(ItemID.SOAKED_KINDLING);
 
-		if (client.getLocalPlayer() != null && client.getLocalPlayer().getPlayerComposition() != null && client.getLocalPlayer().getPlayerComposition().isFemale())
+		if (client.getLocalPlayer() != null && client.getLocalPlayer().getPlayerComposition() != null && client.getLocalPlayer().getPlayerComposition().getGender() == 1)
 		{
-			talkToEthereal = new NpcStep(this, NpcID.ETHEREAL_BEING_778, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Lady.");
-			talkWithEtherealToFight = new NpcStep(this, NpcID.ETHEREAL_BEING_778, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Lady. Be prepared to fight.");
+			talkToEthereal = new NpcStep(this, NpcID.ETHEREAL_LADY, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Lady.");
+			talkWithEtherealToFight = new NpcStep(this, NpcID.ETHEREAL_LADY, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Lady. Be prepared to fight.");
 		}
 		else
 		{
-			talkToEthereal = new NpcStep(this, NpcID.ETHEREAL_BEING, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Man.");
-			talkWithEtherealToFight = new NpcStep(this, NpcID.ETHEREAL_BEING, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Man. Be prepared to fight.");
+			talkToEthereal = new NpcStep(this, NpcID.ETHEREAL_MAN, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Man.");
+			talkWithEtherealToFight = new NpcStep(this, NpcID.ETHEREAL_MAN, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Man. Be prepared to fight.");
 		}
 		talkWithEtherealToFight.addDialogStep("Of course. I'm ready.");
 
 		goToNumbers = new ObjectStep(this, ObjectID.PLATFORM_16633, new WorldPoint(1768, 5080, 2), "Go on the platform to the number challenge.");
-		goToMimic = new ObjectStep(this, ObjectID.PLATFORM_16632, new WorldPoint(1765, 5079, 2), "Go on the platform to the music challenge.");
+		goToMimic = new ObjectStep(this, ObjectID.PLATFORM_16632, new WorldPoint(1765, 5079, 2), "Go on the platform to the mimic challenge.");
 		goToRace = new ObjectStep(this, ObjectID.PLATFORM_16634, new WorldPoint(1770, 5088, 2), "Go on the platform to the race challenge.");
 		goToMemory = new ObjectStep(this, ObjectID.PLATFORM_16636, new WorldPoint(1751, 5095, 2), "Go on the platform to the memory challenge.");
 		goToTrees = new ObjectStep(this, ObjectID.PLATFORM_16635, new WorldPoint(1764, 5098, 2), "Go on the platform to the trees challenge.");
 		goToChance = new ObjectStep(this, ObjectID.PLATFORM_16637, new WorldPoint(1751, 5080, 2), "Go on the platform to the chance challenge.");
 
-		doMemoryChallenge = new MemoryChallenge(this);
-		startTreeChallenge = new NpcStep(this, NpcID.ETHEREAL_PERCEPTIVE, new WorldPoint(1765, 5112, 2), "Talk to Ethereal perspective to begin. Cut 20 logs and deposit them on the log piles faster than the NPC.");
+		doMemoryChallenge = new PuzzleWrapperStep(this, new MemoryChallenge(this), "Solve the memory puzzle.");
+		startTreeChallenge = new NpcStep(this, NpcID.ETHEREAL_PERCEPTIVE, new WorldPoint(1765, 5112, 2), "Talk to Ethereal Perceptive to begin. Cut 20 logs and deposit them on the log piles faster than the NPC.");
 		startTreeChallenge.addDialogStep("Ok, let's go!");
 		doRaceChallenge = new DetailedQuestStep(this, "Race to the end of the course to win!");
-		doChanceChallenge = new ChanceChallenge(this);
-		doNumberChallenge = new NumberChallenge(this);
-		doMimicChallenge = new MimicChallenge(this);
+		doChanceChallenge = new PuzzleWrapperStep(this, new ChanceChallenge(this), "Solve the dice challenge.");
+		doNumberChallenge = new PuzzleWrapperStep(this, new NumberChallenge(this), "Complete the numbers challenge.");
+		doMimicChallenge = new PuzzleWrapperStep(this, new MimicChallenge(this), "Complete the mimic challenge.");
 
 		startNumber = new NpcStep(this, NpcID.ETHEREAL_NUMERATOR, new WorldPoint(1786, 5066, 2),
 			"Talk to the Ethereal Numerator to begin the challenge.");
@@ -898,7 +914,7 @@ public class LunarDiplomacy extends BasicQuestHelper
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("50 x Astral Runes", ItemID.ASTRAL_RUNE, 50),
+				new ItemReward("Astral Runes", ItemID.ASTRAL_RUNE, 50),
 				new ItemReward("A Seal of Passage", ItemID.SEAL_OF_PASSAGE, 1),
 				new ItemReward("A set of Lunar Equipment", -1, 1));
 	}
@@ -918,12 +934,12 @@ public class LunarDiplomacy extends BasicQuestHelper
 		List<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Investigating", Arrays.asList(talkToLokar, talkToBrundt, talkToLokarAgain, climbLadder, talkToBentley),
 			bullseyeLantern, tinderboxHighlighted));
-		allSteps.add(new PanelDetails("The curse", Arrays.asList(climbDownSouthStairs, climbUpSouthStairs, goUpToShultz, goDownToBurns1, goUpToLee1,
+		allSteps.add(new PanelDetails("The curse", Arrays.asList(climbDownSouthStairs, climbUpSouthStairs, goDownToJackAgain, goUpToShultz, goDownToBurns1, goUpToLee1,
 			goDownToDavey, goUpToCabinBoy, replaceLens, lightLantern, goUpToCannon1, goDownToChart, useLanternOnChest, useLanternOnPillar, useLanternOnCrate,
 			talkToBentleyToSail), bullseyeLantern, tinderboxHighlighted));
 		allSteps.add(new PanelDetails("Starting diplomacy", Arrays.asList(
 			enterTown, talkToOneiromancer, returnToTalkToYaga, fillVial, addGuam, addMarrentil, returnToMakePotion, grindTooth,
-			addToothToPotion, returnToOneWithPotion), guam, marrentill, pestle, sealOfPassage));
+			addToothToPotion, returnToOneWithPotion), guam, marrentill, pestle, sealOfPassage, combatGear));
 		allSteps.add(new PanelDetails("Making the staff", Arrays.asList(
 			enterAirAltar, enterFireAltar, enterWaterAltar, enterEarthAltar, returnWithStaff),
 			dramenStaff, airTalisman, fireTalisman, waterTalisman, earthTalisman));
@@ -948,7 +964,7 @@ public class LunarDiplomacy extends BasicQuestHelper
 		allSteps.add(gettingRingPanel);
 
 		PanelDetails gettingClothingPanel = new PanelDetails("Making the clothing", Collections.singletonList(
-			makeClothes), coins400, needle, thread);
+			makeClothes), coins400, needle, thread, suqahHide4);
 		gettingClothingPanel.setLockingStep(gettingClothes);
 		allSteps.add(gettingClothingPanel);
 
@@ -956,14 +972,14 @@ public class LunarDiplomacy extends BasicQuestHelper
 			bringItemsToOneiromancer)));
 
 		allSteps.add(new PanelDetails("Entering the Dreamland", Arrays.asList(
-			useVialOnKindling, lightBrazier, useKindlingOnBrazier, talkToEthereal)));
+			useVialOnKindling, lightBrazier, useKindlingOnBrazier, talkToEthereal), tinderboxHighlighted));
 		allSteps.add(new PanelDetails("Racing challenge", Arrays.asList(goToRace, startRace, doRaceChallenge)));
-		allSteps.add(new PanelDetails("Number challenge", Arrays.asList(goToNumbers, doNumberChallenge)));
+		allSteps.add(new PanelDetails("Number challenge", Arrays.asList(goToNumbers, startNumber, doNumberChallenge)));
 		allSteps.add(new PanelDetails("Mimic challenge", Arrays.asList(goToMimic, doMimicChallenge)));
 		allSteps.add(new PanelDetails("Chance challenge", Arrays.asList(goToChance, doChanceChallenge)));
 		allSteps.add(new PanelDetails("Memory challenge", Arrays.asList(goToMemory, doMemoryChallenge)));
 		allSteps.add(new PanelDetails("Tree challenge", Arrays.asList(goToTrees, doTreeChallenge)));
-		allSteps.add(new PanelDetails("Final challenge", Arrays.asList(talkWithEtherealToFight, fightMe, leaveLecturn, finishQuest)));
+		allSteps.add(new PanelDetails("Final challenge", Arrays.asList(talkWithEtherealToFight, fightMe, leaveLecturn, finishQuest), combatGear));
 		return allSteps;
 	}
 }

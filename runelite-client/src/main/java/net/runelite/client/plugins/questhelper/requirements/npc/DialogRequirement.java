@@ -25,15 +25,17 @@
 package net.runelite.client.plugins.questhelper.requirements.npc;
 
 import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
-import net.runelite.api.Client;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import lombok.Setter;
+import net.runelite.api.Client;
 
 public class DialogRequirement extends SimpleRequirement
 {
-	final String talkerName;
+	@Setter
+	String talkerName;
 	final List<String> text = new ArrayList<>();
 	final boolean mustBeActive;
 
@@ -42,7 +44,7 @@ public class DialogRequirement extends SimpleRequirement
 	public DialogRequirement(String... text)
 	{
 		this.talkerName = null;
-		this.text.add(Arrays.toString(text));
+		this.text.addAll(Arrays.asList(text));
 		this.mustBeActive = false;
 	}
 	public DialogRequirement(String talkerName, String text, boolean mustBeActive)
@@ -50,11 +52,6 @@ public class DialogRequirement extends SimpleRequirement
 		this.talkerName = talkerName;
 		this.text.add(text);
 		this.mustBeActive = mustBeActive;
-	}
-
-	public DialogRequirement(String talkerName, String text)
-	{
-		this(talkerName, text, false);
 	}
 
 	public DialogRequirement(String text)

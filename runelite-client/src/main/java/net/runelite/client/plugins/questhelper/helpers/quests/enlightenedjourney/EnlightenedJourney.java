@@ -24,34 +24,42 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.enlightenedjourney;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestPointRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.ENLIGHTENED_JOURNEY
-)
 public class EnlightenedJourney extends BasicQuestHelper
 {
 	ItemRequirement papyrus3, ballOfWool, sackOfPotatoes, emptySack8, unlitCandle, yellowDye, redDye, silk10, bowl,
@@ -77,8 +85,7 @@ public class EnlightenedJourney extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -115,7 +122,7 @@ public class EnlightenedJourney extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		papyrus3 = new ItemRequirement("Papyrus", ItemID.PAPYRUS, 3);
 		papyrus2 = new ItemRequirement("Papyrus", ItemID.PAPYRUS, 2);
@@ -145,7 +152,8 @@ public class EnlightenedJourney extends BasicQuestHelper
 		sandbag8 = new ItemRequirement("Sandbag", ItemID.SANDBAG, 8);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		entrana = new Zone(new WorldPoint(2798, 3327,0), new WorldPoint(2878, 3394,1));
 	}
@@ -183,6 +191,7 @@ public class EnlightenedJourney extends BasicQuestHelper
 
 		talkToAugusteWithPapyrus = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0),
 			"Talk to Auguste with 2 papyrus and a sack of potatoes.", papyrus2, sackOfPotatoes);
+		talkToAugusteWithPapyrus.addDialogStep("Yes, I have them here.");
 
 		talkToAugusteAfterMob = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0),
 			"Talk to Auguste after the flash mob.");
@@ -203,7 +212,7 @@ public class EnlightenedJourney extends BasicQuestHelper
 			"Talk to Auguste to fly.", logs10, tinderbox);
 		talkToAugusteWithLogsAndTinderbox.addDialogSteps("Okay.");
 
-		doPuzzle = new BalloonFlight1(this);
+		doPuzzle = new TaverleyBalloonFlight(this);
 
 		talkToAugusteToFinish = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2937, 3421, 0),
 			"Talk to Auguste in Taverley to finish the quest.");
