@@ -32,6 +32,9 @@ public class LootScript extends Script {
 
             lootBones(config);
             lootAshes(config);
+            lootRunes(config);
+            lootCoins(config);
+            lootUntradeableItems(config);
             lootItemsByValue(config);
 
         }, 0, 200, TimeUnit.MILLISECONDS);
@@ -84,6 +87,60 @@ public class LootScript extends Script {
                     " ashes"
             );
             if (Rs2GroundItem.lootItemsBasedOnNames(ashesParams)) {
+                Microbot.pauseAllScripts = false;
+            }
+        }
+    }
+
+    // loot runes
+    private void lootRunes(PlayerAssistConfig config) {
+        if (config.toggleLootRunes()) {
+            LootingParameters runesParams = new LootingParameters(
+                    config.attackRadius(),
+                    1,
+                    1,
+                    config.minFreeSlots(),
+                    config.toggleDelayedLooting(),
+                    config.toggleOnlyLootMyItems(),
+                    " rune"
+            );
+            if (Rs2GroundItem.lootItemsBasedOnNames(runesParams)) {
+                Microbot.pauseAllScripts = false;
+            }
+        }
+    }
+
+    // loot coins
+    private void lootCoins(PlayerAssistConfig config) {
+        if (config.toggleLootCoins()) {
+            LootingParameters coinsParams = new LootingParameters(
+                    config.attackRadius(),
+                    1,
+                    1,
+                    config.minFreeSlots(),
+                    config.toggleDelayedLooting(),
+                    config.toggleOnlyLootMyItems(),
+                    "coins"
+            );
+            if (Rs2GroundItem.lootCoins(coinsParams)) {
+                Microbot.pauseAllScripts = false;
+            }
+        }
+    }
+
+    // loot untreadable items
+    private void lootUntradeableItems(PlayerAssistConfig config) {
+        if (config.toggleLootUntradables()) {
+            LootingParameters untradeableItemsParams = new LootingParameters(
+                    config.attackRadius(),
+                    1,
+                    1,
+                    config.minFreeSlots(),
+                    config.toggleDelayedLooting(),
+                    config.toggleOnlyLootMyItems(),
+                    "untradeable"
+            );
+            if (Rs2GroundItem.lootUntradables(untradeableItemsParams)) {
                 Microbot.pauseAllScripts = false;
             }
         }
