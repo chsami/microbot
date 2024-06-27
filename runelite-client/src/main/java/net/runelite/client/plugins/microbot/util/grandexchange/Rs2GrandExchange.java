@@ -165,7 +165,7 @@ public class Rs2GrandExchange {
         if (quantity > 1) {
             Widget quantityButtonX = getQuantityButton_X();
             Microbot.getMouse().click(quantityButtonX.getBounds());
-            sleepUntil(() -> Rs2Widget.getWidget(162, 41) != null, 5000); //GE Enter Price/Quantity
+            sleepUntil(() -> Rs2Widget.getWidget(162, 41) != null); //GE Enter Price/Quantity
             sleep(600, 1000);
             Rs2Keyboard.typeString(Integer.toString(quantity));
             sleep(500, 750);
@@ -192,19 +192,24 @@ public class Rs2GrandExchange {
             if (buyOffer == null) return false;
 
             Microbot.getMouse().click(buyOffer.getBounds());
-            sleepUntil(Rs2GrandExchange::isOfferTextVisible, 5000);
+            sleepUntil(Rs2GrandExchange::isOfferTextVisible);
             sleepUntil(() -> Rs2Widget.hasWidget("What would you like to buy?"));
-            Rs2Keyboard.typeString(itemName);
-            sleepUntil(() -> !Rs2Widget.hasWidget("Start typing the name"), 5000); //GE Search Results
-            sleep(1200);
+            if (Rs2Widget.hasWidget("What would you like to buy?"))
+                Rs2Keyboard.typeString(itemName);
+            sleepUntil(() -> Rs2Widget.hasWidget(itemName)); //GE Search Results
+            sleep(1200, 1600);
             Pair<Widget, Integer> itemResult = getSearchResultWidget(itemName);
             if (itemResult != null) {
                 Rs2Widget.clickWidgetFast(itemResult.getLeft(), itemResult.getRight(), 1);
-                sleepUntil(() -> getPricePerItemButton_X() != null);
+                sleepUntil(() -> !Rs2Widget.hasWidget("Choose an item..."));
+                sleep(600, 1600);
             }
-            buyItemAbove5Percent();
             setQuantity(quantity);
-            confirm();
+            if (buyItemAbove5Percent()) {
+                return true;
+            }
+
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -213,15 +218,17 @@ public class Rs2GrandExchange {
 
     private static boolean buyItemAbove5Percent() {
         Widget pricePerItemButton5Percent = getPricePerItemButton_Plus5Percent();
+
         if (pricePerItemButton5Percent != null) {
+            int basePrice = getItemPrice();
             Microbot.getMouse().click(pricePerItemButton5Percent.getBounds());
-            Microbot.getMouse().click(getConfirm().getBounds());
-            sleepUntil(() -> !isOfferTextVisible());
+            sleepUntil(() -> hasOfferPriceChanged(basePrice), 1600);
+            confirm();
             return true;
         } else {
             System.out.println("unable to find widget setprice.");
+            return false;
         }
-        return false;
     }
 
     private static boolean useGrandExchange() {
@@ -229,7 +236,7 @@ public class Rs2GrandExchange {
             boolean hasExchangeOpen = openExchange();
             if (!hasExchangeOpen) {
                 boolean isAtGe = walkToGrandExchange();
-                if (!isAtGe) return true;
+                return !isAtGe;
             }
         }
         return false;
@@ -525,8 +532,16 @@ public class Rs2GrandExchange {
         return Rs2Widget.isWidgetVisible(WidgetInfo.GRAND_EXCHANGE_OFFER_TEXT);
     }
 
-    public static Widget getItemPrice() {
+    private static boolean hasOfferPriceChanged(int basePrice) {
+        return basePrice != getItemPrice();
+    }
+
+    public static Widget getItemPriceWidget() {
         return Rs2Widget.getWidget(465, 27);
+    }
+
+    public static int getItemPrice() {
+        return Integer.parseInt(Rs2Widget.getWidget(465, 27).getText());
     }
 
     public static Widget getSlot(GrandExchangeSlots slot) {
