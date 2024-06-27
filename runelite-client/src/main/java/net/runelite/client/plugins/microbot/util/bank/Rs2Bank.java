@@ -198,6 +198,24 @@ public class Rs2Bank {
     }
 
     /**
+     * Query count of item inside of bank
+     *
+     */
+    public static int count(String name, boolean exact) {
+        Rs2Item bankItem = findBankItem(name, exact);
+        if (bankItem == null) return 0;
+        return bankItem.quantity;
+    }
+
+    /**
+     * Query count of item inside of bank
+     *
+     */
+    public static int count(String name) {
+        return count(name, false);
+    }
+
+    /**
      * Deposits all equipped items into the bank.
      * This method finds and clicks the "Deposit Equipment" button in the bank interface.
      */
