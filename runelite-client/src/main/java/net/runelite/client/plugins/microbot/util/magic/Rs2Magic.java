@@ -102,6 +102,37 @@ public class Rs2Magic {
         }
     }
 
+    public static void superHeat(String itemName) {
+        Rs2Item item = Rs2Inventory.get(itemName);
+        superHeat(item, 300, 600);
+    }
+
+    public static void superHeat(String itemName, int sleepMin, int sleepMax) {
+        Rs2Item item = Rs2Inventory.get(itemName);
+        superHeat(item, sleepMin, sleepMax);
+    }
+
+    public static void superHeat(int id) {
+        Rs2Item item = Rs2Inventory.get(id);
+        superHeat(item, 300, 600);
+    }
+
+    public static void superHeat(int id, int sleepMin, int sleepMax) {
+        Rs2Item item = Rs2Inventory.get(id);
+        superHeat(item, sleepMin, sleepMax);
+    }
+
+    public static void superHeat(Rs2Item item, int sleepMin, int sleepMax) {
+        sleepUntil(() -> {
+            Rs2Tab.switchToMagicTab();
+            sleep(50, 150);
+            return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
+        });
+        Widget superHeat = Rs2Widget.findWidget(MagicAction.SUPERHEAT_ITEM.getName());
+        if (superHeat.getSpriteId() != SpriteID.SPELL_SUPERHEAT_ITEM) return;
+        superHeat(superHeat, item, sleepMin, sleepMax);
+    }
+
     private static void highAlch(Rs2Item item, int sleepMin, int sleepMax) {
         sleepUntil(() -> {
             Rs2Tab.switchToMagicTab();
@@ -141,10 +172,31 @@ public class Rs2Magic {
         }
     }
 
+    private static void superHeat(Widget superheat, Rs2Item item, int sleepMin, int sleepMax) {
+        if (superheat == null) return;
+        Point point = new Point((int) superheat.getBounds().getCenterX(), (int) superheat.getBounds().getCenterY());
+        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC), 5000);
+        sleep(sleepMin, sleepMax);
+        Microbot.getMouse().click(point);
+        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(() -> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY), 5000);
+        sleep(sleepMin, sleepMax);
+        if (item == null) {
+            Microbot.status = "Superheating x: " + point.getX() + " y: " + point.getY();
+            Microbot.getMouse().click(point);
+        } else {
+            Microbot.status = "Superheating " + item.name;
+            Rs2Inventory.interact(item, "cast");
+        }
+    }
+
     private static void alch(Widget alch) {
         alch(alch, null, 300, 600);
     }
 
+    private static void superHeat(Widget superHeat) {
+        superHeat(superHeat, null, 300, 600);
+    }
+    
     public static boolean isLunar() {
         return Microbot.getVarbitValue(Varbits.SPELLBOOK) == 2;
     }
