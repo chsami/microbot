@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class PlayerAssistPlugin extends Plugin {
-    public static final String version = "1.1.0";
+    public static final String version = "1.1.1";
     private static final String SET = "Set";
     private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
     // SAFE_SPOT = "Safe Spot";
