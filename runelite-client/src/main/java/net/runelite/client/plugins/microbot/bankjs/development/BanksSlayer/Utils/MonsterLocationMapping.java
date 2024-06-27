@@ -15,6 +15,7 @@ public class MonsterLocationMapping {
     public static WorldPoint Black_Demons = new WorldPoint(1724, 10092, 0);
     public static WorldPoint Black_Dragons = new WorldPoint(2454, 4362, 0);
     public static WorldPoint Bloodveld = new WorldPoint(2451, 9822, 0);
+    public static WorldPoint Brine_Rats = new WorldPoint(2707, 10132, 0);
     public static WorldPoint Cave_Bugs = new WorldPoint(3150, 9575, 0);
     public static WorldPoint Cave_Crawlers = new WorldPoint(2791, 9996, 0);
     public static WorldPoint Cave_Slimes = new WorldPoint(3155, 9555, 0);
@@ -56,6 +57,7 @@ public class MonsterLocationMapping {
         MONSTER_LOCATIONS.put("Black Demons", Black_Demons);
         MONSTER_LOCATIONS.put("Black Dragons", Black_Dragons);
         MONSTER_LOCATIONS.put("Bloodveld", Bloodveld);
+        MONSTER_LOCATIONS.put("Brine Rats", Brine_Rats);
         MONSTER_LOCATIONS.put("Cave Bugs", Cave_Bugs);
         MONSTER_LOCATIONS.put("Cave Crawlers", Cave_Crawlers);
         MONSTER_LOCATIONS.put("Cave Slimes", Cave_Slimes);

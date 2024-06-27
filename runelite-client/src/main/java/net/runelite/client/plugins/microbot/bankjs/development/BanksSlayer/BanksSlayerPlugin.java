@@ -2,11 +2,9 @@ package net.runelite.client.plugins.microbot.bankjs.development.BanksSlayer;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.TileObject;
-import net.runelite.api.VarPlayer;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
@@ -56,7 +54,7 @@ public class BanksSlayerPlugin extends Plugin {
     private BanksSlayerOverlay banksSlayerOverlay;
 
     @Inject
-    private BanksSlayerScript banksSlayerScript;
+    BanksSlayerScript banksSlayerScript;
 
     @Inject
     private ClientThread clientThread;
@@ -123,6 +121,7 @@ public class BanksSlayerPlugin extends Plugin {
             }
         }
     }
+
 
     public boolean isPrayerActive() {
         boolean active = Rs2Prayer.isQuickPrayerEnabled();

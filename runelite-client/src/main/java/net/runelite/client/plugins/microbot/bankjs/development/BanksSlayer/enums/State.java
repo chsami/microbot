@@ -5,5 +5,7 @@ public enum State {
     RESTOCK,
     TRAVEL_TO_MONSTER,
     FIGHT_MONSTER,
+    SPECIAL_TRANSPORT,
+    RESET,
     IDLE
 }

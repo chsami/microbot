@@ -19,6 +19,7 @@ public class TaskNpcMapping {
         TASK_NPC_MAPPING.put("Black Demons", Arrays.asList("Black demon"));
         TASK_NPC_MAPPING.put("Black Dragons", Arrays.asList("Black dragon"));
         TASK_NPC_MAPPING.put("Bloodveld", Arrays.asList("Bloodveld"));
+        TASK_NPC_MAPPING.put("Brine Rats", Arrays.asList("Brine rat"));
         TASK_NPC_MAPPING.put("Cave Bugs", Arrays.asList("Cave bug"));
         TASK_NPC_MAPPING.put("Cave Crawlers", Arrays.asList("Cave crawler"));
         TASK_NPC_MAPPING.put("Cave Slimes", Arrays.asList("Cave slime"));
@@ -32,7 +33,7 @@ public class TaskNpcMapping {
         TASK_NPC_MAPPING.put("Greater Demons", Arrays.asList("Greater demon"));
         TASK_NPC_MAPPING.put("Icefiends", Arrays.asList("Icefiend"));
         TASK_NPC_MAPPING.put("Iron Dragons", Arrays.asList("Iron dragon"));
-        TASK_NPC_MAPPING.put("Kalphite", Arrays.asList("Kalphite worker"));
+        TASK_NPC_MAPPING.put("Kalphite", Arrays.asList("Kalphite Worker"));
         TASK_NPC_MAPPING.put("Kurask", Arrays.asList("Kurask"));
         TASK_NPC_MAPPING.put("Lizards", Arrays.asList("Desert lizard"));
         TASK_NPC_MAPPING.put("Minotaurs", Arrays.asList("Minotaur"));

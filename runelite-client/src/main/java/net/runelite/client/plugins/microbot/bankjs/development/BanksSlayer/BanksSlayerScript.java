@@ -3,8 +3,10 @@ package net.runelite.client.plugins.microbot.bankjs.development.BanksSlayer;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -21,6 +23,8 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Potion;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Login;
@@ -52,6 +56,7 @@ public class BanksSlayerScript extends Script {
     private Client client;
     private ConfigManager configManager;
     private ClientThread clientThread;
+    public State state = State.IDLE;
 
     @Inject
     public BanksSlayerScript(OverlayManager overlayManager, ConfigManager configManager, ClientThread clientThread, Client client) {
@@ -81,6 +86,8 @@ public class BanksSlayerScript extends Script {
     private List<String> cannonTaskList;
     private boolean hopping = false;
     private boolean ignoreRestock;
+    private boolean superiorHasSpawned = false;
+    private boolean isSpecialTravelComplete = false;
 
     public static List<NPC> attackableNpcs = new ArrayList<>();
     public static Actor currentNpc = null;
@@ -90,7 +97,6 @@ public class BanksSlayerScript extends Script {
     private volatile boolean isActive = false;
 
     public boolean run(BanksSlayerConfig config) {
-
         this.config = config;
 
         final SlayerMasters selectedSlayerMaster = config.slayerMaster();
@@ -123,6 +129,10 @@ public class BanksSlayerScript extends Script {
                 switch (currentState.get()) {
                     case GET_TASK:
                         handleGetTask(selectedSlayerMaster);
+                        break;
+
+                    case SPECIAL_TRANSPORT:
+                        handleSpecialTransport();
                         break;
 
                     case TRAVEL_TO_MONSTER:
@@ -158,23 +168,42 @@ public class BanksSlayerScript extends Script {
 
         if (!hasTask()) {
             setCurrentState(State.GET_TASK);
-        } else if (!doesEquipmentMatch(taskName) || Rs2Inventory.getInventoryFood().isEmpty()) {
-            if (!ignoreRestock) {
-                setCurrentState(State.RESTOCK);
-            } else {
-                setCurrentState(State.TRAVEL_TO_MONSTER);
-            }
-        } else if (!isCloseToMonster(taskName)) {
-            ignoreRestock = true;
-            setCurrentState(State.TRAVEL_TO_MONSTER);
         } else {
-            setCurrentState(State.FIGHT_MONSTER);
+            clientThread.invoke(this::storeCurrentTaskInMemory);  // Ensure task name is set
+            if (!doesEquipmentMatch(taskName) || Rs2Inventory.getInventoryFood().isEmpty()) {
+                if (!ignoreRestock) {
+                    setCurrentState(State.RESTOCK);
+                } else {
+                    setCurrentState(State.TRAVEL_TO_MONSTER);
+                }
+            } else if (SpecialMonsterTravelling.hasSpecialTravel(taskName) && !isSpecialTravelComplete) {
+                setCurrentState(State.SPECIAL_TRANSPORT);
+            } else if (!isCloseToMonster(taskName)) {
+                ignoreRestock = true;
+                setCurrentState(State.TRAVEL_TO_MONSTER);
+            } else {
+                setCurrentState(State.FIGHT_MONSTER);
+            }
+        }
+    }
+
+    private void handleSpecialTransport() {
+        if (!isActive) {
+            return;
+        }
+
+        log("Handling special transport for task: " + taskName);
+
+        if (SpecialMonsterTravelling.handleSpecialTravel(taskName)) {
+            log("Handled special interaction for task: " + taskName);
+            isSpecialTravelComplete = true;
+                setCurrentState(State.TRAVEL_TO_MONSTER); // Proceed to normal travel after special interaction
+
         }
     }
 
 
     private void handleGetTask(SlayerMasters selectedSlayerMaster) {
-
         if (!isActive) {
             return;
         }
@@ -190,20 +219,55 @@ public class BanksSlayerScript extends Script {
             }
         } else {
             getNewAssignment(selectedSlayerMaster);
+            handleRestock();
         }
     }
 
     private void handleRestock() {
-
         if (!isActive || ignoreRestock || !hasTask()) {
             return;
         }
 
+        clientThread.invoke(this::storeCurrentTaskInMemory);  // Ensure task name is set
+
         if (!doesEquipmentMatch(taskName) || !doesInventoryMatch(taskName)) {
             if (!ignoreRestock) {
                 log("Restocking as ignoreRestock is false.");
-                boolean restocked = restock(taskName);
-                if (restocked) {
+                isSpecialTravelComplete = false;
+
+                WorldPoint currentLocation = Rs2Player.getWorldLocation();
+                WorldPoint closestBank = CommonBankLocations.findClosestBank(currentLocation);
+                Rs2Walker.walkTo(closestBank);
+
+                boolean hasEquipment = doesEquipmentMatch(taskName);
+                boolean hasInventory = doesInventoryMatch(taskName);
+
+                if (!Rs2Bank.isOpen()) {
+                    Rs2Bank.openBank();
+                }
+
+                if (!hasEquipment) {
+                    log("Depositing all items and equipment.");
+                    Rs2Bank.depositAll();
+                    Rs2Bank.depositEquipment();
+                    sleep(600);
+
+                    log("Loading equipment for task: " + taskName);
+                    hasEquipment = MicrobotInventorySetup.loadEquipment(taskName, mainScheduledFuture);
+                    log("Equipment match after loading: " + hasEquipment);
+                }
+
+                if (!hasInventory) {
+                    sleep(600);
+                    log("Loading inventory for task: " + taskName);
+                    hasInventory = MicrobotInventorySetup.loadInventory(taskName, mainScheduledFuture);
+                    sleep(1000);
+                    log("Inventory match after loading: " + hasInventory);
+                }
+
+                log("Restock complete. Equipment match: " + hasEquipment + ", Inventory match: " + hasInventory);
+
+                if (hasEquipment && hasInventory) {
                     log("Restocking successful, transitioning to TRAVEL_TO_MONSTER state.");
                     setCurrentState(State.TRAVEL_TO_MONSTER);
                 } else {
@@ -235,7 +299,6 @@ public class BanksSlayerScript extends Script {
         }
         setCurrentState(State.FIGHT_MONSTER);
     }
-
 
     private void handleFightMonster() {
         if (!isActive) {
@@ -290,6 +353,10 @@ public class BanksSlayerScript extends Script {
             } else {
                 Rs2Player.eatAt(60); // We need to Eat
             }
+        }
+
+        if ((Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) * 100) / Microbot.getClient().getRealSkillLevel(Skill.PRAYER) < Random.random(25, 30)) {
+            Rs2Inventory.interact(Rs2Potion.getPrayerPotionsVariants(), "drink");
         }
     }
 
@@ -426,6 +493,11 @@ public class BanksSlayerScript extends Script {
                 return null;
             }
 
+            // Handle superior monster if spawned
+            if (handleSuperiorMonster(taskName)) {
+                return null; // Superior monster found and handled
+            }
+
             List<String> npcNames = TaskNpcMapping.getNpcNames(taskName);
             log("NPC Names: " + npcNames);
 
@@ -511,10 +583,9 @@ public class BanksSlayerScript extends Script {
                     if (taskLocation != null) {
                         log("Task Location: " + taskLocation);
                     }
+                    log("Task name updated to: " + taskName);
                 } else {
                     log("No Task, Need one.");
-                    currentNpc = null;
-                    this.taskName = ""; // Reset task name if no task
                 }
             } catch (Exception ex) {
                 log("Error storing current task: " + ex.getMessage(), ex);
@@ -601,6 +672,8 @@ public class BanksSlayerScript extends Script {
     }
 
     private boolean travelToSlayerMaster(SlayerMasters slayerMaster) {
+        handleResetTeleport();
+        ignoreRestock = true;
         try {
             WorldPoint slayerMasterLocation = SlayerMasterLocations.getLocation(slayerMaster);
             if (slayerMasterLocation != null) {
@@ -617,6 +690,7 @@ public class BanksSlayerScript extends Script {
 
     private boolean getNewAssignment(SlayerMasters slayerMaster) {
         try {
+            isSpecialTravelComplete = false;
             NPC npc = Rs2Npc.getNpc(slayerMaster.toString());
             if (npc == null) {
                 log("No Slayer Master in sight.");
@@ -624,6 +698,9 @@ public class BanksSlayerScript extends Script {
             } else {
                 Rs2Npc.interact(npc, "Assignment");
                 log("Interacting with Slayer Master: " + slayerMaster);
+                sleep(3000); // Wait for the interaction to complete
+                storeCurrentTaskInMemory(); // Store the task after getting a new assignment
+                ignoreRestock = false;
                 return true;
             }
         } catch (Exception ex) {
@@ -648,7 +725,7 @@ public class BanksSlayerScript extends Script {
             Rs2Dialogue.clickContinue();
             sleep(2400, 3000);
             storeCurrentTaskInMemory();
-            restock(taskName);
+            handleRestock();
             return true;
         } else {
             log("Not on Lunar Spellbook!");
@@ -831,51 +908,65 @@ public class BanksSlayerScript extends Script {
         }
     }
 
-    private boolean restock(String taskName) {
-        if (ignoreRestock || !hasTask()) {
-            return false;
+    @Subscribe
+    public void onChatMessage(ChatMessage event) {
+        ChatMessageType type = event.getType();
+        String message = event.getMessage();
+
+        if (type == ChatMessageType.GAMEMESSAGE) {
+            if (message.contains("A superior foe has appeared...")) {
+                superiorHasSpawned = true;
+            }
         }
-        WorldPoint currentLocation = Rs2Player.getWorldLocation();
-        WorldPoint closestBank = CommonBankLocations.findClosestBank(currentLocation);
-        Rs2Walker.walkTo(closestBank);
+    }
 
-        boolean hasEquipment = doesEquipmentMatch(taskName);
-        boolean hasInventory = doesInventoryMatch(taskName);
+    private boolean handleSuperiorMonster(String taskName) {
+        if (superiorHasSpawned) {
+            List<String> superiorNames = SuperiorMonsterMapping.getSuperiorNames(taskName);
 
-        if (!Rs2Bank.isOpen()) {
-            Rs2Bank.openBank();
+            if (superiorNames.isEmpty()) {
+                log("No superior monster mapping found for task: " + taskName);
+                superiorHasSpawned = false;
+                return false;
+            }
+
+            List<NPC> superiorNpcs = Microbot.getClient().getNpcs().stream()
+                    .filter(x -> !x.isDead() && superiorNames.contains(x.getName()))
+                    .sorted(Comparator.comparingInt(value -> value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())))
+                    .collect(Collectors.toList());
+
+            if (!superiorNpcs.isEmpty()) {
+                for (NPC npc : superiorNpcs) {
+                    if (npc == null || npc.getAnimation() != -1 || npc.isDead()
+                            || (npc.getInteracting() != null && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
+                            || (npc.isInteracting() && npc.getInteracting() != Microbot.getClient().getLocalPlayer()))
+                        continue;
+
+                    if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
+                        Rs2Camera.turnTo(npc);
+                    }
+
+                    if (!Rs2Npc.hasLineOfSight(npc)) {
+                        continue;
+                    }
+
+                    Rs2Npc.interact(npc, "attack");
+                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().isInteracting() && Microbot.getClient().getLocalPlayer().getInteracting() instanceof NPC);
+                    return true;
+                }
+            }
+
+            superiorHasSpawned = false; // Reset the flag after handling
         }
 
-        if (!hasEquipment) {
-            log("Depositing all items and equipment.");
-            Rs2Bank.depositAll();
-            Rs2Bank.depositEquipment();
-            sleep(600);
-
-            log("Loading equipment for task: " + taskName);
-            hasEquipment = MicrobotInventorySetup.loadEquipment(taskName, mainScheduledFuture);
-            log("Equipment match after loading: " + hasEquipment);
-        }
-
-        if (!hasInventory) {
-            sleep(600);
-            log("Loading inventory for task: " + taskName);
-            hasInventory = MicrobotInventorySetup.loadInventory(taskName, mainScheduledFuture);
-            sleep(1000);
-            log("Inventory match after loading: " + hasInventory);
-        }
-
-        log("Restock complete. Equipment match: " + hasEquipment + ", Inventory match: " + hasInventory);
-        return hasEquipment && hasInventory;
+        return false;
     }
 
     private void log(String message) {
-        // Replace with a proper logging framework if necessary
         System.out.println(message);
     }
 
     private void log(String message, Throwable throwable) {
-        // Replace with a proper logging framework if necessary
         System.err.println(message);
         throwable.printStackTrace();
     }

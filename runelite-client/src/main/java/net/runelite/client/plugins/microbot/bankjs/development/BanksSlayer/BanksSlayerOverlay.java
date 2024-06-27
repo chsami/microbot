@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.bankjs.development.BanksSlayer;
 
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.bankjs.development.BanksSlayer.enums.State;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -12,13 +11,13 @@ import java.awt.*;
 
 public class BanksSlayerOverlay extends OverlayPanel {
     private final BanksSlayerPlugin plugin;
-    private final BanksSlayerScript script; // Reference to the script
+    private final BanksSlayerScript script;
 
     @Inject
     BanksSlayerOverlay(BanksSlayerPlugin plugin, BanksSlayerScript script) {
         super(plugin);
         this.plugin = plugin;
-        this.script = script; // Ensure the correct script instance is used
+        this.script = script;
         setPosition(OverlayPosition.BOTTOM_LEFT);
         setPreferredSize(new Dimension(800, 300));
     }
@@ -45,10 +44,16 @@ public class BanksSlayerOverlay extends OverlayPanel {
                     .rightColor(Color.GREEN)
                     .build());
 
+            // Add Script State
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left(plugin.banksSlayerScript.state.toString())
+                    .build());
+
             // Add Task
+            String currentTask = script.getTaskName();
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Task:")
-                    .right(script.getTaskName() != null && !script.getTaskName().isEmpty() ? script.getTaskName() : "No task") // Ensure taskName is fetched correctly
+                    .right(currentTask != null && !currentTask.isEmpty() ? currentTask : "No task")
                     .leftColor(Color.WHITE)
                     .rightColor(Color.WHITE)
                     .build());
@@ -58,15 +63,7 @@ public class BanksSlayerOverlay extends OverlayPanel {
                     .left("In Combat:")
                     .right(plugin.isInCombat() ? "Yes" : "No")
                     .leftColor(Color.WHITE)
-                    .rightColor(plugin.isInCombat() ? Color.RED : Color.GREEN)
-                    .build());
-
-            // Add Script state
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("STATE:")
-                    .right(script.getCurrentState().toString()) // Display current state
-                    .leftColor(Color.WHITE)
-                    .rightColor(Color.CYAN)
+                    .rightColor(plugin.isInCombat() ? Color.GREEN : Color.RED)
                     .build());
 
         } catch (Exception ex) {
