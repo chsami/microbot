@@ -748,13 +748,13 @@ public class LunarDiplomacy extends BasicQuestHelper
 
 		if (client.getLocalPlayer() != null && client.getLocalPlayer().getPlayerComposition() != null && client.getLocalPlayer().getPlayerComposition().isFemale())
 		{
-			talkToEthereal = new NpcStep(this, NpcID.ETHEREAL_LADY, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Lady.");
-			talkWithEtherealToFight = new NpcStep(this, NpcID.ETHEREAL_LADY, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Lady. Be prepared to fight.");
+			talkToEthereal = new NpcStep(this, NpcID.ETHEREAL_BEING_778, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Lady.");
+			talkWithEtherealToFight = new NpcStep(this, NpcID.ETHEREAL_BEING_778, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Lady. Be prepared to fight.");
 		}
 		else
 		{
-			talkToEthereal = new NpcStep(this, NpcID.ETHEREAL_MAN, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Man.");
-			talkWithEtherealToFight = new NpcStep(this, NpcID.ETHEREAL_MAN, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Man. Be prepared to fight.");
+			talkToEthereal = new NpcStep(this, NpcID.ETHEREAL_BEING, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Man.");
+			talkWithEtherealToFight = new NpcStep(this, NpcID.ETHEREAL_BEING, new WorldPoint(1762, 5088, 2), "Talk to the Ethereal Man. Be prepared to fight.");
 		}
 		talkWithEtherealToFight.addDialogStep("Of course. I'm ready.");
 
