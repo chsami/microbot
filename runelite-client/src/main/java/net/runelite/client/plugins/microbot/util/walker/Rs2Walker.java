@@ -114,6 +114,10 @@ public class Rs2Walker {
                     WorldPoint currentWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i);
                     indexOfStartPoint = getClosestTileIndex(path);
 
+                    if (!Rs2Tile.isTileReachable(currentWorldPoint)) {
+                        continue;
+                    }
+
                     /**
                      * CHECK DOORS
                      */
@@ -318,6 +322,11 @@ public class Rs2Walker {
                     Rs2Player.waitForWalking();
                     return true;
                 } else if (action != null && action.contains("Walk-through")) {
+                    Rs2GameObject.interact(wallObject, action);
+                    Rs2Player.waitForWalking();
+                    return true;
+                }
+                if (action != null && action.contains("Pick-lock")) {
                     Rs2GameObject.interact(wallObject, action);
                     Rs2Player.waitForWalking();
                     return true;
@@ -596,6 +605,10 @@ public class Rs2Walker {
                         if (indexOfDestination == -1) continue;
                         if (indexOfOrigin == -1) continue;
                         if (indexOfDestination < indexOfOrigin) continue;
+
+                        if (!Rs2Tile.isTileReachable(path.get(i))) {
+                            continue;
+                        }
 
                         if (path.get(i).equals(origin)) {
                             if (b.isShip()) {
