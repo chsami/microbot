@@ -104,7 +104,7 @@ public class VorkathScript extends Script {
         hasEquipment = false;
         hasInventory = false;
         this.config = config;
-
+        tempVorkathKills = config.SellItemsAtXKills();
         Microbot.getSpecialAttackConfigs().setSpecialAttack(true);
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -218,7 +218,7 @@ public class VorkathScript extends Script {
                         vorkath = Rs2Npc.getNpc(NpcID.VORKATH_8061);
                         if (vorkath == null || vorkath.isDead()) {
                             vorkathSessionKills++;
-                            tempVorkathKills++;
+                            tempVorkathKills--;
                             state = State.LOOT_ITEMS;
                             sleep(300, 600);
                             Rs2Inventory.wield(primaryBolts);
@@ -389,12 +389,12 @@ public class VorkathScript extends Script {
      * @return true if we need to sell items
      */
     private boolean checkSellingItems(VorkathConfig config) {
-        if (tempVorkathKills == 0) return false;
+        if (tempVorkathKills > 0) return false;
         LootTrackerRecord lootRecord = Microbot.getAggregateLootRecords("vorkath");
         if (lootRecord != null) {
             if (tempVorkathKills % config.SellItemsAtXKills() == 0) {
                 state = State.SELLING_ITEMS;
-                tempVorkathKills = 0;
+                tempVorkathKills = config.SellItemsAtXKills();
                 return true;
             }
         }
