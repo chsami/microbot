@@ -1123,6 +1123,9 @@ public class Rs2Bank {
         if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > distance) {
             Rs2Walker.walkTo(initialPlayerLocation, distance);
         }
+        else {
+            Rs2Walker.walkFastCanvas(initialPlayerLocation);
+        }
 
         return !(Rs2Inventory.getEmptySlots() <= emptySlotCount) && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
     }
