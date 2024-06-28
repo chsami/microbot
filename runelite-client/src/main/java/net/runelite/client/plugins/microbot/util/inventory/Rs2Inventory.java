@@ -511,6 +511,20 @@ public class Rs2Inventory {
         return dropAllExcept(false, DropOrder.STANDARD, names);
     }
 
+    /**
+     * Drops all items from the inventory except for the ones specified by the names parameter.
+     * The exactness of the name matching and the order in which items are dropped can be controlled.
+     *
+     * @param exact     If true, items are kept in the inventory if their name exactly matches one of the names in the names parameter.
+     *                  If false, items are kept in the inventory if their name contains one of the names in the names parameter.
+     * @param dropOrder The order in which items are dropped from the inventory. This can be one of the following:
+     *                  - STANDARD: Items are dropped row by row, from left to right.
+     *                  - EFFICIENT_ROW: Items are dropped row by row. For even rows, items are dropped from left to right. For odd rows, items are dropped from right to left.
+     *                  - COLUMN: Items are dropped column by column, from top to bottom.
+     *                  - EFFICIENT_COLUMN: Items are dropped column by column. For even columns, items are dropped from top to bottom. For odd columns, items are dropped from bottom to top.
+     * @param names     The names of the items to keep in the inventory.
+     * @return True if all non-matching items were successfully dropped, false otherwise.
+     */
     public static boolean dropAllExcept(boolean exact, DropOrder dropOrder, String... names) {
         if (exact)
             return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)), dropOrder);
