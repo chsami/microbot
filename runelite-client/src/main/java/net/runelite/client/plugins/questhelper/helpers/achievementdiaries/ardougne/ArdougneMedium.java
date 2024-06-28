@@ -24,15 +24,17 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.ardougne;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.domain.AccountType;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
@@ -44,20 +46,27 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequiremen
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.vars.AccountType;
-import net.runelite.client.game.FishingSpot;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.game.FishingSpot;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.ARDOUGNE_MEDIUM
-)
 public class ArdougneMedium extends ComplexStateQuestHelper
 {
 	// Items required
@@ -91,8 +100,7 @@ public class ArdougneMedium extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doMedium = new ConditionalStep(this, claimReward);
@@ -144,7 +152,7 @@ public class ArdougneMedium extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notUniPen = new VarplayerRequirement(1196, false, 13);
 		notGrapYan = new VarplayerRequirement(1196, false, 14);
@@ -175,8 +183,8 @@ public class ArdougneMedium extends ComplexStateQuestHelper
 		crossbow = new ItemRequirement("Any crossbow", ItemCollections.CROSSBOWS).showConditioned(notGrapYan).isNotConsumed();
 		bucket = new ItemRequirement("Bucket", ItemID.BUCKET)
 			.showConditioned(new Conditions(notClaimSand)).isNotConsumed();
-		lawRune = new ItemRequirement("Law rune", ItemID.LAW_RUNE).showConditioned(notTPArdy);
-		waterRune = new ItemRequirement("Water rune", ItemID.WATER_RUNE).showConditioned(notTPArdy);
+		lawRune = new ItemRequirement("Law runes", ItemID.LAW_RUNE).showConditioned(notTPArdy);
+		waterRune = new ItemRequirement("Water runes", ItemID.WATER_RUNE).showConditioned(notTPArdy);
 		rawChick = new ItemRequirement("Raw chicken", ItemID.RAW_CHICKEN).showConditioned(notKillSwordchick);
 		rawSword = new ItemRequirement("Raw swordfish", ItemID.RAW_SWORDFISH).showConditioned(notKillSwordchick);
 		ibanStaff = new ItemRequirement("Iban staff", ItemID.IBANS_STAFF).showConditioned(notIbanUpgrade).isNotConsumed();
@@ -226,7 +234,8 @@ public class ArdougneMedium extends ComplexStateQuestHelper
 		plagueCity = new QuestRequirement(QuestHelperQuest.PLAGUE_CITY, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		skavidCaves = new Zone(new WorldPoint(2527, 9470, 0), new WorldPoint(2536, 9460, 0));
 		platform = new Zone(new WorldPoint(2760, 3293, 0), new WorldPoint(2795, 3271, 0));
@@ -245,7 +254,7 @@ public class ArdougneMedium extends ComplexStateQuestHelper
 		grapYan2 = new ObjectStep(this, ObjectID.WALL_17048, new WorldPoint(2556, 3075, 1),
 			"Jump off the opposite side!");
 
-		if (client.getAccountType() == AccountType.ULTIMATE_IRONMAN)// will need testing to confirm this works
+		if (questHelperPlugin.getPlayerStateManager().getAccountType() == AccountType.ULTIMATE_IRONMAN)
 		{
 			claimSand = new ObjectStep(this, ObjectID.SANDPIT, new WorldPoint(2543, 3104, 0),
 				"Fill a bucket with sand using Bert's sand pit.", bucket);
@@ -275,8 +284,10 @@ public class ArdougneMedium extends ComplexStateQuestHelper
 		moveToSkavid = new ObjectStep(this, ObjectID.CAVE_ENTRANCE_2806, new WorldPoint(2524, 3069, 0),
 			"Enter the Cave.", lightSource, skavMap);
 		caveNightshade = new ItemStep(this, "Pickup the Cave nightshade.", nightshade);
-
-		moveToPlatform = new NpcStep(this, NpcID.JEB, new WorldPoint(2719, 3305, 0),
+		// Need step at top of wall for grapple
+		// Need to highlight chicksword to kill
+		// Need to point to Jeb if Jeb is deliverer, otherwise Holgart
+		moveToPlatform = new NpcStep(this, NpcID.JEB_4803, new WorldPoint(2719, 3305, 0),
 			"Talk to Jeb or Holgart to travel to the Fishing Platform.", smallFishingNet);
 		((NpcStep) (moveToPlatform)).addAlternateNpcs(NpcID.HOLGART_7789);
 		fishOnPlatform = new NpcStep(this, FishingSpot.SHRIMP.getIds(), new WorldPoint(2790, 3276, 0),

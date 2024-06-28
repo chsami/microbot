@@ -109,6 +109,9 @@ public class Rs2Tile {
     }
 
     public static boolean isWalkable(LocalPoint localPoint) {
+        if (localPoint == null)
+            return true;
+
         Client client = Microbot.getClient();
         if (client.getCollisionMaps() != null) {
             int[][] flags = client.getCollisionMaps()[client.getPlane()].getFlags();
@@ -116,17 +119,20 @@ public class Rs2Tile {
 
             Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
 
-            if (movementFlags.isEmpty()) {
-                return true;
-            }
-            return false;
+            if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FULL)
+                    || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FLOOR))
+                return false;
         }
         return true;
     }
 
     public static List<WorldPoint> getWalkableTilesAroundPlayer(int radius) {
+        return getWalkableTilesAroundTile(Rs2Player.getWorldLocation(), radius);
+    }
+
+    public static List<WorldPoint> getWalkableTilesAroundTile(WorldPoint point, int radius) {
         List<WorldPoint> worldPoints = new ArrayList<>();
-        LocalPoint playerLocalPosition = Rs2Player.getLocalLocation();
+        LocalPoint playerLocalPosition = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
 
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {

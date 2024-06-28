@@ -24,18 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.lumbridgeanddraynor;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
@@ -43,18 +40,24 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequiremen
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.LUMBRIDGE_EASY
-)
 public class LumbridgeEasy extends ComplexStateQuestHelper
 {
 	// Items required
@@ -89,8 +92,7 @@ public class LumbridgeEasy extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doEasy = new ConditionalStep(this, claimReward);
@@ -110,8 +112,8 @@ public class LumbridgeEasy extends ComplexStateQuestHelper
 		doEasy.addStep(notEnterHAM, enterHAMTask);
 
 		killCaveBugTask = new ConditionalStep(this, addRopeToHole);
-		killCaveBugTask.addStep(addedRopeToHole, moveToDarkHole);
 		killCaveBugTask.addStep(inCave, killCaveBug);
+		killCaveBugTask.addStep(addedRopeToHole, moveToDarkHole);
 		doEasy.addStep(notKillCaveBug, killCaveBugTask);
 
 		waterRuneTask = new ConditionalStep(this, moveToWaterAltar);
@@ -141,7 +143,7 @@ public class LumbridgeEasy extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notDrayAgi = new VarplayerRequirement(1194, false, 1);
 		notKillCaveBug = new VarplayerRequirement(1194, false, 2);
@@ -198,10 +200,11 @@ public class LumbridgeEasy extends ComplexStateQuestHelper
 		cooksAssistant = new QuestRequirement(QuestHelperQuest.COOKS_ASSISTANT, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		lumby = new Zone(new WorldPoint(3212, 3213, 0), new WorldPoint(3227, 3201, 0));
-		cave = new Zone(new WorldPoint(3140, 9602, 0), new WorldPoint(3261, 9537, 0));
+		cave = new Zone(new WorldPoint(3140, 9537, 0), new WorldPoint(3261, 9602, 0));
 		sewer = new Zone(new WorldPoint(3077, 9699, 0), new WorldPoint(3132, 9641, 0));
 		mageTower = new Zone(new WorldPoint(3095, 9578, 0), new WorldPoint(3122, 9554, 0));
 		water = new Zone(new WorldPoint(2688, 4863, 0), new WorldPoint(2751, 4800, 0));
@@ -237,7 +240,7 @@ public class LumbridgeEasy extends ComplexStateQuestHelper
 		addRopeToHole.addSubSteps(moveToDarkHole);
 		addRopeToHole.addIcon(ItemID.ROPE);
 		killCaveBug = new NpcStep(this, NpcID.CAVE_BUG, new WorldPoint(3151, 9574, 0),
-			"Kill a Cave Bug.", combatGear, lightSource);
+			"Kill a Cave Bug.", true, combatGear, lightSource);
 
 		moveToWaterAltar = new ObjectStep(this, 34815, new WorldPoint(3185, 3165, 0),
 			"Enter the water altar in Lumbridge Swamp.", waterAccessOrAbyss.highlighted(), runeEss);

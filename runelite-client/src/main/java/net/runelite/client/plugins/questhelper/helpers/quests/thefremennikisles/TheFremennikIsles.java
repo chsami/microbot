@@ -24,37 +24,46 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thefremennikisles;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.requirements.ComplexRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.player.IronmanRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.api.GameState;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Prayer;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_FREMENNIK_ISLES
-)
 public class TheFremennikIsles extends BasicQuestHelper
 {
 	//Items Required
@@ -87,8 +96,7 @@ public class TheFremennikIsles extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		setupPanels();
@@ -278,7 +286,7 @@ public class TheFremennikIsles extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		needle = new ItemRequirement("Needle", ItemID.NEEDLE).isNotConsumed();
 		thread = new ItemRequirement("Thread", ItemID.THREAD);
@@ -324,7 +332,7 @@ public class TheFremennikIsles extends BasicQuestHelper
 
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
-			if (client.getAccountType().isIronman() || client.getAccountType().isGroupIronman())
+			if (questHelperPlugin.getPlayerStateManager().getAccountType().isAnyIronman())
 			{
 				splitLogs8.setTooltip("Cut down the arctic pines nearby, and split them on the woodcutting stump in central Neitiznot");
 				splitLogs4.setTooltip("Cut down the arctic pines nearby, and split them on the woodcutting stump in central Neitiznot");
@@ -372,7 +380,8 @@ public class TheFremennikIsles extends BasicQuestHelper
 		protectRanged = new PrayerRequirement("Protect from Missiles", Prayer.PROTECT_FROM_MISSILES);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		islands = new Zone(new WorldPoint(2298, 3771, 0), new WorldPoint(2432, 3913, 3));
 		neitiznot1 = new Zone(new WorldPoint(2304, 3775, 0), new WorldPoint(2368, 3842, 3));
@@ -543,7 +552,7 @@ public class TheFremennikIsles extends BasicQuestHelper
 
 	public void setupPanels()
 	{
-		if (client.getAccountType().isIronman() || client.getAccountType().isGroupIronman())
+		if (questHelperPlugin.getPlayerStateManager().getAccountType().isAnyIronman())
 		{
 			prepareForRepairPanel = new PanelDetails("Helping Mawnis", Arrays.asList(talkToMawnis, talkToMawnisWithLogs, repairBridge1, talkToMawnisAfterRepair), rope8, axe, knife);
 			prepareForCombatPanel = new PanelDetails("Preparing to fight", Arrays.asList(getYakArmour, makeShield), needle, thread, coins15, bronzeNail, hammer, rope);

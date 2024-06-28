@@ -24,18 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.fremennik;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
@@ -43,17 +40,14 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequire
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FREMENNIK_EASY
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 
 public class FremennikEasy extends ComplexStateQuestHelper
 {
@@ -88,8 +82,7 @@ public class FremennikEasy extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doEasy = new ConditionalStep(this, claimReward);
@@ -141,7 +134,7 @@ public class FremennikEasy extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notCatchCerulean = new VarplayerRequirement(1184, false, 1);
 		notChangeBoots = new VarplayerRequirement(1184, false, 2);
@@ -189,17 +182,10 @@ public class FremennikEasy extends ComplexStateQuestHelper
 				"<col=0040ff>Achievement Diary Stage Task - Current stage: 1.</col>"
 			)
 		);
-
-		inMine = new ZoneRequirement(mine);
-		inKeldagrim = new ZoneRequirement(keldagrim);
-		inWaterbirth = new ZoneRequirement(waterbirth);
-		inHunterArea = new ZoneRequirement(hunterArea);
-		inCaveArea = new ZoneRequirement(caveArea);
-		inRiverArea = new ZoneRequirement(riverArea);
-		inVarrockArea = new ZoneRequirement(varrockArea);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		keldagrim = new Zone(new WorldPoint(2816, 10238, 0), new WorldPoint(2943, 10158, 0));
 		mine = new Zone(new WorldPoint(2675, 3712, 0), new WorldPoint(2690, 3697, 0));
@@ -208,6 +194,14 @@ public class FremennikEasy extends ComplexStateQuestHelper
 		caveArea = new Zone(new WorldPoint(2767, 10165, 0), new WorldPoint(2802, 10127, 0));
 		riverArea = new Zone(new WorldPoint(2816, 10148, 0), new WorldPoint(2893, 10114, 0));
 		varrockArea = new Zone(new WorldPoint(3076, 3617, 0), new WorldPoint(3290, 3374, 0));
+
+		inMine = new ZoneRequirement(mine);
+		inKeldagrim = new ZoneRequirement(keldagrim);
+		inWaterbirth = new ZoneRequirement(waterbirth);
+		inHunterArea = new ZoneRequirement(hunterArea);
+		inCaveArea = new ZoneRequirement(caveArea);
+		inRiverArea = new ZoneRequirement(riverArea);
+		inVarrockArea = new ZoneRequirement(varrockArea);
 	}
 
 	public void setupSteps()
@@ -239,7 +233,7 @@ public class FremennikEasy extends ComplexStateQuestHelper
 		craftTiara.addIcon(ItemID.SILVER_BAR);
 		changeBoots = new NpcStep(this, NpcID.YRSA_3933, new WorldPoint(2625, 3674, 0),
 			"Change your boots at Yrsa's Shoe Store.", coins.quantity(500));
-		goneToWaterbirth = new NpcStep(this, NpcID.JARVALD, new WorldPoint(2620, 3686, 0),
+		goneToWaterbirth = new NpcStep(this, new int[]{NpcID.JARVALD, NpcID.JARVALD_7205}, new WorldPoint(2620, 3686, 0),
 			"Speak with Jarvald to travel to Waterbirth Island.");
 		goneToWaterbirth.addDialogStep("What Jarvald is doing.");
 		goneToWaterbirth.addDialogStep("Can I come?");

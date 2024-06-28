@@ -24,21 +24,20 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.swansong;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.Arrays;
+import java.util.Collection;
 import net.runelite.api.ItemID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 public class FixWall extends DetailedOwnerStep
 {

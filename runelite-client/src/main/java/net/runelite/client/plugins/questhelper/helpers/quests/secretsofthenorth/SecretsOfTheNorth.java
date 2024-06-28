@@ -24,18 +24,17 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.secretsofthenorth;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
@@ -44,15 +43,23 @@ import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextReq
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.SECRETS_OF_THE_NORTH
-)
 public class SecretsOfTheNorth extends BasicQuestHelper
 {
 	// Required
@@ -73,13 +80,14 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 		moveToWeissCave, enterWeissCave, fightAssassin, talkToKhazard, talkToHazeelWeiss, searchBarrel, openCentreGate, solveCenterGate,
 		openNorthChest, solveChestPuzzle, getTinderbox,
 		lightNW, lightSE, lightNE, lightSW, openWestChest, openNorthGate, useLeverOnMechanism, pullLever, inspectPillar,
-		combineShards, openIcyChest, openSouthGate, enterCrevice, defeatMuspah, talkToJallan, continueCutscene;
+		combineShards, openIcyChest, openSouthGate, enterCrevice, defeatMuspah,
+		moveToWeissCaveEnd, enterCreviceEnd, enterWeissCaveEnd, talkToJhallan, continueCutscene;
 
-	NpcStep talkToAlmoneOrClivet, talkToHazeel, finishQuest;
+	NpcStep talkToAlomoneOrClivet, talkToHazeel, finishQuest;
 
 	Requirement notTalkedToGuard, notGoneUpstairs, notInspectCeril, notInspectWall, notInspectWindow, notInspectChest,
 		inspectedCrimeScene, toldWindow, toldCeril, toldWall, checkedBarrel, checkedBoulder, checkedBush, checkedStump,
-		checkedBoulder2, checkedBush2, evelotDefeated, talkedToAlmoneOrClivet, talkedToHazeel, talkedToGuard, talkedToClaus, buttonPressed,
+		checkedBoulder2, checkedBush2, evelotDefeated, talkedToAlomoneOrClivet, talkedToHazeel, talkedToGuard, talkedToClaus, buttonPressed,
 		chestPicked, scrollInspected, handedInScroll, hadDustyScroll, talkedNorth, talkedToSnowflake, questioned1, questioned2, assassinFight,
 		assassinDefeated, talkedToKhazard, puzzleStart, centreGateUnlocked, nwBrazier, seBrazier, neBrazier, swBrazier, brazierFin,
 		northGateUnlocked, fixedLever, leverPulled, southGateOpened, jhallanTalkedTo, returnToGuard, gottenIcyKey;
@@ -94,8 +102,7 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -166,8 +173,8 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 		questionsForHazeel.addStep(new Conditions(inRaftZone, talkedToHazeel), returnStairs);
 		questionsForHazeel.addStep(new Conditions(inHazeelZone, talkedToHazeel), returnRaft);
 		questionsForHazeel.addStep(talkedToHazeel, returnGuard);
-		questionsForHazeel.addStep(new Conditions(talkedToAlmoneOrClivet, inHazeelZone), talkToHazeel);
-		questionsForHazeel.addStep(inHazeelZone, talkToAlmoneOrClivet);
+		questionsForHazeel.addStep(new Conditions(talkedToAlomoneOrClivet, inHazeelZone), talkToHazeel);
+		questionsForHazeel.addStep(inHazeelZone, talkToAlomoneOrClivet);
 		questionsForHazeel.addStep(inRaftZone, boardRaft);
 
 		steps.put(30, questionsForHazeel);
@@ -233,9 +240,12 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 		steps.put(78, goingNorth);
 		steps.put(80, goingNorth);
 
-		ConditionalStep finishingUp = new ConditionalStep(this, talkToJallan);
+		ConditionalStep finishingUp = new ConditionalStep(this, moveToWeissCaveEnd);
 		finishingUp.addStep(returnToGuard, finishQuest);
-		finishingUp.addStep(jhallanTalkedTo, continueCutscene);
+		finishingUp.addStep(new Conditions(inMahjarratCave, jhallanTalkedTo), continueCutscene);
+		finishingUp.addStep(inMuspahRoom, talkToJhallan);
+		finishingUp.addStep(inMahjarratCave, enterCreviceEnd);
+		finishingUp.addStep(inWeissCave, enterWeissCaveEnd);
 
 		steps.put(82, finishingUp);
 		steps.put(84, finishingUp);
@@ -245,11 +255,13 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 		return steps;
 	}
 
-	public void setupRequirements()
+	@Override
+	protected void setupRequirements()
 	{
 		// Required
 		coins = new ItemRequirement("Coins", ItemCollections.COINS, 100);
 		lockpick = new ItemRequirement("Lockpick", ItemID.LOCKPICK).isNotConsumed();
+		lockpick.addAlternates(ItemID.HAIR_CLIP);
 		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).isNotConsumed();
 		tinderbox.canBeObtainedDuringQuest();
 		combatGear = new ItemRequirement("Combat Gear", -1, -1).isNotConsumed();
@@ -297,7 +309,7 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 		checkedBush2 = new VarbitRequirement(14738, 1);
 
 		evelotDefeated = new VarbitRequirement(14722, 28, Operation.GREATER_EQUAL);
-		talkedToAlmoneOrClivet = new VarbitRequirement(14722, 32, Operation.GREATER_EQUAL);
+		talkedToAlomoneOrClivet = new VarbitRequirement(14722, 32, Operation.GREATER_EQUAL);
 		talkedToHazeel = new VarbitRequirement(14722, 36, Operation.GREATER_EQUAL);
 
 		talkedToGuard = new VarbitRequirement(14722, 38, Operation.GREATER_EQUAL);
@@ -352,11 +364,14 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 
 		southGateOpened = new VarbitRequirement(14722, 78, Operation.GREATER_EQUAL);
 
-		jhallanTalkedTo = new VarbitRequirement(14722, 82, Operation.GREATER_EQUAL);
+		jhallanTalkedTo = new VarbitRequirement(14722, 86, Operation.GREATER_EQUAL);
 		returnToGuard = new VarbitRequirement(14722, 88, Operation.GREATER_EQUAL);
+
+		// 14745 0->1 when teleport used from Hazeel
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		mansionFirst = new Zone(new WorldPoint(2562, 3276, 1), new WorldPoint(2577, 3266, 1));
 		mansionSecond = new Zone(new WorldPoint(2562, 3276, 2), new WorldPoint(2577, 3266, 2));
@@ -434,8 +449,8 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 		boardRaft = new ObjectStep(this, ObjectID.RAFT, new WorldPoint(2567, 9679, 0),
 			"Board the raft.");
 		// TODO check if player killed Alomone and direct accordingly
-		talkToAlmoneOrClivet = new NpcStep(this, NpcID.ALOMONE, new WorldPoint(2607, 9671, 0), "Talk to Almone or Clivet inside the cult area.");
-		talkToAlmoneOrClivet.addAlternateNpcs(NpcID.ALOMONE_12093, NpcID.ALOMONE_12094, NpcID.CLIVET, NpcID.CLIVET_12095);
+		talkToAlomoneOrClivet = new NpcStep(this, NpcID.ALOMONE, new WorldPoint(2607, 9671, 0), "Talk to Alomone or Clivet inside the cult area.");
+		talkToAlomoneOrClivet.addAlternateNpcs(NpcID.ALOMONE_12093, NpcID.ALOMONE_12094, NpcID.CLIVET, NpcID.CLIVET_12095);
 		talkToHazeel = new NpcStep(this, NpcID.HAZEEL_12050, new WorldPoint(2607, 9672, 0),
 			"Talk to Hazeel.");
 		returnRaft = new ObjectStep(this, ObjectID.RAFT, new WorldPoint(2606, 9693, 0),
@@ -487,8 +502,7 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 		moveToWeissCave = new ObjectStep(this, ObjectID.STAIRS_33234, new WorldPoint(2867, 3940, 0),
 			"Prepare for a fight and climb down the stairs in the middle of Weiss.", combatGear, antipoison);
 		enterWeissCave = new ObjectStep(this, 46905, new WorldPoint(2846, 10332, 0),
-			"Prepare for a fight and enter the cave to the south.", combatGear, antipoison);
-		enterWeissCave.addText("Put the Assassin in the smoke bombs so you can hit him and dodge the poison vials he throws out.");
+			"Enter the cave to the south.", combatGear, antipoison);
 		enterWeissCave.addDialogStep("Yes.");
 		fightAssassin = new NpcStep(this, NpcID.ASSASSIN_10940, new WorldPoint(2927, 10348, 0), "Defeat the assassin.");
 		fightAssassin.addText("Put the Assassin in the smoke bombs so you can hit him and dodge the poison vials he throws out.");
@@ -496,14 +510,16 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 			"Talk to General Khazard.");
 		talkToHazeelWeiss = new NpcStep(this, NpcID.HAZEEL_12051, new WorldPoint(2903, 10335, 0), "Talk to Hazeel to the west and tell him about what happened.");
 		searchBarrel = new ObjectStep(this, ObjectID.BARREL_46609, new WorldPoint(2923, 10322, 0),
-			"Search the barrel south of the room you fought the assasin.");
-		openCentreGate = new ObjectStep(this, ObjectID.GATE_46602, new WorldPoint(2924, 10329, 0),
-			"Enter the centre room. Use the code \"BLOOD\" to unlock the gate.");
-		solveCenterGate = new SolveDoorCode(this);
+			"Search the barrel south of the room you fought the assassin.");
+		openCentreGate = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.GATE_46602, new WorldPoint(2924, 10329, 0),
+			"Enter the centre room. Use the code \"BLOOD\" to unlock the gate."), new ObjectStep(this, ObjectID.GATE_46602, new WorldPoint(2924, 10329, 0),
+			"Unlock the gate to the centre room by working out the correct code."));
+		solveCenterGate =  new PuzzleWrapperStep(this, new SolveDoorCode(this), "Work out and enter the code to the central room's gate.");
 		openCentreGate.addSubSteps(solveCenterGate);
-		openNorthChest = new ObjectStep(this, ObjectID.CHEST_46619,
-			new WorldPoint(2919, 10331, 0), "Open the north chest using the code \"7402\".");
-		solveChestPuzzle = new SolveChestCode(this);
+		openNorthChest =  new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.CHEST_46619,
+			new WorldPoint(2919, 10331, 0), "Open the north chest using the code \"7402\"."),  new ObjectStep(this, ObjectID.CHEST_46619,
+			new WorldPoint(2919, 10331, 0), "Open the north chest after working out the code for it."));
+		solveChestPuzzle = new PuzzleWrapperStep(this, new SolveChestCode(this), "Open the north chest after working out its code.");
 		openNorthChest.addSubSteps(solveChestPuzzle);
 		getTinderbox = new ObjectStep(this, ObjectID.CRATE_46608, new WorldPoint(2916, 10329, 0),
 			"Get a tinderbox from the crate in the west of the central room.");
@@ -511,9 +527,10 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 		lightSE = new ObjectStep(this, ObjectID.BRAZIER_46614, new WorldPoint(2922, 10325, 0), "Light the South East Brazier.");
 		lightNE = new ObjectStep(this, ObjectID.BRAZIER_46614, new WorldPoint(2922, 10331, 0), "Light the North East Brazier.");
 		lightSW = new ObjectStep(this, ObjectID.BRAZIER_46614, new WorldPoint(2916, 10325, 0), "Light the South West Brazier.");
-		openWestChest = new ObjectStep(this, ObjectID.CHEST_46618, new WorldPoint(2916, 10327, 0), "Open the western Chest.");
-		openNorthGate = new ObjectStep(this, ObjectID.GATE_46601, new WorldPoint(2916, 10338, 0),
-			"Open the north gate using the code LEFT - UP - LEFT - DOWN.");
+		openWestChest = new ObjectStep(this, ObjectID.CHEST_46618, new WorldPoint(2916, 10327, 0), "Open the western chest.");
+		openNorthGate = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.GATE_46601, new WorldPoint(2916, 10338, 0),
+		"Open the north gate using the code LEFT - UP - LEFT - DOWN."), new ObjectStep(this, ObjectID.GATE_46601, new WorldPoint(2916, 10338, 0),
+			"Open the north gate using a code you can work out."));
 		// VarClientInt 1120 represents number of arrows
 		// Left 1119 3->15
 		// Right 1119 1->5
@@ -526,7 +543,7 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 		// Down 810.7
 		// Left 810.8
 		// Right 810.9
-		useLeverOnMechanism = new ObjectStep(this, NullObjectID.NULL_46900, new WorldPoint(2917, 10342, 0), "Use the handle on the Lever mechanism",
+		useLeverOnMechanism = new ObjectStep(this, NullObjectID.NULL_46900, new WorldPoint(2917, 10342, 0), "Use the handle on the lever mechanism",
 			leverHandle.highlighted());
 		useLeverOnMechanism.addIcon(leverHandle.getId());
 		useLeverOnMechanism.addDialogStep("Yes.");
@@ -544,14 +561,20 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 
 		defeatMuspah = new NpcStep(this, NpcID.STRANGE_CREATURE_12074, new WorldPoint(2849, 4259, 0), "Defeat the Strange Creature.");
 		((NpcStep) defeatMuspah).addAlternateNpcs(NpcID.STRANGE_CREATURE_12073, NpcID.STRANGE_CREATURE, NpcID.STRANGE_CREATURE_12075, NpcID.STRANGE_CREATURE_12075);
-
-		talkToJallan = new NpcStep(this, NpcID.JHALLAN, "Speak to Jhallan.");
-		continueCutscene = new NpcStep(this, NpcID.HAZEEL_12051,
-			"Continue the cutscene and then talk to Hazeel for a teleport to Ardougne.");
+		moveToWeissCaveEnd = new ObjectStep(this, ObjectID.STAIRS_33234, new WorldPoint(2867, 3940, 0),
+		"Speak to Jhallan in the Muspah room.");
+		enterWeissCaveEnd = new ObjectStep(this, 46905, new WorldPoint(2846, 10332, 0),
+			"Speak to Jhallan in the Muspah room.");
+		enterCreviceEnd = new ObjectStep(this, ObjectID.CREVICE_46597, new WorldPoint(2908, 10317, 0),
+			"Speak to Jhallan in the Muspah room.");
+		talkToJhallan = new NpcStep(this, NpcID.JHALLAN, "Speak to Jhallan in the Muspah room.");
+		talkToJhallan.addSubSteps(moveToWeissCaveEnd, enterWeissCaveEnd, enterCreviceEnd);
+		continueCutscene = new NpcStep(this, NpcID.HAZEEL_12051, new WorldPoint(2926, 10350, 0),
+			"Talk to Hazeel inside the ruins for a teleport to Ardougne.");
 		continueCutscene.addDialogStep("Yes.");
 		finishQuest = new NpcStep(this, NpcID.GUARD_12087, new WorldPoint(2570, 3276, 0),
 			"Return to the guard outside of the Carnillean Mansion in East Ardougne to finish the quest. " +
-				"Talk to Hazeel for a teleport to Ardougne");
+				"Talk to Hazeel for a teleport to Ardougne.");
 		finishQuest.addAlternateNpcs(NpcID.HAZEEL_12051);
 		finishQuest.addDialogStep("Yes.");
 	}
@@ -626,7 +649,7 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 				speakToEvelot), coins, combatGear));
 
 		allSteps.add(new PanelDetails("The Mysterious Benefactor",
-			Arrays.asList(enterCave, boardRaft, talkToAlmoneOrClivet, talkToHazeel, returnGuard, ladderToClaus, talkToClaus,
+			Arrays.asList(enterCave, boardRaft, talkToAlomoneOrClivet, talkToHazeel, returnGuard, ladderToClaus, talkToClaus,
 				examineShelves, examineWall, lockpickChest, inspectScroll, returnToHazeel), lockpick));
 
 		allSteps.add(new PanelDetails("In The North",
@@ -638,7 +661,7 @@ public class SecretsOfTheNorth extends BasicQuestHelper
 
 
 		allSteps.add(new PanelDetails("Secrets of the Dungeon",
-			Arrays.asList(enterCrevice, defeatMuspah, talkToJallan), combatGear));
+			Arrays.asList(enterCrevice, defeatMuspah, talkToJhallan, continueCutscene, finishQuest), combatGear));
 
 		return allSteps;
 	}

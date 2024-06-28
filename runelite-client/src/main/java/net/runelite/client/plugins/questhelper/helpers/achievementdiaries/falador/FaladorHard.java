@@ -25,51 +25,47 @@
 
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.falador;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.item.TeleportItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ComplexRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.WarriorsGuildAccessRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FALADOR_HARD
-)
+import java.util.*;
 
 public class FaladorHard extends ComplexStateQuestHelper
 {
 
 	//Items Required
 	ItemRequirement pureEss28, mindTiara, coins10000, combatGear, food, lightSource, spade, wyvernProtection, prospectorHelm,
-		prospectorChest, prospectorLegs, prospectorBoots, prosyHelm, prosyChest, prosyLegs, dwarvenHelmet, dragonfireProtection;
+		prosyHelm, prosyChest, prosyLegs, dwarvenHelmet, dragonfireProtection;
 
 	//Items Recommended
 	ItemRequirement faladorTeleport, combatBracelet;
 
-	ItemRequirements prosySet, prospectorSet;
+	ItemRequirements prosySet;
 
-	Requirement herosQuest, slugMenace, grimTales;
+	Requirement heroesQuest, slugMenace, grimTales;
 
 	Requirement notCraftedMindRunes, notChangedFamilyCrest, notKilledMole, notKilledWyvern, notCompleteAgiCourse,
 		notEnterMiningGuildWithProspector, notKilledBlueDragon, notCrackedWallSafe, notPraySarimAltarProsy, notEnterWarriorsGuild,
@@ -80,10 +76,10 @@ public class FaladorHard extends ComplexStateQuestHelper
 		enterDwarvenMinesHelmet, enterMiningGuild, enterHerosGuild, enterHerosGuildBasement, killBlueDragon, enterRoguesDen,
 		crackWallSafe, getProsySet, prayAtAltarSarim, enterWarriorsGuild, equipDwarvenHelmet;
 
-	Zone mindAltar, iceDungeon, wyvernCavern, faladorCastle1, herosGuild, herosGuildBasement, portSarimChurch, dwarvenMine,
+	Zone mindAltar, iceDungeon, wyvernCavern, faladorCastle1, herosGuildBasement, dwarvenMine,
 		miningGuild, herosGuildEntranceway, herosGuildMainHall, roguesDen, moleDen;
 
-	ZoneRequirement inMindAltar, inWyvernCavern, inIceDungeon, inFaladorCastle1, inHerosGuild, inHerosGuildBasement, inPortSarimChurch,
+	ZoneRequirement inMindAltar, inWyvernCavern, inIceDungeon, inFaladorCastle1, inHerosGuild, inHerosGuildBasement,
 		inDwarvenMine, inMiningGuild, inRoguesDen, inMoleDen;
 
 	ConditionalStep craftedMindRunesTask, changedFamilyCrestTask, killedMoleTask, killedWyvernTask, completeAgiCourseTask,
@@ -93,8 +89,7 @@ public class FaladorHard extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doHard = new ConditionalStep(this, claimReward);
@@ -149,7 +144,7 @@ public class FaladorHard extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notCraftedMindRunes = new VarplayerRequirement(1186, false, 26);
 		notChangedFamilyCrest = new VarplayerRequirement(1186, false, 27);
@@ -174,12 +169,6 @@ public class FaladorHard extends ComplexStateQuestHelper
 			.showConditioned(notKilledWyvern).isNotConsumed();
 		prospectorHelm = new ItemRequirement("Prospector Helm", ItemID.PROSPECTOR_HELMET, 1, true)
 			.showConditioned(notEnterMiningGuildWithProspector).isNotConsumed();
-		prospectorChest = new ItemRequirement("Prospector Chest", ItemID.PROSPECTOR_JACKET, 1, true)
-			.showConditioned(notEnterMiningGuildWithProspector).isNotConsumed();
-		prospectorLegs = new ItemRequirement("Prospector Legs", ItemID.PROSPECTOR_LEGS, 1, true)
-			.showConditioned(notEnterMiningGuildWithProspector).isNotConsumed();
-		prospectorBoots = new ItemRequirement("Prospector Boots", ItemID.PROSPECTOR_BOOTS, 1, true)
-			.showConditioned(notEnterMiningGuildWithProspector).isNotConsumed();
 		dragonfireProtection = new ItemRequirement("Protection from Dragonfire", ItemCollections.ANTIFIRE_SHIELDS)
 			.showConditioned(notKilledBlueDragon).isNotConsumed();
 		prosyHelm = new ItemRequirement("Proselyte Helmet", ItemID.PROSELYTE_SALLET).showConditioned(notPraySarimAltarProsy).isNotConsumed();
@@ -189,20 +178,16 @@ public class FaladorHard extends ComplexStateQuestHelper
 		dwarvenHelmet = new ItemRequirement("Dwarven Helmet", ItemID.DWARVEN_HELMET, 1)
 			.showConditioned(notDwarvenHelmetDwarvenMines).isNotConsumed();
 
-		faladorTeleport = new ItemRequirement("Multiple teleports to Falador", ItemID.FALADOR_TELEPORT, -1);
-		combatBracelet = new ItemRequirement("Combat Bracelet", ItemCollections.COMBAT_BRACELETS);
+		faladorTeleport = new TeleportItemRequirement("Multiple teleports to Falador", ItemID.FALADOR_TELEPORT, -1);
+		combatBracelet = new TeleportItemRequirement("Combat Bracelet", ItemCollections.COMBAT_BRACELETS);
 		combatBracelet.addAlternates(ItemCollections.GAMES_NECKLACES);
 
 		prosySet = new ItemRequirements(prosyHelm, prosyLegs, prosyChest);
-		prospectorSet = new ItemRequirements(prospectorBoots, prospectorChest, prospectorHelm, prospectorLegs);
 
 		inMindAltar = new ZoneRequirement(mindAltar);
 		inWyvernCavern = new ZoneRequirement(wyvernCavern);
 		inIceDungeon = new ZoneRequirement(iceDungeon);
 		inFaladorCastle1 = new ZoneRequirement(faladorCastle1);
-		inHerosGuild = new ZoneRequirement(herosGuild);
-		inHerosGuildBasement = new ZoneRequirement(herosGuildBasement);
-		inPortSarimChurch = new ZoneRequirement(portSarimChurch);
 		inDwarvenMine = new ZoneRequirement(dwarvenMine);
 		inMiningGuild = new ZoneRequirement(miningGuild);
 		inHerosGuildBasement = new ZoneRequirement(herosGuildBasement);
@@ -211,11 +196,12 @@ public class FaladorHard extends ComplexStateQuestHelper
 		inMoleDen = new ZoneRequirement(moleDen);
 
 		slugMenace = new QuestRequirement(QuestHelperQuest.THE_SLUG_MENACE, QuestState.FINISHED);
-		herosQuest = new QuestRequirement(QuestHelperQuest.HEROES_QUEST, QuestState.FINISHED);
+		heroesQuest = new QuestRequirement(QuestHelperQuest.HEROES_QUEST, QuestState.FINISHED);
 		grimTales = new QuestRequirement(QuestHelperQuest.GRIM_TALES, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		mindAltar = new Zone(new WorldPoint(2805, 4819, 0), new WorldPoint(2760, 4855, 0));
 		iceDungeon = new Zone(new WorldPoint(2979, 9538, 0), new WorldPoint(3029, 9602, 0));
@@ -271,9 +257,9 @@ public class FaladorHard extends ComplexStateQuestHelper
 
 		//Prospectors in Mining Guild
 		enterDwarvenMines = new ObjectStep(this, ObjectID.STAIRCASE_16664, new WorldPoint(3059, 3376, 0),
-			"Go to the Dwarven Mines.", prospectorBoots, prospectorChest, prospectorLegs, prospectorHelm);
+			"Go to the Dwarven Mines.", prospectorHelm);
 		enterMiningGuild = new ObjectStep(this, ObjectID.DOOR_30364, new WorldPoint(3046, 9756, 0),
-			"Equip your prospector set and then enter the Mining Guild", prospectorBoots, prospectorChest, prospectorLegs, prospectorHelm);
+			"Equip your prospector helmet and then enter the Mining Guild", prospectorHelm);
 
 		//Blue Dragon
 		enterHerosGuild = new ObjectStep(this, ObjectID.DOOR_2624, new WorldPoint(2902, 3501, 0),
@@ -324,7 +310,7 @@ public class FaladorHard extends ComplexStateQuestHelper
 	public List<ItemRequirement> getItemRequirements()
 	{
 		return Arrays.asList(pureEss28, mindTiara, coins10000, combatGear, lightSource, spade, wyvernProtection, prospectorHelm,
-			prospectorBoots, prospectorChest, prospectorLegs, prosyHelm, prosyChest, prosyLegs, dwarvenHelmet);
+			prosyHelm, prosyChest, prosyLegs, dwarvenHelmet);
 	}
 
 	@Override
@@ -355,7 +341,7 @@ public class FaladorHard extends ComplexStateQuestHelper
 
 
 		req.add(grimTales);
-		req.add(herosQuest);
+		req.add(heroesQuest);
 		req.add(slugMenace);
 
 		return req;
@@ -408,8 +394,7 @@ public class FaladorHard extends ComplexStateQuestHelper
 		allSteps.add(dwarvenHelmSteps);
 
 		PanelDetails miningGuildSteps = new PanelDetails("Gold Rush!", Arrays.asList(enterDwarvenMines,
-			enterMiningGuild), new SkillRequirement(Skill.MINING, 60, true), prospectorHelm, prospectorBoots,
-			prospectorChest, prospectorLegs);
+			enterMiningGuild), new SkillRequirement(Skill.MINING, 60, true), prospectorHelm);
 		miningGuildSteps.setDisplayCondition(notEnterMiningGuildWithProspector);
 		miningGuildSteps.setLockingStep(enterMiningGuildWithProspectorTask);
 		allSteps.add(miningGuildSteps);
@@ -421,7 +406,7 @@ public class FaladorHard extends ComplexStateQuestHelper
 		allSteps.add(warriorsGuildSteps);
 
 		PanelDetails blueDragonSteps = new PanelDetails("The Dragon Slayer", Arrays.asList(enterHerosGuild,
-			enterHerosGuildBasement, killBlueDragon), herosQuest, combatGear, food, dragonfireProtection);
+			enterHerosGuildBasement, killBlueDragon), heroesQuest, combatGear, food, dragonfireProtection);
 		blueDragonSteps.setDisplayCondition(notKilledBlueDragon);
 		blueDragonSteps.setLockingStep(killedBlueDragonTask);
 		allSteps.add(blueDragonSteps);

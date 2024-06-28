@@ -3,13 +3,12 @@ package net.runelite.client.plugins.questhelper.helpers.quests.priestinperil;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import java.util.Collections;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.Collections;
 
 public class BringDrezelPureEssenceStep extends NpcStep
 {

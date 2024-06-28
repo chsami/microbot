@@ -24,22 +24,24 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import lombok.Getter;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.emote.QuestEmote;
 import net.runelite.client.plugins.questhelper.steps.overlay.IconOverlay;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import net.runelite.api.ScriptID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public class NpcEmoteStep extends NpcStep
 {
 	private boolean hasScrolled;
+	@Getter
 	private final QuestEmote emote;
 
 	public NpcEmoteStep(QuestHelper questHelper, int npcID, QuestEmote emote, WorldPoint worldPoint, String text, Requirement... requirements)
@@ -63,18 +65,18 @@ public class NpcEmoteStep extends NpcStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 
-		Widget emoteContainer = client.getWidget(WidgetInfo.EMOTE_CONTAINER);
+		Widget emoteContainer = client.getWidget(ComponentID.EMOTES_EMOTE_CONTAINER);
 
 		if (emoteContainer == null || emoteContainer.isHidden())
 		{
 			return;
 		}
 
-		Widget emoteWindow = client.getWidget(WidgetInfo.EMOTE_WINDOW);
+		Widget emoteWindow = client.getWidget(ComponentID.EMOTES_WINDOW);
 
 		if (emoteWindow == null)
 		{
@@ -106,7 +108,7 @@ public class NpcEmoteStep extends NpcStep
 
 	void scrollToWidget(Widget widget)
 	{
-		final Widget parent = client.getWidget(WidgetInfo.EMOTE_CONTAINER);
+		final Widget parent = client.getWidget(ComponentID.EMOTES_EMOTE_CONTAINER);
 
 		if (widget == null || parent == null)
 		{
@@ -118,8 +120,8 @@ public class NpcEmoteStep extends NpcStep
 
 		client.runScript(
 			ScriptID.UPDATE_SCROLLBAR,
-			WidgetInfo.EMOTE_SCROLLBAR.getId(),
-			WidgetInfo.EMOTE_CONTAINER.getId(),
+			ComponentID.EMOTES_EMOTE_SCROLLBAR,
+			ComponentID.EMOTES_EMOTE_CONTAINER,
 			newScroll
 		);
 	}

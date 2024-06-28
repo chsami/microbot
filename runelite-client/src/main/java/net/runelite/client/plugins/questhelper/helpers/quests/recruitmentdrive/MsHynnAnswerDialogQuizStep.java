@@ -28,14 +28,15 @@ package net.runelite.client.plugins.questhelper.helpers.quests.recruitmentdrive;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.RequirementBuilder;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.Subscribe;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.eventbus.Subscribe;
 
 public class MsHynnAnswerDialogQuizStep extends ConditionalStep
 {
@@ -79,7 +80,6 @@ public class MsHynnAnswerDialogQuizStep extends ConditionalStep
 		talkToMsHynnTerprett.setText("Talk to Ms Hynn Terprett and answer the riddle. " + answer);
 	}
 
-	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{

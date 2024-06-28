@@ -26,26 +26,26 @@
  */
 package net.runelite.client.plugins.questhelper.overlays;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestDebugRenderer;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import javax.inject.Inject;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 
-import javax.inject.Inject;
-import java.awt.*;
-
 public class QuestHelperDebugOverlay extends OverlayPanel implements QuestDebugRenderer
 {
-	private final MQuestHelperPlugin plugin;
-	private QuestHelper quest;
+	private final QuestHelperPlugin plugin;
+	private QuestHelper lastSeenQuest;
 
 	@Inject
-	public QuestHelperDebugOverlay(MQuestHelperPlugin plugin)
+	public QuestHelperDebugOverlay(QuestHelperPlugin plugin)
 	{
 		this.plugin = plugin;
-		this.quest = plugin.getSelectedQuest();
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
 	}
 
@@ -62,17 +62,17 @@ public class QuestHelperDebugOverlay extends OverlayPanel implements QuestDebugR
 	}
 
 	@Override
-	public void renderDebugOverlay(Graphics graphics, MQuestHelperPlugin plugin, PanelComponent panelComponent)
+	public void renderDebugOverlay(Graphics graphics, QuestHelperPlugin plugin, PanelComponent panelComponent)
 	{
 		QuestHelper currentQuest = plugin.getSelectedQuest();
-		if ((quest == null || (currentQuest != quest)) && currentQuest != null)
+		if ((lastSeenQuest == null || (currentQuest != lastSeenQuest)) && currentQuest != null)
 		{
-			quest = currentQuest;
+			lastSeenQuest = currentQuest;
 		}
 
-		if (plugin.isDeveloperMode() && quest != null)
+		if (plugin.isDeveloperMode() && lastSeenQuest != null)
 		{
-			quest.renderDebugOverlay(graphics, plugin, panelComponent);
+			lastSeenQuest.renderDebugOverlay(graphics, plugin, panelComponent);
 		}
 	}
 }

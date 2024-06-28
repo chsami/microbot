@@ -24,17 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.desert;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.item.TeleportItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.IronmanRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
@@ -44,18 +42,26 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequiremen
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.TileStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.DESERT_MEDIUM
-)
 public class DesertMedium extends ComplexStateQuestHelper
 {
 	// Items required
@@ -88,8 +94,7 @@ public class DesertMedium extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doMedium = new ConditionalStep(this, claimReward);
@@ -121,8 +126,8 @@ public class DesertMedium extends ComplexStateQuestHelper
 		doMedium.addStep(notVisitGenie, visitGenieTask);
 
 		agiPyramidTask = new ConditionalStep(this, moveToPyramid);
-		agiPyramidTask.addStep(inPyramid, talkToSimon);
 		agiPyramidTask.addStep(new Conditions(inPyramid, talkedToSimon), agiPyramid);
+		agiPyramidTask.addStep(inPyramid, talkToSimon);
 		doMedium.addStep(notAgiPyramid, agiPyramidTask);
 
 		tpEnakhraTask = new ConditionalStep(this, tpEnakhra);
@@ -139,7 +144,7 @@ public class DesertMedium extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notAgiPyramid = new VarplayerRequirement(1198, false, 12);
 		notDesertLizard = new VarplayerRequirement(1198, false, 13);
@@ -155,6 +160,8 @@ public class DesertMedium extends ComplexStateQuestHelper
 		notChopTeak = new VarplayerRequirement(1198, false, 23);
 		notIronman = new IronmanRequirement(false);
 
+		// Eagle boulder moved: 3088 0->1
+
 		// 1557 0->1 talking to simon
 		// 1558 0->1 talking to simon
 		talkedToSimon = new VarbitRequirement(1558, 1, Operation.EQUAL);
@@ -168,12 +175,12 @@ public class DesertMedium extends ComplexStateQuestHelper
 			.showConditioned(notVisitGenie).isNotConsumed();
 		scrollOfRedir = new ItemRequirement("Scroll of redirection", ItemID.SCROLL_OF_REDIRECTION)
 			.showConditioned(new Conditions(notTPPollnivneach, notIronman));
-		teleToHouse = new ItemRequirement("Teleport to house", ItemID.TELEPORT_TO_HOUSE)
+		teleToHouse = new TeleportItemRequirement("Teleport to house", ItemID.TELEPORT_TO_HOUSE)
 			.showConditioned(new Conditions(notTPPollnivneach, notIronman));
 		harraPot = new ItemRequirement("Harralander potion (unf)", ItemID.HARRALANDER_POTION_UNF)
 			.showConditioned(notCombatPot);
 		goatHornDust = new ItemRequirement("Goat horn dust", ItemID.GOAT_HORN_DUST).showConditioned(notCombatPot);
-		camulet = new ItemRequirement("Camulet", ItemID.CAMULET).showConditioned(notTPEnakhra);
+		camulet = new TeleportItemRequirement("Camulet", ItemID.CAMULET).showConditioned(notTPEnakhra);
 		iceCooler = new ItemRequirement("Ice cooler (bring multiple just in case)", ItemID.ICE_COOLER).showConditioned(notDesertLizard);
 
 		combatGear = new ItemRequirement("Combat gear", -1, -1);
@@ -197,7 +204,8 @@ public class DesertMedium extends ComplexStateQuestHelper
 		enakhrasLament = new QuestRequirement(QuestHelperQuest.ENAKHRAS_LAMENT, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		desert = new Zone(new WorldPoint(3127, 3115, 0), new WorldPoint(3519, 2749, 0));
 		eagleArea = new Zone(new WorldPoint(1986, 4985, 3), new WorldPoint(2030, 4944, 3));
@@ -251,7 +259,7 @@ public class DesertMedium extends ComplexStateQuestHelper
 
 		tpEnakhra = new DetailedQuestStep(this, "Teleport to Enakhra's Temple with the Camulet.", camulet);
 
-		if (client.getAccountType().isIronman() || client.getAccountType().isGroupIronman())
+		if (questHelperPlugin.getPlayerStateManager().getAccountType().isAnyIronman())
 		{
 			tpPollnivneach = new DetailedQuestStep(this, "Move your house to Pollnivneach, then enter your house " +
 				"there.", coins.quantity(7500));

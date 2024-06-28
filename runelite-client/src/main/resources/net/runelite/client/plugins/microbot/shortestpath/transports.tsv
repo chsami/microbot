@@ -1338,10 +1338,10 @@
 2557 9844 0	2557 3444 0	Climb-up Ladder 17387				2	
 							
 # Tree Gnome Village Dungeon (during Waterfall quest)							
-2533 3156 0	2533 9556 0	Climb-down Ladder 5250			Waterfall Quest		
-2534 3155 0	2534 9555 0	Climb-down Ladder 5250			Waterfall Quest		
-2532 3155 0	2532 9555 0	Climb-down Ladder 5250			Waterfall Quest		
-2533 9556 0	2533 3156 0	Climb-up Ladder 17387			Waterfall Quest		
+2533 3156 0	2533 9556 0	Climb-down Ladder 5250
+2534 3155 0	2534 9555 0	Climb-down Ladder 5250
+2532 3155 0	2532 9555 0	Climb-down Ladder 5250
+2533 9556 0	2533 3156 0	Climb-up Ladder 17387
 							
 # Tree Gnome Village Dungeon (after Waterfall quest)							
 2533 3156 0	2597 4436 0	Climb-down Ladder 5250			Waterfall Quest		
@@ -4418,3 +4418,19 @@
 2591 3088 0	2591 3092 1	Climb-up Staircase 15645
 2591 3092 1	2590 3088 0	Climb-down Staircase 15648
 2590 3092 1	2590 3088 0	Climb-down Staircase 15648
+
+# Asgarnian ice dungeon
+3008 9550 0	3007 3150 0	Climb-up Ladder 17385
+3008 3150 0	3009 9550 0	Climb-down Trapdoor 1738
+
+# Sawmill
+3310 3508 1	3310 3508 0	Climb-down Ladder 11795
+3310 3508 0	3310 3508 1	Climb-up Ladder 11794
+
+# Desert mining camp
+3290 3035 0	3290 3035 1	Climb-up Ladder 18903
+3290 3037 1	3290 3037 0	Climb-down Ladder 18904
+
+# Kovac
+3366 11483 0	3361 3148 0	Exit Exit 44636
+3361 3148 0	3366 11483 0	Enter Cave 44635

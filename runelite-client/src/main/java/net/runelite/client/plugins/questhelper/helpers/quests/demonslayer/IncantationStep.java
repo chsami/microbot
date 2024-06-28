@@ -27,11 +27,13 @@ package net.runelite.client.plugins.questhelper.helpers.quests.demonslayer;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetID;
 
 import java.util.HashMap;
+import net.runelite.client.eventbus.Subscribe;
 
 public class IncantationStep extends ConditionalStep
 {
@@ -63,13 +65,13 @@ public class IncantationStep extends ConditionalStep
 	public void onWidgetLoaded(WidgetLoaded event)
 	{
 		int groupId = event.getGroupId();
-		if (groupId == WidgetID.DIALOG_PLAYER_GROUP_ID)
+		if (groupId == InterfaceID.DIALOG_PLAYER)
 		{
-			clientThread.invokeLater(() -> resetIncarnationIfRequired());
+			clientThread.invokeLater(this::resetIncarnationIfRequired);
 		}
-		else if (groupId == WidgetID.DIALOG_OPTION_GROUP_ID)
+		else if (groupId == InterfaceID.DIALOG_OPTION)
 		{
-			clientThread.invokeLater(() -> updateChoiceIfRequired());
+			clientThread.invokeLater(this::updateChoiceIfRequired);
 		}
 
 		super.onWidgetLoaded(event);
@@ -81,7 +83,7 @@ public class IncantationStep extends ConditionalStep
 	 */
 	private void resetIncarnationIfRequired()
 	{
-		Widget widget = client.getWidget(WidgetID.DIALOG_PLAYER_GROUP_ID, 4);
+		Widget widget = client.getWidget(InterfaceID.DIALOG_PLAYER, 4);
 		if (widget == null)
 		{
 			return;
@@ -112,7 +114,7 @@ public class IncantationStep extends ConditionalStep
 
 	private boolean shouldUpdateChoice()
 	{
-		Widget widget = client.getWidget(WidgetID.DIALOG_OPTION_GROUP_ID, 1);
+		Widget widget = client.getWidget(InterfaceID.DIALOG_OPTION, 1);
 		if (widget == null)
 		{
 			return false;
@@ -136,6 +138,7 @@ public class IncantationStep extends ConditionalStep
 	{
 		if (incantationOrder != null || (client.getVarbitValue(2562) == 0 && client.getVarbitValue(2563) == 0))
 		{
+			startUpStep(incantationStep);
 			return;
 		}
 		incantationOrder = new String[]{

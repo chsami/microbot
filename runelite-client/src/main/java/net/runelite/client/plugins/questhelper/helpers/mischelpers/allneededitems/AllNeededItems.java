@@ -24,21 +24,19 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.mischelpers.allneededitems;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestDetails;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.SpriteID;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.CHECK_ITEMS
-)
 public class AllNeededItems extends ComplexStateQuestHelper
 {
 	DetailedQuestStep step1;
@@ -46,9 +44,9 @@ public class AllNeededItems extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();
-		questHelperPlugin.itemRequirements.forEach((qhQuest, questReqs) -> refinedList(qhQuest.getName(), reqs, questReqs));
-		questHelperPlugin.itemRecommended.forEach((qhQuest, questRecommended) -> refinedList(qhQuest.getName(), reqs, questRecommended));
+		Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();;
+		questHelperPlugin.getItemRequirements().forEach((qhQuest, questReqs) -> refinedList(qhQuest.getName(), reqs, questReqs));
+		questHelperPlugin.getItemRecommended().forEach((qhQuest, questRecommended) -> refinedList(qhQuest.getName(), reqs, questRecommended));
 
 		step1 = new DetailedQuestStep(this, "Get all items you need. You can have items being highlighted that you" +
 			" need without running this helper if you activate it in the Quest Helper settings.", new ArrayList<>(reqs.values()));
@@ -59,7 +57,7 @@ public class AllNeededItems extends ComplexStateQuestHelper
 		return step1;
 	}
 
-	private List<ItemRequirement> refinedList(String questName, Map<Integer, ItemRequirement> compressedReqs, List<ItemRequirement> reqs)
+	private void refinedList(String questName, Map<Integer, ItemRequirement> compressedReqs, List<ItemRequirement> reqs)
 	{
 		// TODO: Rather than an ItemRequirement, shift to an ItemRequirements with each itemreq as an ItemRequirement in it
 		// This would allow for better mixed IDs between items
@@ -90,12 +88,10 @@ public class AllNeededItems extends ComplexStateQuestHelper
 				}
 			}
 		}
-
-		return new ArrayList<>(compressedReqs.values());
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 
 	}
@@ -104,7 +100,7 @@ public class AllNeededItems extends ComplexStateQuestHelper
 	public List<ItemRequirement> getItemRequirements()
 	{
 		Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();
-		questHelperPlugin.itemRequirements.forEach((qhQuest, questReqs) -> refinedList(qhQuest.getName(), reqs, questReqs));
+		questHelperPlugin.getItemRequirements().forEach((qhQuest, questReqs) -> refinedList(qhQuest.getName(), reqs, questReqs));
 		return new ArrayList<>(reqs.values());
 	}
 
@@ -112,7 +108,7 @@ public class AllNeededItems extends ComplexStateQuestHelper
 	public List<ItemRequirement> getItemRecommended()
 	{
 		Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();
-		questHelperPlugin.itemRecommended.forEach((qhQuest, questRecs) -> refinedList(qhQuest.getName(), reqs, questRecs));
+		questHelperPlugin.getItemRecommended().forEach((qhQuest, questRecs) -> refinedList(qhQuest.getName(), reqs, questRecs));
 		return new ArrayList<>(reqs.values());
 	}
 
@@ -128,7 +124,7 @@ public class AllNeededItems extends ComplexStateQuestHelper
 		Map<Integer, ItemRequirement> miniquestsRec = new LinkedHashMap<>();
 		Map<Integer, ItemRequirement> diariesRec = new LinkedHashMap<>();
 
-		questHelperPlugin.itemRequirements.forEach((qhQuest, reqs) -> {
+		questHelperPlugin.getItemRequirements().forEach((qhQuest, reqs) -> {
 			QuestDetails.Type type = qhQuest.getQuestType();
 			if (type == QuestDetails.Type.P2P || type == QuestDetails.Type.F2P)
 			{
@@ -143,7 +139,7 @@ public class AllNeededItems extends ComplexStateQuestHelper
 				refinedList(qhQuest.getName(), diariesReq, reqs);
 			}
 		});
-		questHelperPlugin.itemRecommended.forEach((qhQuest, reqs) -> {
+		questHelperPlugin.getItemRecommended().forEach((qhQuest, reqs) -> {
 			QuestDetails.Type type = qhQuest.getQuestType();
 			if (type == QuestDetails.Type.P2P || type == QuestDetails.Type.F2P)
 			{

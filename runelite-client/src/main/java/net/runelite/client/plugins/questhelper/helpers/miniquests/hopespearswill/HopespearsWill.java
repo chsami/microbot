@@ -25,35 +25,36 @@
 package net.runelite.client.plugins.questhelper.helpers.miniquests.hopespearswill;
 
 import com.google.common.collect.ImmutableList;
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.NoItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.ItemSlots;
+import static net.runelite.client.plugins.questhelper.requirements.util.LogicHelper.nor;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.steps.*;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
-import java.util.*;
-
-@QuestDescriptor(
-		quest = QuestHelperQuest.HOPESPEARS_WILL
-)
 public class HopespearsWill extends BasicQuestHelper
 {
 	ItemRequirement ghostspeakAmulet, ringOfVisibility, goblinPotion, dramenStaff;
@@ -76,8 +77,7 @@ public class HopespearsWill extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -131,7 +131,8 @@ public class HopespearsWill extends BasicQuestHelper
 		return steps;
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		goblinCave = new Zone(10393);
 		goblinTemple = new Zone(14915);
@@ -139,7 +140,8 @@ public class HopespearsWill extends BasicQuestHelper
 		yubiusk = new Zone(14148);
 	}
 
-	public void setupRequirements()
+	@Override
+	protected void setupRequirements()
 	{
 		ghostspeakAmulet = new ItemRequirement("Ghostspeak amulet", ItemCollections.GHOSTSPEAK);
 		ghostspeakAmulet.setTooltip("or Morytania legs 2 or greater");

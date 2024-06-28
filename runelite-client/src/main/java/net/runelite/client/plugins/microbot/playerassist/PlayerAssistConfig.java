@@ -82,13 +82,12 @@ public interface PlayerAssistConfig extends Config {
         return "This plugin allows for semi afk.\n" +
                 "1. Make sure to place the cannon first before starting the plugin.\n" +
                 "2. Use food also supports Guthan's healing, the shield weapon is default set to Dragon Defender.\n" +
-                "3. Use antiPoison supports any potion with 'poison' in the name.\n" +
-                "4. Items to loot are comma-separated strings.\n" +
+                "3. Prayer, Combat, Ranging & AntiPoison potions are supported \n" +
+                "4. Items to loot based your requirements \n" +
                 "5. You can turn auto attack NPC off if you have a cannon.\n" +
-                "6. PrayFlick should work at the moment.\n" +
-                "7. SafeSpot & auto loot arrows might act funny and are not tested thoroughly. Use at your own risk!\n" +
-                "8. Shift Right-click the ground to select the center tile.\n" +
-                "9. Right-click NPCs to add them to the attack list.";
+                "6. PrayFlick in different styles\n" +
+                "7. SafeSpot you can Shift Right-click the ground to select the tile\n" +
+                "8. Right-click NPCs to add them to the attack list.";
     }
 
     @ConfigItem(
@@ -150,7 +149,7 @@ public interface PlayerAssistConfig extends Config {
     @ConfigItem(
             keyName = "Safe Spot",
             name = "Safe Spot",
-            description = "Right-click the ground to select the safe spot tile",
+            description = "Shift Right-click the ground to select the safe spot tile",
             position = 5,
             section = combatSection
     )
@@ -269,14 +268,50 @@ public interface PlayerAssistConfig extends Config {
             section = lootSection
     )
     default boolean toggleLootArrows() {
-        return true;
+        return false;
+    }
+
+    // toggle loot runes
+    @ConfigItem(
+            keyName = "Loot runes",
+            name = "Loot runes",
+            description = "Enable/disable loot runes",
+            position = 3,
+            section = lootSection
+    )
+    default boolean toggleLootRunes() {
+        return false;
+    }
+
+    // toggle loot coins
+    @ConfigItem(
+            keyName = "Loot coins",
+            name = "Loot coins",
+            description = "Enable/disable loot coins",
+            position = 4,
+            section = lootSection
+    )
+    default boolean toggleLootCoins() {
+        return false;
+    }
+
+    // toggle loot untreadables
+    @ConfigItem(
+            keyName = "Loot untradables",
+            name = "Loot untradables",
+            description = "Enable/disable loot untradables",
+            position = 5,
+            section = lootSection
+    )
+    default boolean toggleLootUntradables() {
+        return false;
     }
 
     @ConfigItem(
             keyName = "Bury Bones",
             name = "Bury Bones",
-            description = "Bury Bones",
-            position = 3,
+            description = "Picks up and Bury Bones",
+            position = 96,
             section = lootSection
     )
     default boolean toggleBuryBones() {
@@ -286,8 +321,8 @@ public interface PlayerAssistConfig extends Config {
     @ConfigItem(
             keyName = "Scatter",
             name = "Scatter",
-            description = "Scatter ashes",
-            position = 4,
+            description = "Picks up and Scatter ashes",
+            position = 97,
             section = lootSection
     )
     default boolean toggleScatter() {
@@ -299,10 +334,22 @@ public interface PlayerAssistConfig extends Config {
             keyName = "delayedLooting",
             name = "Delayed Looting",
             description = "Lets the loot stay on the ground for a while before picking it up",
-            position = 5,
+            position = 98,
             section = lootSection
     )
     default boolean toggleDelayedLooting() {
+        return false;
+    }
+
+    // only loot my items
+    @ConfigItem(
+            keyName = "onlyLootMyItems",
+            name = "Only Loot My Items",
+            description = "Only loot items that are dropped for/by you",
+            position = 99,
+            section = lootSection
+    )
+    default boolean toggleOnlyLootMyItems() {
         return false;
     }
 
@@ -310,7 +357,7 @@ public interface PlayerAssistConfig extends Config {
     @ConfigItem(
             keyName = "Center Tile",
             name = "Manual Center Tile",
-            description = "Right-click the ground to select the center tile",
+            description = "Shift Right-click the ground to select the center tile",
             position = 6,
             section = combatSection
     )
@@ -452,17 +499,6 @@ public interface PlayerAssistConfig extends Config {
         return 99;
     }
 
-    // only loot my items
-    @ConfigItem(
-            keyName = "onlyLootMyItems",
-            name = "Only Loot My Items",
-            description = "Only loot items that are dropped by you",
-            position = 6,
-            section = lootSection
-    )
-    default boolean toggleOnlyLootMyItems() {
-        return false;
-    }
 
     // Use Inventory Setup
     @ConfigItem(

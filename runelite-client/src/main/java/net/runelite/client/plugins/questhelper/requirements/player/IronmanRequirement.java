@@ -25,34 +25,35 @@
 package net.runelite.client.plugins.questhelper.requirements.player;
 
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
+import net.runelite.client.plugins.questhelper.util.Utils;
 import net.runelite.api.Client;
 
 public class IronmanRequirement extends AbstractRequirement
 {
-    final boolean shouldBeIronman;
+	final boolean shouldBeIronman;
 
-    public IronmanRequirement(boolean shouldBeIronman)
-    {
-        this.shouldBeIronman = shouldBeIronman;
-    }
+	public IronmanRequirement(boolean shouldBeIronman)
+	{
+		this.shouldBeIronman = shouldBeIronman;
+	}
 
-    @Override
-    public boolean check(Client client)
-    {
-        return client.getLocalPlayer() != null &&
-                client.getAccountType().isIronman() == shouldBeIronman;
-    }
+	@Override
+	public boolean check(Client client)
+	{
+		return client.getLocalPlayer() != null &&
+			Utils.getAccountType(client).isAnyIronman() == shouldBeIronman;
+	}
 
-    @Override
-    public String getDisplayText()
-    {
-        if (shouldBeIronman)
-        {
-            return "You need to be an ironman";
-        }
-        else
-        {
-            return "You need to not be an ironman";
-        }
-    }
+	@Override
+	public String getDisplayText()
+	{
+		if (shouldBeIronman)
+		{
+			return "You need to be an ironman";
+		}
+		else
+		{
+			return "You need to not be an ironman";
+		}
+	}
 }

@@ -24,41 +24,53 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.recipefordisaster;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarPlayer;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestPointRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.RECIPE_FOR_DISASTER_SIR_AMIK_VARZE
-)
 public class RFDSirAmikVarze extends BasicQuestHelper
 {
 	ItemRequirement combatGear, bucketOfMilk, potOfCream, cornflour, pot, sweetcorn, axe, macheteAndRadimus, machete,
 		vanillaPod, dramenStaffOrLunar, dramenBranch, pestleAndMortar, iceGloves, rawChicken, antidragonShield,
 		antifirePotion, radimusNotes, bruleeWithEgg, baseBrulee, uncookedBrulee, finishedBrulee, finishedBruleeHighlighted,
 		milkyMixture, cornflourMixture, evilEgg, token, cinnamon, pestleAndMortarHighlighted, tokenHighlighted;
+	ItemRequirement draynorVillageTele, lumbridgeTele;
 
-	Requirement inDiningRoom, talkedToWom, inEvilChickenLair, inZanaris, hasEggAndToken, tokenNearby, eggNearby;
+	Requirement inDiningRoom, talkedToWom, inEvilChickenLair, inZanaris, inDraynorVillage, hasEggAndToken, tokenNearby, eggNearby;
 
 	QuestStep enterDiningRoom, inspectAmik, enterKitchen, talkToCook, enterDiningRoomAgain, useBruleeOnVarze, talkToWom, useMilkOnCream,
 		useCornflourOnMilky, addPodToCornflourMixture, enterZanaris, useChickenOnShrine, killEvilChicken, pickUpEgg, useEggOnBrulee,
@@ -67,15 +79,14 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 	ConditionalStep tokenAndEggSteps;
 
 	//Zones
-	Zone diningRoom, zanaris, evilChickenLair;
+	Zone diningRoom, zanaris, evilChickenLair, draynorVillage;
 
 	int evilChickenLevel = 19;
 
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		calculateEvilChickenLevel();
@@ -118,7 +129,7 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		bucketOfMilk = new ItemRequirement("Bucket of milk", ItemID.BUCKET_OF_MILK);
 		bucketOfMilk.setHighlightInInventory(true);
@@ -167,6 +178,10 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 		antifirePotion = new ItemRequirement("Antifire potion", ItemCollections.ANTIFIRE);
 		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
+		draynorVillageTele = new ItemRequirement("Draynor Village teleport", ItemCollections.AMULET_OF_GLORIES, 1);
+		draynorVillageTele.setChargedItem(true);
+		draynorVillageTele.showConditioned(new Conditions(LogicType.NOR, inDraynorVillage));
+		lumbridgeTele = new ItemRequirement("Lumbridge Teleport", ItemID.LUMBRIDGE_TELEPORT, 1);
 
 		milkyMixture = new ItemRequirement("Milky mixture", ItemID.MILKY_MIXTURE);
 		milkyMixture.setHighlightInInventory(true);
@@ -193,29 +208,33 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 
 		tokenHighlighted = new ItemRequirement("Dragon token", ItemID.DRAGON_TOKEN);
 		tokenHighlighted.setHighlightInInventory(true);
+
+		hasEggAndToken = new Conditions(evilEgg, token);
+		tokenNearby = new ItemOnTileRequirement(token);
+		eggNearby = new ItemOnTileRequirement(evilEgg);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		diningRoom = new Zone(new WorldPoint(1856, 5313, 0), new WorldPoint(1870, 5333, 0));
 		zanaris = new Zone(new WorldPoint(2368, 4353, 0), new WorldPoint(2495, 4479, 0));
 		evilChickenLair = new Zone(new WorldPoint(2430, 4355, 0), new WorldPoint(2492, 4407, 0));
+		draynorVillage = new Zone(new WorldPoint(3060, 3221, 0), new WorldPoint(3121, 3283, 0));
+
+		inDiningRoom = new ZoneRequirement(diningRoom);
+		inEvilChickenLair = new ZoneRequirement(evilChickenLair);
+		inDraynorVillage = new ZoneRequirement(draynorVillage);
+		inZanaris = new ZoneRequirement(zanaris);
 	}
 
 	public void setupConditions()
 	{
-		inDiningRoom = new ZoneRequirement(diningRoom);
 		// 1911 0->1->2->3->4->5->6 status of brulee
 		// 1912 0->1 picked up token
 		// 1913 0->1 evil chicken killed
 		talkedToWom = new VarbitRequirement(1919, 1, Operation.GREATER_EQUAL);
 		// 1919 = 2 when entered black dragon lair once
-
-		inEvilChickenLair = new ZoneRequirement(evilChickenLair);
-		inZanaris = new ZoneRequirement(zanaris);
-		hasEggAndToken = new Conditions(evilEgg, token);
-		tokenNearby = new ItemOnTileRequirement(token);
-		eggNearby = new ItemOnTileRequirement(evilEgg);
 	}
 
 	public void setupSteps()
@@ -231,7 +250,8 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 		talkToCook.addSubSteps(enterKitchen);
 
 		talkToWom = new NpcStep(this, NpcID.WISE_OLD_MAN, new WorldPoint(3088, 3255, 0), "Talk to the Wise Old Man in Draynor Village about strange beasts and the Evil Chicken.");
-		talkToWom.addDialogSteps("I'd just like to ask you something.", "Strange beasts", "The Evil Chicken");
+		((NpcStep) talkToWom).addTeleport(draynorVillageTele.quantity(1).named("Amulet of glory (Draynor Village [3])"));
+		talkToWom.addDialogSteps("Draynor Village", "I'd just like to ask you something.", "Strange beasts", "The Evil Chicken");
 
 		useMilkOnCream = new DetailedQuestStep(this, "Use a bucket of milk on a pot of cream.", bucketOfMilk, potOfCream);
 		useCornflourOnMilky = new DetailedQuestStep(this, "Use cornflour on the milky mixture.", cornflour, milkyMixture);
@@ -251,6 +271,7 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 		rubToken.addDialogStep("Please flambe this creme brulee for me.");
 
 		enterDiningRoomAgain = new ObjectStep(this, ObjectID.DOOR_12348, new WorldPoint(3207, 3217, 0), "Go give the Brulee to Sir Amik Varze to finish the quest.", finishedBrulee);
+		((ObjectStep) enterDiningRoomAgain).addTeleport(lumbridgeTele);
 		useBruleeOnVarze = new ObjectStep(this, ObjectID.SIR_AMIK_VARZE_12345, new WorldPoint(1865, 5321, 0), "Give the Brulee to Sir Amik Varze to finish the quest.", finishedBruleeHighlighted);
 		useBruleeOnVarze.addIcon(ItemID.BRULEE_SUPREME);
 		useBruleeOnVarze.addSubSteps(enterDiningRoomAgain);
@@ -301,7 +322,7 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRecommended()
 	{
-		return Arrays.asList(combatGear, antidragonShield, antifirePotion);
+		return Arrays.asList(combatGear, antidragonShield, antifirePotion, draynorVillageTele, lumbridgeTele);
 	}
 
 	@Override
@@ -335,23 +356,23 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 	public List<ExperienceReward> getExperienceRewards()
 	{
 		return Arrays.asList(
-				new ExperienceReward(Skill.COOKING, 4000),
-				new ExperienceReward(Skill.HITPOINTS, 4000));
+			new ExperienceReward(Skill.COOKING, 4000),
+			new ExperienceReward(Skill.HITPOINTS, 4000));
 	}
 
 	@Override
 	public List<UnlockReward> getUnlockRewards()
 	{
 		return Arrays.asList(
-				new UnlockReward("Access to the Evil Chickens Lair"),
-				new UnlockReward("Further access to the Culinaromancer's Chest"));
+			new UnlockReward("Access to the Evil Chickens Lair"),
+			new UnlockReward("Further access to the Culinaromancer's Chest"));
 	}
 
 	@Override
 	public List<PanelDetails> getPanels()
 	{
 		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off", Arrays.asList(inspectAmik, talkToCook, talkToWom)));
+		allSteps.add(new PanelDetails("Starting off", Arrays.asList(inspectAmik, talkToCook, talkToWom), null, Arrays.asList(draynorVillageTele.quantity(1))));
 		PanelDetails tokenAndEggPanel = new PanelDetails("Get token and egg", Arrays.asList(enterZanaris, useChickenOnShrine,
 			killEvilChicken, pickUpEgg, killBlackDragon, pickUpToken),
 			dramenStaffOrLunar, rawChicken, combatGear, antidragonShield, antifirePotion);
@@ -359,7 +380,8 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 		allSteps.add(tokenAndEggPanel);
 		allSteps.add(new PanelDetails("Making the brulee", Arrays.asList(useMilkOnCream, useCornflourOnMilky, addPodToCornflourMixture,
 			useEggOnBrulee, grindBranch, useCinnamonOnBrulee, rubToken, useBruleeOnVarze),
-			bucketOfMilk, potOfCream, cornflourMixture, pestleAndMortar, dramenBranch, vanillaPod, evilEgg, token, iceGloves));
+			Arrays.asList(bucketOfMilk, potOfCream, cornflourMixture, pestleAndMortar, dramenBranch, vanillaPod, evilEgg, token, iceGloves),
+			Arrays.asList(lumbridgeTele)));
 
 		return allSteps;
 	}

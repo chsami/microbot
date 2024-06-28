@@ -25,19 +25,19 @@
 package net.runelite.client.plugins.questhelper.steps;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import lombok.NonNull;
-import net.runelite.api.Client;
-import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.ui.overlay.components.PanelComponent;
-
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import lombok.NonNull;
+import net.runelite.api.Client;
+import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.ui.overlay.components.PanelComponent;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class DetailedOwnerStep extends QuestStep implements OwnerStep
 {
@@ -115,7 +115,7 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 
 	// This should only have been called from a parent ConditionalStep, so default the additional text to the passed in text
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
 	{
 		List<Requirement> allRequirements = new ArrayList<>(additionalRequirements);
 		allRequirements.addAll(requirements);
@@ -130,7 +130,7 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -139,7 +139,7 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -148,7 +148,7 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{

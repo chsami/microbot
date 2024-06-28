@@ -24,17 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.wilderness;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
@@ -44,18 +41,25 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequiremen
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.WILDERNESS_EASY
-)
 public class WildernessEasy extends ComplexStateQuestHelper
 {
 	// Items required
@@ -84,24 +88,10 @@ public class WildernessEasy extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doEasy = new ConditionalStep(this, claimReward);
-
-		killMammothTask = new ConditionalStep(this, killMammoth);
-		doEasy.addStep(notKillMammoth, killMammothTask);
-
-		ironOreTask = new ConditionalStep(this, ironOre);
-		doEasy.addStep(notIronOre, ironOreTask);
-
-		enterAbyssTask = new ConditionalStep(this, abyssEnable);
-		enterAbyssTask.addStep(firstTimeAbyss, enterAbyss);
-		doEasy.addStep(notEnterAbyss, enterAbyssTask);
-
-		chaosTempleTask = new ConditionalStep(this, chaosTemple);
-		doEasy.addStep(notChaosTemple, chaosTempleTask);
 
 		equipTeamCapeTask = new ConditionalStep(this, moveToWildy);
 		equipTeamCapeTask.addStep(inWildy, equipTeamCape);
@@ -118,6 +108,15 @@ public class WildernessEasy extends ComplexStateQuestHelper
 		wildyLeverTask = new ConditionalStep(this, wildyLever);
 		doEasy.addStep(notWildyLever, wildyLeverTask);
 
+		ironOreTask = new ConditionalStep(this, ironOre);
+		doEasy.addStep(notIronOre, ironOreTask);
+
+		killMammothTask = new ConditionalStep(this, killMammoth);
+		doEasy.addStep(notKillMammoth, killMammothTask);
+
+		chaosTempleTask = new ConditionalStep(this, chaosTemple);
+		doEasy.addStep(notChaosTemple, chaosTempleTask);
+
 		lowAlchTask = new ConditionalStep(this, moveToFount);
 		lowAlchTask.addStep(inFount, lowAlch);
 		doEasy.addStep(notLowAlch, lowAlchTask);
@@ -132,11 +131,15 @@ public class WildernessEasy extends ComplexStateQuestHelper
 		enterKBDLairTask.addStep(inKbd, enterKBDLair2);
 		doEasy.addStep(notEnterKBDLair, enterKBDLairTask);
 
+		enterAbyssTask = new ConditionalStep(this, abyssEnable);
+		enterAbyssTask.addStep(firstTimeAbyss, enterAbyss);
+		doEasy.addStep(notEnterAbyss, enterAbyssTask);
+
 		return doEasy;
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notLowAlch = new VarplayerRequirement(1192, false, 1);
 		notWildyLever = new VarplayerRequirement(1192, false, 2);
@@ -178,7 +181,8 @@ public class WildernessEasy extends ComplexStateQuestHelper
 		enterTheAbyss = new QuestRequirement(QuestHelperQuest.ENTER_THE_ABYSS, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		wildy = new Zone(new WorldPoint(2943, 3978, 0), new WorldPoint(3393, 3522, 0));
 		edge = new Zone(new WorldPoint(3067, 10000, 0), new WorldPoint(3288, 9821, 0));
@@ -299,30 +303,7 @@ public class WildernessEasy extends ComplexStateQuestHelper
 	{
 		List<PanelDetails> allSteps = new ArrayList<>();
 
-		PanelDetails mammothSteps = new PanelDetails("Mammoth", Collections.singletonList(killMammoth), combatGear,
-			food);
-		mammothSteps.setDisplayCondition(notKillMammoth);
-		mammothSteps.setLockingStep(killMammothTask);
-		allSteps.add(mammothSteps);
-
-		PanelDetails ironOreSteps = new PanelDetails("Iron Ore", Collections.singletonList(ironOre),
-			new SkillRequirement(Skill.MINING, 15), pickaxe);
-		ironOreSteps.setDisplayCondition(notIronOre);
-		ironOreSteps.setLockingStep(ironOreTask);
-		allSteps.add(ironOreSteps);
-
-		PanelDetails abyssSteps = new PanelDetails("Enter the Abyss", Arrays.asList(abyssEnable, enterAbyss),
-			enterTheAbyss);
-		abyssSteps.setDisplayCondition(notEnterAbyss);
-		abyssSteps.setLockingStep(enterAbyssTask);
-		allSteps.add(abyssSteps);
-
-		PanelDetails chaosSteps = new PanelDetails("Chaos Temple", Collections.singletonList(chaosTemple),
-			chaosAccess);
-		chaosSteps.setDisplayCondition(notChaosTemple);
-		chaosSteps.setLockingStep(chaosTempleTask);
-		allSteps.add(chaosSteps);
-
+		/* Edgeville-region tasks */
 		PanelDetails teamCapeSteps = new PanelDetails("Team Cape", Arrays.asList(moveToWildy, equipTeamCape), teamCape);
 		teamCapeSteps.setDisplayCondition(notEquipTeamCape);
 		teamCapeSteps.setLockingStep(equipTeamCapeTask);
@@ -344,6 +325,25 @@ public class WildernessEasy extends ComplexStateQuestHelper
 		leverSteps.setLockingStep(wildyLeverTask);
 		allSteps.add(leverSteps);
 
+		/* Starting to go up from Edgeville */
+		PanelDetails ironOreSteps = new PanelDetails("Iron Ore", Collections.singletonList(ironOre),
+			new SkillRequirement(Skill.MINING, 15), pickaxe);
+		ironOreSteps.setDisplayCondition(notIronOre);
+		ironOreSteps.setLockingStep(ironOreTask);
+		allSteps.add(ironOreSteps);
+
+		PanelDetails mammothSteps = new PanelDetails("Mammoth", Collections.singletonList(killMammoth), combatGear,
+			food);
+		mammothSteps.setDisplayCondition(notKillMammoth);
+		mammothSteps.setLockingStep(killMammothTask);
+		allSteps.add(mammothSteps);
+
+		PanelDetails chaosSteps = new PanelDetails("Chaos RC Altar", Collections.singletonList(chaosTemple),
+			chaosAccess);
+		chaosSteps.setDisplayCondition(notChaosTemple);
+		chaosSteps.setLockingStep(chaosTempleTask);
+		allSteps.add(chaosSteps);
+
 		PanelDetails alchSteps = new PanelDetails("Free Low Alchemy", Arrays.asList(moveToFount, lowAlch),
 			new SkillRequirement(Skill.MAGIC, 21), normalBook, alchable);
 		alchSteps.setDisplayCondition(notLowAlch);
@@ -361,10 +361,17 @@ public class WildernessEasy extends ComplexStateQuestHelper
 		allSteps.add(altarSteps);
 
 
-		PanelDetails kbdSteps = new PanelDetails("The Lair", Collections.singletonList(enterKBDLair), oneClick);
+		PanelDetails kbdSteps = new PanelDetails("The Lair", Arrays.asList(enterKBDLair, enterKBDLair2), oneClick);
 		kbdSteps.setDisplayCondition(notEnterKBDLair);
 		kbdSteps.setLockingStep(enterKBDLairTask);
 		allSteps.add(kbdSteps);
+
+		/* At end as it skulls the player */
+		PanelDetails abyssSteps = new PanelDetails("Enter the Abyss", Arrays.asList(abyssEnable, enterAbyss),
+			enterTheAbyss);
+		abyssSteps.setDisplayCondition(notEnterAbyss);
+		abyssSteps.setLockingStep(enterAbyssTask);
+		allSteps.add(abyssSteps);
 
 		allSteps.add(new PanelDetails("Finishing off", Collections.singletonList(claimReward)));
 

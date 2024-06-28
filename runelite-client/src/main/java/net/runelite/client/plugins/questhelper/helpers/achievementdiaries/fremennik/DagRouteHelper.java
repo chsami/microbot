@@ -24,10 +24,9 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.fremennik;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
@@ -36,18 +35,14 @@ import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequire
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.ItemID;
-import net.runelite.api.Prayer;
-import net.runelite.api.QuestState;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.Prayer;
+import net.runelite.api.QuestState;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.DAG_ROUTE
-)
 public class DagRouteHelper extends ComplexStateQuestHelper
 {
 	ItemRequirement combatGear, food, prayerPot, petRock, thrownaxe, stamPot;
@@ -59,13 +54,14 @@ public class DagRouteHelper extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		return new ConditionalStep(this, dagRoute);
 	}
 
-	public void setupRequirements()
+	@Override
+	protected void setupRequirements()
 	{
 		thrownaxe = new ItemRequirement("Rune thrownaxe", ItemID.RUNE_THROWNAXE);
 		petRock = new ItemRequirement("Pet rock", ItemID.PET_ROCK);

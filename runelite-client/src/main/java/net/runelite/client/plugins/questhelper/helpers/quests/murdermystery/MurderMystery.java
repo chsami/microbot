@@ -24,34 +24,38 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.murdermystery;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
 import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.eventbus.Subscribe;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.MURDER_MYSTERY
-)
 public class MurderMystery extends BasicQuestHelper
 {
 	//Items Required
@@ -87,7 +91,7 @@ public class MurderMystery extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupZone();
 		setupConditions();
 		setupSteps();
@@ -209,11 +213,21 @@ public class MurderMystery extends BasicQuestHelper
 		hadThread = new RuneliteRequirement(getConfigManager(), "murdermysteryhadthread", criminalsThread.alsoCheckBank(questBank));
 		hadPot = new RuneliteRequirement(getConfigManager(), "murdermysteryhadpot", pungentPot.alsoCheckBank(questBank));
 		heardAboutPoisonSalesman = new RuneliteRequirement(getConfigManager(), "murdermysterytalkedtogossip",
-			new Conditions(true, new DialogRequirement( "Especially as I heard that the poison salesman in the<br>Seers' village made a big sale to one of the family the<br>other day."))
+			new Conditions(true, new DialogRequirement( "Especially as I heard that the poison salesman in the Seers' village made a big sale to one of the family the other day."))
 		);
 		talkedToPoisonSalesman = new RuneliteRequirement(getConfigManager(), "murdermysterytalkedtopoisonsalesman",
-			new Conditions(true, new DialogRequirement(client.getLocalPlayer().getName(),  "Uh... no, it's ok."))
-		);
+			new Conditions(true, LogicType.OR,
+		    	new DialogRequirement(questHelperPlugin.getPlayerStateManager().getPlayerName(),  "Uh... no, it's ok.", false),
+				new DialogRequirement("Anna, Bob, Carol, David, Elizabeth and Frank all bought a bottle! " +
+				"In fact they bought the last of my supplies!")
+		));
+
+		annaGuilty = new VarplayerRequirement(195, 1);
+		bobGuilty = new VarplayerRequirement(195, 2);
+		carolGuilty = new VarplayerRequirement(195, 3);
+		davidGuilty = new VarplayerRequirement(195, 4);
+		elizabethGuilty = new VarplayerRequirement(195, 5);
+		frankGuilty = new VarplayerRequirement(195, 6);
 
 		hasCriminalSilverItem = new Conditions(
 			LogicType.OR,
@@ -224,13 +238,6 @@ public class MurderMystery extends BasicQuestHelper
 			new Conditions(elizabethGuilty, silverNeedle),
 			new Conditions(frankGuilty, silverPot)
 		);
-
-		annaGuilty = new VarplayerRequirement(195, 1);
-		bobGuilty = new VarplayerRequirement(195, 2);
-		carolGuilty = new VarplayerRequirement(195, 3);
-		davidGuilty = new VarplayerRequirement(195, 4);
-		elizabethGuilty = new VarplayerRequirement(195, 5);
-		frankGuilty = new VarplayerRequirement(195, 6);
 
 		hasSuspectPrint = new Conditions(
 			LogicType.OR,
@@ -261,27 +268,27 @@ public class MurderMystery extends BasicQuestHelper
 
 		talkedToAnna = new Conditions(
 			true,
-			new DialogRequirement("Anna", "That useless Gardener Stanford has let his compost")
+			new DialogRequirement("Anna", "That useless Gardener Stanford has let his compost", false)
 		);
 		talkedToBob = new Conditions(
 			true,
-			new DialogRequirement("Bob", "What's it to you anyway? If you absolutely")
+			new DialogRequirement("Bob", "What's it to you anyway? If you absolutely", false)
 		);
 		talkedToCarol = new Conditions(
 			true,
-			new DialogRequirement("Carol", "I felt I had to do it myself.")
+			new DialogRequirement("Carol", "I felt I had to do it myself.", false)
 		);
 		talkedToDavid = new Conditions(
 			true,
-			new DialogRequirement("David", "fire the whole workshy lot")
+			new DialogRequirement("David", "fire the whole workshy lot", false)
 		);
 		talkedToElizabeth = new Conditions(
 			true,
-			new DialogRequirement("Elizabeth", "Doesn't everyone?")
+			new DialogRequirement("Elizabeth", "Doesn't everyone?", false)
 		);
 		talkedToFrank = new Conditions(
 			true,
-			new DialogRequirement("Frank", "clean that family crest")
+			new DialogRequirement("Frank", "clean that family crest", false)
 		);
 		talkedToSuspect = new RuneliteRequirement(getConfigManager(), "murdermysterytalkedtosuspect",
 			new Conditions(
@@ -333,7 +340,7 @@ public class MurderMystery extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		pot = new ItemRequirement("Pot", ItemID.POT);
 		pungentPot = new ItemRequirement("Pungent pot", ItemID.PUNGENT_POT);
@@ -459,8 +466,8 @@ public class MurderMystery extends BasicQuestHelper
 
 		talkToAnna = new NpcStep(this, NpcID.ANNA_4220, new WorldPoint(2734, 3575, 0), "Talk to Anna in the mansion about what she used the poison for. Make sure to finish the dialog.");
 		talkToBob = new NpcStep(this, NpcID.BOB_4221, new WorldPoint(2748, 3559, 0), "Talk to Bob south of the mansion about what he used the poison for. Make sure to finish the dialog.");
-		talkToFrank = new NpcStep(this, NpcID.FRANK, new WorldPoint(2742, 3577, 0), "Talk to Anna in the mansion about what he used the poison for. Make sure to finish the dialog.");
-		talkToDavid = new NpcStep(this, NpcID.DAVID_4223, new WorldPoint(2739, 3581, 0), "Talk to Anna in the mansion about what he used the poison for. Make sure to finish the dialog.");
+		talkToFrank = new NpcStep(this, NpcID.FRANK, new WorldPoint(2742, 3577, 0), "Talk to Frank in the mansion about what he used the poison for. Make sure to finish the dialog.");
+		talkToDavid = new NpcStep(this, NpcID.DAVID_4223, new WorldPoint(2739, 3581, 0), "Talk to David in the mansion about what he used the poison for. Make sure to finish the dialog.");
 		talkToCarol = new ConditionalStep(this, goUpstairs, "Talk to Carol upstairs in the mansion about what she used her poison for. Make sure to finish the dialog.");
 		((ConditionalStep) talkToCarol).addStep(isUpstairs, new NpcStep(this, NpcID.CAROL, new WorldPoint(2734, 3581, 1), ""));
 		talkToElizabeth = new ConditionalStep(this, goUpstairs, "Talk to Elizabeth upstairs in the mansion about what she used her poison for.");
@@ -469,8 +476,8 @@ public class MurderMystery extends BasicQuestHelper
 		searchAnna = new ObjectStep(this, ObjectID.SINCLAIR_FAMILY_COMPOST_HEAP, new WorldPoint(2730, 3572, 0), "Search the compost heap south west of the mansion. If a dialog box doesn't come up, go back to Anna to ask about poison, and COMPLETE THE DIALOG.");
 		searchBob = new ObjectStep(this, ObjectID.SINCLAIR_FAMILY_BEEHIVE, new WorldPoint(2730, 3559, 0), "Search the beehive south west of the mansion. If a dialog box doesn't come up, go back to Bob to ask about poison, and COMPLETE THE DIALOG.");
 		searchCarol = new ObjectStep(this, ObjectID.SINCLAIR_MANSION_DRAIN, new WorldPoint(2736, 3573, 0), "Search the drain south of the mansion. If a dialog box doesn't come up, go back to Carol to ask about poison, and COMPLETE THE DIALOG.");
-		searchDavid = new ConditionalStep(this, goUpstairs);
-		((ConditionalStep)searchDavid).addStep(isUpstairs, new ObjectStep(this, ObjectID.SPIDERS_NEST, new WorldPoint(2740, 3574, 1), "Search the spider's nest, upstairs in the mansion to the south. If a dialog box doesn't come up, go back to David to ask about poison, and COMPLETE THE DIALOG."));
+		searchDavid = new ConditionalStep(this, goUpstairs, "Search the spider's nest, upstairs in the mansion to the south. If a dialog box doesn't come up, go back to David to ask about poison, and COMPLETE THE DIALOG.");
+		((ConditionalStep)searchDavid).addStep(isUpstairs, new ObjectStep(this, ObjectID.SPIDERS_NEST, new WorldPoint(2740, 3574, 1), ""));
 		searchElizabeth = new ObjectStep(this, ObjectID.SINCLAIR_FAMILY_FOUNTAIN, new WorldPoint(2747, 3563, 0), "Search the fountain south east of the mansion. If a dialog box doesn't come up, go back to Elizabeth to ask about poison, and COMPLETE THE DIALOG.");
 		searchFrank = new ObjectStep(this, ObjectID.SINCLAIR_FAMILY_CREST, new WorldPoint(2746, 3573, 0), "Search the family crest attached to the south side of the mansion to the east. If a dialog box doesn't come up, go back to Frank to ask about poison, and COMPLETE THE DIALOG.");
 
@@ -569,7 +576,7 @@ public class MurderMystery extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("2,000 Coins", ItemID.COINS_995, 2000));
+		return Collections.singletonList(new ItemReward("Coins", ItemID.COINS_995, 2000));
 	}
 
 	@Override

@@ -24,32 +24,40 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.aporcineofinterest;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.A_PORCINE_OF_INTEREST
-)
 public class APorcineOfInterest extends BasicQuestHelper
 {
 	//Items Required
 	ItemRequirement rope, slashItem, reinforcedGoggles, combatGear, hoof;
+
+	//Items Recommended
+	ItemRequirement draynorTeleport, faladorFarmTeleport;
 
 	Requirement inCave;
 
@@ -62,8 +70,7 @@ public class APorcineOfInterest extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -94,7 +101,7 @@ public class APorcineOfInterest extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		rope = new ItemRequirement("Rope", ItemID.ROPE);
 		rope.setHighlightInInventory(true);
@@ -110,9 +117,15 @@ public class APorcineOfInterest extends BasicQuestHelper
 
 		hoof = new ItemRequirement("Sourhog foot", ItemID.SOURHOG_FOOT);
 		hoof.setTooltip("You can get another from Sourhog's corpse in his cave");
+
+		// Recommended
+		draynorTeleport = new ItemRequirement("Teleport to north Draynor", ItemID.DRAYNOR_MANOR_TELEPORT);
+		draynorTeleport.addAlternates(ItemCollections.AMULET_OF_GLORIES);
+		faladorFarmTeleport = new ItemRequirement("Teleport to Falador Farm", ItemCollections.EXPLORERS_RINGS);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		cave = new Zone(new WorldPoint(3152, 9669, 0), new WorldPoint(3181, 9720, 0));
 	}
@@ -131,6 +144,7 @@ public class APorcineOfInterest extends BasicQuestHelper
 		talkToSarah.addDialogSteps("Talk about the bounty.");
 
 		useRopeOnHole = new ObjectStep(this, NullObjectID.NULL_40341, new WorldPoint(3151, 3348, 0), "Use a rope on the Strange Hole east of Draynor Manor.", rope);
+		useRopeOnHole.addTeleport(draynorTeleport);
 		useRopeOnHole.addIcon(ItemID.ROPE);
 		useRopeOnHole.addDialogSteps("I think that'll be all for now.");
 
@@ -149,6 +163,7 @@ public class APorcineOfInterest extends BasicQuestHelper
 		cutOffFoot.addSubSteps(enterHoleForFoot);
 
 		returnToSarah = new NpcStep(this, NpcID.SARAH, new WorldPoint(3033, 3293, 0), "Return to Sarah in the South Falador Farm.", hoof);
+		returnToSarah.addTeleport(faladorFarmTeleport);
 		returnToSarah.addDialogSteps("Talk about the bounty.");
 		returnToSpria = new NpcStep(this, NpcID.SPRIA_10434, new WorldPoint(3092, 3267, 0), "Return to Spria in Draynor Village.");
 	}
@@ -156,13 +171,13 @@ public class APorcineOfInterest extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRequirements()
 	{
-		return Arrays.asList(rope, slashItem);
+		return Arrays.asList(rope, slashItem, combatGear);
 	}
 
 	@Override
 	public List<ItemRequirement> getItemRecommended()
 	{
-		return Collections.singletonList(combatGear);
+		return Arrays.asList(draynorTeleport, faladorFarmTeleport);
 	}
 
 	@Override
@@ -186,7 +201,7 @@ public class APorcineOfInterest extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("5,000 Coins", ItemID.COINS_995, 5000));
+		return Collections.singletonList(new ItemReward("Coins", ItemID.COINS_995, 5000));
 	}
 
 	@Override

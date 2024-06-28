@@ -25,20 +25,28 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.theforsakentower;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.OwnerStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.NonNull;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
@@ -46,17 +54,11 @@ import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.components.PanelComponent;
-
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class JugPuzzle extends QuestStep implements OwnerStep
 {
@@ -117,7 +119,7 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 
 	protected void updateSteps()
 	{
-		Widget widget = client.getWidget(WidgetInfo.DIALOG_SPRITE_TEXT);
+		Widget widget = client.getWidget(ComponentID.DIALOG_SPRITE_TEXT);
 
 		if (widget != null)
 		{
@@ -290,7 +292,7 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
 	{
 		if (currentStep != null)
 		{
@@ -299,7 +301,7 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -308,7 +310,7 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -317,7 +319,7 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{

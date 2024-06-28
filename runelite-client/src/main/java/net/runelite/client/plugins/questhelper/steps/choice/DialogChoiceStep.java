@@ -1,37 +1,42 @@
 package net.runelite.client.plugins.questhelper.steps.choice;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 
 import java.util.regex.Pattern;
+import lombok.Getter;
+import lombok.Setter;
 
 public class DialogChoiceStep extends WidgetChoiceStep
 {
+	@Setter
+	@Getter
+	protected String expectedPreviousLine;
 
-	public DialogChoiceStep(MQuestHelperConfig config, String choice)
+	public DialogChoiceStep(QuestHelperConfig config, String choice)
 	{
 		super(config, choice, 219, 1);
 		shouldNumber = true;
 	}
 
-	public DialogChoiceStep(MQuestHelperConfig config, Pattern pattern)
+	public DialogChoiceStep(QuestHelperConfig config, Pattern pattern)
 	{
 		super(config, pattern, 219, 1);
 		shouldNumber = true;
 	}
 
-	public DialogChoiceStep(MQuestHelperConfig config, int choiceId, String choice)
+	public DialogChoiceStep(QuestHelperConfig config, int choiceId, String choice)
 	{
 		super(config, choiceId, choice, 219, 1);
 		shouldNumber = true;
 	}
 
-	public DialogChoiceStep(MQuestHelperConfig config, int choiceId, Pattern pattern)
+	public DialogChoiceStep(QuestHelperConfig config, int choiceId, Pattern pattern)
 	{
 		super(config, choiceId, pattern, 219, 1);
 		shouldNumber = true;
 	}
 
-	public DialogChoiceStep(MQuestHelperConfig config, int choice)
+	public DialogChoiceStep(QuestHelperConfig config, int choice)
 	{
 		super(config, choice, 219, 1);
 		shouldNumber = true;

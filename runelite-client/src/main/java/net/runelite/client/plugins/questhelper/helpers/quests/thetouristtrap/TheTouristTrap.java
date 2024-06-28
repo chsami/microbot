@@ -24,38 +24,49 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thetouristtrap;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.api.widgets.ComponentID;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_TOURIST_TRAP
-)
 public class TheTouristTrap extends BasicQuestHelper
 {
 	//Items Required
-	ItemRequirement desertTop, desertBottom, desertBoot, desertTopWorn, desertBottomWorn, desertBootWorn, bronzeBar3, hammer, feather10,
+	ItemRequirement desertTop, desertBottom, desertBoot, desertTopWorn, desertBottomWorn, desertBootWorn, bronzeBar3, hammer, feather50,
 		metalKey, slaveTop, slaveRobe, slaveBoot, slaveTopWorn, slaveRobeWorn, slaveBootWorn, bedabinKey, technicalPlans, prototypeDart, prototypeDartTip,
 		bronzeBar, tentiPineapple, bronzeBarHighlighted, barrel, anaInABarrel, anaInABarrelHighlighted, barrelHighlighted;
 
@@ -79,8 +90,7 @@ public class TheTouristTrap extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -180,7 +190,7 @@ public class TheTouristTrap extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
@@ -216,7 +226,7 @@ public class TheTouristTrap extends BasicQuestHelper
 		prototypeDartTip = new ItemRequirement("Prototype dart tip", ItemID.PROTOTYPE_DART_TIP);
 		prototypeDartTip.setHighlightInInventory(true);
 
-		feather10 = new ItemRequirement("Feather", ItemID.FEATHER, 10);
+		feather50 = new ItemRequirement("Feather", ItemID.FEATHER, 50);
 		bronzeBar = new ItemRequirement("Bronze bar", ItemID.BRONZE_BAR);
 		bronzeBarHighlighted = new ItemRequirement("Bronze bar", ItemID.BRONZE_BAR);
 		bronzeBarHighlighted.setHighlightInInventory(true);
@@ -237,7 +247,8 @@ public class TheTouristTrap extends BasicQuestHelper
 		coins100 = new ItemRequirement("Coins", ItemCollections.COINS, 100);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		jail = new Zone(new WorldPoint(3284, 3031, 0), new WorldPoint(3287, 3037, 0));
 		camp = new Zone(new WorldPoint(3274, 3014, 0), new WorldPoint(3305, 3037, 1));
@@ -271,7 +282,7 @@ public class TheTouristTrap extends BasicQuestHelper
 
 		hasSlaveClothes = new ItemRequirements(slaveTop, slaveBoot, slaveRobe);
 
-		searchedBookcase = new Conditions(true, new WidgetTextRequirement(WidgetInfo.DIALOG_SPRITE_TEXT, "You notice several books on the subject of sailing."));
+		searchedBookcase = new Conditions(true, new WidgetTextRequirement(ComponentID.DIALOG_SPRITE_TEXT, "You notice several books on the subject of sailing."));
 		distractedSiad = new Conditions(true, new WidgetTextRequirement(229, 1, "The captain starts rambling on about his days as a salty sea dog. He<br>looks quite distracted..."));
 
 		anaPlacedOnCartOfLift = new VarbitRequirement(2805, 1);
@@ -285,9 +296,9 @@ public class TheTouristTrap extends BasicQuestHelper
 
 	public void setupSteps()
 	{
-		talkToIrena = new NpcStep(this, NpcID.IRENA, new WorldPoint(3304, 3112, 0), "Talk to Irena south of the Shanty Pass.");
+		talkToIrena = new NpcStep(this, NpcID.IRENA, new WorldPoint(3304, 3112, 0), "Talk to Irena south of the Shantay Pass.");
 		talkToIrena.addDialogSteps("What's the matter?", "Is there a reward if I get her back?", "I'll look for your daughter.", "Okay Irena, calm down. I'll get your daughter back for you.", "Yes, I'll go on this quest!");
-		talkToCaptain = new NpcStep(this, NpcID.MERCENARY_CAPTAIN, new WorldPoint(3271, 3029, 0), "Talk the Mercenary Captain outside the Desert Mining Camp. When he attacks you, kill him for a key.", combatGear);
+		talkToCaptain = new NpcStep(this, NpcID.MERCENARY_CAPTAIN, new WorldPoint(3271, 3029, 0), "Talk to the Mercenary Captain outside the Desert Mining Camp. When he attacks you, kill him for a key.", combatGear);
 		talkToCaptain.addDialogSteps("Wow! A real captain!", "I'd love to work for a tough guy like you!", "Can't I do something for a strong Captain like you?", "Sorry Sir, I don't think I can do that.", "It's a funny captain who can't fight his own battles!");
 		killCaptain = new NpcStep(this, NpcID.MERCENARY_CAPTAIN, new WorldPoint(3271, 3029, 0), "Kill the Mercenary Captain outside the Desert Mining Camp.", combatGear);
 
@@ -316,12 +327,12 @@ public class TheTouristTrap extends BasicQuestHelper
 		talkToSiad.addDialogSteps("I wanted to have a chat?", "You seem to have a lot of books!", "So, you're interested in sailing?", "I could tell by the cut of your jib.");
 		searchChest = new ObjectStep(this, ObjectID.CHEST_2677, new WorldPoint(3292, 3033, 1), "Search the chest.");
 		searchChest.addDialogSteps("I wanted to have a chat?", "You seem to have a lot of books!", "So, you're interested in sailing?", "I could tell by the cut of your jib.");
-		returnToShabim = new NpcStep(this, NpcID.AL_SHABIM, new WorldPoint(3171, 3028, 0), "Return to Al Shabim in the Bedabin Camp with the plans.", technicalPlans, bronzeBar, hammer, feather10);
+		returnToShabim = new NpcStep(this, NpcID.AL_SHABIM, new WorldPoint(3171, 3028, 0), "Return to Al Shabim in the Bedabin Camp with the plans.", technicalPlans, bronzeBar, hammer, feather50);
 		returnToShabim.addDialogSteps("Yes, I'm very interested.", "Yes, I'm kind of curious.");
-		useAnvil = new ObjectStep(this, ObjectID.AN_EXPERIMENTAL_ANVIL, new WorldPoint(3171, 3048, 0), "Enter the north tent and attempt to make a prototype dart tip on the anvil. Bring all 3 bars with you for this.", technicalPlans, bronzeBarHighlighted, hammer, feather10);
+		useAnvil = new ObjectStep(this, ObjectID.AN_EXPERIMENTAL_ANVIL, new WorldPoint(3171, 3048, 0), "Enter the north tent and attempt to make a prototype dart tip on the anvil. Bring all 3 bars with you for this.", technicalPlans, bronzeBarHighlighted, hammer, feather50);
 		useAnvil.addDialogStep("Yes. I'd like to try.");
 		useAnvil.addIcon(ItemID.BRONZE_BAR);
-		useFeatherOnTip = new DetailedQuestStep(this, "Add 10 feathers to the prototype dart tip.", prototypeDartTip, feather10.highlighted());
+		useFeatherOnTip = new DetailedQuestStep(this, "Add 10 feathers to the prototype dart tip.", prototypeDartTip, feather50.highlighted());
 		bringPrototypeToShabim = new NpcStep(this, NpcID.AL_SHABIM, new WorldPoint(3171, 3028, 0), "Bring the prototype dart to Al Shabim.", prototypeDart);
 
 		enterCampWithPineapple = new ObjectStep(this, ObjectID.GATE_2673, new WorldPoint(3273, 3029, 0), "UNEQUIP ALL COMBAT GEAR and enter the camp.", metalKey, tentiPineapple, slaveTop, slaveRobe, slaveBoot);
@@ -355,9 +366,9 @@ public class TheTouristTrap extends BasicQuestHelper
 		talkToDriver = new NpcStep(this, NpcID.MINE_CART_DRIVER, new WorldPoint(3287, 3021, 0), "Talk to the Mine Cart Driver to escape. Once he's agreed to take you, right-click search the wooden cart to escape.");
 		talkToDriver.addDialogSteps("Nice cart.", "One wagon wheel says to the other, 'I'll see you around'.", "'One good turn deserves another'", "Fired... no, shot perhaps!",
 			"In for a penny in for a pound.", "Well, you see, it's like this...", "Prison riot in ten minutes, get your cart out of here!", "You can't leave me here, I'll get killed!", "Yes, I'll get on.");
-		returnToIrena = new NpcStep(this, NpcID.IRENA, new WorldPoint(3304, 3112, 0), "Bring Ana to Irena south of the Shanty Pass.", anaInABarrel);
-		talkToAna = new NpcStep(this, NpcID.ANA, new WorldPoint(3302, 3110, 0), "Talk to Ana outside the Shanty Pass.");
-		talkToIrenaToFinish = new NpcStep(this, NpcID.IRENA, new WorldPoint(3304, 3112, 0), "Talk to Irena south of the Shanty Pass to finish the quest!");
+		returnToIrena = new NpcStep(this, NpcID.IRENA, new WorldPoint(3304, 3112, 0), "Bring Ana to Irena south of the Shantay Pass.", anaInABarrel);
+		talkToAna = new NpcStep(this, NpcID.ANA, new WorldPoint(3302, 3110, 0), "Talk to Ana outside the Shantay Pass.");
+		talkToIrenaToFinish = new NpcStep(this, NpcID.IRENA, new WorldPoint(3304, 3112, 0), "Talk to Irena south of the Shantay Pass to finish the quest!");
 
 		mineRocks = new DetailedQuestStep(this, "Mine 15 rocks to be able to leave.");
 	}
@@ -371,7 +382,7 @@ public class TheTouristTrap extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRequirements()
 	{
-		return Arrays.asList(desertTop, desertBottom, desertBoot, bronzeBar3, hammer, feather10);
+		return Arrays.asList(desertTop, desertBottom, desertBoot, bronzeBar3, hammer, feather50);
 	}
 
 
@@ -403,7 +414,7 @@ public class TheTouristTrap extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("4,650 Exp. Lamps (Agility, Fletching, Smithing or Theiving)", ItemID.ANTIQUE_LAMP, 2));
+		return Collections.singletonList(new ItemReward("4,650 Exp. Lamps (Agility, Fletching, Smithing or Thieving)", ItemID.ANTIQUE_LAMP, 2));
 	}
 
 	@Override
@@ -418,11 +429,11 @@ public class TheTouristTrap extends BasicQuestHelper
 		List<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Investigating the trap",
 			Arrays.asList(talkToIrena, talkToCaptain, enterCamp, talkToSlave, enterMine, talkToGuard),
-			desertTop, desertBottom, desertBoot, bronzeBar3, hammer, feather10));
+			desertTop, desertBottom, desertBoot, bronzeBar3, hammer, feather50));
 		allSteps.add(new PanelDetails("Helping out",
 			Arrays.asList(talkToShabim, enterCampForTask, goUpToSiad, searchBookcase, talkToSiad, searchChest, returnToShabim,
 				useAnvil, useFeatherOnTip, bringPrototypeToShabim),
-			bronzeBar3, hammer, feather10));
+			bronzeBar3, hammer, feather50));
 		allSteps.add(new PanelDetails("Freeing Ana",
 			Arrays.asList(enterCampWithPineapple, enterMineWithPineapple, talkToGuardWithPineapple, enterDeepMine, getBarrel, enterMineCart, useBarrelOnAna, useBarrelOnMineCart,
 				returnInMineCart, searchBarrelsForAna, sendAnaUp, leaveDeepMine, operateWinch, searchWinchBarrel, useBarrelOnCart, talkToDriver, returnToIrena, talkToAna, talkToIrenaToFinish),

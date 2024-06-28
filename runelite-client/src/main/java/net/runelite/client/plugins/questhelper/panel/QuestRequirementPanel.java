@@ -24,14 +24,12 @@
  */
 package net.runelite.client.plugins.questhelper.panel;
 
-import lombok.Getter;
-import lombok.Setter;
-import net.runelite.client.plugins.questhelper.Icon;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.managers.QuestManager;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.tools.Icon;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -39,6 +37,10 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import lombok.Getter;
+import lombok.Setter;
 
 public class QuestRequirementPanel extends JPanel
 {
@@ -51,7 +53,7 @@ public class QuestRequirementPanel extends JPanel
 	@Getter
 	private final Requirement requirement;
 
-	public QuestRequirementPanel(Requirement requirement)
+	public QuestRequirementPanel(Requirement requirement, QuestManager questManager)
 	{
 		this.requirement = requirement;
 
@@ -70,9 +72,9 @@ public class QuestRequirementPanel extends JPanel
 		}
 
 		text.append(requirement.getDisplayText());
-
 		String html1 = "<html><body style='padding: 0px; margin: 0px; width: 140px'>";
 		String html2 = "</body></html>";
+		String html1Underline = "<html><body style='padding: 0px; margin: 0px; width: 140px; text-decoration:underline'>";
 
 		label = new JLabel(html1 + text + html2);
 		label.setForeground(Color.GRAY);
@@ -122,6 +124,27 @@ public class QuestRequirementPanel extends JPanel
 							menu.show(label, e.getX(), e.getY());
 						}
 					}
+				}
+			});
+		}
+		else if (questManager != null && requirement instanceof QuestRequirement)
+		{
+			QuestHelper quest = ((QuestRequirement) requirement).getQuest().getQuestHelper();
+			label.addMouseListener(new MouseAdapter()
+			{
+				public void mouseClicked(MouseEvent event)
+				{
+					questManager.setSidebarSelectedQuest(quest);
+				}
+
+				public void mouseEntered(MouseEvent evt)
+				{
+					label.setText(html1Underline + text + html2);
+				}
+
+				public void mouseExited(MouseEvent evt)
+				{
+					label.setText(html1 + text + html2);
 				}
 			});
 		}
