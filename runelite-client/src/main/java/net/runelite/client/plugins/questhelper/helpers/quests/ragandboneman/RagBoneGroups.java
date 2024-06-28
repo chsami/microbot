@@ -24,13 +24,12 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.ragandboneman;
 
-import net.runelite.client.plugins.questhelper.QuestBank;
+import net.runelite.client.plugins.questhelper.bank.QuestBank;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -24,23 +24,22 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.anothersliceofham;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.FollowerRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcInteractingRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcInteractingWithNpcRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
@@ -48,15 +47,26 @@ import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.ANOTHER_SLICE_OF_HAM
-)
 public class AnotherSliceOfHam extends BasicQuestHelper
 {
 	//Items Required
@@ -89,7 +99,7 @@ public class AnotherSliceOfHam extends BasicQuestHelper
 
 	DetailedQuestStep talkToSergeant, enterSwamp, climbEnterHamBase;
 
-	DetailedQuestStep goToCrate, waitAtCrate, lureHamMember, enterFinalFight, useSpecial, defeatSigmund, untieZanik;
+	QuestStep goToCrate, waitAtCrate, lureHamMember, enterFinalFight, useSpecial, defeatSigmund, untieZanik;
 
 	ConditionalStep goTalkToUrtag, goTalkToTegdak, goGetArtefacts, goTalkToScribe, goTalkToOldak;
 
@@ -99,8 +109,7 @@ public class AnotherSliceOfHam extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		setupConditionalSteps();
@@ -141,7 +150,7 @@ public class AnotherSliceOfHam extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		lightSource = new ItemRequirement("A light source", ItemCollections.LIGHT_SOURCES).isNotConsumed();
 
@@ -180,7 +189,8 @@ public class AnotherSliceOfHam extends BasicQuestHelper
 	}
 
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		basement = new Zone(new WorldPoint(3208, 9614, 0), new WorldPoint(3219, 9625, 0));
 		tunnels = new Zone(new WorldPoint(3221, 9602, 0), new WorldPoint(3308, 9661, 0));
@@ -262,10 +272,8 @@ public class AnotherSliceOfHam extends BasicQuestHelper
 			"Climb up to the next floor.");
 		talkToUrtag = new NpcStep(this, NpcID.URTAG, new WorldPoint(2733, 5366, 1),
 			"Talk to Ur-tag in the north east building.");
-		talkToUrtag.setWorldMapPoint(new WorldPoint(2797, 5429, 1));
 		enterRailway = new ObjectStep(this, ObjectID.DOORWAY_23052, new WorldPoint(2695, 5277, 1),
 			"Enter the railway entrance in the south west of Dorgesh-Kaan.");
-		enterRailway.setWorldMapPoint(new WorldPoint(2760, 5341, 1));
 
 		talkToTegdak = new NpcStep(this, NpcID.TEGDAK, new WorldPoint(2512, 5564, 0), "");
 
@@ -306,10 +314,8 @@ public class AnotherSliceOfHam extends BasicQuestHelper
 			"Leave the railway.");
 		talkToScribe = new NpcStep(this, NpcID.GOBLIN_SCRIBE, new WorldPoint(2716, 5369, 1),
 			"");
-		talkToScribe.setWorldMapPoint(new WorldPoint(2778, 5432, 1));
 		goDownToF0City = new ObjectStep(this, ObjectID.STAIRS_22940, new WorldPoint(2721, 5360, 1),
 			"Go downstairs.");
-		goDownToF0City.setWorldMapPoint(new WorldPoint(2784, 5425, 1));
 		talkToOldak = new NpcStep(this, NpcID.OLDAK, new WorldPoint(2704, 5365, 0), "");
 
 		talkToGenerals = new NpcStep(this, NpcID.GENERAL_WARTFACE, new WorldPoint(2957, 3512, 0),
@@ -338,13 +344,12 @@ public class AnotherSliceOfHam extends BasicQuestHelper
 		climbEnterHamBase = new ObjectStep(this, NullObjectID.NULL_23282, new WorldPoint(3171, 9568, 0),
 			"Climb down the ladder to the secret H.A.M. base.");
 
-		goToCrate = new ObjectStep(this, ObjectID.CRATE_23283, new WorldPoint(2408, 5538, 0), "Hide behind the marked" +
-			" crate, and " +
-			"wait for the guards to walk past and around the corner.");
-		waitAtCrate = new DetailedQuestStep(this, "Wait for the guards to go around the corner.");
+		goToCrate = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.CRATE_23283, new WorldPoint(2408, 5538, 0), "Hide behind the marked" +
+			" crate, and wait for the guards to walk past and around the corner."), "Work out how to avoid all the H.A.M guards.");
+		waitAtCrate = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Wait for the guards to go around the corner."), "Work out how to avoid all the H.A.M guards.");
 		goToCrate.addSubSteps(waitAtCrate);
-		lureHamMember = new DetailedQuestStep(this, new WorldPoint(2412, 5537, 0), "Run out infront of the final " +
-			"guard, and wait for one of the sergeants to attack them.");
+		lureHamMember = new PuzzleWrapperStep(this, new DetailedQuestStep(this, new WorldPoint(2412, 5537, 0), "Run out in front of the final " +
+			"guard, and wait for one of the sergeants to attack them."), "Work out how to avoid all the H.A.M guards.");
 		enterFinalFight = new ObjectStep(this, ObjectID.LADDER_23376, new WorldPoint(2413, 5526, 0), "Climb down the " +
 			"ladder.");
 

@@ -24,25 +24,28 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.ghostsahoy;
 
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 
 public class DyeShipSteps extends DetailedOwnerStep
 {
@@ -85,7 +88,7 @@ public class DyeShipSteps extends DetailedOwnerStep
 
 	private void updateCurrentColours()
 	{
-		Widget dyed = client.getWidget(WidgetInfo.DIALOG_SPRITE_TEXT);
+		Widget dyed = client.getWidget(ComponentID.DIALOG_SPRITE_TEXT);
 		if (dyed == null)
 		{
 			return;

@@ -24,9 +24,8 @@
  */
 package net.runelite.client.plugins.questhelper.steps.overlay;
 
-import net.runelite.client.plugins.questhelper.Icon;
-
-import java.awt.*;
+import net.runelite.client.plugins.questhelper.tools.Icon;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class IconOverlay

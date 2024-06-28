@@ -24,30 +24,28 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.romeoandjuliet;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.ROMEO__JULIET
-)
 public class RomeoAndJuliet extends BasicQuestHelper
 {
 	//Items Required
@@ -55,7 +53,7 @@ public class RomeoAndJuliet extends BasicQuestHelper
 
 	Requirement inJulietRoom;
 
-	QuestStep talkToRomeo, goUpToJuliet, talkToJuliet, giveLetterToRomeo, talkToLawrence, talkToApothecary, givePotionToJuliet, finishQuest;
+	QuestStep talkToRomeo, goUpToJuliet, talkToJuliet, giveLetterToRomeo, talkToLawrence, talkToApothecary, goUpToJuliet2, givePotionToJuliet, finishQuest;
 
 	//Zones
 	Zone julietRoom;
@@ -63,8 +61,7 @@ public class RomeoAndJuliet extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -81,7 +78,7 @@ public class RomeoAndJuliet extends BasicQuestHelper
 
 		ConditionalStep bringPotionToJuliet = new ConditionalStep(this, talkToApothecary);
 		bringPotionToJuliet.addStep(new Conditions(potion, inJulietRoom), givePotionToJuliet);
-		bringPotionToJuliet.addStep(potion, givePotionToJuliet);
+		bringPotionToJuliet.addStep(potion, goUpToJuliet2);
 
 		steps.put(50, bringPotionToJuliet);
 		steps.put(60, finishQuest);
@@ -90,7 +87,7 @@ public class RomeoAndJuliet extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		cadavaBerry = new ItemRequirement("Cadava berries", ItemID.CADAVA_BERRIES);
 		cadavaBerry.setTooltip("You can pick some from bushes south east of Varrock");
@@ -104,7 +101,8 @@ public class RomeoAndJuliet extends BasicQuestHelper
 		inJulietRoom = new ZoneRequirement(julietRoom);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		julietRoom = new Zone(new WorldPoint(3147, 3425, 1), new WorldPoint(3166, 3443, 1));
 	}
@@ -114,7 +112,6 @@ public class RomeoAndJuliet extends BasicQuestHelper
 		talkToRomeo = new NpcStep(this, NpcID.ROMEO, new WorldPoint(3211, 3422, 0), "Talk to Romeo in Varrock Square.");
 		talkToRomeo.addDialogStep("Yes, I have seen her actually!");
 		talkToRomeo.addDialogStep("Yes, ok, I'll let her know.");
-		talkToRomeo.addDialogStep("Yes.");
 		goUpToJuliet = new ObjectStep(this, ObjectID.STAIRCASE_11797, new WorldPoint(3157, 3436, 0), "Talk to Juliet in the house west of Varrock.");
 		goUpToJuliet.addDialogStep("Ok, thanks.");
 		talkToJuliet = new NpcStep(this, NpcID.JULIET, new WorldPoint(3158, 3427, 1), "Talk to Juliet in the house west of Varrock.");
@@ -126,7 +123,9 @@ public class RomeoAndJuliet extends BasicQuestHelper
 		talkToApothecary = new NpcStep(this, NpcID.APOTHECARY, new WorldPoint(3195, 3405, 0), "Bring the Apothecary cadava berries in south west Varrock.", cadavaBerry);
 		talkToApothecary.addDialogStep("Talk about something else.");
 		talkToApothecary.addDialogStep("Talk about Romeo & Juliet.");
+		goUpToJuliet2 = new ObjectStep(this, ObjectID.STAIRCASE_11797, new WorldPoint(3157, 3436, 0), "Bring the potion to Juliet in the house west of Varrock.", potion);
 		givePotionToJuliet = new NpcStep(this, NpcID.JULIET, new WorldPoint(3158, 3427, 1), "Bring the potion to Juliet in the house west of Varrock.", potion);
+		givePotionToJuliet.addSubSteps(goUpToJuliet2);
 
 		finishQuest = new NpcStep(this, NpcID.ROMEO, new WorldPoint(3211, 3422, 0), "Talk to Romeo in Varrock Square to finish the quest.");
 

@@ -24,29 +24,28 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.hazeelcult;
 
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ManualRequirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 public class HazeelValves extends DetailedOwnerStep
 {
 
-	DetailedQuestStep turnValve1, turnValve2, turnValve3, turnValve4, turnValve5;
+	DetailedQuestStep turnValve1, turnValve2, turnValve3, turnValve4, turnValve5, catchState;
 	DetailedQuestStep turnValve1NoDialog, turnValve2NoDialog,
 		turnValve3NoDialog, turnValve4NoDialog, turnValve5NoDialog;
 
@@ -120,6 +119,10 @@ public class HazeelValves extends DetailedOwnerStep
 			{
 				startUpStep(turnValve5NoDialog);
 			}
+		}
+		else
+		{
+			startUpStep(catchState);
 		}
 	}
 
@@ -231,6 +234,8 @@ public class HazeelValves extends DetailedOwnerStep
 		setupZones();
 		setupConditions();
 
+		catchState = new DetailedQuestStep(getQuestHelper(), "You've entered an unknown state.");
+
 		turnValve1 = new ObjectStep(getQuestHelper(), ObjectID.SEWER_VALVE, new WorldPoint(2562, 3247, 0),
 			"Turn the valve west of the Clocktower to the right.");
 		turnValve1.addDialogStep("Turn it to the right.");
@@ -275,7 +280,7 @@ public class HazeelValves extends DetailedOwnerStep
 	@Override
 	public Collection<QuestStep> getSteps()
 	{
-		return Arrays.asList(turnValve1, turnValve2, turnValve3, turnValve4, turnValve5, turnValve1NoDialog, turnValve2NoDialog, turnValve3NoDialog, turnValve4NoDialog, turnValve5NoDialog);
+		return Arrays.asList(catchState, turnValve1, turnValve2, turnValve3, turnValve4, turnValve5, turnValve1NoDialog, turnValve2NoDialog, turnValve3NoDialog, turnValve4NoDialog, turnValve5NoDialog);
 	}
 
 	public List<QuestStep> getDisplaySteps()

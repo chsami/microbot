@@ -24,26 +24,26 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.xmarksthespot;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.DigStep;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.DigStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.X_MARKS_THE_SPOT
-)
 public class XMarksTheSpot extends BasicQuestHelper
 {
 	//Items Required
@@ -57,7 +57,7 @@ public class XMarksTheSpot extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -75,7 +75,7 @@ public class XMarksTheSpot extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		spade = new ItemRequirement("Spade", ItemID.SPADE).isNotConsumed();
 		glory = new ItemRequirement("Amulet of Glory for faster teleport to Draynor Village.", ItemCollections.AMULET_OF_GLORIES).isNotConsumed();
@@ -83,12 +83,12 @@ public class XMarksTheSpot extends BasicQuestHelper
 
 	private void setupSteps()
 	{
+		// TODO: Worth adding PuzzleWrapperStep at all given the Clue Plugin also does this?
 		speakVeosLumbridge = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3228, 3242, 0),
 			"Talk to Veos in The Sheared Ram pub in Lumbridge to start the quest.");
 		speakVeosLumbridge.addDialogStep("I'm looking for a quest.");
 		speakVeosLumbridge.addDialogStep("Sounds good, what should I do?");
 		speakVeosLumbridge.addDialogSteps("Can I help?", "Yes.");
-
 
 		digOutsideBob = new DigStep(this, new WorldPoint(3230, 3209, 0),
 			"Dig north of Bob's Brilliant Axes, on the west side of the plant against the wall of his house.");
@@ -110,9 +110,11 @@ public class XMarksTheSpot extends BasicQuestHelper
 		speakVeosSarim = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3054, 3245, 0),
 			"Talk to Veos directly south of the Rusty Anchor Inn in Port Sarim to finish the quest.",
 			ancientCasket);
+		((NpcStep) speakVeosSarim).addAlternateNpcs(NpcID.VEOS_8630);
 
 		speakVeosSarimWithoutCasket = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3054, 3245, 0),
 			"Talk to Veos directly south of the Rusty Anchor Inn in Port Sarim to finish the quest.");
+		((NpcStep) speakVeosSarimWithoutCasket).addAlternateNpcs(NpcID.VEOS_8630);
 
 		speakVeosSarim.addSubSteps(speakVeosSarimWithoutCasket);
 	}
@@ -144,7 +146,7 @@ public class XMarksTheSpot extends BasicQuestHelper
 	{
 		return Arrays.asList(
 			new ItemReward("300 Exp. Lamp (Any Skill)", ItemID.ANTIQUE_LAMP, 1),
-			new ItemReward("200 Coins", ItemID.COINS_995, 200),
+			new ItemReward("Coins", ItemID.COINS_995, 200),
 			new ItemReward("A Beginner Clue Scroll", ItemID.CLUE_SCROLL_BEGINNER, 1));
 	}
 

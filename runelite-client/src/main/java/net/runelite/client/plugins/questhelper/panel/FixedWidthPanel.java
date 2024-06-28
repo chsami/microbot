@@ -24,10 +24,9 @@
  */
 package net.runelite.client.plugins.questhelper.panel;
 
+import java.awt.Dimension;
+import javax.swing.JPanel;
 import net.runelite.client.ui.PluginPanel;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class FixedWidthPanel extends JPanel
 {

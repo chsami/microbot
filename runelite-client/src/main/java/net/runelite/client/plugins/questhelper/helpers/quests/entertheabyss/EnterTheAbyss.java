@@ -24,18 +24,18 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.entertheabyss;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
@@ -43,14 +43,16 @@ import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.ENTER_THE_ABYSS
-)
 public class EnterTheAbyss extends BasicQuestHelper
 {
 	// Recommended
@@ -60,7 +62,7 @@ public class EnterTheAbyss extends BasicQuestHelper
 	ItemRequirement scryingOrb, scryingOrbCharged;
 
 	Requirement inWizardBasement, teleportedFromVarrock, teleportedFromArdougne, teleportedFromWizardsTower,
-		teleportedFromGnome, teleportedFromDistentor;
+		teleportedFromGnome, teleportedFromDistentor, freeInventorySpace;
 
 	QuestStep talkToMageInWildy, talkToMageInVarrock, talkToAubury, goDownInWizardsTower, talkToSedridor,
 		talkToCromperty, talkToMageAfterTeleports, talkToMageToFinish;
@@ -70,8 +72,7 @@ public class EnterTheAbyss extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -92,7 +93,7 @@ public class EnterTheAbyss extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		varrockTeleport = new ItemRequirement("Teleports to Varrock", ItemID.VARROCK_TELEPORT, 2);
 		ardougneTeleport = new ItemRequirement("Teleport to Ardougne", ItemID.ARDOUGNE_TELEPORT);
@@ -104,9 +105,12 @@ public class EnterTheAbyss extends BasicQuestHelper
 
 		scryingOrbCharged = new ItemRequirement("Scrying orb", ItemID.SCRYING_ORB);
 		scryingOrbCharged.setTooltip("You can get another from the Mage of Zamorak in south east Varrock");
+
+		freeInventorySpace = new FreeInventorySlotRequirement(1);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		wizardBasement = new Zone(new WorldPoint(3094, 9553, 0), new WorldPoint(3125, 9582, 0));
 	}
@@ -128,7 +132,7 @@ public class EnterTheAbyss extends BasicQuestHelper
 			" of Zamorak in the Wilderness north of Edgeville. BRING NOTHING AS YOU CAN BE KILLED BY OTHER PLAYERS HERE.");
 
 		talkToMageInVarrock = new NpcStep(this, NpcID.MAGE_OF_ZAMORAK_2582, new WorldPoint(3259, 3383, 0),
-			"Talk to the Mage of Zamorak in south east Varrock.");
+			"Talk to the Mage of Zamorak in south east Varrock.", freeInventorySpace);
 		talkToMageInVarrock.addDialogSteps("Where do you get your runes from?", "Maybe I could make it worth your while?", "Yes, but I can still help you as well.",
 			"I did it so that I could then steal their secrets.", "Deal.",
 			"But I'm a loyal servant of Zamorak as well!", "Okay, fine. I don't really serve Zamorak.", "Because I can still help you.");

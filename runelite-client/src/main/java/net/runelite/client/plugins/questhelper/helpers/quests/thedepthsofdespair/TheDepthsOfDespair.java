@@ -24,34 +24,41 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thedepthsofdespair;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.Favour;
-import net.runelite.client.plugins.questhelper.requirements.player.FavourRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.InInstanceRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_DEPTHS_OF_DESPAIR
-)
 public class TheDepthsOfDespair extends BasicQuestHelper
 {
 	// Recommended
@@ -71,21 +78,17 @@ public class TheDepthsOfDespair extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
 		Map<Integer, QuestStep> steps = new HashMap<>();
 
-		ConditionalStep goTalkToLordKandur = new ConditionalStep(this, talkToLordKandur, inVineryHouse);
-		steps.put(0, goTalkToLordKandur);
+		steps.put(0, talkToLordKandur);
 
-		ConditionalStep goTalkToChefOlivia = new ConditionalStep(this, talkToChefOlivia, inVineryHouse);
-		steps.put(1, goTalkToChefOlivia);
+		steps.put(1, talkToChefOlivia);
 
-		ConditionalStep goTalkToGalana = new ConditionalStep(this, talkToGalana, inArceuusLibrary);
-		steps.put(2, goTalkToGalana);
+		steps.put(2, talkToGalana);
 
 		ConditionalStep findAndReadTheVarlamoreEnvoy = new ConditionalStep(this, findTheVarlamoreEnvoy);
 		findAndReadTheVarlamoreEnvoy.addStep(varlamoreEnvoy.alsoCheckBank(questBank), readTheVarlamoreEnvoy);
@@ -118,7 +121,7 @@ public class TheDepthsOfDespair extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		xericsTalisman = new ItemRequirement("Xeric's Talisman", ItemID.XERICS_TALISMAN).isNotConsumed();
 		skillsNecklace = new ItemRequirement("Skills necklace", ItemCollections.SKILLS_NECKLACES).isNotConsumed();
@@ -139,7 +142,8 @@ public class TheDepthsOfDespair extends BasicQuestHelper
 		royalAccordOfTwill = new ItemRequirement("Royal Accord of Twill", ItemID.ROYAL_ACCORD_OF_TWILL);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		houseWestOfVinery = new Zone(new WorldPoint(1810, 3550, 0), new WorldPoint(1820, 3560, 0));
 		arceuusLibraryF1 = new Zone(new WorldPoint(1607, 3831, 0), new WorldPoint(1658, 3784, 0));
@@ -224,7 +228,6 @@ public class TheDepthsOfDespair extends BasicQuestHelper
 		ArrayList<Requirement> req = new ArrayList<>();
 		req.add(new QuestRequirement(QuestHelperQuest.CLIENT_OF_KOUREND, QuestState.FINISHED));
 		req.add(new QuestRequirement(QuestHelperQuest.X_MARKS_THE_SPOT, QuestState.FINISHED));
-		req.add(new FavourRequirement(Favour.HOSIDIUS, 20));
 		req.add(new SkillRequirement(Skill.AGILITY, 18, false));
 		return req;
 	}
@@ -245,8 +248,7 @@ public class TheDepthsOfDespair extends BasicQuestHelper
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("4,000 Coins", ItemID.COINS_995, 4000),
-				new ItemReward("Hosidius Favour Certificate", 1, 1),
+				new ItemReward("Coins", ItemID.COINS_995, 4000),
 				new ItemReward("A Kharedst's Memoirs page", ItemID.KHAREDSTS_MEMOIRS, 1));
 	}
 

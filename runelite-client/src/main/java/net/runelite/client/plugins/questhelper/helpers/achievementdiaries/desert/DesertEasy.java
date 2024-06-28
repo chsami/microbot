@@ -24,38 +24,38 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.desert;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.item.TeleportItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.DESERT_EASY
-)
 public class DesertEasy extends ComplexStateQuestHelper
 {
 	// Items required
@@ -88,8 +88,7 @@ public class DesertEasy extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doEasy = new ConditionalStep(this, claimReward);
@@ -134,7 +133,7 @@ public class DesertEasy extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notGoldWarbler = new VarplayerRequirement(1198, false, 1);
 		notFiveClay = new VarplayerRequirement(1198, false, 2);
@@ -155,7 +154,7 @@ public class DesertEasy extends ComplexStateQuestHelper
 			.showConditioned(new Conditions(LogicType.OR, notEnterKalph, notCollectCacti));
 		shantayPass = new ItemRequirement("Shantay pass", ItemID.SHANTAY_PASS).showConditioned(notEnterDesert);
 		birdSnare = new ItemRequirement("Bird snare", ItemID.BIRD_SNARE).showConditioned(notGoldWarbler).isNotConsumed();
-		pickaxe = new ItemRequirement("Pickaxe", ItemCollections.PICKAXES).showConditioned(notFiveClay).isNotConsumed();
+		pickaxe = new ItemRequirement("Any Pickaxe", ItemCollections.PICKAXES).showConditioned(notFiveClay).isNotConsumed();
 		knife = new ItemRequirement("Knife", ItemID.KNIFE).showConditioned(notCutCactus).isNotConsumed();
 		desertBoots = new ItemRequirement("Desert boots", ItemID.DESERT_BOOTS).showConditioned(notEnterDesert).isNotConsumed();
 		desertRobe = new ItemRequirement("Desert robe", ItemID.DESERT_ROBE).showConditioned(notEnterDesert).isNotConsumed();
@@ -167,8 +166,8 @@ public class DesertEasy extends ComplexStateQuestHelper
 
 		antipoison = new ItemRequirement("Antipoison", ItemCollections.ANTIPOISONS);
 		waterskin = new ItemRequirement("Waterskin", ItemCollections.WATERSKIN).isNotConsumed();
-		pharaohSceptre = new ItemRequirement("Pharaoh's sceptre", ItemCollections.PHAROAH_SCEPTRE).isNotConsumed();
-		necklaceOfPassage = new ItemRequirement("Necklace of passage", ItemCollections.NECKLACE_OF_PASSAGES);
+		pharaohSceptre = new TeleportItemRequirement("Pharaoh's sceptre", ItemCollections.PHAROAH_SCEPTRE).isNotConsumed();
+		necklaceOfPassage = new TeleportItemRequirement("Necklace of passage", ItemCollections.NECKLACE_OF_PASSAGES);
 
 		combatGear = new ItemRequirement("Combat gear and ranged weapon or runes for multiple spell casts", -1, -1);
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
@@ -183,7 +182,8 @@ public class DesertEasy extends ComplexStateQuestHelper
 			2, "Icthlarin's Little Helper Started");
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		pyramidPlunderLobby = new Zone(new WorldPoint(1926, 4465, 2), new WorldPoint(1976, 4419, 3));
 		firstRoom = new Zone(new WorldPoint(1920, 4478, 0), new WorldPoint(1934, 4462, 0));

@@ -24,32 +24,32 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.goblindiplomacy;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+
+import java.util.*;
+
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.GOBLIN_DIPLOMACY
-)
 public class GoblinDiplomacy extends BasicQuestHelper
 {
 	//Required items
@@ -66,8 +66,7 @@ public class GoblinDiplomacy extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -108,7 +107,7 @@ public class GoblinDiplomacy extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		blueDye = new ItemRequirement("Blue dye", ItemID.BLUE_DYE);
 		blueDye.setTooltip("You can have Aggie in Draynor Village make you some for 2 woad leaves (bought from Wyson in Falador Park for 20 coins) and 5 coins.");
@@ -137,7 +136,8 @@ public class GoblinDiplomacy extends BasicQuestHelper
 		hasNorthArmour = new VarbitRequirement(2379, 1);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		upstairs = new Zone(new WorldPoint(2952, 3495, 2), new WorldPoint(2959, 3498, 2));
 	}
@@ -165,16 +165,16 @@ public class GoblinDiplomacy extends BasicQuestHelper
 		talkToGeneral1.addDialogStep("Yes, Wartface looks fat");
 		talkToGeneral1.addDialogStep("Do you want me to pick an armour colour for you?");
 		talkToGeneral1.addDialogStep("What about a different colour?");
-		talkToGeneral1.addDialogStep("I have some orange armour here");
+		talkToGeneral1.addDialogStep("I have some orange armour here.");
 
 		talkToGeneral2 = new NpcStep(this, NpcID.GENERAL_BENTNOZE, new WorldPoint(2958, 3512, 0), "Talk to one of the Goblin Generals in Goblin Village again.", blueArmour);
 		talkToGeneral2.addDialogStep("So how is life for the goblins?");
-		talkToGeneral2.addDialogStep("I have some blue armour here");
+		talkToGeneral2.addDialogStep("I have some blue armour here.");
 
 		talkToGeneral3 = new NpcStep(this, NpcID.GENERAL_BENTNOZE, new WorldPoint(2958, 3512, 0), "Talk to one of the Goblin Generals in Goblin Village once more.", goblinMail);
 		talkToGeneral3.addDialogStep("So how is life for the goblins?");
 		talkToGeneral3.addDialogStep("Yes, Wartface looks fat");
-		talkToGeneral3.addDialogStep("I have some brown armour here");
+		talkToGeneral3.addDialogStep("I have some brown armour here.");
 	}
 
 	@Override

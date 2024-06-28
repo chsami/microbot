@@ -24,13 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.lumbridgeanddraynor;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.player.CombatLevelRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
@@ -41,18 +42,26 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequiremen
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.TileStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.LUMBRIDGE_MEDIUM
-)
 public class LumbridgeMedium extends ComplexStateQuestHelper
 {
 	// Items required
@@ -84,8 +93,7 @@ public class LumbridgeMedium extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doMedium = new ConditionalStep(this, claimReward);
@@ -135,7 +143,7 @@ public class LumbridgeMedium extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notAlKharidRooftop = new VarplayerRequirement(1194, false, 13);
 		notGrappleLum = new VarplayerRequirement(1194, false, 14);
@@ -188,7 +196,8 @@ public class LumbridgeMedium extends ComplexStateQuestHelper
 		lostCity = new QuestRequirement(QuestHelperQuest.LOST_CITY, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		lavaAltar = new Zone(new WorldPoint(2553, 4863, 0), new WorldPoint(2623, 4802, 0));
 		puroPuro = new Zone(new WorldPoint(2561, 4350, 0), new WorldPoint(2623, 4289, 0));
@@ -226,7 +235,7 @@ public class LumbridgeMedium extends ComplexStateQuestHelper
 		pickGardener = new NpcStep(this, NpcID.MARTIN_THE_MASTER_GARDENER, new WorldPoint(3077, 3263, 0),
 			"Pickpocket Martin the Master Gardener in Draynor Village.");
 
-		chopWillow = new ObjectStep(this, ObjectID.WILLOW_TREE, new WorldPoint(3089, 3235, 0),
+		chopWillow = new ObjectStep(this, ObjectID.WILLOW_TREE_10819, new WorldPoint(3089, 3235, 0),
 			"Chop some Willow logs in Draynor Village.", axe);
 
 		moveToZanarisChaeldar = new ObjectStep(this, ObjectID.DOOR_2406, new WorldPoint(3202, 3169, 0),
@@ -361,7 +370,7 @@ public class LumbridgeMedium extends ComplexStateQuestHelper
 		catchSalmonSteps.setLockingStep(catchSalmonTask);
 		allSteps.add(catchSalmonSteps);
 
-		PanelDetails craftACoifSteps = new PanelDetails("Craft a coif", Arrays.asList(moveToCowPen, craftCoif),
+		PanelDetails craftACoifSteps = new PanelDetails("Craft a coif in the cow pen", Arrays.asList(moveToCowPen, craftCoif),
 			new SkillRequirement(Skill.CRAFTING, 38), leather, needle, thread);
 		craftACoifSteps.setDisplayCondition(notCraftCoif);
 		craftACoifSteps.setLockingStep(craftCoifTask);

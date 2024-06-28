@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import javax.annotation.Nullable;
@@ -1023,5 +1024,32 @@ public class Rs2GameObject {
     public static ObjectComposition getObjectComposition(int id) {
         ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
         return objectComposition.getImpostorIds() == null ? objectComposition : objectComposition.getImpostor();
+    }
+
+    public static boolean canWalkTo(TileObject tileObject, int distance) {
+        if (tileObject == null) return false;
+        WorldArea objectArea;
+
+        if (tileObject instanceof GameObject) {
+            GameObject gameObject = (GameObject) tileObject;
+            WorldPoint worldPoint = WorldPoint.fromScene(Microbot.getClient(), gameObject.getSceneMinLocation().getX(), gameObject.getSceneMinLocation().getY(), gameObject.getPlane());
+            objectArea = new WorldArea(
+                    worldPoint,
+                    gameObject.sizeX(),
+                    gameObject.sizeY());
+        } else {
+            objectArea = new WorldArea(
+                    tileObject.getWorldLocation(),
+                    2,
+                    2);
+        }
+
+        var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance);
+        for (var tile : tiles.keySet()){
+            if (tile.distanceTo(objectArea) < 2)
+                return true;
+        }
+
+        return false;
     }
 }

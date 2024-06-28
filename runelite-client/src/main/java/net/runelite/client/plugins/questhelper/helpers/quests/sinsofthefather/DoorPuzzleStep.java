@@ -24,22 +24,22 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.sinsofthefather;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import java.util.List;
 import lombok.NonNull;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
+
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.List;
-import java.util.Queue;
 import java.util.*;
 
 public class DoorPuzzleStep extends DetailedQuestStep
@@ -338,7 +338,7 @@ public class DoorPuzzleStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		Widget panels = client.getWidget(665, 32);
 		if (result != null && panels != null)
@@ -363,17 +363,17 @@ public class DoorPuzzleStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 	}
 
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirement)
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirement)
 	{
 		super.makeOverlayHint(panelComponent, plugin, additionalText, requirement);
 		Widget panels = client.getWidget(665, 32);

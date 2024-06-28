@@ -24,37 +24,43 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.recipefordisaster;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.QuestVarbits;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ComplexRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.WeightRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.WeightRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.RECIPE_FOR_DISASTER_PIRATE_PETE
-)
+import net.runelite.api.Client;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+
 public class RFDPiratePete extends BasicQuestHelper
 {
 	ItemRequirement combatGear, pestleHighlighted, rawCodHighlighted, knifeHighlighted, breadHighlighted, divingAparatus, divingHelmet, fishBowl, bronzeWire3, needle, fishCake,
@@ -74,13 +80,10 @@ public class RFDPiratePete extends BasicQuestHelper
 	//Zones
 	Zone diningRoom, underwater;
 
-	ArrayList<Requirement> generalReqs;
-
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -145,7 +148,7 @@ public class RFDPiratePete extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		canSwim = new WeightRequirement("Weight less than 27kg", 26, Operation.LESS_EQUAL);
 
@@ -191,7 +194,8 @@ public class RFDPiratePete extends BasicQuestHelper
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		diningRoom = new Zone(new WorldPoint(1856, 5313, 0), new WorldPoint(1870, 5333, 0));
 		underwater = new Zone(new WorldPoint(2944, 9472, 1), new WorldPoint(3007, 9534, 1));
@@ -213,15 +217,6 @@ public class RFDPiratePete extends BasicQuestHelper
 
 		hasCrabMeat = new Conditions(LogicType.OR, crabMeat, groundCrabMeatHighlighted);
 		hasKelp = new Conditions(LogicType.OR, kelp, groundKelpHighlighted);
-
-		generalReqs = new ArrayList<>();
-		generalReqs.add(new SkillRequirement(Skill.COOKING, 31));
-		if (client.getAccountType().isIronman() || client.getAccountType().isGroupIronman())
-		{
-			generalReqs.add(new ComplexRequirement(LogicType.OR, "42 Crafting or started Rum Deal for a fishbowl",
-				new SkillRequirement(Skill.CRAFTING, 42, true),
-				new QuestRequirement(QuestHelperQuest.RUM_DEAL, QuestState.IN_PROGRESS)));
-		}
 
 		// 1852 = number of people saved
 		// Talked to cook through base dialog: 1854 0->1
@@ -304,6 +299,14 @@ public class RFDPiratePete extends BasicQuestHelper
 	@Override
 	public List<Requirement> getGeneralRequirements()
 	{
+		ArrayList<Requirement> generalReqs = new ArrayList<>();
+		generalReqs.add(new SkillRequirement(Skill.COOKING, 31));
+		if (questHelperPlugin.getPlayerStateManager().getAccountType().isAnyIronman())
+		{
+			generalReqs.add(new ComplexRequirement(LogicType.OR, "42 Crafting or started Rum Deal for a fishbowl",
+				new SkillRequirement(Skill.CRAFTING, 42, true),
+				new QuestRequirement(QuestHelperQuest.RUM_DEAL, QuestState.IN_PROGRESS)));
+		}
 		return generalReqs;
 	}
 

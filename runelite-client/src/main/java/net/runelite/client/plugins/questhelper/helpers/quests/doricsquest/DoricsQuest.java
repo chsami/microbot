@@ -24,29 +24,27 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.doricsquest;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.DORICS_QUEST
-)
 public class DoricsQuest extends BasicQuestHelper
 {
 	//Items Required
@@ -58,7 +56,7 @@ public class DoricsQuest extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
 
@@ -69,7 +67,7 @@ public class DoricsQuest extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		clay = new ItemRequirement("Clay (UNNOTED)", ItemID.CLAY, 6);
 		copper = new ItemRequirement("Copper ore (UNNOTED)", ItemID.COPPER_ORE, 4);
@@ -116,7 +114,7 @@ public class DoricsQuest extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("180 Coins", ItemID.COINS_995, 180));
+		return Collections.singletonList(new ItemReward("Coins", ItemID.COINS_995, 180));
 	}
 
 	@Override

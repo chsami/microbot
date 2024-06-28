@@ -27,15 +27,15 @@
 
 package net.runelite.client.plugins.questhelper.requirements.player;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import java.awt.Color;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
-
-import java.awt.*;
+import static net.runelite.api.Skill.THIEVING;
 
 /**
  * Requirement that checks if a player meets a certain skill level.
@@ -49,7 +49,7 @@ public class SkillRequirement extends AbstractRequirement
 	private boolean canBeBoosted;
 	private String displayText;
 	private Boosts boosts;
-	private MQuestHelperPlugin questHelperPlugin;
+	private QuestHelperPlugin questHelperPlugin;
 	private Boosts selectedSkill;
 	private int currentSkill;
 	private int highestBoost;
@@ -63,6 +63,7 @@ public class SkillRequirement extends AbstractRequirement
 	 */
 	public SkillRequirement(Skill skill, int requiredLevel, Operation operation)
 	{
+		assert(skill != null);
 		this.skill = skill;
 		this.requiredLevel = requiredLevel;
 		this.displayText = getDisplayText();
@@ -116,7 +117,7 @@ public class SkillRequirement extends AbstractRequirement
 		return skillLevel >= requiredLevel;
 	}
 
-	public boolean checkRange(Skill skill, int requiredLevel, Client client, MQuestHelperConfig config)
+	public boolean checkRange(Skill skill, int requiredLevel, Client client, QuestHelperConfig config)
 	{
 		for (Boosts boostSkills : boosts.values())
 		{
@@ -133,11 +134,23 @@ public class SkillRequirement extends AbstractRequirement
 		{
 			highestBoost = 5;
 		}
+		else if (skill == THIEVING)
+		{
+			//player only has access to Summer sq'irk juice at level 65 thieving which is the default boost value for thieving, currently that's blind to player current skill level
+			if (client.getRealSkillLevel(skill) < 65)
+			{
+				highestBoost = 2; //autumn sq'irk
+			}
+			else if (client.getRealSkillLevel(skill) < 45)
+			{
+				highestBoost = 1;  //spring sq'irk
+			}
+		}
 
 		return requiredLevel - highestBoost <= currentSkill;
 	}
 
-	public int checkBoosted(Client client, MQuestHelperConfig config)
+	public int checkBoosted(Client client, QuestHelperConfig config)
 	{
 		int skillLevel = canBeBoosted ? Math.max(client.getBoostedSkillLevel(skill), client.getRealSkillLevel(skill)) :
 			client.getRealSkillLevel(skill);
@@ -175,7 +188,7 @@ public class SkillRequirement extends AbstractRequirement
 	}
 
 	@Override
-	public Color getColor(Client client, MQuestHelperConfig config)
+	public Color getColor(Client client, QuestHelperConfig config)
 	{
 		switch (checkBoosted(client, config)){
 			case 1:

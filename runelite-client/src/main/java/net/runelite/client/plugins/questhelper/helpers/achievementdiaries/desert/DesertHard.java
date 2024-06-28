@@ -24,16 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.desert;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.item.TeleportItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
@@ -41,18 +39,25 @@ import net.runelite.client.plugins.questhelper.requirements.util.Spellbook;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.TileStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.DESERT_HARD
-)
 public class DesertHard extends ComplexStateQuestHelper
 {
 	// Items required
@@ -63,7 +68,7 @@ public class DesertHard extends ComplexStateQuestHelper
 	ItemRequirement food, waterskin, desertBoots, desertRobe, desertShirt, rope, nardahTP;
 
 	// Quests required
-	Requirement theFued, dreamMentor, desertTreasure, contact, lunarBook;
+	Requirement theFeud, dreamMentor, desertTreasure, contact, lunarBook;
 
 	Requirement notMenaThug, notGranite, notRefillWaterskin, notKalphQueen, notPollRooftop, notKillDust,
 		notAncientMagicks, notKillLocustRider, notBurnYew, notMithPlatebody;
@@ -85,8 +90,7 @@ public class DesertHard extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doHard = new ConditionalStep(this, claimReward);
@@ -131,7 +135,7 @@ public class DesertHard extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notMenaThug = new VarplayerRequirement(1198, false, 24);
 		notGranite = new VarplayerRequirement(1198, false, 25);
@@ -149,7 +153,7 @@ public class DesertHard extends ComplexStateQuestHelper
 		blackjack = new ItemRequirement("Blackjack", ItemCollections.BLACKJACKS).showConditioned(notMenaThug).isNotConsumed();
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.PICKAXES).showConditioned(notGranite).isNotConsumed();
 		fireRune = new ItemRequirement("Fire rune", ItemID.FIRE_RUNE).showConditioned(notRefillWaterskin);
-		waterRune = new ItemRequirement("Water rune", ItemID.WATER_RUNE).showConditioned(notRefillWaterskin);
+		waterRune = new ItemRequirement("Water runes", ItemID.WATER_RUNE).showConditioned(notRefillWaterskin);
 		astralRune = new ItemRequirement("Astral rune", ItemID.ASTRAL_RUNE).showConditioned(notRefillWaterskin);
 		emptyWaterskin = new ItemRequirement("Empty waterskin", ItemID.WATERSKIN0).showConditioned(notRefillWaterskin).isNotConsumed();
 		slayerHelm = new ItemRequirement("Slayer Helmet", ItemCollections.SLAYER_HELMETS)
@@ -159,11 +163,11 @@ public class DesertHard extends ComplexStateQuestHelper
 			.showConditioned(notKillLocustRider).isNotConsumed();
 		yewLog = new ItemRequirement("Yew log", ItemID.YEW_LOGS).showConditioned(notBurnYew);
 		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).showConditioned(notBurnYew).isNotConsumed();
-		mithBar = new ItemRequirement("Mithril bar", ItemID.MITHRIL_BAR).showConditioned(notMithPlatebody);
+		mithBar = new ItemRequirement("Mithril bars", ItemID.MITHRIL_BAR).showConditioned(notMithPlatebody);
 		hammer = new ItemRequirement("Hammer", ItemID.HAMMER).showConditioned(notMithPlatebody).isNotConsumed();
-		rope = new ItemRequirement("Rope", ItemID.ROPE).showConditioned(notKalphQueen);
+		rope = new ItemRequirement("Ropes", ItemID.ROPE).showConditioned(notKalphQueen);
 
-		nardahTP = new ItemRequirement("Nardah teleport", ItemID.NARDAH_TELEPORT);
+		nardahTP = new TeleportItemRequirement("Nardah teleport", ItemID.NARDAH_TELEPORT);
 		desertBoots = new ItemRequirement("Desert boots", ItemID.DESERT_BOOTS).isNotConsumed();
 		desertRobe = new ItemRequirement("Desert robe", ItemID.DESERT_ROBE).isNotConsumed();
 		desertShirt = new ItemRequirement("Desert shirt", ItemID.DESERT_SHIRT).isNotConsumed();
@@ -181,13 +185,14 @@ public class DesertHard extends ComplexStateQuestHelper
 		inSoph2 = new ZoneRequirement(soph2);
 		inMayor = new ZoneRequirement(mayor);
 
-		theFued = new QuestRequirement(QuestHelperQuest.THE_FEUD, QuestState.FINISHED);
+		theFeud = new QuestRequirement(QuestHelperQuest.THE_FEUD, QuestState.FINISHED);
 		dreamMentor = new QuestRequirement(QuestHelperQuest.DREAM_MENTOR, QuestState.FINISHED);
 		desertTreasure = new QuestRequirement(QuestHelperQuest.DESERT_TREASURE, QuestState.FINISHED);
 		contact = new QuestRequirement(QuestHelperQuest.CONTACT, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		kalph = new Zone(new WorldPoint(3454, 9531, 0), new WorldPoint(3520, 9473, 2));
 		smoke = new Zone(new WorldPoint(3166, 9408, 0), new WorldPoint(3332, 9344, 0));
@@ -211,7 +216,7 @@ public class DesertHard extends ComplexStateQuestHelper
 		pollRooftop = new ObjectStep(this, ObjectID.BASKET_14935, new WorldPoint(3351, 2962, 0),
 			"Climb on the basket and complete a lap of the Pollnivneach Rooftop course.");
 
-		menaThug = new NpcStep(this, NpcID.MENAPHITE_THUG, new WorldPoint(3347, 2959, 0),
+		menaThug = new NpcStep(this, new int[]{NpcID.MENAPHITE_THUG, NpcID.MENAPHITE_THUG_3550}, new WorldPoint(3347, 2959, 0),
 			"Knockout and pickpocket a Menaphite thug.", blackjack);
 
 		refillWaterskin = new ItemStep(this, "Refill an empty waterskin using the Lunar spell Humidify in the Desert " +
@@ -244,9 +249,8 @@ public class DesertHard extends ComplexStateQuestHelper
 		moveToSoph2 = new ObjectStep(this, ObjectID.LADDER_20278, new WorldPoint(2800, 5159, 0),
 			"Climb down the ladder again.", combatGear, lightsource);
 		killLocustRider = new NpcStep(this, NpcID.LOCUST_RIDER_796, new WorldPoint(3296, 9267, 2),
-			"Kill a Scarab mage or Locust rider with keris.", true, combatGear, keris.equipped());
-		killLocustRider.addAlternateNpcs(NpcID.SCARAB_MAGE, NpcID.SCARAB_MAGE_799, NpcID.LOCUST_RIDER,
-			NpcID.LOCUST_RIDER_800, NpcID.LOCUST_RIDER_801);
+			"Kill a Locust rider with keris.", true, combatGear, keris.equipped());
+		killLocustRider.addAlternateNpcs(NpcID.LOCUST_RIDER, NpcID.LOCUST_RIDER_800, NpcID.LOCUST_RIDER_801);
 
 		claimReward = new NpcStep(this, NpcID.JARR, new WorldPoint(3303, 3124, 0),
 			"Talk to Jarr at the Shantay pass to claim your reward!");
@@ -284,7 +288,7 @@ public class DesertHard extends ComplexStateQuestHelper
 		reqs.add(contact);
 		reqs.add(dreamMentor);
 		reqs.add(desertTreasure);
-		reqs.add(theFued);
+		reqs.add(theFeud);
 
 		return reqs;
 	}
@@ -337,7 +341,7 @@ public class DesertHard extends ComplexStateQuestHelper
 		allSteps.add(pollRooftopSteps);
 
 		PanelDetails menaphiteThugSteps = new PanelDetails("Menaphite Thug", Collections.singletonList(menaThug),
-			new SkillRequirement(Skill.THIEVING, 65), theFued, blackjack);
+			new SkillRequirement(Skill.THIEVING, 65), theFeud, blackjack);
 		menaphiteThugSteps.setDisplayCondition(notMenaThug);
 		menaphiteThugSteps.setLockingStep(menaThugTask);
 		allSteps.add(menaphiteThugSteps);

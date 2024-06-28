@@ -24,14 +24,9 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.clientofkourend;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
@@ -39,17 +34,21 @@ import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.CLIENT_OF_KOUREND
-)
 public class ClientOfKourend extends BasicQuestHelper
 {
 	//Items Required
@@ -68,7 +67,7 @@ public class ClientOfKourend extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -100,7 +99,7 @@ public class ClientOfKourend extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		feather = new ItemRequirement("Feather", ItemID.FEATHER);
 		feather.setTooltip("Can be purchased from Gerrant's Fishy Business in Port Sarim.");
@@ -127,14 +126,15 @@ public class ClientOfKourend extends BasicQuestHelper
 
 	public void setupSteps()
 	{
-		talkToVeos = new NpcStep(this, NpcID.VEOS_10727, new WorldPoint(1824, 3690, 0), "Talk to Veos on the Port Piscarilius docks. You can travel to him by talking to Veos in Port Sarim.");
+		talkToVeos = new NpcStep(this, NpcID.VEOS_10727, new WorldPoint(1824, 3690, 0),
+			"Talk to Veos on the Port Piscarilius docks. You can travel to him by talking to Veos in Port Sarim.");
 		talkToVeos.addDialogStep("Sounds interesting! How can I help?");
 		talkToVeos.addDialogStep("Can you take me to Great Kourend?");
 		talkToVeos.addDialogStep("Have you got any quests for me?");
 		talkToVeos.addDialogStep("Let's talk about your client...");
 		talkToVeos.addDialogStep("I've lost something you've given me.");
 
-		useFeatherOnScroll = new DetailedQuestStep(this, "Use a feather on the Enchanted Scroll", feather, enchantedScroll);
+		useFeatherOnScroll = new DetailedQuestStep(this, "Use a feather on the Enchanted Scroll.", feather, enchantedScroll);
 
 		talkToLeenz = new NpcStep(this, NpcID.LEENZ, new WorldPoint(1807, 3726, 0), "Talk to Leenz in Port Piscarilius general store.", enchantedQuill);
 		talkToLeenz.addDialogStep("Can I ask you about Port Piscarilius?");
@@ -193,11 +193,11 @@ public class ClientOfKourend extends BasicQuestHelper
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("2 x 500 Experience Lamps (Any Skill)", ItemID.ANTIQUE_LAMP, 2), //4447 Placeholder until confirmed.
-				new ItemReward("20% Kourend Favour Certificate", 22367, 1),
+				new ItemReward("500 Experience Lamps (Any Skill)", ItemID.ANTIQUE_LAMP, 2), //4447 Placeholder until confirmed.
 				new ItemReward("Kharedst's Memoirs", ItemID.KHAREDSTS_MEMOIRS, 1));
 	}
 
+	@Override
 	public List<PanelDetails> getPanels()
 	{
 		List<PanelDetails> allSteps = new ArrayList<>();

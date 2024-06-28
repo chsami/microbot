@@ -26,22 +26,22 @@
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.falador;
 
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.item.TeleportItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ComplexRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
@@ -49,15 +49,10 @@ import net.runelite.client.plugins.questhelper.steps.*;
 import net.runelite.client.plugins.questhelper.steps.emote.QuestEmote;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FALADOR_ELITE
-)
 
 public class FaladorElite extends ComplexStateQuestHelper
 {
@@ -87,8 +82,7 @@ public class FaladorElite extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doElite = new ConditionalStep(this, claimReward);
@@ -126,7 +120,7 @@ public class FaladorElite extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notCraftedAirRunes = new VarplayerRequirement(1187, false, 5);
 		notPurchasedWhite2hSword = new VarplayerRequirement(1187, false, 6);
@@ -139,14 +133,14 @@ public class FaladorElite extends ComplexStateQuestHelper
 		airTiara = new ItemRequirement("Air Tiara", ItemID.AIR_TIARA, 1, true).showConditioned(notCraftedAirRunes).isNotConsumed();
 		coins1920 = new ItemRequirement("Coins", ItemCollections.COINS, 1920).showConditioned(notPurchasedWhite2hSword);
 		spade = new ItemRequirement("Spade", ItemID.SPADE).showConditioned(notGotMagicRoots).isNotConsumed();
-		axe = new ItemRequirement("Axe", ItemCollections.AXES).showConditioned(notGotMagicRoots).isNotConsumed();
+		axe = new ItemRequirement("Any Axe", ItemCollections.AXES).showConditioned(notGotMagicRoots).isNotConsumed();
 		rake = new ItemRequirement("Rake", ItemID.RAKE).showConditioned(notGotMagicRoots).isNotConsumed();
 		magicTreeSapling = new ItemRequirement("Magic Sapling", ItemID.MAGIC_SAPLING).showConditioned(notGotMagicRoots);
 		skillCape = new ItemRequirement("Any Skill Cape or Quest Cape", ItemCollections.SKILLCAPE).showConditioned(notPerformedSkillCapeEmote);
 		toadflaxPotionUnf = new ItemRequirement("Toadflax Potion (unf)", ItemID.TOADFLAX_POTION_UNF).showConditioned(notMadeSaraBrew);
 		crushedNest = new ItemRequirement("Crushed Nest", ItemID.CRUSHED_NEST).showConditioned(notMadeSaraBrew);
 
-		faladorTeleport = new ItemRequirement("Multiple Teleports to Falador", ItemID.FALADOR_TELEPORT, -1);
+		faladorTeleport = new TeleportItemRequirement("Multiple Teleports to Falador", ItemID.FALADOR_TELEPORT, -1);
 
 		magicTreeNearbyNotCheckedVar = new VarbitRequirement(4471, 60);
 		magicTreeNearbyCheckedVar = new VarbitRequirement(4471, 61);
@@ -162,7 +156,8 @@ public class FaladorElite extends ComplexStateQuestHelper
 		wanted = new QuestRequirement(QuestHelperQuest.WANTED, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		airAltar = new Zone(new WorldPoint(2895, 4851, 0), new WorldPoint(2859, 4819, 0));
 		faladorCastle1 = new Zone(new WorldPoint(2954, 3328, 1), new WorldPoint(2997, 3353, 1));

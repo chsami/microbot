@@ -26,34 +26,37 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.tribaltotem;
 
 import com.google.common.collect.ImmutableMap;
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-        quest = QuestHelperQuest.TRIBAL_TOTEM
-)
 public class TribalTotem extends BasicQuestHelper
 {
     //Items Required
@@ -72,8 +75,7 @@ public class TribalTotem extends BasicQuestHelper
     @Override
     public Map<Integer, QuestStep> loadSteps()
     {
-        loadZones();
-        setupRequirements();
+        initializeRequirements();
         setupConditions();
         setupSteps();
 
@@ -98,7 +100,7 @@ public class TribalTotem extends BasicQuestHelper
     }
 
  @Override
- public void setupRequirements()
+ protected void setupRequirements()
     {
         coins = new ItemRequirement("Coins or more for boat trips", ItemCollections.COINS, 90);
         amuletOfGlory = new ItemRequirement("Amulet of glory", ItemCollections.AMULET_OF_GLORIES).isNotConsumed();
@@ -118,7 +120,8 @@ public class TribalTotem extends BasicQuestHelper
         return reqs;
     }
 
-    public void loadZones()
+    @Override
+	protected void setupZones()
     {
         houseGroundFloorEntrance = new Zone(new WorldPoint(2637, 3320, 0), new WorldPoint(2639, 3325, 0));
         houseGroundFloorMiddleRoom = new Zone(new WorldPoint(2634, 3322, 0), new WorldPoint(2636, 3324, 0));
@@ -151,8 +154,10 @@ public class TribalTotem extends BasicQuestHelper
         talkToCromperty = new NpcStep(this, NpcID.WIZARD_CROMPERTY, new WorldPoint(2683, 3326, 0), "Talk to Wizard Cromperty in north east Ardougne.");
         talkToCromperty.addDialogSteps("Chat.", "So what have you invented?", "Can I be teleported please?", "Yes, that sounds good. Teleport me!");
 
-        enterPassword = new ObjectStep(this, ObjectID.DOOR_2705, new WorldPoint(2634, 3323, 0), "Try and open the door to the west. The password is 'KURT', (K=10 right, U=6 left, R=9 left, T=7 left)");
-        solvePassword = new PuzzleStep(this);
+        enterPassword = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.DOOR_2705, new WorldPoint(2634, 3323, 0), "Try and open the door to the west. The password is 'KURT', (K=10 right, U=6 left, R=9 left, T=7 left)"),
+			"Work out and enter the password for the door to the west.");
+        solvePassword = new PuzzleWrapperStep(this, new PuzzleStep(this)).withNoHelpHiddenInSidebar(true);
         climbStairs = new ObjectStep(this, ObjectID.STAIRS_2711, new WorldPoint(2632, 3323, 0), "FIRST Right-click 'Investigate' the stairs to disable a trap, then climb the stairs.");
 
         searchChest = new ObjectStep(this, ObjectID.CHEST_2709, new WorldPoint(2638, 3324, 1), "Open the chest on the top floor and search it for the totem.");

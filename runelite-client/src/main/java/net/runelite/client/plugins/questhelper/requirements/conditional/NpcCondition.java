@@ -24,13 +24,12 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.conditional;
 
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import java.util.ArrayList;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.NpcChanged;
-
-import java.util.ArrayList;
 
 public class NpcCondition extends ConditionForStep
 {
@@ -47,12 +46,16 @@ public class NpcCondition extends ConditionForStep
 
 	public NpcCondition(int npcID, WorldPoint worldPoint)
 	{
+		assert(worldPoint != null);
+
 		this.npcID = npcID;
 		this.zone = new Zone(worldPoint, worldPoint);
 	}
 
 	public NpcCondition(int npcID, Zone zone)
 	{
+		assert(zone != null);
+
 		this.npcID = npcID;
 		this.zone = zone;
 	}

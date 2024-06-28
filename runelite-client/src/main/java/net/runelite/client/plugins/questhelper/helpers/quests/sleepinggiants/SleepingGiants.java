@@ -25,14 +25,13 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.sleepinggiants;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetPresenceRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
@@ -40,19 +39,28 @@ import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirem
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetPresenceRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetSpriteRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+
+import net.runelite.client.plugins.questhelper.steps.widget.WidgetDetails;
+import net.runelite.client.plugins.questhelper.steps.WidgetStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(quest = QuestHelperQuest.SLEEPING_GIANTS)
 @Slf4j
 public class SleepingGiants extends BasicQuestHelper
 {
@@ -90,8 +98,7 @@ public class SleepingGiants extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -167,7 +174,8 @@ public class SleepingGiants extends BasicQuestHelper
 		return steps;
 	}
 
-	public void setupRequirements()
+	@Override
+	protected void setupRequirements()
 	{
 		oakLogs = new ItemRequirement("Oak Logs", ItemID.OAK_LOGS);
 		oakLogs.setQuantity(3);
@@ -179,7 +187,9 @@ public class SleepingGiants extends BasicQuestHelper
 		nails.setQuantity(10);
 
 		hammer = new ItemRequirement("Hammer", ItemID.HAMMER);
+		hammer.addAlternates(ItemID.IMCANDO_HAMMER);
 		hammer.canBeObtainedDuringQuest();
+		hammer.setTooltip("Imcando hammer also works");
 
 		chisel = new ItemRequirement("Chisel", ItemID.CHISEL);
 
@@ -212,7 +222,8 @@ public class SleepingGiants extends BasicQuestHelper
 		preform = new ItemRequirement("Preform", ItemID.PREFORM).equipped();
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		Zone desertPlateau = new Zone(new WorldPoint(3375, 3169, 0), new WorldPoint(3349, 3143, 0));
 		onDesertPlateau = new ZoneRequirement(desertPlateau);
@@ -419,7 +430,7 @@ public class SleepingGiants extends BasicQuestHelper
 			fixPolishingStone, fixGrindstone, fixHammer, speakToKovacAfterRepairs),
 			Arrays.asList(oakLogs, wool, nails, hammer, chisel), Collections.singletonList(freeInventorySpace)));
 		allSteps.add(new PanelDetails("Creating the sword", Arrays.asList(speakToKovacContinue, searchCrate, fillCrucible,
-			speakToKovacAboutMould, setMould, talkToKovakAfterMould, pourMetal, coolDownSword, hitPreformWhileRed, grindstonePreform, polishPreform,
+			speakToKovacAboutMould, setMould, interactWithMould, talkToKovakAfterMould, pourMetal, coolDownSword, hitPreformWhileRed, grindstonePreform, polishPreform,
 			handInPreform), Arrays.asList(iceGloves, bucket)));
 
 		return allSteps;

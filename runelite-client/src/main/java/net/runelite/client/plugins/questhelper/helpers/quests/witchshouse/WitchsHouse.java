@@ -24,32 +24,36 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.witchshouse;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.WITCHS_HOUSE
-)
 public class WitchsHouse extends BasicQuestHelper
 {
 	//Items Required
@@ -70,8 +74,7 @@ public class WitchsHouse extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -90,8 +93,6 @@ public class WitchsHouse extends BasicQuestHelper
 
 		steps.put(1, getTheMagnet);
 		steps.put(2, getTheMagnet);
-		// TODO: Verify this is correct (I believe reading the diary adds 2 to var values)
-		steps.put(4, getTheMagnet);
 
 		ConditionalStep killExperiment = new ConditionalStep(this, getKey);
 		killExperiment.addStep(new Conditions(inShed, experimentNearby), killWitchsExperiment);
@@ -109,6 +110,7 @@ public class WitchsHouse extends BasicQuestHelper
 		killExperiment.addStep(houseKey.alsoCheckBank(questBank), enterHouse);
 
 		steps.put(3, killExperiment);
+		// TODO: Add 'pick up diary', 'read diary' after step 3
 		steps.put(5, killExperiment);
 
 		ConditionalStep returnBall = new ConditionalStep(this, getKey);
@@ -124,7 +126,7 @@ public class WitchsHouse extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		cheese = new ItemRequirement("Cheese (multiple if you mess up)", ItemID.CHEESE);
 		leatherGloves = new ItemRequirement("Leather gloves", ItemID.LEATHER_GLOVES, 1, true).isNotConsumed();
@@ -138,7 +140,8 @@ public class WitchsHouse extends BasicQuestHelper
 		armourAndWeapon.setDisplayItemId(BankSlotIcons.getCombatGear());
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		house = new Zone(new WorldPoint(2901, 3466, 0), new WorldPoint(2907, 3476, 0));
 		upstairsHouse = new Zone(new WorldPoint(2900, 3466, 1), new WorldPoint(2907, 3476, 1));
@@ -170,7 +173,7 @@ public class WitchsHouse extends BasicQuestHelper
 	public void setupSteps()
 	{
 		talkToBoy = new NpcStep(this, NpcID.BOY, new WorldPoint(2928, 3456, 0), "Talk to the Boy in Taverley to start.");
-		talkToBoy.addDialogSteps("What's the matter?", "Ok, I'll see what I can do.");
+		talkToBoy.addDialogSteps("What's the matter?", "Ok, I'll see what I can do.", "Yes.");
 		getKey = new ObjectStep(this, ObjectID.POTTED_PLANT_2867, new WorldPoint(2900, 3474, 0), "Look under the potted plant just outside the witch's house.");
 		enterHouse = new ObjectStep(this, ObjectID.DOOR_2861, new WorldPoint(2900, 3473, 0), "Enter the witch's house.", houseKey);
 		goDownstairs = new ObjectStep(this, ObjectID.LADDER_24718, new WorldPoint(2907, 3476, 0), "Go down the ladder to the basement.");

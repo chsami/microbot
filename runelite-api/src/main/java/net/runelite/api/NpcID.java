@@ -750,8 +750,8 @@ public final class NpcID
 	public static final int SKRAELING_774 = 774;
 	public static final int FISHMONGER = 775;
 	public static final int GREENGROCER = 776;
-	public static final int ETHEREAL_BEING = 777;
-	public static final int ETHEREAL_BEING_778 = 778;
+	public static final int ETHEREAL_MAN = 777;
+	public static final int ETHEREAL_LADY = 778;
 	public static final int ETHEREAL_NUMERATOR = 779;
 	public static final int ETHEREAL_EXPERT = 780;
 	public static final int ETHEREAL_PERCEPTIVE = 781;

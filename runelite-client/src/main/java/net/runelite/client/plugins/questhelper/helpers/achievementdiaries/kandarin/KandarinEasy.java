@@ -25,34 +25,33 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.kandarin;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
+import net.runelite.client.plugins.questhelper.statemanagement.AchievementDiaryStepManager;
 import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.KANDARIN_EASY
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 
 public class KandarinEasy extends ComplexStateQuestHelper
 {
@@ -72,20 +71,23 @@ public class KandarinEasy extends ComplexStateQuestHelper
 	QuestStep buyCandle, collectFlax, playOrgan, plantJute, cupTea, petFish, fillFishbowl,
 		buyStew, talkSherlock, logShortcut, claimReward, moveToWorkshop, petFishMix, petFishFish;
 
+	QuestStep killFire, killEarth, killWater, killAir;
+
 	NpcStep catchMackerel, killEle;
 
 	Zone workshop;
 
-	ZoneRequirement inWorkshop;
+	Requirement inWorkshop;
 
 	ConditionalStep catchMackerelTask, buyCandleTask, collectFlaxTask, playOrganTask, plantJuteTask, cupTeaTask,
 		killEleTask, petFishTask, buyStewTask, talkSherlockTask, logShortcutTask;
 
+	RuneliteRequirement killedFire, killedEarth, killedWater, killedAir;
+
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doEasy = new ConditionalStep(this, claimReward);
@@ -95,10 +97,12 @@ public class KandarinEasy extends ComplexStateQuestHelper
 
 		catchMackerelTask = new ConditionalStep(this, catchMackerel);
 		doEasy.addStep(notCatchMackerel, catchMackerelTask);
+
 		petFishTask = new ConditionalStep(this, fillFishbowl);
-		petFishTask.addStep(fishBowl, petFishMix);
-		petFishTask.addStep(fishBowlSeaweed, petFish);
 		petFishTask.addStep(new Conditions(fishBowlSeaweed, tinyNet), petFishFish);
+		petFishTask.addStep(fishBowlSeaweed, petFish);
+		petFishTask.addStep(fishBowl, petFishMix);
+
 		doEasy.addStep(new Conditions(notPetFish), petFishTask);
 
 		buyCandleTask = new ConditionalStep(this, buyCandle);
@@ -111,6 +115,10 @@ public class KandarinEasy extends ComplexStateQuestHelper
 		doEasy.addStep(notTalkSherlock, talkSherlockTask);
 
 		killEleTask = new ConditionalStep(this, moveToWorkshop);
+		killEleTask.addStep(new Conditions(inWorkshop, killedFire, killedEarth, killedWater), killAir);
+		killEleTask.addStep(new Conditions(inWorkshop, killedFire, killedEarth), killWater);
+		killEleTask.addStep(new Conditions(inWorkshop, killedFire), killEarth);
+		killEleTask.addStep(new Conditions(inWorkshop), killFire);
 		killEleTask.addStep(inWorkshop, killEle);
 		doEasy.addStep(notKillEle, killEleTask);
 
@@ -129,7 +137,8 @@ public class KandarinEasy extends ComplexStateQuestHelper
 		return doEasy;
 	}
 
-	public void setupRequirements()
+	@Override
+	protected void setupRequirements()
 	{
 		notCatchMackerel = new VarplayerRequirement(1178, false, 1);
 		notBuyCandle = new VarplayerRequirement(1178, false, 2);
@@ -142,6 +151,11 @@ public class KandarinEasy extends ComplexStateQuestHelper
 		notBuyStew = new VarplayerRequirement(1178, false, 9);
 		notTalkSherlock = new VarplayerRequirement(1178, false, 10);
 		notLogShortcut = new VarplayerRequirement(1178, false, 11);
+
+		killedFire = AchievementDiaryStepManager.getKilledFire();
+		killedEarth = AchievementDiaryStepManager.getKilledEarth();
+		killedWater = AchievementDiaryStepManager.getKilledWater();
+		killedAir = AchievementDiaryStepManager.getKilledAir();
 
 		coins = new ItemRequirement("Coins", ItemCollections.COINS).showConditioned(new Conditions(LogicType.OR, notPetFish, notBuyCandle, notBuyStew));
 		bigFishingNet = new ItemRequirement("Big fishing net", ItemID.BIG_FISHING_NET).showConditioned(notCatchMackerel).isNotConsumed();
@@ -166,8 +180,7 @@ public class KandarinEasy extends ComplexStateQuestHelper
 
 		food = new ItemRequirement("Food", ItemCollections.GOOD_EATING_FOOD, -1);
 
-		inWorkshop = new ZoneRequirement(workshop);
-
+		inWorkshop = AchievementDiaryStepManager.getInWorkshop();
 		setupGenericRequirements();
 	}
 
@@ -180,16 +193,16 @@ public class KandarinEasy extends ComplexStateQuestHelper
 		((Conditions) eleWorkI).setText("Partial completion of Elemental Workshop I");
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		workshop = new Zone(new WorldPoint(2682, 9862, 0), new WorldPoint(2747, 9927, 0));
 	}
 
 	public void setupSteps()
 	{
-		catchMackerel = new NpcStep(this, NpcID.FISHING_SPOT_1518, new WorldPoint(2841, 3432, 0),
+		catchMackerel = new NpcStep(this, NpcID.FISHING_SPOT_1520, new WorldPoint(2841, 3432, 0),
 			"Fish on Catherby beach at the Big Net fishing spots for a mackerel.", true, bigFishingNet);
-		catchMackerel.addAlternateNpcs(NpcID.FISHING_SPOT_1520);
 		buyCandle = new NpcStep(this, NpcID.CANDLE_MAKER, new WorldPoint(2799, 3439, 0),
 			"Buy a candle from the candle maker in Catherby.", coins.quantity(3));
 
@@ -211,6 +224,16 @@ public class KandarinEasy extends ComplexStateQuestHelper
 		killEle = new NpcStep(this, NpcID.FIRE_ELEMENTAL, new WorldPoint(2719, 9889, 0),
 			"Kill one of each of the 4 elementals.", combatGear, food);
 		killEle.addAlternateNpcs(NpcID.WATER_ELEMENTAL, NpcID.AIR_ELEMENTAL, NpcID.EARTH_ELEMENTAL);
+		killFire = new NpcStep(this, NpcID.FIRE_ELEMENTAL, new WorldPoint(2719, 9877, 0),
+			"Kill one of each of the 4 elementals.", true, combatGear, food);
+		killEarth = new NpcStep(this, NpcID.EARTH_ELEMENTAL, new WorldPoint(2700, 9903, 0),
+			"Kill one of each of the 4 elementals.", true, combatGear, food);
+		killWater = new NpcStep(this, NpcID.WATER_ELEMENTAL, new WorldPoint(2719, 9903, 0),
+			"Kill one of each of the 4 elementals.", true, combatGear, food);
+		killAir = new NpcStep(this, NpcID.AIR_ELEMENTAL, new WorldPoint(2735, 9891, 0),
+			"Kill one of each of the 4 elementals.", true, combatGear, food);
+		killEle.addSubSteps(killFire, killEarth, killWater, killAir);
+
 		buyStew = new NpcStep(this, NpcID.BARTENDER_1318, new WorldPoint(2691, 3494, 0),
 			"Talk with the bartender in Seers' Village and buy a stew.", coins.quantity(20));
 		buyStew.addDialogSteps("What do you have?", "Could I have some stew please?");

@@ -24,32 +24,38 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.ratcatchers;
 
-import net.runelite.client.plugins.questhelper.*;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.NpcCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.FollowerItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.FollowerRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.RATCATCHERS
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+
 public class RatCatchers extends BasicQuestHelper
 {
 	// Required
@@ -97,8 +103,7 @@ public class RatCatchers extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -197,7 +202,7 @@ public class RatCatchers extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		cat = new FollowerItemRequirement("A non-overgrown cat",
 			ItemCollections.HUNTING_CATS,
@@ -251,7 +256,8 @@ public class RatCatchers extends BasicQuestHelper
 		musicScroll.setTooltip("You can get another from the snake charmer");
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		varrockSewer = new Zone(new WorldPoint(3151, 9855, 0), new WorldPoint(3290, 9919, 0));
 		mansionGrounds = new Zone(new WorldPoint(2821, 5061, 0), new WorldPoint(2874, 5120, 0));
@@ -429,7 +435,6 @@ public class RatCatchers extends BasicQuestHelper
 			"Go down the manhole near The Face.");
 		talkToFelkrash = new NpcStep(this, NpcID.FELKRASH, new WorldPoint(2978, 9640, 0),
 			"Talk to Felkrash in the Port Sarim Rat Pits.");
-		((NpcStep) talkToFelkrash).setWorldMapPoint(new WorldPoint(3044, 9645, 0));
 		leaveSarimRatPits = new ObjectStep(this, ObjectID.LADDER_10309, new WorldPoint(2962, 9651, 0),
 			"Leave the rat pits.");
 		talkToTheFaceAgain = new NpcStep(this, NpcID.THE_FACE, new WorldPoint(3019, 3232, 0),
@@ -450,7 +455,6 @@ public class RatCatchers extends BasicQuestHelper
 			"Return to Felkrash to finish.");
 		talkToFelkrashForEnd = new NpcStep(this, NpcID.FELKRASH, new WorldPoint(2978, 9640, 0),
 			"Return to Felkrash to finish.");
-		((NpcStep) talkToFelkrashForEnd).setWorldMapPoint(new WorldPoint(3044, 9645, 0));
 		talkToFelkrashForEnd.addSubSteps(enterPitsForEnd);
 	}
 

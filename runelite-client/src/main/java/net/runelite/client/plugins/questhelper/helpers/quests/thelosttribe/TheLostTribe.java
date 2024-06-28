@@ -24,33 +24,40 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thelosttribe;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcEmoteStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 import net.runelite.client.plugins.questhelper.steps.emote.QuestEmote;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_LOST_TRIBE
-)
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+
 public class TheLostTribe extends BasicQuestHelper
 {
 	//Items Required
@@ -60,7 +67,7 @@ public class TheLostTribe extends BasicQuestHelper
 	ItemRequirement varrockTeleport, faladorTeleport, lumbridgeTeleports;
 
 	Requirement inBasement, inLumbridgeF0, inLumbridgeF1, inLumbridgeF2, inTunnels, inMines,
-		foundRobes, inHamBase, foundSilverware, bobKnows, hansKnows;
+		foundRobes, inHamBase, foundSilverwareOrToldOnSigmund, bobKnows, hansKnows;
 
 	DetailedQuestStep goDownFromF2, talkToSigmund, talkToDuke, goDownFromF1, talkToHans, goUpToF1,
 		goDownIntoBasement, usePickaxeOnRubble, climbThroughHole, grabBrooch, climbOutThroughHole, goUpFromBasement,
@@ -77,8 +84,7 @@ public class TheLostTribe extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		setupConditionalSteps();
@@ -108,7 +114,7 @@ public class TheLostTribe extends BasicQuestHelper
 		steps.put(8, goTalkToDukeAfterEmote);
 
 		ConditionalStep revealSigmund = new ConditionalStep(this, goGetKey);
-		revealSigmund.addStep(foundSilverware, goToDukeWithSilverware);
+		revealSigmund.addStep(silverware.alsoCheckBank(questBank), goToDukeWithSilverware);
 		revealSigmund.addStep(foundRobes, goIntoHamLair);
 		revealSigmund.addStep(key, goOpenRobeChest);
 		steps.put(9, revealSigmund);
@@ -119,7 +125,7 @@ public class TheLostTribe extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.PICKAXES).isNotConsumed();
 		lightSource = new ItemRequirement("A light source", ItemCollections.LIGHT_SOURCES).isNotConsumed();
@@ -135,10 +141,11 @@ public class TheLostTribe extends BasicQuestHelper
 
 		varrockTeleport = new ItemRequirement("Varrock teleport", ItemID.VARROCK_TELEPORT);
 		lumbridgeTeleports = new ItemRequirement("Lumbridge teleports", ItemID.LUMBRIDGE_TELEPORT, 3);
-		faladorTeleport = new ItemRequirement("Falador teleports", ItemID.FALADOR_TELEPORT);
+		faladorTeleport = new ItemRequirement("Falador teleport", ItemID.FALADOR_TELEPORT);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		basement = new Zone(new WorldPoint(3208, 9614, 0), new WorldPoint(3219, 9625, 0));
 		lumbridgeF0 = new Zone(new WorldPoint(3136, 3136, 0), new WorldPoint(3328, 3328, 0));
@@ -160,7 +167,7 @@ public class TheLostTribe extends BasicQuestHelper
 		inHamBase = new ZoneRequirement(hamBase);
 
 		foundRobes = new VarbitRequirement(534, 1, Operation.GREATER_EQUAL);
-		foundSilverware = new VarbitRequirement(534, 3, Operation.GREATER_EQUAL);
+		foundSilverwareOrToldOnSigmund = new VarbitRequirement(534, 3, Operation.GREATER_EQUAL);
 
 		hansKnows = new VarbitRequirement(537, 0);
 		bobKnows = new VarbitRequirement(537, 1);
@@ -207,9 +214,12 @@ public class TheLostTribe extends BasicQuestHelper
 		showBroochToDuke.addDialogStep("I dug through the rubble...");
 
 		searchBookcase = new ObjectStep(this, ObjectID.BOOKCASE_6916, new WorldPoint(3207, 3496, 0), "Search the north west bookcase in the Varrock Castle Library.");
+		searchBookcase.addTeleport(varrockTeleport);
 		readBook = new DetailedQuestStep(this, "Read the entire goblin symbol book.", book);
+		readBook.addWidgetHighlight(183, 16);
 
 		talkToGenerals = new NpcStep(this, NpcID.GENERAL_WARTFACE, new WorldPoint(2957, 3512, 0), "Talk to the Goblin Generals in the Goblin Village.");
+		talkToGenerals.addTeleport(faladorTeleport);
 		talkToGenerals.addDialogSteps("Have you ever heard of the Dorgeshuun?", "It doesn't really matter",
 			"Well either way they refused to fight", "Well I found a brooch underground...", "Well why not show me both greetings?");
 
@@ -294,7 +304,7 @@ public class TheLostTribe extends BasicQuestHelper
 			"Father Aereck says he saw something in the cellar", "The cook says he saw something in the cellar");
 		goTalkToDukeAfterHans.addStep(inLumbridgeF1, talkToDuke);
 
-		goMineRubble = new ConditionalStep(this, goDownToBasement, "Go use a pickaxe on the rubble in the Lumbridge Castle basement.", pickaxe, lightSource);
+		goMineRubble = new ConditionalStep(this, goDownToBasement, "Go use a pickaxe on the rubble in the Lumbridge Castle basement.", pickaxe.highlighted(), lightSource);
 		goMineRubble.addStep(inBasement, usePickaxeOnRubble);
 
 		enterTunnels = new ConditionalStep(this, goDownToBasement, "Enter the hole in Lumbridge Castle's basement.", lightSource);

@@ -24,31 +24,34 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.miniquests.themagearenai;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_MAGE_ARENA
-)
 public class TheMageArenaI extends BasicQuestHelper
 {
 	ItemRequirement runesForCasts, knife, godCape;
@@ -62,8 +65,7 @@ public class TheMageArenaI extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -78,22 +80,18 @@ public class TheMageArenaI extends BasicQuestHelper
 		steps.put(4, fightKolodion);
 		steps.put(5, fightKolodion);
 
-		ConditionalStep goClaimCape = new ConditionalStep(this, enterCavernForPool);
-		goClaimCape.addStep(inStatuesRoom, prayStatue);
-		goClaimCape.addStep(inCavern, enterPool);
-		steps.put(6, goClaimCape);
-
 		ConditionalStep goGetStaff = new ConditionalStep(this, enterCavernForPool);
 		goGetStaff.addStep(new Conditions(inStatuesRoom, hasCape), talkToGuardian);
 		goGetStaff.addStep(new Conditions(inStatuesRoom), prayStatue);
 		goGetStaff.addStep(inCavern, enterPool);
+		steps.put(6, goGetStaff);
 		steps.put(7, goGetStaff);
 
 		return steps;
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		runesForCasts = new ItemRequirement("Runes for fighting Kolodion", -1, -1);
 		runesForCasts.setDisplayItemId(ItemID.DEATH_RUNE);
@@ -102,7 +100,8 @@ public class TheMageArenaI extends BasicQuestHelper
 		godCape.addAlternates(ItemID.GUTHIX_CAPE, ItemID.SARADOMIN_CAPE);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		cavern = new Zone(new WorldPoint(2529, 4709, 0), new WorldPoint(2550, 4725, 0));
 		statuesRoom = new Zone(new WorldPoint(2486, 4683, 0), new WorldPoint(2526, 4736, 0));

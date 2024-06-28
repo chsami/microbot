@@ -27,23 +27,24 @@
  */
 package net.runelite.client.plugins.questhelper.overlays;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import javax.inject.Inject;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPriority;
-
-import javax.inject.Inject;
-import java.awt.*;
-import java.util.ArrayList;
 
 public class QuestHelperOverlay extends OverlayPanel
 {
 	public static final Color TITLED_CONTENT_COLOR = new Color(190, 190, 190);
 
-	private final MQuestHelperPlugin plugin;
+	private final QuestHelperPlugin plugin;
 
 	@Inject
-	public QuestHelperOverlay(MQuestHelperPlugin plugin)
+	public QuestHelperOverlay(QuestHelperPlugin plugin)
 	{
 		this.plugin = plugin;
 		setPriority(OverlayPriority.HIGHEST);

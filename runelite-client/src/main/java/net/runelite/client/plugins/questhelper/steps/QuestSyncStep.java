@@ -24,15 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.QuestWidgets;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.tools.QuestWidgets;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import net.runelite.api.ScriptID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.ColorUtil;
-
-import java.awt.*;
 
 public class QuestSyncStep extends QuestStep
 {
@@ -46,7 +46,7 @@ public class QuestSyncStep extends QuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 

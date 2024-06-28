@@ -24,36 +24,46 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.creatureoffenkenstrain;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.DigStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-        quest = QuestHelperQuest.CREATURE_OF_FENKENSTRAIN
-)
 public class CreatureOfFenkenstrain extends BasicQuestHelper
 {
 	ItemRequirement armor, hammer, ghostSpeakAmulet, silverBar, bronzeWire, needle, thread, spade, coins, telegrabOrCoins, pickledBrain,
@@ -74,8 +84,7 @@ public class CreatureOfFenkenstrain extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -136,7 +145,7 @@ public class CreatureOfFenkenstrain extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		ItemRequirement telegrab = new ItemRequirements("Telegrab runes", new ItemRequirement("Law rune",
 			ItemID.LAW_RUNE), new ItemRequirement("Air rune", ItemID.AIR_RUNE));
@@ -149,9 +158,9 @@ public class CreatureOfFenkenstrain extends BasicQuestHelper
 		hammer = new ItemRequirement("Hammer", ItemCollections.HAMMER).isNotConsumed();
 		ghostSpeakAmulet = new ItemRequirement("Ghostspeak amulet", ItemCollections.GHOSTSPEAK).isNotConsumed();
 		silverBar = new ItemRequirement("Silver bar", ItemID.SILVER_BAR);
-		bronzeWire = new ItemRequirement("Bronze wires", ItemID.BRONZE_WIRE, 3);
+		bronzeWire = new ItemRequirement("Bronze wire", ItemID.BRONZE_WIRE, 3);
 		needle = new ItemRequirement("Needle", ItemID.NEEDLE).isNotConsumed();
-		thread = new ItemRequirement("Threads", ItemID.THREAD, 5);
+		thread = new ItemRequirement("Thread", ItemID.THREAD, 5);
 		spade = new ItemRequirement("Spade", ItemID.SPADE).isNotConsumed();
 		coins = new ItemRequirement("Coins at least", ItemCollections.COINS, 100);
 		pickledBrain = new ItemRequirement("Pickled Brain", ItemID.PICKLED_BRAIN);
@@ -182,7 +191,8 @@ public class CreatureOfFenkenstrain extends BasicQuestHelper
 		staminaPotion = new ItemRequirement("Stamina potions", ItemCollections.STAMINA_POTIONS, -1);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		barZone = new Zone(new WorldPoint(3488, 3477, 0), new WorldPoint(3504, 3471, 0));
 		castleZoneFloor0 = new Zone(new WorldPoint(3526, 3574, 0), new WorldPoint(3566, 3531, 0));
@@ -246,11 +256,12 @@ public class CreatureOfFenkenstrain extends BasicQuestHelper
 			"Head to the Canifis bar and either buy the pickled brain for 50 coins, or telegrab it.", telegrabOrCoins);
 		getPickledBrain.addDialogStep("I'll buy one.");
 		talkToFrenkenstrain = new NpcStep(this, NpcID.DR_FENKENSTRAIN, new WorldPoint(3551, 3548, 0),
-			"Talk to Dr.Fenkenstrain to start the quest");
+			"Talk to Dr. Fenkenstrain to start the quest.");
 		talkToFrenkenstrain.addDialogStep("Yes.");
 		talkToFrenkenstrain.addDialogStep("Braindead");
 		talkToFrenkenstrain.addDialogStep("Grave-digging");
 
+		// TODO: Should the accessing the grave be considered as a puzzle for a PuzzleWrapperStep
 		goUpstairsForStar = new ObjectStep(this, ObjectID.STAIRCASE_5206, new WorldPoint(3560, 3552, 0),
 			"Go up the staircase to grab the items you will need.");
 
@@ -267,7 +278,7 @@ public class CreatureOfFenkenstrain extends BasicQuestHelper
 			obsidianAmulet.highlighted());
 
 		goDownstairsForStar = new ObjectStep(this, ObjectID.STAIRCASE_5207, new WorldPoint(3573, 3553, 1),
-			"Go back to the ground floor");
+			"Go back to the ground floor.");
 
 		talkToGardenerForHead = new NpcStep(this, NpcID.GARDENER_GHOST, new WorldPoint(3548, 3562, 0),
 			"Talk to the Gardener Ghost.", ghostSpeakAmulet.equipped());
@@ -295,19 +306,19 @@ public class CreatureOfFenkenstrain extends BasicQuestHelper
 		leaveExperimentCave = new ObjectStep(this, ObjectID.LADDER_17387, new WorldPoint(3504, 9970, 0),
 			"Leave the caves by going north-west, be sure to pick up the key from the level 51 experiment.");
 
-		getTorso = new DigStep(this, new WorldPoint(3503, 3576, 0), "Use your spade on this tile to get torsos.");
+		getTorso = new DigStep(this, new WorldPoint(3503, 3576, 0), "Use your spade on this tile to get the torso.");
 
 		getArm = new DigStep(this, new WorldPoint(3504, 3576, 0), "Use your spade on this tile to get arms.");
 
 		getLeg = new DigStep(this, new WorldPoint(3505, 3576, 0), "Use your spade on this tile to get legs.");
 
 		deliverBodyParts = new NpcStep(this, NpcID.DR_FENKENSTRAIN, new WorldPoint(3551, 3548, 0),
-			"Deliver the body parts to Dr.Fenkenstrain, use a teleport to Fenkenstrain's castle or run back through " +
+			"Deliver the body parts to Dr. Fenkenstrain, use a teleport to Fenkenstrain's castle or run back through " +
 				"the caves.");
 		deliverBodyParts.addDialogStep("I have some body parts for you.");
 
 		gatherNeedleAndThread = new NpcStep(this, NpcID.DR_FENKENSTRAIN, new WorldPoint(3551, 3548, 0),
-			"Get a needle and 5 threads and deliver them to Dr.Fenkenstrain.", needle, thread);
+			"Get a needle and 5 threads and deliver them to Dr. Fenkenstrain.", needle, thread);
 
 		talkToGardenerForKey = new NpcStep(this, NpcID.GARDENER_GHOST, new WorldPoint(3548, 3562, 0),
 			"Talk to the Gardener Ghost and ask for the shed key.", ghostSpeakAmulet.equipped(), bronzeWire, silverBar);
@@ -335,22 +346,22 @@ public class CreatureOfFenkenstrain extends BasicQuestHelper
 		repairConductor = new ObjectStep(this, ObjectID.LIGHTNING_CONDUCTOR, new WorldPoint(3549, 3537, 2),
 			"Repair the lightning Conductor.");
 
-		goBackToFirstFloor = new DetailedQuestStep(this, "Go back to the first floor of the castle and talk to Dr" +
-			".Fenkenstrain.");
+		goBackToFirstFloor = new DetailedQuestStep(this, "Go back to the first floor of the castle and talk to Dr." +
+			" Fenkenstrain.");
 		talkToFenkenstrainAfterFixingRod = new NpcStep(this, NpcID.DR_FENKENSTRAIN, new WorldPoint(3551, 3548, 0),
-			"Go back to the first floor of the castle and talk to Dr.Fenkenstrain.");
+			"Go back to the first floor of the castle and talk to Dr. Fenkenstrain.");
 
 		goToMonsterFloor1 = new ObjectStep(this, ObjectID.STAIRCASE_5206, new WorldPoint(3538, 3552, 0),
 			"Go up to the second floor to confront Fenkenstrain's monster.");
 		openLockedDoor = new ObjectStep(this, ObjectID.DOOR_5172, new WorldPoint(3548, 3551, 1),
 			"Use the Tower Key on the door.");
 		goToMonsterFloor2 = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(3548, 3554, 1),
-			"Go up the ladder");
+			"Go up the ladder.");
 		talkToMonster = new NpcStep(this, NpcID.FENKENSTRAINS_MONSTER, new WorldPoint(3548, 3555, 2),
 			"Talk to Fenkenstrain's monster.");
 
 		pickPocketFenkenstrain = new NpcStep(this, NpcID.DR_FENKENSTRAIN, new WorldPoint(3551, 3548, 0),
-			"Go back to Dr.Fenkenstrain, instead of talking to him right click and pickpocket him.");
+			"Go back to Dr. Fenkenstrain, instead of talking to him right click and pickpocket him.");
 	}
 
 	@Override

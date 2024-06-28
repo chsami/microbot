@@ -25,13 +25,29 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.theeyesofglouphrie;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.widget.WidgetDetails;
+import net.runelite.client.plugins.questhelper.steps.WidgetStep;
+import net.runelite.client.plugins.questhelper.steps.OwnerStep;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import lombok.NonNull;
-import net.runelite.api.*;
+import net.runelite.api.Client;
+import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
+import net.runelite.api.ItemID;
+import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
@@ -39,10 +55,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.components.PanelComponent;
-
-import java.awt.*;
-import java.util.List;
-import java.util.*;
 
 public class PuzzleStep extends QuestStep implements OwnerStep
 {
@@ -577,7 +589,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		shapeValues.put(5, blueCircleRedPentagon);
 		shapeValues.put(6, indigoCircleOrangeTriangle);
 		shapeValues.put(7, shapes.get(ItemID.VIOLET_CIRCLE));
-		shapeValues.put(8, shapes.get(ItemID.ORANGE));
+		shapeValues.put(8, shapes.get(ItemID.ORANGE_SQUARE));
 		shapeValues.put(9, shapes.get(ItemID.YELLOW_TRIANGLE));
 		shapeValues.put(10, shapes.get(ItemID.ORANGE_PENTAGON));
 		shapeValues.put(12, yellowSquareGreenTriangle);
@@ -651,7 +663,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
 	{
 		if (currentStep != null)
 		{
@@ -660,7 +672,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -669,7 +681,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -678,7 +690,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{

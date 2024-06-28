@@ -24,37 +24,36 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.kandarin;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import net.runelite.client.plugins.questhelper.requirements.util.Spellbook;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.requirements.util.Spellbook;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.KANDARIN_MEDIUM
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 
 public class KandarinMedium extends ComplexStateQuestHelper
 {
@@ -95,8 +94,7 @@ public class KandarinMedium extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doMedium = new ConditionalStep(this, claimReward);
@@ -118,9 +116,9 @@ public class KandarinMedium extends ComplexStateQuestHelper
 		doMedium.addStep(notStringMaple, stringMapleTask);
 
 		superAntiTask = new ConditionalStep(this, moveToSeersCath);
-		superAntiTask.addStep(inSeersCath, mixUnf);
-		superAntiTask.addStep(new Conditions(inSeersCath, unfIrit), crushHorn);
 		superAntiTask.addStep(new Conditions(inSeersCath, unfIrit, hornDust), superAnti);
+		superAntiTask.addStep(new Conditions(inSeersCath, unfIrit), crushHorn);
+		superAntiTask.addStep(inSeersCath, mixUnf);
 		doMedium.addStep(notSuperAnti, superAntiTask);
 
 		mindHelmTask = new ConditionalStep(this, makeMindHelmet);
@@ -156,7 +154,7 @@ public class KandarinMedium extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notBarbAgi = new VarplayerRequirement(1178, false, 12);
 		notSuperAnti = new VarplayerRequirement(1178, false, 13);
@@ -177,7 +175,7 @@ public class KandarinMedium extends ComplexStateQuestHelper
 
 		mithGrap = new ItemRequirement("Mith grapple", ItemID.MITH_GRAPPLE_9419).showConditioned(notGrapOb).isNotConsumed();
 		crossbow = new ItemRequirement("Any crossbow", ItemCollections.CROSSBOWS).showConditioned(notGrapOb).isNotConsumed();
-		unfIrit = new ItemRequirement("Unfinished Irit potion", ItemID.IRIT_POTION_UNF, 1).showConditioned(notSuperAnti);
+		unfIrit = new ItemRequirement("Unfinished irit potion", ItemID.IRIT_POTION_UNF, 1).showConditioned(notSuperAnti);
 		unicornHorn = new ItemRequirement("Unicorn horn", ItemID.UNICORN_HORN, 1).showConditioned(notSuperAnti);
 		mortarPest = new ItemRequirement("Pestle and mortar", ItemID.PESTLE_AND_MORTAR).showConditioned(notSuperAnti).isNotConsumed();
 		hornDust = new ItemRequirement("Horn Dust", ItemID.UNICORN_HORN_DUST, 1).showConditioned(notSuperAnti);
@@ -227,7 +225,8 @@ public class KandarinMedium extends ComplexStateQuestHelper
 		setupGeneralRequirements();
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		bank = new Zone(new WorldPoint(2721, 3495, 0), new WorldPoint(2730, 3490, 0));
 		seersCath = new Zone(new WorldPoint(2687, 3510, 0), new WorldPoint(2839, 3430, 0));
@@ -264,8 +263,19 @@ public class KandarinMedium extends ComplexStateQuestHelper
 			"Go to Seers' Village bank to string a maple shortbow.");
 		stringMaple = new DetailedQuestStep(this, "String a maple shortbow.", mapleUnstrung.highlighted(),
 			bowString.highlighted());
-		moveToTavDungeon = new ObjectStep(this, ObjectID.LADDER_16680, new WorldPoint(2884, 3397, 0),
-			"Enter the Taverly Dungeon.", dustyKey, mithGrap, crossbow);
+
+		int agilityLevel = client.getRealSkillLevel(Skill.AGILITY);
+		if (agilityLevel >= 65 && agilityLevel < 70)
+		{
+			moveToTavDungeon = new ObjectStep(this, ObjectID.LADDER_16680, new WorldPoint(2884, 3397, 0),
+				"Enter the Taverley Dungeon. Bring a summer pie to boost for the 70 Agility shortcut if you'd like to save time.", dustyKey, mithGrap, crossbow);
+		}
+		else
+		{
+			moveToTavDungeon = new ObjectStep(this, ObjectID.LADDER_16680, new WorldPoint(2884, 3397, 0),
+				"Enter the Taverley Dungeon.", dustyKey, mithGrap, crossbow);
+		}
+
 		moveToOb = new ObjectStep(this, ObjectID.LADDER_17385, new WorldPoint(2842, 9824, 0),
 			"Make your way through Taverley Dungeon to the end, and climb the ladder there. If you're 70+ " +
 				"Agility, use one of the shortcuts near the entrance to get there quickly.",
@@ -285,7 +295,7 @@ public class KandarinMedium extends ComplexStateQuestHelper
 				"If you're waiting for it to grow and want to complete further tasks, use the tick box on panel.",
 			rake, limpSeed, seedDib);
 		catchBass = new NpcStep(this, NpcID.FISHING_SPOT_1520, new WorldPoint(2837, 3431, 0),
-			"Catch a bass.", bigFishingNet);
+			"Catch a bass on Catherby Beach.", bigFishingNet);
 		cookBass = new ObjectStep(this, ObjectID.RANGE_26181, new WorldPoint(2818, 3444, 0),
 			"Cook the bass on the range in Catherby.", rawBass);
 		travelMcGrubor = new DetailedQuestStep(this, "Take a fairy ring to McGrubor's Woods (ALS)", staff.equipped());

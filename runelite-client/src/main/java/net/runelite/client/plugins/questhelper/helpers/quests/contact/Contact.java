@@ -24,34 +24,36 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.contact;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.CONTACT
-)
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+
 public class Contact extends BasicQuestHelper
 {
 	//Items Required
@@ -71,8 +73,7 @@ public class Contact extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -123,15 +124,15 @@ public class Contact extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		lightSource = new ItemRequirement("A light source", ItemCollections.LIGHT_SOURCES).isNotConsumed();
 		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).isNotConsumed();
 		parchment = new ItemRequirement("Parchment", ItemID.PARCHMENT);
 		parchment.setHighlightInInventory(true);
 
-		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
-		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
+		combatGear = new ItemRequirement("Combat gear, preferably magic/ranged", -1, -1).isNotConsumed();
+		combatGear.setDisplayItemId(BankSlotIcons.getMagicCombatGear());
 
 		food = new ItemRequirement("Food", ItemCollections.GOOD_EATING_FOOD, -1);
 
@@ -145,7 +146,8 @@ public class Contact extends BasicQuestHelper
 		glory = new ItemRequirement("Amulet of glory for getting to Osman", ItemCollections.AMULET_OF_GLORIES);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		bank = new Zone(new WorldPoint(2772, 5129, 0), new WorldPoint(2758, 5145, 0));
 		dungeon = new Zone(8516);
@@ -216,7 +218,7 @@ public class Contact extends BasicQuestHelper
 			new WorldPoint(2149, 4374, 2),
 			new WorldPoint(2151, 4374, 2),
 
-			new WorldPoint(3304, 9238, 3),
+			new WorldPoint(0, 0, 0),
 
 			new WorldPoint(2154, 4374, 2),
 			new WorldPoint(2157, 4374, 2),
@@ -313,7 +315,7 @@ public class Contact extends BasicQuestHelper
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("2 x 7,000 Experience Lamps (Combat Skills)", ItemID.ANTIQUE_LAMP, 2),
+				new ItemReward("7,000 Experience Lamps (Combat Skills)", ItemID.ANTIQUE_LAMP, 2),
 				new ItemReward("Keris", ItemID.KERIS, 1)
 		);
 	}
@@ -337,7 +339,7 @@ public class Contact extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Help Osman",
 			Arrays.asList(talkToOsmanOutsideSoph, goDownToBankAgain, goDownToDungeonAgain,
-				goDownToChasmAgain, killGiantScarab, talkToOsmanChasm, returnToHighPriest), combatGear, food, prayerPotions,
+				goDownToChasmAgain, killGiantScarab, talkToOsmanChasm, pickUpKeris, returnToHighPriest), combatGear, food, prayerPotions,
 			lightSource, tinderbox));
 
 		return allSteps;

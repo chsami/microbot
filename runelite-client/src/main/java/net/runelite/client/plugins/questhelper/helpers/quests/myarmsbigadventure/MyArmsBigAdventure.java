@@ -24,35 +24,41 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.myarmsbigadventure;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.MY_ARMS_BIG_ADVENTURE
-)
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+
 public class MyArmsBigAdventure extends BasicQuestHelper
 {
 	//Items Required
@@ -79,8 +85,7 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -213,7 +218,7 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		goutLump = new ItemRequirement("Goutweedy lump", ItemID.GOUTWEEDY_LUMP);
 		bucket = new ItemRequirement("Bucket", ItemID.BUCKET).isNotConsumed();
@@ -231,7 +236,7 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 		superCompost = new ItemRequirement("Supercompost", ItemID.SUPERCOMPOST);
 		hardyGout = new ItemRequirement("Hardy gout tubers", ItemID.HARDY_GOUT_TUBERS);
 		hardyGout.setTooltip("You can get more from Murcaily");
-		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
+		combatGear = new ItemRequirement("Combat gear, preferably magic", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
 		food = new ItemRequirement("Food", ItemCollections.GOOD_EATING_FOOD, -1);
 		prayerPotions = new ItemRequirement("Prayer potions", ItemCollections.PRAYER_POTIONS, -1);
@@ -263,7 +268,8 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 			ItemCollections.GAMES_NECKLACES);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		strongholdFloor1 = new Zone(new WorldPoint(2820, 10048, 1), new WorldPoint(2862, 10110, 1));
 		strongholdFloor2 = new Zone(new WorldPoint(2820, 10048, 2), new WorldPoint(2862, 10110, 2));
@@ -300,52 +306,41 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 		enterStronghold = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Enter the Troll Stronghold.");
 
 		goDownToChef = new ObjectStep(this, ObjectID.STONE_STAIRCASE_3789, new WorldPoint(2844, 10052, 2), "Go down the south staircase.");
-		goDownToChef.setWorldMapPoint(new WorldPoint(2971, 10115, 1));
 
 		goUpToChef = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Go up the stairs from the prison.");
-		goUpToChef.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 
 		talkToBurntmeat = new NpcStep(this, NpcID.BURNTMEAT, new WorldPoint(2845, 10057, 1), "Talk to Burntmeat in the Troll Stronghold.");
-		talkToBurntmeat.setWorldMapPoint(new WorldPoint(2911, 10087, 1));
 		talkToBurntmeat.addSubSteps(enterStronghold, goDownToChef, goUpToChef);
 		talkToBurntmeat.addDialogStep("What do you want now?");
 		talkToMyArm = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2855, 10053, 1), "Talk to My Arm near Burntmeat.");
-		talkToMyArm.setWorldMapPoint(new WorldPoint(2919, 10084, 1));
 		talkToMyArm.addDialogStep("Alright, I'll lend him a hand.");
 
 		useBucketOnPot = new ObjectStep(this, ObjectID.COOKING_POT, new WorldPoint(2864, 3591, 0),
 			"Use a bucket on the cooking pot on the Death Plateau. You can find a bucket next to the pot.", bucketHighlight);
 		useBucketOnPot.addIcon(ItemID.BUCKET);
+		useBucketOnPot.addTeleport(gamesNecklace);
 
 		enterStrongholdWithLump = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Return to My Arm with the goutweedy lump.", goutLump);
 
 		goDownToArmWithLump = new ObjectStep(this, ObjectID.STONE_STAIRCASE_3789, new WorldPoint(2844, 10052, 2), "Return to My Arm with the goutweedy lump.", goutLump);
-		goDownToArmWithLump.setWorldMapPoint(new WorldPoint(2971, 10115, 1));
 
 		goUpToArmWithLump = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Return to My Arm with the goutweedy lump.", goutLump);
-		goUpToArmWithLump.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 
 		talkToArmWithLump = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2855, 10053, 1), "Return to My Arm with the goutweedy lump.", goutLump);
-		talkToArmWithLump.setWorldMapPoint(new WorldPoint(2919, 10084, 1));
 		talkToArmWithLump.addSubSteps(goUpToArmWithLump, goDownToArmWithLump, enterStrongholdWithLump);
 
 		enterStrongholdAfterLump = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Return to My Arm.");
 
 		goDownAfterLump = new ObjectStep(this, ObjectID.STONE_STAIRCASE_3789, new WorldPoint(2844, 10052, 2), "Return to My Arm.");
-		goDownAfterLump.setWorldMapPoint(new WorldPoint(2971, 10115, 1));
 
 		goUpAfterLump = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Return to My Arm.");
-		goUpAfterLump.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 
 		talkToArmAfterLump = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2855, 10053, 1), "Return to My Arm.");
-		talkToArmAfterLump.setWorldMapPoint(new WorldPoint(2919, 10084, 1));
 
 		talkToArmWithLump.addSubSteps(goUpToArmWithLump, goDownToArmWithLump, enterStrongholdWithLump, goUpAfterLump, goDownAfterLump, enterStrongholdAfterLump, talkToArmAfterLump);
 
 		goUpFromF1ToMyArm = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2843, 10052, 1), "Go up to the roof of the Stronghold and talk to My Arm.");
-		goUpFromF1ToMyArm.setWorldMapPoint(new WorldPoint(2907, 10083, 1));
 		goUpToMyArm = new ObjectStep(this, ObjectID.TROLL_LADDER_18834, new WorldPoint(2831, 10077, 2), "Climb back up to My Arm.");
-		goUpToMyArm.setWorldMapPoint(new WorldPoint(2959, 10140, 0));
 		talkToMyArmUpstairs = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2835, 3694, 0), "Talk to My Arm on the roof of the Troll Stronghold.");
 		talkToMyArmUpstairs.addSubSteps(goUpFromF1ToMyArm, goUpToMyArm);
 
@@ -370,11 +365,8 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 		enterStrongholdForFight = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0),
 			"Return to My Arm on the roof. Be prepared to fight a baby and giant Roc.", combatGear, rake, superCompost, hardyGout, dibber, spade);
 		goUpToRoofForFight = new ObjectStep(this, ObjectID.TROLL_LADDER_18834, new WorldPoint(2831, 10077, 2), "Climb back up to My Arm.");
-		goUpToRoofForFight.setWorldMapPoint(new WorldPoint(2959, 10140, 0));
 		goUpFromF1ForFight = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2843, 10052, 1), "Go up to the roof of the Stronghold and talk to My Arm.");
-		goUpFromF1ForFight.setWorldMapPoint(new WorldPoint(2907, 10083, 1));
 		goUpFromPrisonForFight = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Return to My Arm, ready to fight.");
-		goUpFromPrisonForFight.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 		talkToMyArmForFight = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2829, 3695, 0), "Talk to My Arm on the roof of the Troll Stronghold.");
 		talkToMyArmForFight.addSubSteps(enterStrongholdForFight, goUpToRoofForFight, goUpFromF1ForFight, goUpFromPrisonForFight);
 
@@ -396,28 +388,24 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 			"Talk to My Arm. Be prepared to fight a baby and giant Roc.");
 		killBabyRoc = new NpcStep(this, NpcID.BABY_ROC, "Kill the Baby Roc.");
 		talkToMyArmAfterBaby = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2829, 3695, 0),
-			"Talk to My Arm. Be prepared to fight the Giant Roc.");
+			"Talk to My Arm. Be prepared to fight the Giant Roc.", combatGear, spade);
 
-		killGiantRoc = new NpcStep(this, NpcID.GIANT_ROC, "Kill the Giant Roc.");
+		killGiantRoc = new NpcStep(this, NpcID.GIANT_ROC, "Kill the Giant Roc. Use protected from ranged, and keep your distance. You can dodge the boulders it throws.");
 		talkToMyArmAfterHarvest = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2829, 3695, 0), "Talk to My Arm.");
 		giveSpade = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2829, 3695, 0), "Give My Arm a spade.", spadeHighlight);
 		giveSpade.addIcon(ItemID.SPADE);
 		goDownFromMyArmToBurntmeat = new ObjectStep(this, ObjectID.TROLL_LADDER, new WorldPoint(2831, 3677, 0), "Go talk to Burntmeat.");
 
 		goDownToBurntmeat = new ObjectStep(this, ObjectID.STONE_STAIRCASE_3789, new WorldPoint(2844, 10052, 2), "Go talk to Burntmeat.");
-		goDownToBurntmeat.setWorldMapPoint(new WorldPoint(2971, 10115, 1));
 
 		talkToBurntmeatAgain = new NpcStep(this, NpcID.BURNTMEAT, new WorldPoint(2845, 10057, 1),
 			"Talk to Burntmeat in the Troll Stronghold.");
-		talkToBurntmeatAgain.setWorldMapPoint(new WorldPoint(2911, 10087, 1));
 		talkToBurntmeatAgain.addSubSteps(goDownFromMyArmToBurntmeat, goDownToBurntmeat);
 
 		enterStrongholdFinish = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0),
 			"Talk to My Arm to finish the quest.");
 		goUpToMyArmFinish = new ObjectStep(this, ObjectID.TROLL_LADDER_18834, new WorldPoint(2831, 10077, 2), "Climb back up to My Arm.");
-		goUpToMyArmFinish.setWorldMapPoint(new WorldPoint(2959, 10140, 0));
 		goUpFromBurntmeatFinish = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2843, 10052, 1), "Go up to the roof of the Stronghold and talk to My Arm.");
-		goUpFromBurntmeatFinish.setWorldMapPoint(new WorldPoint(2907, 10083, 1));
 
 		talkToMyArmFinish = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2829, 3695, 0), "Talk to My Arm to finish the quest.");
 		talkToMyArmFinish.addSubSteps(goUpToMyArmFinish, goUpFromBurntmeatFinish, enterStrongholdFinish);
@@ -483,10 +471,13 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 	public List<PanelDetails> getPanels()
 	{
 		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off", Arrays.asList(talkToBurntmeat, talkToMyArm), climbingBoots));
+		allSteps.add(new PanelDetails("Starting off", Arrays.asList(talkToBurntmeat, talkToMyArm),
+			Collections.singletonList(climbingBoots),
+			Collections.singletonList(gamesNecklace)));
 		allSteps.add(new PanelDetails("Preparing to grow", Arrays.asList(useBucketOnPot, talkToArmWithLump,
 			talkToMyArmUpstairs, readBook, talkToMyArmAfterReading, useUgthankiDung, useCompost, talkToMyArmAfterFertilising),
-			climbingBoots, bucket, spade, supercompost7, ugthanki3));
+			Arrays.asList(climbingBoots, bucket, spade, supercompost7, ugthanki3),
+			Collections.singletonList(gamesNecklace)));
 		allSteps.add(new PanelDetails("Karamja adventure", Arrays.asList(talkToBarnaby, talkAfterBoat, talkToMyArmAtTai, talkToMurcaily, talkToMyArmAfterMurcaily)));
 		allSteps.add(new PanelDetails("Troll farming", Arrays.asList(talkToMyArmForFight, giveRake, giveSupercompost, giveHardyGout,
 			giveDibber, talkToMyArmAfterGrow, killBabyRoc, killGiantRoc, giveSpade, talkToMyArmAfterHarvest, talkToBurntmeatAgain,

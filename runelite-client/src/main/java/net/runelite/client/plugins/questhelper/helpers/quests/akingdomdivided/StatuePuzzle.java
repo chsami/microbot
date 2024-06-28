@@ -24,10 +24,10 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.akingdomdivided;
 
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
@@ -35,13 +35,16 @@ import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.*;
 
 public class StatuePuzzle extends DetailedOwnerStep
 {

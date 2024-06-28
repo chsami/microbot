@@ -27,10 +27,9 @@
 package net.runelite.client.plugins.questhelper.requirements.util;
 
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.api.Client;
-
-import javax.annotation.Nonnull;
 import java.util.function.Predicate;
+import javax.annotation.Nonnull;
+import net.runelite.api.Client;
 
 /**
  * Builder for building non-standard simple {@link Requirement}s.<br>

@@ -24,26 +24,25 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.monkeymadnessii;
 
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import java.util.Arrays;
+import java.util.List;
 import net.runelite.api.ItemID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.SpriteID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class MM2Sabotage extends ConditionalStep
 {
@@ -234,7 +233,7 @@ public class MM2Sabotage extends ConditionalStep
 		goDownFromSatchel1.setLinePoints(pathAboveGunpowder);
 
 		placeSatchel2 = new ObjectStep(getQuestHelper(), ObjectID.COMPROMISED_SUPPORT_28622, new WorldPoint(2090, 5418, 1), "Place a satchel on the support to the south.", filledSatchel1Highlighted);
-		placeSatchel2.addTileMarkers(new WorldPoint(2083, 5430, 1));
+		placeSatchel2.addTileMarkers(new WorldPoint(2085, 5430, 1));
 		placeSatchel2.setHideMinimapLines(true);
 		placeSatchel2.addIcon(ItemID.SATCHEL_19528);
 		placeSatchel2.setLinePoints(pathToSatchel2);
@@ -500,7 +499,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2096, 5397, 2),
 			new WorldPoint(2099, 5397, 2),
 			new WorldPoint(2099, 5398, 2),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2098, 5396, 2),
 			new WorldPoint(2098, 5395, 2),
 			new WorldPoint(2098, 5394, 2),
@@ -512,7 +511,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2097, 5387, 2),
 			new WorldPoint(2099, 5387, 2),
 			new WorldPoint(2099, 5386, 2),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2096, 5387, 2),
 			new WorldPoint(2093, 5387, 2),
 			new WorldPoint(2093, 5386, 2),
@@ -530,7 +529,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2093, 5387, 2),
 			new WorldPoint(2099, 5387, 2),
 			new WorldPoint(2099, 5386, 2),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2097, 5388, 2),
 			new WorldPoint(2097, 5391, 2),
 			new WorldPoint(2096, 5391, 2),
@@ -541,7 +540,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2098, 5397, 2),
 			new WorldPoint(2099, 5397, 2),
 			new WorldPoint(2099, 5398, 2),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2096, 5397, 2),
 			new WorldPoint(2096, 5400, 2),
 			new WorldPoint(2097, 5400, 2),
@@ -583,7 +582,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2084, 5396, 1),
 			new WorldPoint(2084, 5398, 1),
 			new WorldPoint(2084, 5498, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2082, 5399, 1),
 			new WorldPoint(2082, 5405, 1),
 			new WorldPoint(2084, 5405, 1),
@@ -595,7 +594,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2078, 5409, 1),
 			new WorldPoint(2075, 5409, 1),
 			new WorldPoint(2075, 5407, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2073, 5409, 1),
 			new WorldPoint(2071, 5409, 1),
 			new WorldPoint(2071, 5408, 1),
@@ -608,7 +607,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2067, 5414, 1),
 			new WorldPoint(2067, 5415, 1),
 			new WorldPoint(2069, 5415, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2067, 5417, 1),
 			new WorldPoint(2067, 5423, 1),
 			new WorldPoint(2068, 5423, 1),
@@ -619,7 +618,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2068, 5430, 1),
 			new WorldPoint(2069, 5430, 1),
 			new WorldPoint(2069, 5431, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2071, 5430, 1),
 			new WorldPoint(2071, 5429, 1),
 			new WorldPoint(2074, 5429, 1),
@@ -632,7 +631,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2078, 5430, 1),
 			new WorldPoint(2081, 5430, 1),
 			new WorldPoint(2081, 5431, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2084, 5430, 1),
 			new WorldPoint(2083, 5430, 1),
 			new WorldPoint(2082, 5430, 1),
@@ -645,18 +644,18 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2081, 5423, 1),
 			new WorldPoint(2081, 5420, 1),
 			new WorldPoint(2082, 5419, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2085, 5418, 1),
 			new WorldPoint(2083, 5418, 1),
 			new WorldPoint(2083, 5414, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2082, 5412, 1),
 			new WorldPoint(2083, 5412, 1),
 			new WorldPoint(2083, 5410, 1),
 			new WorldPoint(2085, 5410, 1),
 			new WorldPoint(2085, 5408, 1),
 			new WorldPoint(2088, 5408, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2090, 5410, 1),
 			new WorldPoint(2090, 5408, 1),
 			new WorldPoint(2092, 5408, 1),
@@ -679,18 +678,18 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2081, 5423, 1),
 			new WorldPoint(2081, 5420, 1),
 			new WorldPoint(2082, 5419, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2085, 5418, 1),
 			new WorldPoint(2083, 5418, 1),
 			new WorldPoint(2083, 5414, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2082, 5412, 1),
 			new WorldPoint(2083, 5412, 1),
 			new WorldPoint(2083, 5410, 1),
 			new WorldPoint(2085, 5410, 1),
 			new WorldPoint(2085, 5408, 1),
 			new WorldPoint(2088, 5408, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2090, 5410, 1),
 			new WorldPoint(2090, 5408, 1),
 			new WorldPoint(2092, 5408, 1),
@@ -725,7 +724,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2097, 5426, 2),
 			new WorldPoint(2098, 5426, 2),
 			new WorldPoint(2098, 5429, 2),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2098, 5432, 2),
 			new WorldPoint(2097, 5432, 2),
 			new WorldPoint(2097, 5430, 2),
@@ -742,7 +741,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2099, 5427, 1),
 			new WorldPoint(2096, 5427, 1),
 			new WorldPoint(2096, 5426, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2097, 5429, 1),
 			new WorldPoint(2097, 5431, 1),
 			new WorldPoint(2093, 5431, 1),
@@ -758,20 +757,20 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2083, 5414, 1),
 			new WorldPoint(2083, 5412, 1),
 			new WorldPoint(2082, 5412, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2083, 5410, 1),
 			new WorldPoint(2085, 5410, 1),
 			new WorldPoint(2085, 5408, 1),
 			new WorldPoint(2088, 5408, 1),
 			new WorldPoint(2090, 5408, 1),
 			new WorldPoint(2090, 5410, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2092, 5408, 1),
 			new WorldPoint(2092, 5409, 1),
 			new WorldPoint(2096, 5409, 1),
 			new WorldPoint(2096, 5408, 1),
 			new WorldPoint(2098, 5408, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2097, 5423, 1),
 			new WorldPoint(2098, 5423, 1),
 			new WorldPoint(2098, 5424, 1),
@@ -779,7 +778,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2099, 5427, 1),
 			new WorldPoint(2096, 5427, 1),
 			new WorldPoint(2096, 5426, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2097, 5429, 1),
 			new WorldPoint(2097, 5431, 1),
 			new WorldPoint(2093, 5431, 1),
@@ -787,7 +786,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2091, 5429, 1),
 			new WorldPoint(2091, 5430, 1),
 			new WorldPoint(2090, 5430, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2084, 5430, 1),
 			new WorldPoint(2083, 5430, 1),
 			new WorldPoint(2082, 5430, 1),
@@ -857,13 +856,13 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2075, 5430, 2),
 			new WorldPoint(2078, 5430, 2),
 			new WorldPoint(2078, 5431, 2),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2098, 5423, 2),
 			new WorldPoint(2097, 5423, 2),
 			new WorldPoint(2097, 5426, 2),
 			new WorldPoint(2098, 5426, 2),
 			new WorldPoint(2098, 5429, 2),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2098, 5432, 2),
 			new WorldPoint(2097, 5432, 2),
 			new WorldPoint(2097, 5430, 2),
@@ -924,13 +923,13 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2075, 5430, 2),
 			new WorldPoint(2078, 5430, 2),
 			new WorldPoint(2078, 5431, 2),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2098, 5423, 2),
 			new WorldPoint(2097, 5423, 2),
 			new WorldPoint(2097, 5426, 2),
 			new WorldPoint(2098, 5426, 2),
 			new WorldPoint(2098, 5429, 2),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2098, 5432, 2),
 			new WorldPoint(2097, 5432, 2),
 			new WorldPoint(2097, 5430, 2),
@@ -948,7 +947,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2096, 5398, 3),
 			new WorldPoint(2099, 5398, 3),
 			new WorldPoint(2099, 5399, 3),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2098, 5396, 3),
 			new WorldPoint(2098, 5394, 3),
 			new WorldPoint(2097, 5394, 3)
@@ -961,13 +960,13 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2098, 5401, 3),
 			new WorldPoint(2096, 5401, 3),
 			new WorldPoint(2096, 5398, 3),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2099, 5399, 3),
 			new WorldPoint(2099, 5398, 3),
 			new WorldPoint(2098, 5398, 3),
 			new WorldPoint(2098, 5394, 3),
 			new WorldPoint(2097, 5394, 3),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2096, 5409, 3),
 			new WorldPoint(2092, 5409, 3),
 			new WorldPoint(2092, 5408, 3),
@@ -1125,7 +1124,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2096, 5409, 1),
 			new WorldPoint(2096, 5408, 1),
 			new WorldPoint(2098, 5408, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2097, 5429, 1),
 			new WorldPoint(2097, 5431, 1),
 			new WorldPoint(2093, 5431, 1),
@@ -1133,7 +1132,7 @@ public class MM2Sabotage extends ConditionalStep
 			new WorldPoint(2091, 5429, 1),
 			new WorldPoint(2091, 5430, 1),
 			new WorldPoint(2090, 5430, 1),
-			new WorldPoint(0, 0, 0),
+			null,
 			new WorldPoint(2084, 5430, 1),
 			new WorldPoint(2083, 5430, 1),
 			new WorldPoint(2082, 5430, 1),
