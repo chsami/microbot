@@ -155,14 +155,12 @@ public class Rs2Npc {
                         value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
     }
 
-    public static Optional<NPC> getNPCNearestToPlayer() {
+    public static NPC getRandomEventNPC() {
         return getNpcs()
-                .min(Comparator.comparingInt(value ->
-                        value.getWorldLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation())));
-    }
-
-    public static NPC getNPCNearestToPlayer(Predicate<NPC> filter) {
-        return getNPCNearestToPlayer().filter(filter).orElse(null);
+                .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null && 
+                        Arrays.asList(value.getComposition().getActions()).contains("Dismiss")) && value.getInteracting() == Microbot.getClient().getLocalPlayer())
+                .findFirst()
+                .orElse(null);
     }
 
 

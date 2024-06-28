@@ -20,7 +20,7 @@ public class EventDismissScript extends Script {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
 
-                NPC npc = getRandomFollower();
+                NPC npc = Rs2Npc.getRandomEventNPC();
 
                 if (npc != null) {
                     if (shouldDismissNpc(npc, config)) {
@@ -94,14 +94,6 @@ public class EventDismissScript extends Script {
                 return false;
         }
     }
-
-    private NPC getRandomFollower() {
-        return Rs2Npc.getNPCNearestToPlayer(npc -> (npc.getComposition() != null &&
-                npc.getComposition().getActions() != null &&
-                Arrays.asList(npc.getComposition().getActions()).contains("Dismiss")) &&
-                npc.getInteracting() == Microbot.getClient().getLocalPlayer());
-    }
-
     private void dismissNpc(NPC npc) {
         // Interact with NPC to dismiss it
         Rs2Npc.interact(npc, "Dismiss");
