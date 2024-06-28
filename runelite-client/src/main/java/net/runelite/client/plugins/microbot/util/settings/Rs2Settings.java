@@ -60,19 +60,7 @@ public class Rs2Settings {
             sleepUntilOnClientThread(() -> isSettingsInterfaceVisible);
             if(isSettingsInterfaceVisible){
                 Rs2Widget.clickWidget(8781834);
-                sleep(600);
-                Rs2Keyboard.keyPress('l');
-                sleep(100);
-                Rs2Keyboard.keyPress('e');
-                sleep(100);
-                Rs2Keyboard.keyPress('v');
-                sleep(100);
-                Rs2Keyboard.keyPress('e');
-                sleep(100);
-                Rs2Keyboard.keyPress('l');
-                sleep(100);
-                Rs2Keyboard.keyPress('-');
-                sleep(600);
+                Rs2Keyboard.typeString("level-");
                 Rs2Widget.clickWidget("Disable level-up interface");
                 sleep(600);
                 Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
