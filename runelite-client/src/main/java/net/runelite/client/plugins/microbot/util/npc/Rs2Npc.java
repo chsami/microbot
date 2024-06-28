@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -160,6 +161,14 @@ public class Rs2Npc {
                 .filter(x -> x != null && x.getId() == id && !excludedIndexes.contains(x.getIndex()))
                 .min(Comparator.comparingInt(value ->
                         value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
+    }
+
+    public static NPC getRandomEventNPC() {
+        return getNpcs()
+                .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null && 
+                        Arrays.asList(value.getComposition().getActions()).contains("Dismiss")) && value.getInteracting() == Microbot.getClient().getLocalPlayer())
+                .findFirst()
+                .orElse(null);
     }
 
 

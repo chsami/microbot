@@ -133,7 +133,7 @@ public class Rs2Camera {
         }
     }
 
-    private static float cameraPitchPercentage() {
+    public static float cameraPitchPercentage() {
         int minPitch = 128;
         int maxPitch = 383;
         int currentPitch = Microbot.getClient().getCameraPitch();
