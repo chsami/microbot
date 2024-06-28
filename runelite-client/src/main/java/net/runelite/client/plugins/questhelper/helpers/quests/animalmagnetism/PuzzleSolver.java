@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.animalmagnetism;
 
-import net.runelite.client.plugins.questhelper.steps.WidgetDetails;
+import net.runelite.client.plugins.questhelper.steps.widget.WidgetDetails;
 
 import java.util.HashSet;
 

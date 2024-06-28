@@ -32,15 +32,14 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequiremen
 import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import net.runelite.api.Client;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class LadyTableStep extends DetailedOwnerStep
 {
@@ -69,7 +68,6 @@ public class LadyTableStep extends DetailedOwnerStep
 		clickMissingStatue.setWorldPoint(answerStatue.point);
 	}
 
-	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{

@@ -24,20 +24,19 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.wanted;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcHintArrowRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestPointRequirement;
@@ -49,15 +48,17 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequire
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.WANTED
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+
 public class Wanted extends BasicQuestHelper
 {
 	private static final String TEXT_ASK_ABOUT_WANTED_QUEST = "Ask about the Wanted! Quest";
@@ -103,8 +104,7 @@ public class Wanted extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupOtherRequirements();
 		setupSteps();
 
@@ -245,7 +245,7 @@ public class Wanted extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		ItemRequirement lawRune = new ItemRequirement("A law rune", ItemID.LAW_RUNE, 1);
 		ItemRequirement enchantedGem = new ItemRequirement("Enchanted gem", ItemID.ENCHANTED_GEM, 1);
@@ -279,7 +279,8 @@ public class Wanted extends BasicQuestHelper
 		highlightedCommorb.setHighlightInInventory(true);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		taverleyDungeonP1 = new Zone(new WorldPoint(2814, 9854, 0), new WorldPoint(2944, 9670, 0));
 		taverleyDungeonP2 = new Zone(new WorldPoint(2944, 9803, 0), new WorldPoint(2971, 9769, 0));
@@ -449,7 +450,7 @@ public class Wanted extends BasicQuestHelper
 		moveOutOfCanifisAgain = new DetailedQuestStep(this, new WorldPoint(3450, 3488, 0), "Finish the conversation with Savant. Move out of Canifis again first to trigger it again if needed.");
 
 		chaseToCanifis = new DetailedQuestStep(this, new WorldPoint(3485, 3481, 0), "Go to Canifis. Finish the conversation when Savant calls you. If you accidentally exit this conversation, move away and enter Canifis again.", commorb);
-		enterCanifis = new DetailedQuestStep(this, new WorldPoint(3485, 3481, 0), "Go to Canifis.", commorb);
+		enterCanifis = new DetailedQuestStep(this, new WorldPoint(3485, 3481, 0), "Go to Canifis, and scan with your Commorb there until you find Solus.", commorb);
 		enterCanifis.addSubSteps(chaseToCanifis, moveOutOfCanifisAgain);
 
 		goToChampionsGuild = new DetailedQuestStep(this, new WorldPoint(3190, 3359, 0), "Go to the Champions' Guild.",

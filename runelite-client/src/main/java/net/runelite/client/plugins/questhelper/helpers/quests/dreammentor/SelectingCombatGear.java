@@ -24,15 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.dreammentor;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.awt.*;
-import java.util.ArrayList;
 
 public class SelectingCombatGear extends QuestStep
 {
@@ -81,7 +81,7 @@ public class SelectingCombatGear extends QuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 

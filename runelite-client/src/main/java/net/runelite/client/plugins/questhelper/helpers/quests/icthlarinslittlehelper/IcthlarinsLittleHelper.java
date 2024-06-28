@@ -24,36 +24,46 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.icthlarinslittlehelper;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.NpcCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.FollowerItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.npc.FollowerRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetModelRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.ICTHLARINS_LITTLE_HELPER
-)
 public class IcthlarinsLittleHelper extends BasicQuestHelper
 {
 	//Items Required
@@ -84,9 +94,7 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupConditions();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
 
@@ -199,8 +207,9 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
+		setupConditions();
 		cat = new FollowerItemRequirement("A cat",
 			ItemCollections.CATS,
 			NpcCollections.getCats()).isNotConsumed();
@@ -250,11 +259,6 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 
 	public void setupConditions()
 	{
-		inSoph = new ZoneRequirement(soph);
-		inPyramid = new ZoneRequirement(pyramid);
-		inNorthPyramid = new ZoneRequirement(northPyramid, northPyramid2, eastRoom);
-		inEastRoom = new ZoneRequirement(eastRoom);
-
 		puzzleOpen = new WidgetModelRequirement(147, 3, 6474);
 		givenToken = new VarbitRequirement(450, 1);
 
@@ -281,13 +285,19 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 		possessedPriestNearby = new NpcCondition(NpcID.POSSESSED_PRIEST);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		soph = new Zone(new WorldPoint(3262, 2751, 0), new WorldPoint(3322, 2809, 0));
 		pyramid = new Zone(new WorldPoint(3273, 9170, 0), new WorldPoint(3311, 9204, 0));
 		northPyramid = new Zone(new WorldPoint(3276, 9194, 0), new WorldPoint(3311, 9204, 0));
 		northPyramid2 = new Zone(new WorldPoint(3276, 9192, 0), new WorldPoint(3287, 9193, 0));
 		eastRoom = new Zone(new WorldPoint(3300, 9192, 0), new WorldPoint(3311, 9199, 0));
+
+		inSoph = new ZoneRequirement(soph);
+		inPyramid = new ZoneRequirement(pyramid);
+		inNorthPyramid = new ZoneRequirement(northPyramid, northPyramid2, eastRoom);
+		inEastRoom = new ZoneRequirement(eastRoom);
 	}
 
 	public void setupSteps()
@@ -308,7 +318,7 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 
 		openWestDoor = new ObjectStep(this, ObjectID.DOOR_44059, new WorldPoint(3280, 9199, 0), "Attempt to open the western door.");
 
-		solveDoorPuzzle = new DoorPuzzleStep(this);
+		solveDoorPuzzle = new PuzzleWrapperStep(this, new DoorPuzzleStep(this), "Solve the door puzzle.");
 
 		talkToSphinx = new NpcStep(this, NpcID.SPHINX_4209, new WorldPoint(3301, 2785, 0), "Talk to the Sphinx in Sophanem with your cat, and answer its riddle with '9.'.", catFollower);
 		talkToSphinx.addDialogStep("I need help.");
@@ -334,7 +344,6 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 		pickUpAnyJar.addAlternateObjects(NullObjectID.NULL_6636, NullObjectID.NULL_6638, NullObjectID.NULL_6640);
 		pickUpAnyJar.addSubSteps(pickUpCrondisJar, pickUpScarabasJar, pickUpApmekenJar, pickUpHetJar);
 
-
 		pickUpCrondisJarAgain = new ObjectStep(this, NullObjectID.NULL_6636, new WorldPoint(3286, 9195, 0), "Pick up the Crondis Canopic Jar.");
 		pickUpScarabasJarAgain = new ObjectStep(this, NullObjectID.NULL_6638, new WorldPoint(3286, 9196, 0), "Pick up the Scarabas Canopic Jar.");
 		pickUpApmekenJarAgain = new ObjectStep(this, NullObjectID.NULL_6640, new WorldPoint(3286, 9193, 0), "Pick up the Apmeken Canopic Jar.");
@@ -355,7 +364,7 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 		dropJar = new DetailedQuestStep(this, "Drop the canopic jar in the spot you took it from.", jar);
 		dropJar.addSubSteps(dropCrondisJar, dropApmekenJar, dropHetJar, dropScarabasJar);
 
-		solvePuzzleAgain = new DoorPuzzleStep(this);
+		solvePuzzleAgain = new PuzzleWrapperStep(this, new DoorPuzzleStep(this), "Solve the door puzzle again.");
 
 		leavePyramid = new ObjectStep(this, ObjectID.LADDER_6645, new WorldPoint(3277, 9172, 0), "Leave the pyramid and return to the High Priest.");
 		returnToHighPriest = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3281, 2772, 0), "Return to the High Priest in the south west of Sophanem.");
@@ -457,7 +466,7 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 	{
 		return Arrays.asList(
 			new UnlockReward("Access to the city of Sophanem."),
-			new UnlockReward("Ability to take carpet rides from Pollnivneah to Sophanem and Menaphos."));
+			new UnlockReward("Ability to take carpet rides from Pollnivneach to Sophanem and Menaphos."));
 	}
 
 	@Override

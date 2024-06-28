@@ -31,6 +31,11 @@ import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import net.runelite.api.Client;
 import net.runelite.api.GraphicID;
 import net.runelite.api.GraphicsObject;
@@ -40,13 +45,11 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.GraphicsObjectCreated;
 import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.*;
 
 public class BaxtorianPuzzle extends DetailedOwnerStep
 {
@@ -146,7 +149,7 @@ public class BaxtorianPuzzle extends DetailedOwnerStep
 		{
 			clientThread.invokeLater(() ->
 			{
-				Widget itemPlacedWidget = client.getWidget(WidgetInfo.DIALOG_SPRITE_TEXT);
+				Widget itemPlacedWidget = client.getWidget(ComponentID.DIALOG_SPRITE_TEXT);
 
 				if (itemPlacedWidget == null)
 				{

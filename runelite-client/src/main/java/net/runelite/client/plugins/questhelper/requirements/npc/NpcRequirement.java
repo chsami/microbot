@@ -26,21 +26,41 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.npc;
 
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 public class NpcRequirement extends AbstractRequirement
 {
 	private final int npcID;
-	private final Zone zone;
+	private final String npcName;
+
+	@Setter
+	short[] npcColorOverrides;
+
+	/**
+	 * If zone is null, the check won't take any zone into account
+	 */
+	private final @Nullable Zone zone;
 	private final String displayText;
 	private final boolean checkNotInZone;
+
+	/**
+	 * Check for the existence of an NPC within your canvas.
+	 *
+	 * @param npcID the NPC to check for
+	 */
+	public NpcRequirement(int npcID)
+	{
+		this(String.valueOf(npcID), npcID, false, null);
+	}
+
 
 	/**
 	 * Check for the existence of an NPC within your canvas.
@@ -89,10 +109,21 @@ public class NpcRequirement extends AbstractRequirement
 	 */
 	public NpcRequirement(String displayText, int npcID, boolean checkNotInZone, Zone zone)
 	{
+		this(displayText, npcID, null, checkNotInZone, zone);
+	}
+
+	public NpcRequirement(String displayText, int npcID, String npcName, boolean checkNotInZone, Zone zone)
+	{
 		this.displayText = displayText;
+		this.npcName = npcName;
 		this.npcID = npcID;
 		this.zone = zone;
 		this.checkNotInZone = checkNotInZone;
+	}
+
+	public NpcRequirement(int npcID, String npcName)
+	{
+		this("DO NOT DISPLAY", npcID, npcName, false, null);
 	}
 
 	@Override
@@ -100,13 +131,14 @@ public class NpcRequirement extends AbstractRequirement
 	{
 		List<NPC> found = client.getNpcs().stream()
 			.filter(npc -> npc.getId() == npcID)
+			.filter(npc -> npcName == null || (npc.getName() != null && npc.getName().equals(npcName)))
 			.collect(Collectors.toList());
 
 		if (!found.isEmpty())
 		{
 			if (zone != null)
 			{
-				for(NPC npc : found)
+				for (NPC npc : found)
 				{
 					WorldPoint npcLocation = WorldPoint.fromLocalInstance(client,  npc.getLocalLocation(), 2);
 					if (npcLocation != null)
@@ -115,6 +147,7 @@ public class NpcRequirement extends AbstractRequirement
 						return inZone && !checkNotInZone || (!inZone && checkNotInZone);
 					}
 				}
+				return checkNotInZone;
 			}
 			return true; // the NPC exists, and we aren't checking for its location
 		}

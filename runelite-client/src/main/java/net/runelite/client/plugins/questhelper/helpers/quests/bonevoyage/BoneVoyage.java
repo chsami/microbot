@@ -24,18 +24,12 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.bonevoyage;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.Favour;
-import net.runelite.client.plugins.questhelper.requirements.player.FavourRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.TeleportItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
@@ -43,17 +37,28 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequiremen
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.runelite.api.GameState;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.BONE_VOYAGE
-)
 public class BoneVoyage extends BasicQuestHelper
 {
 	//Items Required
@@ -82,8 +87,7 @@ public class BoneVoyage extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
 
@@ -127,11 +131,10 @@ public class BoneVoyage extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		canEnterGuild = new Conditions(
-			new SkillRequirement(Skill.WOODCUTTING, 60, true),
-			new FavourRequirement(Favour.HOSIDIUS, 75)
+			new SkillRequirement(Skill.WOODCUTTING, 60, true)
 		);
 
 		onBoat = new ZoneRequirement(boat, boatSailing);
@@ -146,14 +149,14 @@ public class BoneVoyage extends BasicQuestHelper
 		vodka2 = new ItemRequirement("Vodka", ItemID.VODKA, 2);
 		marrentillPotionUnf = new ItemRequirement("Marrentill potion (unf)", ItemID.MARRENTILL_POTION_UNF);
 
-		digsiteTeleport = new ItemRequirement("Teleport to the Digsite", ItemCollections.DIGSITE_PENDANTS);
-		digsiteTeleport.addAlternates(ItemID.DIGSITE_TELEPORT);
-		woodcuttingGuildTeleport = new ItemRequirement("Teleport to the Woodcutting Guild", ItemCollections.SKILLS_NECKLACES);
+		digsiteTeleport = new TeleportItemRequirement("Teleports to the Digsite", ItemID.DIGSITE_PENDANT_4);
+		digsiteTeleport.addAlternates(ItemID.DIGSITE_PENDANT_5, ItemID.DIGSITE_TELEPORT);
+		woodcuttingGuildTeleport = new TeleportItemRequirement("Teleport to the Woodcutting Guild", ItemCollections.SKILLS_NECKLACES);
 		woodcuttingGuildTeleport.addAlternates(ItemID.XERICS_TALISMAN, ItemID.KHAREDSTS_MEMOIRS);
-		varrockTeleport = new ItemRequirement("Varrock teleport", ItemID.VARROCK_TELEPORT);
-		sarimTeleport = new ItemRequirement("Port Sarim teleport", ItemCollections.AMULET_OF_GLORIES);
+		varrockTeleport = new TeleportItemRequirement("Varrock teleport", ItemID.VARROCK_TELEPORT);
+		sarimTeleport = new TeleportItemRequirement("Port Sarim teleport", ItemCollections.AMULET_OF_GLORIES);
 		sarimTeleport.addAlternates(ItemID.DRAYNOR_MANOR_TELEPORT);
-		lumberyardTeleport = new ItemRequirement("Lumberyard teleport", ItemID.LUMBERYARD_TELEPORT);
+		lumberyardTeleport = new TeleportItemRequirement("Lumberyard teleport", ItemID.LUMBERYARD_TELEPORT);
 		
 		hammer = new ItemRequirement("Hammer", ItemCollections.HAMMER);
 		ironBar = new ItemRequirement("Iron bar", ItemID.IRON_BAR);
@@ -177,7 +180,8 @@ public class BoneVoyage extends BasicQuestHelper
 		potionOfSealegs.setTooltip("You can get another from the Apothecary in Varrock");
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		boat = new Zone(new WorldPoint(3355, 3451, 1), new WorldPoint(3366, 3455, 1));
 		boatSailing = new Zone(new WorldPoint(1812, 4750, 0), new WorldPoint(1840, 4774, 2));
@@ -233,10 +237,10 @@ public class BoneVoyage extends BasicQuestHelper
 			"Talk to the Odd Old Man north of the Dig Site.");
 		talkToOddOldMan.addDialogSteps("Talk about lucky charms.", "I'm making a cursed voyage.");
 		talkToApoth = new NpcStep(this, NpcID.APOTHECARY, new WorldPoint(3195, 3405, 0),
-			"Talk the Apothecary in south west Varrock.", marrentillPotionUnf, vodka2);
+			"Talk to the Apothecary in south west Varrock.", marrentillPotionUnf, vodka2);
 		talkToApoth.addDialogSteps("Talk about something else.", "Talk about Bone Voyage.");
 		talkToApothAgain = new NpcStep(this, NpcID.APOTHECARY, new WorldPoint(3195, 3405, 0),
-			"Talk the Apothecary again.", marrentillPotionUnf, vodka2);
+			"Talk to the Apothecary again.", marrentillPotionUnf, vodka2);
 		talkToApothAgain.addDialogSteps("Talk about something else.", "Talk about Bone Voyage.");
 		boardBargeWithPotionAndCharm = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
 			"Board the barge.", boneCharm, potionOfSealegs);

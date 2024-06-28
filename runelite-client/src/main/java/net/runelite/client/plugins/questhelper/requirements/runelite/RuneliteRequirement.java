@@ -24,21 +24,20 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.runelite;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 public class RuneliteRequirement extends AbstractRequirement
 {
 	@Getter
-	protected final String CONFIG_GROUP = MQuestHelperConfig.QUEST_BACKGROUND_GROUP;
+	protected final String CONFIG_GROUP = QuestHelperConfig.QUEST_BACKGROUND_GROUP;
 
 	protected final String displayText;
 	protected final String runeliteIdentifier;
@@ -49,6 +48,8 @@ public class RuneliteRequirement extends AbstractRequirement
 
 	@Getter
 	protected final Map<String, Requirement> requirements;
+
+	protected String initValue;
 
 	public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue, String text, Map<String, Requirement> requirements)
 	{
@@ -85,6 +86,7 @@ public class RuneliteRequirement extends AbstractRequirement
 		this.displayText = text;
 		this.expectedValue = expectedValue;
 		this.requirements = requirements;
+		this.initValue = initValue;
 		initWithValue(initValue);
 	}
 
@@ -105,6 +107,14 @@ public class RuneliteRequirement extends AbstractRequirement
 		return expectedValue.equals(value);
 	}
 
+	// This is a bit undefined in terms of expected behaviour for multiple requirements.
+	// Currently the last requirement to pass should effectively determine the configValue.
+	// This is an OR, if we assume that all the passes are the same output.
+	// It'd be possible to put in some which force a "false" and some which have a "true" as their value.
+
+	/* TODO: Needs to be adjusted to at least make sense. Possibly just remove the Hash and only allow one Requirement,
+	** seeing as requirements can be nested anyways.
+	 */
 	public void validateCondition(Client client)
 	{
 		requirements.forEach((value, req) -> {
@@ -130,11 +140,18 @@ public class RuneliteRequirement extends AbstractRequirement
 
 	public String getConfigValue()
 	{
+		String value = configManager.getRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier);
+		if (initValue != null && value == null)
+		{
+			setConfigValue(initValue);
+			return initValue;
+		}
 		return configManager.getRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier);
 	}
 
 	public void setConfigValue(String obj)
 	{
+		if (configManager.getRSProfileKey() == null) return;
 		configManager.setRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier, obj);
 	}
 

@@ -25,16 +25,19 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.lunardiplomacy;
 
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.EmoteStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 import net.runelite.client.plugins.questhelper.steps.emote.QuestEmote;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 public class MimicChallenge extends DetailedOwnerStep
 {
@@ -56,7 +59,6 @@ public class MimicChallenge extends DetailedOwnerStep
 		talk.addDialogStep("Suppose I may as well have a go.");
 	}
 
-	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{

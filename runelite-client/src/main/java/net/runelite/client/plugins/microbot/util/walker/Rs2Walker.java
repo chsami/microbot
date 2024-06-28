@@ -43,6 +43,15 @@ public class Rs2Walker {
 
     private static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
 
+    public static boolean walkTo(WorldArea area, int distanceThreshold) {
+        if (area.distanceTo(Rs2Player.getWorldLocation()) > distanceThreshold){
+            var points = area.toWorldPointList();
+            var index = new java.util.Random().nextInt(points.size());
+            return Rs2Walker.walkTo(points.get(index));
+        }
+        return true;
+    }
+    
     public static boolean walkTo(int x, int y, int plane) {
         return walkTo(x, y, plane, 6);
     }
@@ -50,6 +59,7 @@ public class Rs2Walker {
     public static boolean walkTo(int x, int y, int plane, int distance) {
         return walkTo(new WorldPoint(x, y, plane), distance);
     }
+
 
     public static boolean walkTo(WorldPoint target) {
         return walkTo(target, 6);
@@ -103,6 +113,10 @@ public class Rs2Walker {
                 for (int i = indexOfStartPoint; i < ShortestPathPlugin.getPathfinder().getPath().size() - 1; i++) {
                     WorldPoint currentWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i);
                     indexOfStartPoint = getClosestTileIndex(path);
+
+                    if (!Rs2Tile.isTileReachable(currentWorldPoint)) {
+                        continue;
+                    }
 
                     /**
                      * CHECK DOORS
@@ -179,6 +193,12 @@ public class Rs2Walker {
 
     public static boolean walkMiniMap(WorldPoint worldPoint) {
         return walkMiniMap(worldPoint, 5);
+    }
+
+    public static boolean walkMiniMap(WorldArea area) {
+        var points = area.toWorldPointList();
+        var index = new java.util.Random().nextInt(points.size());
+        return Rs2Walker.walkMiniMap(points.get(index));
     }
 
     /**
@@ -298,6 +318,15 @@ public class Rs2Walker {
 
             for (var action : objectComposition.getActions()) {
                 if (action != null && (action.contains("Pay-toll") || action.contains("Pick-lock") || action.contains("Walk-through"))) {
+                    Rs2GameObject.interact(wallObject, action);
+                    Rs2Player.waitForWalking();
+                    return true;
+                } else if (action != null && action.contains("Walk-through")) {
+                    Rs2GameObject.interact(wallObject, action);
+                    Rs2Player.waitForWalking();
+                    return true;
+                }
+                if (action != null && action.contains("Pick-lock")) {
                     Rs2GameObject.interact(wallObject, action);
                     Rs2Player.waitForWalking();
                     return true;
@@ -489,7 +518,7 @@ public class Rs2Walker {
         }
         boolean foundb = false;
         for (String action : objectCompositionb.getActions()) {
-            if (action != null && (action.equals("Open") || action.contains("Pay-toll"))) {
+            if (action != null && (action.equals("Open") || action.contains("Pay-toll") || action.contains("Walk-through"))) {
                 foundb = true;
                 break;
             }
@@ -577,6 +606,10 @@ public class Rs2Walker {
                         if (indexOfOrigin == -1) continue;
                         if (indexOfDestination < indexOfOrigin) continue;
 
+                        if (!Rs2Tile.isTileReachable(path.get(i))) {
+                            continue;
+                        }
+
                         if (path.get(i).equals(origin)) {
                             if (b.isShip()) {
                                 if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
@@ -622,7 +655,7 @@ public class Rs2Walker {
 
                             //check wall objects (tunnels)
                             WallObject wallObject = Rs2GameObject.getWallObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
-                            if (Rs2GameObject.hasLineOfSight(wallObject)) {
+                            if (wallObject != null && wallObject.getId() == b.getObjectId()) {
                                 boolean interact = Rs2GameObject.interact(wallObject, b.getAction(), true);
                                 if (!interact) {
                                     Rs2Walker.walkFastCanvas(path.get(i));
@@ -635,7 +668,7 @@ public class Rs2Walker {
 
                             //check ground objects
                             GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
-                            if (Rs2GameObject.hasLineOfSight(groundObject)) {
+                            if (groundObject != null && groundObject.getId() == b.getObjectId()) {
                                 boolean interact = Rs2GameObject.interact(groundObject, b.getAction(), true);
                                 if (!interact) {
                                     Rs2Walker.walkFastCanvas(path.get(i));

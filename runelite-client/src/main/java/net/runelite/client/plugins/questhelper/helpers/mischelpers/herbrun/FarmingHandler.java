@@ -24,15 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.mischelpers.herbrun;
 
+import java.time.Instant;
+import javax.annotation.Nullable;
 import net.runelite.api.Client;
 import net.runelite.api.Varbits;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.timetracking.TimeTrackingConfig;
 import net.runelite.client.plugins.timetracking.farming.CropState;
 import net.runelite.client.plugins.timetracking.farming.Produce;
-
-import javax.annotation.Nullable;
-import java.time.Instant;
 
 public class FarmingHandler
 {
@@ -82,6 +81,9 @@ public class FarmingHandler
 
 		PatchState state = patch.getImplementation().forVarbitValue(value);
 		if (state == null) return null;
+		if (state.getCropState() == CropState.EMPTY) return CropState.EMPTY;
+		if (state.getProduce() == Produce.WEEDS) return CropState.EMPTY;
+		if (state.getCropState() == CropState.DEAD) return CropState.DEAD;
 
 		if (unixTime <= 0)
 		{
@@ -92,16 +94,7 @@ public class FarmingHandler
 		int stages = state.getStages();
 		int tickrate = state.getTickRate();
 
-		boolean autoweed = client.getVarbitValue(Varbits.AUTOWEED) == 2;
-
 		boolean botanist = client.getVarbitValue(Varbits.LEAGUE_RELIC_5) == 1;
-
-		if (autoweed && state.getProduce() == Produce.WEEDS)
-		{
-			stage = 0;
-			stages = 1;
-			tickrate = 0;
-		}
 
 		if (botanist)
 		{
@@ -115,8 +108,6 @@ public class FarmingHandler
 			doneEstimate = getTickTime(tickrate, stages - 1 - stage, tickTime, profile);
 		}
 
-		if (stage == 0) return CropState.EMPTY;
-		if (state.getCropState() == CropState.DEAD) return CropState.DEAD;
 		if (unixNow >= doneEstimate) return CropState.HARVESTABLE;
 
 		return CropState.GROWING;

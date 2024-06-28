@@ -24,19 +24,42 @@
  */
 package net.runelite.client.plugins.questhelper.panel;
 
-import net.runelite.client.plugins.questhelper.Icon;
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.managers.QuestManager;
+import net.runelite.client.plugins.questhelper.panel.skillfiltering.SkillFilterPanel;
+import net.runelite.client.plugins.questhelper.tools.Icon;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.plaf.basic.BasicButtonUI;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.util.ImageUtil;
@@ -44,45 +67,42 @@ import net.runelite.client.util.LinkBrowser;
 import net.runelite.client.util.SwingUtil;
 import net.runelite.client.util.Text;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.plaf.basic.BasicButtonUI;
-import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.util.List;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Slf4j
 public class QuestHelperPanel extends PluginPanel
 {
+	private final ConfigManager configManager;
+
 	private final QuestOverviewPanel questOverviewPanel;
 	private final FixedWidthPanel questOverviewWrapper = new FixedWidthPanel();
 
-	private JPanel allQuestsCompletedPanel = new JPanel();
-	private JPanel searchQuestsPanel;
+	private final JPanel allQuestsCompletedPanel = new JPanel();
+	private final JPanel searchQuestsPanel;
 
 	private final JPanel allDropdownSections = new JPanel();
 	private final JComboBox<Enum> filterDropdown, difficultyDropdown, orderDropdown;
+
+	private final JLabel skillExpandButton = new JLabel();
 
 	private final IconTextField searchBar = new IconTextField();
 	private final FixedWidthPanel questListPanel = new FixedWidthPanel();
 	private final FixedWidthPanel questListWrapper = new FixedWidthPanel();
 	private final JScrollPane scrollableContainer;
-	public static final int DROPDOWN_HEIGHT = 20;
-//	private boolean settingsPanelActive = false;
+	public static final int DROPDOWN_HEIGHT = 26;
+	//	private boolean settingsPanelActive = false;
 	public boolean questActive = false;
 
 	private final ArrayList<QuestSelectPanel> questSelectPanels = new ArrayList<>();
 
-	MQuestHelperPlugin questHelperPlugin;
+	QuestHelperPlugin questHelperPlugin;
+
+	QuestManager questManager;
 
 	private static final ImageIcon DISCORD_ICON;
 	private static final ImageIcon GITHUB_ICON;
 	private static final ImageIcon PATREON_ICON;
 	private static final ImageIcon SETTINGS_ICON;
+	private static final ImageIcon COLLAPSED_ICON;
+	private static final ImageIcon EXPANDED_ICON;
 
 	static
 	{
@@ -90,13 +110,17 @@ public class QuestHelperPanel extends PluginPanel
 		GITHUB_ICON = Icon.GITHUB.getIcon(img -> ImageUtil.resizeImage(img, 16, 16));
 		PATREON_ICON = Icon.PATREON.getIcon(img -> ImageUtil.resizeImage(img, 16, 16));
 		SETTINGS_ICON = Icon.SETTINGS.getIcon(img -> ImageUtil.resizeImage(img, 16, 16));
+		COLLAPSED_ICON = Icon.COLLAPSED.getIcon();
+		EXPANDED_ICON = Icon.EXPANDED.getIcon();
 	}
 
-	public QuestHelperPanel(MQuestHelperPlugin questHelperPlugin)
+	public QuestHelperPanel(QuestHelperPlugin questHelperPlugin, QuestManager questManager, ConfigManager configManager)
 	{
 		super(false);
 
 		this.questHelperPlugin = questHelperPlugin;
+		this.questManager = questManager;
+		this.configManager = configManager;
 
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
@@ -268,12 +292,12 @@ public class QuestHelperPanel extends PluginPanel
 		searchQuestsPanel.add(allQuestsCompletedPanel, BorderLayout.SOUTH);
 
 		questListPanel.setBorder(new EmptyBorder(8, 10, 0, 10));
-		questListPanel.setLayout(new DynamicGridLayout(0, 1, 0, 5));
+		questListPanel.setLayout(new DynamicPaddedGridLayout(0, 1, 0, 5));
 		questListPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		showMatchingQuests("");
 
 		// Filters
-		filterDropdown = makeNewDropdown(MQuestHelperConfig.QuestFilter.displayFilters(), "filterListBy");
+		filterDropdown = makeNewDropdown(QuestHelperConfig.QuestFilter.displayFilters(), "filterListBy");
 		JPanel filtersPanel = makeDropdownPanel(filterDropdown, "Filters");
 		filtersPanel.setPreferredSize(new Dimension(PANEL_WIDTH, DROPDOWN_HEIGHT));
 
@@ -281,15 +305,56 @@ public class QuestHelperPanel extends PluginPanel
 		JPanel difficultyPanel = makeDropdownPanel(difficultyDropdown, "Difficulty");
 		difficultyPanel.setPreferredSize(new Dimension(PANEL_WIDTH, DROPDOWN_HEIGHT));
 
-		orderDropdown = makeNewDropdown(MQuestHelperConfig.QuestOrdering.values(), "orderListBy");
+		orderDropdown = makeNewDropdown(QuestHelperConfig.QuestOrdering.values(), "orderListBy");
 		JPanel orderPanel = makeDropdownPanel(orderDropdown, "Ordering");
 		orderPanel.setPreferredSize(new Dimension(PANEL_WIDTH, DROPDOWN_HEIGHT));
 
+		// Skill filtering
+		SkillFilterPanel skillFilterPanel = new SkillFilterPanel(questHelperPlugin.skillIconManager, questHelperPlugin.getConfigManager());
+		skillFilterPanel.setVisible(false);
+
+		JLabel filterName = new JLabel("Skill filtering");
+		filterName.setForeground(Color.WHITE);
+		skillExpandButton.setForeground(Color.GRAY);
+		skillExpandButton.setIcon(COLLAPSED_ICON);
+		skillExpandButton.setHorizontalTextPosition(SwingConstants.LEFT);
+		skillExpandButton.setIconTextGap(10);
+
+		JPanel skillExpandBar = new JPanel();
+		skillExpandBar.setLayout(new BorderLayout());
+		skillExpandBar.setToolTipText("Choose skills to hide quests which would require them or reward experience in them");
+		skillExpandBar.add(filterName, BorderLayout.CENTER);
+		skillExpandBar.add(skillExpandButton, BorderLayout.EAST);
+
+		JPanel skillsFilterPanel = new JPanel();
+		skillsFilterPanel.setLayout(new BorderLayout());
+		skillsFilterPanel.setMinimumSize(new Dimension(PANEL_WIDTH, 0));
+		skillsFilterPanel.add(skillExpandBar, BorderLayout.CENTER);
+		skillsFilterPanel.add(skillFilterPanel, BorderLayout.SOUTH);
+		skillExpandBar.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mousePressed(MouseEvent mouseEvent)
+			{
+				skillFilterPanel.setVisible(!skillFilterPanel.isVisible());
+				if (skillFilterPanel.isVisible())
+				{
+					skillExpandButton.setIcon(EXPANDED_ICON);
+				}
+				else
+				{
+					skillExpandButton.setIcon(COLLAPSED_ICON);
+				}
+			}
+		});
+
+		// Filter dropdown + search
+		allDropdownSections.setLayout(new BoxLayout(allDropdownSections, BoxLayout.Y_AXIS));
 		allDropdownSections.setBorder(new EmptyBorder(0, 0, 10, 0));
-		allDropdownSections.setLayout(new BorderLayout(0, BORDER_OFFSET));
-		allDropdownSections.add(filtersPanel, BorderLayout.NORTH);
-		allDropdownSections.add(difficultyPanel, BorderLayout.CENTER);
-		allDropdownSections.add(orderPanel, BorderLayout.SOUTH);
+		allDropdownSections.add(filtersPanel);
+		allDropdownSections.add(difficultyPanel);
+		allDropdownSections.add(orderPanel);
+		allDropdownSections.add(skillsFilterPanel);
 
 		searchQuestsPanel.add(allDropdownSections, BorderLayout.NORTH);
 
@@ -300,6 +365,8 @@ public class QuestHelperPanel extends PluginPanel
 		scrollableContainer = new JScrollPane(questListWrapper);
 		scrollableContainer.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
+
+		// Finishing off head panel
 		JPanel introDetailsPanel = new JPanel();
 		introDetailsPanel.setLayout(new BorderLayout());
 		introDetailsPanel.add(titlePanel, BorderLayout.NORTH);
@@ -309,10 +376,12 @@ public class QuestHelperPanel extends PluginPanel
 		add(scrollableContainer, BorderLayout.CENTER);
 
 		/* Layout */
-		questOverviewPanel = new QuestOverviewPanel(questHelperPlugin);
+		questOverviewPanel = new QuestOverviewPanel(questHelperPlugin, questManager);
 
 		questOverviewWrapper.setLayout(new BorderLayout());
 		questOverviewWrapper.add(questOverviewPanel, BorderLayout.NORTH);
+
+		refreshSkillFiltering();
 	}
 
 	private void onSearchBarChanged()
@@ -343,7 +412,7 @@ public class QuestHelperPanel extends PluginPanel
 			if (e.getStateChange() == ItemEvent.SELECTED)
 			{
 				Enum source = (Enum) e.getItem();
-				questHelperPlugin.getConfigManager().setConfiguration(MQuestHelperConfig.QUEST_HELPER_GROUP, key,
+				questHelperPlugin.getConfigManager().setConfiguration(QuestHelperConfig.QUEST_HELPER_GROUP, key,
 					source);
 			}
 		});
@@ -359,7 +428,8 @@ public class QuestHelperPanel extends PluginPanel
 
 		JPanel filtersPanel = new JPanel();
 		filtersPanel.setLayout(new BorderLayout());
-		filtersPanel.setMinimumSize(new Dimension(PANEL_WIDTH, 0));
+		filtersPanel.setBorder(new EmptyBorder(0, 0, BORDER_OFFSET, 0));
+		filtersPanel.setMinimumSize(new Dimension(PANEL_WIDTH, BORDER_OFFSET));
 		filtersPanel.add(filterName, BorderLayout.CENTER);
 		filtersPanel.add(dropdown, BorderLayout.EAST);
 
@@ -386,7 +456,7 @@ public class QuestHelperPanel extends PluginPanel
 	}
 
 	public void refresh(List<QuestHelper> questHelpers, boolean loggedOut,
-						Map<QuestHelperQuest, QuestState> completedQuests, MQuestHelperConfig.QuestFilter... questFilters)
+						Map<QuestHelperQuest, QuestState> completedQuests, QuestHelperConfig.QuestFilter... questFilters)
 	{
 		questSelectPanels.forEach(questListPanel::remove);
 		questSelectPanels.clear();
@@ -397,20 +467,20 @@ public class QuestHelperPanel extends PluginPanel
 
 		if (questFilters.length > 0)
 		{
-			for (MQuestHelperConfig.QuestFilter questFilter : questFilters)
+			for (QuestHelperConfig.QuestFilter questFilter : questFilters)
 			{
 				List<QuestHelper> filterList = questHelpers.stream()
 					.filter(questFilter)
 					.collect(Collectors.toList());
 
-				if (filterList.size() != 0)
+				if (!filterList.isEmpty())
 				{
 					questSelectPanels.add(new QuestSelectPanel(questFilter.getDisplayName()));
 				}
 				for (QuestHelper questHelper : filterList)
 				{
 					QuestState questState = completedQuests.getOrDefault(questHelper.getQuest(), QuestState.NOT_STARTED);
-					questSelectPanels.add(new QuestSelectPanel(questHelperPlugin, this, questHelper, questState));
+					questSelectPanels.add(new QuestSelectPanel(questHelperPlugin, questManager, this, questHelper, questState));
 				}
 			}
 		}
@@ -419,7 +489,7 @@ public class QuestHelperPanel extends PluginPanel
 			for (QuestHelper questHelper : questHelpers)
 			{
 				QuestState questState = completedQuests.getOrDefault(questHelper.getQuest(), QuestState.NOT_STARTED);
-				questSelectPanels.add(new QuestSelectPanel(questHelperPlugin, this, questHelper, questState));
+				questSelectPanels.add(new QuestSelectPanel(questHelperPlugin, questManager, this, questHelper, questState));
 			}
 		}
 
@@ -527,5 +597,30 @@ public class QuestHelperPanel extends PluginPanel
 	public void updateItemRequirements(Client client, List<Item> bankItems)
 	{
 		questOverviewPanel.updateRequirements(client, bankItems);
+	}
+
+	/**
+	 * Refreshes the label showing the active skill filters
+	 */
+	public void refreshSkillFiltering()
+	{
+		var numFilteredSkills = 0;
+		for (var skill : Skill.values())
+		{
+			var isFiltered = "true".equals(configManager.getConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, "skillfilter" + skill.getName()));
+			if (isFiltered)
+			{
+				numFilteredSkills += 1;
+			}
+		}
+
+		if (numFilteredSkills == 0)
+		{
+			skillExpandButton.setText("");
+		}
+		else
+		{
+			skillExpandButton.setText(String.format("%d active", numFilteredSkills));
+		}
 	}
 }

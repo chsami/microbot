@@ -24,39 +24,42 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.princealirescue;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
 import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.PRINCE_ALI_RESCUE
-)
 public class PrinceAliRescue extends BasicQuestHelper
 {
 	//Items Required
 	ItemRequirement softClay, ballsOfWool3, yellowDye, redberries, ashes, bucketOfWater, potOfFlour, bronzeBar, pinkSkirt, beers3, rope, coins100, wig, dyedWig, paste, keyMould, key,
-		ropeReqs, yellowDyeReqs, ropeHighlighted;
+		ropeReqs, yellowDyeReqs, ropeHighlighted, keyHighlighted;
 
 	//Items Recommended
 	ItemRequirement glory;
@@ -75,8 +78,7 @@ public class PrinceAliRescue extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -132,7 +134,7 @@ public class PrinceAliRescue extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		softClay = new ItemRequirement("Soft clay", ItemID.SOFT_CLAY);
 		ballsOfWool3 = new ItemRequirement("Balls of wool", ItemID.BALL_OF_WOOL, 3);
@@ -158,6 +160,9 @@ public class PrinceAliRescue extends BasicQuestHelper
 		keyMould = new ItemRequirement("Key print", ItemID.KEY_PRINT);
 		key = new ItemRequirement("Bronze key", ItemID.BRONZE_KEY);
 		key.setTooltip("You can get another from Leela for 15 coins");
+
+		keyHighlighted = new ItemRequirement("Bronze key", ItemID.BRONZE_KEY);
+		keyHighlighted.setHighlightInInventory(true);
 		yellowDyeReqs = new ItemRequirement("Yellow dye, or 2 onions + 5 coins to obtain during quest", ItemID.YELLOW_DYE);
 		glory = new ItemRequirement("Amulet of Glory for Al Kharid and Draynor Village teleports", ItemCollections.AMULET_OF_GLORIES);
 	}
@@ -170,7 +175,7 @@ public class PrinceAliRescue extends BasicQuestHelper
 			new WidgetTextRequirement(119, 3, true, "I have duplicated a key, I need to get it from"),
 			new WidgetTextRequirement(119, 3, true, "I got a duplicated cell door key"),
 			new WidgetTextRequirement(11, 2, true, "You give Osman the imprint along with a bronze bar."),
-			new DialogRequirement("I'll use this to have a copy of the key made. I'll send it<br>to Leela once it's ready."),
+			new DialogRequirement("I'll use this to have a copy of the key made. I'll send it to Leela once it's ready."),
 			new DialogRequirement("I think I have everything needed."),
 			key.alsoCheckBank(questBank));
 		madeMould = new RuneliteRequirement(getConfigManager(), "princealikeymouldhandedin", "true", givenKeyMould);
@@ -179,7 +184,8 @@ public class PrinceAliRescue extends BasicQuestHelper
 		hasOrGivenKeyMould = new Conditions(LogicType.OR, keyMould, givenKeyMould, key.alsoCheckBank(questBank));
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		cell = new Zone(new WorldPoint(3121, 3240, 0), new WorldPoint(3125, 3243, 0));
 	}
@@ -210,7 +216,7 @@ public class PrinceAliRescue extends BasicQuestHelper
 		talkToJoe.addDialogStep("I have some beer here. Fancy one?");
 		useRopeOnKeli = new NpcStep(this, NpcID.LADY_KELI, new WorldPoint(3127, 3244, 0), "Use rope on Keli.", ropeHighlighted);
 		useRopeOnKeli.addIcon(ItemID.ROPE);
-		useKeyOnDoor = new ObjectStep(this, ObjectID.PRISON_GATE, new WorldPoint(3123, 3243, 0), "Use the key on the prison door. If Lady Keli respawned you'll need to tie her up again.", key, dyedWig, paste, pinkSkirt);
+		useKeyOnDoor = new ObjectStep(this, ObjectID.PRISON_GATE_2881, new WorldPoint(3123, 3243, 0), "Use the key on the prison door. If Lady Keli respawned you'll need to tie her up again.", keyHighlighted, dyedWig, paste, pinkSkirt);
 		useKeyOnDoor.addIcon(ItemID.BRONZE_KEY);
 		talkToAli = new NpcStep(this, NpcID.PRINCE_ALI, new WorldPoint(3123, 3240, 0), "Talk to Prince Ali and free him.", key, dyedWig, paste, pinkSkirt);
 
@@ -261,7 +267,7 @@ public class PrinceAliRescue extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("700 Coins", ItemID.COINS_995, 700));
+		return Collections.singletonList(new ItemReward("Coins", ItemID.COINS_995, 700));
 	}
 
 	@Override

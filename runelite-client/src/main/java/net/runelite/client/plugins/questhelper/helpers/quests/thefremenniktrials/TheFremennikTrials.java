@@ -24,43 +24,48 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thefremenniktrials;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
+import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
+import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.QuestSyncStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.widgets.ComponentID;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_FREMENNIK_TRIALS
-)
 public class TheFremennikTrials extends BasicQuestHelper
 {
 	//Items Required
@@ -114,8 +119,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -280,7 +284,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		coins = new ItemRequirement("Coins", ItemCollections.COINS, 5250);
 		coins250 = new ItemRequirement("Coins", ItemCollections.COINS, 250);
@@ -311,6 +315,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 		goldenWool = new ItemRequirement("Golden wool", ItemID.GOLDEN_WOOL);
 		goldenFleece = new ItemRequirement("Golden fleece", ItemID.GOLDEN_FLEECE);
+		goldenFleece.addAlternates(ItemID.GOLDEN_WOOL);
 
 		enchantedLyre = new ItemRequirement("Enchanted lyre", ItemID.ENCHANTED_LYRE);
 		strangeObject = new ItemRequirement("Strange object", ItemID.STRANGE_OBJECT);
@@ -365,7 +370,8 @@ public class TheFremennikTrials extends BasicQuestHelper
 		frozenVase = new ItemRequirement(true, "Frozen vase", ItemID.FROZEN_VASE);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		nearPipe = new Zone(new WorldPoint(2663, 3671, 0), new WorldPoint(2667, 3676, 0));
 		koscheiRoom = new Zone(new WorldPoint(2641, 10064, 2), new WorldPoint(2672, 10099, 2));
@@ -387,7 +393,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 	public void setupConditions()
 	{
-		inQuestJournal = new WidgetTextRequirement(WidgetInfo.DIARY_QUEST_WIDGET_TITLE, "The Fremennik Trials");
+		inQuestJournal = new WidgetTextRequirement(ComponentID.DIARY_TITLE, "The Fremennik Trials");
 
 		Requirement syncedReqs = new Conditions(true, LogicType.OR, inQuestJournal,
 			new DialogRequirement("I think I would enjoy the challenge"));
@@ -395,7 +401,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 		hasStartedOlaf = new RuneliteRequirement(configManager, "fremmytrialsstartedolaf",
 			new Conditions(true, LogicType.OR,
-			new DialogRequirement("That is great news outerlander! We always need more<br>music lovers here!"),
+			new DialogRequirement("That is great news outerlander! We always need more music lovers here!"),
 			new DialogRequirement("So how would I go about writing this epic?"),
 			new WidgetTextRequirement(119, 3, true, "Bard<col=000080> will vote for me if"))
 		);
@@ -436,7 +442,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 		talkedToManniWidget = new Conditions(true, new WidgetTextRequirement(119, 3, true, "Reveller<col=000080> will vote for me"));
 		talkedToManniChat = new Conditions(true, LogicType.OR,
 			new DialogRequirement("pick up a keg from that table over there"),
-			new DialogRequirement("Grab a keg of beer<br>from that table near the bar, and come back here with<br>it.")
+			new DialogRequirement("Grab a keg of beer from that table near the bar, and come back here with it.")
 		);
 		talkedToManni = new RuneliteRequirement(configManager, "fremmytrialsstartedmanni",
 			new Conditions(true, LogicType.OR, talkedToManniWidget, talkedToManniChat)
@@ -448,8 +454,8 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 		hasPlacedStrangeObject = new RuneliteRequirement(configManager, "fremmytrialsplacedstrangeobject",
 			new Conditions(true, LogicType.OR,
-			new WidgetTextRequirement(WidgetInfo.DIALOG_PLAYER_TEXT,
-				"That is going to make a really loud bang when it goes<br>off!"),
+			new WidgetTextRequirement(ComponentID.DIALOG_PLAYER_TEXT,
+				"That is going to make a really loud bang when it goes off!"),
 			new ChatMessageRequirement("You put the lit strange object into the pipe."))
 		);
 
@@ -473,21 +479,21 @@ public class TheFremennikTrials extends BasicQuestHelper
 		getFlower = new RuneliteRequirement(configManager, "fremmytrialsstartedsigmund",
 			new Conditions(true, LogicType.OR,
 				new DialogRequirement("We are a very insular clan"),
-				new DialogRequirement("Any<br>suggestions on where to start looking for this flower?"),
-				new DialogRequirement("Did you manage to<br>obtain my flower for me yet?"),
+				new DialogRequirement("Any suggestions on where to start looking for this flower?"),
+				new DialogRequirement("Did you manage to obtain my flower for me yet?"),
 				new WidgetTextRequirement(119, 3, true, "has a <col=800000>rare flower<col=000080> that he wants."))
 		);
 
 		talkedToSailor = new RuneliteRequirement(configManager, "fremmytrialssigmundsailor",
 			new Conditions(true, LogicType.OR,
 			new DialogRequirement("That sounds like a fair deal to me, outerlander."),
-			new DialogRequirement("find a<br>love ballad, do you?"))
+			new DialogRequirement("find a love ballad, do you?"))
 		);
 
 		talkedToOlafForSigmund = new RuneliteRequirement(configManager, "fremmytrialssigmundolaf",
 			new Conditions(true, LogicType.OR,
 			new DialogRequirement("composing you a romantic ballad"),
-			new DialogRequirement("where I could find<br>some custom sturdy boots, do you?"))
+			new DialogRequirement("where I could find some custom sturdy boots, do you?"))
 		);
 
 		Conditions ysraAsked = new Conditions(true, LogicType.AND,
@@ -504,14 +510,14 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 		talkedToBrundtForSigmund = new RuneliteRequirement(configManager, "fremmytrialssigmundbrundt",
 			new Conditions(true, LogicType.OR,
-			new DialogRequirement("Speak to Sigli then, and you may have my promise to<br>reduce our sales taxes. And best of luck with the rest<br>of your trials."),
+			new DialogRequirement("Speak to Sigli then, and you may have my promise to reduce our sales taxes. And best of luck with the rest of your trials."),
 			new WidgetTextRequirement(119, 3, true, "The <col=800000>chieftain<col=000080> wants a <col=800000>map of new hunting grounds<col=000080>...")
 			));
 
 		talkedToSigliForSigmund = new RuneliteRequirement(configManager, "fremmytrialssigmundsigli",
 			new Conditions(true, LogicType.OR,
 			// TODO: Fix this check, missing a br
-			new DialogRequirement("who knows where<br>my hunting ground is."),
+			new DialogRequirement("who knows where my hunting ground is."),
 			new WidgetTextRequirement(119, 3, true, "<col=000080>The hunter<col=000080> is looking for a <col=800000>custom bow string<col=000080>...")
 			));
 
@@ -529,7 +535,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 		talkedToSwensenForSigmund = new RuneliteRequirement(configManager, "fremmytrialssigmundswensen",
 			new Conditions(true, LogicType.OR,
-			new DialogRequirement(" take the time to make a forecast<br>somehow."),
+			new DialogRequirement(" take the time to make a forecast somehow."),
 			new WidgetTextRequirement(119, 3, true, "<col=000080>The <col=800000>navigator<col=000080> is looking for a <col=800000>weather forecast<col=000080>..."))
 		);
 
@@ -589,6 +595,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 		finishedThorvaldTask = new RuneliteRequirement(configManager, "fremmytrialsthorvaldfinished",
 			new Conditions(true, LogicType.OR,
 			new ChatMessageRequirement("Congratulations! You have completed the warrior's trial!"),
+				new ChatMessageRequirement("Congratulations! You have completed the warriors trial!"),
 			new WidgetTextRequirement(119, 3, true, "I now have the Warrior's vote"))
 		);
 
@@ -620,7 +627,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 		talkedToPeer = new RuneliteRequirement(configManager, "fremmytrialpeerstarted",
 			new Conditions(true, LogicType.OR,
 			new DialogRequirement("I have one small question"),
-			new DialogRequirement("So I can bring nothing with me when I enter your<br>house?"),
+			new DialogRequirement("So I can bring nothing with me when I enter your house?"),
 			new WidgetTextRequirement(119, 3, true, "Seer<col=000080> will vote for me if")));
 
 		isMind = new Conditions(true, new WidgetTextRequirement(229, 1, "My first is in mage"));
@@ -721,17 +728,16 @@ public class TheFremennikTrials extends BasicQuestHelper
 		useStrangeObjectOnPipe.addIcon(ItemID.LIT_STRANGE_OBJECT);
 		useStrangeObject.addSubSteps(useStrangeObjectOnPipe);
 		getKegOfBeer = new DetailedQuestStep(this, new WorldPoint(2660, 3676, 0), "Pick up a keg of beer in the longhall.", kegOfBeer);
-		useAlcoholFreeOnKeg = new DetailedQuestStep(this, new WorldPoint(2658, 3673, 0), "Use the low alcohol beer on the keg of beer whilst in the longhall.", alcoholFreeBeer, kegOfBeer);
+		useAlcoholFreeOnKeg = new DetailedQuestStep(this, new WorldPoint(2658, 3673, 0), "Use the low alcohol beer on the keg of beer whilst in the longhall.", alcoholFreeBeer.highlighted(), kegOfBeer.highlighted());
 
 		cheatInBeerDrinking = new NpcStep(this, NpcID.MANNI_THE_REVELLER, new WorldPoint(2658, 3675, 0), "Talk to Manni the Reveller to cheat in the competition.", kegOfBeer);
 		cheatInBeerDrinking.addDialogStep("Ask about becoming a Fremennik");
 		cheatInBeerDrinking.addDialogStep("Yes");
 
 		talkToSigli = new NpcStep(this, NpcID.SIGLI_THE_HUNTSMAN, new WorldPoint(2658, 3650, 0), "Talk to Sigli south of the longhall for a hunters' talisman.");
-		talkToSigli.addDialogStep("What's a Draugen?");
-		talkToSigli.addDialogStep("Yes");
+		talkToSigli.addDialogSteps("Ask about becoming a Fremennik", "What's a Draugen?", "Yes");
 
-		huntDraugen = new DetailedQuestStep(this, "Use the hunter's talisman to hunt down the Draugen.");
+		huntDraugen = new NpcStep(this, NpcID.BUTTERFLY_3923, "Use the hunter's talisman to hunt down the Draugen. It'll appear near one of the butterflies in the area.", true);
 
 		returnToSigli = new NpcStep(this, NpcID.SIGLI_THE_HUNTSMAN, new WorldPoint(2658, 3650, 0), "Return the charged hunters' talisman to Sigli.", chargedHuntersTalisman);
 
@@ -817,15 +823,15 @@ public class TheFremennikTrials extends BasicQuestHelper
 		talkToSwensen.addDialogStep("Yes");
 		talkToSwensen.addDialogStep("Ask about becoming a Fremennik");
 		goDownLadderSwensen = new ObjectStep(this, ObjectID.LADDER_4158, new WorldPoint(2644, 3657, 0), "Climb down Swensen's ladder.");
-		swensen1South = new ObjectStep(this, ObjectID.PORTAL, new WorldPoint(2631, 10002, 0), "Go through the south portal.");
-		swensen2West = new ObjectStep(this, ObjectID.PORTAL_4151, new WorldPoint(2639, 10015, 0), "Go through the west portal.");
-		swensen3East = new ObjectStep(this, ObjectID.PORTAL_4152, new WorldPoint(2656, 10004, 0), "Go through the east portal.");
-		swensen4North = new ObjectStep(this, ObjectID.PORTAL_4153, new WorldPoint(2665, 10018, 0), "Go through the north portal.");
-		swensen5South = new ObjectStep(this, ObjectID.PORTAL_4154, new WorldPoint(2630, 10023, 0), "Go through the south portal.");
-		swensen6East = new ObjectStep(this, ObjectID.PORTAL_4155, new WorldPoint(2656, 10037, 0), "Go through the east portal.");
-		swensen7North = new ObjectStep(this, ObjectID.PORTAL_4156, new WorldPoint(2666, 10029, 0), "Go through the north portal.");
-		swensenUpLadder = new ObjectStep(this, ObjectID.LADDER_4160, new WorldPoint(2665, 10037, 0), "Climb up the ladder.");
-		resetSwensen = new DetailedQuestStep(this, "Climb up a rope/ladder to restart the puzzle.");
+		swensen1South = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.PORTAL, new WorldPoint(2631, 10002, 0), "Go through the south portal."), "Solve Swensen's challenge.");
+		swensen2West = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.PORTAL_4151, new WorldPoint(2639, 10015, 0), "Go through the west portal."), "Solve Swensen's challenge.");
+		swensen3East = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.PORTAL_4152, new WorldPoint(2656, 10004, 0), "Go through the east portal."), "Solve Swensen's challenge.");
+		swensen4North = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.PORTAL_4153, new WorldPoint(2665, 10018, 0), "Go through the north portal."), "Solve Swensen's challenge.");
+		swensen5South = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.PORTAL_4154, new WorldPoint(2630, 10023, 0), "Go through the south portal."), "Solve Swensen's challenge.");
+		swensen6East = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.PORTAL_4155, new WorldPoint(2656, 10037, 0), "Go through the east portal."), "Solve Swensen's challenge.");
+		swensen7North = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.PORTAL_4156, new WorldPoint(2666, 10029, 0), "Go through the north portal."), "Solve Swensen's challenge.");
+		swensenUpLadder = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.LADDER_4160, new WorldPoint(2665, 10037, 0), "Climb up the ladder."), "Solve Swensen's challenge.");
+		resetSwensen = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Climb up a rope/ladder to restart the puzzle."), "Solve Swensen's challenge.");
 
 		/* Peer Task */
 		talkToPeer = new NpcStep(this, NpcID.PEER_THE_SEER, new WorldPoint(2633, 3667, 0), "Talk to Peer the Seer south west of the Rellekka market. You will need to bank all your items. Peer will offer to do this for you.");
@@ -837,75 +843,119 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 		enterCode = new DetailedQuestStep(this, "Enter the solution to Peer's door.");
 
-		inputMind = new CombinationPuzzle(this, "MIND");
-		inputTree = new CombinationPuzzle(this, "TREE");
-		inputLife = new CombinationPuzzle(this, "LIFE");
-		inputFire = new CombinationPuzzle(this, "FIRE");
-		inputTime = new CombinationPuzzle(this, "TIME");
-		inputWind = new CombinationPuzzle(this, "WIND");
+		// TODO: IDEA: Somehow have a parent challenge/puzzle step, so they all highlight the same text.
+		inputMind = new PuzzleWrapperStep(this, new CombinationPuzzle(this, "MIND"), "Solve Peer's challenge.");
+		inputTree = new PuzzleWrapperStep(this, new CombinationPuzzle(this, "TREE"), "Solve Peer's challenge.");
+		inputLife = new PuzzleWrapperStep(this, new CombinationPuzzle(this, "LIFE"), "Solve Peer's challenge.");
+		inputFire = new PuzzleWrapperStep(this, new CombinationPuzzle(this, "FIRE"), "Solve Peer's challenge.");
+		inputTime = new PuzzleWrapperStep(this, new CombinationPuzzle(this, "TIME"), "Solve Peer's challenge.");
+		inputWind = new PuzzleWrapperStep(this, new CombinationPuzzle(this, "WIND"), "Solve Peer's challenge.");
 		enterCode.addSubSteps(inputMind, inputTree, inputLife, inputFire, inputTime, inputWind);
 
-		goUpEntranceLadderPeer = new ObjectStep(this, ObjectID.LADDER_4163, new WorldPoint(2631, 3663, 0), "Go up the ladder.");
-		searchBookcase = new ObjectStep(this, ObjectID.BOOKCASE_4171, new WorldPoint(2634, 3665, 2), "Search the bookcase for a red herring. If you've already unlocked the mural, go search it instead.");
-		cookHerring = new ObjectStep(this, ObjectID.COOKING_RANGE_4172, new WorldPoint(2629, 3664, 2), "Use the red herring on the cooking range.", redHerring);
-		cookHerring.addIcon(ItemID.RED_HERRING);
-		searchUnicorn = new ObjectStep(this, ObjectID.UNICORNS_HEAD_4181, new WorldPoint(2632, 3660, 2), "Study the unicorn's head.");
-		searchBull = new ObjectStep(this, ObjectID.BULLS_HEAD_4182, new WorldPoint(2634, 3660, 2), "Study the bull's head.");
-		searchChest1 = new ObjectStep(this, ObjectID.CHEST_4167, new WorldPoint(2635, 3660, 2), "Search the chest in the south of the room.");
-		searchChest2 = new ObjectStep(this, ObjectID.CHEST_4168, new WorldPoint(2635, 3660, 2), "Search the chest in the south of the room.");
+		goUpEntranceLadderPeer = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.LADDER_4163, new WorldPoint(2631, 3663, 0), "Go up the ladder."),
+			"Solve Peer's challenge.");
+		searchBookcase = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.BOOKCASE_4171, new WorldPoint(2634, 3665, 2), "Search the bookcase for a red herring. If you've already unlocked the mural, go search it instead."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		ObjectStep cookHerringRealStep = new ObjectStep(this, ObjectID.COOKING_RANGE_4172, new WorldPoint(2629, 3664, 2), "Use the red herring on the cooking range.", redHerring);
+		cookHerringRealStep.addIcon(ItemID.RED_HERRING);
+		cookHerring = new PuzzleWrapperStep(this, cookHerringRealStep,
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+
+		searchUnicorn = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.UNICORNS_HEAD_4181, new WorldPoint(2632, 3660, 2), "Study the unicorn's head."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		searchBull = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.BULLS_HEAD_4182, new WorldPoint(2634, 3660, 2), "Study the bull's head."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		searchChest1 = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.CHEST_4167, new WorldPoint(2635, 3660, 2), "Search the chest in the south of the room."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		searchChest2 = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.CHEST_4168, new WorldPoint(2635, 3660, 2), "Search the chest in the south of the room."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		searchChest1.addSubSteps(searchChest2);
-		searchCupboard1 = new ObjectStep(this, ObjectID.CUPBOARD_4177, new WorldPoint(2630, 3660, 2), "Search the cupboard in the south west of the room.");
-		searchCupboard2 = new ObjectStep(this, ObjectID.CUPBOARD_4178, new WorldPoint(2630, 3660, 2), "Search the cupboard in the south west of the room.");
+		searchCupboard1 = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.CUPBOARD_4177, new WorldPoint(2630, 3660, 2), "Search the cupboard in the south west of the room."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		searchCupboard2 = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.CUPBOARD_4178, new WorldPoint(2630, 3660, 2), "Search the cupboard in the south west of the room."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		searchCupboard1.addSubSteps(searchCupboard2);
 
-		useGoopOnDisk = new DetailedQuestStep(this, "Use the sticky red goop on the wooden disk.", stickyRedGoop, woodenDisk);
+		useGoopOnDisk = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Use the sticky red goop on the wooden disk.", stickyRedGoop, woodenDisk),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 
-		openTrapDoorAndGoDown1 = new ObjectStep(this, ObjectID.TRAPDOOR_4174, new WorldPoint(2636, 3663, 2), "Open and go down the trapdoor.");
-		goDown1 = new ObjectStep(this, ObjectID.TRAPDOOR_4173, new WorldPoint(2636, 3663, 2), "Go down the trapdoor.");
+		openTrapDoorAndGoDown1 = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.TRAPDOOR_4174, new WorldPoint(2636, 3663, 2), "Open and go down the trapdoor."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		goDown1 = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.TRAPDOOR_4173, new WorldPoint(2636, 3663, 2), "Go down the trapdoor."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		openTrapDoorAndGoDown1.addSubSteps(goDown1);
 
-		useDiskAnyOnMural = new ObjectStep(this, ObjectID.ABSTRACT_MURAL, new WorldPoint(2634, 3663, 0), "Use the red disks on the abstract mural.", redDiskOld, redDiskNew);
-		useDiskAnyOnMural.addIcon(ItemID.OLD_RED_DISK);
-		useDiskOldOnMural = new ObjectStep(this, ObjectID.ABSTRACT_MURAL, new WorldPoint(2634, 3663, 0), "Use the old red disk on the abstract mural.", redDiskOld);
-		useDiskOldOnMural.addIcon(ItemID.OLD_RED_DISK);
-		useDiskNewOnMural = new ObjectStep(this, ObjectID.ABSTRACT_MURAL, new WorldPoint(2634, 3663, 0), "Use the other red disk on the abstract mural.", redDiskNew);
-		useDiskNewOnMural.addIcon(ItemID.RED_DISK_3743);
+		ObjectStep useDiskAnyOnMuralRealStep = new ObjectStep(this, ObjectID.ABSTRACT_MURAL, new WorldPoint(2634, 3663, 0), "Use the red disks on the abstract mural.", redDiskOld, redDiskNew);
+		useDiskAnyOnMuralRealStep.addIcon(ItemID.OLD_RED_DISK);
+		useDiskAnyOnMural = new PuzzleWrapperStep(this, useDiskAnyOnMuralRealStep, "Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+
+		ObjectStep useDiskOldOnMuralRealStep = new ObjectStep(this, ObjectID.ABSTRACT_MURAL, new WorldPoint(2634, 3663, 0), "Use the old red disk on the abstract mural.", redDiskOld);
+		useDiskOldOnMuralRealStep.addIcon(ItemID.OLD_RED_DISK);
+		useDiskOldOnMural = new PuzzleWrapperStep(this, useDiskOldOnMuralRealStep, "Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+
+		ObjectStep useDiskNewOnMuralRealStep = new ObjectStep(this, ObjectID.ABSTRACT_MURAL, new WorldPoint(2634, 3663, 0), "Use the other red disk on the abstract mural.", redDiskNew);
+		useDiskNewOnMural = new PuzzleWrapperStep(this, useDiskNewOnMuralRealStep, "Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		useDiskNewOnMuralRealStep.addIcon(ItemID.RED_DISK_3743);
+
 		useDiskAnyOnMural.addSubSteps(useDiskOldOnMural, useDiskNewOnMural);
 
-		goBackUpstairs = new ObjectStep(this, ObjectID.LADDER_4164, new WorldPoint(2636, 3663, 0), "Go back upstairs.");
-		goUpstairsWithVaseLid = new ObjectStep(this, ObjectID.LADDER_4164, new WorldPoint(2636, 3663, 0), "Go back upstairs.");
+		goBackUpstairs = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.LADDER_4164, new WorldPoint(2636, 3663, 0), "Go back upstairs."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		goUpstairsWithVaseLid = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.LADDER_4164, new WorldPoint(2636, 3663, 0), "Go back upstairs."),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 
-		useBucketOnTap1 = new ObjectStep(this, ObjectID.TAP, new WorldPoint(2629, 3661, 2), "Use the empty bucket on the tap.", emptyBucket);
-		useBucketOnTap1.addIcon(ItemID.EMPTY_BUCKET);
-		useBucketOnJug1 = new DetailedQuestStep(this, "Use the full bucket on the empty jug.", fullBucket, emptyJug);
-		useJugOnDrain1 = new ObjectStep(this, ObjectID.DRAIN, new WorldPoint(2629, 3662, 2), "Empty the full jug into the drain.", fullJug);
-		useJugOnDrain1.addIcon(ItemID.FULL_JUG);
-		useBucketOnJug2 = new DetailedQuestStep(this, "Use the 2/5ths full bucket on the empty jug.", bucket25, emptyJug);
-		useBucketOnTap2 = new ObjectStep(this, ObjectID.TAP, new WorldPoint(2629, 3661, 2), "Use the empty bucket on the tap.", emptyBucket);
+		ObjectStep useBucketOnTap1RealStep = new ObjectStep(this, ObjectID.TAP, new WorldPoint(2629, 3661, 2), "Use the empty bucket on the tap.", emptyBucket);
+		useBucketOnTap1RealStep.addIcon(ItemID.EMPTY_BUCKET);
+		useBucketOnTap1 = new PuzzleWrapperStep(this, useBucketOnTap1RealStep,
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+
+		useBucketOnJug1 = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Use the full bucket on the empty jug.", fullBucket, emptyJug),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+
+		ObjectStep useJugOnDrain1RealStep = new ObjectStep(this, ObjectID.DRAIN, new WorldPoint(2629, 3662, 2), "Empty the full jug into the drain.", fullJug);
+		useJugOnDrain1RealStep.addIcon(ItemID.FULL_JUG);
+		useJugOnDrain1 = new PuzzleWrapperStep(this, useJugOnDrain1RealStep,
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+
+		useBucketOnJug2 = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Use the 2/5ths full bucket on the empty jug.", bucket25, emptyJug),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		useBucketOnTap2 = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.TAP, new WorldPoint(2629, 3661, 2), "Use the empty bucket on the tap.", emptyBucket),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		useBucketOnTap2.addIcon(ItemID.EMPTY_BUCKET);
-		useBucketOnJug3 = new DetailedQuestStep(this, "Use the full bucket on the 2/3rds full jug.", fullBucket, jug23);
-		useBucketOnScale = new ObjectStep(this, ObjectID.CHEST_4170, new WorldPoint(2632, 3665, 2), "Use the 4/5ths full bucket on the chest with a scale on it.", bucket45);
+		useBucketOnJug3 = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Use the full bucket on the 2/3rds full jug.", fullBucket, jug23),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		useBucketOnScale = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.CHEST_4170, new WorldPoint(2632, 3665, 2), "Use the 4/5ths full bucket on the chest with a scale on it.", bucket45),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		useBucketOnScale.addIcon(ItemID._45THS_FULL_BUCKET);
 
-		fillVase = new ObjectStep(this, ObjectID.TAP, new WorldPoint(2629, 3661, 2), "Use the empty vase on the tap.", vase);
+		fillVase = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.TAP, new WorldPoint(2629, 3661, 2), "Use the empty vase on the tap.", vase),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		fillVase.addIcon(ItemID.VASE_3734);
 
-		useLidOnVase = new DetailedQuestStep(this, "Use the vase lid on the filled vase", filledVase, vaseLid);
+		useLidOnVase = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Use the vase lid on the filled vase", filledVase, vaseLid),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 
-		useVaseOnTable = new ObjectStep(this, ObjectID.FROZEN_TABLE, new WorldPoint(2638, 3665, 2), "Use the filled, sealed vase on the frozen table.", filledVaseWithLid);
+		useVaseOnTable = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.FROZEN_TABLE, new WorldPoint(2638, 3665, 2), "Use the filled, sealed vase on the frozen table.", filledVaseWithLid),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		useVaseOnTable.addIcon(ItemID.SEALED_VASE_3739);
 
-		takeLidOff = new DetailedQuestStep(this, "Take the lid off the vase and fill the vase.", vaseWithLidWrong);
-		warmFrozenVase = new ObjectStep(this, ObjectID.COOKING_RANGE_4172, new WorldPoint(2629, 3664, 2), "Use the frozen vase on the cooking range.", frozenVase);
+		takeLidOff = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Take the lid off the vase and fill the vase.", vaseWithLidWrong),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		warmFrozenVase = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.COOKING_RANGE_4172, new WorldPoint(2629, 3664, 2), "Use the frozen vase on the cooking range.", frozenVase),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		warmFrozenVase.addIcon(ItemID.FROZEN_VASE);
-		emptyJugAndBucket = new DetailedQuestStep(this, "Empty jug and bucket to restart.");
+		emptyJugAndBucket = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Empty jug and bucket to restart."), "Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 
-		useFrozenKeyOnRange = new ObjectStep(this, ObjectID.COOKING_RANGE_4172, new WorldPoint(2629, 3664, 2), "Use the frozen key on the cooking range.", frozenKey);
+		useFrozenKeyOnRange = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.COOKING_RANGE_4172, new WorldPoint(2629, 3664, 2), "Use the frozen key on the cooking range.", frozenKey),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		useFrozenKeyOnRange.addIcon(ItemID.FROZEN_KEY);
-		goDownstairsWithKey = new ObjectStep(this, ObjectID.TRAPDOOR_4174, new WorldPoint(2636, 3663, 2), "Open and go down the trapdoor.", seersKey);
-		goDownstairsWithKey2 = new ObjectStep(this, ObjectID.TRAPDOOR_4173, new WorldPoint(2636, 3663, 2), "Go down the trapdoor.", seersKey);
+		goDownstairsWithKey = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.TRAPDOOR_4174, new WorldPoint(2636, 3663, 2), "Open and go down the trapdoor.", seersKey),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
+		goDownstairsWithKey2 = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.TRAPDOOR_4173, new WorldPoint(2636, 3663, 2), "Go down the trapdoor.", seersKey),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 		goDownstairsWithKey.addSubSteps(goDownstairsWithKey2);
-		leaveSeersHouse = new ObjectStep(this, ObjectID.DOOR_4166, new WorldPoint(2636, 3667, 0), "Leave the Seer's house.", seersKey);
+		leaveSeersHouse = new PuzzleWrapperStep(this, new ObjectStep(this, ObjectID.DOOR_4166, new WorldPoint(2636, 3667, 0), "Leave the Seer's house.", seersKey),
+			"Solve Peer's challenge.").withNoHelpHiddenInSidebar(true);
 
 		finishQuest = new NpcStep(this, NpcID.BRUNDT_THE_CHIEFTAIN_9263, new WorldPoint(2658, 3669, 0), "Talk to Brundt in Rellekka's longhall to finish the quest.");
 		finishQuest.addDialogStep("Ask about anything else.");
@@ -965,7 +1015,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 	@Override
 	public QuestPointReward getQuestPointReward()
 	{
-		return new QuestPointReward(2);
+		return new QuestPointReward(3);
 	}
 
 	@Override

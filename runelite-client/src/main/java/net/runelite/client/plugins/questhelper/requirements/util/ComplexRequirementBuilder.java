@@ -28,10 +28,9 @@ package net.runelite.client.plugins.questhelper.requirements.util;
 
 import net.runelite.client.plugins.questhelper.requirements.ComplexRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-
-import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
  * Builder class for making building {@link ComplexRequirement}s easier.<br>

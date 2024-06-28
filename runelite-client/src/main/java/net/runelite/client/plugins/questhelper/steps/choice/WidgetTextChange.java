@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps.choice;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
 
@@ -32,7 +32,7 @@ public class WidgetTextChange extends WidgetChoiceStep
 {
 	private final String textChange;
 
-	public WidgetTextChange(MQuestHelperConfig config, String choice, int groupId, int childId, String textChange)
+	public WidgetTextChange(QuestHelperConfig config, String choice, int groupId, int childId, String textChange)
 	{
 		super(config, choice, groupId, childId);
 		this.textChange = textChange;

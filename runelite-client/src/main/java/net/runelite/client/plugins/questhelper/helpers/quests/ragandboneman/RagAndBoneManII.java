@@ -24,18 +24,25 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.ragandboneman;
 
-import net.runelite.client.plugins.questhelper.*;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.tools.QuestTile;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarPlayer;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcInteractingRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import static net.runelite.client.plugins.questhelper.requirements.util.LogicHelper.nor;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
@@ -43,18 +50,31 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequire
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.SpriteID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.RAG_AND_BONE_MAN_II
-)
 public class RagAndBoneManII extends BasicQuestHelper
 {
 	//Items Required
@@ -64,7 +84,8 @@ public class RagAndBoneManII extends BasicQuestHelper
 	//Items Recommended
 	ItemRequirement antifireShield, inoculationBracelet, digsitePendant, ectophial, ringOfDueling,
 		gamesNecklace, varrockTeleport, lumbridgeTeleport, nardahTeleport, draynorTeleport,
-		karamjaTeleport, taverleyTeleport, rellekkaTeleport, gnomeTeleport, feldipTeleport, dramenStaff;
+		karamjaTeleport, taverleyTeleport, rellekkaTeleport, gnomeTeleport, feldipTeleport, dramenStaff,
+		rellekkaNETeleport, rangedWeapon;
 
 	ItemRequirement jugOfVinegar, jugOfVinegarNeeded, potOfVinegar, potOfVinegarNeeded, potNeeded, axe, jailKey,
 		boneInVinegar;
@@ -146,8 +167,7 @@ public class RagAndBoneManII extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		setupConditionalSteps();
@@ -194,7 +214,7 @@ public class RagAndBoneManII extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		// Required items
 		coins = new ItemRequirement("Coins", ItemCollections.COINS);
@@ -211,7 +231,6 @@ public class RagAndBoneManII extends BasicQuestHelper
 		fishingExplosive = new ItemRequirement("Fishing explosive", ItemID.FISHING_EXPLOSIVE, 10);
 		fishingExplosive.addAlternates(ItemID.FISHING_EXPLOSIVE_6664);
 		axe = new ItemRequirement("Any axe", ItemCollections.AXES).isNotConsumed();
-
 
 		// Optional items
 		rope = new ItemRequirement("Rope", ItemID.ROPE);
@@ -236,11 +255,15 @@ public class RagAndBoneManII extends BasicQuestHelper
 		rellekkaTeleport = new ItemRequirement("Rellekka teleport", ItemCollections.ENCHANTED_LYRE);
 		rellekkaTeleport.addAlternates(ItemID.RELLEKKA_TELEPORT);
 		gnomeTeleport = new ItemRequirement("Teleport to Gnome Stronghold (Spirit tree/Gnome Glider", -1, 1);
-		feldipTeleport = new ItemRequirement("Teleport to Feldip Hills (Gnome Glider)", ItemID.FELDIP_HILLS_TELEPORT);
+		feldipTeleport = new ItemRequirement("Teleport to Feldip Hills (Gnome Glider or Fairy Ring (AKS))", ItemID.FELDIP_HILLS_TELEPORT);
 
 		dramenStaff = new ItemRequirement("Dramen staff", ItemID.DRAMEN_STAFF).isNotConsumed();
 		dramenStaff.addAlternates(ItemID.LUNAR_STAFF);
+		rellekkaNETeleport = new ItemRequirement("Fairy Ring (DKS)", ItemCollections.FAIRY_STAFF).isNotConsumed();
 
+		rangedWeapon = new ItemRequirement("Ranged weapon for killing vultures", ItemCollections.CROSSBOWS);
+		rangedWeapon.setTooltip("Vultures can fly, making them unable to be attacked with melee");
+		rangedWeapon.addAlternates(ItemCollections.BOWS);
 
 		// Quest items
 		jugOfVinegar = new ItemRequirement("Jar of vinegar", ItemID.JUG_OF_VINEGAR);
@@ -285,7 +308,8 @@ public class RagAndBoneManII extends BasicQuestHelper
 		// Need to know how many pots of vinegar needed, and if missing some
 	}
 
-	private void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		swamp = new Zone(new WorldPoint(3138, 9536, 0), new WorldPoint(3261, 9601, 0));
 		junaRoom = new Zone(new WorldPoint(3205, 9484, 0), new WorldPoint(3263, 9537, 2));
@@ -349,6 +373,9 @@ public class RagAndBoneManII extends BasicQuestHelper
 		hadAllBones = new Conditions(RagBoneGroups.allBonesObtained(RagBoneGroups.getRagBoneIIStates(), questBank));
 
 		hadVinegar = new Conditions(jugOfVinegar.alsoCheckBank(questBank));
+
+		// TODO: Setup check for marking bones 'done' if not on list
+		// Widget 220, 7-15, check Text
 	}
 
 	public void setupSteps()
@@ -365,8 +392,10 @@ public class RagAndBoneManII extends BasicQuestHelper
 
 		killBat = new NpcStep(this, NpcID.BAT, new WorldPoint(3367, 3486, 0),
 			"Kill bats south of the Odd Old Man.");
+
 		killUndeadCow = new NpcStep(this, NpcID.UNDEAD_COW, new WorldPoint(3617, 3526, 0),
-			"Kill undead cows west of the Ectofuntus.");
+			"Kill undead cows west of the Ectofuntus.", true);
+		killUndeadCow.addTeleport(ectophial);
 
 		enterExperimentCave = new ObjectStep(this, ObjectID.MEMORIAL, new WorldPoint(3578, 3528, 0),
 			"Enter the Experiment Cave near Castle Fenkenstrain.");
@@ -420,7 +449,7 @@ public class RagAndBoneManII extends BasicQuestHelper
 		killLizard = new NpcStep(this, NpcID.LIZARD, new WorldPoint(3439, 3036, 0),
 			"Kill the giant lizards north of Nardah.", true, iceCooler);
 		killVulture = new NpcStep(this, NpcID.VULTURE, new WorldPoint(3348, 2875, 0),
-			"Kill vultures south west of Nardah.", true);
+			"Kill vultures south west of Nardah.", true, rangedWeapon);
 		((NpcStep) killVulture).addAlternateNpcs(NpcID.VULTURE_1268);
 		killSeagull = new NpcStep(this, NpcID.SEAGULL, new WorldPoint(3033, 3235, 0),
 			"Kill seagulls on the Port Sarim docks.", true);
@@ -459,6 +488,7 @@ public class RagAndBoneManII extends BasicQuestHelper
 				"Go to Taverley Dungeon. Bring a dusty key if you have one, otherwise you can get one in the dungeon." +
 					" Bring an antifire shield if you can.", dustyKey);
 		}
+		enterTaverleyDungeon.addTeleport(taverleyTeleport);
 
 		goThroughPipe = new ObjectStep(this, ObjectID.OBSTACLE_PIPE_16509, new WorldPoint(2888, 9799, 0),
 			"Squeeze through the obstacle pipe.");
@@ -479,6 +509,7 @@ public class RagAndBoneManII extends BasicQuestHelper
 
 		enterKeldagrimCave = new ObjectStep(this, ObjectID.TUNNEL_5008, new WorldPoint(2732,
 			3713, 0), "Enter the cave north east of Rellekka.");
+		enterKeldagrimCave.addTeleport(rellekkaNETeleport);
 		killTroll = new NpcStep(this, NpcID.MOUNTAIN_TROLL, new WorldPoint(2830, 10107, 0), "Kill trolls.", true);
 		((NpcStep) killTroll).addAlternateNpcs(NpcID.MOUNTAIN_TROLL_937, NpcID.MOUNTAIN_TROLL_938,
 			NpcID.MOUNTAIN_TROLL_939, NpcID.MOUNTAIN_TROLL_940, NpcID.MOUNTAIN_TROLL_941, NpcID.MOUNTAIN_TROLL_942);
@@ -504,12 +535,15 @@ public class RagAndBoneManII extends BasicQuestHelper
 		((NpcStep) killTerrorbird).addAlternateNpcs(NpcID.TERRORBIRD_2065, NpcID.TERRORBIRD_2066);
 		killWolf = new NpcStep(this, NpcID.WOLF, new WorldPoint(2591, 2966, 0),
 			"Kill wolves in Feldip Hills.", true);
+		killWolf.addTeleport(feldipTeleport);
 		killOgre = new NpcStep(this, NpcID.OGRE_2095, new WorldPoint(2570, 2975, 0),
 			"Kill ogres in Feldip Hills.", true);
+		killOgre.addTeleport(feldipTeleport);
 		killZogre = new NpcStep(this, NpcID.ZOGRE, new WorldPoint(2460, 3048, 0),
 			"Kill Zogres in Jiggig.", true, inoculationBracelet);
 		((NpcStep) killZogre).addAlternateNpcs(NpcID.ZOGRE_867, NpcID.ZOGRE_868, NpcID.ZOGRE_869, NpcID.ZOGRE_870,
-			NpcID.ZOGRE_871);
+			NpcID.ZOGRE_871, NpcID.ZOGRE_873, NpcID.ZOGRE_874, NpcID.ZOGRE_875, NpcID.ZOGRE_876);
+		killZogre.addTeleport(feldipTeleport);
 
 		pickupBone = new ItemStep(this, "Pickup the bone.");
 		pickupBone.addItemRequirements(RagBoneGroups.pickupBones(RagBoneGroups.getRagBoneIIStates()));
@@ -844,7 +878,7 @@ public class RagAndBoneManII extends BasicQuestHelper
 	public List<ItemRequirement> getItemRequirements()
 	{
 		return Arrays.asList(coins.quantity(902), pots.quantity(27), logs.quantity(27), tinderbox,
-			lightSource, rope.hideConditioned(addedRope),
+			lightSource, rope.hideConditioned(addedRope), rangedWeapon,
 			dustyKey.hideConditioned(new SkillRequirement(Skill.AGILITY, 70, true)), iceCooler, fishingExplosive,
 			mirrorShield, axe);
 	}
@@ -890,7 +924,7 @@ public class RagAndBoneManII extends BasicQuestHelper
 		List<PanelDetails> allSteps = new ArrayList<>();
 
 		PanelDetails collectingMorytaniaPanel = new PanelDetails("Morytania bones", Arrays.asList(killBat,
-			killUndeadCow, enterExperimentCave, killExperiment, killWerewolf, killGhoul));
+			killUndeadCow, enterExperimentCave, killExperiment, killWerewolf, killGhoul), null, Collections.singletonList(ectophial));
 		collectingMorytaniaPanel.setLockingStep(morySteps);
 		allSteps.add(collectingMorytaniaPanel);
 
@@ -905,7 +939,7 @@ public class RagAndBoneManII extends BasicQuestHelper
 		allSteps.add(collectingLumbridgePanel);
 
 		PanelDetails collectingDesertPanel = new PanelDetails("Desert bones",
-			Arrays.asList(killJackal, killSnake, killLizard, killVulture), iceCooler);
+			Arrays.asList(killJackal, killSnake, killLizard, killVulture), iceCooler, rangedWeapon);
 		collectingDesertPanel.setLockingStep(desertSteps);
 		allSteps.add(collectingDesertPanel);
 
@@ -917,18 +951,25 @@ public class RagAndBoneManII extends BasicQuestHelper
 
 		PanelDetails collectingKaramjaPanel = new PanelDetails("Karamja bones",
 			Arrays.asList(killJogre, enterBrimhavenDungeon, killMossGiant, killFireGiant),
-			coins.quantity(875), axe);
+			coins.quantity(875).hideConditioned(new VarbitRequirement(8122, 1)), axe);
 		collectingKaramjaPanel.setLockingStep(karamjaSteps);
 		allSteps.add(collectingKaramjaPanel);
+		// 8123 0->8 also when paid 1m for perm access
 
 		PanelDetails collectingTaverleyPanel = new PanelDetails("Taverley Dungeon bone",
-			Arrays.asList(enterTaverleyDungeon, killBabyBlueDragon), dustyKey.hideConditioned(new SkillRequirement(Skill.AGILITY, 70, true)));
+			Arrays.asList(enterTaverleyDungeon, killBabyBlueDragon),
+			Collections.singletonList(dustyKey
+					.hideConditioned(new SkillRequirement(Skill.AGILITY, 70, true))),
+			Arrays.asList(taverleyTeleport, antifireShield)
+		);
 		collectingTaverleyPanel.setLockingStep(taverleySteps);
 		allSteps.add(collectingTaverleyPanel);
 
 		PanelDetails collectingFremennikPanel = new PanelDetails("Fremennik bones",
 			Arrays.asList(enterKeldagrimCave, killTroll, killRabbit, enterFremmyDungeon, killBasilisk,
-				travelToWaterbirth, enterWaterbirthDungeon, killDagannoth), mirrorShield);
+				travelToWaterbirth, enterWaterbirthDungeon, killDagannoth),
+			Collections.singletonList(mirrorShield),
+			Arrays.asList(rellekkaTeleport, rellekkaNETeleport));
 		collectingFremennikPanel.setLockingStep(fremennikSteps);
 		allSteps.add(collectingFremennikPanel);
 
@@ -938,7 +979,7 @@ public class RagAndBoneManII extends BasicQuestHelper
 		allSteps.add(collectingStrongholdPanel);
 
 		PanelDetails collectingFeldipPanel = new PanelDetails("Feldip Hills bones",
-			Arrays.asList(killWolf, killOgre, killZogre));
+			Arrays.asList(killWolf, killOgre, killZogre), null, Collections.singletonList(feldipTeleport));
 		collectingFeldipPanel.setLockingStep(feldipSteps);
 		allSteps.add(collectingFeldipPanel);
 

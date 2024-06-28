@@ -24,15 +24,17 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.recipefordisaster;
 
-import net.runelite.client.plugins.questhelper.*;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
@@ -40,14 +42,17 @@ import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.RECIPE_FOR_DISASTER_LUMBRIDGE_GUIDE
-)
+import net.runelite.api.Client;
+import net.runelite.api.ItemID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+
 public class RFDLumbridgeGuide extends BasicQuestHelper
 {
 	ItemRequirement milk, egg, flour, tin, rawGuidanceCake, guidanceCake, guidanceCakeHighlighted, enchantedEgg, enchantedMilk,
@@ -57,8 +62,10 @@ public class RFDLumbridgeGuide extends BasicQuestHelper
 
 	Requirement inDiningRoom, inUpstairsTrailborn;
 
-	QuestStep enterDiningRoom, inspectLumbridgeGuide, goUpToTraiborn, talkToTraiborn, cookCake, enterDiningRoomAgain,
+	DetailedQuestStep enterDiningRoom, inspectLumbridgeGuide, goUpToTraiborn, cookCake, enterDiningRoomAgain,
 		useCakeOnLumbridgeGuide, mixIngredients;
+
+	QuizSteps talkToTraiborn;
 
 	//Zones
 	Zone diningRoom, upstairsTrailborn, quizSpot;
@@ -66,8 +73,7 @@ public class RFDLumbridgeGuide extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -91,7 +97,7 @@ public class RFDLumbridgeGuide extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		milk = new ItemRequirement("Bucket of milk", ItemID.BUCKET_OF_MILK);
 		flour = new ItemRequirement("Pot of flour", ItemID.POT_OF_FLOUR);
@@ -118,7 +124,8 @@ public class RFDLumbridgeGuide extends BasicQuestHelper
 		wizardsTowerTeleport = new ItemRequirement("Necklace of Passage for Wizards' Tower teleport", ItemCollections.NECKLACE_OF_PASSAGES);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		diningRoom = new Zone(new WorldPoint(1856, 5313, 0), new WorldPoint(1870, 5333, 0));
 		upstairsTrailborn = new Zone(new WorldPoint(3100, 3152, 1), new WorldPoint(3117, 3168, 1));
@@ -133,12 +140,18 @@ public class RFDLumbridgeGuide extends BasicQuestHelper
 
 	public void setupSteps()
 	{
-		enterDiningRoom = new ObjectStep(this, ObjectID.LARGE_DOOR_12349, new WorldPoint(3213, 3221, 0), "Go inspect the Lumbridge Guide in the Lumbridge Castle dining room.");
-		inspectLumbridgeGuide = new ObjectStep(this, ObjectID.LUMBRIDGE_GUIDE_12339, new WorldPoint(1865, 5325, 0), "Inspect the Lumbridge Guide in the Lumbridge Castle dining room.");
-		inspectLumbridgeGuide.addDialogStep("Yes, I'm sure I can make a cake.");
+		enterDiningRoom = new ObjectStep(this, ObjectID.LARGE_DOOR_12349, new WorldPoint(3213, 3221, 0),
+			"Go inspect the Lumbridge Guide in the Lumbridge Castle dining room.");
+		enterDiningRoom.addTeleport(lumbridgeTeleport);
+		inspectLumbridgeGuide = new ObjectStep(this, ObjectID.LUMBRIDGE_GUIDE_12339, new WorldPoint(1865, 5325, 0),
+			"Inspect the Lumbridge Guide in the Lumbridge Castle dining room.");
+		inspectLumbridgeGuide.addDialogSteps("Yes, I'm sure I can make a cake.");
 		inspectLumbridgeGuide.addSubSteps(enterDiningRoom);
 
-		goUpToTraiborn = new ObjectStep(this, ObjectID.STAIRCASE_12536, new WorldPoint(3104, 3160, 0), "Go talk to Traiborn in the Wizards' Tower.", egg, flour, milk, tin);
+		goUpToTraiborn = new ObjectStep(this, ObjectID.STAIRCASE_12536, new WorldPoint(3104, 3160, 0),
+			"Go talk to Traiborn in the Wizards' Tower.", egg, flour, milk, tin);
+		goUpToTraiborn.addDialogStep("Wizards' Tower");
+		goUpToTraiborn.addTeleport(wizardsTowerTeleport);
 		talkToTraiborn = new QuizSteps(this);
 
 		cookCake = new DetailedQuestStep(this, "Cook the Guidance Cake.", rawGuidanceCake);

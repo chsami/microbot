@@ -24,33 +24,37 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.familycrest;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FAMILY_CREST
-)
 public class FamilyCrest extends BasicQuestHelper
 {
 	//Items Required
@@ -58,14 +62,20 @@ public class FamilyCrest extends BasicQuestHelper
 		perfectRing, perfectNecklace, goldBar, goldBar2, crestPiece1, crestPiece2, crestPiece3, crest;
 
 	// Items Recommended
-	ItemRequirement varrockTele, faladorTele, ardyTele, alkharidTele, catherbyTele;
+	ItemRequirement varrockTele, faladorTele, ardyTele, alkharidTele, catherbyTele, dwarvenMineTele;
 
 	Requirement inDwarvenMines, inHobgoblinDungeon, northWallUp, southRoomUp, northRoomUp, northWallDown, southRoomDown, northRoomDown,
 		inJollyBoar, inEdgevilleDungeon, crest3Nearby;
 
-	QuestStep talkToDimintheis, talkToCaleb, talkToCalebWithFish, talkToCalebOnceMore, talkToGemTrader, talkToMan, enterDwarvenMine, talkToBoot,
-		enterWitchavenDungeon, pullNorthLever, pullSouthRoomLever, pullNorthLeverAgain, pullNorthRoomLever, pullNorthLever3, pullSouthRoomLever2,
-		followPathAroundEast, mineGold, smeltGold, makeRing, makeNecklace, returnToMan, goUpToJohnathon, talkToJohnathon, giveJohnathonAntipoison,
+	NpcStep talkToDimintheis, talkToCaleb, talkToCalebWithFish, talkToCalebOnceMore, talkToGemTrader, talkToMan;
+	ObjectStep enterDwarvenMine;
+	NpcStep talkToBoot;
+	ObjectStep enterWitchavenDungeon, pullNorthLever, pullSouthRoomLever, pullNorthLeverAgain, pullNorthRoomLever, pullNorthLever3, pullSouthRoomLever2;
+	QuestStep followPathAroundEast, mineGold;
+	ObjectStep smeltGold;
+	QuestStep makeRing, makeNecklace, returnToMan;
+	ObjectStep goUpToJohnathon;
+	QuestStep talkToJohnathon, giveJohnathonAntipoison,
 		killChronizon, pickUpCrest3, repairCrest, returnCrest;
 
 	ObjectStep goDownToChronizon;
@@ -76,8 +86,7 @@ public class FamilyCrest extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -97,7 +106,8 @@ public class FamilyCrest extends BasicQuestHelper
 		ConditionalStep getGold = new ConditionalStep(this, enterWitchavenDungeon);
 		getGold.addStep(new Conditions(perfectNecklace.alsoCheckBank(questBank), perfectRing.alsoCheckBank(questBank)), returnToMan);
 		getGold.addStep(perfectNecklace.alsoCheckBank(questBank), makeRing);
-		getGold.addStep(goldBar2.alsoCheckBank(questBank), makeNecklace);
+		getGold.addStep(new Conditions(gold.alsoCheckBank(questBank), goldBar.alsoCheckBank(questBank)), smeltGold);
+		getGold.addStep(goldBar.alsoCheckBank(questBank), makeNecklace);
 		getGold.addStep(gold2.alsoCheckBank(questBank), smeltGold);
 		getGold.addStep(new Conditions(northRoomUp, southRoomDown), mineGold);
 		getGold.addStep(new Conditions(northRoomUp, northWallUp), pullSouthRoomLever2);
@@ -132,19 +142,21 @@ public class FamilyCrest extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		// Recommended
 		varrockTele = new ItemRequirement("Varrock Teleports", ItemID.VARROCK_TELEPORT, 2);
 		faladorTele = new ItemRequirement("Falador Teleport", ItemID.FALADOR_TELEPORT);
 		ardyTele = new ItemRequirement("Ardougne Teleport", ItemID.ARDOUGNE_TELEPORT);
-		alkharidTele = new ItemRequirement("Al-Kharid Teleport", ItemCollections.RING_OF_DUELINGS);
+		alkharidTele = new ItemRequirement("Al-Kharid Teleport", ItemCollections.RING_OF_DUELINGS, 2);
+		alkharidTele.setChargedItem(true);
 		catherbyTele = new ItemRequirement("Camelot/Catherby Teleport", ItemID.CATHERBY_TELEPORT);
+		dwarvenMineTele = new ItemRequirement("Teleport to the Dwarven Mine (Combat Bracelet [3], Skills Necklace [2])", ItemCollections.SKILLS_NECKLACES);
+		dwarvenMineTele.addAlternates(ItemCollections.COMBAT_BRACELETS);
 
 		varrockTele.addAlternates(ItemID.ACHIEVEMENT_DIARY_CAPE, ItemID.ACHIEVEMENT_DIARY_CAPE_T);
 		varrockTele.addAlternates(ItemCollections.RING_OF_WEALTHS);
 		ardyTele.addAlternates(ItemCollections.ARDY_CLOAKS);
-		alkharidTele.addAlternates(ItemCollections.RING_OF_DUELINGS);
 		alkharidTele.addAlternates(ItemCollections.AMULET_OF_GLORIES);
 		catherbyTele.addAlternates(ItemID.CAMELOT_TELEPORT);
 
@@ -182,7 +194,8 @@ public class FamilyCrest extends BasicQuestHelper
 		crestPiece3 = new ItemRequirement("Crest part", ItemID.CREST_PART_781);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		dwarvenMines = new Zone(new WorldPoint(2960, 9696, 0), new WorldPoint(3062, 9854, 0));
 		hobgoblinDungeon = new Zone(new WorldPoint(2691, 9665, 0), new WorldPoint(2749, 9720, 0));
@@ -220,6 +233,7 @@ public class FamilyCrest extends BasicQuestHelper
 		talkToCaleb.addDialogStep("Are you Caleb Fitzharmon?");
 		talkToCaleb.addDialogStep("So can I have your bit?");
 		talkToCaleb.addDialogStep("Ok, I will get those.");
+		talkToCaleb.addTeleport(catherbyTele);
 		talkToCalebWithFish = new NpcStep(this, NpcID.CALEB, new WorldPoint(2819, 3452, 0),
 			"Talk to Caleb again with the required fish.", shrimp, salmon, tuna, bass, swordfish);
 
@@ -229,16 +243,19 @@ public class FamilyCrest extends BasicQuestHelper
 
 		talkToGemTrader = new NpcStep(this, NpcID.GEM_TRADER, new WorldPoint(3286, 3211, 0), "Talk to the Gem Trader in Al Kharid.");
 		talkToGemTrader.addDialogStep("I'm in search of a man named Avan Fitzharmon.");
+		talkToGemTrader.addTeleport(alkharidTele.quantity(1));
 		talkToMan = new NpcStep(this, NpcID.MAN, new WorldPoint(3295, 3275, 0), "Talk to the man south of the Al Kharid mine.");
 		talkToMan.addDialogStep("I'm looking for a man named Avan Fitzharmon.");
 		enterDwarvenMine = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450, 0),
 			"Talk to Boot in the south western Dwarven Mines.");
+		enterDwarvenMine.addTeleport(dwarvenMineTele);
 		talkToBoot = new NpcStep(this, NpcID.BOOT, new WorldPoint(2984, 9810, 0), "Talk to Boot in the south western Dwarven Mines.");
 		talkToBoot.addDialogStep("Hello. I'm in search of very high quality gold.");
 		talkToBoot.addSubSteps(enterDwarvenMine);
 
 		enterWitchavenDungeon = new ObjectStep(this, ObjectID.OLD_RUIN_ENTRANCE, new WorldPoint(2696, 3283, 0),
 			"Enter the old ruin entrance west of Witchaven.");
+		enterWitchavenDungeon.addTeleport(ardyTele);
 
 		pullNorthLever = new ObjectStep(this, ObjectID.LEVER_2421, new WorldPoint(2722, 9710, 0),
 			"Follow the path around, and pull the lever on the wall in the north east corner.");
@@ -255,23 +272,26 @@ public class FamilyCrest extends BasicQuestHelper
 		followPathAroundEast = new DetailedQuestStep(this, new WorldPoint(2721, 9700, 0), "Follow the dungeon around to the east.");
 
 		mineGold = new ObjectStep(this, ObjectID.GOLD_ROCKS_11371, new WorldPoint(2732, 9680, 0),
-				"Mine 2 perfect gold in the east room.",true, pickaxe, gold2);
+			"Mine 2 perfect gold in the east room.", true, pickaxe, gold2);
 		((ObjectStep) mineGold).setMaxObjectDistance(5000);
 
-		smeltGold = new DetailedQuestStep(this, "Smelt the perfect gold ore into bars.", gold2);
+		smeltGold = new ObjectStep(this, ObjectID.FURNACE_24009, new WorldPoint(3273, 3186, 0), "Smelt the perfect gold ore into bars.", gold2.highlighted());
+		smeltGold.addIcon(ItemID.GOLD_ORE);
+		smeltGold.addTeleport(alkharidTele.quantity(1));
 
-		makeNecklace = new DetailedQuestStep(this, "Make a perfect ruby necklace at a furnace.", goldBar, ruby, necklaceMould);
-		makeRing = new DetailedQuestStep(this, "Make a perfect ruby ring at a furnace.", goldBar, ruby, ringMould);
+		makeNecklace = new ObjectStep(this, ObjectID.FURNACE_24009, "Make a perfect ruby necklace at a furnace. Make sure to only craft one.", goldBar, ruby, necklaceMould);
+		makeRing = new ObjectStep(this, ObjectID.FURNACE_24009, "Make a perfect ruby ring at a furnace. Make sure to only craft one.", goldBar, ruby, ringMould);
 
 		returnToMan = new NpcStep(this, NpcID.AVAN, new WorldPoint(3295, 3275, 0),
 			"Return to the man south of the Al Kharid mine.", perfectRing, perfectNecklace);
 
 		goUpToJohnathon = new ObjectStep(this, ObjectID.STAIRCASE_11797, new WorldPoint(3286, 3494, 0),
 			"Go upstairs in the Jolly Boar Inn north east of Varrock and talk to Johnathon.", antipoison);
+		goUpToJohnathon.addTeleport(varrockTele.quantity(1));
 
 		talkToJohnathon = new NpcStep(this, NpcID.JOHNATHON, new WorldPoint(3277, 3504, 1), "Talk to Johnathon.", antipoison);
 		giveJohnathonAntipoison = new NpcStep(this, NpcID.JOHNATHON, new WorldPoint(3277, 3504, 1),
-			"Give Johnathon some antipoison.", antipoison);
+			"Give Johnathon some antipoison.", antipoison.highlighted());
 		giveJohnathonAntipoison.addIcon(ItemID.ANTIPOISON3);
 
 		goUpToJohnathon.addSubSteps(talkToJohnathon);
@@ -315,7 +335,7 @@ public class FamilyCrest extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRecommended()
 	{
-		return Arrays.asList(varrockTele, catherbyTele, faladorTele, ardyTele, alkharidTele);
+		return Arrays.asList(varrockTele, catherbyTele, faladorTele, ardyTele, alkharidTele, dwarvenMineTele);
 	}
 
 	@Override
@@ -354,7 +374,7 @@ public class FamilyCrest extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Starting off", Collections.singletonList(talkToDimintheis)));
 		allSteps.add(new PanelDetails("Caleb's piece", Arrays.asList(talkToCaleb, talkToCalebWithFish, talkToCalebOnceMore), shrimp, salmon, tuna, bass, swordfish));
 		allSteps.add(new PanelDetails("Avan's piece", Arrays.asList(talkToGemTrader, talkToMan, talkToBoot, enterWitchavenDungeon, pullNorthLever,
-			pullSouthRoomLever, pullNorthLever, pullNorthRoomLever, pullNorthLever3, pullSouthRoomLever2, mineGold, smeltGold, makeNecklace, makeRing, returnToMan),
+			pullSouthRoomLever, pullNorthLeverAgain, pullNorthRoomLever, pullNorthLever3, pullSouthRoomLever2, mineGold, smeltGold, makeNecklace, makeRing, returnToMan),
 			pickaxe, ruby2, necklaceMould, ringMould));
 		allSteps.add(new PanelDetails("Johnathon's piece", Arrays.asList(goUpToJohnathon, giveJohnathonAntipoison, killChronizon),
 			runesForBlasts, antipoison));

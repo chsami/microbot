@@ -24,22 +24,23 @@
  */
 package net.runelite.client.plugins.questhelper.steps.playermadesteps;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.overlay.DirectionArrow;
-import net.runelite.client.plugins.questhelper.steps.playermadesteps.extendedruneliteobjects.ExtendedRuneliteObject;
-import net.runelite.client.plugins.questhelper.steps.playermadesteps.extendedruneliteobjects.RuneliteObjectManager;
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
-import net.runelite.client.ui.overlay.OverlayUtil;
-
-import javax.inject.Inject;
-import java.awt.*;
+import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.ExtendedRuneliteObject;
+import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.RuneliteObjectManager;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.inject.Inject;
+import net.runelite.api.Perspective;
+import net.runelite.api.Point;
+import net.runelite.client.ui.overlay.OverlayUtil;
 
 // TODO: Separate out NPC logic from Step logic
 public class RuneliteObjectStep extends DetailedQuestStep
@@ -84,7 +85,7 @@ public class RuneliteObjectStep extends DetailedQuestStep
 		if (!extendedRuneliteObject.getWorldPoint().isInScene(client)) return;
 		if (questHelper.getConfig().showMiniMapArrow())
 		{
-			if (!extendedRuneliteObject.isActive())
+			if (!extendedRuneliteObject.isRuneliteObjectActive())
 			{
 				super.renderArrow(graphics);
 			}
@@ -101,7 +102,7 @@ public class RuneliteObjectStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		super.makeWorldOverlayHint(graphics, plugin);
 

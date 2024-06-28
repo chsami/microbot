@@ -24,25 +24,34 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.swansong;
 
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.Arrays;
+import java.util.Collection;
+import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 public class FishMonkfish extends DetailedOwnerStep
 {
 
 	DetailedQuestStep fishMonkfish, cookMonkfish, talkToArnoldWithMonkfish;
-	ItemRequirement cookedMonkfish = new ItemRequirement("Fresh monkfish", ItemID.FRESH_MONKFISH_7943, 5);
-	ItemRequirement rawMonkfish = new ItemRequirement("Fresh monkfish", ItemID.FRESH_MONKFISH, 5);
-	ItemRequirement combatGear = new ItemRequirement("Combat gear", -1, -1);
-	ItemRequirement smallNet = new ItemRequirement("Small fishing net", ItemID.SMALL_FISHING_NET);
+	ItemRequirement cookedMonkfish;
+	ItemRequirement rawMonkfish;
+	ItemRequirement combatGear;
+	ItemRequirement smallNet;
 
 
 	public FishMonkfish(QuestHelper questHelper)
@@ -99,6 +108,11 @@ public class FishMonkfish extends DetailedOwnerStep
 	@Override
 	protected void setupSteps()
 	{
+		cookedMonkfish = new ItemRequirement("Fresh monkfish", ItemID.FRESH_MONKFISH_7943, 5);
+		rawMonkfish = new ItemRequirement("Fresh monkfish", ItemID.FRESH_MONKFISH, 5);
+		combatGear = new ItemRequirement("Combat gear", -1, -1);
+		smallNet = new ItemRequirement("Small fishing net", ItemID.SMALL_FISHING_NET);
+
 		fishMonkfish = new ObjectStep(getQuestHelper(), NullObjectID.NULL_13477, new WorldPoint(2311, 3696, 0), "Fish at least 5 fresh monkfish. Sea Trolls will appear, and you'll need to kill them.", smallNet, combatGear);
 		cookMonkfish = new ObjectStep(getQuestHelper(), ObjectID.RANGE_12611, new WorldPoint(2316, 3669, 0), "Cook 5 monkfish. If you burn any, catch some more.", rawMonkfish);
 		talkToArnoldWithMonkfish = new NpcStep(getQuestHelper(), NpcID.ARNOLD_LYDSPOR, new WorldPoint(2329, 3688, 0), "Bring the monkfish to Arnold at the bank.", cookedMonkfish);

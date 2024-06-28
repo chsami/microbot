@@ -25,17 +25,15 @@
 
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.falador;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.item.TeleportItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
@@ -43,22 +41,17 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequire
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
+import java.util.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FALADOR_EASY
-)
 public class FaladorEasy extends ComplexStateQuestHelper
 {
 
 	//Items Required
-	ItemRequirement coins2000, bucket, tiara, mindTalisman, hammer, pickaxe, combatGear;
+	ItemRequirement bucket, tiara, mindTalisman, hammer, pickaxe, combatGear;
 
 	//Items Recommended
 	ItemRequirement teleportFalador, teleportMindAltar, explorersRing;
@@ -90,8 +83,7 @@ public class FaladorEasy extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doEasy = new ConditionalStep(this, claimReward);
@@ -124,10 +116,10 @@ public class FaladorEasy extends ComplexStateQuestHelper
 		doEasy.addStep(notGotSecurityBook, gotSecurityBookTask);
 
 		bluriteLimbsTask = new ConditionalStep(this, getPickaxe);
-		bluriteLimbsTask.addStep(pickaxe, enterDungeon);
-		bluriteLimbsTask.addStep(new Conditions(pickaxe, inBluriteDungeon), mineBlurite);
-		bluriteLimbsTask.addStep(hasBluriteOre, smeltBlurite);
 		bluriteLimbsTask.addStep(hasBluriteBar, smithBluriteLimbs);
+		bluriteLimbsTask.addStep(hasBluriteOre, smeltBlurite);
+		bluriteLimbsTask.addStep(new Conditions(pickaxe, inBluriteDungeon), mineBlurite);
+		bluriteLimbsTask.addStep(pickaxe, enterDungeon);
 		doEasy.addStep(notBluriteLimbs, bluriteLimbsTask);
 
 		mindTiaraTask = new ConditionalStep(this, enterMindAltar);
@@ -142,7 +134,7 @@ public class FaladorEasy extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notFamilyCrest = new VarplayerRequirement(1186, false, 0);
 		notClimbedWall = new VarplayerRequirement(1186, false, 1);
@@ -157,7 +149,6 @@ public class FaladorEasy extends ComplexStateQuestHelper
 		notBluriteLimbs = new VarplayerRequirement(1186, false, 10);
 
 		//Required
-		coins2000 = new ItemRequirement("Coins", ItemCollections.COINS, 2000).showConditioned(notGotHaircut);
 		bucket = new ItemRequirement("Bucket", ItemID.BUCKET).showConditioned(notFilledWater).isNotConsumed();
 		tiara = new ItemRequirement("Silver Tiara", ItemID.TIARA).showConditioned(notMindTiara);
 		mindTalisman = new ItemRequirement("Mind Talisman", ItemID.MIND_TALISMAN).showConditioned(notMindTiara);
@@ -168,9 +159,9 @@ public class FaladorEasy extends ComplexStateQuestHelper
 		combatGear.setDisplayItemId(BankSlotIcons.getRangedCombatGear());
 
 		//Recommended
-		teleportFalador = new ItemRequirement("Multiple teleports to Falador", ItemID.FALADOR_TELEPORT, -1);
-		teleportMindAltar = new ItemRequirement("A Teleport to the Mind Altar", ItemID.MIND_ALTAR_TELEPORT);
-		explorersRing = new ItemRequirement("Explorers Ring (2) or above.", ItemID.EXPLORERS_RING_2).isNotConsumed();
+		teleportFalador = new TeleportItemRequirement("Multiple teleports to Falador", ItemID.FALADOR_TELEPORT, -1);
+		teleportMindAltar = new TeleportItemRequirement("A Teleport to the Mind Altar", ItemID.MIND_ALTAR_TELEPORT);
+		explorersRing = new TeleportItemRequirement("Explorers Ring (2) or above.", ItemID.EXPLORERS_RING_2).isNotConsumed();
 		explorersRing.addAlternates(ItemID.EXPLORERS_RING_3, ItemID.EXPLORERS_RING_4);
 
 		bluriteOre = new ItemRequirement("Blurite Ore", ItemID.BLURITE_ORE);
@@ -190,7 +181,8 @@ public class FaladorEasy extends ComplexStateQuestHelper
 		knightSword = new QuestRequirement(QuestHelperQuest.THE_KNIGHTS_SWORD, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		mindAltar = new Zone(new WorldPoint(2805, 4819, 0), new WorldPoint(2760, 4855, 0));
 		bluriteDungeon = new Zone(new WorldPoint(2979, 9538, 0), new WorldPoint(3069, 9602, 0));
@@ -209,8 +201,9 @@ public class FaladorEasy extends ComplexStateQuestHelper
 
 		//Get a Haircut from the Falador hairdresser
 		getHaircut = new NpcStep(this, NpcID.HAIRDRESSER, new WorldPoint(2945, 3380, 0),
-			"Visit the hairdresser in west Falador for a well deserved shave.", coins2000);
-		getHaircut.addDialogStep("Go Ahead.");
+			"Visit the hairdresser in west Falador for a well deserved shave.");
+		getHaircut.addDialogStep("I'd like a haircut please.");
+		getHaircut.addDialogStep("I'd like a shave please.");
 
 		//Climb over the Western Falador Wall
 		climbWall = new ObjectStep(this, ObjectID.CRUMBLING_WALL_24222, new WorldPoint(2935, 3355, 0),
@@ -224,12 +217,10 @@ public class FaladorEasy extends ComplexStateQuestHelper
 		//Repair a broken strut in the Motherlode Mine
 		enterDwarvenMines = new ObjectStep(this, ObjectID.STAIRCASE_16664, new WorldPoint(3058, 3376, 0),
 			"Enter the Dwarven Mines, you can get there quickly by going down the stairs near the Party Room.", pickaxe);
-		enterDwarvenMines.addIcon(ItemID.RUNE_PICKAXE);
 		enterCaveToMotherlodeMine = new ObjectStep(this, ObjectID.CAVE_26654, new WorldPoint(3059, 9764, 0),
 			"Go through the Cave entrance to the Motherlode Mines.", pickaxe);
-		enterCaveToMotherlodeMine.addIcon(ItemID.RUNE_PICKAXE);
-		fixMotherloadMine = new ObjectStep(this, ObjectID.BROKEN_STRUT, new WorldPoint(3743, 5662, 0),
-			"Repair a broken strut on the Waterwheel in the Motherlode mine. It may take a few minutes for it to break.", hammer.highlighted());
+		fixMotherloadMine = new ObjectStep(this, ObjectID.BROKEN_STRUT, new WorldPoint(3742, 5669, 0),
+			"Repair a broken strut on the Waterwheel in the Motherlode mine. It may take a few minutes for it to break.", true, hammer.highlighted());
 		fixMotherloadMine.addIcon(ItemID.HAMMER);
 
 		//Find out what your family crest is from Sir Renitee
@@ -244,6 +235,7 @@ public class FaladorEasy extends ComplexStateQuestHelper
 		//Browse Sarah's Farm Shop
 		browseSarahFarmingShop = new NpcStep(this, NpcID.SARAH, new WorldPoint(3039, 3292, 0),
 			"Trade Sarah in the Farming Shop south of Falador and browse her goods.");
+		browseSarahFarmingShop.addDialogStep("What are you selling?");
 
 		//Take the boat to Entrana
 		goEntrana = new NpcStep(this, NpcID.MONK_OF_ENTRANA, new WorldPoint(3046, 3235, 0),
@@ -255,6 +247,7 @@ public class FaladorEasy extends ComplexStateQuestHelper
 			"Climb in the Port Sarim Jail to speak to the Security Guard.");
 		getSecurityBook = new NpcStep(this, NpcID.SECURITY_GUARD, new WorldPoint(3013, 3192, 1),
 			"Speak to the Security Guard in the Port Sarim Jail to get a Security Book.");
+		getSecurityBook.addDialogStep("If you're a security guard, let's talk about security.");
 
 		//Smith some Blurite Limbs on Doric's Anvil
 		getPickaxe = new DetailedQuestStep(this, new WorldPoint(2963, 3216, 0),
@@ -263,17 +256,21 @@ public class FaladorEasy extends ComplexStateQuestHelper
 			"Go down the ladder south of Port Sarim. Be prepared for ice giants and ice warriors to attack you.", pickaxe, hammer);
 		mineBlurite = new ObjectStep(this, ObjectID.BLURITE_ROCKS, new WorldPoint(3049, 9566, 0),
 			"Mine a blurite ore in the eastern cavern.", pickaxe, hammer);
-		smeltBlurite = new ObjectStep(this, ObjectID.FURNACE_24009, new WorldPoint(2976, 3368, 0),
+		smeltBlurite = new ObjectStep(this, ObjectID.FURNACE_24009, new WorldPoint(2976, 3369, 0),
 			"Smelt the blurite ore into a blurite bar.", hammer, bluriteOre);
+		smeltBlurite.addWidgetHighlightWithItemIdRequirement(270, 15, ItemID.BLURITE_BAR, true);
 		smithBluriteLimbs = new ObjectStep(this, ObjectID.ANVIL, new WorldPoint(2950, 3451, 0),
 			"Smith the blurite bar into blurite limbs on Doric's Anvil, north of Falador.", hammer, bluriteBar);
 		smithBluriteLimbs.addSubSteps(enterDungeon, mineBlurite, smeltBlurite);
+		smithBluriteLimbs.addWidgetHighlightWithItemIdRequirement(270, 13, ItemID.BLURITE_LIMBS, true);
+
 
 		//Make a Mind Tiara
 		enterMindAltar = new ObjectStep(this, ObjectID.MYSTERIOUS_RUINS_29094, new WorldPoint(2982, 3514, 0),
 			"Use the mind talisman on the Mysterious Ruins to access the Mind Altar.", mindTalisman.highlighted(), tiara);
-		getMindTiara = new ObjectStep(this, ObjectID.ALTAR_34761, new WorldPoint(2785, 4840, 0),
-			"Use the mind talisman on the Altar", mindTalisman, tiara);
+		getMindTiara = new ObjectStep(this, ObjectID.ALTAR_34761, new WorldPoint(2786, 4841, 0),
+			"Use the mind talisman on the Altar", mindTalisman.highlighted(), tiara);
+		getMindTiara.addIcon(ItemID.MIND_TALISMAN);
 		enterMindAltar.addSubSteps(getMindTiara);
 
 		//Claim Reward
@@ -285,7 +282,7 @@ public class FaladorEasy extends ComplexStateQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRequirements()
 	{
-		return Arrays.asList(coins2000, pickaxe, hammer, bucket, tiara, mindTalisman, combatGear);
+		return Arrays.asList(pickaxe, hammer, bucket, tiara, mindTalisman, combatGear);
 	}
 
 	@Override
@@ -335,8 +332,7 @@ public class FaladorEasy extends ComplexStateQuestHelper
 		fillBucketSteps.setLockingStep(filledWaterTask);
 		allSteps.add(fillBucketSteps);
 
-		PanelDetails haircutSteps = new PanelDetails("Get A Haircut", Collections.singletonList(getHaircut),
-			coins2000);
+		PanelDetails haircutSteps = new PanelDetails("Get A Haircut", Collections.singletonList(getHaircut));
 		haircutSteps.setDisplayCondition(notGotHaircut);
 		haircutSteps.setLockingStep(gotHaircutTask);
 		allSteps.add(haircutSteps);

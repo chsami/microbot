@@ -24,14 +24,16 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.fremennik;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.item.TeleportItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpecialAttackRequirement;
@@ -44,17 +46,14 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequire
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FREMENNIK_MEDIUM
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 
 public class FremennikMedium extends ComplexStateQuestHelper
 {
@@ -102,8 +101,7 @@ public class FremennikMedium extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doMedium = new ConditionalStep(this, claimReward);
@@ -141,8 +139,8 @@ public class FremennikMedium extends ComplexStateQuestHelper
 		lighthouseTask.addStep(inWaterbirthIsland, moveToDagCave);
 		lighthouseTask.addStep(inDagCave, dropPetRock);
 		lighthouseTask.addStep(inDagCave_2, moveToAxeSpot);
-		lighthouseTask.addStep(inDagCave_3, activateSpecial);
 		lighthouseTask.addStep(new Conditions(inDagCave_3, specialAttackEnabled), throwAxe);
+		lighthouseTask.addStep(inDagCave_3, activateSpecial);
 		lighthouseTask.addStep(inDagCave_4, moveToDagCave1);
 		lighthouseTask.addStep(inDagCave1, moveToDagCave2);
 		lighthouseTask.addStep(inDagCave2, moveToDagCave3);
@@ -168,7 +166,7 @@ public class FremennikMedium extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notSlayBrineRat = new VarplayerRequirement(1184, false, 11);
 		notSnowyHunter = new VarplayerRequirement(1184, false, 12);
@@ -188,9 +186,11 @@ public class FremennikMedium extends ComplexStateQuestHelper
 		spade = new ItemRequirement("Spade", ItemID.SPADE).showConditioned(notSlayBrineRat).isNotConsumed();
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.PICKAXES).showConditioned(
 			new Conditions(LogicType.OR, notMineGold, notMineCoal)).isNotConsumed();
-		staff = new ItemRequirement("Dramen or Lunar staff", ItemCollections.FAIRY_STAFF).showConditioned(notTravelMisc).isNotConsumed();
+		staff = new TeleportItemRequirement("Dramen or Lunar staff", ItemCollections.FAIRY_STAFF).showConditioned(notTravelMisc).isNotConsumed();
 		butterFlyJar = new ItemRequirement("Butterfly Jar", ItemID.BUTTERFLY_JAR).showConditioned(notSnowyKnight).isNotConsumed();
 		butterFlyNet = new ItemRequirement("Butterfly Net", ItemID.BUTTERFLY_NET).showConditioned(notSnowyKnight).isNotConsumed();
+		butterFlyNet.addAlternates(ItemID.MAGIC_BUTTERFLY_NET);
+		butterFlyNet.setTooltip("Alternatively, use Magic Butterfly Net");
 		petRock = new ItemRequirement("Pet rock", ItemID.PET_ROCK).showConditioned(new Conditions(LogicType.OR,
 			notPetRockPOH, notLighthouse)).isNotConsumed();
 		petRock.setTooltip("Obtained from Askeladden in Rellekka");
@@ -259,7 +259,8 @@ public class FremennikMedium extends ComplexStateQuestHelper
 		inDagCave15 = new ZoneRequirement(dagCave15);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		eagleArea = new Zone(new WorldPoint(1986, 4985, 3), new WorldPoint(2030, 4944, 3));
 		iceCave = new Zone(new WorldPoint(2706, 10228, 0), new WorldPoint(2741, 10193, 0));
@@ -415,6 +416,8 @@ public class FremennikMedium extends ComplexStateQuestHelper
 		req.add(new SkillRequirement(Skill.PRAYER, 43, false,
 			"43 Prayer for protection prayers"));
 		req.add(olafsQuest);
+		req.add(eaglesPeak);
+		req.add(betweenARock);
 		return req;
 	}
 

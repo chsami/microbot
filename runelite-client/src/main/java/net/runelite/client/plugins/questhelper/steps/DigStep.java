@@ -24,11 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.util.InventorySlots;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.util.function.Predicate;
 import net.runelite.api.Item;
 import net.runelite.api.ItemID;
 import net.runelite.api.Player;
@@ -37,10 +40,6 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayUtil;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.function.Predicate;
 
 public class DigStep extends DetailedQuestStep
 {
@@ -81,7 +80,7 @@ public class DigStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		super.makeWorldOverlayHint(graphics, plugin);
 
