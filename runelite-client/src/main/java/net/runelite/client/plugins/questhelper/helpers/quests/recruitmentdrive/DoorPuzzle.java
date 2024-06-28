@@ -25,6 +25,7 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.recruitmentdrive;
 
+import lombok.Getter;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
@@ -62,6 +63,7 @@ public class DoorPuzzle extends QuestStep
 
 	private final int COMPLETE = 56;
 
+	@Getter
 	private final HashMap<Integer, Integer> highlightButtons = new HashMap<>();
 	private final HashMap<Integer, Integer> distance = new HashMap<>();
 

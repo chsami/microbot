@@ -706,6 +706,49 @@ public class Rs2GameObject {
                 .collect(Collectors.toList());
     }
 
+    public static List<TileObject> getTileObjects(int id){
+        return getTileObjects(id, Rs2Player.getWorldLocation());
+    }
+
+    public static List<TileObject> getTileObjects(int id, WorldPoint anchorPoint) {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        if (tiles == null) return new ArrayList<>();
+
+        int z = Microbot.getClient().getPlane();
+        List<TileObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+
+                if (tile.getDecorativeObject() != null
+                        && tile.getDecorativeObject().getId() == id
+                        && tile.getDecorativeObject().getWorldLocation().equals(tile.getWorldLocation()))
+                    tileObjects.add(tile.getDecorativeObject());
+
+                if (tile.getGroundObject() != null
+                        && tile.getGroundObject().getId() == id
+                        && tile.getGroundObject().getWorldLocation().equals(tile.getWorldLocation()))
+                    tileObjects.add(tile.getGroundObject());
+
+                if (tile.getWallObject() != null
+                        && tile.getWallObject().getId() == id
+                        && tile.getWallObject().getWorldLocation().equals(tile.getWorldLocation()))
+                    tileObjects.add(tile.getWallObject());
+            }
+        }
+
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(anchorPoint)))
+                .collect(Collectors.toList());
+    }
+
     public static List<GameObject> getGameObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
@@ -928,7 +971,7 @@ public class Rs2GameObject {
             }
 
             int index = 0;
-            if (action != null && !action.isEmpty()) {
+            if (action != null) {
                 String[] actions;
                 if (objComp.getImpostorIds() != null) {
                     actions = objComp.getImpostor().getActions();
@@ -942,6 +985,12 @@ public class Rs2GameObject {
                         break;
                     }
                 }
+
+                while (index < actions.length && actions[index] == null)
+                    index++;
+
+                if (index == actions.length)
+                    index = 0;
             }
 
 

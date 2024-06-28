@@ -15,6 +15,7 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -200,7 +201,7 @@ public class Rs2Inventory {
      * @return True if the inventory contains all the specified IDs, false otherwise.
      */
     public static boolean containsAll(int... ids) {
-        return contains(ids);
+        return Arrays.stream(ids).allMatch(x -> items().stream().anyMatch(y -> y.id == x));
     }
 
     /**
@@ -1679,6 +1680,11 @@ public class Rs2Inventory {
         }
 
         Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
+
+        if (action.equalsIgnoreCase("destroy")){
+            sleepUntil(() -> Rs2Widget.isWidgetVisible(584, 0));
+            Rs2Widget.clickWidget(Rs2Widget.getWidget(584, 1).getId());
+        }
     }
 
     private static Widget getInventory() {
