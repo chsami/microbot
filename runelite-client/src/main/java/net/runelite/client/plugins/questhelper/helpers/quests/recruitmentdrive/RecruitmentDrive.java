@@ -156,7 +156,7 @@ public class RecruitmentDrive extends BasicQuestHelper
 		ObjectStep climbDownfirstFloorStaircase = new ObjectStep(this, ObjectID.STAIRCASE_24074,
 			firstFloorStairsPosition, "Climb down the stairs from the first floor.");
 
-		talkToSirTiffy = new NpcStep(this, NpcID.SIR_TIFFY_CASHIEN,
+		talkToSirTiffy = new NpcStep(this, NpcID.SIR_TIFFY_CASHIEN, new WorldPoint(2996, 3374, 0),
 			"Talk to Sir Tiffy Cashien in Falador Park.", noItemRequirement);
 
 		ConditionalStep conditionalTalkToSirTiffy = new ConditionalStep(this, talkToSirTiffy);

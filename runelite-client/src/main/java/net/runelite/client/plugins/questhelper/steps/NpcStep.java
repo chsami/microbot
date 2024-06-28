@@ -25,6 +25,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
+import lombok.Getter;
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import static net.runelite.client.plugins.questhelper.overlays.QuestHelperWorldOverlay.IMAGE_Z_OFFSET;
@@ -66,6 +67,7 @@ public class NpcStep extends DetailedQuestStep
 	public final int npcID;
 	protected final List<Integer> alternateNpcIDs = new ArrayList<>();
 
+	@Getter
 	@Setter
 	protected boolean allowMultipleHighlights;
 

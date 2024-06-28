@@ -127,8 +127,8 @@ public class Rs2Camera {
             Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_UP),
                     () -> cameraPitchPercentage() >= percentage, 600);
         } else {
-            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
-            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_DOWN);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_DOWN),
                     () -> cameraPitchPercentage() <= percentage, 600);
         }
     }

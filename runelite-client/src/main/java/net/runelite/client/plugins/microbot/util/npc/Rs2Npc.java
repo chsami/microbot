@@ -106,6 +106,14 @@ public class Rs2Npc {
         return npcs;
     }
 
+    /**
+     * @param id
+     * @return
+     */
+    public static Stream<NPC> getNpcs(int id) {
+        return getNpcs().filter(x -> x.getId() == id);
+    }
+
     public static Stream<NPC> getAttackableNpcs() {
         Stream<NPC> npcs = Microbot.getClient().getNpcs().stream()
                 .filter((npc) -> npc.getCombatLevel() > 0 && !npc.isDead())

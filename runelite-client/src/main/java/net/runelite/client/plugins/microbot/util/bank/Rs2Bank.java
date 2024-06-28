@@ -1038,7 +1038,7 @@ public class Rs2Bank {
         Rs2Player.toggleRunEnergy(true);
         BankLocation bankLocation = getNearestBank();
         Microbot.status = "Walking to nearest bank " + bankLocation.toString();
-        boolean result = bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
+        boolean result = bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
         if (result) {
             return Rs2Bank.useBank();
         } else {

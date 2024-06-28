@@ -351,9 +351,9 @@ public class SleepingGiants extends BasicQuestHelper
 
 		coolDownSword = new ObjectStep(this, NullObjectID.NULL_44777, "Pick up the sword from the mould with a bucket of water or ice gloves equipped.",
 			iceGloves.equipped().showConditioned(iceGloves), bucketOfWater.showConditioned(bucketOfWater).highlighted());
-		coolDownSword.addIcon(ItemID.BUCKET_OF_WATER);
 		fillBucketWaterfall = new ObjectStep(this, ObjectID.WATERFALL_44632,
 			"Fill the bucket with water by using it on the Waterfall.", bucketOfWater);
+		fillBucketWaterfall.addIcon(ItemID.BUCKET);
 
 		takeBucket = new ObjectStep(this, ObjectID.PILE_OF_BUCKETS /* Pile of Buckets */, "Take a Bucket from the Pile of Buckets");
 
