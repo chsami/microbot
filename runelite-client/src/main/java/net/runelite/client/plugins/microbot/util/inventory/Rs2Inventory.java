@@ -33,15 +33,15 @@ public class Rs2Inventory {
 
     // The maximum capacity of the inventory
     private static final int CAPACITY = 28;
+    private static final int COLUMNS = 4;
+    private static final int ROWS = 7;
+    public static List<Rs2Item> inventoryItems = new ArrayList<>();
+    private static boolean isTrackingInventory = false;
+    private static boolean isInventoryChanged = false;
 
     public static ItemContainer inventory() {
         return Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
     }
-
-    public static List<Rs2Item> inventoryItems = new ArrayList<>();
-
-    private static boolean isTrackingInventory = false;
-    private static boolean isInventoryChanged = false;
 
     public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == InventoryID.INVENTORY.getId() && e.getItemContainer() != null) {
@@ -264,7 +264,6 @@ public class Rs2Inventory {
         return false;
     }
 
-
     /**
      * Drops the item with the specified ID from the inventory.
      *
@@ -400,7 +399,94 @@ public class Rs2Inventory {
                 items().stream().filter(predicate).collect(Collectors.toList())) {
             if (item == null) continue;
             invokeMenu(item, "Drop");
-            sleep(150, 600);
+            sleep(150, 300);
+        }
+        return true;
+    }
+
+    /**
+     * Drops all items in the inventory that match a specified filter, in a specified order.
+     *
+     * @param predicate The filter to apply. Only items that match this filter will be dropped.
+     * @param dropOrder The order in which to drop the items. This can be one of the following:
+     *                  - STANDARD: Items are dropped row by row, from left to right.
+     *                  - EFFICIENT_ROW: Items are dropped row by row. For even rows, items are dropped from left to right. For odd rows, items are dropped from right to left.
+     *                  - COLUMN: Items are dropped column by column, from top to bottom.
+     *                  - EFFICIENT_COLUMN: Items are dropped column by column. For even columns, items are dropped from top to bottom. For odd columns, items are dropped from bottom to top.
+     * @return True if all matching items were successfully dropped, false otherwise.
+     */
+    public static boolean dropAll(Predicate<Rs2Item> predicate, DropOrder dropOrder) {
+        List<Rs2Item> itemsToDrop = items().stream()
+                .filter(predicate)
+                .collect(Collectors.toList());
+
+        switch (dropOrder) {
+            case STANDARD:
+                break;
+
+            case EFFICIENT_ROW:
+                itemsToDrop.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    int row1 = index1 / COLUMNS;
+                    int row2 = index2 / COLUMNS;
+                    if (row1 != row2) {
+                        return Integer.compare(row1, row2);
+                    } else {
+                        int col1 = index1 % COLUMNS;
+                        int col2 = index2 % COLUMNS;
+                        if (row1 % 2 == 0) {
+                            // For even rows, sort columns normally (left to right)
+                            return Integer.compare(col1, col2);
+                        } else {
+                            // For odd rows, sort columns in reverse (right to left)
+                            return Integer.compare(col2, col1);
+                        }
+                    }
+                });
+                break;
+
+            case COLUMN:
+                itemsToDrop.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    int col1 = index1 % COLUMNS;
+                    int col2 = index2 % COLUMNS;
+                    if (col1 != col2) {
+                        return Integer.compare(col1, col2);
+                    } else {
+                        return Integer.compare(index1 / COLUMNS, index2 / COLUMNS);
+                    }
+                });
+                break;
+
+            case EFFICIENT_COLUMN:
+                itemsToDrop.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    int col1 = index1 % COLUMNS;
+                    int col2 = index2 % COLUMNS;
+                    if (col1 != col2) {
+                        return Integer.compare(col1, col2);
+                    } else {
+                        int row1 = index1 / COLUMNS;
+                        int row2 = index2 / COLUMNS;
+                        if (col1 % 2 == 0) {
+                            // For even columns, sort rows normally (top to bottom)
+                            return Integer.compare(row1, row2);
+                        } else {
+                            // For odd columns, sort rows in reverse (bottom to top)
+                            return Integer.compare(row2, row1);
+                        }
+                    }
+                });
+                break;
+        }
+
+        for (Rs2Item item : itemsToDrop) {
+            if (item == null) continue;
+            invokeMenu(item, "Drop");
+            sleep(150, 300);
         }
         return true;
     }
@@ -422,14 +508,14 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(String... names) {
-        return dropAllExcept(false, names);
+        return dropAllExcept(false, DropOrder.STANDARD, names);
     }
 
-    public static boolean dropAllExcept(boolean exact, String... names) {
+    public static boolean dropAllExcept(boolean exact, DropOrder dropOrder, String... names) {
         if (exact)
-            return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+            return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)), dropOrder);
         else
-            return dropAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())));
+            return dropAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())), dropOrder);
     }
 
     /**
