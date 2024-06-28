@@ -45,6 +45,10 @@ public class BarbarianFishingOverlay extends OverlayPanel {
                     .build());
 
             panelComponent.getChildren().add(LineComponent.builder().build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Action cooldown:")
+                    .right(String.valueOf(BarbarianFishingScript.timeout))
+                    .build());
 
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)

@@ -4,6 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.plugins.microbot.playerassist.enums.PlayStyle;
 import net.runelite.client.plugins.microbot.util.inventory.DropOrder;
 
 import static net.runelite.client.plugins.microbot.fishing.barbarian.BarbarianFishingConfig.GROUP;
@@ -42,5 +43,17 @@ public interface BarbarianFishingConfig extends Config {
     )
     default DropOrder dropOrder() {
         return DropOrder.STANDARD;
+    }
+
+    // play style
+    @ConfigItem(
+            keyName = "playStyle",
+            name = "Play Style",
+            description = "The play style to use",
+            position = 2,
+            section = generalSection
+    )
+    default PlayStyle playStyle() {
+        return PlayStyle.AGGRESSIVE;
     }
 }

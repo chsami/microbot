@@ -2,9 +2,11 @@ package net.runelite.client.plugins.microbot.fishing.barbarian;
 
 import com.google.inject.Provides;
 import net.runelite.api.Client;
+import net.runelite.api.events.GameTick;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -52,6 +54,11 @@ public class BarbarianFishingPlugin extends Plugin {
             overlayManager.add(fishingOverlay);
         }
         fishingScript.run(config);
+    }
+
+    @Subscribe
+    public void onGameTick(GameTick tick) {
+        fishingScript.onGameTick();
     }
 
     protected void shutDown() {

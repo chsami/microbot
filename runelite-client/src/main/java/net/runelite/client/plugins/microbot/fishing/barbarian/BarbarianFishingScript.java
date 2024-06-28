@@ -16,51 +16,62 @@ import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.validateInter
 
 public class BarbarianFishingScript extends Script {
 
-    public static String version = "1.0.0";
+    public static String version = "1.1.0";
+    public static int timeout = 0;
+    private BarbarianFishingConfig config;
 
     public boolean run(BarbarianFishingConfig config) {
-        initialPlayerLocation = null;
+        this.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            try {
-
-                if (!super.run()) return;
-                if (!Microbot.isLoggedIn()) return;
-
-                if (initialPlayerLocation == null) {
-                    initialPlayerLocation = Rs2Player.getWorldLocation();
-                }
-
-                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || !Rs2Inventory.hasItem("feather")) {
-                    return;
-                }
-
-
-                NPC fishingspot = null;
-                for (int fishingSpotId : FishingSpot.BARB_FISH.getIds()) {
-                    fishingspot = Rs2Npc.getNpc(fishingSpotId);
-                    if (fishingspot != null) {
-                        break;
-                    }
-                }
-
-                if (Rs2Inventory.isFull()) {
-                    if (config.dropOrder() == DropOrder.RANDOM)
-                        Rs2Inventory.dropAllExcept(false, DropOrder.random(), "rod", "net", "pot", "harpoon", "feather", "bait", "vessel");
-                    else
-                        Rs2Inventory.dropAllExcept(false, config.dropOrder(), "rod", "net", "pot", "harpoon", "feather", "bait", "vessel");
-                    return;
-                }
-
-
-                if (fishingspot != null && !Rs2Camera.isTileOnScreen(fishingspot.getLocalLocation())) {
-                    validateInteractable(fishingspot);
-                }
-                Rs2Npc.interact(fishingspot);
-
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+            if (!super.run() || !Microbot.isLoggedIn() || !Rs2Inventory.hasItem("feather") || !Rs2Inventory.hasItem("rod")) {
+                return;
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+
+            if (timeout > 0) {
+                return;
+            }
+
+            if (Rs2Inventory.isFull()) {
+                dropInventoryItems(config);
+                return;
+            }
+
+            NPC fishingspot = findFishingSpot();
+            if (fishingspot == null) {
+                return;
+            }
+
+            if (!Rs2Camera.isTileOnScreen(fishingspot.getLocalLocation())) {
+                validateInteractable(fishingspot);
+            }
+
+            Rs2Npc.interact(fishingspot);
+
+        }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    public void onGameTick() {
+        if (timeout > 0 && !Rs2Player.isInteracting()) {
+            timeout--;
+        }
+        if (Rs2Player.isInteracting() && timeout == 0) {
+            timeout = config.playStyle().getRandomTickInterval();
+        }
+    }
+
+    private NPC findFishingSpot() {
+        for (int fishingSpotId : FishingSpot.BARB_FISH.getIds()) {
+            NPC fishingspot = Rs2Npc.getNpc(fishingSpotId);
+            if (fishingspot != null) {
+                return fishingspot;
+            }
+        }
+        return null;
+    }
+
+    private void dropInventoryItems(BarbarianFishingConfig config) {
+        DropOrder dropOrder = config.dropOrder() == DropOrder.RANDOM ? DropOrder.random() : config.dropOrder();
+        Rs2Inventory.dropAllExcept(false, dropOrder, "rod", "net", "pot", "harpoon", "feather", "bait", "vessel");
     }
 }
