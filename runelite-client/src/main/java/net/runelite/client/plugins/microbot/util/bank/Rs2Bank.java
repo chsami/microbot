@@ -41,15 +41,13 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 @SuppressWarnings("unused")
 @Slf4j
 public class Rs2Bank {
-    public static List<Rs2Item> bankItems = new ArrayList<Rs2Item>();
     private static final int X_AMOUNT_VARBIT = 3960;
     private static final int SELECTED_OPTION_VARBIT = 6590;
     private static final int HANDLE_X_SET = 5;
     private static final int HANDLE_X_UNSET = 6;
     private static final int HANDLE_ALL = 7;
     private static final int WITHDRAW_AS_NOTE_VARBIT = 3958;
-
-
+    public static List<Rs2Item> bankItems = new ArrayList<Rs2Item>();
     /**
      * Container describes from what interface the action happens
      * eg: withdraw means the contailer will be the bank container
@@ -194,7 +192,7 @@ public class Rs2Bank {
         Rs2Item rs2Item = findBankItem(id);
         if (rs2Item == null) return false;
         log.info("Item: " + rs2Item.name + " Amount: " + rs2Item.quantity);
-        return findBankItem(Objects.requireNonNull(rs2Item).name, false, amount) != null;
+        return findBankItem(Objects.requireNonNull(rs2Item).name, true, amount) != null;
     }
 
     /**
