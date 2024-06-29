@@ -23,6 +23,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.timers.GameTimer;
+import net.runelite.client.plugins.timers.TimersPlugin;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -293,6 +294,10 @@ public class Microbot {
     }
 
     public static boolean isTimerActive(GameTimer gameTimer) {
+        if (!isPluginEnabled(TimersPlugin.class.getName())) {
+            log("Please enable the timers plugin to make sure the script is working properly.");
+            return true;
+        }
         for (InfoBox key : infoBoxManager.getInfoBoxes()) {
             if (key.getName().equals(gameTimer.name())) {
                 return true;
@@ -308,6 +313,17 @@ public class Microbot {
         Microbot.getClientThread().runOnClientThread(() ->
                 Microbot.getClient().addChatMessage(ChatMessageType.ENGINE, "", "[" + formattedTime + "]: " + message, "", false)
         );
+    }
+
+    private static boolean isPluginEnabled(String name) {
+        Plugin dashboard = Microbot.getPluginManager().getPlugins().stream()
+                .filter(x -> x.getClass().getName().equals(name))
+                .findFirst()
+                .orElse(null);
+
+        if (dashboard == null) return false;
+
+        return Microbot.getPluginManager().isPluginEnabled(dashboard);
     }
 }
 
