@@ -24,18 +24,21 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.fairytaleii;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
@@ -43,15 +46,26 @@ import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FAIRYTALE_II__CURE_A_QUEEN
-)
 public class FairytaleII extends BasicQuestHelper
 {
 	ItemRequirement dramenOrLunarStaff, vialOfWater, pestleAndMortar;
@@ -85,8 +99,7 @@ public class FairytaleII extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -152,8 +165,12 @@ public class FairytaleII extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
+		thievingReq = new SkillRequirement(Skill.THIEVING, 40);
+		farmReq = new SkillRequirement(Skill.FARMING, 49, true);
+		herbReq = new SkillRequirement(Skill.HERBLORE, 57, true);
+
 		dramenOrLunarStaff = new ItemRequirement("Dramen or lunar staff", ItemID.DRAMEN_STAFF).isNotConsumed();
 		dramenOrLunarStaff.addAlternates(ItemID.LUNAR_STAFF);
 		dramenOrLunarStaff.setDisplayMatchedItemName(true);
@@ -175,7 +192,8 @@ public class FairytaleII extends BasicQuestHelper
 		queensSecateurs = new ItemRequirement("Queen's secateurs", ItemID.QUEENS_SECATEURS_9020);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		zanaris = new Zone(new WorldPoint(2368, 4353, 0), new WorldPoint(2495, 4479, 0));
 		hideout = new Zone(new WorldPoint(2324, 4420, 0), new WorldPoint(2367, 4468, 0));
@@ -190,9 +208,6 @@ public class FairytaleII extends BasicQuestHelper
 		inStarPlane = new ZoneRequirement(starPlane);
 		inGorakPlane = new ZoneRequirement(gorakPlane);
 
-		thievingReq = new SkillRequirement(Skill.THIEVING, 40);
-		farmReq = new SkillRequirement(Skill.FARMING, 49, true);
-		herbReq = new SkillRequirement(Skill.HERBLORE, 57, true);
 
 		// Started, 2333 0->1
 
@@ -383,7 +398,7 @@ public class FairytaleII extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("2 x 2,500 Experience Lamps (Any skill over level 30.)", ItemID.ANTIQUE_LAMP, 2)); //4447 Is placeholder for filter.
+		return Collections.singletonList(new ItemReward("2,500 Experience Lamp (Any skill over level 30.)", ItemID.ANTIQUE_LAMP, 1));
 	}
 
 	@Override

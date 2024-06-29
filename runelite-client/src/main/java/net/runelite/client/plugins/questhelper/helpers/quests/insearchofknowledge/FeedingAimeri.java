@@ -24,7 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.insearchofknowledge;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;

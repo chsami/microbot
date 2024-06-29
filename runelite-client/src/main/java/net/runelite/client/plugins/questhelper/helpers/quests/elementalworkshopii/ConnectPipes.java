@@ -24,13 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.elementalworkshopii;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.widgets.Widget;
-
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
+import net.runelite.api.widgets.Widget;
 
 public class ConnectPipes extends QuestStep
 {
@@ -42,7 +43,7 @@ public class ConnectPipes extends QuestStep
 
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 

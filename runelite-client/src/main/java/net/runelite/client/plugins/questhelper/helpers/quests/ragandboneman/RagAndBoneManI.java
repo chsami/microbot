@@ -24,30 +24,41 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.ragandboneman;
 
-import net.runelite.client.plugins.questhelper.*;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.tools.QuestTile;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import static net.runelite.client.plugins.questhelper.requirements.util.LogicHelper.nor;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.RAG_AND_BONE_MAN_I
-)
 public class RagAndBoneManI extends BasicQuestHelper
 {
 	//Items Required
@@ -85,8 +96,7 @@ public class RagAndBoneManI extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -124,7 +134,7 @@ public class RagAndBoneManI extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		// Required items
 		coins = new ItemRequirement("Coins", ItemCollections.COINS);
@@ -177,7 +187,8 @@ public class RagAndBoneManI extends BasicQuestHelper
 		// Need to know how many pots of vinegar needed, and if missing some
 	}
 
-	private void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		swamp = new Zone(new WorldPoint(3138, 9536, 0), new WorldPoint(3261, 9601, 0));
 		junaRoom = new Zone(new WorldPoint(3205, 9484, 0), new WorldPoint(3263, 9537, 2));
@@ -263,7 +274,7 @@ public class RagAndBoneManI extends BasicQuestHelper
 		killFrogSteps.addStep(addedRope, enterSwamp);
 
 		killMonkey = new NpcStep(this, NpcID.MONKEY_2848, new WorldPoint(2886, 3167, 0),
-			"Kill a monkey on karamja.", true);
+			"Kill a monkey on Karamja.", true);
 
 		enterKaramjaDungeon = new ObjectStep(this, ObjectID.ROCKS_11441, new WorldPoint(2857, 3169, 0),
 			"Kill a giant bat in the Karamja Volcano Dungeon.");

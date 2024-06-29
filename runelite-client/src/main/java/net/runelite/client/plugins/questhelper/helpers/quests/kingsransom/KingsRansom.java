@@ -24,34 +24,42 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.kingsransom;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetModelRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.WidgetStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.KINGS_RANSOM
-)
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+
 public class KingsRansom extends BasicQuestHelper
 {
 	//Items Required
@@ -60,7 +68,7 @@ public class KingsRansom extends BasicQuestHelper
 		hairclipOrLockpick, holyGrail, granite, telegrab;
 
 	//Items Recommended
-	ItemRequirement ardougneTeleport, camelotTeleport, edgevilleTeleport;
+	ItemRequirement ardougneTeleport, camelotTeleport, monasteryOrEdgevilleTeleport;
 
 	Requirement hasBlackHelm, hasScrapPaper, hasForm, inUpstairsManor, inDownstairsManor, inTrialRoom, handlerInRoom, butlerInRoom,
 		maidInRoom, askedAboutThread, askedAboutDagger, askedAboutNight, askedAboutPoison, inPrison, inBasement, inPuzzle, hasTelegrabItems,
@@ -82,8 +90,7 @@ public class KingsRansom extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -178,7 +185,7 @@ public class KingsRansom extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		scrapPaper = new ItemRequirement("Scrap paper", ItemID.SCRAP_PAPER);
 		addressForm = new ItemRequirement("Address form", ItemID.ADDRESS_FORM);
@@ -227,11 +234,13 @@ public class KingsRansom extends BasicQuestHelper
 		granite.addAlternates(ItemID.GRANITE_5KG, ItemID.GRANITE_500G);
 
 		ardougneTeleport = new ItemRequirement("Ardougne teleport", ItemID.ARDOUGNE_TELEPORT);
-		camelotTeleport = new ItemRequirement("Camelot teleport", ItemID.CAMELOT_TELEPORT);
-		edgevilleTeleport = new ItemRequirement("Edgeville teleport", ItemID.AMULET_OF_GLORY6);
+		camelotTeleport = new ItemRequirement("Camelot teleport", ItemID.CAMELOT_TELEPORT, 3);
+		monasteryOrEdgevilleTeleport = new ItemRequirement("Monastery with Combat Bracelet or Edgeville glory teleport", ItemCollections.AMULET_OF_GLORIES);
+		monasteryOrEdgevilleTeleport.addAlternates(ItemCollections.COMBAT_BRACELETS);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		upstairsManor = new Zone(new WorldPoint(2729, 3572, 1), new WorldPoint(2749, 3584, 1));
 		downstairsManor = new Zone(new WorldPoint(2733, 3574, 0), new WorldPoint(2747, 3582, 0));
@@ -285,6 +294,7 @@ public class KingsRansom extends BasicQuestHelper
 	public void setupSteps()
 	{
 		talkToGossip = new NpcStep(this, NpcID.GOSSIP, new WorldPoint(2741, 3557, 0), "Talk to Gossip, just south of the Sinclair Mansion.");
+		talkToGossip.addDialogStep("Yes.");
 		talkToGossip.addDialogStep("How curious. Maybe I should investigate it.");
 		talkToGuard = new NpcStep(this, NpcID.GUARD_4218, new WorldPoint(2741, 3561, 0), "Talk to the Guard in the Sinclair Manor.");
 
@@ -364,7 +374,7 @@ public class KingsRansom extends BasicQuestHelper
 
 		goDownToArthur = new ObjectStep(this, ObjectID.LADDER_25843, new WorldPoint(3016, 3519, 0), "Enter the Black Knight Fortress basement.");
 
-		solvePuzzle = new LockpickPuzzle(this);
+		solvePuzzle = new PuzzleWrapperStep(this, new LockpickPuzzle(this), "Pick the door's lock.");
 
 		enterStatueForGrail = new ObjectStep(this, ObjectID.STATUE_26073, new WorldPoint(2780, 3508, 0), "Search the statue east of Camelot.");
 
@@ -410,7 +420,7 @@ public class KingsRansom extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRecommended()
 	{
-		return Arrays.asList(ardougneTeleport, camelotTeleport, edgevilleTeleport);
+		return Arrays.asList(ardougneTeleport, camelotTeleport, monasteryOrEdgevilleTeleport);
 	}
 
 	@Override

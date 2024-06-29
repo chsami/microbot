@@ -10,10 +10,12 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.client.plugins.timers.TimersPlugin;
+import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
+import net.runelite.client.plugins.timers.GameTimer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,8 +25,11 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.5.1";
+    public static String version = "1.5.2";
     ThievingConfig config;
+
+    //TODO: CHECK IF TIMER PLUGIN IS ACTIVE and if not send message
+
 
     public boolean run(ThievingConfig config) {
         this.config = config;
@@ -37,6 +42,9 @@ public class ThievingScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
+                if (isStunned())
+                    return;
+
                 List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
 
                 if (foods.isEmpty()) {
@@ -48,6 +56,7 @@ public class ThievingScript extends Script {
                 if (Rs2Inventory.isFull()) {
                     dropItems(foods);
                 }
+                handleShadowVeil();
                 openCoinPouches(config);
                 wearDodgyNecklace();
                 Rs2Player.eatAt(config.hitpoints());
@@ -99,7 +108,6 @@ public class ThievingScript extends Script {
         if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < config.hitpoints())
             return;
         if (config.THIEVING_NPC() != ThievingNpc.NONE) {
-            sleepUntil(() -> TimersPlugin.t == null || !TimersPlugin.t.render());
             if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
                 handleElves();
             } else {
@@ -116,6 +124,16 @@ public class ThievingScript extends Script {
                     }
                 }
             }
+        }
+    }
+
+    private boolean isStunned() {
+        return Microbot.isTimerActive(GameTimer.PICKPOCKET_STUN);
+    }
+
+    private void handleShadowVeil() {
+        if (!Rs2Magic.isShadowVeilActive() && Rs2Magic.isArceeus()) {
+            Rs2Magic.cast(MagicAction.SHADOW_VEIL);
         }
     }
 

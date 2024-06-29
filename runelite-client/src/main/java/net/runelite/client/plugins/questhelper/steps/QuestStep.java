@@ -27,22 +27,43 @@ package net.runelite.client.plugins.questhelper.steps;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Module;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.QuestVarbits;
-import net.runelite.client.plugins.questhelper.VisibilityHelper;
+import net.runelite.client.plugins.questhelper.steps.widget.AbstractWidgetHighlight;
+import net.runelite.client.plugins.questhelper.steps.widget.Spell;
+import net.runelite.client.plugins.questhelper.steps.widget.SpellWidgetHighlight;
+import net.runelite.client.plugins.questhelper.steps.widget.WidgetHighlight;
+import net.runelite.client.plugins.questhelper.tools.VisibilityHelper;
+import static net.runelite.client.plugins.questhelper.overlays.QuestHelperOverlay.TITLED_CONTENT_COLOR;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.steps.choice.*;
+import net.runelite.client.plugins.questhelper.steps.choice.DialogChoiceChange;
+import net.runelite.client.plugins.questhelper.steps.choice.DialogChoiceStep;
+import net.runelite.client.plugins.questhelper.steps.choice.DialogChoiceSteps;
+import net.runelite.client.plugins.questhelper.steps.choice.WidgetTextChange;
+import net.runelite.client.plugins.questhelper.steps.choice.WidgetChoiceStep;
+import net.runelite.client.plugins.questhelper.steps.choice.WidgetChoiceSteps;
 import net.runelite.client.plugins.questhelper.steps.overlay.IconOverlay;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.SpriteID;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.widgets.WidgetID;
+import net.runelite.api.widgets.InterfaceID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -50,14 +71,6 @@ import net.runelite.client.game.SpriteManager;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.*;
-import java.util.regex.Pattern;
-
-import static net.runelite.client.plugins.questhelper.overlays.QuestHelperOverlay.TITLED_CONTENT_COLOR;
 
 public abstract class QuestStep implements Module
 {
@@ -111,6 +124,7 @@ public abstract class QuestStep implements Module
 	@Setter
 	protected boolean allowInCutscene = false;
 
+	@Getter
 	protected int iconItemID = -1;
 	protected BufferedImage icon;
 
@@ -124,6 +138,9 @@ public abstract class QuestStep implements Module
 	protected WidgetChoiceSteps widgetChoices = new WidgetChoiceSteps();
 
 	@Getter
+	protected List<AbstractWidgetHighlight> widgetsToHighlight = new ArrayList<>();
+
+	@Getter
 	private final List<QuestStep> substeps = new ArrayList<>();
 
 	@Getter
@@ -132,6 +149,8 @@ public abstract class QuestStep implements Module
 	@Getter
 	@Setter
 	private boolean showInSidebar = true;
+
+	protected String lastDialogSeen = "";
 
 	public QuestStep(QuestHelper questHelper)
 	{
@@ -209,7 +228,7 @@ public abstract class QuestStep implements Module
 	@Subscribe
 	public void onWidgetLoaded(WidgetLoaded event)
 	{
-		if (event.getGroupId() == WidgetID.DIALOG_OPTION_GROUP_ID) // 219
+		if (event.getGroupId() == InterfaceID.DIALOG_OPTION)
 		{
 			clientThread.invokeLater(this::highlightChoice);
 		}
@@ -245,7 +264,7 @@ public abstract class QuestStep implements Module
 
 	public void highlightChoice()
 	{
-		choices.checkChoices(client);
+		choices.checkChoices(client, lastDialogSeen);
 	}
 
 	public void setText(String text)
@@ -306,6 +325,13 @@ public abstract class QuestStep implements Module
 		}
 	}
 
+	public void addDialogConsideringLastLineCondition(String dialogString, String choiceValue)
+	{
+		DialogChoiceStep choice = new DialogChoiceStep(questHelper.getConfig(), dialogString);
+		choice.setExpectedPreviousLine(choiceValue);
+		choices.addChoice(choice);
+	}
+
 	public void addDialogChange(String choice, String newText)
 	{
 		choices.addChoice(new DialogChoiceChange(questHelper.getConfig(), choice, newText));
@@ -334,22 +360,40 @@ public abstract class QuestStep implements Module
 		widgetChoices.addChoice(new WidgetTextChange(questHelper.getConfig(), choice, groupID, childID, newText));
 	}
 
-	public void addWidgetLastLoadedCondition(String widgetValue, int widgetGroupID, int widgetChildID, String choiceValue, int choiceGroupId, int choiceChildId)
+	@Subscribe
+	public void onChatMessage(ChatMessage chatMessage)
 	{
-		WidgetLastState conditionWidget = new WidgetLastState(questHelper.getConfig(), widgetValue, widgetGroupID, widgetChildID);
-		widgetChoices.addChoice(conditionWidget);
-
-		WidgetChoiceStep newWidgetChoice = new WidgetChoiceStep(questHelper.getConfig(), choiceValue, choiceGroupId, choiceChildId);
-		newWidgetChoice.setWidgetToCheck(conditionWidget);
-		widgetChoices.addChoice(newWidgetChoice);
+		if (chatMessage.getType() == ChatMessageType.DIALOG)
+		{
+			lastDialogSeen = chatMessage.getMessage();
+		}
 	}
 
-	public void addDialogLastLoadedCondition(String widgetValue, int widgetGroupID, int widgetChildID, String choiceValue)
-	{
-		addWidgetLastLoadedCondition(widgetValue, widgetGroupID, widgetChildID, choiceValue, 219, 1);
+	public void clearWidgetHighlights() {
+		widgetsToHighlight.clear();
 	}
 
-	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
+	public void addSpellHighlight(Spell spell)
+	{
+		widgetsToHighlight.add(new SpellWidgetHighlight(spell));
+	}
+
+	public void addWidgetHighlight(int groupID, int childID)
+	{
+		widgetsToHighlight.add(new WidgetHighlight(groupID, childID));
+	}
+
+	public void addWidgetHighlight(int groupID, int childID, int childChildID)
+	{
+		widgetsToHighlight.add(new WidgetHighlight(groupID, childID, childChildID));
+	}
+
+	public void addWidgetHighlightWithItemIdRequirement(int groupID, int childID, int itemID, boolean checkChildren)
+	{
+		widgetsToHighlight.add(new WidgetHighlight(groupID, childID, itemID, checkChildren));
+	}
+
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
 	{
 		addTitleToPanel(panelComponent);
 
@@ -396,23 +440,23 @@ public abstract class QuestStep implements Module
 		this.iconItemID = iconItemID;
 	}
 
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 	}
 
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 	}
 
-	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 	}
 
-	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 	}
 
-	public void makeDirectionOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeDirectionOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 	}
 

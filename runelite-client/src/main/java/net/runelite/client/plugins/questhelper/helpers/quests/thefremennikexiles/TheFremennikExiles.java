@@ -24,19 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thefremennikexiles;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.player.InInstanceRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
@@ -50,15 +46,31 @@ import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Prayer;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_FREMENNIK_EXILES
-)
 public class TheFremennikExiles extends BasicQuestHelper
 {
 	//Items Required
@@ -105,8 +117,7 @@ public class TheFremennikExiles extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
 
@@ -208,7 +219,7 @@ public class TheFremennikExiles extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
@@ -308,7 +319,8 @@ public class TheFremennikExiles extends BasicQuestHelper
 		// 9485 0->2->1 bottom right
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		yagaHouse = new Zone(new WorldPoint(2449, 4645, 0), new WorldPoint(2453, 4649, 0));
 		lunarMine = new Zone(new WorldPoint(2300, 10313, 2), new WorldPoint(2370, 10354, 2));
@@ -322,7 +334,7 @@ public class TheFremennikExiles extends BasicQuestHelper
 			"Talk to Brundt in Rellekka's longhall.");
 		talkToBrundt.addDialogSteps("Ask for a quest.", "Yes.");
 		buyKegs = new NpcStep(this, NpcID.THORA_THE_BARKEEP, new WorldPoint(2662, 3673, 0),
-			"Buy 2 kegs of beer from Thora in Rellekka.", coins650);
+			"Buy 2 kegs of beer from Thora in Rellekka.  She will be unavailable to trade later in the quest.", coins650);
 		talkToFreygerd = new NpcStep(this, NpcID.FREYGERD_3942, new WorldPoint(2668, 3703, 0),
 			"Talk to Freygerd in north Rellekka.", combatGear, mirrorShield.equipped());
 		searchSandpit = new ObjectStep(this, NullObjectID.NULL_4373, new WorldPoint(2668, 3708, 0),
@@ -431,7 +443,7 @@ public class TheFremennikExiles extends BasicQuestHelper
 			"Enter the door, ready to fight.", combatGear, vShield.equipped());
 		enterCaveToFight.addDialogStep("Yes.");
 		fightTyphor = new NpcStep(this, NpcID.TYPHOR, new WorldPoint(2457, 10384, 0), "Fight Typhor, who attacks " +
-			"with both Melee and Magic", vShield.equipped());
+			"with both Melee and Magic. He is weak to crush.", vShield.equipped());
 		((NpcStep) fightTyphor).addAlternateNpcs(NpcID.TYPHOR_9296);
 
 		PrayerRequirement protectFromMagic = new PrayerRequirement("Protect from Magic", Prayer.PROTECT_FROM_MAGIC);

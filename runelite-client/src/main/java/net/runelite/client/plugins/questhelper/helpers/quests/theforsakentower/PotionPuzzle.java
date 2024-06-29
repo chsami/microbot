@@ -25,18 +25,26 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.theforsakentower;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.OwnerStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NullObjectID;
@@ -48,14 +56,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.components.PanelComponent;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PotionPuzzle extends QuestStep implements OwnerStep
 {
@@ -87,7 +87,11 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 
 	Requirement[] hasFluids;
 
-	DetailedQuestStep goUpLadder, goUpStairs, goDownToFirstFloor, searchPotionCupboard, inspectRefinery, readNote, getFluid, useFluidOnRefinery, activateRefinery;
+	DetailedQuestStep goUpLadder, goUpStairs, goDownToFirstFloor, searchPotionCupboard, inspectRefinery, readNote, activateRefinery;
+
+	ObjectStep useFluidOnRefineryRealStep, getFluidRealStep;
+
+	QuestStep getFluid, useFluidOnRefinery;
 
 	Zone firstFloor, basement, secondFloor;
 
@@ -143,11 +147,11 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 			{
 				if (!fluidFound)
 				{
-					getFluid.addWidgetChoice(correctFluid-1, 187, 3);
-					getFluid.setText("Take Fluid " + correctFluid + " from the table.");
+					getFluidRealStep.addWidgetChoice(correctFluid-1, 187, 3);
+					getFluidRealStep.setText("Take Fluid " + correctFluid + " from the table.");
 
-					useFluidOnRefinery.addRequirement(fluids[correctFluid]);
-					useFluidOnRefinery.addIcon(fluids[correctFluid].getId());
+					useFluidOnRefineryRealStep.addRequirement(fluids[correctFluid]);
+					useFluidOnRefineryRealStep.addIcon(fluids[correctFluid].getId());
 
 					fluidFound = true;
 				}
@@ -172,7 +176,7 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 		}
 		else
 		{
-			startUpStep(goUpStairs);
+			startUpStep(getFluid);
 		}
 	}
 
@@ -206,7 +210,7 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, List<String> additionalText, List<Requirement> requirements)
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, List<String> additionalText, List<Requirement> requirements)
 	{
 		if (currentStep != null)
 		{
@@ -215,7 +219,7 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -224,7 +228,7 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -233,7 +237,7 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -299,9 +303,11 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 		searchPotionCupboard = new ObjectStep(getQuestHelper(), ObjectID.CUPBOARD_33522, new WorldPoint(1387, 3820, 1), "Search the cupboard on the east wall.");
 		inspectRefinery = new ObjectStep(getQuestHelper(), NullObjectID.NULL_34595, new WorldPoint(1382, 3819, 1), "Inspect the refinery.");
 		inspectRefinery.addDialogStep("Yes.");
-		readNote = new DetailedQuestStep(getQuestHelper(), "Read the old notes", oldNotes);
-		getFluid = new ObjectStep(getQuestHelper(), NullObjectID.NULL_34596, new WorldPoint(1382, 3826, 1), "Attempt to take the correct fluid from the table.");
-		useFluidOnRefinery = new ObjectStep(getQuestHelper(), NullObjectID.NULL_34595, new WorldPoint(1382, 3819, 1), "Use the fluid on the refinery.");
+		readNote = new DetailedQuestStep(getQuestHelper(), "Read the old notes.", oldNotes);
+		getFluidRealStep = new ObjectStep(getQuestHelper(), NullObjectID.NULL_34596, new WorldPoint(1382, 3826, 1), "Attempt to take the correct fluid from the table.");
+		getFluid = new PuzzleWrapperStep(getQuestHelper(), getFluidRealStep, getFluidRealStep.copy());
+		useFluidOnRefineryRealStep = new ObjectStep(getQuestHelper(), NullObjectID.NULL_34595, new WorldPoint(1382, 3819, 1), "Use the fluid on the refinery.");
+		useFluidOnRefinery = new PuzzleWrapperStep(getQuestHelper(), useFluidOnRefineryRealStep, useFluidOnRefineryRealStep.copy());
 		useFluidOnRefinery.addDialogStep("Yes.");
 
 		activateRefinery = new ObjectStep(getQuestHelper(), NullObjectID.NULL_34595, new WorldPoint(1382, 3819, 1), "Activate the refinery.");

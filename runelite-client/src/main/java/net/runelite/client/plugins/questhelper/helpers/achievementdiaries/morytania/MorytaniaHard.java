@@ -24,16 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.morytania;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
@@ -41,22 +40,31 @@ import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Prayer;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.MORYTANIA_HARD
-)
 public class MorytaniaHard extends ComplexStateQuestHelper
 {
 	// Items required
-	ItemRequirement combatGear, crystalMineKey, pickaxe, coins, limestoneBrick, hammer, saw, teakPlank, lawRune,
+	ItemRequirement combatGear, pickaxe, coins, limestoneBrick, hammer, saw, teakPlank, lawRune,
 		bloodRune, noseProtection, watermelonSeeds, seedDibber, rake, axe, tinderbox, witchwoodIcon, lightSource,
 		mushroomSpore, spade, mahoLogs;
 
@@ -87,8 +95,7 @@ public class MorytaniaHard extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doHard = new ConditionalStep(this, claimReward);
@@ -142,7 +149,7 @@ public class MorytaniaHard extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notKharyrll = new VarplayerRequirement(1180, false, 23);
 		notAdvancedSpikes = new VarplayerRequirement(1180, false, 24);
@@ -156,8 +163,6 @@ public class MorytaniaHard extends ComplexStateQuestHelper
 		notMithOre = new VarplayerRequirement(1181, false, 2);
 
 		piety = new PrayerRequirement("Piety activated", Prayer.PIETY);
-
-		crystalMineKey = new KeyringRequirement(configManager, KeyringCollection.CRYSTAL_MINE_KEY).showConditioned(notMithOre).isNotConsumed();
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.PICKAXES).showConditioned(notMithOre).isNotConsumed();
 		coins = new ItemRequirement("Coins", ItemCollections.COINS).showConditioned(notKharyrll);
 		limestoneBrick = new ItemRequirement("Limestone brick", ItemID.LIMESTONE_BRICK).showConditioned(notKharyrll);
@@ -223,7 +228,8 @@ public class MorytaniaHard extends ComplexStateQuestHelper
 		desertTreasure = new QuestRequirement(QuestHelperQuest.DESERT_TREASURE, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		hauntedMine1 = new Zone(new WorldPoint(3400, 9662, 0), new WorldPoint(3439, 9614, 0));
 		hauntedMine2 = new Zone(new WorldPoint(2767, 4605, 0), new WorldPoint(2817, 4556, 0));
@@ -240,11 +246,10 @@ public class MorytaniaHard extends ComplexStateQuestHelper
 	{
 		moveToMine = new ObjectStep(this, ObjectID.CART_TUNNEL, new WorldPoint(3440, 3232, 0),
 			"Enter the haunted mine.");
-		mithOre = new ObjectStep(this, ObjectID.MITHRIL_ORE_VEIN_20419, new WorldPoint(2786, 4599, 0),
-			"Mine the mithril ore. You may need to kill or juke the possessed pickaxes in the area.", pickaxe,
-			crystalMineKey);
-		moveToLevelTwo = new ObjectStep(this, ObjectID.LADDER_4965, new WorldPoint(3413, 9633, 0),
-			"Climb down the ladder that leads to the lower level.");
+		mithOre = new ObjectStep(this, ObjectID.MITHRIL_ORE_VEIN_20419, new WorldPoint(2806, 4439, 0),
+			"Mine the mithril ore in the north-east of the area.", pickaxe);
+		moveToLevelTwo = new ObjectStep(this, ObjectID.CART_TUNNEL_29332, new WorldPoint(3435, 9634, 0),
+			"Enter the mine cart shaft by the entrance, directly south of you.");
 
 		moveToGrotto = new ObjectStep(this, ObjectID.GROTTO, new WorldPoint(3440, 3337, 0),
 			"Enter the grotto tree in Mort Myre Swamp.");
@@ -317,7 +322,7 @@ public class MorytaniaHard extends ComplexStateQuestHelper
 	{
 		return Arrays.asList(combatGear, coins.quantity(100000), limestoneBrick.quantity(2), hammer, saw,
 			teakPlank.quantity(3), lawRune.quantity(200), bloodRune.quantity(100), watermelonSeeds.quantity(3), seedDibber, spade, rake, axe,
-			tinderbox, witchwoodIcon, lightSource, mushroomSpore, pickaxe, crystalMineKey);
+			tinderbox, witchwoodIcon, lightSource, mushroomSpore, pickaxe);
 	}
 
 	@Override
@@ -402,7 +407,7 @@ public class MorytaniaHard extends ComplexStateQuestHelper
 		allSteps.add(watermelonsSteps);
 
 		PanelDetails mithSteps = new PanelDetails("Haunted Mithril Ore", Arrays.asList(moveToMine, moveToLevelTwo,
-			mithOre), new SkillRequirement(Skill.MINING, 55, true), hauntedMine, pickaxe, crystalMineKey);
+			mithOre), new SkillRequirement(Skill.MINING, 55, true), hauntedMine, pickaxe);
 		mithSteps.setDisplayCondition(notMithOre);
 		mithSteps.setLockingStep(mithOreTask);
 		allSteps.add(mithSteps);

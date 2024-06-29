@@ -25,13 +25,12 @@
 package net.runelite.client.plugins.questhelper.panel.questorders;
 
 import com.google.common.collect.ImmutableList;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import lombok.Getter;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
+import lombok.Getter;
 
 public class QuestOrders
 {
@@ -45,12 +44,13 @@ public class QuestOrders
 		QuestHelperQuest.PRINCE_ALI_RESCUE,
 		QuestHelperQuest.THE_RESTLESS_GHOST,
 		QuestHelperQuest.RUNE_MYSTERIES,
-		//QuestHelperQuest.STRONGHOLD_OF_SECURITY - Placeholder for future addition.
+		QuestHelperQuest.STRONGHOLD_OF_SECURITY,
 		QuestHelperQuest.IMP_CATCHER,
 		QuestHelperQuest.WITCHS_POTION,
 		QuestHelperQuest.GERTRUDES_CAT,
-		// https://oldschool.runescape.wiki/w/Natural_history_quiz
+		// QuestHelperQuest.NATURAL_HITORY_QUIZ - Placeholder for future addition.
 		QuestHelperQuest.DADDYS_HOME,
+		QuestHelperQuest.CHILDREN_OF_THE_SUN,
 		QuestHelperQuest.DWARF_CANNON,
 		QuestHelperQuest.WATERFALL_QUEST,
 		QuestHelperQuest.TREE_GNOME_VILLAGE,
@@ -110,6 +110,7 @@ public class QuestOrders
 		QuestHelperQuest.RECIPE_FOR_DISASTER_DWARF,
 		QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG,
 		QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG,
+		// QuestHelperQuest.VARROCK_MUSEUM_KUDOS, - Placeholder for future addition.
 		QuestHelperQuest.BONE_VOYAGE,
 		QuestHelperQuest.WATCHTOWER,
 		QuestHelperQuest.THE_GIANT_DWARF,
@@ -133,8 +134,8 @@ public class QuestOrders
 		QuestHelperQuest.SPIRITS_OF_THE_ELID,
 		QuestHelperQuest.GARDEN_OF_TRANQUILLITY,
 		QuestHelperQuest.ENLIGHTENED_JOURNEY,
-		//QuestHelperQuest.BALLOON_TRANSPORT_CRAFTING_GUILD - Placeholder for addition in future.
-		//QuestHelperQuest.BALLOON_TRANSPORT_VARROCK - Placeholder for later addition.
+		QuestHelperQuest.BALLOON_TRANSPORT_CRAFTING_GUILD,
+		QuestHelperQuest.BALLOON_TRANSPORT_VARROCK,
 		QuestHelperQuest.ROMEO__JULIET,
 		QuestHelperQuest.TEARS_OF_GUTHIX,
 		QuestHelperQuest.IN_SEARCH_OF_THE_MYREQUE,
@@ -152,6 +153,7 @@ public class QuestOrders
 		QuestHelperQuest.RECIPE_FOR_DISASTER_EVIL_DAVE,
 		QuestHelperQuest.RECIPE_FOR_DISASTER_PIRATE_PETE,
 		QuestHelperQuest.TAI_BWO_WANNAI_TRIO,
+		QuestHelperQuest.KANDARIN_EASY,
 		QuestHelperQuest.CONTACT,
 		QuestHelperQuest.TEMPLE_OF_IKOV,
 		QuestHelperQuest.THE_EYES_OF_GLOUPHRIE,
@@ -161,7 +163,6 @@ public class QuestOrders
 		QuestHelperQuest.TALE_OF_THE_RIGHTEOUS,
 		QuestHelperQuest.WILDERNESS_EASY,
 		QuestHelperQuest.DESERT_EASY,
-		QuestHelperQuest.KANDARIN_EASY,
 		QuestHelperQuest.FALADOR_EASY,
 		QuestHelperQuest.LUMBRIDGE_EASY,
 		QuestHelperQuest.MORYTANIA_EASY,
@@ -171,9 +172,9 @@ public class QuestOrders
 		QuestHelperQuest.WESTERN_EASY,
 		QuestHelperQuest.BETWEEN_A_ROCK,
 		QuestHelperQuest.THE_FORSAKEN_TOWER,
-		QuestHelperQuest.ARCHITECTURAL_ALLIANCE,
 		QuestHelperQuest.THE_SLUG_MENACE,
 		QuestHelperQuest.GETTING_AHEAD,
+		// QuestHelperQuest.MUSEUM_CAMP, - Placeholder for future addition.
 		QuestHelperQuest.COLD_WAR,
 		QuestHelperQuest.THE_HAND_IN_THE_SAND,
 		QuestHelperQuest.ENAKHRAS_LAMENT,
@@ -205,6 +206,8 @@ public class QuestOrders
 		QuestHelperQuest.OLAFS_QUEST,
 		QuestHelperQuest.A_KINGDOM_DIVIDED,
 		QuestHelperQuest.A_TASTE_OF_HOPE,
+		QuestHelperQuest.AT_FIRST_LIGHT,
+		QuestHelperQuest.BALLOON_TRANSPORT_CASTLE_WARS,
 		QuestHelperQuest.ARDOUGNE_MEDIUM,
 		QuestHelperQuest.DESERT_MEDIUM,
 		QuestHelperQuest.FALADOR_MEDIUM,
@@ -215,17 +218,23 @@ public class QuestOrders
 		QuestHelperQuest.MORYTANIA_MEDIUM,
 		QuestHelperQuest.VARROCK_MEDIUM,
 		QuestHelperQuest.WESTERN_MEDIUM,
-		//QuestHelperQuest.BALLOON_TRANSPORT_CASTLE_WARS - Placeholder for later addition.
 		QuestHelperQuest.CURSE_OF_THE_EMPTY_LORD,
 		QuestHelperQuest.THE_GENERALS_SHADOW,
+		QuestHelperQuest.HIS_FAITHFUL_SERVANTS,
 		QuestHelperQuest.THE_GREAT_BRAIN_ROBBERY,
 		QuestHelperQuest.FAIRYTALE_II__CURE_A_QUEEN,
 		QuestHelperQuest.RECIPE_FOR_DISASTER_MONKEY_AMBASSADOR,
 		QuestHelperQuest.RECIPE_FOR_DISASTER_FINALE,
+		QuestHelperQuest.TWILIGHTS_PROMISE,
+		QuestHelperQuest.PERILOUS_MOON,
+		QuestHelperQuest.THE_RIBBITING_TALE_OF_A_LILY_PAD_LABOUR_DISPUTE,
+		QuestHelperQuest.THE_PATH_OF_GLOUPHRIE,
 		QuestHelperQuest.LUNAR_DIPLOMACY,
 		QuestHelperQuest.KINGS_RANSOM,
 		QuestHelperQuest.KNIGHT_WAVES_TRAINING_GROUNDS,
 		QuestHelperQuest.SWAN_SONG,
+		QuestHelperQuest.BELOW_ICE_MOUNTAIN,
+		QuestHelperQuest.DEFENDER_OF_VARROCK,
 		QuestHelperQuest.DEVIOUS_MINDS,
 		QuestHelperQuest.GRIM_TALES,
 		QuestHelperQuest.DREAM_MENTOR,
@@ -233,22 +242,20 @@ public class QuestOrders
 		QuestHelperQuest.WILDERNESS_MEDIUM,
 		QuestHelperQuest.THE_FREMENNIK_EXILES,
 		QuestHelperQuest.SINS_OF_THE_FATHER,
-		//QuestHelperQuest.BALLOON_TRANSPORT_GRAND_TREE - Placeholder for later addition.
+		QuestHelperQuest.BALLOON_TRANSPORT_GRAND_TREE,
 		QuestHelperQuest.IN_SEARCH_OF_KNOWLEDGE,
 		QuestHelperQuest.HOPESPEARS_WILL,
 		QuestHelperQuest.BENEATH_CURSED_SANDS,
-		QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM,
 		QuestHelperQuest.MONKEY_MADNESS_II,
 		//QuestHelperQuest.INTO_THE_TOMBS, - Placeholder for later addition. (Miniquest)
 		QuestHelperQuest.A_NIGHT_AT_THE_THEATRE,
 		QuestHelperQuest.DRAGON_SLAYER_II,
+		QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM,
 		QuestHelperQuest.SECRETS_OF_THE_NORTH,
-		//QuestHelperQuest.SECRETS_OF_THE_NORTH, - Placeholder for later addition.
+		QuestHelperQuest.DESERT_TREASURE_II,
 		QuestHelperQuest.SONG_OF_THE_ELVES,
 		QuestHelperQuest.CLOCK_TOWER,
 		QuestHelperQuest.THE_CORSAIR_CURSE,
-		QuestHelperQuest.BELOW_ICE_MOUNTAIN,
-
 		// Remaining section is unordered as not part of list on https://oldschool.runescape.wiki/w/Optimal_quest_guide
 		QuestHelperQuest.BEAR_YOUR_SOUL,
 		QuestHelperQuest.ENCHANTED_KEY,
@@ -292,8 +299,11 @@ public class QuestOrders
 		QuestHelperQuest.IMP_CATCHER,
 		QuestHelperQuest.CLIENT_OF_KOUREND,
 		QuestHelperQuest.ROMEO__JULIET,
+		QuestHelperQuest.STRONGHOLD_OF_SECURITY,
 		QuestHelperQuest.GERTRUDES_CAT,
 		QuestHelperQuest.DADDYS_HOME,
+		// QuestHelperQuest.NATURAL_HITORY_QUIZ - Placeholder for future addition.
+		QuestHelperQuest.CHILDREN_OF_THE_SUN,
 		QuestHelperQuest.RUNE_MYSTERIES,
 		QuestHelperQuest.TREE_GNOME_VILLAGE,
 		QuestHelperQuest.MONKS_FRIEND,
@@ -411,6 +421,7 @@ public class QuestOrders
 		QuestHelperQuest.SKIPPY_AND_THE_MOGRES,
 		QuestHelperQuest.RAG_AND_BONE_MAN_II,
 		QuestHelperQuest.LAIR_OF_TARN_RAZORLOR,
+		QuestHelperQuest.THE_GARDEN_OF_DEATH,
 		QuestHelperQuest.RUM_DEAL,
 		QuestHelperQuest.PIRATES_TREASURE,
 		QuestHelperQuest.CABIN_FEVER,
@@ -423,7 +434,9 @@ public class QuestOrders
 		QuestHelperQuest.DESERT_TREASURE,
 		QuestHelperQuest.CURSE_OF_THE_EMPTY_LORD,
 		QuestHelperQuest.THE_GENERALS_SHADOW,
+		QuestHelperQuest.HIS_FAITHFUL_SERVANTS,
 		QuestHelperQuest.A_TASTE_OF_HOPE,
+		QuestHelperQuest.AT_FIRST_LIGHT,
 		QuestHelperQuest.FAMILY_CREST,
 		QuestHelperQuest.LEGENDS_QUEST,
 		QuestHelperQuest.RECIPE_FOR_DISASTER_SIR_AMIK_VARZE,
@@ -447,7 +460,6 @@ public class QuestOrders
 		QuestHelperQuest.FAIRYTALE_II__CURE_A_QUEEN,
 		QuestHelperQuest.TALE_OF_THE_RIGHTEOUS,
 		QuestHelperQuest.THE_FORSAKEN_TOWER,
-		QuestHelperQuest.ARCHITECTURAL_ALLIANCE,
 		QuestHelperQuest.A_KINGDOM_DIVIDED,
 		QuestHelperQuest.RECIPE_FOR_DISASTER_MONKEY_AMBASSADOR,
 		QuestHelperQuest.REGICIDE,
@@ -459,7 +471,11 @@ public class QuestOrders
 		QuestHelperQuest.KINGS_RANSOM,
 		QuestHelperQuest.KNIGHT_WAVES_TRAINING_GROUNDS,
 		QuestHelperQuest.SWAN_SONG,
+		QuestHelperQuest.DEFENDER_OF_VARROCK,
 		QuestHelperQuest.RECIPE_FOR_DISASTER_FINALE,
+		QuestHelperQuest.TWILIGHTS_PROMISE,
+		QuestHelperQuest.PERILOUS_MOON,
+		QuestHelperQuest.THE_RIBBITING_TALE_OF_A_LILY_PAD_LABOUR_DISPUTE,
 		QuestHelperQuest.GRIM_TALES,
 		QuestHelperQuest.DREAM_MENTOR,
 		QuestHelperQuest.WILDERNESS_MEDIUM,
@@ -468,6 +484,7 @@ public class QuestOrders
 		QuestHelperQuest.LUMBRIDGE_MEDIUM,
 		QuestHelperQuest.MORYTANIA_MEDIUM,
 		QuestHelperQuest.DEVIOUS_MINDS,
+		QuestHelperQuest.THE_PATH_OF_GLOUPHRIE,
 		QuestHelperQuest.THE_FREMENNIK_EXILES,
 		QuestHelperQuest.SINS_OF_THE_FATHER,
 		QuestHelperQuest.BENEATH_CURSED_SANDS,
@@ -478,19 +495,20 @@ public class QuestOrders
 		QuestHelperQuest.DRAGON_SLAYER_II,
 		QuestHelperQuest.SECRETS_OF_THE_NORTH,
 		QuestHelperQuest.SONG_OF_THE_ELVES,
+		QuestHelperQuest.DESERT_TREASURE_II,
 		QuestHelperQuest.THE_CORSAIR_CURSE,
 
 		// Remaining section is unordered as not part of list on https://oldschool.runescape.wiki/w/Optimal_quest_guide/Ironman
 
-		//QuestHelperQuest.STRONGHOLD_OF_SECURITY - Placeholder for future addition.
-		//QuestHelperQuest.BALLOON_TRANSPORT_CRAFTING_GUILD - Placeholder for addition in future.
-		//QuestHelperQuest.BALLOON_TRANSPORT_GRAND_TREE - Placeholder for later addition.
-		//QuestHelperQuest.BALLOON_TRANSPORT_VARROCK - Placeholder for later addition.
-		//QuestHelperQuest.BALLOON_TRANSPORT_CASTLE_WARS - Placeholder for later addition.
+		QuestHelperQuest.BALLOON_TRANSPORT_CRAFTING_GUILD,
+		QuestHelperQuest.BALLOON_TRANSPORT_GRAND_TREE,
+		QuestHelperQuest.BALLOON_TRANSPORT_VARROCK,
+		QuestHelperQuest.BALLOON_TRANSPORT_CASTLE_WARS,
 		//QuestHelperQuest.INTO_THE_TOMBS, - Placeholder for later addition. (Miniquest)
 		//QuestHelperQuest.THE_FROZEN_DOOR, - Placeholder for future addition. (Miniquest)
-		//QuestHelperQuest.SECRETS_OF_THE_NORTH, - Placeholder for later addition.
-		QuestHelperQuest.THE_GARDEN_OF_DEATH,
+		//QuestHelperQuest.VARROCK_MUSEUM_KUDOS, - Placeholder for future addition.
+		//QuestHelperQuest.MUSEUM_CAMP, - Placeholder for future addition.
+		//QuestHelperQuest.VARROCK_MUSEUM_KUDOS_II - Placeholder for future addition.
 		QuestHelperQuest.IN_SEARCH_OF_KNOWLEDGE,
 		QuestHelperQuest.BEAR_YOUR_SOUL,
 		QuestHelperQuest.ENCHANTED_KEY,
@@ -628,7 +646,6 @@ public class QuestOrders
 		QuestHelperQuest.ENAKHRAS_LAMENT,
 		QuestHelperQuest.CABIN_FEVER,
 		QuestHelperQuest.FAIRYTALE_I__GROWING_PAINS,
-		QuestHelperQuest.RECIPE_FOR_DISASTER,
 		QuestHelperQuest.RECIPE_FOR_DISASTER_START,
 		QuestHelperQuest.RECIPE_FOR_DISASTER_DWARF,
 		QuestHelperQuest.RECIPE_FOR_DISASTER_WARTFACE_AND_BENTNOZE,
@@ -677,6 +694,7 @@ public class QuestOrders
 		QuestHelperQuest.DRAGON_SLAYER_II,
 		QuestHelperQuest.TALE_OF_THE_RIGHTEOUS,
 		QuestHelperQuest.A_TASTE_OF_HOPE,
+		QuestHelperQuest.AT_FIRST_LIGHT,
 		QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM,
 		QuestHelperQuest.THE_FORSAKEN_TOWER,
 		QuestHelperQuest.THE_ASCENT_OF_ARCEUUS,
@@ -694,7 +712,8 @@ public class QuestOrders
 		QuestHelperQuest.BENEATH_CURSED_SANDS,
 		QuestHelperQuest.SLEEPING_GIANTS,
 		QuestHelperQuest.THE_GARDEN_OF_DEATH,
-		//QuestHelperQuest.SECRETS_OF_THE_NORTH, - Placeholder for future addition
+		QuestHelperQuest.SECRETS_OF_THE_NORTH,
+		QuestHelperQuest.THE_PATH_OF_GLOUPHRIE,
 		// Miniquests
 		QuestHelperQuest.ALFRED_GRIMHANDS_BARCRAWL,
 		QuestHelperQuest.THE_MAGE_ARENA,
@@ -704,7 +723,6 @@ public class QuestOrders
 		QuestHelperQuest.ENCHANTED_KEY,
 		QuestHelperQuest.LAIR_OF_TARN_RAZORLOR,
 		QuestHelperQuest.THE_GENERALS_SHADOW,
-		QuestHelperQuest.ARCHITECTURAL_ALLIANCE,
 		QuestHelperQuest.BEAR_YOUR_SOUL,
 		QuestHelperQuest.FAMILY_PEST,
 		QuestHelperQuest.THE_MAGE_ARENA_II,
@@ -713,7 +731,15 @@ public class QuestOrders
 		//QuestHelperQuest.THE_FROZEN_DOOR, - Placeholder for future addition.
 		QuestHelperQuest.HOPESPEARS_WILL,
 		//QuestHelperQuest.INTO_THE_TOMBS, - Placeholder for future addition.
-		QuestHelperQuest.SECRETS_OF_THE_NORTH
+		QuestHelperQuest.SECRETS_OF_THE_NORTH,
+		QuestHelperQuest.HIS_FAITHFUL_SERVANTS,
+		QuestHelperQuest.DESERT_TREASURE_II,
+		QuestHelperQuest.CHILDREN_OF_THE_SUN,
+		QuestHelperQuest.DEFENDER_OF_VARROCK,
+		QuestHelperQuest.TWILIGHTS_PROMISE,
+		QuestHelperQuest.AT_FIRST_LIGHT,
+		QuestHelperQuest.PERILOUS_MOON,
+		QuestHelperQuest.THE_RIBBITING_TALE_OF_A_LILY_PAD_LABOUR_DISPUTE
 	);
 
 	public static String normalizeQuestName(String questName)

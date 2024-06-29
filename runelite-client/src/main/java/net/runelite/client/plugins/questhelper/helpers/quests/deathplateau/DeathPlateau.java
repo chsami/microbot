@@ -24,37 +24,41 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.deathplateau;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.DEATH_PLATEAU
-)
 public class DeathPlateau extends BasicQuestHelper
 {
 	//Items Recommended
@@ -81,8 +85,7 @@ public class DeathPlateau extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -143,7 +146,7 @@ public class DeathPlateau extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		asgarnianAle = new ItemRequirement("Asgarnian ale", ItemID.ASGARNIAN_ALE);
 
@@ -180,7 +183,8 @@ public class DeathPlateau extends BasicQuestHelper
 		gamesNecklace = new ItemRequirement("Games necklace", ItemCollections.GAMES_NECKLACES);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		castleDownstairs = new Zone(new WorldPoint(2893, 3558, 0), new WorldPoint(2904, 3569, 0));
 		castleUpstairs = new Zone(new WorldPoint(2891, 3556, 1), new WorldPoint(2906, 3571, 1));
@@ -252,11 +256,21 @@ public class DeathPlateau extends BasicQuestHelper
 
 		readIou = new DetailedQuestStep(this, "Read the IOU, and then keep the Combination for the end of the quest.", iouHighlight);
 
-		placeRedStone = new ObjectStep(this, ObjectID.STONE_MECHANISM_3677, new WorldPoint(2894, 3563, 0), "Use the red stone on the mechanism.", redStone);
-		placeBlueStone = new ObjectStep(this, ObjectID.STONE_MECHANISM, new WorldPoint(2894, 3562, 0), "Use the blue stone on the mechanism.", blueStone);
-		placeYellowStone = new ObjectStep(this, ObjectID.STONE_MECHANISM, new WorldPoint(2895, 3562, 0), "Use the yellow stone on the mechanism.", yellowStone);
-		placePinkStone = new ObjectStep(this, ObjectID.STONE_MECHANISM_3677, new WorldPoint(2895, 3563, 0), "Use the pink stone on the mechanism.", pinkStone);
-		placeGreenStone = new ObjectStep(this, ObjectID.STONE_MECHANISM, new WorldPoint(2895, 3564, 0), "Use the green stone on the mechanism.", greenStone);
+		placeRedStone = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.STONE_MECHANISM_3677, new WorldPoint(2894, 3563, 0), "Use the red stone on the mechanism.", redStone),
+			"Work out where to place the red stone on the mechanism.");
+		placeBlueStone = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.STONE_MECHANISM, new WorldPoint(2894, 3562, 0), "Use the blue stone on the mechanism.", blueStone),
+			"Work out where to place the red stone on the mechanism.");
+		placeYellowStone = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.STONE_MECHANISM, new WorldPoint(2895, 3562, 0), "Use the yellow stone on the mechanism.", yellowStone),
+			"Work out where to place the red stone on the mechanism.");
+		placePinkStone = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.STONE_MECHANISM_3677, new WorldPoint(2895, 3563, 0), "Use the pink stone on the mechanism.", pinkStone),
+			"Work out where to place the red stone on the mechanism.");
+		placeGreenStone = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.STONE_MECHANISM, new WorldPoint(2895, 3564, 0), "Use the green stone on the mechanism.", greenStone),
+			"Work out where to place the red stone on the mechanism.");
 		placeStones = new DetailedQuestStep(this, new WorldPoint(2896, 3563, 0), "Go back to Burthorpe castle, and place the coloured stone balls in the correct spots on the mechanism.");
 		placeStones.addSubSteps(placeRedStone, placeBlueStone, placeYellowStone, placePinkStone, placeGreenStone);
 
@@ -278,7 +292,7 @@ public class DeathPlateau extends BasicQuestHelper
 
 		talkToTenzing2 = new NpcStep(this, NpcID.TENZING, new WorldPoint(2820, 3555, 0), "Bring the spiked boots, along with (unnoted) 10 bread and 10 trout to Tenzing.", spikedBoots, bread, trout);
 
-		goNorth = new DetailedQuestStep(this, new WorldPoint(2865, 3609, 0), "Exit Tenzing's house through the north door, and go north, past the Death Plateau warning, and around to the east until you stop and say you've went far enough.", secretMap);
+		goNorth = new DetailedQuestStep(this, new WorldPoint(2865, 3609, 0), "Exit Tenzing's house through the north door, and go north, past the Death Plateau warning, and around to the east until you stop and say you've gone far enough.", secretMap);
 
 		goToHaroldStairs3 = new ObjectStep(this, ObjectID.STAIRCASE_15645, new WorldPoint(2915, 3540, 0), "If you lost the Combination, retrieve it from Harold.");
 		goToHaroldDoor3 = new ObjectStep(this, ObjectID.DOOR_3747, new WorldPoint(2906, 3543, 1), "If you lost the Combination, retrieve it from Harold.");

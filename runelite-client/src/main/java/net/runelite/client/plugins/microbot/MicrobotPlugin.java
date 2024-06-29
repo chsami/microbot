@@ -22,13 +22,13 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
-import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
@@ -77,12 +77,10 @@ public class MicrobotPlugin extends Plugin {
     private SpriteManager spriteManager;
     @Inject
     private WorldMapOverlay worldMapOverlay;
-
     @Inject
-    private Rs2NpcManager rs2NpcManager;
+    private InfoBoxManager infoBoxManager;
     @Inject
     private WorldMapPointManager worldMapPointManager;
-
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -97,7 +95,9 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setSpriteManager(spriteManager);
         Microbot.setPluginManager(pluginManager);
         Microbot.setWorldMapOverlay(worldMapOverlay);
+        Microbot.setInfoBoxManager(infoBoxManager);
         Microbot.setWorldMapPointManager(worldMapPointManager);
+        Microbot.setChatMessageManager(chatMessageManager);
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }

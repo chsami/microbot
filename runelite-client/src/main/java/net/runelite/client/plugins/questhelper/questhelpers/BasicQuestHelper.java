@@ -24,16 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.questhelpers;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
 public abstract class BasicQuestHelper extends QuestHelper
 {
@@ -50,7 +49,7 @@ public abstract class BasicQuestHelper extends QuestHelper
 	}
 
 	@Override
-	public void startUp(MQuestHelperConfig config)
+	public void startUp(QuestHelperConfig config)
 	{
 		steps = loadSteps();
 		this.config = config;
@@ -69,7 +68,7 @@ public abstract class BasicQuestHelper extends QuestHelper
 	@Override
 	public boolean updateQuest()
 	{
-		if (var < getVar())
+		if (var != getVar())
 		{
 			var = getVar();
 			shutDownStep();
@@ -87,9 +86,4 @@ public abstract class BasicQuestHelper extends QuestHelper
 	}
 
 	public abstract Map<Integer, QuestStep> loadSteps();
-
-	protected Requirement nor(Requirement... condition)
-	{
-		return new Conditions(LogicType.NOR, condition);
-	}
 }

@@ -151,4 +151,6 @@
 2768 10002 0	2770 10002 0	Jump-over Strange floor 16544	81 Agility				
 2770 10002 0	2768 10002 0	Jump-over Strange floor 16544	81 Agility				
 3500 9510 2	3506 9505 2	Squeeze-through Crevice 16465	86 Agility				
-3506 9505 2	3500 9510 2	Squeeze-through Crevice 16465	86 Agility				
+3506 9505 2	3500 9510 2	Squeeze-through Crevice 16465	86 Agility
+3308 3491 0	3308 3493 0	Climb-over Broken fence 2618
+3308 3493 0	3308 3491 0	Climb-over Broken fence 2618

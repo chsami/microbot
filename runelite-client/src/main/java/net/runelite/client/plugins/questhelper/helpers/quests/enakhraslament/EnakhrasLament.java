@@ -24,35 +24,43 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.enakhraslament;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Spellbook;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Prayer;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.ENAKHRAS_LAMENT
-)
 public class EnakhrasLament extends BasicQuestHelper
 {
 	//Items Required
@@ -83,8 +91,7 @@ public class EnakhrasLament extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -176,7 +183,7 @@ public class EnakhrasLament extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.PICKAXES).isNotConsumed();
 		chiselHighlighted = new ItemRequirement("Chisel", ItemID.CHISEL).isNotConsumed();
@@ -263,7 +270,8 @@ public class EnakhrasLament extends BasicQuestHelper
 		onNormals = new SpellbookRequirement(Spellbook.NORMAL);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		templeEntranceRoom = new Zone(new WorldPoint(3124, 9328, 1), new WorldPoint(3128, 9330, 1));
 		templeGroundFloor = new Zone(new WorldPoint(3074, 9282, 0), new WorldPoint(3133, 9341, 0));
@@ -299,8 +307,8 @@ public class EnakhrasLament extends BasicQuestHelper
 
 		openedDoor1 = new VarbitRequirement(1608, 1);
 		openedDoor2 = new VarbitRequirement(1609, 1);
-		openedDoor3 = new VarbitRequirement(1610, 1);
-		openedDoor4 = new VarbitRequirement(1611, 1);
+		openedDoor3 = new VarbitRequirement(1607, 1);
+		openedDoor4 = new VarbitRequirement(1610, 1);
 
 		zPlaced = new VarbitRequirement(1611, 1);
 		mPlaced = new VarbitRequirement(1612, 1);
@@ -329,7 +337,7 @@ public class EnakhrasLament extends BasicQuestHelper
 
 	public void setupSteps()
 	{
-		talkToLazim = new NpcStep(this, NpcID.LAZIM, new WorldPoint(3190, 2925, 0), "Talk to Lazim in the quarry south of the Bandit Camp.", pickaxe, onNormals);
+		talkToLazim = new NpcStep(this, NpcID.LAZIM, new WorldPoint(3190, 2925, 0), "Before you begin, ensure that you have enough prayer points to use Protect from Melee for around five seconds (you will need this later in the temple). Talk to Lazim in the quarry south of the Bandit Camp.", pickaxe, onNormals);
 		talkToLazim.addDialogStep("Of course!");
 		bringLazim32Sandstone = new NpcStep(this, NpcID.LAZIM, new WorldPoint(3190, 2925, 0), "Get 32kg of sandstone and give it to Lazim. This can be done in batches, and you can mine some nearby.");
 		bringLazim32Sandstone.addDialogStep("Okay, I'll get on with it.");
@@ -394,8 +402,8 @@ public class EnakhrasLament extends BasicQuestHelper
 
 		goUpToPuzzles = new ObjectStep(this, ObjectID.LADDER_11041, new WorldPoint(3104, 9309, 0), "Open the central room's doors using the metal letters. Go up the ladder in the central room.");
 
-			useSoftClayOnPedestal = new ObjectStep(this, NullObjectID.NULL_10987, new WorldPoint(3104, 9312, 1),
-				"Use soft clay on the pedestal.", softClay.highlighted());
+		useSoftClayOnPedestal = new ObjectStep(this, NullObjectID.NULL_10987, new WorldPoint(3104, 9312, 1),
+			"Use soft clay on the pedestal.", softClay.highlighted());
 		useChiselOnGranite = new DetailedQuestStep(this, "Use a chisel on granite (5kg).", granite, chiselHighlighted);
 		useStoneHeadOnPedestal = new ObjectStep(this, NullObjectID.NULL_10987, new WorldPoint(3104, 9312, 1), "Use the camel stone head on the pedestal.", camelHead);
 		useStoneHeadOnPedestal.addIcon(ItemID.STONE_HEAD_7002);
@@ -433,8 +441,11 @@ public class EnakhrasLament extends BasicQuestHelper
 		useChiselOnWall = new ObjectStep(this, NullObjectID.NULL_11027, new WorldPoint(3107, 9291, 1), "Use a chisel on the wall.", chiselHighlighted);
 		useChiselOnWall.addDialogSteps("Of course, I'll help you out.", "Okay, I'll start building.");
 		useChiselOnWall.addIcon(ItemID.CHISEL);
+		repairWall.addSubSteps(useChiselOnWall);
 
 		talkToAkthankos = new NpcStep(this, NpcID.BONEGUARD_3577, new WorldPoint(3105, 9297, 1), "Talk to the Boneguard to finish the quest.");
+		((NpcStep) talkToAkthankos).addAlternateNpcs(NpcID.AKTHANAKOS);
+
 	}
 
 	@Override
@@ -519,7 +530,7 @@ public class EnakhrasLament extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Explore the ground floor", Arrays.asList(talkToLazimInTemple, cutOffLimb, takeM, enterDoor1, enterDoor2, enterMDoor, goUpToPuzzles)));
 		allSteps.add(new PanelDetails("Solve the puzzles", Arrays.asList(useSoftClayOnPedestal, useChiselOnGranite, useStoneHeadOnPedestal, useBread, castFireSpell, castAirSpell,
 			useLog, useOakLog, useWillowLog, useMapleLog, useCandle, useCoal)));
-		allSteps.add(new PanelDetails("Free Akthankos", Arrays.asList(passBarrier, goUpFromPuzzleRoom, castCrumbleUndead, goDownToFinalRoom, protectThenTalk, repairWall)));
+		allSteps.add(new PanelDetails("Free Akthankos", Arrays.asList(passBarrier, goUpFromPuzzleRoom, castCrumbleUndead, goDownToFinalRoom, protectThenTalk, repairWall, talkToAkthankos)));
 
 		return allSteps;
 	}

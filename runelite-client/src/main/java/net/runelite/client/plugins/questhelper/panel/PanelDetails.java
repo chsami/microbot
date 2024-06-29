@@ -29,10 +29,13 @@ import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Collection;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.*;
 
 public class PanelDetails
 {
@@ -94,6 +97,7 @@ public class PanelDetails
 		setHideCondition(new Conditions(LogicType.NOR, req));
 	}
 
+	/* Set the states of the quest the steps in the sidebar should be active */
 	public void setVars(Integer... vars)
 	{
 		this.vars = Arrays.asList(vars);

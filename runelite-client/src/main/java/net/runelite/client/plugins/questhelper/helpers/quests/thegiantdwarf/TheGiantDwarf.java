@@ -24,41 +24,48 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thegiantdwarf;
 
-import net.runelite.client.plugins.questhelper.*;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarPlayer;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.WeightRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.util.Spellbook;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetInfo;
-
-import java.util.*;
+import net.runelite.api.widgets.ComponentID;
 
 @SuppressWarnings("CheckStyle")
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_GIANT_DWARF
-)
 public class TheGiantDwarf extends BasicQuestHelper
 {
 	//Items Required
@@ -92,16 +99,16 @@ public class TheGiantDwarf extends BasicQuestHelper
 	Zone keldagrim, keldagrim2, trollRoom, dwarfEntrance, consortium;
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		// Required
 		coins2500 = new ItemRequirement("coins", ItemCollections.COINS, 2500);
 		coins2500.setTooltip("Bring more to be safe.");
 		coins200 = new ItemRequirement("Coins", ItemCollections.COINS, 200);
 		logs = new ItemRequirement("Logs", ItemID.LOGS);
-		logs.setTooltip("Most logs will work, however, arctic pine logs do not work.");
+		logs.setTooltip("Most logs will work, however, arctic pine logs and redwood logs do not work.");
 		logs.addAlternates(ItemID.OAK_LOGS, ItemID.WILLOW_LOGS, ItemID.TEAK_LOGS, ItemID.MAPLE_LOGS,
-			ItemID.MAHOGANY_LOGS, ItemID.YEW_LOGS, ItemID.MAGIC_LOGS, ItemID.REDWOOD_LOGS);
+			ItemID.MAHOGANY_LOGS, ItemID.YEW_LOGS, ItemID.MAGIC_LOGS);
 		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).isNotConsumed();
 		tinderbox.setHighlightInInventory(true);
 		coal = new ItemRequirement("Coal", ItemID.COAL);
@@ -171,7 +178,8 @@ public class TheGiantDwarf extends BasicQuestHelper
 		dwarvenBattleaxeSapphires = new ItemRequirement("Dwarven battleaxe", ItemID.DWARVEN_BATTLEAXE_5058);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		trollRoom = new Zone(new WorldPoint(2762, 10123, 0), new WorldPoint(2804, 10164, 0));
 		dwarfEntrance = new Zone(new WorldPoint(2814, 10121, 0), new WorldPoint(2884, 10139, 0));
@@ -204,7 +212,7 @@ public class TheGiantDwarf extends BasicQuestHelper
 			new WidgetTextRequirement(219, 1, 2, "Yes, about those special clothes again..."));
 
 		talkedToLibrarian = new Conditions(true, LogicType.OR,
-			new WidgetTextRequirement(WidgetInfo.DIALOG_NPC_TEXT,
+			new WidgetTextRequirement(ComponentID.DIALOG_NPC_TEXT,
 				"Let me think... I believe it is on the top shelf of one of<br>the bookcases in the library, because it is such an old<br>book.",
 				"Well, thanks, I'll have a look."
 			),
@@ -219,10 +227,9 @@ public class TheGiantDwarf extends BasicQuestHelper
 		talkedToVermundiWithBook = new VarbitRequirement(584, 1);
 
 		askedToStartMachine = new Conditions(true, LogicType.OR,
-			new WidgetTextRequirement(WidgetInfo.DIALOG_PLAYER_TEXT,
-				"Don't worry, I'll get them for you. Let's see... some<br>coal and some logs. Shouldn't be too hard."),
-			new DialogRequirement("Well, like I said, I can't do anything really " +
-				"without my<br>spinning machine."),
+			new DialogRequirement(questHelperPlugin.getPlayerStateManager().getPlayerName(),
+				"Don't worry, I'll get them for you. Let's see... some coal and some logs. Shouldn't be too hard.", false),
+			new DialogRequirement("Well, like I said, I can't do anything really without my spinning machine."),
 			new WidgetTextRequirement(119, 3, true, "<col=000080>I must get <col=800000>coal<col=000080> and <col=800000>logs<col=000080>.")
 		);
 
@@ -347,11 +354,11 @@ public class TheGiantDwarf extends BasicQuestHelper
 		talkToVermundiWithBook.addSubSteps(talkToVermundiAfterBook);
 
 		useCoalOnMachine = new ObjectStep(this, ObjectID.SPINNING_MACHINE, new WorldPoint(2885, 10189, 0),
-			"Use your coal on the spinning machine light it with a tinder box.", coal, logs);
+			"Use your coal on the spinning machine light it with a tinderbox.", coal, logs);
 		useCoalOnMachine.addIcon(ItemID.COAL);
 
 		startMachine = new ObjectStep(this, ObjectID.SPINNING_MACHINE, new WorldPoint(2885, 10189, 0),
-			"Start the spinning machine with a tinder box.", tinderbox);
+			"Start the spinning machine with a tinderbox.", tinderbox);
 		startMachine.addIcon(ItemID.TINDERBOX);
 
 		talkToVermundiWithMachine = new NpcStep(this, NpcID.VERMUNDI, new WorldPoint(2887, 10188, 0),
@@ -420,7 +427,7 @@ public class TheGiantDwarf extends BasicQuestHelper
 			"Go to the upper floor of the market.");
 
 		talkToSecretary = new NpcStep(this, NpcID.BLUE_OPAL_SECRETARY, new WorldPoint(2869, 10205, 1),
-			"Keep talking to the same secretary and complete the tasks given. If you don't want to do one of the task, " +
+			"Keep talking to the same secretary and complete the tasks given. If you don't want to do one of the tasks, " +
 				"just talk to them again for a different one.");
 		//TODO: Add a way to check which company is chosen
 		//((NpcStep) talkToSecretary).addAlternateNpcs(NpcID.PURPLE_PEWTER_SECRETARY, NpcID.GREEN_GEMSTONE_SECRETARY,
@@ -525,8 +532,7 @@ public class TheGiantDwarf extends BasicQuestHelper
 	public Map<Integer, QuestStep> loadSteps()
 	{
 		// Varbit 571
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 

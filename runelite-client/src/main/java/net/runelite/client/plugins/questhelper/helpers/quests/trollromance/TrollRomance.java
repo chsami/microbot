@@ -24,33 +24,38 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.trollromance;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.TROLL_ROMANCE
-)
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+
 public class TrollRomance extends BasicQuestHelper
 {
 	//Items Required
@@ -71,8 +76,7 @@ public class TrollRomance extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -128,7 +132,7 @@ public class TrollRomance extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		ironBar = new ItemRequirement("Iron bar", ItemID.IRON_BAR);
 		mapleLog = new ItemRequirement("Maple/yew logs", ItemID.MAPLE_LOGS);
@@ -157,7 +161,8 @@ public class TrollRomance extends BasicQuestHelper
 		gamesNeck = new ItemRequirement("Games necklace", ItemCollections.GAMES_NECKLACES);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		strongholdFloor1 = new Zone(new WorldPoint(2820, 10048, 1), new WorldPoint(2862, 10110, 1));
 		strongholdFloor2 = new Zone(new WorldPoint(2820, 10048, 2), new WorldPoint(2862, 10110, 2));
@@ -183,19 +188,15 @@ public class TrollRomance extends BasicQuestHelper
 		enterStronghold = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Enter the Troll Stronghold.");
 
 		goDownToUg = new ObjectStep(this, ObjectID.STONE_STAIRCASE_3789, new WorldPoint(2844, 10109, 2), "Climb down the north staircase.");
-		goDownToUg.setWorldMapPoint(new WorldPoint(2971, 10172, 1));
 
 		goUpToUg = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Go up the stairs from the prison.");
-		goUpToUg.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 
 		talkToUg = new NpcStep(this, NpcID.UG, new WorldPoint(2827, 10064, 1), "Talk to Ug in the south west room of the Troll Stronghold's first floor.");
 		talkToUg.addDialogSteps("Awww, you poor troll. What seems to be the problem?", "Don't worry now, I'll see what I can do.");
-		talkToUg.setWorldMapPoint(new WorldPoint(2891, 10097, 0));
 		talkToUg.addSubSteps(enterStronghold, goDownToUg, goUpToUg);
 
 		talkToAga = new NpcStep(this, NpcID.AGA, new WorldPoint(2828, 10104, 1), "Talk to Aga north of Ug.");
 		talkToAga.addDialogStep("So... how's your... um... love life?");
-		talkToAga.setWorldMapPoint(new WorldPoint(2892, 10136, 0));
 
 		talkToTenzing = new NpcStep(this, NpcID.TENZING, new WorldPoint(2820, 3555, 0), "Talk to Tenzing west of Burthorpe.");
 		talkToTenzing.addDialogSteps("Do you know where I can find Trollweiss?", "What would I need to make such a sled?");
@@ -217,40 +218,31 @@ public class TrollRomance extends BasicQuestHelper
 		enterStrongholdAgain = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Return to Ug with the trollweiss flowers.", trollweissFlowers, combatGear);
 
 		goDownToUgAgain = new ObjectStep(this, ObjectID.STONE_STAIRCASE_3789, new WorldPoint(2844, 10109, 2), "Return to Ug with the trollweiss flowers.");
-		goDownToUgAgain.setWorldMapPoint(new WorldPoint(2971, 10172, 1));
 
 		goUpToUgAgain = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Return to Ug with the trollweiss flowers.");
-		goUpToUgAgain.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 
 		talkToUgWithFlowers = new NpcStep(this, NpcID.UG, new WorldPoint(2827, 10064, 1), "Return to Ug with the trollweiss flowers.", trollweissFlowers);
-		talkToUgWithFlowers.setWorldMapPoint(new WorldPoint(2891, 10097, 0));
 		talkToUgWithFlowers.addSubSteps(enterStrongholdAgain, goDownToUgAgain, goUpToUgAgain);
 
 		enterStrongholdForEnd = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Return to Ug to finish.");
 
 		goDownToUgForEnd = new ObjectStep(this, ObjectID.STONE_STAIRCASE_3789, new WorldPoint(2844, 10109, 2), "Return to Ug to finish.");
-		goDownToUgForEnd.setWorldMapPoint(new WorldPoint(2971, 10172, 1));
 
 		goUpToUgForEnd = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Return to Ug to finish.");
-		goUpToUgForEnd.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 
 		enterStrongholdForFight = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Challenge Arrg to a fight.", combatGear);
 
 		goDownToUgForFight = new ObjectStep(this, ObjectID.STONE_STAIRCASE_3789, new WorldPoint(2844, 10109, 2), "Challenge Arrg to a fight.", combatGear);
-		goDownToUgForFight.setWorldMapPoint(new WorldPoint(2971, 10172, 1));
 
 		goUpToUgForFight = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Challenge Arrg to a fight.", combatGear);
-		goUpToUgForFight.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 
 
-		challengeArrg = new NpcStep(this, NpcID.ARRG, new WorldPoint(2829, 10095, 1), "Challenge to Arrg to fight.", combatGear);
+		challengeArrg = new NpcStep(this, NpcID.ARRG, new WorldPoint(2829, 10095, 1), "Challenge Arrg to a fight.", combatGear);
 		challengeArrg.addDialogStep("I am here to kill you!");
-		challengeArrg.setWorldMapPoint(new WorldPoint(2892, 10127, 0));
 		challengeArrg.addSubSteps(enterStrongholdForFight, goUpToUgForFight, goDownToUgForFight);
 
 		killArrg = new NpcStep(this, NpcID.ARRG_643, "Kill Arrg.");
 		returnToUg = new NpcStep(this, NpcID.UG, new WorldPoint(2827, 10064, 1), "Talk to Ug in the south west room to finish the quest.");
-		returnToUg.setWorldMapPoint(new WorldPoint(2891, 10097, 0));
 		returnToUg.addSubSteps(goDownToUgForEnd, goUpToUgForEnd, enterStrongholdForEnd);
 	}
 

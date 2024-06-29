@@ -26,12 +26,11 @@ package net.runelite.client.plugins.questhelper.requirements.conditional;
 
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class ConditionForStep implements InitializableRequirement
 {

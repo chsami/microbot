@@ -1,13 +1,15 @@
 package net.runelite.client.plugins.questhelper.steps;
 
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.overlay.DirectionArrow;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
 import net.runelite.api.Perspective;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-
-import java.awt.*;
+import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 
 public class ItemStep extends DetailedQuestStep
 {

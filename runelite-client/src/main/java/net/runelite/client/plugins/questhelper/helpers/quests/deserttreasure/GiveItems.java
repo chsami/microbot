@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.deserttreasure;
 
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NullItemID;
@@ -44,7 +44,6 @@ public class GiveItems extends NpcStep
 		itemQuantitiesLeft();
 	}
 
-	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{

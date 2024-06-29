@@ -24,34 +24,40 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.naturespirit;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.player.PrayerPointRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.NATURE_SPIRIT
-)
 public class NatureSpirit extends BasicQuestHelper
 {
 	//Items Required
@@ -62,7 +68,7 @@ public class NatureSpirit extends BasicQuestHelper
 	ItemRequirement combatGear, salveTele;
 
 	Requirement inUnderground, fillimanNearby, mirrorNearby, usedMushroom, onOrange,
-		usedCard, inGrotto, natureSpiritNearby, ghastNearby;
+		usedCard, inGrotto, natureSpiritNearby, ghastNearby, prayerPoints;
 
 	QuestStep goDownToDrezel, talkToDrezel, leaveDrezel, enterSwamp, tryToEnterGrotto, talkToFilliman, takeWashingBowl,
 		takeMirror, useMirrorOnFilliman, searchGrotto, useJournalOnFilliman, goBackDownToDrezel, talkToDrezelForBlessing,
@@ -76,8 +82,7 @@ public class NatureSpirit extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -161,7 +166,7 @@ public class NatureSpirit extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		ghostspeak = new ItemRequirement("Ghostspeak amulet", ItemID.GHOSTSPEAK_AMULET, 1, true).isNotConsumed();
 		silverSickle = new ItemRequirement("Silver sickle", ItemID.SILVER_SICKLE);
@@ -190,7 +195,8 @@ public class NatureSpirit extends BasicQuestHelper
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		underground = new Zone(new WorldPoint(3402, 9880, 0), new WorldPoint(3443, 9907, 0));
 		orangeStone = new Zone(new WorldPoint(3440, 3335, 0), new WorldPoint(3440, 3335, 0));
@@ -214,6 +220,8 @@ public class NatureSpirit extends BasicQuestHelper
 			new WidgetTextRequirement(119, 3, true, "spell scroll was absorbed"));
 
 		ghastNearby = new NpcCondition(NpcID.GHAST_946);
+
+		prayerPoints = new PrayerPointRequirement(1);
 	}
 
 	public void setupSteps()
@@ -259,7 +267,8 @@ public class NatureSpirit extends BasicQuestHelper
 		searchAltar = new ObjectStep(this, ObjectID.GROTTO_3520, new WorldPoint(3442, 9741, 0), "Search the grotto inside.", ghostspeak);
 		talkToFillimanInGrotto = new NpcStep(this, NpcID.FILLIMAN_TARLOCK, new WorldPoint(3441, 9738, 0), "Talk to Filliman in the grotto to bless your sickle.", ghostspeak, silverSickle);
 		blessSickle = new NpcStep(this, NpcID.NATURE_SPIRIT, new WorldPoint(3441, 9738, 0), "Talk to the Nature Spirit in the grotto to bless your sickle.", ghostspeak, silverSickle);
-		fillPouches = new DetailedQuestStep(this, "Right-click 'bloom' the blessed sickle next to rotten logs for mort myre fungi. Use these to fill the druid pouch.", blessedSickle);
+		fillPouches = new DetailedQuestStep(this,
+			"Right-click 'bloom' the blessed sickle next to rotten logs for mort myre fungi. Use these to fill the druid pouch.", blessedSickle, prayerPoints);
 		killGhasts = new NpcStep(this, NpcID.GHAST, "Use the filled druid pouch on a ghast to make it attackable and kill it. You'll need to kill 3.", druidPouchFull);
 		killGhast = new NpcStep(this, NpcID.GHAST_946, "Kill the ghast.", druidPouchFull);
 		killGhasts.addSubSteps(killGhast);
@@ -331,12 +340,12 @@ public class NatureSpirit extends BasicQuestHelper
 		List<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Start the quest",
 			Arrays.asList(talkToDrezel, enterSwamp, tryToEnterGrotto, talkToFilliman, takeWashingBowl,
-				takeMirror, useMirrorOnFilliman, searchGrotto, useJournalOnFilliman), ghostspeak, silverSickle));
+				takeMirror, useMirrorOnFilliman, searchGrotto, useJournalOnFilliman), ghostspeak, silverSickle, prayerPoints));
 		allSteps.add(new PanelDetails("Helping Filliman",
 			Arrays.asList(talkToDrezelForBlessing, castSpellAndGetMushroom, useMushroom, useSpellCard, standOnOrange,
 				tellFillimanToCast, enterGrotto, searchAltar, talkToFillimanInGrotto, blessSickle), ghostspeak, silverSickle));
 		allSteps.add(new PanelDetails("Killing Ghasts",
-			Arrays.asList(fillPouches, killGhasts, enterGrottoAgain, talkToNatureSpiritToFinish), ghostspeak, blessedSickle));
+			Arrays.asList(fillPouches, killGhasts, enterGrottoAgain, talkToNatureSpiritToFinish), ghostspeak, blessedSickle, prayerPoints));
 
 		return allSteps;
 	}

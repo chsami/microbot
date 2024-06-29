@@ -24,21 +24,28 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.rumdeal;
 
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.FishingSpot;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 public class SlugSteps extends DetailedOwnerStep
 {
@@ -68,27 +75,14 @@ public class SlugSteps extends DetailedOwnerStep
 	protected void updateSteps()
 	{
 		int numHandedIn = client.getVarbitValue(1354);
-		ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
 
-		int numInInv = 0;
-
-		if (inventory != null)
-		{
-			Item[] inventoryItems = inventory.getItems();
-			for (Item item : inventoryItems)
-			{
-				if (item.getId() == sluglings.getId())
-				{
-					numInInv++;
-				}
-			}
-		}
 		sluglings.setQuantity(5 - numHandedIn);
+
 		if (numHandedIn >= 5)
 		{
 			startUpStep(pullPressureLever);
 		}
-		else if (numHandedIn + numInInv >= 5)
+		else if (sluglings.check(client))
 		{
 			startUpStep(pressureSluglings);
 		}
@@ -119,7 +113,7 @@ public class SlugSteps extends DetailedOwnerStep
 		talkToPete = new NpcStep(getQuestHelper(), NpcID.PIRATE_PETE, new WorldPoint(3680, 3537, 0), "Talk to Pirate Pete north east of the Ectofuntus.");
 		talkToPete.addDialogSteps("Okay!");
 		addSluglings = new ObjectStep(getQuestHelper(), ObjectID.PRESSURE_BARREL, new WorldPoint(2142, 5102, 2),
-			"Add the sea creatures to the pressure barrel on the top floor.", sluglings);
+			"Add the sea creatures to the pressure barrel on the top floor.", sluglings.highlighted());
 		addSluglings.addIcon(ItemID.SLUGLINGS);
 		goDownFromTop = new ObjectStep(getQuestHelper(), ObjectID.LADDER_10168, new WorldPoint(2163, 5092, 2), "Go down the ladder and fish for sea creatures.");
 

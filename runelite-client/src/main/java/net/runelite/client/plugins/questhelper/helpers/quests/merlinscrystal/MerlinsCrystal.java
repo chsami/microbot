@@ -24,33 +24,37 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.merlinscrystal;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.MERLINS_CRYSTAL
-)
 public class MerlinsCrystal extends BasicQuestHelper
 {
 	//Items Required
@@ -76,8 +80,7 @@ public class MerlinsCrystal extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -141,7 +144,7 @@ public class MerlinsCrystal extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		bread = new ItemRequirement("Bread", ItemID.BREAD);
 		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).isNotConsumed();
@@ -164,7 +167,8 @@ public class MerlinsCrystal extends BasicQuestHelper
 		equippedExcalibur = excalibur.equipped();
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		fayeGround = new Zone(new WorldPoint(2764, 3395, 0), new WorldPoint(2781, 3410, 0));
 		faye1 = new Zone(new WorldPoint(2764, 3395, 1), new WorldPoint(2781, 3410, 1));
@@ -192,7 +196,7 @@ public class MerlinsCrystal extends BasicQuestHelper
 		clearedHive = new ObjectCondition(ObjectID.BEEHIVE_305);
 		hasAnyBlackCandle = new Conditions(LogicType.OR, blackCandle, litBlackCandle);
 		beggarNearby = new NpcCondition(NpcID.BEGGAR);
-		talkedToLady = new WidgetTextRequirement(217, 5, "Ok. That seems easy enough.");
+		talkedToLady = new Conditions(true, new DialogRequirement(questHelperPlugin.getPlayerStateManager().getPlayerName(), "Ok. That seems easy enough.", false));
 		hasReadSpell = new Conditions(true, LogicType.AND, new WidgetTextRequirement(229, 1, "You find a small inscription"));
 		inStar = new ZoneRequirement(star);
 		thrantaxNearby = new NpcCondition(NpcID.THRANTAX_THE_MIGHTY);
@@ -203,7 +207,8 @@ public class MerlinsCrystal extends BasicQuestHelper
 	public void setupSteps()
 	{
 		startQuest = new NpcStep(this, NpcID.KING_ARTHUR, new WorldPoint(2763, 3513, 0), "Talk to King Arthur in Camelot Castle to start.");
-		startQuest.addDialogStep("I want to become a knight of the round table!");
+		startQuest.addDialogStep("Yes.");
+		startQuest.addDialogStep("I want to become a Knight of the Round Table!");
 		talkToGawain = new NpcStep(this, NpcID.SIR_GAWAIN, new WorldPoint(2758, 3504, 0), "Talk to Sir Gawain about how Merlin got trapped.");
 		talkToGawain.addDialogStep("Do you know how Merlin got trapped?");
 

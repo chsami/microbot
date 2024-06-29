@@ -24,43 +24,51 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.rovingelves;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.ROVING_ELVES
-)
 public class RovingElves extends BasicQuestHelper
 {
 	//Items Required
 	ItemRequirement glarialsPebble, pebbleHint, keyHint, key, spade, rope, seed, blessedSeed, highlightRope, blessedSeedHighlight;
 
 	//Items Recommended
-	//I don't know amounts of teleports, hopefully someone can fix that later
-	ItemRequirement prayerPotions, food, ardougneTeleports, camelotTeleports, iorwerthCampTeleports, skillsNecklace, gamesNecklace;
+	ItemRequirement prayerPotions, food, elvenForestTeleport, baxTeleport, superCombatPotion, antipoison;
 
 	Requirement inGlarialsTomb, onDeadTreeIsland, onLedge, onHudonIsland, inFalls, seedNearby, inThroneRoom;
 
-	QuestStep talkToIslwyn, talkToEluned, enterGlarialsTombstone, killGuardian, pickUpSeed, returnSeedToEluned, boardRaft, useRopeOnRock, useRopeOnTree, enterFalls,
+	DetailedQuestStep talkToIslwyn, talkToEluned, enterGlarialsTombstone, killGuardian, pickUpSeed, returnSeedToEluned, boardRaft, useRopeOnRock, useRopeOnTree, enterFalls,
 		searchFallsCrate, useKeyOnFallsDoor, plantSeed, returnToIslwyn;
 
 	//Zones
@@ -69,8 +77,7 @@ public class RovingElves extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -102,7 +109,7 @@ public class RovingElves extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		seed = new ItemRequirement("Consecration seed", ItemID.CONSECRATION_SEED);
 		seed.addAlternates(ItemID.CONSECRATION_SEED_4206);
@@ -126,12 +133,15 @@ public class RovingElves extends BasicQuestHelper
 		rope = new ItemRequirement("Rope", ItemID.ROPE).isNotConsumed();
 		highlightRope = rope.highlighted();
 		prayerPotions = new ItemRequirement("A few prayer potions", ItemID.PRAYER_POTION4);
-		skillsNecklace = new ItemRequirement("Skills necklace", ItemCollections.SKILLS_NECKLACES, 1);
-		gamesNecklace = new ItemRequirement("Games necklace", ItemCollections.GAMES_NECKLACES, 1);
-		ardougneTeleports = new ItemRequirement("Ardougne teleports", ItemID.ARDOUGNE_TELEPORT, -1);
-		camelotTeleports = new ItemRequirement("Camelot Teleports", ItemID.CAMELOT_TELEPORT, -1);
-		iorwerthCampTeleports = new ItemRequirement("Iorwerth camp teleports", ItemID.IORWERTH_CAMP_TELEPORT, -1);
+		baxTeleport = new ItemRequirement("Teleport to Baxtorian Falls. Skills necklace (Fishing Guild [1]), Games necklace (Barbarian Outpost [2])", ItemCollections.SKILLS_NECKLACES);
+		baxTeleport.addAlternates(ItemCollections.GAMES_NECKLACES);
+
+		elvenForestTeleport =
+			new ItemRequirement("Teleport near to Elven Forest. Iorwerth camp teleport, Charter Ship to Port Tyras", ItemID.IORWERTH_CAMP_TELEPORT);
 		food = new ItemRequirement("Food", ItemCollections.GOOD_EATING_FOOD, -1);
+
+		superCombatPotion = new ItemRequirement("Super combat potion", ItemCollections.SUPER_COMBAT_POTIONS);
+		antipoison = new ItemRequirement("Antipoison potion", ItemCollections.ANTIPOISONS);
 	}
 
 	public void setupConditions()
@@ -147,7 +157,8 @@ public class RovingElves extends BasicQuestHelper
 		// 8374 0->1 when leaving?
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		glarialTomb = new Zone(new WorldPoint(2524, 9801, 0), new WorldPoint(2557, 9849, 0));
 		hudonIsland = new Zone(new WorldPoint(2510, 3476, 0), new WorldPoint(2515, 3482, 0));
@@ -159,21 +170,26 @@ public class RovingElves extends BasicQuestHelper
 
 	public void setupSteps()
 	{
-		talkToIslwyn = new NpcStep(this, NpcID.ISLWYN, new WorldPoint(2207, 3159, 0), "Talk to Islwyn in Isafdar. If he's not at the marked location, try hopping worlds to find him here.");
+		talkToIslwyn = new NpcStep(this, NpcID.ISLWYN, new WorldPoint(2207, 3159, 0),
+			"Talk to Islwyn in Isafdar. If he's not at the marked location, try hopping worlds to find him here.", antipoison);
+		talkToIslwyn.addTeleport(elvenForestTeleport);
 		talkToIslwyn.addDialogStep("Yes.");
 		talkToEluned = new NpcStep(this, NpcID.ELUNED_8766, new WorldPoint(2207, 3159, 0), "Talk to Eluned.");
 		enterGlarialsTombstone = new ObjectStep(this, ObjectID.GLARIALS_TOMBSTONE, new WorldPoint(2559, 3445, 0),
 			"Bank everything besides the pebble, some potions, and some food. After, go use Glarial's pebble to Glarial's Tombstone east of Baxtorian Falls. Be prepared to fight a level 84 Moss Guardian bare-handed.",
-			glarialsPebble);
+			Collections.singletonList(glarialsPebble.highlighted()), Arrays.asList(food, prayerPotions, superCombatPotion, elvenForestTeleport));
 		enterGlarialsTombstone.addIcon(ItemID.GLARIALS_PEBBLE);
+		enterGlarialsTombstone.addTeleport(baxTeleport);
 
 		killGuardian = new NpcStep(this, NpcID.MOSS_GUARDIAN, new WorldPoint(2515, 9844, 0), "Kill the Moss Guardian for a Consecration seed.");
 
 		pickUpSeed = new ItemStep(this, "Pick up the consecration seed.", seed);
 
-		returnSeedToEluned = new NpcStep(this, NpcID.ELUNED_8766, new WorldPoint(2207, 3159, 0), "Return the seed to Eluned.", seed);
-
+		returnSeedToEluned = new NpcStep(this, NpcID.ELUNED_8766, new WorldPoint(2207, 3159, 0), "Return the seed to Eluned.",
+			Collections.singletonList(seed), Collections.singletonList(antipoison));
+		returnSeedToEluned.addTeleport(elvenForestTeleport);
 		boardRaft = new ObjectStep(this, ObjectID.LOG_RAFT, new WorldPoint(2509, 3494, 0), "Board the log raft on the top of Baxtorian Falls.", blessedSeed, rope, spade);
+		boardRaft.addTeleport(baxTeleport);
 		useRopeOnRock = new ObjectStep(this, ObjectID.ROCK, new WorldPoint(2512, 3468, 0), "Use a rope on the rock to the south.", highlightRope);
 		useRopeOnRock.addIcon(ItemID.ROPE);
 		useRopeOnTree = new ObjectStep(this, ObjectID.DEAD_TREE_2020, new WorldPoint(2512, 3465, 0), "Use a rope on the dead tree.", highlightRope);
@@ -186,6 +202,7 @@ public class RovingElves extends BasicQuestHelper
 		plantSeed = new DetailedQuestStep(this, "Plant the consecrated seed anywhere in the room.", blessedSeedHighlight, spade);
 
 		returnToIslwyn = new NpcStep(this, NpcID.ISLWYN, new WorldPoint(2207, 3159, 0), "Return to Islwyn in Isafdar to finish the quest.");
+		returnToIslwyn.addTeleport(elvenForestTeleport);
 	}
 
 	@Override
@@ -197,7 +214,7 @@ public class RovingElves extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRecommended()
 	{
-		return Arrays.asList(prayerPotions, food, skillsNecklace, gamesNecklace, ardougneTeleports, camelotTeleports, iorwerthCampTeleports);
+		return Arrays.asList(antipoison, prayerPotions, food, superCombatPotion, baxTeleport.quantity(2), elvenForestTeleport.quantity(3));
 	}
 
 	@Override
@@ -241,14 +258,15 @@ public class RovingElves extends BasicQuestHelper
 	{
 		List<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Starting off",
-			Arrays.asList(talkToIslwyn, talkToEluned)));
+			Arrays.asList(talkToIslwyn, talkToEluned), null, Arrays.asList(antipoison, elvenForestTeleport, baxTeleport)));
 
 		allSteps.add(new PanelDetails("Get the seed",
-			Arrays.asList(enterGlarialsTombstone, killGuardian, pickUpSeed, returnSeedToEluned), glarialsPebble));
+			Arrays.asList(enterGlarialsTombstone, killGuardian, pickUpSeed, returnSeedToEluned), Collections.singletonList(glarialsPebble),
+			Arrays.asList(food, prayerPotions, baxTeleport, elvenForestTeleport, antipoison)));
 
 		allSteps.add(new PanelDetails("Plant the seed",
 			Arrays.asList(boardRaft, useRopeOnRock, useRopeOnTree, enterFalls, searchFallsCrate, useKeyOnFallsDoor,
-				plantSeed, returnToIslwyn), spade, rope, blessedSeed));
+				plantSeed, returnToIslwyn), Arrays.asList(spade, rope, blessedSeed), Arrays.asList(baxTeleport, elvenForestTeleport, antipoison)));
 		return allSteps;
 	}
 }

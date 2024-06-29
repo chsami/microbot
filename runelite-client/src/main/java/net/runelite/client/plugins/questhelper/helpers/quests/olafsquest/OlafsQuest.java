@@ -24,37 +24,48 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.olafsquest;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetModelRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.DigStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.WidgetStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.OLAFS_QUEST
-)
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import static net.runelite.client.plugins.questhelper.requirements.util.LogicHelper.and;
+
 public class OlafsQuest extends BasicQuestHelper
 {
 	//Items Required
@@ -62,10 +73,10 @@ public class OlafsQuest extends BasicQuestHelper
 		triangleKey, circleKey, starKey;
 
 	//Items Recommended
-	ItemRequirement  prayerPotions, food, combatGear;
+	ItemRequirement prayerPotions, food, combatGear;
 
 	Requirement givenIngridCarving, inFirstArea, inSecondArea, inThirdArea, keyNearby, puzzleOpen, has2Barrels6Ropes, hasBarrel3Ropes, placedBarrel1, placedBarrel2,
-		keyInterfaceOpen, ulfricNearby, killedUlfric;
+		keyInterfaceOpen, ulfricNearby, killedUlfric, tenFreeSlots;
 
 	QuestStep talkToOlaf, chopTree, giveLogToOlaf, talkToIngrid, talkToVolf, returnToOlaf, useDampPlanks, talkToOlafAfterPlanks, digHole, pickUpKey, searchPainting, doPuzzle, pickUpItems,
 		pickUpItems2, useBarrel, useBarrel2, openGate, chooseSquare, chooseCross, chooseTriangle, chooseCircle, chooseStar, killUlfric;
@@ -80,8 +91,7 @@ public class OlafsQuest extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -113,15 +123,15 @@ public class OlafsQuest extends BasicQuestHelper
 		solvePuzzleSteps.addStep(new Conditions(triangleKey, keyInterfaceOpen), chooseTriangle);
 		solvePuzzleSteps.addStep(new Conditions(squareKey, keyInterfaceOpen), chooseSquare);
 		solvePuzzleSteps.addStep(new Conditions(crossKey, keyInterfaceOpen), chooseCross);
-		solvePuzzleSteps.addStep(new Conditions(key, placedBarrel2), openGate);
-		solvePuzzleSteps.addStep(new Conditions(key, placedBarrel1, hasBarrel3Ropes), useBarrel2);
+		solvePuzzleSteps.addStep(new Conditions(key, inSecondArea, placedBarrel2), openGate);
+		solvePuzzleSteps.addStep(new Conditions(key, placedBarrel1, inSecondArea, hasBarrel3Ropes), useBarrel2);
 		solvePuzzleSteps.addStep(new Conditions(placedBarrel1, inSecondArea, key), pickUpItems2);
-		solvePuzzleSteps.addStep(new Conditions(has2Barrels6Ropes, key), useBarrel);
+		solvePuzzleSteps.addStep(new Conditions(has2Barrels6Ropes, inSecondArea, key), useBarrel);
 		solvePuzzleSteps.addStep(new Conditions(inSecondArea, key), pickUpItems);
 		solvePuzzleSteps.addStep(puzzleOpen, doPuzzle);
-		solvePuzzleSteps.addStep(key, searchPainting);
-		solvePuzzleSteps.addStep(keyNearby, pickUpKey);
-		solvePuzzleSteps.addStep(inFirstArea, killSkeleton);
+		solvePuzzleSteps.addStep(and(inFirstArea, key), searchPainting);
+		solvePuzzleSteps.addStep(and(inFirstArea, keyNearby), pickUpKey);
+		solvePuzzleSteps.addStep(new Conditions(inFirstArea), killSkeleton);
 
 		steps.put(60, solvePuzzleSteps);
 		steps.put(70, solvePuzzleSteps);
@@ -130,14 +140,14 @@ public class OlafsQuest extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
-		
+
 		food = new ItemRequirement("Food", ItemCollections.GOOD_EATING_FOOD, -1);
 		food.setUrlSuffix("Food");
-		
+
 		prayerPotions = new ItemRequirement("Prayer potions", ItemCollections.PRAYER_POTIONS, -1);
 
 		axe = new ItemRequirement("Any axe", ItemCollections.AXES).isNotConsumed();
@@ -160,6 +170,9 @@ public class OlafsQuest extends BasicQuestHelper
 		triangleKey = new ItemRequirement("Key", ItemID.KEY_11041);
 		circleKey = new ItemRequirement("Key", ItemID.KEY_11042);
 		starKey = new ItemRequirement("Key", ItemID.KEY_11043);
+
+		tenFreeSlots = new FreeInventorySlotRequirement(10);
+		tenFreeSlots.setTooltip("Only need 4 slots free if bringing 6 rope with you.");
 
 		rottenBarrel = new ItemRequirement("Rotten barrel", ItemID.ROTTEN_BARREL);
 		rottenBarrel.addAlternates(ItemID.ROTTEN_BARREL_11045);
@@ -191,7 +204,8 @@ public class OlafsQuest extends BasicQuestHelper
 		killedUlfric = new VarbitRequirement(3539, 1);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		firstArea = new Zone(new WorldPoint(2689, 10116, 0), new WorldPoint(2707, 10141, 0));
 		firstArea2 = new Zone(new WorldPoint(2707, 10118, 0), new WorldPoint(2739, 10148, 0));
@@ -215,11 +229,12 @@ public class OlafsQuest extends BasicQuestHelper
 		talkToOlafAfterPlanks.addDialogStep("Alright, here, have some food. Now give me the map.");
 		digHole = new DigStep(this, new WorldPoint(2748, 3732, 0), "Dig next to the Windswept Tree.");
 
+		pickUpKey = new ItemStep(this, "Pick up the dropped key.", key);
+
 		killSkeleton = new NpcStep(this, NpcID.SKELETON_FREMENNIK, new WorldPoint(2727, 10141, 0), "Go deeper into the caverns and kill a Skeleton Fremennik for a key.", true);
 		killSkeleton.addAlternateNpcs(NpcID.SKELETON_FREMENNIK_4492, NpcID.SKELETON_FREMENNIK_4493, NpcID.SKELETON_FREMENNIK_4494, NpcID.SKELETON_FREMENNIK_4495,
 			NpcID.SKELETON_FREMENNIK_4496, NpcID.SKELETON_FREMENNIK_4497, NpcID.SKELETON_FREMENNIK_4498, NpcID.SKELETON_FREMENNIK_4499);
-
-		pickUpKey = new ItemStep(this, "Pick up the dropped key.", key);
+		killSkeleton.addSubSteps(pickUpKey);
 
 		searchPainting = new ObjectStep(this, ObjectID.PICTURE_WALL, new WorldPoint(2707, 10147, 0), "Search the picture wall in the north room.");
 
@@ -229,9 +244,9 @@ public class OlafsQuest extends BasicQuestHelper
 		pickUpItems2 = new DetailedQuestStep(this, "Pick up 1 rotten barrels and 3 ropes from around the room.", rottenBarrel, ropes3);
 		pickUpItems.addSubSteps(pickUpItems2);
 
-		useBarrel = new ObjectStep(this, ObjectID.WALKWAY, new WorldPoint(2722, 10168, 0), "WALK onto the walkway to the east, and use a barrel on it to repair it.", rottenBarrel, ropes3);
+		useBarrel = new ObjectStep(this, ObjectID.WALKWAY, new WorldPoint(2722, 10168, 0), "WALK onto the walkway to the east, and use a barrel on it to repair it.", rottenBarrel.highlighted(), ropes3);
 		useBarrel.addIcon(ItemID.ROTTEN_BARREL_11045);
-		useBarrel2 = new ObjectStep(this, ObjectID.WALKWAY_23214, new WorldPoint(2724, 10168, 0), "WALK on the walkway and repair the next hole in it.", rottenBarrel, ropes3);
+		useBarrel2 = new ObjectStep(this, ObjectID.WALKWAY_23214, new WorldPoint(2724, 10168, 0), "WALK on the walkway and repair the next hole in it.", rottenBarrel.highlighted(), ropes3);
 		useBarrel2.addIcon(ItemID.ROTTEN_BARREL_11045);
 
 		openGate = new ObjectStep(this, ObjectID.GATE_23216, new WorldPoint(2725, 10168, 0), "Open the gate on the walkway, clicking the key hole which matches your key.", key);
@@ -295,7 +310,7 @@ public class OlafsQuest extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("4 x Rubies", ItemID.RUBY, 4));
+		return Collections.singletonList(new ItemReward("Rubies", ItemID.RUBY, 4));
 	}
 
 	@Override
@@ -314,7 +329,7 @@ public class OlafsQuest extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Finding treasure",
 			Arrays.asList(digHole, killSkeleton, searchPainting, doPuzzle, pickUpItems,
-				useBarrel, useBarrel2, openGate, searchChest, killUlfric, searchChestAgain)));
+				useBarrel, useBarrel2, openGate, searchChest, killUlfric, searchChestAgain), spade, tenFreeSlots, combatGear));
 		return allSteps;
 	}
 }

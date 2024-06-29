@@ -24,34 +24,44 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.atasteofhope;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.A_TASTE_OF_HOPE
-)
 public class ATasteOfHope extends BasicQuestHelper
 {
 	//Items Required
@@ -68,14 +78,16 @@ public class ATasteOfHope extends BasicQuestHelper
 		climbDownFromRoof, lookThroughWindow, returnToBase, talkToSafalaanAfterSpying,
 		pressDecoratedWallReturn, pressDecoratedWallAfterSerafina, talkToFlaygian,
 		talkToSafalaanAfterFlaygian, goUpToSerafinaHouse, enterSerafinaHouse, talkToSafalaanInSerafinaHouse,
-		searchForMeat, searchForHerb, searchForVial, searchForPestle, useHerbOnVial, usePestleOnMeat,
-		useMeatOnPotion, usePotionOnDoor, talkToSafalaanAfterPotion, useHerbOnBlood, usePestleOnMeatAgain,
-		useMeatOnBlood, useBloodOnDoor, getOldNotes, talkToSafalaanWithNotes, enterBaseAfterSerafina,
+		getOldNotes, talkToSafalaanWithNotes, enterBaseAfterSerafina,
 		killAbomination, enterOldManRalBasement, talkToSafalaanInRalBasement, talkToVertidaInRalBasement,
 		readFlaygianNotes, getSickle, getChain, useEmeraldOnSickle, enchantSickle, addSickleToRod,
 		talkToSafalaanAfterFlail, talkToKael, killRanis, talkToKaelAgain, enterRalForEnd, talkToSafalaanForEnd,
 		talkToSafalaanForAbominationFight, talkToSafalaanAfterAbominationFight, enterRalWithFlail, talkToKaelSidebar,
 		killRanisSidebar, pressDecoratedWall;
+
+	PuzzleWrapperStep searchForMeat, searchForHerb, searchForVial, searchForPestle, useHerbOnVial, usePestleOnMeat,
+		useMeatOnPotion, usePotionOnDoor, talkToSafalaanAfterPotion, useHerbOnBlood, usePestleOnMeatAgain,
+		useMeatOnBlood, useBloodOnDoor;
 
 	//Zones
 	Zone myrequeBase, theatreP1, theatreP2, theatreP3, theatreP4, theatreP5, theatreP6, serafinaHouse, newBase, ranisFight;
@@ -83,8 +95,7 @@ public class ATasteOfHope extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -229,7 +240,7 @@ public class ATasteOfHope extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		coins1000 = new ItemRequirement("Coins", ItemCollections.COINS, 1000);
 		knife = new ItemRequirement("Knife", ItemID.KNIFE).isNotConsumed();
@@ -301,7 +312,8 @@ public class ATasteOfHope extends BasicQuestHelper
 		ivandisFlailEquipped = new ItemRequirement("Ivandis flail", ItemID.IVANDIS_FLAIL, 1, true);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		myrequeBase = new Zone(new WorldPoint(3616, 9616, 0), new WorldPoint(3640, 9647, 0));
 		theatreP1 = new Zone(new WorldPoint(3638, 3202, 1), new WorldPoint(3646, 3214, 1));
@@ -439,24 +451,49 @@ public class ATasteOfHope extends BasicQuestHelper
 		talkToSafalaanInSerafinaHouse = new NpcStep(this, NpcID.SAFALAAN_HALLOW_8216, new WorldPoint(3596, 9675, 0), "Talk to Safalaan.");
 		// Talked to Safalaan, 2592 2->0
 
-		searchForHerb = new ObjectStep(this, ObjectID.BARREL_32564, new WorldPoint(3599, 9678, 0), "Search the barrel in the north east corner.");
-		searchForMeat = new ObjectStep(this, ObjectID.CRATE_32567, new WorldPoint(3593, 9677, 0), "Search the crate in the west of the room for mysterious meat.");
-		searchForVial = new ObjectStep(this, ObjectID.CRATE_32566, new WorldPoint(3598, 9671, 0), "Search a crate in the south east corner for a vial.");
-		searchForPestle = new ObjectStep(this, ObjectID.CRATE_32568, new WorldPoint(3594, 9671, 0), "Search the crate near the staircase for a pestle and mortar.");
+		searchForHerb = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.BARREL_32564, new WorldPoint(3599, 9678, 0), "Search the barrel in the north east corner."), "Work out how to open the door in the room.");
+		searchForMeat = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.CRATE_32567, new WorldPoint(3593, 9677, 0), "Search the crate in the west of the room for mysterious meat."),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
+		searchForVial = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.CRATE_32566, new WorldPoint(3598, 9671, 0), "Search a crate in the south east corner for a vial."),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
+		searchForPestle = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.CRATE_32568, new WorldPoint(3594, 9671, 0), "Search the crate near the staircase for a pestle and mortar."),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
 
-		useHerbOnVial = new DetailedQuestStep(this, "Add the herb to a vial of water.", herb, vialOfWater);
-		usePestleOnMeat = new DetailedQuestStep(this, "Use the pestle and mortar on the meat.", pestleAndMortarHighlighted, meatHighlighted);
-		useMeatOnPotion = new DetailedQuestStep(this, "Add the crushed meat to the potion.", crushedMeat, unfinishedPotion);
-		usePotionOnDoor = new ObjectStep(this, ObjectID.DOOR_32562, new WorldPoint(3596, 9680, 0), "Use the potion on the door.", potion);
+		useHerbOnVial = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, "Add the herb to a vial of water.", herb, vialOfWater),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
+		usePestleOnMeat = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, "Use the pestle and mortar on the meat.", pestleAndMortarHighlighted, meatHighlighted),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
+		useMeatOnPotion = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, "Add the crushed meat to the potion.", crushedMeat, unfinishedPotion),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
+		usePotionOnDoor = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.DOOR_32562, new WorldPoint(3596, 9680, 0), "Use the potion on the door.", potion),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
 		usePotionOnDoor.addDialogStep("Yes.");
 		usePotionOnDoor.addIcon(ItemID.POTION_22409);
-		talkToSafalaanAfterPotion = new NpcStep(this, NpcID.SAFALAAN_HALLOW_8216, new WorldPoint(3596, 9675, 0), "Talk to Safalaan for his blood.", vial);
+		talkToSafalaanAfterPotion = new PuzzleWrapperStep(this,
+			new NpcStep(this, NpcID.SAFALAAN_HALLOW_8216, new WorldPoint(3596, 9675, 0), "Talk to Safalaan for his blood.", vial),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
 		talkToSafalaanAfterPotion.addDialogStep("Yes.");
 
-		useHerbOnBlood = new DetailedQuestStep(this, "Add the herb to a vial of blood.", herb, bloodVial);
-		usePestleOnMeatAgain = new DetailedQuestStep(this, "Use the pestle and mortar on the meat.", pestleAndMortarHighlighted, meatHighlighted);
-		useMeatOnBlood = new DetailedQuestStep(this, "Add the crushed meat to the unfinished potion.", crushedMeat, unfinishedBloodPotion);
-		useBloodOnDoor = new ObjectStep(this, ObjectID.DOOR_32562, new WorldPoint(3596, 9680, 0), "Use the blood potion on the door.", bloodPotion);
+		useHerbOnBlood = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, "Add the herb to a vial of blood.", herb, bloodVial),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
+		usePestleOnMeatAgain = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, "Use the pestle and mortar on the meat.", pestleAndMortarHighlighted, meatHighlighted),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
+		useMeatOnBlood = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, "Add the crushed meat to the unfinished potion.", crushedMeat, unfinishedBloodPotion),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
+		useBloodOnDoor = new PuzzleWrapperStep(this,
+			new ObjectStep(this, ObjectID.DOOR_32562, new WorldPoint(3596, 9680, 0), "Use the blood potion on the door.", bloodPotion),
+			"Work out how to open the door in the room.").withNoHelpHiddenInSidebar(true);
 		useBloodOnDoor.addDialogStep("Yes.");
 		useBloodOnDoor.addIcon(ItemID.BLOOD_POTION);
 		getOldNotes = new ObjectStep(this, ObjectID.CHEST_32572, new WorldPoint(3596, 9683, 0), "Search the chest for some notes.");
@@ -556,7 +593,7 @@ public class ATasteOfHope extends BasicQuestHelper
 		return Arrays.asList(
 				new ItemReward("Ivandis Flail", ItemID.IVANDIS_FLAIL, 1),
 				new ItemReward("Drakan's Medallion", ItemID.DRAKANS_MEDALLION, 1),
-				new ItemReward("3 x 2,500 Experience Tomes (Any skill over level 35).", ItemID.TOME_OF_EXPERIENCE, 3) //22415 is placeholder
+				new ItemReward("2,500 Experience Tomes (Any skill over level 35).", ItemID.TOME_OF_EXPERIENCE, 3) //22415 is placeholder
 		);
 	}
 

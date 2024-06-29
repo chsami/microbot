@@ -26,13 +26,12 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.requirements.util.ItemSlots;
-import net.runelite.api.Client;
-
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import net.runelite.api.Client;
 
 /**
  * Requirement that checks if a player has no item in a specified {@link ItemSlots}.
@@ -40,7 +39,6 @@ import java.util.Objects;
 public class NoItemRequirement extends ItemRequirement
 {
 	private final ItemSlots slot;
-	private final int matchingItemID;
 
 	/**
 	 * Checks if a player has no items in a given {@link ItemSlots}
@@ -52,7 +50,6 @@ public class NoItemRequirement extends ItemRequirement
 	{
 		super(text, -1, -1);
 		this.slot = slot;
-		matchingItemID = -1;
 	}
 
 	@Override
@@ -62,7 +59,7 @@ public class NoItemRequirement extends ItemRequirement
 	}
 
 	@Override
-	public Color getColor(Client client, MQuestHelperConfig config)
+	public Color getColor(Client client, QuestHelperConfig config)
 	{
 		return check(client) ? config.passColour() : config.failColour();
 	}
@@ -71,5 +68,11 @@ public class NoItemRequirement extends ItemRequirement
 	public String getDisplayText()
 	{
 		return "Nothing in your " + slot.getName();
+	}
+
+	@Override
+	protected NoItemRequirement copyOfClass()
+	{
+		return new NoItemRequirement(getName(), slot);
 	}
 }

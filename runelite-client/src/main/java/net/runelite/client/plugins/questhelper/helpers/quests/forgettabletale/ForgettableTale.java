@@ -24,14 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.forgettabletale;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
@@ -41,23 +41,34 @@ import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequireme
 import net.runelite.client.plugins.questhelper.requirements.util.ItemSlots;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.WidgetStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FORGETTABLE_TALE
-)
 public class ForgettableTale extends BasicQuestHelper
 {
 	// Required
-	ItemRequirement coins500, barleyMalt2, bucketOfWater2, spade, dibber, rake, yeast, kebab, beer, dwarvenStout,
+	ItemRequirement coins500, barleyMalt2, bucketOfWater2, dibber, rake, yeast, kebab, beer, dwarvenStout,
 		beerGlass, randomItem, coins, pot;
 
 	// Recommended
@@ -143,8 +154,7 @@ public class ForgettableTale extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -342,13 +352,12 @@ public class ForgettableTale extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		coins500 = new ItemRequirement("Coins", ItemCollections.COINS, 500);
 		coins = new ItemRequirement("Coins", ItemCollections.COINS);
 		barleyMalt2 = new ItemRequirement("Barley malt", ItemID.BARLEY_MALT, 2);
 		bucketOfWater2 = new ItemRequirement("Bucket of water", ItemID.BUCKET_OF_WATER, 2);
-		spade = new ItemRequirement("Spade", ItemID.SPADE).isNotConsumed();
 		dibber = new ItemRequirement("Seed dibber", ItemID.SEED_DIBBER).isNotConsumed();
 		rake = new ItemRequirement("Rake", ItemID.RAKE).isNotConsumed();
 		yeast = new ItemRequirement("Ale yeast", ItemID.ALE_YEAST);
@@ -376,7 +385,8 @@ public class ForgettableTale extends BasicQuestHelper
 		ticketToWWM = new ItemRequirement("Minecart ticket", ItemID.MINECART_TICKET_5022);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		keldagrim = new Zone(new WorldPoint(2816, 10112, 0), new WorldPoint(2950, 10239, 3));
 		pubUpstairs = new Zone(new WorldPoint(2907, 10187, 1), new WorldPoint(2919, 10197, 1));
@@ -873,7 +883,7 @@ public class ForgettableTale extends BasicQuestHelper
 		goPlantKelda.addStep(inKelgdagrim, rakeKelda);
 
 		goHarvestKelda = new ConditionalStep(this, travelToKeldagrim,
-			"Harvest the kelda hops.", spade);
+			"Harvest the kelda hops.");
 		goHarvestKelda.addStep(inKelgdagrim, harvestHops);
 
 		goBrew = new ConditionalStep(this, travelToKeldagrim,
@@ -930,7 +940,7 @@ public class ForgettableTale extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRequirements()
 	{
-		return Arrays.asList(coins500, barleyMalt2, bucketOfWater2, spade, dibber, rake, kebab, beer.quantity(3),
+		return Arrays.asList(coins500, barleyMalt2, bucketOfWater2, dibber, rake, kebab, beer.quantity(3),
 			dwarvenStout, beerGlass, randomItem);
 	}
 
@@ -980,7 +990,7 @@ public class ForgettableTale extends BasicQuestHelper
 				goTalkRowdyDwarf, goTalkToKhorvak, goGiveKhorvakBeer, goTalkToGuass, goTalkToRind,
 				goPlantKelda, waitForKelda, goHarvestKelda, goBrew, pickupPot, buyYeast, addWater, addMalts, addKelda, addYeast,
 				waitBrewing, goTurnValve, goUseGlass, goGiveDrunkenDwarfKelda), coins500, barleyMalt2, bucketOfWater2,
-			spade,	dibber, rake, beer.quantity(2), dwarvenStout, beerGlass, randomItem));
+			dibber, rake, beer.quantity(2), dwarvenStout, beerGlass, randomItem));
 		allSteps.add(new PanelDetails("Unlocking the tunnels", Arrays.asList(goTalkToConductor, goTalkToDirector,
 			goTakeSecretCart)));
 		allSteps.add(new PanelDetails("Puzzle 1", Arrays.asList(searchBox1, startPuzzle1, puzzle1P1, puzzle1P2,

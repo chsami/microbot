@@ -27,10 +27,9 @@
 package net.runelite.client.plugins.questhelper.requirements.conditional;
 
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.api.Client;
-
-import javax.annotation.Nonnull;
 import java.util.List;
+import javax.annotation.Nonnull;
+import net.runelite.api.Client;
 
 /**
  * Represents a {@link Requirement} that has to be initialized before being

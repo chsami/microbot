@@ -24,31 +24,40 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.karamja;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.KARAMJA_MEDIUM
-)
 public class KaramjaMedium extends BasicQuestHelper
 {
 	// Items required
@@ -89,8 +98,7 @@ public class KaramjaMedium extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
 
@@ -123,8 +131,8 @@ public class KaramjaMedium extends BasicQuestHelper
 		usedGliderTask = new ConditionalStep(this, flyToKaramja);
 		doMedium.addStep(notUsedGlider, usedGliderTask);
 
-		caughtKarambwanTask = new ConditionalStep(this, catchKarambwan);
-		caughtKarambwanTask.addStep(rawKarambwanji.alsoCheckBank(questBank), catchKarambwanji);
+		caughtKarambwanTask = new ConditionalStep(this, catchKarambwanji);
+		caughtKarambwanTask.addStep(rawKarambwanji.alsoCheckBank(questBank), catchKarambwan);
 		doMedium.addStep(notCaughtKarambwan, caughtKarambwanTask);
 
 		charteredFromShipyardTask = new ConditionalStep(this, charterFromShipyard);
@@ -167,7 +175,7 @@ public class KaramjaMedium extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notClaimedTicket = new VarbitRequirement(3579, 0);
 		notEnteredWall = new VarbitRequirement(3580, 0);
@@ -232,7 +240,7 @@ public class KaramjaMedium extends BasicQuestHelper
 		food = new ItemRequirement("Food", ItemCollections.GOOD_EATING_FOOD, -1);
 		antipoison = new ItemRequirement("Antipoison", ItemCollections.ANTIPOISONS, -1);
 
-		spiderOnAStick = new ItemRequirement("Spider on stick", ItemID.SPIDER_ON_STICK);
+		spiderOnAStick = new ItemRequirement("Spider on stick", List.of(ItemID.SPIDER_ON_STICK, ItemID.SPIDER_ON_SHAFT));
 		spiderOnAStick.setTooltip("You can get one by using a spider carcass on an arrow shaft");
 
 		agility12 = new SkillRequirement(Skill.AGILITY, 12);
@@ -256,7 +264,8 @@ public class KaramjaMedium extends BasicQuestHelper
 		inBrimhavenDungeon = new ZoneRequirement(brimhavenDungeon);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		cave = new Zone(new WorldPoint(2821, 9545, 0), new WorldPoint(2879, 9663, 0));
 		agilityArena = new Zone(new WorldPoint(2747, 9531, 0), new WorldPoint(2813, 9601, 3));
@@ -298,6 +307,7 @@ public class KaramjaMedium extends BasicQuestHelper
 		getMachete = new NpcStep(this, NpcID.SAFTA_DOC_6423, new WorldPoint(2790, 3100, 0),
 			"Get a gem machete from Safta Doc. If you want to make a red topaz one, you'll need 1200 trading sticks.",
 			goutTuber, opal.quantity(3), tradingSticks.quantity(300));
+		((NpcStep) getMachete).addAlternateNpcs(NpcID.SAFTA_DOC);
 		getMachete.addDialogSteps("What do you do here?", "Yes, I'd like to get a machete.");
 		flyToKaramja = new NpcStep(this, NpcID.CAPTAIN_DALBUR, new WorldPoint(3284, 3213, 0),
 			"Fly on a Gnome Glider to Karamja.");

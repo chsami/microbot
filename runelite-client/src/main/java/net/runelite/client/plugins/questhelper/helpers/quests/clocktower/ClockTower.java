@@ -25,31 +25,38 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.clocktower;
 
-import net.runelite.client.plugins.questhelper.*;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarPlayer;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.ItemID;
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.CLOCK_TOWER
-)
 public class ClockTower extends BasicQuestHelper
 {
 	ItemRequirement bucketOfWater, noteAboutWater, staminaPotions, ardougneCloak, redCog, blueCog, blackCog, whiteCog, ratPoison;
@@ -84,8 +91,7 @@ public class ClockTower extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -136,7 +142,7 @@ public class ClockTower extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		bucketOfWater = new ItemRequirement("Bucket of Water or a pair of ice gloves or smiths gloves(i)", ItemID.BUCKET_OF_WATER);
 		bucketOfWater.addAlternates(ItemID.ICE_GLOVES, ItemID.SMITHS_GLOVES_I);
@@ -153,7 +159,8 @@ public class ClockTower extends BasicQuestHelper
 		ratPoison = new ItemRequirement("Rat Poison", ItemID.RAT_POISON);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		groundFloor = new Zone(new WorldPoint(2563, 3239, 0), new WorldPoint(2573, 3245, 0));
 		secondFloor = new Zone(new WorldPoint(2563, 3239, 2), new WorldPoint(2573, 3245, 2));
@@ -209,6 +216,7 @@ public class ClockTower extends BasicQuestHelper
 
 	public void setupSteps()
 	{
+		// TODO: Need to determine to what degree PuzzleWrapperStep should be used in this quest
 		talkToKojo = new NpcStep(this, NpcID.BROTHER_KOJO, new WorldPoint(2570, 3245, 0), "Talk to Brother Kojo at the clock tower.");
 		talkToKojo.addDialogStep("OK old monk, what can I do?");
 
@@ -346,7 +354,7 @@ public class ClockTower extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("500 Coins", ItemID.COINS_995, 500));
+		return Collections.singletonList(new ItemReward("Coins", ItemID.COINS_995, 500));
 	}
 
 	@Override

@@ -24,18 +24,15 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.varrock;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.ComplexRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
@@ -45,18 +42,25 @@ import net.runelite.client.plugins.questhelper.requirements.util.Spellbook;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.VARROCK_ELITE
-)
 public class VarrockElite extends ComplexStateQuestHelper
 {
 	// Items required
@@ -80,8 +84,7 @@ public class VarrockElite extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doElite = new ConditionalStep(this, claimReward);
@@ -111,7 +114,7 @@ public class VarrockElite extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notSuperCombat = new VarplayerRequirement(1177, false, 7);
 		notPlankMake = new VarplayerRequirement(1177, false, 8);
@@ -133,8 +136,8 @@ public class VarrockElite extends ComplexStateQuestHelper
 		cookingGuild = new ItemRequirement("Access to cooking guild", ItemCollections.COOKING_GUILD).showConditioned(notSummerPie).isNotConsumed();
 		cookingGuild.setTooltip("A chef's hat, Varrock Armour 3, or Cooking Cape");
 		rawPie = new ItemRequirement("Raw summer pie", ItemID.RAW_SUMMER_PIE).showConditioned(notSummerPie);
-		runeBar = new ItemRequirement("Rune bar", ItemID.RUNITE_BAR).showConditioned(notRuneDart);
-		feather = new ItemRequirement("Feather", ItemID.FEATHER).showConditioned(notRuneDart);
+		feather = new ItemRequirement("Feather", ItemID.FEATHER, 10).showConditioned(notRuneDart);
+		runeBar = new ItemRequirement("Runite bar", ItemID.RUNITE_BAR).showConditioned(notRuneDart);
 		hammer = new ItemRequirement("Hammer", ItemID.HAMMER).showConditioned(notRuneDart).isNotConsumed();
 		runeDartTip = new ItemRequirement("Rune dart tip", ItemID.RUNE_DART_TIP);
 		essence = new ItemRequirement("Essence", ItemCollections.ESSENCE_LOW).showConditioned(not100Earth);
@@ -164,7 +167,8 @@ public class VarrockElite extends ComplexStateQuestHelper
 		touristTrap = new QuestRequirement(QuestHelperQuest.THE_TOURIST_TRAP, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		bank = new Zone(new WorldPoint(3179, 3448, 0), new WorldPoint(3191, 3432, 0));
 		lumb = new Zone(new WorldPoint(3300, 3501, 0), new WorldPoint(3313, 3493, 0));
@@ -193,11 +197,11 @@ public class VarrockElite extends ComplexStateQuestHelper
 		earthRune100 = new ObjectStep(this, 34763, new WorldPoint(2658, 4841, 0),
 			"Craft the earth runes.", essence.quantity(25));
 		moveToAnvil = new DetailedQuestStep(this, new WorldPoint(3188, 3426, 0),
-			"Go to the anvil beside the west Varrock bank.", runeBar, feather.quantity(10), hammer);
+			"Go to the anvil beside the west Varrock bank.", runeBar, feather, hammer);
 		dartTip = new ObjectStep(this, ObjectID.ANVIL_2097, new WorldPoint(3188, 3426, 0),
 			"Make rune dart tips on the anvil in west Varrock.", runeBar);
 		runeDart = new ItemStep(this, "Use feathers on the rune dart tips.", runeDartTip.highlighted(),
-			feather.quantity(10).highlighted());
+			feather.highlighted());
 
 		claimReward = new NpcStep(this, NpcID.TOBY, new WorldPoint(3225, 3415, 0),
 			"Talk to Toby in Varrock to claim your reward!");
@@ -275,7 +279,7 @@ public class VarrockElite extends ComplexStateQuestHelper
 
 		PanelDetails runeDartsSteps = new PanelDetails("Smith and Fletch 10 Rune Darts", Arrays.asList(moveToAnvil,
 			dartTip, runeDart), new SkillRequirement(Skill.FLETCHING, 81), new SkillRequirement(Skill.SMITHING, 89),
-			touristTrap, runeBar, feather.quantity(10), hammer);
+			touristTrap, runeBar, feather, hammer);
 		runeDartsSteps.setDisplayCondition(notRuneDart);
 		runeDartsSteps.setLockingStep(runeDartTask);
 		allSteps.add(runeDartsSteps);

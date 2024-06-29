@@ -28,13 +28,14 @@
 package net.runelite.client.plugins.questhelper.requirements.player;
 
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.stream.Stream;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-
-import java.util.Locale;
 
 /**
  * Requirement that checks if a player has a required number of slots free in a given

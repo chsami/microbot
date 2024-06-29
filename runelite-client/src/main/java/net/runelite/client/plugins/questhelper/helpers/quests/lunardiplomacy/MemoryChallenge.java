@@ -27,14 +27,12 @@ package net.runelite.client.plugins.questhelper.helpers.quests.lunardiplomacy;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.tools.QuestPerspective;
+import java.util.ArrayList;
+import java.util.List;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class MemoryChallenge extends DetailedQuestStep
 {
@@ -42,9 +40,16 @@ public class MemoryChallenge extends DetailedQuestStep
 	List<WorldPoint> currentPath = new ArrayList<>();
 	int column1, column2, column3, column4, lastPos;
 
+	private static final int ROWS = 8;
+	private static final int COLS = 4;
+	private static final int[] LEDGE_X = {1731, 1734, 1737, 1740};
+	private static final int LEDGE_Y_START = 5108;
+	private static final int LEDGE_Y_END = 5083;
+
 	public MemoryChallenge(QuestHelper questHelper)
 	{
-		super(questHelper, "Work out the route across the cloud tiles through trial and error.");
+		super(questHelper, new WorldPoint(1737, 5083, 2),
+			"Work out the route across the cloud tiles through trial and error.");
 	}
 
 	@Override
@@ -54,7 +59,6 @@ public class MemoryChallenge extends DetailedQuestStep
 		setupPaths();
 	}
 
-	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{
@@ -70,6 +74,11 @@ public class MemoryChallenge extends DetailedQuestStep
 			return;
 		}
 
+		if (lastPos + 1 == wps.size())
+		{
+			return;
+		}
+
 		// If start of path, check first point in legit path
 		if (currentPath.size() == 0)
 		{
@@ -80,7 +89,7 @@ public class MemoryChallenge extends DetailedQuestStep
 		// If started path, check furthest we've reached in path
 		WorldPoint lastPoint = currentPath.get(currentPath.size() - 1);
 
-		WorldPoint instanceWp = QuestPerspective.getInstanceWorldPoint(client, wps.get(lastPos));
+		WorldPoint instanceWp = wps.get(lastPos);
 		if (instanceWp == null)
 		{
 			return;
@@ -94,7 +103,7 @@ public class MemoryChallenge extends DetailedQuestStep
 
 	public void checkNextTile(int wpsPos)
 	{
-		WorldPoint instanceWp = QuestPerspective.getInstanceWorldPoint(client, wps.get(wpsPos));
+		WorldPoint instanceWp = QuestPerspective.getInstanceWorldPointFromReal(client, wps.get(wpsPos));
 		if (instanceWp == null)
 		{
 			return;
@@ -110,10 +119,8 @@ public class MemoryChallenge extends DetailedQuestStep
 		}
 	}
 
-	public void setupPaths()
+	private void setupPaths()
 	{
-		// Store world points
-		// Compare to world points
 		int current1 = client.getVarbitValue(2412);
 		int current2 = client.getVarbitValue(2413);
 		int current3 = client.getVarbitValue(2414);
@@ -133,227 +140,89 @@ public class MemoryChallenge extends DetailedQuestStep
 		column3 = current3;
 		column4 = current4;
 
-		setLinePoints(new ArrayList<>());
-		currentPath = new ArrayList<>();
+		int[][] grid = createGrid(column1, column2, column3, column4);
+		wps = findPath(grid);
+	}
 
+	private static int[][] createGrid(int west, int middleWest, int middleEast, int east)
+	{
+		int[][] grid = new int[ROWS][COLS];
 
-		// Path 1
-		if (client.getVarbitValue(2414) == 83)
+		for (int row = 0; row < ROWS; row++)
 		{
-			wps = Arrays.asList(
-				new WorldPoint(1731, 5106, 2),
-				new WorldPoint(1731, 5103, 2),
-				new WorldPoint(1734, 5103, 2),
-				new WorldPoint(1737, 5103, 2),
-				new WorldPoint(1740, 5103, 2),
-				new WorldPoint(1740, 5100, 2),
-				new WorldPoint(1740, 5097, 2),
-				new WorldPoint(1737, 5097, 2),
-				new WorldPoint(1734, 5097, 2),
-				new WorldPoint(1731, 5097, 2),
-				new WorldPoint(1731, 5094, 2),
-				new WorldPoint(1731, 5091, 2),
-				new WorldPoint(1731, 5088, 2),
-				new WorldPoint(1734, 5088, 2),
-				new WorldPoint(1737, 5088, 2),
-				new WorldPoint(1737, 5085, 2),
-				new WorldPoint(1737, 5083, 2)
-			);
-			setWorldPoint(1737, 5083, 2);
+			grid[row][0] = (west >> (ROWS - 1 - row)) & 1;
+			grid[row][1] = (middleWest >> (ROWS - 1 - row)) & 1;
+			grid[row][2] = (middleEast >> (ROWS - 1 - row)) & 1;
+			grid[row][3] = (east >> (ROWS - 1 - row)) & 1;
 		}
-		// Path 2
-		else if (client.getVarbitValue(2414) == 192)
+
+		return grid;
+	}
+
+	public static List<WorldPoint> findPath(int[][] grid)
+	{
+		List<WorldPoint> path = new ArrayList<>();
+
+		// Find the starting point in the first row
+		int startCol = -1;
+		for (int col = 0; col < COLS; col++)
 		{
-			wps = Arrays.asList(
-				new WorldPoint(1737, 5106, 2),
-				new WorldPoint(1737, 5103, 2),
-				new WorldPoint(1734, 5103, 2),
-				new WorldPoint(1731, 5103, 2),
-				new WorldPoint(1731, 5100, 2),
-				new WorldPoint(1731, 5097, 2),
-				new WorldPoint(1734, 5097, 2),
-				new WorldPoint(1734, 5094, 2),
-				new WorldPoint(1734, 5091, 2),
-				new WorldPoint(1731, 5091, 2),
-				new WorldPoint(1731, 5088, 2),
-				new WorldPoint(1731, 5085, 2),
-				new WorldPoint(1731, 5083, 2)
-			);
-			setWorldPoint(1731, 5083, 2);
+			if (grid[ROWS - 1][col] == 1)
+			{
+				startCol = col;
+				break;
+			}
 		}
-		// Path 3
-		else if (client.getVarbitValue(2415) == 7)
+
+		if (startCol == -1)
 		{
-			wps = Arrays.asList(
-				new WorldPoint(1731, 5106, 2),
-				new WorldPoint(1731, 5103, 2),
-				new WorldPoint(1734, 5103, 2),
-				new WorldPoint(1737, 5103, 2),
-				new WorldPoint(1737, 5100, 2),
-				new WorldPoint(1737, 5097, 2),
-				new WorldPoint(1734, 5097, 2),
-				new WorldPoint(1731, 5097, 2),
-				new WorldPoint(1731, 5094, 2),
-				new WorldPoint(1731, 5091, 2),
-				new WorldPoint(1734, 5091, 2),
-				new WorldPoint(1737, 5091, 2),
-				new WorldPoint(1740, 5091, 2),
-				new WorldPoint(1740, 5088, 2),
-				new WorldPoint(1740, 5085, 2),
-				new WorldPoint(1740, 5083, 2)
-			);
-			setWorldPoint(1740, 5083, 2);
+			return new ArrayList<>();
 		}
-		// Path 4, shared varbit with 3 but will 3 has already passed
-		else if (client.getVarbitValue(2412) == 28)
+
+		path.add(new WorldPoint(LEDGE_X[startCol], LEDGE_Y_START, 2));
+		// Perform the pathfinding
+		addNewTileToPath(grid, ROWS - 1, startCol, path);
+		path.add(new WorldPoint(path.get(path.size() - 1).getX(), LEDGE_Y_END, 2));
+
+		return path;
+	}
+
+	private static boolean addNewTileToPath(int[][] grid, int row, int col, List<WorldPoint> path)
+	{
+		// Add new tile to path, and remove, so it won't be re-considered
+		path.add(new WorldPoint(LEDGE_X[col], LEDGE_Y_START - 2 - ((ROWS - row - 1) * 3), 2));
+		grid[row][col] = 0;
+
+		// If reached end, return
+		if (row == 0)
 		{
-			wps = Arrays.asList(
-				new WorldPoint(1734, 5106, 2),
-				new WorldPoint(1734, 5103, 2),
-				new WorldPoint(1737, 5103, 2),
-				new WorldPoint(1737, 5100, 2),
-				new WorldPoint(1737, 5097, 2),
-				new WorldPoint(1734, 5097, 2),
-				new WorldPoint(1731, 5097, 2),
-				new WorldPoint(1731, 5094, 2),
-				new WorldPoint(1731, 5091, 2),
-				new WorldPoint(1734, 5091, 2),
-				new WorldPoint(1734, 5088, 2),
-				new WorldPoint(1737, 5088, 2),
-				new WorldPoint(1737, 5085, 2),
-				new WorldPoint(1737, 5083, 2)
-			);
-			setWorldPoint(1731, 5083, 2);
+			return true;
 		}
-		// Path 5
-		else if (client.getVarbitValue(2415) == 123)
+
+		// Check south, then east, then west
+		int[][] directions = {{-1, 0}, {0, 1}, {0, -1}};
+		for (int[] dir : directions)
 		{
-			wps = Arrays.asList(
-				new WorldPoint(1734, 5106, 2),
-				new WorldPoint(1734, 5103, 2),
-				new WorldPoint(1737, 5103, 2),
-				new WorldPoint(1740, 5103, 2),
-				new WorldPoint(1740, 5100, 2),
-				new WorldPoint(1740, 5097, 2),
-				new WorldPoint(1740, 5094, 2),
-				new WorldPoint(1737, 5094, 2),
-				new WorldPoint(1734, 5094, 2),
-				new WorldPoint(1731, 5094, 2),
-				new WorldPoint(1731, 5091, 2),
-				new WorldPoint(1731, 5088, 2),
-				new WorldPoint(1734, 5088, 2),
-				new WorldPoint(1737, 5088, 2),
-				new WorldPoint(1740, 5088, 2),
-				new WorldPoint(1740, 5085, 2),
-				new WorldPoint(1740, 5083, 2)
-			);
-			setWorldPoint(1740, 5083, 2);
+			int newRow = row + dir[0];
+			int newCol = col + dir[1];
+
+			if (isValidNextTile(grid, newRow, newCol))
+			{
+				if (addNewTileToPath(grid, newRow, newCol, path))
+				{
+					return true;
+				}
+			}
 		}
-		// Path 6
-		else if (client.getVarbitValue(2414) == 42)
-		{
-			wps = Arrays.asList(
-				new WorldPoint(1731, 5106, 2),
-				new WorldPoint(1731, 5103, 2),
-				new WorldPoint(1731, 5100, 2),
-				new WorldPoint(1734, 5100, 2),
-				new WorldPoint(1737, 5100, 2),
-				new WorldPoint(1740, 5100, 2),
-				new WorldPoint(1740, 5097, 2),
-				new WorldPoint(1740, 5094, 2),
-				new WorldPoint(1737, 5094, 2),
-				new WorldPoint(1734, 5094, 2),
-				new WorldPoint(1734, 5091, 2),
-				new WorldPoint(1734, 5088, 2),
-				new WorldPoint(1737, 5088, 2),
-				new WorldPoint(1740, 5088, 2),
-				new WorldPoint(1740, 5085, 2),
-				new WorldPoint(1740, 5083, 2)
-			);
-			setWorldPoint(1740, 5083, 2);
-		}
-		// Path 7
-		else if (client.getVarbitValue(2413) == 218)
-		{
-			wps = Arrays.asList(
-				new WorldPoint(1734, 5106, 2),
-				new WorldPoint(1734, 5103, 2),
-				new WorldPoint(1737, 5103, 2),
-				new WorldPoint(1737, 5100, 2),
-				new WorldPoint(1737, 5097, 2),
-				new WorldPoint(1734, 5097, 2),
-				new WorldPoint(1734, 5094, 2),
-				new WorldPoint(1731, 5094, 2),
-				new WorldPoint(1731, 5091, 2),
-				new WorldPoint(1731, 5088, 2),
-				new WorldPoint(1734, 5088, 2),
-				new WorldPoint(1737, 5088, 2),
-				new WorldPoint(1737, 5085, 2),
-				new WorldPoint(1737, 5083, 2)
-			);
-			setWorldPoint(1737, 5083, 2);
-		}
-		// Path 8
-		else if (client.getVarbitValue(2414) == 91)
-		{
-			wps = Arrays.asList(
-				new WorldPoint(1734, 5106, 2),
-				new WorldPoint(1734, 5103, 2),
-				new WorldPoint(1737, 5103, 2),
-				new WorldPoint(1740, 5103, 2),
-				new WorldPoint(1740, 5100, 2),
-				new WorldPoint(1740, 5097, 2),
-				new WorldPoint(1737, 5097, 2),
-				new WorldPoint(1737, 5094, 2),
-				new WorldPoint(1734, 5094, 2),
-				new WorldPoint(1734, 5091, 2),
-				new WorldPoint(1734, 5088, 2),
-				new WorldPoint(1737, 5088, 2),
-				new WorldPoint(1737, 5085, 2),
-				new WorldPoint(1737, 5083, 2)
-			);
-			setWorldPoint(1737, 5083, 2);
-		}
-		// Path 9
-		else if (client.getVarbitValue(2413) == 3)
-		{
-			wps = Arrays.asList(
-				new WorldPoint(1740, 5106, 2),
-				new WorldPoint(1740, 5103, 2),
-				new WorldPoint(1740, 5100, 2),
-				new WorldPoint(1737, 5100, 2),
-				new WorldPoint(1737, 5097, 2),
-				new WorldPoint(1737, 5094, 2),
-				new WorldPoint(1740, 5094, 2),
-				new WorldPoint(1740, 5091, 2),
-				new WorldPoint(1740, 5088, 2),
-				new WorldPoint(1737, 5088, 2),
-				new WorldPoint(1734, 5088, 2),
-				new WorldPoint(1734, 5085, 2),
-				new WorldPoint(1734, 5083, 2)
-			);
-			setWorldPoint(1734, 5083, 2);
-		}
-		// Path 10
-		else if (client.getVarbitValue(2412) == 30)
-		{
-			wps = Arrays.asList(
-				new WorldPoint(1734, 5106, 2),
-				new WorldPoint(1734, 5103, 2),
-				new WorldPoint(1737, 5103, 2),
-				new WorldPoint(1737, 5100, 2),
-				new WorldPoint(1737, 5097, 2),
-				new WorldPoint(1734, 5097, 2),
-				new WorldPoint(1731, 5097, 2),
-				new WorldPoint(1731, 5094, 2),
-				new WorldPoint(1731, 5091, 2),
-				new WorldPoint(1731, 5088, 2),
-				new WorldPoint(1734, 5088, 2),
-				new WorldPoint(1737, 5088, 2),
-				new WorldPoint(1737, 5085, 2),
-				new WorldPoint(1737, 5083, 2)
-			);
-			setWorldPoint(1737, 5083, 2);
-		}
+
+		// Remove if something went wrong
+		grid[row][col] = 1;
+		path.remove(path.size() - 1);
+		return false;
+	}
+
+	private static boolean isValidNextTile(int[][] grid, int row, int col)
+	{
+		return row >= 0 && row < ROWS && col >= 0 && col < COLS && grid[row][col] == 1;
 	}
 }

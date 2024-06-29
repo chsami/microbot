@@ -24,36 +24,46 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.deathtothedorgeshuun;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.npc.FollowerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcInteractingRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.DEATH_TO_THE_DORGESHUUN
-)
 public class DeathToTheDorgeshuun extends BasicQuestHelper
 {
 	//Items Required
@@ -61,19 +71,17 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		hamShirt2, hamRobe2, hamHood2, hamBoot2, hamGloves2, hamLogo2, hamCloak2, hamSet2, hamShirt, hamRobe, hamHood, hamBoot, hamGloves,
 		hamLogo, hamCloak, hamSet, zanik, pickaxeHighlighted, tinderbox, crate, combatGear, gamesNecklace;
 
-	FollowerRequirement zanikFollower;
-
 	Requirement inBasement, inLumbridgeF0, inLumbridgeF1, inLumbridgeF2, inTunnels, inMines, inHamBase, zanikIsFollowing,
 		talkedToShopkeeper, talkedToWoman, talkedToDuke, talkedToAereck, talkedToGoblins, goneOutside, heardSpeaker, isBehindGuard1,
 		killedGuard1, isNearGuard4, isNearGuard5, inStoreroom, killedGuard2, killedGuard3, killedGuard4, killedGuard5, zanikWaitingFor4,
 		zanikWaitingFor5, isDisguisedZanikFollowing, zanikPickedUp, ropeAddedToHole, minedRocks, inSwamp, inJunaRoom, inMill, killedGuards,
 		talkedToJohn;
 
-	DetailedQuestStep goDownFromF2, talkToMistag, talkToZanik, talkToMistagToTravel, talkToCook, talkToDuke, talkToHans,
+	QuestStep goDownFromF2, talkToMistag, talkToZanik, talkToMistagToTravel, talkToCook, talkToDuke, talkToHans,
 		talkToWoman, talkToBob, talkToAereck, talkToGuide, approachGoblins, talkToShopkeeper, goOutside, talkToZanikAboutOrigin,
 		listenToSpeaker, standNearTrapdoor, goDownTrapdoor, standBehindGuard1, talkToGuard1, talkToGuard2, tellZanikToKillGuard3, talkToJohanhus,
 		standNearGuard4, tellZanikToWaitForGuard4, runSouthToLureGuard4, standNearGuard5, tellZanikToWaitForGuard5, lureGuard5, listenToDoor,
-		checkZanikCorpse, mineRocks, climbIntoSwamp, enterJunaArea, talkToJuna, talkToJunaMore, searchCrate, enterMill, killGuards, killSigmund,
+		leaveHamBase, checkZanikCorpse, mineRocks, climbIntoSwamp, enterJunaArea, talkToJuna, talkToJunaMore, searchCrate, enterMill, killGuards, killSigmund,
 		smashDrill, enterExit, goDownFromF1, goUpToF1, goDownIntoBasement, climbThroughHole, goUpFromBasement, enterHamLair, talkToKazgar;
 
 	ConditionalStep goTalkToMistag, goTalkToZanik, goHaveZanikFollow, goTalkToCook, goTalkToDuke, goTalkToHans, goTalkToWoman, goTalkToBob,
@@ -87,8 +95,7 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		setupConditionalSteps();
@@ -137,6 +144,7 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		savingZanik.addStep(new Conditions(zanikPickedUp, minedRocks), goToJunaSteps);
 		savingZanik.addStep(new Conditions(zanikPickedUp, inTunnels), mineRocks);
 		savingZanik.addStep(zanikPickedUp, goClearRocks);
+		savingZanik.addStep(inHamBase, leaveHamBase);
 		steps.put(6, savingZanik);
 
 		steps.put(7, talkToJunaMore);
@@ -166,7 +174,7 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.PICKAXES).isNotConsumed();
 		pickaxeHighlighted = pickaxe.highlighted().isNotConsumed();
@@ -206,7 +214,6 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		hamSet2.setTooltip("The chance of thieving a ham clothing piece increases massively AFTER starting the quest");
 
 		zanik = new ItemRequirement("Zanik", ItemID.ZANIK);
-		zanikFollower = new FollowerRequirement("Zanik following you. If she's not, retrieve her from Lumbridge Basement", NpcID.ZANIK_4508);
 
 		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).isNotConsumed();
 
@@ -216,7 +223,8 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		gamesNecklace = new ItemRequirement("Games necklace (requires Tears of Guthix to teleport to Juna)", ItemID.GAMES_NECKLACE8);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		basement = new Zone(new WorldPoint(3208, 9614, 0), new WorldPoint(3219, 9625, 0));
 		lumbridgeF0 = new Zone(new WorldPoint(3136, 3136, 0), new WorldPoint(3328, 3328, 0));
@@ -258,7 +266,7 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		talkedToGoblins = new VarbitRequirement(2261, 1);
 		talkedToWoman = new VarbitRequirement(2262, 1);
 		goneOutside = new VarbitRequirement(2263, 1);
-		zanikIsFollowing = new Conditions(LogicType.OR, new VarbitRequirement(2264, 0));
+		zanikIsFollowing =  new VarplayerRequirement(447, List.of(NpcID.ZANIK_4508, NpcID.ZANIK_4509), 16);
 		talkedToShopkeeper = new VarbitRequirement(2265, 1);
 		heardSpeaker = new VarbitRequirement(2268, 1);
 		talkedToJohn = new VarbitRequirement(2269, 1);
@@ -294,6 +302,7 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		talkToKazgar = new NpcStep(this, NpcID.KAZGAR, new WorldPoint(3230, 9610, 0), "Travel with Kazgar to shortcut to Mistag.");
 		talkToMistag = new NpcStep(this, NpcID.MISTAG_7298, new WorldPoint(3319, 9615, 0), "");
 		talkToMistagToTravel = new NpcStep(this, NpcID.MISTAG_7298, new WorldPoint(3319, 9615, 0), "Travel with Mistag back to Lumbridge.");
+		talkToMistagToTravel.addDialogStep("Can you show me the way out of the mines?");
 		talkToZanik = new NpcStep(this, NpcID.ZANIK_4506, new WorldPoint(3212, 9620, 0), "");
 
 		talkToCook = new NpcStep(this, NpcID.COOK_4626, new WorldPoint(3209, 3215, 0), "");
@@ -325,36 +334,66 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 
 		goDownTrapdoor = new ObjectStep(this, NullObjectID.NULL_15766, new WorldPoint(3166, 9622, 0), "Picklock the trapdoor south of the stage and go down it.");
 
-		standBehindGuard1 = new DetailedQuestStep(this, new WorldPoint(2569, 5189, 0), "Stand behind the guard and talk to them so they turn their back to Zanik.");
-		talkToGuard1 = new NpcStep(this, NpcID.GUARD_4516, new WorldPoint(2570, 5189, 0), "Talk to them so they turn their back to Zanik.");
+		standBehindGuard1 = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, new WorldPoint(2569, 5189, 0), "Stand behind the guard and talk to them so they turn their back to Zanik."),
+			"Sneak your way to the end of the secret area.");
+		talkToGuard1 = new PuzzleWrapperStep(this,
+			new NpcStep(this, NpcID.GUARD_4516, new WorldPoint(2570, 5189, 0), "Talk to them so they turn their back to Zanik."),
+				"Sneak your way to the end of the secret area.").withNoHelpHiddenInSidebar(true);
 		standBehindGuard1.addSubSteps(talkToGuard1);
 
-		talkToGuard2 = new NpcStep(this, NpcID.GUARD_4517, new WorldPoint(2566, 5192, 0), "Go through the nearby crack, then out the other side. Talk to the second guard to turn them around so Zanik can kill them.");
-		talkToGuard2.setLinePoints(Arrays.asList(
+		NpcStep talkToGuard2RealStep = new NpcStep(this, NpcID.GUARD_4517, new WorldPoint(2566, 5192, 0),
+			"Go through the nearby crack, then out the other side. Talk to the second guard to turn them around so Zanik can kill them.");
+		talkToGuard2RealStep.setLinePoints(Arrays.asList(
 			new WorldPoint(2569, 5189, 0),
 			new WorldPoint(2569, 5195, 0),
 			new WorldPoint(2566, 5195, 0),
 			new WorldPoint(2566, 5193, 0)
 		));
+		talkToGuard2 = new PuzzleWrapperStep(this,
+			talkToGuard2RealStep,
+			"Sneak your way to the end of the secret area.").withNoHelpHiddenInSidebar(true);
 
-		tellZanikToKillGuard3 = new NpcStep(this, NpcID.ZANIK_4509, "Wait for the third guard to be walking away, then tell Zanik to kill them.");
-		tellZanikToKillGuard3.addDialogStep("Now!");
-		standNearGuard4 = new DetailedQuestStep(this, new WorldPoint(2576, 5195, 0), "Stand near to the next guard, then tell Zanik to wait there.");
-		tellZanikToWaitForGuard4 = new NpcStep(this, NpcID.ZANIK_4509, "Tell Zanik to wait.");
-		tellZanikToWaitForGuard4.addDialogStep("Wait here.");
-		runSouthToLureGuard4 = new DetailedQuestStep(this, new WorldPoint(2577, 5191, 0), "Run east then south to lure the guard past Zanik.");
-		standNearGuard5 = new DetailedQuestStep(this, new WorldPoint(2577, 5200, 0), "Stand in the north east, just out of sight of the last guard, and tell Zanik to wait there.");
-		tellZanikToWaitForGuard5 = new NpcStep(this, NpcID.ZANIK_4509, "Tell Zanik to wait.");
-		tellZanikToWaitForGuard5.addDialogStep("Wait here.");
-		lureGuard5 = new DetailedQuestStep(this, new WorldPoint(2566, 5201, 0), "Approach the final guard from the west so Zanik can kill them.");
-		lureGuard5.setLinePoints(Arrays.asList(
+		NpcStep tellZanikToKillGuard3RealStep = new NpcStep(this, NpcID.ZANIK_4509, "Wait for the third guard to be walking away, then tell Zanik to kill them.");
+		tellZanikToKillGuard3RealStep.addDialogStep("Now!");
+		tellZanikToKillGuard3 = new PuzzleWrapperStep(this,
+			tellZanikToKillGuard3RealStep, "Sneak your way to the end of the secret area.").withNoHelpHiddenInSidebar(true);
+		standNearGuard4 = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, new WorldPoint(2576, 5195, 0), "Stand near to the next guard, then tell Zanik to wait there."),
+			"Sneak your way to the end of the secret area.");
+
+		NpcStep tellZanikToWaitForGuard4RealStep = new NpcStep(this, NpcID.ZANIK_4509, "Tell Zanik to wait.");
+		tellZanikToWaitForGuard4RealStep.addDialogStep("Wait here.");
+		tellZanikToWaitForGuard4 = new PuzzleWrapperStep(this,
+			tellZanikToWaitForGuard4RealStep, "Sneak your way to the end of the secret area.").withNoHelpHiddenInSidebar(true);
+
+		runSouthToLureGuard4 = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, new WorldPoint(2577, 5191, 0), "Run east then south to lure the guard past Zanik."),
+			"Sneak your way to the end of the secret area.").withNoHelpHiddenInSidebar(true);
+		standNearGuard5 = new PuzzleWrapperStep(this,
+			new DetailedQuestStep(this, new WorldPoint(2577, 5200, 0), "Stand in the north east, just out of sight of the last guard, and tell Zanik to wait there."),
+			"Sneak your way to the end of the secret area.").withNoHelpHiddenInSidebar(true);
+
+		NpcStep tellZanikToWaitForGuard5RealStep = new NpcStep(this, NpcID.ZANIK_4509, "Tell Zanik to wait.");
+		tellZanikToWaitForGuard5RealStep.addDialogStep("Wait here.");
+		tellZanikToWaitForGuard5 = new PuzzleWrapperStep(this,
+			tellZanikToWaitForGuard5RealStep,
+			"Sneak your way to the end of the secret area.").withNoHelpHiddenInSidebar(true);
+
+		DetailedQuestStep lureGuard5RealStep = new DetailedQuestStep(this, new WorldPoint(2566, 5201, 0), "Approach the final guard from the west so Zanik can kill them.");
+		lureGuard5RealStep.setLinePoints(Arrays.asList(
 			new WorldPoint(2577, 5199, 0),
 			new WorldPoint(2577, 5195, 0),
 			new WorldPoint(2566, 5195, 0),
 			new WorldPoint(2566, 5201, 0)
 		));
+		lureGuard5 = new PuzzleWrapperStep(this,
+			lureGuard5RealStep,
+			"Sneak your way to the end of the secret area.").withNoHelpHiddenInSidebar(true);
 
+		leaveHamBase = new ObjectStep(this, ObjectID.LADDER_5493, new WorldPoint(3149, 9653, 0), "Leave the H.A.M base and inspect Zanik just outside it.");
 		checkZanikCorpse = new ObjectStep(this, NullObjectID.NULL_15712, new WorldPoint(3161, 3246, 0), "Inspect Zanik outside the H.A.M base.");
+		checkZanikCorpse.addSubSteps(leaveHamBase);
 		listenToDoor = new ObjectStep(this, ObjectID.LARGE_DOOR_15757, new WorldPoint(2571, 5204, 0), "Listen to the large door.");
 
 		mineRocks = new ObjectStep(this, ObjectID.HOLE_6912, new WorldPoint(3224, 9602, 0), "Use a pickaxe on the rocks to the south.", pickaxeHighlighted, lightSource);
@@ -367,7 +406,8 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		talkToJunaMore = new ObjectStep(this, NullObjectID.NULL_3193, new WorldPoint(3252, 9517, 2), "Talk to Juna with both hands free. Collect 20 tears of Guthix.", lightSource);
 		talkToJunaMore.addDialogStep("Yes.");
 
-		searchCrate = new ObjectStep(this, ObjectID.CRATE_15704, new WorldPoint(3228, 3280, 0), "Search a crate south of the farm east of the Lumbridge.", zanikFollower, combatGear, hamSet);
+		searchCrate = new ObjectStep(this, ObjectID.CRATE_15704, new WorldPoint(3228, 3280, 0),
+			"Search a crate south of the farm east of Lumbridge. If Zanik isn't appearing when doing so, call her in the 'Worn equipment' tab with the 'Call follower' button with a whistle icon.", combatGear, hamSet);
 		searchCrate.addDialogSteps("I don't know, what are you thinking?", "Good idea.");
 		enterMill = new ObjectStep(this, NullObjectID.NULL_15765, new WorldPoint(3230, 3286, 0), "Enter the trapdoor outside the farm.", combatGear, hamSet);
 		killGuards = new NpcStep(this, NpcID.GUARD, new WorldPoint(2000, 5087, 0), "Kill the guards to the west.", true);
@@ -390,7 +430,8 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		goTalkToMistag.addStep(inMines, talkToMistag);
 		goTalkToMistag.addStep(inTunnels, talkToKazgar);
 		goTalkToMistag.addStep(inBasement, climbThroughHole);
-		goTalkToMistag.addDialogSteps("What is this favour?", "I'll act as a guide.");
+		goTalkToMistag.addDialogSteps("What is this favour?", "I'll act as a guide.", "Yes.");
+		// 0001000110011100 1011100011111101
 
 		goTalkToZanik = new ConditionalStep(this, goDownToBasement, "Talk to Zanik in Lumbridge Castle's basement.", hamHood2, hamShirt2, hamRobe2, hamBoot2, hamGloves2, hamCloak2, hamLogo2);
 		goTalkToZanik.addStep(inMines, talkToMistagToTravel);
@@ -398,61 +439,63 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		goTalkToZanik.addStep(inBasement, talkToZanik);
 		if (client.getLocalPlayer() != null)
 		{
-			goTalkToZanik.addDialogStep("Yes, I'm " + client.getLocalPlayer().getName() + "!");
+			goTalkToZanik.addDialogStep("Yes, I'm " + questHelperPlugin.getPlayerStateManager().getPlayerName() + "!");
+			goTalkToZanik.addDialogStep("Yes, I have two sets of robes!");
 		}
 
 		goHaveZanikFollow = new ConditionalStep(this, goDownToBasement, "Talk to Zanik in Lumbridge Castle's basement.");
 		goHaveZanikFollow.addStep(inBasement, talkToZanik);
 		goHaveZanikFollow.addDialogSteps("Yes.", "Yes please!");
 
-		goTalkToCook = new ConditionalStep(this, talkToCook, "Talk to the Lumbridge Cook.", zanikFollower);
+		goTalkToCook = new ConditionalStep(this, talkToCook, "Talk to the Lumbridge Cook.");
 		goTalkToCook.addStep(inLumbridgeF2, goDownFromF2);
 		goTalkToCook.addStep(inLumbridgeF1, goDownFromF1);
 		goTalkToCook.addStep(inBasement, goUpFromBasement);
 
-		goTalkToDuke = new ConditionalStep(this, goUpToF1, "Talk to the Duke.", zanikFollower);
+		goTalkToDuke = new ConditionalStep(this, goUpToF1, "Talk to the Duke.");
 		goTalkToDuke.addStep(inLumbridgeF1, talkToDuke);
 
-		goOutsideSteps = new ConditionalStep(this, goOutside, "Leave the castle, and go through the entire leaving cutscene. If you cut it short, enter/leave again.", zanikFollower);
+		goOutsideSteps = new ConditionalStep(this, goOutside, "Leave the castle, and go through the entire leaving cutscene. If you cut it short, enter/leave again.");
 		goOutsideSteps.addStep(inLumbridgeF2, goDownFromF2);
 		goOutsideSteps.addStep(inLumbridgeF1, goDownFromF1);
 		goOutsideSteps.addStep(inBasement, goUpFromBasement);
 
-		goTalkToHans = new ConditionalStep(this, talkToHans, "Talk to Hans.", zanikFollower);
+		goTalkToHans = new ConditionalStep(this, talkToHans, "Talk to Hans.");
 		goTalkToHans.addStep(inLumbridgeF2, goDownFromF2);
 		goTalkToHans.addStep(inLumbridgeF1, goDownFromF1);
 		goTalkToHans.addStep(inBasement, goUpFromBasement);
 
-		goTalkToWoman = new ConditionalStep(this, talkToWoman, "Talk to any man or woman around Lumbridge.", zanikFollower);
+		goTalkToWoman = new ConditionalStep(this, talkToWoman, "Talk to any man or woman around Lumbridge.");
 		goTalkToWoman.addStep(inLumbridgeF2, goDownFromF2);
 		goTalkToWoman.addStep(inLumbridgeF1, goDownFromF1);
 		goTalkToWoman.addStep(inBasement, goUpFromBasement);
 
-		goTalkToGuide = new ConditionalStep(this, talkToGuide, "Talk to the Lumbridge Guide.", zanikFollower);
+		goTalkToGuide = new ConditionalStep(this, talkToGuide, "Talk to the Lumbridge Guide.");
 		goTalkToGuide.addStep(inLumbridgeF2, goDownFromF2);
 		goTalkToGuide.addStep(inLumbridgeF1, goDownFromF1);
 		goTalkToGuide.addStep(inBasement, goUpFromBasement);
 
-		goTalkToBob = new ConditionalStep(this, talkToBob, "Talk to Bob in south Lumbridge.", zanikFollower);
+		goTalkToBob = new ConditionalStep(this, talkToBob, "Talk to Bob in south Lumbridge.");
 		goTalkToBob.addStep(inLumbridgeF2, goDownFromF2);
 		goTalkToBob.addStep(inLumbridgeF1, goDownFromF1);
 		goTalkToBob.addStep(inBasement, goUpFromBasement);
 
-		goTalkToAereck = new ConditionalStep(this, talkToAereck, "Talk to Father Aereck.", zanikFollower);
+		goTalkToAereck = new ConditionalStep(this, talkToAereck, "Talk to Father Aereck.");
 		goTalkToAereck.addStep(inLumbridgeF2, goDownFromF2);
 		goTalkToAereck.addStep(inLumbridgeF1, goDownFromF1);
 		goTalkToAereck.addStep(inBasement, goUpFromBasement);
 
-		goNearGoblins = new ConditionalStep(this, approachGoblins, "Approach the goblins east of the River Lum.", zanikFollower);
+		goNearGoblins = new ConditionalStep(this, approachGoblins, "Approach the goblins east of the River Lum.");
 		goNearGoblins.addStep(inLumbridgeF2, goDownFromF2);
 		goNearGoblins.addStep(inLumbridgeF1, goDownFromF1);
 		goNearGoblins.addStep(inBasement, goUpFromBasement);
 
-		goTalkToShopkeeper = new ConditionalStep(this, talkToShopkeeper, "Talk to the Lumbridge General Store shopkeeper.", zanikFollower);
+		goTalkToShopkeeper = new ConditionalStep(this, talkToShopkeeper, "Talk to the Lumbridge General Store shopkeeper.");
 		goTalkToShopkeeper.addStep(inLumbridgeF2, goDownFromF2);
 		goTalkToShopkeeper.addStep(inLumbridgeF1, goDownFromF1);
 		goTalkToShopkeeper.addStep(inBasement, goUpFromBasement);
 
+		// 0001000110011101 1110110010110110
 		goIntoHamLair = new ConditionalStep(this, enterHamLair, "Enter the H.A.M lair west of Lumbridge.", hamHood, hamShirt, hamRobe, hamBoot, hamGloves, hamCloak, hamLogo);
 		goIntoHamLair.addStep(inLumbridgeF2, goDownFromF2);
 		goIntoHamLair.addStep(inLumbridgeF1, goDownFromF1);
@@ -471,6 +514,11 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 
 		goGetZanikForMill = new ConditionalStep(this, goHaveZanikFollow, "Talk to Zanik under the Lumbridge Castle.");
 		goGetZanikForMill.addDialogStep("Let's go!");
+
+		// Left mill right after entering:
+		//
+
+		// Weird teleporting occurs when talking to H.A.M member who's moving boxes, 4513 version (not 4514)
 	}
 
 	@Override
