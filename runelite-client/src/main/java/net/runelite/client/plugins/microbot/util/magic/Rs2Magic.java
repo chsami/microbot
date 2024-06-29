@@ -1,11 +1,11 @@
 package net.runelite.client.plugins.microbot.util.magic;
 
-import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -13,17 +13,24 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
+import net.runelite.client.plugins.timers.GameTimer;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
 import java.util.Arrays;
 
+import static net.runelite.client.plugins.microbot.Microbot.log;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Magic {
-    public boolean canCast(MagicAction magicSpell) {
-        return Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= magicSpell.getLevel();
+    public static boolean canCast(MagicAction magicSpell) {
+        if (Rs2Tab.getCurrentTab() != InterfaceTab.MAGIC) {
+            Rs2Tab.switchToMagicTab();
+            sleep(150, 300);
+        }
+        Widget widget = Arrays.stream(Rs2Widget.getWidget(14286851).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
+        return widget != null;
     }
 
     public static void cast(MagicAction magicSpell) {
@@ -31,6 +38,10 @@ public class Rs2Magic {
         Rs2Tab.switchToMagicTab();
         Microbot.status = "Casting " + magicSpell.getName();
         sleep(150, 300);
+        if (!canCast(magicSpell)) {
+            log("Unable to cast " + magicSpell.getName());
+            return;
+        }
         int identifier = 1;
         if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")
                 || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
@@ -82,6 +93,7 @@ public class Rs2Magic {
 
     /**
      * alch item with minsleep of 300 and maxsleep of 600
+     *
      * @param item
      */
     public static void alch(Rs2Item item) {
@@ -89,7 +101,6 @@ public class Rs2Magic {
     }
 
     /**
-     *
      * @param item
      * @param sleepMin
      * @param sleepMax
@@ -200,7 +211,7 @@ public class Rs2Magic {
     private static void superHeat(Widget superHeat) {
         superHeat(superHeat, null, 300, 600);
     }
-    
+
     public static boolean isLunar() {
         return Microbot.getVarbitValue(Varbits.SPELLBOOK) == 2;
     }
@@ -211,5 +222,13 @@ public class Rs2Magic {
 
     public static boolean isModern() {
         return Microbot.getVarbitValue(Varbits.SPELLBOOK) == 0;
+    }
+
+    public static boolean isArceeus() {
+        return Microbot.getVarbitValue(Varbits.SPELLBOOK) == 3;
+    }
+
+    public static boolean isShadowVeilActive() {
+        return Microbot.isTimerActive(GameTimer.SHADOW_VEIL);
     }
 }
