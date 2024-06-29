@@ -39,6 +39,7 @@ public @interface PluginDescriptor {
     String Forn = "<html>[<font color=#AF2B1E>F</font>] ";
     String See1Duck = "<html>[<font color=#ffff1a>\uD83E\uDD86</font>] ";
     String GMason = "<html>[<font color=#0077B6>G</font>] ";
+    String Pumster = "<html>[<font color=#03ff4e>P</font>] ";
 
     String name();
 
