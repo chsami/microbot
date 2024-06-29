@@ -4,6 +4,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -21,7 +22,7 @@ public class PVirewatchScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-                long startTime = System.currentTimeMillis();
+                Rs2Combat.enableAutoRetialiate();
 
                 if(plugin.fightArea.contains(client.getLocalPlayer().getWorldLocation())) {
                     Microbot.status = "Figthing";
