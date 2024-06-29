@@ -26,19 +26,21 @@
  */
 package net.runelite.client.plugins.timers;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.runelite.api.GraphicID;
 import net.runelite.api.ItemID;
 import net.runelite.api.SpriteID;
+
+import javax.annotation.Nullable;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+
 import static net.runelite.client.util.RSTimeUnit.GAME_TICKS;
 
 @Getter(AccessLevel.PACKAGE)
-enum GameTimer
+public enum GameTimer
 {
 	STAMINA(ItemID.STAMINA_POTION4, GameTimerImageType.ITEM, "Stamina", false),
 	ANTIFIRE(ItemID.ANTIFIRE_POTION4, GameTimerImageType.ITEM, "Antifire", false),
@@ -99,7 +101,7 @@ enum GameTimer
 	;
 
 	@Nullable
-	private final Duration duration;
+	public final Duration duration;
 	@Nullable
 	private final Integer graphicId;
 	private final String description;
