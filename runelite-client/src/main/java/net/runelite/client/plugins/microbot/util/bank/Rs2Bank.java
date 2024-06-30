@@ -851,7 +851,7 @@ public class Rs2Bank {
             if (bank == null) {
                 GameObject chest = Rs2GameObject.findChest();
                 if (chest == null) {
-                    NPC npc = Rs2Npc.getNpc("banker");
+                    NPC npc = Rs2Npc.getBankerNPC();
                     if (npc == null) return false;
                     action = Rs2Npc.interact(npc, "bank");
                 } else {
