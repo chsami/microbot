@@ -5,6 +5,8 @@ Microbot is an opensource automated oldschool runescape client based on runelite
  
 If you have any questions, please join our [Discord](https://discord.gg/zaGrfqFEWE) server.
 
+Find our blogpost on: https://microbot.atlassian.net/wiki/spaces/~60200544692da10070cdeb29/blogs
+
 
 ## ☕ Buy Me a Coffee
 
