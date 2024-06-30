@@ -22,7 +22,7 @@ public class JadOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + JadScript.version)
+                    .text("Micro JAD Helper V" + JadScript.VERSION)
                     .color(Color.GREEN)
                     .build());
 

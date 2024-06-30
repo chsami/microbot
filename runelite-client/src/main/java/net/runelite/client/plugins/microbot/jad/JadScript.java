@@ -12,52 +12,42 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-
 public class JadScript extends Script {
-    public static double version = 1.0;
-    public static Map<Integer, Long> npcCooldowns = new HashMap<>();
+    public static final String VERSION = "1.0.1";
+    public static final Map<Integer, Long> npcAttackCooldowns = new HashMap<>();
+
     public boolean run(JadConfig config) {
         Microbot.enableAutoRunOn = false;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!Microbot.isLoggedIn()) return;
-                if (!super.run()) return;
-                //CODE HERE
+                if (!Microbot.isLoggedIn() || !super.run()) return;
 
-                var npcs = Rs2Npc.getNpcs("Jad", false);
+                var jadNpcs = Rs2Npc.getNpcs("Jad", false);
 
-                for (net.runelite.api.NPC npc: npcs.collect(Collectors.toList())) {
-                    if (npc == null) continue;
-                    long currentTime = System.currentTimeMillis();
-                    if (npcCooldowns.containsKey(npc.getIndex())) {
-                        if (currentTime - npcCooldowns.get(npc.getIndex()) < 4800) {
+                for (net.runelite.api.NPC jadNpc : jadNpcs.collect(Collectors.toList())) {
+                    if (jadNpc == null) continue;
+
+                    long currentTimeMillis = System.currentTimeMillis();
+                    int npcIndex = jadNpc.getIndex();
+
+                    if (npcAttackCooldowns.containsKey(npcIndex)) {
+                        if (currentTimeMillis - npcAttackCooldowns.get(npcIndex) < 4800) {
                             continue;
                         } else {
-                            npcCooldowns.remove(npc.getIndex());
+                            npcAttackCooldowns.remove(npcIndex);
                         }
                     }
-                    if ( Rs2Reflection.getAnimation(npc) == 7592) {
-                        var healer = Rs2Npc.getNpcs("hurkot", false)
-                                .filter(x -> x != null && x.getInteracting() != Microbot.getClient().getLocalPlayer())
-                                .findFirst()
-                                .orElse(null);
-                        Rs2Npc.interact(healer, "attack");
-                        sleep(600);
-                        npcCooldowns.put(npc.getIndex(), currentTime);
-                        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, true);
-                    } else if (Rs2Reflection.getAnimation(npc) == 7593) {
-                        var healer = Rs2Npc.getNpcs("hurkot", false)
-                                .filter(x -> x != null && x.getInteracting() != Microbot.getClient().getLocalPlayer())
-                                .findFirst()
-                                .orElse(null);
-                        Rs2Npc.interact(healer, "attack");
-                        sleep(600);
-                        npcCooldowns.put(npc.getIndex(), currentTime);
-                        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true);
+
+                    int npcAnimation = Rs2Reflection.getAnimation(jadNpc);
+
+                    if (npcAnimation == 7592 || npcAnimation == 2656) {
+                        handleHealerInteraction("hurkot", Rs2PrayerEnum.PROTECT_MAGIC);
+                        npcAttackCooldowns.put(npcIndex, currentTimeMillis);
+                    } else if (npcAnimation == 7593 || npcAnimation == 2652) {
+                        handleHealerInteraction("hurkot", Rs2PrayerEnum.PROTECT_RANGE);
+                        npcAttackCooldowns.put(npcIndex, currentTimeMillis);
                     }
-
                 }
-
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
@@ -65,9 +55,22 @@ public class JadScript extends Script {
         return true;
     }
 
+    private void handleHealerInteraction(String healerName, Rs2PrayerEnum prayer) {
+        var healer = Rs2Npc.getNpcs(healerName, false)
+                .filter(npc -> npc != null && npc.getInteracting() != Microbot.getClient().getLocalPlayer())
+                .findFirst()
+                .orElse(null);
+
+        if (healer != null) {
+            Rs2Npc.interact(healer, "attack");
+            sleep(600);
+            Rs2Prayer.toggle(prayer, true);
+        }
+    }
+
     @Override
     public void shutdown() {
         super.shutdown();
-        npcCooldowns.clear();
+        npcAttackCooldowns.clear();
     }
 }
