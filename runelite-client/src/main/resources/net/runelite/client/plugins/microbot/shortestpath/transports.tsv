@@ -4434,3 +4434,11 @@
 # Kovac
 3366 11483 0	3361 3148 0	Exit Exit 44636
 3361 3148 0	3366 11483 0	Enter Cave 44635
+
+# Hazeel cult
+2567 9680 0	2606 9692 0	Board Raft 2849
+2606 9692 0	2567 9680 0	Board Raft 2849
+
+# Murder mystery
+2736 3580 1	2736 3580 0	Climb-down Staircase 25683
+2736 3580 0	2736 3580 1	Climb-up Staircase 25682

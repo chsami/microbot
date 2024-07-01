@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
@@ -316,6 +317,23 @@ public class Rs2Npc {
         } else {
             return npc.getWorldLocation();
         }
+    }
+
+    public static boolean canWalkTo(NPC npc, int distance) {
+        if (npc == null) return false;
+        var location = getWorldLocation(npc);
+
+        var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance);
+        for (var tile : tiles.keySet()){
+            if (tile.equals(location))
+                return true;
+        }
+
+        var localLocation = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), location);
+        if (localLocation != null && !Rs2Tile.isWalkable(localLocation))
+            return tiles.keySet().stream().anyMatch(x -> x.distanceTo(location) < 2);
+
+        return false;
     }
 
     /**

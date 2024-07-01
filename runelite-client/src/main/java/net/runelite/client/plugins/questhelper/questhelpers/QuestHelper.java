@@ -98,6 +98,7 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 	@Getter
 	protected QuestHelperPlugin questHelperPlugin;
 
+	@Getter
 	private boolean hasInitialized;
 
 	@Override

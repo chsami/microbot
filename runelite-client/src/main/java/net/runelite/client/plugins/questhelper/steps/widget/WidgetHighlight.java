@@ -36,8 +36,10 @@ public class WidgetHighlight extends AbstractWidgetHighlight
 	@Getter
 	protected final int groupId;
 
+	@Getter
 	protected final int childId;
 
+	@Getter
 	protected final int childChildId;
 
 	@Getter
