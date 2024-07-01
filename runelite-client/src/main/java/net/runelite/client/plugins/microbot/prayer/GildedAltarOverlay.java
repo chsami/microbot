@@ -1,18 +1,15 @@
 package net.runelite.client.plugins.microbot.prayer;
 
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetUtil;
-import net.runelite.client.plugins.microbot.Microbot;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+
+import javax.inject.Inject;
+
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
-
-import javax.inject.Inject;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class GildedAltarOverlay extends OverlayPanel {
     private final GildedAltarPlugin plugin;

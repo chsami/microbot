@@ -1,6 +1,13 @@
 package net.runelite.client.plugins.microbot.prayer;
 
+import java.awt.AWTException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
 import com.google.inject.Provides;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +27,9 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.OverlayManager;
-
-import javax.inject.Inject;
-import java.awt.*;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import static net.runelite.api.MenuAction.CC_OP;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Gilded Altar",
@@ -153,30 +153,53 @@ public class GildedAltarPlugin extends Plugin {
     }
 
     public void leaveHouse() {
-        Rs2Reflection.invokeMenu(-1, 7602207, CC_OP.getId(), 1, -1, "House Option", "", -1, -1);
-        Rs2Reflection.invokeMenu(-1, 24248341, CC_OP.getId(), 1, -1, "Leave House", "", -1, -1);
-        setSkipTicks(4);
+        System.out.println("Attempting to leave house...");
+        
+        if (Rs2GameObject.findObjectById(HOUSE_PORTAL_OBJECT) == null) {
+            System.out.println("Not in house, HOUSE_PORTAL_OBJECT not found.");
+            return;
+        }
+
+        // Switch to Settings tab
+        Rs2Tab.switchToSettingsTab();
+        setSkipTicks(2);
+
+        // Click House Options
+        if (Rs2Widget.clickWidget(7602207)) {
+            System.out.println("Clicked House Options button");
+            setSkipTicks(2);
+        } else {
+            System.out.println("House Options button not found.");
+            return;
+        }
+
+        // Click Leave House
+        if (Rs2Widget.clickWidget(24248341)) {
+            System.out.println("Clicked Leave House button");
+            setSkipTicks(4);
+        } else {
+            System.out.println("Leave House button not found.");
+        }
     }
 
     public void unnoteBones() {
-        if (Microbot.getClient().getWidget(14352385) == null) {
+        if (client.getWidget(14352385) == null) {
             if (!Rs2Inventory.isItemSelected()) {
                 Rs2Inventory.use("bones");
             } else {
-
                 Rs2Npc.interact("Phials", "Use");
                 setSkipTicks(2);
             }
-        } else if (Microbot.getClient().getWidget(14352385) != null) {
+        } else if (client.getWidget(14352385) != null) {
             Rs2Keyboard.keyPress('3');
             setSkipTicks(2);
         }
     }
 
     private void enterHouse() {
-        boolean isAdvertismentWidgetOpen = Rs2Widget.hasWidget("House advertisement");
+        boolean isAdvertisementWidgetOpen = Rs2Widget.hasWidget("House advertisement");
 
-        if (!isAdvertismentWidgetOpen) {
+        if (!isAdvertisementWidgetOpen) {
             Rs2GameObject.interact(ObjectID.HOUSE_ADVERTISEMENT, "View");
             setSkipTicks(2);
             return;
@@ -184,16 +207,14 @@ public class GildedAltarPlugin extends Plugin {
 
         Widget container = Rs2Widget.getWidget(52, 9);
         if (container == null || container.getChildren() == null) return;
-        Widget playerHouse = null;
-        for (String player : config.housePlayerName().split(",")) {
-            playerHouse = Rs2Widget.findWidget(player, Arrays.stream(container.getChildren()).collect(Collectors.toList()));
-            if (playerHouse != null) break;
-        }
 
-        if (playerHouse != null) {
-            Rs2Reflection.invokeMenu(playerHouse.getIndex(), 3407891, CC_OP.getId(), 1, -1,
-                    "", "", (int) playerHouse.getBounds().getCenterX(), (int) playerHouse.getBounds().getCenterY());
-            setSkipTicks(2);
+        for (String player : config.housePlayerName().split(",")) {
+            Widget playerHouse = Rs2Widget.findWidget(player, Arrays.stream(container.getChildren()).collect(Collectors.toList()));
+            if (playerHouse != null) {
+                Rs2Widget.clickChildWidget(3407891, playerHouse.getIndex());
+                setSkipTicks(2);
+                return;
+            }
         }
     }
 
@@ -207,5 +228,4 @@ public class GildedAltarPlugin extends Plugin {
             setSkipTicks(1);
         }
     }
-
 }
