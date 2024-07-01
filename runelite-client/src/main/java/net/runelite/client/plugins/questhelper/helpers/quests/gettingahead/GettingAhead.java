@@ -24,32 +24,40 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.gettingahead;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-        quest = QuestHelperQuest.GETTING_AHEAD
-)
 public class GettingAhead extends BasicQuestHelper
 {
 	//Items Required
@@ -82,8 +90,7 @@ public class GettingAhead extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -121,18 +128,21 @@ public class GettingAhead extends BasicQuestHelper
 		makeClayHead.addStep(new Conditions(bucket, clay), fillBucket);
 		makeClayHead.addStep(clay, takeBucket);
 		makeClayHead.addStep(pickaxe, mineClay);
+		makeClayHead.addSubSteps(talkToGordonGen);
 		steps.put(18, makeClayHead);
-
 		steps.put(20, talkToGordonGen);
+
 		addFurToHead = new ConditionalStep(this, goUpstairsHouse, "Use the bear fur on the clay head then talk to Gordon.");
 		addFurToHead.addStep(new Conditions(thread, needle), useFurOnHead);
 		addFurToHead.addStep(new Conditions(inUpstairsHouse, needle), getThread);
 		addFurToHead.addStep(inUpstairsHouse, getNeedle);
+		addFurToHead.addSubSteps(talkToGordonGen2);
 		steps.put(22, addFurToHead);
 		steps.put(24, talkToGordonGen2);
 
 		dyeHead = new ConditionalStep(this, takeDye, "Use the red dye on the fur head then talk to Gordon.");
 		dyeHead.addStep(redDye, useDyeOnHead);
+		dyeHead.addSubSteps(talkToGordonGen3);
 		steps.put(26, dyeHead);
 		steps.put(28, talkToGordonGen3);
 
@@ -148,7 +158,7 @@ public class GettingAhead extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		itemsTip = new ItemRequirement("You can get all the required items during the quest.", -1, -1);
 
@@ -222,7 +232,8 @@ public class GettingAhead extends BasicQuestHelper
 		inUpstairsHouse = new ZoneRequirement(upstairsHouse);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		kebosMine = new Zone(new WorldPoint(1174, 10000, 0), new WorldPoint(1215, 10035, 0));
 		upstairsHouse = new Zone(new WorldPoint(1238, 3677, 1), new WorldPoint(1244, 3687, 1));
@@ -328,7 +339,7 @@ public class GettingAhead extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("3,000 Coins", ItemID.COINS_995, 3000));
+		return Collections.singletonList(new ItemReward("Coins", ItemID.COINS_995, 3000));
 	}
 
 	@Override
@@ -345,7 +356,7 @@ public class GettingAhead extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Killing the Beast", Arrays.asList(goUseFlourOnGate, goToMine, returnToGordon),
 			potOfFlour));
 		allSteps.add(new PanelDetails("Making the fake head", Arrays.asList(talkToMary2, makeClayHead, addFurToHead,
-			useDyeOnHead, putUpHead, talkToGordonFinal), bearFur, softClay, hammer, saw, planks, nails, knife, redDye, needle, thread));
+			dyeHead, putUpHead, talkToGordonFinal), bearFur, softClay, hammer, saw, planks, nails, knife, redDye, needle, thread));
 		return allSteps;
 	}
 	

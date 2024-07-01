@@ -25,17 +25,23 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.theforsakentower;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.OwnerStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import lombok.NonNull;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
@@ -46,12 +52,6 @@ import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.components.PanelComponent;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 public class AltarPuzzle extends QuestStep implements OwnerStep
 {
@@ -69,12 +69,13 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 
 	Requirement inSecondFloor, inFloor1, inBasement;
 
-	DetailedQuestStep goUpLadder, goUpStairs, goUpToSecondFloor, restartStep, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15;
+	QuestStep goUpLadder, goUpStairs, goUpToSecondFloor, restartStep, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15;
 
-	ArrayList<DetailedQuestStep> rebalanceW = new ArrayList<>();
-	ArrayList<DetailedQuestStep> rebalanceE = new ArrayList<>();
-	ArrayList<DetailedQuestStep> rebalanceC = new ArrayList<>();
+	ArrayList<QuestStep> rebalanceW = new ArrayList<>();
+	ArrayList<QuestStep> rebalanceE = new ArrayList<>();
+	ArrayList<QuestStep> rebalanceC = new ArrayList<>();
 
+	List<QuestStep> moves = new ArrayList<>();
 
 	public AltarPuzzle(QuestHelper questHelper)
 	{
@@ -311,7 +312,7 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, MQuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> requirements)
 	{
 		if (currentStep != null)
 		{
@@ -320,7 +321,7 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -329,7 +330,7 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -338,7 +339,7 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 	}
 
 	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		if (currentStep != null)
 		{
@@ -424,14 +425,21 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 		m15 = new DetailedQuestStep(getQuestHelper(), "Move a disc from the east pylon to the centre pylon.");
 		m15.addSubSteps(rebalanceE.get(9), rebalanceC.get(9));
 
-		restartStep = new DetailedQuestStep(getQuestHelper(), "Unknown state. Restart the puzzle to start again.");
+		moves = new ArrayList<>(Arrays.asList(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15));
+		moves.replaceAll(step -> new PuzzleWrapperStep(getQuestHelper(), step, "Solve the altar puzzle."));
+		rebalanceC.replaceAll(step -> new PuzzleWrapperStep(getQuestHelper(), step, "Solve the altar puzzle."));
+		rebalanceW.replaceAll(step -> new PuzzleWrapperStep(getQuestHelper(), step, "Solve the altar puzzle."));
+		rebalanceE.replaceAll(step -> new PuzzleWrapperStep(getQuestHelper(), step, "Solve the altar puzzle."));
+
+		restartStep = new PuzzleWrapperStep(getQuestHelper(), new DetailedQuestStep(getQuestHelper(), "Unknown state. Restart the puzzle to start again."));
 	}
 
 	public List<PanelDetails> panelDetails()
 	{
 		List<PanelDetails> allSteps = new ArrayList<>();
 		PanelDetails potionPanel = new PanelDetails("Altar puzzle",
-			Arrays.asList(goUpToSecondFloor, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15));
+			new ArrayList<>(List.of(goUpToSecondFloor)));
+		moves.forEach((potionPanel::addSteps));
 		potionPanel.setLockingStep(this);
 		allSteps.add(potionPanel);
 		return allSteps;

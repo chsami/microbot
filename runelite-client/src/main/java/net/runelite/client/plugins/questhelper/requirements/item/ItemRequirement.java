@@ -26,27 +26,30 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
-
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.bank.QuestBank;
+import net.runelite.client.plugins.questhelper.collections.ItemWithCharge;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
+import net.runelite.client.plugins.questhelper.requirements.ManualRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.InventorySlots;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestBank;
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
-import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.util.InventorySlots;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.ui.overlay.components.LineComponent;
-
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class ItemRequirement extends AbstractRequirement
 {
@@ -81,9 +84,10 @@ public class ItemRequirement extends AbstractRequirement
 	@Getter
 	private boolean displayMatchedItemName;
 
+	// This is defaulted to a ManualRequirement so that we can use a null state to better detect issues
 	@Setter
 	@Getter
-	protected Requirement conditionToHide;
+	protected Requirement conditionToHide = new ManualRequirement();
 
 	@Getter
 	@Setter
@@ -96,6 +100,17 @@ public class ItemRequirement extends AbstractRequirement
 	protected boolean isConsumedItem = true;
 
 	protected boolean shouldAggregate = true;
+
+	/**
+	 * Denotes whether the quantity-check should take into consideration item charges.
+	 * With this enabled, 1xRing of dueling(7) will count as 7 quantity.
+	 */
+	@Setter
+	@Getter
+	protected boolean isChargedItem = false;
+
+	@Setter
+	protected Requirement additionalOptions;
 
 	public ItemRequirement(String name, int id)
 	{
@@ -125,18 +140,27 @@ public class ItemRequirement extends AbstractRequirement
 	public ItemRequirement(String name, List<Integer> items)
 	{
 		this(name, items.get(0), 1);
+
+		assert(items.stream().noneMatch(Objects::isNull));
+
 		this.addAlternates(items.subList(1, items.size()));
 	}
 
 	public ItemRequirement(String name, List<Integer> items, int quantity)
 	{
 		this(name, items.get(0), quantity);
+
+		assert(items.stream().noneMatch(Objects::isNull));
+
 		this.addAlternates(items.subList(1, items.size()));
 	}
 
 	public ItemRequirement(String name, List<Integer> items, int quantity, boolean equip)
 	{
 		this(name, items.get(0), quantity);
+
+		assert(items.stream().noneMatch(Objects::isNull));
+
 		this.equip = equip;
 		this.addAlternates(items.subList(1, items.size()));
 	}
@@ -197,6 +221,13 @@ public class ItemRequirement extends AbstractRequirement
 		return newItem;
 	}
 
+	public ItemRequirement named(String name)
+	{
+		ItemRequirement newItem = copy();
+		newItem.setName(name);
+		return newItem;
+	}
+
 	public ItemRequirement equipped()
 	{
 		ItemRequirement newItem = copy();
@@ -239,9 +270,22 @@ public class ItemRequirement extends AbstractRequirement
 		return newItem;
 	}
 
+	protected ItemRequirement copyOfClass()
+	{
+		if (this.getClass() != ItemRequirement.class)
+		{
+			throw new UnsupportedOperationException("Subclasses must override copy()");
+		}
+		return new ItemRequirement(name, id, quantity, equip);
+	}
+
 	public ItemRequirement copy()
 	{
-		ItemRequirement newItem = new ItemRequirement(name, id, quantity, equip);
+		ItemRequirement newItem = copyOfClass();
+		newItem.setName(name);
+		newItem.setId(id);
+		newItem.setEquip(equip);
+		newItem.setQuantity(quantity);
 		newItem.addAlternates(alternateItems);
 		newItem.setDisplayItemId(displayItemId);
 		newItem.setExclusiveToOneItemType(exclusiveToOneItemType);
@@ -254,6 +298,8 @@ public class ItemRequirement extends AbstractRequirement
 		newItem.shouldAggregate = shouldAggregate;
 		newItem.setTooltip(getTooltip());
 		newItem.setUrlSuffix(getUrlSuffix());
+		newItem.additionalOptions = additionalOptions;
+		newItem.isChargedItem = isChargedItem;
 
 		return newItem;
 	}
@@ -282,7 +328,7 @@ public class ItemRequirement extends AbstractRequirement
 	}
 
 	@Override
-	protected List<LineComponent> getOverlayDisplayText(Client client, MQuestHelperConfig config)
+	protected List<LineComponent> getOverlayDisplayText(Client client, QuestHelperConfig config)
 	{
 		List<LineComponent> lines = new ArrayList<>();
 
@@ -346,7 +392,7 @@ public class ItemRequirement extends AbstractRequirement
 	}
 
 	@Override
-	public Color getColor(Client client, MQuestHelperConfig config)
+	public Color getColor(Client client, QuestHelperConfig config)
 	{
 		Color color = config.failColour();
 		if (!this.isActualItem())
@@ -385,7 +431,7 @@ public class ItemRequirement extends AbstractRequirement
 	}
 
 	public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
-										 List<Item> bankItems, MQuestHelperConfig config)
+										 List<Item> bankItems, QuestHelperConfig config)
 	{
 		Color color = config.failColour();
 		if (!this.isActualItem())
@@ -409,7 +455,7 @@ public class ItemRequirement extends AbstractRequirement
 	}
 
 	protected ArrayList<LineComponent> getAdditionalText(Client client, boolean includeTooltip,
-														 MQuestHelperConfig config)
+														 QuestHelperConfig config)
 	{
 		Color equipColor = config.passColour();
 
@@ -469,6 +515,12 @@ public class ItemRequirement extends AbstractRequirement
 
 	public boolean check(Client client, boolean checkConsideringSlotRestrictions, List<Item> items)
 	{
+		if (!shouldDisplayText(client)) return false;
+		if (additionalOptions != null && additionalOptions.check(client))
+		{
+			return true;
+		}
+
 		List<Item> allItems = new ArrayList<>(items);
 		if (questBank != null && questBank.getBankItems() != null)
 		{
@@ -535,6 +587,24 @@ public class ItemRequirement extends AbstractRequirement
 
 	public int getNumMatches(List<Item> items, int itemID)
 	{
+		if (isChargedItem)
+		{
+			return items.stream()
+				.filter(Objects::nonNull)
+				.filter(i -> i.getId() == itemID)
+				.mapToInt(i -> {
+					ItemWithCharge itemWithCharge = ItemWithCharge.findItem(i.getId());
+					if (itemWithCharge != null)
+					{
+						return itemWithCharge.getCharges();
+					}
+
+					// Fall back to using the item's quantity
+					return i.getQuantity();
+				})
+				.sum();
+		}
+
 		return items.stream()
 			.filter(Objects::nonNull)
 			.filter(i -> i.getId() == itemID)

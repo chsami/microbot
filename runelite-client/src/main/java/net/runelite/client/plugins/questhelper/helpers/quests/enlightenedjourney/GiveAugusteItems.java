@@ -25,8 +25,8 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.enlightenedjourney;
 
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.api.ItemID;

@@ -24,39 +24,49 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.sinsofthefather;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
-import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.player.InInstanceRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.InInstanceRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
+import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
+import java.util.HashMap;
 
-@QuestDescriptor(
-        quest = QuestHelperQuest.SINS_OF_THE_FATHER
-)
 public class SinsOfTheFather extends BasicQuestHelper
 {
 	//Items Required
@@ -97,8 +107,7 @@ public class SinsOfTheFather extends BasicQuestHelper
 	public Map<Integer, QuestStep> loadSteps()
 	{
 		Map<Integer, QuestStep> steps = new HashMap<>();
-		setupZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -301,7 +310,8 @@ public class SinsOfTheFather extends BasicQuestHelper
 		return steps;
 	}
 
-	private void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		followingCarlArea = new Zone(new WorldPoint(3676, 3264, 0), new WorldPoint(3782, 3399, 0));
 		kroyArea = new Zone(new WorldPoint(3724, 9664, 1), new WorldPoint(3903, 9855, 1));
@@ -354,7 +364,7 @@ public class SinsOfTheFather extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		haemBook = new ItemRequirement("Haemalchemy volume 2", ItemID.HAEMALCHEMY_VOLUME_2);
 		haemBook.setTooltip("If you lost the book, search the bookshelf in the room west of Safalaan to get it back");
@@ -485,22 +495,22 @@ public class SinsOfTheFather extends BasicQuestHelper
 		((NpcStep) (followCarl)).setLinePoints(Arrays.asList(
 			new WorldPoint(3750, 3308, 0),
 			new WorldPoint(3751, 3315, 0),
-			new WorldPoint(0, 0, 2),
+			new WorldPoint(0, 0, 0),
 			new WorldPoint(3747, 3316, 0),
 			new WorldPoint(3740, 3324, 0),
-			new WorldPoint(0, 0, 2),
+			new WorldPoint(0, 0, 0),
 			new WorldPoint(3740, 3328, 0),
 			new WorldPoint(3718, 3325, 0),
-			new WorldPoint(0, 0, 2),
+			new WorldPoint(0, 0, 0),
 			new WorldPoint(3718, 3328, 0),
 			new WorldPoint(3700, 3323, 0),
-			new WorldPoint(0, 0, 2),
+			new WorldPoint(0, 0, 0),
 			new WorldPoint(3703, 3320, 0),
 			new WorldPoint(3705, 3305, 0),
-			new WorldPoint(0, 0, 2),
+			new WorldPoint(0, 0, 0),
 			new WorldPoint(3707, 3310, 0),
 			new WorldPoint(3719, 3312, 0),
-			new WorldPoint(0, 0, 2),
+			new WorldPoint(0, 0, 0),
 			new WorldPoint(3718, 3316, 0),
 			new WorldPoint(3731, 3318, 0),
 			new WorldPoint(3731, 3307, 0)
@@ -621,7 +631,7 @@ public class SinsOfTheFather extends BasicQuestHelper
 			"Speak to Vanescula in the Icyene Graveyard.");
 		talkToVanesculaAfterTeam.addDialogStep("Icyene Graveyard.");
 
-		goToLab = new ObjectStep(this, ObjectID.STAIRCASE_18049, new WorldPoint(3643, 3305, 0), "Enter the Meiyerditch lab. The fastest way here is to have a Vyrewatch take you to the mines, mine 15 Daeylt Ore, then leave.");
+		goToLab = new ObjectStep(this, ObjectID.STAIRCASE_18049, new WorldPoint(3643, 3305, 0), "Enter the Meiyerditch lab. The fastest way here is to have a Vyrewatch take you to the mines, mine 15 Daeyalt Ore, then leave.");
 		goToLab.addDialogStep("Meiyerditch.");
 		talkToSafalaanInLab = new NpcStep(this, NpcID.SAFALAAN_HALLOW_9537, new WorldPoint(3635, 9689, 0),
 			"Speak to Safalaan at the Lab.");
@@ -689,22 +699,22 @@ public class SinsOfTheFather extends BasicQuestHelper
 		enterDarkmeyer.addDialogSteps("Meiyerditch.", "Send me to the mines.");
 
 		talkToDesmodus = new NpcStep(this, NpcID.DESMODUS_LASIURUS, new WorldPoint(3612, 3362, 0),
-			"Speak to Desmodus Lasiurus outside the Aboretum in Darkmeyer.",
+			"Speak to Desmodus Lasiurus outside the Arboretum in Darkmeyer.",
 			scentedTop, scentedLegs, scentedShoes);
 
 		talkToMordan = new NpcStep(this, NpcID.MORDAN_NIKAZSI, new WorldPoint(3662, 3347, 0),
 			"Speak to Mordan Mikazsi in lower Darkmeyer.", scentedTop, scentedLegs, scentedShoes);
 
 		talkToMaria = new NpcStep(this, NpcID.MARIA_GADDERANKS, new WorldPoint(3618, 3378, 0),
-			"Speak to Maria Gadderanks in the jail north of the Aboretum in Darkmeyer.",
+			"Speak to Maria Gadderanks in the jail north of the Arboretum in Darkmeyer.",
 			scentedTop, scentedLegs, scentedShoes);
 
 		talkToDesmodusAgain = new NpcStep(this, NpcID.DESMODUS_LASIURUS, new WorldPoint(3612, 3362, 0),
-			"Speak to Desmodus Lasiurus outside the Aboretum in Darkmeyer.",
+			"Speak to Desmodus Lasiurus outside the Arboretum in Darkmeyer.",
 			scentedTop, scentedLegs, scentedShoes);
 
 		getNote = new ObjectStep(this, ObjectID.SHELVES_37999, new WorldPoint(3625, 3358, 0),
-			"Search the shelves in the Aboretum in Darkmeyer. Read the Old Note you get.",
+			"Search the shelves in the Arboretum in Darkmeyer. Read the Old Note you get.",
 			scentedTop, scentedLegs, scentedShoes);
 
 		readNote = new DetailedQuestStep(this, "Read the note.", oldNote);
@@ -798,9 +808,9 @@ public class SinsOfTheFather extends BasicQuestHelper
 		templeTrek = new NpcStep(this, NpcID.IVAN_STROM_9530, new WorldPoint(3444, 3485, 0),
 			"Speak to Ivan Strom outside the east entrance of Paterdomus to go temple treking with him.");
 		talkToTeamSteps = new DetailedQuestStep(this, "Convince the Myreque to take on Drakan.");
-		valveStep = new ValveStep(this);
+		valveStep = new PuzzleWrapperStep(this, new ValveStep(this), "Set the valves in the rooms to the values calculated from the note.");
 		createFlailSteps = new DetailedQuestStep(this, "Create the blisterwood flail.", blisterwoodFlail);
-		doDoorPuzzle = new DoorPuzzleStep(this);
+		doDoorPuzzle = new PuzzleWrapperStep(this, new DoorPuzzleStep(this), "Open the mausoleum's door.");
 	}
 
 	@Override
@@ -847,7 +857,7 @@ public class SinsOfTheFather extends BasicQuestHelper
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("6 x 15,000 Experience Tomes (Any skill above 60)", ItemID.ANTIQUE_LAMP, 6), //4447 is placeholder for filter
+				new ItemReward("15,000 Experience Tomes (Any skill above 60)", ItemID.ANTIQUE_LAMP, 6), //4447 is placeholder for filter
 				new ItemReward("A Blisterwood Flail", ItemID.BLISTERWOOD_FLAIL, 1));
 	}
 

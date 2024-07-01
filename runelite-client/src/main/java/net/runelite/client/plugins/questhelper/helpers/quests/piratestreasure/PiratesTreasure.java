@@ -24,28 +24,32 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.piratestreasure;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.DigStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-        quest = QuestHelperQuest.PIRATES_TREASURE
-)
 public class PiratesTreasure extends BasicQuestHelper
 {
 	//ItemRequirements
@@ -68,7 +72,7 @@ public class PiratesTreasure extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
+		initializeRequirements();
 
 		Map<Integer, QuestStep> steps = new HashMap<>();
 
@@ -91,8 +95,8 @@ public class PiratesTreasure extends BasicQuestHelper
 		openChest.addDialogStep("Ok thanks, I'll go and get it.");
 		openChest.addIcon(ItemID.CHEST_KEY);
 
-		inBlueMoonFirst = new ZoneRequirement(blueMoonFirst);
 		blueMoonFirst = new Zone(new WorldPoint(3213, 3405, 1), new WorldPoint(3234, 3391, 1));
+		inBlueMoonFirst = new ZoneRequirement(blueMoonFirst);
 
 		ConditionalStep getTreasureMap = new ConditionalStep(this, climbStairs);
 		getTreasureMap.addStep(new Conditions(chestKey, inBlueMoonFirst), openChest);
@@ -108,7 +112,7 @@ public class PiratesTreasure extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		sixtyCoins = new ItemRequirement("Coins", ItemCollections.COINS, 60);
 		spade = new ItemRequirement("Spade", ItemID.SPADE).isNotConsumed();
@@ -156,7 +160,7 @@ public class PiratesTreasure extends BasicQuestHelper
 		return Arrays.asList(
 				new ItemReward("A Gold Ring", ItemID.GOLD_RING, 1),
 				new ItemReward("An Emerald", ItemID.EMERALD, 1),
-				new ItemReward("450 Coins", ItemID.COINS_995, 450));
+				new ItemReward("Coins", ItemID.COINS_995, 450));
 	}
 
 	@Override

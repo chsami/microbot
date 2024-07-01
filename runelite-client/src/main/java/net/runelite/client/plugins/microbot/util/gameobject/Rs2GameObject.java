@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import javax.annotation.Nullable;
@@ -20,6 +21,8 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static net.runelite.api.NullObjectID.NULL_34810;
 
 /**
  * TODO: This class should be cleaned up, less methods by passing filters instead of multiple parameters
@@ -463,6 +466,8 @@ public class Rs2GameObject {
 
         ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"bank_booth"}, false);
 
+        possibleBankIds.add(NULL_34810);
+
         for (GameObject gameObject : gameObjects) {
             if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
 
@@ -705,6 +710,49 @@ public class Rs2GameObject {
                 .collect(Collectors.toList());
     }
 
+    public static List<TileObject> getTileObjects(int id){
+        return getTileObjects(id, Rs2Player.getWorldLocation());
+    }
+
+    public static List<TileObject> getTileObjects(int id, WorldPoint anchorPoint) {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        if (tiles == null) return new ArrayList<>();
+
+        int z = Microbot.getClient().getPlane();
+        List<TileObject> tileObjects = new ArrayList<>();
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                Tile tile = tiles[z][x][y];
+
+                if (tile == null) {
+                    continue;
+                }
+
+                if (tile.getDecorativeObject() != null
+                        && tile.getDecorativeObject().getId() == id
+                        && tile.getDecorativeObject().getWorldLocation().equals(tile.getWorldLocation()))
+                    tileObjects.add(tile.getDecorativeObject());
+
+                if (tile.getGroundObject() != null
+                        && tile.getGroundObject().getId() == id
+                        && tile.getGroundObject().getWorldLocation().equals(tile.getWorldLocation()))
+                    tileObjects.add(tile.getGroundObject());
+
+                if (tile.getWallObject() != null
+                        && tile.getWallObject().getId() == id
+                        && tile.getWallObject().getWorldLocation().equals(tile.getWorldLocation()))
+                    tileObjects.add(tile.getWallObject());
+            }
+        }
+
+        return tileObjects.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(anchorPoint)))
+                .collect(Collectors.toList());
+    }
+
     public static List<GameObject> getGameObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
@@ -927,7 +975,7 @@ public class Rs2GameObject {
             }
 
             int index = 0;
-            if (action != null && !action.isEmpty()) {
+            if (action != null) {
                 String[] actions;
                 if (objComp.getImpostorIds() != null) {
                     actions = objComp.getImpostor().getActions();
@@ -941,6 +989,12 @@ public class Rs2GameObject {
                         break;
                     }
                 }
+
+                while (index < actions.length && actions[index] == null)
+                    index++;
+
+                if (index == actions.length)
+                    index = 0;
             }
 
 
@@ -1023,5 +1077,32 @@ public class Rs2GameObject {
     public static ObjectComposition getObjectComposition(int id) {
         ObjectComposition objectComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(id));
         return objectComposition.getImpostorIds() == null ? objectComposition : objectComposition.getImpostor();
+    }
+
+    public static boolean canWalkTo(TileObject tileObject, int distance) {
+        if (tileObject == null) return false;
+        WorldArea objectArea;
+
+        if (tileObject instanceof GameObject) {
+            GameObject gameObject = (GameObject) tileObject;
+            WorldPoint worldPoint = WorldPoint.fromScene(Microbot.getClient(), gameObject.getSceneMinLocation().getX(), gameObject.getSceneMinLocation().getY(), gameObject.getPlane());
+            objectArea = new WorldArea(
+                    worldPoint,
+                    gameObject.sizeX(),
+                    gameObject.sizeY());
+        } else {
+            objectArea = new WorldArea(
+                    tileObject.getWorldLocation(),
+                    2,
+                    2);
+        }
+
+        var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance);
+        for (var tile : tiles.keySet()){
+            if (tile.distanceTo(objectArea) < 2)
+                return true;
+        }
+
+        return false;
     }
 }

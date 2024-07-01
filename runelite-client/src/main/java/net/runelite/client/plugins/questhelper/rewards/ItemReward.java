@@ -26,6 +26,9 @@ package net.runelite.client.plugins.questhelper.rewards;
 
 import javax.annotation.Nonnull;
 
+import net.runelite.api.ItemID;
+import net.runelite.api.Skill;
+
 public class ItemReward implements Reward
 {
 	private final String name;
@@ -62,6 +65,12 @@ public class ItemReward implements Reward
 	@Override
 	public String getDisplayText()
 	{
-		return getName();
+		String text = "";
+		if (quantity > 1)
+		{
+			text = quantity + " x ";
+		}
+		text += getName();
+		return text;
 	}
 }

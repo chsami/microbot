@@ -25,15 +25,11 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.landofthegoblins;
 
 import com.google.common.collect.ImmutableList;
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.NoItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.FollowerRequirement;
@@ -41,27 +37,31 @@ import net.runelite.client.plugins.questhelper.requirements.npc.NoFollowerRequir
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.CombatLevelRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.InInstanceRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.ItemSlots;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetPresenceRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
+import java.util.Collections;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-
-import java.util.*;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
-@QuestDescriptor(
-		quest = QuestHelperQuest.LAND_OF_THE_GOBLINS
-)
 public class LandOfTheGoblins extends BasicQuestHelper
 {
 	Requirement noPet;
@@ -69,44 +69,43 @@ public class LandOfTheGoblins extends BasicQuestHelper
 	ItemRequirement tinderbox, dorgeshKaanSphereRec, dramenStaff, skillsNecklace, combatBracelet, lumbridgeTeleport, draynorTeleport, explorersRing, salveAmulet;
 	CombatLevelRequirement recommendedCombatLevel;
 	ItemRequirement pharmakosBerryHighlight, toadflaxUnfHighlight, goblinPotion, goblinPotionHighlight, noEquippedItems,
-					dorgeshKaanSphere, blackGoblinMail, huzamogaarbKey, hemensterWhitefish, pestleAndMortar, vial,
-					blackMushroom, whiteGoblinMail, yellowGoblinMail, blueGoblinMail, orangeGoblinMail, purpleGoblinMail,
-					saragorgakKey, yurkolgokhKey, ekeleshuunKey, nargoshuunKey, horogothgarKey, anyGoblinMail;
+		dorgeshKaanSphere, blackGoblinMail, huzamogaarbKey, hemensterWhitefish, pestleAndMortar, vial,
+		blackMushroom, whiteGoblinMail, yellowGoblinMail, blueGoblinMail, orangeGoblinMail, purpleGoblinMail,
+		saragorgakKey, yurkolgokhKey, ekeleshuunKey, nargoshuunKey, horogothgarKey, anyGoblinMail;
 	Zone basement, tunnels, mines, cityF0, cityF1, dorgeshKaan, goblinCave, guardArea, goblinTemple, northEastRoomSouth,
 		northEastRoomNorth, hemenster, whitePriestRoom, yellowPriestRoom, bluePriestRoom, orangePriestRoom, purplePriestRoom,
 		crypt, dorgeshKaanF1, dorgeshKaanCaveUpper, dorgeshKaanCaveLower;
 	Requirement inMines, inTunnels, inBasement, inDorgeshKaanF0, inDorgeshKaanWithGrubfoot, invSpaceToUnequip, inGoblinCave, inGoblinCaveWithZanik,
-			inGoblinCaveWithGoblinPotion, inFrontOfGuardsWithGoblinPotion, goblinSelectionActive, isAGoblin,
-			hasBlackMushroomsOrDye, inGoblinTemple, blackGoblinMailEquipped, inNorthEastRoom, blackDyeOrBlackGoblinMail,
-			knowsAboutWhitefish, inHemenster, inWhitePriestRoom, inYellowPriestRoom, inBluePriestRoom, inOrangePriestRoom, inPurplePriestRoom,
-			hasAllGoblinKeys, inCrypt, snotheadAlive, snailfeetAlive, mosschinAlive, redeyesAlive, strongbonesAlive,
-			snotheadDead, snailfeetDead, mosschinDead, redeyesDead, strongbonesDead, inDorgeshKaanF1, inDorgeshKaanCaveUpper,
-			inDorgeshKaanCaveLower, learnedAboutMachine, firstGreater, firstLess, secondGreater, secondLess, thirdGreater, thirdLess, fairyRingMachineWidgetPresent,
-			fairyRingMachineFixed, inYubiusk, unlockedDoor;
+		inGoblinCaveWithGoblinPotion, inFrontOfGuardsWithGoblinPotion, goblinSelectionActive, isAGoblin,
+		hasBlackMushroomsOrDye, inGoblinTemple, blackGoblinMailEquipped, inNorthEastRoom, blackDyeOrBlackGoblinMail,
+		knowsAboutWhitefish, inHemenster, inWhitePriestRoom, inYellowPriestRoom, inBluePriestRoom, inOrangePriestRoom, inPurplePriestRoom,
+		hasAllGoblinKeys, inCrypt, snotheadAlive, snailfeetAlive, mosschinAlive, redeyesAlive, strongbonesAlive,
+		snotheadDead, snailfeetDead, mosschinDead, redeyesDead, strongbonesDead, inDorgeshKaanF1, inDorgeshKaanCaveUpper,
+		inDorgeshKaanCaveLower, learnedAboutMachine, firstGreater, firstLess, secondGreater, secondLess, thirdGreater, thirdLess, fairyRingMachineWidgetPresent,
+		fairyRingMachineFixed, inYubiusk, unlockedDoor;
 	Requirement grubfootFollowing;
 	ConditionalStep goTalkToGrubfoot, goTalkToZanik, goReturnToDorg;
 	QuestStep goDownIntoBasement, climbThroughHole, talkToKazgar;
 	QuestStep talkToGrubfoot, enterDorgeshKaan, talkToZanik, enterGoblinCave, talkToZanikGoblinCave, talkToGuard,
-			talkToMakeoverMage, pickPharmakosBerry, mixGoblinPotion, goBackToGoblinCave, goToGuards, drinkGoblinPotion,
-			makeBlackDye, confirmGoblin, pickBlackMushrooms, talkToGuardAsGoblin, getGoblinMail, dyeGoblinMail, enterTempleDoorForThieving,
-			enterNorthEastRoom, searchCrateForSphere, talkToZanikInCell, leaveNorthEastRoom, talkToPriestInTemple, enterNorthEastRoomForKey,
-			goBackToGoblinCaveNoDye, goToGuardsNoDye, drinkGoblinPotionNoDye, talkToGuardAsGoblinNoDye, pickpocketPriest,
-			talkToAggie, goToHemenster, catchWhitefish, talkToAggieWithFish, goToTempleWithDyes, enterGoblinCaveForKilling,
-			passWhiteGuard, passYellowGuard, passBlueGuard, passOrangeGuard, passPurpleGuard,
-			pickpocketWhitePriest, pickpocketYellowPriest, pickpocketBluePriest, pickpocketOrangePriest, pickpocketPurplePriest,
-			dyeGoblinMailBlue, dyeGoblinMailYellow, dyeGoblinMailOrange, dyeGoblinMailPurple, unlockCrypt, enterCrypt,
-			sayNameSnothead, sayNameSnailfeet, sayNameMosschin, sayNameRedeyes, sayNameStrongbones,
-			defeatSnothead, defeatSnailfeet, defeatMosschin, defeatRedeyes, defeatStrongbones,
-			learnSnailfeet, learnMosschin, learnRedeyes, learnStrongbones, learnYubiusk,
-			talkToOldak, returnToDorgeshKaanOrFairyRing, climbDorgeshKaanStairsF0, climbDorgeshKaanStairsF1,
-			climbLadderTop, talkToOldakAtMachine, inspectMachine, increaseFirst, decreaseFirst, increaseSecond, decreaseSecond, increaseThird, decreaseThird,
-			confirmFixMachine, watchYubiuskCutscene, goToYubiusk, openBox;
+		talkToMakeoverMage, pickPharmakosBerry, mixGoblinPotion, goBackToGoblinCave, goToGuards, drinkGoblinPotion,
+		makeBlackDye, confirmGoblin, pickBlackMushrooms, talkToGuardAsGoblin, getGoblinMail, dyeGoblinMail, enterTempleDoorForThieving,
+		enterNorthEastRoom, searchCrateForSphere, talkToZanikInCell, leaveNorthEastRoom, talkToPriestInTemple, enterNorthEastRoomForKey,
+		goBackToGoblinCaveNoDye, goToGuardsNoDye, drinkGoblinPotionNoDye, talkToGuardAsGoblinNoDye, pickpocketPriest,
+		talkToAggie, goToHemenster, catchWhitefish, talkToAggieWithFish, goToTempleWithDyes, enterGoblinCaveForKilling,
+		passWhiteGuard, passYellowGuard, passBlueGuard, passOrangeGuard, passPurpleGuard,
+		pickpocketWhitePriest, pickpocketYellowPriest, pickpocketBluePriest, pickpocketOrangePriest, pickpocketPurplePriest,
+		dyeGoblinMailBlue, dyeGoblinMailYellow, dyeGoblinMailOrange, dyeGoblinMailPurple, unlockCrypt, enterCrypt,
+		sayNameSnothead, sayNameSnailfeet, sayNameMosschin, sayNameRedeyes, sayNameStrongbones,
+		defeatSnothead, defeatSnailfeet, defeatMosschin, defeatRedeyes, defeatStrongbones,
+		learnSnailfeet, learnMosschin, learnRedeyes, learnStrongbones, learnYubiusk,
+		talkToOldak, returnToDorgeshKaanOrFairyRing, climbDorgeshKaanStairsF0, climbDorgeshKaanStairsF1,
+		climbLadderTop, talkToOldakAtMachine, inspectMachine, increaseFirst, decreaseFirst, increaseSecond, decreaseSecond, increaseThird, decreaseThird,
+		confirmFixMachine, watchYubiuskCutscene, goToYubiusk, openBox;
 
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -180,7 +179,9 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		returnToTempleWithDyes.addStep(isAGoblin, enterTempleDoorForThieving);
 		returnToTempleWithDyes.addStep(goblinSelectionActive, confirmGoblin);
 		returnToTempleWithDyes.addStep(inFrontOfGuardsWithGoblinPotion, drinkGoblinPotion);
-		returnToTempleWithDyes.addStep(new Conditions(LogicType.NOR, isAGoblin), goToGuards);
+		returnToTempleWithDyes.addStep(inGoblinCaveWithGoblinPotion, goToGuards);
+		returnToTempleWithDyes.addStep(goblinPotion.alsoCheckBank(questBank), goBackToGoblinCave);
+		goToTempleWithDyes.addSubSteps(returnToTempleWithDyes);
 
 		ConditionalStep dyeing = new ConditionalStep(this, goToHemenster);
 		dyeing.addStep(hasAllGoblinKeys, unlockCrypt);
@@ -288,7 +289,8 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		return steps;
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		basement = new Zone(new WorldPoint(3208, 9614, 0), new WorldPoint(3219, 9625, 0));
 		tunnels = new Zone(new WorldPoint(3221, 9602, 0), new WorldPoint(3308, 9661, 0));
@@ -319,7 +321,8 @@ public class LandOfTheGoblins extends BasicQuestHelper
 
 	}
 
-	public void setupRequirements()
+	@Override
+	protected void setupRequirements()
 	{
 		inBasement = new ZoneRequirement(basement);
 		inTunnels = new ZoneRequirement(tunnels);
@@ -332,6 +335,53 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		FollowerRequirement zanikFollowing = new FollowerRequirement("Zanik", NpcID.ZANIK_11261);
 		inGoblinCaveWithZanik = new Conditions(LogicType.AND, inGoblinCave, zanikFollowing);
 		unlockedDoor = new VarbitRequirement(QuestHelperQuest.LAND_OF_THE_GOBLINS.getId(), 36, Operation.GREATER_EQUAL);
+
+		saragorgakKey = new ItemRequirement("Saragorgak key", ItemID.SARAGORGAK_KEY).alsoCheckBank(questBank);
+		yurkolgokhKey = new ItemRequirement("Yurkolgokh key", ItemID.YURKOLGOKH_KEY).alsoCheckBank(questBank);
+		ekeleshuunKey = new ItemRequirement("Ekeleshuun key", ItemID.EKELESHUUN_KEY).alsoCheckBank(questBank);
+		nargoshuunKey = new ItemRequirement("Narogoshuun key", ItemID.NAROGOSHUUN_KEY).alsoCheckBank(questBank);
+		horogothgarKey = new ItemRequirement("Horogothgar key", ItemID.HOROGOTHGAR_KEY).alsoCheckBank(questBank);
+
+		huzamogaarbKey = new ItemRequirement("Huzamogaarb key", ItemID.HUZAMOGAARB_KEY).alsoCheckBank(questBank);
+
+		// ItemRequirements
+		lightSource = new ItemRequirement("Light source", ItemCollections.LIGHT_SOURCES);
+		toadflaxPotionUnf = new ItemRequirement("Toadflax potion (unf)", ItemID.TOADFLAX_POTION_UNF);
+		goblinMail = new ItemRequirement("Goblin mail", ItemID.GOBLIN_MAIL).hideConditioned(unlockedDoor);
+		goblinMail.canBeObtainedDuringQuest();
+		yellowDye = new ItemRequirement("Yellow dye", ItemID.YELLOW_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, yurkolgokhKey));
+		blueDye = new ItemRequirement("Blue dye", ItemID.BLUE_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, ekeleshuunKey));
+		orangeDye = new ItemRequirement("Orange dye", ItemID.ORANGE_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, nargoshuunKey));
+		purpleDye = new ItemRequirement("Purple dye", ItemID.PURPLE_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, horogothgarKey));
+		pestleAndMortar = new ItemRequirement("Pestle and mortar", ItemID.PESTLE_AND_MORTAR).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, huzamogaarbKey));
+		vial = new ItemRequirement("Vial", ItemID.VIAL).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, huzamogaarbKey));
+		blackMushroom = new ItemRequirement("Black mushroom", ItemID.BLACK_MUSHROOM).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, huzamogaarbKey));
+		blackDye = new ItemRequirement("Black dye", ItemID.BLACK_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, huzamogaarbKey));
+		blackDye.setTooltip("Black mushrooms obtainable during quest - bring empty vial and pestle and mortar");
+		fishingRod = new ItemRequirement("Fishing rod", ItemID.FISHING_ROD).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, saragorgakKey));
+		rawSlimyEel = new ItemRequirement("Raw slimy eel", ItemID.RAW_SLIMY_EEL).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, saragorgakKey));
+		coins = new ItemRequirement("Coins", ItemCollections.COINS, 5).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, saragorgakKey));
+		noPet = new NoFollowerRequirement("No pet following you");
+		combatGear = new ItemRequirement("Combat gear", -1, -1);
+
+		invSpaceToUnequip = new ItemRequirement("Inventory space to unequip all your items", -1, -1);
+		noEquippedItems = new NoItemRequirement("No equipped items", ItemSlots.ANY_EQUIPPED);
+
+		recommendedCombatLevel = new CombatLevelRequirement(65);
+		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX);
+		tinderbox.setTooltip("If using an extinguishable light source");
+		dorgeshKaanSphereRec = new ItemRequirement("Dorgesh-Kaan sphere", ItemID.DORGESHKAAN_SPHERE, 2);
+		dramenStaff = new ItemRequirement("Dramen staff", ItemID.DRAMEN_STAFF);
+		dramenStaff.addAlternates(ItemID.LUNAR_STAFF);
+		dramenStaff.setTooltip("For transportation via fairy rings");
+		skillsNecklace = new ItemRequirement("Skills necklace", ItemCollections.SKILLS_NECKLACES, 3);
+		skillsNecklace.setChargedItem(true);
+		combatBracelet = new ItemRequirement("Combat bracelet", ItemCollections.COMBAT_BRACELETS);
+		lumbridgeTeleport = new ItemRequirement("Lumbridge teleport", -1, 2);
+		draynorTeleport = new ItemRequirement("Draynor Village teleport", ItemCollections.AMULET_OF_GLORIES, 2);
+		draynorTeleport.setChargedItem(true);
+		explorersRing = new ItemRequirement("Explorer's ring 3 or 4", Arrays.asList(ItemID.EXPLORERS_RING_3, ItemID.EXPLORERS_RING_4));
+		salveAmulet = new ItemRequirement("Salve amulet or Salve amulet (e)", ItemCollections.SALVE_AMULET);
 
 		pharmakosBerryHighlight = new ItemRequirement("Pharmakos berries", ItemID.PHARMAKOS_BERRIES);
 		pharmakosBerryHighlight.setHighlightInInventory(true);
@@ -354,7 +404,6 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		dorgeshKaanSphere = new ItemRequirement("Dorgesh-Kaan sphere", ItemID.DORGESHKAAN_SPHERE);
 		blackDyeOrBlackGoblinMail = new Conditions(LogicType.OR, blackDye, blackGoblinMail);
 
-		huzamogaarbKey = new ItemRequirement("Huzamogaarb key", ItemID.HUZAMOGAARB_KEY).alsoCheckBank(questBank);
 		knowsAboutWhitefish = new VarbitRequirement(13602, 1);
 		inHemenster = new ZoneRequirement(hemenster);
 		hemensterWhitefish = new ItemRequirement("Whitefish", ItemID.WHITEFISH);
@@ -369,11 +418,6 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		anyGoblinMail.addAlternates(ItemID.BLACK_GOBLIN_MAIL, ItemID.WHITE_GOBLIN_MAIL, ItemID.YELLOW_GOBLIN_MAIL, ItemID.BLUE_GOBLIN_MAIL,
 			ItemID.ORANGE_GOBLIN_MAIL, ItemID.PURPLE_GOBLIN_MAIL);
 
-		saragorgakKey = new ItemRequirement("Saragorgak key", ItemID.SARAGORGAK_KEY).alsoCheckBank(questBank);
-		yurkolgokhKey = new ItemRequirement("Yurkolgokh key", ItemID.YURKOLGOKH_KEY).alsoCheckBank(questBank);
-		ekeleshuunKey = new ItemRequirement("Ekeleshuun key", ItemID.EKELESHUUN_KEY).alsoCheckBank(questBank);
-		nargoshuunKey = new ItemRequirement("Narogoshuun key", ItemID.NAROGOSHUUN_KEY).alsoCheckBank(questBank);
-		horogothgarKey = new ItemRequirement("Horogothgar key", ItemID.HOROGOTHGAR_KEY).alsoCheckBank(questBank);
 		hasAllGoblinKeys = new Conditions(huzamogaarbKey, saragorgakKey, yurkolgokhKey, ekeleshuunKey, nargoshuunKey, horogothgarKey);
 
 		inWhitePriestRoom = new ZoneRequirement(whitePriestRoom);
@@ -411,43 +455,6 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		fairyRingMachineFixed = new VarbitRequirement(13611, 0, Operation.GREATER);
 
 		inYubiusk = new InInstanceRequirement();
-
-		// ItemRequirements
-		lightSource = new ItemRequirement("Light source", ItemCollections.LIGHT_SOURCES);
-		toadflaxPotionUnf = new ItemRequirement("Toadflax potion (unf)", ItemID.TOADFLAX_POTION_UNF);
-		goblinMail = new ItemRequirement("Goblin mail", ItemID.GOBLIN_MAIL).hideConditioned(unlockedDoor);
-		goblinMail.canBeObtainedDuringQuest();
-		yellowDye = new ItemRequirement("Yellow dye", ItemID.YELLOW_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, yurkolgokhKey));
-		blueDye = new ItemRequirement("Blue dye", ItemID.BLUE_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, ekeleshuunKey));
-		orangeDye = new ItemRequirement("Orange dye", ItemID.ORANGE_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, nargoshuunKey));
-		purpleDye = new ItemRequirement("Purple dye", ItemID.PURPLE_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, horogothgarKey));
-		pestleAndMortar = new ItemRequirement("Pestle and mortar", ItemID.PESTLE_AND_MORTAR).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, huzamogaarbKey));
-		vial = new ItemRequirement("Vial", ItemID.VIAL).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, huzamogaarbKey));
-		blackMushroom = new ItemRequirement("Black mushroom", ItemID.BLACK_MUSHROOM).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, huzamogaarbKey));
-		blackDye = new ItemRequirement("Black dye", ItemID.BLACK_DYE).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, huzamogaarbKey));
-		blackDye.setTooltip("Black mushrooms obtainable during quest - bring empty vial and pestle and mortar");
-		fishingRod = new ItemRequirement("Fishing rod", ItemID.FISHING_ROD).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, saragorgakKey));
-		rawSlimyEel = new ItemRequirement("Raw slimy eel", ItemID.RAW_SLIMY_EEL).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, saragorgakKey));
-		coins = new ItemRequirement("Coins", ItemCollections.COINS, 5).hideConditioned(new Conditions(LogicType.OR, unlockedDoor, saragorgakKey));
-		noPet = new NoFollowerRequirement("No pet following you");
-		combatGear = new ItemRequirement("Combat gear", -1, -1);
-
-		invSpaceToUnequip = new ItemRequirement("Inventory space to unequip all your items", -1, -1);
-		noEquippedItems = new NoItemRequirement("No equipped items", ItemSlots.ANY_EQUIPPED);
-
-		recommendedCombatLevel = new CombatLevelRequirement(65);
-		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX);
-		tinderbox.setTooltip("If using an extinguishable light source");
-		dorgeshKaanSphereRec = new ItemRequirement("Dorgesh-Kaan sphere", ItemID.DORGESHKAAN_SPHERE, 2);
-		dramenStaff = new ItemRequirement("Dramen staff", ItemID.DRAMEN_STAFF);
-		dramenStaff.addAlternates(ItemID.LUNAR_STAFF);
-		dramenStaff.setTooltip("For transportation via fairy rings");
-		skillsNecklace = new ItemRequirement("Skills necklace", ItemCollections.SKILLS_NECKLACES);
-		combatBracelet = new ItemRequirement("Combat bracelet", ItemCollections.COMBAT_BRACELETS);
-		lumbridgeTeleport = new ItemRequirement("Lumbridge teleport", -1, 2);
-		draynorTeleport = new ItemRequirement("Draynor Village teleport", -1, 2);
-		explorersRing = new ItemRequirement("Explorer's ring 3 or 4", Arrays.asList(ItemID.EXPLORERS_RING_3, ItemID.EXPLORERS_RING_4));
-		salveAmulet = new ItemRequirement("Salve amulet or Salve amulet (e)", ItemCollections.SALVE_AMULET);
 	}
 
 	public void setupSteps()
@@ -455,6 +462,7 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		goDownIntoBasement = new ObjectStep(this, ObjectID.TRAPDOOR_14880, new WorldPoint(3209, 3216, 0), "Enter the Lumbridge Castle basement.");
 		climbThroughHole = new ObjectStep(this, NullObjectID.NULL_6898, new WorldPoint(3219, 9618, 0), "");
 		talkToKazgar = new NpcStep(this, NpcID.KAZGAR_7301, new WorldPoint(3230, 9610, 0), "Travel with Kazgar to shortcut to Mistag.");
+		talkToKazgar.addDialogStep("Can you show me the way to the mines?");
 
 		talkToGrubfoot = new NpcStep(this, NpcID.GRUBFOOT_11255, new WorldPoint(3318, 9611, 0), "");
 		talkToGrubfoot.addDialogStep("Yes.");
@@ -473,11 +481,13 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		talkToGuard = new NpcStep(this, NpcID.GOBLIN_GUARD_11314, new WorldPoint(2580, 9852, 0), "Talk to the goblin guard in the northwest of the cave.");
 		talkToMakeoverMage = new NpcStep(this, new int[]{NpcID.MAKEOVER_MAGE, NpcID.MAKEOVER_MAGE_1307}, new WorldPoint(2917, 3322, 0),
 			"Talk to the Makeover Mage southwest of Falador.", toadflaxPotionUnf);
+		((NpcStep) talkToMakeoverMage).addTeleport(skillsNecklace.quantity(1).named("Skills necklace (Crafting Guild [3])"));
 		talkToMakeoverMage.addDialogSteps("Can you turn me into a goblin?", "I need to slip past some goblin guards.", "Can you turn me into a goblin or not?");
 		pickPharmakosBerry = new ObjectStep(this, ObjectID.PHARMAKOS_BUSH, "Pick some Pharmakos berries from the bushes outside.", toadflaxPotionUnf);
 		mixGoblinPotion = new DetailedQuestStep(this, "Use the pharmakos berries on the unfinished toadflax potion.", pharmakosBerryHighlight, toadflaxUnfHighlight);
 		goBackToGoblinCave = new ObjectStep(this, ObjectID.CAVE_ENTRANCE, new WorldPoint(2624, 3393, 0), "Go back to the Goblin Cave outside the Fishing Guild.",
 			goblinPotion, vial, pestleAndMortar, noEquippedItems);
+		((ObjectStep) goBackToGoblinCave).addTeleport(skillsNecklace.quantity(1).named("Skills necklace (Fishing Guild [1])"));
 		pickBlackMushrooms = new ObjectStep(this, ObjectID.BLACK_MUSHROOMS, new WorldPoint(2577, 9845, 0), "Pick some black mushrooms and use it on a vial to make black dye.",
 			goblinPotion, vial, pestleAndMortar, noEquippedItems);
 		makeBlackDye = new DetailedQuestStep(this, "Make black dye by using the blackmushrooms on a vial.", blackMushroom.highlighted(), vial.highlighted(), pestleAndMortar);
@@ -499,11 +509,11 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		talkToZanikInCell = new NpcStep(this, NpcID.ZANIK_11260, new WorldPoint(3751, 4343, 0), "Talk to Zanik in the cell.", dorgeshKaanSphere);
 		leaveNorthEastRoom = new NpcStep(this, NpcID.GUARD_11318, new WorldPoint(3753, 4329, 0), "Pass by the guard to leave the northeastern room.");
 		talkToPriestInTemple = new NpcStep(this, NpcID.HIGH_PRIEST_BIGHEAD, new WorldPoint(3744, 4328, 0), "Talk to High Priest Bighead. When prompted, answer in this order: True, False, False.");
-		talkToPriestInTemple.addDialogLastLoadedCondition("True or false: Those who do not believe in Big High<br>War God, whether they goblins or other races, must<br>die.", 231, 6,
+		talkToPriestInTemple.addDialogConsideringLastLineCondition("True or false: Those who do not believe in Big High War God, whether they goblins or other races, must die.",
 			"True.");
-		talkToPriestInTemple.addDialogLastLoadedCondition("Second question. True or false: Big High War God<br>chose goblins to be his race because goblins mighty<br>warriors.", 231, 6,
+		talkToPriestInTemple.addDialogConsideringLastLineCondition("Second question. True or false: Big High War God chose goblins to be his race because goblins mighty warriors.",
 			"False.");
-		talkToPriestInTemple.addDialogLastLoadedCondition("Third question. True or false: Goblin leaders should be<br>good at planning in order to win battles.", 231, 6,
+		talkToPriestInTemple.addDialogConsideringLastLineCondition("Third question. True or false: Goblin leaders should be good at planning in order to win battles.",
 			"False.");
 		talkToPriestInTemple.addDialogStep("Yes.");
 		talkToPriestInTemple.addDialogStep("I understand Big High War God.");
@@ -530,14 +540,18 @@ public class LandOfTheGoblins extends BasicQuestHelper
 
 		pickpocketPriest = new NpcStep(this, NpcID.PRIEST_11307, new WorldPoint(3754, 4340, 0), "Pickpocket a key from the priest.");
 		talkToAggie = new NpcStep(this, NpcID.AGGIE, new WorldPoint(3086, 3258, 0), "Talk to Aggie in Draynor Village.");
-		talkToAggie.addDialogSteps("Can you make dyes for me please?", "Can you make black or white dye?", "Thanks.");
+		((NpcStep) talkToAggie).addTeleport(draynorTeleport.quantity(1).named("Amulet of glory (Draynor Village [3])"));
+		talkToAggie.addDialogSteps("Draynor Village", "Can you make dyes for me please?", "Can you make black or white dye?", "Thanks.");
 		goToHemenster = new ObjectStep(this, ObjectID.GATE_48, new WorldPoint(2642, 3441, 0), "Go to Hemenster to catch a whitefish.", fishingRod, rawSlimyEel);
-		goToHemenster.addDialogStep("I need to catch a Hemenster Whitefish.");
+		((ObjectStep) goToHemenster).addTeleport(combatBracelet.named("Combat bracelet (Ranging Guild [4])"));
+		goToHemenster.addDialogSteps("Ranging Guild", "I need to catch a Hemenster Whitefish.");
 		catchWhitefish = new NpcStep(this, NpcID.FISHING_SPOT_4080, new WorldPoint(2637, 3444, 0), "Catch a Hemenster whitefish.", fishingRod, rawSlimyEel);
 		talkToAggieWithFish = new NpcStep(this, NpcID.AGGIE, new WorldPoint(3086, 3258, 0), "Bring the whitefish and black goblin mail to Aggie.", coins, hemensterWhitefish, blackGoblinMail);
-		talkToAggieWithFish.addDialogSteps("Can you make dyes for me please?", "Could you remove the dye from this goblin mail?");
+		((NpcStep) talkToAggieWithFish).addTeleport(draynorTeleport.quantity(1).named("Amulet of glory (Draynor Village [3])"));
+		talkToAggieWithFish.addDialogSteps("Draynor Village", "Can you make dyes for me please?", "Could you remove the dye from this goblin mail?");
 		goToTempleWithDyes = new ObjectStep(this, ObjectID.CAVE_ENTRANCE, new WorldPoint(2624, 3393, 0),
-				"", whiteGoblinMail, goblinPotion, huzamogaarbKey, yellowDye, blueDye, orangeDye, purpleDye, noEquippedItems, combatGear);
+			"Return to the goblin temple with all the dyes and some combat gear.", whiteGoblinMail, goblinPotion, huzamogaarbKey, yellowDye, blueDye, orangeDye, purpleDye, noEquippedItems, combatGear);
+		((ObjectStep) goToTempleWithDyes).addTeleport(skillsNecklace.quantity(1).named("Skills necklace (Fishing Guild [1])"));
 
 		enterTempleDoorForThieving = new ObjectStep(this, ObjectID.STAIRS_43261, new WorldPoint(2581, 9853, 0), "Enter the temple.");
 
@@ -628,6 +642,7 @@ public class LandOfTheGoblins extends BasicQuestHelper
 		goTalkToZanik.addStep(inDorgeshKaanWithGrubfoot, talkToZanik);
 		goTalkToZanik.addStep(grubfootFollowing, enterCity);
 
+		// TODO: Add a teleport step to use one of the Dorgesh-Kaan spheres
 		goReturnToDorg = new ConditionalStep(this, enterCity, "Return to Dorgesh-Kaan and speak to Oldak.");
 
 		returnToDorgeshKaanOrFairyRing = new ConditionalStep(this, enterCity, "If you have access to fairy rings, travel to AJQ. Otherwise, return to Dorgesh-Kaan.");
@@ -667,10 +682,10 @@ public class LandOfTheGoblins extends BasicQuestHelper
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(ImmutableList.of("Snothead (level 32)",
-				"Snailfeet (level 56)",
-				"Mosschin (level 88)",
-				"Redeyes (level 121)",
-				"Strongbones (level 184)"));
+			"Snailfeet (level 56)",
+			"Mosschin (level 88)",
+			"Redeyes (level 121)",
+			"Strongbones (level 184)"));
 	}
 
 	@Override
@@ -687,24 +702,25 @@ public class LandOfTheGoblins extends BasicQuestHelper
 	}
 
 	@Override
-	public QuestPointReward getQuestPointReward() {
+	public QuestPointReward getQuestPointReward()
+	{
 		return new QuestPointReward(2);
 	}
 
 	@Override
 	public List<ExperienceReward> getExperienceRewards() {
 		return Arrays.asList(new ExperienceReward(Skill.AGILITY, 8000),
-				new ExperienceReward(Skill.FISHING, 8000),
-				new ExperienceReward(Skill.THIEVING, 8000),
-				new ExperienceReward(Skill.HERBLORE, 8000));
+			new ExperienceReward(Skill.FISHING, 8000),
+			new ExperienceReward(Skill.THIEVING, 8000),
+			new ExperienceReward(Skill.HERBLORE, 8000));
 	}
 
 	@Override
 	public List<UnlockReward> getUnlockRewards() {
 		return Arrays.asList(new UnlockReward("Access to the Goblin Temple"),
-				new UnlockReward("Access to Yu'Biusk (with fairy ring code BLQ)"),
-				new UnlockReward("Ability to purchase plain of mud spheres"),
-				new UnlockReward("Ability to make goblin potions"));
+			new UnlockReward("Access to Yu'Biusk (with fairy ring code BLQ)"),
+			new UnlockReward("Ability to purchase plain of mud spheres"),
+			new UnlockReward("Ability to make goblin potions"));
 	}
 
 	@Override
@@ -712,30 +728,30 @@ public class LandOfTheGoblins extends BasicQuestHelper
 	{
 		ArrayList<PanelDetails> panels = new ArrayList<>();
 		panels.add(new PanelDetails("Grubfoot's Dream",
-				Arrays.asList(goTalkToGrubfoot, enterDorgeshKaan, talkToZanik),
-				lightSource, noPet));
+			Arrays.asList(goTalkToGrubfoot, enterDorgeshKaan, talkToZanik),
+			lightSource, noPet));
 		panels.add(new PanelDetails("Impostor Among Goblins",
-				Arrays.asList(enterGoblinCave, talkToZanikGoblinCave, talkToGuard, talkToMakeoverMage, pickPharmakosBerry, mixGoblinPotion),
+			Arrays.asList(enterGoblinCave, talkToZanikGoblinCave, talkToGuard, talkToMakeoverMage, pickPharmakosBerry, mixGoblinPotion),
 			Collections.singletonList(toadflaxPotionUnf),
-				Arrays.asList(skillsNecklace, invSpaceToUnequip)));
+			Arrays.asList(skillsNecklace, invSpaceToUnequip)));
 		panels.add(new PanelDetails("The Temple of Tribes",
-				Arrays.asList(goBackToGoblinCave, goToGuards, pickBlackMushrooms, makeBlackDye, drinkGoblinPotion, talkToGuardAsGoblin, dyeGoblinMail, enterNorthEastRoom, searchCrateForSphere, talkToZanikInCell,
-					leaveNorthEastRoom, talkToPriestInTemple, enterNorthEastRoomForKey, pickpocketPriest),
-				Arrays.asList(noPet, goblinPotion, vial, pestleAndMortar, goblinMail),
-				Arrays.asList(invSpaceToUnequip, dorgeshKaanSphereRec)));
+			Arrays.asList(goBackToGoblinCave, goToGuards, pickBlackMushrooms, makeBlackDye, drinkGoblinPotion, talkToGuardAsGoblin, dyeGoblinMail, enterNorthEastRoom, searchCrateForSphere, talkToZanikInCell,
+				leaveNorthEastRoom, talkToPriestInTemple, enterNorthEastRoomForKey, pickpocketPriest),
+			Arrays.asList(noPet, goblinPotion, vial, pestleAndMortar, goblinMail),
+			Arrays.asList(skillsNecklace.quantity(1), invSpaceToUnequip, dorgeshKaanSphereRec)));
 		panels.add(new PanelDetails("Keys to the Crypt",
-				Arrays.asList(talkToAggie, goToHemenster, catchWhitefish, talkToAggieWithFish, goToTempleWithDyes, pickpocketWhitePriest, dyeGoblinMailYellow,
-					pickpocketYellowPriest, dyeGoblinMailBlue, pickpocketBluePriest, dyeGoblinMailOrange, pickpocketOrangePriest,
-					dyeGoblinMailPurple, pickpocketPurplePriest, unlockCrypt),
-				Arrays.asList(fishingRod, rawSlimyEel, coins, yellowDye, blueDye, orangeDye, purpleDye, blackGoblinMail, goblinPotion, huzamogaarbKey, combatGear),
-				Arrays.asList(draynorTeleport, combatBracelet)));
+			Arrays.asList(talkToAggie, goToHemenster, catchWhitefish, talkToAggieWithFish, goToTempleWithDyes, pickpocketWhitePriest, dyeGoblinMailYellow,
+				pickpocketYellowPriest, dyeGoblinMailBlue, pickpocketBluePriest, dyeGoblinMailOrange, pickpocketOrangePriest,
+				dyeGoblinMailPurple, pickpocketPurplePriest, unlockCrypt),
+			Arrays.asList(fishingRod, rawSlimyEel, coins, yellowDye, blueDye, orangeDye, purpleDye, blackGoblinMail, goblinPotion, huzamogaarbKey, combatGear),
+			Arrays.asList(draynorTeleport, combatBracelet, skillsNecklace.quantity(1))));
 		panels.add(new PanelDetails("High Priests of Ages Past",
-				Arrays.asList(enterCrypt, sayNameSnothead, defeatSnothead, sayNameSnailfeet, defeatSnailfeet, sayNameMosschin, defeatMosschin, sayNameRedeyes, defeatRedeyes, sayNameStrongbones, defeatStrongbones, learnYubiusk),
-				combatGear));
+			Arrays.asList(enterCrypt, sayNameSnothead, defeatSnothead, sayNameSnailfeet, defeatSnailfeet, sayNameMosschin, defeatMosschin, sayNameRedeyes, defeatRedeyes, sayNameStrongbones, defeatStrongbones, learnYubiusk),
+			combatGear));
 		panels.add(new PanelDetails("Path to Yu'biusk",
-				Arrays.asList(goReturnToDorg, talkToOldak, talkToOldakAtMachine, inspectMachine, watchYubiuskCutscene, openBox),
+			Arrays.asList(goReturnToDorg, talkToOldak, talkToOldakAtMachine, inspectMachine, watchYubiuskCutscene, openBox),
 			Collections.singletonList(lightSource),
-				Arrays.asList(dorgeshKaanSphereRec, dramenStaff)));
+			Arrays.asList(dorgeshKaanSphereRec, dramenStaff)));
 		return panels;
 	}
 }

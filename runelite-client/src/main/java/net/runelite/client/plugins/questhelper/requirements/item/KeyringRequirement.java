@@ -24,16 +24,16 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
-import net.runelite.client.plugins.questhelper.KeyringCollection;
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
-import net.runelite.api.Client;
-import net.runelite.api.Item;
-import net.runelite.client.config.ConfigManager;
-
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import net.runelite.api.Client;
+import net.runelite.api.Item;
+import net.runelite.api.ItemID;
+import net.runelite.client.config.ConfigManager;
 
 public class KeyringRequirement extends ItemRequirement
 {
@@ -43,9 +43,12 @@ public class KeyringRequirement extends ItemRequirement
 
 	ConfigManager configManager;
 
+	ItemRequirement keyring;
+
 	public KeyringRequirement(String name, ConfigManager configManager, KeyringCollection key)
 	{
 		super(name, key.getItemID());
+		keyring = new ItemRequirement("Steel key ring", ItemID.STEEL_KEY_RING);
 		runeliteRequirement = new RuneliteRequirement(configManager, key.runeliteName(),
 			"true", key.toChatText());
 		this.keyringCollection = key;
@@ -55,6 +58,7 @@ public class KeyringRequirement extends ItemRequirement
 	public KeyringRequirement(ConfigManager configManager, KeyringCollection key)
 	{
 		super(key.toChatText(), key.getItemID());
+		keyring = new ItemRequirement("Steel key ring", ItemID.STEEL_KEY_RING);
 		runeliteRequirement = new RuneliteRequirement(configManager, key.runeliteName(),
 			"true", key.toChatText());
 		this.keyringCollection = key;
@@ -93,7 +97,7 @@ public class KeyringRequirement extends ItemRequirement
 	{
 		boolean match = runeliteRequirement.check(client);
 
-		if (match)
+		if (match && keyring.check(client))
 		{
 			return true;
 		}
@@ -103,7 +107,7 @@ public class KeyringRequirement extends ItemRequirement
 
 	@Override
 	public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
-										 List<Item> bankItems, MQuestHelperConfig config)
+										 List<Item> bankItems, QuestHelperConfig config)
 	{
 		Color color = config.failColour();
 		if (!this.isActualItem())
@@ -133,5 +137,11 @@ public class KeyringRequirement extends ItemRequirement
 			}
 		}
 		return color;
+	}
+
+	@Override
+	protected KeyringRequirement copyOfClass()
+	{
+		return new KeyringRequirement(getName(), configManager, keyringCollection);
 	}
 }

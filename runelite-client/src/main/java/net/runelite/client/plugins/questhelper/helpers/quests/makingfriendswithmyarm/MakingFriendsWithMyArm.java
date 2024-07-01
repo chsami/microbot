@@ -24,37 +24,47 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.makingfriendswithmyarm;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.player.InInstanceRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.InInstanceRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.TileStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM
-)
 public class MakingFriendsWithMyArm extends BasicQuestHelper
 {
 	//Items Required
@@ -89,8 +99,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -251,7 +260,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		saw = new ItemRequirement("Saw", ItemCollections.SAW).isNotConsumed();
 		boltOfCloth = new ItemRequirement("Bolt of cloth", ItemID.BOLT_OF_CLOTH);
@@ -262,6 +271,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		trollTele = new ItemRequirement("Trollheim teleports", ItemID.TROLLHEIM_TELEPORT);
 		varrockTele = new ItemRequirement("Varrock teleport", ItemID.VARROCK_TELEPORT);
 		draynorTele = new ItemRequirement("Draynor teleport", ItemID.DRAYNOR_MANOR_TELEPORT, 2);
+		draynorTele.addAlternates(ItemCollections.AMULET_OF_GLORIES);
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.PICKAXES).isNotConsumed();
 		rope = new ItemRequirement("Rope", ItemID.ROPE);
 		ropeHighlight = new ItemRequirement("Rope", ItemID.ROPE);
@@ -285,7 +295,8 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		goatDung = new ItemRequirement("Goat dung", ItemID.GOAT_DUNG);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		strongholdFloor1 = new Zone(new WorldPoint(2820, 10048, 1), new WorldPoint(2862, 10110, 1));
 		strongholdFloor2 = new Zone(new WorldPoint(2820, 10048, 2), new WorldPoint(2862, 10110, 2));
@@ -412,25 +423,19 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		enterStronghold = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Talk to Burntmeat in the Troll Stronghold's kitchen.");
 
 		goDownToBurntmeat = new ObjectStep(this, ObjectID.STONE_STAIRCASE_3789, new WorldPoint(2844, 10052, 2), "Go down the south staircase.");
-		goDownToBurntmeat.setWorldMapPoint(new WorldPoint(2971, 10115, 1));
 
 		goUpToBurntmeat = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Go up the stairs from the prison.");
-		goUpToBurntmeat.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 
 		talkToBurntmeat = new NpcStep(this, NpcID.BURNTMEAT, new WorldPoint(2845, 10057, 1), "Talk to Burntmeat in the Troll Stronghold's kitchen.");
-		talkToBurntmeat.setWorldMapPoint(new WorldPoint(2911, 10087, 1));
 		talkToBurntmeat.addSubSteps(enterStronghold, goDownToBurntmeat, goUpToBurntmeat);
 		talkToBurntmeat.addDialogSteps("Yes, I'll take your quest.", "Why in the heck would you choose My Arm?");
 
 		enterStrongholdAfterStart = new ObjectStep(this, ObjectID.STRONGHOLD, new WorldPoint(2839, 3690, 0), "Talk to My Arm on the roof of the Troll Stronghold.");
 
 		goUpAfterStart = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2853, 10107, 0), "Talk to My Arm on the roof of the Troll Stronghold.");
-		goUpAfterStart.setWorldMapPoint(new WorldPoint(2853, 10106, 1));
 
 		goUpFromF1ToMyArm = new ObjectStep(this, ObjectID.STONE_STAIRCASE, new WorldPoint(2843, 10052, 1), "Talk to My Arm on the roof of the Troll Stronghold.");
-		goUpFromF1ToMyArm.setWorldMapPoint(new WorldPoint(2907, 10083, 1));
 		goUpToMyArmAfterStart = new ObjectStep(this, ObjectID.TROLL_LADDER_18834, new WorldPoint(2831, 10077, 2), "Talk to My Arm on the roof of the Troll Stronghold.");
-		goUpToMyArmAfterStart.setWorldMapPoint(new WorldPoint(2959, 10140, 0));
 		talkToMyArmUpstairs = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2830, 3698, 0), "Talk to My Arm on the roof of the Troll Stronghold.");
 		talkToMyArmUpstairs.addDialogSteps("I'm doing another quest for Burntmeat.", "Wolfbone said we should go by sea.");
 		talkToMyArmUpstairs.addSubSteps(enterStrongholdAfterStart, goUpAfterStart, goUpFromF1ToMyArm, goUpToMyArmAfterStart);
@@ -440,7 +445,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		talkToLarryAgain = new NpcStep(this, NpcID.LARRY_828, new WorldPoint(2707, 3733, 0), "Talk to Larry again.");
 		talkToLarryAgain.addDialogSteps("Can I transport My Arm in your boat?", "Never mind, I just need to borrow your boat.");
 
-		boardBoat = new ObjectStep(this, NullObjectID.NULL_21176, new WorldPoint(2709, 3735, 0), "Board Larry's boat.");
+		boardBoat = new ObjectStep(this, NullObjectID.NULL_21176, new WorldPoint(2709, 3735, 0), "Board Larry's boat to Weiss.");
 		boardBoat.addDialogStep("Travel to Weiss.");
 		// 6719 0->2 on boat
 
@@ -477,7 +482,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 
 		enterHole = new ObjectStep(this, ObjectID.HOLE_33227, new WorldPoint(2854, 3944,0), "Wait a few seconds, and run into the hole.");
 		goSouthSneak.addSubSteps(goWestSneak1, goWestSneak2, goWestSneak3, goNorth, enterHole);
-		enterNarrowHole = new ObjectStep(this, ObjectID.NARROW_GAP, new WorldPoint(7248, 2978, 0), "Enter the narrow gap to the south quickly.");
+		enterNarrowHole = new ObjectStep(this, ObjectID.NARROW_GAP, new WorldPoint(2704, 5794, 0), "Enter the narrow gap to the south quickly.");
 
 		enterWater = new ObjectStep(this, ObjectID.WATERS_EDGE, new WorldPoint(2710, 5782, 0), "Enter the water.");
 
@@ -512,7 +517,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 
 		pickUpCoffin = new ObjectStep(this, NullObjectID.NULL_33332, new WorldPoint(3090, 3254, 0), "Pick up the coffin in the Wise Old Man's house.");
 
-		takeBoatWithWom = new ObjectStep(this, NullObjectID.NULL_21176, new WorldPoint(2709, 3735, 0), "Board Larry's boat.", coffin, combatRangeMelee);
+		takeBoatWithWom = new ObjectStep(this, NullObjectID.NULL_21176, new WorldPoint(2709, 3735, 0), "Board Larry's boat to Weiss.", coffin, combatRangeMelee);
 		takeBoatWithWom.addDialogStep("Travel to Weiss.");
 
 		enterCaveWithWom = new ObjectStep(this, NullObjectID.NULL_33329, new WorldPoint(2859, 3967, 0), "Enter the cave entrance.", coffin, combatRangeMelee);
@@ -522,7 +527,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		talkToMyArmAfterGivingWom = new NpcStep(this, NpcID.MY_ARM_742, new WorldPoint(2877, 3947, 0), "Talk to My Arm in Weiss.");
 		talkToMyArmWithWom.addSubSteps(takeBoatWithWom, enterCaveWithWom, talkToMyArmAfterGivingWom);
 
-		takeBoatToPrison = new ObjectStep(this, NullObjectID.NULL_21176, new WorldPoint(2709, 3735, 0), "Board Larry's boat.");
+		takeBoatToPrison = new ObjectStep(this, NullObjectID.NULL_21176, new WorldPoint(2709, 3735, 0), "Board Larry's boat to Weiss.");
 		takeBoatToPrison.addDialogStep("Travel to Weiss.");
 
 		enterCaveToPrison = new ObjectStep(this, NullObjectID.NULL_33329, new WorldPoint(2859, 3967, 0), "Enter the cave entrance. Be prepared to fight.", combatRangeMelee);
@@ -540,7 +545,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		killMother = new NpcStep(this, NpcID.MOTHER_8430, "Kill Mother. Protect from Ranged, keep moving and keep your distance.");
 		killMother.addAlternateNpcs(NpcID.MOTHER_8428, NpcID.MOTHER_8429);
 
-		pickUpBucket = new ObjectStep(this, ObjectID.BUCKETS, new WorldPoint(2867, 3934, 0), "You now need to put out the fire. Pick up a bucket from the bucket pile.");
+		pickUpBucket = new ObjectStep(this, ObjectID.PILE_OF_BUCKETS, new WorldPoint(2867, 3934, 0), "You now need to put out the fire. Pick up a bucket from the bucket pile.");
 		useBucketOnWater = new ObjectStep(this, ObjectID.BARREL_OF_WATER, new WorldPoint(2869, 3933, 0), "Fill the bucket on the barrel of water.", bucketHighlight);
 		useBucketOnWater.addIcon(ItemID.BUCKET);
 
@@ -620,7 +625,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Faking death", Arrays.asList(talkToWom, buildCoffin, talkToApoth, talkToWomAfterPrep, pickUpCoffin),
 			saw, hammer, mahogPlanks5, boltOfCloth, cadavaBerries));
 		allSteps.add(new PanelDetails("Rising up", Arrays.asList(talkToMyArmWithWom, talkToOddMushroom, talkToSnowflake, killDontKnowWhat,
-			pickUpBucket, useBucketOnWater, useBucketOnFire, killMother), combatRangeMelee));
+			pickUpBucket, useBucketOnWater, useBucketOnFire, killMother), coffin, combatRangeMelee));
 		allSteps.add(new PanelDetails("Finishing off", Arrays.asList(talkToMyArmAfterFight, talkToWomAfterFight, talkToSnowflakeAfterFight,
 			pickUpGoatDung, bringDungToSnowflake, readNotes, talkToSnowflakeToFinish)));
 

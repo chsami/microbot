@@ -24,35 +24,44 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.betweenarock;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.BETWEEN_A_ROCK
-)
 public class BetweenARock extends BasicQuestHelper
 {
 	//Items Required
@@ -60,11 +69,16 @@ public class BetweenARock extends BasicQuestHelper
 		baseSchematic, schematicEngineer, khorvakSchematic, goldHelmet, hammer, goldBars3, schematicHighlight, solvedSchematic, combatGear,
 		goldOre6, goldBars4, coins1000, goldHelmetEquipped, food;
 
+	// Items Recommended
+	ItemRequirement faladorTeleport;
+
 	Requirement inTrollRoom, inDwarfEntrance, inDwarfMine, inKeldagrim, inDwarvenMine, hasUsedGoldBar, hasCannonball, shotGoldCannonball,
 		inKhorvakRoom, inRealm, avatarNearby, hasSolvedSchematic;
 
-	QuestStep enterDwarfCave, enterDwarfCave2, talkToFerryman, talkToDondakan, travelBackWithFerryman, talkToBoatman, talkToEngineer, talkToRolad, enterDwarvenMine, killScorpion,
-		searchCart, mineRock, goBackUpToRolad, returnToRolad, readEntireBook, travelToKeldagrim, enterDwarfCaveWithBook, enterDwarfCave2WithBook, talkToFerrymanWithBook, talkToDondakanWithBook,
+	DetailedQuestStep enterDwarfCave, enterDwarfCave2, talkToFerryman, talkToDondakan, travelBackWithFerryman, talkToBoatman, talkToEngineer, talkToRolad, enterDwarvenMine, killScorpion,
+		searchCart;
+	ObjectStep mineRock;
+	QuestStep goBackUpToRolad, returnToRolad, readEntireBook, travelToKeldagrim, enterDwarfCaveWithBook, enterDwarfCave2WithBook, talkToFerrymanWithBook, talkToDondakanWithBook,
 		useGoldBarOnDondakan, makeGoldCannonball, enterDwarfCaveWithCannonball, enterDwarfCave2WithCannonball, talkToFerrymanWithCannonball, useGoldCannonballOnDondakan, talkToDondakanAfterShot,
 		readBookAgain, talkToEngineerAgain, travelBackWithFerrymanAgain, travelToKeldagrimAgain, talkToBoatmanAgain, useGoldBarOnAnvil, enterKhorvakRoom, talkToKhorvak, assembleSchematic, enterDwarfCaveWithHelmet,
 		enterDwarfCave2WithHelmet, talkToFerrymanWithHelmet, talkToDondakanWithHelmet, mine6GoldOre, talkToDondakanForEnd, talkToSecondFlame, finishQuest;
@@ -77,8 +91,7 @@ public class BetweenARock extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -163,7 +176,7 @@ public class BetweenARock extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.PICKAXES).isNotConsumed();
 		hammer = new ItemRequirement("Hammer", ItemCollections.HAMMER).isNotConsumed();
@@ -188,7 +201,8 @@ public class BetweenARock extends BasicQuestHelper
 		goldCannonballHighlight = new ItemRequirement("Cannon ball", ItemID.CANNON_BALL);
 		goldCannonballHighlight.setHighlightInInventory(true);
 
-		cannonMould = new ItemRequirement("Ammo mould", ItemID.AMMO_MOULD);
+		cannonMould = new ItemRequirement("Ammo mould", ItemID.AMMO_MOULD, 1);
+		cannonMould.addAlternates(ItemID.DOUBLE_AMMO_MOULD);
 		cannonMould.setTooltip("You can buy one from Nulodion above the Dwarven Mine for 5 coins");
 
 		schematic = new ItemRequirement("Schematic", ItemID.SCHEMATIC);
@@ -215,9 +229,16 @@ public class BetweenARock extends BasicQuestHelper
 
 		goldBars4 = new ItemRequirement("Gold bars", ItemID.GOLD_BAR, 4);
 		coins1000 = new ItemRequirement("Coins for travelling", ItemCollections.COINS, 1000);
+
+		// Recommended
+		faladorTeleport = new ItemRequirement("Teleport to Ice Mountain", ItemCollections.COMBAT_BRACELETS);
+		faladorTeleport.addAlternates(ItemID.LASSAR_TELEPORT, ItemID.MIND_ALTAR_TELEPORT);
+		faladorTeleport.addAlternates(ItemCollections.AMULET_OF_GLORIES);
+		faladorTeleport.addAlternates(ItemID.FALADOR_TELEPORT);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		trollRoom = new Zone(new WorldPoint(2762, 10123, 0), new WorldPoint(2804, 10164, 0));
 		dwarfEntrance = new Zone(new WorldPoint(2814, 10121, 0), new WorldPoint(2884, 10139, 0));
@@ -270,15 +291,26 @@ public class BetweenARock extends BasicQuestHelper
 
 		talkToRolad = new NpcStep(this, NpcID.ROLAD, new WorldPoint(3022, 3453, 0),
 			"Talk to Rolad at the Ice Mountain entrance to the Dwarven Mine. If you don't have an ammo mould, buy one from Nulodion whilst you're here.", pickaxe);
+		talkToRolad.addTeleport(faladorTeleport);
 		talkToRolad.addDialogStep("I'll be back later.");
 
 		enterDwarvenMine = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450, 0), "Enter the Dwarven Mine.", pickaxe);
 
-		searchCart = new DetailedQuestStep(this, "Search the mine carts for a page.");
+		searchCart = new ObjectStep(this, ObjectID.MINE_CART_6045, "Search the mine carts for a page.");
 
-		killScorpion = new DetailedQuestStep(this, "Kill scorpions for a page.");
+		killScorpion = new NpcStep(this, NpcID.SCORPION_3024, new WorldPoint(3043, 9796, 0), "Kill scorpions for a page.", true);
 
-		mineRock = new DetailedQuestStep(this, "Mine low level rocks for a page.", pickaxe);
+		mineRock = new ObjectStep(this, ObjectID.TIN_ROCKS_11361, "Mine low level rocks for a page.", true, pickaxe);
+		mineRock.setOverlayText("Mine low level rocks for a page.\n\nYou can continue mining the same rocks.");
+		mineRock.addAlternateObjects(
+			ObjectID.TIN_ROCKS_11360,
+			ObjectID.CLAY_ROCKS,
+			ObjectID.CLAY_ROCKS_11363,
+			ObjectID.IRON_ROCKS,
+			ObjectID.IRON_ROCKS_11365,
+			ObjectID.COPPER_ROCKS_11161,
+			ObjectID.COPPER_ROCKS_10943
+			);
 
 		goBackUpToRolad = new ObjectStep(this, ObjectID.LADDER_17387, new WorldPoint(3019, 9850, 0), "Go back up to Rolad.", pages);
 
@@ -333,10 +365,10 @@ public class BetweenARock extends BasicQuestHelper
 		talkToKhorvak.addDialogStep("No, I've had enough of buying drinks for people!");
 		talkToKhorvak.addSubSteps(enterKhorvakRoom);
 
-		assembleSchematic = new PuzzleStep(this, schematicHighlight);
+		assembleSchematic = new PuzzleWrapperStep(this, new PuzzleStep(this, schematicHighlight), "Assemble the schematics.");
 
-		enterDwarfCaveWithHelmet = new ObjectStep(this, ObjectID.TUNNEL_5008, new WorldPoint(2732, 3713, 0), "Prepare" +
-			" to for a fight, then return to Dondakan.", coins5, goldHelmetEquipped, solvedSchematic, pickaxe,
+		enterDwarfCaveWithHelmet = new ObjectStep(this, ObjectID.TUNNEL_5008, new WorldPoint(2732, 3713, 0),
+			"Prepare for a fight, then return to Dondakan.", coins5, goldHelmetEquipped, solvedSchematic, pickaxe,
 			combatGear, food);
 		enterDwarfCave2WithHelmet = new ObjectStep(this, ObjectID.CAVE_ENTRANCE_5973, new WorldPoint(2781, 10161, 0),
 			"Prepare for a fight, then return to Dondakan.", coins5, goldHelmetEquipped, solvedSchematic, pickaxe,
@@ -377,6 +409,14 @@ public class BetweenARock extends BasicQuestHelper
 		reqs.add(hammer);
 		reqs.add(cannonMould);
 		reqs.add(coins1000);
+		return reqs;
+	}
+
+	@Override
+	public List<ItemRequirement> getItemRecommended()
+	{
+		List<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(faladorTeleport);
 		return reqs;
 	}
 
@@ -426,7 +466,7 @@ public class BetweenARock extends BasicQuestHelper
 			Collections.singletonList(talkToDondakan)));
 		allSteps.add(new PanelDetails("Research",
 			Arrays.asList(talkToEngineer, talkToRolad, enterDwarvenMine, searchCart, killScorpion, mineRock,
-				returnToRolad, readEntireBook), coins5, pickaxe));
+				returnToRolad, readEntireBook), Arrays.asList(coins5, pickaxe), List.of(faladorTeleport)));
 		allSteps.add(new PanelDetails("Experiment",
 			Arrays.asList(talkToDondakanWithBook, useGoldBarOnDondakan, makeGoldCannonball, useGoldCannonballOnDondakan),
 			cannonMould, goldBar));

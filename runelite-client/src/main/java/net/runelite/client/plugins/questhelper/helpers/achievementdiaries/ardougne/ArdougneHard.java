@@ -24,13 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.ardougne;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
@@ -41,18 +42,25 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequiremen
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.ARDOUGNE_HARD
-)
 public class ArdougneHard extends ComplexStateQuestHelper
 {
 	// Items required
@@ -86,8 +94,7 @@ public class ArdougneHard extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doHard = new ConditionalStep(this, claimReward);
@@ -141,7 +148,7 @@ public class ArdougneHard extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notRecharge = new VarplayerRequirement(1196, false, 26);
 		notMagicGuild = new VarplayerRequirement(1196, false, 27);
@@ -162,10 +169,10 @@ public class ArdougneHard extends ComplexStateQuestHelper
 		redAtAltar = new VarbitRequirement(1250, 1);
 
 		earthRune = new ItemRequirement("Earth rune", ItemID.EARTH_RUNE).showConditioned(notTPWatchtower);
-		lawRune = new ItemRequirement("Law rune", ItemID.LAW_RUNE).showConditioned(notTPWatchtower);
+		lawRune = new ItemRequirement("Law runes", ItemID.LAW_RUNE).showConditioned(notTPWatchtower);
 		coins = new ItemRequirement("Coins", ItemCollections.COINS)
 			.showConditioned(new Conditions(notYanHouse, notYanPOH));
-		mithBar = new ItemRequirement("Mithril bar", ItemID.MITHRIL_BAR).showConditioned(notMithPlate);
+		mithBar = new ItemRequirement("Mithril bars", ItemID.MITHRIL_BAR).showConditioned(notMithPlate);
 		hammer = new ItemRequirement("Hammer", ItemID.HAMMER)
 			.showConditioned(new Conditions(LogicType.OR, notMithPlate, notDragSquare)).isNotConsumed();
 		rope = new ItemRequirement("Rope", ItemID.ROPE).showConditioned(notRedSally).isNotConsumed();
@@ -221,7 +228,8 @@ public class ArdougneHard extends ComplexStateQuestHelper
 		watchtower = new QuestRequirement(QuestHelperQuest.WATCHTOWER, QuestState.FINISHED);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		castle = new Zone(new WorldPoint(2568, 3310, 1), new WorldPoint(2591, 3282, 1));
 		death0 = new Zone(new WorldPoint(1855, 4681, 0), new WorldPoint(2047, 4602, 0));
@@ -331,8 +339,8 @@ public class ArdougneHard extends ComplexStateQuestHelper
 		reqs.add(new SkillRequirement(Skill.HUNTER, 59));
 		reqs.add(new SkillRequirement(Skill.MAGIC, 66));
 		reqs.add(new SkillRequirement(Skill.RUNECRAFT, 65, true));
-		reqs.add(new SkillRequirement(Skill.SMITHING, 68));
-		reqs.add(new SkillRequirement(Skill.THIEVING, 72));
+		reqs.add(new SkillRequirement(Skill.SMITHING, 68, true));
+		reqs.add(new SkillRequirement(Skill.THIEVING, 72, true));
 
 		reqs.add(monkeyMadness);
 		reqs.add(legendsQuest);
@@ -404,7 +412,7 @@ public class ArdougneHard extends ComplexStateQuestHelper
 		allSteps.add(mgSteps);
 
 		PanelDetails plateSteps = new PanelDetails("Mithril Platebody", Collections.singletonList(mithPlate),
-			new SkillRequirement(Skill.SMITHING, 68), mithBar.quantity(5), hammer);
+			new SkillRequirement(Skill.SMITHING, 68, true), mithBar.quantity(5), hammer);
 		plateSteps.setDisplayCondition(notMithPlate);
 		plateSteps.setLockingStep(mithPlateTask);
 		allSteps.add(plateSteps);

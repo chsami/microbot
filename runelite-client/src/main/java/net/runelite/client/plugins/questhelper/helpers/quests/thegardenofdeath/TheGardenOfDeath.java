@@ -24,32 +24,39 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thegardenofdeath;
 
-import net.runelite.client.plugins.questhelper.*;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.ItemID;
-import net.runelite.api.NullObjectID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Skill;
+import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.WidgetStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.widgets.ComponentID;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_GARDEN_OF_DEATH
-)
 public class TheGardenOfDeath extends BasicQuestHelper
 {
 	// Required
@@ -61,13 +68,13 @@ public class TheGardenOfDeath extends BasicQuestHelper
 	// Quest items
 	ItemRequirement stoneTablet1, stoneTablet2, stoneTablet3, stoneTablet4, kasondesJournal, wordTranslations, dirtyNote1, dirtyNote2, dirtyNote3, compass, warningNote;
 
-	DetailedQuestStep getJournal, readJournal, getSecateurs, enterHole, searchForTablet, readTablet1, readTranslations, attemptTranslation, inputWords1;
+	QuestStep getJournal, readJournal, getSecateurs, enterHole, searchForTablet, readTablet1, readTranslations, attemptTranslation, inputWords1;
 
-	DetailedQuestStep leaveHole, goToMolch, enterMolchHole, searchVines, cutVines, searchForTablet2, readTablet2, readTranslations2, attemptTranslation2, inputWords2;
+	QuestStep leaveHole, goToMolch, enterMolchHole, searchVines, cutVines, searchForTablet2, readTablet2, readTranslations2, attemptTranslation2, inputWords2;
 
-	DetailedQuestStep leaveHole2, leaveMolchIsland, enterXericShrineHole, searchForTablet3, readTablet3, readTranslations3, attemptTranslation3, inputWords3;
+	QuestStep leaveHole2, leaveMolchIsland, enterXericShrineHole, searchForTablet3, readTablet3, readTranslations3, attemptTranslation3, inputWords3;
 
-	DetailedQuestStep leaveHole3, enterMorraHole, searchForTablet4, readTablet4, readTranslations4, attemptTranslation4, inputWords4;
+	QuestStep leaveHole3, enterMorraHole, searchForTablet4, readTablet4, readTranslations4, attemptTranslation4, inputWords4;
 
 	DetailedQuestStep readTabletFinal, readWarningNote;
 
@@ -80,8 +87,7 @@ public class TheGardenOfDeath extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -164,7 +170,8 @@ public class TheGardenOfDeath extends BasicQuestHelper
 		return steps;
 	}
 
-	public void setupRequirements()
+	@Override
+	protected void setupRequirements()
 	{
 		// Required
 		secateurs = new ItemRequirement("Secateurs (Obtainable in quest)", ItemID.SECATEURS);
@@ -194,7 +201,8 @@ public class TheGardenOfDeath extends BasicQuestHelper
 		warningNote = new ItemRequirement("Warning note", ItemID.WARNING_NOTE);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		hole = new Zone(new WorldPoint(1290, 9860, 0), new WorldPoint(1325, 9895, 0));
 		molchIsland = new Zone(new WorldPoint(1358, 3623, 0), new WorldPoint(1379, 3643, 0));
@@ -213,7 +221,7 @@ public class TheGardenOfDeath extends BasicQuestHelper
 
 		translationOpen = new WidgetTextRequirement(804, 4, "Translations");
 		chatInputOpen = new Conditions(LogicType.OR,
-			new WidgetTextRequirement(WidgetInfo.CHATBOX_TITLE, "Enter a possible translation for a word you've found:"),
+			new WidgetTextRequirement(ComponentID.CHATBOX_TITLE, "Enter a possible translation for a word you've found:"),
 			new WidgetTextRequirement(229, 1, "You've discovered a new translation",
 				"You've already discovered this translation", "You can't think of any suitable translations"),
 			new WidgetTextRequirement(219, 1, 0, "Attempt another translation?")
@@ -234,13 +242,13 @@ public class TheGardenOfDeath extends BasicQuestHelper
 		readJournal = new DetailedQuestStep(this, "Read the journal", kasondesJournal.highlighted());
 		getSecateurs = new ObjectStep(this, ObjectID.CAMPING_EQUIPMENT_46325, new WorldPoint(1312, 3470, 0), "Search the camping equipment for some secateurs.");
 		enterHole = new ObjectStep(this, ObjectID.HOLE_46326, new WorldPoint(1308, 3467, 0), "Enter the nearby hole.", secateurs);
-		searchForTablet = new ObjectStep(this, ObjectID.STONE_TABLE_46376, new WorldPoint(1306, 9885, 0), "Search the south east table.");
+		searchForTablet = new ObjectStep(this, ObjectID.STONE_TABLE_46376, new WorldPoint(1306, 9885, 0), "Search the north-west table.");
 		readTablet1 = new DetailedQuestStep(this, "Read the stone tablet.", stoneTablet1.highlighted());
 		readTablet1.addDialogStep("Yes.");
 		readTranslations = new DetailedQuestStep(this, "Read the word translations.", wordTranslations.highlighted());
 		attemptTranslation = new WidgetStep(this, "Click the 'Attempt Translation' button.", 804, 5);
 
-		inputWords1 = new DetailedQuestStep(this, "Type 'Island', 'Water', 'Time', 'Vessel', and 'North'.");
+		inputWords1 = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Type 'Island', 'Water', 'Time', 'Vessel', and 'North'."), "Work out various translation words and input them to the word translations.");
 		inputWords1.addDialogStep("Yes.");
 
 		leaveHole = new ObjectStep(this, ObjectID.ROPE_46327, new WorldPoint(1309, 9867, 0), "Leave the hole.");
@@ -256,7 +264,8 @@ public class TheGardenOfDeath extends BasicQuestHelper
 		readTablet2.addDialogStep("Yes.");
 		readTranslations2 = new DetailedQuestStep(this, "Read the word translations.", wordTranslations.highlighted());
 		attemptTranslation2 = new WidgetStep(this, "Click the 'Attempt Translation' button.", 804, 5);
-		inputWords2 = new DetailedQuestStep(this, "Type 'West', 'Poison', 'Body', 'Food', and 'Earth'.");
+		inputWords2 = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Type 'West', 'Poison', 'Body', 'Food', and 'Earth'."),
+			"Work out various translation words and input them to the word translations.");
 		inputWords2.addDialogStep("Yes.");
 
 		leaveHole2 = new ObjectStep(this, ObjectID.ROPE_46330, new WorldPoint(1375, 10033, 0), "Leave the hole.");
@@ -268,7 +277,8 @@ public class TheGardenOfDeath extends BasicQuestHelper
 		readTablet3.addDialogStep("Yes.");
 		readTranslations3 = new DetailedQuestStep(this, "Read the word translations.", wordTranslations.highlighted());
 		attemptTranslation3 = new WidgetStep(this, "Click the 'Attempt Translation' button.", 804, 5);
-		inputWords3 = new DetailedQuestStep(this, "Type 'Make', 'Yes', 'No', 'Move', 'Arrive', 'East', and 'South'.");
+		inputWords3 = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Type 'Make', 'Yes', 'No', 'Move', 'Arrive', 'East', and 'South'."),
+			"Work out various translation words and input them to the word translations.");
 		inputWords3.addDialogStep("Yes.");
 
 		leaveHole3 = new ObjectStep(this, ObjectID.ROPE_46333, new WorldPoint(1294, 10033, 0), "Leave the hole.");
@@ -280,7 +290,8 @@ public class TheGardenOfDeath extends BasicQuestHelper
 		readTablet4.addDialogStep("Yes.");
 		readTranslations4 = new DetailedQuestStep(this, "Read the word translations.", wordTranslations.highlighted());
 		attemptTranslation4 = new WidgetStep(this, "Click the 'Attempt Translation' button.", 804, 5);
-		inputWords4 = new DetailedQuestStep(this, "Type 'Few', 'Big', 'Sun', 'Moon', 'Life', 'Death', 'Mind', 'Home', 'Air', and 'Fire'.");
+		inputWords4 = new PuzzleWrapperStep(this, new DetailedQuestStep(this, "Type 'Few', 'Big', 'Sun', 'Moon', 'Life', 'Death', 'Mind', 'Home', 'Air', and 'Fire'."),
+			"Work out various translation words and input them to the word translations.");
 		inputWords4.addDialogStep("Yes.");
 
 		readTabletFinal = new DetailedQuestStep(this, "Read the final stone tablet again.", stoneTablet4.highlighted());
@@ -306,6 +317,12 @@ public class TheGardenOfDeath extends BasicQuestHelper
 		ArrayList<Requirement> req = new ArrayList<>();
 		req.add(new SkillRequirement(Skill.FARMING, 20));
 		return req;
+	}
+
+	@Override
+	public QuestPointReward getQuestPointReward()
+	{
+		return new QuestPointReward(1);
 	}
 
 	@Override

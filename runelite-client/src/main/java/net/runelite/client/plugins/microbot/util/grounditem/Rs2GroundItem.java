@@ -316,6 +316,67 @@ public class Rs2GroundItem {
         return !groundItems.isEmpty();
     }
 
+    // Loot untradables
+    public static boolean lootUntradables(LootingParameters params) {
+        final Predicate<GroundItem> filter = groundItem ->
+                groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < params.getRange() &&
+                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
+                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_OTHER) &&
+                        !groundItem.isTradeable() &&
+                        groundItem.getId() != ItemID.COINS_995;
+        List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
+                .filter(filter)
+                .collect(Collectors.toList());
+        if (groundItems.size() < params.getMinItems()) return false;
+        if (params.isDelayedLooting()) {
+            // Get the ground item with the lowest despawn time
+            GroundItem item = groundItems.stream().min(Comparator.comparingInt(Rs2GroundItem::calculateDespawnTime)).orElse(null);
+            assert item != null;
+            if (calculateDespawnTime(item) > 150) return false;
+        }
+
+        for (GroundItem groundItem : groundItems) {
+            if (groundItem.getQuantity() < params.getMinQuantity()) continue;
+            if (Rs2Inventory.getEmptySlots() <= params.getMinInvSlots()) return true;
+            if (interact(groundItem)) {
+                Microbot.pauseAllScripts = true;
+                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 5000);
+            }
+        }
+        sleepUntil(() -> !isLooting(filter));
+        return !groundItems.isEmpty();
+    }
+
+    // Loot coins
+    public static boolean lootCoins(LootingParameters params) {
+        final Predicate<GroundItem> filter = groundItem ->
+                groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < params.getRange() &&
+                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
+                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_OTHER) &&
+                        groundItem.getId() == ItemID.COINS_995;
+        List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
+                .filter(filter)
+                .collect(Collectors.toList());
+        if (groundItems.size() < params.getMinItems()) return false;
+        if (params.isDelayedLooting()) {
+            // Get the ground item with the lowest despawn time
+            GroundItem item = groundItems.stream().min(Comparator.comparingInt(Rs2GroundItem::calculateDespawnTime)).orElse(null);
+            assert item != null;
+            if (calculateDespawnTime(item) > 150) return false;
+        }
+
+        for (GroundItem groundItem : groundItems) {
+            if (groundItem.getQuantity() < params.getMinQuantity()) continue;
+            if (Rs2Inventory.getEmptySlots() <= params.getMinInvSlots()) return true;
+            if (interact(groundItem)) {
+                Microbot.pauseAllScripts = true;
+                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 5000);
+            }
+        }
+        sleepUntil(() -> !isLooting(filter));
+        return !groundItems.isEmpty();
+    }
+
 
     private static boolean isLooting(Predicate<GroundItem> filter) {
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()

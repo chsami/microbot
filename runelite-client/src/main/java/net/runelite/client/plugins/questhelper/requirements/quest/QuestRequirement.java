@@ -27,13 +27,12 @@
 
 package net.runelite.client.plugins.questhelper.requirements.quest;
 
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
+import java.util.Locale;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.QuestState;
-
-import java.util.Locale;
 
 /**
  * Requirement that checks if a {@link net.runelite.api.Quest} has a certain state.
@@ -55,6 +54,8 @@ public class QuestRequirement extends AbstractRequirement
 	 */
 	public QuestRequirement(QuestHelperQuest quest, QuestState requiredState)
 	{
+		assert(quest != null);
+		assert(requiredState != null);
 		this.quest = quest;
 		this.requiredState = requiredState;
 		this.minimumVarValue = null;
@@ -82,6 +83,7 @@ public class QuestRequirement extends AbstractRequirement
 	 */
 	public QuestRequirement(QuestHelperQuest quest, int minimumVarValue)
 	{
+		assert(quest != null);
 		this.quest = quest;
 		this.requiredState = null;
 		this.minimumVarValue = minimumVarValue;

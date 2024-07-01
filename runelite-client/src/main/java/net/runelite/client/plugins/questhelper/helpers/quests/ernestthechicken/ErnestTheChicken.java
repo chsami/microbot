@@ -25,33 +25,37 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.ernestthechicken;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.ERNEST_THE_CHICKEN
-)
 public class ErnestTheChicken extends BasicQuestHelper
 {
 	//Items Required
@@ -73,8 +77,7 @@ public class ErnestTheChicken extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -143,7 +146,7 @@ public class ErnestTheChicken extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		spade = new ItemRequirement("Spade", ItemID.SPADE).isNotConsumed();
 		fishFood = new ItemRequirement("Fish food", ItemID.FISH_FOOD);
@@ -182,7 +185,8 @@ public class ErnestTheChicken extends BasicQuestHelper
 		inEmptyRoom = new ZoneRequirement(emptyRoom);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		manorGround1 = new Zone(new WorldPoint(3097, 3354, 0), new WorldPoint(3119, 3373, 0));
 		secretRoom = new Zone(new WorldPoint(3090, 3354, 0), new WorldPoint(3096, 3363, 0));
@@ -217,17 +221,17 @@ public class ErnestTheChicken extends BasicQuestHelper
 		searchBookcase = new ObjectStep(this, ObjectID.BOOKCASE, new WorldPoint(3097, 3358, 0), "Search the bookcase in the west room to enter the secret room.");
 		goDownLadder = new ObjectStep(this, ObjectID.LADDER_133, new WorldPoint(3092, 3362, 0), "Climb down the ladder into the basement.");
 
-		pullDownLeverA = new ObjectStep(this, NullObjectID.NULL_146, new WorldPoint(3108, 9745, 0), "Pull down lever A.");
-		pullDownLeverB = new ObjectStep(this, NullObjectID.NULL_147, new WorldPoint(3118, 9752, 0), "Pull down lever B.");
-		pullDownLeverC = new ObjectStep(this, NullObjectID.NULL_148, new WorldPoint(3112, 9760, 0), "Pull down lever C.");
-		pullDownLeverD = new ObjectStep(this, NullObjectID.NULL_149, new WorldPoint(3108, 9767, 0), "Pull down lever D.");
-		pullDownLeverE = new ObjectStep(this, NullObjectID.NULL_150, new WorldPoint(3097, 9767, 0), "Pull down lever E.");
-		pullDownLeverF = new ObjectStep(this, NullObjectID.NULL_151, new WorldPoint(3096, 9765, 0), "Pull down lever F.");
-		pullUpLeverA = new ObjectStep(this, NullObjectID.NULL_146, new WorldPoint(3108, 9745, 0), "Pull up lever A.");
-		pullUpLeverB = new ObjectStep(this, NullObjectID.NULL_147, new WorldPoint(3118, 9752, 0), "Pull up lever B.");
-		pullUpLeverC = new ObjectStep(this, NullObjectID.NULL_148, new WorldPoint(3112, 9760, 0), "Pull up lever C.");
-		pullUpLeverD = new ObjectStep(this, NullObjectID.NULL_149, new WorldPoint(3108, 9767, 0), "Pull up lever D.");
-		pullUpLeverE = new ObjectStep(this, NullObjectID.NULL_150, new WorldPoint(3097, 9767, 0), "Pull up lever E.");
+		pullDownLeverA = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_146, new WorldPoint(3108, 9745, 0), "Pull down lever A."));
+		pullDownLeverB = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_147, new WorldPoint(3118, 9752, 0), "Pull down lever B.")).withNoHelpHiddenInSidebar(true);
+		pullDownLeverC = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_148, new WorldPoint(3112, 9760, 0), "Pull down lever C.")).withNoHelpHiddenInSidebar(true);
+		pullDownLeverD = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_149, new WorldPoint(3108, 9767, 0), "Pull down lever D.")).withNoHelpHiddenInSidebar(true);
+		pullDownLeverE = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_150, new WorldPoint(3097, 9767, 0), "Pull down lever E.")).withNoHelpHiddenInSidebar(true);
+		pullDownLeverF = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_151, new WorldPoint(3096, 9765, 0), "Pull down lever F.")).withNoHelpHiddenInSidebar(true);
+		pullUpLeverA = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_146, new WorldPoint(3108, 9745, 0), "Pull up lever A.")).withNoHelpHiddenInSidebar(true);
+		pullUpLeverB = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_147, new WorldPoint(3118, 9752, 0), "Pull up lever B.")).withNoHelpHiddenInSidebar(true);
+		pullUpLeverC = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_148, new WorldPoint(3112, 9760, 0), "Pull up lever C.")).withNoHelpHiddenInSidebar(true);
+		pullUpLeverD = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_149, new WorldPoint(3108, 9767, 0), "Pull up lever D.")).withNoHelpHiddenInSidebar(true);
+		pullUpLeverE = new PuzzleWrapperStep(this, new ObjectStep(this, NullObjectID.NULL_150, new WorldPoint(3097, 9767, 0), "Pull up lever E.")).withNoHelpHiddenInSidebar(true);
 		pickupOilCan = new DetailedQuestStep(this, new WorldPoint(3092, 9755, 0), "Pick up the oil can in the west room.", oilCan);
 
 		goUpFromBasement = new ObjectStep(this, ObjectID.LADDER_132, new WorldPoint(3117, 9754, 0), "Climb out of the basement.");
@@ -258,7 +262,7 @@ public class ErnestTheChicken extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("300 Coins", ItemID.COINS_995, 300));
+		return Collections.singletonList(new ItemReward("Coins", ItemID.COINS_995, 300));
 	}
 
 	@Override

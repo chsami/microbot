@@ -26,19 +26,19 @@
  */
 package net.runelite.client.plugins.questhelper.questhelpers;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import net.runelite.client.ui.overlay.components.PanelComponent;
-
-import java.awt.*;
 
 public interface QuestDebugRenderer
 {
 	/** Used to render overlay's like quest steps. */
-	default void renderDebugOverlay(Graphics graphics, MQuestHelperPlugin plugin, PanelComponent panelComponent) {}
+	default void renderDebugOverlay(Graphics graphics, QuestHelperPlugin plugin, PanelComponent panelComponent) {}
 
 	/** Used to render an overlay similar to how fishing spot overlays work. */
-	default void renderDebugWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin, QuestHelper quest, PanelComponent panelComponent) {}
+	default void renderDebugWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin, QuestHelper quest, PanelComponent panelComponent) {}
 
 	/** Used to render overlays on widgets */
-	default void renderDebugWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin, QuestHelper quest, PanelComponent panelComponent) {}
+	default void renderDebugWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin, QuestHelper quest, PanelComponent panelComponent) {}
 }

@@ -24,26 +24,26 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.miniquests.daddyshome;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.DADDYS_HOME
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+
 public class DaddysHome extends BasicQuestHelper
 {
 	//Items Required
@@ -68,7 +68,7 @@ public class DaddysHome extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -114,7 +114,7 @@ public class DaddysHome extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		plank10 = new ItemRequirement("Plank", ItemID.PLANK, 10);
 		bolt5 = new ItemRequirement("Bolt of cloth", ItemID.BOLT_OF_CLOTH, 5);
@@ -216,14 +216,14 @@ public class DaddysHome extends BasicQuestHelper
 	public List<ItemReward> getItemRewards()
 	{
 		return Arrays.asList(
-				new ItemReward("25 x Planks", ItemID.PLANK, 25),
-				new ItemReward("10 x Oak Planks", ItemID.OAK_PLANK, 10),
-				new ItemReward("50 x Mithril Nails", ItemID.MITHRIL_NAILS, 50),
-				new ItemReward("5 x Steel Bars", ItemID.STEEL_BAR, 5),
-				new ItemReward("8 x Bolt of Cloth", ItemID.BOLT_OF_CLOTH, 8),
-				new ItemReward("5 x House Teleport Tablets", ItemID.TELEPORT_TO_HOUSE, 5),
-				new ItemReward("1 x Falador Teleport Tablet", ItemID.FALADOR_TELEPORT, 1),
-				new ItemReward("POH in Rimmington or 1,000 Coins", ItemID.COINS_995, 1000));
+			new ItemReward("Planks", ItemID.PLANK, 25),
+			new ItemReward("Oak Planks", ItemID.OAK_PLANK, 10),
+			new ItemReward("Mithril Nails", ItemID.MITHRIL_NAILS, 50),
+			new ItemReward("Steel Bars", ItemID.STEEL_BAR, 5),
+			new ItemReward("Bolt of Cloth", ItemID.BOLT_OF_CLOTH, 8),
+			new ItemReward("House Teleport Tablets", ItemID.TELEPORT_TO_HOUSE, 5),
+			new ItemReward("Falador Teleport Tablet", ItemID.FALADOR_TELEPORT, 1),
+			new ItemReward("POH in Rimmington or 1,000 Coins", ItemID.COINS_995, 1));
 	}
 
 	@Override

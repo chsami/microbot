@@ -24,13 +24,10 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.ardougne;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
@@ -39,18 +36,20 @@ import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.ARDOUGNE_EASY
-)
 public class ArdougneEasy extends ComplexStateQuestHelper
 {
 	// Items required
@@ -71,7 +70,7 @@ public class ArdougneEasy extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doEasy = new ConditionalStep(this, claimReward);
@@ -110,7 +109,7 @@ public class ArdougneEasy extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notEssMine = new VarplayerRequirement(1196, false, 0);
 		notStealCake = new VarplayerRequirement(1196, false, 1);
@@ -151,7 +150,7 @@ public class ArdougneEasy extends ComplexStateQuestHelper
 			"Check what pets you have insured with Probita in East Ardougne (right-click her to Check).");
 
 		wildyLever = new ObjectStep(this, ObjectID.LEVER_1814, new WorldPoint(2561, 3311, 0),
-			"Use the Ardougne lever to teleport to the Wilderness (you may pull the lever there to return).");
+			"Use the Ardougne lever to teleport to the Wilderness (you may pull the lever there to return). This will take you to DEEP Wilderness, bank anything you aren't willing to lose.");
 
 		enterCombatCamp = new ObjectStep(this, ObjectID.GATE_2041, new WorldPoint(2518, 3356, 0),
 			"Enter the Combat Training Camp north of West Ardougne.");

@@ -24,15 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.observatoryquest;
 
-import net.runelite.client.plugins.questhelper.QuestVarPlayer;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarPlayer;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import java.util.HashMap;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.HashMap;
 
 public class StarSignAnswer extends NpcStep
 {
@@ -64,7 +63,6 @@ public class StarSignAnswer extends NpcStep
 		updateCorrectChoice();
 	}
 
-	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{

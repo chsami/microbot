@@ -27,7 +27,11 @@
 package net.runelite.client.plugins.questhelper.requirements.npc;
 
 import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.ConditionForStep;
+import java.util.Arrays;
+import java.util.List;
 import net.runelite.api.Client;
+import net.runelite.api.NPC;
 
 public class NpcInteractingWithNpcRequirement extends SimpleRequirement
 {
@@ -36,6 +40,7 @@ public class NpcInteractingWithNpcRequirement extends SimpleRequirement
 
 	public NpcInteractingWithNpcRequirement(Integer npcID, String npcName2)
 	{
+		assert(npcID != null);
 		this.npcID = npcID;
 		this.npcName2 = npcName2;
 	}

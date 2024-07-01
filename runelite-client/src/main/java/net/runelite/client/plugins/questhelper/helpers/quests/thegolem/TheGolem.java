@@ -24,33 +24,37 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thegolem;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_GOLEM
-)
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+
 public class TheGolem extends BasicQuestHelper
 {
 	//Items Required
@@ -59,7 +63,7 @@ public class TheGolem extends BasicQuestHelper
 		papyrusHighlight;
 
 	//Items Recommended
-	ItemRequirement varrockTeleport, digsiteTeleport, waterskins;
+	ItemRequirement varrockTeleport, digsiteTeleport, waterskins, necklaceOfPassage;
 
 	Requirement inRuin, turnedStatue1, turnedStatue2, turnedStatue3, turnedStatue4,hasReadLetter, added1Clay, added2Clay, added3Clay, talkedToElissa,
 		hasReadNotes, talkedToCurator, inUpstairsMuseum, stolenStatuette, inThroneRoom, openedHead, enteredRuins;
@@ -75,8 +79,7 @@ public class TheGolem extends BasicQuestHelper
 	public Map<Integer, QuestStep> loadSteps()
 	{
 		Map<Integer, QuestStep> steps = new HashMap<>();
-		setupZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -148,7 +151,8 @@ public class TheGolem extends BasicQuestHelper
 		return steps;
 	}
 
-	private void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		ruin = new Zone(new WorldPoint(2706, 4881, 0), new WorldPoint(2738, 4918, 0));
 		upstairsMuseum = new Zone(new WorldPoint(3249, 3440, 1), new WorldPoint(3269, 3457, 1));
@@ -156,7 +160,7 @@ public class TheGolem extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		letter = new ItemRequirement("Letter", ItemID.LETTER_4615);
 		letter.setHighlightInInventory(true);
@@ -209,9 +213,11 @@ public class TheGolem extends BasicQuestHelper
 		statuetteHighlight.setHighlightInInventory(true);
 		statuetteHighlight.setTooltip("If you've lost it, talk to the Curator in the Varrock museum again");
 
+		// Recommended items
 		varrockTeleport = new ItemRequirement("Varrock teleport", ItemID.VARROCK_TELEPORT);
 		digsiteTeleport = new ItemRequirement("Digsite teleport", ItemCollections.DIGSITE_PENDANTS);
 		digsiteTeleport.addAlternates(ItemID.DIGSITE_TELEPORT);
+		necklaceOfPassage = new ItemRequirement("Necklace of passage to Eagle's Eyrie", ItemCollections.NECKLACE_OF_PASSAGES);
 		waterskins = new ItemRequirement("Waterskins", ItemID.WATERSKIN4, -1);
 	}
 
@@ -244,7 +250,10 @@ public class TheGolem extends BasicQuestHelper
 
 	private void setupSteps()
 	{
-		pickUpLetter = new DetailedQuestStep(this, new WorldPoint(3479, 3092, 0), "Pick up the letter on the floor in Uzer and read it.", letter);
+		pickUpLetter = new DetailedQuestStep(this, new WorldPoint(3479, 3092, 0),
+			"Pick up the letter on the floor in Uzer and read it.", letter);
+		((DetailedQuestStep) pickUpLetter).addTeleport(necklaceOfPassage);
+		pickUpLetter.addDialogSteps("Eagle's Eyrie");
 		readLetter = new DetailedQuestStep(this, "Read the letter.", letter);
 		pickUpLetter.addSubSteps(readLetter);
 
@@ -272,14 +281,15 @@ public class TheGolem extends BasicQuestHelper
 		openCabinet = new ObjectStep(this, NullObjectID.NULL_24626, new WorldPoint(3257, 3453, 1), "Right-click open the golem statue's display case.", key);
 
 		stealFeather = new NpcStep(this, NpcID.DESERT_PHOENIX, new WorldPoint(3414, 3154, 0), "Steal a feather from the desert phoenix north of Uzer.");
-
+		((NpcStep) stealFeather).addTeleport(necklaceOfPassage);
+		stealFeather.addDialogSteps("Eagle's Eyrie");
 		enterRuin = new ObjectStep(this, ObjectID.STAIRCASE_6373, new WorldPoint(3493, 3090, 0), "Enter the Uzer ruins.", statuette, pestleAndMortar, vial, papyrus);
 		enterRuinWithoutStatuette = new ObjectStep(this, ObjectID.STAIRCASE_6373, new WorldPoint(3493, 3090, 0), "Enter the Uzer ruins.");
 		enterRuin.addSubSteps(enterRuinWithoutStatuette);
 
 		useImplementOnGolem = new NpcStep(this, NpcID.CLAY_GOLEM_5136, new WorldPoint(3485, 3088, 0), "Use the strange implement on the Golem in Uzer.", strangeImplementHighlight);
 		useImplementOnGolem.addIcon(ItemID.STRANGE_IMPLEMENT);
-		useProgramOnGolem = new NpcStep(this, NpcID.CLAY_GOLEM_5136, new WorldPoint(3485, 3088, 0), "Use the strange implement on the Golem in Uzer.", programHighlight);
+		useProgramOnGolem = new NpcStep(this, NpcID.CLAY_GOLEM_5136, new WorldPoint(3485, 3088, 0), "Use the golem program on the Golem in Uzer.", programHighlight);
 		useProgramOnGolem.addIcon(ItemID.GOLEM_PROGRAM);
 
 		useStatuette = new ObjectStep(this, NullObjectID.NULL_6306, new WorldPoint(2725, 4896, 0), "Use the statue on the empty alcove.", statuetteHighlight);
@@ -348,7 +358,7 @@ public class TheGolem extends BasicQuestHelper
 	@Override
 	public List<UnlockReward> getUnlockRewards()
 	{
-		return Collections.singletonList(new UnlockReward("Ability to take the Carpet ride from Shanty Pass to Uzer."));
+		return Collections.singletonList(new UnlockReward("Ability to take the Carpet ride from Shantay Pass to Uzer."));
 	}
 
 	@Override
@@ -362,7 +372,7 @@ public class TheGolem extends BasicQuestHelper
 			talkToCurator, pickpocketCurator, goUpInMuseum, openCabinet)));
 		allSteps.add(new PanelDetails("Opening the portal", Arrays.asList(enterRuin, useStatuette, turnStatue1,
 			enterThroneRoom, leaveThroneRoom, talkToGolemAfterPortal, pickBlackMushroom, grindMushroom,
-			stealFeather, useFeatherOnInk, useQuillOnPapyrus, useProgramOnGolem), vial, pestleAndMortar, papyrus));
+			stealFeather, useFeatherOnInk, useQuillOnPapyrus, useImplementOnGolem, useProgramOnGolem), vial, pestleAndMortar, papyrus));
 
 		return allSteps;
 	}

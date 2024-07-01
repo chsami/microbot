@@ -26,14 +26,13 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.util;
 
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 @Getter
 public enum ItemSlots

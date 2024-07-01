@@ -45,7 +45,7 @@ public class VorkathOverlay extends OverlayPanel {
                     .left("Vorkath kills: " + plugin.vorkathScript.vorkathSessionKills)
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Vorkath kills until selling: " + plugin.vorkathScript.tempVorkathKills % config.SellItemsAtXKills())
+                    .left("Vorkath kills until selling: " + plugin.vorkathScript.tempVorkathKills)
                     .build());
 
 

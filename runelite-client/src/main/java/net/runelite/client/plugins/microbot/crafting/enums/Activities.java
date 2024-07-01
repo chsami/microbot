@@ -11,7 +11,8 @@ public enum Activities {
     DEFAULT("Default script"),
     GEM_CUTTING("Cutting gems"),
     GLASSBLOWING("Glassblowing"),
-    STAFF_MAKING("Staff making");
+    STAFF_MAKING("Staff making"),
+    FLAX_SPINNING("Flax spinning");
 
     private final String name;
 

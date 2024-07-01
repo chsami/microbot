@@ -24,15 +24,18 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.kandarin;
 
-import net.runelite.client.plugins.questhelper.*;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.Spellbook;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
@@ -42,17 +45,14 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequire
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.KANDARIN_HARD
-)
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 
 public class KandarinHard extends ComplexStateQuestHelper
 {
@@ -66,7 +66,7 @@ public class KandarinHard extends ComplexStateQuestHelper
 	// unlisted item reqs
 	ItemRequirement unstrungYewLong;
 
-	Requirement piety, choppedLogs;
+	Requirement piety, choppedLogs, normalSpellbook;
 
 	Requirement notCatchStur, notSeersRooftop, notYewLong, notPietyCourt, notWaterOrb, notBurnMaple,
 		notShadowHound, notMithrilDrag, notBuyGranite, notFancyStone, notAddySpear;
@@ -87,8 +87,7 @@ public class KandarinHard extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doHard = new ConditionalStep(this, claimReward);
@@ -139,7 +138,7 @@ public class KandarinHard extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notCatchStur = new VarplayerRequirement(1178, false, 26);
 		notSeersRooftop = new VarplayerRequirement(1178, false, 27);
@@ -209,9 +208,11 @@ public class KandarinHard extends ComplexStateQuestHelper
 			)
 		);
 
+		normalSpellbook = new SpellbookRequirement(Spellbook.NORMAL);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		tavDungeon = new Zone(new WorldPoint(2813, 9857, 0), new WorldPoint(2972, 9669, 0));
 		obIsland = new Zone(new WorldPoint(2833, 3427, 0), new WorldPoint(2849, 3415, 0));
@@ -225,18 +226,19 @@ public class KandarinHard extends ComplexStateQuestHelper
 	public void setupSteps()
 	{
 		moveToTavDungeon = new ObjectStep(this, ObjectID.LADDER_16680, new WorldPoint(2884, 3397, 0),
-			"Enter the Taverley Dungeon.", dustyKey, waterRune.quantity(30), cosmicRune.quantity(3), unpoweredOrb);
+			"Enter the Taverley Dungeon to charge a water orb. Make sure you're on the normal spellbook.", normalSpellbook,
+			dustyKey, waterRune.quantity(30), cosmicRune.quantity(3), unpoweredOrb);
 		moveToOb = new ObjectStep(this, ObjectID.LADDER_17385, new WorldPoint(2842, 9824, 0),
 			"Make your way through Taverley Dungeon to the end, and climb the ladder there. If you're 70+ " +
 				"Agility, use on of the shortcuts near the entrance to get there quickly.",
 			dustyKey, waterRune.quantity(30), cosmicRune.quantity(3), unpoweredOrb);
 		waterOrb = new ObjectStep(this, ObjectID.OBELISK_OF_WATER, new WorldPoint(2844, 3422, 0),
 			"Use the charge water orb spell on the obelisk.", waterRune.quantity(30), cosmicRune.quantity(3),
-			unpoweredOrb);
+			unpoweredOrb, normalSpellbook);
 		waterOrb.addIcon(ItemID.WATER_ORB);
 		seersRooftop = new ObjectStep(this, ObjectID.WALL_14927, new WorldPoint(2729, 3489, 0),
 			"Complete a lap of the Seers' village Rooftop course.");
-		yewLong = new ObjectStep(this, ObjectID.YEW_TREE, new WorldPoint(2715, 3460, 0),
+		yewLong = new ObjectStep(this, ObjectID.YEW_TREE_10822, new WorldPoint(2715, 3460, 0),
 			"Cut some yew logs near Seers' Village. Make sure to use the knife on the ones you cut.", axe);
 		cutLongbow = new ItemStep(this, "Use knife on yew logs to make a yew longbow (u)", yewLogs.highlighted(), knife.highlighted());
 		stringBow = new ItemStep(this, "String the bow.", bowString.highlighted(), unstrungYewLong.highlighted());
@@ -363,7 +365,7 @@ public class KandarinHard extends ComplexStateQuestHelper
 		List<PanelDetails> allSteps = new ArrayList<>();
 
 		PanelDetails chargeOrbSteps = new PanelDetails("Charge Water Orb", Arrays.asList(moveToTavDungeon, moveToOb,
-			waterOrb), waterRune.quantity(30), cosmicRune.quantity(3), unpoweredOrb, dustyKey);
+			waterOrb), normalSpellbook, waterRune.quantity(30), cosmicRune.quantity(3), unpoweredOrb, dustyKey);
 		chargeOrbSteps.setDisplayCondition(notWaterOrb);
 		chargeOrbSteps.setLockingStep(waterOrbTask);
 		allSteps.add(chargeOrbSteps);

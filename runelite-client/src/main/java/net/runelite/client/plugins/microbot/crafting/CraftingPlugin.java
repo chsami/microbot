@@ -11,10 +11,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.crafting.enums.Activities;
-import net.runelite.client.plugins.microbot.crafting.scripts.DefaultScript;
-import net.runelite.client.plugins.microbot.crafting.scripts.GemsScript;
-import net.runelite.client.plugins.microbot.crafting.scripts.GlassblowingScript;
-import net.runelite.client.plugins.microbot.crafting.scripts.StaffScript;
+import net.runelite.client.plugins.microbot.crafting.scripts.*;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 
@@ -30,14 +27,13 @@ import java.awt.*;
 @Slf4j
 public class CraftingPlugin extends Plugin {
 
+    private final DefaultScript defaultScript = new DefaultScript();
+    private final GemsScript gemsScript = new GemsScript();
+    private final GlassblowingScript glassblowingScript = new GlassblowingScript();
+    private final StaffScript staffScript = new StaffScript();
+    private final FlaxSpinScript flaxSpinScript = new FlaxSpinScript();
     @Inject
     private CraftingConfig config;
-
-    @Provides
-    CraftingConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(CraftingConfig.class);
-    }
-
     @Inject
     private Client client;
     @Inject
@@ -49,10 +45,10 @@ public class CraftingPlugin extends Plugin {
     @Inject
     private CraftingOverlay craftingOverlay;
 
-    private final DefaultScript defaultScript = new DefaultScript();
-    private final GemsScript gemsScript = new GemsScript();
-    private final GlassblowingScript glassblowingScript = new GlassblowingScript();
-    private final StaffScript staffScript = new StaffScript();
+    @Provides
+    CraftingConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(CraftingConfig.class);
+    }
 
     @Override
     protected void startUp() throws AWTException {
@@ -71,8 +67,10 @@ public class CraftingPlugin extends Plugin {
             gemsScript.run(config);
         } else if (config.activityType() == Activities.GLASSBLOWING) {
             glassblowingScript.run(config);
-        } else if (config.activityType() == Activities.STAFF_MAKING){
+        } else if (config.activityType() == Activities.STAFF_MAKING) {
             staffScript.run(config);
+        } else if (config.activityType() == Activities.FLAX_SPINNING) {
+            flaxSpinScript.run(config);
         }
     }
 
@@ -81,6 +79,7 @@ public class CraftingPlugin extends Plugin {
         glassblowingScript.shutdown();
         gemsScript.shutdown();
         defaultScript.shutdown();
+        flaxSpinScript.shutdown();
         overlayManager.remove(craftingOverlay);
     }
 }
