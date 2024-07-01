@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.prayer;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
-import net.runelite.client.plugins.microbot.magic.housetab.enums.HOUSETABS_CONFIG;
 
 @ConfigGroup("GildedAltar")
 public interface GildedAltarConfig extends Config {
