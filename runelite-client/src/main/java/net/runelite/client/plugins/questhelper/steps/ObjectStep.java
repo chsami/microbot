@@ -68,6 +68,7 @@ public class ObjectStep extends DetailedQuestStep
 	@Getter
 	protected final ArrayList<Integer> alternateObjectIDs = new ArrayList<>();
 	public final int objectID;
+	@Getter
 	private final List<TileObject> objects = new ArrayList<>();
 	private boolean showAllInArea;
 	@Setter
