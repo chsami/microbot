@@ -30,40 +30,11 @@ import com.formdev.flatlaf.extras.FlatInspector;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import com.google.inject.Provides;
-import java.awt.AWTEvent;
-import java.awt.KeyboardFocusManager;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.event.AWTEventListener;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import static java.lang.Math.min;
-import java.util.Arrays;
-import java.util.List;
-import javax.inject.Inject;
-import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
-import javax.swing.RootPaneContainer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.Experience;
-import net.runelite.api.IndexedSprite;
-import net.runelite.api.ItemID;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.NPC;
-import net.runelite.api.Player;
-import net.runelite.api.Skill;
-import net.runelite.api.VarbitComposition;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.CommandExecuted;
-import net.runelite.api.events.MenuEntryAdded;
-import net.runelite.api.events.ScriptCallbackEvent;
-import net.runelite.api.events.StatChanged;
-import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.events.*;
 import net.runelite.api.kit.KitType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
@@ -81,6 +52,17 @@ import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.util.ImageUtil;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.AWTEventListener;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.lang.Math.min;
 
 @Slf4j
 @PluginDescriptor(
@@ -138,6 +120,7 @@ public class DevToolsPlugin extends Plugin
 
 	private DevToolsButton players;
 	private DevToolsButton npcs;
+	private DevToolsButton inventory;
 	private DevToolsButton groundItems;
 	private DevToolsButton groundObjects;
 	private DevToolsButton gameObjects;
@@ -233,6 +216,7 @@ public class DevToolsPlugin extends Plugin
 	{
 		players = new DevToolsButton("Players");
 		npcs = new DevToolsButton("NPCs");
+		inventory = new DevToolsButton("Inventory");
 
 		groundItems = new DevToolsButton("Ground Items");
 		groundObjects = new DevToolsButton("Ground Objects");

@@ -7,6 +7,7 @@ import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ProfileManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
@@ -21,6 +22,10 @@ import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
+import net.runelite.client.plugins.timers.GameTimer;
+import net.runelite.client.plugins.timers.TimersPlugin;
+import net.runelite.client.ui.overlay.infobox.InfoBox;
+import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.WorldUtil;
@@ -29,6 +34,8 @@ import net.runelite.http.api.worlds.World;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -82,6 +89,12 @@ public class Microbot {
     @Getter
     @Setter
     private static WorldMapOverlay worldMapOverlay;
+    @Getter
+    @Setter
+    private static InfoBoxManager infoBoxManager;
+    @Getter
+    @Setter
+    private static ChatMessageManager chatMessageManager;
 
     public static boolean debug = false;
 
@@ -103,13 +116,13 @@ public class Microbot {
                 != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
 
-    @Deprecated(since="1.2.4 - use Rs2Player variant", forRemoval = true)
+    @Deprecated(since = "1.2.4 - use Rs2Player variant", forRemoval = true)
     public static boolean isMoving() {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
                 != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
 
-    @Deprecated(since="1.2.4 - use Rs2Player variant", forRemoval = true)
+    @Deprecated(since = "1.2.4 - use Rs2Player variant", forRemoval = true)
     public static boolean isAnimating() {
         return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
     }
@@ -121,9 +134,11 @@ public class Microbot {
     public static int getVarbitPlayerValue(int varbit) {
         return getClientThread().runOnClientThread(() -> getClient().getVarpValue(varbit));
     }
+
     public static EnumComposition getEnum(int id) {
         return getClientThread().runOnClientThread(() -> getClient().getEnum(id));
     }
+
     public static StructComposition getStructComposition(int structId) {
         return getClientThread().runOnClientThread(() -> getClient().getStructComposition(structId));
     }
@@ -153,8 +168,9 @@ public class Microbot {
 
     public static boolean hopToWorld(int worldNumber) {
         return Microbot.getClientThread().runOnClientThread(() -> {
-            if (Microbot.getClient().getLocalPlayer() != null && Microbot.getClient().getLocalPlayer().isInteracting()) return false;
-            if (quickHopTargetWorld != null || Microbot.getClient().getGameState() != GameState.LOGGED_IN)  return false;
+            if (Microbot.getClient().getLocalPlayer() != null && Microbot.getClient().getLocalPlayer().isInteracting())
+                return false;
+            if (quickHopTargetWorld != null || Microbot.getClient().getGameState() != GameState.LOGGED_IN) return false;
             if (Microbot.getClient().getWorld() == worldNumber) {
                 return false;
             }
@@ -221,8 +237,8 @@ public class Microbot {
 
     public static Point calculateClickingPoint(Rectangle rect) {
         if (rect.getX() == 1 && rect.getY() == 1) return new Point(1, 1);
-        int x = (int)(rect.getX() + (double) Random.random((int)rect.getWidth() / 6 * -1, (int)rect.getWidth() / 6) + rect.getWidth() / 2.0);
-        int y = (int)(rect.getY() + (double)Random.random((int)rect.getHeight() / 6 * -1, (int)rect.getHeight() / 6) + rect.getHeight() / 2.0);
+        int x = (int) (rect.getX() + (double) Random.random((int) rect.getWidth() / 6 * -1, (int) rect.getWidth() / 6) + rect.getWidth() / 2.0);
+        int y = (int) (rect.getY() + (double) Random.random((int) rect.getHeight() / 6 * -1, (int) rect.getHeight() / 6) + rect.getHeight() / 2.0);
         return new Point(x, y);
     }
 
@@ -230,7 +246,7 @@ public class Microbot {
         targetMenu = entry;
         int viewportHeight = client.getViewportHeight();
         int viewportWidth = client.getViewportWidth();
-        if (!(rectangle.getX() > (double)viewportWidth) && !(rectangle.getY() > (double)viewportHeight) && !(rectangle.getX() < 0.0) && !(rectangle.getY() < 0.0)) {
+        if (!(rectangle.getX() > (double) viewportWidth) && !(rectangle.getY() > (double) viewportHeight) && !(rectangle.getX() < 0.0) && !(rectangle.getY() < 0.0)) {
             click(rectangle);
         } else {
             click(new Rectangle(1, 1));
@@ -243,9 +259,9 @@ public class Microbot {
         if (client.isStretchedEnabled()) {
             Dimension stretched = client.getStretchedDimensions();
             Dimension real = client.getRealDimensions();
-            double width = (double)stretched.width / real.getWidth();
-            double height = (double)stretched.height / real.getHeight();
-            point = new Point((int)((double)point.getX() * width), (int)((double)point.getY() * height));
+            double width = (double) stretched.width / real.getWidth();
+            double height = (double) stretched.height / real.getHeight();
+            point = new Point((int) ((double) point.getX() * width), (int) ((double) point.getY() * height));
         }
 
         mouseEvent(504, point);
@@ -275,6 +291,39 @@ public class Microbot {
                 .filter(x -> x.getTitle().equalsIgnoreCase(npcName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public static boolean isTimerActive(GameTimer gameTimer) {
+        if (!isPluginEnabled(TimersPlugin.class.getName())) {
+            log("Please enable the timers plugin to make sure the script is working properly.");
+            return true;
+        }
+        for (InfoBox key : infoBoxManager.getInfoBoxes()) {
+            if (key.getName().equals(gameTimer.name())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void log(String message) {
+        LocalTime currentTime = LocalTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String formattedTime = currentTime.format(formatter);
+        Microbot.getClientThread().runOnClientThread(() ->
+                Microbot.getClient().addChatMessage(ChatMessageType.ENGINE, "", "[" + formattedTime + "]: " + message, "", false)
+        );
+    }
+
+    private static boolean isPluginEnabled(String name) {
+        Plugin dashboard = Microbot.getPluginManager().getPlugins().stream()
+                .filter(x -> x.getClass().getName().equals(name))
+                .findFirst()
+                .orElse(null);
+
+        if (dashboard == null) return false;
+
+        return Microbot.getPluginManager().isPluginEnabled(dashboard);
     }
 }
 

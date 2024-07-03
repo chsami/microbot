@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static net.runelite.api.NullObjectID.NULL_34810;
+
 /**
  * TODO: This class should be cleaned up, less methods by passing filters instead of multiple parameters
  */
@@ -463,6 +465,8 @@ public class Rs2GameObject {
         List<GameObject> gameObjects = getGameObjects();
 
         ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"bank_booth"}, false);
+
+        possibleBankIds.add(NULL_34810);
 
         for (GameObject gameObject : gameObjects) {
             if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;

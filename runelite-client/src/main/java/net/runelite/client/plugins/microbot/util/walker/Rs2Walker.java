@@ -114,6 +114,10 @@ public class Rs2Walker {
                 for (int i = indexOfStartPoint; i < ShortestPathPlugin.getPathfinder().getPath().size() - 1; i++) {
                     WorldPoint currentWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i);
 
+                    if (!Rs2Tile.isTileReachable(currentWorldPoint)) {
+                        continue;
+                    }
+
                     /**
                      * CHECK DOORS
                      */
@@ -383,11 +387,16 @@ public class Rs2Walker {
             ObjectComposition objectComposition = Rs2GameObject.getObjectComposition(wallObject.getId());
 
             for (var action : objectComposition.getActions()) {
-                if (action != null && action.contains("Pay-toll")) {
+                if (action != null && (action.contains("Pay-toll") || action.contains("Pick-lock") || action.contains("Walk-through"))) {
                     Rs2GameObject.interact(wallObject, action);
                     Rs2Player.waitForWalking();
                     return true;
                 } else if (action != null && action.contains("Walk-through")) {
+                    Rs2GameObject.interact(wallObject, action);
+                    Rs2Player.waitForWalking();
+                    return true;
+                }
+                if (action != null && action.contains("Pick-lock")) {
                     Rs2GameObject.interact(wallObject, action);
                     Rs2Player.waitForWalking();
                     return true;
@@ -529,7 +538,7 @@ public class Rs2Walker {
             }
             boolean found = false;
             for (String action : objectComposition.getActions()) {
-                if (action != null && (action.equals("Open") || action.contains("Pay-toll") || action.contains("Walk-through"))) {
+                if (action != null && (action.equals("Open") || action.contains("Pay-toll") || action.contains("Pick-lock") || action.contains("Walk-through"))) {
                     found = true;
                     break;
                 }
@@ -647,28 +656,37 @@ public class Rs2Walker {
                 for (int i = indexOfStartPoint; i < path.size(); i++) {
                     if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                         continue;
-                    if (path.stream().noneMatch(x -> x.equals(b.getDestination()))) continue;
 
-                    int indexOfOrigin = IntStream.range(0, path.size())
-                            .filter(f -> path.get(f).equals(b.getOrigin()))
-                            .findFirst()
-                            .orElse(-1);
-                    int indexOfDestination = IntStream.range(0, path.size())
-                            .filter(f -> path.get(f).equals(b.getDestination()))
-                            .findFirst()
-                            .orElse(-1);
-                    if (indexOfDestination == -1) continue;
-                    if (indexOfOrigin == -1) continue;
-                    if (indexOfDestination < indexOfOrigin) continue;
+                    for (int i = indexOfStartPoint; i < path.size(); i++) {
+                        if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
+                            continue;
+                        if (path.stream().noneMatch(x -> x.equals(b.getDestination()))) continue;
 
-                    if (path.get(i).equals(origin)) {
-                        if (b.isShip()) {
-                            if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
-                                Rs2Npc.interact(b.getNpcName(), b.getAction());
-                                Rs2Player.waitForWalking();
-                            } else {
-                                Rs2Walker.walkFastCanvas(path.get(i));
-                                sleep(1200, 1600);
+                        int indexOfOrigin = IntStream.range(0, path.size())
+                                .filter(f -> path.get(f).equals(b.getOrigin()))
+                                .findFirst()
+                                .orElse(-1);
+                        int indexOfDestination = IntStream.range(0, path.size())
+                                .filter(f -> path.get(f).equals(b.getDestination()))
+                                .findFirst()
+                                .orElse(-1);
+                        if (indexOfDestination == -1) continue;
+                        if (indexOfOrigin == -1) continue;
+                        if (indexOfDestination < indexOfOrigin) continue;
+
+                        if (!Rs2Tile.isTileReachable(path.get(i))) {
+                            continue;
+                        }
+
+                        if (path.get(i).equals(origin)) {
+                            if (b.isShip()) {
+                                if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
+                                    Rs2Npc.interact(b.getNpcName(), b.getAction());
+                                    sleep(1200, 1600);
+                                } else {
+                                    Rs2Walker.walkFastCanvas(path.get(i));
+                                    sleep(1200, 1600);
+                                }
                             }
                         }
 

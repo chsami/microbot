@@ -4,10 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.microbot.crafting.enums.Activities;
-import net.runelite.client.plugins.microbot.crafting.enums.Gems;
-import net.runelite.client.plugins.microbot.crafting.enums.Glass;
-import net.runelite.client.plugins.microbot.crafting.enums.Staffs;
+import net.runelite.client.plugins.microbot.crafting.enums.*;
 
 @ConfigGroup(CraftingConfig.GROUP)
 public interface CraftingConfig extends Config {
@@ -20,6 +17,34 @@ public interface CraftingConfig extends Config {
             position = 0
     )
     String generalSection = "general";
+    @ConfigSection(
+            name = "Gems",
+            description = "Config for gem cutting",
+            position = 1,
+            closedByDefault = true
+    )
+    String gemSection = "gem";
+    @ConfigSection(
+            name = "Glass",
+            description = "Config for glass blowing",
+            position = 2,
+            closedByDefault = true
+    )
+    String glassSection = "glass";
+    @ConfigSection(
+            name = "Staffs",
+            description = "Config for staff making",
+            position = 2,
+            closedByDefault = true
+    )
+    String staffSection = "staff";
+    @ConfigSection(
+            name = "Flax",
+            description = "Configure Settings for Flax Spinning activity",
+            position = 3,
+            closedByDefault = true
+    )
+    String flaxSpinSection = "flaxspin";
 
     @ConfigItem(
             keyName = "Activity",
@@ -28,8 +53,7 @@ public interface CraftingConfig extends Config {
             position = 0,
             section = generalSection
     )
-    default Activities activityType()
-    {
+    default Activities activityType() {
         return Activities.NONE;
     }
 
@@ -40,17 +64,9 @@ public interface CraftingConfig extends Config {
             position = 1,
             section = generalSection
     )
-    default boolean Afk()
-    {
+    default boolean Afk() {
         return false;
     }
-
-    @ConfigSection(
-            name = "Gems",
-            description = "Config for gem cutting",
-            position = 1
-    )
-    String gemSection = "gem";
 
     @ConfigItem(
             keyName = "Gem",
@@ -59,17 +75,9 @@ public interface CraftingConfig extends Config {
             position = 0,
             section = gemSection
     )
-    default Gems gemType()
-    {
+    default Gems gemType() {
         return Gems.NONE;
     }
-
-    @ConfigSection(
-            name = "Glass",
-            description = "Config for glass blowing",
-            position = 2
-    )
-    String glassSection = "glass";
 
     @ConfigItem(
             keyName = "Glass",
@@ -78,17 +86,9 @@ public interface CraftingConfig extends Config {
             position = 0,
             section = glassSection
     )
-    default Glass glassType()
-    {
+    default Glass glassType() {
         return Glass.PROGRESSIVE;
     }
-
-    @ConfigSection(
-            name = "Staffs",
-            description = "Config for staff making",
-            position = 2
-    )
-    String staffSection = "staff";
 
     @ConfigItem(
             keyName = "Staffs",
@@ -97,8 +97,18 @@ public interface CraftingConfig extends Config {
             position = 0,
             section = staffSection
     )
-    default Staffs staffType()
-    {
+    default Staffs staffType() {
         return Staffs.PROGRESSIVE;
+    }
+
+    @ConfigItem(
+            name = "Location",
+            description = "Choose Location where to spin flax",
+            keyName = "flaxSpinLocation",
+            position = 0,
+            section = flaxSpinSection
+    )
+    default FlaxSpinLocations flaxSpinLocation() {
+        return FlaxSpinLocations.SEERS_VILLAGE;
     }
 }

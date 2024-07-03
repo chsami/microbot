@@ -45,7 +45,7 @@ public class Rs2Reflection {
                 }
                 int value = declaredField.getInt(npc);
                 declaredField.setInt(npc, 4795789);
-                if (npc.getAnimation() == 1049413981 * 4795789) {
+                if (npc.getAnimation() == -614178723 * 4795789) {
                     animationField = declaredField.getName();
                     declaredField.setInt(npc, value);
                     declaredField.setAccessible(false);
@@ -60,7 +60,7 @@ public class Rs2Reflection {
         }
         Field animation = npc.getClass().getSuperclass().getDeclaredField(animationField);
         animation.setAccessible(true);
-        int anim = animation.getInt(npc) * 1049413981;
+        int anim = animation.getInt(npc) * -614178723;
         animation.setAccessible(false);
         return anim;
     }

@@ -27,14 +27,6 @@ package net.runelite.client.plugins.devtools;
 
 import com.formdev.flatlaf.extras.FlatUIDefaultsInspector;
 import com.google.inject.ProvisionException;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.TrayIcon;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
-import javax.swing.JButton;
-import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -48,6 +40,12 @@ import net.runelite.client.ui.overlay.OverlayMenuEntry;
 import net.runelite.client.ui.overlay.infobox.Counter;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.util.ImageUtil;
+
+import javax.inject.Inject;
+import javax.swing.*;
+import java.awt.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 class DevToolsPanel extends PluginPanel
@@ -103,6 +101,7 @@ class DevToolsPanel extends PluginPanel
 
 		container.add(plugin.getPlayers());
 		container.add(plugin.getNpcs());
+		container.add(plugin.getInventory());
 
 		container.add(plugin.getGroundItems());
 		container.add(plugin.getGroundObjects());
