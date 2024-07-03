@@ -172,6 +172,13 @@ public class Rs2Npc {
                 .orElse(null);
     }
 
+    public static NPC getBankerNPC() {
+        return getNpcs()
+                .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null &&
+                        Arrays.asList(value.getComposition().getActions()).contains("Bank")))
+                .findFirst()
+                .orElse(null);
+    }
 
     public static boolean interact(NPC npc, String action) {
         if (npc == null) return false;
