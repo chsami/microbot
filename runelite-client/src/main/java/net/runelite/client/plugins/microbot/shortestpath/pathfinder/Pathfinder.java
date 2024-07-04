@@ -34,6 +34,8 @@ public class Pathfinder implements Runnable {
     private List<WorldPoint> path = (List<WorldPoint>)Collections.EMPTY_LIST;
     private boolean pathNeedsUpdate = false;
     private Node bestLastNode;
+    /** Item transports for player-held are not added until the first valid wilderness tile is encountered, 30 for some items, 20 for most */
+    private int maxWildernessLevelItemsAdded;
 
     public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target) {
         stats = new PathfinderStats();
@@ -44,6 +46,7 @@ public class Pathfinder implements Runnable {
         visited = new VisitedTiles(map);
         targetPacked = WorldPointUtil.packWorldPoint(target);
         targetInWilderness = PathfinderConfig.isInWilderness(target);
+        maxWildernessLevelItemsAdded = 31;
     }
 
     public boolean isDone() {
@@ -126,6 +129,24 @@ public class Pathfinder implements Runnable {
             }
 
             node = boundary.removeFirst();
+
+            if (this.maxWildernessLevelItemsAdded > 20) {
+                // make sure item transports aren't added twice
+                boolean shouldAddItems = false;
+                // these are overlapping boundaries, so if the node isn't in level 30, it's in 0-29
+                // likewise, if the node isn't in level 20, it's in 0-19
+                if (this.maxWildernessLevelItemsAdded > 30 && !config.isInLevel30Wilderness(node.packedPosition)) {
+                    this.maxWildernessLevelItemsAdded = 30;
+                    shouldAddItems = true;
+                }
+                if (this.maxWildernessLevelItemsAdded > 20 && !config.isInLevel20Wilderness(node.packedPosition)) {
+                    this.maxWildernessLevelItemsAdded = 20;
+                    shouldAddItems = true;
+                }
+                if (shouldAddItems) {
+                    config.refreshPlayerTransportData(WorldPointUtil.unpackWorldPoint(node.packedPosition), this.maxWildernessLevelItemsAdded);
+                }
+            }
 
             if (node.packedPosition == targetPacked) {
                 bestLastNode = node;

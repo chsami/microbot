@@ -11,7 +11,6 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -31,7 +30,7 @@ public class PathTileOverlay extends Overlay {
         this.plugin = plugin;
         this.config = config;
         setPosition(OverlayPosition.DYNAMIC);
-        setPriority(OverlayPriority.LOW);
+        setPriority(Overlay.PRIORITY_LOW);
         setLayer(OverlayLayer.ABOVE_SCENE);
     }
 
@@ -49,14 +48,14 @@ public class PathTileOverlay extends Overlay {
 
             StringBuilder s = new StringBuilder();
             for (Transport b : plugin.getTransports().getOrDefault(a, new ArrayList<>())) {
-                for (WorldPoint origin : WorldPoint.toLocalInstance(client, b.getOrigin())) {
-                    Point cb = tileCenter(origin);
+                for (WorldPoint destination : WorldPoint.toLocalInstance(client, b.getDestination())) {
+                    Point cb = tileCenter(destination);
                     if (cb != null) {
                         graphics.drawLine(ca.getX(), ca.getY(), cb.getX(), cb.getY());
                     }
-                    if (origin.getPlane() > a.getPlane()) {
+                    if (destination.getPlane() > a.getPlane()) {
                         s.append("+");
-                    } else if (origin.getPlane() < a.getPlane()) {
+                    } else if (destination.getPlane() < a.getPlane()) {
                         s.append("-");
                     } else {
                         s.append("=");
