@@ -34,15 +34,13 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 
 
 public class Rs2Walker {
-    static int stuckCount = 0;
-    static WorldPoint lastPosition;
+    private static final ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
     @Setter
     public static ShortestPathConfig config;
+    static int stuckCount = 0;
+    static WorldPoint lastPosition;
     static int idle = 0;
-
     static WorldPoint currentTarget;
-
-    private static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
 
     public static boolean walkTo(WorldArea area, int distanceThreshold) {
         if (area.distanceTo(Rs2Player.getWorldLocation()) > distanceThreshold){
@@ -236,11 +234,8 @@ public class Rs2Walker {
                 && Rs2Tile.isWalkable(point.dy(1)))
             return true;
 
-        if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_SOUTH)
-                && Rs2Tile.isWalkable(point.dy(-1)))
-            return true;
-
-        return false;
+        return movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_SOUTH)
+                && Rs2Tile.isWalkable(point.dy(-1));
     }
 
     public static boolean walkMiniMap(WorldPoint worldPoint, int zoomDistance) {
@@ -432,17 +427,6 @@ public class Rs2Walker {
                 .filter(i -> path.get(i).equals(startPoint))
                 .findFirst()
                 .orElse(0);
-    }
-
-    /**
-     * @param start
-     */
-    public void setStart(WorldPoint start) {
-        if (ShortestPathPlugin.getPathfinder() == null) {
-            return;
-        }
-        ShortestPathPlugin.setStartPointSet(true);
-        restartPathfinding(start, ShortestPathPlugin.getPathfinder().getTarget());
     }
 
     /**
@@ -653,10 +637,6 @@ public class Rs2Walker {
                     continue;
                 }
 
-                for (int i = indexOfStartPoint; i < path.size(); i++) {
-                    if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
-                        continue;
-
                     for (int i = indexOfStartPoint; i < path.size(); i++) {
                         if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                             continue;
@@ -755,7 +735,7 @@ public class Rs2Walker {
                     }
 
 
-                }
+
             }
         }
         return false;
@@ -841,5 +821,16 @@ public class Rs2Walker {
         } else {
             stuckCount = 0;
         }
+    }
+
+    /**
+     * @param start
+     */
+    public void setStart(WorldPoint start) {
+        if (ShortestPathPlugin.getPathfinder() == null) {
+            return;
+        }
+        ShortestPathPlugin.setStartPointSet(true);
+        restartPathfinding(start, ShortestPathPlugin.getPathfinder().getTarget());
     }
 }
