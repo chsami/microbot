@@ -196,10 +196,12 @@ public class Transport {
                 Integer.parseInt(parts_destination[2]));
 
         try {
-            action = parts[2].split(DELIM)[0];
-            String npcAndObjectId = parts[2].substring(parts[2].indexOf(action) + action.length()).trim();
-            npcName = npcAndObjectId.replaceAll("\\d", "").trim();  // Remove the numbers to get the NPC name
-            objectId = Integer.parseInt(parts[2].split(DELIM)[parts[2].split(DELIM).length - 1]);
+            if (!parts[2].isBlank()){
+                action = parts[2].split(DELIM)[0];
+                String npcAndObjectId = parts[2].substring(parts[2].indexOf(action) + action.length()).trim();
+                npcName = npcAndObjectId.replaceAll("\\d", "").trim();  // Remove the numbers to get the NPC name
+                objectId = Integer.parseInt(parts[2].split(DELIM)[parts[2].split(DELIM).length - 1]);
+            }
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }
