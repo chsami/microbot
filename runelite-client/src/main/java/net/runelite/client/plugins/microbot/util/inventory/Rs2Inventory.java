@@ -15,7 +15,6 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
-import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -755,13 +754,9 @@ public class Rs2Inventory {
      * @return True if the player has the specified quantity of the item, false otherwise.
      */
     public static boolean hasItemAmount(String name, int amount) {
-        Rs2Item rs2Item = get(name);
-        if (rs2Item == null) return false;
-        if (rs2Item.isStackable) {
-            return rs2Item.quantity >= amount;
-        } else {
-            return items().stream().filter(x -> x.name.equalsIgnoreCase(name)).count() >= amount;
-        }
+        Rs2Item item = get(name);
+        if (item == null) return false;
+        return hasItemAmount(name, amount, item.isStackable(), false);
     }
 
     /**
