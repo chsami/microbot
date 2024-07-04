@@ -311,26 +311,6 @@ public class Transport {
         return quests;
     }
 
-    private static void addItemTransports(Map<WorldPoint, List<Transport>> transports) {
-        try {
-            String s = new String(Util.readAllBytes(ShortestPathPlugin.class.getResourceAsStream("/items.tsv")), StandardCharsets.UTF_8);
-            Scanner scanner = new Scanner(s);
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-
-                if (line.startsWith("#") || line.isBlank()) {
-                    continue;
-                }
-                Transport transport = new Transport(line, TransportType.PLAYER_ITEM);
-                transports.computeIfAbsent(null, k -> new ArrayList<>()).add(transport);
-            }
-            scanner.close();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static void addTransports(Map<WorldPoint, List<Transport>> transports, String path, TransportType transportType) {
         try {
             String s = new String(Util.readAllBytes(ShortestPathPlugin.class.getResourceAsStream(path)), StandardCharsets.UTF_8);
@@ -352,7 +332,7 @@ public class Transport {
                     fairyRingsQuestNames.add(p.length >= 7 ? p[6] : "");
                 } else {
                     Transport transport = new Transport(line, transportType);
-                    WorldPoint origin = transport.getOrigin();
+                    WorldPoint origin = transportType.equals(TransportType.PLAYER_ITEM) ? null : transport.getOrigin();
                     transports.computeIfAbsent(origin, k -> new ArrayList<>()).add(transport);
                 }
             }
@@ -394,8 +374,7 @@ public class Transport {
         addTransports(transports, "spirit_trees.tsv", TransportType.SPIRIT_TREE);
         addTransports(transports, "levers.tsv", TransportType.TELEPORTATION_LEVER);
         addTransports(transports, "portals.tsv", TransportType.TELEPORTATION_PORTAL);
-
-        addItemTransports(transports);
+        addTransports(transports, "items.tsv", TransportType.PLAYER_ITEM);
 
         return transports;
     }

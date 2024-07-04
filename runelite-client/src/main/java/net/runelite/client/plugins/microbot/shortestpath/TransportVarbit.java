@@ -1,4 +1,4 @@
-package shortestpath;
+package net.runelite.client.plugins.microbot.shortestpath;
 
 import lombok.Getter;
 
