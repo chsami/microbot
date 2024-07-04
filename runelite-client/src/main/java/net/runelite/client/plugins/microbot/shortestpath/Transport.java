@@ -11,11 +11,13 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -641,5 +643,53 @@ public class Transport {
             default:
                 return -1;
         }
+    }
+
+    public boolean handleItemTeleport(){
+        for (var itemId : itemRequirements){
+            Rs2Item item;
+            List<String> actions;
+            boolean isWearing = Rs2Equipment.isWearing(itemId);
+
+            if (isWearing)
+                item = Rs2Equipment.get(itemId);
+            else if (Rs2Inventory.hasItem(itemId))
+                item = Rs2Inventory.get(itemId);
+            else
+                continue;
+
+            if (item == null)
+                continue;
+
+            String itemAction = "";
+
+            if (itemId == ItemID.TELEPORT_TO_HOUSE)
+                itemAction = "outside";
+
+            if (itemAction.isEmpty()){
+                for (var action : (isWearing ? item.getEquipmentActions().toArray(new String[0]) : item.getInventoryActions())){
+                    if (action == null)
+                        continue;
+
+                    var actionSplits = action.toLowerCase().split(":");
+                    if (Arrays.stream(actionSplits[actionSplits.length - 1].split(" ")).anyMatch(x -> displayInfo.toLowerCase().contains(x))){
+                        itemAction = action;
+                        break;
+                    }
+                }
+            }
+
+            if (!itemAction.isEmpty()){
+                if (isWearing)
+                    Rs2Equipment.interact(itemId, itemAction);
+                else
+                    Rs2Inventory.interact(itemId, itemAction);
+
+                Rs2Player.waitForAnimation();
+                return true;
+            }
+        }
+
+        return false;
     }
 }

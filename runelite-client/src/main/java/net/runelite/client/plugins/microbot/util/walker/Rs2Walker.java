@@ -654,7 +654,7 @@ public class Rs2Walker {
                     if (indexOfOrigin == -1) continue;
                     if (indexOfDestination < indexOfOrigin) continue;
 
-                    if (!Rs2Tile.isTileReachable(path.get(i))) {
+                    if (origin != null && !Rs2Tile.isTileReachable(path.get(i))) {
                         continue;
                     }
 
@@ -672,7 +672,7 @@ public class Rs2Walker {
                             }
                         }
 
-                        if (b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
+                        if (origin != null && b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
                             handled |= handleTrapdoor(b);
                         }
 
@@ -687,6 +687,10 @@ public class Rs2Walker {
 
                         if (b.isFairyRing()) {
                             handled |= b.handleFairyRing();
+                        }
+
+                        if (b.isPlayerItem()){
+                            handled |= b.handleItemTeleport();
                         }
 
                         if (handled)
