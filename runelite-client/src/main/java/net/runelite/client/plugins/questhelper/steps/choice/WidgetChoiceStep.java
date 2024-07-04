@@ -48,6 +48,7 @@ public class WidgetChoiceStep
 
 	private Pattern pattern;
 
+	@Getter
 	protected List<String> excludedStrings;
 	protected int excludedGroupId;
 	protected int excludedChildId;

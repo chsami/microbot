@@ -15,8 +15,8 @@ public enum MLMMiningSpot {
     WEST_MID(null),
     WEST_UPPER(Arrays.asList(new WorldPoint(3752, 5683, 0), new WorldPoint(3752, 5680, 0))),
     SOUTH(Arrays.asList(new WorldPoint(3745, 5647, 0), new WorldPoint(3756, 5653, 0))),
-    NORTH(null);
-    //EAST_UPPER(Arrays.asList(new WorldPoint(3760, 5671, 0), new WorldPoint(3758, 5673, 0)));
+    NORTH(null),
+    EAST_UPPER(Arrays.asList(new WorldPoint(3760, 5673, 0), new WorldPoint(3759, 5673, 0)));
 
     private final List<WorldPoint> worldPoint;
 

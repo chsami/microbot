@@ -71,6 +71,10 @@ public class FlickerScript extends Script {
                 if (prayFlickAttackStyle != null) {
                     handlePrayerFlick();
                 }
+                // if currentMonstersAttackingUs is empty, disable all prayers
+                if (currentMonstersAttackingUs.isEmpty()) {
+                    Rs2Prayer.disableAllPrayers();
+                }
 
 
             } catch (Exception ex) {

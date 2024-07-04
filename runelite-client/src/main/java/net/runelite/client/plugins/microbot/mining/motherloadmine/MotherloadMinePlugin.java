@@ -45,13 +45,18 @@ public class MotherloadMinePlugin extends Plugin {
     @Subscribe
     public void onWallObjectSpawned(WallObjectSpawned event) {
         WallObject wallObject = event.getWallObject();
-        if (wallObject == null)
-            return;
-        if (MotherloadMineScript.status == MLMStatus.MINING && (wallObject.getId() == ObjectID.DEPLETED_VEIN_26665 || wallObject.getId() == ObjectID.DEPLETED_VEIN_26666 || wallObject.getId() == ObjectID.DEPLETED_VEIN_26667 || wallObject.getId() == ObjectID.DEPLETED_VEIN_26668)) {
-            if (wallObject.getWorldLocation().equals(MotherloadMineScript.oreVein.getWorldLocation())) {
-                MotherloadMineScript.oreVein = null;
+        try {
+            if (wallObject == null || MotherloadMineScript.oreVein == null)
+                return;
+            if (MotherloadMineScript.status == MLMStatus.MINING && (wallObject.getId() == ObjectID.DEPLETED_VEIN_26665 || wallObject.getId() == ObjectID.DEPLETED_VEIN_26666 || wallObject.getId() == ObjectID.DEPLETED_VEIN_26667 || wallObject.getId() == ObjectID.DEPLETED_VEIN_26668)) {
+                if (wallObject.getWorldLocation().equals(MotherloadMineScript.oreVein.getWorldLocation())) {
+                    MotherloadMineScript.oreVein = null;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     protected void shutDown() {

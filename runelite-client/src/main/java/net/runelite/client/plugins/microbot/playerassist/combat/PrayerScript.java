@@ -32,7 +32,8 @@ public class PrayerScript extends Script {
         if (config.prayerStyle() == PrayerStyle.CONTINUOUS) {
             Rs2Prayer.toggleQuickPrayer(Rs2Combat.inCombat());
         } else {
-            Rs2Prayer.toggleQuickPrayer(config.prayerStyle() == PrayerStyle.ALWAYS_ON);
+            if (super.run())
+                Rs2Prayer.toggleQuickPrayer(config.prayerStyle() == PrayerStyle.ALWAYS_ON);
         }
     }
 
