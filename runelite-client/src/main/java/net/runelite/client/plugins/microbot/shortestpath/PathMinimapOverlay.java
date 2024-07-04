@@ -72,14 +72,12 @@ public class PathMinimapOverlay extends Overlay {
 
     public static void renderMinimapRect(Client client, Graphics2D graphics, Point center, Color color) {
         double angle = client.getCameraYawTarget() * Perspective.UNIT;
-        double tileSize = client.getMinimapZoom();
-        int x = (int) Math.round(center.getX() - tileSize / 2);
-        int y = (int) Math.round(center.getY() - tileSize / 2);
+        double tileSize = client.getMinimapZoom() / 3.0;
         int width = (int) Math.round(tileSize);
         int height = (int) Math.round(tileSize);
         graphics.setColor(color);
         graphics.rotate(angle, center.getX(), center.getY());
-        graphics.fillRect(x, y, width, height);
+        graphics.fillRect(center.getX() - width / 2, center.getY() - height / 2, width, height);
         graphics.rotate(-angle, center.getX(), center.getY());
     }
 }
