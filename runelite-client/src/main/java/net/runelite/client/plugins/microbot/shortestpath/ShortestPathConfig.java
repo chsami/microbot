@@ -160,6 +160,17 @@ public interface ShortestPathConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "playerItemConsumableDistance",
+            name = "Consumable item distance",
+            description = "The distance consumable items add to the path. This sets a minimum distance for consumable items when pathing.",
+            position = 13,
+            section = sectionSettings
+    )
+    default int playerItemConsumableDistance() {
+        return 100;
+    }
+
+    @ConfigItem(
         keyName = "cancelInstead",
         name = "Cancel instead of recalculating",
         description = "Whether the path should be cancelled rather than recalculated when the recalculate distance limit is exceeded",

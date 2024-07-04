@@ -138,6 +138,11 @@ public class PathfinderConfig {
             boolean itemInInventory = skipInventoryCheck || transport.getItemRequirements().isEmpty() ||
                 transport.getItemRequirements().stream().anyMatch(inventoryItems::contains);
             // questStates and varbits cannot be checked in a non-main thread, so item transports' quests and varbits are cached in `refreshTransportData`
+
+            if (transport.isPlayerItem() && transport.isConsumable()){
+                transport.setWait(config.playerItemConsumableDistance());
+            }
+
             if (useTransport(transport) && itemInInventory && transport.getMaxWildernessLevel() >= wildernessLevel) {
                 usableTransports.add(transport);
             }
