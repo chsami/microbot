@@ -71,6 +71,7 @@ public class NpcStep extends DetailedQuestStep
 	@Setter
 	protected boolean allowMultipleHighlights;
 
+	@Getter
 	protected final ArrayList<NPC> npcs = new ArrayList<>();
 
 	@Setter

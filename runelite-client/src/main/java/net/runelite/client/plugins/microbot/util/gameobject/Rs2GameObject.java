@@ -715,6 +715,13 @@ public class Rs2GameObject {
     }
 
     public static List<TileObject> getTileObjects(int id, WorldPoint anchorPoint) {
+        return getTileObjects().stream()
+                .filter(x -> Objects.nonNull(x) && x.getId() == id)
+                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(anchorPoint)))
+                .collect(Collectors.toList());
+    }
+
+    public static List<TileObject> getTileObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
@@ -731,17 +738,14 @@ public class Rs2GameObject {
                 }
 
                 if (tile.getDecorativeObject() != null
-                        && tile.getDecorativeObject().getId() == id
                         && tile.getDecorativeObject().getWorldLocation().equals(tile.getWorldLocation()))
                     tileObjects.add(tile.getDecorativeObject());
 
                 if (tile.getGroundObject() != null
-                        && tile.getGroundObject().getId() == id
                         && tile.getGroundObject().getWorldLocation().equals(tile.getWorldLocation()))
                     tileObjects.add(tile.getGroundObject());
 
                 if (tile.getWallObject() != null
-                        && tile.getWallObject().getId() == id
                         && tile.getWallObject().getWorldLocation().equals(tile.getWorldLocation()))
                     tileObjects.add(tile.getWallObject());
             }
@@ -749,7 +753,6 @@ public class Rs2GameObject {
 
         return tileObjects.stream()
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparingInt(tile -> tile.getWorldLocation().distanceTo(anchorPoint)))
                 .collect(Collectors.toList());
     }
 

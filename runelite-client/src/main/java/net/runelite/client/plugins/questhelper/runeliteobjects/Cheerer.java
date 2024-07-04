@@ -45,8 +45,8 @@ public class Cheerer
 
 	public static void createCheerers(RuneliteObjectManager runeliteObjectManager, Client client, ConfigManager configManager)
 	{
-		createWOM(runeliteObjectManager, client);
-		createZoinkwiz(runeliteObjectManager, client);
+		//createWOM(runeliteObjectManager, client);
+		//createZoinkwiz(runeliteObjectManager, client);
 	}
 
 	private static void createWOM(RuneliteObjectManager runeliteObjectManager, Client client)

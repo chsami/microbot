@@ -9,6 +9,6 @@ public class Rs2Potion {
     }
 
     public static List<String> getRangePotionsVariants() {
-        return Arrays.asList("ranging potion", "bastion potion");
+        return Arrays.asList("ranging potion", "bastion potion", "divine bastion potion");
     }
 }
