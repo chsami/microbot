@@ -232,6 +232,27 @@ public class Transport {
                 int itemId = Integer.parseInt(item);
                 itemRequirements.add(itemId);
             }
+        } else if (parts.length >= 5 && !parts[4].isEmpty()) {
+            String[] itemRequirements = parts[4].split(";");
+
+            for (String requirement : itemRequirements) {
+                if (requirement.isBlank())
+                    continue;
+
+                int splitIndex = requirement.indexOf(DELIM);
+                int amount;
+                String item;
+
+                try {
+                    amount = Integer.parseInt(requirement.substring(0, splitIndex));
+                    item = requirement.substring(splitIndex + 1);
+                } catch (NumberFormatException e) {
+                    amount = 1;
+                    item = requirement;
+                }
+
+                items.put(item, amount);
+            }
         }
 
         // Quest requirements
