@@ -683,25 +683,35 @@ public class Transport {
 
             String itemAction = "";
 
+            // House teleports should target outside for following pathing
             if (itemId == ItemID.TELEPORT_TO_HOUSE)
                 itemAction = "outside";
 
+            // Match item action based on the teleport destination
             if (itemAction.isEmpty()){
-                for (var action : (isWearing ? item.getEquipmentActions().toArray(new String[0]) : item.getInventoryActions())){
+                var actions = isWearing ? item.getEquipmentActions().toArray(new String[0]) : item.getInventoryActions();
+                for (var action : actions){
                     if (action == null)
                         continue;
 
-                    // Choose default action
-                    if (action.equalsIgnoreCase("rub")
-                        || action.equalsIgnoreCase("break")
-                        || action.equalsIgnoreCase("teleport")) {
+                    var actionSplits = action.toLowerCase().split(":");
+                    if (hasTeleportMatch(actionSplits[actionSplits.length - 1])){
                         itemAction = action;
                         break;
                     }
+                }
+            }
 
-                    // Match item action based on the teleport destination
-                    var actionSplits = action.toLowerCase().split(":");
-                    if (hasTeleportMatch(actionSplits[actionSplits.length - 1])){
+            // Choose default action if no match found
+            if (itemAction.isEmpty()){
+                var actions = isWearing ? item.getEquipmentActions().toArray(new String[0]) : item.getInventoryActions();
+                for (var action : actions){
+                    if (action == null)
+                        continue;
+
+                    if (action.equalsIgnoreCase("rub")
+                            || action.equalsIgnoreCase("break")
+                            || action.equalsIgnoreCase("teleport")) {
                         itemAction = action;
                         break;
                     }
