@@ -691,14 +691,17 @@ public class Transport {
                     if (action == null)
                         continue;
 
+                    // Choose default action
                     if (action.equalsIgnoreCase("rub")
-                        || action.equalsIgnoreCase("break")) {
+                        || action.equalsIgnoreCase("break")
+                        || action.equalsIgnoreCase("teleport")) {
                         itemAction = action;
                         break;
                     }
 
+                    // Match item action based on the teleport destination
                     var actionSplits = action.toLowerCase().split(":");
-                    if (Arrays.stream(actionSplits[actionSplits.length - 1].split(" ")).anyMatch(x -> displayInfo.toLowerCase().contains(x))){
+                    if (hasTeleportMatch(actionSplits[actionSplits.length - 1])){
                         itemAction = action;
                         break;
                     }
@@ -712,10 +715,13 @@ public class Transport {
                     Rs2Inventory.interact(itemId, itemAction);
 
                 if (itemAction.equalsIgnoreCase("rub")){
-                    sleepUntil(() -> Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS));
+                    sleepUntil(() -> Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS), 1000);
+                    if (!Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS))
+                        return false;
+
                     var options = Rs2Widget.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS).getDynamicChildren();
                     for (var option : options){
-                        if (displayInfo.toLowerCase().contains(StringUtils.strip(option.getText(), ".").toLowerCase())){
+                        if (hasTeleportMatch(StringUtils.strip(option.getText(), ".").toLowerCase())){
                             Rs2Keyboard.keyPress(option.getOnKeyListener()[7].toString().charAt(0));
                             break;
                         }
@@ -728,5 +734,14 @@ public class Transport {
         }
 
         return false;
+    }
+
+    private boolean hasTeleportMatch(String text){
+        return Arrays.stream(text.split(" "))
+                .filter(x -> !x.isBlank()
+                        && !x.equalsIgnoreCase("xeric's")
+                        && !x.equalsIgnoreCase("guild")
+                        && !x.equalsIgnoreCase("the"))
+                .anyMatch(x -> displayInfo.toLowerCase().contains(x));
     }
 }
