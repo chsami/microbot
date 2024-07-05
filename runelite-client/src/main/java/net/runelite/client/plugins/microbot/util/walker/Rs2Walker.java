@@ -447,6 +447,7 @@ public class Rs2Walker {
      * @param target
      */
     public static void setTarget(WorldPoint target) {
+        if (!Microbot.isLoggedIn()) return;
         Player localPlayer = Microbot.getClient().getLocalPlayer();
         if (!ShortestPathPlugin.isStartPointSet() && localPlayer == null) {
             return;
