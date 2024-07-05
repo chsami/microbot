@@ -4,7 +4,6 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.api.vars.AccountType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -243,7 +242,11 @@ public class Rs2Player {
         if (treshHold <= percentage) {
             List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
             if (!foods.isEmpty()) {
-                return Rs2Inventory.interact(foods.get(0), "eat");
+                if (foods.get(0).getName().contains("jug of wine")) {
+                    return Rs2Inventory.interact(foods.get(0), "drink");
+                } else {
+                    return Rs2Inventory.interact(foods.get(0), "eat");
+                }
             }
         }
         return false;

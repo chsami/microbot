@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.5.4";
+    public static String version = "1.5.5";
     ThievingConfig config;
 
     public boolean run(ThievingConfig config) {
@@ -47,7 +47,6 @@ public class ThievingScript extends Script {
 
                 if (foods.isEmpty()) {
                     openCoinPouches(1);
-                    dropItems(foods);
                     bank();
                     return;
                 }
