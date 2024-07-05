@@ -59,14 +59,11 @@ public class AutoMiningScript extends Script {
                                 return;
                         } else {
                             Rs2Inventory.dropAllExcept("pickaxe");
-                            return;
                         }
 
                         state = State.MINING;
                         break;
                 }
-
-
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
