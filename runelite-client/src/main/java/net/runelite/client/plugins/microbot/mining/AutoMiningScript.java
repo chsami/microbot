@@ -44,9 +44,11 @@ public class AutoMiningScript extends Script {
                         }
                         
                         GameObject rock = Rs2GameObject.findObject(config.ORE().getName(), true, config.distanceToStray(), true, initialPlayerLocation);
-
-                        if (Rs2GameObject.interact(rock)) {
-                            Rs2Player.waitForAnimation();
+                        
+                        if(rock != null){
+                            if (Rs2GameObject.interact(rock)) {
+                                Rs2Player.waitForAnimation();
+                            } 
                         }
                         break;
                     case RESETTING:
