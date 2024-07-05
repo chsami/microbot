@@ -30,6 +30,7 @@ public class ThievingScript extends Script {
 
     public boolean run(ThievingConfig config) {
         this.config = config;
+        Rs2Walker.setTarget(null);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
