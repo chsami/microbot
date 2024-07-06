@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.questhelper.steps;
 
+import lombok.Getter;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
@@ -14,6 +15,7 @@ public class PuzzleStep extends DetailedQuestStep
 {
 
 	ButtonHighlighCalculator highlightCalculator;
+	@Getter
 	private HashSet<WidgetDetails> highlightedButtons = new HashSet<>();
 
 	public PuzzleStep(QuestHelper questHelper, ButtonHighlighCalculator highlightCalculator, Requirement... requirements)
