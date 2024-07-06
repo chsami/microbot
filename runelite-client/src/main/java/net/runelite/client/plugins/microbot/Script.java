@@ -110,7 +110,7 @@ public abstract class Script implements IScript {
 
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
-        if (!hasRunEnergy && useStaminaPotsIfNeeded) {
+        if (!hasRunEnergy && useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
             Rs2Inventory.useRestoreEnergyItem();
         }
 
