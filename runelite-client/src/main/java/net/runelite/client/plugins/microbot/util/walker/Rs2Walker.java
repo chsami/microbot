@@ -169,10 +169,10 @@ public class Rs2Walker {
                 if (Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance * 2).containsKey(path.get(path.size() - 1))) {
                         System.out.println("walk minimap");
 
-                    if (Microbot.getClient().isInInstancedRegion())
-                        Rs2Walker.walkFastCanvas(target);
-                    else
-                        Rs2Walker.walkMiniMap(target);
+                        if (Microbot.getClient().isInInstancedRegion())
+                            Rs2Walker.walkFastCanvas(target);
+                        else
+                            Rs2Walker.walkMiniMap(target);
 
                         sleep(600, 1200);
                         System.out.println("sleep walk minimap");
