@@ -43,6 +43,8 @@ public class ThievingScript extends Script {
                 if (isStunned())
                     return;
 
+                Rs2Inventory.dropAll("jug");
+
                 List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
 
                 if (foods.isEmpty()) {
@@ -54,8 +56,6 @@ public class ThievingScript extends Script {
                     dropItems(foods);
                 }
                 if (Rs2Player.eatAt(config.hitpoints())) {
-                    sleep(600, 800);
-                    Rs2Inventory.dropAll("jug");
                     return;
                 }
 
