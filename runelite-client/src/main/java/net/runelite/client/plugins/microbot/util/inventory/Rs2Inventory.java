@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1797,6 +1799,24 @@ public class Rs2Inventory {
         return getUnNotedItem(name, exact) != null;
     }
 
+    /**
+     * Method will search for restore energy items in inventory & use them
+     *
+     */
+    public static void useRestoreEnergyItem() {
+        List<String> restoreEnergyItems = Arrays.asList("Stamina potion", "Super energy", "Super energy mix", "Energy potion", "Energy mix");
+        Pattern pattern = Pattern.compile("^(.*?)(?:\\(\\d+\\))?$");
+
+        List<Rs2Item> filteredItems = items().stream()
+                .filter(item -> {
+                    Matcher matcher = pattern.matcher(item.getName());
+                    return matcher.matches() && restoreEnergyItems.contains(matcher.group(1).trim());
+                })
+                .collect(Collectors.toList());
+        if(filteredItems.isEmpty()) return;
+        
+        Rs2Inventory.interact(filteredItems.stream().findFirst().get().name, "drink");
+    }
     /**
      * Method executes menu actions
      *

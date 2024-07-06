@@ -111,7 +111,7 @@ public abstract class Script implements IScript {
         boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
         if (!hasRunEnergy && useStaminaPotsIfNeeded) {
-            Rs2Inventory.interact("Stamina potion", "drink");
+            Rs2Inventory.useRestoreEnergyItem();
         }
 
         return true;
