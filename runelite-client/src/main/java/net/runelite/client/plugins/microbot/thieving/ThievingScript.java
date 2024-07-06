@@ -53,8 +53,10 @@ public class ThievingScript extends Script {
                 if (Rs2Inventory.isFull()) {
                     dropItems(foods);
                 }
-                if (Rs2Player.eatAt(config.hitpoints()))
+                if (Rs2Player.eatAt(config.hitpoints())) {
+                    Rs2Inventory.dropAll("jug");
                     return;
+                }
 
                 handleShadowVeil();
                 openCoinPouches(config.coinPouchTreshHold());

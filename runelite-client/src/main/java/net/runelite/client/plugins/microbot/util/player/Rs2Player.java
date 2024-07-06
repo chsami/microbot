@@ -8,7 +8,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.VarbitValues;
-import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -25,8 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static net.runelite.api.MenuAction.CC_OP;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 
 public class Rs2Player {
@@ -161,11 +159,11 @@ public class Rs2Player {
         if (widget == null) return false;
         if (Microbot.getClient().getEnergy() > 1000 && toggle) {
             Microbot.getMouse().click(widget.getCanvasLocation());
-            Global.sleep(150, 300);
+            sleep(150, 300);
             return true;
         } else if (!toggle) {
             Microbot.getMouse().click(widget.getCanvasLocation());
-            Global.sleep(150, 300);
+            sleep(150, 300);
             return true;
         }
         return false;
@@ -242,7 +240,7 @@ public class Rs2Player {
         if (treshHold <= percentage) {
             List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
             if (!foods.isEmpty()) {
-                if (foods.get(0).getName().contains("jug of wine")) {
+                if (foods.get(0).getName().toLowerCase().contains("jug of wine")) {
                     return Rs2Inventory.interact(foods.get(0), "drink");
                 } else {
                     return Rs2Inventory.interact(foods.get(0), "eat");

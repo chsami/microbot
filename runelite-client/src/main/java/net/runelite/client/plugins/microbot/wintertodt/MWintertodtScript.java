@@ -238,6 +238,7 @@ public class MWintertodtScript extends Script {
 
     private boolean shouldEat() {
         if (eatAt(config.eatAt())) {
+            Rs2Inventory.dropAll("jug");
             resetActions = true;
             return true;
         }
