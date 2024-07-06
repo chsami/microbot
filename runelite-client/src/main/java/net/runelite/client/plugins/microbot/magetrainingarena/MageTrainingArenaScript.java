@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.magetrainingarena;
 
+import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
@@ -14,14 +15,18 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.mta.MTAPlugin;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
+import net.runelite.client.ui.overlay.infobox.Counter;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -37,12 +42,21 @@ public class MageTrainingArenaScript extends Script {
     WorldPoint bankPoint = new WorldPoint(3365, 3318, 1);
 
     MTAPlugin mtaPlugin;
+    int nextHpThreshold = 50;
+
+    @Getter
+    Room currentRoom;
 
     public boolean run(MageTrainingArenaConfig config) {
         Microbot.enableAutoRunOn = false;
         mtaPlugin = (MTAPlugin)Microbot.getPluginManager().getPlugins()
                 .stream().filter(x -> x instanceof net.runelite.client.plugins.mta.MTAPlugin)
                 .findFirst().orElse(null);
+
+        if (mtaPlugin == null || !Microbot.getPluginManager().isActive(mtaPlugin)){
+            Microbot.showMessage("Make sure to enable the 'Mage Training Arena' plugin and restart this plugin afterwards!");
+            return false;
+        }
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -52,10 +66,18 @@ public class MageTrainingArenaScript extends Script {
                 if (handleFirstTime())
                     return;
 
-                var currentRoom = getCurrentRoom();
+                if (config.buyRewards() && !Rs2Inventory.contains(config.reward().getItemId())){
+                    buyReward(config.reward());
+                    return;
+                }
+
+                currentRoom = getCurrentRoom();
                 if (currentRoom == null){
                     enterRoom(Room.ALCHEMIST);
-                } else {
+                } else if (!Rs2Inventory.contains(currentRoom.getRunesId())) {
+                    leaveRoom();
+                }
+                else {
                     switch (currentRoom){
                         case ALCHEMIST:
                             handleAlchemistRoom();
@@ -139,8 +161,17 @@ public class MageTrainingArenaScript extends Script {
             itemId = ItemID.CYLINDER;
         }
 
-        if (pileId == -1)
+        if (pileId == -1) {
+            var index = Random.random(0, 4);
+            Rs2Walker.walkTo(new WorldPoint[]{
+                    new WorldPoint(3347, 9655, 0),
+                    new WorldPoint(3378, 9655, 0),
+                    new WorldPoint(3379, 9624, 0),
+                    new WorldPoint(3346, 9624, 0)
+            }[index]);
+            Rs2Player.waitForWalking();
             return;
+        }
 
 
         if (Rs2Inventory.contains(ItemID.DRAGONSTONE_6903))
@@ -192,7 +223,35 @@ public class MageTrainingArenaScript extends Script {
     }
 
     private void handleGraveyardRoom() {
+        var bonepile = Rs2GameObject.findObjectByLocation(new WorldPoint(3352, 9637, 1));
+        var foodChute = Rs2GameObject.findObjectByLocation(new WorldPoint(3354, 9639, 1));
 
+        var boneGoal = 28 - Rs2Inventory.items().stream().filter(x -> x.name.equalsIgnoreCase("Animals' bones")).count();
+        if (Counter.getCount() >= boneGoal){
+            // TODO Handle bones to peaches
+            Rs2Magic.cast(MagicAction.BONES_TO_BANANAS);
+            Rs2Player.waitForAnimation();
+            return;
+        }
+
+        if (Rs2Inventory.contains(ItemID.BANANA, ItemID.PEACH)){
+            if ((Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) < nextHpThreshold){
+                var amountToEat = Random.random(2, 6);
+                nextHpThreshold = Random.random(40, 80);
+                for (int i = 0; i < amountToEat; i++) {
+                    Rs2Inventory.interact(Rs2Inventory.contains(ItemID.BANANA) ? ItemID.BANANA : ItemID.PEACH, "eat");
+                    sleep(1400, 2000);
+                }
+            }
+
+            Rs2GameObject.interact(foodChute);
+            Rs2Inventory.waitForInventoryChanges();
+            return;
+        }
+
+        Rs2GameObject.interact(bonepile);
+        if (Rs2Player.getWorldLocation().distanceTo(bonepile.getWorldLocation()) > 1)
+            Rs2Player.waitForWalking();
     }
 
     private void handleAlchemistRoom() {
@@ -212,6 +271,23 @@ public class MageTrainingArenaScript extends Script {
             Rs2GameObject.interact("Cupboard", "Search");
         else
             Rs2GameObject.interact(room.getSuggestion().getGameObject(), "Take-5");
+        Rs2Inventory.waitForInventoryChanges();
+    }
+
+    private void buyReward(Reward reward){
+        if (!Rs2Walker.walkTo(bankPoint))
+            return;
+
+        if (!Rs2Widget.isWidgetVisible(197, 0)){
+            Rs2Npc.interact(NpcID.REWARDS_GUARDIAN, "Trade-with");
+            sleepUntil(() -> Rs2Widget.isWidgetVisible(197, 0));
+            sleep(400, 600);
+        }
+        var rewardWidgets = Rs2Widget.getWidget(197, 11).getDynamicChildren();
+        var widget = Arrays.stream(rewardWidgets).filter(x -> x.getItemId() == reward.getItemId()).findFirst().orElse(null);
+        Rs2Widget.clickWidgetFast(widget, 0);
+        sleep(400, 600);
+        Rs2Widget.clickWidget(197, 9);
         Rs2Inventory.waitForInventoryChanges();
     }
 
