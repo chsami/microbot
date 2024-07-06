@@ -43,8 +43,6 @@ public class ThievingScript extends Script {
                 if (isStunned())
                     return;
 
-                Rs2Inventory.dropAll("jug");
-
                 List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
 
                 if (foods.isEmpty()) {
