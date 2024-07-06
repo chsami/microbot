@@ -53,6 +53,7 @@ public class ThievingScript extends Script {
                     return;
                 }
                 if (Rs2Inventory.isFull()) {
+                    Rs2Player.eatAt(99);
                     dropItems(foods);
                 }
                 if (Rs2Player.eatAt(config.hitpoints())) {
