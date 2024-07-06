@@ -161,6 +161,7 @@ public class ThievingScript extends Script {
 
         doNotDropItemList.add(config.food().getName());
         doNotDropItemList.add("dodgy necklace");
+        doNotDropItemList.add("coins");
         Rs2Inventory.dropAllExcept(config.keepItemsAboveValue(), doNotDropItemList);
     }
 }
