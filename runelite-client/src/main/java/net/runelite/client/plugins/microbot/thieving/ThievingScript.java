@@ -54,6 +54,7 @@ public class ThievingScript extends Script {
                     dropItems(foods);
                 }
                 if (Rs2Player.eatAt(config.hitpoints())) {
+                    sleep(600, 800);
                     Rs2Inventory.dropAll("jug");
                     return;
                 }
