@@ -61,7 +61,7 @@ public class Rs2Walker {
 
 
     public static boolean walkTo(WorldPoint target) {
-        return walkTo(target, 6);
+        return walkTo(target, config.reachedDistance());
     }
 
     public static boolean walkTo(WorldPoint target, int distance) {
@@ -112,7 +112,7 @@ public class Rs2Walker {
                 for (int i = indexOfStartPoint; i < ShortestPathPlugin.getPathfinder().getPath().size() - 1; i++) {
                     WorldPoint currentWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i);
 
-                    if (!Rs2Tile.isTileReachable(currentWorldPoint)) {
+                    if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().isInInstancedRegion()) {
                         continue;
                     }
 
@@ -163,9 +163,14 @@ public class Rs2Walker {
                     }
                 }
 
-                if (Rs2Tile.getWalkableTilesAroundPlayer(distance).contains(target)) {
+                if (Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), config.reachedDistance()).containsKey(path.get(path.size() - 1))) {
                     System.out.println("walk minimap");
-                    Rs2Walker.walkMiniMap(target);
+
+                    if (Microbot.getClient().isInInstancedRegion())
+                        Rs2Walker.walkFastCanvas(target);
+                    else
+                        Rs2Walker.walkMiniMap(target);
+
                     sleep(600, 1200);
                     System.out.println("sleep walk minimap");
                 }

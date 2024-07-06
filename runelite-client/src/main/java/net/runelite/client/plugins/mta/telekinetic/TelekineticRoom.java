@@ -38,6 +38,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import javax.inject.Inject;
+
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -78,11 +80,16 @@ public class TelekineticRoom extends MTARoom
 
 	private static Stack<Direction> moves = new Stack<>();
 	private LocalPoint destination;
+	@Getter
 	private WorldPoint location;
+	@Getter
 	private WorldPoint finishLocation;
 	private static Rectangle bounds;
+	@Getter
 	private NPC guardian;
 	private int numMazeWalls;
+	@Getter
+	private WorldPoint target;
 
 	@Inject
 	private TelekineticRoom(MTAConfig config, Client client)
@@ -145,6 +152,7 @@ public class TelekineticRoom extends MTARoom
 			bounds = getBounds(telekineticWalls.toArray(new WallObject[0]));
 			numMazeWalls = telekineticWalls.size();
 			client.clearHintArrow();
+			target = null;
 		}
 		else if (guardian != null)
 		{
@@ -173,6 +181,7 @@ public class TelekineticRoom extends MTARoom
 			if (location.equals(finishLocation))
 			{
 				client.clearHintArrow();
+				target = null;
 			}
 			else
 			{
@@ -184,6 +193,7 @@ public class TelekineticRoom extends MTARoom
 		else
 		{
 			client.clearHintArrow();
+			target = null;
 			moves.clear();
 		}
 	}
@@ -248,6 +258,7 @@ public class TelekineticRoom extends MTARoom
 				if (optimal != null)
 				{
 					client.setHintArrow(optimal);
+					target = optimal;
 					renderWorldPoint(graphics2D, optimal);
 				}
 			}
