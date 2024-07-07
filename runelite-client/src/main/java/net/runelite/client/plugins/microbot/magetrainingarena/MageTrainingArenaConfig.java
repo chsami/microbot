@@ -50,7 +50,13 @@ public interface MageTrainingArenaConfig extends Config {
             section = generalSection
     )
     default String GUIDE() {
-        return "";
+        return "- Make sure to enable the official RuneLite plugin 'Mage Training Arena'\n" +
+                "- Your inventory should only contain staves and Law/Cosmic/Nature runes\n" +
+                "- You need to configure the staves to use and have the requirements to equip all of them\n" +
+                "- To use T6 enchants you need to have any lava staff configured as your fire staff\n" +
+                "- The bot will stop if you are out of runes or the point limit is reached\n" +
+                "- Rune pouches are not supported yet\n" +
+                "- Equip a graceful outfit for maximum efficiency";
     }
 
     @ConfigItem(

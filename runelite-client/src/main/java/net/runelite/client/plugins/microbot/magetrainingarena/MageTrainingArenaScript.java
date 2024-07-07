@@ -74,12 +74,6 @@ public class MageTrainingArenaScript extends Script {
                     return;
                 }
 
-                if (!Rs2Inventory.contains(ItemID.LAW_RUNE, ItemID.COSMIC_RUNE, ItemID.NATURE_RUNE)){
-                    Microbot.showMessage("MTA: Out of runes! Please restart the plugin after you restocked on runes.");
-                    sleep(500);
-                    shutdown();
-                }
-
                 if (handleFirstTime())
                     return;
 
@@ -115,6 +109,10 @@ public class MageTrainingArenaScript extends Script {
                                 .filter(x -> x.getPoints() == missingPoints.get(index))
                                 .findFirst().orElseThrow();
                         enterRoom(nextRoom);
+                    } else {
+                        Microbot.showMessage("MTA: Out of runes! Please restart the plugin after you restocked on runes.");
+                        sleep(500);
+                        shutdown();
                     }
                 } else if (!Rs2Inventory.contains(currentRoom.getRunesId())
                                 || currentPoints.get(currentRoom.getPoints()) >= config.reward().getPoints().get(currentRoom.getPoints())  * (config.buyRewards() ? 1 : (buyable + 1))) {
@@ -322,9 +320,10 @@ public class MageTrainingArenaScript extends Script {
             }
 
             Rs2Magic.cast(MagicAction.TELEKINETIC_GRAB);
-            sleepUntil(() -> room.getGuardian().getWorldLocation().equals(room.getLocation())
-                    && room.getGuardian().getId() != NullNpcID.NULL_6778
-                    && Rs2Player.getWorldLocation().equals(targetConverted), 10_000);
+            sleepUntil(() -> room.getGuardian() == null
+                    || room.getGuardian().getWorldLocation().equals(room.getLocation())
+                        && room.getGuardian().getId() != NullNpcID.NULL_6778
+                        && Rs2Player.getWorldLocation().equals(targetConverted), 10_000);
             if (!Rs2Player.getWorldLocation().equals(targetConverted)) return;
 
             sleep(400, 600);
