@@ -62,6 +62,7 @@ public enum BankLocation {
     LUMBRIDGE_BASEMENT(new WorldPoint(3218, 9623, 0)),
     LUMBRIDGE_TOP(new WorldPoint(3209, 3220, 2)),
     LUNAR_ISLE(new WorldPoint(2099, 3919, 0)),
+    MAGE_TRAINING_ARENA(new WorldPoint(3366, 3318, 1)),
     MINING_GUILD(new WorldPoint(3013, 9718, 0)),
     MOR_UL_REK(new WorldPoint(2541, 5140, 0)),
     MOTHERLOAD(new WorldPoint(3760, 5666, 0)),

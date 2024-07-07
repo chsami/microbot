@@ -7,6 +7,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.magetrainingarena.enums.TelekineticRooms;
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.FireStaves;
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.Points;
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.Rewards;
@@ -37,6 +38,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 
 
 public class MageTrainingArenaScript extends Script {
@@ -87,6 +90,12 @@ public class MageTrainingArenaScript extends Script {
                     if (ensureInventory())
                         return;
 
+                    if (currentPoints.entrySet().stream().allMatch(x -> config.reward().getPoints().get(x.getKey()) <= x.getValue())) {
+                        // TODO multi step buying (wands)
+                        buyReward(config.reward());
+                        return;
+                    }
+
                     var missingPoints = currentPoints.entrySet().stream()
                             .filter(x -> config.reward().getPoints().get(x.getKey()) > x.getValue()
                                 && Arrays.stream(Rooms.values()).anyMatch(y -> y.getPoints() == x.getKey() && Rs2Inventory.contains(y.getRunesId())))
@@ -101,9 +110,6 @@ public class MageTrainingArenaScript extends Script {
                 } else if (!Rs2Inventory.contains(currentRoom.getRunesId())
                                 || currentPoints.get(currentRoom.getPoints()) >= config.reward().getPoints().get(currentRoom.getPoints())) {
                     leaveRoom();
-                } else if (currentPoints.entrySet().stream().allMatch(x -> config.reward().getPoints().get(x.getKey()) <= x.getValue())) {
-                    // TODO multi step buying (wands)
-                    buyReward(config.reward());
                 } else {
                     switch (currentRoom){
                         case ALCHEMIST:
@@ -164,12 +170,12 @@ public class MageTrainingArenaScript extends Script {
                 gain = Rs2Inventory.get("Coins").quantity / 100;
 
             var widget = Rs2Widget.getWidget(points.getKey().getWidgetId(), points.getKey().getChildId());
-            if (widget != null)
-                currentPoints.put(points.getKey(), Integer.parseInt(widget.getText()));
+            if (widget != null && !Microbot.getClientThread().runOnClientThread(widget::isHidden))
+                currentPoints.put(points.getKey(), Integer.parseInt(widget.getText().replace(",", "")));
             else {
                 var roomWidget = Rs2Widget.getWidget(points.getKey().getRoomWidgetId(), points.getKey().getRoomChildId());
                 if (roomWidget != null)
-                    currentPoints.put(points.getKey(), Integer.parseInt(roomWidget.getText()) + gain);
+                    currentPoints.put(points.getKey(), Integer.parseInt(roomWidget.getText().replace(",", "")) + gain);
             }
         }
     }
@@ -267,32 +273,50 @@ public class MageTrainingArenaScript extends Script {
             Rs2Inventory.wear(config.airStaff().getItemId());
 
         var room = mtaPlugin.getTelekineticRoom();
-        var target = room.getTarget();
+        var teleRoom = Arrays.stream(TelekineticRooms.values())
+                .filter(x -> Rs2Player.getWorldLocation().distanceTo(x.getArea()) == 0)
+                .findFirst().orElseThrow();
 
-        if (target == null) {
-            // TODO walk to maze
-            return;
+        // Walk to maze if guardian is not visible
+        WorldPoint target;
+        if (room.getTarget() != null)
+            target = room.getTarget();
+        else {
+            Rs2Walker.walkTo(teleRoom.getMaze());
+            sleepUntil(() -> room.getTarget() != null, 10_000);
+            Rs2Walker.setTarget(null);
+            target = room.getTarget();
         }
 
         var localTarget = LocalPoint.fromWorld(Microbot.getClient(), target);
         var targetConverted = WorldPoint.fromLocalInstance(Microbot.getClient(), localTarget);
 
         if (room.getGuardian().getWorldLocation().equals(room.getFinishLocation())){
-            Rs2Npc.interact(room.getGuardian());
-            Rs2Player.waitForAnimation();
-        } else if (!Rs2Player.getWorldLocation().equals(targetConverted)) {
-            if (Rs2Camera.isTileOnScreen(localTarget))
-                Rs2Walker.walkCanvas(target);
-            else
-                Rs2Walker.walkTo(targetConverted);
-            Rs2Player.waitForWalking();
+            sleepUntil(() -> room.getGuardian().getId() == NpcID.MAZE_GUARDIAN_6779);
+            sleep(200, 400);
+            Rs2Npc.interact(room.getGuardian(), "New-maze");
+            sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(teleRoom.getArea()) != 0);
         } else {
+            if (!Rs2Player.getWorldLocation().equals(targetConverted)) {
+                if (Rs2Camera.isTileOnScreen(localTarget)) {
+                    Rs2Walker.walkCanvas(target);
+                    sleep(300, 900);
+                }
+                else {
+                    Rs2Walker.walkTo(targetConverted);
+                    return;
+                }
+            }
+
             Rs2Magic.cast(MagicAction.TELEKINETIC_GRAB);
-            sleep(100, 300);
+            sleepUntil(() -> room.getGuardian().getWorldLocation().equals(room.getLocation())
+                    && room.getGuardian().getId() != NullNpcID.NULL_6778
+                    && Rs2Player.getWorldLocation().equals(targetConverted), 10_000);
+            if (!Rs2Player.getWorldLocation().equals(targetConverted)) return;
+
+            sleep(400, 600);
             Rs2Npc.interact(room.getGuardian());
-            sleepUntil(() -> room.getGuardian().getId() == NullNpcID.NULL_6778);
-            sleep(50);
-            sleepUntil(() -> room.getGuardian().getId() == NpcID.MAZE_GUARDIAN || room.getGuardian().getId() == NpcID.MAZE_GUARDIAN_6779);
+            sleepUntil(() -> !target.equals(room.getTarget()));
         }
     }
 
@@ -339,8 +363,12 @@ public class MageTrainingArenaScript extends Script {
         var best = room.getBest();
         var item = Rs2Inventory.get(best.getId());
         if (item != null) {
+            if (Rs2Player.isAnimating()) {
+                sleepUntil(() -> !Rs2Player.isAnimating());
+                sleep(100, 300);
+            }
             Rs2Magic.alch(item);
-            Rs2Player.waitForAnimation();
+            Rs2Inventory.waitForInventoryChanges();
             return;
         }
 
@@ -362,28 +390,15 @@ public class MageTrainingArenaScript extends Script {
         }
         var rewardWidgets = Rs2Widget.getWidget(197, 11).getDynamicChildren();
         var widget = Arrays.stream(rewardWidgets).filter(x -> x.getItemId() == reward.getItemId()).findFirst().orElse(null);
-        Rs2Widget.clickWidgetFast(widget, 0);
+        Rs2Widget.clickWidgetFast(widget, Arrays.asList(rewardWidgets).indexOf(widget));
         sleep(400, 600);
         Rs2Widget.clickWidget(197, 9);
         Rs2Inventory.waitForInventoryChanges();
     }
 
-    private Map<WorldArea, WorldPoint> telekineticRooms = Map.ofEntries(
-            entry(new WorldArea(3324, 9697, 34, 30, 0), new WorldPoint(3334, 9718, 0)),
-            entry(new WorldArea(3358, 9704, 34, 23, 0), new WorldPoint(3379, 9716, 0)),
-            entry(new WorldArea(3327, 9669, 31, 27, 0), new WorldPoint(3352, 9690, 0)),
-            entry(new WorldArea(3361, 9664, 28, 39, 0), new WorldPoint(3373, 9696, 0)),
-            entry(new WorldArea(3331, 9702, 37, 24, 1), new WorldPoint(3362, 9713, 1)),
-            entry(new WorldArea(3368, 9704, 22, 22, 1), new WorldPoint(3377, 9706, 1)),
-            entry(new WorldArea(3332, 9671, 35, 29, 1), new WorldPoint(3355, 9693, 1)),
-            entry(new WorldArea(3367, 9669, 25, 34, 1), new WorldPoint(3382, 9698, 1)),
-            entry(new WorldArea(3332, 9696, 42, 31, 2), new WorldPoint(3359, 9701, 2)),
-            entry(new WorldArea(3331, 9667, 45, 27, 2), new WorldPoint(3368, 9680, 2))
-    );
-
     private Rooms getCurrentRoom(){
         for (var room : Rooms.values()){
-            if (room == Rooms.TELEKINETIC && telekineticRooms.keySet().stream().anyMatch(x -> Rs2Player.getWorldLocation().distanceTo(x) == 0)
+            if (room == Rooms.TELEKINETIC && Arrays.stream(TelekineticRooms.values()).anyMatch(x -> Rs2Player.getWorldLocation().distanceTo(x.getArea()) == 0)
                     || room.getArea() != null && Rs2Player.getWorldLocation().distanceTo(room.getArea()) == 0)
                 return room;
         }
@@ -411,9 +426,9 @@ public class MageTrainingArenaScript extends Script {
         if (room != Rooms.TELEKINETIC)
             exit = room.getExit();
         else {
-            for (var kvp : telekineticRooms.entrySet()) {
-                if (Rs2Player.getWorldLocation().distanceTo(kvp.getKey()) == 0){
-                    exit = kvp.getValue();
+            for (var teleRoom : TelekineticRooms.values()) {
+                if (Rs2Player.getWorldLocation().distanceTo(teleRoom.getArea()) == 0){
+                    exit = teleRoom.getExit();
                     break;
                 }
             }

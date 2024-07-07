@@ -32,10 +32,12 @@ public class Rs2Magic {
             sleep(150, 300);
         }
 
-        if (magicSpell.getName().toLowerCase().contains("enchant") && Rs2Widget.findWidget(magicSpell.getName(), Arrays.stream(Rs2Widget.getWidget(218, 0).getStaticChildren()).collect(Collectors.toList())) == null){
-            if (Rs2Widget.isHidden(14286860)) return false;
-            Rs2Widget.clickWidget(14286860);
-            sleep(150, 300);
+        if (magicSpell.getName().toLowerCase().contains("enchant")){
+            if (Rs2Widget.findWidget(magicSpell.getName(), Arrays.stream(Rs2Widget.getWidget(218, 0).getStaticChildren()).collect(Collectors.toList())) == null) {
+                if (Rs2Widget.isHidden(14286860)) return false;
+                Rs2Widget.clickWidget(14286860);
+                sleep(150, 300);
+            }
         } else if (Rs2Widget.isWidgetVisible(218, 4) && Arrays.stream(Rs2Widget.getWidget(218, 4).getActions()).anyMatch(x -> x.equalsIgnoreCase("back"))){
             Rs2Widget.clickWidget(218, 4);
             sleep(150, 300);
