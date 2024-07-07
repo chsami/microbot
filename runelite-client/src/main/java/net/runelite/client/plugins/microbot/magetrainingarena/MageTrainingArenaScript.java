@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.magetrainingarena;
 
-import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
@@ -8,12 +7,18 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.FireStaves;
+import net.runelite.client.plugins.microbot.magetrainingarena.enums.Points;
+import net.runelite.client.plugins.microbot.magetrainingarena.enums.Rewards;
+import net.runelite.client.plugins.microbot.magetrainingarena.enums.Rooms;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -22,13 +27,14 @@ import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.mta.MTAPlugin;
-import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import net.runelite.client.ui.overlay.infobox.Counter;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 
@@ -38,46 +44,67 @@ public class MageTrainingArenaScript extends Script {
 
     boolean firstTime = false;
 
-    WorldPoint teleportersPoint = new WorldPoint(3363, 3318, 0);
+    WorldPoint portalPoint = new WorldPoint(3363, 3318, 0);
     WorldPoint bankPoint = new WorldPoint(3365, 3318, 1);
 
-    MTAPlugin mtaPlugin;
+    MageTrainingArenaConfig config;
+    public static MTAPlugin mtaPlugin;
     int nextHpThreshold = 50;
 
-    @Getter
-    Room currentRoom;
+    public static Rooms currentRoom;
+    public static Map<Points, Integer> currentPoints = Arrays.stream(Points.values()).collect(Collectors.toMap(x -> x, x -> -1));;
 
-    public boolean run(MageTrainingArenaConfig config) {
+    public boolean run(MageTrainingArenaConfig config, MageTrainingArenaPlugin plugin) {
+        this.config = config;
         Microbot.enableAutoRunOn = false;
-        mtaPlugin = (MTAPlugin)Microbot.getPluginManager().getPlugins()
-                .stream().filter(x -> x instanceof net.runelite.client.plugins.mta.MTAPlugin)
-                .findFirst().orElse(null);
-
-        if (mtaPlugin == null || !Microbot.getPluginManager().isActive(mtaPlugin)){
-            Microbot.showMessage("Make sure to enable the 'Mage Training Arena' plugin and restart this plugin afterwards!");
-            return false;
-        }
+        sleepUntil(() -> Microbot.getPluginManager() != null, 30_000);
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+                if (mtaPlugin != null && !Microbot.getPluginManager().isActive(mtaPlugin)) return;
+
+                if (mtaPlugin == null) {
+                    if (Microbot.getPluginManager() == null) return;
+
+                    mtaPlugin = (MTAPlugin) Microbot.getPluginManager().getPlugins()
+                            .stream().filter(x -> x instanceof net.runelite.client.plugins.mta.MTAPlugin)
+                            .findFirst().orElse(null);
+
+                    return;
+                }
 
                 if (handleFirstTime())
                     return;
 
-                if (config.buyRewards() && !Rs2Inventory.contains(config.reward().getItemId())){
-                    buyReward(config.reward());
-                    return;
-                }
-
                 currentRoom = getCurrentRoom();
+                updatePoints();
+                if (initPoints())
+                    return;
+
                 if (currentRoom == null){
-                    enterRoom(Room.ALCHEMIST);
-                } else if (!Rs2Inventory.contains(currentRoom.getRunesId())) {
+                    if (ensureInventory())
+                        return;
+
+                    var missingPoints = currentPoints.entrySet().stream()
+                            .filter(x -> config.reward().getPoints().get(x.getKey()) > x.getValue()
+                                && Arrays.stream(Rooms.values()).anyMatch(y -> y.getPoints() == x.getKey() && Rs2Inventory.contains(y.getRunesId())))
+                            .map(Map.Entry::getKey).collect(Collectors.toList());
+
+                    if (!missingPoints.isEmpty()){
+                        var nextRoom = Arrays.stream(Rooms.values())
+                                .filter(x -> x.getPoints() == missingPoints.get(Random.random(0, missingPoints.size())))
+                                .findFirst().orElseThrow();
+                        enterRoom(nextRoom);
+                    }
+                } else if (!Rs2Inventory.contains(currentRoom.getRunesId())
+                                || currentPoints.get(currentRoom.getPoints()) >= config.reward().getPoints().get(currentRoom.getPoints())) {
                     leaveRoom();
-                }
-                else {
+                } else if (currentPoints.entrySet().stream().allMatch(x -> config.reward().getPoints().get(x.getKey()) <= x.getValue())) {
+                    // TODO multi step buying (wands)
+                    buyReward(config.reward());
+                } else {
                     switch (currentRoom){
                         case ALCHEMIST:
                             handleAlchemistRoom();
@@ -103,26 +130,73 @@ public class MageTrainingArenaScript extends Script {
         return true;
     }
 
+    private boolean ensureInventory() {
+        Predicate<Rs2Item> additionalItemPredicate = x -> !x.name.toLowerCase().contains("rune") && !x.name.toLowerCase().contains("staff");
+
+        if (Rs2Inventory.contains(additionalItemPredicate)){
+            if (!Rs2Bank.walkToBankAndUseBank())
+                return true;
+
+            Rs2Bank.depositAll(additionalItemPredicate);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean initPoints() {
+        if (currentPoints.values().stream().anyMatch(x -> x == -1)){
+            if (currentRoom != null)
+                leaveRoom();
+            else
+                Rs2Walker.walkTo(portalPoint);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void updatePoints() {
+        for (var points : currentPoints.entrySet()){
+            int gain = 0;
+            if (points.getKey() == Points.ALCHEMIST && currentRoom == Rooms.ALCHEMIST && Rs2Inventory.hasItem("Coins"))
+                gain = Rs2Inventory.get("Coins").quantity / 100;
+
+            var widget = Rs2Widget.getWidget(points.getKey().getWidgetId(), points.getKey().getChildId());
+            if (widget != null)
+                currentPoints.put(points.getKey(), Integer.parseInt(widget.getText()));
+            else {
+                var roomWidget = Rs2Widget.getWidget(points.getKey().getRoomWidgetId(), points.getKey().getRoomChildId());
+                if (roomWidget != null)
+                    currentPoints.put(points.getKey(), Integer.parseInt(roomWidget.getText()) + gain);
+            }
+        }
+    }
+
     private void handleEnchantmentRoom() {
         MagicAction enchant;
         int staffId;
 
         var magicLevel = Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC);
-        if (magicLevel >= 68){
+        if (magicLevel >= 87 && (config.fireStaff() == FireStaves.LAVA_BATTLESTAFF || config.fireStaff() == FireStaves.MYSTIC_LAVA_STAFF)){
+            enchant = MagicAction.ENCHANT_ONYX_JEWELLERY;
+            staffId = config.fireStaff().getItemId();
+        } else if (magicLevel >= 68){
             enchant = MagicAction.ENCHANT_DRAGONSTONE_JEWELLERY;
-            staffId = ItemID.MUD_BATTLESTAFF;
+            staffId = config.waterStaff().getItemId();
         } else if (magicLevel >= 57){
             enchant = MagicAction.ENCHANT_DIAMOND_JEWELLERY;
-            staffId = ItemID.MUD_BATTLESTAFF;
+            staffId = config.earthStaff().getItemId();
         } else if (magicLevel >= 49){
             enchant = MagicAction.ENCHANT_RUBY_JEWELLERY;
-            staffId = ItemID.STAFF_OF_FIRE;
+            staffId = config.fireStaff().getItemId();
         } else if (magicLevel >= 27){
             enchant = MagicAction.ENCHANT_EMERALD_JEWELLERY;
-            staffId = ItemID.STAFF_OF_AIR;
+            staffId = config.airStaff().getItemId();
         } else {
             enchant = MagicAction.ENCHANT_SAPPHIRE_JEWELLERY;
-            staffId = ItemID.STAFF_OF_WATER;
+            staffId = config.waterStaff().getItemId();
         }
 
         if (!Rs2Equipment.isWearing(staffId))
@@ -189,8 +263,8 @@ public class MageTrainingArenaScript extends Script {
     }
 
     private void handleTelekineticRoom() {
-        if (!Rs2Equipment.isWearing(ItemID.STAFF_OF_AIR))
-            Rs2Inventory.wear(ItemID.STAFF_OF_AIR);
+        if (!Rs2Equipment.isWearing(config.airStaff().getItemId()))
+            Rs2Inventory.wear(config.airStaff().getItemId());
 
         var room = mtaPlugin.getTelekineticRoom();
         var target = room.getTarget();
@@ -223,6 +297,9 @@ public class MageTrainingArenaScript extends Script {
     }
 
     private void handleGraveyardRoom() {
+        if (!Rs2Equipment.isWearing(config.waterStaff().getItemId()))
+            Rs2Inventory.wear(config.waterStaff().getItemId());
+
         var bonepile = Rs2GameObject.findObjectByLocation(new WorldPoint(3352, 9637, 1));
         var foodChute = Rs2GameObject.findObjectByLocation(new WorldPoint(3354, 9639, 1));
 
@@ -244,19 +321,19 @@ public class MageTrainingArenaScript extends Script {
                 }
             }
 
-            Rs2GameObject.interact(foodChute);
+            Rs2GameObject.interact(foodChute, "Deposit");
             Rs2Inventory.waitForInventoryChanges();
             return;
         }
 
-        Rs2GameObject.interact(bonepile);
+        Rs2GameObject.interact(bonepile, "Grab");
         if (Rs2Player.getWorldLocation().distanceTo(bonepile.getWorldLocation()) > 1)
             Rs2Player.waitForWalking();
     }
 
     private void handleAlchemistRoom() {
-        if (!Rs2Equipment.isWearing(ItemID.STAFF_OF_FIRE))
-            Rs2Inventory.wear(ItemID.STAFF_OF_FIRE);
+        if (!Rs2Equipment.isWearing(config.fireStaff().getItemId()))
+            Rs2Inventory.wear(config.fireStaff().getItemId());
 
         var room = mtaPlugin.getAlchemyRoom();
         var best = room.getBest();
@@ -274,7 +351,7 @@ public class MageTrainingArenaScript extends Script {
         Rs2Inventory.waitForInventoryChanges();
     }
 
-    private void buyReward(Reward reward){
+    private void buyReward(Rewards reward){
         if (!Rs2Walker.walkTo(bankPoint))
             return;
 
@@ -304,9 +381,9 @@ public class MageTrainingArenaScript extends Script {
             entry(new WorldArea(3331, 9667, 45, 27, 2), new WorldPoint(3368, 9680, 2))
     );
 
-    private Room getCurrentRoom(){
-        for (var room : Room.values()){
-            if (room == Room.TELEKINETIC && telekineticRooms.keySet().stream().anyMatch(x -> Rs2Player.getWorldLocation().distanceTo(x) == 0)
+    private Rooms getCurrentRoom(){
+        for (var room : Rooms.values()){
+            if (room == Rooms.TELEKINETIC && telekineticRooms.keySet().stream().anyMatch(x -> Rs2Player.getWorldLocation().distanceTo(x) == 0)
                     || room.getArea() != null && Rs2Player.getWorldLocation().distanceTo(room.getArea()) == 0)
                 return room;
         }
@@ -314,8 +391,8 @@ public class MageTrainingArenaScript extends Script {
         return null;
     }
 
-    private void enterRoom(Room room){
-        if (!Rs2Walker.walkTo(teleportersPoint))
+    private void enterRoom(Rooms room){
+        if (!Rs2Walker.walkTo(portalPoint))
             return;
 
         Rs2GameObject.interact(room.getTeleporter(), "Enter");
@@ -331,7 +408,7 @@ public class MageTrainingArenaScript extends Script {
             return;
 
         WorldPoint exit = null;
-        if (room != Room.TELEKINETIC)
+        if (room != Rooms.TELEKINETIC)
             exit = room.getExit();
         else {
             for (var kvp : telekineticRooms.entrySet()) {

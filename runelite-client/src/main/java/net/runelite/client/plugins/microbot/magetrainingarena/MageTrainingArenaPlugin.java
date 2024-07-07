@@ -7,6 +7,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -42,16 +43,11 @@ public class MageTrainingArenaPlugin extends Plugin {
             overlayManager.add(overlay);
         }
 
-        script.run(config);
+        script.run(config, this);
     }
 
     protected void shutDown() {
         script.shutdown();
         overlayManager.remove(overlay);
-    }
-
-    @Subscribe
-    public void onConfigChanged(ConfigChanged event) {
-
     }
 }
