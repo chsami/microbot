@@ -44,6 +44,7 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.sideloading.MicrobotPluginManager;
 import net.runelite.client.rs.ClientLoader;
 import net.runelite.client.rs.ClientUpdateCheckMode;
 import net.runelite.client.ui.ClientUI;
@@ -157,6 +158,9 @@ public class RuneLite {
     @Inject
     @Nullable
     private TelemetryClient telemetryClient;
+
+    @Inject
+    private MicrobotPluginManager microbotPluginManager;
 
     public static void main(String[] args) throws Exception {
         Locale.setDefault(Locale.ENGLISH);
@@ -396,6 +400,8 @@ public class RuneLite {
         pluginManager.loadCorePlugins();
         pluginManager.loadSideLoadPlugins();
         externalPluginManager.loadExternalPlugins();
+
+        microbotPluginManager.loadSideLoadPlugins();
 
         SplashScreen.stage(.70, null, "Finalizing configuration");
 
