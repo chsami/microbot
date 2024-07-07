@@ -15,26 +15,32 @@ public interface MageTrainingArenaConfig extends Config {
     @ConfigSection(
             name = "General",
             description = "General",
-            position = 0,
-            closedByDefault = false
+            position = 0
     )
     String generalSection = "general";
 
     @ConfigSection(
             name = "Rewards",
             description = "Rewards",
-            position = 1,
-            closedByDefault = false
+            position = 2
     )
     String rewardsSection = "rewards";
 
     @ConfigSection(
             name = "Staves",
             description = "Staves",
-            position = 1,
+            position = 3,
             closedByDefault = true
     )
     String stavesSection = "staves";
+
+    @ConfigSection(
+            name = "Graveyard",
+            description = "Graveyard",
+            position = 4,
+            closedByDefault = true
+    )
+    String graveyardSection = "graveyard";
 
     @ConfigItem(
             keyName = "GUIDE",
@@ -50,18 +56,18 @@ public interface MageTrainingArenaConfig extends Config {
     @ConfigItem(
             keyName = "Buy rewards",
             name = "Buy rewards",
-            description = "Buy rewards",
+            description = "Determines whether the bot should buy the selected reward.",
             position = 1,
             section = rewardsSection
     )
     default boolean buyRewards() {
-        return false;
+        return true;
     }
 
     @ConfigItem(
             keyName = "Reward",
             name = "Reward",
-            description = "The reward to buy",
+            description = "The reward to aim for.",
             position = 2,
             section = rewardsSection
     )
@@ -111,5 +117,27 @@ public interface MageTrainingArenaConfig extends Config {
     )
     default FireStaves fireStaff() {
         return FireStaves.LAVA_BATTLESTAFF;
+    }
+
+    @ConfigItem(
+            keyName = "Healing threshold (min)",
+            name = "Healing threshold (min)",
+            description = "Each time the bot eats it chooses a random threshold (between min and max value) to eat at next time.",
+            position = 7,
+            section = graveyardSection
+    )
+    default int healingThresholdMin() {
+        return 40;
+    }
+
+    @ConfigItem(
+            keyName = "Healing threshold (max)",
+            name = "Healing threshold (max)",
+            description = "Each time the bot eats it chooses a random threshold (between min and max value) to eat at next time.",
+            position = 8,
+            section = graveyardSection
+    )
+    default int healingThresholdMax() {
+        return 70;
     }
 }

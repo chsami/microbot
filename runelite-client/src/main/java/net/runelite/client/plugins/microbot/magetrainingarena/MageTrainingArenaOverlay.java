@@ -3,9 +3,7 @@ package net.runelite.client.plugins.microbot.magetrainingarena;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.components.LineComponent;
-import net.runelite.client.ui.overlay.components.ProgressBarComponent;
-import net.runelite.client.ui.overlay.components.TitleComponent;
+import net.runelite.client.ui.overlay.components.*;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -65,6 +63,12 @@ public class MageTrainingArenaOverlay extends OverlayPanel {
                 var progressBar = new ProgressBarComponent();
                 progressBar.setValue(progress);
                 panelComponent.getChildren().add(progressBar);
+
+                if (config.buyRewards() && MageTrainingArenaScript.bought > 0)
+                    panelComponent.getChildren().add(LineComponent.builder().left("Bought: " + MageTrainingArenaScript.bought).build());
+                else if (!config.buyRewards() && MageTrainingArenaScript.buyable > 0)
+                    panelComponent.getChildren().add(LineComponent.builder().left("Buyable: " + MageTrainingArenaScript.bought).build());
+
 
                 panelComponent.getChildren().add(LineComponent.builder().build());
 

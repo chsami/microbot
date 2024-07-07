@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.magetrainingarena;
 
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -33,14 +32,10 @@ import net.runelite.client.ui.overlay.infobox.Counter;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static java.util.Map.entry;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
-
 
 public class MageTrainingArenaScript extends Script {
     public static double version = 1.0;
@@ -55,12 +50,13 @@ public class MageTrainingArenaScript extends Script {
     int nextHpThreshold = 50;
 
     public static Rooms currentRoom;
-    public static Map<Points, Integer> currentPoints = Arrays.stream(Points.values()).collect(Collectors.toMap(x -> x, x -> -1));;
+    public static Map<Points, Integer> currentPoints = Arrays.stream(Points.values()).collect(Collectors.toMap(x -> x, x -> -1));
+    public static int bought = 0;
+    public static int buyable = 0;
 
-    public boolean run(MageTrainingArenaConfig config, MageTrainingArenaPlugin plugin) {
+    public boolean run(MageTrainingArenaConfig config) {
         this.config = config;
         Microbot.enableAutoRunOn = false;
-        sleepUntil(() -> Microbot.getPluginManager() != null, 30_000);
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -78,6 +74,12 @@ public class MageTrainingArenaScript extends Script {
                     return;
                 }
 
+                if (!Rs2Inventory.contains(ItemID.LAW_RUNE, ItemID.COSMIC_RUNE, ItemID.NATURE_RUNE)){
+                    Microbot.showMessage("MTA: Out of runes! Please restart the plugin after you restocked on runes.");
+                    sleep(500);
+                    shutdown();
+                }
+
                 if (handleFirstTime())
                     return;
 
@@ -90,25 +92,32 @@ public class MageTrainingArenaScript extends Script {
                     if (ensureInventory())
                         return;
 
-                    if (currentPoints.entrySet().stream().allMatch(x -> config.reward().getPoints().get(x.getKey()) <= x.getValue())) {
-                        // TODO multi step buying (wands)
-                        buyReward(config.reward());
+                    if (currentPoints.entrySet().stream().allMatch(x -> config.reward().getPoints().get(x.getKey()) * (config.buyRewards() ? 1 : (buyable + 1)) <= x.getValue())) {
+                        if (config.buyRewards()){
+                            // TODO multi step buying (wands)
+                            buyReward(config.reward());
+                        } else {
+                            buyable = config.reward().getPoints().entrySet().stream()
+                                    .mapToInt(x -> currentPoints.get(x.getKey()) / x.getValue())
+                                    .min().orElseThrow();
+                        }
                         return;
                     }
 
                     var missingPoints = currentPoints.entrySet().stream()
-                            .filter(x -> config.reward().getPoints().get(x.getKey()) > x.getValue()
+                            .filter(x -> config.reward().getPoints().get(x.getKey()) * (config.buyRewards() ? 1 : (buyable + 1)) > x.getValue()
                                 && Arrays.stream(Rooms.values()).anyMatch(y -> y.getPoints() == x.getKey() && Rs2Inventory.contains(y.getRunesId())))
                             .map(Map.Entry::getKey).collect(Collectors.toList());
 
                     if (!missingPoints.isEmpty()){
+                        var index = Random.random(0, missingPoints.size());
                         var nextRoom = Arrays.stream(Rooms.values())
-                                .filter(x -> x.getPoints() == missingPoints.get(Random.random(0, missingPoints.size())))
+                                .filter(x -> x.getPoints() == missingPoints.get(index))
                                 .findFirst().orElseThrow();
                         enterRoom(nextRoom);
                     }
                 } else if (!Rs2Inventory.contains(currentRoom.getRunesId())
-                                || currentPoints.get(currentRoom.getPoints()) >= config.reward().getPoints().get(currentRoom.getPoints())) {
+                                || currentPoints.get(currentRoom.getPoints()) >= config.reward().getPoints().get(currentRoom.getPoints())  * (config.buyRewards() ? 1 : (buyable + 1))) {
                     leaveRoom();
                 } else {
                     switch (currentRoom){
@@ -129,8 +138,12 @@ public class MageTrainingArenaScript extends Script {
 
                 sleep(500, 1000);
             } catch (Exception ex) {
+                if (ex instanceof InterruptedException)
+                    return;
+
                 System.out.println(ex.getMessage());
                 ex.printStackTrace(System.out);
+                Microbot.log("MTA Exception: " + ex.getMessage());
             }
         }, 0, 10, TimeUnit.MILLISECONDS);
         return true;
@@ -288,8 +301,8 @@ public class MageTrainingArenaScript extends Script {
             target = room.getTarget();
         }
 
-        var localTarget = LocalPoint.fromWorld(Microbot.getClient(), target);
-        var targetConverted = WorldPoint.fromLocalInstance(Microbot.getClient(), localTarget);
+        var localTarget = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target);
+        var targetConverted = WorldPoint.fromLocalInstance(Microbot.getClient(), Objects.requireNonNull(localTarget));
 
         if (room.getGuardian().getWorldLocation().equals(room.getFinishLocation())){
             sleepUntil(() -> room.getGuardian().getId() == NpcID.MAZE_GUARDIAN_6779);
@@ -338,7 +351,7 @@ public class MageTrainingArenaScript extends Script {
         if (Rs2Inventory.contains(ItemID.BANANA, ItemID.PEACH)){
             if ((Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) < nextHpThreshold){
                 var amountToEat = Random.random(2, 6);
-                nextHpThreshold = Random.random(40, 80);
+                nextHpThreshold = Random.random(config.healingThresholdMin(), config.healingThresholdMax());
                 for (int i = 0; i < amountToEat; i++) {
                     Rs2Inventory.interact(Rs2Inventory.contains(ItemID.BANANA) ? ItemID.BANANA : ItemID.PEACH, "eat");
                     sleep(1400, 2000);
@@ -351,7 +364,7 @@ public class MageTrainingArenaScript extends Script {
         }
 
         Rs2GameObject.interact(bonepile, "Grab");
-        if (Rs2Player.getWorldLocation().distanceTo(bonepile.getWorldLocation()) > 1)
+        if (Rs2Player.getWorldLocation().distanceTo(Objects.requireNonNull(bonepile).getWorldLocation()) > 1)
             Rs2Player.waitForWalking();
     }
 
@@ -394,6 +407,7 @@ public class MageTrainingArenaScript extends Script {
         sleep(400, 600);
         Rs2Widget.clickWidget(197, 9);
         Rs2Inventory.waitForInventoryChanges();
+        bought++;
     }
 
     private Rooms getCurrentRoom(){

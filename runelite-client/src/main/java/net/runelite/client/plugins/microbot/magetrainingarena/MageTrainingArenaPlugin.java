@@ -43,7 +43,7 @@ public class MageTrainingArenaPlugin extends Plugin {
             overlayManager.add(overlay);
         }
 
-        script.run(config, this);
+        script.run(config);
     }
 
     protected void shutDown() {
