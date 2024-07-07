@@ -522,7 +522,7 @@ public class Rs2GameObject {
     }
 
     public static TileObject findObject(List<Integer> ids) {
-        int distance = 0;
+        int distance = 17; // render distance seems to be around 17
         for (int id : ids) {
             TileObject object = findObjectById(id);
             if (object == null) continue;
