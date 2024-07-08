@@ -78,7 +78,7 @@ public class Rs2Camera {
         } else if (getAngleTo(degrees) < -5) {
             Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
             Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
-                    () -> Math.abs(getAngleTo(degrees)) >= -5, 10);
+                    () -> Math.abs(getAngleTo(degrees)) <= 5, 10);
         }
     }
 

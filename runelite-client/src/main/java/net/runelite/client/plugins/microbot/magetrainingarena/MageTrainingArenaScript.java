@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.magetrainingarena;
 
+import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
@@ -30,9 +31,7 @@ import net.runelite.client.plugins.mta.MTAPlugin;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import net.runelite.client.ui.overlay.infobox.Counter;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
@@ -51,14 +50,19 @@ public class MageTrainingArenaScript extends Script {
     private int nextHpThreshold = 50;
     private Boolean btp = null;
 
-    public static Rooms currentRoom;
-    public static Map<Points, Integer> currentPoints = Arrays.stream(Points.values()).collect(Collectors.toMap(x -> x, x -> -1));
-    public static int bought = 0;
-    public static int buyable = 0;
+    private Rooms currentRoom;
+    @Getter
+    private static final Map<Points, Integer> currentPoints = Arrays.stream(Points.values()).collect(Collectors.toMap(x -> x, x -> -1));
+    @Getter
+    private static int bought;
+    @Getter
+    private static int buyable;
 
     public boolean run(MageTrainingArenaConfig config) {
         this.config = config;
-        Microbot.enableAutoRunOn = false;
+        Microbot.enableAutoRunOn = true;
+        bought = 0;
+        buyable = 0;
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -88,12 +92,15 @@ public class MageTrainingArenaScript extends Script {
                     if (ensureInventory())
                         return;
 
-                    if (currentPoints.entrySet().stream().allMatch(x -> config.reward().getPoints().get(x.getKey()) * (config.buyRewards() ? 1 : (buyable + 1)) <= x.getValue())) {
+                    if (currentPoints.entrySet().stream().allMatch(x -> getRequiredPoints().get(x.getKey()) * (config.buyRewards() ? 1 : (buyable + 1)) <= x.getValue())) {
                         if (config.buyRewards()){
-                            // TODO multi step buying (wands)
-                            buyReward(config.reward());
+                            var rewardToBuy = config.reward();
+                            while (rewardToBuy.getPreviousReward() != null && !Rs2Inventory.contains(rewardToBuy.getPreviousReward().getItemId()))
+                                rewardToBuy = rewardToBuy.getPreviousReward();
+
+                            buyReward(rewardToBuy);
                         } else {
-                            buyable = config.reward().getPoints().entrySet().stream()
+                            buyable = getRequiredPoints().entrySet().stream()
                                     .mapToInt(x -> currentPoints.get(x.getKey()) / x.getValue())
                                     .min().orElseThrow();
                         }
@@ -101,7 +108,7 @@ public class MageTrainingArenaScript extends Script {
                     }
 
                     var missingPoints = currentPoints.entrySet().stream()
-                            .filter(x -> config.reward().getPoints().get(x.getKey()) * (config.buyRewards() ? 1 : (buyable + 1)) > x.getValue()
+                            .filter(x -> getRequiredPoints().get(x.getKey()) * (config.buyRewards() ? 1 : (buyable + 1)) > x.getValue()
                                 && Arrays.stream(Rooms.values()).anyMatch(y -> y.getPoints() == x.getKey() && Rs2Inventory.contains(y.getRunesId())))
                             .map(Map.Entry::getKey).collect(Collectors.toList());
 
@@ -117,7 +124,7 @@ public class MageTrainingArenaScript extends Script {
                         shutdown();
                     }
                 } else if (!Rs2Inventory.contains(currentRoom.getRunesId())
-                                || currentPoints.get(currentRoom.getPoints()) >= config.reward().getPoints().get(currentRoom.getPoints())  * (config.buyRewards() ? 1 : (buyable + 1))) {
+                                || currentPoints.get(currentRoom.getPoints()) >= getRequiredPoints().get(currentRoom.getPoints())  * (config.buyRewards() ? 1 : (buyable + 1))) {
                     leaveRoom();
                 } else {
                     switch (currentRoom){
@@ -150,7 +157,16 @@ public class MageTrainingArenaScript extends Script {
     }
 
     private boolean ensureInventory() {
-        Predicate<Rs2Item> additionalItemPredicate = x -> !x.name.toLowerCase().contains("rune") && !x.name.toLowerCase().contains("staff");
+        var reward = config.reward();
+        var previousRewards = new ArrayList<Integer>();
+        while (reward.getPreviousReward() != null){
+            reward = reward.getPreviousReward();
+            previousRewards.add(reward.getItemId());
+        }
+
+        Predicate<Rs2Item> additionalItemPredicate = x -> !x.name.toLowerCase().contains("rune")
+                && !x.name.toLowerCase().contains("staff")
+                && !previousRewards.contains(x.id);
 
         if (Rs2Inventory.contains(additionalItemPredicate)){
             if (!Rs2Bank.walkToBankAndUseBank())
@@ -193,6 +209,26 @@ public class MageTrainingArenaScript extends Script {
         }
     }
 
+    private Map<Points, Integer> getRequiredPoints(){
+        return getRequiredPoints(config);
+    }
+
+    public static Map<Points, Integer> getRequiredPoints(MageTrainingArenaConfig config){
+        var currentReward = config.reward();
+        var requiredPoints = currentReward.getPoints().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        while (currentReward.getPreviousReward() != null){
+            currentReward = currentReward.getPreviousReward();
+            if (Rs2Inventory.contains(currentReward.getItemId()))
+                break;
+
+            for (var points : requiredPoints.entrySet())
+                points.setValue(points.getValue() + currentReward.getPoints().get(points.getKey()));
+        }
+
+        return requiredPoints;
+    }
+
     private void handleEnchantmentRoom() {
         MagicAction enchant;
         int staffId;
@@ -228,7 +264,7 @@ public class MageTrainingArenaScript extends Script {
                 return;
 
             Rs2GameObject.interact(ObjectID.HOLE_23698, "Deposit");
-            Rs2Inventory.waitForInventoryChanges();
+            Rs2Player.waitForWalking();
             return;
         }
 
@@ -256,7 +292,14 @@ public class MageTrainingArenaScript extends Script {
             itemId = ItemID.CYLINDER;
         }
 
-        if (pileId == -1) {
+        if (pileId == -1) return;
+
+        var object = Rs2GameObject.getGameObjects(pileId).stream()
+                .filter(Rs2Camera::isTileOnScreen)
+                .min(Comparator.comparing(x -> x.getWorldLocation().distanceTo(Rs2Player.getWorldLocation())))
+                .orElse(null);
+
+        if (object == null) {
             var index = Random.random(0, 4);
             Rs2Walker.walkTo(new WorldPoint[]{
                     new WorldPoint(3347, 9655, 0),
@@ -323,16 +366,10 @@ public class MageTrainingArenaScript extends Script {
                     sleep(200, 400);
                 }
 
-                if (Rs2Camera.isTileOnScreen(localTarget)) {
-                    Rs2Walker.walkCanvas(target);
-                    if (!sleepUntil(Rs2Player::isWalking, 2000)){
-                        var angle = Rs2Camera.angleToTile(localTarget);
-                        Rs2Camera.setAngle(angle);
-                        return;
-                    }
+                if (Rs2Camera.isTileOnScreen(localTarget) && Rs2Walker.walkCanvas(target) != null) {
+                    Rs2Walker.setTarget(null);
                     sleep(300, 900);
-                }
-                else {
+                } else {
                     Rs2Walker.walkTo(targetConverted);
                     return;
                 }
@@ -439,7 +476,9 @@ public class MageTrainingArenaScript extends Script {
         sleep(400, 600);
         Rs2Widget.clickWidget(197, 9);
         Rs2Inventory.waitForInventoryChanges();
-        bought++;
+
+        if (reward == config.reward())
+            bought++;
     }
 
     public static Rooms getCurrentRoom(){

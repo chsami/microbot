@@ -39,15 +39,15 @@ public class MageTrainingArenaOverlay extends OverlayPanel {
                         .build());
             } else {
                 panelComponent.getChildren().add(LineComponent.builder()
-                        .left("Room: " + (MageTrainingArenaScript.currentRoom != null ? MageTrainingArenaScript.currentRoom : "-"))
+                        .left("Room: " + (MageTrainingArenaScript.getCurrentRoom() != null ? MageTrainingArenaScript.getCurrentRoom() : "-"))
                         .build());
                 panelComponent.getChildren().add(LineComponent.builder()
                         .left("Reward: " + config.reward())
                         .build());
 
                 panelComponent.getChildren().add(LineComponent.builder().build());
-                for (var points : MageTrainingArenaScript.currentPoints.entrySet()){
-                    var rewardPoints = config.reward().getPoints().get(points.getKey());
+                for (var points : MageTrainingArenaScript.getCurrentPoints().entrySet()){
+                    var rewardPoints = MageTrainingArenaScript.getRequiredPoints(config).get(points.getKey());
                     panelComponent.getChildren().add(LineComponent.builder()
                             .left(String.format("%s: %d / %d", points.getKey(), points.getValue(), rewardPoints))
                             .build());
@@ -56,16 +56,16 @@ public class MageTrainingArenaOverlay extends OverlayPanel {
                 panelComponent.getChildren().add(LineComponent.builder().build());
 
                 double progress = 0;
-                for (var points : MageTrainingArenaScript.currentPoints.entrySet()){
-                    var rewardPoints = config.reward().getPoints().get(points.getKey());
-                    progress += Math.min((double) (points.getValue() - MageTrainingArenaScript.buyable * rewardPoints) / rewardPoints, 1) * 25;
+                for (var points : MageTrainingArenaScript.getCurrentPoints().entrySet()){
+                    var rewardPoints = MageTrainingArenaScript.getRequiredPoints(config).get(points.getKey());
+                    progress += Math.min((double) (points.getValue() - (config.buyRewards() ? 0 : MageTrainingArenaScript.getBuyable()) * rewardPoints) / rewardPoints, 1) * 25;
                 }
 
 
-                if (config.buyRewards() && MageTrainingArenaScript.bought > 0)
-                    panelComponent.getChildren().add(LineComponent.builder().left("Bought: " + MageTrainingArenaScript.bought).build());
-                else if (!config.buyRewards() && MageTrainingArenaScript.buyable > 0)
-                    panelComponent.getChildren().add(LineComponent.builder().left("Buyable: " + MageTrainingArenaScript.buyable).build());
+                if (config.buyRewards() && MageTrainingArenaScript.getBought() > 0)
+                    panelComponent.getChildren().add(LineComponent.builder().left("Bought: " + MageTrainingArenaScript.getBought()).build());
+                else if (!config.buyRewards() && MageTrainingArenaScript.getBuyable() > 0)
+                    panelComponent.getChildren().add(LineComponent.builder().left("Buyable: " + MageTrainingArenaScript.getBuyable()).build());
 
                 var progressBar = new ProgressBarComponent();
                 progressBar.setValue(progress);
