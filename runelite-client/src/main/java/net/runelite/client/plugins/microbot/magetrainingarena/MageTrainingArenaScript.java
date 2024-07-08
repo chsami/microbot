@@ -25,9 +25,11 @@ import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.mta.MTAPlugin;
+import net.runelite.client.plugins.mta.alchemy.AlchemyRoomTimer;
 import net.runelite.client.plugins.mta.telekinetic.TelekineticRoom;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import net.runelite.client.ui.overlay.infobox.Counter;
+import net.runelite.client.ui.overlay.infobox.Timer;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -373,7 +375,7 @@ public class MageTrainingArenaScript extends Script {
             }
 
             if (!Rs2Player.isAnimating()
-                    && StreamSupport.stream(Microbot.getClient().getProjectiles().spliterator(), false).noneMatch(x -> x.getId() == GraphicID.TELEKINETIC_SPELL)
+                    && StreamSupport.stream(Microbot.getClient().getTopLevelWorldView().getProjectiles().spliterator(), false).noneMatch(x -> x.getId() == GraphicID.TELEKINETIC_SPELL)
                     && !TelekineticRoom.getMoves().isEmpty()
                     && TelekineticRoom.getMoves().peek() == room.getPosition()
                     && room.getGuardian().getId() != NullNpcID.NULL_6778
@@ -447,6 +449,12 @@ public class MageTrainingArenaScript extends Script {
             lastAlchTick = Microbot.getClient().getTickCount();
             return;
         }
+
+        var timer = (AlchemyRoomTimer) Microbot.getInfoBoxManager().getInfoBoxes().stream()
+                .filter(x -> x instanceof AlchemyRoomTimer)
+                .findFirst().orElse(null);
+        if (timer == null || Integer.parseInt(timer.getText().split(":")[1]) < 2)
+            return;
 
         if (room.getSuggestion() == null) {
             Rs2GameObject.interact("Cupboard", "Search");
