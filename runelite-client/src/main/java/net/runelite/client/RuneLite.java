@@ -72,9 +72,6 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.swing.*;
 import java.applet.Applet;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -87,7 +84,6 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -695,48 +691,4 @@ public class RuneLite {
         okHttpClientBuilder.sslSocketFactory(sc.getSocketFactory(), trustManager);
     }
     // endregion
-}
-
-
-class BlockingYesNoDialog extends JDialog {
-    private boolean result = false;
-
-    public BlockingYesNoDialog(Frame parent, String title, String message) {
-        super(parent, title, true);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout());
-
-        JLabel label = new JLabel(message);
-        panel.add(label);
-
-        JButton yesButton = new JButton("Yes");
-        yesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result = true;
-                setVisible(false);
-            }
-        });
-        panel.add(yesButton);
-
-        JButton noButton = new JButton("No");
-        noButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result = false;
-                setVisible(false);
-            }
-        });
-        panel.add(noButton);
-
-        getContentPane().add(panel);
-        pack();
-        setLocationRelativeTo(parent);
-    }
-
-    public boolean showDialog() {
-        setVisible(true);
-        return result;
-    }
 }

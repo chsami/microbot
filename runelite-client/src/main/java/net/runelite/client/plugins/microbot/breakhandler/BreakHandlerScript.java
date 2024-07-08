@@ -5,6 +5,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Login;
+import net.runelite.client.ui.ClientUI;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -20,8 +21,11 @@ public class BreakHandlerScript extends Script {
     public static int totalBreaks = 0;
 
     public static Duration duration;
+
+    private String title = "";
     public boolean run(BreakHandlerConfig config) {
         Microbot.enableAutoRunOn = false;
+        title = ClientUI.getFrame().getTitle();
         breakIn = Random.random(config.timeUntilBreakStart() * 60, config.timeUntilBreakEnd() * 60);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -33,6 +37,10 @@ public class BreakHandlerScript extends Script {
                 if (breakDuration > 0) {
                     breakDuration--;
                     duration = Duration.between(LocalDateTime.now(),LocalDateTime.now().plusSeconds(breakDuration));
+                    long hours = BreakHandlerScript.duration.toHours();
+                    long minutes = BreakHandlerScript.duration.toMinutes() % 60;
+                    long seconds = BreakHandlerScript.duration.getSeconds() % 60;
+                    ClientUI.getFrame().setTitle(String.format("Break duration: %02d:%02d:%02d%n", hours, minutes, seconds));
                 }
 
                 if (breakDuration <= 0 && Microbot.pauseAllScripts) {
@@ -40,6 +48,7 @@ public class BreakHandlerScript extends Script {
                     breakIn = Random.random(config.timeUntilBreakStart() * 60, config.timeUntilBreakEnd() * 60);
                     new Login();
                     totalBreaks++;
+                    ClientUI.getFrame().setTitle(title);
                     return;
                 }
 
@@ -60,6 +69,9 @@ public class BreakHandlerScript extends Script {
 
     @Override
     public void shutdown() {
+        breakIn = 0;
+        breakDuration = 0;
+        ClientUI.getFrame().setTitle(title);
         super.shutdown();
     }
 }
