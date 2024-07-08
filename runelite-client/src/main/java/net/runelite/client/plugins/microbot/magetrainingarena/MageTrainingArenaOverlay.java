@@ -58,14 +58,14 @@ public class MageTrainingArenaOverlay extends OverlayPanel {
                 double progress = 0;
                 for (var points : MageTrainingArenaScript.currentPoints.entrySet()){
                     var rewardPoints = config.reward().getPoints().get(points.getKey());
-                    progress += Math.min((double) points.getValue() / rewardPoints, 1) * 25;
+                    progress += Math.min((double) (points.getValue() - MageTrainingArenaScript.buyable * rewardPoints) / rewardPoints, 1) * 25;
                 }
 
 
                 if (config.buyRewards() && MageTrainingArenaScript.bought > 0)
                     panelComponent.getChildren().add(LineComponent.builder().left("Bought: " + MageTrainingArenaScript.bought).build());
                 else if (!config.buyRewards() && MageTrainingArenaScript.buyable > 0)
-                    panelComponent.getChildren().add(LineComponent.builder().left("Buyable: " + MageTrainingArenaScript.bought).build());
+                    panelComponent.getChildren().add(LineComponent.builder().left("Buyable: " + MageTrainingArenaScript.buyable).build());
 
                 var progressBar = new ProgressBarComponent();
                 progressBar.setValue(progress);
