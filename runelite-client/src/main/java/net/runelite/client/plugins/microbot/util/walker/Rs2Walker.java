@@ -19,7 +19,6 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
 import java.awt.*;
@@ -297,20 +296,17 @@ public class Rs2Walker {
             canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY(), Microbot.getClient().getTopLevelWorldView().getScene()), Microbot.getClient().getPlane());
         }
 
-        var mainGameArea = Rs2Widget.getWidget(164, 15);
-        if (canv == null || mainGameArea != null && (canv.getX() > mainGameArea.getWidth() || canv.getY() > mainGameArea.getHeight()))
-            return;
+        int canvasX = canv != null ? canv.getX() : -1;
+        int canvasY = canv != null ? canv.getY() : -1;
 
-        Microbot.doInvoke(new NewMenuEntry(canv.getX(), canv.getY(), MenuAction.WALK.getId(), 0, -1, "Walk here"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        Microbot.doInvoke(new NewMenuEntry(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
         //Rs2Reflection.invokeMenu(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here", "", -1, -1);
     }
 
     public static WorldPoint walkCanvas(WorldPoint worldPoint) {
         Point point = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromWorld(Microbot.getClient(), worldPoint), Microbot.getClient().getPlane());
 
-        var mainGameArea = Rs2Widget.getWidget(164, 15);
-        if (point == null || mainGameArea != null && (point.getX() > mainGameArea.getWidth() || point.getY() > mainGameArea.getHeight()))
-            return null;
+        if (point == null) return null;
 
         Microbot.getMouse().click(point);
 

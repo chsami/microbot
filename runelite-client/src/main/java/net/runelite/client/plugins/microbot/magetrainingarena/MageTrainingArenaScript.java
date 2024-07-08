@@ -28,6 +28,7 @@ import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.mta.MTAPlugin;
+import net.runelite.client.plugins.mta.telekinetic.TelekineticRoom;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import net.runelite.client.ui.overlay.infobox.Counter;
 
@@ -36,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class MageTrainingArenaScript extends Script {
     public static double version = 1.0;
@@ -332,8 +334,6 @@ public class MageTrainingArenaScript extends Script {
             sleep(500, 1000);
         }
 
-        Rs2Magic.canCast(MagicAction.BONES_TO_PEACHES);
-
         var room = mtaPlugin.getTelekineticRoom();
         var teleRoom = Arrays.stream(TelekineticRooms.values())
                 .filter(x -> Rs2Player.getWorldLocation().distanceTo(x.getArea()) == 0)
@@ -360,36 +360,28 @@ public class MageTrainingArenaScript extends Script {
             Rs2Npc.interact(room.getGuardian(), "New-maze");
             sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(teleRoom.getArea()) != 0);
         } else {
-            if (!Rs2Player.getWorldLocation().equals(targetConverted)) {
-                if (Rs2Widget.getWidget(218, 27) != null && Rs2Widget.getWidget(218, 27).getBorderType() == 2) {
-                    Rs2Walker.walkCanvas(target);
-                    sleep(200, 400);
-                }
-
-                if (Rs2Camera.isTileOnScreen(localTarget) && Rs2Walker.walkCanvas(target) != null) {
+            if (!Rs2Player.getWorldLocation().equals(targetConverted)
+                    && (Microbot.getClient().getLocalDestinationLocation() == null
+                        || !Microbot.getClient().getLocalDestinationLocation().equals(localTarget))) {
+                if (Rs2Camera.isTileOnScreen(localTarget)) {
+                    Rs2Walker.walkFastCanvas(targetConverted);
                     Rs2Walker.setTarget(null);
-                    sleep(300, 900);
+                    sleep(200, 400);
                 } else {
                     Rs2Walker.walkTo(targetConverted);
-                    return;
                 }
             }
 
-            Rs2Magic.cast(MagicAction.TELEKINETIC_GRAB);
-
-            BooleanSupplier guardianPredicate = () -> room.getGuardian().getWorldLocation().equals(room.getLocation())
+            if (!Rs2Player.isAnimating()
+                    && StreamSupport.stream(Microbot.getClient().getProjectiles().spliterator(), false).noneMatch(x -> x.getId() == GraphicID.TELEKINETIC_SPELL)
+                    && !TelekineticRoom.getMoves().isEmpty()
+                    && TelekineticRoom.getMoves().peek() == room.getPosition()
                     && room.getGuardian().getId() != NullNpcID.NULL_6778
-                    && Rs2Player.getWorldLocation().equals(
-                            WorldPoint.fromLocalInstance(Microbot.getClient(), Objects.requireNonNull(
-                                    LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), room.getTarget()))))
-                    && Rs2Widget.getWidget(218, 27) != null
-                    && Rs2Widget.getWidget(218, 27).getBorderType() == 2;
-            sleepUntil(() -> room.getGuardian() == null || !Rs2Player.isWalking() || guardianPredicate.getAsBoolean());
-            if (room.getGuardian() == null || !guardianPredicate.getAsBoolean()) return;
-
-            sleep(400, 600);
-            Rs2Npc.interact(room.getGuardian());
-            sleepUntil(() -> !target.equals(room.getTarget()));
+                    && !room.getGuardian().getLocalLocation().equals(room.getDestination())){
+                Rs2Magic.cast(MagicAction.TELEKINETIC_GRAB);
+                sleep(200, 800);
+                Rs2Npc.interact(room.getGuardian());
+            }
         }
     }
 

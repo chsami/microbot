@@ -78,7 +78,9 @@ public class TelekineticRoom extends MTARoom
 
 	private final List<WallObject> telekineticWalls = new ArrayList<>();
 
+	@Getter
 	private static Stack<Direction> moves = new Stack<>();
+	@Getter
 	private LocalPoint destination;
 	@Getter
 	private WorldPoint location;
@@ -494,7 +496,7 @@ public class TelekineticRoom extends MTARoom
 		return new Rectangle(minX, minY, maxX - minX, maxY - minY);
 	}
 
-	private Direction getPosition()
+	public Direction getPosition()
 	{
 		WorldPoint mine = client.getLocalPlayer().getWorldLocation();
 
