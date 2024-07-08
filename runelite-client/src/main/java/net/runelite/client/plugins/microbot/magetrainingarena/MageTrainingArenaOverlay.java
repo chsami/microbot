@@ -32,7 +32,7 @@ public class MageTrainingArenaOverlay extends OverlayPanel {
 
             panelComponent.getChildren().add(LineComponent.builder().build());
 
-            if (!Microbot.getPluginManager().isActive(MageTrainingArenaScript.mtaPlugin)){
+            if (!Microbot.getPluginManager().isActive(MageTrainingArenaScript.getMtaPlugin())){
                 panelComponent.getChildren().add(LineComponent.builder()
                         .left("Make sure to enable the 'Mage Training Arena' plugin!")
                         .leftColor(Color.RED)

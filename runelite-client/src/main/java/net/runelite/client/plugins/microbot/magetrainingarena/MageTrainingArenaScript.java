@@ -7,11 +7,8 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
-import net.runelite.client.plugins.microbot.magetrainingarena.enums.TelekineticRooms;
+import net.runelite.client.plugins.microbot.magetrainingarena.enums.*;
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.FireStaves;
-import net.runelite.client.plugins.microbot.magetrainingarena.enums.Points;
-import net.runelite.client.plugins.microbot.magetrainingarena.enums.Rewards;
-import net.runelite.client.plugins.microbot.magetrainingarena.enums.Rooms;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
@@ -34,7 +31,6 @@ import net.runelite.client.ui.overlay.infobox.Counter;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -48,11 +44,14 @@ public class MageTrainingArenaScript extends Script {
     private static final WorldPoint bankPoint = new WorldPoint(3365, 3318, 1);
 
     private MageTrainingArenaConfig config;
-    public static MTAPlugin mtaPlugin;
+    private Rooms currentRoom;
     private int nextHpThreshold = 50;
     private Boolean btp = null;
+    private int lastAlchTick = 0;
+    private int shapesToPick = 3;
 
-    private Rooms currentRoom;
+    @Getter
+    private static MTAPlugin mtaPlugin;
     @Getter
     private static final Map<Points, Integer> currentPoints = Arrays.stream(Points.values()).collect(Collectors.toMap(x -> x, x -> -1));
     @Getter
@@ -275,28 +274,10 @@ public class MageTrainingArenaScript extends Script {
             return;
         }
 
-        int pileId = -1;
-        int itemId = -1;
-        if (Rs2Widget.isWidgetVisible(195, 14)) {
-            pileId = ObjectID.PENTAMID_PILE;
-            itemId = ItemID.PENTAMID;
-        }
-        else if (Rs2Widget.isWidgetVisible(195, 16)) {
-            pileId = ObjectID.ICOSAHEDRON_PILE;
-            itemId = ItemID.ICOSAHEDRON;
-        }
-        else if (Rs2Widget.isWidgetVisible(195, 10)) {
-            pileId = ObjectID.CUBE_PILE;
-            itemId = ItemID.CUBE;
-        }
-        else if (Rs2Widget.isWidgetVisible(195, 12)) {
-            pileId = ObjectID.CYLINDER_PILE;
-            itemId = ItemID.CYLINDER;
-        }
+        var bonusShape = getBonusShape();
+        if (bonusShape == null) return;
 
-        if (pileId == -1) return;
-
-        var object = Rs2GameObject.getGameObjects(pileId).stream()
+        var object = Rs2GameObject.getGameObjects(bonusShape.getObjectId()).stream()
                 .filter(Rs2Camera::isTileOnScreen)
                 .min(Comparator.comparing(x -> x.getWorldLocation().distanceTo(Rs2Player.getWorldLocation())))
                 .orElse(null);
@@ -313,19 +294,34 @@ public class MageTrainingArenaScript extends Script {
             return;
         }
 
-
+        int itemId;
         if (Rs2Inventory.contains(ItemID.DRAGONSTONE_6903))
             itemId = ItemID.DRAGONSTONE_6903;
+        else
+            itemId = bonusShape.getItemId();
 
-        if (Rs2Inventory.contains(itemId)){
+        if (Rs2Inventory.contains(ItemID.DRAGONSTONE_6903) || Rs2Inventory.count(itemId) >= shapesToPick){
+            shapesToPick = Random.random(2, 4);
+
             Rs2Magic.cast(enchant);
             sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.INVENTORY);
             sleep(200, 500);
             Rs2Inventory.interact(itemId);
-        } else {
-            Rs2GameObject.interact(pileId, "Take-from");
+
+            sleepUntil(() -> !Rs2Inventory.contains(itemId) || itemId != ItemID.DRAGONSTONE_6903 && bonusShape != getBonusShape(), 20_000);
+        } else if (Rs2GameObject.interact(object, "Take-from")) {
+            Rs2Walker.setTarget(null);
             Rs2Inventory.waitForInventoryChanges();
-        }
+        } else
+            Rs2Walker.walkFastCanvas(object.getWorldLocation());
+    }
+
+    private EnchantmentShapes getBonusShape(){
+        for (var shape : EnchantmentShapes.values())
+            if (Rs2Widget.isWidgetVisible(shape.getWidgetId(), shape.getWidgetChildId()))
+                return shape;
+
+        return null;
     }
 
     private void handleTelekineticRoom() {
@@ -413,7 +409,9 @@ public class MageTrainingArenaScript extends Script {
                 nextHpThreshold = Random.random(config.healingThresholdMin(), config.healingThresholdMax());
                 for (int i = 0; i < amountToEat; i++) {
                     Rs2Inventory.interact(btp ? ItemID.PEACH : ItemID.BANANA, "eat");
-                    sleep(1400, 2000);
+
+                    if (i < amountToEat - 1)
+                        sleep(1400, 2000);
                 }
             }
 
@@ -437,12 +435,12 @@ public class MageTrainingArenaScript extends Script {
         var best = room.getBest();
         var item = Rs2Inventory.get(best.getId());
         if (item != null) {
-            if (Rs2Player.isAnimating()) {
-                sleepUntil(() -> !Rs2Player.isAnimating());
-                sleep(100, 300);
+            if (lastAlchTick + 3 > Microbot.getClient().getTickCount()) {
+                sleepUntil(() -> lastAlchTick + 3 <= Microbot.getClient().getTickCount());
+                sleep(50, 200);
             }
             Rs2Magic.alch(item);
-            Rs2Inventory.waitForInventoryChanges();
+            lastAlchTick = Microbot.getClient().getTickCount();
             return;
         }
 
