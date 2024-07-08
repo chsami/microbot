@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -22,6 +23,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1804,18 +1806,35 @@ public class Rs2Inventory {
      *
      */
     public static void useRestoreEnergyItem() {
-        List<String> restoreEnergyItems = Arrays.asList("Stamina potion", "Super energy", "Super energy mix", "Energy potion", "Energy mix");
+        String staminaRestoreItemName = "Stamina potion";
+        List<String> restoreEnergyItemNames = Arrays.asList("Super energy", "Super energy mix", "Energy potion", "Energy mix");
         Pattern pattern = Pattern.compile("^(.*?)(?:\\(\\d+\\))?$");
 
-        List<Rs2Item> filteredItems = items().stream()
+        List<Rs2Item> filteredRestoreEnergyItems = items().stream()
                 .filter(item -> {
                     Matcher matcher = pattern.matcher(item.getName());
-                    return matcher.matches() && restoreEnergyItems.contains(matcher.group(1).trim());
+                    return matcher.matches() && restoreEnergyItemNames.contains(matcher.group(1).trim());
                 })
                 .collect(Collectors.toList());
-        if(filteredItems.isEmpty()) return;
+
+        List<Rs2Item> filteredStaminaRestoreItems = items().stream()
+                .filter(item -> {
+                    Matcher matcher = pattern.matcher(item.getName());
+                    return matcher.matches() && staminaRestoreItemName.equals(matcher.group(1).trim());
+                })
+                .collect(Collectors.toList());
         
-        Rs2Inventory.interact(filteredItems.stream().findFirst().get().name, "drink");
+        if (filteredStaminaRestoreItems.isEmpty() && filteredRestoreEnergyItems.isEmpty()) return;
+
+        if (filteredStaminaRestoreItems.isEmpty()) {
+            Rs2Inventory.interact(filteredRestoreEnergyItems.stream().findFirst().get().name, "drink");
+        } else {
+            if (Rs2Player.hasStaminaBuffActive() && !filteredRestoreEnergyItems.isEmpty()) {
+                Rs2Inventory.interact(filteredRestoreEnergyItems.stream().findFirst().get().name, "drink");
+            } else {
+                Rs2Inventory.interact(filteredStaminaRestoreItems.stream().findFirst().get().name, "drink");
+            }
+        }
     }
     /**
      * Method executes menu actions
