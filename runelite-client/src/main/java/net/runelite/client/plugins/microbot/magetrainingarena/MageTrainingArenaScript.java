@@ -35,6 +35,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
+
 public class MageTrainingArenaScript extends Script {
     public static double version = 1.0;
 
@@ -257,13 +260,14 @@ public class MageTrainingArenaScript extends Script {
 
         if (!Rs2Equipment.isWearing(staffId)){
             Rs2Inventory.wear(staffId);
-            sleep(500, 1000);
+            return;
         }
 
         if (Rs2Inventory.isFull()){
             if (!Rs2Walker.walkTo(new WorldPoint(3363, 9640, 0)))
                 return;
 
+            Rs2Walker.setTarget(null);
             Rs2GameObject.interact(ObjectID.HOLE_23698, "Deposit");
             Rs2Player.waitForWalking();
             return;
@@ -327,7 +331,7 @@ public class MageTrainingArenaScript extends Script {
     private void handleTelekineticRoom() {
         if (!Rs2Equipment.isWearing(config.airStaff().getItemId())){
             Rs2Inventory.wear(config.airStaff().getItemId());
-            sleep(500, 1000);
+            return;
         }
 
         var room = mtaPlugin.getTelekineticRoom();
@@ -384,7 +388,7 @@ public class MageTrainingArenaScript extends Script {
     private void handleGraveyardRoom() {
         if (!Rs2Equipment.isWearing(config.waterStaff().getItemId())) {
             Rs2Inventory.wear(config.waterStaff().getItemId());
-            sleep(500, 1000);
+            return;
         }
 
         if (btp == null)
@@ -428,7 +432,7 @@ public class MageTrainingArenaScript extends Script {
     private void handleAlchemistRoom() {
         if (!Rs2Equipment.isWearing(config.fireStaff().getItemId())){
             Rs2Inventory.wear(config.fireStaff().getItemId());
-            sleep(500, 1000);
+            return;
         }
 
         var room = mtaPlugin.getAlchemyRoom();
@@ -444,11 +448,16 @@ public class MageTrainingArenaScript extends Script {
             return;
         }
 
-        if (room.getSuggestion() == null)
+        if (room.getSuggestion() == null) {
             Rs2GameObject.interact("Cupboard", "Search");
-        else
+
+            if (sleepUntilTrue(Rs2Player::isWalking, 100, 1000))
+                sleepUntil(() -> !Rs2Player.isWalking());
+        }
+        else {
             Rs2GameObject.interact(room.getSuggestion().getGameObject(), "Take-5");
-        Rs2Inventory.waitForInventoryChanges();
+            Rs2Inventory.waitForInventoryChanges();
+        }
     }
 
     private void buyReward(Rewards reward){
