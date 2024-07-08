@@ -128,9 +128,96 @@ public class Rs2Inventory {
      */
     public static boolean combine(Rs2Item primary, Rs2Item secondary) {
         boolean primaryItemInteracted = use(primary);
-        sleep(100);
+        sleep(100, 175);
         boolean secondaryItemInteracted = use(secondary);
         return primaryItemInteracted && secondaryItemInteracted;
+    }
+
+    /**
+     * Combines the closest items in the inventory based on their names.
+     * <p>
+     * This method searches for items in the inventory by their names, then finds the pair of primary and
+     * secondary items with the smallest slot difference and combines them.
+     * <p>
+     * For combining items by their IDs, see {@link #combineClosest(int, int) combineClosest}.
+     *
+     * @param primaryItemName   the name of the primary item to combine
+     * @param secondaryItemName the name of the secondary item to combine
+     * @return true if the items were successfully combined, false otherwise
+     */
+    public static boolean combineClosest(String primaryItemName, String secondaryItemName) {
+        List<Rs2Item> primaryItems = items().stream().filter(x -> x.name.equalsIgnoreCase(primaryItemName)).collect(Collectors.toList());
+        List<Rs2Item> secondaryItems = items().stream().filter(x -> x.name.equalsIgnoreCase(secondaryItemName)).collect(Collectors.toList());
+
+        if (primaryItems.isEmpty() || secondaryItems.isEmpty()) return false;
+
+        Rs2Item closestPrimaryItem = null;
+        Rs2Item closestSecondaryItem = null;
+        int minSlotDifference = Integer.MAX_VALUE;
+
+        // Compare each primary item with each secondary item to find the closest slots
+        for (Rs2Item primaryItem : primaryItems) {
+            for (Rs2Item secondaryItem : secondaryItems) {
+                int slotDifference = calculateSlotDifference(primaryItem.slot, secondaryItem.slot);
+                if (slotDifference <= minSlotDifference) {
+                    minSlotDifference = slotDifference;
+                    closestPrimaryItem = primaryItem;
+                    closestSecondaryItem = secondaryItem;
+                }
+            }
+        }
+
+        return combine(closestPrimaryItem, closestSecondaryItem);
+    }
+
+    /**
+     * Combines the closest items in the inventory based on their IDs.
+     * <p>
+     * This method searches for items in the inventory by their IDs, then finds the pair of primary and
+     * secondary items with the smallest slot difference and combines them.
+     * <p>
+     * For combining items by their names, see {@link #combineClosest(String, String) combineClosest}.
+     *
+     * @param primaryItemId   the ID of the primary item to combine
+     * @param secondaryItemId the ID of the secondary item to combine
+     * @return true if the items were successfully combined, false otherwise
+     */
+    public static boolean combineClosest(int primaryItemId, int secondaryItemId) {
+        List<Rs2Item> primaryItems = items().stream().filter(x -> x.id == primaryItemId).collect(Collectors.toList());
+        List<Rs2Item> secondaryItems = items().stream().filter(x -> x.id == secondaryItemId).collect(Collectors.toList());
+
+        if (primaryItems.isEmpty() || secondaryItems.isEmpty()) return false;
+
+        Rs2Item closestPrimaryItem = null;
+        Rs2Item closestSecondaryItem = null;
+        int minSlotDifference = Integer.MAX_VALUE;
+
+        // Compare each primary item with each secondary item to find the closest slots
+        for (Rs2Item primaryItem : primaryItems) {
+            for (Rs2Item secondaryItem : secondaryItems) {
+                int slotDifference = calculateSlotDifference(primaryItem.slot, secondaryItem.slot);
+                if (slotDifference <= minSlotDifference) {
+                    minSlotDifference = slotDifference;
+                    closestPrimaryItem = primaryItem;
+                    closestSecondaryItem = secondaryItem;
+                }
+            }
+        }
+
+        return combine(closestPrimaryItem, closestSecondaryItem);
+    }
+
+
+    // Helper method to calculate the Manhattan distance between two inventory slots
+    private static int calculateSlotDifference(int slot1, int slot2) {
+        // Calculate the row and column for each slot
+        int row1 = (slot1 - 1) / 4;
+        int col1 = (slot1 - 1) % 4;
+        int row2 = (slot2 - 1) / 4;
+        int col2 = (slot2 - 1) % 4;
+
+        // Calculate the Manhattan distance between the two slots
+        return Math.abs(row1 - row2) + Math.abs(col1 - col2);
     }
 
     /**
@@ -850,7 +937,7 @@ public class Rs2Inventory {
 
     public static List<Rs2Item> getInventoryFood() {
         List<Rs2Item> items = items().stream()
-                .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")))
+                .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")) || x.getName().toLowerCase().contains("jug of wine"))
                 .collect(Collectors.toList());
         return items;
     }
@@ -1162,12 +1249,7 @@ public class Rs2Inventory {
      */
     public static boolean interact(Rs2Item item, String action) {
         if (item == null) return false;
-        Rs2Item rs2Item = items().stream().filter(x -> x == item).findFirst().orElse(null);
-        if (rs2Item == null) {
-            rs2Item = items().stream().filter(x -> x.id == item.id).findFirst().orElse(null);
-            if (rs2Item == null) return false;
-        }
-        invokeMenu(rs2Item, action);
+        invokeMenu(item, action);
         return true;
     }
 
@@ -1289,13 +1371,13 @@ public class Rs2Inventory {
      * @param rs2Item The item to get the bounds for.
      * @return The bounding rectangle for the item's slot, or null if the item is not found.
      */
-    public static java.awt.Rectangle itemBounds(Rs2Item rs2Item) {
+    public static Rectangle itemBounds(Rs2Item rs2Item) {
         Widget inventory = getInventory();
 
         if (inventory == null) return null;
 
         Widget item = Arrays.stream(inventory.getDynamicChildren())
-                .filter(x -> x.getItemId() == rs2Item.id)
+                .filter(x -> x.getIndex() == rs2Item.slot)
                 .findFirst()
                 .orElse(null);
 
@@ -1530,9 +1612,8 @@ public class Rs2Inventory {
      * @return True if the item is successfully used, false otherwise.
      */
     public static boolean use(Rs2Item rs2Item) {
-        Rs2Item item = items().stream().filter(x -> x == rs2Item).findFirst().orElse(null);
-        if (item == null) return false;
-        return interact(item, "Use");
+        if (rs2Item == null) return false;
+        return interact(rs2Item, "Use");
     }
 
     /**
@@ -1754,7 +1835,8 @@ public class Rs2Inventory {
         }
 
         if (!action.isEmpty()) {
-            var itemWidget = Arrays.stream(inventoryWidgets).filter(x -> x != null && x.getItemId() == rs2Item.id).findFirst().orElseGet(null);
+            assert inventoryWidgets != null;
+            var itemWidget = Arrays.stream(inventoryWidgets).filter(x -> x != null && x.getIndex() == rs2Item.slot).findFirst().orElseGet(null);
 
             String[] actions = itemWidget != null && itemWidget.getActions() != null ?
                     itemWidget.getActions() :
@@ -1774,7 +1856,7 @@ public class Rs2Inventory {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
         }
 
-        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
+        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), (itemBounds(rs2Item) == null) ? new Rectangle(1, 1) : itemBounds(rs2Item));
 
         if (action.equalsIgnoreCase("destroy")){
             sleepUntil(() -> Rs2Widget.isWidgetVisible(584, 0));

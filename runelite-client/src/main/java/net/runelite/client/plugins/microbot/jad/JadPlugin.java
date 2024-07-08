@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Default + "Jad Helper",
+        name = PluginDescriptor.Mocrosoft + "Jad Helper",
         description = "Jad Prayer Switcher plugin",
         tags = {"Jad", "microbot"},
         enabledByDefault = false

@@ -119,6 +119,7 @@ public class DetailedQuestStep extends QuestStep
 
 	protected boolean started;
 
+	@Getter
 	@Setter
 	protected boolean hideWorldArrow;
 

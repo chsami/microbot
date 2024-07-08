@@ -25,14 +25,12 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.5.2";
+    public static String version = "1.5.5";
     ThievingConfig config;
-
-    //TODO: CHECK IF TIMER PLUGIN IS ACTIVE and if not send message
-
 
     public boolean run(ThievingConfig config) {
         this.config = config;
+        Rs2Walker.setTarget(null);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
@@ -48,18 +46,21 @@ public class ThievingScript extends Script {
                 List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
 
                 if (foods.isEmpty()) {
-                    openCoinPouches(config);
-                    dropItems(foods);
+                    openCoinPouches(1);
                     bank();
                     return;
                 }
                 if (Rs2Inventory.isFull()) {
+                    Rs2Player.eatAt(99);
                     dropItems(foods);
                 }
+                if (Rs2Player.eatAt(config.hitpoints())) {
+                    return;
+                }
+
                 handleShadowVeil();
-                openCoinPouches(config);
+                openCoinPouches(config.coinPouchTreshHold());
                 wearDodgyNecklace();
-                Rs2Player.eatAt(config.hitpoints());
                 pickpocket();
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -92,9 +93,9 @@ public class ThievingScript extends Script {
         }
     }
 
-    private void openCoinPouches(ThievingConfig config) {
-        if (Rs2Inventory.hasItemAmount("coin pouch", config.coinPouchTreshHold(), true)) {
-            Rs2Inventory.interact("coin pouch", "open-all");
+    private void openCoinPouches(int amt) {
+        if (Rs2Inventory.hasItemAmount("coin pouch", amt, true)) {
+            Rs2Inventory.interact("coin pouch", "Open-all");
         }
     }
 
@@ -114,8 +115,9 @@ public class ThievingScript extends Script {
                 Map<NPC, HighlightedNpc> highlightedNpcs =  net.runelite.client.plugins.npchighlight.NpcIndicatorsPlugin.getHighlightedNpcs();
                 if (highlightedNpcs.isEmpty()) {
                     if (Rs2Npc.pickpocket(config.THIEVING_NPC().getName())) {
+                        Rs2Walker.setTarget(null);
                         sleep(50, 250);
-                    } else {
+                    } else if (Rs2Npc.getNpc(config.THIEVING_NPC().getName()) == null){
                         Rs2Walker.walkTo(initialPlayerLocation);
                     }
                 } else {
@@ -158,6 +160,7 @@ public class ThievingScript extends Script {
 
         doNotDropItemList.add(config.food().getName());
         doNotDropItemList.add("dodgy necklace");
+        doNotDropItemList.add("coins");
         Rs2Inventory.dropAllExcept(config.keepItemsAboveValue(), doNotDropItemList);
     }
 }
