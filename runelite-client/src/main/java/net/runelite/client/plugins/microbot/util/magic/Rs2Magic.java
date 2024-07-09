@@ -19,6 +19,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import java.awt.*;
 import java.util.Arrays;
 
+import static net.runelite.api.Varbits.SHADOW_VEIL;
 import static net.runelite.client.plugins.microbot.Microbot.log;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
@@ -30,6 +31,9 @@ public class Rs2Magic {
             sleep(150, 300);
         }
         Widget widget = Arrays.stream(Rs2Widget.getWidget(14286851).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
+        if (widget == null) {
+            widget = Arrays.stream(Rs2Widget.getWidget(14286851).getStaticChildren()).filter(x -> x.getId() == magicSpell.getWidgetId()).findFirst().orElse(null);
+        }
         return widget != null;
     }
 
@@ -229,6 +233,6 @@ public class Rs2Magic {
     }
 
     public static boolean isShadowVeilActive() {
-        return Microbot.isTimerActive(GameTimer.SHADOW_VEIL);
+        return Microbot.getVarbitValue(SHADOW_VEIL) == 1;
     }
 }
