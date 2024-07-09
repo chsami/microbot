@@ -112,6 +112,7 @@ public class InventorySetupsPluginPanel extends PluginPanel
 	private final InventorySetupsRunePouchPanel runePouchPanel;
 	private final InventorySetupsBoltPouchPanel boltPouchPanel;
 	private final InventorySetupsSpellbookPanel spellbookPanel;
+	private final InventorySetupsQuickPrayersPanel quickPrayersPanel;
 	private final InventorySetupsAdditionalItemsPanel additionalFilteredItemsPanel;
 	private final InventorySetupsNotesPanel notesPanel;
 
@@ -188,6 +189,7 @@ public class InventorySetupsPluginPanel extends PluginPanel
 		this.inventoryPanel = new InventorySetupsInventoryPanel(itemManager, plugin, runePouchPanel, boltPouchPanel);
 		this.equipmentPanel = new InventorySetupsEquipmentPanel(itemManager, plugin);
 		this.spellbookPanel = new InventorySetupsSpellbookPanel(itemManager, plugin);
+		this.quickPrayersPanel = new InventorySetupsQuickPrayersPanel(itemManager, plugin);
 		this.additionalFilteredItemsPanel = new InventorySetupsAdditionalItemsPanel(itemManager, plugin);
 		this.notesPanel = new InventorySetupsNotesPanel(itemManager, plugin);
 		this.noSetupsPanel = new JPanel();
@@ -551,6 +553,8 @@ public class InventorySetupsPluginPanel extends PluginPanel
 		setupDisplayPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		setupDisplayPanel.add(spellbookPanel);
 		setupDisplayPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		setupDisplayPanel.add(quickPrayersPanel);
+		setupDisplayPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		setupDisplayPanel.add(additionalFilteredItemsPanel);
 		setupDisplayPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		setupDisplayPanel.add(notesPanel);
@@ -631,16 +635,14 @@ public class InventorySetupsPluginPanel extends PluginPanel
 		}
 	}
 
-	public void refreshCurrentSetup()
-	{
-		if (currentSelectedSetup != null)
-		{
+	public void refreshCurrentSetup() {
+		if (currentSelectedSetup != null) {
+			System.out.println("Refreshing current setup: " + currentSelectedSetup.getName());
 			setCurrentInventorySetup(currentSelectedSetup, false);
 		}
 	}
 
-	public void setCurrentInventorySetup(final InventorySetup inventorySetup, boolean resetScrollBar)
-	{
+	public void setCurrentInventorySetup(final InventorySetup inventorySetup, boolean resetScrollBar) {
 		overviewPanelScrollPosition = contentWrapperPane.getVerticalScrollBar().getValue();
 		currentSelectedSetup = inventorySetup;
 		inventoryPanel.updatePanelWithSetupInformation(inventorySetup);
@@ -648,6 +650,7 @@ public class InventorySetupsPluginPanel extends PluginPanel
 		boltPouchPanel.updatePanelWithSetupInformation(inventorySetup);
 		equipmentPanel.updatePanelWithSetupInformation(inventorySetup);
 		spellbookPanel.updatePanelWithSetupInformation(inventorySetup);
+		quickPrayersPanel.updatePanelWithSetupInformation(inventorySetup);
 		additionalFilteredItemsPanel.updatePanelWithSetupInformation(inventorySetup);
 		notesPanel.updatePanelWithSetupInformation(inventorySetup);
 
@@ -670,8 +673,7 @@ public class InventorySetupsPluginPanel extends PluginPanel
 		highlightEquipment();
 		highlightSpellbook();
 
-		if (resetScrollBar)
-		{
+		if (resetScrollBar) {
 			// reset scrollbar back to top
 			setScrollBarPosition(0);
 		}
@@ -681,8 +683,8 @@ public class InventorySetupsPluginPanel extends PluginPanel
 
 		validate();
 		repaint();
-
 	}
+
 
 	public void highlightInventory()
 	{
@@ -784,6 +786,8 @@ public class InventorySetupsPluginPanel extends PluginPanel
 				return additionalFilteredItemsPanel.isStackCompareForSlotAllowed(slotId);
 			case SPELL_BOOK:
 				return spellbookPanel.isStackCompareForSlotAllowed(slotId);
+			case QUICK_PRAYERS:
+				return quickPrayersPanel.isStackCompareForSlotAllowed(slotId);
 			default:
 				return false;
 		}

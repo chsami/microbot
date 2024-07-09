@@ -39,7 +39,9 @@ public enum InventorySetupsSlotID
 
 	SPELL_BOOK(4),
 
-	ADDITIONAL_ITEMS(5);
+	ADDITIONAL_ITEMS(5),
+
+	QUICK_PRAYERS(6);
 
 	private final int id;
 

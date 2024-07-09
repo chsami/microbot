@@ -51,6 +51,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.inventorysetups.ui.InventorySetupsPluginPanel;
 import net.runelite.client.plugins.inventorysetups.ui.InventorySetupsRunePouchPanel;
 import net.runelite.client.plugins.inventorysetups.ui.InventorySetupsSlot;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.JagexColors;
 import net.runelite.client.ui.NavigationButton;
@@ -769,6 +770,11 @@ public class MInventorySetupsPlugin extends Plugin
 		}
 
 		this.internalFilteringIsAllowed = true;
+		this.cache = new InventorySetupsCache();
+		this.inventorySetups = new ArrayList<>();
+		this.sections = new ArrayList<>();
+		this.dataManager = new InventorySetupsPersistentDataManager(this, panel, configManager, cache, gson, inventorySetups, sections);
+
 		this.panel = new InventorySetupsPluginPanel(this, itemManager);
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "inventorysetups_icon.png");
 
@@ -784,12 +790,7 @@ public class MInventorySetupsPlugin extends Plugin
 
 		bankFilteringMode = InventorySetupsFilteringModeID.ALL;
 
-		this.cache = new InventorySetupsCache();
-		this.inventorySetups = new ArrayList<>();
-		this.sections = new ArrayList<>();
-		this.dataManager = new InventorySetupsPersistentDataManager(this, panel, configManager, cache, gson, inventorySetups, sections);
-
-		// load all the inventory setups from the config file
+		// Load all the inventory setups from the config file
 		clientThread.invokeLater(() ->
 		{
 			switch (client.getGameState())
@@ -807,8 +808,8 @@ public class MInventorySetupsPlugin extends Plugin
 
 			return true;
 		});
-
 	}
+
 
 	public void addInventorySetup()
 	{
@@ -862,7 +863,10 @@ public class MInventorySetupsPlugin extends Plugin
 
 			int spellbook = getCurrentSpellbook();
 
-			final InventorySetup invSetup = new InventorySetup(inv, eqp, runePouchData, boltPouchData, new HashMap<>(), newName, "",
+			// Retrieve quick prayers
+			List<QuickPrayerSetup> quickPrayers = getCurrentQuickPrayers();
+
+			final InventorySetup invSetup = new InventorySetup(inv, eqp, runePouchData, boltPouchData, new HashMap<>(), quickPrayers, newName, "",
 					config.highlightColor(),
 					config.highlightDifference(),
 					config.enableDisplayColor() ? config.displayColor() : null,
@@ -874,9 +878,9 @@ public class MInventorySetupsPlugin extends Plugin
 			inventorySetups.add(invSetup);
 			dataManager.updateConfig(true, false);
 			SwingUtilities.invokeLater(() -> panel.redrawOverviewPanel(false));
-
 		});
 	}
+
 
 	public void addSection()
 	{
@@ -1397,11 +1401,15 @@ public class MInventorySetupsPlugin extends Plugin
 				boltPouchData = getBoltPouchData();
 			}
 
+			// Retrieve quick prayers
+			List<QuickPrayerSetup> quickPrayers = getCurrentQuickPrayers();
+
 			setup.updateRunePouch(runePouchData);
 			setup.updateBoltPouch(boltPouchData);
 			setup.updateInventory(inv);
 			setup.updateEquipment(eqp);
 			setup.updateSpellbook(getCurrentSpellbook());
+			setup.updateQuickPrayers(quickPrayers);
 			dataManager.updateConfig(true, false);
 			panel.refreshCurrentSetup();
 		});
@@ -1768,6 +1776,41 @@ public class MInventorySetupsPlugin extends Plugin
 
 	}
 
+	public void updateQuickPrayerInSetup(int slotIndex, Rs2PrayerEnum prayer) {
+		assert panel.getCurrentSelectedSetup() != null : "Setup is null";
+		assert slotIndex >= 0 && slotIndex < 4 : "Slot index out of range";
+		assert prayer != null : "Prayer is null";
+
+		clientThread.invokeLater(() -> {
+			InventorySetup currentSetup = panel.getCurrentSelectedSetup();
+			List<QuickPrayerSetup> quickPrayers = currentSetup.getQuickPrayers();
+
+			// Update or add the quick prayer in the setup
+			if (slotIndex < quickPrayers.size()) {
+				quickPrayers.get(slotIndex).setPrayer(prayer);
+			} else {
+				// Fill up the list with nulls if necessary to reach the desired index
+				while (quickPrayers.size() <= slotIndex) {
+					quickPrayers.add(new QuickPrayerSetup(null));
+				}
+				quickPrayers.set(slotIndex, new QuickPrayerSetup(prayer));
+			}
+
+			// Debug logging
+			System.out.println("Updated Quick Prayer: Slot " + slotIndex + " to " + prayer);
+			for (int i = 0; i < 4; i++) {
+				String prayerName = (i < quickPrayers.size() && quickPrayers.get(i).getPrayer() != null)
+						? quickPrayers.get(i).getPrayer().name()
+						: "None";
+				System.out.println("Slot " + i + ": " + prayerName);
+			}
+
+			dataManager.updateConfig(true, false);
+			panel.refreshCurrentSetup();
+		});
+	}
+
+
 	public void updateNotesInSetup(final InventorySetup setup, final String text)
 	{
 		clientThread.invokeLater(() ->
@@ -1874,6 +1917,22 @@ public class MInventorySetupsPlugin extends Plugin
 		assert client.isClientThread() : "getCurrentSpellbook must be called on Client Thread";
 		return client.getVarbitValue(SPELLBOOK_VARBIT);
 	}
+
+	private List<QuickPrayerSetup> getCurrentQuickPrayers()
+	{
+		List<QuickPrayerSetup> quickPrayers = new ArrayList<>();
+
+		// Retrieve the current quick prayers from the game state or configuration
+		// Add logic here to populate the quickPrayers list based on the current game state
+		// Example: quickPrayers.add(new QuickPrayerSetup(Rs2PrayerEnum.PROTECT_MELEE));
+
+		// This is a placeholder example; implement the actual logic based on your game's state
+		quickPrayers.add(new QuickPrayerSetup(Rs2PrayerEnum.PROTECT_MELEE));
+		quickPrayers.add(new QuickPrayerSetup(Rs2PrayerEnum.PIETY));
+
+		return quickPrayers;
+	}
+
 
 	public List<InventorySetupsItem> getNormalizedContainer(final InventorySetupsSlotID id)
 	{

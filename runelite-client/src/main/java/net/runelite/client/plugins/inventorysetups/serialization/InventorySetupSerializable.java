@@ -1,10 +1,11 @@
 package net.runelite.client.plugins.inventorysetups.serialization;
 
-
 import com.google.common.base.Strings;
 import lombok.Value;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupsItem;
+import net.runelite.client.plugins.inventorysetups.QuickPrayerSetup;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -16,37 +17,37 @@ import java.util.Map;
 @Value
 public class InventorySetupSerializable
 {
-
-	List<InventorySetupItemSerializable> inv;	// inventory
-	List<InventorySetupItemSerializable> eq;	// equipment
+	List<InventorySetupItemSerializable> inv; // inventory
+	List<InventorySetupItemSerializable> eq;  // equipment
 	@Nullable
-	List<InventorySetupItemSerializable> rp;	// rune pouch (null = No rp)
+	List<InventorySetupItemSerializable> rp;  // rune pouch (null = No rp)
 	@Nullable
-	List<InventorySetupItemSerializable> bp;	// bolt pouch (null = No bp)
+	List<InventorySetupItemSerializable> bp;  // bolt pouch (null = No bp)
 	@Nullable
-	Map<Integer, InventorySetupItemSerializable> afi;	    // additional filtered items (null = No afi)
-	String name;    // name of setup
+	Map<Integer, InventorySetupItemSerializable> afi; // additional filtered items (null = No afi)
+	String name;  // name of setup
 	@Nullable
-	String notes;   // notes (null = empty notes)
-	Color hc; 		// highlight color
+	String notes; // notes (null = empty notes)
+	Color hc;     // highlight color
 	@Nullable
-	Boolean hd;     // highlight difference (null = false)
+	Boolean hd;   // highlight difference (null = false)
 	@Nullable
-	Color dc;       // display color (null = no color)
+	Color dc;     // display color (null = no color)
 	@Nullable
-	Boolean fb;		// filter bank (null = false)
+	Boolean fb;   // filter bank (null = false)
 	@Nullable
-	Boolean uh;		// unordered highlight (null = false)
+	Boolean uh;   // unordered highlight (null = false)
 	@Nullable
-	Integer sb;		// Spell book (null = 0 standard)
+	Integer sb;   // Spell book (null = 0 standard)
 	@Nullable
-	Boolean fv;		// favorite (null = false)
+	Boolean fv;   // favorite (null = false)
 	@Nullable
-	Integer iId;	// iconID (null = default item ID for icon view)
+	Integer iId;  // iconID (null = default item ID for icon view)
+	@Nullable
+	List<QuickPrayerSetupSerializable> qp; // quick prayers (null = no qp)
 
 	static public InventorySetupSerializable convertFromInventorySetup(final InventorySetup inventorySetup)
 	{
-
 		List<InventorySetupItemSerializable> inv = convertListFromInventorySetup(inventorySetup.getInventory());
 		List<InventorySetupItemSerializable> eq = convertListFromInventorySetup(inventorySetup.getEquipment());
 		List<InventorySetupItemSerializable> rp = convertListFromInventorySetup(inventorySetup.getRune_pouch());
@@ -62,6 +63,16 @@ public class InventorySetupSerializable
 			}
 		}
 
+		List<QuickPrayerSetupSerializable> qp = null;
+		if (inventorySetup.getQuickPrayers() != null && !inventorySetup.getQuickPrayers().isEmpty())
+		{
+			qp = new ArrayList<>();
+			for (final QuickPrayerSetup quickPrayerSetup : inventorySetup.getQuickPrayers())
+			{
+				qp.add(new QuickPrayerSetupSerializable(quickPrayerSetup.getPrayer()));
+			}
+		}
+
 		String name = inventorySetup.getName();
 		String notes = !Strings.isNullOrEmpty(inventorySetup.getNotes()) ? inventorySetup.getNotes() : null;
 		Color hc = inventorySetup.getHighlightColor();
@@ -73,7 +84,7 @@ public class InventorySetupSerializable
 		Boolean fv = inventorySetup.isFavorite() ? Boolean.TRUE : null;
 		Integer iId = inventorySetup.getIconID() > 0 ? inventorySetup.getIconID() : null;
 
-		return new InventorySetupSerializable(inv, eq, rp, bp, afi, name, notes, hc, hd, dc, fb, uh, sb, fv, iId);
+		return new InventorySetupSerializable(inv, eq, rp, bp, afi, name, notes, hc, hd, dc, fb, uh, sb, fv, iId, qp);
 	}
 
 	static private List<InventorySetupItemSerializable> convertListFromInventorySetup(final List<InventorySetupsItem> items)
@@ -106,7 +117,6 @@ public class InventorySetupSerializable
 
 	static public InventorySetup convertToInventorySetup(final InventorySetupSerializable iss)
 	{
-
 		// Note that items will not have a name. They will need to be retrieved from the item manager
 		// Either immediately after or delayed when a setup is opened
 		List<InventorySetupsItem> inv = convertListToInventorySetup(iss.getInv());
@@ -121,6 +131,16 @@ public class InventorySetupSerializable
 				afi.put(key, InventorySetupItemSerializable.convertToInventorySetupItem(iss.getAfi().get(key)));
 			}
 		}
+
+		List<QuickPrayerSetup> qp = new ArrayList<>();
+		if (iss.getQp() != null)
+		{
+			for (final QuickPrayerSetupSerializable qpSerializable : iss.getQp())
+			{
+				qp.add(new QuickPrayerSetup(qpSerializable.getPrayer()));
+			}
+		}
+
 		String name = iss.getName();
 		String notes = iss.getNotes() != null ? iss.getNotes() : "";
 		Color hc = iss.getHc();
@@ -132,8 +152,6 @@ public class InventorySetupSerializable
 		boolean fv = iss.getFv() != null ? iss.getFv() : Boolean.FALSE;
 		int iId = iss.getIId() != null ? iss.getIId() : -1;
 
-		return new InventorySetup(inv, eq, rp, bp, afi, name, notes, hc, hd, dc, fb, uh, sb, fv, iId);
+		return new InventorySetup(inv, eq, rp, bp, afi, qp, name, notes, hc, hd, dc, fb, uh, sb, fv, iId);
 	}
-
-
 }
