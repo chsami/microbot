@@ -108,10 +108,12 @@ public abstract class Script implements IScript {
         if (Microbot.pauseAllScripts)
             return false;
 
-        boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
+        if (Microbot.isLoggedIn()) {
+            boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
-        if (!hasRunEnergy && useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
-            Rs2Inventory.useRestoreEnergyItem();
+            if (!hasRunEnergy && useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
+                Rs2Inventory.useRestoreEnergyItem();
+            }
         }
 
         return true;
