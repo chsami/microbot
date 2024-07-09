@@ -26,9 +26,8 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.util;
 
-import lombok.Getter;
-
 import java.util.function.BiFunction;
+import lombok.Getter;
 
 public enum Operation
 {

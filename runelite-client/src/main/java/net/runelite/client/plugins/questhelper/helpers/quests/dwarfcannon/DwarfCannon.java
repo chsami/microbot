@@ -1,31 +1,31 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.dwarfcannon;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-
-import java.util.*;
-
-@QuestDescriptor(
-        quest = QuestHelperQuest.DWARF_CANNON
-)
 
 public class DwarfCannon extends BasicQuestHelper
 {
@@ -47,8 +47,7 @@ public class DwarfCannon extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -98,7 +97,7 @@ public class DwarfCannon extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		staminas = new ItemRequirement("Stamina Potions", ItemCollections.STAMINA_POTIONS);
 		teleToAsg = new ItemRequirement("Teleport to Falador, Amulet of Glory, or Combat Bracelet",
@@ -143,7 +142,8 @@ public class DwarfCannon extends BasicQuestHelper
 
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		cave = new Zone(new WorldPoint(2557, 9790, 0), new WorldPoint(2624, 9859, 0));
 		tower1 = new Zone(new WorldPoint(2568, 3439, 1), new WorldPoint(2572, 3445, 1));
@@ -186,7 +186,10 @@ public class DwarfCannon extends BasicQuestHelper
 
 		//Fix cannon
 		// TODO: Update this to highlight widgets as you progress, indicating what tool to use on what
-		useToolkit = new ObjectStep(this, NullObjectID.NULL_15597, new WorldPoint(2563, 3462, 0), "Use the toolkit on the broken multicannon.  Use the right tool on the spring, the middle tool on the Safety switch, and the left tool on the gear.");
+		useToolkit = new PuzzleWrapperStep(this,
+			new ObjectStep(this, NullObjectID.NULL_15597, new WorldPoint(2563, 3462, 0),
+				"Use the toolkit on the broken multicannon.  Use the right tool on the spring, the middle tool on the Safety switch, and the left tool on the gear."),
+			new ObjectStep(this, NullObjectID.NULL_15597, new WorldPoint(2563, 3462, 0), "Use the toolkit on the broken multicannon."));
 		useToolkit.addIcon(ItemID.TOOLKIT);
 		talkToCaptainLawgof5 = new NpcStep(this, NpcID.CAPTAIN_LAWGOF, new WorldPoint(2567, 3460, 0), "Talk to Captain Lawgof (There will be a short pause in dialogue.  Both need to be completed.).");
 		talkToCaptainLawgof5.addDialogStep("Okay then, just for you!");

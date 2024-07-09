@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.fishing.minnows;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GraphicID;
 import net.runelite.api.NPC;
 import net.runelite.api.NpcID;
@@ -12,9 +13,10 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class MinnowsScript extends Script {
 
-    public static final String version = "1.0.2";
+    public static final String version = "1.0.3";
     public static final WorldArea MINNOWS_PLATFORM = new WorldArea(new WorldPoint(2607, 3440, 0), 2622 - 2607, 3446 - 3440);
     private static final int FLYING_FISH_GRAPHIC_ID = GraphicID.FLYING_FISH;
 
@@ -68,12 +70,14 @@ public class MinnowsScript extends Script {
     }
 
     public void onGameTick() {
+        log.info("Timeout : " + timeout);
         if (timeout > 0) {
             timeout--;
         }
         if (Rs2Player.isInteracting()) {
-            //set timeout to random number between 2 and 3
-            timeout = (int) (Math.random() * 2) + 2;
+            //set timeout to random number between 3 and 4
+            timeout = 3 + (int) (Math.random() * 2);
+
         }
     }
 

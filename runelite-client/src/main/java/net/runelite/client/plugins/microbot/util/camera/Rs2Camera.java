@@ -127,13 +127,13 @@ public class Rs2Camera {
             Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_UP),
                     () -> cameraPitchPercentage() >= percentage, 600);
         } else {
-            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
-            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
+            Rs2Keyboard.keyHold(KeyEvent.VK_DOWN);
+            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_DOWN),
                     () -> cameraPitchPercentage() <= percentage, 600);
         }
     }
 
-    private static float cameraPitchPercentage() {
+    public static float cameraPitchPercentage() {
         int minPitch = 128;
         int maxPitch = 383;
         int currentPitch = Microbot.getClient().getCameraPitch();

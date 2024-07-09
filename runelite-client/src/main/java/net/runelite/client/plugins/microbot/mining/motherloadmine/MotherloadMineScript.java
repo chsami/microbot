@@ -24,8 +24,9 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 @Slf4j
 public class MotherloadMineScript extends Script {
-    public static final String version = "1.5.2";
+    public static final String version = "1.5.4";
     private static final WorldArea UPSTAIRS = new WorldArea(new WorldPoint(3747, 5676, 0), 7, 8);
+    private static final WorldPoint HOPPER = new WorldPoint(3748, 5674, 0);
     private static final int UPPER_FLOOR_HEIGHT = -490;
     private static final int SACK_LARGE_SIZE = 162;
     private static final int SACK_SIZE = 81;
@@ -48,6 +49,9 @@ public class MotherloadMineScript extends Script {
     }
 
     private void initialize() {
+        //Rs2Antiban.isEnabled = true;
+        //Rs2Antiban.simulateAttentionSpan = true;
+        //Rs2Antiban.setActivity(Activity.MOTHERLODE_MINE);
         miningSpot = MLMMiningSpot.IDLE;
         status = MLMStatus.IDLE;
         emptySack = false;
@@ -58,7 +62,11 @@ public class MotherloadMineScript extends Script {
     }
 
     private void executeTask() {
-        if (!super.run() || !Microbot.isLoggedIn()) return;
+        if (!super.run() || !Microbot.isLoggedIn()) {
+            oreVein = null;
+            miningSpot = MLMMiningSpot.IDLE;
+            return;
+        }
 
         if (pickAxeInInventory.isEmpty() && config.pickAxeInInventory()) {
             Microbot.showMessage("Pickaxe was not found in your inventory");
@@ -66,7 +74,10 @@ public class MotherloadMineScript extends Script {
             return;
         }
 
+        //if(Rs2Antiban.isActionCooldownActive) return;
+
         if (Rs2Player.isAnimating() || Microbot.getClient().getLocalPlayer().isInteracting()) return;
+
 
         handleDragonPickaxeSpec();
         handleInventory();
@@ -107,6 +118,8 @@ public class MotherloadMineScript extends Script {
         }
 
         if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > maxSackSize || (emptySack && !Rs2Inventory.contains("pay-dirt"))) {
+            oreVein = null;
+            miningSpot = MLMMiningSpot.IDLE;
             status = MLMStatus.EMPTY_SACK;
         } else if (!Rs2Inventory.isFull()) {
             status = MLMStatus.MINING;
@@ -134,7 +147,9 @@ public class MotherloadMineScript extends Script {
             findRandomMiningSpot();
         } else {
             if (walkToMiningSpot()) {
+                if (Rs2Player.isMoving()) return;
                 mineVein();
+                //Rs2Antiban.actionCooldown();
             }
         }
     }
@@ -164,24 +179,29 @@ public class MotherloadMineScript extends Script {
 
     private void fixWaterwheel() {
         if (isUpperFloor()) goDown();
-        Rs2Walker.walkTo(new WorldPoint(3741, 5666, 0));
-        if (Rs2GameObject.interact(ObjectID.BROKEN_STRUT)) {
-            sleepUntil(() -> Microbot.isGainingExp);
+        if (Rs2Walker.walkTo(new WorldPoint(3741, 5666, 0), 15)) {
+            Microbot.isGainingExp = false;
+            if (Rs2GameObject.interact(ObjectID.BROKEN_STRUT))
+                sleepUntil(() -> Microbot.isGainingExp);
         }
+
     }
 
     private void depositHopper() {
-        if (!isUpperFloor()) Rs2Walker.walkTo(new WorldPoint(3748, 5674, 0));
-        if (Rs2GameObject.interact(ObjectID.HOPPER_26674)) {
-            sleepUntil(() -> !Rs2Inventory.isFull());
-            if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > maxSackSize - 28) {
-                emptySack = true;
+        if (!isUpperFloor() || isUpperFloor()) {
+            if (Rs2GameObject.interact(ObjectID.HOPPER_26674)) {
+                sleepUntil(() -> !Rs2Inventory.isFull());
+                if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > maxSackSize - 28) {
+                    emptySack = true;
+                }
+            } else {
+                Rs2Walker.walkTo(HOPPER, 15);
             }
         }
     }
 
     private void bankItems() {
-        Rs2Walker.walkTo(new WorldPoint(3759, 5666, 0));
+        //Rs2Walker.walkTo(new WorldPoint(3759, 5666, 0));
         bank();
     }
 
@@ -207,16 +227,14 @@ public class MotherloadMineScript extends Script {
     private void findRandomMiningSpot() {
         miningSpot = random(1, 5) == 2
                 ? (config.mineUpstairs() ? MLMMiningSpot.WEST_UPPER : MLMMiningSpot.SOUTH)
-                : (config.mineUpstairs() ? MLMMiningSpot.WEST_UPPER : MLMMiningSpot.WEST_LOWER);
+                : (config.mineUpstairs() ? MLMMiningSpot.EAST_UPPER : MLMMiningSpot.WEST_LOWER);
         Collections.shuffle(miningSpot.getWorldPoint());
     }
 
     private boolean walkToMiningSpot() {
         WorldPoint miningWorldPoint = miningSpot.getWorldPoint().get(0);
         if (!isUpperFloor() && config.mineUpstairs()) goUp();
-        Rs2Walker.walkTo(miningWorldPoint);
-        moveToMiningSpot();
-        return true;
+        return Rs2Walker.walkTo(miningWorldPoint, 10);
     }
 
     private boolean mineVein() {
@@ -255,9 +273,12 @@ public class MotherloadMineScript extends Script {
     }
 
     private void interactWithVein(WallObject vein) {
-        Rs2GameObject.interact(vein);
-        oreVein = vein;
-        sleepUntil(Rs2Player::isAnimating);
+        if (Rs2GameObject.interact(vein))
+            oreVein = vein;
+        sleepUntil(Rs2Player::isAnimating, 5000);
+        if (!Rs2Player.isAnimating()) {
+            oreVein = null;
+        }
     }
 
     private void goUp() {

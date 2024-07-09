@@ -26,17 +26,21 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import net.runelite.client.plugins.questhelper.util.Utils;
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
-
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.function.Predicate;
 
 public class ItemRequirements extends ItemRequirement
 {
@@ -54,6 +58,9 @@ public class ItemRequirements extends ItemRequirement
 	public ItemRequirements(String name, ItemRequirement... itemRequirements)
 	{
 		super(name, itemRequirements[0].getId(), -1);
+
+		assert(Utils.varargsNotNull(itemRequirements));
+
 		this.itemRequirements.addAll(Arrays.asList(itemRequirements));
 		this.logicType = LogicType.AND;
 	}
@@ -61,6 +68,9 @@ public class ItemRequirements extends ItemRequirement
 	public ItemRequirements(LogicType logicType, String name, ItemRequirement... itemRequirements)
 	{
 		super(name, itemRequirements[0].getId(), -1);
+
+		assert(Utils.varargsNotNull(itemRequirements));
+
 		this.itemRequirements.addAll(Arrays.asList(itemRequirements));
 		this.logicType = logicType;
 	}
@@ -68,6 +78,9 @@ public class ItemRequirements extends ItemRequirement
 	public ItemRequirements(LogicType logicType, String name, List<ItemRequirement> itemRequirements)
 	{
 		super(name, itemRequirements.get(0).getId(), -1);
+
+		assert(itemRequirements.stream().noneMatch(Objects::isNull));
+
 		this.itemRequirements.addAll(itemRequirements);
 		this.logicType = logicType;
 	}
@@ -108,14 +121,14 @@ public class ItemRequirements extends ItemRequirement
 	}
 
 	@Override
-	public Color getColor(Client client, MQuestHelperConfig config)
+	public Color getColor(Client client, QuestHelperConfig config)
 	{
 		return this.check(client, true) ? config.passColour() : config.failColour();
 	}
 
 	@Override
 	public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
-										 List<Item> bankItems, MQuestHelperConfig config)
+										 List<Item> bankItems, QuestHelperConfig config)
 	{
 		Color color = config.failColour();
 		if (!this.isActualItem() && this.getItemRequirements() == null)
@@ -151,6 +164,7 @@ public class ItemRequirements extends ItemRequirement
 		newItem.setQuestBank(getQuestBank());
 		newItem.setTooltip(getTooltip());
 		newItem.logicType = logicType;
+		newItem.additionalOptions = additionalOptions;
 
 		return newItem;
 	}

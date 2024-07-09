@@ -24,24 +24,23 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.recipefordisaster;
 
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 
 public class QuizSteps extends DetailedOwnerStep
 {
@@ -88,7 +87,7 @@ public class QuizSteps extends DetailedOwnerStep
 			items.add(flour);
 		}
 
-		Widget currentDialog = client.getWidget(WidgetInfo.DIALOG_NPC_TEXT);
+		Widget currentDialog = client.getWidget(ComponentID.DIALOG_NPC_TEXT);
 
 		if (currentDialog != null)
 		{
@@ -118,7 +117,7 @@ public class QuizSteps extends DetailedOwnerStep
 	{
 		answerQuestions = new NpcStep(getQuestHelper(), NpcID.WIZARD_TRAIBORN, new WorldPoint(3112, 3162, 1), "Talk to Traiborn.");
 		answerQuestions.addDialogSteps("Ask about helping the Lumbridge Guide.", "Okay. Let's start!", "Okay. I'm ready!", "Quiz me!");
-		answerQuestions.addDialogSteps("Unferth", "Gertrude", "King Lathas", "Pirate Pete", "Islwyn", "Hetty", "Professsor Gronigen", "Ali Morrisane", "Velorina", "Reldo");
+		answerQuestions.addDialogSteps("Unferth", "Gertrude", "King Lathas", "Pirate Pete", "Islwyn", "Hetty", "Professor Gronigen", "Ali Morrisane", "Velorina", "Reldo");
 		answerQuestions.addDialogSteps("Bandit camp", "Flour, Eggs and milk", "20", "Sand, bucket, soda ash, glass blowing pipe", "16", "North to South", "46", "2", "Keep Le Faye", "Dark Wizards'", "Catherby", "Legends'");
 		answerQuestions.addDialogSteps("Trout", "Mind Talisman", "Guthix Prayer Book, Magic Logs, Pike");
 		answerQuestions.addDialogStep(1, "10"); // Answer to bribe question

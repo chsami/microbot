@@ -25,23 +25,13 @@
 package net.runelite.client.ui.overlay;
 
 import com.google.common.base.Strings;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import net.runelite.api.Actor;
-import net.runelite.api.Client;
-import net.runelite.api.Perspective;
 import net.runelite.api.Point;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.util.ColorUtil;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class OverlayUtil
 {
@@ -262,5 +252,25 @@ public class OverlayUtil
 		}
 
 		return result;
+	}
+
+	public static void renderTextLocation(Graphics2D graphics, Point txtLoc, String text, Color color, int size)
+	{
+		if (Strings.isNullOrEmpty(text))
+		{
+			return;
+		}
+
+		Font font = new Font(Font.DIALOG, Font.PLAIN, size);
+		graphics.setFont(font);
+
+		int x = txtLoc.getX();
+		int y = txtLoc.getY();
+
+		graphics.setColor(Color.BLACK);
+		graphics.drawString(text, x + 1, y + 1);
+
+		graphics.setColor(ColorUtil.colorWithAlpha(color, 0xFF));
+		graphics.drawString(text, x, y);
 	}
 }

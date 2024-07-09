@@ -24,30 +24,37 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thehandinthesand;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_HAND_IN_THE_SAND
-)
 public class TheHandInTheSand extends BasicQuestHelper
 {
 	//Items Required
@@ -55,7 +62,7 @@ public class TheHandInTheSand extends BasicQuestHelper
 		beerOr2Coins, earthRunes5, coins, bucketOfSand, truthSerumHighlight, activatedOrb;
 
 	//Items Recommended
-	ItemRequirement teleportsToYanille, teleportsToBrimhaven;
+	ItemRequirement teleportsToYanille, teleportsToBrimhaven, teleportToPortSarim;
 
 	Requirement notTeleportedToSarim, inYanille, inLightSpot, receivedBottledWater, vialPlaced, madeTruthSerum;
 
@@ -69,8 +76,7 @@ public class TheHandInTheSand extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -111,7 +117,7 @@ public class TheHandInTheSand extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		beer = new ItemRequirement("Beer", ItemID.BEER);
 		bottledWater = new ItemRequirement("Bottled water", ItemID.BOTTLED_WATER);
@@ -176,9 +182,12 @@ public class TheHandInTheSand extends BasicQuestHelper
 			ItemID.BRIMHAVEN_TELEPORT, 2);
 		teleportsToYanille = new ItemRequirement("Teleports to Yanille, such as dueling ring or minigame teleport",
 			ItemID.YANILLE_TELEPORT, 3);
+		teleportToPortSarim = new ItemRequirement("Teleport to Port Sarim", ItemCollections.EXPLORERS_RINGS);
+		teleportToPortSarim.addAlternates(ItemCollections.AMULET_OF_GLORIES);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		yanille = new Zone(new WorldPoint(2528, 3063, 0), new WorldPoint(2628, 3122, 0));
 		lightSpot = new Zone(new WorldPoint(3016, 3259, 0), new WorldPoint(3016, 3259, 0));
@@ -210,9 +219,9 @@ public class TheHandInTheSand extends BasicQuestHelper
 		talkToBertAboutScroll = new NpcStep(this, NpcID.BERT, new WorldPoint(2551, 3099, 0), "Return to Bert in west Yanille with the rota and sand.", bertsRota, sandysRota);
 
 		ringBellAgain = new ObjectStep(this, ObjectID.BELL_6847, new WorldPoint(2598, 3085, 0), "Ring the bell outside the Wizards' Guild in Yanille. Talk to Zavistic Rarve when he appears.", magicScroll);
+		ringBellAgain.addDialogStep("I have a rather sandy problem that I'd like to palm off on you.");
 		talkToRarveAgain = new ObjectStep(this, ObjectID.BELL_6847, new WorldPoint(2598, 3085, 0), "Talk to Zavistic Rarve again to get teleported to Port Sarim.", vial);
-		talkToRarveAgain.addDialogStep("Can you help me more?");
-		talkToRarveAgain.addDialogStep("Yes, that would be great!");
+		talkToRarveAgain.addDialogSteps("Can you help me more?", "Yes, that would be great!", "I have a rather sandy problem that I'd like to palm off on you.");
 
 		talkToBetty = new NpcStep(this, NpcID.BETTY_5905, new WorldPoint(3014, 3258, 0), "Travel to Port Sarim, and talk to Betty in the magic shop.", vial);
 		talkToBetty.addDialogStep("Talk to Betty about the Hand in the Sand.");
@@ -223,23 +232,28 @@ public class TheHandInTheSand extends BasicQuestHelper
 		talkToBettyAgain.addDialogStep("Talk to Betty about the Hand in the Sand.");
 
 		standInDoorway = new DetailedQuestStep(this, new WorldPoint(3016, 3259, 0), "Stand in Betty's doorway and use the rose-tinted lens on the counter.");
-		useLensOnCounter = new ObjectStep(this, ObjectID.COUNTER, new WorldPoint(3013, 3259, 0), "Stand in Betty's doorway and use the rose-tinted lens on the counter.", roseLens);
+		useLensOnCounter = new ObjectStep(this, NullObjectID.NULL_10812, new WorldPoint(3013, 3258, 0), "Stand in Betty's doorway and use the rose-tinted lens on the counter.", roseLens);
 		useLensOnCounter.addIcon(ItemID.ROSE_TINTED_LENS);
 		useLensOnCounter.addSubSteps(standInDoorway);
 		talkToBettyOnceMore =  new NpcStep(this, NpcID.BETTY_5905, new WorldPoint(3014, 3258, 0), "Talk to Betty again.", truthSerum, sand);
 		talkToBettyOnceMore.addDialogStep("Talk to Betty about the Hand in the Sand.");
 		talkToSandyWithPotion =  new NpcStep(this, NpcID.SANDY, new WorldPoint(2790, 3175, 0), "Talk to Sandy in Brimhaven again with the truth serum. Select distractions until one works.", truthSerum);
-		useSerumOnCoffee = new ObjectStep(this, NullObjectID.NULL_10806, new WorldPoint(2789, 3176, 0), "Use the truth serum on Sandy's coffee mug.", truthSerum);
+		useSerumOnCoffee = new ObjectStep(this, NullObjectID.NULL_10806, new WorldPoint(2789, 3176, 0), "Use the truth serum on Sandy's coffee mug.",
+			truthSerum.highlighted());
 		useSerumOnCoffee.addIcon(ItemID.TRUTH_SERUM);
-		activateMagicalOrb = new DetailedQuestStep(this, "Activate the magical orb next to Sandy.", magicalOrb);
+		activateMagicalOrb = new DetailedQuestStep(this, new WorldPoint(2789, 3175, 0), "Activate the magical orb next to Sandy.", magicalOrb);
 
 		interrogateSandy = new NpcStep(this, NpcID.SANDY, new WorldPoint(2790, 3175, 0), "Ask Sandy all questions available with the Magical orb (a) in your inventory.", activatedOrb);
 		interrogateSandy.addDialogSteps("Why is Bert's rota different from the original?", "Why doesn't Bert remember the change in his hours?", "What happened to the wizard?");
 
 		ringBellAfterInterrogation = new ObjectStep(this, ObjectID.BELL_6847, new WorldPoint(2598, 3085, 0), "Return to the Wizards' Guild in Yanille and ring the bell outside. Talk to Zavistic Rarve when he appears.", activatedOrb, earthRunes5, bucketOfSand);
-		ringBellWithItems = new ObjectStep(this, ObjectID.BELL_6847, new WorldPoint(2598, 3085, 0), "Give  Zavistic Rarve 5 earth runes and a bucket of sand.", earthRunes5, bucketOfSand);
+		ringBellAfterInterrogation.addDialogStep("I have a rather sandy problem that I'd like to palm off on you.");
+		ringBellWithItems = new ObjectStep(this, ObjectID.BELL_6847, new WorldPoint(2598, 3085, 0), "Give Zavistic Rarve 5 earth runes and a bucket of sand.", earthRunes5, bucketOfSand);
+		ringBellWithItems.addDialogStep("I have a rather sandy problem that I'd like to palm off on you.");
 		talkToMazion = new NpcStep(this, NpcID.MAZION, new WorldPoint(2815, 3340, 0), "Travel to Entrana (bank all combat gear), and talk to Mazion at the sand pit.");
+		talkToMazion.addTeleport(teleportToPortSarim);
 		ringBellEnd = new ObjectStep(this, ObjectID.BELL_6847, new WorldPoint(2598, 3085, 0), "Return to the Wizards' Guild in Yanille and ring the bell outside. Talk to Zavistic Rarve when he appears to finish the quest.", wizardsHead);
+		ringBellEnd.addDialogStep("I have a rather sandy problem that I'd like to palm off on you.");
 	}
 
 	@Override
@@ -263,6 +277,7 @@ public class TheHandInTheSand extends BasicQuestHelper
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
 		reqs.add(teleportsToYanille);
 		reqs.add(teleportsToBrimhaven);
+		reqs.add(teleportToPortSarim);
 
 		return reqs;
 	}
@@ -304,7 +319,8 @@ public class TheHandInTheSand extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Making a truth serum", Arrays.asList(talkToBertAboutScroll, ringBellAgain, talkToRarveAgain, talkToBetty, addRedberries, addWhiteberries, useDyeOnLanternLens,
 			talkToBettyAgain, useLensOnCounter, talkToBettyOnceMore), vial2, lanternLens, redberries, whiteberries));
 		allSteps.add(new PanelDetails("Uncover the truth", Arrays.asList(talkToSandyWithPotion, useSerumOnCoffee, activateMagicalOrb, interrogateSandy), truthSerum, magicalOrb));
-		allSteps.add(new PanelDetails("Finishing off", Arrays.asList(ringBellAfterInterrogation, talkToMazion, ringBellEnd), earthRunes5, bucketOfSand));
+		allSteps.add(new PanelDetails("Finishing off", Arrays.asList(ringBellAfterInterrogation, ringBellWithItems, talkToMazion, ringBellEnd),
+			List.of(earthRunes5, bucketOfSand), List.of(teleportToPortSarim)));
 		return allSteps;
 	}
 }

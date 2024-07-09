@@ -24,18 +24,16 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.varrock;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
@@ -47,17 +45,21 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequire
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Prayer;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.VARROCK_HARD
-)
 public class VarrockHard extends ComplexStateQuestHelper
 {
 	// Items required
@@ -82,7 +84,7 @@ public class VarrockHard extends ComplexStateQuestHelper
 	QuestStep claimReward, moveToStronghold, moveToStronghold2, moveToStronghold3, moveToStronghold4, makeSceptre,
 		makeSkull, skullSceptre, makeSkullSceptre, getCape, spottyCape, getKudos, wakkaEdge, moveToBasement, kudos,
 		paddewwaTP, cutYew, goUp1, goUp2, goUp3, burnLogs, fancyStone, growYew, chopYew, digUpYewRoots,
-		moveToUpstairs, activateSmite, prayAtAltar, obsPipe, moveToEdge;
+		moveToUpstairs, prayAtAltar, obsPipe, moveToEdge;
 
 	NpcStep killMino, killFlesh, killCatablepon, killAnkou;
 
@@ -97,8 +99,7 @@ public class VarrockHard extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doHard = new ConditionalStep(this, claimReward);
@@ -114,23 +115,22 @@ public class VarrockHard extends ComplexStateQuestHelper
 		doHard.addStep(notSpottyCape, spottyCapeTask);
 
 		kudosTask = new ConditionalStep(this, getKudos);
-		kudosTask.addStep(new Conditions(not153Kudos, atleast153Kudos), moveToBasement);
 		kudosTask.addStep(new Conditions(not153Kudos, inBasement, atleast153Kudos), kudos);
+		kudosTask.addStep(new Conditions(not153Kudos, atleast153Kudos), moveToBasement);
 		doHard.addStep(not153Kudos, kudosTask);
 
 		yewChurchTask = new ConditionalStep(this, cutYew);
-		yewChurchTask.addStep(new Conditions(notYewChurch, cutYewTree), goUp1);
-		yewChurchTask.addStep(new Conditions(notYewChurch, inChurch2, cutYewTree), goUp2);
-		yewChurchTask.addStep(new Conditions(notYewChurch, inChurch3, cutYewTree), goUp3);
 		yewChurchTask.addStep(new Conditions(notYewChurch, inChurch4, cutYewTree), burnLogs);
+		yewChurchTask.addStep(new Conditions(notYewChurch, inChurch3, cutYewTree), goUp3);
+		yewChurchTask.addStep(new Conditions(notYewChurch, inChurch2, cutYewTree), goUp2);
+		yewChurchTask.addStep(new Conditions(notYewChurch, cutYewTree), goUp1);
 		doHard.addStep(notYewChurch, yewChurchTask);
 
 		fancyStoneTask = new ConditionalStep(this, fancyStone);
 		doHard.addStep(notFancyStone, fancyStoneTask);
 
 		smiteAltarTask = new ConditionalStep(this, moveToUpstairs);
-		smiteAltarTask.addStep(new Conditions(notSmiteAltar, inUpstairs), activateSmite);
-		smiteAltarTask.addStep(new Conditions(notSmiteAltar, inUpstairs, smiteActive), prayAtAltar);
+		smiteAltarTask.addStep(new Conditions(notSmiteAltar, inUpstairs), prayAtAltar);
 		doHard.addStep(notSmiteAltar, smiteAltarTask);
 
 		wakkaEdgeTask = new ConditionalStep(this, wakkaEdge);
@@ -144,18 +144,37 @@ public class VarrockHard extends ComplexStateQuestHelper
 		doHard.addStep(notPipe, pipeTask);
 
 		skullSceptreTask = new ConditionalStep(this, moveToStronghold);
-		skullSceptreTask.addStep(new Conditions(notSkullSceptre, inStronghold1), killMino);
+		// Kill minotaurs
+		skullSceptreTask.addStep(new Conditions(notSkullSceptre, inStronghold1, new Conditions(LogicType.NOR, rightSkull.alsoCheckBank(questBank), strangeSkull.alsoCheckBank(questBank))), killMino);
+
+		// Go to the 2nd floor
 		skullSceptreTask.addStep(new Conditions(new Conditions(LogicType.OR, rightSkull.alsoCheckBank(questBank), strangeSkull.alsoCheckBank(questBank)),
 			notSkullSceptre, inStronghold1), moveToStronghold2);
-		skullSceptreTask.addStep(new Conditions(notSkullSceptre, inStronghold2), killFlesh);
+
+		// Kill Flesh crawlers
+		skullSceptreTask.addStep(new Conditions(notSkullSceptre, inStronghold2, new Conditions(LogicType.NOR, botSceptre.alsoCheckBank(questBank), runedSceptre.alsoCheckBank(questBank))), killFlesh);
+
+		// Go to the 3rd floor
 		skullSceptreTask.addStep(new Conditions(new Conditions(LogicType.OR, botSceptre.alsoCheckBank(questBank), runedSceptre.alsoCheckBank(questBank)),
 			notSkullSceptre, inStronghold2), moveToStronghold3);
-		skullSceptreTask.addStep(new Conditions(notSkullSceptre, inStronghold3), killCatablepon);
+
+		// Kill Catablepons
+		skullSceptreTask.addStep(new Conditions(notSkullSceptre, inStronghold3, new Conditions(LogicType.NOR, topSceptre.alsoCheckBank(questBank), runedSceptre.alsoCheckBank(questBank))), killCatablepon);
+
+		// Go to the 4th floor
 		skullSceptreTask.addStep(new Conditions(new Conditions(LogicType.OR, topSceptre.alsoCheckBank(questBank), runedSceptre.alsoCheckBank(questBank)),
 			notSkullSceptre, inStronghold3), moveToStronghold4);
-		skullSceptreTask.addStep(new Conditions(notSkullSceptre, inStronghold4), killAnkou);
+
+		// Kill Ankou
+		skullSceptreTask.addStep(new Conditions(notSkullSceptre, inStronghold4, new Conditions(LogicType.NOR, leftSkull.alsoCheckBank(questBank), strangeSkull.alsoCheckBank(questBank), combinedSkullSceptre.alsoCheckBank(questBank))), killAnkou);
+
+		// Make strange skull
 		skullSceptreTask.addStep(new Conditions(notSkullSceptre, leftSkull.alsoCheckBank(questBank), rightSkull.alsoCheckBank(questBank)), makeSkull);
+
+		// Make runed sceptre
 		skullSceptreTask.addStep(new Conditions(notSkullSceptre, botSceptre.alsoCheckBank(questBank), topSceptre.alsoCheckBank(questBank)), makeSceptre);
+
+		// Make skull sceptre
 		skullSceptreTask.addStep(new Conditions(notSkullSceptre, runedSceptre.alsoCheckBank(questBank), strangeSkull.alsoCheckBank(questBank)), makeSkullSceptre);
 		skullSceptreTask.addStep(new Conditions(notSkullSceptre, combinedSkullSceptre.alsoCheckBank(questBank)), skullSceptre);
 		doHard.addStep(notSkullSceptre, skullSceptreTask);
@@ -164,7 +183,7 @@ public class VarrockHard extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notSpottyCape = new VarplayerRequirement(1176, false, 29);
 		not153Kudos = new VarplayerRequirement(1176, false, 30);
@@ -179,7 +198,7 @@ public class VarrockHard extends ComplexStateQuestHelper
 
 		atleast153Kudos = new VarbitRequirement(3637, Operation.GREATER_EQUAL, 153, "153+ Kudos");
 
-		smiteActive = new VarbitRequirement(4121, Operation.EQUAL, 1, "Smite Active");
+		smiteActive = new PrayerRequirement("Smite", Prayer.SMITE);
 
 		ancientBook = new SpellbookRequirement(Spellbook.ANCIENT);
 
@@ -255,7 +274,8 @@ public class VarrockHard extends ComplexStateQuestHelper
 		);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		stronghold1 = new Zone(new WorldPoint(1854, 5248, 0), new WorldPoint(1918, 5183, 0));
 		stronghold2 = new Zone(new WorldPoint(1983, 5248, 0), new WorldPoint(2049, 5183, 0));
@@ -304,7 +324,7 @@ public class VarrockHard extends ComplexStateQuestHelper
 			"Right-click on the Skull sceptre and select 'Invoke' to teleport to the stronghold.",
 			combinedSkullSceptre.highlighted());
 		getCape = new NpcStep(this, NpcID.ASYFF, new WorldPoint(3281, 3398, 0),
-			"Have Asyff make a spotty cape.", dashingKeb.quantity(2), coins.quantity(800));
+			"Have Asyff make a spottier cape.", dashingKeb.quantity(2), coins.quantity(800));
 		getCape.addDialogStep("Could you make anything out of this fur that I got from hunting?");
 		spottyCape = new ItemStep(this, "Equip the spottier cape.", cape.highlighted());
 		moveToBasement = new ObjectStep(this, ObjectID.STAIRS_24428, new WorldPoint(3256, 3452, 0),
@@ -322,15 +342,16 @@ public class VarrockHard extends ComplexStateQuestHelper
 			"Climb to the top of the Varrock Church.", yewLog, tinderBox);
 		goUp2 = new ObjectStep(this, ObjectID.STAIRCASE_11792, new WorldPoint(3259, 3488, 1),
 			"Climb the stairs.", yewLog, tinderBox);
+		goUp2.addDialogStep("Climb up");
 		goUp3 = new ObjectStep(this, ObjectID.STAIRCASE_11792, new WorldPoint(3259, 3488, 2),
 			"Climb the stairs.", yewLog, tinderBox);
+		goUp3.addDialogStep("Climb up");
 		goUp1.addSubSteps(goUp2, goUp3);
 		burnLogs = new ItemStep(this, "Burn the yew logs on top of the church.", tinderBox.highlighted(),
 			yewLog.highlighted());
 
 		fancyStone = new NpcStep(this, NpcID.ESTATE_AGENT, new WorldPoint(3240, 3475, 0),
-			"TALK to the estate agent to redecorate your house to fancy stone. Must be done through dialog, NOT " +
-				"right-click.", coins.quantity(25000));
+			"Talk to the estate agent to redecorate your house to fancy stone.", coins.quantity(25000));
 		fancyStone.addDialogStep("Can you redecorate my house please?");
 		growYew = new ObjectStep(this, 8513, new WorldPoint(3229, 3459, 0),
 			"Grow and check the health of a yew tree in front of Varrock palace. " +
@@ -344,9 +365,8 @@ public class VarrockHard extends ComplexStateQuestHelper
 			"Dig up the stump to get the Yew roots.", spade);
 		moveToUpstairs = new ObjectStep(this, ObjectID.STAIRCASE_11789, new WorldPoint(3219, 3497, 0),
 			"Climb the stairs in the back of the Varrock palace.");
-		activateSmite = new DetailedQuestStep(this, "Activate smite.");
 		prayAtAltar = new ObjectStep(this, ObjectID.ALTAR, new WorldPoint(3208, 3495, 1),
-			"Pray at altar.", smiteActive);
+			"Pray at altar with Smite active.", smiteActive);
 		moveToEdge = new ObjectStep(this, ObjectID.TRAPDOOR_1581, new WorldPoint(3097, 3468, 0),
 			"Enter the Edgeville dungeon.");
 		obsPipe = new ObjectStep(this, 16511, new WorldPoint(3150, 9906, 0),
@@ -378,7 +398,14 @@ public class VarrockHard extends ComplexStateQuestHelper
 		reqs.add(new SkillRequirement(Skill.CONSTRUCTION, 50));
 		reqs.add(new SkillRequirement(Skill.FARMING, 68, true));
 		reqs.add(new SkillRequirement(Skill.FIREMAKING, 60));
-		reqs.add(new SkillRequirement(Skill.HUNTER, 66));
+		if (questHelperPlugin.getPlayerStateManager().getAccountType().isAnyIronman())
+		{
+			reqs.add(new SkillRequirement(Skill.HUNTER, 69, true));
+		}
+		else
+		{
+			reqs.add(new SkillRequirement(Skill.HUNTER, 66));
+		}
 		reqs.add(new SkillRequirement(Skill.MAGIC, 54));
 		reqs.add(new SkillRequirement(Skill.PRAYER, 52));
 		reqs.add(new SkillRequirement(Skill.WOODCUTTING, 60));
@@ -451,7 +478,7 @@ public class VarrockHard extends ComplexStateQuestHelper
 		fancyStoneSteps.setLockingStep(fancyStoneTask);
 		allSteps.add(fancyStoneSteps);
 
-		PanelDetails smitedSteps = new PanelDetails("Altar Smited", Arrays.asList(moveToUpstairs, activateSmite,
+		PanelDetails smitedSteps = new PanelDetails("Altar Smited", Arrays.asList(moveToUpstairs,
 			prayAtAltar), new SkillRequirement(Skill.PRAYER, 52));
 		smitedSteps.setDisplayCondition(notSmiteAltar);
 		smitedSteps.setLockingStep(smiteAltarTask);

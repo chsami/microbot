@@ -24,35 +24,46 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.theslugmenace;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetModelRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetPresenceRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.THE_SLUG_MENACE
-)
 public class TheSlugMenace extends BasicQuestHelper
 {
 	//Items Required
@@ -76,8 +87,7 @@ public class TheSlugMenace extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -138,7 +148,7 @@ public class TheSlugMenace extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		commorb = new ItemRequirement("Commorb (can get another from Sir Tiffy)", ItemID.COMMORB).isNotConsumed();
 		commorb.addAlternates(ItemID.COMMORB_V2);
@@ -180,11 +190,17 @@ public class TheSlugMenace extends BasicQuestHelper
 
 		chisel = new ItemRequirement("Chisel", ItemID.CHISEL).isNotConsumed();
 
-		airRune = new ItemRequirement("Air rune", ItemID.AIR_RUNE_9693);
-		earthRune = new ItemRequirement("Earth rune", ItemID.EARTH_RUNE_9695);
-		waterRune = new ItemRequirement("Water rune", ItemID.WATER_RUNE_9691);
-		fireRune = new ItemRequirement("Fire rune", ItemID.FIRE_RUNE_9699);
-		mindRune = new ItemRequirement("Mind rune", ItemID.MIND_RUNE_9697);
+		usedAirRune = new VarbitRequirement(2623, 1);
+		usedEarthRune = new VarbitRequirement(2622, 1);
+		usedWaterRune = new VarbitRequirement(2625, 1);
+		usedFireRune = new VarbitRequirement(2624, 1);
+		usedMindRune = new VarbitRequirement(2626, 1);
+
+		airRune = new ItemRequirement("Air rune", ItemID.AIR_RUNE_9693).hideConditioned(usedAirRune);
+		earthRune = new ItemRequirement("Earth rune", ItemID.EARTH_RUNE_9695).hideConditioned(usedEarthRune);
+		waterRune = new ItemRequirement("Water rune", ItemID.WATER_RUNE_9691).hideConditioned(usedWaterRune);
+		fireRune = new ItemRequirement("Fire rune", ItemID.FIRE_RUNE_9699).hideConditioned(usedFireRune);
+		mindRune = new ItemRequirement("Mind rune", ItemID.MIND_RUNE_9697).hideConditioned(usedMindRune);
 
 		meleeGear = new ItemRequirement("Melee weapon to fight the Slug Prince", -1, -1).isNotConsumed();
 		meleeGear.setDisplayItemId(BankSlotIcons.getCombatGear());
@@ -257,7 +273,8 @@ public class TheSlugMenace extends BasicQuestHelper
 		mindAltarTeleport.appendToTooltip("Taverley Teleport");
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		hobgoblinDungeon = new Zone(new WorldPoint(2691, 9665, 0), new WorldPoint(2749, 9720, 0));
 		seaSlugDungeon = new Zone(new WorldPoint(2304, 5059, 0), new WorldPoint(2377, 5124, 0));
@@ -276,23 +293,17 @@ public class TheSlugMenace extends BasicQuestHelper
 
 		onPlatform = new ZoneRequirement(platform);
 
-		puzzleUp = new WidgetModelRequirement(460, 4, 18393);
+		puzzleUp = new WidgetPresenceRequirement(460, 8);
 
 		repairedPage = new VarbitRequirement(2611, 1);
 
 		pickedUpSlug = new VarbitRequirement(2631, 1);
 
-		usedAirRune = new VarbitRequirement(2623, 1);
-		usedEarthRune = new VarbitRequirement(2622, 1);
-		usedWaterRune = new VarbitRequirement(2625, 1);
-		usedFireRune = new VarbitRequirement(2624, 1);
-		usedMindRune = new VarbitRequirement(2626, 1);
-
-		hasOrUsedAirRune = new Conditions(LogicType.OR, airRune, usedAirRune);
-		hasOrUsedWaterRune = new Conditions(LogicType.OR, waterRune, usedWaterRune);
-		hasOrUsedEarthRune = new Conditions(LogicType.OR, earthRune, usedEarthRune);
-		hasOrUsedFireRune = new Conditions(LogicType.OR, fireRune, usedFireRune);
-		hasOrUsedMindRune = new Conditions(LogicType.OR, mindRune, usedMindRune);
+		hasOrUsedAirRune = new Conditions(LogicType.OR, airRune.alsoCheckBank(questBank), usedAirRune);
+		hasOrUsedWaterRune = new Conditions(LogicType.OR, waterRune.alsoCheckBank(questBank), usedWaterRune);
+		hasOrUsedEarthRune = new Conditions(LogicType.OR, earthRune.alsoCheckBank(questBank), usedEarthRune);
+		hasOrUsedFireRune = new Conditions(LogicType.OR, fireRune.alsoCheckBank(questBank), usedFireRune);
+		hasOrUsedMindRune = new Conditions(LogicType.OR, mindRune.alsoCheckBank(questBank), usedMindRune);
 
 		hasAllRunes = new Conditions(hasOrUsedAirRune, hasOrUsedEarthRune, hasOrUsedFireRune, hasOrUsedMindRune, hasOrUsedWaterRune);
 
@@ -342,8 +353,9 @@ public class TheSlugMenace extends BasicQuestHelper
 		talkToBailey = new NpcStep(this, NpcID.BAILEY, new WorldPoint(2764, 3275, 0), "Talk to Bailey on the Fishing Platform.", deadSeaSlug);
 		useGlueOnFragment = new DetailedQuestStep(this, "Use the slug glue on one of the fragments.", glue, pageFragment1);
 
-		solvePuzzle = new PuzzleStep(this);
+		solvePuzzle = new PuzzleWrapperStep(this, new PuzzleStep(this), "Combine the fragments.");
 
+		// TODO: Expand out this section to be more descriptive and guiding
 		useEmptyRunes = new DetailedQuestStep(this, "Right-click each page to turn rune/pure essence into empty runes. Take each empty rune and use it on its respective Runecrafting Altar. Bring extra essence (~10 extra) as it is possible to accidentally destroy the essence upon creation.", page1, page2, page3, essence, chisel);
 
 		enterDungeonAgain = new ObjectStep(this, ObjectID.OLD_RUIN_ENTRANCE, new WorldPoint(2696, 3283, 0), "Prepare to fight the Slug Prince (level 62). Only melee can hurt it. Then, enter the old ruin entrance west of Witchaven.", meleeGear, airRune, waterRune, earthRune, fireRune, mindRune);
@@ -411,9 +423,9 @@ public class TheSlugMenace extends BasicQuestHelper
 	public List<ExperienceReward> getExperienceRewards()
 	{
 		return Arrays.asList(
-				new ExperienceReward(Skill.RUNECRAFT, 3500),
-				new ExperienceReward(Skill.CRAFTING, 3500),
-				new ExperienceReward(Skill.THIEVING, 3500));
+			new ExperienceReward(Skill.RUNECRAFT, 3500),
+			new ExperienceReward(Skill.CRAFTING, 3500),
+			new ExperienceReward(Skill.THIEVING, 3500));
 	}
 
 	@Override

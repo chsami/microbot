@@ -26,14 +26,13 @@
 package net.runelite.client.plugins.questhelper.helpers.miniquests.enchantedkey;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.awt.Rectangle;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.coords.WorldPoint;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
-import java.util.Set;
 
 /**
  * Solution finder for hot-cold style puzzles.

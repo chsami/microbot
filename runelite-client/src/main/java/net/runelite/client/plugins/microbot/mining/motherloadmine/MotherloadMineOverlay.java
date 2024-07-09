@@ -17,17 +17,20 @@ public class MotherloadMineOverlay extends OverlayPanel {
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
+        setSnappable(true);
     }
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            panelComponent.setPreferredLocation(new Point(80, 8));
-            panelComponent.setPreferredSize(new Dimension(275, 700));
+
+            panelComponent.setPreferredSize(new Dimension(275, 900));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("\uD83E\uDD86 Motherlode Mine \uD83E\uDD86")
                     .color(Color.ORANGE)
                     .build());
 
+
+            //Rs2Antiban.renderAntibanOverlayComponents(panelComponent);
             addEmptyLine();
 
 

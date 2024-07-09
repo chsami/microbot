@@ -53,6 +53,8 @@
 3066 3261 0	3071 3260 0	Climb-into Underwall tunnel 19032	100 Agility		Diary
 3069 3259 0	3064 3260 0	Climb-into Underwall tunnel 19036	100 Agility		Diary
 3067 3260 0	3071 3260 0	Climb-into Underwall tunnel 19032	100 Agility		Diary
+3070 3257 0	3066 3257 0	Climb-into Underwall tunnel 19036	42 Agility      7
+3066 3257 0	3070 3257 0	Climb-into Underwall tunnel 19032	42 Agility      7
 3035 9806 0	3028 9806 0	Squeeze-through Crevice 16543	42 Agility				
 3028 9806 0	3035 9806 0	Squeeze-through Crevice 16543	42 Agility				
 2878 3665 0	2878 3668 0	Climb Rocks 16522	43 Agility				
@@ -151,4 +153,6 @@
 2768 10002 0	2770 10002 0	Jump-over Strange floor 16544	81 Agility				
 2770 10002 0	2768 10002 0	Jump-over Strange floor 16544	81 Agility				
 3500 9510 2	3506 9505 2	Squeeze-through Crevice 16465	86 Agility				
-3506 9505 2	3500 9510 2	Squeeze-through Crevice 16465	86 Agility				
+3506 9505 2	3500 9510 2	Squeeze-through Crevice 16465	86 Agility
+3308 3491 0	3308 3493 0	Climb-over Broken fence 2618
+3308 3493 0	3308 3491 0	Climb-over Broken fence 2618

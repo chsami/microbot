@@ -41,7 +41,7 @@ public class Restriction {
                 Integer.parseInt(parts_point[2]));
 
         // Quest requirements
-        if (!parts[1].isEmpty()) {
+        if (parts.length > 1 && !parts[1].isEmpty()) {
             this.quests = findQuests(parts[1]);
         }
     }

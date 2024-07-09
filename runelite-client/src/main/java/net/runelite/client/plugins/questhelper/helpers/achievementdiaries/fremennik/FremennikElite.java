@@ -24,17 +24,14 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.fremennik;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpecialAttackRequirement;
@@ -45,17 +42,14 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequire
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FREMENNIK_ELITE
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 
 public class FremennikElite extends ComplexStateQuestHelper
 {
@@ -98,8 +92,7 @@ public class FremennikElite extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doElite = new ConditionalStep(this, claimReward);
@@ -153,7 +146,7 @@ public class FremennikElite extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notDagKings = new VarplayerRequirement(1184, false, 31);
 		notAstralRunes = new VarplayerRequirement(1185, false, 0);
@@ -175,7 +168,7 @@ public class FremennikElite extends ComplexStateQuestHelper
 		thrownaxe = new ItemRequirement("Rune thrownaxe", ItemID.RUNE_THROWNAXE).showConditioned(notDagKings);
 		climbingBoots = new ItemRequirement("Climbing boots", ItemCollections.CLIMBING_BOOTS)
 		.showConditioned(new Conditions(LogicType.OR, notGodwarsGenerals, notSpiritualMage)).isNotConsumed();
-		rope = new ItemRequirement("Rope", ItemID.ROPE).showConditioned(new Conditions(LogicType.OR, notGodwarsGenerals, notSpiritualMage));
+		rope = new ItemRequirement("Ropes", ItemID.ROPE).showConditioned(new Conditions(LogicType.OR, notGodwarsGenerals, notSpiritualMage));
 		crossbow = new ItemRequirement("Any crossbow", ItemCollections.CROSSBOWS)
 			.showConditioned(new Conditions(LogicType.OR, notGodwarsGenerals, notSpiritualMage)).isNotConsumed();
 		mithGrap = new ItemRequirement("Mith grapple", ItemID.MITH_GRAPPLE_9419)
@@ -225,7 +218,8 @@ public class FremennikElite extends ComplexStateQuestHelper
 		inPirates3 = new ZoneRequirement(pirates3);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		godWars = new Zone(new WorldPoint(2819, 5375, 2), new WorldPoint(2943, 5252, 2));
 		godWars2 = new Zone(new WorldPoint(2819, 5375, 1), new WorldPoint(2943, 5252, 1));
@@ -377,11 +371,11 @@ public class FremennikElite extends ComplexStateQuestHelper
 	public List<Requirement> getGeneralRequirements()
 	{
 		ArrayList<Requirement> req = new ArrayList<>();
-		req.add(new SkillRequirement(Skill.AGILITY, 80));
-		req.add(new SkillRequirement(Skill.CRAFTING, 80));
+		req.add(new SkillRequirement(Skill.AGILITY, 80, true));
+		req.add(new SkillRequirement(Skill.CRAFTING, 80, true));
 		req.add(new SkillRequirement(Skill.HITPOINTS, 70, false));
 		req.add(new SkillRequirement(Skill.RANGED, 70, false));
-		req.add(new SkillRequirement(Skill.RUNECRAFT, 82));
+		req.add(new SkillRequirement(Skill.RUNECRAFT, 82, true));
 		req.add(new SkillRequirement(Skill.SLAYER, 83, true));
 		req.add(new SkillRequirement(Skill.STRENGTH, 70, false));
 		req.add(new SkillRequirement(Skill.PRAYER, 43, false,
@@ -422,20 +416,20 @@ public class FremennikElite extends ComplexStateQuestHelper
 		allSteps.add(dagannothKingsSteps);
 
 		PanelDetails dragonstoneAmuletSteps = new PanelDetails("Dragonstone Amulet", Arrays.asList(moveToNeit, dragonAmulet),
-			fremIsles, new SkillRequirement(Skill.CRAFTING, 80), dragonstone, goldBar, amuletMould);
+			fremIsles, new SkillRequirement(Skill.CRAFTING, 80, true), dragonstone, goldBar, amuletMould);
 		dragonstoneAmuletSteps.setDisplayCondition(notDragonAmulet);
 		dragonstoneAmuletSteps.setLockingStep(dragonAmuletTask);
 		allSteps.add(dragonstoneAmuletSteps);
 
 		PanelDetails astralRunesSteps = new PanelDetails("Astral Runes", Arrays.asList(moveToPirates, moveToCaptain,
 			moveToCaptain2, moveToLunarIsle, moveToAltar1, moveToAltar2), lunarDiplomacy,
-			new SkillRequirement(Skill.RUNECRAFT, 82), pureEssence.quantity(28));
+			new SkillRequirement(Skill.RUNECRAFT, 82, true), pureEssence.quantity(28));
 		astralRunesSteps.setDisplayCondition(notAstralRunes);
 		astralRunesSteps.setLockingStep(astralRunesTask);
 		allSteps.add(astralRunesSteps);
 
 		PanelDetails rellekkaRooftopsSteps = new PanelDetails("Rellekka Rooftops", Collections.singletonList(rellRooftop),
-			new SkillRequirement(Skill.AGILITY, 80));
+			new SkillRequirement(Skill.AGILITY, 80, true));
 		rellekkaRooftopsSteps.setDisplayCondition(notRellRooftop);
 		rellekkaRooftopsSteps.setLockingStep(rellRooftopTask);
 		allSteps.add(rellekkaRooftopsSteps);
@@ -448,7 +442,7 @@ public class FremennikElite extends ComplexStateQuestHelper
 		allSteps.add(spiritualMageSteps);
 
 		PanelDetails godWarsSteps = new PanelDetails("God Wars Generals", Arrays.asList(moveToGodWarsGWD,
-			godwarsGenerals), trollStronghold, new SkillRequirement(Skill.AGILITY, 70),
+			godwarsGenerals), trollStronghold, new SkillRequirement(Skill.AGILITY, 70, false),
 			new SkillRequirement(Skill.STRENGTH, 70, false), new SkillRequirement(Skill.HITPOINTS, 70, false),
 			new SkillRequirement(Skill.RANGED, 70, false), combatGear, rope.quantity(2), climbingBoots, hammer,
 			mithGrap, crossbow);

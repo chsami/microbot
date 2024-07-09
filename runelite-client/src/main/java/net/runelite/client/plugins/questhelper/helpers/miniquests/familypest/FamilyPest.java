@@ -25,33 +25,33 @@
 
 package net.runelite.client.plugins.questhelper.helpers.miniquests.familypest;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-        quest = QuestHelperQuest.FAMILY_PEST
-)
 public class FamilyPest extends BasicQuestHelper
 {
 	//Item Requirements
@@ -72,8 +72,7 @@ public class FamilyPest extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -92,7 +91,7 @@ public class FamilyPest extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		//Recommended
 		dueling = new ItemRequirement("Ring of Dueling", -1, -1);
@@ -106,7 +105,7 @@ public class FamilyPest extends BasicQuestHelper
 
 	public void setupSteps()
 	{
-		talkToDimintheis = new NpcStep(this, NpcID.DIMINTHEIS, new WorldPoint(3280, 3404, 0), "Talk to Dimintheis (Southeast of Varrock.");
+		talkToDimintheis = new NpcStep(this, NpcID.DIMINTHEIS, new WorldPoint(3280, 3404, 0), "Talk to Dimintheis (south-east of Varrock).");
 		talkToDimintheis.addDialogSteps("Have you got any quests for me?", "Oh come on, however menial, I want to help!");
 
 		talkToAvan = new NpcStep(this, NpcID.AVAN_387, new WorldPoint(3294, 3282, 0), "Talk to Avan (Entrance to the Al Kharid Mine).");
@@ -133,7 +132,8 @@ public class FamilyPest extends BasicQuestHelper
 		talkedToJohnathon = new VarbitRequirement(5350, 1);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		upstairsJollyBoar = new Zone(new WorldPoint(3273, 3485, 1), new WorldPoint(3287, 3509, 1));
 	}

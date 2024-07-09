@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.playerassist.constants.Constants;
 import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.Arrays;
@@ -124,6 +125,7 @@ public class BankerScript extends Script {
 
     public boolean handleBanking() {
         Microbot.pauseAllScripts = true;
+        Rs2Prayer.disableAllPrayers();
         if (goToBank() && Rs2Bank.openBank()) {
             if (depositAllExcept(config) && withdrawUpkeepItems(config)) {
                 Rs2Walker.walkTo(config.centerLocation());

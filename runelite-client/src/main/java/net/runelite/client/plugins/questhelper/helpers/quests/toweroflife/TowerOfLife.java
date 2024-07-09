@@ -24,31 +24,41 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.toweroflife;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.FreeInventorySlotRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleStep;
+import net.runelite.client.plugins.questhelper.steps.PuzzleWrapperStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.TOWER_OF_LIFE
-)
 public class TowerOfLife extends BasicQuestHelper
 {
 	//Items Required
@@ -95,8 +105,7 @@ public class TowerOfLife extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
-		setupZones();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -117,7 +126,7 @@ public class TowerOfLife extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		rawSwordfish = new ItemRequirement("Raw swordfish (for diary task)", ItemID.RAW_SWORDFISH);
 		rawChicken = new ItemRequirement("Raw chicken (for diary task)", ItemID.RAW_CHICKEN);
@@ -148,7 +157,8 @@ public class TowerOfLife extends BasicQuestHelper
 		cageBindingFluid = new ItemRequirement("Binding fluid", ItemID.BINDING_FLUID, 4);
 	}
 
-	public void setupZones()
+	@Override
+	protected void setupZones()
 	{
 		WorldPoint z1a = new WorldPoint(2652, 3224, 0);
 		WorldPoint z1b = new WorldPoint(2646, 3212, 0);
@@ -210,10 +220,10 @@ public class TowerOfLife extends BasicQuestHelper
 
 	public void setupSteps()
 	{
-		talkToEffigy = new NpcStep(this, NpcID.EFFIGY, new WorldPoint(2637, 3218, 0), "Talk to Effigy outside the Tower of Life");
+		talkToEffigy = new NpcStep(this, NpcID.EFFIGY, new WorldPoint(2637, 3218, 0), "Talk to Effigy outside the Tower of Life.");
 		talkToEffigy.addDialogStep("Sure, why not.");
 
-		talkToBonafido = new NpcStep(this, NpcID.BONAFIDO, new WorldPoint(2651, 3228, 0), "Talk to Bonafido");
+		talkToBonafido = new NpcStep(this, NpcID.BONAFIDO, new WorldPoint(2651, 3228, 0), "Talk to Bonafido.");
 
 		setupGetBuildersCostume();
 
@@ -222,30 +232,26 @@ public class TowerOfLife extends BasicQuestHelper
 		climbUpToFloor1 = new ObjectStep(this, ObjectID.STAIRS_21871, new WorldPoint(2645, 3220, 0), "Go upstairs.");
 		climbUpToFloor2 = new ObjectStep(this, ObjectID.STAIRS_21871, new WorldPoint(2653, 3220, 1), "Go upstairs.");
 		climbUpToFloor3 = new ObjectStep(this, ObjectID.LADDER_17974, new WorldPoint(2647, 3221, 2), "Go upstairs.");
-		climbDownToGround = new ObjectStep(this, ObjectID.STAIRS_21872, new WorldPoint(2645, 3220, 1), "Go downstairs" +
-			".");
-		climbDownToFloor1 = new ObjectStep(this, ObjectID.STAIRS_21872, new WorldPoint(2653, 3220, 2), "Go downstairs" +
-			".");
-		climbDownToFloor2 = new ObjectStep(this, ObjectID.LADDER_17975, new WorldPoint(2647, 3221, 3), "Go downstairs" +
-			".");
+		climbDownToGround = new ObjectStep(this, ObjectID.STAIRS_21872, new WorldPoint(2645, 3220, 1), "Go downstairs.");
+		climbDownToFloor1 = new ObjectStep(this, ObjectID.STAIRS_21872, new WorldPoint(2653, 3220, 2), "Go downstairs.");
+		climbDownToFloor2 = new ObjectStep(this, ObjectID.LADDER_17975, new WorldPoint(2647, 3221, 3), "Go downstairs.");
 
-		climbDownToBasement = new ObjectStep(this, NullObjectID.NULL_21944, new WorldPoint(2648, 3212, 0), "Go " +
-			"downstairs.");
+		climbDownToBasement = new ObjectStep(this, NullObjectID.NULL_21944, new WorldPoint(2648, 3212, 0), "Go downstairs.");
 
-		enterTowerAgain = new ObjectStep(this, ObjectID.TOWER_DOOR, new WorldPoint(2649, 3225, 0), "Go back into the " +
-			"tower.");
-		climbBackUpToFloor1 = new ObjectStep(this, ObjectID.STAIRS_21871, new WorldPoint(2645, 3220, 0), "Go back " +
-			"upstairs.");
-		climbBackUpToFloor2 = new ObjectStep(this, ObjectID.STAIRS_21871, new WorldPoint(2653, 3220, 1), "Go back " +
-			"upstairs.");
-		climbBackUpToFloor3 = new ObjectStep(this, ObjectID.LADDER_17974, new WorldPoint(2647, 3221, 2), "Go back " +
-			"upstairs.");
-		climbBackDownToGround = new ObjectStep(this, ObjectID.STAIRS_21872, new WorldPoint(2645, 3220, 1), "Go back " +
-			"downstairs.");
-		climbBackDownToFloor1 = new ObjectStep(this, ObjectID.STAIRS_21872, new WorldPoint(2653, 3220, 2), "Go back " +
-			"downstairs.");
-		climbBackDownToFloor2 = new ObjectStep(this, ObjectID.LADDER_17975, new WorldPoint(2647, 3221, 3), "Go back " +
-			"downstairs.");
+		enterTowerAgain = new ObjectStep(this, ObjectID.TOWER_DOOR, new WorldPoint(2649, 3225, 0),
+			"Go back into the tower.");
+		climbBackUpToFloor1 = new ObjectStep(this, ObjectID.STAIRS_21871, new WorldPoint(2645, 3220, 0),
+			"Go back upstairs.");
+		climbBackUpToFloor2 = new ObjectStep(this, ObjectID.STAIRS_21871, new WorldPoint(2653, 3220, 1),
+			"Go back upstairs.");
+		climbBackUpToFloor3 = new ObjectStep(this, ObjectID.LADDER_17974, new WorldPoint(2647, 3221, 2),
+			"Go back upstairs.");
+		climbBackDownToGround = new ObjectStep(this, ObjectID.STAIRS_21872, new WorldPoint(2645, 3220, 1),
+			"Go back downstairs.");
+		climbBackDownToFloor1 = new ObjectStep(this, ObjectID.STAIRS_21872, new WorldPoint(2653, 3220, 2),
+			"Go back downstairs.");
+		climbBackDownToFloor2 = new ObjectStep(this, ObjectID.LADDER_17975, new WorldPoint(2647, 3221, 3),
+			"Go back downstairs.");
 
 		setupFixTower();
 
@@ -313,7 +319,8 @@ public class TowerOfLife extends BasicQuestHelper
 		);
 		calibratePressureMachine = new ObjectStep(this, ObjectID.PRESSURE_MACHINE, new WorldPoint(2649, 3223, 1),
 			"Calibrate the Pressure Machine.");
-		solvePressureMachinePuzzle = new PuzzleStep(this, "Click the wheels to calibrate the machine", new PuzzleSolver(client)::pressureSolver);
+		solvePressureMachinePuzzle = new PuzzleWrapperStep(this,
+			new PuzzleStep(this, "Click the wheels to calibrate the machine", new PuzzleSolver(client)::pressureSolver));
 
 		fixPressureMachine = new ConditionalStep(this, fixPressureMachineGetSheets);
 		fixPressureMachine.addStep(isPressureMachineBuilt, solvePressureMachinePuzzle);
@@ -339,9 +346,10 @@ public class TowerOfLife extends BasicQuestHelper
 		buildPipeMachine.addDialogStep("Yes");
 		buildPipeMachine.addSubSteps(fixPipeMachineGetPipes, fixPipeMachineGetRings, fixPipeMachineGetRivets,
 			climbUpToFloor1, climbUpToFloor2, climbUpToFloor3, climbDownToGround, climbDownToFloor1, climbDownToFloor2);
-		solvePipeMachinePuzzle = new PuzzleStep(this,
+
+		solvePipeMachinePuzzle = new PuzzleWrapperStep(this, new PuzzleStep(this,
 			"Calibrate the pipe machine. Select pipe pieces on the right side of the UI to see where to put them.",
-			new PuzzleSolver(client)::pipeSolver);
+			new PuzzleSolver(client)::pipeSolver));
 
 		fixPipeMachine = new ConditionalStep(this, fixPipeMachineGetPipes);
 		fixPipeMachine.addStep(isPipeMachineBuilt, solvePipeMachinePuzzle);
@@ -365,7 +373,7 @@ public class TowerOfLife extends BasicQuestHelper
 		buildCage.addDialogStep("Yes");
 		buildCage.addSubSteps(fixCageGetBars, fixCageGetFluid,
 			climbUpToFloor1, climbUpToFloor2, climbUpToFloor3, climbDownToGround, climbDownToFloor1, climbDownToFloor2);
-		solveCagePuzzle = new PuzzleStep(this, "Assemble the cage.", new PuzzleSolver(client)::cageSolver);
+		solveCagePuzzle = new PuzzleWrapperStep(this, new PuzzleStep(this, "Assemble the cage.", new PuzzleSolver(client)::cageSolver));
 
 		fixCage = new ConditionalStep(this, fixCageGetBars);
 		fixCage.addStep(isCageBuilt, solveCagePuzzle);

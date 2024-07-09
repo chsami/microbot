@@ -24,31 +24,32 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.recipefordisaster;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.QuestVarbits;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarbits;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.RECIPE_FOR_DISASTER_WARTFACE_AND_BENTNOZE
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+
 public class RFDGoblins extends BasicQuestHelper
 {
 	ItemRequirement bread, orange, knife, blueGreenPurpledye, spice, fishingBait, bucketOfWater,
@@ -71,8 +72,7 @@ public class RFDGoblins extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -101,7 +101,7 @@ public class RFDGoblins extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		bread = new ItemRequirement("Bread", ItemID.BREAD);
 		orange = new ItemRequirement("Orange", ItemID.ORANGE);
@@ -141,7 +141,8 @@ public class RFDGoblins extends BasicQuestHelper
 		teleportLumbridge = new ItemRequirement("Teleport to Lumbridge", ItemID.LUMBRIDGE_TELEPORT);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		diningRoom = new Zone(new WorldPoint(1856, 5313, 0), new WorldPoint(1870, 5333, 0));
 		cookRoom = new Zone(new WorldPoint(2974, 9906, 0), new WorldPoint(2990, 9917, 0));
@@ -188,7 +189,7 @@ public class RFDGoblins extends BasicQuestHelper
 
 		talkToCook = new NpcStep(this, NpcID.GOBLIN_COOK, new WorldPoint(2981, 9909, 0), "");
 		((NpcStep)talkToCook).addAlternateNpcs(NpcID.GOBLIN_COOK_4852);
-		talkToCookAfterChar = new NpcStep(this, NpcID.GOBLIN_COOK_4851, new WorldPoint(2981, 9909, 0),
+		talkToCookAfterChar = new NpcStep(this, NpcID.GOBLIN_COOK_4851, new WorldPoint(2981, 9868, 0),
 			"");
 
 		useWaterOnBread = new DetailedQuestStep(this, "Use a bucket of water on some bread.", bucketOfWaterHighlighted,

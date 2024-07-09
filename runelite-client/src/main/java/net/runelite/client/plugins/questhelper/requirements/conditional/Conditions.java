@@ -27,13 +27,14 @@ package net.runelite.client.plugins.questhelper.requirements.conditional;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import lombok.Setter;
-import net.runelite.api.Client;
-
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import net.runelite.client.plugins.questhelper.util.Utils;
+import lombok.Setter;
+import net.runelite.api.Client;
 
 public class Conditions extends ConditionForStep
 {
@@ -43,21 +44,37 @@ public class Conditions extends ConditionForStep
 	@Setter
 	protected String text;
 
+	/**
+	 * @param conditions list of requirements that must all be met
+	 */
 	public Conditions(Requirement... conditions)
 	{
+		assert(Utils.varargsNotNull(conditions));
+
 		this.conditions = new ArrayList<>();
 		Collections.addAll(this.conditions, conditions);
 		logicType = LogicType.AND;
 	}
 
+	/**
+	 * @param conditions list of requirements that must all be met
+	 */
 	public Conditions(List<Requirement> conditions)
 	{
+		assert(conditions.stream().noneMatch(Objects::isNull));
+
 		this.conditions = new ArrayList<>(conditions);
 		logicType = LogicType.AND;
 	}
 
+	/**
+	 * @param logicType type of logic to apply to the list of requirements for this Condition to be met
+	 * @param conditions list of requirements that will be evaluated based on the logicType
+	 */
 	public Conditions(LogicType logicType, Requirement... conditions)
 	{
+		assert(Utils.varargsNotNull(conditions));
+
 		this.conditions = new ArrayList<>();
 		Collections.addAll(this.conditions, conditions);
 		this.logicType = logicType;
@@ -65,6 +82,8 @@ public class Conditions extends ConditionForStep
 
 	public Conditions(Operation operation, int quantity, Requirement... conditions)
 	{
+		assert(Utils.varargsNotNull(conditions));
+
 		this.conditions = new ArrayList<>();
 		Collections.addAll(this.conditions, conditions);
 		this.logicType = LogicType.AND;
@@ -74,12 +93,16 @@ public class Conditions extends ConditionForStep
 
 	public Conditions(LogicType logicType, List<Requirement> conditions)
 	{
+		assert(conditions.stream().noneMatch(Objects::isNull));
+
 		this.conditions = new ArrayList<>(conditions);
 		this.logicType = logicType;
 	}
 
 	public Conditions(boolean onlyNeedToPassOnce, Operation operation, int quantity, Requirement... conditions)
 	{
+		assert(Utils.varargsNotNull(conditions));
+
 		this.conditions = new ArrayList<>();
 		Collections.addAll(this.conditions, conditions);
 		this.onlyNeedToPassOnce = onlyNeedToPassOnce;
@@ -90,6 +113,8 @@ public class Conditions extends ConditionForStep
 
 	public Conditions(boolean onlyNeedToPassOnce, LogicType logicType, Requirement... conditions)
 	{
+		assert(Utils.varargsNotNull(conditions));
+
 		this.conditions = new ArrayList<>();
 		Collections.addAll(this.conditions, conditions);
 		this.onlyNeedToPassOnce = onlyNeedToPassOnce;
@@ -98,6 +123,8 @@ public class Conditions extends ConditionForStep
 
 	public Conditions(boolean onlyNeedToPassOnce, Requirement... conditions)
 	{
+		assert(Utils.varargsNotNull(conditions));
+
 		this.conditions = new ArrayList<>();
 		Collections.addAll(this.conditions, conditions);
 		this.onlyNeedToPassOnce = onlyNeedToPassOnce;

@@ -26,27 +26,44 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import java.util.List;
+import java.util.Objects;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
-
-import java.util.List;
 
 public class FollowerItemRequirement extends ItemRequirement
 {
 	private final List<Integer> followerIDs;
+	private final List<Integer> itemIDs;
 
 	public FollowerItemRequirement(String name, List<Integer> itemIDs, List<Integer> followerIDs)
 	{
 		super(name, itemIDs);
+
+		assert(itemIDs.stream().noneMatch(Objects::isNull));
+		assert(followerIDs.stream().noneMatch(Objects::isNull));
+
+		this.itemIDs = itemIDs;
 		this.followerIDs = followerIDs;
 	}
 
 	public FollowerItemRequirement(String name, ItemCollections itemIDs, List<Integer> followerIDs)
 	{
 		super(name, itemIDs);
+
+		assert(followerIDs.stream().noneMatch(Objects::isNull));
+
+		this.itemIDs = itemIDs.getItems();
 		this.followerIDs = followerIDs;
 	}
+
+	@Override
+	protected FollowerItemRequirement copyOfClass()
+	{
+		return new FollowerItemRequirement(getName(), itemIDs, followerIDs);
+	}
+
 	@Override
 	public boolean check(Client client, boolean checkConsideringSlotRestrictions, List<Item> items)
 	{

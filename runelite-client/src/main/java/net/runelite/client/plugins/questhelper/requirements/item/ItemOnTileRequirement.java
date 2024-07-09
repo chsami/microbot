@@ -28,15 +28,16 @@
 package net.runelite.client.plugins.questhelper.requirements.item;
 
 import net.runelite.client.plugins.questhelper.requirements.conditional.ConditionForStep;
+import net.runelite.client.plugins.questhelper.steps.tools.QuestPerspective;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import net.runelite.client.plugins.questhelper.util.Utils;
 import net.runelite.api.Client;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 public class ItemOnTileRequirement extends ConditionForStep
 {
@@ -50,17 +51,24 @@ public class ItemOnTileRequirement extends ConditionForStep
 
 	public ItemOnTileRequirement(ItemRequirement item)
 	{
+		assert(item != null);
+
 		this.itemID = item.getAllIds();
 	}
 
 	public ItemOnTileRequirement(int itemID, WorldPoint worldPoint)
 	{
+		assert(worldPoint != null);
+
 		this.itemID = Collections.singletonList(itemID);
 		this.worldPoint = worldPoint;
 	}
 
 	public ItemOnTileRequirement(ItemRequirement item, WorldPoint worldPoint)
 	{
+		assert(item != null);
+		assert(worldPoint != null);
+
 		this.itemID = item.getAllIds();
 		this.worldPoint = worldPoint;
 	}
@@ -71,38 +79,30 @@ public class ItemOnTileRequirement extends ConditionForStep
 		return checkAllTiles(client);
 	}
 
-	// TODO: Make this not massively inefficient
 	private boolean checkAllTiles(Client client)
 	{
+		if (client.getScene() == null) return false;
+
 		if (worldPoint != null)
 		{
-			Collection<WorldPoint> localWorldPoints = WorldPoint.toLocalInstance(client, worldPoint);
+			LocalPoint localPoint = QuestPerspective.getInstanceLocalPointFromReal(client, worldPoint);
+			if (localPoint == null) return false;
 
-			for (WorldPoint point : localWorldPoints)
+			Tile tile = client.getScene().getTiles()[client.getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
+			if (tile != null)
 			{
-				LocalPoint localPoint = LocalPoint.fromWorld(client, point);
-				if (localPoint == null)
+				List<TileItem> items = tile.getGroundItems();
+				if (items == null) return false;
+				for (TileItem item : items)
 				{
-					continue;
-				}
-
-				Tile tile = client.getScene().getTiles()[client.getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
-				if (tile != null)
-				{
-					List<TileItem> items = tile.getGroundItems();
-					if (items != null)
+					if (itemID.contains(item.getId()))
 					{
-						for (TileItem item : items)
-						{
-							if (itemID.contains(item.getId()))
-							{
-								return true;
-							}
-						}
+						return true;
 					}
 				}
+
+				return false;
 			}
-			return false;
 		}
 
 		Tile[][] squareOfTiles = client.getScene().getTiles()[client.getPlane()];

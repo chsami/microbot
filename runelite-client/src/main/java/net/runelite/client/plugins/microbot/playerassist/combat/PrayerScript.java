@@ -17,6 +17,8 @@ public class PrayerScript extends Script {
         Rs2NpcManager.loadJson();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (!Microbot.isLoggedIn()) return;
+
                 handlePrayer(config);
             } catch (Exception ex) {
                 System.err.println("Error: " + ex.getMessage());
@@ -32,7 +34,8 @@ public class PrayerScript extends Script {
         if (config.prayerStyle() == PrayerStyle.CONTINUOUS) {
             Rs2Prayer.toggleQuickPrayer(Rs2Combat.inCombat());
         } else {
-            Rs2Prayer.toggleQuickPrayer(config.prayerStyle() == PrayerStyle.ALWAYS_ON);
+            if (super.run())
+                Rs2Prayer.toggleQuickPrayer(config.prayerStyle() == PrayerStyle.ALWAYS_ON);
         }
     }
 

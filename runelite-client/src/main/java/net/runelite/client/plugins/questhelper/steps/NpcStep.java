@@ -25,12 +25,26 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import lombok.Getter;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import static net.runelite.client.plugins.questhelper.overlays.QuestHelperWorldOverlay.IMAGE_Z_OFFSET;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.overlay.DirectionArrow;
 import net.runelite.client.plugins.questhelper.steps.tools.QuestPerspective;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import javax.inject.Inject;
 import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -45,30 +59,28 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.util.ColorUtil;
 
-import javax.inject.Inject;
-import java.awt.*;
-import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import static net.runelite.client.plugins.questhelper.overlays.QuestHelperWorldOverlay.IMAGE_Z_OFFSET;
-
 public class NpcStep extends DetailedQuestStep
 {
 	@Inject
 	protected Client client;
 
 	public final int npcID;
-	private final List<Integer> alternateNpcIDs = new ArrayList<>();
+	protected final List<Integer> alternateNpcIDs = new ArrayList<>();
 
-	private boolean allowMultipleHighlights;
+	@Getter
+	@Setter
+	protected boolean allowMultipleHighlights;
 
-	private final ArrayList<NPC> npcs = new ArrayList<>();
+	@Getter
+	protected final ArrayList<NPC> npcs = new ArrayList<>();
 
 	@Setter
-	private int maxRoamRange = 48;
+	protected int maxRoamRange = 48;
+
+	protected boolean mustBeFocused = false;
+
+	@Setter
+	protected String npcName;
 
 	public NpcStep(QuestHelper questHelper, int npcID, String text, Requirement... requirements)
 	{
@@ -86,16 +98,44 @@ public class NpcStep extends DetailedQuestStep
 		}
 	}
 
+	public NpcStep(QuestHelper questHelper, int[] npcID, WorldPoint worldPoint, String text, boolean allowMultipleHighlights, Requirement... requirements)
+	{
+		this(questHelper, npcID, worldPoint, text, requirements);
+		this.allowMultipleHighlights = allowMultipleHighlights;
+	}
+
 	public NpcStep(QuestHelper questHelper, int npcID, WorldPoint worldPoint, String text, Requirement... requirements)
 	{
 		super(questHelper, worldPoint, text, requirements);
 		this.npcID = npcID;
 	}
 
+	public NpcStep(QuestHelper questHelper, int npcID, String npcName, WorldPoint worldPoint, String text, Requirement... requirements)
+	{
+		super(questHelper, worldPoint, text, requirements);
+		this.npcID = npcID;
+		this.npcName = npcName;
+	}
+
+	public NpcStep(QuestHelper questHelper, int npcID, String npcName, WorldPoint worldPoint, String text, boolean allowMultipleHighlights, Requirement... requirements)
+	{
+		super(questHelper, worldPoint, text, requirements);
+		this.npcID = npcID;
+		this.npcName = npcName;
+		this.allowMultipleHighlights = allowMultipleHighlights;
+	}
+
 	public NpcStep(QuestHelper questHelper, int npcID, WorldPoint worldPoint, String text, List<Requirement> requirements, List<Requirement> optionalRequirements)
 	{
 		super(questHelper, worldPoint, text, requirements, optionalRequirements);
 		this.npcID = npcID;
+	}
+
+	public NpcStep(QuestHelper questHelper, int npcID, WorldPoint worldPoint, String text, boolean allowMultipleHighlights, List<Requirement> requirements, List<Requirement> optionalRequirements)
+	{
+		super(questHelper, worldPoint, text, requirements, optionalRequirements);
+		this.npcID = npcID;
+		this.allowMultipleHighlights = allowMultipleHighlights;
 	}
 
 	public NpcStep(QuestHelper questHelper, int[] npcID, WorldPoint worldPoint, String text, Requirement... requirements)
@@ -119,25 +159,42 @@ public class NpcStep extends DetailedQuestStep
 		this(questHelper, npcID, null, text, allowMultipleHighlights, requirements);
 	}
 
+	public NpcStep copy()
+	{
+		NpcStep newStep = new NpcStep(getQuestHelper(), npcID, worldPoint, null, requirements, recommended);
+		if (text != null)
+		{
+			newStep.setText(text);
+		}
+		newStep.allowMultipleHighlights = allowMultipleHighlights;
+		newStep.addAlternateNpcs(alternateNpcIDs);
+		if (mustBeFocused) {
+			newStep.setMustBeFocused(true);
+		}
+		newStep.setMaxRoamRange(maxRoamRange);
+
+		return newStep;
+	}
+
+	protected boolean npcPassesChecks(NPC npc)
+	{
+		if (npcName != null && (npc.getName() == null || !npc.getName().equals(npcName))) return false;
+		return npcID == npc.getId() || alternateNpcIDs.contains(npc.getId());
+	}
+
 	@Override
 	public void startUp()
 	{
 		super.startUp();
 
+		scanForNpcs();
+	}
+
+	public void scanForNpcs()
+	{
 		for (NPC npc : client.getNpcs())
 		{
-			if (npcID == npc.getId() || alternateNpcIDs.contains(npc.getId()))
-			{
-				WorldPoint npcPoint = WorldPoint.fromLocalInstance(client, npc.getLocalLocation());
-				if (this.npcs.size() == 0 && (worldPoint == null || npcPoint.distanceTo(worldPoint) < maxRoamRange))
-				{
-					this.npcs.add(npc);
-				}
-				else if (allowMultipleHighlights)
-				{
-					this.npcs.add(npc);
-				}
-			}
+			addNpcToListGivenMatchingID(npc, this::npcPassesChecks, npcs);
 		}
 	}
 
@@ -159,6 +216,12 @@ public class NpcStep extends DetailedQuestStep
 		return ids;
 	}
 
+	public void setMustBeFocused(boolean mustBeFocused)
+	{
+		this.mustBeFocused = mustBeFocused;
+		if (mustBeFocused) allowMultipleHighlights = true;
+	}
+
 	@Override
 	public void shutDown()
 	{
@@ -166,7 +229,6 @@ public class NpcStep extends DetailedQuestStep
 		npcs.clear();
 	}
 
-	@Subscribe
 	@Override
 	public void onGameStateChanged(GameStateChanged event)
 	{
@@ -175,34 +237,43 @@ public class NpcStep extends DetailedQuestStep
 		{
 			npcs.clear();
 		}
+		else if (event.getGameState() == GameState.LOGGED_IN)
+		{
+			scanForNpcs();
+		}
 	}
 
 	@Subscribe
 	public void onNpcSpawned(NpcSpawned event)
 	{
-		if (event.getNpc().getId() == npcID || alternateNpcIDs.contains(event.getNpc().getId()))
+		addNpcToListGivenMatchingID(event.getNpc(), this::npcPassesChecks, npcs);
+	}
+
+	public void addNpcToListGivenMatchingID(NPC npc, Function<NPC, Boolean> condition, List<NPC> list)
+	{
+		if (condition.apply(npc))
 		{
-			WorldPoint npcPoint = WorldPoint.fromLocalInstance(client, event.getNpc().getLocalLocation());
+			WorldPoint npcPoint = WorldPoint.fromLocalInstance(client, npc.getLocalLocation());
 			if (npcs.size() == 0)
 			{
 				if (worldPoint == null)
 				{
-					npcs.add(event.getNpc());
+					list.add(npc);
 				}
 				else if (npcPoint.distanceTo(worldPoint) < maxRoamRange)
 				{
-					npcs.add(event.getNpc());
+					list.add(npc);
 				}
 			}
 			else if (allowMultipleHighlights)
 			{
 				if (worldPoint == null || npcPoint.distanceTo(worldPoint) < maxRoamRange)
 				{
-					npcs.add(event.getNpc());
+					list.add(npc);
 				}
 			}
 		}
-	}
+	};
 
 	@Subscribe
 	public void onNpcDespawned(NpcDespawned event)
@@ -216,7 +287,9 @@ public class NpcStep extends DetailedQuestStep
 		int newNpcId = npcChanged.getNpc().getId();
 		npcs.remove(npcChanged.getNpc());
 
-		if (allIds().contains(newNpcId) && npcChanged.getNpc().getComposition().isVisible())
+		// This used to contain isVisible check as well, but it doesn't seem to be accurate for a lot
+		// This MAY for some NPCs which have alternate version (The Kendal) require re-consideration
+		if (allIds().contains(newNpcId))
 		{
 			if (npcs.size() == 0 || allowMultipleHighlights)
 			{
@@ -226,7 +299,7 @@ public class NpcStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		npcs.removeIf(npc -> npc.getId() == -1);
 
@@ -234,7 +307,7 @@ public class NpcStep extends DetailedQuestStep
 
 		if (worldPoint != null)
 		{
-			Collection<WorldPoint> localWorldPoints = QuestPerspective.toLocalInstance(client, worldPoint);
+			Collection<WorldPoint> localWorldPoints = QuestPerspective.toLocalInstanceFromReal(client, worldPoint);
 			if (localWorldPoints.isEmpty())
 			{
 				return;
@@ -245,11 +318,12 @@ public class NpcStep extends DetailedQuestStep
 
 		for (NPC npc : npcs)
 		{
+			if (mustBeFocused && npc.getInteracting() != client.getLocalPlayer()) continue;
 			highlightNpc(npc, configColor, graphics);
 
 			if (questHelper.getConfig().showSymbolOverlay())
 			{
-				int zOffset = questHelper.getConfig().highlightStyleNpcs() == MQuestHelperConfig.NpcHighlightStyle.TILE
+				int zOffset = questHelper.getConfig().highlightStyleNpcs() == QuestHelperConfig.NpcHighlightStyle.TILE
 					? IMAGE_Z_OFFSET
 					: (npc.getLogicalHeight() / 2);
 
@@ -260,6 +334,11 @@ public class NpcStep extends DetailedQuestStep
 				}
 			}
 		}
+	}
+
+	@Override
+	protected void renderTileIcon(Graphics2D graphics)
+	{
 	}
 
 	private void highlightNpc(NPC npc, Color color, Graphics2D graphics)

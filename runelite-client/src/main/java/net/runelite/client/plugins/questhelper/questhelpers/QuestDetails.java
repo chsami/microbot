@@ -23,11 +23,9 @@
  *  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
 package net.runelite.client.plugins.questhelper.questhelpers;
 
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import java.util.function.Predicate;
 
 public interface QuestDetails

@@ -24,42 +24,48 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.mountaindaughter;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.NpcHintArrowRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ItemStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.TileStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
+import net.runelite.api.SpriteID;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.MOUNTAIN_DAUGHTER
-)
 public class MountainDaughter extends BasicQuestHelper
 {
 	//Items Required
-	private ItemRequirement axe, pickaxe, whitePearl, whitePearlSeed, mud, plank, muddyRocks, safetyGuarantee,
-		halfRock, gloves, corpse, pole, rope, rocks, necklace;
+	private ItemRequirement axe, pickaxe, whitePearl, whitePearlSeed, mud, plank, muddyRocks5, safetyGuarantee,
+		halfRock, gloves, corpse, pole, rope, necklace;
 
 	//Items Recommended
 	private ItemRequirement slayerRing, combatGear;
@@ -69,7 +75,7 @@ public class MountainDaughter extends BasicQuestHelper
 		gottenGuarantee, givenGuaranteeToSvidi, finishedDiplomacy, finishedFood, finishedFoodAndDiplomacy, inKendalCave,
 		fightableKendalNearby, hasBuried, rubbedMudIntoTree;
 
-	private QuestStep enterCamp, enterCampOverRocks, talkToHamal, digUpMud, rubMudIntoTree, climbTree, poleVaultRocks, plankRocks, listenToSpirit,
+	private QuestStep enterCamp, enterCampOverRocks, talkToHamal, digUpMud, pickupPole, rubMudIntoTree, climbTree, poleVaultRocks, plankRocks, listenToSpirit,
 		plankRocksReturn, talkToHamalAfterSpirit, talkToJokul, talkToSvidi, speakToBrundt, getRockFragment, returnToBrundt, returnToSvidi, getFruit,
 		eatFruit, returnToSpirit, returnToHamalAboutFood, returnToHamalAboutDiplomacy, talkToKendal, killKendal, noPlankRocksReturn, enterCave,
 		grabCorpse, bringCorpseToHamal, collectRocks, createCairn, buryCorpseOnIsland, speakRagnar;
@@ -80,8 +86,7 @@ public class MountainDaughter extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		loadConditions();
 		loadQuestSteps();
 
@@ -97,7 +102,8 @@ public class MountainDaughter extends BasicQuestHelper
 		speakToSpirit.addStep(onIsland2, plankRocks);
 		speakToSpirit.addStep(onIsland1, poleVaultRocks);
 		speakToSpirit.addStep(new Conditions(inTheCamp, rubbedMudIntoTree), climbTree);
-		speakToSpirit.addStep(new Conditions(inTheCamp, mud), rubMudIntoTree);
+		speakToSpirit.addStep(new Conditions(inTheCamp, mud, pole), rubMudIntoTree);
+		speakToSpirit.addStep(new Conditions(inTheCamp, mud), pickupPole);
 		speakToSpirit.addStep(inTheCamp, digUpMud);
 
 		steps.put(10, speakToSpirit);
@@ -144,7 +150,7 @@ public class MountainDaughter extends BasicQuestHelper
 		ConditionalStep buryCorpse = new ConditionalStep(this, enterCampOverRocks);
 		buryCorpse.addStep(hasBuried, createCairn);
 		buryCorpse.addStep(necklace.alsoCheckBank(questBank), buryCorpseOnIsland);
-		buryCorpse.addStep(rocks.alsoCheckBank(questBank), speakRagnar);
+		buryCorpse.addStep(muddyRocks5.alsoCheckBank(questBank), speakRagnar);
 		buryCorpse.addStep(inTheCamp, collectRocks);
 
 		steps.put(60, buryCorpse);
@@ -152,7 +158,8 @@ public class MountainDaughter extends BasicQuestHelper
 		return steps;
 	}
 
-	private void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		CAMP_ZONE_1 = new Zone(new WorldPoint(2758, 3660, 0), new WorldPoint(2821, 3664, 0));
 		CAMP_ZONE_2 = new Zone(new WorldPoint(2767, 3653, 0), new WorldPoint(2821, 3712, 0));
@@ -166,7 +173,7 @@ public class MountainDaughter extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		rope = new ItemRequirement("Rope", ItemID.ROPE);
 		pickaxe = new ItemRequirement("Any pickaxe", ItemID.BRONZE_PICKAXE).isNotConsumed();
@@ -181,7 +188,7 @@ public class MountainDaughter extends BasicQuestHelper
 		pole.addAlternates(ItemCollections.WATER_STAFF);
 		pole.addAlternates(ItemCollections.EARTH_STAFF);
 		pole.addAlternates(ItemCollections.FIRE_STAFF);
-		pole.setTooltip("A Dramen Staff will NOT work. A pole can be obtained from the goat pen north of Hamal's house.");
+		pole.setTooltip("A Dramen Staff will NOT work. A pole can be obtained from the goat pen north of Hamal's tent.");
 		gloves = new ItemRequirement("Almost any gloves", ItemID.LEATHER_GLOVES).isNotConsumed();
 		gloves.addAlternates(ItemID.BARROWS_GLOVES, ItemID.DRAGON_GLOVES, ItemID.RUNE_GLOVES, ItemID.ADAMANT_GLOVES, ItemID.MITHRIL_GLOVES,
 			ItemID.BLACK_GLOVES, ItemID.STEEL_GLOVES, ItemID.IRON_GLOVES, ItemID.BRONZE_GLOVES, ItemID.HARDLEATHER_GLOVES,
@@ -201,12 +208,11 @@ public class MountainDaughter extends BasicQuestHelper
 		whitePearlSeed = new ItemRequirement("White pearl seed", ItemID.WHITE_PEARL_SEED);
 		corpse = new ItemRequirement("Corpse of woman", ItemID.CORPSE_OF_WOMAN);
 		corpse.setTooltip("You can find this corpse again in the Kendal's cave.");
-		muddyRocks = new ItemRequirement("Muddy rock", ItemID.MUDDY_ROCK, 5);
+		muddyRocks5 = new ItemRequirement("Muddy rock", ItemID.MUDDY_ROCK, 5);
 		slayerRing = new ItemRequirement("Slayer ring for teleports", ItemCollections.SLAYER_RINGS);
 		combatGear = new ItemRequirement("Combat gear for The Kendal fight", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
 
-		rocks = new ItemRequirement("Muddy rock", ItemID.MUDDY_ROCK);
 		necklace = new ItemRequirement("Asleif's necklace", ItemID.ASLEIFS_NECKLACE);
 	}
 
@@ -252,7 +258,8 @@ public class MountainDaughter extends BasicQuestHelper
 		talkToHamal.addDialogStep("I will search for her!");
 
 		digUpMud = new ObjectStep(this, ObjectID.ROOTS_5885, new WorldPoint(2805, 3661, 0),
-			"If you did not bring a staff grab a pole from the goat pen north of Hamal's house. Head south of Hamal's house and dig some mud from the mud pond.");
+			"Head south of Hamal's tent and dig some mud from the mud pond.");
+		pickupPole = new ItemStep(this, new WorldPoint(2813, 3685, 0), "Pick up the pole north of Hamal's tent.", pole);
 
 		rubMudIntoTree = new ObjectStep(this, ObjectID.TALL_TREE, new WorldPoint(2772, 3681, 0),
 			"Use mud on the Tall Tree on the lake north of the camp, and then climb it.",
@@ -345,6 +352,8 @@ public class MountainDaughter extends BasicQuestHelper
 		enterCave = new ObjectStep(this, ObjectID.CAVE_ENTRANCE_5857, new WorldPoint(2809, 3703, 0),
 			"Cut through the trees north east of the lake and enter the cave there. Bring combat gear.",
 			axe);
+		((ObjectStep) enterCave).addTileMarker(new WorldPoint(2802, 3703, 0), SpriteID.COMBAT_STYLE_AXE_CHOP);
+		((ObjectStep) enterCave).addTileMarker(new WorldPoint(2807, 3703, 0), SpriteID.COMBAT_STYLE_AXE_CHOP);
 
 		talkToKendal = new NpcStep(this, NpcID.THE_KENDAL, new WorldPoint(2788, 10081, 0),
 			"Speak to the Kendal, then kill him.");
@@ -360,16 +369,14 @@ public class MountainDaughter extends BasicQuestHelper
 
 		grabCorpse = new TileStep(this, new WorldPoint(2784, 10078, 0), "Pick up the Corpse of Woman.");
 		bringCorpseToHamal = new NpcStep(this, NpcID.HAMAL_THE_CHIEFTAIN, new WorldPoint(2810, 3672, 0),
-			"Bring the corpse to Hamal.",
-			corpse);
+			"Bring the corpse to Hamal.", corpse);
 		bringCorpseToHamal.addDialogStep("But he's not a god!");
 		bringCorpseToHamal.addDialogStep("I will.");
 
-		collectRocks = new DetailedQuestStep(this, "Collect 5 Muddy Rocks from around the camp.", muddyRocks);
+		collectRocks = new DetailedQuestStep(this, "Collect 5 Muddy Rocks from around the camp.", muddyRocks5);
 
 		speakRagnar = new NpcStep(this, NpcID.RAGNAR, new WorldPoint(2766, 3676, 0),
-			"Speak to Ragnar.",
-			corpse, muddyRocks);
+			"Speak to Ragnar.", corpse, muddyRocks5);
 		speakRagnar.addDialogStep("Thank you. I will make sure she's given a proper burial now.");
 
 		buryCorpseOnIsland = new TileStep(this, new WorldPoint(2782, 3694, 0), "Return to the centre of the lake and bury the corpse.",
@@ -377,7 +384,7 @@ public class MountainDaughter extends BasicQuestHelper
 
 		createCairn = new ObjectStep(this, ObjectID.BURIAL_MOUND, new WorldPoint(2783, 3694, 0),
 			"Use the Muddy rocks on the Burial Mound at the centre of the Mountain Camp's lake.",
-			muddyRocks);
+			muddyRocks5);
 		createCairn.addIcon(ItemID.MUDDY_ROCK);
 	}
 
@@ -444,7 +451,7 @@ public class MountainDaughter extends BasicQuestHelper
 		List<PanelDetails> allSteps = new ArrayList<>();
 
 		allSteps.add(new PanelDetails("Speak to Hamal", Arrays.asList(enterCamp, talkToHamal), rope, plank, pickaxe));
-		allSteps.add(new PanelDetails("Go to the centre of the lake", Arrays.asList(digUpMud, rubMudIntoTree, climbTree,
+		allSteps.add(new PanelDetails("Go to the centre of the lake", Arrays.asList(digUpMud, pickupPole, rubMudIntoTree, climbTree,
 			poleVaultRocks, plankRocks, listenToSpirit)));
 		allSteps.add(new PanelDetails("Find out how to help", Arrays.asList(talkToHamalAfterSpirit, talkToJokul)));
 		allSteps.add(new PanelDetails("Making peace with Rellekka", Arrays.asList(talkToSvidi, speakToBrundt, getRockFragment, returnToBrundt, returnToSvidi)));

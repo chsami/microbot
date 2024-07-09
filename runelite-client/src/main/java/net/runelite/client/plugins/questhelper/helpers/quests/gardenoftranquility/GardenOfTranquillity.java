@@ -24,34 +24,43 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.gardenoftranquility;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.NoItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.util.ItemSlots;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.GARDEN_OF_TRANQUILLITY
-)
 public class GardenOfTranquillity extends BasicQuestHelper
 {
 	ItemRequirement ringOfCharos, rake, dibber, spade, secateurs, wateringCan, trowel, plantCure2, marigoldSeed,
@@ -105,7 +114,7 @@ public class GardenOfTranquillity extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 
@@ -207,7 +216,7 @@ public class GardenOfTranquillity extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		ringOfCharos = new ItemRequirement("Ring of Charos", ItemID.RING_OF_CHAROS).isNotConsumed();
 		rake = new ItemRequirement("Rake", ItemID.RAKE).isNotConsumed();
@@ -381,16 +390,16 @@ public class GardenOfTranquillity extends BasicQuestHelper
 			"Talk to the Wise Old Man in Draynor Village.", ringOfCharos);
 		talkToWom.addDialogSteps("Queen Ellamaria has sent me to seek your guidance.", "I have returned to you with " +
 			"the Ring of Charos.", "Can I retake the diplomacy test?");
-		talkToWom.addWidgetChoice("Show them a range of colours so that they can come to a compromise.", 162, 562, 133);
-		talkToWom.addWidgetChoice("Take his generous gift even though you have no need for it.", 162, 562, 133);
-		talkToWom.addWidgetChoice("It's absolutely, unquestionably the most interesting thing I've ever done!", 162, 562, 133);
-		talkToWom.addWidgetChoice("Put on the silly helmet and jump into the cannon.", 162, 562, 133);
-		talkToWom.addWidgetChoice("Put on the silly helmet and jump into the cannon.", 162, 562, 133);
-		talkToWom.addWidgetChoice("You of course Pkmaster0036, no one could ever challenge your greatness!", 162, 562
+		talkToWom.addWidgetChoice("Show them a range of colours so that they can come to a compromise.", 162, 565, 133);
+		talkToWom.addWidgetChoice("Take his generous gift even though you have no need for it.", 162, 565, 133);
+		talkToWom.addWidgetChoice("It's absolutely, unquestionably the most interesting thing I've ever done!", 162, 565, 133);
+		talkToWom.addWidgetChoice("Put on the silly helmet and jump into the cannon.", 162, 565, 133);
+		talkToWom.addWidgetChoice("Put on the silly helmet and jump into the cannon.", 162, 565, 133);
+		talkToWom.addWidgetChoice("You of course Pkmaster0036, no one could ever challenge your greatness!", 162, 565
 			, 133);
-		talkToWom.addWidgetChoice("I'll do whatever you ask - I just love the monarchy!", 162, 562, 133);
+		talkToWom.addWidgetChoice("I'll do whatever you ask - I just love the monarchy!", 162, 565, 133);
 		talkToWom.addWidgetChoice("No, especially not that wise old man, who doesn't look at all suspicious.", 162,
-			562, 133);
+			565, 133);
 
 		talkToElstan = new NpcStep(this, NpcID.ELSTAN, new WorldPoint(3056, 3311, 0),
 			"Talk to Elstan north west of Draynor Village.", ringOfCharosA.equipped());

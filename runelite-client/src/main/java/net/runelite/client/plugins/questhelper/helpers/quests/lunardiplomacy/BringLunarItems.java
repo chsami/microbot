@@ -1,8 +1,8 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.lunardiplomacy;
 
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.api.ItemID;
@@ -59,7 +59,6 @@ public class BringLunarItems extends NpcStep
 		updateStep();
 	}
 
-	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{

@@ -494,7 +494,8 @@
 2594 3209 0	2597 3208 1	Climb-up Staircase 16671				1	
 2595 3210 0	2597 3208 1	Climb-up Staircase 16671				1	
 2596 3210 0	2597 3208 1	Climb-up Staircase 16671				1	
-							
+2675 3300 0	2675 3300 1	Climb-up Staircase 16671				1
+
 # Ardougne Sewers							
 2587 3237 0	2570 9682 0	Enter Cave entrance 2852					
 2570 9682 0	2587 3237 0	Climb-up Stairs 2853					
@@ -628,6 +629,12 @@
 2570 9668 0	2570 3268 0	Climb-up Ladder 17385				2	
 2571 3267 0	2571 9667 0	Climb-down Ladder 17384				2	
 2571 9667 0	2571 3267 0	Climb-up Ladder 17385				2	
+2674 3299 0	2675 3300 1	Climb-up Staircase 16671				1	
+2675 3300 1	2674 3299 0	Climb-down Staircase 16673				1	
+2674 3304 0	2674 3303 0	Pick-lock Door 11720				2	
+2674 3305 0	2674 3306 0	Pick-lock Door 11719				2	
+2674 3303 0	2674 3304 0	Open Door 11720				1	
+2674 3306 0	2674 3305 0	Open Door 11719				1	
 							
 # West Ardougne							
 2559 3300 0	2556 3300 0	Open Ardougne Wall Door 8739					
@@ -1338,10 +1345,10 @@
 2557 9844 0	2557 3444 0	Climb-up Ladder 17387				2	
 							
 # Tree Gnome Village Dungeon (during Waterfall quest)							
-2533 3156 0	2533 9556 0	Climb-down Ladder 5250			Waterfall Quest		
-2534 3155 0	2534 9555 0	Climb-down Ladder 5250			Waterfall Quest		
-2532 3155 0	2532 9555 0	Climb-down Ladder 5250			Waterfall Quest		
-2533 9556 0	2533 3156 0	Climb-up Ladder 17387			Waterfall Quest		
+2533 3156 0	2533 9556 0	Climb-down Ladder 5250
+2534 3155 0	2534 9555 0	Climb-down Ladder 5250
+2532 3155 0	2532 9555 0	Climb-down Ladder 5250
+2533 9556 0	2533 3156 0	Climb-up Ladder 17387
 							
 # Tree Gnome Village Dungeon (after Waterfall quest)							
 2533 3156 0	2597 4436 0	Climb-down Ladder 5250			Waterfall Quest		
@@ -4418,3 +4425,27 @@
 2591 3088 0	2591 3092 1	Climb-up Staircase 15645
 2591 3092 1	2590 3088 0	Climb-down Staircase 15648
 2590 3092 1	2590 3088 0	Climb-down Staircase 15648
+
+# Asgarnian ice dungeon
+3008 9550 0	3007 3150 0	Climb-up Ladder 17385
+3008 3150 0	3009 9550 0	Climb-down Trapdoor 1738
+
+# Sawmill
+3310 3508 1	3310 3508 0	Climb-down Ladder 11795
+3310 3508 0	3310 3508 1	Climb-up Ladder 11794
+
+# Desert mining camp
+3290 3035 0	3290 3035 1	Climb-up Ladder 18903
+3290 3037 1	3290 3037 0	Climb-down Ladder 18904
+
+# Kovac
+3366 11483 0	3361 3148 0	Exit Exit 44636
+3361 3148 0	3366 11483 0	Enter Cave 44635
+
+# Hazeel cult
+2567 9680 0	2606 9692 0	Board Raft 2849
+2606 9692 0	2567 9680 0	Board Raft 2849
+
+# Murder mystery
+2736 3580 1	2736 3580 0	Climb-down Staircase 25683
+2736 3580 0	2736 3580 1	Climb-up Staircase 25682

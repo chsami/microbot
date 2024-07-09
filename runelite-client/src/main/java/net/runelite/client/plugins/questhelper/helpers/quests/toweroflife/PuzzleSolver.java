@@ -24,13 +24,13 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.toweroflife;
 
-import net.runelite.client.plugins.questhelper.steps.WidgetDetails;
+import net.runelite.client.plugins.questhelper.steps.widget.WidgetDetails;
+import java.util.List;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.function.Function;
 
 public class PuzzleSolver
@@ -219,34 +219,33 @@ public class PuzzleSolver
 
 			for (PipeSolverSolution soln : pipeSolverSolutions)
 			{
-				if (soln.isSelected())
+				if ((soln.isRight() || soln.isLeft() || soln.isBelow() || soln.isAbove()) && !soln.isSelected())
 				{
-					if (!soln.isSelected())
-					{
-						highlights.add(soln.pieceInfo);
-					}
-					else if (!soln.isOriented())
-					{ //Rotate
-						highlights.add(PIPE_CTRL_ROTATE);
-					}
-					else if (soln.isRight())
-					{ //Align horizontal
-						highlights.add(PIPE_CTRL_LEFT);
-					}
-					else if (soln.isLeft())
-					{ //Align horizontal
-						highlights.add(PIPE_CTRL_RIGHT);
-					}
-					else if (soln.isBelow())
-					{ //Align vertical
-						highlights.add(PIPE_CTRL_UP);
-					}
-					else if (soln.isAbove())
-					{ //Align vertical
-						highlights.add(PIPE_CTRL_DOWN);
-					}
-					return highlights;
+					highlights.add(soln.pieceInfo);
 				}
+				else if ((soln.isRight() || soln.isLeft() || soln.isBelow() || soln.isAbove()) && !soln.isOriented())
+				{ //Rotate
+					highlights.add(PIPE_CTRL_ROTATE);
+				}
+				else if (soln.isRight())
+				{ //Align horizontal
+					highlights.add(PIPE_CTRL_LEFT);
+				}
+				else if (soln.isLeft())
+				{ //Align horizontal
+					highlights.add(PIPE_CTRL_RIGHT);
+				}
+				else if (soln.isBelow())
+				{ //Align vertical
+					highlights.add(PIPE_CTRL_UP);
+				}
+				else if (soln.isAbove())
+				{ //Align vertical
+					highlights.add(PIPE_CTRL_DOWN);
+				}
+
+				if (!highlights.isEmpty())
+					return highlights;
 			}
 
 			return highlights;

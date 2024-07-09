@@ -24,25 +24,39 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.monkeymadnessii;
 
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.ChatMessageRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.PrayerRequirement;
-import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import net.runelite.api.ChatMessageType;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.NullObjectID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Player;
+import net.runelite.api.Prayer;
+import net.runelite.api.SpriteID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.util.*;
 
 public class AgilityDungeonSteps extends DetailedOwnerStep
 {
@@ -577,26 +591,26 @@ public class AgilityDungeonSteps extends DetailedOwnerStep
 	{
 		if (chatMessage.getType() == ChatMessageType.GAMEMESSAGE)
 		{
-			path1SouthIsWrongChat.validateCondition(client, chatMessage.getMessage());
-			path2NorthIsWrongChat.validateCondition(client, chatMessage.getMessage());
-			path2NorthIsWrongChat2.validateCondition(client, chatMessage.getMessage());
-			path3SouthIsWrongChat.validateCondition(client, chatMessage.getMessage());
-			path4NorthIsWrongChat.validateCondition(client, chatMessage.getMessage());
-			path5WestIsWrongChat.validateCondition(client, chatMessage.getMessage());
-			path5MiddleIsWrongChat.validateCondition(client, chatMessage.getMessage());
-			path5EastIsWrongChat.validateCondition(client, chatMessage.getMessage());
-			path5MiddleToEastWrongChat.validateCondition(client, chatMessage.getMessage());
-			path5MiddleToWestWrongChat.validateCondition(client, chatMessage.getMessage());
-			path5EastToMiddleWrongChat.validateCondition(client, chatMessage.getMessage());
-			path5WestToMiddleWrongChat.validateCondition(client, chatMessage.getMessage());
-			path6WestIsWrongChat.validateCondition(client, chatMessage.getMessage());
+			path1SouthIsWrongChat.validateCondition(client, chatMessage);
+			path2NorthIsWrongChat.validateCondition(client, chatMessage);
+			path2NorthIsWrongChat2.validateCondition(client, chatMessage);
+			path3SouthIsWrongChat.validateCondition(client, chatMessage);
+			path4NorthIsWrongChat.validateCondition(client, chatMessage);
+			path5WestIsWrongChat.validateCondition(client, chatMessage);
+			path5MiddleIsWrongChat.validateCondition(client, chatMessage);
+			path5EastIsWrongChat.validateCondition(client, chatMessage);
+			path5MiddleToEastWrongChat.validateCondition(client, chatMessage);
+			path5MiddleToWestWrongChat.validateCondition(client, chatMessage);
+			path5EastToMiddleWrongChat.validateCondition(client, chatMessage);
+			path5WestToMiddleWrongChat.validateCondition(client, chatMessage);
+			path6WestIsWrongChat.validateCondition(client, chatMessage);
 			for (MM2AgilityNodes mm2AgilityNode : fifthSectionMap)
 			{
 				for (int i = 0; i < mm2AgilityNode.getPaths().length; i++)
 				{
 					if (mm2AgilityNode.getPaths()[i] != null)
 					{
-						mm2AgilityNode.getPaths()[i].getWrongWay().validateCondition(client, chatMessage.getMessage());
+						mm2AgilityNode.getPaths()[i].getWrongWay().validateCondition(client, chatMessage);
 					}
 				}
 			}

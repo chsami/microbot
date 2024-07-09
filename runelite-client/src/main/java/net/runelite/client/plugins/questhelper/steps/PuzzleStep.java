@@ -1,18 +1,21 @@
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import lombok.Getter;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.steps.widget.WidgetDetails;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.util.HashSet;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-
-import java.awt.*;
-import java.util.HashSet;
 public class PuzzleStep extends DetailedQuestStep
 {
 
 	ButtonHighlighCalculator highlightCalculator;
+	@Getter
 	private HashSet<WidgetDetails> highlightedButtons = new HashSet<>();
 
 	public PuzzleStep(QuestHelper questHelper, ButtonHighlighCalculator highlightCalculator, Requirement... requirements)
@@ -40,7 +43,7 @@ public class PuzzleStep extends DetailedQuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, MQuestHelperPlugin plugin)
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 		for (WidgetDetails button : highlightedButtons)

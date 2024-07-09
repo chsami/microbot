@@ -44,6 +44,7 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.sideloading.MicrobotPluginManager;
 import net.runelite.client.rs.ClientLoader;
 import net.runelite.client.rs.ClientUpdateCheckMode;
 import net.runelite.client.ui.ClientUI;
@@ -71,9 +72,6 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.swing.*;
 import java.applet.Applet;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -86,7 +84,6 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -157,6 +154,9 @@ public class RuneLite {
     @Inject
     @Nullable
     private TelemetryClient telemetryClient;
+
+    @Inject
+    private MicrobotPluginManager microbotPluginManager;
 
     public static void main(String[] args) throws Exception {
         Locale.setDefault(Locale.ENGLISH);
@@ -396,6 +396,8 @@ public class RuneLite {
         pluginManager.loadCorePlugins();
         pluginManager.loadSideLoadPlugins();
         externalPluginManager.loadExternalPlugins();
+
+        microbotPluginManager.loadSideLoadPlugins();
 
         SplashScreen.stage(.70, null, "Finalizing configuration");
 
@@ -689,48 +691,4 @@ public class RuneLite {
         okHttpClientBuilder.sslSocketFactory(sc.getSocketFactory(), trustManager);
     }
     // endregion
-}
-
-
-class BlockingYesNoDialog extends JDialog {
-    private boolean result = false;
-
-    public BlockingYesNoDialog(Frame parent, String title, String message) {
-        super(parent, title, true);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout());
-
-        JLabel label = new JLabel(message);
-        panel.add(label);
-
-        JButton yesButton = new JButton("Yes");
-        yesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result = true;
-                setVisible(false);
-            }
-        });
-        panel.add(yesButton);
-
-        JButton noButton = new JButton("No");
-        noButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result = false;
-                setVisible(false);
-            }
-        });
-        panel.add(noButton);
-
-        getContentPane().add(panel);
-        pack();
-        setLocationRelativeTo(parent);
-    }
-
-    public boolean showDialog() {
-        setVisible(true);
-        return result;
-    }
 }

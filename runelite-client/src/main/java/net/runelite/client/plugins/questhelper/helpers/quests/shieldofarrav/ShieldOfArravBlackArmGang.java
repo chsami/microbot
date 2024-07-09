@@ -24,30 +24,34 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.shieldofarrav;
 
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
 import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.*;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG
-)
 public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 {
 	//Items Required
@@ -64,8 +68,7 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -96,7 +99,7 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		storeRoomKey = new ItemRequirement("Weapon store key", ItemID.WEAPON_STORE_KEY);
 		twoPhoenixCrossbow = new ItemRequirement("Phoenix crossbow", ItemID.PHOENIX_CROSSBOW, 2);
@@ -106,7 +109,8 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 		certificate = new ItemRequirement("Certificate", ItemID.CERTIFICATE);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		storeRoom = new Zone(new WorldPoint(3242, 3380, 1), new WorldPoint(3252, 3386, 1));
 		upstairsInBase = new Zone(new WorldPoint(3182, 3382, 1), new WorldPoint(3201, 3398, 1));
@@ -175,7 +179,7 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 	@Override
 	public List<ItemReward> getItemRewards()
 	{
-		return Collections.singletonList(new ItemReward("600 Coins", ItemID.COINS_995, 600));
+		return Collections.singletonList(new ItemReward("Coins", ItemID.COINS_995, 600));
 	}
 
 	@Override

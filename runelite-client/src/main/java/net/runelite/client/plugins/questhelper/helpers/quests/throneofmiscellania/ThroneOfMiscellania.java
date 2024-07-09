@@ -24,33 +24,39 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.throneofmiscellania;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.client.plugins.questhelper.steps.emote.QuestEmote;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.EmoteStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
+import net.runelite.client.plugins.questhelper.steps.emote.QuestEmote;
 import java.util.*;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.THRONE_OF_MISCELLANIA
-)
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+
 public class ThroneOfMiscellania extends BasicQuestHelper
 {
 	//Items Required
@@ -58,14 +64,14 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 		giantNib, giantPen, goodAnthem, awfulAnthem, treaty;
 
 	//Items Recommended
-	ItemRequirement dramenStaff;
+	ItemRequirement runRestoreItems, dramenStaff, rellekkaTeleport;
 
 	Requirement inIslands, inMiscCastleFirstFloor, inEtcCastleFirstFloor, inAstridRoom, inBrandRoom,
 		talked1P1, talked1P2, talked1P3, givenFlowers, doneEmote, talked1P4, talked2P1, talked2P2, talked2P3, givenBowOrCake,
 		talked2P4, talked3P1, talked3P2, talked3P3, blownKiss, diplomacyStep1, diplomacyStep2, diplomacyStep3, diplomacyStep4,
-		diplomacyStep5, diplomacyStep6, hasCourted, has75Support;
+		diplomacyStep5, diplomacyStep6, hasCourted, has75Support, courtingBrand;
 
-	QuestStep travelToMisc, talkToVargas, getFlowers, goUpToVargas, talkAstrid1, talkAstrid2, talkAstrid3,
+	DetailedQuestStep travelToMisc, talkToVargas, getFlowers, goUpToVargas, talkAstrid1, talkAstrid2, talkAstrid3,
 		talkBrand1, talkBrand2, talkBrand3, giveFlowersToAstrid, giveFlowersToBrand, giveBowToAstrid,
 		giveCakeToBrand, clapForBrand, danceForAstrid, goUpstairsToBrand, blowKissToAstrid, blowKissToBrand, useRingOnAstrid,
 		useRingOnBrand, goUpstairsToAstrid, goUpEtcDip1, talkToSigridDip1, goDownEtcDip1, goUpMiscDip1, talkToVargasDip1, goDownMiscDip1,
@@ -81,8 +87,7 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -160,7 +165,8 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 
 		ConditionalStep courting;
 
-		courting = courtAstrid;
+		courting = new ConditionalStep(this, courtAstrid);
+		courting.addStep(courtingBrand, courtBrand);
 
 		// TODO: Add toggle for Brand once confirmed what's up with new progression
 
@@ -201,7 +207,7 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		ironBar = new ItemRequirement("Iron bar", ItemID.IRON_BAR);
 		logs = new ItemRequirement("Logs", ItemID.LOGS);
@@ -217,38 +223,48 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 		flowers = new ItemRequirement("Flowers", ItemCollections.FLOWERS);
 		flowers.setTooltip("You can buy some from the Flower Girl on Miscellania for 15 coins");
 		flowers.setHighlightInInventory(true);
-		cake = new ItemRequirement("Cake", ItemID.CAKE);
+		cake = new ItemRequirement("Cake (if courting Brand)", ItemID.CAKE);
 		cake.addAlternates(ItemID.CHOCOLATE_CAKE);
-		bow = new ItemRequirement("Any normal/oak/willow/maple/yew shortbow or longbow", ItemID.SHORTBOW);
+		bow = new ItemRequirement("Any normal/oak/willow/maple/yew shortbow or longbow (if courting Astrid)", ItemID.SHORTBOW);
 		bow.addAlternates(ItemID.LONGBOW, ItemID.OAK_SHORTBOW, ItemID.OAK_LONGBOW, ItemID.WILLOW_SHORTBOW, ItemID.WILLOW_LONGBOW, ItemID.MAPLE_SHORTBOW, ItemID.MAPLE_LONGBOW, ItemID.YEW_SHORTBOW, ItemID.YEW_LONGBOW);
 		bow.setTooltip("You will lose this bow");
 		bow.setHighlightInInventory(true);
+		runRestoreItems = new ItemRequirement("Potions/Items to restore run energy", ItemCollections.RUN_RESTORE_ITEMS);
 		dramenStaff = new ItemRequirement("Dramen staff if travelling via Fairy Ring CIP", ItemCollections.FAIRY_STAFF).isNotConsumed();
+		rellekkaTeleport = new ItemRequirement("Miscellania teleport (Fairy Ring (CIP), tablet, lyre)", ItemCollections.FAIRY_STAFF);
+		rellekkaTeleport.addAlternates(ItemID.RELLEKKA_TELEPORT, ItemID.ENCHANTED_LYREI, ItemID.ENCHANTED_LYRE5, ItemID.ENCHANTED_LYRE4, ItemID.ENCHANTED_LYRE3, ItemID.ENCHANTED_LYRE2, ItemID.ENCHANTED_LYRE1);
+
 		giantNib = new ItemRequirement("Giant nib", ItemID.GIANT_NIB);
 		giantNib.setHighlightInInventory(true);
 		giantPen = new ItemRequirement("Giant pen", ItemID.GIANT_PEN);
 		awfulAnthem = new ItemRequirement("Awful anthem", ItemID.AWFUL_ANTHEM);
 		goodAnthem = new ItemRequirement("Good anthem", ItemID.GOOD_ANTHEM);
 		treaty = new ItemRequirement("Treaty", ItemID.TREATY);
-		
-		String repItemsString = "One of: ";
+
+		reputationItems = new ItemRequirement("One of: ", ItemID.LOBSTER_POT);
 		if (client.getRealSkillLevel(Skill.FARMING) >= 10)
 		{
-			repItemsString += "a rake, ";
+			reputationItems.setName(reputationItems.getName() + "a rake, ");
+			// Set ID so it's first recommended item
+			reputationItems.setId(ItemID.RAKE);
 		}
 		if (client.getRealSkillLevel(Skill.MINING) >= 30)
 		{
-			repItemsString += "a pickaxe, ";
+			reputationItems.setName(reputationItems.getName() + "a pickaxe, ");
+			reputationItems.addAlternates(ItemCollections.PICKAXES);
 		}
 		if (client.getRealSkillLevel(Skill.WOODCUTTING) >= 45)
 		{
-			repItemsString += "an axe, ";
+			reputationItems.setName(reputationItems.getName() + "an axe, ");
+			reputationItems.addAlternates(ItemCollections.AXES);
 		}
-		repItemsString += "a harpoon or lobster pot.";
-		reputationItems = new ItemRequirement(repItemsString, -1, -1);
+		// The player requires Heroes' Quest, thus can do this
+		reputationItems.setName(reputationItems.getName() + "a harpoon or lobster pot.");
+		reputationItems.addAlternates(ItemID.HARPOON, ItemID.LOBSTER_POT);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		islands = new Zone(new WorldPoint(2491, 3835, 0), new WorldPoint(2627, 3904, 3));
 		miscCastleFirstFloor = new Zone(new WorldPoint(2497, 3845, 1), new WorldPoint(2511, 3875, 1));
@@ -266,6 +282,9 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 		inEtcCastleFirstFloor = new ZoneRequirement(etcCastleFirstFloor);
 		inBrandRoom = new ZoneRequirement(brandRoom1, brandRoom2);
 		inAstridRoom = new ZoneRequirement(astridRoom1, astridRoom2);
+
+		// Chose Brand, 14607 0->1
+		courtingBrand = new VarbitRequirement(14607, 1);
 
 		talked1P1 = new VarbitRequirement(85, 1);
 		talked1P2 = new VarbitRequirement(86, 1);
@@ -301,16 +320,17 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 	{
 		String travelText = "Travel to Miscellania. You can take a boat from Rellekka. You can also use Fairy Rings to teleport there with the code CIP If you've unlocked them.";
 		travelToMisc = new NpcStep(this, NpcID.SAILOR_3936, new WorldPoint(2629, 3693, 0), travelText);
+		travelToMisc.addTeleport(rellekkaTeleport);
 		getFlowers = new NpcStep(this, NpcID.FLOWER_GIRL, new WorldPoint(2511, 3865, 0), "Buy some flowers from the Flower Girl for 15gp.");
 		getFlowers.addDialogStep("Yes, please.");
 		goUpToVargas = new ObjectStep(this, ObjectID.STAIRCASE_16675, new WorldPoint(2506, 3849, 0), "Go upstairs in the Miscellania castle.");
-		talkToVargas = new NpcStep(this, NpcID.KING_VARGAS, new WorldPoint(2501, 3860, 1), "Talk to King Vargas.");
-		talkToVargas.addDialogStep("If I may be so bold...");
+		talkToVargas = new NpcStep(this, NpcID.KING_VARGAS, new WorldPoint(2501, 3860, 1), "Talk to King Vargas. You can choose whether to get Brand's or Astrid's approval");
+		talkToVargas.addDialogSteps("Yes.", "If I may be so bold...");
 		talkToVargas.addSubSteps(goUpToVargas);
 
 		/* Winning over Astrid */
 		talkAstrid1 = new NpcStep(this, NpcID.PRINCESS_ASTRID, new WorldPoint(2502, 3867, 1), "Talk to Princess Astrid a few times.");
-		talkAstrid1.addDialogStep("Archery is a noble Art!");
+		talkAstrid1.addDialogStep("Archery is a noble art!");
 		talkAstrid1.addDialogStep("He's been very helpful.");
 		talkAstrid1.addDialogStep("Hahahaha!");
 
@@ -325,12 +345,17 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 		talkAstrid3.addDialogStep("And what a great bard he makes!");
 
 		giveFlowersToAstrid = new NpcStep(this, NpcID.PRINCESS_ASTRID, new WorldPoint(2502, 3867, 1), "Use flowers on Astrid.", flowers);
+		giveFlowersToAstrid.addIcon(ItemID.MIXED_FLOWERS);
 		giveFlowersToAstrid.addDialogStep("Yes");
-		giveBowToAstrid = new NpcStep(this, NpcID.PRINCESS_ASTRID, new WorldPoint(2502, 3867, 1), "Use any bow on Astrid.", bow);
+		giveBowToAstrid = new NpcStep(this, NpcID.PRINCESS_ASTRID, new WorldPoint(2502, 3867, 1),
+			"Use any bow on Astrid.", bow.highlighted());
+		giveBowToAstrid.addIcon(ItemID.SHORTBOW);
 		giveBowToAstrid.addDialogStep("Yes");
 		danceForAstrid = new EmoteStep(this, QuestEmote.DANCE, "Dance in Princess Astrid's room.");
 		blowKissToAstrid = new EmoteStep(this, QuestEmote.BLOW_KISS, "Blow kiss emote next to Princess Astrid.");
-		useRingOnAstrid = new NpcStep(this, NpcID.PRINCESS_ASTRID, new WorldPoint(2502, 3867, 1), "Use a ring on Astrid.", ring);
+		useRingOnAstrid = new NpcStep(this, NpcID.PRINCESS_ASTRID, new WorldPoint(2502, 3867, 1),
+			"Use a ring on Astrid.", ring.highlighted());
+		useRingOnAstrid.addIcon(ItemID.GOLD_RING);
 		useRingOnAstrid.addDialogStep("Yes");
 
 		talkBrand1 = new NpcStep(this, NpcID.PRINCE_BRAND, new WorldPoint(2502, 3852, 1), "Talk to Prince Brand a few times.");
@@ -348,11 +373,18 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 		talkBrand3.addDialogStep("I wouldn't presume to have the skill...");
 		talkBrand3.addDialogStep("That was lovely. I'm touched!");
 
-		giveCakeToBrand = new NpcStep(this, NpcID.PRINCE_BRAND, new WorldPoint(2502, 3852, 1), "Give Prince Brand a cake.", cake);
+		giveCakeToBrand = new NpcStep(this, NpcID.PRINCE_BRAND, new WorldPoint(2502, 3852, 1),
+			"Give Prince Brand a cake.", cake.highlighted());
+		giveCakeToBrand.addDialogStep("Yes");
 		giveFlowersToBrand = new NpcStep(this, NpcID.PRINCE_BRAND, new WorldPoint(2502, 3852, 1), "Use flowers on Prince Brand.", flowers);
+		giveFlowersToBrand.addDialogStep("Yes");
+		giveFlowersToBrand.addIcon(ItemID.MIXED_FLOWERS);
 		blowKissToBrand = new EmoteStep(this, QuestEmote.BLOW_KISS, "Use the blow kiss emote next to Prince Brand");
 		clapForBrand = new EmoteStep(this, QuestEmote.CLAP, "Use the Clap emote next to Prince Brand");
-		useRingOnBrand = new NpcStep(this, NpcID.PRINCE_BRAND, new WorldPoint(2502, 3852, 1), "Use a ring on Prince Brand.", ring);
+		useRingOnBrand = new NpcStep(this, NpcID.PRINCE_BRAND, new WorldPoint(2502, 3852, 1),
+			"Use a ring on Prince Brand.", ring.highlighted());
+		useRingOnBrand.addDialogStep("Yes");
+		useRingOnBrand.addIcon(ItemID.GOLD_RING);
 
 		goUpstairsToBrand = new ObjectStep(this, ObjectID.STAIRCASE_16675, new WorldPoint(2506, 3849, 0), "Go upstairs in the Miscellania castle.");
 		goUpstairsToBrand.setShowInSidebar(false);
@@ -381,6 +413,7 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 		talkToBrandDip.addSubSteps(goDownEtcDip2, goUpMiscDip2, getAnotherAwfulAnthem);
 
 		talkToGhrimDip = new NpcStep(this, NpcID.ADVISOR_GHRIM, new WorldPoint(2499, 3857, 1), "Talk to Advisor Ghrim.");
+		talkToGhrimDip.addDialogStep("How do I make peace with Etceteria?");
 
 		goDownMiscDip2 = new ObjectStep(this, ObjectID.STAIRCASE_16676, new WorldPoint(2506, 3849, 1), "Go downstairs and return to Queen Sigrid.");
 		goDownMiscDip2.addDialogStep("Climb down the stairs.");
@@ -445,7 +478,7 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 		reqs.add(flowers);
 
 		reqs.add(bow);
-//		reqs.add(cake);
+		reqs.add(cake);
 		reqs.add(reputationItems);
 		return reqs;
 	}
@@ -464,6 +497,7 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
 		reqs.add(dramenStaff);
+		reqs.add(runRestoreItems);
 		return reqs;
 	}
 
@@ -498,29 +532,27 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 	public List<PanelDetails> getPanels()
 	{
 		List<PanelDetails> allSteps = new ArrayList<>();
-		ItemRequirement giftItem;
-		giftItem = bow;
 
 		allSteps.add(new PanelDetails("Talk to King Vargas", Arrays.asList(travelToMisc, getFlowers,
-			talkToVargas), flowers, giftItem, ring, ironBar, logs, reputationItems));
+			talkToVargas), flowers, bow, cake, ring, ironBar, logs, reputationItems));
 
 		PanelDetails astridPanel = new PanelDetails("Win over Astrid",
 			Arrays.asList(goUpstairsToAstrid, talkAstrid1, giveFlowersToAstrid, danceForAstrid, talkAstrid2,
 				giveBowToAstrid, talkAstrid3, blowKissToAstrid, useRingOnAstrid));
 
-//		PanelDetails brandPanel = new PanelDetails("Win over Brand",
-//			Arrays.asList(goUpstairsToBrand, talkBrand1, giveFlowersToBrand, clapForBrand, talkBrand2,
-//				giveCakeToBrand, talkBrand3, blowKissToBrand, useRingOnBrand));
+		PanelDetails brandPanel = new PanelDetails("Win over Brand",
+			Arrays.asList(goUpstairsToBrand, talkBrand1, giveFlowersToBrand, clapForBrand, talkBrand2,
+				giveCakeToBrand, talkBrand3, blowKissToBrand, useRingOnBrand));
 
 
 		allSteps.add(astridPanel);
-//		allSteps.add(brandPanel);
+		allSteps.add(brandPanel);
 
 		allSteps.add(new PanelDetails("Establish peace",
 			Arrays.asList(talkToSigridDip1, talkToVargasDip1, talkToSigridDip2, talkToBrandDip, talkToGhrimDip, talkToSigridDip3, talkToVargasDip2,
 				talkToDerrik, makePen, giveVargasPen)));
 
-		allSteps.add(new PanelDetails("Get support", Arrays.asList(get75Support, finishQuest)));
+		allSteps.add(new PanelDetails("Get support", Arrays.asList(get75Support, finishQuest), reputationItems));
 		return allSteps;
 	}
 }

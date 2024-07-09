@@ -41,15 +41,13 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 @SuppressWarnings("unused")
 @Slf4j
 public class Rs2Bank {
-    public static List<Rs2Item> bankItems = new ArrayList<Rs2Item>();
     private static final int X_AMOUNT_VARBIT = 3960;
     private static final int SELECTED_OPTION_VARBIT = 6590;
     private static final int HANDLE_X_SET = 5;
     private static final int HANDLE_X_UNSET = 6;
     private static final int HANDLE_ALL = 7;
     private static final int WITHDRAW_AS_NOTE_VARBIT = 3958;
-
-
+    public static List<Rs2Item> bankItems = new ArrayList<Rs2Item>();
     /**
      * Container describes from what interface the action happens
      * eg: withdraw means the contailer will be the bank container
@@ -194,7 +192,25 @@ public class Rs2Bank {
         Rs2Item rs2Item = findBankItem(id);
         if (rs2Item == null) return false;
         log.info("Item: " + rs2Item.name + " Amount: " + rs2Item.quantity);
-        return findBankItem(Objects.requireNonNull(rs2Item).name, false, amount) != null;
+        return findBankItem(Objects.requireNonNull(rs2Item).name, true, amount) != null;
+    }
+
+    /**
+     * Query count of item inside of bank
+     *
+     */
+    public static int count(String name, boolean exact) {
+        Rs2Item bankItem = findBankItem(name, exact);
+        if (bankItem == null) return 0;
+        return bankItem.quantity;
+    }
+
+    /**
+     * Query count of item inside of bank
+     *
+     */
+    public static int count(String name) {
+        return count(name, false);
     }
 
     /**
@@ -835,7 +851,7 @@ public class Rs2Bank {
             if (bank == null) {
                 GameObject chest = Rs2GameObject.findChest();
                 if (chest == null) {
-                    NPC npc = Rs2Npc.getNpc("banker");
+                    NPC npc = Rs2Npc.getBankerNPC();
                     if (npc == null) return false;
                     action = Rs2Npc.interact(npc, "bank");
                 } else {
@@ -991,7 +1007,7 @@ public class Rs2Bank {
         BankLocation nearest = null;
         double dist = Double.MAX_VALUE;
         int y = Microbot.getClient().getLocalPlayer().getWorldLocation().getY();
-        boolean isInCave = Microbot.getClient().getLocalPlayer().getWorldLocation().getY() > 9000;
+        boolean isInCave = y > 9000;
         if (isInCave) {
             y -= 6300; //minus -6300 to set y to the surface
         }
@@ -1017,8 +1033,8 @@ public class Rs2Bank {
         Rs2Player.toggleRunEnergy(true);
         BankLocation bankLocation = getNearestBank();
         Microbot.status = "Walking to nearest bank " + bankLocation.toString();
-        Rs2Walker.walkTo(bankLocation.getWorldPoint());
-        return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
+        Rs2Walker.walkTo(bankLocation.getWorldPoint(), 4);
+        return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;
     }
 
     //Distance to bank
@@ -1038,7 +1054,7 @@ public class Rs2Bank {
         Rs2Player.toggleRunEnergy(true);
         BankLocation bankLocation = getNearestBank();
         Microbot.status = "Walking to nearest bank " + bankLocation.toString();
-        boolean result = bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
+        boolean result = bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
         if (result) {
             return Rs2Bank.useBank();
         } else {
@@ -1082,14 +1098,15 @@ public class Rs2Bank {
     }
 
     /**
-     * Banks items if your inventory is full. Will walk back to the initialplayerlocation passed as param
+     * Banks items if your inventory not enough emptyslots. Will walk back to the initialplayerlocation passed as param
      *
      * @param itemNames
      * @param initialPlayerLocation
+     * @param emptySlotCount
      * @return
      */
-    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
-        if (Rs2Inventory.isFull()) {
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount) {
+        if (Rs2Inventory.getEmptySlots() <= emptySlotCount) {
             boolean isBankOpen = Rs2Bank.walkToBankAndUseBank();
             if (isBankOpen) {
                 for (String itemName : itemNames) {
@@ -1101,11 +1118,25 @@ public class Rs2Bank {
 
         final int distance = 4;
 
-        if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > 10) {
+        if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > distance) {
             Rs2Walker.walkTo(initialPlayerLocation, distance);
         }
+        else {
+            Rs2Walker.walkFastCanvas(initialPlayerLocation);
+        }
 
-        return !Rs2Inventory.isFull() && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
+        return !(Rs2Inventory.getEmptySlots() <= emptySlotCount) && initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) <= distance;
+    }
+
+    /**
+     * Banks items if your inventory is full. Will walk back to the initialplayerlocation passed as param
+     *
+     * @param itemNames
+     * @param initialPlayerLocation
+     * @return
+     */
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
+        return bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation, 0);
     }
 
     /**

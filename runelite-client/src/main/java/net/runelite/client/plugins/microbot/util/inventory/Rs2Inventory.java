@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -22,7 +23,10 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,15 +37,15 @@ public class Rs2Inventory {
 
     // The maximum capacity of the inventory
     private static final int CAPACITY = 28;
+    private static final int COLUMNS = 4;
+    private static final int ROWS = 7;
+    public static List<Rs2Item> inventoryItems = new ArrayList<>();
+    private static boolean isTrackingInventory = false;
+    private static boolean isInventoryChanged = false;
 
     public static ItemContainer inventory() {
         return Microbot.getClient().getItemContainer(InventoryID.INVENTORY);
     }
-
-    public static List<Rs2Item> inventoryItems = new ArrayList<>();
-
-    private static boolean isTrackingInventory = false;
-    private static boolean isInventoryChanged = false;
 
     public static void storeInventoryItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == InventoryID.INVENTORY.getId() && e.getItemContainer() != null) {
@@ -128,9 +132,96 @@ public class Rs2Inventory {
      */
     public static boolean combine(Rs2Item primary, Rs2Item secondary) {
         boolean primaryItemInteracted = use(primary);
-        sleep(100);
+        sleep(100, 175);
         boolean secondaryItemInteracted = use(secondary);
         return primaryItemInteracted && secondaryItemInteracted;
+    }
+
+    /**
+     * Combines the closest items in the inventory based on their names.
+     * <p>
+     * This method searches for items in the inventory by their names, then finds the pair of primary and
+     * secondary items with the smallest slot difference and combines them.
+     * <p>
+     * For combining items by their IDs, see {@link #combineClosest(int, int) combineClosest}.
+     *
+     * @param primaryItemName   the name of the primary item to combine
+     * @param secondaryItemName the name of the secondary item to combine
+     * @return true if the items were successfully combined, false otherwise
+     */
+    public static boolean combineClosest(String primaryItemName, String secondaryItemName) {
+        List<Rs2Item> primaryItems = items().stream().filter(x -> x.name.equalsIgnoreCase(primaryItemName)).collect(Collectors.toList());
+        List<Rs2Item> secondaryItems = items().stream().filter(x -> x.name.equalsIgnoreCase(secondaryItemName)).collect(Collectors.toList());
+
+        if (primaryItems.isEmpty() || secondaryItems.isEmpty()) return false;
+
+        Rs2Item closestPrimaryItem = null;
+        Rs2Item closestSecondaryItem = null;
+        int minSlotDifference = Integer.MAX_VALUE;
+
+        // Compare each primary item with each secondary item to find the closest slots
+        for (Rs2Item primaryItem : primaryItems) {
+            for (Rs2Item secondaryItem : secondaryItems) {
+                int slotDifference = calculateSlotDifference(primaryItem.slot, secondaryItem.slot);
+                if (slotDifference <= minSlotDifference) {
+                    minSlotDifference = slotDifference;
+                    closestPrimaryItem = primaryItem;
+                    closestSecondaryItem = secondaryItem;
+                }
+            }
+        }
+
+        return combine(closestPrimaryItem, closestSecondaryItem);
+    }
+
+    /**
+     * Combines the closest items in the inventory based on their IDs.
+     * <p>
+     * This method searches for items in the inventory by their IDs, then finds the pair of primary and
+     * secondary items with the smallest slot difference and combines them.
+     * <p>
+     * For combining items by their names, see {@link #combineClosest(String, String) combineClosest}.
+     *
+     * @param primaryItemId   the ID of the primary item to combine
+     * @param secondaryItemId the ID of the secondary item to combine
+     * @return true if the items were successfully combined, false otherwise
+     */
+    public static boolean combineClosest(int primaryItemId, int secondaryItemId) {
+        List<Rs2Item> primaryItems = items().stream().filter(x -> x.id == primaryItemId).collect(Collectors.toList());
+        List<Rs2Item> secondaryItems = items().stream().filter(x -> x.id == secondaryItemId).collect(Collectors.toList());
+
+        if (primaryItems.isEmpty() || secondaryItems.isEmpty()) return false;
+
+        Rs2Item closestPrimaryItem = null;
+        Rs2Item closestSecondaryItem = null;
+        int minSlotDifference = Integer.MAX_VALUE;
+
+        // Compare each primary item with each secondary item to find the closest slots
+        for (Rs2Item primaryItem : primaryItems) {
+            for (Rs2Item secondaryItem : secondaryItems) {
+                int slotDifference = calculateSlotDifference(primaryItem.slot, secondaryItem.slot);
+                if (slotDifference <= minSlotDifference) {
+                    minSlotDifference = slotDifference;
+                    closestPrimaryItem = primaryItem;
+                    closestSecondaryItem = secondaryItem;
+                }
+            }
+        }
+
+        return combine(closestPrimaryItem, closestSecondaryItem);
+    }
+
+
+    // Helper method to calculate the Manhattan distance between two inventory slots
+    private static int calculateSlotDifference(int slot1, int slot2) {
+        // Calculate the row and column for each slot
+        int row1 = (slot1 - 1) / 4;
+        int col1 = (slot1 - 1) % 4;
+        int row2 = (slot2 - 1) / 4;
+        int col2 = (slot2 - 1) % 4;
+
+        // Calculate the Manhattan distance between the two slots
+        return Math.abs(row1 - row2) + Math.abs(col1 - col2);
     }
 
     /**
@@ -200,7 +291,7 @@ public class Rs2Inventory {
      * @return True if the inventory contains all the specified IDs, false otherwise.
      */
     public static boolean containsAll(int... ids) {
-        return contains(ids);
+        return Arrays.stream(ids).allMatch(x -> items().stream().anyMatch(y -> y.id == x));
     }
 
     /**
@@ -263,7 +354,6 @@ public class Rs2Inventory {
         }
         return false;
     }
-
 
     /**
      * Drops the item with the specified ID from the inventory.
@@ -400,7 +490,94 @@ public class Rs2Inventory {
                 items().stream().filter(predicate).collect(Collectors.toList())) {
             if (item == null) continue;
             invokeMenu(item, "Drop");
-            sleep(150, 600);
+            sleep(150, 300);
+        }
+        return true;
+    }
+
+    /**
+     * Drops all items in the inventory that match a specified filter, in a specified order.
+     *
+     * @param predicate The filter to apply. Only items that match this filter will be dropped.
+     * @param dropOrder The order in which to drop the items. This can be one of the following:
+     *                  - STANDARD: Items are dropped row by row, from left to right.
+     *                  - EFFICIENT_ROW: Items are dropped row by row. For even rows, items are dropped from left to right. For odd rows, items are dropped from right to left.
+     *                  - COLUMN: Items are dropped column by column, from top to bottom.
+     *                  - EFFICIENT_COLUMN: Items are dropped column by column. For even columns, items are dropped from top to bottom. For odd columns, items are dropped from bottom to top.
+     * @return True if all matching items were successfully dropped, false otherwise.
+     */
+    public static boolean dropAll(Predicate<Rs2Item> predicate, DropOrder dropOrder) {
+        List<Rs2Item> itemsToDrop = items().stream()
+                .filter(predicate)
+                .collect(Collectors.toList());
+
+        switch (dropOrder) {
+            case STANDARD:
+                break;
+
+            case EFFICIENT_ROW:
+                itemsToDrop.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    int row1 = index1 / COLUMNS;
+                    int row2 = index2 / COLUMNS;
+                    if (row1 != row2) {
+                        return Integer.compare(row1, row2);
+                    } else {
+                        int col1 = index1 % COLUMNS;
+                        int col2 = index2 % COLUMNS;
+                        if (row1 % 2 == 0) {
+                            // For even rows, sort columns normally (left to right)
+                            return Integer.compare(col1, col2);
+                        } else {
+                            // For odd rows, sort columns in reverse (right to left)
+                            return Integer.compare(col2, col1);
+                        }
+                    }
+                });
+                break;
+
+            case COLUMN:
+                itemsToDrop.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    int col1 = index1 % COLUMNS;
+                    int col2 = index2 % COLUMNS;
+                    if (col1 != col2) {
+                        return Integer.compare(col1, col2);
+                    } else {
+                        return Integer.compare(index1 / COLUMNS, index2 / COLUMNS);
+                    }
+                });
+                break;
+
+            case EFFICIENT_COLUMN:
+                itemsToDrop.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    int col1 = index1 % COLUMNS;
+                    int col2 = index2 % COLUMNS;
+                    if (col1 != col2) {
+                        return Integer.compare(col1, col2);
+                    } else {
+                        int row1 = index1 / COLUMNS;
+                        int row2 = index2 / COLUMNS;
+                        if (col1 % 2 == 0) {
+                            // For even columns, sort rows normally (top to bottom)
+                            return Integer.compare(row1, row2);
+                        } else {
+                            // For odd columns, sort rows in reverse (bottom to top)
+                            return Integer.compare(row2, row1);
+                        }
+                    }
+                });
+                break;
+        }
+
+        for (Rs2Item item : itemsToDrop) {
+            if (item == null) continue;
+            invokeMenu(item, "Drop");
+            sleep(150, 300);
         }
         return true;
     }
@@ -422,14 +599,28 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(String... names) {
-        return dropAllExcept(false, names);
+        return dropAllExcept(false, DropOrder.STANDARD, names);
     }
 
-    public static boolean dropAllExcept(boolean exact, String... names) {
+    /**
+     * Drops all items from the inventory except for the ones specified by the names parameter.
+     * The exactness of the name matching and the order in which items are dropped can be controlled.
+     *
+     * @param exact     If true, items are kept in the inventory if their name exactly matches one of the names in the names parameter.
+     *                  If false, items are kept in the inventory if their name contains one of the names in the names parameter.
+     * @param dropOrder The order in which items are dropped from the inventory. This can be one of the following:
+     *                  - STANDARD: Items are dropped row by row, from left to right.
+     *                  - EFFICIENT_ROW: Items are dropped row by row. For even rows, items are dropped from left to right. For odd rows, items are dropped from right to left.
+     *                  - COLUMN: Items are dropped column by column, from top to bottom.
+     *                  - EFFICIENT_COLUMN: Items are dropped column by column. For even columns, items are dropped from top to bottom. For odd columns, items are dropped from bottom to top.
+     * @param names     The names of the items to keep in the inventory.
+     * @return True if all non-matching items were successfully dropped, false otherwise.
+     */
+    public static boolean dropAllExcept(boolean exact, DropOrder dropOrder, String... names) {
         if (exact)
-            return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
+            return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)), dropOrder);
         else
-            return dropAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())));
+            return dropAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())), dropOrder);
     }
 
     /**
@@ -654,13 +845,9 @@ public class Rs2Inventory {
      * @return True if the player has the specified quantity of the item, false otherwise.
      */
     public static boolean hasItemAmount(String name, int amount) {
-        Rs2Item rs2Item = get(name);
-        if (rs2Item == null) return false;
-        if (rs2Item.isStackable) {
-            return rs2Item.quantity >= amount;
-        } else {
-            return items().stream().filter(x -> x.name.equalsIgnoreCase(name)).count() >= amount;
-        }
+        Rs2Item item = get(name);
+        if (item == null) return false;
+        return hasItemAmount(name, amount, item.isStackable(), false);
     }
 
     /**
@@ -754,7 +941,7 @@ public class Rs2Inventory {
 
     public static List<Rs2Item> getInventoryFood() {
         List<Rs2Item> items = items().stream()
-                .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")))
+                .filter(x -> Arrays.stream(x.getInventoryActions()).anyMatch(a -> a != null && a.equalsIgnoreCase("eat")) || x.getName().toLowerCase().contains("jug of wine"))
                 .collect(Collectors.toList());
         return items;
     }
@@ -1066,12 +1253,7 @@ public class Rs2Inventory {
      */
     public static boolean interact(Rs2Item item, String action) {
         if (item == null) return false;
-        Rs2Item rs2Item = items().stream().filter(x -> x == item).findFirst().orElse(null);
-        if (rs2Item == null) {
-            rs2Item = items().stream().filter(x -> x.id == item.id).findFirst().orElse(null);
-            if (rs2Item == null) return false;
-        }
-        invokeMenu(rs2Item, action);
+        invokeMenu(item, action);
         return true;
     }
 
@@ -1193,13 +1375,13 @@ public class Rs2Inventory {
      * @param rs2Item The item to get the bounds for.
      * @return The bounding rectangle for the item's slot, or null if the item is not found.
      */
-    public static java.awt.Rectangle itemBounds(Rs2Item rs2Item) {
+    public static Rectangle itemBounds(Rs2Item rs2Item) {
         Widget inventory = getInventory();
 
         if (inventory == null) return null;
 
         Widget item = Arrays.stream(inventory.getDynamicChildren())
-                .filter(x -> x.getItemId() == rs2Item.id)
+                .filter(x -> x.getIndex() == rs2Item.slot)
                 .findFirst()
                 .orElse(null);
 
@@ -1434,9 +1616,8 @@ public class Rs2Inventory {
      * @return True if the item is successfully used, false otherwise.
      */
     public static boolean use(Rs2Item rs2Item) {
-        Rs2Item item = items().stream().filter(x -> x == rs2Item).findFirst().orElse(null);
-        if (item == null) return false;
-        return interact(item, "Use");
+        if (rs2Item == null) return false;
+        return interact(rs2Item, "Use");
     }
 
     /**
@@ -1621,6 +1802,41 @@ public class Rs2Inventory {
     }
 
     /**
+     * Method will search for restore energy items in inventory & use them
+     *
+     */
+    public static void useRestoreEnergyItem() {
+        String staminaRestoreItemName = "Stamina potion";
+        List<String> restoreEnergyItemNames = Arrays.asList("Super energy", "Super energy mix", "Energy potion", "Energy mix");
+        Pattern pattern = Pattern.compile("^(.*?)(?:\\(\\d+\\))?$");
+
+        List<Rs2Item> filteredRestoreEnergyItems = items().stream()
+                .filter(item -> {
+                    Matcher matcher = pattern.matcher(item.getName());
+                    return matcher.matches() && restoreEnergyItemNames.contains(matcher.group(1).trim());
+                })
+                .collect(Collectors.toList());
+
+        List<Rs2Item> filteredStaminaRestoreItems = items().stream()
+                .filter(item -> {
+                    Matcher matcher = pattern.matcher(item.getName());
+                    return matcher.matches() && staminaRestoreItemName.equals(matcher.group(1).trim());
+                })
+                .collect(Collectors.toList());
+        
+        if (filteredStaminaRestoreItems.isEmpty() && filteredRestoreEnergyItems.isEmpty()) return;
+
+        if (filteredStaminaRestoreItems.isEmpty()) {
+            Rs2Inventory.interact(filteredRestoreEnergyItems.stream().findFirst().get().name, "drink");
+        } else {
+            if (Rs2Player.hasStaminaBuffActive() && !filteredRestoreEnergyItems.isEmpty()) {
+                Rs2Inventory.interact(filteredRestoreEnergyItems.stream().findFirst().get().name, "drink");
+            } else {
+                Rs2Inventory.interact(filteredStaminaRestoreItems.stream().findFirst().get().name, "drink");
+            }
+        }
+    }
+    /**
      * Method executes menu actions
      *
      * @param rs2Item Current item to interact with
@@ -1658,7 +1874,8 @@ public class Rs2Inventory {
         }
 
         if (!action.isEmpty()) {
-            var itemWidget = Arrays.stream(inventoryWidgets).filter(x -> x != null && x.getItemId() == rs2Item.id).findFirst().orElseGet(null);
+            assert inventoryWidgets != null;
+            var itemWidget = Arrays.stream(inventoryWidgets).filter(x -> x != null && x.getIndex() == rs2Item.slot).findFirst().orElseGet(null);
 
             String[] actions = itemWidget != null && itemWidget.getActions() != null ?
                     itemWidget.getActions() :
@@ -1678,7 +1895,12 @@ public class Rs2Inventory {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
         }
 
-        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
+        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), (itemBounds(rs2Item) == null) ? new Rectangle(1, 1) : itemBounds(rs2Item));
+
+        if (action.equalsIgnoreCase("destroy")){
+            sleepUntil(() -> Rs2Widget.isWidgetVisible(584, 0));
+            Rs2Widget.clickWidget(Rs2Widget.getWidget(584, 1).getId());
+        }
     }
 
     private static Widget getInventory() {

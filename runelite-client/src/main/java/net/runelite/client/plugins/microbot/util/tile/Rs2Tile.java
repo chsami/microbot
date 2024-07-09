@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.tile;
 
 import lombok.Getter;
 import net.runelite.api.Client;
+import net.runelite.api.CollisionDataFlag;
 import net.runelite.api.GraphicsObject;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
@@ -32,7 +33,7 @@ public class Rs2Tile {
             tileExecutor.scheduleWithFixedDelay(() -> {
                 if (dangerousGraphicsObjectTiles.isEmpty()) return;
 
-                for (MutablePair<WorldPoint, Integer> dangerousTile: dangerousGraphicsObjectTiles) {
+                for (MutablePair<WorldPoint, Integer> dangerousTile : dangerousGraphicsObjectTiles) {
                     dangerousTile.setValue(dangerousTile.getValue() - 600);
                 }
                 dangerousGraphicsObjectTiles = dangerousGraphicsObjectTiles.stream().filter(x -> x.getValue() > 0).collect(Collectors.toList());
@@ -74,7 +75,7 @@ public class Rs2Tile {
     public static List<WorldPoint> getSafeTiles(int radius) {
         List<WorldPoint> safeTiles = new ArrayList<>();
 
-        for (WorldPoint walkableTile: getWalkableTilesAroundPlayer(radius)) {
+        for (WorldPoint walkableTile : getWalkableTilesAroundPlayer(radius)) {
             boolean isDangerousTile = dangerousGraphicsObjectTiles.stream().anyMatch(x -> x.getKey().equals(walkableTile));
             if (isDangerousTile) continue;
             safeTiles.add(walkableTile);
@@ -109,6 +110,9 @@ public class Rs2Tile {
     }
 
     public static boolean isWalkable(LocalPoint localPoint) {
+        if (localPoint == null)
+            return true;
+
         Client client = Microbot.getClient();
         if (client.getCollisionMaps() != null) {
             int[][] flags = client.getCollisionMaps()[client.getPlane()].getFlags();
@@ -116,17 +120,20 @@ public class Rs2Tile {
 
             Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
 
-            if (movementFlags.isEmpty()) {
-                return true;
-            }
-            return false;
+            if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FULL)
+                    || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FLOOR))
+                return false;
         }
         return true;
     }
 
     public static List<WorldPoint> getWalkableTilesAroundPlayer(int radius) {
+        return getWalkableTilesAroundTile(Rs2Player.getWorldLocation(), radius);
+    }
+
+    public static List<WorldPoint> getWalkableTilesAroundTile(WorldPoint point, int radius) {
         List<WorldPoint> worldPoints = new ArrayList<>();
-        LocalPoint playerLocalPosition = Rs2Player.getLocalLocation();
+        LocalPoint playerLocalPosition = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
 
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {
@@ -147,15 +154,20 @@ public class Rs2Tile {
         return worldPoints;
     }
 
-    public static HashMap<WorldPoint, Integer> getReachableTilesFromTile(WorldPoint tile, int distance){
+    public static HashMap<WorldPoint, Integer> getReachableTilesFromTile(WorldPoint tile, int distance) {
         var tileDistances = new HashMap<WorldPoint, Integer>();
         tileDistances.put(tile, 0);
 
-        for (int i = 0; i < distance + 1; i++){
+        for (int i = 0; i < distance + 1; i++) {
             int dist = i;
-            for (var kvp : tileDistances.entrySet().stream().filter(x -> x.getValue() == dist).collect(Collectors.toList())){
+            for (var kvp : tileDistances.entrySet().stream().filter(x -> x.getValue() == dist).collect(Collectors.toList())) {
                 var point = kvp.getKey();
-                var localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
+                LocalPoint localPoint;
+                if (Microbot.getClient().isInInstancedRegion()) {
+                    var worldPoint = WorldPoint.toLocalInstance(Microbot.getClient(), point).stream().findFirst().get();
+                    localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+                } else
+                    localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
 
                 if (Microbot.getClient().getCollisionMaps() != null && localPoint != null) {
                     int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
@@ -164,7 +176,7 @@ public class Rs2Tile {
                     Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
 
                     if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FULL)
-                            || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FLOOR)){
+                            || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FLOOR)) {
                         tileDistances.remove(point);
                         continue;
                     }
@@ -201,5 +213,55 @@ public class Rs2Tile {
             }
         }
         return localPoints;
+    }
+
+    public static boolean isTileReachable(WorldPoint targetPoint) {
+        boolean[][] visited = new boolean[104][104];
+        int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
+        WorldPoint playerLoc = Microbot.getClient().getLocalPlayer().getWorldLocation();
+        int startX = playerLoc.getX() - Microbot.getClient().getBaseX();
+        int startY = playerLoc.getY() - Microbot.getClient().getBaseY();
+        int startPoint = (startX << 16) | startY;
+        ArrayDeque<Integer> queue = new ArrayDeque<>();
+        queue.add(startPoint);
+        visited[startX][startY] = true;
+
+        while (!queue.isEmpty()) {
+            int point = queue.poll();
+            int x = point >> 16;
+            int y = point & 0xFFFF;
+
+            if (isWithinBounds(x, y)) {
+                checkAndAddNeighbour(queue, visited, flags, x, y, -1, 0, CollisionDataFlag.BLOCK_MOVEMENT_WEST);
+                checkAndAddNeighbour(queue, visited, flags, x, y, 1, 0, CollisionDataFlag.BLOCK_MOVEMENT_EAST);
+                checkAndAddNeighbour(queue, visited, flags, x, y, 0, -1, CollisionDataFlag.BLOCK_MOVEMENT_SOUTH);
+                checkAndAddNeighbour(queue, visited, flags, x, y, 0, 1, CollisionDataFlag.BLOCK_MOVEMENT_NORTH);
+            }
+        }
+
+        return isVisited(targetPoint, visited);
+    }
+
+    private static boolean isWithinBounds(int x, int y) {
+        return x >= 0 && y >= 0 && x < 104 && y < 104;
+    }
+
+    private static void checkAndAddNeighbour(ArrayDeque<Integer> queue, boolean[][] visited, int[][] flags, int x, int y, int dx, int dy, int blockMovementFlag) {
+        int nx = x + dx;
+        int ny = y + dy;
+
+        if (isWithinBounds(nx, ny) && !visited[nx][ny] && (flags[x][y] & blockMovementFlag) == 0 && (flags[nx][ny] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0) {
+            queue.add((nx << 16) | ny);
+            visited[nx][ny] = true;
+        }
+    }
+
+    private static boolean isVisited(WorldPoint worldPoint, boolean[][] visited) {
+        int baseX = Microbot.getClient().getTopLevelWorldView().getBaseX();
+        int baseY = Microbot.getClient().getTopLevelWorldView().getBaseY();
+        int x = worldPoint.getX() - baseX;
+        int y = worldPoint.getY() - baseY;
+
+        return isWithinBounds(x, y) && visited[x][y];
     }
 }

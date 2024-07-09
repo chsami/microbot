@@ -24,15 +24,12 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.achievementdiaries.fremennik;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SpellbookRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
@@ -41,17 +38,14 @@ import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequire
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.*;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@QuestDescriptor(
-	quest = QuestHelperQuest.FREMENNIK_HARD
-)
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 
 public class FremennikHard extends ComplexStateQuestHelper
 {
@@ -87,8 +81,7 @@ public class FremennikHard extends ComplexStateQuestHelper
 	@Override
 	public QuestStep loadStep()
 	{
-		loadZones();
-		setupRequirements();
+		initializeRequirements();
 		setupSteps();
 
 		ConditionalStep doHard = new ConditionalStep(this, claimReward);
@@ -138,7 +131,7 @@ public class FremennikHard extends ComplexStateQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
 		notTPTroll = new VarplayerRequirement(1184, false, 21);
 		notCatchKyatt = new VarplayerRequirement(1184, false, 23);
@@ -154,10 +147,10 @@ public class FremennikHard extends ComplexStateQuestHelper
 		bronzeNail = new ItemRequirement("Bronze nails", ItemID.BRONZE_NAILS).showConditioned(notCraftShield);
 		rope = new ItemRequirement("Rope", ItemID.ROPE).showConditioned(notCraftShield).isNotConsumed();
 		lawRune = new ItemRequirement("Law rune", ItemID.LAW_RUNE).showConditioned(notTPTroll);
-		lawRune2 = new ItemRequirement("Law rune", ItemID.LAW_RUNE).showConditioned(notTPWaterbirth);
-		astralRune = new ItemRequirement("Astral rune", ItemID.ASTRAL_RUNE).showConditioned(notTPWaterbirth);
+		lawRune2 = new ItemRequirement("Law runes", ItemID.LAW_RUNE).showConditioned(notTPWaterbirth);
+		astralRune = new ItemRequirement("Astral runes", ItemID.ASTRAL_RUNE).showConditioned(notTPWaterbirth);
 		waterRune = new ItemRequirement("Water rune", ItemID.WATER_RUNE).showConditioned(notTPWaterbirth);
-		fireRune = new ItemRequirement("Fire rune", ItemID.FIRE_RUNE).showConditioned(notTPTroll);
+		fireRune = new ItemRequirement("Fire runes", ItemID.FIRE_RUNE).showConditioned(notTPTroll);
 		teasingStick = new ItemRequirement("Teasing Stick", ItemID.TEASING_STICK).showConditioned(notCatchKyatt).isNotConsumed();
 		knife = new ItemRequirement("Knife", ItemID.KNIFE).showConditioned(notCatchKyatt).isNotConsumed();
 		axe = new ItemRequirement("Any axe", ItemCollections.AXES).showConditioned(notCraftShield).isNotConsumed();
@@ -190,7 +183,8 @@ public class FremennikHard extends ComplexStateQuestHelper
 		inBlastArea = new ZoneRequirement(blastArea);
 	}
 
-	public void loadZones()
+	@Override
+	protected void setupZones()
 	{
 		misc = new Zone(new WorldPoint(2492, 3922, 0), new WorldPoint(2629, 3814, 0));
 		neitiznot = new Zone(new WorldPoint(2306, 3825, 0), new WorldPoint(2367, 3779, 0));

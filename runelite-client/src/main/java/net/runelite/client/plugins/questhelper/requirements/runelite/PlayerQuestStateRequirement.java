@@ -24,9 +24,9 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.runelite;
 
-import net.runelite.client.plugins.questhelper.PlayerQuests;
+import net.runelite.client.plugins.questhelper.questinfo.PlayerQuests;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import net.runelite.client.plugins.questhelper.steps.playermadesteps.RuneliteConfigSetter;
+import net.runelite.client.plugins.questhelper.runeliteobjects.RuneliteConfigSetter;
 import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
 

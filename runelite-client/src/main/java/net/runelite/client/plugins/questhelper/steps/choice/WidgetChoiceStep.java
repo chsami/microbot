@@ -24,35 +24,31 @@
  */
 package net.runelite.client.plugins.questhelper.steps.choice;
 
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.questhelper.MQuestHelperConfig;
-import lombok.Getter;
-import lombok.Setter;
-import net.runelite.api.Client;
-import net.runelite.api.widgets.JavaScriptCallback;
-import net.runelite.api.widgets.Widget;
-
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import lombok.Getter;
+import lombok.Setter;
+import net.runelite.api.*;
+import net.runelite.api.widgets.JavaScriptCallback;
+import net.runelite.api.widgets.Widget;
 
 public class WidgetChoiceStep
 {
-	protected final MQuestHelperConfig config;
+	protected final QuestHelperConfig config;
 
 	@Getter
 	private final String choice;
-
-	@Setter
-	WidgetLastState widgetToCheck;
 
 	@Setter
 	String expectedTextInWidget;
 
 	private Pattern pattern;
 
+	@Getter
 	protected List<String> excludedStrings;
 	protected int excludedGroupId;
 	protected int excludedChildId;
@@ -69,7 +65,7 @@ public class WidgetChoiceStep
 	@Getter
 	private int groupIdForChecking;
 
-	public WidgetChoiceStep(MQuestHelperConfig config, String choice, int groupId, int childId)
+	public WidgetChoiceStep(QuestHelperConfig config, String choice, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = choice;
@@ -80,7 +76,7 @@ public class WidgetChoiceStep
 		this.pattern = null;
 	}
 
-	public WidgetChoiceStep(MQuestHelperConfig config, int groupId, int childId)
+	public WidgetChoiceStep(QuestHelperConfig config, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = null;
@@ -91,7 +87,7 @@ public class WidgetChoiceStep
 		this.pattern = null;
 	}
 
-	public WidgetChoiceStep(MQuestHelperConfig config, Pattern pattern, int groupId, int childId)
+	public WidgetChoiceStep(QuestHelperConfig config, Pattern pattern, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = null;
@@ -102,7 +98,7 @@ public class WidgetChoiceStep
 		this.pattern = pattern;
 	}
 
-	public WidgetChoiceStep(MQuestHelperConfig config, int choiceId, int groupId, int childId)
+	public WidgetChoiceStep(QuestHelperConfig config, int choiceId, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = null;
@@ -112,7 +108,7 @@ public class WidgetChoiceStep
 		this.childId = childId;
 	}
 
-	public WidgetChoiceStep(MQuestHelperConfig config, int choiceId, String choice, int groupId, int childId)
+	public WidgetChoiceStep(QuestHelperConfig config, int choiceId, String choice, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = choice;
@@ -122,7 +118,7 @@ public class WidgetChoiceStep
 		this.childId = childId;
 	}
 
-	public WidgetChoiceStep(MQuestHelperConfig config, int choiceId, Pattern pattern, int groupId, int childId)
+	public WidgetChoiceStep(QuestHelperConfig config, int choiceId, Pattern pattern, int groupId, int childId)
 	{
 		this.config = config;
 		this.choice = null;
@@ -157,9 +153,12 @@ public class WidgetChoiceStep
 			{
 				for (Widget currentExclusionChoice : exclusionChoices)
 				{
-					if (excludedStrings.contains(currentExclusionChoice.getText()))
+					for (String excludedString : excludedStrings)
 					{
-						return;
+						if (currentExclusionChoice.getText().contains(excludedString))
+						{
+							return;
+						}
 					}
 				}
 			}
@@ -167,11 +166,6 @@ public class WidgetChoiceStep
 		Widget dialogChoice = client.getWidget(groupId, childId);
 
 		if (dialogChoice == null)
-		{
-			return;
-		}
-
-		if (widgetToCheck != null && !widgetToCheck.priorTextMatches())
 		{
 			return;
 		}
@@ -221,8 +215,6 @@ public class WidgetChoiceStep
 		{
 			text.setText("[" + option + "] " + text.getText());
 		}
-
-		Microbot.getMouse().click(text.getCanvasLocation());
 
 		text.setTextColor(config.textHighlightColor().getRGB());
 		text.setOnMouseLeaveListener((JavaScriptCallback) ev -> text.setTextColor(config.textHighlightColor().getRGB()));

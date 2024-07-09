@@ -24,10 +24,8 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.belowicemountain;
 
-import net.runelite.client.plugins.questhelper.ItemCollections;
-import net.runelite.client.plugins.questhelper.QuestDescriptor;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
@@ -49,10 +47,8 @@ import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.*;
+import java.util.List;
 
-@QuestDescriptor(
-	quest = QuestHelperQuest.BELOW_ICE_MOUNTAIN
-)
 public class BelowIceMountain extends BasicQuestHelper
 {
 	// varbit 12065 tracks checkal line?
@@ -79,7 +75,7 @@ public class BelowIceMountain extends BasicQuestHelper
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		setupRequirements();
+		initializeRequirements();
 		setupConditions();
 		setupSteps();
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -128,10 +124,11 @@ public class BelowIceMountain extends BasicQuestHelper
 	}
 
 	@Override
-	public void setupRequirements()
+	protected void setupRequirements()
 	{
-		cookedMeat = new ItemRequirement("Cooked Meat", ItemID.COOKED_MEAT, 1);
-		bread = new ItemRequirement("Bread", ItemID.BREAD, 1);
+		cookedMeat = new ItemRequirement("Cooked Meat", ItemID.COOKED_MEAT);
+		cookedMeat.canBeObtainedDuringQuest();
+		bread = new ItemRequirement("Bread", ItemID.BREAD);
 		knife = new ItemRequirement("Knife", ItemID.KNIFE).isNotConsumed();
 		coins = new ItemRequirement("Coins", ItemCollections.COINS, 3);
 
