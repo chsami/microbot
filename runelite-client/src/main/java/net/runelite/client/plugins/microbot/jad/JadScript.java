@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class JadScript extends Script {
-    public static final String VERSION = "1.0.1";
+    public static final String VERSION = "1.0.3";
     public static final Map<Integer, Long> npcAttackCooldowns = new HashMap<>();
 
     public boolean run(JadConfig config) {
