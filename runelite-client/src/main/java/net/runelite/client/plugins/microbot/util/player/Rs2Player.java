@@ -34,7 +34,7 @@ public class Rs2Player {
     private static int divineRangedTime = -1;
     private static int divineBastionTime = -1;
     public static int antiVenomTime = -1;
-
+    public static int staminaBuffTime = -1;
     public static int antiPoisonTime = -1;
 
 
@@ -66,6 +66,9 @@ public class Rs2Player {
     public static boolean hasAntiPoisonActive() {
         return antiPoisonTime > 0;
     }
+    public static boolean hasStaminaBuffActive() {
+        return staminaBuffTime > 0;
+    }
 
     private static final Map<Player, Long> playerDetectionTimes = new ConcurrentHashMap<>();
 
@@ -81,6 +84,9 @@ public class Rs2Player {
         }
         if (event.getVarbitId() == Varbits.DIVINE_BASTION) {
             divineBastionTime = event.getValue();
+        }
+        if (event.getVarbitId() == Varbits.STAMINA_EFFECT) {
+            staminaBuffTime = event.getValue();
         }
         if (event.getVarpId() == VarPlayer.POISON) {
             if (event.getValue() >= VENOM_VALUE_CUTOFF) {
