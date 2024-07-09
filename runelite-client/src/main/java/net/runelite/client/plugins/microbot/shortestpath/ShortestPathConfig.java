@@ -193,7 +193,7 @@ public interface ShortestPathConfig extends Config {
         section = sectionSettings
     )
     default int recalculateDistance() {
-        return 10;
+        return 6;
     }
 
     @Range(

@@ -522,23 +522,21 @@ public class Rs2GameObject {
     }
 
     public static TileObject findObject(List<Integer> ids) {
-        int distance = 0;
-        TileObject tileObject = null;
+        int distance = 17; // render distance seems to be around 17
         for (int id : ids) {
             TileObject object = findObjectById(id);
             if (object == null) continue;
-            if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance || tileObject == null) {
+            if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance) {
                 if (Rs2Player.getWorldLocation().getPlane() != object.getPlane()) continue;
                 if (object instanceof GroundObject && !Rs2Walker.canReach(object.getWorldLocation()))
                     continue;
 
                 if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY()))
                     continue;
-                tileObject = object;
-                distance = Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation());
+                return object;
             }
         }
-        return tileObject;
+        return null;
     }
 
     public static TileObject findObject(int[] ids) {
@@ -993,11 +991,12 @@ public class Rs2GameObject {
                     }
                 }
 
-                while (index < actions.length && actions[index] == null)
-                    index++;
-
                 if (index == actions.length)
                     index = 0;
+            }
+
+            if (index == -1) {
+                Microbot.log("Failed to interact with object " + object.getId() + " " + action);
             }
 
 
@@ -1035,6 +1034,10 @@ public class Rs2GameObject {
     }
 
     public static boolean hasLineOfSight(TileObject tileObject) {
+        return hasLineOfSight(Rs2Player.getWorldLocation(), tileObject);
+    }
+
+    public static boolean hasLineOfSight(WorldPoint point, TileObject tileObject) {
         if (tileObject == null) return false;
         if (tileObject instanceof GameObject) {
             GameObject gameObject = (GameObject) tileObject;
@@ -1043,14 +1046,14 @@ public class Rs2GameObject {
                     worldPoint,
                     gameObject.sizeX(),
                     gameObject.sizeY())
-                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), point.toWorldArea());
         } else {
             return new WorldArea(
                     tileObject.getWorldLocation(),
                     2,
                     2)
-                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), new WorldArea(Rs2Player.getWorldLocation().getX(),
-                            Rs2Player.getWorldLocation().getY(), 2, 2, Rs2Player.getWorldLocation().getPlane()));
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), new WorldArea(point.getX(),
+                            point.getY(), 2, 2, point.getPlane()));
         }
     }
 
@@ -1089,6 +1092,12 @@ public class Rs2GameObject {
         if (tileObject instanceof GameObject) {
             GameObject gameObject = (GameObject) tileObject;
             WorldPoint worldPoint = WorldPoint.fromScene(Microbot.getClient(), gameObject.getSceneMinLocation().getX(), gameObject.getSceneMinLocation().getY(), gameObject.getPlane());
+
+            if (Microbot.getClient().isInInstancedRegion()){
+                var localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+                worldPoint = WorldPoint.fromLocalInstance(Microbot.getClient(), localPoint);
+            }
+
             objectArea = new WorldArea(
                     worldPoint,
                     gameObject.sizeX(),

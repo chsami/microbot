@@ -18,12 +18,7 @@ public interface ThievingConfig extends Config {
             section = generalSection
     )
     default String GUIDE() {
-        return "Start near any of the npc\n" +
-                "Script default food is monkfish\n" +
-                "Script will walk to bank if out of food\n"+
-                "Make sure to start the script wearing dodgy necklace\n"+
-                "Script supports dodgy necklace\n"+
-                "Use Open CoinPouch Helper";
+        return "Start near any of the npc";
     }
     @ConfigSection(
             name = "general",

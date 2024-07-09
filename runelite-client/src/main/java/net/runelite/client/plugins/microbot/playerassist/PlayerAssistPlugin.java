@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class PlayerAssistPlugin extends Plugin {
-    public static final String version = "1.2.1";
+    public static final String version = "1.2.2";
     private static final String SET = "Set";
     private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
     // SAFE_SPOT = "Safe Spot";
@@ -101,7 +101,7 @@ public class PlayerAssistPlugin extends Plugin {
             overlayManager.add(playerAssistOverlay);
             overlayManager.add(playerAssistInfoOverlay);
         }
-        if (!config.toggleCenterTile())
+        if (!config.toggleCenterTile() && Microbot.isLoggedIn())
             setCenter(Rs2Player.getWorldLocation());
         lootScript.run(config);
         cannonScript.run(config);

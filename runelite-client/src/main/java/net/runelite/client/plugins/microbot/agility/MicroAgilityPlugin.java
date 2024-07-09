@@ -130,6 +130,37 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14944, -1, 2996, Operation.GREATER, Operation.LESS_EQUAL));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(DRYING_LINE));
 
+        agilityScript.rellekkaCourse.add(new AgilityObstacleModel(ROUGH_WALL_14946));
+        agilityScript.rellekkaCourse.add(new AgilityObstacleModel(GAP_14947, -1, 3672, Operation.GREATER, Operation.GREATER));
+        agilityScript.rellekkaCourse.add(new AgilityObstacleModel(TIGHTROPE_14987));
+        agilityScript.rellekkaCourse.add(new AgilityObstacleModel(GAP_14990));
+        agilityScript.rellekkaCourse.add(new AgilityObstacleModel(GAP_14991, -1, 3653, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.rellekkaCourse.add(new AgilityObstacleModel(TIGHTROPE_14992));
+        agilityScript.rellekkaCourse.add(new AgilityObstacleModel(PILE_OF_FISH));
+
+        agilityScript.ardougneCourse.add(new AgilityObstacleModel(WOODEN_BEAMS));
+        agilityScript.ardougneCourse.add(new AgilityObstacleModel(GAP_15609));
+        agilityScript.ardougneCourse.add(new AgilityObstacleModel(PLANK_26635));
+        agilityScript.ardougneCourse.add(new AgilityObstacleModel(GAP_15610));
+        agilityScript.ardougneCourse.add(new AgilityObstacleModel(GAP_15611, -1, 3310, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.ardougneCourse.add(new AgilityObstacleModel(STEEP_ROOF));
+        agilityScript.ardougneCourse.add(new AgilityObstacleModel(GAP_15612));
+
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(LADDER_36221));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(TIGHTROPE_36225));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(CHIMNEY_36227));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(ROOF_EDGE));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(DARK_HOLE_36229));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(LADDER_36231));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(ROPE_BRIDGE_36233, 2265, -1, Operation.GREATER_EQUAL, Operation.GREATER));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(TIGHTROPE_36234, 2254, -1, Operation.GREATER_EQUAL, Operation.GREATER));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(ROPE_BRIDGE_36235, -1, 3398, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(TIGHTROPE_36236, -1, 3409, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(TIGHTROPE_36237));
+        agilityScript.prifddinasCourse.add(new AgilityObstacleModel(DARK_HOLE_36238));
+
+
+
         agilityScript.run(config);
     }
 
@@ -142,6 +173,9 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.gnomeStrongholdCourse = new ArrayList<>();
         agilityScript.polnivCourse = new ArrayList<>();
         agilityScript.varrockCourse = new ArrayList<>();
+        agilityScript.rellekkaCourse = new ArrayList<>();
+        agilityScript.ardougneCourse = new ArrayList<>();
+        agilityScript.prifddinasCourse = new ArrayList<>();
 
         overlayManager.remove(agilityOverlay);
     }
