@@ -112,7 +112,7 @@ public class Rs2Walker {
                     /**
                      * MAIN WALK LOOP
                      */
-                    for (int i = indexOfStartPoint; i < ShortestPathPlugin.getPathfinder().getPath().size() - 1; i++) {
+                    for (int i = indexOfStartPoint; i < ShortestPathPlugin.getPathfinder().getPath().size(); i++) {
                         WorldPoint currentWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i);
 
                         if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().isInInstancedRegion()) {
@@ -125,7 +125,7 @@ public class Rs2Walker {
                         Microbot.status = "Checking for doors...";
                         long startTime = System.currentTimeMillis();
 
-                        boolean doorOrTransportResult = handleDoors(currentWorldPoint, ShortestPathPlugin.getPathfinder().getPath().get(i + 1));
+                        boolean doorOrTransportResult = handleDoors(path, i);
                         if (doorOrTransportResult) {
                             break;
                         }
@@ -366,66 +366,75 @@ public class Rs2Walker {
         return worldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
     }
 
-    /**
-     * @param currentWorldPoint
-     * @param nextWorldPoint
-     * @return
-     */
-    private static boolean handleDoors(WorldPoint currentWorldPoint, WorldPoint nextWorldPoint) {
+    private static boolean handleDoors(List<WorldPoint> path, int index) {
 
         if (ShortestPathPlugin.getPathfinder() == null) return false;
 
-        if (nextWorldPoint == null) return false;
+        if (index == path.size() - 1) return false;
 
-        boolean hasDoor = isDoorPresent(currentWorldPoint, nextWorldPoint);
+        var doorActions = Arrays.asList("open", "pay-toll", "pick-lock", "walk-through");
 
-        if (!hasDoor) {
-            //temp fix: some doors are objects instead of walls
-            TileObject door = Rs2GameObject.findObject(ObjectID.DOOR_1535, nextWorldPoint);
-            if (door == null) return false;
+        // Check this and the next tile for door objects
+        for (int doorIndex = index; doorIndex < index + 2; doorIndex++){
+            var point = path.get(doorIndex);
 
-            Rs2GameObject.interact(door, "open");
-            Rs2Player.waitForWalking();
-            return false;
-        }
+            // Handle wall and game objects
+            var object = Rs2GameObject.getTileObjects()
+                    .stream().filter(x -> x.getWorldLocation().equals(point) && (x instanceof WallObject || x instanceof GameObject))
+                    .min(Comparator.comparing(x -> x instanceof GameObject)).orElse(null);
+            if (object == null) continue;
 
+            var objectComp = Rs2GameObject.getObjectComposition(object.getId());
+            if (objectComp == null) continue;
 
-        WallObject wallObject = null;
-        Tile currentTile = getTile(currentWorldPoint);
-        if (currentTile != null) {
-            wallObject = currentTile.getWallObject();
-        }
-        if (wallObject == null) {
-            Tile nextTile = getTile(nextWorldPoint);
-            if (nextTile != null) {
-                wallObject = nextTile.getWallObject();
+            // Match action
+            var action = Arrays.stream(objectComp.getActions()).filter(x -> x != null && doorActions.contains(x.toLowerCase())).findFirst().orElse(null);
+            if (action == null) continue;
+
+            int orientation;
+            if (object instanceof WallObject)
+                orientation = ((WallObject) object).getOrientationA();
+            else
+                orientation = ((GameObject) object).getOrientation();
+
+            // Match orientation
+            boolean found = false;
+
+            if (doorIndex == index){
+                // Forward
+                var neighborPoint = path.get(doorIndex + 1);
+                if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
+                    || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
+                    || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
+                    || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
+                    found = true;
+            } else if (doorIndex == index + 1){
+                // Backward
+                var neighborPoint = path.get(doorIndex - 1);
+                if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
+                        || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
+                        || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
+                        || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
+                    found = true;
+
+                // Diagonal objects with any orientation
+                if (index + 2 < path.size() && (orientation == 16 || orientation == 32 || orientation == 64 || orientation == 128)){
+                    var prevPoint = path.get(doorIndex - 1);
+                    var nextPoint = path.get(doorIndex + 1);
+
+                    if (Math.abs(prevPoint.getX() - nextPoint.getX()) > 0 && Math.abs(prevPoint.getY() - nextPoint.getY()) > 0)
+                        found = true;
+                }
+            }
+
+            // Interact with object if action matches or store as fallback (only orthogonal doors)
+            if (found){
+                Rs2GameObject.interact(object, action);
+                Rs2Player.waitForWalking();
+                return true;
             }
         }
 
-        if (wallObject != null) {
-            ObjectComposition objectComposition = Rs2GameObject.getObjectComposition(wallObject.getId());
-
-            for (var action : objectComposition.getActions()) {
-                if (action != null && (action.contains("Pay-toll") || action.contains("Pick-lock") || action.contains("Walk-through"))) {
-                    Rs2GameObject.interact(wallObject, action);
-                    Rs2Player.waitForWalking();
-                    return true;
-                } else if (action != null && action.contains("Walk-through")) {
-                    Rs2GameObject.interact(wallObject, action);
-                    Rs2Player.waitForWalking();
-                    return true;
-                }
-                if (action != null && action.contains("Pick-lock")) {
-                    Rs2GameObject.interact(wallObject, action);
-                    Rs2Player.waitForWalking();
-                    return true;
-                }
-            }
-
-            Rs2GameObject.interact(wallObject);
-            Rs2Player.waitForWalking();
-            return true;
-        }
         return false;
     }
 
@@ -520,115 +529,6 @@ public class Rs2Walker {
                 ShortestPathPlugin.setPathfinderFuture(ShortestPathPlugin.getPathfindingExecutor().submit(ShortestPathPlugin.getPathfinder()));
             }
         });
-    }
-
-    /**
-     * TODO: REFACTOR DUPLICATE CODE
-     *
-     * @param a
-     * @param b
-     * @return
-     */
-    public static boolean isDoorPresent(WorldPoint a, WorldPoint b) {
-        Tile currentTile = getTile(a);
-        WallObject wallObject;
-        if (currentTile != null) {
-            wallObject = currentTile.getWallObject();
-        } else {
-            wallObject = null;
-        }
-//        if (wallObject == null)
-//            return false;
-
-        if (wallObject != null) {
-            ObjectComposition objectComposition = Rs2GameObject.getObjectComposition(wallObject.getId());
-            if (objectComposition == null) {
-                return false;
-            }
-            boolean found = false;
-            for (String action : objectComposition.getActions()) {
-                if (action != null && (action.equals("Open") || action.contains("Pay-toll") || action.contains("Pick-lock") || action.contains("Walk-through"))) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                return false;
-            }
-            int orientation = wallObject.getOrientationA();
-            if (orientation == 1) {
-                //blocks west
-                if (a.dx(-1).getX() == b.getX()) {
-                    return true;
-                }
-            }
-            if (orientation == 4) {
-                //blocks east
-                if (a.dx(+1).getX() == b.getX()) {
-                    return true;
-                }
-            }
-            if (orientation == 2) {
-                //blocks north
-                if (a.dy(1).getY() == b.getY()) {
-                    return true;
-                }
-            }
-            if (orientation == 8) {
-                //blocks south
-                if (a.dy(-1).getY() == b.getY())
-                    return true;
-            }
-        }
-
-        Tile nextTile = getTile(b);
-        WallObject wallObjectb;
-        if (nextTile != null) {
-            wallObjectb = nextTile.getWallObject();
-        } else {
-            wallObjectb = null;
-        }
-        if (wallObjectb == null) {
-            return false;
-        }
-        ObjectComposition objectCompositionb = Rs2GameObject.getObjectComposition(wallObjectb.getId());
-        if (objectCompositionb == null) {
-            return false;
-        }
-        boolean foundb = false;
-        for (String action : objectCompositionb.getActions()) {
-            if (action != null && (action.equals("Open") || action.contains("Pay-toll") || action.contains("Walk-through"))) {
-                foundb = true;
-                break;
-            }
-        }
-        if (!foundb) {
-            return false;
-        }
-        int orientationb = wallObjectb.getOrientationA();
-        if (orientationb == 1) {
-            //blocks east
-            if (b.dx(-1).getX() == a.getX()) {
-                return true;
-            }
-        }
-        if (orientationb == 4) {
-            //blocks west
-            if (b.dx(+1).getX() == a.getX()) {
-                return true;
-            }
-        }
-        if (orientationb == 2) {
-            //blocks south
-            if (b.dy(+1).getY() == a.getY()) {
-                return true;
-            }
-        }
-        if (orientationb == 8) {
-            //blocks north
-            return b.dy(-1).getY() == a.getY();
-        }
-        return false;
     }
 
     /**
