@@ -148,8 +148,13 @@ public class PathfinderConfig {
             }
         }
 
-        transports.put(location, usableTransports);
-        transportsPacked.put(WorldPointUtil.packWorldPoint(location), usableTransports);
+        if (transports.containsKey(location)) {
+            transports.get(location).addAll(usableTransports);
+            transportsPacked.get(WorldPointUtil.packWorldPoint(location)).addAll(usableTransports);
+        } else {
+            transports.put(location, usableTransports);
+            transportsPacked.put(WorldPointUtil.packWorldPoint(location), usableTransports);
+        }
     }
 
     private void refreshTransportData() {
