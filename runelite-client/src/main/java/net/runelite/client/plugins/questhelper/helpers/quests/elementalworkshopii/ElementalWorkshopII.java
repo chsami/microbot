@@ -504,10 +504,13 @@ public class ElementalWorkshopII extends BasicQuestHelper
 
 		placeSmallCog = new ObjectStep(this, ObjectID.PIN_18665, new WorldPoint(1959, 5157, 2),
 			"Place the small cog on the top left peg.", smallCog.highlighted());
+		placeSmallCog.addIcon(ItemID.SMALL_COG);
 		placeMediumCog = new ObjectStep(this, ObjectID.PIN, new WorldPoint(1959, 5157, 2),
 			"Place the medium cog on the bottom left peg.", mediumCog.highlighted());
+		placeMediumCog.addIcon(ItemID.MEDIUM_COG);
 		placeLargeCog = new ObjectStep(this, ObjectID.PIN_18666, new WorldPoint(1959, 5157, 2),
 			"Place the large cog on the right peg.", largeCog.highlighted());
+		placeLargeCog.addIcon(ItemID.LARGE_COG);
 
 		placeBar = new NpcStep(this, NpcID.JIG_CART, new WorldPoint(1954, 5147, 2), "Place the elemental bar on the " +
 			"jig cart.", elementalBar.highlighted());

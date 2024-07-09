@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class JadScript extends Script {
-    public static final String VERSION = "1.0.1";
+    public static final String VERSION = "1.0.3";
     public static final Map<Integer, Long> npcAttackCooldowns = new HashMap<>();
 
     public boolean run(JadConfig config) {
@@ -31,7 +31,7 @@ public class JadScript extends Script {
                     int npcIndex = jadNpc.getIndex();
 
                     if (npcAttackCooldowns.containsKey(npcIndex)) {
-                        if (currentTimeMillis - npcAttackCooldowns.get(npcIndex) < 4800) {
+                        if (currentTimeMillis - npcAttackCooldowns.get(npcIndex) < 4600) {
                             continue;
                         } else {
                             npcAttackCooldowns.remove(npcIndex);
@@ -65,7 +65,13 @@ public class JadScript extends Script {
             Rs2Npc.interact(healer, "attack");
             sleep(600);
             Rs2Prayer.toggle(prayer, true);
+        } else {
+            if (Microbot.getClient().getLocalPlayer().getInteracting() == null || Microbot.getClient().getLocalPlayer().getInteracting() != null && Microbot.getClient().getLocalPlayer().getInteracting().getName().contains(healerName)) {
+                Rs2Npc.interact(Rs2Npc.getNpc("Jad", false), "attack");
+            }
+            Rs2Prayer.toggle(prayer, true);
         }
+
     }
 
     @Override

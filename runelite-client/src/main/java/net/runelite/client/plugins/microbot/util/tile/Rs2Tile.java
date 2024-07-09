@@ -162,7 +162,12 @@ public class Rs2Tile {
             int dist = i;
             for (var kvp : tileDistances.entrySet().stream().filter(x -> x.getValue() == dist).collect(Collectors.toList())) {
                 var point = kvp.getKey();
-                var localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
+                LocalPoint localPoint;
+                if (Microbot.getClient().isInInstancedRegion()) {
+                    var worldPoint = WorldPoint.toLocalInstance(Microbot.getClient(), point).stream().findFirst().get();
+                    localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+                } else
+                    localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
 
                 if (Microbot.getClient().getCollisionMaps() != null && localPoint != null) {
                     int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();

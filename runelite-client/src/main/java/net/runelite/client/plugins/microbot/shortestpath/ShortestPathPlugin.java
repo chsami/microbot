@@ -137,6 +137,9 @@ public class ShortestPathPlugin extends Plugin {
     @Setter
     private static boolean startPointSet = false;
 
+    @Setter
+    private static int reachedDistance;
+
     @Provides
     public ShortestPathConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(ShortestPathConfig.class);
@@ -256,12 +259,15 @@ public class ShortestPathPlugin extends Plugin {
             return;
         }
 
-        if (Rs2Player.getWorldLocation().distanceTo(pathfinder.getTarget()) < config.reachedDistance()) {
+        var path = pathfinder.getPath();
+
+        if (Rs2Player.getWorldLocation().distanceTo(pathfinder.getTarget()) < reachedDistance
+                && Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), reachedDistance).containsKey(path.get(path.size() - 1))) {
             setTarget(null);
             if (Microbot.getClientThread().scheduledFuture != null) {
                 Microbot.getClientThread().scheduledFuture.cancel(true);
             }
-            System.out.println("Web Walker finished with reachedDistance " + config.reachedDistance());
+            System.out.println("Web Walker finished with reachedDistance " + reachedDistance);
             return;
         }
 

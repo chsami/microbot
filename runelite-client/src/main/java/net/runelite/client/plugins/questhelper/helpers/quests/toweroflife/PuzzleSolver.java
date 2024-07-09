@@ -219,34 +219,33 @@ public class PuzzleSolver
 
 			for (PipeSolverSolution soln : pipeSolverSolutions)
 			{
-				if (soln.isSelected())
+				if ((soln.isRight() || soln.isLeft() || soln.isBelow() || soln.isAbove()) && !soln.isSelected())
 				{
-					if (!soln.isSelected())
-					{
-						highlights.add(soln.pieceInfo);
-					}
-					else if (!soln.isOriented())
-					{ //Rotate
-						highlights.add(PIPE_CTRL_ROTATE);
-					}
-					else if (soln.isRight())
-					{ //Align horizontal
-						highlights.add(PIPE_CTRL_LEFT);
-					}
-					else if (soln.isLeft())
-					{ //Align horizontal
-						highlights.add(PIPE_CTRL_RIGHT);
-					}
-					else if (soln.isBelow())
-					{ //Align vertical
-						highlights.add(PIPE_CTRL_UP);
-					}
-					else if (soln.isAbove())
-					{ //Align vertical
-						highlights.add(PIPE_CTRL_DOWN);
-					}
-					return highlights;
+					highlights.add(soln.pieceInfo);
 				}
+				else if ((soln.isRight() || soln.isLeft() || soln.isBelow() || soln.isAbove()) && !soln.isOriented())
+				{ //Rotate
+					highlights.add(PIPE_CTRL_ROTATE);
+				}
+				else if (soln.isRight())
+				{ //Align horizontal
+					highlights.add(PIPE_CTRL_LEFT);
+				}
+				else if (soln.isLeft())
+				{ //Align horizontal
+					highlights.add(PIPE_CTRL_RIGHT);
+				}
+				else if (soln.isBelow())
+				{ //Align vertical
+					highlights.add(PIPE_CTRL_UP);
+				}
+				else if (soln.isAbove())
+				{ //Align vertical
+					highlights.add(PIPE_CTRL_DOWN);
+				}
+
+				if (!highlights.isEmpty())
+					return highlights;
 			}
 
 			return highlights;

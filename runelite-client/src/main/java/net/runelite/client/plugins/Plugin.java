@@ -70,4 +70,10 @@ public abstract class Plugin implements Module
 	{
 		return getClass().getAnnotation(PluginDescriptor.class).name();
 	}
+
+	public void setInjector(Injector injector)
+	{
+		this.injector = injector;
+	}
+
 }

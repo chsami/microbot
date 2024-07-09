@@ -17,6 +17,8 @@ public class PrayerScript extends Script {
         Rs2NpcManager.loadJson();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (!Microbot.isLoggedIn()) return;
+
                 handlePrayer(config);
             } catch (Exception ex) {
                 System.err.println("Error: " + ex.getMessage());

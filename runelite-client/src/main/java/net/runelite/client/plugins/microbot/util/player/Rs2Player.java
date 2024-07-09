@@ -4,12 +4,10 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.api.vars.AccountType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.VarbitValues;
-import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -26,8 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static net.runelite.api.MenuAction.CC_OP;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 
 public class Rs2Player {
@@ -37,7 +34,7 @@ public class Rs2Player {
     private static int divineRangedTime = -1;
     private static int divineBastionTime = -1;
     public static int antiVenomTime = -1;
-
+    public static int staminaBuffTime = -1;
     public static int antiPoisonTime = -1;
 
 
@@ -69,6 +66,9 @@ public class Rs2Player {
     public static boolean hasAntiPoisonActive() {
         return antiPoisonTime > 0;
     }
+    public static boolean hasStaminaBuffActive() {
+        return staminaBuffTime > 0;
+    }
 
     private static final Map<Player, Long> playerDetectionTimes = new ConcurrentHashMap<>();
 
@@ -84,6 +84,9 @@ public class Rs2Player {
         }
         if (event.getVarbitId() == Varbits.DIVINE_BASTION) {
             divineBastionTime = event.getValue();
+        }
+        if (event.getVarbitId() == Varbits.STAMINA_EFFECT) {
+            staminaBuffTime = event.getValue();
         }
         if (event.getVarpId() == VarPlayer.POISON) {
             if (event.getValue() >= VENOM_VALUE_CUTOFF) {
@@ -162,11 +165,11 @@ public class Rs2Player {
         if (widget == null) return false;
         if (Microbot.getClient().getEnergy() > 1000 && toggle) {
             Microbot.getMouse().click(widget.getCanvasLocation());
-            Global.sleep(150, 300);
+            sleep(150, 300);
             return true;
         } else if (!toggle) {
             Microbot.getMouse().click(widget.getCanvasLocation());
-            Global.sleep(150, 300);
+            sleep(150, 300);
             return true;
         }
         return false;
@@ -243,7 +246,11 @@ public class Rs2Player {
         if (treshHold <= percentage) {
             List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
             if (!foods.isEmpty()) {
-                return Rs2Inventory.interact(foods.get(0), "eat");
+                if (foods.get(0).getName().toLowerCase().contains("jug of wine")) {
+                    return Rs2Inventory.interact(foods.get(0), "drink");
+                } else {
+                    return Rs2Inventory.interact(foods.get(0), "eat");
+                }
             }
         }
         return false;
