@@ -115,7 +115,7 @@ public class Rs2Walker {
                     for (int i = indexOfStartPoint; i < ShortestPathPlugin.getPathfinder().getPath().size(); i++) {
                         WorldPoint currentWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i);
 
-                        if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().isInInstancedRegion()) {
+                        if (i > 0 && !Rs2Tile.isTileReachable(ShortestPathPlugin.getPathfinder().getPath().get(i - 1)) && !Microbot.getClient().isInInstancedRegion()) {
                             continue;
                         }
 
@@ -144,6 +144,10 @@ public class Rs2Walker {
 
                         if (doorOrTransportResult)
                             break;
+
+                        if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().isInInstancedRegion()) {
+                            continue;
+                        }
 
                         if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance()
                                 || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
@@ -183,6 +187,7 @@ public class Rs2Walker {
                 }
                 return Rs2Player.getWorldLocation().distanceTo(target) < distance;
             } catch (Exception ex) {
+                if (ex instanceof InterruptedException) return false;
                 Microbot.log("Microbot Walker Exception " + ex.getMessage());
             }
             return false;
@@ -582,10 +587,6 @@ public class Rs2Walker {
                     if (indexOfDestination == -1) continue;
                     if (indexOfOrigin == -1) continue;
                     if (indexOfDestination < indexOfOrigin) continue;
-
-                    if (!Rs2Tile.isTileReachable(path.get(i))) {
-                        continue;
-                    }
 
                     if (path.get(i).equals(origin)) {
                         if (b.isShip()) {
