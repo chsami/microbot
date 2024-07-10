@@ -379,7 +379,7 @@ public class Rs2Walker {
             var point = path.get(doorIndex);
 
             // Handle wall and game objects
-            var object = Rs2GameObject.getTileObjects()
+            var object = Rs2GameObject.getAll()
                     .stream().filter(x -> x.getWorldLocation().equals(point) && (x instanceof WallObject || x instanceof GameObject))
                     .min(Comparator.comparing(x -> x instanceof GameObject)).orElse(null);
             if (object == null) continue;
@@ -391,43 +391,47 @@ public class Rs2Walker {
             var action = Arrays.stream(objectComp.getActions()).filter(x -> x != null && doorActions.contains(x.toLowerCase())).findFirst().orElse(null);
             if (action == null) continue;
 
-            int orientation;
-            if (object instanceof WallObject)
-                orientation = ((WallObject) object).getOrientationA();
-            else
-                orientation = ((GameObject) object).getOrientation();
-
-            // Match orientation
             boolean found = false;
+            if (object instanceof WallObject){
+                // Match wall objects by orientation
+                var orientation = ((WallObject) object).getOrientationA();
 
-            if (doorIndex == index){
-                // Forward
-                var neighborPoint = path.get(doorIndex + 1);
-                if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
-                    || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
-                    || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
-                    || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
-                    found = true;
-            } else if (doorIndex == index + 1){
-                // Backward
-                var neighborPoint = path.get(doorIndex - 1);
-                if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
-                        || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
-                        || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
-                        || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
-                    found = true;
-
-                // Diagonal objects with any orientation
-                if (index + 2 < path.size() && (orientation == 16 || orientation == 32 || orientation == 64 || orientation == 128)){
-                    var prevPoint = path.get(doorIndex - 1);
-                    var nextPoint = path.get(doorIndex + 1);
-
-                    if (Math.abs(prevPoint.getX() - nextPoint.getX()) > 0 && Math.abs(prevPoint.getY() - nextPoint.getY()) > 0)
+                if (doorIndex == index){
+                    // Forward
+                    var neighborPoint = path.get(doorIndex + 1);
+                    if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
+                            || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
+                            || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
+                            || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
                         found = true;
+                } else if (doorIndex == index + 1){
+                    // Backward
+                    var neighborPoint = path.get(doorIndex - 1);
+                    if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
+                            || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
+                            || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
+                            || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
+                        found = true;
+
+                    // Diagonal objects with any orientation
+                    if (index + 2 < path.size() && (orientation == 16 || orientation == 32 || orientation == 64 || orientation == 128)){
+                        var prevPoint = path.get(doorIndex - 1);
+                        var nextPoint = path.get(doorIndex + 1);
+
+                        if (Math.abs(prevPoint.getX() - nextPoint.getX()) > 0 && Math.abs(prevPoint.getY() - nextPoint.getY()) > 0)
+                            found = true;
+                    }
                 }
+            } else if (object instanceof GameObject){
+                // Match game objects by name
+                // Orientation does not work as game objects are not strictly oriented like walls
+                var objectNames = Arrays.asList("door");
+
+                if (objectNames.contains(objectComp.getName().toLowerCase()))
+                    found = true;
             }
 
-            // Interact with object if action matches or store as fallback (only orthogonal doors)
+
             if (found){
                 Rs2GameObject.interact(object, action);
                 Rs2Player.waitForWalking();
