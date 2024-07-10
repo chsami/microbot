@@ -25,27 +25,28 @@
 package net.runelite.client.plugins.questhelper.helpers.miniquests.alfredgrimhandsbarcrawl;
 
 
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.collections.ItemCollections;
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.var.VarplayerRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.runelite.api.ItemID;
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.coords.WorldPoint;
 
 public class AlfredGrimhandsBarcrawl extends ComplexStateQuestHelper
 {
@@ -164,7 +165,7 @@ public class AlfredGrimhandsBarcrawl extends ComplexStateQuestHelper
 		talkToRustyAnchor = new NpcStep(this, NpcID.BARTENDER_1313, new WorldPoint(3046, 3257, 0),
 			"Talk to the bartender in the Rusty Anchor in Port Sarim.", coins8);
 		talkToRustyAnchor.addDialogStep("I'm doing Alfred Grimhand's Barcrawl.");
-		talkToZambo = new NpcStep(this, NpcID.ZAMBO, new WorldPoint(2927, 3144, 0),
+		talkToZambo = new NpcStep(this, NpcID.SUROK_MAGIS, new WorldPoint(2927, 3144, 0),
 			"Talk to Zambo in the Karamja Spirits Bar on Musa Point.", coins7);
 		talkToZambo.addDialogStep("I'm doing Alfred Grimhand's barcrawl.");
 		talkToDeadMansChest = new NpcStep(this, NpcID.BARTENDER_1314, new WorldPoint(2796, 3156, 0),
