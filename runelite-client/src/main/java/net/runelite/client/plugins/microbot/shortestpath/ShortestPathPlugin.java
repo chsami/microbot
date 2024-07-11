@@ -29,7 +29,9 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.SplitFlagMap
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.JagexColors;
+import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
@@ -105,6 +107,9 @@ public class ShortestPathPlugin extends Plugin {
     private PathMapTooltipOverlay pathMapTooltipOverlay;
 
     @Inject
+    private ClientToolbar clientToolbar;
+
+    @Inject
     private DebugOverlayPanel debugOverlayPanel;
 
     @Inject
@@ -117,6 +122,7 @@ public class ShortestPathPlugin extends Plugin {
     private WorldMapOverlay worldMapOverlay;
 
     private Point lastMenuOpenedPoint;
+    private ShortestPathPanel panel;
     @Getter
     @Setter
     private static WorldMapPoint marker;
@@ -124,6 +130,7 @@ public class ShortestPathPlugin extends Plugin {
     @Getter
     @Setter
     private static WorldPoint lastLocation = new WorldPoint(0, 0, 0);
+    private NavigationButton navButton;
     private MenuEntry lastClick;
     private Shape minimapClipFixed;
     private Shape minimapClipResizeable;
@@ -163,6 +170,26 @@ public class ShortestPathPlugin extends Plugin {
 
         pathfinderConfig = new PathfinderConfig(map, transports, restrictions, client, config);
 
+        panel = injector.getInstance(ShortestPathPanel.class);
+
+        BufferedImage icon;
+        try {
+            icon = ImageUtil.loadImageResource(ShortestPathPlugin.class, "/net/runelite/client/plugins/shortestpath/icon.png");
+        } catch (IllegalArgumentException e) {
+
+            icon = null;
+
+        }
+
+        navButton = NavigationButton.builder()
+                .tooltip("Shortest Path")
+                .icon(icon)
+                .priority(5)
+                .panel(panel)
+                .build();
+
+        clientToolbar.addNavigation(navButton);
+
         Rs2Walker.setConfig(config);
 
         overlayManager.add(pathOverlay);
@@ -182,6 +209,7 @@ public class ShortestPathPlugin extends Plugin {
         overlayManager.remove(pathMapOverlay);
         overlayManager.remove(pathMapTooltipOverlay);
         overlayManager.remove(debugOverlayPanel);
+        clientToolbar.removeNavigation(navButton);
         exit();
     }
 
@@ -265,6 +293,16 @@ public class ShortestPathPlugin extends Plugin {
                 stopTraveling();
             }
         }
+
+        if ("travelToFarming".equals(event.getKey())) {
+            boolean travelToFarming = Boolean.parseBoolean(event.getNewValue());
+            if (travelToFarming) {
+                handleTravelToFarmingLocation();
+            } else {
+                stopTraveling();
+            }
+        }
+
         if ("drawDebugPanel".equals(event.getKey())) {
             if (config.drawDebugPanel()) {
                 overlayManager.add(debugOverlayPanel);
@@ -302,7 +340,6 @@ public class ShortestPathPlugin extends Plugin {
             if (Microbot.getClientThread().scheduledFuture != null) {
                 Microbot.getClientThread().scheduledFuture.cancel(true);
             }
-            System.out.println("Web Walker finished with reachedDistance " + reachedDistance);
             return;
         }
 
@@ -458,6 +495,45 @@ public class ShortestPathPlugin extends Plugin {
         if (slayerMasterLocation != null) {
             boolean walkResult = Rs2Walker.walkTo(slayerMasterLocation);
         } else {}
+    }
+
+    public void handleTravelToFarmingLocation() {
+        WorldPoint farmingLocation = null;
+        String selectedCategory = config.catFarming().name();
+        String selectedLocation = "NONE";
+
+        switch (config.catFarming()) {
+            case ALLOTMENTS:
+                selectedLocation = config.selectedAllotment().name();
+                farmingLocation = config.selectedAllotment().getWorldPoint();
+                break;
+            case BUSHES:
+                selectedLocation = config.selectedBush().name();
+                farmingLocation = config.selectedBush().getWorldPoint();
+                break;
+            case FRUIT_TREES:
+                selectedLocation = config.selectedFruitTree().name();
+                farmingLocation = config.selectedFruitTree().getWorldPoint();
+                break;
+            case HERBS:
+                selectedLocation = config.selectedHerb().name();
+                farmingLocation = config.selectedHerb().getWorldPoint();
+                break;
+            case HOPS:
+                selectedLocation = config.selectedHop().name();
+                farmingLocation = config.selectedHop().getWorldPoint();
+                break;
+            case TREES:
+                selectedLocation = config.selectedTree().name();
+                farmingLocation = config.selectedTree().getWorldPoint();
+                break;
+            default:
+                return;
+        }
+
+        if (farmingLocation != null) {
+            boolean walkResult = Rs2Walker.walkTo(farmingLocation);
+        }
     }
 
     private WorldPoint getSelectedWorldPoint() {
@@ -675,6 +751,12 @@ public class ShortestPathPlugin extends Plugin {
             polygon.addPoint(point.x + offsetX, point.y + offsetY);
         }
         return polygon;
+    }
+
+    public void updateCustomLocation(int x, int y, int z) {
+        configManager.setConfiguration(CONFIG_GROUP, "customLocationX", x);
+        configManager.setConfiguration(CONFIG_GROUP, "customLocationY", y);
+        configManager.setConfiguration(CONFIG_GROUP, "customLocationZ", z);
     }
 
     private void stopTraveling() {

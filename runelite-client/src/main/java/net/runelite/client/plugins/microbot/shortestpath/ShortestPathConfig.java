@@ -1,13 +1,13 @@
 package net.runelite.client.plugins.microbot.shortestpath;
 
 import net.runelite.client.config.*;
-import net.runelite.client.plugins.microbot.shortestpath.enums.Banks;
-import net.runelite.client.plugins.microbot.shortestpath.enums.SlayerMasters;
+import net.runelite.client.plugins.microbot.shortestpath.enums.*;
 
 import java.awt.*;
 
 @ConfigGroup(ShortestPathPlugin.CONFIG_GROUP)
 public interface ShortestPathConfig extends Config {
+
     @ConfigSection(
             name = "Travel to Custom Location",
             description = "Options for traveling to a custom location",
@@ -55,7 +55,7 @@ public interface ShortestPathConfig extends Config {
             position = 4,
             section = sectionCustomLocation
     )
-    default boolean travelToCustomLocation() {
+    default boolean travelToCustomLocation(boolean b) {
         return false;
     }
 
@@ -78,8 +78,17 @@ public interface ShortestPathConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "selectedBank",
+            name = "Bank",
+            description = "Select a bank location for pathfinding",
+            position = 6,
+            section = sectionBank
+    )
+    void selectedBank(Banks bank);
+
+    @ConfigItem(
             keyName = "travelToBank",
-            name = "Begin Traveling",
+            name = "Travel to Bank",
             description = "Toggle to travel to the selected bank",
             position = 7,
             section = sectionBank
@@ -87,6 +96,15 @@ public interface ShortestPathConfig extends Config {
     default boolean travelToBank() {
         return false;
     }
+
+    @ConfigItem(
+            keyName = "travelToBank",
+            name = "Travel to Bank",
+            description = "Toggle to travel to the selected bank",
+            position = 7,
+            section = sectionBank
+    )
+    void travelToBank(boolean travel);
 
     @ConfigSection(
             name = "Travel to Slayer Master",
@@ -107,8 +125,17 @@ public interface ShortestPathConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "selectedSlayerMaster",
+            name = "Slayer Master",
+            description = "Select a Slayer Master location for pathfinding",
+            position = 9,
+            section = sectionSlayerMaster
+    )
+    void selectedSlayerMaster(SlayerMasters slayerMaster);
+
+    @ConfigItem(
             keyName = "travelToSlayerMaster",
-            name = "Begin Traveling",
+            name = "Travel to Slayer Master",
             description = "Toggle to travel to the selected Slayer Master",
             position = 10,
             section = sectionSlayerMaster
@@ -117,10 +144,185 @@ public interface ShortestPathConfig extends Config {
         return false;
     }
 
+    @ConfigItem(
+            keyName = "travelToSlayerMaster",
+            name = "Travel to Slayer Master",
+            description = "Toggle to travel to the selected Slayer Master",
+            position = 10,
+            section = sectionSlayerMaster
+    )
+    void travelToSlayerMaster(boolean travel);
+
+    @ConfigSection(
+            name = "Travel to Farming Locations",
+            description = "Options for traveling to farming locations",
+            position = 11
+    )
+    String sectionFarming = "sectionFarming";
+
+    @ConfigItem(
+            keyName = "catFarming",
+            name = "Patch Type",
+            description = "Select the Farming category you want",
+            position = 12,
+            section = sectionFarming
+    )
+    default Farming catFarming() {
+        return Farming.NONE;
+    }
+
+    @ConfigItem(
+            keyName = "catFarming",
+            name = "Patch Type",
+            description = "Select the Farming category you want",
+            position = 12,
+            section = sectionFarming
+    )
+    void catFarming(Farming farming);
+
+    @ConfigItem(
+            keyName = "travelToFarming",
+            name = "Travel to Farming Location",
+            description = "Toggle to travel to the selected farming location",
+            position = 13,
+            section = sectionFarming
+    )
+    default boolean travelToFarming() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "travelToFarming",
+            name = "Travel to Farming Location",
+            description = "Toggle to travel to the selected farming location",
+            position = 13,
+            section = sectionFarming
+    )
+    void travelToFarming(boolean travel);
+
+    @ConfigItem(
+            keyName = "selectedAllotment",
+            name = "Selected Allotment",
+            description = "The currently selected allotment",
+            position = 14,
+            section = sectionFarming
+    )
+    default Allotments selectedAllotment() {
+        return Allotments.NONE;
+    }
+
+    @ConfigItem(
+            keyName = "selectedAllotment",
+            name = "Selected Allotment",
+            description = "The currently selected allotment",
+            position = 14,
+            section = sectionFarming
+    )
+    void selectedAllotment(Allotments allotment);
+
+    @ConfigItem(
+            keyName = "selectedBush",
+            name = "Selected Bush",
+            description = "The currently selected bush",
+            position = 15,
+            section = sectionFarming
+    )
+    default Bushes selectedBush() {
+        return Bushes.NONE;
+    }
+
+    @ConfigItem(
+            keyName = "selectedBush",
+            name = "Selected Bush",
+            description = "The currently selected bush",
+            position = 15,
+            section = sectionFarming
+    )
+    void selectedBush(Bushes bush);
+
+    @ConfigItem(
+            keyName = "selectedFruitTree",
+            name = "Selected Fruit Tree",
+            description = "The currently selected fruit tree",
+            position = 16,
+            section = sectionFarming
+    )
+    default FruitTrees selectedFruitTree() {
+        return FruitTrees.NONE;
+    }
+
+    @ConfigItem(
+            keyName = "selectedFruitTree",
+            name = "Selected Fruit Tree",
+            description = "The currently selected fruit tree",
+            position = 16,
+            section = sectionFarming
+    )
+    void selectedFruitTree(FruitTrees fruitTree);
+
+    @ConfigItem(
+            keyName = "selectedHerb",
+            name = "Selected Herb",
+            description = "The currently selected herb",
+            position = 17,
+            section = sectionFarming
+    )
+    default Herbs selectedHerb() {
+        return Herbs.NONE;
+    }
+
+    @ConfigItem(
+            keyName = "selectedHerb",
+            name = "Selected Herb",
+            description = "The currently selected herb",
+            position = 17,
+            section = sectionFarming
+    )
+    void selectedHerb(Herbs herb);
+
+    @ConfigItem(
+            keyName = "selectedHop",
+            name = "Selected Hop",
+            description = "The currently selected hop",
+            position = 18,
+            section = sectionFarming
+    )
+    default Hops selectedHop() {
+        return Hops.NONE;
+    }
+
+    @ConfigItem(
+            keyName = "selectedHop",
+            name = "Selected Hop",
+            description = "The currently selected hop",
+            position = 18,
+            section = sectionFarming
+    )
+    void selectedHop(Hops hop);
+
+    @ConfigItem(
+            keyName = "selectedTree",
+            name = "Selected Tree",
+            description = "The currently selected tree",
+            position = 19,
+            section = sectionFarming
+    )
+    default Trees selectedTree() {
+        return Trees.NONE;
+    }
+
+    @ConfigItem(
+            keyName = "selectedTree",
+            name = "Selected Tree",
+            description = "The currently selected tree",
+            position = 19,
+            section = sectionFarming
+    )
+    void selectedTree(Trees tree);
     @ConfigSection(
             name = "Settings",
             description = "Options for the pathfinding",
-            position = 9
+            position = 13
     )
     String sectionSettings = "sectionSettings";
 
@@ -129,7 +331,7 @@ public interface ShortestPathConfig extends Config {
             name = "Avoid wilderness",
             description = "Whether the wilderness should be avoided if possible<br>" +
                     "(otherwise, will e.g. suggest using wilderness lever to travel from Edgeville to Ardougne)",
-            position = 10,
+            position = 14,
             section = sectionSettings
     )
     default boolean avoidWilderness() {
@@ -140,7 +342,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "useAgilityShortcuts",
             name = "Use agility shortcuts",
             description = "Whether to include agility shortcuts in the path.<br>You must also have the required agility level",
-            position = 11,
+            position = 15,
             section = sectionSettings
     )
     default boolean useAgilityShortcuts() {
@@ -152,7 +354,7 @@ public interface ShortestPathConfig extends Config {
             name = "Use grapple shortcuts",
             description = "Whether to include crossbow grapple agility shortcuts in the path.<br>" +
                     "You must also have the required agility, ranged and strength levels",
-            position = 12,
+            position = 16,
             section = sectionSettings
     )
     default boolean useGrappleShortcuts() {
@@ -163,7 +365,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "useBoats",
             name = "Use boats",
             description = "Whether to include small boats in the path<br>(e.g. the boat to Fishing Platform)",
-            position = 13,
+            position = 17,
             section = sectionSettings
     )
     default boolean useBoats() {
@@ -174,7 +376,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "useCanoes",
             name = "Use canoes",
             description = "Whether to include canoes in the path",
-            position = 14,
+            position = 18,
             section = sectionSettings
     )
     default boolean useCanoes() {
@@ -185,7 +387,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "useCharterShips",
             name = "Use charter ships",
             description = "Whether to include charter ships in the path",
-            position = 15,
+            position = 19,
             section = sectionSettings
     )
     default boolean useCharterShips() {
@@ -196,7 +398,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "useShips",
             name = "Use ships",
             description = "Whether to include passenger ships in the path<br>(e.g. the customs ships to Karamja)",
-            position = 16,
+            position = 20,
             section = sectionSettings
     )
     default boolean useShips() {
@@ -208,7 +410,7 @@ public interface ShortestPathConfig extends Config {
             name = "Use fairy rings",
             description = "Whether to include fairy rings in the path.<br>" +
                     "You must also have completed the required quests or miniquests",
-            position = 17,
+            position = 21,
             section = sectionSettings
     )
     default boolean useFairyRings() {
@@ -219,7 +421,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "useGnomeGliders",
             name = "Use gnome gliders",
             description = "Whether to include gnome gliders in the path",
-            position = 18,
+            position = 22,
             section = sectionSettings
     )
     default boolean useGnomeGliders() {
@@ -230,7 +432,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "useSpiritTrees",
             name = "Use spirit trees",
             description = "Whether to include spirit trees in the path",
-            position = 19,
+            position = 23,
             section = sectionSettings
     )
     default boolean useSpiritTrees() {
@@ -241,7 +443,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "useTeleportationLevers",
             name = "Use teleportation levers",
             description = "Whether to include teleportation levers in the path<br>(e.g. the lever from Edgeville to Wilderness)",
-            position = 20,
+            position = 24,
             section = sectionSettings
     )
     default boolean useTeleportationLevers() {
@@ -252,7 +454,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "useTeleportationPortals",
             name = "Use teleportation portals",
             description = "Whether to include teleportation portals in the path<br>(e.g. the portal from Ferox Enclave to Castle Wars)",
-            position = 21,
+            position = 25,
             section = sectionSettings
     )
     default boolean useTeleportationPortals() {
@@ -263,7 +465,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "cancelInstead",
             name = "Cancel instead of recalculating",
             description = "Whether the path should be cancelled rather than recalculated when the recalculate distance limit is exceeded",
-            position = 22,
+            position = 26,
             section = sectionSettings
     )
     default boolean cancelInstead() {
@@ -278,7 +480,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "recalculateDistance",
             name = "Recalculate distance",
             description = "Distance from the path the player should be for it to be recalculated (-1 for never)",
-            position = 23,
+            position = 27,
             section = sectionSettings
     )
     default int recalculateDistance() {
@@ -293,7 +495,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "finishDistance",
             name = "Finish distance",
             description = "Distance from the target tile at which the path should be ended (-1 for never)",
-            position = 24,
+            position = 28,
             section = sectionSettings
     )
     default int reachedDistance() {
@@ -304,7 +506,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "showTileCounter",
             name = "Show tile counter",
             description = "Whether to display the number of tiles travelled, number of tiles remaining or disable counting",
-            position = 25,
+            position = 29,
             section = sectionSettings
     )
     default TileCounter showTileCounter() {
@@ -315,7 +517,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "tileCounterStep",
             name = "Tile counter step",
             description = "The number of tiles between the displayed tile counter numbers",
-            position = 26,
+            position = 30,
             section = sectionSettings
     )
     default int tileCounterStep() {
@@ -334,7 +536,7 @@ public interface ShortestPathConfig extends Config {
             name = "Calculation cutoff",
             description = "The cutoff threshold in number of ticks (0.6 seconds) of no progress being<br>" +
                     "made towards the path target before the calculation will be stopped",
-            position = 27,
+            position = 31,
             section = sectionSettings
     )
     default int calculationCutoff() {
@@ -345,7 +547,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "showTransportInfo",
             name = "Show transport info",
             description = "Whether to display transport destination hint info, e.g. which chat option and text to click",
-            position = 28,
+            position = 32,
             section = sectionSettings
     )
     default boolean showTransportInfo() {
@@ -355,7 +557,7 @@ public interface ShortestPathConfig extends Config {
     @ConfigSection(
             name = "Display",
             description = "Options for displaying the path on the world map, minimap and scene tiles",
-            position = 29
+            position = 33
     )
     String sectionDisplay = "sectionDisplay";
 
@@ -363,7 +565,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "drawMap",
             name = "Draw path on world map",
             description = "Whether the path should be drawn on the world map",
-            position = 30,
+            position = 34,
             section = sectionDisplay
     )
     default boolean drawMap() {
@@ -374,7 +576,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "drawMinimap",
             name = "Draw path on minimap",
             description = "Whether the path should be drawn on the minimap",
-            position = 31,
+            position = 35,
             section = sectionDisplay
     )
     default boolean drawMinimap() {
@@ -385,7 +587,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "drawTiles",
             name = "Draw path on tiles",
             description = "Whether the path should be drawn on the game tiles",
-            position = 32,
+            position = 36,
             section = sectionDisplay
     )
     default boolean drawTiles() {
@@ -396,7 +598,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "pathStyle",
             name = "Path style",
             description = "Whether to display the path as tiles or a segmented line",
-            position = 33,
+            position = 37,
             section = sectionDisplay
     )
     default TileStyle pathStyle() {
@@ -406,7 +608,7 @@ public interface ShortestPathConfig extends Config {
     @ConfigSection(
             name = "Colours",
             description = "Colours for the path map, minimap and scene tiles",
-            position = 34
+            position = 38
     )
     String sectionColours = "sectionColours";
 
@@ -415,7 +617,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "colourPath",
             name = "Path",
             description = "Colour of the path tiles on the world map, minimap and in the game scene",
-            position = 35,
+            position = 39,
             section = sectionColours
     )
     default Color colourPath() {
@@ -427,7 +629,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "colourPathCalculating",
             name = "Calculating",
             description = "Colour of the path tiles while the pathfinding calculation is in progress",
-            position = 36,
+            position = 40,
             section = sectionColours
     )
     default Color colourPathCalculating() {
@@ -439,7 +641,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "colourTransports",
             name = "Transports",
             description = "Colour of the transport tiles",
-            position = 37,
+            position = 41,
             section = sectionColours
     )
     default Color colourTransports() {
@@ -451,7 +653,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "colourCollisionMap",
             name = "Collision map",
             description = "Colour of the collision map tiles",
-            position = 38,
+            position = 42,
             section = sectionColours
     )
     default Color colourCollisionMap() {
@@ -463,7 +665,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "colourText",
             name = "Text",
             description = "Colour of the text of the tile counter and fairy ring codes",
-            position = 39,
+            position = 43,
             section = sectionColours
     )
     default Color colourText() {
@@ -473,7 +675,7 @@ public interface ShortestPathConfig extends Config {
     @ConfigSection(
             name = "Debug Options",
             description = "Various options for debugging",
-            position = 40,
+            position = 44,
             closedByDefault = true
     )
     String sectionDebug = "sectionDebug";
@@ -482,7 +684,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "drawTransports",
             name = "Draw transports",
             description = "Whether transports should be drawn",
-            position = 41,
+            position = 45,
             section = sectionDebug
     )
     default boolean drawTransports() {
@@ -493,7 +695,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "drawCollisionMap",
             name = "Draw collision map",
             description = "Whether the collision map should be drawn",
-            position = 42,
+            position = 46,
             section = sectionDebug
     )
     default boolean drawCollisionMap() {
@@ -504,7 +706,7 @@ public interface ShortestPathConfig extends Config {
             keyName = "drawDebugPanel",
             name = "Show debug panel",
             description = "Toggles displaying the pathfinding debug stats panel",
-            position = 43,
+            position = 47,
             section = sectionDebug
     )
     default boolean drawDebugPanel() {
