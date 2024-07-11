@@ -112,10 +112,10 @@ public class Rs2Walker {
                     /**
                      * MAIN WALK LOOP
                      */
-                    for (int i = indexOfStartPoint; i < ShortestPathPlugin.getPathfinder().getPath().size(); i++) {
-                        WorldPoint currentWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i);
+                    for (int i = indexOfStartPoint; i < path.size(); i++) {
+                        WorldPoint currentWorldPoint = path.get(i);
 
-                        if (i > 0 && !Rs2Tile.isTileReachable(ShortestPathPlugin.getPathfinder().getPath().get(i - 1)) && !Microbot.getClient().isInInstancedRegion()) {
+                        if (i > 0 && !Rs2Tile.isTileReachable(path.get(i - 1)) && !Microbot.getClient().isInInstancedRegion()) {
                             continue;
                         }
 
