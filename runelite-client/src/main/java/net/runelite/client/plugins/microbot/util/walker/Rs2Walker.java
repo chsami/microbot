@@ -40,7 +40,7 @@ public class Rs2Walker {
     static int stuckCount = 0;
     static WorldPoint lastPosition;
     static int idle = 0;
-    static WorldPoint currentTarget;
+    public static WorldPoint currentTarget;
 
     public static boolean walkTo(WorldArea area, int distanceThreshold) {
         if (area.distanceTo(Rs2Player.getWorldLocation()) > distanceThreshold){

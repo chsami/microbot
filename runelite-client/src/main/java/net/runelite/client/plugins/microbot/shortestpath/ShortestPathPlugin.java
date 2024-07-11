@@ -20,6 +20,8 @@ import net.runelite.client.game.SpriteManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.shortestpath.enums.Banks;
+import net.runelite.client.plugins.microbot.shortestpath.enums.SlayerMasters;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
@@ -47,12 +49,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Web Walker",
         description = "Draws the shortest path to a chosen destination on the map (right click a spot on the world map to use)",
-        tags = {"pathfinder", "map", "waypoint", "navigation", "microbot"},
+        tags = {
+                "pathfinder",
+                "map",
+                "waypoint",
+                "navigation",
+                "microbot"
+        },
         enabledByDefault = true,
         alwaysOn = true
 )
@@ -84,6 +91,9 @@ public class ShortestPathPlugin extends Plugin {
 
     @Inject
     private PathTileOverlay pathOverlay;
+
+    @Inject
+    private ConfigManager configManager;
 
     @Inject
     private PathMinimapOverlay pathMinimapOverlay;
@@ -125,7 +135,7 @@ public class ShortestPathPlugin extends Plugin {
     private static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
     @Getter
     @Setter
-    private static Future<?> pathfinderFuture;
+    private static Future < ? > pathfinderFuture;
     @Getter
     private static final Object pathfinderMutex = new Object();
     @Getter
@@ -148,9 +158,8 @@ public class ShortestPathPlugin extends Plugin {
     @Override
     protected void startUp() {
         SplitFlagMap map = SplitFlagMap.fromResources();
-        Map<WorldPoint, List<Transport>> transports = Transport.loadAllFromResources();
-        List<Restriction> restrictions = Restriction.loadAllFromResources();
-
+        Map < WorldPoint, List < Transport >> transports = Transport.loadAllFromResources();
+        List < Restriction > restrictions = Restriction.loadAllFromResources();
 
         pathfinderConfig = new PathfinderConfig(map, transports, restrictions, client, config);
 
@@ -185,7 +194,7 @@ public class ShortestPathPlugin extends Plugin {
     }
 
     public void restartPathfinding(WorldPoint start, WorldPoint end) {
-        synchronized (pathfinderMutex) {
+        synchronized(pathfinderMutex) {
             if (pathfinder != null) {
                 pathfinder.cancel();
                 pathfinderFuture.cancel(true);
@@ -199,7 +208,7 @@ public class ShortestPathPlugin extends Plugin {
 
         getClientThread().invokeLater(() -> {
             pathfinderConfig.refresh();
-            synchronized (pathfinderMutex) {
+            synchronized(pathfinderMutex) {
                 pathfinder = new Pathfinder(pathfinderConfig, start, end);
                 pathfinderFuture = pathfindingExecutor.submit(pathfinder);
             }
@@ -213,7 +222,7 @@ public class ShortestPathPlugin extends Plugin {
         }
 
         var reachableTiles = Rs2Tile.getReachableTilesFromTile(location, config.recalculateDistance() - 1);
-        for (WorldPoint point : pathfinder.getPath()) {
+        for (WorldPoint point: pathfinder.getPath()) {
             if (reachableTiles.containsKey(point)) {
                 return true;
             }
@@ -230,6 +239,32 @@ public class ShortestPathPlugin extends Plugin {
             return;
         }
 
+        if ("travelToCustomLocation".equals(event.getKey())) {
+            boolean travelToCustomLocation = Boolean.parseBoolean(event.getNewValue());
+            if (travelToCustomLocation) {
+                handleTravelToCustomLocation();
+            } else {
+                stopTraveling();
+            }
+        }
+
+        if ("travelToBank".equals(event.getKey())) {
+            boolean travelToBank = Boolean.parseBoolean(event.getNewValue());
+            if (travelToBank) {
+                handleTravelToBank();
+            } else {
+                stopTraveling();
+            }
+        }
+
+        if ("travelToSlayerMaster".equals(event.getKey())) {
+            boolean travelToSlayerMaster = Boolean.parseBoolean(event.getNewValue());
+            if (travelToSlayerMaster) {
+                handleTravelToSlayerMaster();
+            } else {
+                stopTraveling();
+            }
+        }
         if ("drawDebugPanel".equals(event.getKey())) {
             if (config.drawDebugPanel()) {
                 overlayManager.add(debugOverlayPanel);
@@ -239,12 +274,12 @@ public class ShortestPathPlugin extends Plugin {
             return;
         }
 
-        // Transport option changed; rerun pathfinding
         if (TRANSPORT_OPTIONS_REGEX.matcher(event.getKey()).find()) {
             if (pathfinder != null) {
                 restartPathfinding(pathfinder.getStart(), pathfinder.getTarget());
             }
         }
+
     }
 
     @Subscribe
@@ -261,8 +296,8 @@ public class ShortestPathPlugin extends Plugin {
 
         var path = pathfinder.getPath();
 
-        if (Rs2Player.getWorldLocation().distanceTo(pathfinder.getTarget()) < reachedDistance
-                && Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), reachedDistance).containsKey(path.get(path.size() - 1))) {
+        if (Rs2Player.getWorldLocation().distanceTo(pathfinder.getTarget()) < reachedDistance &&
+                Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), reachedDistance).containsKey(path.get(path.size() - 1))) {
             setTarget(null);
             if (Microbot.getClientThread().scheduledFuture != null) {
                 Microbot.getClientThread().scheduledFuture.cancel(true);
@@ -295,7 +330,7 @@ public class ShortestPathPlugin extends Plugin {
             if (config.drawTransports()) {
                 addMenuEntry(event, ADD_START, TRANSPORT, 1);
                 addMenuEntry(event, ADD_END, TRANSPORT, 1);
-                // addMenuEntry(event, "Copy Position");
+
             }
 
             addMenuEntry(event, SET, TARGET, 1);
@@ -305,7 +340,7 @@ public class ShortestPathPlugin extends Plugin {
                 }
                 WorldPoint selectedTile = getSelectedWorldPoint();
                 if (pathfinder.getPath() != null) {
-                    for (WorldPoint tile : pathfinder.getPath()) {
+                    for (WorldPoint tile: pathfinder.getPath()) {
                         if (tile.equals(selectedTile)) {
                             addMenuEntry(event, CLEAR, PATH, 1);
                             break;
@@ -341,7 +376,7 @@ public class ShortestPathPlugin extends Plugin {
         }
     }
 
-    public static Map<WorldPoint, List<Transport>> getTransports() {
+    public static Map < WorldPoint, List < Transport >> getTransports() {
         return pathfinderConfig.getTransports();
     }
 
@@ -369,14 +404,14 @@ public class ShortestPathPlugin extends Plugin {
                     lastClick.getOption() + " " + Text.removeTags(lastClick.getTarget()) + " " + lastClick.getIdentifier()
             );
             Transport transport = new Transport(transportStart, transportEnd);
-            pathfinderConfig.getTransports().computeIfAbsent(transportStart, k -> new ArrayList<>()).add(transport);
+            pathfinderConfig.getTransports().computeIfAbsent(transportStart, k -> new ArrayList < > ()).add(transport);
         }
 
         if (entry.getOption().equals("Copy Position")) {
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
-                    new StringSelection("(" + currentLocation.getX() + ", "
-                            + currentLocation.getY() + ", "
-                            + currentLocation.getPlane() + ")"), null);
+                    new StringSelection("(" + currentLocation.getX() + ", " +
+                            currentLocation.getY() + ", " +
+                            currentLocation.getPlane() + ")"), null);
         }
 
         if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
@@ -394,6 +429,35 @@ public class ShortestPathPlugin extends Plugin {
         if (entry.getType() != MenuAction.WALK) {
             lastClick = entry;
         }
+    }
+
+    private void handleTravelToCustomLocation() {
+        int x = config.customLocationX();
+        int y = config.customLocationY();
+        int z = config.customLocationZ();
+
+        WorldPoint customLocation = new WorldPoint(x, y, z);
+        boolean walkResult = Rs2Walker.walkTo(customLocation);
+    }
+
+    private void handleTravelToBank() {
+        Banks selectedBank = config.selectedBank();
+
+        WorldPoint bankLocation = selectedBank.getWorldPoint();
+
+        if (bankLocation != null) {
+            boolean walkResult = Rs2Walker.walkTo(bankLocation);
+        } else {}
+    }
+
+    private void handleTravelToSlayerMaster() {
+        SlayerMasters selectedSlayerMaster = config.selectedSlayerMaster();
+
+        WorldPoint slayerMasterLocation = selectedSlayerMaster.getWorldPoint();
+
+        if (slayerMasterLocation != null) {
+            boolean walkResult = Rs2Walker.walkTo(slayerMasterLocation);
+        } else {}
     }
 
     private WorldPoint getSelectedWorldPoint() {
@@ -416,7 +480,7 @@ public class ShortestPathPlugin extends Plugin {
         }
 
         if (target == null) {
-            synchronized (pathfinderMutex) {
+            synchronized(pathfinderMutex) {
                 if (pathfinder != null) {
                     pathfinder.cancel();
                 }
@@ -462,8 +526,8 @@ public class ShortestPathPlugin extends Plugin {
             return null;
         }
 
-        final int dx = (int) ((point.getX() - middle.getX()) / zoom);
-        final int dy = (int) ((-(point.getY() - middle.getY())) / zoom);
+        final int dx = (int)((point.getX() - middle.getX()) / zoom);
+        final int dy = (int)((-(point.getY() - middle.getY())) / zoom);
 
         return mapPoint.dx(dx).dy(dy);
     }
@@ -486,8 +550,8 @@ public class ShortestPathPlugin extends Plugin {
             int yTileOffset = (yTileMax - worldPoint.getY() - 1) * -1;
             int xTileOffset = worldPoint.getX() + widthInTiles / 2 - worldMapPosition.getX();
 
-            int xGraphDiff = ((int) (xTileOffset * pixelsPerTile));
-            int yGraphDiff = (int) (yTileOffset * pixelsPerTile);
+            int xGraphDiff = ((int)(xTileOffset * pixelsPerTile));
+            int yGraphDiff = (int)(yTileOffset * pixelsPerTile);
 
             yGraphDiff -= pixelsPerTile - Math.ceil(pixelsPerTile / 2);
             xGraphDiff += pixelsPerTile - Math.ceil(pixelsPerTile / 2);
@@ -502,7 +566,7 @@ public class ShortestPathPlugin extends Plugin {
     }
 
     private void addMenuEntry(MenuEntryAdded event, String option, String target, int position) {
-        List<MenuEntry> entries = new LinkedList<>(Arrays.asList(client.getMenuEntries()));
+        List < MenuEntry > entries = new LinkedList < > (Arrays.asList(client.getMenuEntries()));
 
         if (entries.stream().anyMatch(e -> e.getOption().equals(option) && e.getTarget().equals(target))) {
             return;
@@ -581,7 +645,7 @@ public class ShortestPathPlugin extends Plugin {
         Color previousColour;
         final int width = image.getWidth();
         final int height = image.getHeight();
-        List<java.awt.Point> points = new ArrayList<>();
+        List < java.awt.Point > points = new ArrayList < > ();
         for (int y = 0; y < height; y++) {
             previousColour = outsideColour;
             for (int x = 0; x < width; x++) {
@@ -607,9 +671,46 @@ public class ShortestPathPlugin extends Plugin {
         int offsetX = minimapRectangle.x;
         int offsetY = minimapRectangle.y;
         Polygon polygon = new Polygon();
-        for (java.awt.Point point : points) {
+        for (java.awt.Point point: points) {
             polygon.addPoint(point.x + offsetX, point.y + offsetY);
         }
         return polygon;
+    }
+
+    private void stopTraveling() {
+
+        Rs2Walker.setTarget(null);
+
+        synchronized(pathfinderMutex) {
+            if (pathfinder != null) {
+                pathfinder.cancel();
+            }
+            setPathfinder(null);
+            if (pathfinderFuture != null) {
+                pathfinderFuture.cancel(true);
+            }
+        }
+
+        Microbot.getWorldMapPointManager().remove(getMarker());
+        setMarker(null);
+        setStartPointSet(false);
+
+        if (Microbot.getClientThread().scheduledFuture != null) {
+            Microbot.getClientThread().scheduledFuture.cancel(true);
+        }
+
+        Player localPlayer = client.getLocalPlayer();
+        if (localPlayer != null) {
+            WorldPoint currentLocation = localPlayer.getWorldLocation();
+            setLastLocation(currentLocation);
+
+            configManager.setConfiguration(CONFIG_GROUP, "travelToCustomLocation", false);
+            configManager.setConfiguration(CONFIG_GROUP, "travelToBank", false);
+            configManager.setConfiguration(CONFIG_GROUP, "travelToSlayerMaster", false);
+
+            Rs2Walker.currentTarget = null;
+
+            Microbot.log("Web walking stopping...");
+        }
     }
 }
