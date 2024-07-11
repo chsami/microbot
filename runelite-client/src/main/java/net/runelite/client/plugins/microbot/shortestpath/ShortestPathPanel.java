@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.microbot.shortestpath;
 
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.shortestpath.enums.*;
-import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.ComboBoxListRenderer;
 
@@ -12,9 +12,12 @@ import java.awt.*;
 
 public class ShortestPathPanel extends PluginPanel {
 
-    private final ShortestPathConfig config;
     private final ShortestPathPlugin plugin;
 
+    private JTextField xField, yField, zField;
+    private JComboBox<Banks> bankComboBox;
+    private JComboBox<SlayerMasters> slayerMasterComboBox;
+    private JComboBox<Farming> farmingComboBox;
     private JComboBox<Allotments> allotmentsComboBox;
     private JComboBox<Bushes> bushesComboBox;
     private JComboBox<FruitTrees> fruitTreesComboBox;
@@ -23,9 +26,8 @@ public class ShortestPathPanel extends PluginPanel {
     private JComboBox<Trees> treesComboBox;
 
     @Inject
-    private ShortestPathPanel(ShortestPathConfig config, ShortestPathPlugin plugin) {
+    private ShortestPathPanel(ShortestPathPlugin plugin) {
         super();
-        this.config = config;
         this.plugin = plugin;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -60,9 +62,9 @@ public class ShortestPathPanel extends PluginPanel {
         yLabel.setHorizontalAlignment(SwingConstants.CENTER);
         zLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JTextField xField = new JTextField(String.valueOf(config.customLocationX()), 5);
-        JTextField yField = new JTextField(String.valueOf(config.customLocationY()), 5);
-        JTextField zField = new JTextField(String.valueOf(config.customLocationZ()), 5);
+        xField = new JTextField("0", 5);
+        yField = new JTextField("0", 5);
+        zField = new JTextField("0", 5);
 
         xField.setHorizontalAlignment(JTextField.CENTER);
         yField.setHorizontalAlignment(JTextField.CENTER);
@@ -79,19 +81,8 @@ public class ShortestPathPanel extends PluginPanel {
         JButton startButton = new JButton("Start");
         JButton stopButton = new JButton("Stop");
 
-        startButton.addActionListener(e -> {
-            try {
-                int x = Integer.parseInt(xField.getText());
-                int y = Integer.parseInt(yField.getText());
-                int z = Integer.parseInt(zField.getText());
-                plugin.updateCustomLocation(x, y, z);
-                config.travelToCustomLocation(true);
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(panel, "Please enter valid coordinates.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        stopButton.addActionListener(e -> config.travelToCustomLocation(false));
+        startButton.addActionListener(e -> plugin.handleTravelToCustomLocation());
+        stopButton.addActionListener(e -> plugin.stopTraveling());
 
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
@@ -108,7 +99,7 @@ public class ShortestPathPanel extends PluginPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(createCenteredTitledBorder("Travel to Bank"));
 
-        JComboBox<Banks> bankComboBox = new JComboBox<>(Banks.values());
+        bankComboBox = new JComboBox<>(Banks.values());
         bankComboBox.setRenderer(new ComboBoxListRenderer());
         bankComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         bankComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, bankComboBox.getPreferredSize().height));
@@ -118,13 +109,8 @@ public class ShortestPathPanel extends PluginPanel {
         JButton startButton = new JButton("Start");
         JButton stopButton = new JButton("Stop");
 
-        startButton.addActionListener(e -> {
-            Banks selectedBank = (Banks) bankComboBox.getSelectedItem();
-            config.selectedBank(selectedBank);
-            config.travelToBank(true);
-        });
-
-        stopButton.addActionListener(e -> config.travelToBank(false));
+        startButton.addActionListener(e -> plugin.handleTravelToBank());
+        stopButton.addActionListener(e -> plugin.stopTraveling());
 
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
@@ -141,7 +127,7 @@ public class ShortestPathPanel extends PluginPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(createCenteredTitledBorder("Travel to Slayer Master"));
 
-        JComboBox<SlayerMasters> slayerMasterComboBox = new JComboBox<>(SlayerMasters.values());
+        slayerMasterComboBox = new JComboBox<>(SlayerMasters.values());
         slayerMasterComboBox.setRenderer(new ComboBoxListRenderer());
         slayerMasterComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         slayerMasterComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, slayerMasterComboBox.getPreferredSize().height));
@@ -151,13 +137,8 @@ public class ShortestPathPanel extends PluginPanel {
         JButton startButton = new JButton("Start");
         JButton stopButton = new JButton("Stop");
 
-        startButton.addActionListener(e -> {
-            SlayerMasters selectedSlayerMaster = (SlayerMasters) slayerMasterComboBox.getSelectedItem();
-            config.selectedSlayerMaster(selectedSlayerMaster);
-            config.travelToSlayerMaster(true);
-        });
-
-        stopButton.addActionListener(e -> config.travelToSlayerMaster(false));
+        startButton.addActionListener(e -> plugin.handleTravelToSlayerMaster());
+        stopButton.addActionListener(e -> plugin.stopTraveling());
 
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
@@ -174,7 +155,7 @@ public class ShortestPathPanel extends PluginPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(createCenteredTitledBorder("Travel to Farming Location"));
 
-        JComboBox<Farming> farmingComboBox = new JComboBox<>(Farming.values());
+        farmingComboBox = new JComboBox<>(Farming.values());
         farmingComboBox.setRenderer(new ComboBoxListRenderer());
         farmingComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         farmingComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, farmingComboBox.getPreferredSize().height));
@@ -199,7 +180,6 @@ public class ShortestPathPanel extends PluginPanel {
 
         farmingComboBox.addActionListener(e -> {
             Farming selectedFarming = (Farming) farmingComboBox.getSelectedItem();
-            config.catFarming(selectedFarming);
             allotmentsComboBox.setVisible(selectedFarming == Farming.ALLOTMENTS);
             bushesComboBox.setVisible(selectedFarming == Farming.BUSHES);
             fruitTreesComboBox.setVisible(selectedFarming == Farming.FRUIT_TREES);
@@ -212,34 +192,8 @@ public class ShortestPathPanel extends PluginPanel {
         JButton startButton = new JButton("Start");
         JButton stopButton = new JButton("Stop");
 
-        startButton.addActionListener(e -> {
-            Farming selectedFarming = (Farming) farmingComboBox.getSelectedItem();
-            config.catFarming(selectedFarming);
-            switch (selectedFarming) {
-                case ALLOTMENTS:
-                    config.selectedAllotment((Allotments) allotmentsComboBox.getSelectedItem());
-                    break;
-                case BUSHES:
-                    config.selectedBush((Bushes) bushesComboBox.getSelectedItem());
-                    break;
-                case FRUIT_TREES:
-                    config.selectedFruitTree((FruitTrees) fruitTreesComboBox.getSelectedItem());
-                    break;
-                case HERBS:
-                    config.selectedHerb((Herbs) herbsComboBox.getSelectedItem());
-                    break;
-                case HOPS:
-                    config.selectedHop((Hops) hopsComboBox.getSelectedItem());
-                    break;
-                case TREES:
-                    config.selectedTree((Trees) treesComboBox.getSelectedItem());
-                    break;
-            }
-            config.travelToFarming(true);
-            plugin.handleTravelToFarmingLocation();
-        });
-
-        stopButton.addActionListener(e -> config.travelToFarming(false));
+        startButton.addActionListener(e -> plugin.handleTravelToFarmingLocation());
+        stopButton.addActionListener(e -> plugin.stopTraveling());
 
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
@@ -252,5 +206,48 @@ public class ShortestPathPanel extends PluginPanel {
         panel.add(buttonPanel);
 
         return panel;
+    }
+
+    public WorldPoint getCustomLocation() {
+        try {
+            int x = Integer.parseInt(xField.getText());
+            int y = Integer.parseInt(yField.getText());
+            int z = Integer.parseInt(zField.getText());
+            return new WorldPoint(x, y, z);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    public Banks getSelectedBank() {
+        return (Banks) bankComboBox.getSelectedItem();
+    }
+
+    public SlayerMasters getSelectedSlayerMaster() {
+        return (SlayerMasters) slayerMasterComboBox.getSelectedItem();
+    }
+
+    public Farming getSelectedFarmingCategory() {
+        return (Farming) farmingComboBox.getSelectedItem();
+    }
+
+    public WorldPoint getSelectedFarmingLocation() {
+        Farming selectedFarming = getSelectedFarmingCategory();
+        switch (selectedFarming) {
+            case ALLOTMENTS:
+                return ((Allotments) allotmentsComboBox.getSelectedItem()).getWorldPoint();
+            case BUSHES:
+                return ((Bushes) bushesComboBox.getSelectedItem()).getWorldPoint();
+            case FRUIT_TREES:
+                return ((FruitTrees) fruitTreesComboBox.getSelectedItem()).getWorldPoint();
+            case HERBS:
+                return ((Herbs) herbsComboBox.getSelectedItem()).getWorldPoint();
+            case HOPS:
+                return ((Hops) hopsComboBox.getSelectedItem()).getWorldPoint();
+            case TREES:
+                return ((Trees) treesComboBox.getSelectedItem()).getWorldPoint();
+            default:
+                return null;
+        }
     }
 }

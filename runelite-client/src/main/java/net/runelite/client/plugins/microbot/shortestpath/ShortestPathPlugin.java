@@ -468,69 +468,31 @@ public class ShortestPathPlugin extends Plugin {
         }
     }
 
-    private void handleTravelToCustomLocation() {
-        int x = config.customLocationX();
-        int y = config.customLocationY();
-        int z = config.customLocationZ();
-
-        WorldPoint customLocation = new WorldPoint(x, y, z);
-        boolean walkResult = Rs2Walker.walkTo(customLocation);
+    public void handleTravelToCustomLocation() {
+        WorldPoint customLocation = panel.getCustomLocation();
+        if (customLocation != null) {
+            boolean walkResult = Rs2Walker.walkTo(customLocation);
+        }
     }
 
-    private void handleTravelToBank() {
-        Banks selectedBank = config.selectedBank();
-
+    public void handleTravelToBank() {
+        Banks selectedBank = panel.getSelectedBank();
         WorldPoint bankLocation = selectedBank.getWorldPoint();
-
         if (bankLocation != null) {
             boolean walkResult = Rs2Walker.walkTo(bankLocation);
-        } else {}
+        }
     }
 
-    private void handleTravelToSlayerMaster() {
-        SlayerMasters selectedSlayerMaster = config.selectedSlayerMaster();
-
+    public void handleTravelToSlayerMaster() {
+        SlayerMasters selectedSlayerMaster = panel.getSelectedSlayerMaster();
         WorldPoint slayerMasterLocation = selectedSlayerMaster.getWorldPoint();
-
         if (slayerMasterLocation != null) {
             boolean walkResult = Rs2Walker.walkTo(slayerMasterLocation);
-        } else {}
+        }
     }
 
     public void handleTravelToFarmingLocation() {
-        WorldPoint farmingLocation = null;
-        String selectedCategory = config.catFarming().name();
-        String selectedLocation = "NONE";
-
-        switch (config.catFarming()) {
-            case ALLOTMENTS:
-                selectedLocation = config.selectedAllotment().name();
-                farmingLocation = config.selectedAllotment().getWorldPoint();
-                break;
-            case BUSHES:
-                selectedLocation = config.selectedBush().name();
-                farmingLocation = config.selectedBush().getWorldPoint();
-                break;
-            case FRUIT_TREES:
-                selectedLocation = config.selectedFruitTree().name();
-                farmingLocation = config.selectedFruitTree().getWorldPoint();
-                break;
-            case HERBS:
-                selectedLocation = config.selectedHerb().name();
-                farmingLocation = config.selectedHerb().getWorldPoint();
-                break;
-            case HOPS:
-                selectedLocation = config.selectedHop().name();
-                farmingLocation = config.selectedHop().getWorldPoint();
-                break;
-            case TREES:
-                selectedLocation = config.selectedTree().name();
-                farmingLocation = config.selectedTree().getWorldPoint();
-                break;
-            default:
-                return;
-        }
-
+        WorldPoint farmingLocation = panel.getSelectedFarmingLocation();
         if (farmingLocation != null) {
             boolean walkResult = Rs2Walker.walkTo(farmingLocation);
         }
@@ -759,7 +721,7 @@ public class ShortestPathPlugin extends Plugin {
         configManager.setConfiguration(CONFIG_GROUP, "customLocationZ", z);
     }
 
-    private void stopTraveling() {
+    void stopTraveling() {
 
         Rs2Walker.setTarget(null);
 
