@@ -229,7 +229,7 @@ public class Rs2Walker {
                         continue;
 
                     int tileData = flags[localTilePoint.getSceneX()][localTilePoint.getSceneY()];
-                    Set<MovementFlag> tileFlags = MovementFlag.getSetFlags(data);
+                    Set<MovementFlag> tileFlags = MovementFlag.getSetFlags(tileData);
 
                     if (tileFlags.isEmpty())
                         return tile;
