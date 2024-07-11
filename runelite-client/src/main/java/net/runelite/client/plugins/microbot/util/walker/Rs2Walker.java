@@ -189,6 +189,8 @@ public class Rs2Walker {
             } catch (Exception ex) {
                 if (ex instanceof InterruptedException) return false;
                 Microbot.log("Microbot Walker Exception " + ex.getMessage());
+                System.out.println(ex.getMessage());
+                ex.printStackTrace(System.out);
             }
             return false;
         });

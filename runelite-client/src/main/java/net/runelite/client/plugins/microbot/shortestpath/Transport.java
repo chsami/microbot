@@ -489,7 +489,6 @@ public class Transport {
     }
 
     // Constants for widget IDs
-    private static final int FAIRY_RING_ID = 29495;
     private static final int FAIRY_RING_MENU = 26083328;
 
     private static final int SLOT_ONE = 26083331;
@@ -549,7 +548,8 @@ public class Transport {
 
         if (Rs2Equipment.isWearing("Dramen staff") || Rs2Equipment.isWearing("Lunar staff")) {
             System.out.println("Interacting with the fairy ring directly.");
-            Rs2GameObject.interact(FAIRY_RING_ID, "Configure");
+            var fairyRing = Rs2GameObject.findObjectByLocation(origin);
+            Rs2GameObject.interact(fairyRing, "Configure");
         } else if (Rs2Inventory.contains("Dramen staff")) {
             Rs2Inventory.equip("Dramen staff");
             sleep(600);
