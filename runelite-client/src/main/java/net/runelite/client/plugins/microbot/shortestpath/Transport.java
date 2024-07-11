@@ -360,7 +360,7 @@ public class Transport {
         GNOME_GLIDER,
         SPIRIT_TREE,
         TELEPORTATION_LEVER,
-        TELEPORTATION_PORTAL
+        TELEPORTATION_PORTAL,
         NPC,
     }
 

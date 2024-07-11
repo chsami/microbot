@@ -264,10 +264,10 @@ public class PathfinderConfig {
             return false;
         }
 
-        }
-
         if (isNpc && !useNpcs){
             return false;
+        }
+
         if (transport.getItems().entrySet().stream().anyMatch(x -> !Rs2Inventory.hasItemAmount(x.getKey(), x.getValue())))
             return false;
 
