@@ -155,4 +155,10 @@
 3500 9510 2	3506 9505 2	Squeeze-through Crevice 16465	86 Agility				
 3506 9505 2	3500 9510 2	Squeeze-through Crevice 16465	86 Agility
 3308 3491 0	3308 3493 0	Climb-over Broken fence 2618
-3308 3493 0	3308 3491 0	Climb-over Broken fence 2618
+3308 3493 0	3308 3491 0	Climb-over Broken fence 2618	
+3221 9556 0	3221 9552 0	Jump-across Stepping stone 5949	23 Agility
+3221 9552 0	3221 9556 0	Jump-across Stepping stone 5949	23 Agility				
+3241 9524 2	3239 9524 2	Climb Rocks 6673	23 Agility				
+3239 9524 2	3241 9524 2	Climb Rocks 6673	23 Agility				
+3241 9525 2	3239 9525 2	Climb Rocks 6673	23 Agility				
+3239 9525 2	3241 9525 2	Climb Rocks 6673	23 Agility				

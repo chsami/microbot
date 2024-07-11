@@ -379,7 +379,7 @@ public class Rs2Walker {
 
         if (index == path.size() - 1) return false;
 
-        var doorActions = Arrays.asList("open", "pay-toll", "pick-lock", "walk-through");
+        var doorActions = Arrays.asList("pay-toll", "pick-lock", "walk-through", "open");
 
         // Check this and the next tile for door objects
         for (int doorIndex = index; doorIndex < index + 2; doorIndex++){
@@ -395,7 +395,9 @@ public class Rs2Walker {
             if (objectComp == null) continue;
 
             // Match action
-            var action = Arrays.stream(objectComp.getActions()).filter(x -> x != null && doorActions.contains(x.toLowerCase())).findFirst().orElse(null);
+            var action = Arrays.stream(objectComp.getActions())
+                    .filter(x -> x != null && doorActions.contains(x.toLowerCase()))
+                    .min(Comparator.comparing(x -> doorActions.indexOf(x.toLowerCase()))).orElse(null);
             if (action == null) continue;
 
             boolean found = false;
@@ -634,24 +636,10 @@ public class Rs2Walker {
                         return true;
                     }
 
-
-                    //check wall objects (tunnels)
-                    WallObject wallObject = Rs2GameObject.getWallObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
-                    if (wallObject != null && wallObject.getId() == b.getObjectId()) {
-                        boolean interact = Rs2GameObject.interact(wallObject, b.getAction(), true);
-                        if (!interact) {
-                            Rs2Walker.walkMiniMap(path.get(i));
-                            sleep(1600, 2000);
-                            return false;
-                        }
-                        Rs2Player.waitForWalking();
-                        return true;
-                    }
-
-                    //check ground objects
-                    GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
-                    if (groundObject != null && groundObject.getId() == b.getObjectId()) {
-                        boolean interact = Rs2GameObject.interact(groundObject, b.getAction(), true);
+                        //check tile objects
+                        TileObject tileObject = Rs2GameObject.getTileObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+                        if (tileObject != null && tileObject.getId() == b.getObjectId()) {
+                            boolean interact = Rs2GameObject.interact(tileObject, b.getAction(), true);
                         if (!interact) {
                             Rs2Walker.walkMiniMap(path.get(i));
                             sleep(1600, 2000);
