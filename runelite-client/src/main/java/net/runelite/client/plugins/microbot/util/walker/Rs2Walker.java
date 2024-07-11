@@ -593,7 +593,7 @@ public class Rs2Walker {
                     if (indexOfDestination < indexOfOrigin) continue;
 
                     if (path.get(i).equals(origin)) {
-                        if (b.isShip()) {
+                        if (b.isShip() || b.isNpc()) {
                             if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
                                 Rs2Npc.interact(b.getNpcName(), b.getAction());
                                 sleep(1200, 1600);

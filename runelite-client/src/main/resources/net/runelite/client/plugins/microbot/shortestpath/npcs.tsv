@@ -1,0 +1,14 @@
+# X Y Z	X Y Z	menuOption menuTarget objectID	Skill requirements	Item requirements	Quest	Travel time	Info
+# Lumbridge cellar
+3319 9615 0	3232 9610 0	Cellar Mistag 7299			Death to the Dorgeshuun
+3319 9615 0	3245 9648 0	Watermill Mistag 7299			Death to the Dorgeshuun
+3229 9610 0	3313 9613 0	Mines Kazgar 7301			Death to the Dorgeshuun
+3229 9610 0	3245 9648 0	Watermill Kazgar 7301			Death to the Dorgeshuun
+3245 9648 0	3232 9610 0	Cellar Dartog 997			Death to the Dorgeshuun
+3245 9648 0	3313 9613 0	Mines Dartog 997			Death to the Dorgeshuun
+3319 9615 0	3232 9610 0	Follow Mistag 7298			The Lost Tribe
+3229 9610 0	3313 9613 0	Follow Kazgar 7300			The Lost Tribe
+
+# Tree gnome village
+2503 3193 0	2515 3159 0	Follow Elkoy 4968			Tree Gnome Village
+2515 3159 0	2503 3193 0	Follow Elkoy 4968			Tree Gnome Village
