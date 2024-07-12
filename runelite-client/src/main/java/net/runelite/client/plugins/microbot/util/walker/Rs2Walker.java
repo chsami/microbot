@@ -696,75 +696,75 @@ public class Rs2Walker {
                                 sleep(1200, 1600);
                             }
                         }
-                    }
 
-                    if (origin != null && b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
+                        if (origin != null && b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
                             handled |= handleTrapdoor(b);
-                    }
+                        }
 
-                    if (b.isSpiritTree()) {
+                        if (b.isSpiritTree()) {
                             handled |= b.handleSpiritTree();
-                    }
+                        }
 
 
-                    if (b.isGnomeGlider()) {
+                        if (b.isGnomeGlider()) {
                             handled |= b.handleGlider();
-                    }
+                        }
 
-                    if (b.isFairyRing()) {
+                        if (b.isFairyRing()) {
                             handled |= b.handleFairyRing();
-                    }
+                        }
 
-                        if (b.isPlayerItem()){
+                        if (b.isPlayerItem()) {
                             handled |= b.handleItemTeleport();
                         }
 
                         if (handled)
                             return true;
 
-                    GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+                        GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
 
-                    //check game objects
-                    if (gameObject != null && gameObject.getId() == b.getObjectId()) {
-                        boolean interact = Rs2GameObject.interact(gameObject, b.getAction(), true);
-                        if (!interact) {
-                            Rs2Walker.walkMiniMap(path.get(i));
-                            sleep(1600, 2000);
-                            return false;
-                        }
-                        Rs2Player.waitForWalking();
-                        return true;
-                    }
-
-
-                    //check wall objects (tunnels)
-                    WallObject wallObject = Rs2GameObject.getWallObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
-                    if (wallObject != null && wallObject.getId() == b.getObjectId()) {
-                        boolean interact = Rs2GameObject.interact(wallObject, b.getAction(), true);
-                        if (!interact) {
-                            Rs2Walker.walkMiniMap(path.get(i));
-                            sleep(1600, 2000);
-                            return false;
-                        }
-                        Rs2Player.waitForWalking();
-                        return true;
-                    }
-
-                    //check ground objects
-                    GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
-                    if (groundObject != null && groundObject.getId() == b.getObjectId()) {
-                        boolean interact = Rs2GameObject.interact(groundObject, b.getAction(), true);
-                        if (!interact) {
-                            Rs2Walker.walkMiniMap(path.get(i));
-                            sleep(1600, 2000);
-                            return false;
-                        }
-                        if (b.isAgilityShortcut()) {
-                            Rs2Player.waitForAnimation();
-                        } else {
+                        //check game objects
+                        if (gameObject != null && gameObject.getId() == b.getObjectId()) {
+                            boolean interact = Rs2GameObject.interact(gameObject, b.getAction(), true);
+                            if (!interact) {
+                                Rs2Walker.walkMiniMap(path.get(i));
+                                sleep(1600, 2000);
+                                return false;
+                            }
                             Rs2Player.waitForWalking();
+                            return true;
                         }
-                        return true;
+
+
+                        //check wall objects (tunnels)
+                        WallObject wallObject = Rs2GameObject.getWallObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+                        if (wallObject != null && wallObject.getId() == b.getObjectId()) {
+                            boolean interact = Rs2GameObject.interact(wallObject, b.getAction(), true);
+                            if (!interact) {
+                                Rs2Walker.walkMiniMap(path.get(i));
+                                sleep(1600, 2000);
+                                return false;
+                            }
+                            Rs2Player.waitForWalking();
+                            return true;
+                        }
+
+                        //check ground objects
+                        GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
+                        if (groundObject != null && groundObject.getId() == b.getObjectId()) {
+                            boolean interact = Rs2GameObject.interact(groundObject, b.getAction(), true);
+                            if (!interact) {
+                                Rs2Walker.walkMiniMap(path.get(i));
+                                sleep(1600, 2000);
+                                return false;
+                            }
+                            if (b.isAgilityShortcut()) {
+                                Rs2Player.waitForAnimation();
+                            } else {
+                                Rs2Player.waitForWalking();
+                            }
+                            return true;
+                        }
                     }
                 }
             }
