@@ -386,8 +386,17 @@ public class Rs2Walker {
             var point = path.get(doorIndex);
 
             // Handle wall and game objects
-            var object = Rs2GameObject.findObjectByLocation(point);
-            if (object == null || object instanceof GroundObject || object instanceof DecorativeObject) continue;
+            TileObject object = null;
+            var tile = Rs2GameObject.getTiles(3).stream()
+                    .filter(x -> x.getWorldLocation().equals(point))
+                    .findFirst().orElse(null);
+            if (tile != null)
+                object = tile.getWallObject();
+
+            if (object == null)
+                object = Rs2GameObject.getGameObject(point);
+
+            if (object == null) continue;
 
             var objectComp = Rs2GameObject.getObjectComposition(object.getId());
             if (objectComp == null) continue;
