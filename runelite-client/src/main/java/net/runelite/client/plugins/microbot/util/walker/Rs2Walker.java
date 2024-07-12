@@ -149,7 +149,7 @@ public class Rs2Walker {
                             continue;
                         }
 
-                        if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance()
+                        if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > 10
                                 || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
                             // InstancedRegions require localPoint instead of worldpoint to navigate
                             if (Microbot.getClient().isInInstancedRegion()) {
@@ -379,7 +379,7 @@ public class Rs2Walker {
 
         if (index == path.size() - 1) return false;
 
-        var doorActions = Arrays.asList("pay-toll", "pick-lock", "walk-through", "open");
+        var doorActions = Arrays.asList("pay-toll", "pick-lock", "walk-through", "go-through", "open");
 
         // Check this and the next tile for door objects
         for (int doorIndex = index; doorIndex < index + 2; doorIndex++){

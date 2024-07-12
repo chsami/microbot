@@ -4459,3 +4459,7 @@
 3219 9532 2	3226 9542 0	Enter Tunnel 6658
 3317 9603 0	2748 5374 0	Open Door 6919
 2748 5374 0	3317 9603 0	Open Bone door 22945
+
+# Mountain camp
+2761 3657 0	2761 3660 0	Clib-over Rockslide 5847
+2761 3660 0	2761 3657 0	Clib-over Rockslide 5847
