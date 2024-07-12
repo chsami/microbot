@@ -601,9 +601,20 @@ public class Rs2Walker {
 
                     if (path.get(i).equals(origin)) {
                         if (b.isShip() || b.isNpc()) {
-                            if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
-                                Rs2Npc.interact(b.getNpcName(), b.getAction());
-                                sleep(1200, 1600);
+                            var npcAndAction = String.format("%s %s", b.getAction(), b.getNpcName());
+                            NPC npc = null;
+                            String action = "";
+                            for (int n = npcAndAction.indexOf(" "); n >= 0; n = npcAndAction.indexOf(" ", n + 1)){
+                                npc = Rs2Npc.getNpc(npcAndAction.substring(n + 1));
+                                if (npc != null){
+                                    action = npcAndAction.substring(0, n);
+                                    break;
+                                }
+                            }
+
+                            if (Rs2Npc.canWalkTo(npc, 20)){
+                                Rs2Npc.interact(npc, action);
+                                Rs2Player.waitForWalking();
                             } else {
                                 Rs2Walker.walkFastCanvas(path.get(i));
                                 sleep(1200, 1600);
