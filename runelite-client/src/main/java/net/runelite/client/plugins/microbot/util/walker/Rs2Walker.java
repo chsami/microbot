@@ -600,7 +600,7 @@ public class Rs2Walker {
                     if (indexOfDestination < indexOfOrigin) continue;
 
                     if (path.get(i).equals(origin)) {
-                        if (b.isShip() || b.isNpc()) {
+                        if (b.isShip() || b.isNpc() || b.isBoat()) {
                             var npcAndAction = String.format("%s %s", b.getAction(), b.getNpcName());
                             NPC npc = null;
                             String action = "";

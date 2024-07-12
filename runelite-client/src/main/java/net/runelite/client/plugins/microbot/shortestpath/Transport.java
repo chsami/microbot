@@ -557,6 +557,7 @@ public class Transport {
             System.out.println("Interacting with the fairy ring directly.");
             var fairyRing = Rs2GameObject.findObjectByLocation(origin);
             Rs2GameObject.interact(fairyRing, "Configure");
+            Rs2Player.waitForWalking();
         } else if (Rs2Inventory.contains("Dramen staff")) {
             Rs2Inventory.equip("Dramen staff");
             sleep(600);
