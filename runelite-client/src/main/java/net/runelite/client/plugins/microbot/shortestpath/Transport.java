@@ -2,22 +2,31 @@ package net.runelite.client.plugins.microbot.shortestpath;
 
 import com.google.common.base.Strings;
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 /**
  * This class represents a travel point between two WorldPoints.
@@ -50,9 +59,11 @@ public class Transport {
     @Getter
     private List<Quest> quests = new ArrayList<>();
 
-    /**
-     * Whether the transport is an agility shortcut
-     */
+    /** The ids of items required to use this transport. If the player has **any** matching item, this transport is valid */
+    @Getter
+    private List<Integer> itemRequirements = new ArrayList<>();
+
+    /** Whether the transport is an agility shortcut */
     @Getter
     private boolean isAgilityShortcut;
 
@@ -116,9 +127,12 @@ public class Transport {
     @Getter
     private boolean isTeleportationPortal;
 
-    /**
-     * The additional travel time
-     */
+    /** Whether the transport is a player-held item */
+    @Getter
+    private boolean isPlayerItem;
+
+    /** The additional travel time */
+    @Setter
     @Getter
     private int wait;
 
@@ -136,13 +150,28 @@ public class Transport {
     private int objectId;
     @Getter
     private boolean isMember;
-
+    
     @Getter
     private String npcName;
+
+    /** If this is an item transport, this tracks if it is consumable (as opposed to having infinite uses) */
+    @Getter
+    private final boolean isConsumable;
+
+    /** If this is an item transport, this is the maximum wilderness level that it can be used in */
+    @Getter
+    private final int maxWildernessLevel;
+
+    /** Any varbits to check for the transport to be valid. All must pass for a transport to be valid */
+    @Getter
+    private final List<TransportVarbit> varbits;
 
     Transport(final WorldPoint origin, final WorldPoint destination) {
         this.origin = origin;
         this.destination = destination;
+        this.isConsumable = false;
+        this.maxWildernessLevel = -1;
+        this.varbits = new ArrayList<>();
     }
 
     Transport(final String line, TransportType transportType) {
@@ -153,20 +182,26 @@ public class Transport {
         String[] parts_origin = parts[0].split(DELIM);
         String[] parts_destination = parts[1].split(DELIM);
 
-        origin = new WorldPoint(
+        if (!TransportType.PLAYER_ITEM.equals(transportType)) {
+            origin = new WorldPoint(
                 Integer.parseInt(parts_origin[0]),
                 Integer.parseInt(parts_origin[1]),
                 Integer.parseInt(parts_origin[2]));
+        } else {
+            origin = null;
+        }
         destination = new WorldPoint(
                 Integer.parseInt(parts_destination[0]),
                 Integer.parseInt(parts_destination[1]),
                 Integer.parseInt(parts_destination[2]));
 
         try {
-            action = parts[2].split(DELIM)[0];
-            String npcAndObjectId = parts[2].substring(parts[2].indexOf(action) + action.length()).trim();
-            npcName = npcAndObjectId.replaceAll("\\d", "").trim();  // Remove the numbers to get the NPC name
-            objectId = Integer.parseInt(parts[2].split(DELIM)[parts[2].split(DELIM).length - 1]);
+            if (!parts[2].isBlank()){
+                action = parts[2].split(DELIM)[0];
+                String npcAndObjectId = parts[2].substring(parts[2].indexOf(action) + action.length()).trim();
+                npcName = npcAndObjectId.replaceAll("\\d", "").trim();  // Remove the numbers to get the NPC name
+                objectId = Integer.parseInt(parts[2].split(DELIM)[parts[2].split(DELIM).length - 1]);
+            }
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -191,8 +226,15 @@ public class Transport {
             }
         }
 
-        // Item requirements
-        if (parts.length >= 5 && !parts[4].isEmpty()) {
+        itemRequirements = new ArrayList<>();
+        // Item requirements are currently only implemented for player-held item transports
+        if (TransportType.PLAYER_ITEM.equals(transportType)) {
+            String[] itemIds = parts[4].split(";");
+            for (String item : itemIds) {
+                int itemId = Integer.parseInt(item);
+                itemRequirements.add(itemId);
+            }
+        } else if (parts.length >= 5 && !parts[4].isEmpty()) {
             String[] itemRequirements = parts[4].split(";");
 
             for (String requirement : itemRequirements) {
@@ -206,7 +248,7 @@ public class Transport {
                 try {
                     amount = Integer.parseInt(requirement.substring(0, splitIndex));
                     item = requirement.substring(splitIndex + 1);
-                } catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
                     amount = 1;
                     item = requirement;
                 }
@@ -224,10 +266,35 @@ public class Transport {
         if (parts.length >= 7 && !parts[6].isEmpty()) {
             this.wait = Integer.parseInt(parts[6]);
         }
+        if (TransportType.PLAYER_ITEM.equals(transportType)) {
+            // Item transports should always have a non-zero wait, so the pathfinder doesn't calculate the cost by distance
+            this.wait = Math.max(this.wait, 1);
+        }
 
         // Destination
         if (parts.length >= 8 && !parts[7].isEmpty()) {
             this.displayInfo = parts[7];
+        }
+
+        // Consumable - for item transports
+        this.isConsumable = parts.length >= 9 && parts[8].equals("T");
+
+        // Wilderness level - for item transports
+        if (parts.length >= 10 && !parts[9].isEmpty()) {
+            this.maxWildernessLevel = Integer.parseInt(parts[9]);
+        } else {
+            this.maxWildernessLevel = -1;
+        }
+
+        this.varbits = new ArrayList<>();
+        // Varbit check - all must evaluate to true
+        if (parts.length >= 11 && !parts[10].isEmpty()) {
+            for (String varbitCheck : parts[10].split(DELIM)) {
+                var varbitParts = varbitCheck.split("=");
+                int varbitId = Integer.parseInt(varbitParts[0]);
+                int varbitValue = Integer.parseInt(varbitParts[1]);
+                varbits.add(new TransportVarbit(varbitId, varbitValue));
+            }
         }
 
         isAgilityShortcut = TransportType.AGILITY_SHORTCUT.equals(transportType);
@@ -240,6 +307,7 @@ public class Transport {
         isSpiritTree = TransportType.SPIRIT_TREE.equals(transportType);
         isTeleportationLever = TransportType.TELEPORTATION_LEVER.equals(transportType);
         isTeleportationPortal = TransportType.TELEPORTATION_PORTAL.equals(transportType);
+        isPlayerItem = TransportType.PLAYER_ITEM.equals(transportType);
         isMember = TransportType.TELEPORTATION_LEVER.equals(transportType)
                 ||  TransportType.SPIRIT_TREE.equals(transportType)
                 || TransportType.GNOME_GLIDER.equals(transportType)
@@ -297,7 +365,7 @@ public class Transport {
                     fairyRingsQuestNames.add(p.length >= 7 ? p[6] : "");
                 } else {
                     Transport transport = new Transport(line, transportType);
-                    WorldPoint origin = transport.getOrigin();
+                    WorldPoint origin = transportType.equals(TransportType.PLAYER_ITEM) ? null : transport.getOrigin();
                     transports.computeIfAbsent(origin, k -> new ArrayList<>()).add(transport);
                 }
             }
@@ -320,6 +388,7 @@ public class Transport {
                     }
                 }
             }
+            scanner.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -338,6 +407,7 @@ public class Transport {
         addTransports(transports, "spirit_trees.tsv", TransportType.SPIRIT_TREE);
         addTransports(transports, "levers.tsv", TransportType.TELEPORTATION_LEVER);
         addTransports(transports, "portals.tsv", TransportType.TELEPORTATION_PORTAL);
+        addTransports(transports, "items.tsv", TransportType.PLAYER_ITEM);
 
         return transports;
     }
@@ -354,7 +424,8 @@ public class Transport {
         GNOME_GLIDER,
         SPIRIT_TREE,
         TELEPORTATION_LEVER,
-        TELEPORTATION_PORTAL
+        TELEPORTATION_PORTAL,
+        PLAYER_ITEM,
     }
 
     private static boolean completedQuests(Transport transport) {
@@ -603,5 +674,108 @@ public class Transport {
             default:
                 return -1;
         }
+    }
+
+    public boolean handleItemTeleport(){
+        for (var itemId : itemRequirements){
+            Rs2Item item;
+            boolean isWearing = Rs2Equipment.isWearing(itemId);
+
+            if (isWearing)
+                item = Rs2Equipment.get(itemId);
+            else if (Rs2Inventory.hasItem(itemId))
+                item = Rs2Inventory.get(itemId);
+            else
+                continue;
+
+            if (item == null)
+                continue;
+
+            // Close blocking interfaces
+            if (Rs2Bank.isOpen()){
+                Rs2Bank.closeBank();
+                sleepUntil(() -> !Rs2Bank.isOpen(), 1000);
+                if (Rs2Bank.isOpen())
+                    return false;
+            } else if (Rs2GrandExchange.isOpen()){
+                Rs2GrandExchange.closeExchange();
+                sleepUntil(() -> !Rs2GrandExchange.isOpen(), 1000);
+                if (Rs2GrandExchange.isOpen())
+                    return false;
+            }
+
+            String itemAction = "";
+
+            // House teleports should target outside for following pathing
+            if (itemId == ItemID.TELEPORT_TO_HOUSE)
+                itemAction = "outside";
+
+            // Match item action based on the teleport destination
+            if (itemAction.isEmpty()){
+                var actions = isWearing ? item.getEquipmentActions().toArray(new String[0]) : item.getInventoryActions();
+                for (var action : actions){
+                    if (action == null)
+                        continue;
+
+                    var actionSplits = action.toLowerCase().split(":");
+                    if (hasTeleportMatch(actionSplits[actionSplits.length - 1])){
+                        itemAction = action;
+                        break;
+                    }
+                }
+            }
+
+            // Choose default action if no match found
+            if (itemAction.isEmpty()){
+                var actions = isWearing ? item.getEquipmentActions().toArray(new String[0]) : item.getInventoryActions();
+                for (var action : actions){
+                    if (action == null)
+                        continue;
+
+                    if (action.equalsIgnoreCase("rub")
+                            || action.equalsIgnoreCase("break")
+                            || action.equalsIgnoreCase("teleport")) {
+                        itemAction = action;
+                        break;
+                    }
+                }
+            }
+
+            if (!itemAction.isEmpty()){
+                if (isWearing)
+                    Rs2Equipment.interact(itemId, itemAction);
+                else
+                    Rs2Inventory.interact(itemId, itemAction);
+
+                if (itemAction.equalsIgnoreCase("rub")){
+                    sleepUntil(() -> Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS), 1000);
+                    if (!Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS))
+                        return false;
+
+                    var options = Rs2Widget.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS).getDynamicChildren();
+                    for (var option : options){
+                        if (hasTeleportMatch(StringUtils.strip(option.getText(), ".").toLowerCase())){
+                            Rs2Keyboard.keyPress(option.getOnKeyListener()[7].toString().charAt(0));
+                            break;
+                        }
+                    }
+                }
+
+                Rs2Player.waitForAnimation();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean hasTeleportMatch(String text){
+        return Arrays.stream(text.split(" "))
+                .filter(x -> !x.isBlank()
+                        && !x.equalsIgnoreCase("xeric's")
+                        && !x.equalsIgnoreCase("guild")
+                        && !x.equalsIgnoreCase("the")
+                        && !x.equalsIgnoreCase("to"))
+                .anyMatch(x -> displayInfo.toLowerCase().contains(x));
     }
 }
