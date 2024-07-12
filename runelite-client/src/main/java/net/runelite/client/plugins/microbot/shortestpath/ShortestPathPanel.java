@@ -5,10 +5,15 @@ import net.runelite.client.plugins.microbot.shortestpath.enums.*;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.ComboBoxListRenderer;
 
+import net.runelite.client.util.ImageUtil;
+
 import javax.inject.Inject;
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class ShortestPathPanel extends PluginPanel {
 
@@ -42,16 +47,39 @@ public class ShortestPathPanel extends PluginPanel {
         add(createFarmingPanel());
     }
 
-    private TitledBorder createCenteredTitledBorder(String title) {
-        TitledBorder titledBorder = BorderFactory.createTitledBorder(title);
-        titledBorder.setTitleJustification(TitledBorder.CENTER);
-        return titledBorder;
+    private Border createCenteredTitledBorder(String title, String iconPath) {
+        BufferedImage icon = ImageUtil.loadImageResource(getClass(), iconPath);
+        ImageIcon imageIcon = new ImageIcon(icon);
+        
+        JLabel titleLabel = new JLabel("<html><b>" + title + "</b></html>", imageIcon, JLabel.CENTER);
+        titleLabel.setHorizontalTextPosition(JLabel.RIGHT);
+        titleLabel.setVerticalTextPosition(JLabel.CENTER);
+        
+        Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+        Border lineBorder = BorderFactory.createLineBorder(Color.GRAY);
+        
+        return BorderFactory.createCompoundBorder(
+            BorderFactory.createCompoundBorder(
+                lineBorder,
+                BorderFactory.createEmptyBorder(2, 2, 2, 2)
+            ),
+            new TitledBorder(emptyBorder, title, TitledBorder.CENTER, TitledBorder.TOP, null, null) {
+                @Override
+                public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+                    Graphics2D g2d = (Graphics2D) g.create();
+                    g2d.translate(x + width / 2 - titleLabel.getPreferredSize().width / 2, y);
+                    titleLabel.setSize(titleLabel.getPreferredSize());
+                    titleLabel.paint(g2d);
+                    g2d.dispose();
+                }
+            }
+        );
     }
 
     private JPanel createCustomLocationPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(createCenteredTitledBorder("Travel to Custom Location"));
+        panel.setBorder(createCenteredTitledBorder("Travel to Custom Location", "/net/runelite/client/plugins/microbot/shortestpath/Map_link_icon.png"));
 
         JPanel coordinatesPanel = new JPanel(new GridLayout(2, 3, 5, 5));
 
@@ -97,7 +125,7 @@ public class ShortestPathPanel extends PluginPanel {
     private JPanel createBankPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(createCenteredTitledBorder("Travel to Bank"));
+        panel.setBorder(createCenteredTitledBorder("Travel to Bank", "/net/runelite/client/plugins/microbot/shortestpath/Bank_icon.png"));
 
         bankComboBox = new JComboBox<>(Banks.values());
         bankComboBox.setRenderer(new ComboBoxListRenderer());
@@ -125,7 +153,7 @@ public class ShortestPathPanel extends PluginPanel {
     private JPanel createSlayerMasterPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(createCenteredTitledBorder("Travel to Slayer Master"));
+        panel.setBorder(createCenteredTitledBorder("Travel to Slayer Master", "/net/runelite/client/plugins/microbot/shortestpath/Slayer_Master_icon.png"));
 
         slayerMasterComboBox = new JComboBox<>(SlayerMasters.values());
         slayerMasterComboBox.setRenderer(new ComboBoxListRenderer());
@@ -153,7 +181,7 @@ public class ShortestPathPanel extends PluginPanel {
     private JPanel createFarmingPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(createCenteredTitledBorder("Travel to Farming Location"));
+        panel.setBorder(createCenteredTitledBorder("Travel to Farming Location", "/net/runelite/client/plugins/microbot/shortestpath/Farming_patch_icon.png"));
 
         farmingComboBox = new JComboBox<>(Farming.values());
         farmingComboBox.setRenderer(new ComboBoxListRenderer());

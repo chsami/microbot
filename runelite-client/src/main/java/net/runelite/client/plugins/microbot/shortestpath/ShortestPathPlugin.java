@@ -176,7 +176,7 @@ public class ShortestPathPlugin extends Plugin {
         }
 
         navButton = NavigationButton.builder()
-                .tooltip("Shortest Path")
+                .tooltip("Web Walker")
                 .icon(icon)
                 .priority(5)
                 .panel(panel)
