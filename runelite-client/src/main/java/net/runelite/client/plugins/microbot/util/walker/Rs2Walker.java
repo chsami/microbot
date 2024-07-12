@@ -648,7 +648,7 @@ public class Rs2Walker {
                         if (!interact) {
                             Rs2Walker.walkMiniMap(path.get(i));
                             sleep(1600, 2000);
-                            return false;
+                            return true;
                         }
                         Rs2Player.waitForWalking();
                         return true;
@@ -661,7 +661,7 @@ public class Rs2Walker {
                         if (!interact) {
                             Rs2Walker.walkMiniMap(path.get(i));
                             sleep(1600, 2000);
-                            return false;
+                            return true;
                         }
                         if (b.isAgilityShortcut()) {
                             Rs2Player.waitForAnimation();
