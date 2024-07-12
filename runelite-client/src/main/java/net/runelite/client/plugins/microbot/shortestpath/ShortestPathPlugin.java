@@ -55,13 +55,7 @@ import java.util.regex.Pattern;
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Web Walker",
         description = "Draws the shortest path to a chosen destination on the map (right click a spot on the world map to use)",
-        tags = {
-                "pathfinder",
-                "map",
-                "waypoint",
-                "navigation",
-                "microbot"
-        },
+        tags = {"pathfinder", "map", "waypoint", "navigation", "microbot"},
         enabledByDefault = true,
         alwaysOn = true
 )
@@ -471,7 +465,8 @@ public class ShortestPathPlugin extends Plugin {
     public void handleTravelToCustomLocation() {
         WorldPoint customLocation = panel.getCustomLocation();
         if (customLocation != null) {
-            boolean walkResult = Rs2Walker.walkTo(customLocation);
+            Microbot.log("Web walking starting. Traveling to Custom Location (" + customLocation.getX() + ", " + customLocation.getY() + ", " + customLocation.getPlane() + ").");
+            Rs2Walker.walkTo(customLocation);
         }
     }
 
@@ -479,7 +474,8 @@ public class ShortestPathPlugin extends Plugin {
         Banks selectedBank = panel.getSelectedBank();
         WorldPoint bankLocation = selectedBank.getWorldPoint();
         if (bankLocation != null) {
-            boolean walkResult = Rs2Walker.walkTo(bankLocation);
+            Microbot.log("Web walking starting. Traveling to " + selectedBank.getName() + ".");
+            Rs2Walker.walkTo(bankLocation);
         }
     }
 
@@ -487,14 +483,17 @@ public class ShortestPathPlugin extends Plugin {
         SlayerMasters selectedSlayerMaster = panel.getSelectedSlayerMaster();
         WorldPoint slayerMasterLocation = selectedSlayerMaster.getWorldPoint();
         if (slayerMasterLocation != null) {
-            boolean walkResult = Rs2Walker.walkTo(slayerMasterLocation);
+            Microbot.log("Web walking starting. Traveling to " + selectedSlayerMaster.getName() + ".");
+            Rs2Walker.walkTo(slayerMasterLocation);
         }
     }
 
     public void handleTravelToFarmingLocation() {
+        String locationName = panel.getSelectedFarmingLocationName();
         WorldPoint farmingLocation = panel.getSelectedFarmingLocation();
         if (farmingLocation != null) {
-            boolean walkResult = Rs2Walker.walkTo(farmingLocation);
+            Microbot.log("Web walking starting. Traveling to " + locationName.charAt(0) + locationName.substring(1).toLowerCase() + ".");
+            Rs2Walker.walkTo(farmingLocation);
         }
     }
 

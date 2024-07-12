@@ -250,4 +250,24 @@ public class ShortestPathPanel extends PluginPanel {
                 return null;
         }
     }
+
+    public String getSelectedFarmingLocationName() {
+        Farming selectedFarming = getSelectedFarmingCategory();
+        switch (selectedFarming) {
+            case ALLOTMENTS:
+                return ((Allotments) allotmentsComboBox.getSelectedItem()).name();
+            case BUSHES:
+                return ((Bushes) bushesComboBox.getSelectedItem()).name();
+            case FRUIT_TREES:
+                return ((FruitTrees) fruitTreesComboBox.getSelectedItem()).name();
+            case HERBS:
+                return ((Herbs) herbsComboBox.getSelectedItem()).name();
+            case HOPS:
+                return ((Hops) hopsComboBox.getSelectedItem()).name();
+            case TREES:
+                return ((Trees) treesComboBox.getSelectedItem()).name();
+            default:
+                return "Unknown";
+        }
+    }
 }
