@@ -774,7 +774,8 @@ public class Transport {
                 .filter(x -> !x.isBlank()
                         && !x.equalsIgnoreCase("xeric's")
                         && !x.equalsIgnoreCase("guild")
-                        && !x.equalsIgnoreCase("the"))
+                        && !x.equalsIgnoreCase("the")
+                        && !x.equalsIgnoreCase("to"))
                 .anyMatch(x -> displayInfo.toLowerCase().contains(x));
     }
 }
