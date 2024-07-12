@@ -30,7 +30,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static double version = 1.4;
+    public static String version = "1.4.1";
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -110,7 +110,6 @@ public class MWintertodtScript extends Script {
 //                    state = State.FIX_BRAZIER;
 //                }
 
-
                 switch (state) {
                     case BANKING:
                         if (!handleBankLogic(config)) return;
@@ -120,7 +119,7 @@ public class MWintertodtScript extends Script {
                         break;
                     case ENTER_ROOM:
                         if (!wintertodtRespawning && !isWintertodtAlive) {
-                            Rs2Walker.walkTo(BOSS_ROOM);
+                            Rs2Walker.walkTo(BOSS_ROOM, 12);
                         } else {
                             state = State.WAITING;
                         }

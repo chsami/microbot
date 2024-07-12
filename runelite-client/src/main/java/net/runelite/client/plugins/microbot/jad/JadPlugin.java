@@ -30,36 +30,28 @@ public class JadPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private JadOverlay exampleOverlay;
+    private JadOverlay jadOverlay;
 
     @Inject
-    JadScript exampleScript;
+    JadScript jadScript;
 
 
     @Override
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
-            overlayManager.add(exampleOverlay);
+            overlayManager.add(jadOverlay);
         }
-        exampleScript.run(config);
+        jadScript.run(config);
     }
 
     protected void shutDown() {
-        exampleScript.shutdown();
-        overlayManager.remove(exampleOverlay);
+        jadScript.shutdown();
+        overlayManager.remove(jadOverlay);
     }
     int ticks = 10;
     @Subscribe
     public void onGameTick(GameTick tick)
     {
-        //System.out.println(getName().chars().mapToObj(i -> (char)(i + 3)).map(String::valueOf).collect(Collectors.joining()));
-
-        if (ticks > 0) {
-            ticks--;
-        } else {
-            ticks = 10;
-        }
-
     }
 
 }
