@@ -41,6 +41,7 @@ public class Rs2Walker {
     static WorldPoint lastPosition;
     static int idle = 0;
     static WorldPoint currentTarget;
+    static int nextWalkingDistance = 10;
 
     public static boolean walkTo(WorldArea area, int distanceThreshold) {
         if (area.distanceTo(Rs2Player.getWorldLocation()) > distanceThreshold) {
@@ -149,7 +150,8 @@ public class Rs2Walker {
                             continue;
                         }
 
-                        if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > 10) {
+                        if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > nextWalkingDistance) {
+                            nextWalkingDistance = Random.random(7, 11);
                             // InstancedRegions require localPoint instead of worldpoint to navigate
                             if (Microbot.getClient().isInInstancedRegion()) {
                                 Rs2Walker.walkFastCanvas(currentWorldPoint);
