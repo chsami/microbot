@@ -849,6 +849,44 @@ public class Rs2Inventory {
         if (item == null) return false;
         return hasItemAmount(name, amount, item.isStackable(), false);
     }
+    
+    /**
+     * Retrieves the quantity of an item based on its ID.
+     *
+     * @param id The ID of the item.
+     * @return The quantity of the item if found, otherwise 0.
+     */
+    public static long ItemQuantity(int id) {
+        Rs2Item rs2Item = get(id);
+        if (rs2Item != null) {
+            if (rs2Item.isStackable()) {
+                return rs2Item.quantity;
+            } else {
+                return items().stream().filter(x -> x.id == id).count();
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Retrieves the quantity of an item based on its name.
+     *
+     * @param itemName The name of the item.
+     * @return The quantity of the item if found, otherwise 0.
+     */
+    public static long ItemQuantity(String itemName) {
+        Rs2Item rs2Item = get(itemName);
+        if (rs2Item != null) {
+            if (rs2Item.isStackable()) {
+                return rs2Item.quantity;
+            } else {
+                return items().stream().filter(x -> x.id == rs2Item.getId()).count();
+            }
+        } else {
+            return 0;
+        }
+    }
 
     /**
      * Checks if the player has a certain quantity of an item.
