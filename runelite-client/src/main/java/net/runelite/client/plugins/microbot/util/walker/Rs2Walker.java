@@ -99,8 +99,12 @@ public class Rs2Walker {
                         break;
                     }
 
+                    //avoid tree attacking you in draynor
+                    checkIfStuck();
                     if (stuckCount > 10) {
-                        setTarget(null);
+                        var moveableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet().toArray(new WorldPoint[0]);
+                        walkMiniMap(moveableTiles[Random.random(0, moveableTiles.length)]);
+                        sleep(600, 1000);
                     }
 
                     List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
@@ -166,8 +170,6 @@ public class Rs2Walker {
                                 }
                                 break;
                             }
-                            //avoid tree attacking you in draynor
-                            checkIfStuck();
                         }
                     }
 
