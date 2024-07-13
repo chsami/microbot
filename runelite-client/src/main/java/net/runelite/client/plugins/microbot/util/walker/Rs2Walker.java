@@ -172,14 +172,16 @@ public class Rs2Walker {
                             }
                         }
                     }
-
-                    if (Rs2Tile.isTileReachable(path.get(path.size() - 1))) {
+                    
+                    var moveableTiles = Rs2Tile.getReachableTilesFromTile(path.get(path.size() - 1), Math.min(3, distance)).keySet().toArray(new WorldPoint[0]);
+                    var finalTile = moveableTiles.length > 0 ? moveableTiles[Random.random(0, moveableTiles.length)] : path.get(path.size() - 1);
+                    if (Rs2Tile.isTileReachable(finalTile)) {
                         System.out.println("walk minimap");
 
                         if (Microbot.getClient().isInInstancedRegion())
-                            Rs2Walker.walkFastCanvas(target);
+                            Rs2Walker.walkFastCanvas(finalTile);
                         else
-                            Rs2Walker.walkMiniMap(target);
+                            Rs2Walker.walkMiniMap(finalTile);
 
                         sleep(600, 1200);
                         System.out.println("sleep walk minimap");
