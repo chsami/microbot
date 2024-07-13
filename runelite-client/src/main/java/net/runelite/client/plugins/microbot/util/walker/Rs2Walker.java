@@ -660,7 +660,9 @@ public class Rs2Walker {
                         List<TileObject> tileObjects = Rs2GameObject.getTileObjects(b.getObjectId(), b.getOrigin());
                         TileObject tileObject = tileObjects.stream().findFirst().orElse(null);
                         if (tileObject instanceof GroundObject)
-                            tileObject = tileObjects.stream().min(Comparator.comparing(x -> x.getWorldLocation().distanceTo(b.getDestination()))).orElse(null);
+                            tileObject = tileObjects.stream()
+                                    .filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation()))
+                                    .min(Comparator.comparing(x -> x.getWorldLocation().distanceTo(b.getOrigin()))).orElse(null);
 
                         if (tileObject != null && tileObject.getId() == b.getObjectId()) {
                             boolean interact = Rs2GameObject.interact(tileObject, b.getAction(), true);
