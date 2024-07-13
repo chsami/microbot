@@ -10,11 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @PluginDescriptor(
         name = PluginDescriptor.Geoff + "Plank Make",
-        description = "Makes planks on the lunar spellbook",
+        description = "Makes planks on the lunar spell.",
         tags = {"magic", "moneymaking"},
         enabledByDefault = false
 )
@@ -38,6 +40,7 @@ public class PlankMakePlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
+        Microbot.setMouse(new VirtualMouse());
         log.info("Starting up PlankMakePlugin");
         if (overlayManager != null) {
             overlayManager.add(PlankMakeOverlay);

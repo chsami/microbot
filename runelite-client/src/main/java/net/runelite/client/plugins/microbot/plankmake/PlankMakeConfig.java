@@ -18,9 +18,9 @@ public interface PlankMakeConfig extends Config {
                 section = generalSection
         )
         default String GUIDE() {
-            return "Start at any bank with runes and coins and make sure you have\n" +
+            return "Start at any bank with runes and coins in your inventory and make sure you have\n" +
                     "already pre-cast plank make on the log you want to use and click don't ask again \n" +
-                    "on the pop up and everything should be good to go";
+                    "on the pop up and everything should be good to go.";
         }
 
         @ConfigSection(
