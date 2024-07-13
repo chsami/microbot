@@ -77,7 +77,7 @@ public class Rs2Walker {
         idle = 0;
         Microbot.getClientThread().runOnSeperateThread(() -> {
             try {
-                while (!Thread.currentThread().isInterrupted() && true) {
+                while (!Thread.currentThread().isInterrupted()) {
                     if (!Microbot.isLoggedIn()) {
                         setTarget(null);
                         break;
@@ -149,8 +149,7 @@ public class Rs2Walker {
                             continue;
                         }
 
-                        if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > 10
-                                || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
+                        if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > 10) {
                             // InstancedRegions require localPoint instead of worldpoint to navigate
                             if (Microbot.getClient().isInInstancedRegion()) {
                                 Rs2Walker.walkFastCanvas(currentWorldPoint);
@@ -170,10 +169,7 @@ public class Rs2Walker {
                         }
                     }
 
-                    if (Rs2Player.getWorldLocation().distanceTo(target) < distance) return true;
-
-
-                    if (Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 12).containsKey(path.get(path.size() - 1))) {
+                    if (Rs2Tile.isTileReachable(path.get(path.size() - 1))) {
                         System.out.println("walk minimap");
 
                         if (Microbot.getClient().isInInstancedRegion())
