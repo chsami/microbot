@@ -25,7 +25,7 @@ public interface ThievingConfig extends Config {
             description = "general",
             position = 0
     )
-    String generalSection = "general";
+    String generalSection = "General";
 
     @ConfigItem(
             keyName = "Npc",
@@ -38,6 +38,36 @@ public interface ThievingConfig extends Config {
     {
         return ThievingNpc.NONE;
     }
+
+    @ConfigSection(
+            name = "buffs",
+            description = "general",
+            position = 0
+    )
+    String buffsSection = "Buffs";
+
+    @ConfigItem(
+            keyName = "shadowVeil",
+            name = "Shadow veil",
+            description = "Choose whether to shadow veil",
+            position = 0,
+            section = buffsSection
+    )
+    default boolean shadowVeil() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "equipBook",
+            name = "Equip book of the dead",
+            description = "Whether or not to equip the book of the dead",
+            position = 0,
+            section = buffsSection
+    )
+    default boolean equipBook() {
+        return true;
+    }
+
 
     @ConfigSection(
             name = "Food",
