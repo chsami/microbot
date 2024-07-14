@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.magic;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.Microbot.log;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
@@ -29,6 +31,18 @@ public class Rs2Magic {
             Rs2Tab.switchToMagicTab();
             sleep(150, 300);
         }
+
+        if (magicSpell.getName().toLowerCase().contains("enchant")){
+            if (Rs2Widget.findWidget(magicSpell.getName(), Arrays.stream(Rs2Widget.getWidget(218, 0).getStaticChildren()).collect(Collectors.toList())) == null) {
+                if (Rs2Widget.isHidden(14286860)) return false;
+                Rs2Widget.clickWidget(14286860);
+                sleep(150, 300);
+            }
+        } else if (Rs2Widget.isWidgetVisible(218, 4) && Arrays.stream(Rs2Widget.getWidget(218, 4).getActions()).anyMatch(x -> x.equalsIgnoreCase("back"))){
+            Rs2Widget.clickWidget(218, 4);
+            sleep(150, 300);
+        }
+
         Widget widget = Arrays.stream(Rs2Widget.getWidget(14286851).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
         return widget != null;
     }
@@ -43,8 +57,7 @@ public class Rs2Magic {
             return;
         }
         int identifier = 1;
-        if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("enchant")
-                || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
+        if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
             menuAction = MenuAction.CC_OP;
         } else {
             menuAction = MenuAction.WIDGET_TARGET;
@@ -143,6 +156,10 @@ public class Rs2Magic {
             sleep(50, 150);
             return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
         });
+        if (Rs2Widget.isWidgetVisible(218, 4) && Arrays.stream(Rs2Widget.getWidget(218, 4).getActions()).anyMatch(x -> x.equalsIgnoreCase("back"))){
+            Rs2Widget.clickWidget(218, 4);
+            sleep(150, 300);
+        }
         Widget superHeat = Rs2Widget.findWidget(MagicAction.SUPERHEAT_ITEM.getName());
         if (superHeat.getSpriteId() != SpriteID.SPELL_SUPERHEAT_ITEM) return;
         superHeat(superHeat, item, sleepMin, sleepMax);
@@ -154,6 +171,10 @@ public class Rs2Magic {
             sleep(50, 150);
             return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
         });
+        if (Rs2Widget.isWidgetVisible(218, 4) && Arrays.stream(Rs2Widget.getWidget(218, 4).getActions()).anyMatch(x -> x.equalsIgnoreCase("back"))){
+            Rs2Widget.clickWidget(218, 4);
+            sleep(150, 300);
+        }
         Widget highAlch = Rs2Widget.findWidget(MagicAction.HIGH_LEVEL_ALCHEMY.getName());
         if (highAlch.getSpriteId() != 41) return;
         alch(highAlch, item, sleepMin, sleepMax);
@@ -165,6 +186,10 @@ public class Rs2Magic {
             sleep(50, 150);
             return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
         });
+        if (Rs2Widget.isWidgetVisible(218, 4) && Arrays.stream(Rs2Widget.getWidget(218, 4).getActions()).anyMatch(x -> x.equalsIgnoreCase("back"))){
+            Rs2Widget.clickWidget(218, 4);
+            sleep(150, 300);
+        }
         Widget lowAlch = Rs2Widget.findWidget(MagicAction.LOW_LEVEL_ALCHEMY.getName());
         if (lowAlch.getSpriteId() != 25) return;
         alch(lowAlch, item, sleepMin, sleepMax);

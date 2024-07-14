@@ -49,10 +49,12 @@ public class MTAPlugin extends Plugin
 	@Inject
 	private OverlayManager overlayManager;
 
+	@Getter
 	@Inject
 	private AlchemyRoom alchemyRoom;
 	@Inject
 	private GraveyardRoom graveyardRoom;
+	@Getter
 	@Inject
 	private TelekineticRoom telekineticRoom;
 	@Inject
