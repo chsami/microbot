@@ -41,6 +41,7 @@ public class Rs2Walker {
     static WorldPoint lastPosition;
     static int idle = 0;
     static WorldPoint currentTarget;
+    static int nextWalkingDistance = 10;
 
     public static boolean walkTo(WorldArea area, int distanceThreshold) {
         if (area.distanceTo(Rs2Player.getWorldLocation()) > distanceThreshold) {
@@ -77,7 +78,7 @@ public class Rs2Walker {
         idle = 0;
         Microbot.getClientThread().runOnSeperateThread(() -> {
             try {
-                while (!Thread.currentThread().isInterrupted() && true) {
+                while (!Thread.currentThread().isInterrupted()) {
                     if (!Microbot.isLoggedIn()) {
                         setTarget(null);
                         break;
@@ -98,8 +99,12 @@ public class Rs2Walker {
                         break;
                     }
 
+                    //avoid tree attacking you in draynor
+                    checkIfStuck();
                     if (stuckCount > 10) {
-                        setTarget(null);
+                        var moveableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet().toArray(new WorldPoint[0]);
+                        walkMiniMap(moveableTiles[Random.random(0, moveableTiles.length)]);
+                        sleep(600, 1000);
                     }
 
                     List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
@@ -112,6 +117,7 @@ public class Rs2Walker {
                     /**
                      * MAIN WALK LOOP
                      */
+                    boolean doorOrTransportResult = false;
                     for (int i = indexOfStartPoint; i < path.size(); i++) {
                         WorldPoint currentWorldPoint = path.get(i);
 
@@ -125,7 +131,7 @@ public class Rs2Walker {
                         Microbot.status = "Checking for doors...";
                         long startTime = System.currentTimeMillis();
 
-                        boolean doorOrTransportResult = handleDoors(path, i);
+                        doorOrTransportResult = handleDoors(path, i);
                         if (doorOrTransportResult) {
                             break;
                         }
@@ -149,8 +155,8 @@ public class Rs2Walker {
                             continue;
                         }
 
-                        if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > 10
-                                || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
+                        if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > nextWalkingDistance) {
+                            nextWalkingDistance = Random.random(7, 11);
                             // InstancedRegions require localPoint instead of worldpoint to navigate
                             if (Microbot.getClient().isInInstancedRegion()) {
                                 Rs2Walker.walkFastCanvas(currentWorldPoint);
@@ -165,24 +171,23 @@ public class Rs2Walker {
                                 }
                                 break;
                             }
-                            //avoid tree attacking you in draynor
-                            checkIfStuck();
                         }
                     }
 
-                    if (Rs2Player.getWorldLocation().distanceTo(target) < distance) return true;
+                    if (!doorOrTransportResult){
+                        var moveableTiles = Rs2Tile.getReachableTilesFromTile(path.get(path.size() - 1), Math.min(3, distance)).keySet().toArray(new WorldPoint[0]);
+                        var finalTile = moveableTiles.length > 0 ? moveableTiles[Random.random(0, moveableTiles.length)] : path.get(path.size() - 1);
+                        if (Rs2Tile.isTileReachable(finalTile)) {
+                            System.out.println("walk minimap");
 
+                            if (Microbot.getClient().isInInstancedRegion())
+                                Rs2Walker.walkFastCanvas(finalTile);
+                            else
+                                Rs2Walker.walkMiniMap(finalTile);
 
-                    if (Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 12).containsKey(path.get(path.size() - 1))) {
-                        System.out.println("walk minimap");
-
-                        if (Microbot.getClient().isInInstancedRegion())
-                            Rs2Walker.walkFastCanvas(target);
-                        else
-                            Rs2Walker.walkMiniMap(target);
-
-                        sleep(600, 1200);
-                        System.out.println("sleep walk minimap");
+                            sleep(600, 1200);
+                            System.out.println("sleep walk minimap");
+                        }
                     }
                 }
                 return Rs2Player.getWorldLocation().distanceTo(target) < distance;
@@ -658,7 +663,10 @@ public class Rs2Walker {
                         List<TileObject> tileObjects = Rs2GameObject.getTileObjects(b.getObjectId(), b.getOrigin());
                         TileObject tileObject = tileObjects.stream().findFirst().orElse(null);
                         if (tileObject instanceof GroundObject)
-                            tileObject = tileObjects.stream().min(Comparator.comparing(x -> x.getWorldLocation().distanceTo(b.getDestination()))).orElse(null);
+                            tileObject = tileObjects.stream()
+                                    .filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation()))
+                                    .min(Comparator.comparing(x -> ((TileObject)x).getWorldLocation().distanceTo(b.getOrigin()))
+                                            .thenComparing(x -> ((TileObject)x).getWorldLocation().distanceTo(b.getDestination()))).orElse(null);
 
                         if (tileObject != null && tileObject.getId() == b.getObjectId()) {
                             boolean interact = Rs2GameObject.interact(tileObject, b.getAction(), true);
