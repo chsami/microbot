@@ -31,6 +31,16 @@ public interface CraftingConfig extends Config {
             closedByDefault = true
     )
     String glassSection = "glass";
+    @ConfigItem(
+            keyName = "fletchIntoBoltTips",
+            name = "Fletch into Bolt Tips",
+            description = "Fletch cut gems into bolt tips if possible",
+            position = 1,
+            section = gemSection
+    )
+    default boolean fletchIntoBoltTips() {
+        return false;
+    }
     @ConfigSection(
             name = "Staffs",
             description = "Config for staff making",
@@ -59,7 +69,7 @@ public interface CraftingConfig extends Config {
 
     @ConfigItem(
             keyName = "Afk",
-            name = "Afk randomly",
+            name = "Random AFKs",
             description = "Randomy afks between 3 and 60 seconds",
             position = 1,
             section = generalSection
