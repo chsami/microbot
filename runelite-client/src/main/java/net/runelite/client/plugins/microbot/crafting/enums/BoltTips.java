@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum BoltTips {
-    NONE("None", "None", 1),
+    NONE(" ", "", 1),
     OPAL("Opal", "Opal Bolt Tips", 11),
     JADE("Jade", "Jade Bolt Tips", 26),
     RED_TOPAZ("Red Topaz", "Red Topaz Bolt Tips", 48),

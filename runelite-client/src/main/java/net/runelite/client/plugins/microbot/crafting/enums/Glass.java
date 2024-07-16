@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Glass {
+    NONE(" ", "", '0', 0),
     PROGRESSIVE("Progressive Mode","None", '0', 1),
     BEER_GLASS("Beer Glass", "Beer Glass", '1', 1),
     CANDLE_LANTERN("Empty Candle Lantern", "Empty Candle Lantern", '2', 4),

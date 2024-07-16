@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Staffs {
+    NONE(" ","",0,""),
     PROGRESSIVE("Progressive Mode","None", 1, ""),
     WATER_BATTLESTAFF("Water Battlestaff", "Water Battlestaff", 54, "Water Orb"),
     EARTH_BATTLESTAFF("Earth Battlestaff", "Earth Battlestaff", 58, "Earth Orb"),

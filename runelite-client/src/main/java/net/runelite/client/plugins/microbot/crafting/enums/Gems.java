@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Gems
 {
-    NONE("None", 1),
+    NONE(" ", 1),
     OPAL("Opal", 1),
     JADE("Jade", 13),
     RED_TOPAZ("Red Topaz", 16),

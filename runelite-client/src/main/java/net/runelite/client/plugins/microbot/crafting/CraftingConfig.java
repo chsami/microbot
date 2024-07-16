@@ -97,7 +97,7 @@ public interface CraftingConfig extends Config {
             section = glassSection
     )
     default Glass glassType() {
-        return Glass.PROGRESSIVE;
+        return Glass.NONE;
     }
 
     @ConfigItem(
@@ -108,7 +108,7 @@ public interface CraftingConfig extends Config {
             section = staffSection
     )
     default Staffs staffType() {
-        return Staffs.PROGRESSIVE;
+        return Staffs.NONE;
     }
 
     @ConfigItem(
@@ -119,6 +119,6 @@ public interface CraftingConfig extends Config {
             section = flaxSpinSection
     )
     default FlaxSpinLocations flaxSpinLocation() {
-        return FlaxSpinLocations.SEERS_VILLAGE;
+        return FlaxSpinLocations.NONE;
     }
 }
