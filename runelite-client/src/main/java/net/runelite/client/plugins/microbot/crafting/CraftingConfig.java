@@ -59,7 +59,7 @@ public interface CraftingConfig extends Config {
 
     @ConfigItem(
             keyName = "Afk",
-            name = "Afk randomly",
+            name = "Random AFKs",
             description = "Randomy afks between 3 and 60 seconds",
             position = 1,
             section = generalSection
