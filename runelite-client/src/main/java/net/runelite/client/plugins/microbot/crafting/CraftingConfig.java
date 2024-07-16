@@ -24,6 +24,13 @@ public interface CraftingConfig extends Config {
             closedByDefault = true
     )
     String gemSection = "gem";
+    @ConfigSection(
+            name = "Glass",
+            description = "Config for glass blowing",
+            position = 2,
+            closedByDefault = true
+    )
+    String glassSection = "glass";
     @ConfigItem(
             keyName = "fletchIntoBoltTips",
             name = "Fletch into Bolt Tips",
@@ -34,7 +41,6 @@ public interface CraftingConfig extends Config {
     default boolean fletchIntoBoltTips() {
         return false;
     }
-    String glassSection = "glass";
     @ConfigSection(
             name = "Staffs",
             description = "Config for staff making",

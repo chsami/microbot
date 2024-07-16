@@ -28,6 +28,7 @@ public class GemsScript extends Script {
                 }
                 final String uncutGemName = "uncut " + config.gemType().getName();
                 if (!Rs2Inventory.hasItem(uncutGemName) || !Rs2Inventory.hasItem("chisel")) {
+                    Microbot.status = "BANKING";
                     Rs2Bank.openBank();
                     if (Rs2Bank.isOpen()) {
                         Rs2Bank.depositAll("crushed gem");
@@ -36,13 +37,14 @@ public class GemsScript extends Script {
                             Rs2Bank.withdrawItem(true, "chisel");
                             Rs2Bank.withdrawAll(true, uncutGemName);
                         } else {
-                            Microbot.showMessage("Ran out of materials");
+                            Microbot.showMessage("You've ran out of materials!");
                             shutdown();
                         }
                         Rs2Bank.closeBank();
                         sleepUntil(() -> !Rs2Bank.isOpen());
                     }
                 } else {
+                    Microbot.status = "CUTTING GEMS";
                     Rs2Inventory.use("chisel");
                     Rs2Inventory.use(uncutGemName);
                     sleep(600);
@@ -50,8 +52,8 @@ public class GemsScript extends Script {
                     sleep(4000);
                     sleepUntil(() -> !Microbot.isGainingExp || !Rs2Inventory.hasItem(uncutGemName), 30000);
 
-                    // If enabled, fletch into bolt tips...
                     if (config.fletchIntoBoltTips()) {
+                        Microbot.status = "FLETCHING BOLT TIPS";
                         BoltTips boltTip = BoltTips.valueOf(config.gemType().name());
                         if (Microbot.hasLevel(boltTip.getFletchingLevelRequired(), Skill.FLETCHING) &&
                                 Rs2Inventory.hasItem(config.gemType().getName()) &&
@@ -65,7 +67,7 @@ public class GemsScript extends Script {
                         }
                     }
                 }
-
+                Microbot.status = "IDLE";
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
@@ -76,5 +78,6 @@ public class GemsScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
+        Microbot.status = "IDLE";
     }
 }
