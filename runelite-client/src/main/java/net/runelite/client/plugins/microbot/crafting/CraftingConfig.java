@@ -24,12 +24,16 @@ public interface CraftingConfig extends Config {
             closedByDefault = true
     )
     String gemSection = "gem";
-    @ConfigSection(
-            name = "Glass",
-            description = "Config for glass blowing",
-            position = 2,
-            closedByDefault = true
+    @ConfigItem(
+            keyName = "fletchIntoBoltTips",
+            name = "Fletch into Bolt Tips",
+            description = "Fletch cut gems into bolt tips if possible",
+            position = 1,
+            section = gemSection
     )
+    default boolean fletchIntoBoltTips() {
+        return false;
+    }
     String glassSection = "glass";
     @ConfigSection(
             name = "Staffs",
