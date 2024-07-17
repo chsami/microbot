@@ -189,7 +189,18 @@ public interface ogConstConfig extends Config {
             min = 100000,
             max = 2500000
     )
-    default int getMinMoneybagAmount() {return 1500000;}
+    default String getMinMoneybagAmount() {return " ";}
+
+    @ConfigItem(
+            keyName = "moneyBagTopUpAmount",
+            name = "Money Bag Top-Up Amount",
+            description = "The amount of coins to top up the money bag with",
+            position = 11,
+            section = "Servant"
+    )
+    default String moneyBagTopUpAmount() {
+        return " ";
+    }
 
     //Settings
     @ConfigItem(

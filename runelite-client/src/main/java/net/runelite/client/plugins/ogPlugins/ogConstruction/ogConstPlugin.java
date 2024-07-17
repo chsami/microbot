@@ -7,6 +7,7 @@ import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -22,8 +23,12 @@ import java.awt.*;
 )
 @Slf4j
 public class ogConstPlugin extends Plugin {
+
     @Inject
     private ogConstConfig config;
+
+    private String moneyBagTopUpAmount;
+
     @Provides
     ogConstConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(ogConstConfig.class);
@@ -43,6 +48,18 @@ public class ogConstPlugin extends Plugin {
     }
 
     @Subscribe void onGameTick(GameTick gameTick){ogConstScript.onGameTick(gameTick);}
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event) {
+        if (!event.getGroup().equals("ogConstConfig")) {
+            return;
+        }
+
+        if (event.getKey().equals("moneyBagTopUpAmount")) {
+            this.moneyBagTopUpAmount = config.moneyBagTopUpAmount();
+            System.out.println("Updated Money Bag Top-Up Amount: " + this.moneyBagTopUpAmount);
+        }
+    }
 
 
     @Override
