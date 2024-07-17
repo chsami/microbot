@@ -32,6 +32,8 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Objects;
 import javax.inject.Inject;
+
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -261,7 +263,7 @@ public class AlchemyRoom extends MTARoom
 			&& player.getWorldLocation().getPlane() == 2;
 	}
 
-	private AlchemyItem getBest()
+	public AlchemyItem getBest()
 	{
 		for (int i = 0; i < INFO_LENGTH; i++)
 		{
@@ -376,7 +378,7 @@ public class AlchemyRoom extends MTARoom
 
 	}
 
-	private Cupboard getSuggestion()
+	public Cupboard getSuggestion()
 	{
 		// check if a cupboard has the best item in it
 		if (best != null)

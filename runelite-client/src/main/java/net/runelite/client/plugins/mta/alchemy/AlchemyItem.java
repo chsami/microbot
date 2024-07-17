@@ -27,7 +27,7 @@ package net.runelite.client.plugins.mta.alchemy;
 import lombok.Getter;
 import net.runelite.api.ItemID;
 
-enum AlchemyItem
+public enum AlchemyItem
 {
 	LEATHER_BOOTS("Leather Boots", ItemID.LEATHER_BOOTS_6893),
 	ADAMANT_KITESHIELD("Adamant Kiteshield", ItemID.ADAMANT_KITESHIELD_6894),
