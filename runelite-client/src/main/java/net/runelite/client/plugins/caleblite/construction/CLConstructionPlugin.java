@@ -15,6 +15,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.caleblite.construction.enums.State;
@@ -60,9 +61,6 @@ public class CLConstructionPlugin extends Plugin {
             case ENTERING_HOUSE:
                 enterPlayerHouse();
                 break;
-            case MOVING_TO_HOTSPOT:
-  //              moveToHotspot();
-                break;
             case BUILDING:
                 buildFurniture();
                 break;
@@ -77,7 +75,7 @@ public class CLConstructionPlugin extends Plugin {
             if (!isInBuildMode()) {
                 enterBuildMode();
             } else {
-                currentState = State.MOVING_TO_HOTSPOT;
+                currentState = State.BUILDING;
             }
         } else {
             if (Rs2GameObject.interact("Portal", "Build mode")) {
@@ -88,9 +86,31 @@ public class CLConstructionPlugin extends Plugin {
 
     private void buildFurniture() {
         Buildables selectedBuildable = config.buildable();
-        if (Rs2GameObject.interact(selectedBuildable.getHotspotId(), selectedBuildable.getAction())) {
-            Global.sleepUntil(() -> Rs2GameObject.findObjectById(selectedBuildable.getBuiltId()) != null, Random.random(3000, 5000));
-            currentState = State.REMOVING;
+        TileObject hotspot = Rs2GameObject.findObjectByName(selectedBuildable.getSpotName());
+
+        if (hotspot == null) {
+            Microbot.log("Hotspot not found: " + selectedBuildable.getSpotName());
+            return;
+        }
+
+        if (!Rs2Player.isMoving() && !Rs2Player.isAnimating()) {
+            if (Rs2GameObject.interact(hotspot, selectedBuildable.getAction())) {
+                Global.sleepUntil(() -> !Rs2Player.isMoving() && !Rs2Player.isAnimating(), Random.random(5000, 8000));
+
+                Global.sleepUntil(() -> Rs2GameObject.findObjectByName(selectedBuildable.getBuiltName()) != null,
+                        Random.random(3000, 5000));
+
+                if (Rs2GameObject.findObjectByName(selectedBuildable.getBuiltName()) != null) {
+                    Microbot.log("Successfully built: " + selectedBuildable.getBuiltName());
+                    currentState = State.REMOVING;
+                } else {
+                    Microbot.log("Failed to build: " + selectedBuildable.getBuiltName());
+                }
+            } else {
+                Microbot.log("Failed to interact with hotspot: " + selectedBuildable.getSpotName());
+            }
+        } else {
+            Global.sleepUntil(() -> !Rs2Player.isMoving() && !Rs2Player.isAnimating(), Random.random(5000, 8000));
         }
     }
 
