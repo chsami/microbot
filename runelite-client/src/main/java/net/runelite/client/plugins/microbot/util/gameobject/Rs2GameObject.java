@@ -123,6 +123,64 @@ public class Rs2GameObject {
         return findObjectById(id) != null;
     }
 
+    public static TileObject findObjectByName(String name) {
+        Scene scene = Microbot.getClient().getScene();
+        Tile[][][] tiles = scene.getTiles();
+
+        for (int z = 0; z < Constants.MAX_Z; z++) {
+            for (int x = 0; x < Constants.SCENE_SIZE; x++) {
+                for (int y = 0; y < Constants.SCENE_SIZE; y++) {
+                    Tile tile = tiles[z][x][y];
+                    if (tile == null) {
+                        continue;
+                    }
+
+                    for (TileObject object : tile.getGameObjects()) {
+                        if (object == null) {
+                            continue;
+                        }
+
+                        ObjectComposition objComp = getObjectComposition(object);
+                        if (objComp != null && objComp.getName().equalsIgnoreCase(name)) {
+                            return object;
+                        }
+                    }
+
+                    WallObject wallObject = tile.getWallObject();
+                    if (wallObject != null) {
+                        ObjectComposition objComp = getObjectComposition(wallObject);
+                        if (objComp != null && objComp.getName().equalsIgnoreCase(name)) {
+                            return wallObject;
+                        }
+                    }
+
+                    DecorativeObject decorativeObject = tile.getDecorativeObject();
+                    if (decorativeObject != null) {
+                        ObjectComposition objComp = getObjectComposition(decorativeObject);
+                        if (objComp != null && objComp.getName().equalsIgnoreCase(name)) {
+                            return decorativeObject;
+                        }
+                    }
+
+                    GroundObject groundObject = tile.getGroundObject();
+                    if (groundObject != null) {
+                        ObjectComposition objComp = getObjectComposition(groundObject);
+                        if (objComp != null && objComp.getName().equalsIgnoreCase(name)) {
+                            return groundObject;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static ObjectComposition getObjectComposition(TileObject object) {
+        int id = object.getId();
+        return Microbot.getClient().getObjectDefinition(id);
+    }
+
     public static TileObject findObjectById(int id) {
 
         List<GameObject> gameObjects = getGameObjects();
