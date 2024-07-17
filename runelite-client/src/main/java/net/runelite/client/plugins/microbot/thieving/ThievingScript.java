@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.thieving;
 
 import net.runelite.api.NPC;
-import net.runelite.api.Skill;
 import net.runelite.client.game.npcoverlay.HighlightedNpc;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.5.5";
+    public static String version = "1.5.6";
     ThievingConfig config;
 
     public boolean run(ThievingConfig config) {
@@ -106,8 +105,6 @@ public class ThievingScript extends Script {
     }
 
     private void pickpocket() {
-        if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < config.hitpoints())
-            return;
         if (config.THIEVING_NPC() != ThievingNpc.NONE) {
             if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
                 handleElves();
