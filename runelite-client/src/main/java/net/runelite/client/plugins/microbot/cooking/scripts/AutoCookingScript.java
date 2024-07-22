@@ -2,11 +2,8 @@ package net.runelite.client.plugins.microbot.cooking.scripts;
 
 import net.runelite.api.NPC;
 import net.runelite.api.TileObject;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.cooking.AutoCookingConfig;
 import net.runelite.client.plugins.microbot.cooking.AutoCookingPlugin;
 import net.runelite.client.plugins.microbot.cooking.enums.CookingAreaType;
@@ -16,12 +13,10 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.settings.Rs2Settings;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -89,7 +84,7 @@ public class AutoCookingScript extends Script {
                                 Rs2Camera.turnTo(cookingObject.getLocalLocation());
                                 return;
                             }
-                            Rs2Inventory.useItemOnObject(config.cookingItem().getRawItemID(), cookingObject);
+                            Rs2Inventory.useItemOnObject(config.cookingItem().getRawItemID(), cookingObject.getId());
                             sleepUntil(() -> !Rs2Player.isMoving() && Rs2Widget.findWidget("How many would you like to cook?", null, false) != null);
 
                             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
