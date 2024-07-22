@@ -41,6 +41,7 @@ public @interface PluginDescriptor {
     String GMason = "<html>[<font color=#0077B6>G</font>] ";
     String Pumster = "<html>[<font color=#03ff4e>P</font>] ";
     String Basche = "<html>[<font color=#07A6F0>B</font>] ";
+    String Vince = "<html>[<font color=#5bffe4>V</font>] ";
 
     String name();
 
