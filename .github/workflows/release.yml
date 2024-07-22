@@ -27,8 +27,8 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "1.4.0"
+          automatic_release_tag: "1.4.1"
           prerelease: false
-          title: "Release 1.4.0"
+          title: "Release 1.4.1"
           files: |
             /home/runner/work/microbot/microbot/runelite-client/target/microbot-*.jar

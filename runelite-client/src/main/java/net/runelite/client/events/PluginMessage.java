@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2020, Hydrox6 <ikada@protonmail.ch>
+ * Copyright (c) 2023, jocopa3
+ * Copyright (c) 2024, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,45 +23,41 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.loginscreen;
+package net.runelite.client.events;
 
-import lombok.Getter;
+import java.util.Collections;
+import java.util.Map;
+import lombok.NonNull;
+import lombok.Value;
 
-public enum LoginScreenOverride
+/**
+ * An event pluginhub plugins can use to send data to each other.
+ */
+@Value
+public class PluginMessage
 {
-	OFF,
-	NORMAL("normal.jpg"),
-	OLD("old.jpg"),
-	CHRISTMAS("christmas.jpg"),
-	CHAMBERS_OF_XERIC("cox.jpg"),
-	DARKMEYER("darkmeyer.jpg"),
-	DRAGON_SLAYER_2("ds2.jpg"),
-	FOSSIL_ISLAND("fossil_island.jpg"),
-	HALLOWEEN("halloween.jpg"),
-	HALLOWEEN_2019("halloween_2019.jpg"),
-	INFERNO("inferno.jpg"),
-	KEBOS("kebos.jpg"),
-	MONKEY_MADNESS_2("mm2.jpg"),
-	PRIFDDINAS("prifddinas.jpg"),
-	THEATRE_OF_BLOOD("tob.jpg"),
-	A_KINGDOM_DIVIDED("akd.jpg"),
-	NEX("nex.jpg"),
-	TOMBS_OF_AMASCUT("toa.jpg"),
-	VARLAMORE("varlamore.jpg"),
-	WHILE_GUTHIX_SLEEPS("wgs.jpg"),
-	CUSTOM,
-	RANDOM;
+	/**
+	 * Event namespace. This should usually be a unique string representing your plugin name eg. "tombs-of-amascut"
+	 */
+	String namespace;
+	/**
+	 * Event name. This should represent what the event is for, eg "points".
+	 */
+	String name;
+	/**
+	 * Event data.
+	 */
+	Map<String, Object> data;
 
-	@Getter
-	private final String fileName;
-
-	LoginScreenOverride()
+	public PluginMessage(@NonNull String namespace, @NonNull String name)
 	{
-		this.fileName = null;
+		this(namespace, name, Collections.emptyMap());
 	}
 
-	LoginScreenOverride(String fileName)
+	public PluginMessage(@NonNull String namespace, @NonNull String name, @NonNull Map<String, Object> data)
 	{
-		this.fileName = fileName;
+		this.namespace = namespace;
+		this.name = name;
+		this.data = data;
 	}
 }
