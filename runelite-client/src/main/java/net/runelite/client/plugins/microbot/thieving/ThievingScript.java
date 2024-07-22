@@ -108,8 +108,6 @@ public class ThievingScript extends Script {
     }
 
     private void pickpocket() {
-        if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < config.hitpoints())
-            return;
         if (config.THIEVING_NPC() != ThievingNpc.NONE) {
             if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
                 handleElves();
