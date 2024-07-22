@@ -24,9 +24,11 @@
  */
 package net.runelite.client.plugins.mta.alchemy;
 
+import lombok.Getter;
 import net.runelite.api.GameObject;
 
-class Cupboard
+@Getter
+public class Cupboard
 {
 	GameObject gameObject;
 	AlchemyItem alchemyItem;

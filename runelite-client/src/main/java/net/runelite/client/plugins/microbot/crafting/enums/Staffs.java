@@ -5,11 +5,12 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Staffs {
-    PROGRESSIVE("Progressive Mode","none", 1, ""),
-    WATER_BATTLESTAFF("Water battlestaff", "water battlestaff", 54, "Water orb"),
-    EARTH_BATTLESTAFF("Earth battlestaff", "earth battlestaff", 58, "Earth orb"),
-    FIRE_BATTLESTAFF("Fire battlestaff", "fire battlestaff", 62, "Fire orb"),
-    AIR_BATTLESTAFF("Air battlestaff", "air battlestaff", 66, "Air orb");
+    NONE(" ","",0,""),
+    PROGRESSIVE("Progressive Mode","None", 1, ""),
+    WATER_BATTLESTAFF("Water Battlestaff", "Water Battlestaff", 54, "Water Orb"),
+    EARTH_BATTLESTAFF("Earth Battlestaff", "Earth Battlestaff", 58, "Earth Orb"),
+    FIRE_BATTLESTAFF("Fire Battlestaff", "Fire Battlestaff", 62, "Fire Orb"),
+    AIR_BATTLESTAFF("Air Battlestaff", "Air Battlestaff", 66, "Air Orb");
 
     private final String label;
     private final String itemName;

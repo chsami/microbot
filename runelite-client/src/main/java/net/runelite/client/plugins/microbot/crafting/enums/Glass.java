@@ -5,15 +5,16 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Glass {
-    PROGRESSIVE("Progressive Mode","none", '0', 1),
-    BEER_GLASS("Beer glass", "beer glass", '1', 1),
-    CANDLE_LANTERN("Empty candle lantern", "empty candle lantern", '2', 4),
-    OIL_LAMP("Empty oil lamp", "empty oil lamp", '3', 12),
-    VIAL("Vial", "vial", '4', 33),
-    FISHBOWL("Empty fishbowl", "empty fishbowl", '5', 42),
-    UNPOWERED_ORB("Unpowered orb", "unpowered orb", '6', 46),
-    LANTERN_LENS("Lantern lens", "lantern lens", '7', 49),
-    LIGHT_ORB("Empty light orb", "empty light orb", '8', 87);
+    NONE(" ", "", '0', 0),
+    PROGRESSIVE("Progressive Mode","None", '0', 1),
+    BEER_GLASS("Beer Glass", "Beer Glass", '1', 1),
+    CANDLE_LANTERN("Empty Candle Lantern", "Empty Candle Lantern", '2', 4),
+    OIL_LAMP("Empty Oil Lamp", "Empty Oil Lamp", '3', 12),
+    VIAL("Vial", "Vial", '4', 33),
+    FISHBOWL("Empty Fishbowl", "Empty Fishbowl", '5', 42),
+    UNPOWERED_ORB("Unpowered Orb", "Unpowered Orb", '6', 46),
+    LANTERN_LENS("Lantern Lens", "Lantern Lens", '7', 49),
+    LIGHT_ORB("Empty Light Orb", "Empty Light Orb", '8', 87);
 
     private final String label;
     private final String itemName;
