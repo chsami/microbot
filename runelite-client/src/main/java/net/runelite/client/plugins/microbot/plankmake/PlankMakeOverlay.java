@@ -17,16 +17,16 @@ public class PlankMakeOverlay extends OverlayPanel {
     PlankMakeOverlay(PlankMakePlugin plugin)
     {
         super(plugin);
-        setPosition(OverlayPosition.TOP_LEFT);
+        setPosition(OverlayPosition.ABOVE_CHATBOX_RIGHT);
         setNaughty();
     }
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        panelComponent.setPreferredSize(new Dimension(200, 300));
+        panelComponent.setPreferredSize(new Dimension(300, 400));
         panelComponent.getChildren().add(TitleComponent.builder()
-                .text("Plank Make" + PlankMakeScript.version)
-                .color(Color.GREEN)
+                .text("Plank Make " + PlankMakeScript.version)
+                .color(Color.YELLOW)
                 .build());
 
         // Update to display the combined message

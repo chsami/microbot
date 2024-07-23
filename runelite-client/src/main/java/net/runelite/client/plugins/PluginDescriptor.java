@@ -42,7 +42,7 @@ public @interface PluginDescriptor {
     String Pumster = "<html>[<font color=#03ff4e>P</font>] ";
     String Basche = "<html>[<font color=#07A6F0>B</font>] ";
     String Vince = "<html>[<font color=#5bffe4>V</font>] ";
-    String Geoff = "<html>[<font color=#ffbc03>\uD83C\uDF41G</font>] ";
+    String Geoff = "<html>[<font color=#ffbc03>G</font>] ";
 
     String name();
 

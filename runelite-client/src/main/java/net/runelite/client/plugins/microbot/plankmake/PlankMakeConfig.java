@@ -18,9 +18,12 @@ public interface PlankMakeConfig extends Config {
             section = generalSection
     )
     default String GUIDE() {
-        return "Start at any bank with runes and coins in your inventory and make sure you have\n" +
-                "already pre-cast plank make on the log you want to use and click don't ask again \n" +
-                "on the pop up and everything should be good to go.";
+        return "To initiate the process, please begin at a bank with Astral, Earth, nature " +
+                "runes and coins in your inventory. If you are using the Mud staff " +
+                "equip that and ensure that you have previously pre-cast the " +
+                "Plank Make spell on the desired log and acknowledge the " +
+                "prompt to avoid any further notifications. With these steps complete, " +
+                "you should be ready to proceed.";
     }
 
     @ConfigSection(
@@ -43,24 +46,46 @@ public interface PlankMakeConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "lazyMode",
-            name = "Enable Lazy Mode",
-            description = "Enable lazy mode to add random delays and make the script less tick perfect",
+            keyName = "useSetDelay",
+            name = "Use Set Delay",
+            description = "Enable to use a set delay between actions",
             position = 2,
             section = generalSection
     )
-    default boolean lazyMode() {
+    default boolean useSetDelay() {
         return false;
     }
 
     @ConfigItem(
-            keyName = "maxLazyDelay",
-            name = "Maximum Lazy Delay",
-            description = "The maximum additional delay in milliseconds to add in lazy mode",
+            keyName = "setDelay",
+            name = "Set Delay (ms)",
+            description = "The fixed delay in milliseconds between actions",
             position = 3,
             section = generalSection
     )
-    default int maxLazyDelay() {
+    default int setDelay() {
         return 500; // Default to 500 milliseconds
+    }
+
+    @ConfigItem(
+            keyName = "useRandomDelay",
+            name = "Use Random Delay",
+            description = "Enable to use a random delay between actions",
+            position = 4,
+            section = generalSection
+    )
+    default boolean useRandomDelay() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "maxRandomDelay",
+            name = "Maximum Random Delay (ms)",
+            description = "The maximum random delay in milliseconds between actions",
+            position = 5,
+            section = generalSection
+    )
+    default int maxRandomDelay() {
+        return 1000; // Default to 1000 milliseconds
     }
 }

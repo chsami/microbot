@@ -17,8 +17,10 @@ public class PlankMakeScript extends Script {
     public static long plankMade = 0;
     private int profitPerPlank = 0;
     private long startTime;
-    private boolean lazyMode;
-    private int maxLazyDelay;
+    private boolean useSetDelay;
+    private int setDelay;
+    private boolean useRandomDelay;
+    private int maxRandomDelay;
 
     // State management
     private enum State {
@@ -35,8 +37,10 @@ public class PlankMakeScript extends Script {
         int processedItemPrice = Microbot.getItemManager().search(config.ITEM().getFinished()).get(0).getPrice();
         profitPerPlank = processedItemPrice - unprocessedItemPrice;
 
-        lazyMode = config.lazyMode();
-        maxLazyDelay = config.maxLazyDelay();
+        useSetDelay = config.useSetDelay();
+        setDelay = config.setDelay();
+        useRandomDelay = config.useRandomDelay();
+        maxRandomDelay = config.maxRandomDelay();
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -63,14 +67,14 @@ public class PlankMakeScript extends Script {
         if (Rs2Inventory.hasItem(config.ITEM().getName(), true)) {
             int initialPlankCount = Rs2Inventory.count(config.ITEM().getFinished());
             Rs2Magic.cast(MagicAction.PLANK_MAKE);
-            addRandomDelay();
+            addDelay();
             Rs2Inventory.interact(config.ITEM().getName());
 
             // Wait for the inventory count to change indicating Planks have been made
             if (waitForInventoryChange(config.ITEM().getFinished(), initialPlankCount)) {
                 int plankMadeThisAction = Rs2Inventory.count(config.ITEM().getFinished()) - initialPlankCount;
                 plankMade += plankMadeThisAction;
-                addRandomDelay();
+                addDelay();
             } else {
                 Microbot.log("Failed to detect plank creation.");
                 currentState = State.WAITING;
@@ -129,16 +133,18 @@ public class PlankMakeScript extends Script {
                 QuantityFormatter.quantityToRSDecimalStack(profitPerHour) + "/hr)";
     }
 
-    private void addRandomDelay() {
-        if (lazyMode) {
-            sleep(Random.random(0, maxLazyDelay));
+    private void addDelay() {
+        if (useSetDelay) {
+            sleep(setDelay);
+        } else if (useRandomDelay) {
+            sleep(Random.random(0, maxRandomDelay));
         }
     }
 
     @Override
     public void shutdown() {
         super.shutdown();
-        plankMade = 0; // Reset the count of tanned hides
+        plankMade = 0; // Reset the count of planks made
         combinedMessage = ""; // Reset the combined message
         currentState = State.PLANKING; // Reset the current state
     }
