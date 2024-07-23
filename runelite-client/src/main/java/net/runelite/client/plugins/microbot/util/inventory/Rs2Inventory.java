@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Potion;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
@@ -1806,23 +1807,8 @@ public class Rs2Inventory {
      *
      */
     public static void useRestoreEnergyItem() {
-        String staminaRestoreItemName = "Stamina potion";
-        List<String> restoreEnergyItemNames = Arrays.asList("Super energy", "Super energy mix", "Energy potion", "Energy mix");
-        Pattern pattern = Pattern.compile("^(.*?)(?:\\(\\d+\\))?$");
-
-        List<Rs2Item> filteredRestoreEnergyItems = items().stream()
-                .filter(item -> {
-                    Matcher matcher = pattern.matcher(item.getName());
-                    return matcher.matches() && restoreEnergyItemNames.contains(matcher.group(1).trim());
-                })
-                .collect(Collectors.toList());
-
-        List<Rs2Item> filteredStaminaRestoreItems = items().stream()
-                .filter(item -> {
-                    Matcher matcher = pattern.matcher(item.getName());
-                    return matcher.matches() && staminaRestoreItemName.equals(matcher.group(1).trim());
-                })
-                .collect(Collectors.toList());
+        List<Rs2Item> filteredRestoreEnergyItems = getFilteredPotionItemsInInventory(Rs2Potion.getRestoreEnergyPotionsVariants());
+        List<Rs2Item> filteredStaminaRestoreItems = getFilteredPotionItemsInInventory(Rs2Potion.getStaminaPotion());
         
         if (filteredStaminaRestoreItems.isEmpty() && filteredRestoreEnergyItems.isEmpty()) return;
 
@@ -1835,6 +1821,32 @@ public class Rs2Inventory {
                 Rs2Inventory.interact(filteredStaminaRestoreItems.stream().findFirst().get().name, "drink");
             }
         }
+    }
+
+    /**
+     * Method fetches list of potion items in Inventory, will ignore uses
+     *
+     * @param potionName Potion Name
+     * @return List of Potion Items in Inventory
+     */
+    public static List<Rs2Item> getFilteredPotionItemsInInventory(String potionName) {
+        return getFilteredPotionItemsInInventory(Arrays.asList(potionName));
+    }
+    
+    /**
+     * Method fetches list of potion items in Inventory, will ignore uses
+     *
+     * @param potionNames List of Potion Names
+     * @return List of Potion Items in Inventory
+     */
+    public static List<Rs2Item> getFilteredPotionItemsInInventory(List<String> potionNames) {
+        Pattern usesRegexPattern = Pattern.compile("^(.*?)(?:\\(\\d+\\))?$");
+        return getPotions().stream()
+                .filter(item -> {
+                    Matcher matcher = usesRegexPattern.matcher(item.getName());
+                    return matcher.matches() && potionNames.contains(matcher.group(1).trim());
+                })
+                .collect(Collectors.toList());
     }
     /**
      * Method executes menu actions

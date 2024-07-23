@@ -318,19 +318,23 @@ public class Rs2Player {
         return Microbot.getClientThread().runOnClientThread(() -> quest.getState(client));
     }
 
-    public static int getRealSkillLevel(Skill skill){
+    public static int getRealSkillLevel(Skill skill) {
         Client client = Microbot.getClient();
         return client.getRealSkillLevel(skill);
     }
 
-    public static int getBoostedSkillLevel(Skill skill){
+    public static int getBoostedSkillLevel(Skill skill) {
         Client client = Microbot.getClient();
         return client.getBoostedSkillLevel(skill);
     }
 
-    public static boolean getSkillRequirement(Skill skill, int levelRequired, boolean isBoosted){
+    public static boolean getSkillRequirement(Skill skill, int levelRequired, boolean isBoosted) {
         if (isBoosted) return getBoostedSkillLevel(skill) >= levelRequired;
         return getRealSkillLevel(skill) >= levelRequired;
+    }
+ 
+    public static boolean getSkillRequirement(Skill skill, int levelRequired) {
+        return getSkillRequirement(skill, levelRequired, false);
     }
 
     public static boolean isIronman() {
@@ -338,7 +342,7 @@ public class Rs2Player {
         return accountType > 0 && accountType <= 3;
     }
 
-    public static boolean isGroupIronman(){
+    public static boolean isGroupIronman() {
         int accountType = Microbot.getVarbitValue(Varbits.ACCOUNT_TYPE);
         return accountType >= 4;
     }
