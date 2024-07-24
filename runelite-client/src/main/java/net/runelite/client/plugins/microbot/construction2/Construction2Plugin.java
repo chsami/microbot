@@ -18,7 +18,7 @@ import java.awt.*;
 
 @PluginDescriptor(
         name = PluginDescriptor.Geoff + "Construction 2",
-        description = "Microbot construction plugin with added new bits.",
+        description = "Geoff's Microbot construction plugin with added new bits.",
         tags = {"skilling", "microbot", "construction"},
         enabledByDefault = false
 )
