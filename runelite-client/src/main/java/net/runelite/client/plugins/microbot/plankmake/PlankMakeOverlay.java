@@ -23,7 +23,7 @@ public class PlankMakeOverlay extends OverlayPanel {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        panelComponent.setPreferredSize(new Dimension(300, 400));
+        panelComponent.setPreferredSize(new Dimension(200, 300));
         panelComponent.getChildren().add(TitleComponent.builder()
                 .text("Plank Make " + PlankMakeScript.version)
                 .color(Color.YELLOW)
