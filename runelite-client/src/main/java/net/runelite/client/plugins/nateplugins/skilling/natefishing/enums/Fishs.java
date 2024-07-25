@@ -9,12 +9,11 @@ import net.runelite.client.game.FishingSpot;
 public enum Fishs {
     SHRIMP("shrimp", FishingSpot.SHRIMP.getIds(),"net"),
     TROUT("trout/salmon", FishingSpot.SALMON.getIds(),"lure"),
-    TUNA("tuna/swordfish", FishingSpot.HARPOONFISH.getIds(),"harpoon"),
+    TUNA("tuna/swordfish", FishingSpot.LOBSTER.getIds(),"harpoon"),
     LOBSTER("lobster", FishingSpot.LOBSTER.getIds(),"cage"),
     MONKFISH("monkfish", FishingSpot.MONKFISH.getIds(),"net"),
-
+    KARAMBWANJI("karambwanji", FishingSpot.KARAMBWANJI.getIds(), "net"),
     LAVA_EEL("lava eel", FishingSpot.LAVA_EEL.getIds(), "lure"),
-
     SHARK("shark", FishingSpot.SHARK.getIds(),"harpoon");
 
     private final String name;
