@@ -43,15 +43,15 @@ public enum CookingLocation {
     private final CookingAreaType cookingAreaType;
     private final int cookingObjectID;
 
-    public static CookingLocation findNearestCookingLocation(AutoCookingConfig config, WorldPoint playerWorldPoint) {
+    public static CookingLocation findNearestCookingLocation(CookingItem item, WorldPoint playerWorldPoint) {
         CookingLocation nearestLocation = null;
         double nearestDistance = Double.MAX_VALUE;
 
         for (CookingLocation location : values()) {
             double distance = calculateDistance(playerWorldPoint, location.getCookingObjectWorldPoint());
             if (!location.hasRequirements()) continue;
-            if ((config.cookingItem().getCookingAreaType() != CookingAreaType.BOTH) &&
-                    (location.getCookingAreaType() != config.cookingItem().getCookingAreaType())) continue;
+            if ((item.getCookingAreaType() != CookingAreaType.BOTH) &&
+                    (location.getCookingAreaType() != item.getCookingAreaType())) continue;
             if (distance < nearestDistance) {
                 nearestDistance = distance;
                 nearestLocation = location;
@@ -78,7 +78,7 @@ public enum CookingLocation {
         switch (this) {
             case COOKS_GUILD:
                 boolean hasFaladorHardDiary = Microbot.getVarbitValue(Varbits.DIARY_FALADOR_HARD) == 1;
-                boolean hasMaxedCrafting = Rs2Player.getSkillRequirement(Skill.CRAFTING, 99, false);
+                boolean hasMaxedCrafting = Rs2Player.getSkillRequirement(Skill.CRAFTING, 99);
                 boolean isWearingCraftingGuild = (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron"));
 
                 if (hasLineOfSight && Rs2Player.isMember() && (hasMaxedCrafting || hasFaladorHardDiary)) return true;

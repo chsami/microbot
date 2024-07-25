@@ -41,7 +41,7 @@ public enum CookingItem {
     private final CookingAreaType cookingAreaType;
 
     private boolean hasLevelRequired() {
-        return Rs2Player.getSkillRequirement(Skill.COOKING, this.getLevelRequired(), false);
+        return Rs2Player.getSkillRequirement(Skill.COOKING, this.getLevelRequired());
     }
 
     public boolean hasRequirements() {
@@ -56,7 +56,7 @@ public enum CookingItem {
             case RAW_MANTA_RAY:
                 return hasLevelRequired() && Rs2Player.isMember();
             default:
-                return true;
+                return hasLevelRequired();
         }
     }
 }
