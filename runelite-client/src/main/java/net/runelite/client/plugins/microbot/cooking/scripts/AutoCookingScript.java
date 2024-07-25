@@ -35,13 +35,14 @@ enum CookingState {
 
 public class AutoCookingScript extends Script {
 
-    CookingState state;
-    boolean init = true;
-    CookingLocation location;
+    private CookingState state;
+    private boolean init;
+    private CookingLocation location;
 
     public boolean run(AutoCookingConfig config) {
         Microbot.enableAutoRunOn = false;
         CookingItem cookingItem = config.cookingItem();
+        init = true;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
@@ -90,7 +91,7 @@ public class AutoCookingScript extends Script {
 
                             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                             Microbot.status = "Cooking " + cookingItem.getRawItemName();
-                            sleepUntilTrue(() -> !hasRawItem(cookingItem) && AutoCookingPlugin.hasPlayerStoppedAnimating(), 500, 150000);
+                            sleepUntilTrue(() -> !hasRawItem(cookingItem) && !Rs2Player.isAnimating(3500), 500, 150000);
                             if (hasBurntItem(cookingItem) && !cookingItem.getBurntItemName().isEmpty()) {
                                 state = CookingState.DROPPING;
                                 return;
