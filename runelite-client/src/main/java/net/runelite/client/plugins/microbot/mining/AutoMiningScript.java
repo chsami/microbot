@@ -34,6 +34,12 @@ public class AutoMiningScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
+                if (!config.ORE().hasRequiredLevel()) {
+                    Microbot.showMessage("You do not have the required mining level to mine this ore.");
+                    shutdown();
+                    return;
+                }
+
                 if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
 
                 switch (state) {
@@ -42,18 +48,18 @@ public class AutoMiningScript extends Script {
                             state = State.RESETTING;
                             return;
                         }
-                        
+
                         GameObject rock = Rs2GameObject.findObject(config.ORE().getName(), true, config.distanceToStray(), true, initialPlayerLocation);
-                        
-                        if(rock != null){
+
+                        if (rock != null) {
                             if (Rs2GameObject.interact(rock)) {
                                 Rs2Player.waitForAnimation();
-                            } 
+                            }
                         }
                         break;
                     case RESETTING:
                         List<String> itemNames = Arrays.stream(config.itemsToBank().split(",")).map(String::toLowerCase).collect(Collectors.toList());
-                        
+
                         if (config.useBank()) {
                             if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation))
                                 return;
@@ -65,7 +71,7 @@ public class AutoMiningScript extends Script {
                         break;
                 }
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                Microbot.log(ex.getMessage());
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
