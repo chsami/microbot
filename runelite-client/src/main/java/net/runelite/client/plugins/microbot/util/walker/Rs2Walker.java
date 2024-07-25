@@ -107,6 +107,8 @@ public class Rs2Walker {
                         sleep(600, 1000);
                     }
 
+                    if (ShortestPathPlugin.getPathfinder() == null) break;
+
                     List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
                     int indexOfStartPoint = getClosestTileIndex(path);
                     lastPosition = Rs2Player.getWorldLocation();
