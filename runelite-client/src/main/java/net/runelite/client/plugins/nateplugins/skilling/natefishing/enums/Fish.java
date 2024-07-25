@@ -6,7 +6,7 @@ import net.runelite.client.game.FishingSpot;
 
 @Getter
 @RequiredArgsConstructor
-public enum Fishs {
+public enum Fish {
     SHRIMP("shrimp", FishingSpot.SHRIMP.getIds(),"net"),
     TROUT("trout/salmon", FishingSpot.SALMON.getIds(),"lure"),
     TUNA("tuna/swordfish", FishingSpot.LOBSTER.getIds(),"harpoon"),
