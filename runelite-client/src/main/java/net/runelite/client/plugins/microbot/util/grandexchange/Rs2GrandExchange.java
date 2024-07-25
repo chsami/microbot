@@ -342,10 +342,13 @@ public class Rs2GrandExchange {
             openExchange();
         }
         sleepUntil(Rs2GrandExchange::isOpen);
-        Rs2Widget.clickWidgetFast(
-                COLLECT_BUTTON, collectToBank ? 2 : 1);
-        sleepUntil(() -> Rs2Widget.getWidget(COLLECT_BUTTON).isSelfHidden());
-        return Rs2Widget.getWidget(COLLECT_BUTTON).isSelfHidden();
+        Widget[] collectButton = Rs2Widget.getWidget(465,6).getDynamicChildren();
+        if (!collectButton[1].isSelfHidden()) {
+            Rs2Widget.clickWidgetFast(
+                    COLLECT_BUTTON, collectToBank ? 2 : 1);
+            sleepUntil(() -> collectButton[1].isSelfHidden());
+        }
+        return collectButton[1].isSelfHidden();
     }
 
     public static boolean collectToInventory() {

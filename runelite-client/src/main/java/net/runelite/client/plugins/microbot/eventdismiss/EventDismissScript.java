@@ -24,8 +24,10 @@ public class EventDismissScript extends Script {
 
                 if (npc != null) {
                     if (shouldDismissNpc(npc, config)) {
+                        Microbot.pauseAllScripts = true;
                         dismissNpc(npc);
                     } else if (!Rs2Inventory.isFull()) {
+                        Microbot.pauseAllScripts = true;
                         talkToNPC(npc);
                     }
                 }
@@ -97,6 +99,7 @@ public class EventDismissScript extends Script {
     private void dismissNpc(NPC npc) {
         // Interact with NPC to dismiss it
         Rs2Npc.interact(npc, "Dismiss");
+        Microbot.pauseAllScripts = false;
     }
 
     private void talkToNPC(NPC npc) {
@@ -104,5 +107,6 @@ public class EventDismissScript extends Script {
         Rs2Npc.interact(npc, "Talk-to");
         sleep(1200);
         Rs2Dialogue.clickContinue();
+        Microbot.pauseAllScripts = false;
     }
 }
