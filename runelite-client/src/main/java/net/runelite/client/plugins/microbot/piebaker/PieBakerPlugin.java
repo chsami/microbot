@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @PluginDescriptor(
-        name = "Pie Baker",
+        name = PluginDescriptor.Bttqjs + "Pie Baker",
         description = "Automatically bakes pies using the Lunar spellbook",
         tags = {"pie", "baking", "cooking", "magic"}
 )
