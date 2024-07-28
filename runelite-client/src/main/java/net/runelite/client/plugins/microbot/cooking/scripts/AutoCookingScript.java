@@ -35,12 +35,14 @@ enum CookingState {
 
 public class AutoCookingScript extends Script {
 
-    CookingState state;
-    boolean init = true;
-    CookingLocation location;
+    private CookingState state;
+    private boolean init;
+    private CookingLocation location;
 
     public boolean run(AutoCookingConfig config) {
         Microbot.enableAutoRunOn = false;
+        CookingItem cookingItem = config.cookingItem();
+        init = true;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
@@ -52,11 +54,11 @@ public class AutoCookingScript extends Script {
                     }
 
                     if (config.useNearestCookingLocation()) {
-                        location = CookingLocation.findNearestCookingLocation(config, initialPlayerLocation);
+                        location = CookingLocation.findNearestCookingLocation(cookingItem, initialPlayerLocation);
                     } else {
                         location = config.cookingLocation();
-                        if (config.cookingItem().getCookingAreaType() != CookingAreaType.BOTH) {
-                            if (location.getCookingAreaType() != config.cookingItem().getCookingAreaType()) {
+                        if (cookingItem.getCookingAreaType() != CookingAreaType.BOTH) {
+                            if (location.getCookingAreaType() != cookingItem.getCookingAreaType()) {
                                 Microbot.showMessage("Cooking Area does not match item's cooking area");
                                 shutdown();
                                 return;
@@ -64,14 +66,14 @@ public class AutoCookingScript extends Script {
                         }
                     }
 
-                    getState(config);
+                    getState(config, location);
                 }
 
                 if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
 
                 switch (state) {
                     case COOKING:
-                        if (!config.cookingItem().hasRequirements()) {
+                        if (!cookingItem.hasRequirements()) {
                             Microbot.showMessage("You do not meet the requirements to cook this item");
                             shutdown();
                             return;
@@ -84,13 +86,13 @@ public class AutoCookingScript extends Script {
                                 Rs2Camera.turnTo(cookingObject.getLocalLocation());
                                 return;
                             }
-                            Rs2Inventory.useItemOnObject(config.cookingItem().getRawItemID(), cookingObject.getId());
+                            Rs2Inventory.useItemOnObject(cookingItem.getRawItemID(), cookingObject.getId());
                             sleepUntil(() -> !Rs2Player.isMoving() && Rs2Widget.findWidget("How many would you like to cook?", null, false) != null);
 
                             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-                            Microbot.status = "Cooking " + config.cookingItem().getRawItemName();
-                            sleepUntilTrue(() -> !hasRawItem(config) && AutoCookingPlugin.hasPlayerStoppedAnimating(), 500, 150000);
-                            if (hasBurntItem(config) && !config.cookingItem().getBurntItemName().isEmpty()) {
+                            Microbot.status = "Cooking " + cookingItem.getRawItemName();
+                            sleepUntilTrue(() -> !hasRawItem(cookingItem) && !Rs2Player.isAnimating(3500), 500, 150000);
+                            if (hasBurntItem(cookingItem) && !cookingItem.getBurntItemName().isEmpty()) {
                                 state = CookingState.DROPPING;
                                 return;
                             }
@@ -98,9 +100,9 @@ public class AutoCookingScript extends Script {
                             break;
                         }
                     case DROPPING:
-                        Microbot.status = "Dropping " + config.cookingItem().getBurntItemName();
-                        Rs2Inventory.dropAll(item -> item.name.equalsIgnoreCase(config.cookingItem().getBurntItemName()), config.getDropOrder());
-                        sleepUntilTrue(() -> !hasBurntItem(config), 500, 150000);
+                        Microbot.status = "Dropping " + cookingItem.getBurntItemName();
+                        Rs2Inventory.dropAll(item -> item.name.equalsIgnoreCase(cookingItem.getBurntItemName()), config.getDropOrder());
+                        sleepUntilTrue(() -> !hasBurntItem(cookingItem), 500, 150000);
                         state = CookingState.BANKING;
                         break;
                     case BANKING:
@@ -113,12 +115,12 @@ public class AutoCookingScript extends Script {
                             if (!isBankOpen || !Rs2Bank.isOpen()) return;
                         }
 
-                        if (hasCookedItem(config)) {
-                            Rs2Bank.depositAll(config.cookingItem().getCookedItemName(), true);
+                        if (hasCookedItem(cookingItem)) {
+                            Rs2Bank.depositAll(cookingItem.getCookedItemName(), true);
                             sleep(Random.random(800, 1600));
                         }
 
-                        if (config.cookingItem().equals(CookingItem.UNCOOKED_PIZZA)) {
+                        if (cookingItem.equals(CookingItem.UNCOOKED_PIZZA)) {
                             Rs2Bank.depositAll();
                             if (Rs2Bank.count("pot of flour") > 9 && Rs2Bank.count(config.humidifyItem().getFilledItemName()) > 9) {
                                 Rs2Bank.withdrawX("pot of flour", 9);
@@ -149,12 +151,12 @@ public class AutoCookingScript extends Script {
                             }
 
                         }
-                        if (!hasRawItem(config)) {
+                        if (!hasRawItem(cookingItem)) {
                             Microbot.showMessage("No Raw Food Item found in Bank");
                             shutdown();
                             return;
                         }
-                        Rs2Bank.withdrawAll(config.cookingItem().getRawItemName(), true);
+                        Rs2Bank.withdrawAll(cookingItem.getRawItemName(), true);
                         sleep(Random.random(800, 1600));
                         state = CookingState.WALKING;
                         Rs2Bank.closeBank();
@@ -167,7 +169,7 @@ public class AutoCookingScript extends Script {
                             Rs2Walker.walkFastCanvas(location.getCookingObjectWorldPoint());
                         }
 
-                        if (hasRawItem(config)) {
+                        if (hasRawItem(cookingItem)) {
                             state = CookingState.COOKING;
                         } else {
                             state = CookingState.BANKING;
@@ -209,9 +211,9 @@ public class AutoCookingScript extends Script {
         return true;
     }
 
-    private void getState(AutoCookingConfig config) {
-        if (!hasRawItem(config)) {
-            if (hasBurntItem(config)) {
+    private void getState(AutoCookingConfig config, CookingLocation location) {
+        if (!hasRawItem(config.cookingItem())) {
+            if (hasBurntItem(config.cookingItem())) {
                 state = CookingState.DROPPING;
                 init = false;
                 return;
@@ -235,18 +237,18 @@ public class AutoCookingScript extends Script {
         return Rs2Player.getWorldLocation().distanceTo(location.getCookingObjectWorldPoint()) <= distance && !Rs2Player.isMoving();
     }
 
-    private boolean hasRawItem(AutoCookingConfig config) {
+    private boolean hasRawItem(CookingItem cookingItem) {
         if (Rs2Bank.isOpen()) {
-            return Rs2Bank.hasBankItem(config.cookingItem().getRawItemName(), true);
+            return Rs2Bank.hasBankItem(cookingItem.getRawItemName(), true);
         }
-        return Rs2Inventory.hasItem(config.cookingItem().getRawItemName(), true);
+        return Rs2Inventory.hasItem(cookingItem.getRawItemName(), true);
     }
 
-    private boolean hasCookedItem(AutoCookingConfig config) {
-        return Rs2Inventory.hasItem(config.cookingItem().getCookedItemName(), true);
+    private boolean hasCookedItem(CookingItem cookingItem) {
+        return Rs2Inventory.hasItem(cookingItem.getCookedItemName(), true);
     }
 
-    private boolean hasBurntItem(AutoCookingConfig config) {
-        return Rs2Inventory.hasItem(config.cookingItem().getBurntItemName(), true);
+    private boolean hasBurntItem(CookingItem cookingItem) {
+        return Rs2Inventory.hasItem(cookingItem.getBurntItemName(), true);
     }
 }

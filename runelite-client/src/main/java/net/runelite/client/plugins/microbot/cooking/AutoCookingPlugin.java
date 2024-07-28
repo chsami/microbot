@@ -27,7 +27,6 @@ import java.awt.*;
 )
 @Slf4j
 public class AutoCookingPlugin extends Plugin {
-    public static long lastAnimationTime = 0;
     public static double version = 1.0;
     @Inject
     AutoCookingScript autoCookingScript;
@@ -41,13 +40,6 @@ public class AutoCookingPlugin extends Plugin {
     private OverlayManager overlayManager;
     @Inject
     private AutoCookingOverlay overlay;
-
-    public static boolean hasPlayerStoppedAnimating() {
-        if (lastAnimationTime == 0 || (System.currentTimeMillis() - lastAnimationTime) < 3000)
-            return false;
-        lastAnimationTime = 0;
-        return true;
-    }
 
     @Provides
     AutoCookingConfig provideConfig(ConfigManager configManager) {
@@ -74,21 +66,5 @@ public class AutoCookingPlugin extends Plugin {
     protected void shutDown() {
         autoCookingScript.shutdown();
         overlayManager.remove(overlay);
-    }
-
-    @Subscribe
-    public void onAnimationChanged(AnimationChanged event) {
-        if (!(event.getActor() instanceof Player)) {
-            return;
-        }
-
-        Player player = (Player) event.getActor();
-        if (player != client.getLocalPlayer()) {
-            return;
-        }
-
-        if (player.getAnimation() == AnimationID.COOKING_FIRE || player.getAnimation() == AnimationID.COOKING_RANGE || player.getAnimation() == AnimationID.COOKING_WINE) {
-            lastAnimationTime = System.currentTimeMillis();
-        }
     }
 }
