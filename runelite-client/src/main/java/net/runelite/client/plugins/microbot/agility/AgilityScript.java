@@ -34,7 +34,7 @@ import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.PRIFDDI
 
 public class AgilityScript extends Script {
 
-    public static String version = "1.1.0";
+    public static String version = "1.1.1";
     final int MAX_DISTANCE = 2300;
 
     public List<AgilityObstacleModel> draynorCourse = new ArrayList<>();
