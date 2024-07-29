@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.flipperschaser;
 
+
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -9,7 +10,6 @@ import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.discord.DiscordWebhook;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -18,10 +18,15 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
-import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
 
 @PluginDescriptor(
     name = PluginDescriptor.Bttqjs + "Flippers Chaser",
@@ -174,7 +179,6 @@ public class FlippersChaserPlugin extends Plugin {
     }
 
     private void logOut() {
-        Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
         clientThread.invoke(() -> client.runScript(ScriptID.LOG_OUT, 1));
     }
 
@@ -185,14 +189,12 @@ public class FlippersChaserPlugin extends Plugin {
             webhook.addEmbed(new DiscordWebhook.EmbedObject()
                 .setTitle("[Success]")
                 .setDescription(client.getLocalPlayer().getName() + " has obtained Flippers successfully!")
-                .setColor("#B4E380")
-                .setImage(client.getScreenshot()));
+                .setColor("#B4E380"));
         } else {
             webhook.addEmbed(new DiscordWebhook.EmbedObject()
                 .setTitle("[Failure]")
                 .setDescription(client.getLocalPlayer().getName() + " has no food in inventory, logging out.")
-                .setColor("#FF4C4C")
-                .setImage(client.getScreenshot()));
+                .setColor("#FF4C4C"));
         }
         webhook.execute();
     }
@@ -208,6 +210,81 @@ public class FlippersChaserPlugin extends Plugin {
     public void onItemContainerChanged(ItemContainerChanged event) {
         if (event.getContainerId() == InventoryID.INVENTORY.getId() && !Rs2Inventory.containsFood()) {
             handleFailure();
+        }
+    }
+
+    // Nested DiscordWebhook class for simplicity
+    private static class DiscordWebhook {
+        private final String webhookUrl;
+        private final StringBuilder json;
+
+        public DiscordWebhook(String webhookUrl) {
+            this.webhookUrl = webhookUrl;
+            this.json = new StringBuilder();
+            this.json.append("{\"embeds\":[");
+        }
+
+        public void addEmbed(EmbedObject embed) {
+            if (json.length() > 11) {
+                json.append(",");
+            }
+            json.append(embed.toJson());
+        }
+
+        public void execute() {
+            try {
+                json.append("]}");
+                byte[] postData = json.toString().getBytes(StandardCharsets.UTF_8);
+                URL url = new URL(webhookUrl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Content-Length", String.valueOf(postData.length));
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(postData);
+                }
+                conn.getInputStream(); // Ensure the request is sent
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public static class EmbedObject {
+            private final StringBuilder json;
+
+            public EmbedObject() {
+                this.json = new StringBuilder();
+                this.json.append("{");
+            }
+
+            public EmbedObject setTitle(String title) {
+                appendComma();
+                json.append("\"title\":\"").append(title).append("\"");
+                return this;
+            }
+
+            public EmbedObject setDescription(String description) {
+                appendComma();
+                json.append("\"description\":\"").append(description).append("\"");
+                return this;
+            }
+
+            public EmbedObject setColor(String color) {
+                appendComma();
+                json.append("\"color\":\"").append(Integer.parseInt(color.substring(1), 16)).append("\"");
+                return this;
+            }
+
+            private void appendComma() {
+                if (json.length() > 1 && json.charAt(json.length() - 1) != '{') {
+                    json.append(",");
+                }
+            }
+
+            public String toJson() {
+                return json.append("}").toString();
+            }
         }
     }
 }
