@@ -1,8 +1,10 @@
 package net.runelite.client.plugins.microbot.util.player;
 
+import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -17,6 +19,8 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +40,9 @@ public class Rs2Player {
     public static int antiVenomTime = -1;
     public static int staminaBuffTime = -1;
     public static int antiPoisonTime = -1;
-
+    public static Instant lastAnimationTime = null;
+    @Getter
+    public static int lastAnimationID = AnimationID.IDLE;
 
     public static boolean hasAntiFireActive() {
         return antiFireTime > 0 || hasSuperAntiFireActive();
@@ -105,6 +111,22 @@ public class Rs2Player {
         }
     }
 
+    public static void handleAnimationChanged(AnimationChanged event) {
+        if (!(event.getActor() instanceof Player)) {
+            return;
+        }
+
+        Player player = (Player) event.getActor();
+        if (player != Microbot.getClient().getLocalPlayer()) {
+            return;
+        }
+
+        if (player.getAnimation() != AnimationID.IDLE) {
+            lastAnimationTime = Instant.now();
+            lastAnimationID = player.getAnimation();
+        }
+    }
+
     public static void waitForWalking() {
         boolean result = sleepUntilTrue(Rs2Player::isWalking, 100, 5000);
         if (!result) return;
@@ -129,16 +151,21 @@ public class Rs2Player {
         sleepUntil(() -> !Rs2Player.isAnimating(), time);
     }
 
+    public static boolean isAnimating(int ms) {
+        return (lastAnimationTime != null && Duration.between(lastAnimationTime, Instant.now()).toMillis() < ms) || getAnimation() != AnimationID.IDLE;
+    }
+
     public static boolean isAnimating() {
-        return Microbot.isAnimating();
+        return isAnimating(600);
     }
 
     public static boolean isWalking() {
-        return Microbot.isMoving();
+        return Rs2Player.isMoving();
     }
 
     public static boolean isMoving() {
-        return Microbot.isMoving();
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
+                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
 
     public static boolean isInteracting() {

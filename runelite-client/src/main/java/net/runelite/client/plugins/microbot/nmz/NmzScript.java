@@ -13,7 +13,6 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.misc.SpecialAttackWeaponEnum;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
@@ -48,7 +47,7 @@ public class NmzScript extends Script {
     public boolean run(NmzConfig config) {
         NmzScript.config = config;
         prayerPotionScript = new PrayerPotionScript();
-        Microbot.getSpecialAttackConfigs().setSpecialAttack(true).setSpecialAttackWeapon(SpecialAttackWeaponEnum.ABYSSAL_DAGGER).setMinimumSpecEnergy(500);
+        Microbot.getSpecialAttackConfigs().setSpecialAttack(true);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
