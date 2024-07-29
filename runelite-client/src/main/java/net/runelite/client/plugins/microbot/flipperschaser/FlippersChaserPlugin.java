@@ -24,7 +24,7 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 
 @PluginDescriptor(
-    name = PluginDescriptor.Bttqjs + "F",
+    name = PluginDescriptor.Bttqjs + "Flippers Chaser",
     description = "Automates obtaining Flippers from Mogres",
     tags = {"service", "automation", "combat", "microbot"}
 )
