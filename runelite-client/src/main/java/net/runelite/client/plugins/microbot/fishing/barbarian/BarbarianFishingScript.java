@@ -31,6 +31,9 @@ public class BarbarianFishingScript extends Script {
             //  if(Rs2Antiban.isActionCooldownActive)
             //      return;
 
+            if (Rs2Player.isInteracting())
+                return;
+
             if (Rs2Inventory.isFull()) {
                 dropInventoryItems(config);
                 return;
