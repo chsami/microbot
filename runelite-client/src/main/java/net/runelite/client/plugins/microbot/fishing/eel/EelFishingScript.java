@@ -6,7 +6,6 @@ import net.runelite.client.game.FishingSpot;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.fishing.eel.enums.EelFishingSpot;
-import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -109,7 +108,7 @@ public class EelFishingScript extends Script {
     }
 
     public void shutdown() {
-        Rs2Antiban.resetAntiban();
+        //Rs2Antiban.resetAntiban();
         super.shutdown();
     }
 }
