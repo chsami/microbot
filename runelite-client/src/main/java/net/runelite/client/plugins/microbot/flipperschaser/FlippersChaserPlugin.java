@@ -114,7 +114,6 @@ public class FlippersChaserPlugin extends Plugin {
     }
 
     private void useFishingExplosive() {
-        // Find "Ominous Fishing Spot" and use fishing explosive
         NPC fishingSpot = findFishingSpot();
         if (fishingSpot != null) {
             Rs2Inventory.useItemOnNpc(ItemID.FISHING_EXPLOSIVE, fishingSpot);
