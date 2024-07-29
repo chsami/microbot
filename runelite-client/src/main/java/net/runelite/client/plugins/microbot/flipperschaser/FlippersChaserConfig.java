@@ -28,9 +28,7 @@ public interface FlippersChaserConfig extends Config {
     @ConfigItem(
         keyName = "foodType",
         name = "Food Type",
-        description = "Select the type of food to use",
-        hidden = true,
-        unhide = "useFood"
+        description = "Select the type of food to use"
     )
     default String foodType() {
         return "Shark";
