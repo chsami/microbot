@@ -1,34 +1,40 @@
 package net.runelite.client.plugins.microbot.bankjs.BanksBankStander;
 
-import net.runelite.api.ItemComposition;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import javax.inject.Inject;
 import java.awt.event.KeyEvent;
-import java.util.concurrent.TimeUnit;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class BanksBankStanderScript extends Script {
+    public static double version = 1.1;
+    String firstItemIdentifier;
+    String secondItemIdentifier;
     @Inject
     private BanksBankStanderConfig config;
-
-    public static double version = 1.1;
     private CurrentStatus currentStatus = CurrentStatus.FETCH_SUPPLIES;
-
-    String firstItemIdentifier;
     private int firstItemQuantity;
     private Integer firstItemId;
-    String secondItemIdentifier;
     private int secondItemQuantity;
     private Integer secondItemId;
     private int sleepMin;
     private int sleepMax;
     private int sleepTarget;
+
+    // method to parse string to integer, returns null if parsing fails
+    public static Integer TryParseInt(String text) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException ex) {
+            System.out.println("Could not Parse Int from Item, using Name Instead");
+            return null;
+        }
+    }
 
     public boolean run(BanksBankStanderConfig config) {
         this.config = config; // Initialize the config object before accessing its parameters
@@ -90,7 +96,6 @@ public class BanksBankStanderScript extends Script {
                     Rs2Inventory.hasItem(secondItemIdentifier);
         }
     }
-
 
     private boolean fetchItems() {
         // Check if we have supplies already by calling hasItems
@@ -198,7 +203,6 @@ public class BanksBankStanderScript extends Script {
         return true;
     }
 
-
     private int calculateSleepDuration() {
         // Create a Random object
         Random random = new Random();
@@ -218,15 +222,5 @@ public class BanksBankStanderScript extends Script {
         } while (sleepDuration < sleepMin || sleepDuration > sleepMax); // Ensure the duration is within the specified range
 
         return sleepDuration;
-    }
-
-    // method to parse string to integer, returns null if parsing fails
-    public static Integer TryParseInt(String text) {
-        try {
-            return Integer.parseInt(text);
-        } catch (NumberFormatException ex) {
-            System.out.println("Could not Parse Int from Item, using Name Instead");
-            return null;
-        }
     }
 }
