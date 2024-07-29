@@ -2,6 +2,8 @@ package net.runelite.client.plugins.microbot.woodcutting.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.runelite.api.Skill;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 @Getter
 @RequiredArgsConstructor
@@ -25,5 +27,9 @@ public enum WoodcuttingTree {
     @Override
     public String toString() {
         return name;
+    }
+
+    public boolean hasRequiredLevel() {
+        return Rs2Player.getSkillRequirement(Skill.WOODCUTTING, this.woodcuttingLevel);
     }
 }

@@ -65,9 +65,6 @@ public class PestControlScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-                if (Microbot.getClient().getMinimapZoom() != 2.0) {
-                    Microbot.getClient().setMinimapZoom(2.0);
-                }
                 final boolean isInPestControl = Microbot.getClient().getWidget(WidgetInfo.PEST_CONTROL_BLUE_SHIELD) != null;
                 final boolean isInBoat = Microbot.getClient().getWidget(WidgetInfo.PEST_CONTROL_BOAT_INFO) != null;
                 if (isInPestControl) {

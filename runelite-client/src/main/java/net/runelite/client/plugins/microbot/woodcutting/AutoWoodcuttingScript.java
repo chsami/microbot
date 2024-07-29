@@ -49,6 +49,12 @@ public class AutoWoodcuttingScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
+                if (!config.TREE().hasRequiredLevel()) {
+                    Microbot.showMessage("You do not have the required woodcutting level to cut this tree.");
+                    shutdown();
+                    return;
+                }
+
                 if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
 
                 switch (state) {
@@ -69,9 +75,11 @@ public class AutoWoodcuttingScript extends Script {
                         GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), true, getInitialPlayerLocation());
 
                         if (tree != null) {
-                            Rs2GameObject.interact(tree, config.TREE().getAction());
-                            if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
-                                returnPoint = Microbot.getClient().getLocalPlayer().getWorldLocation();
+                            if(Rs2GameObject.interact(tree, config.TREE().getAction())) {
+                                Rs2Player.waitForAnimation();
+                                if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
+                                    returnPoint = Microbot.getClient().getLocalPlayer().getWorldLocation();
+                                }
                             }
                         }
                         break;
@@ -80,7 +88,7 @@ public class AutoWoodcuttingScript extends Script {
                         break;
                 }
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                Microbot.log(ex.getMessage());
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
@@ -112,7 +120,7 @@ public class AutoWoodcuttingScript extends Script {
         }
     }
 
-    private boolean burnLog(AutoWoodcuttingConfig config) {
+    private void burnLog(AutoWoodcuttingConfig config) {
         WorldPoint fireSpot;
         if (Rs2Player.isStandingOnGameObject() || cannotLightFire) {
             fireSpot = fireSpot(1);
@@ -126,7 +134,6 @@ public class AutoWoodcuttingScript extends Script {
             sleepUntil(Rs2Inventory::waitForInventoryChanges);
         }
         sleepUntil(() -> !isFiremake() && !Rs2Player.isStandingOnGameObject() && !Rs2Player.isStandingOnGroundItem(), 2500);
-        return true;
     }
 
     private WorldPoint fireSpot(int distance) {

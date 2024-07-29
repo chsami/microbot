@@ -16,7 +16,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 @PluginDescriptor(
         name = PluginDescriptor.Geoff + "Plank Make",
-        description = "Makes planks on the lunar spell.",
+        description = "Geoff's lunar plank maker",
         tags = {"magic", "moneymaking"},
         enabledByDefault = false
 )
@@ -24,6 +24,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 public class PlankMakePlugin extends Plugin {
     @Inject
     private PlankMakeConfig config;
+
     @Provides
     PlankMakeConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(PlankMakeConfig.class);
@@ -36,7 +37,6 @@ public class PlankMakePlugin extends Plugin {
 
     @Inject
     PlankMakeScript PlankMakeScript;
-
 
     @Override
     protected void startUp() throws AWTException {

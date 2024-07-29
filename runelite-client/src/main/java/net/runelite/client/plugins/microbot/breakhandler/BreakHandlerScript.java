@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.breakhandler;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -21,6 +23,10 @@ public class BreakHandlerScript extends Script {
     public static int totalBreaks = 0;
 
     public static Duration duration;
+    
+    @Setter
+    @Getter
+    public static boolean lockState = false;
 
     private String title = "";
     public boolean run(BreakHandlerConfig config) {
@@ -52,7 +58,7 @@ public class BreakHandlerScript extends Script {
                     return;
                 }
 
-                if (breakIn <= 0 && !Microbot.pauseAllScripts) {
+                if (breakIn <= 0 && !Microbot.pauseAllScripts && !isLockState()) {
                     Microbot.pauseAllScripts = true;
                     breakDuration = Random.random(config.breakDurationStart() * 60, config.breakDurationEnd() * 60);
                     if (config.logoutAfterBreak())
