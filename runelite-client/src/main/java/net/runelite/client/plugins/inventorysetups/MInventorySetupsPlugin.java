@@ -161,7 +161,8 @@ public class MInventorySetupsPlugin extends Plugin
 	@Getter
 	private ColorPickerManager colorPickerManager;
 
-	private InventorySetupsPluginPanel panel;
+	@Getter
+    private InventorySetupsPluginPanel panel;
 
 	@Getter
 	public static List<InventorySetup> inventorySetups;
@@ -1789,7 +1790,7 @@ public class MInventorySetupsPlugin extends Plugin
 			if (slotIndex < quickPrayers.size()) {
 				quickPrayers.get(slotIndex).setPrayer(prayer);
 			} else {
-				// Fill up the list with nulls if necessary to reach the desired index
+				// Ensure the list has enough capacity
 				while (quickPrayers.size() <= slotIndex) {
 					quickPrayers.add(new QuickPrayerSetup(null));
 				}
@@ -1797,18 +1798,19 @@ public class MInventorySetupsPlugin extends Plugin
 			}
 
 			// Debug logging
-			System.out.println("Updated Quick Prayer: Slot " + slotIndex + " to " + prayer);
+			System.out.printf("Updated Quick Prayer: Slot %d to %s%n", slotIndex, prayer);
 			for (int i = 0; i < 4; i++) {
 				String prayerName = (i < quickPrayers.size() && quickPrayers.get(i).getPrayer() != null)
 						? quickPrayers.get(i).getPrayer().name()
 						: "None";
-				System.out.println("Slot " + i + ": " + prayerName);
+				System.out.printf("Slot %d: %s%n", i, prayerName);
 			}
 
 			dataManager.updateConfig(true, false);
 			panel.refreshCurrentSetup();
 		});
 	}
+
 
 
 	public void updateNotesInSetup(final InventorySetup setup, final String text)
@@ -2625,5 +2627,6 @@ public class MInventorySetupsPlugin extends Plugin
 		section.setName(newName);
 		// config will already be updated by caller so no need to update it here
 	}
+
 
 }

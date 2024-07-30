@@ -94,6 +94,7 @@ public class InventorySetupsSlot extends JPanel
 		setPreferredSize(new Dimension(width, height));
 		setBackground(color);
 		setLayout(new GridBagLayout());
+
 		// Set constraints to put it in the north east (top right)
 		GridBagConstraints fuzzyConstraints = new GridBagConstraints(0, 0, 1, 1, 1, 1,
 				GridBagConstraints.NORTHEAST, GridBagConstraints.NONE,
@@ -102,42 +103,52 @@ public class InventorySetupsSlot extends JPanel
 		GridBagConstraints stackConstraints = new GridBagConstraints(0, 0, 1, 1, 1, 1,
 				GridBagConstraints.SOUTHEAST, GridBagConstraints.NONE,
 				new Insets(0, 0, 0, 0), 0, 0);
-		add(imageLabel);
+
+		add(imageLabel, new GridBagConstraints());
 		add(fuzzyIndicator, fuzzyConstraints);
 		add(stackIndicator, stackConstraints);
 	}
 
-	public void setImageLabel(String toolTip, BufferedImage itemImage, boolean isFuzzy, InventorySetupsStackCompareID stackCompare)
-	{
-		if (itemImage == null || toolTip == null)
-		{
+	public void setImageLabel(String toolTip, BufferedImage itemImage, boolean isFuzzy, InventorySetupsStackCompareID stackCompare) {
+		if (itemImage == null || toolTip == null) {
 			imageLabel.setToolTipText("");
 			imageLabel.setIcon(null);
-		}
-		else
-		{
+		} else {
 			imageLabel.setToolTipText(toolTip);
-			if (itemImage instanceof AsyncBufferedImage) // if the slot is a spellbook, use these
-			{
-				AsyncBufferedImage itemImageAsync = (AsyncBufferedImage)itemImage;
+			if (itemImage instanceof AsyncBufferedImage) { // if the slot is a spellbook, use these
+				AsyncBufferedImage itemImageAsync = (AsyncBufferedImage) itemImage;
 				itemImageAsync.addTo(imageLabel);
-			}
-			else
-			{
+				itemImageAsync.onLoaded(() -> {
+					revalidate();
+					repaint();
+					SwingUtilities.invokeLater(() -> {
+						getParent().revalidate();
+						getParent().repaint();
+					});
+				});
+			} else {
 				imageLabel.setIcon(new ImageIcon(itemImage));
 			}
 		}
 
 		fuzzyIndicator.setText(isFuzzy ? "*" : "");
 		stackIndicator.setText(InventorySetupsStackCompareID.getStringFromValue(stackCompare));
-
 		// Force UI update
 		revalidate();
 		repaint();
+		SwingUtilities.invokeLater(() -> {
+			getParent().revalidate();
+			getParent().repaint();
+		});
+
+		// Debug logging
+		System.out.println("setImageLabel called with tooltip: " + toolTip);
+		System.out.println("Image is null: " + (itemImage == null));
+		System.out.println("Icon set on imageLabel: " + imageLabel.getIcon());
 	}
 
-	public void setImageLabel(String toolTip, BufferedImage itemImage)
-	{
+	public void setImageLabel(String toolTip, BufferedImage itemImage) {
 		setImageLabel(toolTip, itemImage, false, InventorySetupsStackCompareID.None);
 	}
+
 }

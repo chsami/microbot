@@ -38,6 +38,17 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
             BufferedImage chivalry = plugin.getSpriteManager().getSprite(SpriteID.PRAYER_CHIVALRY, 0);
             BufferedImage noPrayer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);  // Placeholder for no prayer
 
+            // Debug statements to verify image loading
+            System.out.println("Incredible Reflexes Image: " + (incredibleReflexes != null));
+            System.out.println("Ultimate Strength Image: " + (ultimateStrength != null));
+            System.out.println("Protect From Magic Image: " + (protectFromMagic != null));
+            System.out.println("Protect From Melee Image: " + (protectFromMelee != null));
+            System.out.println("Protect From Missiles Image: " + (protectFromMissiles != null));
+            System.out.println("Augury Image: " + (augury != null));
+            System.out.println("Rigour Image: " + (rigour != null));
+            System.out.println("Piety Image: " + (piety != null));
+            System.out.println("Chivalry Image: " + (chivalry != null));
+
             // Add images to quickPrayerImages list, fallback to noPrayer if any image is null
             quickPrayerImages.add(incredibleReflexes != null ? incredibleReflexes : noPrayer);
             quickPrayerImages.add(ultimateStrength != null ? ultimateStrength : noPrayer);
@@ -54,6 +65,7 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
             revalidate();
             repaint();
         });
+
     }
 
     private void setupQuickPrayerSlots() {
@@ -67,6 +79,7 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
         }
     }
 
+
     @Override
     public void setupContainerPanel(JPanel containerSlotsPanel) {
         if (quickPrayerSlots == null || quickPrayerSlots.isEmpty()) {
@@ -78,13 +91,13 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
         String[] prayerNames = {
                 "Incredible Reflexes", "Ultimate Strength", "Protect from Magic",
                 "Protect from Melee", "Protect from Missiles", "Augury",
-                "Rigour", "Piety", "Chivalry"
+                "Rigour", "Piety", "Chivalry", "No Prayer"
         };
 
         Rs2PrayerEnum[] prayerEnums = {
                 Rs2PrayerEnum.INCREDIBLE_REFLEXES, Rs2PrayerEnum.ULTIMATE_STRENGTH, Rs2PrayerEnum.PROTECT_MAGIC,
                 Rs2PrayerEnum.PROTECT_MELEE, Rs2PrayerEnum.PROTECT_RANGE, Rs2PrayerEnum.AUGURY,
-                Rs2PrayerEnum.RIGOUR, Rs2PrayerEnum.PIETY, Rs2PrayerEnum.CHIVALRY
+                Rs2PrayerEnum.RIGOUR, Rs2PrayerEnum.PIETY, Rs2PrayerEnum.CHIVALRY, null
         };
 
         for (int i = 0; i < quickPrayerSlots.size(); i++) {
@@ -100,13 +113,18 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
                 final int slotIndex = i;  // Create a final copy of the index
                 menuItem.addActionListener(e -> {
                     // Call the method to update the prayer for this slot
+                    System.out.println("Updating Slot " + slotIndex + " to :" + selectedPrayer);
                     plugin.updateQuickPrayerInSetup(slotIndex, selectedPrayer);
+                    updatePanelWithSetupInformation(plugin.getPanel().getCurrentSelectedSetup());
                 });
                 popupMenu.add(menuItem);
             }
 
             slot.setComponentPopupMenu(popupMenu);
             slot.getImageLabel().setComponentPopupMenu(popupMenu);
+
+            // Debugging
+            System.out.println("Adding slot: " + i + " to container panel.");
         }
     }
 
@@ -134,13 +152,17 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
 
             // Remove images and tool tips for the slots not used
             for (int i = j; i < 4; i++) {
-                this.setQuickPrayerSlotImageAndText(quickPrayerSlots.get(i), null); // Use null to clear the slot
+                this.clearQuickPrayerSlot(quickPrayerSlots.get(i)); // Use a separate method to clear the slot
             }
 
             // Ensure the panel is revalidated and repainted
             this.revalidate();
             this.repaint();
         });
+    }
+
+    private void clearQuickPrayerSlot(InventorySetupsSlot slot) {
+        setSlotImageIfDifferent(slot, "No Prayer", quickPrayerImages.get(9)); // Use placeholder for no prayer
     }
 
     private void setQuickPrayerSlotImageAndText(InventorySetupsSlot slot, Rs2PrayerEnum prayer) {
@@ -196,16 +218,29 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
         System.out.println("Image is null: " + (image == null));
 
         // Set the image and tooltip
-        slot.setImageLabel(tooltip, image);
-
-        // Debug logging for image label
-        System.out.println("Image label icon: " + slot.getImageLabel().getIcon());
-        System.out.println("Image label tooltip: " + slot.getImageLabel().getToolTipText());
-
-        // Force UI update
-        slot.revalidate();
-        slot.repaint();
+        setSlotImageIfDifferent(slot, tooltip, image);
     }
+
+
+    private void setSlotImageIfDifferent(InventorySetupsSlot slot, String tooltip, BufferedImage image) {
+        if (!tooltip.equals(slot.getImageLabel().getToolTipText()) || !isSameImage(slot.getImageLabel().getIcon(), image)) {
+            slot.getImageLabel().setIcon(new ImageIcon(image));
+            slot.getImageLabel().setToolTipText(tooltip);
+            System.out.println("Image label icon: " + slot.getImageLabel().getIcon());
+            System.out.println("Image label tooltip: " + slot.getImageLabel().getToolTipText());
+            slot.revalidate();
+            slot.repaint();
+        }
+    }
+
+    private boolean isSameImage(Icon icon, BufferedImage image) {
+        if (icon instanceof ImageIcon) {
+            return ((ImageIcon) icon).getImage().equals(image);
+        }
+        return false;
+    }
+
+
 
     @Override
     public void resetSlotColors() {
