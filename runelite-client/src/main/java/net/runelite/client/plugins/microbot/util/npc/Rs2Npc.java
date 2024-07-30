@@ -17,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -195,21 +194,12 @@ public class Rs2Npc {
 
             MenuAction menuAction = getMenuAction(index);
 
-          /*  if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
-                Microbot.getClient().setCameraPitchTarget(Random.random(430, 460));
-                Microbot.getMouse().scrollDown(new net.runelite.api.Point(1, 1));
-                Microbot.getMouse().scrollDown(new net.runelite.api.Point(1, 1));
-                Microbot.getMouse().scrollDown(new net.runelite.api.Point(1, 1));
-                Rs2Camera.turnTo(npc);
-            }*/
-
             if (menuAction != null) {
                 Microbot.doInvoke(new NewMenuEntry(0, 0, menuAction.getId(), npc.getIndex(), -1, npc.getName()), new Rectangle(npc.getCanvasTilePoly().getBounds()));
-                //Rs2Reflection.invokeMenu(0, 0, menuAction.getId(), npc.getIndex(),-1, action, "", -1, -1);
             }
 
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            Microbot.log(ex.getMessage());
         }
 
         return true;

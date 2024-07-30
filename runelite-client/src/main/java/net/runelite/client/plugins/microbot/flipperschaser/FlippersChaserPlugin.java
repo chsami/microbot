@@ -4,24 +4,28 @@ package net.runelite.client.plugins.microbot.flipperschaser;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.*;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.events.PlayerDespawned;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.NpcLootReceived;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.ItemStack;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.mouse.Mouse;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.ui.overlay.OverlayManager;
-import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
-import java.awt.event.KeyEvent;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -55,7 +59,7 @@ public class FlippersChaserPlugin extends Plugin {
     private OverlayManager overlayManager;
 
     @Inject
-    private FlippersChaserConfig config;
+    public FlippersChaserConfig config;
 
     private boolean inCombat;
     private boolean flippersObtained;
@@ -85,13 +89,8 @@ public class FlippersChaserPlugin extends Plugin {
             return;
         }
 
-        if (config.usePrayer() && client.getBoostedSkillLevel(Skill.PRAYER) <= 5) {
-            Rs2Inventory.useItem(ItemID.PRAYER_POTION4);
-        }
-
-        if (config.useFood() && client.getBoostedSkillLevel(Skill.HITPOINTS) <= 20) {
-            useFood(config.foodType());
-        }
+        Rs2Player.drinkPrayerPotionAt(5);
+        Rs2Player.eatAt(20);
 
         if (!inCombat) {
             useFishingExplosive();
@@ -109,7 +108,7 @@ public class FlippersChaserPlugin extends Plugin {
 
     @Subscribe
     public void onNpcLootReceived(NpcLootReceived event) {
-        for (Item item : event.getItems()) {
+        for (ItemStack item : event.getItems()) {
             if (item.getId() == ItemID.FLIPPERS) {
                 flippersObtained = true;
                 handleSuccess();
@@ -133,27 +132,10 @@ public class FlippersChaserPlugin extends Plugin {
     }
 
     private void attackNpc(NPC npc) {
-        Mouse.click(npc.getCanvasTilePoly().getBounds());
-        if (config.usePrayer()) {
-            Rs2Player.togglePrayer(Prayer.PROTECT_FROM_MELEE);
+        Rs2Npc.interact(npc);
+        if (Rs2Player.hasPrayerPoints()) {
+            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE);
         }
-    }
-
-    private void useFood(String foodType) {
-        int foodId;
-        switch (foodType) {
-            case "Cooked karambwan":
-                foodId = ItemID.COOKED_KARAMBWAN;
-                break;
-            case "Monkfish":
-                foodId = ItemID.MONKFISH;
-                break;
-            case "Shark":
-            default:
-                foodId = ItemID.SHARK;
-                break;
-        }
-        Rs2Inventory.useItem(foodId);
     }
 
     private void handleSuccess() {
@@ -171,15 +153,15 @@ public class FlippersChaserPlugin extends Plugin {
     }
 
     private void teleportOrLogout() {
-        if (Rs2Inventory.containsItem(ItemID.TELEPORT_TO_HOUSE)) {
-            Rs2Inventory.useItem(ItemID.TELEPORT_TO_HOUSE);
+        if (Rs2Inventory.hasItem(ItemID.TELEPORT_TO_HOUSE)) {
+            Rs2Inventory.use(ItemID.TELEPORT_TO_HOUSE);
         } else {
             logOut();
         }
     }
 
     private void logOut() {
-        clientThread.invoke(() -> client.runScript(ScriptID.LOG_OUT, 1));
+        Rs2Player.logout();
     }
 
     private void sendDiscordNotification(boolean success) {
@@ -208,7 +190,7 @@ public class FlippersChaserPlugin extends Plugin {
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
-        if (event.getContainerId() == InventoryID.INVENTORY.getId() && !Rs2Inventory.containsFood()) {
+        if (event.getContainerId() == InventoryID.INVENTORY.getId() && Rs2Inventory.getInventoryFood().isEmpty()) {
             handleFailure();
         }
     }
