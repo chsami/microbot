@@ -51,7 +51,7 @@ public interface Construction2Config extends Config {
     )
     default String GUIDE() {
         return "This script supports oak larder, oak dungeon doors, mahogany table with a demon butler. " +
-                "Call the butler and clear and use the planks on him you're going to use." +
+                "Call the butler and use the planks on him you're going to use." +
                 " Then start the plugin next to the build space with " +
                 "coins, a saw, a hammer and your noted planks and the rest of your inventory un-noted planks.";
     }
