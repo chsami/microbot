@@ -1780,7 +1780,6 @@ public class MInventorySetupsPlugin extends Plugin
 	public void updateQuickPrayerInSetup(int slotIndex, Rs2PrayerEnum prayer) {
 		assert panel.getCurrentSelectedSetup() != null : "Setup is null";
 		assert slotIndex >= 0 && slotIndex < 4 : "Slot index out of range";
-		assert prayer != null : "Prayer is null";
 
 		clientThread.invokeLater(() -> {
 			InventorySetup currentSetup = panel.getCurrentSelectedSetup();

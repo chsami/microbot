@@ -24,7 +24,6 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
     InventorySetupsQuickPrayersPanel(ItemManager itemManager, MInventorySetupsPlugin plugin) {
         super(itemManager, plugin, "Quick Prayers");
         quickPrayerImages = new ArrayList<>();
-        quickPrayerSlots = new ArrayList<>();
 
         plugin.getClientThread().invokeLater(() -> {
             BufferedImage incredibleReflexes = plugin.getSpriteManager().getSprite(SpriteID.PRAYER_INCREDIBLE_REFLEXES, 0);
@@ -36,7 +35,7 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
             BufferedImage rigour = plugin.getSpriteManager().getSprite(SpriteID.PRAYER_RIGOUR, 0);
             BufferedImage piety = plugin.getSpriteManager().getSprite(SpriteID.PRAYER_PIETY, 0);
             BufferedImage chivalry = plugin.getSpriteManager().getSprite(SpriteID.PRAYER_CHIVALRY, 0);
-            BufferedImage noPrayer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);  // Placeholder for no prayer
+            BufferedImage noPrayer = null;
 
             // Debug statements to verify image loading
             System.out.println("Incredible Reflexes Image: " + (incredibleReflexes != null));
@@ -50,20 +49,18 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
             System.out.println("Chivalry Image: " + (chivalry != null));
 
             // Add images to quickPrayerImages list, fallback to noPrayer if any image is null
-            quickPrayerImages.add(incredibleReflexes != null ? incredibleReflexes : noPrayer);
-            quickPrayerImages.add(ultimateStrength != null ? ultimateStrength : noPrayer);
-            quickPrayerImages.add(protectFromMagic != null ? protectFromMagic : noPrayer);
-            quickPrayerImages.add(protectFromMelee != null ? protectFromMelee : noPrayer);
-            quickPrayerImages.add(protectFromMissiles != null ? protectFromMissiles : noPrayer);
-            quickPrayerImages.add(augury != null ? augury : noPrayer);
-            quickPrayerImages.add(rigour != null ? rigour : noPrayer);
-            quickPrayerImages.add(piety != null ? piety : noPrayer);
-            quickPrayerImages.add(chivalry != null ? chivalry : noPrayer);
-            quickPrayerImages.add(noPrayer); // For "No Prayer"
+            quickPrayerImages.add(incredibleReflexes);
+            quickPrayerImages.add(ultimateStrength);
+            quickPrayerImages.add(protectFromMagic);
+            quickPrayerImages.add(protectFromMelee);
+            quickPrayerImages.add(protectFromMissiles);
+            quickPrayerImages.add(augury);
+            quickPrayerImages.add(rigour);
+            quickPrayerImages.add(piety);
+            quickPrayerImages.add(chivalry);
+            quickPrayerImages.add(noPrayer);
 
-            setupQuickPrayerSlots();
-            revalidate();
-            repaint();
+            return true;
         });
 
     }
@@ -82,10 +79,9 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
 
     @Override
     public void setupContainerPanel(JPanel containerSlotsPanel) {
-        if (quickPrayerSlots == null || quickPrayerSlots.isEmpty()) {
-            setupQuickPrayerSlots();
+       if (quickPrayerSlots == null || quickPrayerSlots.isEmpty()) {
+           setupQuickPrayerSlots();
         }
-
         containerSlotsPanel.setLayout(new GridLayout(1, 4, 1, 1));
 
         String[] prayerNames = {
@@ -102,7 +98,6 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
 
         for (int i = 0; i < quickPrayerSlots.size(); i++) {
             InventorySetupsSlot slot = quickPrayerSlots.get(i);
-            containerSlotsPanel.add(slot);
 
             // Create popup menu
             JPopupMenu popupMenu = new JPopupMenu();
@@ -122,7 +117,7 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
 
             slot.setComponentPopupMenu(popupMenu);
             slot.getImageLabel().setComponentPopupMenu(popupMenu);
-
+            containerSlotsPanel.add(slot);
             // Debugging
             System.out.println("Adding slot: " + i + " to container panel.");
         }
@@ -139,11 +134,7 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
         final List<QuickPrayerSetup> setupQuickPrayers = setup.getQuickPrayers();
 
         SwingUtilities.invokeLater(() -> {
-            if (quickPrayerSlots.size() < 4) {
-                setupQuickPrayerSlots();
-            }
-
-            int j = 0;
+           int j = 0;
             for (final QuickPrayerSetup quickPrayerSetup : setupQuickPrayers) {
                 if (j >= 4) break;  // Ensure we do not go beyond the 4 slots
                 this.setQuickPrayerSlotImageAndText(quickPrayerSlots.get(j), quickPrayerSetup.getPrayer());
@@ -156,6 +147,13 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
             }
 
             // Ensure the panel is revalidated and repainted
+            for (final QuickPrayerSetup quickPrayerSetup : setupQuickPrayers) {
+                if (j >= 4) break;  // Ensure we do not go beyond the 4 slots
+                this.setQuickPrayerSlotImageAndText(quickPrayerSlots.get(j), quickPrayerSetup.getPrayer());
+                j++;
+            }
+
+
             this.revalidate();
             this.repaint();
         });
@@ -224,12 +222,7 @@ public class InventorySetupsQuickPrayersPanel extends InventorySetupsContainerPa
 
     private void setSlotImageIfDifferent(InventorySetupsSlot slot, String tooltip, BufferedImage image) {
         if (!tooltip.equals(slot.getImageLabel().getToolTipText()) || !isSameImage(slot.getImageLabel().getIcon(), image)) {
-            slot.getImageLabel().setIcon(new ImageIcon(image));
-            slot.getImageLabel().setToolTipText(tooltip);
-            System.out.println("Image label icon: " + slot.getImageLabel().getIcon());
-            System.out.println("Image label tooltip: " + slot.getImageLabel().getToolTipText());
-            slot.revalidate();
-            slot.repaint();
+            slot.setImageLabel(tooltip,  image);
         }
     }
 
