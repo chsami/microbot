@@ -148,8 +148,20 @@ public enum BankLocation {
             case LEGENDS_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
                 return Rs2Player.isMember() && Rs2Player.getQuestState(Quest.LEGENDS_QUEST) == QuestState.FINISHED;
+            case MINING_GUILD_BANK:
+                if (hasLineOfSight && Rs2Player.isMember()) return true;
+                return Rs2Player.isMember() && Rs2Player.getSkillRequirement(Skill.MINING, 60);
             default:
                 return true;
+        }
+    }
+    public boolean hasException() {
+        switch (this) {
+            case MINING_GUILD_BANK:
+                boolean inRegion = Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID() == 12183 || Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID() == 12184;
+                return inRegion;
+            default:
+                return false;
         }
     }
 }

@@ -308,6 +308,10 @@ public class Microbot {
     }
 
     public static void log(String message) {
+        if (!Microbot.isLoggedIn()) {
+            System.out.println(message);
+            return;
+        }
         LocalTime currentTime = LocalTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = currentTime.format(formatter);

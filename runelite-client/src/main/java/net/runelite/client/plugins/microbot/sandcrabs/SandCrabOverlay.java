@@ -1,21 +1,12 @@
 package net.runelite.client.plugins.microbot.sandcrabs;
 
-import net.runelite.api.Perspective;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.example.ExampleScript;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
-import net.runelite.client.ui.overlay.tooltip.Tooltip;
 
 import javax.inject.Inject;
 import java.awt.*;
-
-import static java.awt.Color.GREEN;
 
 public class SandCrabOverlay extends OverlayPanel {
     private final SandCrabPlugin plugin;
