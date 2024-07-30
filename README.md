@@ -16,7 +16,6 @@ If you enjoy my open source work and would like to support me, consider buying m
 
 Thank you for your support! 😊
 
-
 # I Want To Bot
 
 ## Non jagex account
@@ -34,14 +33,6 @@ After you've done setting it up follow these two steps:
 1) Simply login with the jagex launcher for the first time. This will create a token for your account. Close everything after succesfully login in through the jagex launcher. 
 2) Open the microbot.jar from microbot and this should prompt you with the jagex account to login.
 
-## Jagex Launcher
-
-**Disclaimer:** Before you can do this step, you need to have done the following guide: https://github.com/runelite/runelite/wiki/Using-Jagex-Accounts
-
-Simply replace the Official RuneLite.jar with the microbot.jar and make sure the name is the same!! After that you can start up the jagex launcher and select runelite, this will startup microbot.
-
-![img_2.png](img_2.png)
-
 # I Want To Develop
 
 ## First Time Running the project as a Developer?
@@ -50,6 +41,11 @@ Make sure to follow this guide if it's your first time running the project
 
 https://github.com/runelite/runelite/wiki/Building-with-IntelliJ-IDEA
 
+## Microbot ChatGpt Chatbot
+
+![image](https://github.com/user-attachments/assets/363cec80-675b-4b36-be7a-4ddd56fdf216)
+
+use your AI Chatbot to learn to write scripts in microbot: https://chatgpt.com/g/g-LM0fGeeXB-microbot-documentation
 
 ## Project Layout
 
@@ -62,7 +58,6 @@ If you can't find a specific thing in a utility class you can always call the Mi
 ```java 
 Microbot.getClient().getLocalPlayer().getWorldLocation()
 ```
-
 
 ![img.png](img.png)
 

@@ -54,6 +54,7 @@ public class SpecialAttackConfigs {
     }
 
     public boolean useSpecWeapon() {
+        if (!Microbot.isLoggedIn()) return false;
         if (!Rs2Combat.inCombat()) return false;
         if (!Microbot.getSpecialAttackConfigs().isUseSpecialAttack()) return false;
         if (Rs2Combat.getSpecEnergy() < Microbot.getSpecialAttackConfigs().getMinimumSpecEnergy() && currentEquipment == null) return false;
@@ -87,12 +88,14 @@ public class SpecialAttackConfigs {
         if (name.isEmpty()) return false;
         if (Rs2Equipment.isWearingShield() && is2H && Rs2Inventory.isFull()) return false;
 
+        if (currentEquipment == null) {
+            currentEquipment = new ArrayList<>();
+            currentEquipment.addAll(Rs2Equipment.equipmentItems);
+        }
+
         if (Rs2Combat.getSpecEnergy() < specEnergy && !NmzScript.isHasSurge()) {
-            if (currentEquipment == null) {
-                currentEquipment = new ArrayList<>();
-                currentEquipment.addAll(Rs2Equipment.equipmentItems);
-            }
-            if (currentEquipment.get(EquipmentInventorySlot.WEAPON.getSlotIdx()).id != Rs2Equipment.get(EquipmentInventorySlot.WEAPON).id) {
+            Rs2Item rs2Item = currentEquipment.stream().filter(x -> x.getSlot() == EquipmentInventorySlot.WEAPON.getSlotIdx()).findFirst().orElse(null);
+            if (rs2Item != null && rs2Item.id != Rs2Equipment.get(EquipmentInventorySlot.WEAPON).id) {
                 Rs2Item weapon = currentEquipment
                         .stream()
                         .filter(x -> x.getSlot() == EquipmentInventorySlot.WEAPON.getSlotIdx())

@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.thieving;
 
 import net.runelite.api.NPC;
 import net.runelite.api.Skill;
+import net.runelite.api.Varbits;
 import net.runelite.client.game.npcoverlay.HighlightedNpc;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.5.5";
+    public static String version = "1.5.6";
     ThievingConfig config;
 
     public boolean run(ThievingConfig config) {
@@ -57,8 +58,9 @@ public class ThievingScript extends Script {
                 if (Rs2Player.eatAt(config.hitpoints())) {
                     return;
                 }
-
-                handleShadowVeil();
+                if (config.shadowVeil()) {
+                    handleShadowVeil();
+                }
                 openCoinPouches(config.coinPouchTreshHold());
                 wearDodgyNecklace();
                 pickpocket();
@@ -106,8 +108,6 @@ public class ThievingScript extends Script {
     }
 
     private void pickpocket() {
-        if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) < config.hitpoints())
-            return;
         if (config.THIEVING_NPC() != ThievingNpc.NONE) {
             if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
                 handleElves();
@@ -134,7 +134,10 @@ public class ThievingScript extends Script {
     }
 
     private void handleShadowVeil() {
-        if (!Rs2Magic.isShadowVeilActive() && Rs2Magic.isArceeus()) {
+        if (!Rs2Magic.isShadowVeilActive() && Rs2Magic.isArceeus() &&
+            Rs2Player.getBoostedSkillLevel(Skill.MAGIC) >= MagicAction.SHADOW_VEIL.getLevel() &&
+            Microbot.getVarbitValue(Varbits.SHADOW_VEIL_COOLDOWN) == 0
+        ) {
             Rs2Magic.cast(MagicAction.SHADOW_VEIL);
         }
     }
@@ -147,6 +150,19 @@ public class ThievingScript extends Script {
             Rs2Bank.depositAll();
             Rs2Bank.withdrawX(true, config.food().getName(), config.foodAmount(), true);
             Rs2Bank.withdrawX(true, "dodgy necklace", config.dodgyNecklaceAmount());
+            if (config.shadowVeil()) {
+                Rs2Bank.withdrawAll(true,"Fire rune", true);
+                sleep(75,200);
+                Rs2Bank.withdrawAll(true,"Earth rune", true);
+                sleep(75,200);
+                Rs2Bank.withdrawAll(true,"Cosmic rune", true);
+                sleep(75,200);
+                if (config.equipBook()) {
+                    Rs2Bank.withdrawAndEquip("book of the dead");
+                } else {
+                    Rs2Bank.withdrawItem(true, "book of the dead");
+                }
+            }
             Rs2Bank.closeBank();
         }
     }
@@ -161,6 +177,12 @@ public class ThievingScript extends Script {
         doNotDropItemList.add(config.food().getName());
         doNotDropItemList.add("dodgy necklace");
         doNotDropItemList.add("coins");
+        doNotDropItemList.add("book of the dead");
+        if (config.shadowVeil()) {
+            doNotDropItemList.add("Fire rune");
+            doNotDropItemList.add("Earth rune");
+            doNotDropItemList.add("Cosmic rune");
+        }
         Rs2Inventory.dropAllExcept(config.keepItemsAboveValue(), doNotDropItemList);
     }
 }

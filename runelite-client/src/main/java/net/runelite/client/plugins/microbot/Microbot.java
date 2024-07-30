@@ -161,7 +161,8 @@ public class Microbot {
         GameState idx = client.getGameState();
         return idx == GameState.LOGGED_IN;
     }
-
+    
+    @Deprecated(since = "1.4.0 - use Rs2Player variant", forRemoval = true)
     public static boolean hasLevel(int levelRequired, Skill skill) {
         return Microbot.getClient().getRealSkillLevel(skill) >= levelRequired;
     }
@@ -307,6 +308,10 @@ public class Microbot {
     }
 
     public static void log(String message) {
+        if (!Microbot.isLoggedIn()) {
+            System.out.println(message);
+            return;
+        }
         LocalTime currentTime = LocalTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = currentTime.format(formatter);
@@ -314,7 +319,6 @@ public class Microbot {
                 Microbot.getClient().addChatMessage(ChatMessageType.ENGINE, "", "[" + formattedTime + "]: " + message, "", false)
         );
     }
-
     private static boolean isPluginEnabled(String name) {
         Plugin dashboard = Microbot.getPluginManager().getPlugins().stream()
                 .filter(x -> x.getClass().getName().equals(name))
@@ -324,6 +328,10 @@ public class Microbot {
         if (dashboard == null) return false;
 
         return Microbot.getPluginManager().isPluginEnabled(dashboard);
+    }
+    
+    public static boolean isPluginEnabled(Class c) {
+        return isPluginEnabled(c.getName());
     }
 }
 

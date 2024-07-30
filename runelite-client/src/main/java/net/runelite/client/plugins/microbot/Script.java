@@ -94,21 +94,22 @@ public abstract class Script implements IScript {
     public boolean run() {
         hasLeveledUp = false;
         Microbot.getSpecialAttackConfigs().useSpecWeapon();
-        if (Microbot.enableAutoRunOn)
-            Rs2Player.toggleRunEnergy(true);
-
-        if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
-            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-        }
-        Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
-        if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden)) {
-            Rs2Widget.clickWidget(clickHereToPlayButton.getId());
-        }
 
         if (Microbot.pauseAllScripts)
             return false;
 
         if (Microbot.isLoggedIn()) {
+            if (Microbot.enableAutoRunOn)
+                Rs2Player.toggleRunEnergy(true);
+
+            if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
+                Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+            }
+            Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
+            if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden)) {
+                Rs2Widget.clickWidget(clickHereToPlayButton.getId());
+            }
+
             boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
 
             if (!hasRunEnergy && useStaminaPotsIfNeeded && Rs2Player.isMoving()) {

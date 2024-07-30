@@ -7,17 +7,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Gems
 {
-    NONE("NONE", 1),
-    OPAL("opal", 1),
-    Jade("jade", 13),
-    RED_TOPAZ("red topaz", 16),
-    SAPPHIRE("sapphire", 20),
-    EMERALD("emerald", 27),
-    RUBY("ruby", 34),
-    DIAMOND("diamond", 43),
-    DRAGONSTONE("dragonstone", 55),
-    ONYX("onyx", 67),
-    ZENYTE("zenyte", 89);
+    NONE(" ", 1),
+    OPAL("Opal", 1),
+    JADE("Jade", 13),
+    RED_TOPAZ("Red Topaz", 16),
+    SAPPHIRE("Sapphire", 20),
+    EMERALD("Emerald", 27),
+    RUBY("Ruby", 34),
+    DIAMOND("Diamond", 43),
+    DRAGONSTONE("Dragonstone", 55),
+    ONYX("Onyx", 67),
+    ZENYTE("Zenyte", 89);
 
     private final String name;
     private final int levelRequired;
