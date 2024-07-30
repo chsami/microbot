@@ -35,7 +35,8 @@ import java.nio.charset.StandardCharsets;
 @PluginDescriptor(
     name = PluginDescriptor.Bttqjs + "Flippers Chaser",
     description = "Automates obtaining Flippers from Mogres",
-    tags = {"service", "automation", "combat", "microbot"}
+    tags = {"service", "automation", "combat", "microbot"},
+    enabledByDefault = false
 )
 @Slf4j
 public class FlippersChaserPlugin extends Plugin {
@@ -45,15 +46,6 @@ public class FlippersChaserPlugin extends Plugin {
 
     @Inject
     private ClientThread clientThread;
-
-    @Inject
-    private Notifier notifier;
-
-    @Inject
-    private ItemManager itemManager;
-
-    @Inject
-    private ChatMessageManager chatMessageManager;
 
     @Inject
     private OverlayManager overlayManager;

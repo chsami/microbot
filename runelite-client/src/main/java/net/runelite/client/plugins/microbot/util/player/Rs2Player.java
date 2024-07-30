@@ -156,7 +156,7 @@ public class Rs2Player {
     }
 
     public static boolean waitForXpDrop(Skill skill, boolean inventoryFullCheck) {
-        return waitForXpDrop( skill,100, inventoryFullCheck);
+        return waitForXpDrop( skill,5000, inventoryFullCheck);
     }
 
     public static boolean waitForXpDrop(Skill skill, int time, boolean inventoryFullCheck) {

@@ -26,23 +26,6 @@ public class FlippersChaserOverlay extends OverlayPanel {
             .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
-            .left("Use Prayer")
-            .right(Boolean.toString(plugin.config.usePrayer()))
-            .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-            .left("Use Food")
-            .right(Boolean.toString(plugin.config.useFood()))
-            .build());
-
-        if (plugin.config.useFood()) {
-            panelComponent.getChildren().add(LineComponent.builder()
-                .left("Food Type")
-                .right(plugin.config.foodType())
-                .build());
-        }
-
-        panelComponent.getChildren().add(LineComponent.builder()
             .left("Discord Webhook")
             .right(Boolean.toString(plugin.config.useDiscordWebhook()))
             .build());
