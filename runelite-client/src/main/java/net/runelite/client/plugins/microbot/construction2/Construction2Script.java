@@ -196,10 +196,10 @@ public class Construction2Script extends Script {
         if (space == null) return;
         if (Rs2GameObject.interact(space, "Build")) {
             System.out.println("Interacted with build space: " + space.getId());
-            sleepUntilOnClientThread(this::hasFurnitureInterfaceOpen, 5000);
+            sleepUntilOnClientThread(this::hasFurnitureInterfaceOpen, 2500);
             System.out.println("Pressing key: " + buildKey);
             Rs2Keyboard.keyPress(buildKey); // Ensure this is the correct key for the selected build option
-            sleepUntilOnClientThread(() -> getBuiltObject(config) != null, 5000);
+            sleepUntilOnClientThread(() -> getBuiltObject(config) != null, 2500);
             System.out.println("Built object: " + config.selectedMode());
         } else {
             System.out.println("Failed to interact with build space: " + space.getId());
@@ -229,9 +229,9 @@ public class Construction2Script extends Script {
         if (builtObject == null) return;
         if (Rs2GameObject.interact(builtObject, "Remove")) {
             System.out.println("Interacted with remove option: " + builtObject.getId());
-            sleepUntilOnClientThread(() -> hasRemoveInterfaceOpen(config), 5000);
+            sleepUntilOnClientThread(() -> hasRemoveInterfaceOpen(config), 2500);
             Rs2Keyboard.keyPress('1');
-            sleepUntilOnClientThread(() -> getBuildSpace(config) != null, 5000);
+            sleepUntilOnClientThread(() -> getBuildSpace(config) != null, 2500);
             System.out.println("Removed object: " + config.selectedMode());
         } else {
             System.out.println("Failed to interact with remove option: " + builtObject.getId());
@@ -246,18 +246,18 @@ public class Construction2Script extends Script {
         );
         if (butlerIsTooFar) {
             Rs2Tab.switchToSettingsTab();
-            sleep(800, 1800);
+            sleep(300, 900);
             Widget houseOptionWidget = Rs2Widget.findWidget(SpriteID.OPTIONS_HOUSE_OPTIONS, null);
             if (houseOptionWidget != null) Microbot.getMouse().click(houseOptionWidget.getCanvasLocation());
-            sleep(800, 1800);
+            sleep(300, 900);
             Widget callServantWidget = Rs2Widget.findWidget("Call Servant", null);
             if (callServantWidget != null) Microbot.getMouse().click(callServantWidget.getCanvasLocation());
         }
 
         if (Rs2Dialogue.isInDialogue() || Rs2Npc.interact(butler, "Talk-to")) {
-            sleep(1200);
+            sleep(500);
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-            sleep(1200, 2000);
+            sleep(400, 1000);
             if (Rs2Widget.findWidget("Go to the bank...", null) != null) {
                 Rs2Inventory.useItemOnNpc(config.selectedMode().getPlankItemId() + 1, butler.getId()); // + 1 for noted item
                 sleepUntilOnClientThread(() -> Rs2Widget.hasWidget("Dost thou wish me to exchange that certificate"));
@@ -272,7 +272,7 @@ public class Construction2Script extends Script {
                 sleepUntilOnClientThread(() -> !hasDialogueOptionToUnnote());
             } else if (hasPayButlerDialogue() || hasDialogueOptionToPay()) {
                 Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-                sleep(1200, 2000);
+                sleep(400, 1000);
                 if (hasDialogueOptionToPay()) {
                     Rs2Keyboard.keyPress('1');
                 }
