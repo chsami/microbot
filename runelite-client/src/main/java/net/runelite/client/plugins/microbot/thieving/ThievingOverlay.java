@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.thieving;
 
-import net.runelite.api.Skill;
+import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -12,10 +12,13 @@ import java.awt.*;
 
 
 public class ThievingOverlay extends OverlayPanel {
+    private final ThievingPlugin plugin;
+
     @Inject
     ThievingOverlay(ThievingPlugin plugin)
     {
         super(plugin);
+        this.plugin = plugin;
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }
@@ -25,7 +28,7 @@ public class ThievingOverlay extends OverlayPanel {
 
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Thieving V" + ThievingScript.version)
+                    .text(plugin.getClass().getAnnotation(PluginDescriptor.class).name() + " " + plugin.getClass().getAnnotation(PluginDescriptor.class).version())
                     .color(Color.ORANGE)
                     .build());
 

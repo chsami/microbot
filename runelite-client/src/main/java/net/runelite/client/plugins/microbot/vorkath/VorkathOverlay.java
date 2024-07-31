@@ -26,7 +26,7 @@ public class VorkathOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(300, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text(plugin.getClass().getAnnotation(PluginDescriptor.class).name())
+                    .text(plugin.getClass().getAnnotation(PluginDescriptor.class).name() + " " + plugin.getClass().getAnnotation(PluginDescriptor.class).version())
                     .color(Color.GREEN)
                     .build());
 
