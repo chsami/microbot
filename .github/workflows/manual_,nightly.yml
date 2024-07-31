@@ -49,6 +49,6 @@ jobs:
           source_dir: /home/runner/work/microbot/microbot/runelite-client/target/jars
           container_name: microbot
           connection_string: ${{ secrets.blobConnectionString }}
-          extra_args: '--pattern *.tar.gz'
+          extra_args: '--pattern *.jar'
           # WARNING: this will overwrite existing blobs in your blob storage
           overwrite: 'true'
