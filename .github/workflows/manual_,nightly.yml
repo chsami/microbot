@@ -46,6 +46,6 @@ jobs:
           source_dir: runelite-client/target/jars
           container_name: microbot
           connection_string: ${{ secrets.blobConnectionString }}
-          extra_args: '--pattern *.jar'
+          extra_args: '--pattern *.jar --destination-path nightly'
           # WARNING: this will overwrite existing blobs in your blob storage
           overwrite: 'true'
