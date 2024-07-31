@@ -119,7 +119,7 @@ public class PluginManager
 		refreshPlugins();
 	}
 
-	private void refreshPlugins()
+	public void refreshPlugins()
 	{
 		loadDefaultPluginConfiguration(null);
 		SwingUtilities.invokeLater(() ->

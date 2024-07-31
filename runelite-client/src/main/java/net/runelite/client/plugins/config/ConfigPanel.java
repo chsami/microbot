@@ -29,65 +29,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.lang.reflect.ParameterizedType;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.JTextComponent;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.config.ConfigDescriptor;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigItemDescriptor;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.config.ConfigObject;
-import net.runelite.client.config.ConfigSection;
-import net.runelite.client.config.ConfigSectionDescriptor;
-import net.runelite.client.config.Keybind;
-import net.runelite.client.config.ModifierlessKeybind;
-import net.runelite.client.config.Notification;
-import net.runelite.client.config.Range;
-import net.runelite.client.config.Units;
+import net.runelite.client.config.*;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ExternalPluginsChanged;
 import net.runelite.client.events.PluginChanged;
@@ -95,6 +38,7 @@ import net.runelite.client.events.ProfileChanged;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
+import net.runelite.client.plugins.microbot.sideloading.MicrobotWebClient;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.FontManager;
@@ -108,6 +52,21 @@ import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.SwingUtil;
 import net.runelite.client.util.Text;
 import org.apache.commons.lang3.ArrayUtils;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+import java.util.*;
 
 @Slf4j
 class ConfigPanel extends PluginPanel
@@ -140,6 +99,7 @@ class ConfigPanel extends PluginPanel
 	private final ExternalPluginManager externalPluginManager;
 	private final ColorPickerManager colorPickerManager;
 	private final Provider<NotificationPanel> notificationPanelProvider;
+	private final MicrobotWebClient microbotWebClient;
 
 	private final TitleCaseListCellRenderer listCellRenderer = new TitleCaseListCellRenderer();
 
@@ -156,7 +116,8 @@ class ConfigPanel extends PluginPanel
 		PluginManager pluginManager,
 		ExternalPluginManager externalPluginManager,
 		ColorPickerManager colorPickerManager,
-		Provider<NotificationPanel> notificationPanelProvider
+		Provider<NotificationPanel> notificationPanelProvider,
+		MicrobotWebClient microbotWebClient
 	)
 	{
 		super(false);
@@ -167,6 +128,7 @@ class ConfigPanel extends PluginPanel
 		this.externalPluginManager = externalPluginManager;
 		this.colorPickerManager = colorPickerManager;
 		this.notificationPanelProvider = notificationPanelProvider;
+		this.microbotWebClient = microbotWebClient;
 
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
@@ -211,9 +173,9 @@ class ConfigPanel extends PluginPanel
 		this.pluginConfig = pluginConfig;
 
 		String name = pluginConfig.getName();
-		title.setText(name);
+		title.setText(name + " " + pluginConfig.getVersion());
 		title.setForeground(Color.WHITE);
-		title.setToolTipText("<html>" + name + ":<br>" + pluginConfig.getDescription() + "</html>");
+		title.setToolTipText("<html>" + name + ":<br>" + pluginConfig.getDescription() + " " + pluginConfig.getVersion() + "</html>");
 
 		String iname = pluginConfig.getInternalPluginHubName();
 		JMenuItem uninstallItem = null;
@@ -432,6 +394,34 @@ class ConfigPanel extends PluginPanel
 				rebuild();
 			}
 		});
+
+		if (!pluginConfig.getJar().isEmpty()) {
+			List<String> options = microbotWebClient.getScriptMetaDataList(pluginConfig.getJar());
+
+			// Create the dropdown (JComboBox) and populate it with the list
+			JComboBox<String> comboBox = new JComboBox<>();
+			for (String option : options) {
+				comboBox.addItem(option);
+			}
+
+			// Create the button
+			JButton downloadButton = new JButton("Download");
+
+			// Add an ActionListener to the button
+			downloadButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// Get the selected item from the combo box
+					String selectedValue = (String) comboBox.getSelectedItem();
+					// Call the download method with the selected value
+					microbotWebClient.downloadScript(selectedValue);
+				}
+			});
+			mainPanel.add(comboBox);
+			mainPanel.add(downloadButton);
+		}
+
+
 		mainPanel.add(resetButton);
 
 		JButton backButton = new JButton("Back");

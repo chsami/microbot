@@ -18,7 +18,9 @@ import java.awt.*;
         name = PluginDescriptor.Mocrosoft + "Thieving",
         description = "Microbot thieving plugin",
         tags = {"thieving", "microbot", "skilling"},
-        enabledByDefault = false
+        enabledByDefault = false,
+        version = "1.5.6",
+        jar = "m-thieving"
 )
 @Slf4j
 public class ThievingPlugin extends Plugin {
