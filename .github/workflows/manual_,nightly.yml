@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: bacongobbler/azure-blob-storage-upload@main
         with:
-          source_dir: jars
+          source_dir: .
           container_name: microbot
           connection_string: ${{ secrets.blobConnectionString }}
           extra_args: '--pattern *.jar'
