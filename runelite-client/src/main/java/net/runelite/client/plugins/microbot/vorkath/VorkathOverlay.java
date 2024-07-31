@@ -7,18 +7,19 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.awt.*;
 
 public class VorkathOverlay extends OverlayPanel {
     private final VorkathPlugin plugin;
-    private final VorkathConfig config;
+    private final String vorkathPluginVersion;
 
     @Inject
-    VorkathOverlay(VorkathPlugin plugin, VorkathConfig config)
+    VorkathOverlay(VorkathPlugin plugin, @Named("vorkath.plugin.version") String vorkathPluginVersion)
     {
         super(plugin);
         this.plugin = plugin;
-        this.config = config;
+        this.vorkathPluginVersion = vorkathPluginVersion;
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }
@@ -27,7 +28,7 @@ public class VorkathOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(300, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Vorkath V" + VorkathScript.version)
+                    .text("Micro Vorkath V" + vorkathPluginVersion)
                     .color(Color.GREEN)
                     .build());
 

@@ -7,7 +7,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ExampleScript extends Script {
-    public static double version = 1.0;
+
+    //public static List<String> versions = Arrays.asList(storageUrl + "/microbot-example-1.4.2.jar");
 
     public boolean run(ExampleConfig config) {
         Microbot.enableAutoRunOn = false;

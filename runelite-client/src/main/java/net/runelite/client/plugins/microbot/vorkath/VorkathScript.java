@@ -52,8 +52,6 @@ enum State {
 }
 
 public class VorkathScript extends Script {
-    public static String version = "1.3.6";
-
     State state = State.ZOMBIE_SPAWN;
 
     private final int whiteProjectileId = 395;
