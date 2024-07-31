@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: bacongobbler/azure-blob-storage-upload@main
         with:
-          source_dir: /home/runner/work/microbot/microbot/runelite-client/target/jars
+          source_dir: jars
           container_name: microbot
           connection_string: ${{ secrets.blobConnectionString }}
           extra_args: '--pattern *.jar'
