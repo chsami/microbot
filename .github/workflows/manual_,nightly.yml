@@ -40,11 +40,8 @@ jobs:
           files: |
             /home/runner/work/microbot/microbot/runelite-client/target/*.jar
 
-  upload:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: bacongobbler/azure-blob-storage-upload@main
+      - name: Upload Jar
+        uses: "bacongobbler/azure-blob-storage-upload@main"
         with:
           source_dir: .
           container_name: microbot
