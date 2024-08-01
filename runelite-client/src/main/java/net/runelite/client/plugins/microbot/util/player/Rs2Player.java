@@ -175,6 +175,11 @@ public class Rs2Player {
         return false;
     }
 
+    public static boolean isRunEnabled()
+    {
+        return Microbot.getVarbitPlayerValue(173) == 1;
+    }
+
     public static void logout() {
         if (Microbot.isLoggedIn())
             Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));

@@ -310,7 +310,7 @@ public class Rs2GameObject {
         return null;
     }
 
-    private static List<DecorativeObject> getDecorationObjects() {
+    public static List<DecorativeObject> getDecorationObjects() {
         Scene scene = Microbot.getClient().getScene();
         Tile[][][] tiles = scene.getTiles();
 
