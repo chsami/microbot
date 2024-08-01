@@ -7,15 +7,17 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.awt.*;
 
 public class ExampleOverlay extends OverlayPanel {
-    private final String examplePluginVersion = "1.0.0";
+    private final String examplePluginVersion;
 
     @Inject
-    ExampleOverlay(ExamplePlugin plugin)
+    ExampleOverlay(ExamplePlugin plugin, @Named("example.plugin.version") String examplePluginVersion)
     {
         super(plugin);
+        this.examplePluginVersion = examplePluginVersion;
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }

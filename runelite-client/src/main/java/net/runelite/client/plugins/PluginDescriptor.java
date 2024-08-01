@@ -95,7 +95,4 @@ public @interface PluginDescriptor {
     boolean loadWhenOutdated() default false;
 
     boolean loadInSafeMode() default true;
-    String version() default "";
-
-    String jar() default "";
 }

@@ -20,13 +20,10 @@ import java.awt.*;
         name = PluginDescriptor.Mocrosoft + "Vorkath",
         description = "Microbot Vorkath plugin",
         tags = {"vorkath", "microbot"},
-        enabledByDefault = false,
-        version = "1.3.6",
-        jar = "m-vorkath"
+        enabledByDefault = false
 )
 @Slf4j
 public class VorkathPlugin extends Plugin {
-
     @Inject
     Client client;
     @Inject

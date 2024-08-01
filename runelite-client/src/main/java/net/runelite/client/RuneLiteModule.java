@@ -56,7 +56,6 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.PluginManager;
-import net.runelite.client.plugins.microbot.sideloading.MicrobotWebClient;
 import net.runelite.client.task.Scheduler;
 import net.runelite.client.util.DeferredEventBus;
 import net.runelite.client.util.ExecutorServiceExceptionLogger;
@@ -119,7 +118,6 @@ public class RuneLiteModule extends AbstractModule
 			}
 		}
 
-		bind(MicrobotWebClient.class);
 		bindConstant().annotatedWith(Names.named("developerMode")).to(developerMode);
 		bindConstant().annotatedWith(Names.named("safeMode")).to(safeMode);
 		bindConstant().annotatedWith(Names.named("disableTelemetry")).to(disableTelemetry);

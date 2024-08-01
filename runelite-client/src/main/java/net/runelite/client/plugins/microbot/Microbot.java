@@ -98,6 +98,10 @@ public class Microbot {
     @Setter
     private static ChatMessageManager chatMessageManager;
 
+    @Inject
+    @Named("microbot.storage") public static String storageUrl;
+
+
     public static boolean debug = false;
 
     public static boolean isGainingExp = false;
