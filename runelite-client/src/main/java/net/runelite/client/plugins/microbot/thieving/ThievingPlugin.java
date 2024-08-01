@@ -19,7 +19,7 @@ import java.awt.*;
         description = "Microbot thieving plugin",
         tags = {"thieving", "microbot", "skilling"},
         enabledByDefault = false,
-        version = "1.5.7",
+        version = "1.5.6",
         jar = "m-thieving"
 )
 @Slf4j

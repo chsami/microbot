@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
+    public static String version = "1.5.6";
     ThievingConfig config;
 
     public boolean run(ThievingConfig config) {

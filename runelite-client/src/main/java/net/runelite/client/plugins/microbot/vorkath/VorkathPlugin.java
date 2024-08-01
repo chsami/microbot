@@ -21,7 +21,7 @@ import java.awt.*;
         description = "Microbot Vorkath plugin",
         tags = {"vorkath", "microbot"},
         enabledByDefault = false,
-        version = "1.3.7",
+        version = "1.3.6",
         jar = "m-vorkath"
 )
 @Slf4j
