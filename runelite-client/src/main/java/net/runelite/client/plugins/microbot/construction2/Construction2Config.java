@@ -15,7 +15,7 @@ public interface Construction2Config extends Config {
         OAK_LARDER("Oak Larder", ItemID.OAK_PLANK),
         OAK_DUNGEON_DOOR("Oak Dungeon Door", ItemID.OAK_PLANK),
         MAHOGANY_TABLE("Mahogany Table", ItemID.MAHOGANY_PLANK);
-        //MYTHICAL_CAPE("Mythical Cape Mount", ItemID.MYTHICAL_CAPE); broken, keeps trying to remove the guild trophy space instead of build shits weird idk
+        // MYTHICAL_CAPE("Mythical Cape Mount", ItemID.MYTHICAL_CAPE); broken, keeps trying to remove the guild trophy space instead of build shits weird idk
 
         private final String name;
         private final int plankItemId;
@@ -65,5 +65,27 @@ public interface Construction2Config extends Config {
     )
     default ConstructionMode selectedMode() {
         return ConstructionMode.OAK_DUNGEON_DOOR;
+    }
+
+    @ConfigItem(
+            keyName = "useCustomDelay",
+            name = "Use Custom Delay",
+            description = "Toggle to use custom action delay",
+            position = 3,
+            section = generalSection
+    )
+    default boolean useCustomDelay() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "actionDelay",
+            name = "Action Delay",
+            description = "Adjust the delay (in milliseconds) between actions",
+            position = 4,
+            section = generalSection
+    )
+    default int actionDelay() {
+        return 600; // Default delay of 600 milliseconds
     }
 }

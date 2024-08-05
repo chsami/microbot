@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Construction2Script extends Script {
 
+    private static final int DEFAULT_DELAY = 600;
     private Construction2State state = Construction2State.Idle;
 
     public TileObject getOakDungeonDoorSpace() {
@@ -96,6 +97,8 @@ public class Construction2Script extends Script {
     }
 
     public boolean run(Construction2Config config) {
+        int actionDelay = config.useCustomDelay() ? config.actionDelay() : DEFAULT_DELAY;
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
@@ -104,13 +107,13 @@ public class Construction2Script extends Script {
                 calculateState(config);
                 switch (state) {
                     case Build:
-                        build(config);
+                        build(config, actionDelay);
                         break;
                     case Remove:
-                        remove(config);
+                        remove(config, actionDelay);
                         break;
                     case Butler:
-                        butler(config);
+                        butler(config, actionDelay);
                         break;
                     default:
                         break;
@@ -118,7 +121,7 @@ public class Construction2Script extends Script {
             } catch (Exception ex) {
                 System.out.println("Error in scheduled task: " + ex.getMessage());
             }
-        }, 0, 600, TimeUnit.MILLISECONDS);
+        }, 0, actionDelay, TimeUnit.MILLISECONDS);
         return true;
     }
 
@@ -146,10 +149,10 @@ public class Construction2Script extends Script {
                 space = getMahoganyTableSpace();
                 builtObject = getMahoganyTable();
                 break;
-           // case MYTHICAL_CAPE:
-           //     space = getGuildTrophySpace();
-           //     builtObject = getMythicalCapeMount();
-           //     break;
+            // case MYTHICAL_CAPE:
+            //     space = getGuildTrophySpace();
+            //     builtObject = getMythicalCapeMount();
+            //     break;
             default:
                 return;
         }
@@ -168,7 +171,7 @@ public class Construction2Script extends Script {
         }
     }
 
-    private void build(Construction2Config config) {
+    private void build(Construction2Config config, int actionDelay) {
         TileObject space = null;
         char buildKey = '1';
 
@@ -185,10 +188,10 @@ public class Construction2Script extends Script {
                 space = getMahoganyTableSpace();
                 buildKey = '6';
                 break;
-           // case MYTHICAL_CAPE:
-           //     space = getGuildTrophySpace();
-           //     buildKey = '4';
-           //     break;
+            // case MYTHICAL_CAPE:
+            //     space = getGuildTrophySpace();
+            //     buildKey = '4';
+            //     break;
             default:
                 return;
         }
@@ -206,7 +209,7 @@ public class Construction2Script extends Script {
         }
     }
 
-    private void remove(Construction2Config config) {
+    private void remove(Construction2Config config, int actionDelay) {
         TileObject builtObject = null;
 
         switch (config.selectedMode()) {
@@ -219,9 +222,9 @@ public class Construction2Script extends Script {
             case MAHOGANY_TABLE:
                 builtObject = getMahoganyTable();
                 break;
-           // case MYTHICAL_CAPE:
-           //     builtObject = getMythicalCapeMount();
-           //     break;
+            // case MYTHICAL_CAPE:
+            //     builtObject = getMythicalCapeMount();
+            //     break;
             default:
                 return;
         }
@@ -238,7 +241,7 @@ public class Construction2Script extends Script {
         }
     }
 
-    private void butler(Construction2Config config) {
+    private void butler(Construction2Config config, int actionDelay) {
         NPC butler = getButler();
         if (butler == null) return;
         boolean butlerIsTooFar = Microbot.getClientThread().runOnClientThread(() ->
@@ -288,8 +291,8 @@ public class Construction2Script extends Script {
                 return hasRemoveLarderInterfaceOpen();
             case MAHOGANY_TABLE:
                 return hasRemoveTableInterfaceOpen();
-           // case MYTHICAL_CAPE:
-               // return hasRemoveCapeMountInterfaceOpen();
+            // case MYTHICAL_CAPE:
+            // return hasRemoveCapeMountInterfaceOpen();
             default:
                 return false;
         }
@@ -303,8 +306,8 @@ public class Construction2Script extends Script {
                 return getOakLarder();
             case MAHOGANY_TABLE:
                 return getMahoganyTable();
-           // case MYTHICAL_CAPE:
-               // return getMythicalCapeMount();
+            // case MYTHICAL_CAPE:
+            // return getMythicalCapeMount();
             default:
                 return null;
         }
@@ -318,8 +321,8 @@ public class Construction2Script extends Script {
                 return getOakLarderSpace();
             case MAHOGANY_TABLE:
                 return getMahoganyTableSpace();
-           // case MYTHICAL_CAPE:
-               // return getGuildTrophySpace();
+            // case MYTHICAL_CAPE:
+            // return getGuildTrophySpace();
             default:
                 return null;
         }
