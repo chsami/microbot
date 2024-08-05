@@ -43,6 +43,7 @@ public @interface PluginDescriptor {
     String Basche = "<html>[<font color=#07A6F0>B</font>] ";
     String Vince = "<html>[<font color=#5bffe4>V</font>] ";
     String Geoff = "<html>[<font color=#ffbc03>\uD83C\uDF41G</font>] ";
+    String Basm = "<html>[<font color=#b3b3b3>W</font>] ";
 
     String name();
 
