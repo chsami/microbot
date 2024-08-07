@@ -221,6 +221,11 @@ public class Rs2Player {
         return false;
     }
 
+    public static boolean isRunEnabled()
+    {
+        return Microbot.getVarbitPlayerValue(173) == 1;
+    }
+
     public static void logout() {
         if (Microbot.isLoggedIn()) {
             //logout from main tab
