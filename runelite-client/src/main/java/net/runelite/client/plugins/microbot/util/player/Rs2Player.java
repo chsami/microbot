@@ -1,8 +1,10 @@
 package net.runelite.client.plugins.microbot.util.player;
 
+import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -17,6 +19,8 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +40,9 @@ public class Rs2Player {
     public static int antiVenomTime = -1;
     public static int staminaBuffTime = -1;
     public static int antiPoisonTime = -1;
-
+    public static Instant lastAnimationTime = null;
+    @Getter
+    public static int lastAnimationID = AnimationID.IDLE;
 
     public static boolean hasAntiFireActive() {
         return antiFireTime > 0 || hasSuperAntiFireActive();
@@ -105,6 +111,22 @@ public class Rs2Player {
         }
     }
 
+    public static void handleAnimationChanged(AnimationChanged event) {
+        if (!(event.getActor() instanceof Player)) {
+            return;
+        }
+
+        Player player = (Player) event.getActor();
+        if (player != Microbot.getClient().getLocalPlayer()) {
+            return;
+        }
+
+        if (player.getAnimation() != AnimationID.IDLE) {
+            lastAnimationTime = Instant.now();
+            lastAnimationID = player.getAnimation();
+        }
+    }
+
     public static void waitForWalking() {
         boolean result = sleepUntilTrue(Rs2Player::isWalking, 100, 5000);
         if (!result) return;
@@ -123,22 +145,46 @@ public class Rs2Player {
         sleepUntil(() -> !Rs2Player.isAnimating());
     }
 
+    public static boolean waitForXpDrop(Skill skill) {
+        final int skillExp = Microbot.getClient().getSkillExperience(skill);
+        return sleepUntilTrue(() -> skillExp != Microbot.getClient().getSkillExperience(skill), 100, 5000);
+    }
+
+    public static boolean waitForXpDrop(Skill skill, int time) {
+        final int skillExp = Microbot.getClient().getSkillExperience(skill);
+        return sleepUntilTrue(() -> skillExp != Microbot.getClient().getSkillExperience(skill), 100, time);
+    }
+
+    public static boolean waitForXpDrop(Skill skill, boolean inventoryFullCheck) {
+        return waitForXpDrop( skill,5000, inventoryFullCheck);
+    }
+
+    public static boolean waitForXpDrop(Skill skill, int time, boolean inventoryFullCheck) {
+        final int skillExp = Microbot.getClient().getSkillExperience(skill);
+        return sleepUntilTrue(() -> skillExp != Microbot.getClient().getSkillExperience(skill) || (inventoryFullCheck && Rs2Inventory.isFull()), 100, time);
+    }
+
     public static void waitForAnimation(int time) {
         boolean result = sleepUntilTrue(Rs2Player::isAnimating, 100, time);
         if (!result) return;
         sleepUntil(() -> !Rs2Player.isAnimating(), time);
     }
 
+    public static boolean isAnimating(int ms) {
+        return (lastAnimationTime != null && Duration.between(lastAnimationTime, Instant.now()).toMillis() < ms) || getAnimation() != AnimationID.IDLE;
+    }
+
     public static boolean isAnimating() {
-        return Microbot.isAnimating();
+        return isAnimating(600);
     }
 
     public static boolean isWalking() {
-        return Microbot.isMoving();
+        return Rs2Player.isMoving();
     }
 
     public static boolean isMoving() {
-        return Microbot.isMoving();
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
+                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
     }
 
     public static boolean isInteracting() {
@@ -181,8 +227,12 @@ public class Rs2Player {
     }
 
     public static void logout() {
-        if (Microbot.isLoggedIn())
+        if (Microbot.isLoggedIn()) {
+            //logout from main tab
             Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+            //logout from world hopper
+            Microbot.doInvoke(new NewMenuEntry(-1, 4522009, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        }
 
         //Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
     }
@@ -323,19 +373,23 @@ public class Rs2Player {
         return Microbot.getClientThread().runOnClientThread(() -> quest.getState(client));
     }
 
-    public static int getRealSkillLevel(Skill skill){
+    public static int getRealSkillLevel(Skill skill) {
         Client client = Microbot.getClient();
         return client.getRealSkillLevel(skill);
     }
 
-    public static int getBoostedSkillLevel(Skill skill){
+    public static int getBoostedSkillLevel(Skill skill) {
         Client client = Microbot.getClient();
         return client.getBoostedSkillLevel(skill);
     }
 
-    public static boolean getSkillRequirement(Skill skill, int levelRequired, boolean isBoosted){
+    public static boolean getSkillRequirement(Skill skill, int levelRequired, boolean isBoosted) {
         if (isBoosted) return getBoostedSkillLevel(skill) >= levelRequired;
         return getRealSkillLevel(skill) >= levelRequired;
+    }
+ 
+    public static boolean getSkillRequirement(Skill skill, int levelRequired) {
+        return getSkillRequirement(skill, levelRequired, false);
     }
 
     public static boolean isIronman() {
@@ -343,7 +397,7 @@ public class Rs2Player {
         return accountType > 0 && accountType <= 3;
     }
 
-    public static boolean isGroupIronman(){
+    public static boolean isGroupIronman() {
         int accountType = Microbot.getVarbitValue(Varbits.ACCOUNT_TYPE);
         return accountType >= 4;
     }

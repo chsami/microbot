@@ -589,8 +589,15 @@ public class Rs2GameObject {
                 if (object instanceof GroundObject && !Rs2Walker.canReach(object.getWorldLocation()))
                     continue;
 
-                if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY()))
-                    continue;
+                //exceptions if the pathsize needs to be bigger
+                if (object.getId() == ObjectID.MARKET_STALL_14936) {
+                    if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY(), 4, 4))
+                        continue;
+                } else {
+                    if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY()))
+                        continue;
+                }
+
                 return object;
             }
         }

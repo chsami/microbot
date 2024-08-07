@@ -121,11 +121,11 @@ public class MicroAgilityPlugin extends Plugin {
 
         // Pollnivneach
         agilityScript.polnivCourse.add(new AgilityObstacleModel(BASKET_14935));
-        agilityScript.polnivCourse.add(new AgilityObstacleModel(MARKET_STALL_14936, -1, 2969, Operation.GREATER, Operation.LESS_EQUAL));
-        agilityScript.polnivCourse.add(new AgilityObstacleModel(BANNER_14937));
-        agilityScript.polnivCourse.add(new AgilityObstacleModel(GAP_14938));
-        agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14939));
-        agilityScript.polnivCourse.add(new AgilityObstacleModel(ROUGH_WALL_14940));
+        agilityScript.polnivCourse.add(new AgilityObstacleModel(MARKET_STALL_14936, -1, 2968, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.polnivCourse.add(new AgilityObstacleModel(BANNER_14937, -1, 2976, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.polnivCourse.add(new AgilityObstacleModel(GAP_14938, 3362, -1, Operation.LESS_EQUAL, Operation.GREATER));
+        agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14939, 3366, -1, Operation.GREATER_EQUAL, Operation.GREATER));
+        agilityScript.polnivCourse.add(new AgilityObstacleModel(ROUGH_WALL_14940, -1, 2982, Operation.GREATER, Operation.GREATER_EQUAL));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(MONKEYBARS));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14944, -1, 2996, Operation.GREATER, Operation.LESS_EQUAL));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(DRYING_LINE));
