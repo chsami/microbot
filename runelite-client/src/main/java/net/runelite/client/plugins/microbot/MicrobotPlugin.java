@@ -147,7 +147,12 @@ public class MicrobotPlugin extends Plugin {
     public void onVarbitChanged(VarbitChanged event) {
         Rs2Player.handlePotionTimers(event);
     }
-
+    
+    @Subscribe
+    public void onAnimationChanged(AnimationChanged event) {
+        Rs2Player.handleAnimationChanged(event);
+    }
+    
     @Subscribe(priority = 999)
     private void onMenuEntryAdded(MenuEntryAdded event) {
         if (Microbot.targetMenu != null && event.getType() != Microbot.targetMenu.getType().getId()) {
