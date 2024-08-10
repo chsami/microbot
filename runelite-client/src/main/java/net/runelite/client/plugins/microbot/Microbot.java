@@ -23,7 +23,6 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
-import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.NaturalMouse;
 import net.runelite.client.plugins.timers.GameTimer;
 import net.runelite.client.plugins.timers.TimersPlugin;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
@@ -50,7 +49,18 @@ import java.util.concurrent.TimeUnit;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class Microbot {
+    private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
+    @Getter
+    private static final SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
     public static MenuEntry targetMenu;
+    @Inject
+    @Named("microbot.storage")
+    public static String storageUrl;
+    public static boolean debug = false;
+    public static boolean isGainingExp = false;
+    public static boolean pauseAllScripts = false;
+    public static String status = "IDLE";
+    public static boolean enableAutoRunOn = true;
     @Getter
     @Setter
     private static Mouse mouse;
@@ -99,24 +109,8 @@ public class Microbot {
     @Getter
     @Setter
     private static ChatMessageManager chatMessageManager;
-
-    @Inject
-    @Named("microbot.storage") public static String storageUrl;
-
-
-    public static boolean debug = false;
-
-    public static boolean isGainingExp = false;
-    public static boolean pauseAllScripts = false;
-    public static String status = "IDLE";
-
-    public static boolean enableAutoRunOn = true;
-
-    private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
-    @Getter
-    private static final SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
@@ -256,12 +250,12 @@ public class Microbot {
     }
 
     public static void doInvoke(MenuEntry entry, Rectangle rectangle) {
-        targetMenu = entry;
+
         try {
             if (Rs2UiHelper.isRectangleWithinViewport(rectangle)) {
-                click(rectangle);
+                click(rectangle, entry);
             } else {
-                click(new Rectangle(1, 1));
+                click(new Rectangle(1, 1), entry);
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
@@ -275,26 +269,15 @@ public class Microbot {
         Point startPoint = Rs2UiHelper.getClickingPoint(start, true);
         Point endPoint = Rs2UiHelper.getClickingPoint(end, true);
         mouse.drag(startPoint, endPoint);
+        if (!Microbot.getClient().isClientThread()) {
+            sleep(50, 80);
+        }
     }
 
-    public static void click(Rectangle rectangle) {
+    public static void click(Rectangle rectangle, MenuEntry entry) {
 
         Point point = Rs2UiHelper.getClickingPoint(rectangle, true);
-//        if (client.isStretchedEnabled()) {
-//            Dimension stretched = client.getStretchedDimensions();
-//            Dimension real = client.getRealDimensions();
-//            double width = (double) stretched.width / real.getWidth();
-//            double height = (double) stretched.height / real.getHeight();
-//            point = new Point((int) ((double) point.getX() * width), (int) ((double) point.getY() * height));
-//        }
-//        mouseEvent(504, point);
-//        mouseEvent(505, point);
-//        mouseEvent(503, point);
-//        mouseEvent(501, point);
-//        mouseEvent(502, point);
-//        mouseEvent(500, point);
-
-        mouse.click(point);
+        mouse.click(point, entry);
 
 
         if (!Microbot.getClient().isClientThread()) {
