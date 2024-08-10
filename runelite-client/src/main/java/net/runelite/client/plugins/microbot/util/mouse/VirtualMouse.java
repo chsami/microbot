@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.mouse;
 
+import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
@@ -50,13 +51,32 @@ public class VirtualMouse extends Mouse {
         clicked(point, rightClick ? MouseEvent.BUTTON3 : MouseEvent.BUTTON1);
         setLastClick(point);
     }
-
     public Mouse click(Point point, boolean rightClick) {
         if (point == null) return this;
 
         if (Rs2AntibanSettings.naturalMouse && (point.getX() > 1 && point.getY() > 1))
             Microbot.naturalMouse.moveTo(point.getX(), point.getY());
 
+        if (Microbot.getClient().isClientThread()) {
+            scheduledExecutorService.schedule(() -> {
+                handleClick(point, rightClick);
+            }, 0, TimeUnit.MILLISECONDS);
+        } else {
+            handleClick(point, rightClick);
+        }
+
+        return this;
+    }
+
+    public Mouse click(Point point, boolean rightClick, MenuEntry entry) {
+        if (point == null) return this;
+        if (Rs2AntibanSettings.naturalMouse && (point.getX() > 1 && point.getY() > 1))
+            Microbot.naturalMouse.moveTo(point.getX(), point.getY());
+
+
+        // Target menu was set before mouse movement causing some unintended behavior
+        // This will set the target menu after the mouse movement is finished
+        Microbot.targetMenu = entry;
         if (Microbot.getClient().isClientThread()) {
             scheduledExecutorService.schedule(() -> {
                 handleClick(point, rightClick);
@@ -88,6 +108,11 @@ public class VirtualMouse extends Mouse {
     @Override
     public Mouse click(Point point) {
         return click(point, false);
+    }
+
+    @Override
+    public Mouse click(Point point, MenuEntry entry) {
+        return click(point, false, entry);
     }
 
     @Override

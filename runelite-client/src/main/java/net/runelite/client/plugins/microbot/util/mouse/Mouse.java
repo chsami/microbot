@@ -1,14 +1,14 @@
 package net.runelite.client.plugins.microbot.util.mouse;
 
 import lombok.Getter;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
-
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 @Getter
 public abstract class Mouse {
@@ -41,13 +41,14 @@ public abstract class Mouse {
     }
 
     public int randomizeClick() {
-        return random(-10, 10);
+        return (int) Rs2Random.normalRange(-10, 10, 4);
     }
 
 
     public abstract void setLastClick(Point point);
 
     public abstract void setLastMove(Point point);
+
 
 
     public abstract Mouse click(int x, int y);
@@ -61,6 +62,7 @@ public abstract class Mouse {
     public abstract Mouse click(Point point);
     public abstract Mouse click(Point point, boolean rightClick);
 
+    public abstract Mouse click(Point point, MenuEntry entry);
     public abstract Mouse click();
 
     public abstract Mouse move(Point point);
