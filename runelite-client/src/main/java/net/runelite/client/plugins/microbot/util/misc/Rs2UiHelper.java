@@ -6,10 +6,11 @@ import net.runelite.api.Point;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 
 import java.awt.*;
 import java.util.Objects;
-import java.util.Random;
 
 public class Rs2UiHelper {
     public static boolean isRectangleWithinViewport(Rectangle rectangle) {
@@ -26,36 +27,12 @@ public class Rs2UiHelper {
         if (rectangle.getX() == 1 && rectangle.getY() == 1) return new Point(1, 1);
         if (rectangle.getX() == 0 && rectangle.getY() == 0) return new Point(1, 1);
         //check if mouse is already within the rectangle and return current position
-        java.awt.Point mousePos = Microbot.getMouse().getMousePosition();
-        if (rectangle.contains(mousePos)) return new Point(mousePos.x, mousePos.y);
-
-        if (!randomize) return new Point((int) rectangle.getCenterX(), (int) rectangle.getCenterY());
-        Random random = new Random();
-        // Calculate mean and standard deviation for the normal distribution
-        double meanX = rectangle.getX() + rectangle.getWidth() / 2.0;
-        double meanY = rectangle.getY() + rectangle.getHeight() / 2.0;
-        double stddevX = rectangle.getWidth() / 6.0;
-        double stddevY = rectangle.getHeight() / 6.0;
-
-        // Generate normally distributed random values
-        double normalX = random.nextGaussian() * stddevX + meanX;
-        double normalY = random.nextGaussian() * stddevY + meanY;
-
-        // Add jitter with a small uniformly distributed random offset
-        double jitterRangeX = rectangle.getWidth() / 10.0;  // Adjust the range as needed
-        double jitterRangeY = rectangle.getHeight() / 10.0; // Adjust the range as needed
-        double jitterX = random.nextDouble() * jitterRangeX - jitterRangeX / 2.0;
-        double jitterY = random.nextDouble() * jitterRangeY - jitterRangeY / 2.0;
-
-        // Apply jitter to the normally distributed values
-        normalX += jitterX;
-        normalY += jitterY;
-
-        // Clamp the values to ensure they lie within the rectangle
-        int x = (int) Math.max(rectangle.getX(), Math.min(normalX, rectangle.getX() + rectangle.getWidth() - 1));
-        int y = (int) Math.max(rectangle.getY(), Math.min(normalY, rectangle.getY() + rectangle.getHeight() - 1));
-
-        return new Point(x, y);
+        if (Rs2AntibanSettings.naturalMouse) {
+            java.awt.Point mousePos = Microbot.getMouse().getMousePosition();
+            if (rectangle.contains(mousePos)) return new Point(mousePos.x, mousePos.y);
+            else return Rs2Random.randomPointEx(new Point(mousePos.x, mousePos.y), rectangle, 0.3);
+        } else
+            return Rs2Random.randomPointEx(Microbot.getMouse().getLastClick(), rectangle, 0.3);
     }
 
     public static Rectangle getNpcClickbox(NPC npc) {
