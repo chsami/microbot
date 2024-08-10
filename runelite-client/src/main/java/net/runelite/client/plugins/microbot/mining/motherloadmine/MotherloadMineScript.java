@@ -49,9 +49,7 @@ public class MotherloadMineScript extends Script {
     }
 
     private void initialize() {
-        //Rs2Antiban.isEnabled = true;
-        //Rs2Antiban.simulateAttentionSpan = true;
-        //Rs2Antiban.setActivity(Activity.MOTHERLODE_MINE);
+        Rs2Antiban.antibanSetupTemplates.applyMiningSetup();
         miningSpot = MLMMiningSpot.IDLE;
         status = MLMStatus.IDLE;
         emptySack = false;
@@ -149,7 +147,8 @@ public class MotherloadMineScript extends Script {
             if (walkToMiningSpot()) {
                 if (Rs2Player.isMoving()) return;
                 mineVein();
-                //Rs2Antiban.actionCooldown();
+                Rs2Antiban.actionCooldown();
+                Rs2Antiban.takeMicroBreakByChance();
             }
         }
     }
