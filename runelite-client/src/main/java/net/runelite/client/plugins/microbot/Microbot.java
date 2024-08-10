@@ -23,6 +23,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
+import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.NaturalMouse;
 import net.runelite.client.plugins.timers.GameTimer;
 import net.runelite.client.plugins.timers.TimersPlugin;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
@@ -61,6 +62,9 @@ public class Microbot {
     public static boolean pauseAllScripts = false;
     public static String status = "IDLE";
     public static boolean enableAutoRunOn = true;
+    @Getter
+    @Setter
+    public static NaturalMouse naturalMouse;
     @Getter
     @Setter
     private static Mouse mouse;
