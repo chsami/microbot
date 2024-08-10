@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.mining.amethyst;
 
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -29,6 +30,7 @@ public class AmethystMiningOverlay extends OverlayPanel {
 
             addEmptyLine();
 
+            Rs2Antiban.renderAntibanOverlayComponents(panelComponent);
 
             addEmptyLine();
 
