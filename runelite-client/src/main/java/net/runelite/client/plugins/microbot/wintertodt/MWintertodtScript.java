@@ -34,19 +34,55 @@ public class MWintertodtScript extends Script {
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
-
-    final WorldPoint BOSS_ROOM = new WorldPoint(1630, 3982, 0);
-
     static MWintertodtConfig config;
-
-    String axe = "";
+    private static boolean lockState = false;
+    final WorldPoint BOSS_ROOM = new WorldPoint(1630, 3982, 0);
     final String SUPPLY_CRATE = "supply crate";
+    String axe = "";
     int wintertodtHp = -1;
 
-    private static boolean lockState = false;
+    private static void changeState(State scriptState) {
+        changeState(scriptState, false);
+    }
+
+    private static void changeState(State scriptState, boolean lock) {
+        if (state == scriptState || lockState) return;
+        System.out.println("Changing current script state from: " + state + " to " + scriptState);
+        state = scriptState;
+        resetActions = true;
+        setLockState(scriptState, lock);
+        lockState = lock;
+    }
+
+    private static void setLockState(State state, boolean lock) {
+        if (lockState == lock) return;
+        lockState = lock;
+        System.out.println("State " + state.toString() + " has set lockState to " + lockState);
+    }
+
+    private static boolean shouldFletchRoots() {
+        if (!config.fletchRoots()) return false;
+        if (!Rs2Inventory.hasItem(ItemID.BRUMA_ROOT)) {
+            setLockState(State.FLETCH_LOGS, false);
+            return false;
+        }
+        changeState(State.FLETCH_LOGS, true);
+        return true;
+    }
+
+    public static void onHitsplatApplied(HitsplatApplied hitsplatApplied) {
+        Actor actor = hitsplatApplied.getActor();
+
+        if (actor != Microbot.getClient().getLocalPlayer()) {
+            return;
+        }
+
+        resetActions = true;
+
+    }
 
     public boolean run(MWintertodtConfig config) {
-        this.config = config;
+        MWintertodtScript.config = config;
         state = State.BANKING;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -139,19 +175,21 @@ public class MWintertodtScript extends Script {
                         break;
                     case CHOP_ROOTS:
                         Rs2Combat.setSpecState(true, 1000);
-                        if (!Rs2Player.isAnimating() || resetActions) {
+                        if (!Rs2Player.isAnimating()) {
                             Rs2GameObject.interact(ObjectID.BRUMA_ROOTS, "Chop");
                             sleepUntil(Rs2Player::isAnimating, 2000);
                             resetActions = false;
                         }
                         break;
                     case FLETCH_LOGS:
-                        if (!Microbot.isGainingExp || resetActions)
+                        if (Rs2Player.getAnimation() != AnimationID.FLETCHING_BOW_CUTTING || resetActions)
                         {
                             walkToBrazier();
                             Rs2Inventory.combine(ItemID.KNIFE, ItemID.BRUMA_ROOT);
-                            Rs2Player.waitForAnimation();
                             resetActions = false;
+                            sleep(Constants.GAME_TICK_LENGTH);
+                            sleepUntil(() -> Rs2Player.getAnimation() != AnimationID.FLETCHING_BOW_CUTTING, 2000);
+
                         }
                         break;
                     case BURN_LOGS:
@@ -159,10 +197,11 @@ public class MWintertodtScript extends Script {
                             TileObject burningBrazier = Rs2GameObject.findObjectById(BURNING_BRAZIER_29314);
                             if (burningBrazier.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) < 10) {
                                 Rs2GameObject.interact(BURNING_BRAZIER_29314, "feed");
-                                Rs2Player.waitForAnimation();
-                                sleep(2000);
+                                resetActions = false;
+                                sleep(Constants.GAME_TICK_LENGTH * 3);
+
                             }
-                            resetActions = false;
+
                         }
                         break;
 //                    case FIX_BRAZIER: // TODO: fix this state
@@ -189,41 +228,14 @@ public class MWintertodtScript extends Script {
     private void handleMainLoop() {
         if (isWintertodtAlmostDead()) {
             setLockState(State.BURN_LOGS, false);
-            if (shouldBurnLogs()) return;
+            if (shouldBurnLogs()) {
+            }
         } else {
             if (shouldChopRoots()) return;
             if (shouldFletchRoots()) return;
-            if (shouldBurnLogs()) return;
+            if (shouldBurnLogs()) {
+            }
         }
-    }
-
-    private static void changeState(State scriptState) {
-        changeState(scriptState, false);
-    }
-
-    private static void changeState(State scriptState, boolean lock) {
-        if (state == scriptState || lockState) return;
-        System.out.println("Changing current script state from: " + state + " to " +  scriptState);
-        state = scriptState;
-        resetActions = true;
-        setLockState(scriptState, lock);
-        lockState = lock;
-    }
-
-    private static void setLockState(State state, boolean lock) {
-        if (lockState == lock) return;
-        lockState = lock;
-        System.out.println("State " + state.toString() + " has set lockState to " + lockState);
-    }
-
-    private static boolean shouldFletchRoots() {
-        if (!config.fletchRoots()) return false;
-        if (!Rs2Inventory.hasItem(ItemID.BRUMA_ROOT)) {
-            setLockState(State.FLETCH_LOGS, false);
-            return false;
-        }
-        changeState(State.FLETCH_LOGS, true);
-        return true;
     }
 
     private boolean shouldBurnLogs() {
@@ -300,17 +312,6 @@ public class MWintertodtScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
-    }
-
-    public static void onHitsplatApplied(HitsplatApplied hitsplatApplied) {
-        Actor actor = hitsplatApplied.getActor();
-
-        if (actor != Microbot.getClient().getLocalPlayer()) {
-            return;
-        }
-
-        resetActions = true;
-
     }
 
     private void walkToBrazier() {
