@@ -148,7 +148,7 @@ public class FletchingScript extends Script {
     }
 
     private void fletch(FletchingConfig config) {
-        Rs2Inventory.combine(primaryItemToFletch, secondaryItemToFletch);
+        Rs2Inventory.combineClosest(primaryItemToFletch, secondaryItemToFletch);
         sleepUntil(() -> Rs2Widget.getWidget(17694736) != null);
         if (fletchingMode == FletchingMode.PROGRESSIVE) {
             keyPress(model.getFletchingItem().getOption(model.getFletchingMaterial(), fletchingMode));
