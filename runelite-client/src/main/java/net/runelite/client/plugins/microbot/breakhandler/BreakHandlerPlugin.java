@@ -3,6 +3,8 @@ package net.runelite.client.plugins.microbot.breakhandler;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -19,20 +21,18 @@ import java.awt.*;
 @Slf4j
 public class BreakHandlerPlugin extends Plugin {
     @Inject
+    BreakHandlerScript breakHandlerScript;
+    @Inject
     private BreakHandlerConfig config;
-    @Provides
-    BreakHandlerConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(BreakHandlerConfig.class);
-    }
-
     @Inject
     private OverlayManager overlayManager;
     @Inject
     private BreakHandlerOverlay breakHandlerOverlay;
 
-    @Inject
-    BreakHandlerScript breakHandlerScript;
-
+    @Provides
+    BreakHandlerConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(BreakHandlerConfig.class);
+    }
 
     @Override
     protected void startUp() throws AWTException {
@@ -45,5 +45,15 @@ public class BreakHandlerPlugin extends Plugin {
     protected void shutDown() {
         breakHandlerScript.shutdown();
         overlayManager.remove(breakHandlerOverlay);
+    }
+
+    // on settings change
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event) {
+        if (event.getGroup().equals("Breakhandler")) {
+            if (event.getKey().equals("UsePlaySchedule")) {
+                breakHandlerScript.reset();
+            }
+        }
     }
 }

@@ -37,6 +37,7 @@ import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER
 import static net.runelite.api.widgets.ComponentID.BANK_ITEM_CONTAINER;
 import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
 import static net.runelite.client.plugins.microbot.util.Global.*;
+import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.itemBounds;
 
 @SuppressWarnings("unused")
 @Slf4j
@@ -68,7 +69,7 @@ public class Rs2Bank {
         if (container == ComponentID.BANK_INVENTORY_ITEM_CONTAINER) {
             identifier = identifier + 1;
         }
-        Microbot.doInvoke(new NewMenuEntry(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        Microbot.doInvoke(new NewMenuEntry(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, rs2Item.name), (itemBounds(rs2Item) == null) ? new Rectangle(1, 1) : itemBounds(rs2Item));
         // MenuEntryImpl(getOption=Wear, getTarget=<col=ff9040>Amulet of glory(4)</col>, getIdentifier=9, getType=CC_OP_LOW_PRIORITY, getParam0=1, getParam1=983043, getItemId=1712, isForceLeftClick=false, isDeprioritized=false)
         // Rs2Reflection.invokeMenu(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, "Withdraw-1", rs2Item.name, -1, -1);
     }

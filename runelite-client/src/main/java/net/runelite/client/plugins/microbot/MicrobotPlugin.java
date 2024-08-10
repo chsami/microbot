@@ -22,6 +22,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
+import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.NaturalMouse;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
@@ -47,12 +48,6 @@ import java.lang.reflect.InvocationTargetException;
 @Slf4j
 public class MicrobotPlugin extends Plugin {
     @Inject
-    private Client client;
-    @Inject
-    private ClientThread clientThread;
-    @Inject
-    private ClientToolbar clientToolbar;
-    @Inject
     Notifier notifier;
     @Inject
     WorldService worldService;
@@ -68,7 +63,12 @@ public class MicrobotPlugin extends Plugin {
     ChatMessageManager chatMessageManager;
     @Inject
     PluginManager pluginManager;
-
+    @Inject
+    private Client client;
+    @Inject
+    private ClientThread clientThread;
+    @Inject
+    private ClientToolbar clientToolbar;
     @Inject
     private MicrobotOverlay microbotOverlay;
     @Inject
@@ -81,6 +81,8 @@ public class MicrobotPlugin extends Plugin {
     private InfoBoxManager infoBoxManager;
     @Inject
     private WorldMapPointManager worldMapPointManager;
+    @Inject
+    private NaturalMouse naturalMouse;
     @Override
     protected void startUp() throws AWTException {
         Microbot.pauseAllScripts = false;
@@ -92,6 +94,7 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setItemManager(itemManager);
         Microbot.setNpcManager(npcManager);
         Microbot.setMouse(new VirtualMouse());
+        Microbot.setNaturalMouse(naturalMouse);
         Microbot.setSpriteManager(spriteManager);
         Microbot.setPluginManager(pluginManager);
         Microbot.setWorldMapOverlay(worldMapOverlay);
