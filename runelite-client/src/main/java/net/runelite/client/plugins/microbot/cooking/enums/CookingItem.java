@@ -17,19 +17,21 @@ public enum CookingItem {
     RAW_SHARK("raw shark", ItemID.RAW_SHARK, 80, "shark", ItemID.SHARK, "burnt shark", ItemID.BURNT_SHARK, CookingAreaType.BOTH),
     RAW_MONKFISH("raw monkfish", ItemID.RAW_MONKFISH, 62, "monkfish", ItemID.MONKFISH, "burnt monkfish", ItemID.BURNT_MONKFISH, CookingAreaType.BOTH),
     RAW_SWORDFISH("raw swordfish", ItemID.RAW_SWORDFISH, 45, "swordfish", ItemID.SWORDFISH, "burnt swordfish", ItemID.BURNT_SWORDFISH, CookingAreaType.BOTH),
-    RAW_BASS("raw bass", ItemID.RAW_BASS, 43, "bass", ItemID.BASS, "burnt bass", ItemID.BURNT_FISH, CookingAreaType.BOTH),
+    RAW_BASS("raw bass", ItemID.RAW_BASS, 43, "bass", ItemID.BASS, "burnt fish", ItemID.BURNT_FISH_367, CookingAreaType.BOTH),
     RAW_LOBSTER("raw lobster", ItemID.RAW_LOBSTER, 40, "lobster", ItemID.LOBSTER, "burnt lobster", ItemID.BURNT_LOBSTER, CookingAreaType.BOTH),
     UNCOOKED_PIZZA("uncooked pizza", ItemID.UNCOOKED_PIZZA, 35, "plain pizza", ItemID.PLAIN_PIZZA, "burnt pizza", ItemID.BURNT_PIZZA, CookingAreaType.RANGE),
     RAW_KARAMBWAN("raw karambwan", ItemID.RAW_KARAMBWAN, 30, "cooked karambwan", ItemID.COOKED_KARAMBWAN, "burnt karambwan", ItemID.BURNT_KARAMBWAN, CookingAreaType.BOTH),
-    RAW_TUNA("raw tuna", ItemID.RAW_TUNA, 30, "tuna", ItemID.TUNA, "burnt tuna", ItemID.BURNT_FISH, CookingAreaType.BOTH),
-    RAW_SALMON("raw salmon", ItemID.RAW_SALMON, 25, "salmon", ItemID.SALMON, "burnt salmon", ItemID.BURNT_FISH, CookingAreaType.BOTH),
-    RAW_PIKE("raw pike", ItemID.RAW_PIKE, 20, "pike", ItemID.PIKE, "burnt pike", ItemID.BURNT_FISH, CookingAreaType.BOTH),
-    RAW_COD("raw cod", ItemID.RAW_COD, 18, "cod", ItemID.COD, "burnt cod", ItemID.BURNT_FISH, CookingAreaType.BOTH),
-    RAW_TROUT("raw trout", ItemID.RAW_TROUT, 15, "trout", ItemID.TROUT, "burnt trout", ItemID.BURNT_FISH, CookingAreaType.BOTH),
-    RAW_SHRIMP("raw shrimps", ItemID.RAW_SHRIMPS, 1, "shrimps", ItemID.SHRIMPS, "burnt shrimps", ItemID.BURNT_SHRIMP, CookingAreaType.BOTH),
+    RAW_TUNA("raw tuna", ItemID.RAW_TUNA, 30, "tuna", ItemID.TUNA, "burnt fish", ItemID.BURNT_FISH_367, CookingAreaType.BOTH),
+    RAW_SALMON("raw salmon", ItemID.RAW_SALMON, 25, "salmon", ItemID.SALMON, "burnt fish", ItemID.BURNT_FISH_343, CookingAreaType.BOTH),
+    RAW_PIKE("raw pike", ItemID.RAW_PIKE, 20, "pike", ItemID.PIKE, "burnt fish", ItemID.BURNT_FISH_343, CookingAreaType.BOTH),
+    RAW_COD("raw cod", ItemID.RAW_COD, 18, "cod", ItemID.COD, "burnt fish", ItemID.BURNT_FISH_343, CookingAreaType.BOTH),
+    RAW_TROUT("raw trout", ItemID.RAW_TROUT, 15, "trout", ItemID.TROUT, "burnt fish", ItemID.BURNT_FISH_343, CookingAreaType.BOTH),
+    RAW_MACKEREL("raw mackerel", ItemID.RAW_MACKEREL, 10, "mackerel", ItemID.MACKEREL, "burnt fish", ItemID.BURNT_FISH_357, CookingAreaType.BOTH),
+    RAW_HERRING("raw herring", ItemID.RAW_HERRING, 5, "herring", ItemID.HERRING, "burnt fish", ItemID.BURNT_FISH_357, CookingAreaType.BOTH),
+    RAW_SHRIMP("raw shrimps", ItemID.RAW_SHRIMPS, 1, "shrimps", ItemID.SHRIMPS, "burnt shrimp", ItemID.BURNT_SHRIMP, CookingAreaType.BOTH),
     RAW_CHICKEN("raw chicken", ItemID.RAW_CHICKEN, 1, "chicken", ItemID.CHICKEN, "burnt chicken", ItemID.BURNT_CHICKEN, CookingAreaType.BOTH),
-    RAW_ANCHOVIES("raw anchovies", ItemID.RAW_ANCHOVIES, 1, "anchovies", ItemID.ANCHOVIES, "burnt anchovies", ItemID.BURNT_FISH, CookingAreaType.BOTH),
-    RAW_SARDINE("raw sardine", ItemID.RAW_SARDINE, 1, "sardine", ItemID.SARDINE, "burnt sardine", ItemID.BURNT_FISH, CookingAreaType.BOTH);
+    RAW_ANCHOVIES("raw anchovies", ItemID.RAW_ANCHOVIES, 1, "anchovies", ItemID.ANCHOVIES, "burnt fish", ItemID.BURNT_FISH, CookingAreaType.BOTH),
+    RAW_SARDINE("raw sardine", ItemID.RAW_SARDINE, 1, "sardine", ItemID.SARDINE, "burnt fish", ItemID.BURNT_FISH_369, CookingAreaType.BOTH);
 
     private final String rawItemName;
     private final int rawItemID;
