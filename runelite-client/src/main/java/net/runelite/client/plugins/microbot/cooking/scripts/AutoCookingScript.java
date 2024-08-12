@@ -91,7 +91,7 @@ public class AutoCookingScript extends Script {
 
                             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                             Microbot.status = "Cooking " + cookingItem.getRawItemName();
-                            sleepUntilTrue(() -> !hasRawItem(cookingItem) && !Rs2Player.isAnimating(3500), 500, 150000);
+                            sleepUntilTrue(() -> !hasRawItem(cookingItem) || !Rs2Player.isAnimating(3500), 500, 150000);
                             if (hasBurntItem(cookingItem) && !cookingItem.getBurntItemName().isEmpty()) {
                                 state = CookingState.DROPPING;
                                 return;
