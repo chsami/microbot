@@ -35,7 +35,7 @@ public enum CookingLocation {
     TAI_BWO_WANNAI(new WorldPoint(2788, 3048, 0), CookingAreaType.FIRE, ObjectID.FIRE_26185),
     PORT_PISCARILIUS(new WorldPoint(1806, 3735, 0), CookingAreaType.RANGE, ObjectID.RANGE_27724),
     HOSIDIUS(new WorldPoint(1738, 3612, 0), CookingAreaType.RANGE, ObjectID.RANGE_27517),
-    HOSIDIUS_KITCHEN(new WorldPoint(1680, 3621, 0), CookingAreaType.RANGE, ObjectID.CLAY_OVEN_21302),
+    HOSIDIUS_KITCHEN(new WorldPoint(1677, 3621, 0), CookingAreaType.RANGE, ObjectID.CLAY_OVEN_21302),
     NARDAH(new WorldPoint(3434, 2887, 0), CookingAreaType.RANGE, ObjectID.CLAY_OVEN),
     LANDS_END(new WorldPoint(1515, 3442, 0), CookingAreaType.RANGE, ObjectID.RANGE_7183);
 
