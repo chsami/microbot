@@ -12,34 +12,8 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.concurrent.TimeUnit;
 
-
-/*
-PATCH NOTES:
-v0.0.1
-Initial Plugin Inception
-v1.0.0
-Rework initial mining
-Sleeps on Player Animation
-v1.0.1
-Working out potential Level Checks to Mine where possible
-Level checks are currently supported through ProgressiveMiningMode
-v1.1.0
-Updating Overlay to show amount of Stardust mined
-Revisting overlay for Stardust mined later
-Implemented Dpick special
-v1.1.1
-Change pathing on Shortestpath to not conflict with area of star
-Added check for GameObjectID 29733 which is a corner of the crashed star
-v1.2.0
-Corrected level check for player, will no longer attempt to mine if player does not have level required
-v1.2.1
-Added correct Tier display
-Cleaned up some code
-*/
-
-
 public class CrashedStarScript extends Script {
-    public static String version = "1.2.0";
+    public static String version = "1.2.1";
 
     CrashedStarConfig config;
 
