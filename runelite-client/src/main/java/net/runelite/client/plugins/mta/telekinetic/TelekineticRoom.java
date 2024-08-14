@@ -24,48 +24,22 @@
  */
 package net.runelite.client.plugins.mta.telekinetic;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Stack;
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.GroundObject;
-import net.runelite.api.NPC;
-import net.runelite.api.NpcID;
-import net.runelite.api.NullNpcID;
-import net.runelite.api.NullObjectID;
-import net.runelite.api.Perspective;
-import net.runelite.api.WallObject;
-import net.runelite.api.coords.Angle;
-import net.runelite.api.coords.Direction;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldArea;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.GroundObjectSpawned;
-import net.runelite.api.events.NpcDespawned;
-import net.runelite.api.events.NpcSpawned;
-import net.runelite.api.events.WallObjectSpawned;
+import net.runelite.api.*;
+import net.runelite.api.coords.*;
+import net.runelite.api.events.*;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.mta.MTAConfig;
 import net.runelite.client.plugins.mta.MTARoom;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.List;
+import java.util.Queue;
+import java.util.*;
 
 @Slf4j
 public class TelekineticRoom extends MTARoom
@@ -307,7 +281,7 @@ public class TelekineticRoom extends MTARoom
 
     public static WorldPoint optimal(int index)
     {
-        WorldPoint current = client.getLocalPlayer().getWorldLocation();
+        WorldPoint current = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
         Direction next = moves.get(moves.size() - 1 - index);
         WorldArea areaNext = getIndicatorLine(next);
