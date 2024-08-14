@@ -27,7 +27,12 @@ package net.runelite.client.menus;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.*;
+import net.runelite.api.Actor;
+import net.runelite.api.Menu;
+import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
+import net.runelite.api.NPC;
+import net.runelite.api.Player;
 import net.runelite.api.widgets.Widget;
 
 import javax.annotation.Nullable;
@@ -187,13 +192,7 @@ public class TestMenuEntry implements MenuEntry
 	}
 
 	@Override
-	public MenuEntry setParent(MenuEntry parent)
-	{
-		return this;
-	}
-
-	@Override
-	public MenuEntry getParent()
+	public Consumer<MenuEntry> onClick()
 	{
 		return null;
 	}
@@ -248,5 +247,23 @@ public class TestMenuEntry implements MenuEntry
 	public Actor getActor()
 	{
 		return actor;
+	}
+
+	@Override
+	public Menu getSubMenu()
+	{
+		return null;
+	}
+
+	@Override
+	public Menu createSubMenu()
+	{
+		return null;
+	}
+
+	@Override
+	public void deleteSubMenu()
+	{
+
 	}
 }

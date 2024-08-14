@@ -32,6 +32,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.GraphicID;
+import net.runelite.api.GraphicsObject;
+import net.runelite.api.KeyCode;
+import net.runelite.api.Menu;
+import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
+import net.runelite.api.NPC;
+import net.runelite.api.NPCComposition;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.client.callback.ClientThread;
@@ -324,14 +334,14 @@ public class NpcIndicatorsPlugin extends Plugin
 		MenuEntry parent = client.createMenuEntry(idx--)
 			.setOption("Tag color")
 			.setTarget(target)
-			.setType(MenuAction.RUNELITE_SUBMENU);
+			.setType(MenuAction.RUNELITE);
+		Menu submenu = parent.createSubMenu();
 
 		for (final Color c : colors)
 		{
-			client.createMenuEntry(idx--)
+			submenu.createMenuEntry(0)
 				.setOption(ColorUtil.prependColorTag("Set color", c))
 				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
 				.onClick(e ->
 				{
 					setNpcHighlightColor(npc.getId(), c);
@@ -339,10 +349,9 @@ public class NpcIndicatorsPlugin extends Plugin
 				});
 		}
 
-		client.createMenuEntry(idx--)
+		submenu.createMenuEntry(0)
 			.setOption("Pick color")
 			.setType(MenuAction.RUNELITE)
-			.setParent(parent)
 			.onClick(e -> SwingUtilities.invokeLater(() ->
 			{
 				RuneliteColorPicker colorPicker = colorPickerManager.create(SwingUtilities.windowForComponent((Applet) client),
@@ -357,10 +366,9 @@ public class NpcIndicatorsPlugin extends Plugin
 
 		if (getNpcHighlightColor(npc.getId()) != null)
 		{
-			client.createMenuEntry(idx--)
+			submenu.createMenuEntry(0)
 				.setOption("Reset")
 				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
 				.onClick(e ->
 				{
 					unsetNpcHighlightColor(npc.getId());
@@ -376,7 +384,8 @@ public class NpcIndicatorsPlugin extends Plugin
 		MenuEntry parent = client.createMenuEntry(idx--)
 			.setOption("Tag style")
 			.setTarget(target)
-			.setType(MenuAction.RUNELITE_SUBMENU);
+			.setType(MenuAction.RUNELITE);
+		Menu submenu = parent.createSubMenu();
 
 		String[] names = {"Hull", "Tile", "True tile", "South-west tile", "South-west true tile", "Outline"};
 		String[] styles = {STYLE_HULL, STYLE_TILE, STYLE_TRUE_TILE, STYLE_SW_TILE, STYLE_SW_TRUE_TILE, STYLE_OUTLINE};
@@ -384,10 +393,9 @@ public class NpcIndicatorsPlugin extends Plugin
 		for (int i = 0; i < names.length; ++i)
 		{
 			final String style = styles[i];
-			client.createMenuEntry(idx--)
+			submenu.createMenuEntry(0)
 				.setOption(names[i])
 				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
 				.onClick(e ->
 				{
 					setNpcTagStyle(npc.getId(), style);
@@ -397,10 +405,9 @@ public class NpcIndicatorsPlugin extends Plugin
 
 		if (getNpcTagStyle(npc.getId()) != null)
 		{
-			client.createMenuEntry(idx--)
+			submenu.createMenuEntry(0)
 				.setOption("Reset")
 				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
 				.onClick(e ->
 				{
 					unsetNpcTagStyle(npc.getId());

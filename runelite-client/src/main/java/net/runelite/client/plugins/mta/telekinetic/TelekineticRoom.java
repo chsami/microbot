@@ -240,7 +240,11 @@ public class TelekineticRoom extends MTARoom
 			}
 			if (!moves.isEmpty())
 			{
-				if (moves.peek() == getPosition())
+				if (guardian.getId() == MAZE_GUARDIAN_MOVING)
+				{
+					graphics2D.setColor(Color.YELLOW);
+				}
+				else if (moves.peek() == getPosition())
 				{
 					graphics2D.setColor(Color.GREEN);
 				}
@@ -255,7 +259,7 @@ public class TelekineticRoom extends MTARoom
 					graphics2D.drawPolygon(tile);
 				}
 
-				WorldPoint optimal = optimal();
+				WorldPoint optimal = optimal(0);
 
 				if (optimal != null)
 				{
@@ -264,31 +268,62 @@ public class TelekineticRoom extends MTARoom
 					renderWorldPoint(graphics2D, optimal);
 				}
 			}
+			// show next move.
+			if (moves.size() >= 2)
+			{
+				WorldPoint optimal = optimal(1);
+
+				if (optimal != null)
+				{
+					graphics2D.setColor(Color.CYAN);
+					renderWorldPoint(graphics2D, optimal);
+				}
+			}
 		}
 	}
 
-	public static WorldPoint optimal()
-	{
-		WorldPoint current = Microbot.getClient().getLocalPlayer().getWorldLocation();
+    public static WorldPoint optimal()
+    {
+        WorldPoint current = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
-		Direction next = moves.pop();
-		WorldArea areaNext = getIndicatorLine(next);
-		WorldPoint nearestNext = nearest(areaNext, current);
+        Direction next = moves.pop();
+        WorldArea areaNext = getIndicatorLine(next);
+        WorldPoint nearestNext = nearest(areaNext, current);
 
-		if (moves.isEmpty())
-		{
-			moves.push(next);
+        if (moves.isEmpty())
+        {
+            moves.push(next);
 
-			return nearestNext;
-		}
+            return nearestNext;
+        }
 
-		Direction after = moves.peek();
-		moves.push(next);
-		WorldArea areaAfter = getIndicatorLine(after);
-		WorldPoint nearestAfter = nearest(areaAfter, nearestNext);
+        Direction after = moves.peek();
+        moves.push(next);
+        WorldArea areaAfter = getIndicatorLine(after);
+        WorldPoint nearestAfter = nearest(areaAfter, nearestNext);
 
-		return nearest(areaNext, nearestAfter);
-	}
+        return nearest(areaNext, nearestAfter);
+    }
+
+    public static WorldPoint optimal(int index)
+    {
+        WorldPoint current = client.getLocalPlayer().getWorldLocation();
+
+        Direction next = moves.get(moves.size() - 1 - index);
+        WorldArea areaNext = getIndicatorLine(next);
+        WorldPoint nearestNext = nearest(areaNext, current);
+
+        if (moves.size() <= 1 + index)
+        {
+            return nearestNext;
+        }
+
+        Direction after = moves.get(moves.size() - 2 - index);
+        WorldArea areaAfter = getIndicatorLine(after);
+        WorldPoint nearestAfter = nearest(areaAfter, nearestNext);
+
+        return nearest(areaNext, nearestAfter);
+    }
 
 	private static int manhattan(WorldPoint point1, WorldPoint point2)
 	{
