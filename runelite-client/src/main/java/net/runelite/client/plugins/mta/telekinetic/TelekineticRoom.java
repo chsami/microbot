@@ -24,48 +24,22 @@
  */
 package net.runelite.client.plugins.mta.telekinetic;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Stack;
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.GroundObject;
-import net.runelite.api.NPC;
-import net.runelite.api.NpcID;
-import net.runelite.api.NullNpcID;
-import net.runelite.api.NullObjectID;
-import net.runelite.api.Perspective;
-import net.runelite.api.WallObject;
-import net.runelite.api.coords.Angle;
-import net.runelite.api.coords.Direction;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldArea;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.GroundObjectSpawned;
-import net.runelite.api.events.NpcDespawned;
-import net.runelite.api.events.NpcSpawned;
-import net.runelite.api.events.WallObjectSpawned;
+import net.runelite.api.*;
+import net.runelite.api.coords.*;
+import net.runelite.api.events.*;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.mta.MTAConfig;
 import net.runelite.client.plugins.mta.MTARoom;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.List;
+import java.util.Queue;
+import java.util.*;
 
 @Slf4j
 public class TelekineticRoom extends MTARoom
@@ -240,7 +214,11 @@ public class TelekineticRoom extends MTARoom
 			}
 			if (!moves.isEmpty())
 			{
-				if (moves.peek() == getPosition())
+				if (guardian.getId() == MAZE_GUARDIAN_MOVING)
+				{
+					graphics2D.setColor(Color.YELLOW);
+				}
+				else if (moves.peek() == getPosition())
 				{
 					graphics2D.setColor(Color.GREEN);
 				}
@@ -255,7 +233,7 @@ public class TelekineticRoom extends MTARoom
 					graphics2D.drawPolygon(tile);
 				}
 
-				WorldPoint optimal = optimal();
+				WorldPoint optimal = optimal(0);
 
 				if (optimal != null)
 				{
@@ -264,31 +242,62 @@ public class TelekineticRoom extends MTARoom
 					renderWorldPoint(graphics2D, optimal);
 				}
 			}
+			// show next move.
+			if (moves.size() >= 2)
+			{
+				WorldPoint optimal = optimal(1);
+
+				if (optimal != null)
+				{
+					graphics2D.setColor(Color.CYAN);
+					renderWorldPoint(graphics2D, optimal);
+				}
+			}
 		}
 	}
 
-	public static WorldPoint optimal()
-	{
-		WorldPoint current = Microbot.getClient().getLocalPlayer().getWorldLocation();
+    public static WorldPoint optimal()
+    {
+        WorldPoint current = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
-		Direction next = moves.pop();
-		WorldArea areaNext = getIndicatorLine(next);
-		WorldPoint nearestNext = nearest(areaNext, current);
+        Direction next = moves.pop();
+        WorldArea areaNext = getIndicatorLine(next);
+        WorldPoint nearestNext = nearest(areaNext, current);
 
-		if (moves.isEmpty())
-		{
-			moves.push(next);
+        if (moves.isEmpty())
+        {
+            moves.push(next);
 
-			return nearestNext;
-		}
+            return nearestNext;
+        }
 
-		Direction after = moves.peek();
-		moves.push(next);
-		WorldArea areaAfter = getIndicatorLine(after);
-		WorldPoint nearestAfter = nearest(areaAfter, nearestNext);
+        Direction after = moves.peek();
+        moves.push(next);
+        WorldArea areaAfter = getIndicatorLine(after);
+        WorldPoint nearestAfter = nearest(areaAfter, nearestNext);
 
-		return nearest(areaNext, nearestAfter);
-	}
+        return nearest(areaNext, nearestAfter);
+    }
+
+    public static WorldPoint optimal(int index)
+    {
+        WorldPoint current = Microbot.getClient().getLocalPlayer().getWorldLocation();
+
+        Direction next = moves.get(moves.size() - 1 - index);
+        WorldArea areaNext = getIndicatorLine(next);
+        WorldPoint nearestNext = nearest(areaNext, current);
+
+        if (moves.size() <= 1 + index)
+        {
+            return nearestNext;
+        }
+
+        Direction after = moves.get(moves.size() - 2 - index);
+        WorldArea areaAfter = getIndicatorLine(after);
+        WorldPoint nearestAfter = nearest(areaAfter, nearestNext);
+
+        return nearest(areaNext, nearestAfter);
+    }
 
 	private static int manhattan(WorldPoint point1, WorldPoint point2)
 	{

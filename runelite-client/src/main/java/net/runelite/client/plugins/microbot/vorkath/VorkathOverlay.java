@@ -11,14 +11,12 @@ import java.awt.*;
 
 public class VorkathOverlay extends OverlayPanel {
     private final VorkathPlugin plugin;
-    private final VorkathConfig config;
 
     @Inject
-    VorkathOverlay(VorkathPlugin plugin, VorkathConfig config)
+    VorkathOverlay(VorkathPlugin plugin)
     {
         super(plugin);
         this.plugin = plugin;
-        this.config = config;
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }

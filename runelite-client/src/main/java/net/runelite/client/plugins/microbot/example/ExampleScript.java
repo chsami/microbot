@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ExampleScript extends Script {
-    public static double version = 1.0;
 
     public boolean run(ExampleConfig config) {
         Microbot.enableAutoRunOn = false;

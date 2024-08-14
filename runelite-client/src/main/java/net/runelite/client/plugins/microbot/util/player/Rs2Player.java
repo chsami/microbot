@@ -145,6 +145,25 @@ public class Rs2Player {
         sleepUntil(() -> !Rs2Player.isAnimating());
     }
 
+    public static boolean waitForXpDrop(Skill skill) {
+        final int skillExp = Microbot.getClient().getSkillExperience(skill);
+        return sleepUntilTrue(() -> skillExp != Microbot.getClient().getSkillExperience(skill), 100, 5000);
+    }
+
+    public static boolean waitForXpDrop(Skill skill, int time) {
+        final int skillExp = Microbot.getClient().getSkillExperience(skill);
+        return sleepUntilTrue(() -> skillExp != Microbot.getClient().getSkillExperience(skill), 100, time);
+    }
+
+    public static boolean waitForXpDrop(Skill skill, boolean inventoryFullCheck) {
+        return waitForXpDrop( skill,5000, inventoryFullCheck);
+    }
+
+    public static boolean waitForXpDrop(Skill skill, int time, boolean inventoryFullCheck) {
+        final int skillExp = Microbot.getClient().getSkillExperience(skill);
+        return sleepUntilTrue(() -> skillExp != Microbot.getClient().getSkillExperience(skill) || (inventoryFullCheck && Rs2Inventory.isFull()), 100, time);
+    }
+
     public static void waitForAnimation(int time) {
         boolean result = sleepUntilTrue(Rs2Player::isAnimating, 100, time);
         if (!result) return;
@@ -202,9 +221,18 @@ public class Rs2Player {
         return false;
     }
 
+    public static boolean isRunEnabled()
+    {
+        return Microbot.getVarbitPlayerValue(173) == 1;
+    }
+
     public static void logout() {
-        if (Microbot.isLoggedIn())
+        if (Microbot.isLoggedIn()) {
+            //logout from main tab
             Microbot.doInvoke(new NewMenuEntry(-1, 11927560, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+            //logout from world hopper
+            Microbot.doInvoke(new NewMenuEntry(-1, 4522009, CC_OP.getId(), 1, -1, "Logout"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        }
 
         //Rs2Reflection.invokeMenu(-1, 11927560, CC_OP.getId(), 1, -1, "Logout", "", -1, -1);
     }

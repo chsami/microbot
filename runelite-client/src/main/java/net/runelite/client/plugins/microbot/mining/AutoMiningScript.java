@@ -1,9 +1,12 @@
 package net.runelite.client.plugins.microbot.mining;
 
 import net.runelite.api.GameObject;
+import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -20,7 +23,7 @@ enum State {
 
 public class AutoMiningScript extends Script {
 
-    public static String version = "1.4.0";
+    public static String version = "1.4.1";
     State state = State.MINING;
 
     public boolean run(AutoMiningConfig config) {
@@ -40,6 +43,9 @@ public class AutoMiningScript extends Script {
                     return;
                 }
 
+                if (Rs2Equipment.isWearing("Dragon pickaxe"))
+                    Rs2Combat.setSpecState(true, 1000);
+
                 if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
 
                 switch (state) {
@@ -53,7 +59,7 @@ public class AutoMiningScript extends Script {
 
                         if (rock != null) {
                             if (Rs2GameObject.interact(rock)) {
-                                Rs2Player.waitForAnimation();
+                                Rs2Player.waitForXpDrop(Skill.MINING, true);
                             }
                         }
                         break;
@@ -61,7 +67,7 @@ public class AutoMiningScript extends Script {
                         List<String> itemNames = Arrays.stream(config.itemsToBank().split(",")).map(String::toLowerCase).collect(Collectors.toList());
 
                         if (config.useBank()) {
-                            if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation))
+                            if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation, 0, config.distanceToStray()))
                                 return;
                         } else {
                             Rs2Inventory.dropAllExcept("pickaxe");

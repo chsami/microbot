@@ -7,9 +7,11 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.awt.*;
 
 public class ExampleOverlay extends OverlayPanel {
+
     @Inject
     ExampleOverlay(ExamplePlugin plugin)
     {
@@ -22,7 +24,7 @@ public class ExampleOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + ExampleScript.version)
+                    .text("Micro Example V1.0.0")
                     .color(Color.GREEN)
                     .build());
 
