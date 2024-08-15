@@ -131,7 +131,7 @@ public class Rs2Random {
 
     // Dice function: Generates a random number and returns true if within the chance percentage
     public static boolean dice(double chancePercent) {
-        return RANDOM.nextDouble() < chancePercent / 100;
+        return RANDOM.nextDouble() < (chancePercent <= 0.99 ? chancePercent * 100 : chancePercent) / 100;
     }
 
     // Wait function weighted towards the mean of Min and Max

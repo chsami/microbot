@@ -96,7 +96,7 @@ public class AntibanPlugin extends Plugin {
                 }
             } else {
                 Rs2AntibanSettings.actionCooldownActive = false;
-                //Microbot.pauseAllScripts = false;
+                Microbot.pauseAllScripts = false;
             }
         }
     }
@@ -204,8 +204,7 @@ public class AntibanPlugin extends Plugin {
 
     @Subscribe
     public void onStatChanged(StatChanged statChanged) {
-        if (!Rs2AntibanSettings.antibanEnabled ||
-                (!Rs2AntibanSettings.dynamicIntensity && !Rs2AntibanSettings.dynamicActivity)) {
+        if (!Rs2AntibanSettings.antibanEnabled) {
             return;
         }
 
@@ -214,7 +213,7 @@ public class AntibanPlugin extends Plugin {
         final Integer previous = skillExp.put(skill, exp);
 
         if (lastSkillChanged != null && lastSkillChanged.equals(skill)) {
-            if (Rs2AntibanSettings.contextualVariability && !Rs2AntibanSettings.actionCooldownActive) {
+            if (Rs2AntibanSettings.universalAntiban && !Rs2AntibanSettings.actionCooldownActive) {
                 Rs2Antiban.actionCooldown();
             }
             return;
@@ -236,8 +235,7 @@ public class AntibanPlugin extends Plugin {
         if (activity != null && Rs2AntibanSettings.dynamicActivity) {
             Rs2Antiban.setActivity(activity);
             Microbot.log("Activity changed, new activity: " + activity);
-            if (Rs2AntibanSettings.contextualVariability) {
-                applyContextualVariabilitySetup();
+            if (Rs2AntibanSettings.universalAntiban) {
                 Rs2Antiban.actionCooldown();
             }
         }

@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.antiban.enums.ActivityIntensity
 import net.runelite.client.plugins.microbot.util.antiban.enums.Category;
 import net.runelite.client.plugins.microbot.util.antiban.enums.PlayStyle;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.ui.overlay.components.*;
 import net.runelite.client.util.ColorUtil;
@@ -70,147 +71,6 @@ public class Rs2Antiban {
     @Getter
     @Setter
     private static PlayStyle playStyle;
-
-    /**
-     * <h1>Basic Setup</h1>
-     * This method sets up the basic configuration for the antiban system.
-     * It is used to enable the minimal functionality that works out of the box without any additional configuration.
-     * The basic setup utilizes natural mouse movements to create natural delays between actions
-     */
-    public static void basicSetup() {
-        Rs2AntibanSettings.actionCooldownActive = false;
-        Rs2AntibanSettings.microBreakActive = false;
-        Rs2AntibanSettings.antibanEnabled = true;
-        Rs2AntibanSettings.usePlayStyle = false;
-        Rs2AntibanSettings.randomIntervals = false;
-        Rs2AntibanSettings.simulateFatigue = false;
-        Rs2AntibanSettings.simulateAttentionSpan = false;
-        Rs2AntibanSettings.behavioralVariability = false;
-        Rs2AntibanSettings.nonLinearIntervals = false;
-        Rs2AntibanSettings.profileSwitching = false;
-        Rs2AntibanSettings.timeOfDayAdjust = false;
-        Rs2AntibanSettings.simulateMistakes = false;
-        Rs2AntibanSettings.naturalMouse = true;
-        Rs2AntibanSettings.contextualVariability = false;
-        Rs2AntibanSettings.dynamicIntensity = true;
-        Rs2AntibanSettings.dynamicActivity = true;
-        Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.actionCooldownChance = 0.1;
-        Rs2AntibanSettings.microBreakChance = 0.1;
-        Rs2AntibanSettings.microBreakDurationLow = 3;
-        Rs2AntibanSettings.microBreakDurationHigh = 15;
-    }
-
-    /**
-     * <h1>Basic Play Style Setup</h1>
-     * This method sets up the basic configuration for the antiban system with play style enabled.
-     * Provides action cooldowns in the most basic and aggressive play style.
-     * To activate the action cooldown, call the actionCooldown() method after the desired action.
-     *
-     * @param activity The activity to be performed
-     * @see Rs2Antiban#actionCooldown()
-     */
-    public static void basicPlayStyleSetup(Activity activity) {
-        Rs2AntibanSettings.actionCooldownActive = false;
-        Rs2AntibanSettings.microBreakActive = false;
-        Rs2AntibanSettings.antibanEnabled = true;
-        Rs2AntibanSettings.usePlayStyle = true;
-        Rs2AntibanSettings.randomIntervals = false;
-        Rs2AntibanSettings.simulateFatigue = false;
-        Rs2AntibanSettings.simulateAttentionSpan = false;
-        Rs2AntibanSettings.behavioralVariability = false;
-        Rs2AntibanSettings.nonLinearIntervals = false;
-        Rs2AntibanSettings.profileSwitching = false;
-        Rs2AntibanSettings.timeOfDayAdjust = false;
-        Rs2AntibanSettings.simulateMistakes = false;
-        Rs2AntibanSettings.naturalMouse = false;
-        Rs2AntibanSettings.contextualVariability = false;
-        Rs2AntibanSettings.dynamicIntensity = false;
-        Rs2AntibanSettings.dynamicActivity = false;
-        Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.actionCooldownChance = 0.1;
-        Rs2AntibanSettings.microBreakChance = 0.1;
-        Rs2AntibanSettings.microBreakDurationLow = 3;
-        Rs2AntibanSettings.microBreakDurationHigh = 15;
-        setActivity(activity);
-        Rs2Antiban.playStyle = PlayStyle.EXTREME_AGGRESSIVE;
-
-    }
-
-    /**
-     * <h1>Intermediate Play Style Setup</h1>
-     * This method sets up the intermediate configuration for the antiban system with play style enabled.
-     * Provides action cooldowns based on the activity intensity and play style.
-     * The action cooldown is randomized within the primary and secondary tick intervals in the current play style.
-     * To activate the action cooldown, call the actionCooldown() method after the desired action.
-     *
-     * @param activity The activity to be performed
-     * @see Rs2Antiban#actionCooldown()
-     */
-
-    // Advanced play style setup: maximal functionality with play style enabled
-    public static void intermediatePlayStyleSetup(Activity activity) {
-        Rs2AntibanSettings.actionCooldownActive = false;
-        Rs2AntibanSettings.microBreakActive = false;
-        Rs2AntibanSettings.antibanEnabled = true;
-        Rs2AntibanSettings.usePlayStyle = true;
-        Rs2AntibanSettings.randomIntervals = false;
-        Rs2AntibanSettings.simulateFatigue = false;
-        Rs2AntibanSettings.simulateAttentionSpan = false;
-        Rs2AntibanSettings.behavioralVariability = true;
-        Rs2AntibanSettings.nonLinearIntervals = false;
-        Rs2AntibanSettings.profileSwitching = false; //TODO: Implement this
-        Rs2AntibanSettings.timeOfDayAdjust = false; //TODO: Implement this
-        Rs2AntibanSettings.simulateMistakes = false; //Handled by the natural mouse
-        Rs2AntibanSettings.naturalMouse = true;
-        Rs2AntibanSettings.contextualVariability = false; //TODO: Implement this
-        Rs2AntibanSettings.dynamicIntensity = false;
-        Rs2AntibanSettings.dynamicActivity = false;
-        Rs2AntibanSettings.devDebug = true;
-        Rs2AntibanSettings.actionCooldownChance = 0.1;
-        Rs2AntibanSettings.microBreakChance = 0.1;
-        Rs2AntibanSettings.microBreakDurationLow = 1;
-        Rs2AntibanSettings.microBreakDurationHigh = 5;
-        setActivity(activity);
-    }
-
-    /**
-     * <h1>Advanced Play Style Setup</h1>
-     * This method sets up the advanced configuration for the antiban system with play style enabled.
-     * Provides action cooldowns based on the activity intensity and play style.
-     * The action cooldown is randomized within the primary and secondary tick intervals in the current play style.
-     * Attention span is simulated to switch play styles to create a more human-like drift in attention.
-     * Non-linear intervals are used to create Anti-patterns in the action cooldowns to avoid fingerprinting.
-     * To activate the action cooldown, call the actionCooldown() method after the desired action.
-     *
-     * @param activity The activity to be performed
-     * @see Rs2Antiban#actionCooldown()
-     */
-    public static void advancedPlayStyleSetup(Activity activity) {
-        Rs2AntibanSettings.actionCooldownActive = false;
-        Rs2AntibanSettings.microBreakActive = false;
-        Rs2AntibanSettings.antibanEnabled = true;
-        Rs2AntibanSettings.usePlayStyle = true;
-        Rs2AntibanSettings.randomIntervals = false;
-        Rs2AntibanSettings.simulateFatigue = false;
-        Rs2AntibanSettings.simulateAttentionSpan = true;
-        Rs2AntibanSettings.behavioralVariability = true;
-        Rs2AntibanSettings.nonLinearIntervals = true;
-        Rs2AntibanSettings.profileSwitching = false; //TODO: Implement this
-        Rs2AntibanSettings.timeOfDayAdjust = false; //TODO: Implement this
-        Rs2AntibanSettings.simulateMistakes = false; //Handled by the natural mouse
-        Rs2AntibanSettings.naturalMouse = true;
-        Rs2AntibanSettings.contextualVariability = false; //TODO: Implement this
-        Rs2AntibanSettings.dynamicIntensity = false;
-        Rs2AntibanSettings.dynamicActivity = false;
-        Rs2AntibanSettings.devDebug = true;
-        Rs2AntibanSettings.takeMicroBreaks = true;
-        Rs2AntibanSettings.actionCooldownChance = 0.1;
-        Rs2AntibanSettings.microBreakChance = 0.1;
-        Rs2AntibanSettings.microBreakDurationLow = 1;
-        Rs2AntibanSettings.microBreakDurationHigh = 5;
-        setActivity(activity);
-    }
 
 
     public static void setActivity(Activity activity) {
@@ -278,12 +138,17 @@ public class Rs2Antiban {
     }
 
     public static void actionCooldown() {
+        if (Rs2AntibanSettings.actionCooldownChance < 1.00) {
+            actionCooldownByChance();
+            return;
+        }
+
         if (!Rs2AntibanSettings.usePlayStyle) {
             Microbot.log("PlayStyle not enabled, cannot perform action cooldown");
             return;
         }
 
-        if (Rs2AntibanSettings.contextualVariability)
+        if (Rs2AntibanSettings.universalAntiban)
             Microbot.pauseAllScripts = true;
         if (Rs2AntibanSettings.nonLinearIntervals)
             playStyle.evolvePlayStyle();
@@ -292,6 +157,9 @@ public class Rs2Antiban {
         else
             TIMEOUT = playStyle.getPrimaryTickInterval();
         Rs2AntibanSettings.actionCooldownActive = true;
+        if (Rs2AntibanSettings.moveMouseRandomly)
+            if (Rs2Random.dice(Rs2AntibanSettings.moveMouseRandomlyChance))
+                moveMouseRandomly();
         if (Rs2AntibanSettings.moveMouseOffScreen)
             moveMouseOffScreen();
     }
@@ -313,8 +181,12 @@ public class Rs2Antiban {
             else
                 TIMEOUT = playStyle.getPrimaryTickInterval();
             Rs2AntibanSettings.actionCooldownActive = true;
+            if (Rs2AntibanSettings.moveMouseRandomly)
+                if (Rs2Random.dice(Rs2AntibanSettings.moveMouseRandomlyChance))
+                    moveMouseRandomly();
             if (Rs2AntibanSettings.moveMouseOffScreen)
                 moveMouseOffScreen();
+
         }
 
     }
@@ -390,6 +262,10 @@ public class Rs2Antiban {
      */
     public static void moveMouseOffScreen() {
         Microbot.naturalMouse.moveOffScreen();
+    }
+
+    public static void moveMouseRandomly() {
+        Microbot.naturalMouse.moveRandom();
     }
 
     public static void activateAntiban() {

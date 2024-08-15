@@ -32,9 +32,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_COMBAT);
     }
@@ -62,9 +63,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_RUNECRAFT);
     }
@@ -92,9 +94,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_CONSTRUCTION);
     }
@@ -123,9 +126,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_AGILITY);
     }
@@ -153,9 +157,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_HERBLORE);
     }
@@ -183,9 +188,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_THIEVING);
     }
@@ -213,9 +219,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_CRAFTING);
     }
@@ -243,9 +250,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_FLETCHING);
     }
@@ -277,9 +285,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_HUNTER);
     }
@@ -307,9 +316,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 1;
         Rs2AntibanSettings.microBreakDurationHigh = 4;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_MINING);
     }
@@ -337,9 +347,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_SMITHING);
     }
@@ -367,9 +378,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_FISHING);
     }
@@ -397,9 +409,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_COOKING);
     }
@@ -427,9 +440,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_FIREMAKING);
     }
@@ -457,9 +471,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
     }
@@ -487,9 +502,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.playSchedule = true;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setActivity(Activity.GENERAL_FARMING);
     }
@@ -518,9 +534,10 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = false;
+        Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
     }
 

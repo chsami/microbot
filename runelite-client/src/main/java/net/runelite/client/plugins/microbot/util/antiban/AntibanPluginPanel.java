@@ -11,6 +11,7 @@ public class AntibanPluginPanel extends PluginPanel {
     private final JCheckBox isActionCooldownActive = new JCheckBox("Action Cooldown Active");
     private final JCheckBox isMicroBreakActive = new JCheckBox("Micro Break Active");
     private final JCheckBox isEnabled = new JCheckBox("Enabled");
+    private final JCheckBox universalAntiban = new JCheckBox("Universal Antiban");
     private final JCheckBox usePlayStyle = new JCheckBox("Use Play Style");
     private final JCheckBox useRandomIntervals = new JCheckBox("Use Random Intervals");
     private final JCheckBox simulateFatigue = new JCheckBox("Simulate Fatigue");
@@ -22,6 +23,7 @@ public class AntibanPluginPanel extends PluginPanel {
     private final JCheckBox simulateMistakes = new JCheckBox("Simulate Mistakes");
     private final JCheckBox useNaturalMouse = new JCheckBox("Use Natural Mouse");
     private final JCheckBox moveMouseOffScreen = new JCheckBox("Move Mouse Off Screen");
+    private final JCheckBox moveMouseRandomly = new JCheckBox("Move Mouse Randomly");
     private final JCheckBox useContextualVariability = new JCheckBox("Use Contextual Variability");
     private final JCheckBox dynamicActivityIntensity = new JCheckBox("Dynamic Activity Intensity");
     private final JCheckBox dynamicActivity = new JCheckBox("Dynamic Activity");
@@ -34,12 +36,14 @@ public class AntibanPluginPanel extends PluginPanel {
     private final JSlider actionCooldownChance = new JSlider(0, 100, (int) (Rs2AntibanSettings.actionCooldownChance * 100));
     private final JSlider microBreakChance = new JSlider(0, 100, (int) (Rs2AntibanSettings.microBreakChance * 100));
     private final JSlider timeout = new JSlider(0, 60, Rs2Antiban.getTIMEOUT());
+    private final JSlider moveMouseRandomlyChance = new JSlider(0, 100, (int) (Rs2AntibanSettings.moveMouseRandomlyChance * 100));
 
     private final JLabel microBreakDurationLowLabel = new JLabel("Micro Break Duration Low (min): " + Rs2AntibanSettings.microBreakDurationLow);
     private final JLabel microBreakDurationHighLabel = new JLabel("Micro Break Duration High (min): " + Rs2AntibanSettings.microBreakDurationHigh);
     private final JLabel actionCooldownChanceLabel = new JLabel("Action Cooldown Chance (%): " + (int) (Rs2AntibanSettings.actionCooldownChance * 100));
     private final JLabel microBreakChanceLabel = new JLabel("Micro Break Chance (%): " + (int) (Rs2AntibanSettings.microBreakChance * 100));
     private final JLabel timeoutLabel = new JLabel("Timeout (min): " + Rs2Antiban.getTIMEOUT());
+    private final JLabel moveMouseRandomlyChanceLabel = new JLabel("Random Mouse Movement (%): " + (int) (Rs2AntibanSettings.moveMouseRandomlyChance * 100));
 
     // Additional Info Panel
     private final JLabel playStyleLabel = new JLabel("Play Style: " + (Rs2Antiban.getPlayStyle() != null ? Rs2Antiban.getPlayStyle().getName() : "null"));
@@ -103,7 +107,7 @@ public class AntibanPluginPanel extends PluginPanel {
 
     private JPanel createGeneralSettingsPanel() {
         JPanel panel = createPanel("General Settings");
-        addCheckboxesToPanel(panel, isEnabled, devDebug);
+        addCheckboxesToPanel(panel, isEnabled, universalAntiban, useContextualVariability, devDebug);
         return panel;
     }
 
@@ -121,7 +125,8 @@ public class AntibanPluginPanel extends PluginPanel {
 
     private JPanel createMouseSettingsPanel() {
         JPanel panel = createPanel("Mouse Settings");
-        addCheckboxesToPanel(panel, useNaturalMouse, moveMouseOffScreen, useContextualVariability, simulateMistakes);
+        addCheckboxesToPanel(panel, useNaturalMouse, simulateMistakes, moveMouseOffScreen, moveMouseRandomly);
+        addSlidersToPanel(panel, moveMouseRandomlyChanceLabel, moveMouseRandomlyChance);
         return panel;
     }
 
@@ -194,6 +199,7 @@ public class AntibanPluginPanel extends PluginPanel {
         setupSlider(actionCooldownChance, 20, 100, 10);
         setupSlider(microBreakChance, 20, 100, 10);
         setupSlider(timeout, 10, 60, 5);
+        setupSlider(moveMouseRandomlyChance, 20, 100, 10);
     }
 
     private void setupSlider(JSlider slider, int majorTickSpacing, int max, int minorTickSpacing) {
@@ -209,6 +215,7 @@ public class AntibanPluginPanel extends PluginPanel {
         isActionCooldownActive.addActionListener(e -> Rs2AntibanSettings.actionCooldownActive = isActionCooldownActive.isSelected());
         isMicroBreakActive.addActionListener(e -> Rs2AntibanSettings.microBreakActive = isMicroBreakActive.isSelected());
         isEnabled.addActionListener(e -> Rs2AntibanSettings.antibanEnabled = isEnabled.isSelected());
+        universalAntiban.addActionListener(e -> Rs2AntibanSettings.universalAntiban = universalAntiban.isSelected());
         usePlayStyle.addActionListener(e -> Rs2AntibanSettings.usePlayStyle = usePlayStyle.isSelected());
         useRandomIntervals.addActionListener(e -> Rs2AntibanSettings.randomIntervals = useRandomIntervals.isSelected());
         simulateFatigue.addActionListener(e -> Rs2AntibanSettings.simulateFatigue = simulateFatigue.isSelected());
@@ -220,6 +227,7 @@ public class AntibanPluginPanel extends PluginPanel {
         simulateMistakes.addActionListener(e -> Rs2AntibanSettings.simulateMistakes = simulateMistakes.isSelected());
         useNaturalMouse.addActionListener(e -> Rs2AntibanSettings.naturalMouse = useNaturalMouse.isSelected());
         moveMouseOffScreen.addActionListener(e -> Rs2AntibanSettings.moveMouseOffScreen = moveMouseOffScreen.isSelected());
+        moveMouseRandomly.addActionListener(e -> Rs2AntibanSettings.moveMouseRandomly = moveMouseRandomly.isSelected());
         useContextualVariability.addActionListener(e -> Rs2AntibanSettings.contextualVariability = useContextualVariability.isSelected());
         dynamicActivityIntensity.addActionListener(e -> Rs2AntibanSettings.dynamicIntensity = dynamicActivityIntensity.isSelected());
         dynamicActivity.addActionListener(e -> Rs2AntibanSettings.dynamicActivity = dynamicActivity.isSelected());
@@ -246,6 +254,10 @@ public class AntibanPluginPanel extends PluginPanel {
         timeout.addChangeListener(e -> {
             Rs2Antiban.setTIMEOUT(timeout.getValue());
             timeoutLabel.setText("Timeout (min): " + timeout.getValue());
+        });
+        moveMouseRandomlyChance.addChangeListener(e -> {
+            Rs2AntibanSettings.moveMouseRandomlyChance = moveMouseRandomlyChance.getValue() / 100.0;
+            moveMouseRandomlyChanceLabel.setText("Random Mouse Movement (%): " + moveMouseRandomlyChance.getValue());
         });
     }
 
