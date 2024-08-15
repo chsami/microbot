@@ -2032,7 +2032,7 @@ public class Rs2Inventory {
     public static boolean moveItemToSlot(Rs2Item item, int slot) {
         if (item == null) return false;
         if (slot < 0 || slot >= CAPACITY) return false;
-        if (item.slot == slot) return true;
+        if (item.slot == slot) return false;
 
         Widget inventory = getInventory();
         if (inventory == null) return false;
