@@ -27,9 +27,6 @@ public class MicrobotMouseOverlay extends Overlay {
     @Override
     public Dimension render(Graphics2D g) {
         if (plugin.getMouseMovement().isActive()) {
-            if (Microbot.getClient().getCanvas().getCursor().getType() != Cursor.CROSSHAIR_CURSOR) {
-                Microbot.getClient().getCanvas().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
-            }
             if (!Microbot.getMouse().getTimer().isRunning()) {
                 Microbot.getMouse().getTimer().start();
             }

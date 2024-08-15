@@ -29,10 +29,23 @@ public class MicrobotClickOverlay extends Overlay {
 
             g.setFont(new Font("Tahoma", Font.BOLD, 18));
 
-            OverlayUtil.renderTextLocation(g, new net.runelite.api.Point(Microbot.getMouse().getLastClick().getX() - (g.getFont().getSize() / 3),
-                    Microbot.getMouse().getLastClick().getY() + (g.getFont().getSize() / 3)), "X", Color.WHITE);
-            OverlayUtil.renderTextLocation(g, new net.runelite.api.Point(Microbot.getMouse().getLastClick2().getX() - (g.getFont().getSize() / 3),
-                    Microbot.getMouse().getLastClick2().getY() + (g.getFont().getSize() / 3)), "X", Color.GREEN);
+            // Get the FontMetrics for the current font
+            FontMetrics metrics = g.getFontMetrics(g.getFont());
+
+            // Get the width and height of the character
+            int charWidth = metrics.stringWidth("X");
+            int charHeight = metrics.getAscent(); // ascent gives the height of the character above the baseline
+
+            int x = Microbot.getMouse().getLastClick().getX() - (charWidth / 2);
+            int y = Microbot.getMouse().getLastClick().getY() + (charHeight / 2);
+
+            OverlayUtil.renderTextLocation(g, new net.runelite.api.Point(x, y), "X", Color.WHITE);
+
+            x = Microbot.getMouse().getLastClick2().getX() - (charWidth / 2);
+            y = Microbot.getMouse().getLastClick2().getY() + (charHeight / 2);
+
+            OverlayUtil.renderTextLocation(g, new net.runelite.api.Point(x, y), "X", Color.GREEN);
+
 
 
         }
