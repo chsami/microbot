@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.util.misc;
 
-import net.runelite.api.NPC;
+import net.runelite.api.Actor;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.TileObject;
@@ -8,6 +8,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 
 import java.awt.*;
 import java.util.Objects;
@@ -29,21 +30,28 @@ public class Rs2UiHelper {
         //check if mouse is already within the rectangle and return current position
         if (Rs2AntibanSettings.naturalMouse) {
             java.awt.Point mousePos = Microbot.getMouse().getMousePosition();
-            if (rectangle.contains(mousePos)) return new Point(mousePos.x, mousePos.y);
+            if (isMouseWithinRectangle(rectangle)) return new Point(mousePos.x, mousePos.y);
             else return Rs2Random.randomPointEx(new Point(mousePos.x, mousePos.y), rectangle, 0.5);
         } else
             return Rs2Random.randomPointEx(Microbot.getMouse().getLastClick(), rectangle, 0.5);
     }
 
-    public static Rectangle getNpcClickbox(NPC npc) {
+    //check if mouse is already within the rectangle
+    public static boolean isMouseWithinRectangle(Rectangle rectangle) {
+        java.awt.Point mousePos = Microbot.getMouse().getMousePosition();
+        return rectangle.contains(mousePos);
+    }
 
-        LocalPoint lp = npc.getLocalLocation();
+    public static Rectangle getActorClickbox(Actor actor) {
+        LocalPoint lp = actor.getLocalLocation();
         if (lp == null) {
             Microbot.log("LocalPoint is null");
             return new Rectangle(1, 1);
         }
-        Shape clickbox = Microbot.getClientThread().runOnClientThread(() -> Perspective.getClickbox(Microbot.getClient(), npc.getModel(), npc.getCurrentOrientation(), lp.getX(), lp.getY(),
-                Perspective.getTileHeight(Microbot.getClient(), lp, npc.getWorldLocation().getPlane())));
+
+
+        Shape clickbox = Microbot.getClientThread().runOnClientThread(() -> Perspective.getClickbox(Microbot.getClient(), actor.getModel(), actor.getCurrentOrientation(), lp.getX(), lp.getY(),
+                Perspective.getTileHeight(Microbot.getClient(), lp, actor.getWorldLocation().getPlane())));
 
 
         //check if any of the values are negative and return a new rectangle with positive values
@@ -70,5 +78,14 @@ public class Rs2UiHelper {
         return new Rectangle(clickbox.getBounds());
     }
 
+    // check if a menu entry is a actor
+    public static boolean hasActor(NewMenuEntry entry) {
+        return entry.getActor() != null;
+    }
+
+    // check if a menu entry is a game object
+    public static boolean isGameObject(NewMenuEntry entry) {
+        return entry.getGameObject() != null;
+    }
 
 }
