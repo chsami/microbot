@@ -136,6 +136,11 @@ public class NaturalMouse {
         }
     }
 
+    // Move to a random point on the screen
+    public void moveRandom() {
+        moveTo(random.nextInt(0, client.getCanvasWidth() + 1), random.nextInt(0, client.getCanvasHeight() + 1));
+    }
+
     private static class SpeedManagerImpl extends DefaultSpeedManager {
         private SpeedManagerImpl(Collection<Flow> flows) {
             super(flows);
