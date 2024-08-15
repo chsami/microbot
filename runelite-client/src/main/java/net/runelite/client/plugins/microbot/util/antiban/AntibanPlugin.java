@@ -179,9 +179,9 @@ public class AntibanPlugin extends Plugin {
 
         if (Rs2AntibanSettings.takeMicroBreaks && !Microbot.isPluginEnabled(BreakHandlerPlugin.class)) {
             Microbot.log("BreakHandlerPlugin is not enabled, attempting to enable it....");
-            Plugin breakHandlerPlugin = Microbot.getPluginManager().getPlugins()
-                    .stream()
-                    .filter(p -> p.getName().contains("BreakHandler"))
+            String name = BreakHandlerPlugin.class.getName();
+            Plugin breakHandlerPlugin = Microbot.getPluginManager().getPlugins().stream()
+                    .filter(x -> x.getClass().getName().equals(name))
                     .findFirst()
                     .orElse(null);
             Microbot.startPlugin(breakHandlerPlugin);
