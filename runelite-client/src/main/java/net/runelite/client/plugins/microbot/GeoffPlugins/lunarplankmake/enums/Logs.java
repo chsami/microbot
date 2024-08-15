@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.plankmake.enums;
+package net.runelite.client.plugins.microbot.GeoffPlugins.lunarplankmake.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

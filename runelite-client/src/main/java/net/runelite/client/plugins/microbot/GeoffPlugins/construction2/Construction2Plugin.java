@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.construction2;
+package net.runelite.client.plugins.microbot.GeoffPlugins.construction2;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.construction2.enums.Construction2State;
+import net.runelite.client.plugins.microbot.GeoffPlugins.construction2.enums.Construction2State;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 

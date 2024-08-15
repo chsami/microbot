@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.plankmake;
+package net.runelite.client.plugins.microbot.GeoffPlugins.lunarplankmake;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,10 +11,10 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
-public class PlankMakeOverlay extends OverlayPanel {
+public class LunarPlankMakeOverlay extends OverlayPanel {
 
     @Inject
-    PlankMakeOverlay(PlankMakePlugin plugin)
+    LunarPlankMakeOverlay(LunarPlankMakePlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.ABOVE_CHATBOX_RIGHT);
@@ -25,13 +25,13 @@ public class PlankMakeOverlay extends OverlayPanel {
     public Dimension render(Graphics2D graphics) {
         panelComponent.setPreferredSize(new Dimension(200, 300));
         panelComponent.getChildren().add(TitleComponent.builder()
-                .text("Plank Make " + PlankMakeScript.version)
+                .text("Plank Make " + LunarPlankMakeScript.version)
                 .color(Color.YELLOW)
                 .build());
 
         // Update to display the combined message
         panelComponent.getChildren().add(LineComponent.builder()
-                .left(PlankMakeScript.combinedMessage)
+                .left(LunarPlankMakeScript.combinedMessage)
                 .build());
 
         return super.render(graphics);

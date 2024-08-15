@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.plankmake;
+package net.runelite.client.plugins.microbot.GeoffPlugins.lunarplankmake;
 
 import java.awt.AWTException;
 
@@ -15,43 +15,43 @@ import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Geoff + "Plank Make",
+        name = PluginDescriptor.Geoff + "Lunar Plank Make",
         description = "Geoff's lunar plank maker",
         tags = {"magic", "moneymaking"},
         enabledByDefault = false
 )
 @Slf4j
-public class PlankMakePlugin extends Plugin {
+public class LunarPlankMakePlugin extends Plugin {
     @Inject
-    private PlankMakeConfig config;
+    private LunarPlankMakeConfig config;
 
     @Provides
-    PlankMakeConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(PlankMakeConfig.class);
+    LunarPlankMakeConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(LunarPlankMakeConfig.class);
     }
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private PlankMakeOverlay PlankMakeOverlay;
+    private LunarPlankMakeOverlay LunarPlankMakeOverlay;
 
     @Inject
-    PlankMakeScript PlankMakeScript;
+    LunarPlankMakeScript LunarPlankMakeScript;
 
     @Override
     protected void startUp() throws AWTException {
         Microbot.setMouse(new VirtualMouse());
-        log.info("Starting up PlankMakePlugin");
+        log.info("Starting up LunarPlankMakePlugin");
         if (overlayManager != null) {
-            overlayManager.add(PlankMakeOverlay);
+            overlayManager.add(LunarPlankMakeOverlay);
         }
-        PlankMakeScript.run(config);
+        LunarPlankMakeScript.run(config);
     }
 
     @Override
     protected void shutDown() {
-        log.info("Shutting down PlankMakePlugin");
-        PlankMakeScript.shutdown();
-        overlayManager.remove(PlankMakeOverlay);
+        log.info("Shutting down LunarPlankMakePlugin");
+        LunarPlankMakeScript.shutdown();
+        overlayManager.remove(LunarPlankMakeOverlay);
     }
 }

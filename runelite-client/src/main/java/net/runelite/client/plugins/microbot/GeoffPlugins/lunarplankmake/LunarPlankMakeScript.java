@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.plankmake;
+package net.runelite.client.plugins.microbot.GeoffPlugins.lunarplankmake;
 
 import java.util.concurrent.TimeUnit;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -10,7 +10,7 @@ import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import net.runelite.client.util.QuantityFormatter;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
-public class PlankMakeScript extends Script {
+public class LunarPlankMakeScript extends Script {
 
     public static String version = "1.0.1";
     public static String combinedMessage = "";
@@ -31,7 +31,7 @@ public class PlankMakeScript extends Script {
 
     private State currentState = State.PLANKING;
 
-    public boolean run(PlankMakeConfig config) {
+    public boolean run(LunarPlankMakeConfig config) {
         startTime = System.currentTimeMillis();
         int unprocessedItemPrice = Microbot.getItemManager().search(config.ITEM().getName()).get(0).getPrice();
         int processedItemPrice = Microbot.getItemManager().search(config.ITEM().getFinished()).get(0).getPrice();
@@ -57,13 +57,13 @@ public class PlankMakeScript extends Script {
                         break;
                 }
             } catch (Exception ex) {
-                Microbot.log("Exception in PlankMakeScript: " + ex.getMessage());
+                Microbot.log("Exception in LunarPlankMakeScript: " + ex.getMessage());
             }
         }, 0, 50, TimeUnit.MILLISECONDS);
         return true;
     }
 
-    private void plankItems(PlankMakeConfig config) {
+    private void plankItems(LunarPlankMakeConfig config) {
         if (Rs2Inventory.hasItem(config.ITEM().getName(), true)) {
             int initialPlankCount = Rs2Inventory.count(config.ITEM().getFinished());
             Rs2Magic.cast(MagicAction.PLANK_MAKE);
@@ -95,7 +95,7 @@ public class PlankMakeScript extends Script {
         return true;
     }
 
-    private void bank(PlankMakeConfig config) {
+    private void bank(LunarPlankMakeConfig config) {
         if (!Rs2Bank.openBank()) return;
 
         Rs2Bank.depositAll(config.ITEM().getFinished());
@@ -120,7 +120,7 @@ public class PlankMakeScript extends Script {
         currentState = State.PLANKING;
     }
 
-    private void calculateProfitAndDisplay(PlankMakeConfig config) {
+    private void calculateProfitAndDisplay(LunarPlankMakeConfig config) {
         double elapsedHours = (System.currentTimeMillis() - startTime) / 3600000.0;
         int plankPerHour = (int) (plankMade / elapsedHours);
         int totalProfit = profitPerPlank * (int) plankMade;

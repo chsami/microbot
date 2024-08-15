@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.construction2;
+package net.runelite.client.plugins.microbot.GeoffPlugins.construction2;
 
 import net.runelite.api.ItemID;
 import net.runelite.client.config.Config;

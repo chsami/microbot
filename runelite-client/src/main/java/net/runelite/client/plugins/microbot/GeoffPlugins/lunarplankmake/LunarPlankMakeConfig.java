@@ -1,13 +1,13 @@
-package net.runelite.client.plugins.microbot.plankmake;
+package net.runelite.client.plugins.microbot.GeoffPlugins.lunarplankmake;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.microbot.plankmake.enums.Logs;
+import net.runelite.client.plugins.microbot.GeoffPlugins.lunarplankmake.enums.Logs;
 
 @ConfigGroup("plankMake")
-public interface PlankMakeConfig extends Config {
+public interface LunarPlankMakeConfig extends Config {
     String GROUP = "Plank Make";
 
     @ConfigItem(
