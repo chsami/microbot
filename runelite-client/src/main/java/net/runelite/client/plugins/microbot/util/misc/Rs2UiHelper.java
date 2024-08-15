@@ -39,6 +39,8 @@ public class Rs2UiHelper {
     //check if mouse is already within the rectangle
     public static boolean isMouseWithinRectangle(Rectangle rectangle) {
         java.awt.Point mousePos = Microbot.getMouse().getMousePosition();
+        if (rectangle.getX() == 1 && rectangle.getY() == 1) return true;
+        if (rectangle.getX() == 0 && rectangle.getY() == 0) return true;
         return rectangle.contains(mousePos);
     }
 
