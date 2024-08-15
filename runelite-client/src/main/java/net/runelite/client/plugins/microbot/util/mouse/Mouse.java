@@ -1,10 +1,10 @@
 package net.runelite.client.plugins.microbot.util.mouse;
 
 import lombok.Getter;
-import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,7 +62,7 @@ public abstract class Mouse {
     public abstract Mouse click(Point point);
     public abstract Mouse click(Point point, boolean rightClick);
 
-    public abstract Mouse click(Point point, MenuEntry entry);
+    public abstract Mouse click(Point point, NewMenuEntry entry);
     public abstract Mouse click();
 
     public abstract Mouse move(Point point);

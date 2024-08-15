@@ -1,9 +1,10 @@
 package net.runelite.client.plugins.microbot.util.mouse;
 
-import net.runelite.api.MenuEntry;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 
 import javax.inject.Inject;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
+@Slf4j
 public class VirtualMouse extends Mouse {
 
     private final ScheduledExecutorService scheduledExecutorService;
@@ -68,18 +70,40 @@ public class VirtualMouse extends Mouse {
         return this;
     }
 
-    public Mouse click(Point point, boolean rightClick, MenuEntry entry) {
+    public Mouse click(Point point, boolean rightClick, NewMenuEntry entry) {
         if (point == null) return this;
-        if (Rs2AntibanSettings.naturalMouse && (point.getX() > 1 && point.getY() > 1))
+        if (Rs2AntibanSettings.naturalMouse && (point.getX() > 1 && point.getY() > 1)) {
             Microbot.naturalMouse.moveTo(point.getX(), point.getY());
+            if (Rs2UiHelper.hasActor(entry)) {
+                log.info("Actor found: " + entry.getActor().getName());
+                Rectangle rectangle = Rs2UiHelper.getActorClickbox(entry.getActor());
+                if (!Rs2UiHelper.isMouseWithinRectangle(rectangle)) {
+                    point = Rs2UiHelper.getClickingPoint(rectangle, true);
+                    Microbot.naturalMouse.moveTo(point.getX(), point.getY());
+                }
+
+            }
+            if (Rs2UiHelper.isGameObject(entry)) {
+                log.info("Game Object found: " + entry.getGameObject().toString());
+                Rectangle rectangle = Rs2UiHelper.getObjectClickbox(entry.getGameObject());
+                if (!Rs2UiHelper.isMouseWithinRectangle(rectangle)) {
+                    point = Rs2UiHelper.getClickingPoint(rectangle, true);
+                    Microbot.naturalMouse.moveTo(point.getX(), point.getY());
+                }
+            }
+
+
+        }
+
 
 
         // Target menu was set before mouse movement causing some unintended behavior
         // This will set the target menu after the mouse movement is finished
         Microbot.targetMenu = entry;
         if (Microbot.getClient().isClientThread()) {
+            Point finalPoint = point;
             scheduledExecutorService.schedule(() -> {
-                handleClick(point, rightClick);
+                handleClick(finalPoint, rightClick);
             }, 0, TimeUnit.MILLISECONDS);
         } else {
             handleClick(point, rightClick);
@@ -111,7 +135,7 @@ public class VirtualMouse extends Mouse {
     }
 
     @Override
-    public Mouse click(Point point, MenuEntry entry) {
+    public Mouse click(Point point, NewMenuEntry entry) {
         return click(point, false, entry);
     }
 
