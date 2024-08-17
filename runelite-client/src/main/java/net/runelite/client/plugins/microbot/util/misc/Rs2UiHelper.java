@@ -27,6 +27,9 @@ public class Rs2UiHelper {
     public static Point getClickingPoint(Rectangle rectangle, boolean randomize) {
         if (rectangle.getX() == 1 && rectangle.getY() == 1) return new Point(1, 1);
         if (rectangle.getX() == 0 && rectangle.getY() == 0) return new Point(1, 1);
+
+        if (!randomize) return new Point((int) rectangle.getCenterX(), (int) rectangle.getCenterY());
+
         //check if mouse is already within the rectangle and return current position
         if (Rs2AntibanSettings.naturalMouse) {
             java.awt.Point mousePos = Microbot.getMouse().getMousePosition();
@@ -58,9 +61,9 @@ public class Rs2UiHelper {
 
         //check if any of the values are negative and return a new rectangle with positive values
         assert clickbox != null;
-        if (clickbox.getBounds().getX() < 0 || clickbox.getBounds().getY() < 0 || clickbox.getBounds().getWidth() < 0 || clickbox.getBounds().getHeight() < 0) {
-            return new Rectangle((int) Math.abs(clickbox.getBounds().getX()), (int) Math.abs(clickbox.getBounds().getY()), (int) Math.abs(clickbox.getBounds().getWidth()), (int) Math.abs(clickbox.getBounds().getHeight()));
-        }
+//        if (clickbox.getBounds().getX() < 0 || clickbox.getBounds().getY() < 0 || clickbox.getBounds().getWidth() < 0 || clickbox.getBounds().getHeight() < 0) {
+//            return new Rectangle((int) Math.abs(clickbox.getBounds().getX()), (int) Math.abs(clickbox.getBounds().getY()), (int) Math.abs(clickbox.getBounds().getWidth()), (int) Math.abs(clickbox.getBounds().getHeight()));
+//        }
 
         return new Rectangle(clickbox.getBounds());
     }
@@ -73,9 +76,9 @@ public class Rs2UiHelper {
 
         //check if any of the values are negative and return a new rectangle with positive values
         assert clickbox != null;
-        if (clickbox.getBounds().getX() < 0 || clickbox.getBounds().getY() < 0 || clickbox.getBounds().getWidth() < 0 || clickbox.getBounds().getHeight() < 0) {
-            return new Rectangle((int) Math.abs(clickbox.getBounds().getX()), (int) Math.abs(clickbox.getBounds().getY()), (int) Math.abs(clickbox.getBounds().getWidth()), (int) Math.abs(clickbox.getBounds().getHeight()));
-        }
+//        if (clickbox.getBounds().getX() < 0 || clickbox.getBounds().getY() < 0 || clickbox.getBounds().getWidth() < 0 || clickbox.getBounds().getHeight() < 0) {
+//            return new Rectangle((int) Math.abs(clickbox.getBounds().getX()), (int) Math.abs(clickbox.getBounds().getY()), (int) Math.abs(clickbox.getBounds().getWidth()), (int) Math.abs(clickbox.getBounds().getHeight()));
+//        }
 
         return new Rectangle(clickbox.getBounds());
     }
