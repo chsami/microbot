@@ -22,6 +22,72 @@ import java.util.Set;
 
 import static net.runelite.api.AnimationID.*;
 
+/**
+ * The {@code Rs2Antiban} class provides a comprehensive anti-ban system that simulates human-like behavior
+ * during various in-game activities. This system includes features such as mouse fatigue, random intervals,
+ * micro-breaks, action cooldowns, and contextually aware mouse movements, all aimed at reducing the risk
+ * of detection by anti-cheat systems.
+ *
+ * <p>
+ * The class uses configurations set in {@code Rs2AntibanSettings} to determine the behavior of the bot
+ * during activities like woodcutting, mining, cooking, and more. It leverages various methods to simulate
+ * natural player behaviors, such as random mouse movements and taking breaks. It also integrates with
+ * specific activity configurations like play style, activity intensity, and categories, which are adjusted
+ * based on the activity being performed.
+ * </p>
+ *
+ * <h3>Main Features:</h3>
+ * <ul>
+ *   <li>Human-Like Behavior Simulation: Simulates actions such as moving the mouse randomly, taking micro-breaks,
+ *       and varying the intervals between actions to mimic natural gameplay.</li>
+ *   <li>Activity-Based Configurations: Allows setting activity-specific antiban configurations through
+ *       the {@code setActivity()} and {@code setActivityIntensity()} methods, ensuring that the antiban
+ *       behavior is appropriate for the current task.</li>
+ *   <li>Mouse Fatigue Simulation: Integrates with a mouse fatigue system to simulate the effects of fatigue
+ *       on mouse movement over time.</li>
+ *   <li>Overlay Rendering: Provides methods to render an overlay that displays current antiban status,
+ *       including activity, play style, and action cooldown progress.</li>
+ *   <li>Micro-Breaks and Cooldowns: Supports taking breaks based on a random chance or specific intervals
+ *       to simulate a player taking short pauses during gameplay.</li>
+ * </ul>
+ *
+ * <h3>Usage:</h3>
+ * <p>
+ * The methods provided in this class are designed to be called during in-game activities to ensure the antiban
+ * system is engaged and functioning according to the activity being performed. The configurations can be customized
+ * through {@code Rs2AntibanSettings} to adjust behaviors such as action cooldowns, break chances, and mouse movements.
+ * </p>
+ *
+ * <h3>Example:</h3>
+ * <pre>
+ * // Setting the antiban activity to woodcutting
+ * Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
+ *
+ * // Triggering an action cooldown based on current settings
+ * Rs2Antiban.actionCooldown();
+ *
+ * // Rendering the antiban overlay in a panel
+ * Rs2Antiban.renderAntibanOverlayComponents(panelComponent);
+ * </pre>
+ *
+ * <h3>Available Methods:</h3>
+ * <ul>
+ *   <li><code>setActivity(Activity activity)</code>: Sets the current activity and adjusts antiban settings based on the activity type.</li>
+ *   <li><code>setActivityIntensity(ActivityIntensity intensity)</code>: Sets the intensity level of the current activity.</li>
+ *   <li><code>actionCooldown()</code>: Triggers an action cooldown, potentially adjusting play style and performing random mouse movements.</li>
+ *   <li><code>takeMicroBreakByChance()</code>: Attempts to trigger a micro-break based on a random chance.</li>
+ *   <li><code>isWoodcutting()</code>: Checks if the player is currently performing a woodcutting animation.</li>
+ *   <li><code>isMining()</code>: Checks if the player is currently performing a mining animation.</li>
+ *   <li><code>isIdle()</code>: Checks if the player is currently idle (not performing any animation).</li>
+ *   <li><code>renderAntibanOverlayComponents(PanelComponent panelComponent)</code>: Renders an overlay showing the current antiban status and action cooldown progress.</li>
+ *   <li><code>moveMouseOffScreen()</code>: Moves the mouse off-screen to simulate taking a break.</li>
+ *   <li><code>moveMouseRandomly()</code>: Moves the mouse randomly to simulate natural behavior during gameplay.</li>
+ *   <li><code>activateAntiban()</code>: Activates the antiban system.</li>
+ *   <li><code>deactivateAntiban()</code>: Deactivates the antiban system.</li>
+ *   <li><code>resetAntibanSettings()</code>: Resets all antiban settings to their default values.</li>
+ * </ul>
+ */
+
 @Getter
 @Setter
 public class Rs2Antiban {
@@ -125,21 +191,80 @@ public class Rs2Antiban {
                 || message.startsWith("You accidentally spoil");
     }
 
+    /**
+     * Checks if the player is currently performing a woodcutting animation.
+     *
+     * @return true if the player is performing a woodcutting animation, false otherwise.
+     */
     public static boolean isWoodcutting() {
         return WOODCUTTING_ANIMS.contains(Rs2Player.getAnimation());
     }
 
+    /**
+     * Checks if the player is currently performing a mining animation.
+     *
+     * @return true if the player is performing a mining animation, false otherwise.
+     */
     public static boolean isMining() {
         return MINING_ANIMATION_IDS.contains(Rs2Player.getAnimation());
     }
 
+    /**
+     * Checks if the player is currently idle.
+     *
+     * @return true if the player is idle, false otherwise.
+     */
     public static boolean isIdle() {
         return AntibanPlugin.isIdle();
     }
 
+    /**
+     * <h2>Handles the Execution of an Action Cooldown Based on Anti-Ban Behaviors</h2>
+     * <p>
+     * This method controls the flow for activating the cooldown either with certainty or based on a chance.
+     * It includes logic to adjust behaviors such as non-linear intervals, behavioral variability, and random mouse movements
+     * to simulate more human-like actions.
+     * </p>
+     *<p>
+     * Execute this method at any point in your script where you want to trigger an action cooldown.
+     *</p>
+     * <p>
+     * The cooldown can be triggered directly if <code>actionCooldownChance</code> is 1.00 (100%),
+     * or by chance if <code>actionCooldownChance</code> is less than 1.00 (100%). Several features like universal antiban,
+     * non-linear intervals, and play style evolution are configurable through <code>Rs2AntibanSettings</code>.
+     * </p>
+     *
+     * <h3>Primary Actions Handled:</h3>
+     * <ul>
+     *   <li>Pausing all scripts if the universal antiban is enabled.</li>
+     *   <li>Evolving play style if non-linear intervals are enabled.</li>
+     *   <li>Setting a timeout based on behavioral variability settings.</li>
+     *   <li>Optionally moving the mouse randomly or off-screen based on respective settings.</li>
+     * </ul>
+     *
+     * <h3>Preconditions:</h3>
+     * <ul>
+     *   <li>If <code>Rs2AntibanSettings.usePlayStyle</code> is disabled, the cooldown will not be performed.</li>
+     * </ul>
+     *
+     * <h3>Main Flow:</h3>
+     * <ul>
+     *   <li>If <code>actionCooldownChance</code> &lt; 1.00 (100%), the cooldown is triggered based on the result of a random dice roll.</li>
+     *   <li>If <code>actionCooldownChance</code> is 1.00 (100%) or greater, the cooldown is triggered unconditionally.</li>
+     * </ul>
+     *
+     * <h3>Helper Methods:</h3>
+     * <p>
+     * <code>performActionCooldown()</code> encapsulates the shared logic for performing the cooldown,
+     * adjusting the play style, and invoking other anti-ban actions like moving the mouse randomly or off-screen.
+     * </p>
+     */
+
     public static void actionCooldown() {
-        if (Rs2AntibanSettings.actionCooldownChance < 1.00) {
-            actionCooldownByChance();
+        if (Rs2AntibanSettings.actionCooldownChance <= 0.99) {
+            if (Rs2Random.dice(Rs2AntibanSettings.actionCooldownChance)) {
+                performActionCooldown();
+            }
             return;
         }
 
@@ -148,50 +273,62 @@ public class Rs2Antiban {
             return;
         }
 
+        performActionCooldown();
+    }
+
+    private static void performActionCooldown() {
         if (Rs2AntibanSettings.universalAntiban)
             Microbot.pauseAllScripts = true;
+
         if (Rs2AntibanSettings.nonLinearIntervals)
             playStyle.evolvePlayStyle();
+
         if (Rs2AntibanSettings.behavioralVariability)
             TIMEOUT = playStyle.getRandomTickInterval();
         else
             TIMEOUT = playStyle.getPrimaryTickInterval();
+
         Rs2AntibanSettings.actionCooldownActive = true;
-        if (Rs2AntibanSettings.moveMouseRandomly)
-            if (Rs2Random.dice(Rs2AntibanSettings.moveMouseRandomlyChance))
-                moveMouseRandomly();
+
+        if (Rs2AntibanSettings.moveMouseRandomly && Rs2Random.dice(Rs2AntibanSettings.moveMouseRandomlyChance)) {
+            Rs2Random.wait(100, 200);
+            moveMouseRandomly();
+        }
+
         if (Rs2AntibanSettings.moveMouseOffScreen)
             moveMouseOffScreen();
     }
 
-    // method to activate the action cooldown by chance
-    public static void actionCooldownByChance() {
-        if (!Rs2AntibanSettings.usePlayStyle) {
-            Microbot.log("PlayStyle not enabled, cannot perform action cooldown");
-            return;
-        }
 
+    /**
+     * Attempts to trigger a micro-break based on a random chance, as configured in Rs2AntibanSettings.
+     *
+     * <p>
+     * This method simulates human-like pauses in the bot's behavior by invoking a micro-break if a randomly generated
+     * value is less than the configured <code>microBreakChance</code>. When triggered, the break duration is determined
+     * randomly within a specified range and the mouse may be optionally moved off-screen.
+     * </p>
+     *
+     * <h3>Behavior:</h3>
+     * <ul>
+     *   <li>If a random value is less than <code>Rs2AntibanSettings.microBreakChance</code>, the micro-break is activated.</li>
+     *   <li>The break duration is randomly set between <code>Rs2AntibanSettings.microBreakDurationLow</code> and
+     *   <code>Rs2AntibanSettings.microBreakDurationHigh</code>, in seconds.</li>
+     *   <li>If <code>Rs2AntibanSettings.moveMouseOffScreen</code> is enabled, the mouse is moved off-screen during the break.</li>
+     * </ul>
+     *
+     * <h3>Preconditions:</h3>
+     * <ul>
+     *   <li>The configuration in <code>Rs2AntibanSettings</code> must define valid break chance and duration values.</li>
+     * </ul>
+     *
+     * <h3>Postconditions:</h3>
+     * <ul>
+     *   <li><code>Rs2AntibanSettings.microBreakActive</code> is set to <code>true</code> if the break is triggered.</li>
+     *   <li><code>BreakHandlerScript.breakDuration</code> is set to a randomly determined value in seconds.</li>
+     * </ul>
+     */
 
-        if (Math.random() < Rs2AntibanSettings.actionCooldownChance) {
-
-            if (Rs2AntibanSettings.nonLinearIntervals)
-                playStyle.evolvePlayStyle();
-            if (Rs2AntibanSettings.behavioralVariability)
-                TIMEOUT = playStyle.getRandomTickInterval();
-            else
-                TIMEOUT = playStyle.getPrimaryTickInterval();
-            Rs2AntibanSettings.actionCooldownActive = true;
-            if (Rs2AntibanSettings.moveMouseRandomly)
-                if (Rs2Random.dice(Rs2AntibanSettings.moveMouseRandomlyChance))
-                    moveMouseRandomly();
-            if (Rs2AntibanSettings.moveMouseOffScreen)
-                moveMouseOffScreen();
-
-        }
-
-    }
-
-    // method to take a micro break by chance
     public static void takeMicroBreakByChance() {
         if (Math.random() < Rs2AntibanSettings.microBreakChance) {
             Rs2AntibanSettings.microBreakActive = true;
@@ -202,6 +339,95 @@ public class Rs2Antiban {
         }
     }
 
+
+    /**
+     * Renders an overlay component that displays various anti-ban settings and information within a panel.
+     *
+     * <p>
+     * This method populates a <code>PanelComponent</code> with details regarding the current anti-ban system's state,
+     * activity levels, play styles, and other related information. It is intended for use in providing a visual representation
+     * of the anti-ban system's status during runtime, with debug information shown when enabled.
+     * </p>
+     *
+     * <h3>Overlay Components:</h3>
+     * <ul>
+     *   <li>A title component labeled "🦆 Humanizer 🦆" with orange coloring.</li>
+     *   <li>Details about the current activity, including method name, category, and intensity.</li>
+     *   <li>If <code>Rs2AntibanSettings.devDebug</code> is enabled, several debug lines will show key anti-ban settings,
+     *       such as action cooldown, random intervals, and behavioral variability.</li>
+     *   <li>If a play style is active, the panel displays the current play style name and the time remaining until the next switch
+     *       if attention span simulation is enabled.</li>
+     *   <li>A progress bar representing the current action cooldown based on a tick interval, providing a visual cue for
+     *       the remaining time.</li>
+     *   <li>Status updates on whether the bot is busy or idle, indicating potential upcoming breaks.</li>
+     * </ul>
+     *
+     * <h3>Behavior:</h3>
+     * <ul>
+     *   <li>The method dynamically updates the panel with current information based on settings in <code>Rs2AntibanSettings</code>
+     *       and <code>playStyle</code>.</li>
+     *   <li>If debug mode is enabled, additional lines provide detailed state information, such as whether action cooldown,
+     *       fatigue simulation, and natural mouse movements are active.</li>
+     *   <li>The progress bar visually indicates the current state of the action cooldown timer.</li>
+     * </ul>
+     *
+     * <h3>Preconditions:</h3>
+     * <ul>
+     *   <li><code>playStyle</code> and <code>Rs2AntibanSettings</code> must be properly initialized.</li>
+     *   <li>The <code>panelComponent</code> must be passed as a valid and non-null component to receive overlay data.</li>
+     * </ul>
+     *
+     * <h3>Where to Use:</h3>
+     * <p>
+     * This method should be used within overlay rendering methods, typically in custom overlay classes that extend
+     * <code>OverlayPanel</code>. For example, in the <code>MotherloadMineOverlay</code> class, this method is used to
+     * display anti-ban information in the mining overlay. It is invoked within the <code>render(Graphics2D graphics)</code>
+     * method to ensure that the anti-ban status is updated every time the overlay is drawn.
+     * </p>
+     *
+     * <p>
+     * To integrate this method into a custom overlay:
+     * </p>
+     * <ol>
+     *   <li>Ensure that your overlay class extends <code>OverlayPanel</code> or a similar class that supports adding components.</li>
+     *   <li>Invoke <code>Rs2Antiban.renderAntibanOverlayComponents(panelComponent);</code> within the overlay's
+     *       <code>render</code> method, before or after other components are added, depending on the desired layout.</li>
+     *   <li>Ensure that the appropriate <code>Rs2AntibanSettings</code> are configured before invoking the method.</li>
+     * </ol>
+     *
+     * <h3>Example Usage:</h3>
+     * <pre>
+     * {@code
+     * @Override
+     * public Dimension render(Graphics2D graphics) {
+     *     try {
+     *         panelComponent.setPreferredSize(new Dimension(275, 900));
+     *         panelComponent.getChildren().add(TitleComponent.builder()
+     *                 .text("\uD83E\uDD86 Motherlode Mine \uD83E\uDD86")
+     *                 .color(Color.ORANGE)
+     *                 .build());
+     *
+     *         Rs2Antiban.renderAntibanOverlayComponents(panelComponent);
+     *         addEmptyLine();
+     *
+     *         panelComponent.getChildren().add(LineComponent.builder()
+     *                 .left("Mining Location: " + MotherloadMineScript.miningSpot.name())
+     *                 .build());
+     *
+     *         addEmptyLine();
+     *
+     *         panelComponent.getChildren().add(LineComponent.builder()
+     *                 .left(status.toString())
+     *                 .right("Version: " + MotherloadMineScript.version)
+     *                 .build());
+     *     } catch (Exception ex) {
+     *         System.out.println(ex.getMessage());
+     *     }
+     *     return super.render(graphics);
+     * }
+     * }
+     * </pre>
+     */
 
     public static void renderAntibanOverlayComponents(PanelComponent panelComponent) {
         final ProgressBarComponent progressBarComponent = new ProgressBarComponent();
@@ -264,6 +490,11 @@ public class Rs2Antiban {
         Microbot.naturalMouse.moveOffScreen();
     }
 
+    /**
+     * <h1>Move Mouse Randomly</h1>
+     * This method moves the mouse randomly based on the given chance in settings.
+     * This is used to simulate a user moving the mouse randomly to take a break.
+     */
     public static void moveMouseRandomly() {
         Microbot.naturalMouse.moveRandom();
     }
@@ -277,34 +508,8 @@ public class Rs2Antiban {
     }
 
     // reset all the variables
-    public static void resetAntiban() {
-        Rs2AntibanSettings.antibanEnabled = false;
-        Rs2AntibanSettings.microBreakActive = false;
-        Rs2AntibanSettings.actionCooldownActive = false;
-        Rs2AntibanSettings.usePlayStyle = false;
-        Rs2AntibanSettings.randomIntervals = false;
-        Rs2AntibanSettings.simulateFatigue = false;
-        Rs2AntibanSettings.simulateAttentionSpan = false;
-        Rs2AntibanSettings.behavioralVariability = false;
-        Rs2AntibanSettings.nonLinearIntervals = false;
-        Rs2AntibanSettings.profileSwitching = false;
-        Rs2AntibanSettings.timeOfDayAdjust = false;
-        Rs2AntibanSettings.simulateMistakes = false;
-        Rs2AntibanSettings.naturalMouse = false;
-        Rs2AntibanSettings.contextualVariability = false;
-        Rs2AntibanSettings.dynamicIntensity = true;
-        Rs2AntibanSettings.dynamicActivity = true;
-        Rs2AntibanSettings.devDebug = true;
-        TIMEOUT = 0;
-        activity = null;
-        activityIntensity = null;
-        category = null;
-        playStyle = null;
-        Rs2AntibanSettings.takeMicroBreaks = false;
-        Rs2AntibanSettings.actionCooldownChance = 0.1;
-        Rs2AntibanSettings.microBreakChance = 0.1;
-        Rs2AntibanSettings.microBreakDurationLow = 3;
-        Rs2AntibanSettings.microBreakDurationHigh = 15;
+    public static void resetAntibanSettings() {
+        Rs2AntibanSettings.reset();
     }
 
 }

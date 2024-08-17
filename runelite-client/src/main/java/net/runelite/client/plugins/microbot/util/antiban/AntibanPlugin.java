@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.util.antiban;
 
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.AnimationID;
 import net.runelite.api.GameState;
 import net.runelite.api.Skill;
@@ -33,6 +32,44 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * The AntibanPlugin is responsible for managing anti-ban behaviors during bot operation.
+ *
+ * <p>
+ * This plugin ensures that the bot behaves in a more human-like manner to avoid detection by using various
+ * anti-ban strategies. These strategies include simulating breaks, adjusting activity levels, and mimicking
+ * attention span variations. The plugin tracks user activity and game state to dynamically adjust bot behavior.
+ * </p>
+ *
+ * <h3>Main Features:</h3>
+ * <ul>
+ *   <li>Simulates action cooldowns and micro-breaks based on the bot's current activities.</li>
+ *   <li>Dynamically adjusts activity intensity and behavior depending on the bot's in-game actions, such as mining or cooking.</li>
+ *   <li>Tracks user skill changes and updates the anti-ban settings accordingly.</li>
+ *   <li>Supports attention span simulation, profile switching, and periodic breaks to ensure realistic play styles.</li>
+ *   <li>Automatically enables the BreakHandlerPlugin when needed for managing breaks.</li>
+ * </ul>
+ *
+ * <h3>Usage:</h3>
+ * <p>
+ * The <code>AntibanPlugin</code> works silently in the background to adjust the bot's behavior during runtime.
+ * Users do not need to manually interact with this plugin, as it is automatically integrated into the bot framework.
+ * </p>
+ *
+ * <p>
+ * The plugin monitors in-game actions, such as cooking, mining, and skill changes, to adjust its anti-ban strategy
+ * accordingly. It also manages the simulation of breaks, cooldowns, and play style variations to mimic human behavior
+ * and avoid detection.
+ * </p>
+ *
+ * <h3>Additional Details:</h3>
+ * <ul>
+ *   <li>Automatic tracking of idle time to determine if the bot should take a break.</li>
+ *   <li>Real-time updates to anti-ban settings based on player activities and game state changes.</li>
+ *   <li>Hidden from the user interface to avoid unnecessary distractions, while always being active in the background.</li>
+ * </ul>
+ */
+
 @PluginDescriptor(
         name = PluginDescriptor.See1Duck + "Antiban",
         description = "Antiban for microbot",
@@ -40,7 +77,8 @@ import java.util.TimerTask;
         alwaysOn = true,
         hidden = true
 )
-@Slf4j
+
+
 public class AntibanPlugin extends Plugin {
 
     private static final int COOK_TIMEOUT = 3;
@@ -76,7 +114,7 @@ public class AntibanPlugin extends Plugin {
         return idleTicks > IDLE_TIMEOUT;
     }
 
-    public static void updateIdleTicks() {
+    private static void updateIdleTicks() {
         idleTicks++;
     }
 
@@ -139,7 +177,7 @@ public class AntibanPlugin extends Plugin {
 
     @Subscribe
     public void onProfileChanged(ProfileChanged event) {
-        Rs2Antiban.resetAntiban();
+        Rs2Antiban.resetAntibanSettings();
     }
 
     @Subscribe
@@ -244,29 +282,5 @@ public class AntibanPlugin extends Plugin {
             Rs2Antiban.setActivityIntensity(activityIntensity);
             Microbot.log("Activity changed, new activity intensity: " + activityIntensity);
         }
-    }
-
-    private void applyContextualVariabilitySetup() {
-        Rs2AntibanSettings.antibanEnabled = true;
-        Rs2AntibanSettings.usePlayStyle = true;
-        Rs2AntibanSettings.randomIntervals = false;
-        Rs2AntibanSettings.simulateFatigue = true;
-        Rs2AntibanSettings.simulateAttentionSpan = true;
-        Rs2AntibanSettings.behavioralVariability = true;
-        Rs2AntibanSettings.nonLinearIntervals = true;
-        Rs2AntibanSettings.profileSwitching = true;
-        Rs2AntibanSettings.timeOfDayAdjust = false;
-        Rs2AntibanSettings.simulateMistakes = true;
-        Rs2AntibanSettings.naturalMouse = true;
-        Rs2AntibanSettings.contextualVariability = true;
-        Rs2AntibanSettings.dynamicIntensity = true;
-        Rs2AntibanSettings.dynamicActivity = true;
-        Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
-        Rs2AntibanSettings.playSchedule = true;
-        Rs2AntibanSettings.microBreakDurationLow = 3;
-        Rs2AntibanSettings.microBreakDurationHigh = 8;
-        Rs2AntibanSettings.actionCooldownChance = 0.05;
-        Rs2AntibanSettings.microBreakChance = 0.05;
     }
 }

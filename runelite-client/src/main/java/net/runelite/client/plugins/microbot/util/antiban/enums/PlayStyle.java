@@ -10,6 +10,52 @@ import java.time.Instant;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * The PlayStyle enum represents different behavioral profiles for bot activity,
+ * each simulating varying levels of human-like behavior by adjusting the frequency
+ * and intensity of actions over time.
+ *
+ * <p>
+ * Each play style has its own characteristics, such as how aggressive or passive the bot's actions are,
+ * the length of breaks between actions, and the overall attention span. The enum offers profiles ranging
+ * from highly aggressive behavior with minimal breaks to passive styles with long pauses between actions.
+ * It is used to simulate different user behavior patterns and make the bot's actions less predictable.
+ * </p>
+ *
+ * <h3>Main Features:</h3>
+ * <ul>
+ *   <li>Profiles: Ranges from "Extreme Aggressive" to "Passive," with varying tick intervals and breaks.</li>
+ *   <li>Dynamic Evolution: Play styles can evolve over time, adjusting action intervals using sine wave patterns
+ *   to simulate natural human variability.</li>
+ *   <li>Attention Span: Each play style includes a simulated attention span, after which the profile may switch
+ *   to another one to mimic shifts in focus or behavior.</li>
+ *   <li>Profile Switching: Play styles can switch up or down based on probability, simulating refocusing and
+ *   different user habits.</li>
+ *   <li>Randomization: Random play style generation for unpredictable behavior and more realistic automation.</li>
+ * </ul>
+ *
+ * <h3>Usage:</h3>
+ * <p>
+ * The <code>PlayStyle</code> enum is primarily used to control how the bot behaves in different situations,
+ * allowing it to alternate between aggressive, moderate, or cautious behaviors dynamically. This helps the bot
+ * to avoid detection by simulating varied human actions over time.
+ * </p>
+ *
+ * <h3>Example:</h3>
+ * <pre>
+ * PlayStyle currentStyle = PlayStyle.AGGRESSIVE;
+ * Rs2Antiban.playStyle = currentStyle; // Set the current play style
+ * Rs2Antiban.playStyle.evolvePlayStyle(); // Dynamically evolve the play style (evolve is called each time Rs2Antiban.actionCooldown() is triggered)
+ * </pre>
+ *
+ * <h3>Attention Span Simulation:</h3>
+ * <p>
+ * Each play style tracks an attention span, representing the time the bot will continue with the current profile
+ * before switching to a new one. This ensures that the bot does not remain in a single behavior pattern for too long,
+ * helping it to mimic real human behavior.
+ * </p>
+ */
+
 @Slf4j
 public enum PlayStyle {
     EXTREME_AGGRESSIVE("Extreme Aggressive", 1, 3, 2, 0.00), // Almost no break between inputs

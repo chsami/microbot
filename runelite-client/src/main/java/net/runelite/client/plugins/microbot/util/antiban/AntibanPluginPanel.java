@@ -7,6 +7,35 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
+/**
+ * The AntibanPluginPanel is a user interface panel for configuring anti-ban settings.
+ *
+ * <p>
+ * This panel allows users to adjust settings related to the anti-ban system, such as enabling micro-breaks,
+ * adjusting action cooldown probabilities, and configuring behavioral simulations like fatigue or attention span.
+ * The panel is divided into different categories, each focusing on specific aspects of anti-ban behavior,
+ * including activity settings, mouse behavior, and cooldown management.
+ * </p>
+ *
+ * <p>
+ * Users can interact with various checkboxes and sliders to tailor the bot's anti-ban features to their preferences,
+ * making it behave more like a human player during automated tasks.
+ * </p>
+ *
+ * <h3>Main Features:</h3>
+ * <ul>
+ *   <li>Enable or disable anti-ban features like action cooldowns and micro-breaks.</li>
+ *   <li>Customize the bot's behavior with random intervals, dynamic activity, and simulated fatigue.</li>
+ *   <li>Adjust the duration and probability of micro-breaks and action cooldowns.</li>
+ *   <li>Fine-tune mouse behavior, including natural movements and random actions.</li>
+ *   <li>View real-time information about the current play style, activity, and bot status.</li>
+ * </ul>
+ *
+ * <p>
+ * This panel is automatically integrated into the bot's user interface and does not require manual initialization by the user.
+ * </p>
+ */
+
 public class AntibanPluginPanel extends PluginPanel {
     private final JCheckBox isActionCooldownActive = new JCheckBox("Action Cooldown Active");
     private final JCheckBox isMicroBreakActive = new JCheckBox("Micro Break Active");

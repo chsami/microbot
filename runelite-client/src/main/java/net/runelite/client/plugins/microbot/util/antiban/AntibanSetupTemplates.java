@@ -3,11 +3,65 @@ package net.runelite.client.plugins.microbot.util.antiban;
 import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 
 /**
- * The {@code AntibanSetupTemplates} class provides a set of methods to apply specific antiban
- * configurations tailored to different activities within the game. These configurations adjust various
- * settings such as mouse movement, random intervals, and fatigue simulation to mimic human behavior and
- * reduce the likelihood of detection by anti-cheat systems.
+ * The {@code AntibanSetupTemplates} class provides predefined antiban setup configurations tailored to specific
+ * in-game activities. These configurations are designed to mimic human-like behaviors such as fatigue simulation,
+ * attention span, and behavioral variability, with the goal of reducing detection risks by anti-cheat systems.
+ *
+ * <p>
+ * Each method in this class corresponds to a specific activity (e.g., combat, runecrafting, construction) and
+ * adjusts various settings to create a more realistic and undetectable experience for the bot.
+ * These setups adjust mouse movement patterns, simulate breaks, introduce variability, and more.
+ * </p>
+ *
+ * <h3>Main Features:</h3>
+ * <ul>
+ *   <li>Activity-Specific Setups: Methods are provided to apply antiban configurations for a wide range of activities,
+ *       including skilling, combat, and more specialized tasks like runecrafting and herblore.</li>
+ *   <li>Human-Like Behavior Simulation: The setups simulate human-like behaviors to avoid detection, including fatigue,
+ *       attention span, micro breaks, mouse movement patterns, and random intervals.</li>
+ *   <li>Flexible Configurations: Each setup method customizes settings such as action cooldowns, behavioral variability,
+ *       and micro breaks to tailor the antiban behavior to the specific activity.</li>
+ *   <li>Basic Setup: A general setup method is included for cases where simpler antiban measures are needed without
+ *       advanced features like attention span or micro breaks.</li>
+ * </ul>
+ *
+ * <h3>Usage:</h3>
+ * <p>
+ * These methods are intended to be called before executing specific game activities to ensure that the antiban measures
+ * are properly configured for the task. The configurations can be adjusted to suit different activities or playstyles
+ * by enabling or disabling certain features like profile switching or dynamic intensity.
+ * </p>
+ *
+ * <h3>Example:</h3>
+ * <p>Inside your plugin script class, execute the initialization outside the main loop.</p>
+ * <pre>
+ * private void initialize() {
+ *         Rs2Antiban.antibanSetupTemplates.applyMiningSetup();
+ *     }
+ * </pre>
+ *
+ * <h3>Available Setup Methods:</h3>
+ * <ul>
+ *   <li><code>applyCombatSetup()</code>: Configures antiban settings for combat activities.</li>
+ *   <li><code>applyRunecraftingSetup()</code>: Configures antiban settings for runecrafting activities.</li>
+ *   <li><code>applyConstructionSetup()</code>: Configures antiban settings for construction activities.</li>
+ *   <li><code>applyAgilitySetup()</code>: Configures antiban settings for agility tasks.</li>
+ *   <li><code>applyHerbloreSetup()</code>: Configures antiban settings for herblore tasks.</li>
+ *   <li><code>applyThievingSetup()</code>: Configures antiban settings for thieving tasks.</li>
+ *   <li><code>applyCraftingSetup()</code>: Configures antiban settings for crafting tasks.</li>
+ *   <li><code>applyFletchingSetup()</code>: Configures antiban settings for fletching tasks.</li>
+ *   <li><code>applyHunterSetup()</code>: Configures antiban settings for hunter tasks.</li>
+ *   <li><code>applyMiningSetup()</code>: Configures antiban settings for mining tasks.</li>
+ *   <li><code>applySmithingSetup()</code>: Configures antiban settings for smithing tasks.</li>
+ *   <li><code>applyFishingSetup()</code>: Configures antiban settings for fishing tasks.</li>
+ *   <li><code>applyCookingSetup()</code>: Configures antiban settings for cooking tasks.</li>
+ *   <li><code>applyFiremakingSetup()</code>: Configures antiban settings for firemaking tasks.</li>
+ *   <li><code>applyWoodcuttingSetup()</code>: Configures antiban settings for woodcutting tasks.</li>
+ *   <li><code>applyFarmingSetup()</code>: Configures antiban settings for farming tasks.</li>
+ *   <li><code>applyGeneralBasicSetup()</code>: Applies a basic antiban configuration without advanced features.</li>
+ * </ul>
  */
+
 public class AntibanSetupTemplates {
     /**
      * Applies the antiban setup tailored for general combat activities.

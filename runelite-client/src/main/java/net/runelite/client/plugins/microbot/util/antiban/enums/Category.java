@@ -8,6 +8,59 @@ import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
+/**
+ * The Category enum represents different categories of player activities, such as combat, skilling, and processing.
+ *
+ * <p>
+ * Each category is associated with a specific type of activity and contains logic to determine whether the player is "busy"
+ * based on the current game state. This is used to control bot behavior and ensure it adapts to the player's activity,
+ * pausing or adjusting actions when the player is engaged in a task.
+ * </p>
+ *
+ * <h3>Main Features:</h3>
+ * <ul>
+ *   <li>Categories for Various Activities: Includes categories such as combat, skilling (e.g., fishing, cooking, magic),
+ *   processing, and collecting, each with its own logic to determine if the player is busy.</li>
+ *   <li>Custom Busy Logic: Each category overrides the <code>isBusy()</code> method, providing custom logic
+ *   for determining if the player is engaged in the respective activity.</li>
+ *   <li>Bot Activity Control: The bot uses these categories to manage when it should take action or pause, based
+ *   on whether the player is currently busy performing an activity.</li>
+ * </ul>
+ *
+ * <h3>Usage:</h3>
+ * <p>
+ * The <code>Category</code> enum is used within the bot's logic to monitor the player's activities and determine
+ * if the bot should continue executing actions or wait for the player to finish their current task. Each category
+ * provides specific logic to handle different types of activities such as combat, skilling, and crafting.
+ * This class is used by the anti-ban system to make sure the action cooldown is not counting down while the player is busy.
+ * </p>
+ *
+ * <h3>Example:</h3>
+ * <pre>
+ * Category currentCategory = Category.SKILLING_COOKING;
+ * if (currentCategory.isBusy()) {
+ *     // The player is busy cooking, so the bot may pause actions.
+ * } else {
+ *     // The player is idle, and the bot can continue with the next task.
+ * }
+ * </pre>
+ *
+ * <h3>Customization:</h3>
+ * <p>
+ * Each category overrides the <code>isBusy()</code> method to implement custom logic for checking if the player is engaged
+ * in a specific task. For example, the <code>COMBAT_MID</code> category checks if the player is in combat, while the
+ * <code>SKILLING_COOKING</code> category checks if the player is currently cooking. Some categories are not fully implemented
+ * and include TODO notes for further customization based on game-specific conditions.
+ * </p>
+ *
+ * <h3>Development Notes:</h3>
+ * <p>
+ * Several categories contain TODO notes indicating that additional logic may be required to accurately determine if the player is busy.
+ * These categories currently rely on simple checks, such as whether the player is animating or if the inventory is full,
+ * but may need further refinement based on specific interactions or game mechanics.
+ * </p>
+ */
+
 public enum Category {
     COMBAT_MID("Combat/Mid") {
         @Override
@@ -90,7 +143,7 @@ public enum Category {
     SKILLING_THIEVING("Skilling/Thieving") {
         @Override
         public boolean isBusy() {
-            return !Rs2Player.isAnimating() || Rs2Inventory.isFull();
+            return !Rs2Player.isAnimating();
         }
     },
     SKILLING("Skilling") {

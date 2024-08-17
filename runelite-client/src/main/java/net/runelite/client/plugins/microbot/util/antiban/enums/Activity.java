@@ -3,6 +3,58 @@ package net.runelite.client.plugins.microbot.util.antiban.enums;
 import lombok.Getter;
 import net.runelite.api.Skill;
 
+/**
+ * The Activity enum represents various activities that the player can perform in the game, each associated with a specific
+ * category and intensity level.
+ *
+ * <p>
+ * Activities range from general skilling and combat tasks to specific high-intensity boss fights or complex tasks. Each activity
+ * is linked to a <code>Category</code> that defines the type of activity (e.g., skilling, combat), and an <code>ActivityIntensity</code>
+ * that controls how aggressive or passive the bot's behavior should be during that activity.
+ * </p>
+ *
+ * <h3>Main Features:</h3>
+ * <ul>
+ *   <li>Wide Range of Activities: Covers general skilling activities such as mining, cooking, and woodcutting,
+ *   as well as high-intensity tasks like boss fights and combat encounters.</li>
+ *   <li>Category Association: Each activity is linked to a <code>Category</code> that helps the bot identify the
+ *   type of activity and how to handle it.</li>
+ *   <li>Intensity Levels: Activities have different intensity levels based on their complexity and demands, which are
+ *   represented by <code>ActivityIntensity</code>. For example, combat activities tend to have higher intensity, while
+ *   skilling tasks may be more moderate or low intensity.</li>
+ *   <li>Skill Mapping: The enum provides a method to map game skills to the appropriate general activity,
+ *   ensuring that the bot behaves correctly when training a particular skill.</li>
+ * </ul>
+ *
+ * <h3>Usage:</h3>
+ * <p>
+ * The <code>Activity</code> enum is used to control bot behavior based on the type of activity the player is performing.
+ * Each activity informs the bot of the type of task being executed, its intensity, and the corresponding category to ensure
+ * appropriate behavior, such as taking breaks or adjusting actions dynamically.
+ * </p>
+ *
+ * <h3>Example:</h3>
+ * <pre>
+ * Rs2Antiban.setActivity(Activity activity);
+ * Rs2Antiban.getCategory();
+ * Rs2Antiban.setActivityIntensity(ActivityIntensity activityIntensity);
+ * </pre>
+ *
+ * <h3>Skill-Based Activity Mapping:</h3>
+ * <p>
+ * The <code>fromSkill(Skill skill)</code> method maps in-game skills (e.g., Mining, Fishing, Combat) to general activities,
+ * allowing the bot to adjust its behavior based on the skill currently being trained. This ensures that the bot
+ * behaves consistently for all general activities related to a specific skill.
+ * </p>
+ *
+ * <h3>Activity Categories and Intensities:</h3>
+ * <p>
+ * Each activity belongs to a <code>Category</code> that defines the overall type of the activity (e.g., skilling, combat,
+ * collecting), and each is assigned an <code>ActivityIntensity</code> level, which determines the speed and aggression of
+ * the bot's actions during that activity.
+ * </p>
+ */
+
 public enum Activity {
     GENERAL_MINING("General Mining", Category.SKILLING_MINING, ActivityIntensity.LOW),
     GENERAL_SMITHING("General Smithing", Category.SKILLING_SMITHING, ActivityIntensity.LOW),
