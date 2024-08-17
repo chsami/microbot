@@ -242,7 +242,7 @@ public class AntibanPlugin extends Plugin {
 
     @Subscribe
     public void onStatChanged(StatChanged statChanged) {
-        if (!Rs2AntibanSettings.antibanEnabled) {
+        if (!Rs2AntibanSettings.antibanEnabled && !Rs2AntibanSettings.universalAntiban) {
             return;
         }
 
