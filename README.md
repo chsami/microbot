@@ -1,3 +1,6 @@
+![image](https://github.com/user-attachments/assets/3051cdc8-a82a-428c-9baf-8069b3a39985)
+
+
 # Microbot
 Microbot is an opensource automated oldschool runescape client based on runelite. It uses a plugin system to enable scripting. Here is a youtube channel showing off some of the scripts
 
