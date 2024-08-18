@@ -15,6 +15,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.breakhandler.BreakHandlerPlugin;
 import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.antiban.enums.ActivityIntensity;
+import net.runelite.client.plugins.microbot.util.antiban.ui.MasterPanel;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
@@ -141,7 +142,7 @@ public class AntibanPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
-        final AntibanPluginPanel panel = injector.getInstance(AntibanPluginPanel.class);
+        final MasterPanel panel = injector.getInstance(MasterPanel.class);
         final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "antiban.png");
         navButton = NavigationButton.builder()
                 .tooltip("Antiban")
@@ -251,7 +252,7 @@ public class AntibanPlugin extends Plugin {
         final Integer previous = skillExp.put(skill, exp);
 
         if (lastSkillChanged != null && lastSkillChanged.equals(skill)) {
-            if (Rs2AntibanSettings.universalAntiban && !Rs2AntibanSettings.actionCooldownActive) {
+            if (Rs2AntibanSettings.universalAntiban && !Rs2AntibanSettings.actionCooldownActive && Rs2Antiban.getActivity() != null) {
                 Rs2Antiban.actionCooldown();
             }
             return;
