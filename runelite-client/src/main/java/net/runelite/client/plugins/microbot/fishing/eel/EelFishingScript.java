@@ -8,7 +8,6 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.fishing.eel.enums.EelFishingSpot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
-import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.antiban.enums.ActivityIntensity;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -30,8 +29,8 @@ public class EelFishingScript extends Script {
 
     public boolean run(EelFishingConfig config) {
         this.config = config;
-        Rs2Antiban.resetAntiban();
-        Rs2Antiban.advancedPlayStyleSetup(Activity.GENERAL_FISHING);
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyFishingSetup();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run() || !Microbot.isLoggedIn() || !Rs2Inventory.hasItem("bait") || !Rs2Inventory.hasItem("rod")) {
                 return;
@@ -120,7 +119,7 @@ public class EelFishingScript extends Script {
     }
 
     public void shutdown() {
-        Rs2Antiban.resetAntiban();
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
     }
 }
