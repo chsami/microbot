@@ -13,7 +13,6 @@ import net.runelite.client.plugins.microbot.mining.amethyst.enums.MiningSpot;
 import net.runelite.client.plugins.microbot.mining.amethyst.enums.Status;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
-import net.runelite.client.plugins.microbot.util.antiban.enums.ActivityIntensity;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
@@ -211,7 +210,6 @@ public class AmethystMiningScript extends Script {
 
     private void initialize() {
         Rs2Antiban.antibanSetupTemplates.applyMiningSetup();
-        Rs2Antiban.setActivityIntensity(ActivityIntensity.EXTREME);
         status = Status.IDLE;
         miningSpot = MiningSpot.NULL;
         oreVein = null;
