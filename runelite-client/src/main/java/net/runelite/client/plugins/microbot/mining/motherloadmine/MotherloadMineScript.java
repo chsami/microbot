@@ -27,7 +27,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 @Slf4j
 public class MotherloadMineScript extends Script {
-    public static final String version = "1.6.4";
+    public static final String version = "1.6.5";
     private static final WorldArea UPSTAIRS = new WorldArea(new WorldPoint(3747, 5676, 0), 7, 8);
     private static final WorldPoint HOPPER = new WorldPoint(3748, 5674, 0);
     private static final int UPPER_FLOOR_HEIGHT = -490;
@@ -303,6 +303,7 @@ public class MotherloadMineScript extends Script {
     }
 
     public void shutdown() {
+        Rs2Antiban.resetAntibanSettings();
         oreVein = null;
         miningSpot = MLMMiningSpot.IDLE;
         Rs2Walker.setTarget(null);

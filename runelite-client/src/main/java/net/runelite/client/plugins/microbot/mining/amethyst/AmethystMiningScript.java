@@ -29,7 +29,7 @@ import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
 public class AmethystMiningScript extends Script {
-    public static String version = "1.1.0";
+    public static String version = "1.1.1";
     public static Status status = Status.IDLE;
     public static WallObject oreVein;
     private static AmethystMiningConfig config;
@@ -217,6 +217,7 @@ public class AmethystMiningScript extends Script {
 
     @Override
     public void shutdown() {
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
         status = Status.IDLE;
         miningSpot = MiningSpot.NULL;

@@ -37,7 +37,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static String version = "1.4.2";
+    public static String version = "1.4.3";
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -361,6 +361,7 @@ public class MWintertodtScript extends Script {
 
     @Override
     public void shutdown() {
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
     }
 

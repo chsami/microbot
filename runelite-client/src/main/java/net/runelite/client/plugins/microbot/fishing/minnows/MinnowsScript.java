@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class MinnowsScript extends Script {
 
-    public static final String version = "1.0.3";
+    public static final String version = "1.0.4";
     public static final WorldArea MINNOWS_PLATFORM = new WorldArea(new WorldPoint(2607, 3440, 0), 2622 - 2607, 3446 - 3440);
     private static final int FLYING_FISH_GRAPHIC_ID = GraphicID.FLYING_FISH;
 
@@ -82,6 +82,8 @@ public class MinnowsScript extends Script {
 
     @Override
     public void shutdown() {
+
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
     }
 }

@@ -27,7 +27,7 @@ class ProgressiveFletchingModel {
 
 public class FletchingScript extends Script {
 
-    public static double version = 1.6;
+    public static String version = "1.6.1";
     ProgressiveFletchingModel model = new ProgressiveFletchingModel();
 
     String primaryItemToFletch = "";
@@ -227,6 +227,8 @@ public class FletchingScript extends Script {
 
     @Override
     public void shutdown() {
+
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
     }
 }

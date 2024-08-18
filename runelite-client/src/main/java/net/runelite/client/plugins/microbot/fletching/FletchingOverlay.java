@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.fletching;
 
-import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -24,12 +23,13 @@ public class FletchingOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Fletcher V" + FletchingScript.version)
+                    .text("Micro Fletcher")
                     .color(Color.GREEN)
                     .build());
 
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
+                    .right("Version: " + FletchingScript.version)
                     .build());
         } catch(Exception ex) {
             System.out.println(ex.getMessage());

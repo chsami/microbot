@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class HumidifierScript extends Script {
 
-    public static String version = "1.6.1";
+    public static String version = "1.6.2";
     public static String itemsProcessedMessage = "";
     public static String profitMessage = "Calculating...";
     private static long itemsProcessed = 0;
@@ -96,6 +96,7 @@ public class HumidifierScript extends Script {
 
     @Override
     public void shutdown() {
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
         itemsProcessed = 0;
     }
