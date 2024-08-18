@@ -140,8 +140,6 @@ public class Rs2Antiban {
 
 
     public static void setActivity(Activity activity) {
-        Rs2AntibanSettings.dynamicIntensity = false;
-        Rs2AntibanSettings.dynamicActivity = false;
         Rs2Antiban.activity = activity;
         Rs2Antiban.category = activity.getCategory();
         Rs2Antiban.activityIntensity = activity.getActivityIntensity();
@@ -149,8 +147,11 @@ public class Rs2Antiban {
         if (Rs2AntibanSettings.simulateAttentionSpan) {
             Rs2Antiban.playStyle = PlayStyle.EXTREME_AGGRESSIVE;
             //Rs2Antiban.playStyle = activityIntensity.getPlayStyle();
-        } else
-            Rs2Antiban.playStyle = activityIntensity.getPlayStyle();
+        } else {
+            if (Rs2Antiban.playStyle == null)
+                Rs2Antiban.playStyle = activityIntensity.getPlayStyle();
+        }
+
         if (Rs2AntibanSettings.randomIntervals) {
             Rs2Antiban.playStyle = PlayStyle.RANDOM;
         }
@@ -327,16 +328,19 @@ public class Rs2Antiban {
      *   <li><code>Rs2AntibanSettings.microBreakActive</code> is set to <code>true</code> if the break is triggered.</li>
      *   <li><code>BreakHandlerScript.breakDuration</code> is set to a randomly determined value in seconds.</li>
      * </ul>
+     * @return true if a micro-break is triggered, false otherwise.
      */
 
-    public static void takeMicroBreakByChance() {
+    public static boolean takeMicroBreakByChance() {
         if (Math.random() < Rs2AntibanSettings.microBreakChance) {
             Rs2AntibanSettings.microBreakActive = true;
             BreakHandlerScript.breakDuration = Random.random(Rs2AntibanSettings.microBreakDurationLow * 60, Rs2AntibanSettings.microBreakDurationHigh * 60);
             if (Rs2AntibanSettings.moveMouseOffScreen)
                 moveMouseOffScreen();
+            return true;
 
         }
+        return false;
     }
 
 
@@ -510,6 +514,10 @@ public class Rs2Antiban {
     // reset all the variables
     public static void resetAntibanSettings() {
         Rs2AntibanSettings.reset();
+        Rs2Antiban.playStyle = null;
+        Rs2Antiban.activity = null;
+        Rs2Antiban.activityIntensity = null;
+        Rs2Antiban.category = null;
     }
 
 }

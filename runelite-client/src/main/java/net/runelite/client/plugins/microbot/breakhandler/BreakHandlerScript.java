@@ -24,12 +24,14 @@ public class BreakHandlerScript extends Script {
 
     public static Duration duration;
     public static Duration breakInDuration;
-
     @Setter
     @Getter
     public static boolean lockState = false;
-
     private String title = "";
+
+    public static boolean isBreakActive() {
+        return breakDuration > 0;
+    }
 
     public static String formatDuration(Duration duration, String header) {
         long hours = duration.toHours();
