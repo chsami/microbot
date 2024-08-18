@@ -11,7 +11,6 @@ import net.runelite.client.plugins.microbot.fletching.enums.FletchingMaterial;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingMode;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
-import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -38,8 +37,8 @@ public class FletchingScript extends Script {
 
     public void run(FletchingConfig config) {
         fletchingMode = config.fletchingMode();
-        Rs2Antiban.resetAntiban();
-        Rs2Antiban.advancedPlayStyleSetup(Activity.GENERAL_FLETCHING);
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyFletchingSetup();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn())
