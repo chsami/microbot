@@ -118,10 +118,21 @@ public interface MWintertodtConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "MinFood",
+            name = "Min Food",
+            description = "Minimum food to start a new game",
+            position = 3,
+            section = foodSection
+    )
+    default int minFood() {
+        return 2;
+    }
+
+    @ConfigItem(
             keyName = "Eat at %",
             name = "Eat at %",
             description = "Eat at specific percentage health.",
-            position = 3,
+            position = 4,
             section = foodSection
     )
     default int eatAt() {
@@ -132,7 +143,7 @@ public interface MWintertodtConfig extends Config {
             keyName = "Hitpoints Tresshold",
             name = "HP % to run away",
             description = "Runs to the bank if a specific health treshhold is reached and the player does not have any food in their inventory.",
-            position = 4,
+            position = 5,
             section = foodSection
     )
     default int hpTreshhold() {
