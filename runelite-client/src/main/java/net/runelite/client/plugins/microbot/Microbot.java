@@ -291,6 +291,17 @@ public class Microbot {
         }
     }
 
+    public static void click(Rectangle rectangle) {
+
+        Point point = Rs2UiHelper.getClickingPoint(rectangle, true);
+        mouse.click(point);
+
+
+        if (!Microbot.getClient().isClientThread()) {
+            sleep(50, 80);
+        }
+    }
+
     @Deprecated(since = "1.3.8 - use Mouse class", forRemoval = true)
     private static void mouseEvent(int id, Point point) {
         MouseEvent e = new MouseEvent(client.getCanvas(), id, System.currentTimeMillis(), 0, point.getX(), point.getY(), 1, false, 1);
