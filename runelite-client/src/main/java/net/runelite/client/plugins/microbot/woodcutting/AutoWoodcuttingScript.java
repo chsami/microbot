@@ -72,7 +72,7 @@ public class AutoWoodcuttingScript extends Script {
                             return;
                         }
 
-                        GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), true, getInitialPlayerLocation());
+                        GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), config.useHasLineOfSight(), getInitialPlayerLocation());
 
                         if (tree != null) {
                             if(Rs2GameObject.interact(tree, config.TREE().getAction())) {
