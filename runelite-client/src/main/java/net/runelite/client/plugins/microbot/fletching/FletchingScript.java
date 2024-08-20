@@ -165,11 +165,11 @@ public class FletchingScript extends Script {
         sleepUntil(() -> Rs2Widget.getWidget(17694736) == null);
         Rs2Antiban.actionCooldown();
         Rs2Antiban.takeMicroBreakByChance();
-//        if (fletchingMode == FletchingMode.PROGRESSIVE) {
-//            sleepUntil(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired()) || hasLeveledUp, 60000);
-//        } else {
-//            sleepUntil(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired()) || hasLeveledUp, 60000);
-//        }
+        if (fletchingMode == FletchingMode.PROGRESSIVE) {
+            sleepUntil(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired()) || hasLeveledUp, 60000);
+        } else {
+            sleepUntil(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, config.fletchingItem().getAmountRequired()) || hasLeveledUp, 60000);
+        }
     }
 
     private boolean configChecks(FletchingConfig config) {
