@@ -1,10 +1,10 @@
-package net.runelite.client.plugins.microbot.construction2;
+package net.runelite.client.plugins.microbot.GeoffPlugins.construction2;
 
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.construction2.enums.Construction2State;
+import net.runelite.client.plugins.microbot.GeoffPlugins.construction2.enums.Construction2State;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
