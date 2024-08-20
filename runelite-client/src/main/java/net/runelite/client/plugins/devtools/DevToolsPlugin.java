@@ -32,20 +32,8 @@ import com.google.common.primitives.Ints;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.Experience;
-import net.runelite.api.IndexedSprite;
-import net.runelite.api.ItemID;
 import net.runelite.api.Menu;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.NPC;
-import net.runelite.api.Player;
-import net.runelite.api.PlayerComposition;
-import net.runelite.api.Skill;
-import net.runelite.api.VarbitComposition;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.kit.KitType;
@@ -258,6 +246,7 @@ public class DevToolsPlugin extends Plugin
 
 		mouseClick = new DevToolsButton("Bot Clicks");
 		mouseMovement = new DevToolsButton("Bot Mouse");
+		mouseMovement.setActive(true);
 
 		overlayManager.add(overlay);
 		overlayManager.add(locationOverlay);
