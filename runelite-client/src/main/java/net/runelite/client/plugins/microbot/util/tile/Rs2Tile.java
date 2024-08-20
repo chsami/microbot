@@ -1,10 +1,7 @@
 package net.runelite.client.plugins.microbot.util.tile;
 
 import lombok.Getter;
-import net.runelite.api.Client;
-import net.runelite.api.CollisionDataFlag;
-import net.runelite.api.GraphicsObject;
-import net.runelite.api.Tile;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.devtools.MovementFlag;
@@ -240,6 +237,26 @@ public class Rs2Tile {
         }
 
         return isVisited(targetPoint, visited);
+    }
+
+    public static boolean areSurroundingTilesWalkable(WorldPoint worldPoint, int sizeX, int sizeY) {
+        for (int dx = -1; dx <= sizeX; dx++) {
+            for (int dy = -1; dy <= sizeY; dy++) {
+                // Skip the inside tiles, only check the border
+                if (dx >= 0 && dx < sizeX && dy >= 0 && dy < sizeY) {
+                    continue;
+                }
+
+                int checkX = worldPoint.getX() + dx;
+                int checkY = worldPoint.getY() + dy;
+
+                if (isTileReachable(new WorldPoint(checkX, checkY, worldPoint.getPlane()))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static boolean isWithinBounds(int x, int y) {

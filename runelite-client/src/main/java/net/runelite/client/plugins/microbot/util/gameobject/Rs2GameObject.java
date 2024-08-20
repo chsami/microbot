@@ -432,10 +432,13 @@ public class Rs2GameObject {
         }
 
         for (GameObject gameObject : gameObjects) {
-            ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
+            if (!Rs2Tile.areSurroundingTilesWalkable(gameObject.getWorldLocation(), gameObject.sizeX(), gameObject.sizeY()))
+                continue;
 
             if (hasLineOfSight && !hasLineOfSight(gameObject))
                 continue;
+
+            ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
 
             if (objComp == null) {
                 continue;

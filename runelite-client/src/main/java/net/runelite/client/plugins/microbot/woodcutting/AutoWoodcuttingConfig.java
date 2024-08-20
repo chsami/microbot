@@ -40,17 +40,6 @@ public interface AutoWoodcuttingConfig extends Config {
     {
         return 20;
     }
-    @ConfigItem(
-            keyName = "CheckLineOfSight",
-            name = "Check LineOfSight",
-            description = "Will only cut tree's when has line of sight",
-            position = 2,
-            section = generalSection
-    )
-    default boolean useHasLineOfSight()
-    {
-        return false;
-    }
 
     @ConfigItem(
             keyName = "Hop",

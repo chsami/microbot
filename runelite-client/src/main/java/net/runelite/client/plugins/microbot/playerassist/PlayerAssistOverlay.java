@@ -6,7 +6,6 @@ import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.model.Monster;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -52,9 +51,6 @@ public class PlayerAssistOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         if (attackableNpcs == null) return null;
-
-
-        net.runelite.api.Point loc = Perspective.localToCanvas(Microbot.getClient(), Rs2Player.getLocalLocation(), Rs2Player.getWorldLocation().getPlane(), 150);
 
         LocalPoint lp =  LocalPoint.fromWorld(Microbot.getClient(), config.centerLocation());
         if (lp != null) {
