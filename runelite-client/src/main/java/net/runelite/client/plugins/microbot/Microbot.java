@@ -21,7 +21,10 @@ import net.runelite.client.plugins.microbot.configs.SpecialAttackConfigs;
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
+import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.NaturalMouse;
 import net.runelite.client.plugins.timers.GameTimer;
 import net.runelite.client.plugins.timers.TimersPlugin;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
@@ -48,7 +51,21 @@ import java.util.concurrent.TimeUnit;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class Microbot {
+    private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
+    @Getter
+    private static final SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
     public static MenuEntry targetMenu;
+    @Inject
+    @Named("microbot.storage")
+    public static String storageUrl;
+    public static boolean debug = false;
+    public static boolean isGainingExp = false;
+    public static boolean pauseAllScripts = false;
+    public static String status = "IDLE";
+    public static boolean enableAutoRunOn = true;
+    @Getter
+    @Setter
+    public static NaturalMouse naturalMouse;
     @Getter
     @Setter
     private static Mouse mouse;
@@ -97,24 +114,8 @@ public class Microbot {
     @Getter
     @Setter
     private static ChatMessageManager chatMessageManager;
-
-    @Inject
-    @Named("microbot.storage") public static String storageUrl;
-
-
-    public static boolean debug = false;
-
-    public static boolean isGainingExp = false;
-    public static boolean pauseAllScripts = false;
-    public static String status = "IDLE";
-
-    public static boolean enableAutoRunOn = true;
-
-    private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
-    @Getter
-    private static final SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
@@ -239,9 +240,14 @@ public class Microbot {
     }
 
     public static void startPlugin(Plugin plugin) {
+        if (plugin == null) return;
+        Microbot.getPluginManager().setPluginEnabled(plugin, true);
+        Microbot.getPluginManager().startPlugins();
+
 
     }
 
+    @Deprecated(since = "1.3.8 - use Rs2UiHelper", forRemoval = true)
     public static Point calculateClickingPoint(Rectangle rect) {
         if (rect.getX() == 1 && rect.getY() == 1) return new Point(1, 1);
         int x = (int) (rect.getX() + (double) Random.random((int) rect.getWidth() / 6 * -1, (int) rect.getWidth() / 6) + rect.getWidth() / 2.0);
@@ -249,40 +255,54 @@ public class Microbot {
         return new Point(x, y);
     }
 
-    public static void doInvoke(MenuEntry entry, Rectangle rectangle) {
-        targetMenu = entry;
-        int viewportHeight = client.getViewportHeight();
-        int viewportWidth = client.getViewportWidth();
-        if (!(rectangle.getX() > (double) viewportWidth) && !(rectangle.getY() > (double) viewportHeight) && !(rectangle.getX() < 0.0) && !(rectangle.getY() < 0.0)) {
-            click(rectangle);
-        } else {
-            click(new Rectangle(1, 1));
+    public static void doInvoke(NewMenuEntry entry, Rectangle rectangle) {
+
+        try {
+            if (Rs2UiHelper.isRectangleWithinViewport(rectangle)) {
+                click(rectangle, entry);
+            } else {
+                click(new Rectangle(1, 1), entry);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+            // Handle the error as needed
+        }
+    }
+
+    public static void drag(Rectangle start, Rectangle end) {
+        if (start == null || end == null) return;
+        if (!Rs2UiHelper.isRectangleWithinViewport(start) || !Rs2UiHelper.isRectangleWithinViewport(end)) return;
+        Point startPoint = Rs2UiHelper.getClickingPoint(start, true);
+        Point endPoint = Rs2UiHelper.getClickingPoint(end, true);
+        mouse.drag(startPoint, endPoint);
+        if (!Microbot.getClient().isClientThread()) {
+            sleep(50, 80);
+        }
+    }
+
+    public static void click(Rectangle rectangle, NewMenuEntry entry) {
+
+        Point point = Rs2UiHelper.getClickingPoint(rectangle, true);
+        mouse.click(point, entry);
+
+
+        if (!Microbot.getClient().isClientThread()) {
+            sleep(50, 80);
         }
     }
 
     public static void click(Rectangle rectangle) {
 
-        Point point = calculateClickingPoint(rectangle);
-        if (client.isStretchedEnabled()) {
-            Dimension stretched = client.getStretchedDimensions();
-            Dimension real = client.getRealDimensions();
-            double width = (double) stretched.width / real.getWidth();
-            double height = (double) stretched.height / real.getHeight();
-            point = new Point((int) ((double) point.getX() * width), (int) ((double) point.getY() * height));
-        }
+        Point point = Rs2UiHelper.getClickingPoint(rectangle, true);
+        mouse.click(point);
 
-        mouseEvent(504, point);
-        mouseEvent(505, point);
-        mouseEvent(503, point);
-        mouseEvent(501, point);
-        mouseEvent(502, point);
-        mouseEvent(500, point);
 
         if (!Microbot.getClient().isClientThread()) {
-            sleep(50, 100);
+            sleep(50, 80);
         }
     }
 
+    @Deprecated(since = "1.3.8 - use Mouse class", forRemoval = true)
     private static void mouseEvent(int id, Point point) {
         MouseEvent e = new MouseEvent(client.getCanvas(), id, System.currentTimeMillis(), 0, point.getX(), point.getY(), 1, false, 1);
         client.getCanvas().dispatchEvent(e);

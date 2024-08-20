@@ -27,4 +27,16 @@ public interface EelFishingConfig extends Config {
     default EelFishingSpot fishingSpot() {
         return EelFishingSpot.INFERNAL_EEL;
     }
+
+    // check box if the user wants to use fast combination
+    @ConfigItem(
+            keyName = "useFastCombination",
+            name = "Use fast combination",
+            description = "Use fast combination",
+            position = 1,
+            section = generalSection
+    )
+    default boolean useFastCombination() {
+        return false;
+    }
 }

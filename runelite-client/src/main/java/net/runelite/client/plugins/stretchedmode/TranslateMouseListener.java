@@ -25,13 +25,15 @@
  */
 package net.runelite.client.plugins.stretchedmode;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.input.MouseListener;
 
+import javax.inject.Inject;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+
+@Slf4j
 public class TranslateMouseListener implements MouseListener
 {
 	private final Client client;
@@ -86,6 +88,11 @@ public class TranslateMouseListener implements MouseListener
 
 	private MouseEvent translateEvent(MouseEvent e)
 	{
+        // Check if the event source is "Microbot"
+        if ("Microbot".equals(e.getSource().toString())) {
+            // Ignore the event by returning null or the original event (decide based on your needs)
+            return e;  // or return e; if you want to pass the event unchanged
+        }
 		Dimension stretchedDimensions = client.getStretchedDimensions();
 		Dimension realDimensions = client.getRealDimensions();
 
