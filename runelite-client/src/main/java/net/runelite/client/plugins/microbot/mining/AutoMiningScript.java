@@ -4,6 +4,8 @@ import net.runelite.api.GameObject;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -23,16 +25,19 @@ enum State {
 
 public class AutoMiningScript extends Script {
 
-    public static String version = "1.4.1";
+    public static String version = "1.4.2";
     State state = State.MINING;
 
     public boolean run(AutoMiningConfig config) {
         initialPlayerLocation = null;
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyMiningSetup();
+        Rs2AntibanSettings.actionCooldownChance = 0.1;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
                 if (!Microbot.isLoggedIn()) return;
-
+                if (Rs2AntibanSettings.actionCooldownActive) return;
                 if (initialPlayerLocation == null) {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
@@ -60,6 +65,8 @@ public class AutoMiningScript extends Script {
                         if (rock != null) {
                             if (Rs2GameObject.interact(rock)) {
                                 Rs2Player.waitForXpDrop(Skill.MINING, true);
+                                Rs2Antiban.actionCooldown();
+                                Rs2Antiban.takeMicroBreakByChance();
                             }
                         }
                         break;

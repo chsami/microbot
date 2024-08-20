@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.mining.motherloadmine;
 
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -30,7 +31,7 @@ public class MotherloadMineOverlay extends OverlayPanel {
                     .build());
 
 
-            //Rs2Antiban.renderAntibanOverlayComponents(panelComponent);
+            Rs2Antiban.renderAntibanOverlayComponents(panelComponent);
             addEmptyLine();
 
 

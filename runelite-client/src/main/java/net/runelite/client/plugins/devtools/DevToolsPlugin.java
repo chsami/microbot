@@ -127,10 +127,50 @@ public class DevToolsPlugin extends Plugin
 
 	@Inject
 	private ChatMessageManager chatMessageManager;
-
 	@Inject
 	private DevToolsConfig config;
+	private final HotkeyListener swingInspectorHotkeyListener = new HotkeyListener(() -> config.swingInspectorHotkey()) {
+		Object inspector;
 
+		@Override
+		public void hotkeyPressed() {
+			Window window = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+			try {
+				if (inspector == null) {
+					JRootPane rootPane = ((RootPaneContainer) window).getRootPane();
+					FlatInspector fi = new FlatInspector(rootPane);
+					fi.setEnabled(true);
+					inspector = fi;
+					fi.addPropertyChangeListener(ev ->
+					{
+						if ("enabled".equals(ev.getPropertyName()) && !fi.isEnabled() && inspector == ev.getSource()) {
+							inspector = null;
+						}
+					});
+				} else {
+					((FlatInspector) inspector).setEnabled(false);
+				}
+			} catch (LinkageError | Exception e) {
+				log.warn("unable to open swing inspector", e);
+				JOptionPane.showMessageDialog(window, "The swing inspector is not available.");
+			}
+		}
+	};
+	private final AWTEventListener swingInspectorKeyListener = rawEv ->
+	{
+		if (rawEv instanceof KeyEvent) {
+			KeyEvent kev = (KeyEvent) rawEv;
+			if (kev.getID() == KeyEvent.KEY_PRESSED) {
+				swingInspectorHotkeyListener.keyPressed(kev);
+			} else if (kev.getID() == KeyEvent.KEY_RELEASED) {
+				swingInspectorHotkeyListener.keyReleased(kev);
+			}
+		}
+	};
+	@Inject
+	private MicrobotClickOverlay microbotClickOverlay;
+	@Inject
+	private MicrobotMouseOverlay microbotMouseOverlay;
 	private DevToolsButton players;
 	private DevToolsButton npcs;
 	private DevToolsButton inventory;
@@ -163,60 +203,9 @@ public class DevToolsPlugin extends Plugin
 	private DevToolsButton shell;
 	private DevToolsButton menus;
 	private DevToolsButton uiDefaultsInspector;
+	private DevToolsButton mouseClick;
+	private DevToolsButton mouseMovement;
 	private NavigationButton navButton;
-
-	private final HotkeyListener swingInspectorHotkeyListener = new HotkeyListener(() -> config.swingInspectorHotkey())
-	{
-		Object inspector;
-
-		@Override
-		public void hotkeyPressed()
-		{
-			Window window = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
-			try
-			{
-				if (inspector == null)
-				{
-					JRootPane rootPane = ((RootPaneContainer) window).getRootPane();
-					FlatInspector fi = new FlatInspector(rootPane);
-					fi.setEnabled(true);
-					inspector = fi;
-					fi.addPropertyChangeListener(ev ->
-					{
-						if ("enabled".equals(ev.getPropertyName()) && !fi.isEnabled() && inspector == ev.getSource())
-						{
-							inspector = null;
-						}
-					});
-				}
-				else
-				{
-					((FlatInspector) inspector).setEnabled(false);
-				}
-			}
-			catch (LinkageError | Exception e)
-			{
-				log.warn("unable to open swing inspector", e);
-				JOptionPane.showMessageDialog(window, "The swing inspector is not available.");
-			}
-		}
-	};
-
-	private final AWTEventListener swingInspectorKeyListener = rawEv ->
-	{
-		if (rawEv instanceof KeyEvent)
-		{
-			KeyEvent kev = (KeyEvent) rawEv;
-			if (kev.getID() == KeyEvent.KEY_PRESSED)
-			{
-				swingInspectorHotkeyListener.keyPressed(kev);
-			}
-			else if (kev.getID() == KeyEvent.KEY_RELEASED)
-			{
-				swingInspectorHotkeyListener.keyReleased(kev);
-			}
-		}
-	};
 
 	@Provides
 	DevToolsConfig provideConfig(ConfigManager configManager)
@@ -267,6 +256,9 @@ public class DevToolsPlugin extends Plugin
 
 		uiDefaultsInspector = new DevToolsButton("Swing Defaults");
 
+		mouseClick = new DevToolsButton("Bot Clicks");
+		mouseMovement = new DevToolsButton("Bot Mouse");
+
 		overlayManager.add(overlay);
 		overlayManager.add(locationOverlay);
 		overlayManager.add(sceneOverlay);
@@ -274,6 +266,8 @@ public class DevToolsPlugin extends Plugin
 		overlayManager.add(worldMapLocationOverlay);
 		overlayManager.add(mapRegionOverlay);
 		overlayManager.add(soundEffectOverlay);
+		overlayManager.add(microbotClickOverlay);
+		overlayManager.add(microbotMouseOverlay);
 
 		final DevToolsPanel panel = injector.getInstance(DevToolsPanel.class);
 
@@ -304,6 +298,8 @@ public class DevToolsPlugin extends Plugin
 		overlayManager.remove(worldMapLocationOverlay);
 		overlayManager.remove(mapRegionOverlay);
 		overlayManager.remove(soundEffectOverlay);
+		overlayManager.remove(microbotClickOverlay);
+		overlayManager.remove(microbotMouseOverlay);
 		clientToolbar.removeNavigation(navButton);
 		Toolkit.getDefaultToolkit().removeAWTEventListener(swingInspectorKeyListener);
 	}

@@ -8,6 +8,9 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMMiningSpot;
 import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMStatus;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
+import net.runelite.client.plugins.microbot.util.antiban.enums.ActivityIntensity;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -24,7 +27,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 @Slf4j
 public class MotherloadMineScript extends Script {
-    public static final String version = "1.5.4";
+    public static final String version = "1.6.5";
     private static final WorldArea UPSTAIRS = new WorldArea(new WorldPoint(3747, 5676, 0), 7, 8);
     private static final WorldPoint HOPPER = new WorldPoint(3748, 5674, 0);
     private static final int UPPER_FLOOR_HEIGHT = -490;
@@ -49,9 +52,7 @@ public class MotherloadMineScript extends Script {
     }
 
     private void initialize() {
-        //Rs2Antiban.isEnabled = true;
-        //Rs2Antiban.simulateAttentionSpan = true;
-        //Rs2Antiban.setActivity(Activity.MOTHERLODE_MINE);
+        Rs2Antiban.antibanSetupTemplates.applyMiningSetup();
         miningSpot = MLMMiningSpot.IDLE;
         status = MLMStatus.IDLE;
         emptySack = false;
@@ -74,7 +75,7 @@ public class MotherloadMineScript extends Script {
             return;
         }
 
-        //if(Rs2Antiban.isActionCooldownActive) return;
+        if (Rs2AntibanSettings.actionCooldownActive) return;
 
         if (Rs2Player.isAnimating() || Microbot.getClient().getLocalPlayer().isInteracting()) return;
 
@@ -86,9 +87,11 @@ public class MotherloadMineScript extends Script {
             case IDLE:
                 return;
             case MINING:
+                Rs2Antiban.setActivityIntensity(Rs2Antiban.getActivity().getActivityIntensity());
                 handleMining();
                 break;
             case EMPTY_SACK:
+                Rs2Antiban.setActivityIntensity(ActivityIntensity.EXTREME);
                 emptySack();
                 break;
             case FIXING_WATERWHEEL:
@@ -149,7 +152,8 @@ public class MotherloadMineScript extends Script {
             if (walkToMiningSpot()) {
                 if (Rs2Player.isMoving()) return;
                 mineVein();
-                //Rs2Antiban.actionCooldown();
+                Rs2Antiban.actionCooldown();
+                Rs2Antiban.takeMicroBreakByChance();
             }
         }
     }
@@ -174,6 +178,7 @@ public class MotherloadMineScript extends Script {
                 bank();
         }
         emptySack = false;
+        Rs2Antiban.takeMicroBreakByChance();
         status = MLMStatus.IDLE;
     }
 
@@ -298,6 +303,7 @@ public class MotherloadMineScript extends Script {
     }
 
     public void shutdown() {
+        Rs2Antiban.resetAntibanSettings();
         oreVein = null;
         miningSpot = MLMMiningSpot.IDLE;
         Rs2Walker.setTarget(null);

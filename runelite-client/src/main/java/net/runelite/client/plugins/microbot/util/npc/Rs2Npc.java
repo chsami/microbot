@@ -9,13 +9,12 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -195,7 +194,7 @@ public class Rs2Npc {
             MenuAction menuAction = getMenuAction(index);
 
             if (menuAction != null) {
-                Microbot.doInvoke(new NewMenuEntry(0, 0, menuAction.getId(), npc.getIndex(), -1, npc.getName()), new Rectangle(npc.getCanvasTilePoly().getBounds()));
+                Microbot.doInvoke(new NewMenuEntry(0, 0, menuAction.getId(), npc.getIndex(), -1, npc.getName(), npc), Rs2UiHelper.getActorClickbox(npc));
             }
 
         } catch (Exception ex) {
@@ -255,7 +254,7 @@ public class Rs2Npc {
     }
 
     public static boolean attack(String npcName) {
-        return attack(Arrays.asList(npcName));
+        return attack(Collections.singletonList(npcName));
     }
 
     public static boolean attack(List<String> npcNames) {
