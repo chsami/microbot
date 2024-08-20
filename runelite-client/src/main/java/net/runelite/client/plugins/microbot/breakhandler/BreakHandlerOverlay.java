@@ -40,12 +40,12 @@ public class BreakHandlerOverlay extends OverlayPanel {
 
             if (BreakHandlerScript.breakIn > 0) {
                 panelComponent.getChildren().add(LineComponent.builder()
-                        .left(String.format("Break in: %02d:%02d:%02d%n", hours, minutes, seconds))
+                        .left(BreakHandlerScript.formatDuration(BreakHandlerScript.breakInDuration, "Break in:"))
                         .build());
             }
             if (BreakHandlerScript.breakDuration > 0) {
                 panelComponent.getChildren().add(LineComponent.builder()
-                        .left(String.format("Break duration: %02d:%02d:%02d%n", hours, minutes, seconds))
+                        .left(BreakHandlerScript.formatDuration(BreakHandlerScript.duration, "Break duration:"))
                         .build());
             }
 

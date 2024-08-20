@@ -28,11 +28,19 @@ enum State {
 
 public class AutoWoodcuttingScript extends Script {
 
-    public static String version = "1.6.0";
+    public static String version = "1.6.1";
     public boolean cannotLightFire = false;
 
     State state = State.WOODCUTTING;
-    private WorldPoint returnPoint;
+    private static WorldPoint returnPoint;
+
+    public static WorldPoint initPlayerLoc(AutoWoodcuttingConfig config) {
+        if (config.walkBack() == WoodcuttingWalkBack.INITIAL_LOCATION) {
+            return getInitialPlayerLocation();
+        } else {
+            return returnPoint;
+        }
+    }
 
     public boolean run(AutoWoodcuttingConfig config) {
         if (config.hopWhenPlayerDetected()) {
@@ -47,6 +55,10 @@ public class AutoWoodcuttingScript extends Script {
 
                 if (initialPlayerLocation == null) {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
+                }
+
+                if (returnPoint == null) {
+                    returnPoint = Rs2Player.getWorldLocation();
                 }
 
                 if (!config.TREE().hasRequiredLevel()) {
@@ -72,7 +84,7 @@ public class AutoWoodcuttingScript extends Script {
                             return;
                         }
 
-                        GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), true, getInitialPlayerLocation());
+                        GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), false, getInitialPlayerLocation());
 
                         if (tree != null) {
                             if(Rs2GameObject.interact(tree, config.TREE().getAction())) {
@@ -165,5 +177,12 @@ public class AutoWoodcuttingScript extends Script {
     private void walkBack(AutoWoodcuttingConfig config) {
         Rs2Walker.walkTo(new WorldPoint(calculateReturnPoint(config).getX() - Random.random(-1, 1), calculateReturnPoint(config).getY() - Random.random(-1, 1), calculateReturnPoint(config).getPlane()));
         sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(calculateReturnPoint(config)) <= 4);
+    }
+
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        returnPoint = null;
+        initialPlayerLocation = null;
     }
 }

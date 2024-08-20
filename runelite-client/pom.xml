@@ -56,12 +56,6 @@
 			<artifactId>RoaringBitmap</artifactId>
 			<version>0.9.44</version>
 		</dependency>
-		<!-- Archive Patcher library -->
-		<dependency>
-			<groupId>com.google.archivepatcher</groupId>
-			<artifactId>archive-patch-applier</artifactId>
-			<version>1.0.4</version>
-		</dependency>
 		<!-- CFR decompiler library -->
 		<dependency>
 			<groupId>org.benf</groupId>

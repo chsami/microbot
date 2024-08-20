@@ -4,6 +4,8 @@ import net.runelite.api.NPC;
 import net.runelite.client.game.FishingSpot;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.inventory.DropOrder;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -16,21 +18,21 @@ import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.validateInter
 
 public class BarbarianFishingScript extends Script {
 
-    public static String version = "1.1.1";
+    public static String version = "1.1.2";
     public static int timeout = 0;
     private BarbarianFishingConfig config;
 
     public boolean run(BarbarianFishingConfig config) {
         this.config = config;
-        //Rs2Antiban.resetAntiban();
-        //Rs2Antiban.advancedPlayStyleSetup(Activity.GENERAL_FISHING);
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyFishingSetup();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run() || !Microbot.isLoggedIn() || !Rs2Inventory.hasItem("feather") || !Rs2Inventory.hasItem("rod")) {
                 return;
             }
 
-            //  if(Rs2Antiban.isActionCooldownActive)
-            //      return;
+            if (Rs2AntibanSettings.actionCooldownActive) return;
+
 
             if (Rs2Player.isInteracting())
                 return;
@@ -77,7 +79,7 @@ public class BarbarianFishingScript extends Script {
     }
 
     public void shutdown() {
-        //Rs2Antiban.resetAntiban();
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
     }
 }

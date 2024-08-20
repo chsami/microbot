@@ -423,8 +423,11 @@ public class Rs2Walker {
 
             // Match action
             var action = Arrays.stream(objectComp.getActions())
-                    .filter(x -> x != null && doorActions.contains(x.toLowerCase()))
-                    .min(Comparator.comparing(x -> doorActions.indexOf(x.toLowerCase()))).orElse(null);
+                    .filter(x -> x != null && doorActions.stream().anyMatch(doorAction -> x.toLowerCase().startsWith(doorAction)))
+                    .min(Comparator.comparing(x -> doorActions.indexOf(
+                            doorActions.stream().filter(doorAction -> x.toLowerCase().startsWith(doorAction)).findFirst().orElse(""))))
+                    .orElse(null);
+
             if (action == null) continue;
 
             boolean found = false;
@@ -469,6 +472,7 @@ public class Rs2Walker {
 
 
             if (found){
+                System.out.println(action);
                 Rs2GameObject.interact(object, action);
                 Rs2Player.waitForWalking();
                 return true;

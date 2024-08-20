@@ -9,9 +9,10 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingItem;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingMaterial;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingMode;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,7 @@ class ProgressiveFletchingModel {
 
 public class FletchingScript extends Script {
 
-    public static double version = 1.6;
+    public static String version = "1.6.1";
     ProgressiveFletchingModel model = new ProgressiveFletchingModel();
 
     String primaryItemToFletch = "";
@@ -36,6 +37,8 @@ public class FletchingScript extends Script {
 
     public void run(FletchingConfig config) {
         fletchingMode = config.fletchingMode();
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyFletchingSetup();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn())
@@ -48,8 +51,11 @@ public class FletchingScript extends Script {
 
                 if (!configChecks(config)) return;
 
-                if (config.Afk() && Random.random(1, 100) == 2)
-                    sleep(1000, 60000);
+                if (Rs2AntibanSettings.actionCooldownActive)
+                    return;
+
+//                if (config.Afk() && Random.random(1, 100) == 2)
+//                    sleep(1000, 60000);
 
                 boolean hasRequirementsToFletch;
                 boolean hasRequirementsToBank;
@@ -148,14 +154,17 @@ public class FletchingScript extends Script {
     }
 
     private void fletch(FletchingConfig config) {
-        Rs2Inventory.combine(primaryItemToFletch, secondaryItemToFletch);
+        Rs2Inventory.combineClosest(primaryItemToFletch, secondaryItemToFletch);
         sleepUntil(() -> Rs2Widget.getWidget(17694736) != null);
         if (fletchingMode == FletchingMode.PROGRESSIVE) {
             keyPress(model.getFletchingItem().getOption(model.getFletchingMaterial(), fletchingMode));
+
         } else {
             keyPress(config.fletchingItem().getOption(config.fletchingMaterial(), fletchingMode));
         }
         sleepUntil(() -> Rs2Widget.getWidget(17694736) == null);
+        Rs2Antiban.actionCooldown();
+        Rs2Antiban.takeMicroBreakByChance();
         if (fletchingMode == FletchingMode.PROGRESSIVE) {
             sleepUntil(() -> !Rs2Inventory.hasItemAmount(secondaryItemToFletch, model.getFletchingItem().getAmountRequired()) || hasLeveledUp, 60000);
         } else {
@@ -218,6 +227,8 @@ public class FletchingScript extends Script {
 
     @Override
     public void shutdown() {
+
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
     }
 }

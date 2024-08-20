@@ -16,6 +16,8 @@ public class NewMenuEntry implements MenuEntry {
     private int param1;
     private boolean forceLeftClick;
     private int itemId;
+    private Actor actor;
+    private TileObject gameObject;
 
     public NewMenuEntry(int param0, int param1, int opcode, int identifier, int itemId, String target) {
         this.option = "Use";
@@ -26,6 +28,30 @@ public class NewMenuEntry implements MenuEntry {
         this.param1 = param1;
         this.forceLeftClick = true;
         this.itemId = itemId;
+    }
+
+    public NewMenuEntry(int param0, int param1, int opcode, int identifier, int itemId, String target, Actor actor) {
+        this.option = "Use";
+        this.target = target;
+        this.identifier = identifier;
+        this.type = MenuAction.of(opcode);
+        this.param0 = param0;
+        this.param1 = param1;
+        this.forceLeftClick = true;
+        this.itemId = itemId;
+        this.actor = actor;
+    }
+
+    public NewMenuEntry(int param0, int param1, int opcode, int identifier, int itemId, String target, TileObject gameObject) {
+        this.option = "Use";
+        this.target = target;
+        this.identifier = identifier;
+        this.type = MenuAction.of(opcode);
+        this.param0 = param0;
+        this.param1 = param1;
+        this.forceLeftClick = true;
+        this.itemId = itemId;
+        this.gameObject = gameObject;
     }
 
     public NewMenuEntry(String option, String target, int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
@@ -47,6 +73,9 @@ public class NewMenuEntry implements MenuEntry {
         this.param1 = param1;
         this.forceLeftClick = true;
         this.itemId = itemId;
+    }
+
+    public NewMenuEntry() {
     }
 
     public String getOption() {
@@ -138,6 +167,7 @@ public class NewMenuEntry implements MenuEntry {
     public Consumer<MenuEntry> onClick() {
         return null;
     }
+
     public MenuEntry getParent() {
         return this;
     }
@@ -167,17 +197,23 @@ public class NewMenuEntry implements MenuEntry {
 
     @Nullable
     public NPC getNpc() {
-        return null;
+        return actor instanceof NPC ? (NPC) actor : null;
+
     }
 
     @Nullable
     public Player getPlayer() {
-        return null;
+        return actor instanceof Player ? (Player) actor : null;
     }
 
     @Nullable
     public Actor getActor() {
-        return null;
+        return actor;
+    }
+
+    @Nullable
+    public TileObject getGameObject() {
+        return gameObject;
     }
 
     @org.jetbrains.annotations.Nullable
@@ -238,14 +274,8 @@ public class NewMenuEntry implements MenuEntry {
                 Object this$type = this.getType();
                 Object other$type = other.getType();
                 if (this$type == null) {
-                    if (other$type != null) {
-                        return false;
-                    }
-                } else if (!this$type.equals(other$type)) {
-                    return false;
-                }
-
-                return true;
+                    return other$type == null;
+                } else return this$type.equals(other$type);
             }
         }
     }
@@ -273,8 +303,5 @@ public class NewMenuEntry implements MenuEntry {
     public String toString() {
         String var10000 = this.getOption();
         return "NewMenuEntry(option=" + var10000 + ", target=" + this.getTarget() + ", identifier=" + this.getIdentifier() + ", type=" + this.getType() + ", param0=" + this.getParam0() + ", param1=" + this.getParam1() + ", forceLeftClick=" + this.isForceLeftClick() + ")";
-    }
-
-    public NewMenuEntry() {
     }
 }
