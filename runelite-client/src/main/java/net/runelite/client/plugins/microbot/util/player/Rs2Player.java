@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static net.runelite.api.MenuAction.CC_OP;
 import static net.runelite.client.plugins.microbot.util.Global.*;
@@ -137,6 +138,27 @@ public class Rs2Player {
         boolean result = sleepUntilTrue(Rs2Player::isWalking, 100, time);
         if (!result) return;
         sleepUntil(() -> !Rs2Player.isWalking(), time);
+    }
+
+
+
+    public static boolean eatAt(int percentage, List<String> allowedFoodList) {
+        double healthThreshold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100)
+                / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
+
+        if (healthThreshold <= percentage) {
+            List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
+            Optional<Rs2Item> foodToEat = foods.stream()
+                    .filter(food -> allowedFoodList.stream()
+                            .anyMatch(allowedFood -> food.getName().equalsIgnoreCase(allowedFood.trim())))
+                    .findFirst();
+
+            if (foodToEat.isPresent()) {
+                String interaction = foodToEat.get().getName().toLowerCase().contains("jug of wine") ? "drink" : "eat";
+                return Rs2Inventory.interact(foodToEat.get(), interaction);
+            }
+        }
+        return false;
     }
 
     public static void waitForAnimation() {
