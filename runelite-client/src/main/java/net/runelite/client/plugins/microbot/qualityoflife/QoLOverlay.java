@@ -75,8 +75,7 @@ public class QoLOverlay extends OverlayPanel {
                     textLocation = new Point(textLocation.getX(), textLocation.getY() - 25);
 
                     OverlayUtil.renderTextLocation(graphics, textLocation, text, Color.YELLOW);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
+                } catch (Exception ignored) {
                 }
 
             }
