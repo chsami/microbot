@@ -8,7 +8,7 @@ import net.runelite.client.plugins.microbot.util.inventory.DropOrder;
 import net.runelite.client.plugins.nateplugins.skilling.natefishing.enums.Fish;
 
 @ConfigGroup("Fishing")
-public interface AutoFishingConfig extends Config {
+public interface AutoFishConfig extends Config {
     @ConfigSection(
             name = "General",
             description = "General",

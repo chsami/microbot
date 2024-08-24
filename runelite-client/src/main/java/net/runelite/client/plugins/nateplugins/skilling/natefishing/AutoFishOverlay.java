@@ -9,11 +9,11 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class AutoFishingOverlay extends OverlayPanel {
+public class AutoFishOverlay extends OverlayPanel {
 
 
     @Inject
-    AutoFishingOverlay(AutoFishingPlugin plugin)
+    AutoFishOverlay(AutoFishPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
