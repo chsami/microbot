@@ -16,4 +16,15 @@ public interface QoLConfig extends Config {
     default boolean renderMaxHitOverlay() {
         return true;
     }
+
+    // boolean to use Withdraw-Last from bank
+    @ConfigItem(
+            keyName = "useWithdrawLast",
+            name = "Use Withdraw-Last",
+            description = "Use Withdraw-Last",
+            position = 1
+    )
+    default boolean useWithdrawLast() {
+        return true;
+    }
 }

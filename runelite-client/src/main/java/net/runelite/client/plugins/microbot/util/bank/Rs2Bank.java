@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Predicates;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -33,6 +34,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static net.runelite.api.Varbits.*;
 import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
 import static net.runelite.api.widgets.ComponentID.BANK_ITEM_CONTAINER;
 import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
@@ -42,6 +44,10 @@ import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.i
 @SuppressWarnings("unused")
 @Slf4j
 public class Rs2Bank {
+    public static final int BANK_ITEM_WIDTH = 36;
+    public static final int BANK_ITEM_HEIGHT = 32;
+    public static final int BANK_ITEM_Y_PADDING = 4;
+    public static final int BANK_ITEMS_PER_ROW = 8;
     private static final int X_AMOUNT_VARBIT = 3960;
     private static final int SELECTED_OPTION_VARBIT = 6590;
     private static final int HANDLE_X_SET = 5;
@@ -56,6 +62,8 @@ public class Rs2Bank {
      * and so on...
      */
     private static int container = -1;
+    // Array to store the counts of items in each tab
+    private static final int[] bankTabCounts = new int[9];
 
     /**
      * Executes menu swapping for a specific rs2Item and entry index.
@@ -112,6 +120,7 @@ public class Rs2Bank {
      * Finds a bank item widget in the bank interface by its partial name match.
      *
      * @param name The name of the item to find.
+     *
      * @return The bank item widget if found, or null if not found.
      */
     public static Rs2Item findBankItem(String name) {
@@ -122,6 +131,7 @@ public class Rs2Bank {
      * check if the player has a bank item identified by id
      *
      * @param id the item id
+     *
      * @return boolean
      */
     public static boolean hasItem(int id) {
@@ -132,6 +142,7 @@ public class Rs2Bank {
      * check if the player has a bank item identified by contains name
      *
      * @param name the item name
+     *
      * @return boolean
      */
     public static boolean hasItem(String name) {
@@ -141,6 +152,7 @@ public class Rs2Bank {
     /**
      * @param name
      * @param exact
+     *
      * @return
      */
     public static boolean hasItem(String name, boolean exact) {
@@ -151,6 +163,7 @@ public class Rs2Bank {
      * check if the player has a bank item identified by exact name.
      *
      * @param name the item name
+     *
      * @return boolean
      */
     public static boolean hasBankItem(String name) {
@@ -161,6 +174,7 @@ public class Rs2Bank {
      * check if the player has a bank item identified by exact name.
      *
      * @param name the item name
+     *
      * @return boolean
      */
     public static boolean hasBankItem(String name, int amount) {
@@ -171,6 +185,7 @@ public class Rs2Bank {
      * check if the player has a bank item identified by exact name.
      *
      * @param name the item name
+     *
      * @return boolean
      */
     public static boolean hasBankItem(String name, int amount, boolean exact) {
@@ -182,6 +197,7 @@ public class Rs2Bank {
      *
      * @param name  the item name
      * @param exact exact search based on equalsIgnoreCase
+     *
      * @return boolean
      */
     public static boolean hasBankItem(String name, boolean exact) {
@@ -198,7 +214,6 @@ public class Rs2Bank {
 
     /**
      * Query count of item inside of bank
-     *
      */
     public static int count(String name, boolean exact) {
         Rs2Item bankItem = findBankItem(name, exact);
@@ -208,7 +223,6 @@ public class Rs2Bank {
 
     /**
      * Query count of item inside of bank
-     *
      */
     public static int count(String name) {
         return count(name, false);
@@ -375,6 +389,7 @@ public class Rs2Bank {
      * deposit all items identified by its ItemWidget
      *
      * @param rs2Item item to deposit
+     *
      * @returns did deposit anything
      */
     private static boolean depositAll(Rs2Item rs2Item) {
@@ -391,6 +406,7 @@ public class Rs2Bank {
      * deposit all items identified by its id
      *
      * @param id searches based on the id
+     *
      * @return true if anything deposited
      */
     public static boolean depositAll(int id) {
@@ -421,7 +437,6 @@ public class Rs2Bank {
 
         return !itemsToDeposit.isEmpty();
     }
-
 
     /**
      * deposit all items identified by its name
@@ -465,6 +480,7 @@ public class Rs2Bank {
      * This method uses a lambda function to filter out the items with the specified IDs from the deposit operation.
      *
      * @param ids The IDs of the items to be excluded from the deposit.
+     *
      * @return true if any items were deposited, false otherwise.
      */
     public static boolean depositAllExcept(Integer... ids) {
@@ -476,6 +492,7 @@ public class Rs2Bank {
      * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
      *
      * @param names The names of the items to be excluded from the deposit.
+     *
      * @return true if any items were deposited, false otherwise.
      */
     public static boolean depositAllExcept(String... names) {
@@ -487,6 +504,7 @@ public class Rs2Bank {
      * This method uses a lambda function to filter out the items with the specified names from the deposit operation.
      *
      * @param names The names of the items to be excluded from the deposit.
+     *
      * @return true if any items were deposited, false otherwise.
      */
     public static boolean depositAllExcept(List<String> names) {
@@ -499,6 +517,7 @@ public class Rs2Bank {
      * It also allows for a delay between deposit operations.
      *
      * @param names The names of the items to be excluded from the deposit.
+     *
      * @return true if any items were deposited, false otherwise.
      */
     public static boolean depositAllExcept(boolean exact, String... names) {
@@ -544,7 +563,7 @@ public class Rs2Bank {
     }
 
     public static void withdrawItem(boolean checkInv, int id) {
-        if (checkInv &&  Rs2Inventory.hasItem(id)) return;
+        if (checkInv && Rs2Inventory.hasItem(id)) return;
         withdrawOne(id);
     }
 
@@ -665,6 +684,7 @@ public class Rs2Bank {
      * withdraw all items identified by its ItemWidget.
      *
      * @param rs2Item Item to withdraw
+     *
      * @return
      */
     private static boolean withdrawAll(Rs2Item rs2Item) {
@@ -705,6 +725,7 @@ public class Rs2Bank {
      * withdraw all items identified by its id.
      *
      * @param id item id to search
+     *
      * @return
      */
     public static boolean withdrawAll(int id) {
@@ -899,6 +920,7 @@ public class Rs2Bank {
      * open bank identified by tile object.
      *
      * @param object TileObject
+     *
      * @return true if bank is open
      */
     public static boolean openBank(TileObject object) {
@@ -950,6 +972,7 @@ public class Rs2Bank {
      * find an item in the bank identified by its id.
      *
      * @param id item id to find
+     *
      * @return bankItem
      */
     @SuppressWarnings("UnnecessaryLocalVariable")
@@ -967,6 +990,7 @@ public class Rs2Bank {
      *
      * @param name  The name of the item.
      * @param exact If true, requires an exact name match.
+     *
      * @return The item widget, or null if the item isn't found.
      */
     @SuppressWarnings("UnnecessaryLocalVariable")
@@ -980,6 +1004,7 @@ public class Rs2Bank {
      * @param name   The name of the item.
      * @param exact  If true, requires an exact name match.
      * @param amount the amount needed to find in the bank
+     *
      * @return The item widget, or null if the item isn't found.
      */
     @SuppressWarnings("UnnecessaryLocalVariable")
@@ -1109,6 +1134,7 @@ public class Rs2Bank {
      * @param itemNames
      * @param initialPlayerLocation
      * @param emptySlotCount
+     *
      * @return
      */
     public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount) {
@@ -1117,10 +1143,12 @@ public class Rs2Bank {
 
     /**
      * Banks items if your inventory not enough emptyslots. Will walk back to the initialplayerlocation passed as param
+     *
      * @param itemNames
      * @param initialPlayerLocation
      * @param emptySlotCount
      * @param distance
+     *
      * @return
      */
     public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
@@ -1139,8 +1167,7 @@ public class Rs2Bank {
 
         if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > distance) {
             Rs2Walker.walkTo(initialPlayerLocation, distance);
-        }
-        else {
+        } else {
             Rs2Walker.walkFastCanvas(initialPlayerLocation);
         }
 
@@ -1152,6 +1179,7 @@ public class Rs2Bank {
      *
      * @param itemNames
      * @param initialPlayerLocation
+     *
      * @return
      */
     public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
@@ -1178,10 +1206,12 @@ public class Rs2Bank {
         sleep(600);
         return hasWithdrawAsNote();
     }
+
     /**
      * Withdraw items from the lootTrackerPlugin
      *
      * @param npcName
+     *
      * @return
      */
     public static boolean withdrawLootItems(String npcName, List<String> itemsToNotSell) {
@@ -1198,10 +1228,12 @@ public class Rs2Bank {
         for (LootTrackerRecord lootTrackerRecord : Microbot.getAggregateLootRecords()) {
             if (!lootTrackerRecord.getTitle().equalsIgnoreCase(npcName)) continue;
             for (LootTrackerItem lootTrackerItem : lootTrackerRecord.getItems()) {
-                if (itemsToNotSell.stream().anyMatch(x -> x.trim().equalsIgnoreCase(lootTrackerItem.getName()))) continue;
+                if (itemsToNotSell.stream().anyMatch(x -> x.trim().equalsIgnoreCase(lootTrackerItem.getName())))
+                    continue;
                 int itemId = lootTrackerItem.getId();
                 ItemComposition itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(lootTrackerItem.getId()));
-                if (Arrays.stream(itemComposition.getInventoryActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("eat"))) continue;
+                if (Arrays.stream(itemComposition.getInventoryActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("eat")))
+                    continue;
                 final boolean isNoted = itemComposition.getNote() == 799;
                 if (!itemComposition.isTradeable() && !isNoted) continue;
 
@@ -1220,5 +1252,235 @@ public class Rs2Bank {
         }
         Rs2Bank.closeBank();
         return itemFound;
+    }
+
+    private static Widget getBankSizeWidget() {
+
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget bankContainerWidget = Microbot.getClient().getWidget(ComponentID.BANK_ITEM_COUNT_TOP);
+            return bankContainerWidget;
+        });
+    }
+
+    //Get amount of items in bank
+    public static int getBankItemCount() {
+        Widget bank = getBankSizeWidget();
+        if (bank == null) return 0;
+        return Integer.parseInt(bank.getText());
+    }
+
+    public static List<Widget> getTabs() {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget bankContainerWidget = Microbot.getClient().getWidget(ComponentID.BANK_TAB_CONTAINER);
+            if (bankContainerWidget != null) {
+                // get children and filter out the tabs that don't have the Action Collapse tab
+                return Arrays.asList(bankContainerWidget.getDynamicChildren());
+            }
+            return null;
+        });
+    }
+
+    public static List<Widget> getItems() {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget bankContainerWidget = Microbot.getClient().getWidget(ComponentID.BANK_ITEM_CONTAINER);
+            if (bankContainerWidget != null) {
+                // get children and filter out the tabs that don't have the Action Collapse tab
+                return Arrays.asList(bankContainerWidget.getDynamicChildren());
+            }
+            return null;
+        });
+    }
+
+    // get item widget by slot id
+    public static Widget getItemWidget(int slotId) {
+        List<Widget> items = getItems();
+        if (items == null) return null;
+        if (slotId < 0 || slotId >= items.size()) return null;
+        return items.get(slotId);
+    }
+
+    // get item widget bounds by slot id
+    public static Rectangle getItemBounds(int slotId) {
+        Widget itemWidget = getItemWidget(slotId);
+        if (itemWidget == null) return null;
+        return itemWidget.getBounds();
+    }
+
+    public static int getCurrentTab() {
+        return Microbot.getVarbitValue(Varbits.CURRENT_BANK_TAB);
+    }
+
+    public static boolean isMainTabOpen() {
+        return isTabOpen(0);
+    }
+
+    public static boolean isTabOpen(int index) {
+        return getCurrentTab() == index;
+    }
+
+    public static void openMainTab() {
+        openTab(0);
+    }
+
+    public static void openTab(int index) {
+        List<Widget> tabs = getTabs();
+        if (tabs == null) return;
+        if (index < 0 || index > tabs.size()) return;
+        Rs2Widget.clickWidgetFast(tabs.get(index + 10), 10 + index);
+        Rs2Random.wait(100, 200);
+    }
+
+    // Method to update the tab counts
+    private static void updateTabCounts() {
+        bankTabCounts[0] = Microbot.getVarbitValue(BANK_TAB_ONE_COUNT);
+        bankTabCounts[1] = Microbot.getVarbitValue(BANK_TAB_TWO_COUNT);
+        bankTabCounts[2] = Microbot.getVarbitValue(BANK_TAB_THREE_COUNT);
+        bankTabCounts[3] = Microbot.getVarbitValue(BANK_TAB_FOUR_COUNT);
+        bankTabCounts[4] = Microbot.getVarbitValue(BANK_TAB_FIVE_COUNT);
+        bankTabCounts[5] = Microbot.getVarbitValue(BANK_TAB_SIX_COUNT);
+        bankTabCounts[6] = Microbot.getVarbitValue(BANK_TAB_SEVEN_COUNT);
+        bankTabCounts[7] = Microbot.getVarbitValue(BANK_TAB_EIGHT_COUNT);
+        bankTabCounts[8] = Microbot.getVarbitValue(BANK_TAB_NINE_COUNT);
+    }
+
+    private static int getItemTab(int itemSlotId) {
+        int totalSlots = 0;
+
+        // Loop through each tab's count and determine the tab for the item
+        for (int i = 0; i < bankTabCounts.length; i++) {
+            totalSlots += bankTabCounts[i];
+            if (itemSlotId < totalSlots) {
+                return i + 1; // Return tab number (1-indexed)
+            }
+        }
+
+        // If itemSlotId is above all the tabs, it is in tab 0
+        return 0;
+    }
+
+    public static int getItemTabForBankItem(int itemSlotId) {
+        // Update tab counts before checking which tab the item is in
+        updateTabCounts();
+
+        // Get the total number of items in the bank
+        int totalItemsInBank = getBankItemCount();
+
+        // Ensure the slot ID is within valid range
+        if (itemSlotId < 0 || itemSlotId >= totalItemsInBank) {
+            return -1;  // Invalid slot ID
+        }
+
+        // Determine which tab the item is in
+        return getItemTab(itemSlotId);
+    }
+
+    private static int[] countPartialRowsInTabs() {
+        int[] partialRowCounts = new int[bankTabCounts.length];
+
+        for (int i = 0; i < bankTabCounts.length; i++) {
+            int totalItemsInTab = bankTabCounts[i];
+
+            // If there's a remainder, then there is a partially filled row
+            if (totalItemsInTab % BANK_ITEMS_PER_ROW != 0) {
+                partialRowCounts[i] = 1;
+            } else {
+                partialRowCounts[i] = 0;
+            }
+        }
+
+        return partialRowCounts;
+    }
+
+    // method to calculate partial rows in the bank
+    private static int calculatePartialRowsInBank(int numberOfTabs) {
+        int totalPartialRows = 0;
+
+        // Get the partial row counts for each tab
+        int[] partialRowCounts = countPartialRowsInTabs();
+
+        // Calculate the total number of partial rows
+        for (int i = 0; i < numberOfTabs; i++) {
+            totalPartialRows += partialRowCounts[i];
+        }
+
+        return totalPartialRows;
+    }
+
+    private static int calculateScrollYFromSlotId(int slotId) {
+        int row;
+        int scrollY;
+        // Get total items in tabs 1-9
+        int totalItemsInTabs1To9 = bankTabCounts[0] + bankTabCounts[1] + bankTabCounts[2] + bankTabCounts[3] + bankTabCounts[4] + bankTabCounts[5] + bankTabCounts[6] + bankTabCounts[7] + bankTabCounts[8];
+
+        // Get the current tab selected
+        int currentTab = getCurrentTab();
+
+        // Calculate the rows only within the selected tab
+        if (currentTab == 0) {
+            // Determine if the slotId belongs to tab 0 or one of the other tabs
+            if (slotId >= totalItemsInTabs1To9) {
+                // The item belongs to tab 0
+                int tab0SlotId = slotId - totalItemsInTabs1To9;
+                row = tab0SlotId / BANK_ITEMS_PER_ROW;
+            } else {
+                // The item belongs to tabs 1-9
+                int totalItemsInBank = getBankItemCount();
+                int tab0SlotId = slotId + (totalItemsInBank - totalItemsInTabs1To9);
+
+                row = tab0SlotId / BANK_ITEMS_PER_ROW;
+                row += calculatePartialRowsInBank(getItemTab(slotId));
+            }
+        } else {
+            // If a tab from 1-9 is selected, calculate rows within that tab
+            int itemsBeforeSelectedTab = 0;
+            for (int i = 0; i < currentTab - 1; i++) {
+                itemsBeforeSelectedTab += bankTabCounts[i];  // Sum items from previous tabs
+            }
+
+            // Calculate the position relative to the selected tab
+            int tabSlotId = slotId - itemsBeforeSelectedTab;
+
+            // Only calculate rows within the selected tab
+            row = tabSlotId / BANK_ITEMS_PER_ROW;
+        }
+
+        // Calculate the scrollY based on the row within the selected tab
+        scrollY = row * (BANK_ITEM_HEIGHT + BANK_ITEM_Y_PADDING);
+
+        // Get the widget that displays the bank items
+        Widget w = Microbot.getClient().getWidget(ComponentID.BANK_ITEM_CONTAINER);
+
+        // Check the height of the bank window to adjust scrolling if necessary
+        int bankHeight = w.getHeight() / (BANK_ITEM_HEIGHT + BANK_ITEM_Y_PADDING);
+
+        // Calculate the minimum scrollY to ensure the item is visible at the top of the window
+        // This would be the scrollY that places the item's row at the very top of the visible area
+        int minScrollY = scrollY - (bankHeight) * (BANK_ITEM_HEIGHT + BANK_ITEM_Y_PADDING);
+
+        // Ensure that minScrollY is non-negative, since scrollY cannot be negative
+        if (minScrollY < 0) {
+            minScrollY = 0;
+        }
+
+        // return a value that is within the bounds of the scroll bar
+        return Rs2Random.nextInt(minScrollY, scrollY, 0.5, true);
+    }
+
+    public static void scrollBankToSlot(int slotId) {
+        int scrollY = calculateScrollYFromSlotId(slotId);
+        Widget w = Microbot.getClient().getWidget(ComponentID.BANK_ITEM_CONTAINER);
+        if (w != null) {
+            Microbot.getClientThread().invokeLater(() -> {
+                Microbot.getClient().setVarcIntValue(VarClientInt.BANK_SCROLL, scrollY);
+                Microbot.getClient().runScript(ScriptID.UPDATE_SCROLLBAR, ComponentID.BANK_SCROLLBAR, ComponentID.BANK_ITEM_CONTAINER, scrollY);
+            });
+            w.setScrollY(scrollY);
+            Microbot.getClient().setVarcIntValue(VarClientInt.BANK_SCROLL, scrollY);
+            Microbot.getClientThread().invokeLater(() ->
+                    Microbot.getClient().runScript(ScriptID.UPDATE_SCROLLBAR,
+                            ComponentID.BANK_SCROLLBAR,
+                            ComponentID.BANK_ITEM_CONTAINER,
+                            scrollY));
+        }
     }
 }
