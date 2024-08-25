@@ -22,9 +22,9 @@ import java.awt.*;
         enabledByDefault = false
 )
 @Slf4j
-public class AutoFishingPlugin extends Plugin {
+public class AutoFishPlugin extends Plugin {
     @Inject
-    private AutoFishingConfig config;
+    private AutoFishConfig config;
     @Inject
     private Client client;
     @Inject
@@ -33,14 +33,14 @@ public class AutoFishingPlugin extends Plugin {
     Notifier notifier;
 
     @Provides
-    AutoFishingConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(AutoFishingConfig.class);
+    AutoFishConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(AutoFishConfig.class);
     }
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private AutoFishingOverlay fishingOverlay;
+    private AutoFishOverlay fishingOverlay;
 
     @Inject
     AutoFishingScript fishingScript;
