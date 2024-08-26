@@ -5,7 +5,11 @@
 # Microbot
 Microbot is an opensource automated oldschool runescape client based on runelite. It uses a plugin system to enable scripting. Here is a youtube channel showing off some of the scripts
 
+## Youtube
+
 [![image](https://github.com/user-attachments/assets/f15ec853-9b92-474e-a269-9a984e8bb792)](https://www.youtube.com/channel/UCEj_7N5OPJkdDi0VTMOJOpw)
+
+## Discord
 
 [![Discord Banner 1](https://discord.com/api/guilds/1087718903985221642/widget.png?style=banner1)](https://discord.gg/zaGrfqFEWE)
 
@@ -46,11 +50,11 @@ Make sure to follow this guide if it's your first time running the project
 
 https://github.com/runelite/runelite/wiki/Building-with-IntelliJ-IDEA
 
-## Microbot ChatGpt Chatbot
+## Microbot ChatGPT Chatbot
 
-![image](https://github.com/user-attachments/assets/363cec80-675b-4b36-be7a-4ddd56fdf216)
+[![image](https://github.com/user-attachments/assets/92adb50f-1500-44c0-a069-ff976cccd317)](https://chatgpt.com/g/g-LM0fGeeXB-microbot-documentation)
 
-use your AI Chatbot to learn to write scripts in microbot: https://chatgpt.com/g/g-LM0fGeeXB-microbot-documentation
+Use this AI Chatbot to learn how to write scripts in [Microbot GPT](https://chatgpt.com/g/g-LM0fGeeXB-microbot-documentation)
 
 ## Project Layout
 
