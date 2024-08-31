@@ -136,7 +136,8 @@ public class AntibanPlugin extends Plugin {
                 }
             } else {
                 Rs2AntibanSettings.actionCooldownActive = false;
-                Microbot.pauseAllScripts = false;
+                if (Rs2AntibanSettings.universalAntiban && !Rs2AntibanSettings.microBreakActive)
+                    Microbot.pauseAllScripts = false;
             }
         }
     }
@@ -244,6 +245,8 @@ public class AntibanPlugin extends Plugin {
         }
 
         if (Rs2AntibanSettings.usePlayStyle) {
+            if (Rs2Antiban.getPlayStyle() == null)
+                return;
             if (Rs2AntibanSettings.simulateAttentionSpan && Rs2AntibanSettings.profileSwitching &&
                     Rs2Antiban.getPlayStyle().shouldSwitchProfileBasedOnAttention()) {
                 Rs2Antiban.setPlayStyle(Rs2Antiban.getPlayStyle().switchProfile());
@@ -267,6 +270,9 @@ public class AntibanPlugin extends Plugin {
                 Rs2Antiban.actionCooldown();
                 Rs2Antiban.takeMicroBreakByChance();
             }
+            if (Rs2Antiban.getActivity() == null)
+                updateAntibanSettings(skill);
+
             return;
         }
 
