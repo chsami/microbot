@@ -19,12 +19,34 @@ public interface QoLConfig extends Config {
 
     // boolean to use Withdraw-Last from bank
     @ConfigItem(
-            keyName = "useWithdrawLast",
-            name = "Use Withdraw-Last",
-            description = "Use Withdraw-Last",
+            keyName = "useDoLastBank",
+            name = "Use Do-Last Bank",
+            description = "Use Do-Last Bank",
             position = 1
     )
-    default boolean useWithdrawLast() {
+    default boolean useDoLastBank() {
+        return true;
+    }
+
+    // boolean to use DoLast action on furnace
+    @ConfigItem(
+            keyName = "useDoLastFurnace",
+            name = "Use Do-Last Furnace",
+            description = "Use Do-Last Furnace",
+            position = 2
+    )
+    default boolean useDoLastFurnace() {
+        return true;
+    }
+
+    // boolean to use Dialogue auto continue
+    @ConfigItem(
+            keyName = "useDialogueAutoContinue",
+            name = "Dialogue Auto Continue",
+            description = "Use Dialogue Auto Continue",
+            position = 3
+    )
+    default boolean useDialogueAutoContinue() {
         return true;
     }
 }

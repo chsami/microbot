@@ -9,6 +9,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.loottracker.LootTrackerItem;
 import net.runelite.client.plugins.loottracker.LootTrackerRecord;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -39,7 +40,8 @@ import static net.runelite.api.widgets.ComponentID.BANK_INVENTORY_ITEM_CONTAINER
 import static net.runelite.api.widgets.ComponentID.BANK_ITEM_CONTAINER;
 import static net.runelite.client.plugins.microbot.Microbot.updateItemContainer;
 import static net.runelite.client.plugins.microbot.util.Global.*;
-import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.itemBounds;
+import static net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject.hoverOverObject;
+import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.hoverOverActor;
 
 @SuppressWarnings("unused")
 @Slf4j
@@ -73,13 +75,38 @@ public class Rs2Bank {
      */
     public static void invokeMenu(int entryIndex, Rs2Item rs2Item) {
         int identifier = entryIndex;
+        Rectangle itemBoundingBox = null;
 
-        if (container == ComponentID.BANK_INVENTORY_ITEM_CONTAINER) {
+        if (container == BANK_INVENTORY_ITEM_CONTAINER) {
             identifier = identifier + 1;
+            itemBoundingBox = Rs2Inventory.itemBounds(rs2Item);
         }
-        Microbot.doInvoke(new NewMenuEntry(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, rs2Item.name), (itemBounds(rs2Item) == null) ? new Rectangle(1, 1) : itemBounds(rs2Item));
+        if (container == BANK_ITEM_CONTAINER) {
+            int itemTab = getItemTabForBankItem(rs2Item.slot);
+            if (!isTabOpen(itemTab))
+                openTab(itemTab);
+            scrollBankToSlot(rs2Item.slot);
+            itemBoundingBox = itemBounds(rs2Item);
+        }
+
+        Microbot.doInvoke(new NewMenuEntry(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, rs2Item.name), (itemBoundingBox == null) ? new Rectangle(1, 1) : itemBoundingBox);
         // MenuEntryImpl(getOption=Wear, getTarget=<col=ff9040>Amulet of glory(4)</col>, getIdentifier=9, getType=CC_OP_LOW_PRIORITY, getParam0=1, getParam1=983043, getItemId=1712, isForceLeftClick=false, isDeprioritized=false)
         // Rs2Reflection.invokeMenu(rs2Item.slot, container, MenuAction.CC_OP.getId(), identifier, rs2Item.id, "Withdraw-1", rs2Item.name, -1, -1);
+    }
+
+    /**
+     * Gets the bounding rectangle for the slot of the specified item in the bank container.
+     *
+     * @param rs2Item The item to get the bounds for.
+     *
+     * @return The bounding rectangle for the item's slot, or null if the item is not found.
+     */
+    public static Rectangle itemBounds(Rs2Item rs2Item) {
+        Widget itemWidget = getItemWidget(rs2Item.slot);
+
+        if (itemWidget == null) return null;
+
+        return itemWidget.getBounds();
     }
 
     /**
@@ -954,7 +981,7 @@ public class Rs2Bank {
     private static void handleWearItem(int id) {
         Rs2Item rs2Item = Rs2Inventory.get(id);
         if (rs2Item == null) return;
-        container = ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
+        container = BANK_INVENTORY_ITEM_CONTAINER;
 
         invokeMenu(8, rs2Item);
     }
@@ -1262,13 +1289,29 @@ public class Rs2Bank {
         });
     }
 
-    //Get amount of items in bank
+    /**
+     * Retrieves the total number of items in the bank.
+     * <p>
+     * This method fetches the bank size widget and parses its text to determine
+     * the total number of items currently stored in the bank.
+     *
+     * @return The total number of items in the bank. Returns 0 if the bank widget is not found.
+     */
     public static int getBankItemCount() {
         Widget bank = getBankSizeWidget();
         if (bank == null) return 0;
         return Integer.parseInt(bank.getText());
     }
 
+    /**
+     * Retrieves the list of bank tab widgets.
+     * <p>
+     * This method runs on the client thread to fetch the bank tab container widget
+     * and then retrieves its dynamic children, which represent the tabs in the bank.
+     * </p>
+     *
+     * @return A list of bank tab widgets, or null if the bank tab container widget is not found.
+     */
     public static List<Widget> getTabs() {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget bankContainerWidget = Microbot.getClient().getWidget(ComponentID.BANK_TAB_CONTAINER);
@@ -1280,18 +1323,33 @@ public class Rs2Bank {
         });
     }
 
+    /**
+     * Retrieves the list of item widgets in the bank container.
+     * <p>
+     * This method runs on the client thread to fetch the bank container widget
+     * and then retrieves its dynamic children, which represent the items in the bank.
+     * </p>
+     *
+     * @return A list of item widgets in the bank container, or null if the bank container widget is not found.
+     */
     public static List<Widget> getItems() {
         return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget bankContainerWidget = Microbot.getClient().getWidget(ComponentID.BANK_ITEM_CONTAINER);
+            Widget bankContainerWidget = Microbot.getClient().getWidget(BANK_ITEM_CONTAINER);
             if (bankContainerWidget != null) {
-                // get children and filter out the tabs that don't have the Action Collapse tab
+                // Get children and filter out the tabs that don't have the Action Collapse tab
                 return Arrays.asList(bankContainerWidget.getDynamicChildren());
             }
             return null;
         });
     }
 
-    // get item widget by slot id
+    /**
+     * Retrieves the widget of an item based on the given slot ID.
+     *
+     * @param slotId the ID of the slot to retrieve the widget from
+     *
+     * @return the Widget associated with the specified slot ID, or null if the slot ID is out of range or if the items list is null
+     */
     public static Widget getItemWidget(int slotId) {
         List<Widget> items = getItems();
         if (items == null) return null;
@@ -1299,29 +1357,61 @@ public class Rs2Bank {
         return items.get(slotId);
     }
 
-    // get item widget bounds by slot id
+    /**
+     * Retrieves the bounding rectangle of an item widget based on the given slot ID.
+     *
+     * @param slotId the ID of the slot to retrieve the widget bounds from
+     *
+     * @return the bounds of the item widget as a Rectangle, or null if the widget is not found
+     */
     public static Rectangle getItemBounds(int slotId) {
         Widget itemWidget = getItemWidget(slotId);
         if (itemWidget == null) return null;
         return itemWidget.getBounds();
     }
 
+    /**
+     * Gets the current tab index of the user's interface.
+     *
+     * @return the index of the currently selected tab
+     */
     public static int getCurrentTab() {
-        return Microbot.getVarbitValue(Varbits.CURRENT_BANK_TAB);
+        return Microbot.getVarbitValue(CURRENT_BANK_TAB);
     }
 
+    /**
+     * Checks if the main tab (index 0) is currently open.
+     *
+     * @return true if the main tab is open, false otherwise
+     */
     public static boolean isMainTabOpen() {
         return isTabOpen(0);
     }
 
+    /**
+     * Checks if a tab with the given index is currently open.
+     *
+     * @param index the index of the tab to check
+     *
+     * @return true if the specified tab is open, false otherwise
+     */
     public static boolean isTabOpen(int index) {
         return getCurrentTab() == index;
     }
 
+    /**
+     * Opens the main tab (index 0) in the user's interface.
+     */
     public static void openMainTab() {
         openTab(0);
     }
 
+    /**
+     * Opens a tab based on the given index.
+     *
+     * @param index the index of the tab to open
+     *              If the index is invalid or the tabs list is null, no action will be taken.
+     */
     public static void openTab(int index) {
         List<Widget> tabs = getTabs();
         if (tabs == null) return;
@@ -1330,7 +1420,11 @@ public class Rs2Bank {
         Rs2Random.wait(100, 200);
     }
 
-    // Method to update the tab counts
+
+    /**
+     * Updates the item counts for each bank tab by retrieving values from corresponding variables.
+     * This method fetches the item counts for each tab (1-9) and stores them in the bankTabCounts array.
+     */
     private static void updateTabCounts() {
         bankTabCounts[0] = Microbot.getVarbitValue(BANK_TAB_ONE_COUNT);
         bankTabCounts[1] = Microbot.getVarbitValue(BANK_TAB_TWO_COUNT);
@@ -1343,6 +1437,13 @@ public class Rs2Bank {
         bankTabCounts[8] = Microbot.getVarbitValue(BANK_TAB_NINE_COUNT);
     }
 
+    /**
+     * Determines the tab number that contains the item based on its slot ID.
+     *
+     * @param itemSlotId the slot ID of the item
+     *
+     * @return the 1-indexed tab number containing the item, or 0 if the item is in the main tab
+     */
     private static int getItemTab(int itemSlotId) {
         int totalSlots = 0;
 
@@ -1358,6 +1459,14 @@ public class Rs2Bank {
         return 0;
     }
 
+    /**
+     * Retrieves the tab number of a bank item based on its slot ID.
+     * Updates the tab counts before determining which tab the item belongs to.
+     *
+     * @param itemSlotId the slot ID of the bank item
+     *
+     * @return the tab number containing the item, or -1 if the slot ID is invalid
+     */
     public static int getItemTabForBankItem(int itemSlotId) {
         // Update tab counts before checking which tab the item is in
         updateTabCounts();
@@ -1374,6 +1483,12 @@ public class Rs2Bank {
         return getItemTab(itemSlotId);
     }
 
+    /**
+     * Counts the partial rows present in each tab based on the number of items in each tab.
+     * A partial row is considered if a tab does not have enough items to fully fill a row.
+     *
+     * @return an array of integers where each element is 1 if the tab has a partial row, 0 otherwise
+     */
     private static int[] countPartialRowsInTabs() {
         int[] partialRowCounts = new int[bankTabCounts.length];
 
@@ -1391,7 +1506,13 @@ public class Rs2Bank {
         return partialRowCounts;
     }
 
-    // method to calculate partial rows in the bank
+    /**
+     * Calculates the total number of partial rows in the bank across all specified tabs.
+     *
+     * @param numberOfTabs the number of tabs to consider when calculating partial rows
+     *
+     * @return the total number of partial rows in the specified tabs
+     */
     private static int calculatePartialRowsInBank(int numberOfTabs) {
         int totalPartialRows = 0;
 
@@ -1406,11 +1527,20 @@ public class Rs2Bank {
         return totalPartialRows;
     }
 
+    /**
+     * Calculates the vertical scroll position (scrollY) required to make a specific item visible in the bank view.
+     *
+     * @param slotId the slot ID of the item to scroll to
+     *
+     * @return the calculated scrollY value needed to display the item at the top of the bank view
+     */
     private static int calculateScrollYFromSlotId(int slotId) {
         int row;
         int scrollY;
         // Get total items in tabs 1-9
-        int totalItemsInTabs1To9 = bankTabCounts[0] + bankTabCounts[1] + bankTabCounts[2] + bankTabCounts[3] + bankTabCounts[4] + bankTabCounts[5] + bankTabCounts[6] + bankTabCounts[7] + bankTabCounts[8];
+        int totalItemsInTabs1To9 = bankTabCounts[0] + bankTabCounts[1] + bankTabCounts[2] + bankTabCounts[3] +
+                bankTabCounts[4] + bankTabCounts[5] + bankTabCounts[6] + bankTabCounts[7] +
+                bankTabCounts[8];
 
         // Get the current tab selected
         int currentTab = getCurrentTab();
@@ -1448,9 +1578,10 @@ public class Rs2Bank {
         scrollY = row * (BANK_ITEM_HEIGHT + BANK_ITEM_Y_PADDING);
 
         // Get the widget that displays the bank items
-        Widget w = Microbot.getClient().getWidget(ComponentID.BANK_ITEM_CONTAINER);
+        Widget w = Microbot.getClient().getWidget(BANK_ITEM_CONTAINER);
 
         // Check the height of the bank window to adjust scrolling if necessary
+        assert w != null;
         int bankHeight = w.getHeight() / (BANK_ITEM_HEIGHT + BANK_ITEM_Y_PADDING);
 
         // Calculate the minimum scrollY to ensure the item is visible at the top of the window
@@ -1462,25 +1593,81 @@ public class Rs2Bank {
             minScrollY = 0;
         }
 
+        // check if the item is already visible by checking if currentScrollY is a value between minScrollY and scrollY
+        int currentScrollY = w.getScrollY();
+        if (currentScrollY >= minScrollY && currentScrollY <= scrollY) {
+            return currentScrollY;
+        }
+
+        if (minScrollY == 0)
+            return minScrollY;
+
         // return a value that is within the bounds of the scroll bar
         return Rs2Random.nextInt(minScrollY, scrollY, 0.5, true);
     }
 
+    /**
+     * Scrolls the bank view to make a specified item slot visible.
+     *
+     * @param slotId the slot ID of the item to scroll to
+     */
     public static void scrollBankToSlot(int slotId) {
         int scrollY = calculateScrollYFromSlotId(slotId);
-        Widget w = Microbot.getClient().getWidget(ComponentID.BANK_ITEM_CONTAINER);
+        Widget w = Microbot.getClient().getWidget(BANK_ITEM_CONTAINER);
         if (w != null) {
             Microbot.getClientThread().invokeLater(() -> {
                 Microbot.getClient().setVarcIntValue(VarClientInt.BANK_SCROLL, scrollY);
-                Microbot.getClient().runScript(ScriptID.UPDATE_SCROLLBAR, ComponentID.BANK_SCROLLBAR, ComponentID.BANK_ITEM_CONTAINER, scrollY);
+                Microbot.getClient().runScript(ScriptID.UPDATE_SCROLLBAR, ComponentID.BANK_SCROLLBAR, BANK_ITEM_CONTAINER, scrollY);
             });
             w.setScrollY(scrollY);
             Microbot.getClient().setVarcIntValue(VarClientInt.BANK_SCROLL, scrollY);
             Microbot.getClientThread().invokeLater(() ->
                     Microbot.getClient().runScript(ScriptID.UPDATE_SCROLLBAR,
                             ComponentID.BANK_SCROLLBAR,
-                            ComponentID.BANK_ITEM_CONTAINER,
+                            BANK_ITEM_CONTAINER,
                             scrollY));
         }
+    }
+
+
+    /**
+     * Tries to hover the mouse over the bank object or bank NPC.
+     *
+     * @return True if bank was successfully hovered over, otherwise false.
+     */
+    public static boolean preHover() {
+        if (!Rs2AntibanSettings.naturalMouse) {
+            Microbot.log("Natural mouse is not enabled, can't hover");
+            return false;
+        }
+
+        if (isOpen()) {
+            return false;
+        }
+
+        Microbot.status = "Hovering over bank";
+
+        try {
+            GameObject bank = Rs2GameObject.findBank();
+            if (bank != null) {
+                return hoverOverObject(bank);
+            }
+
+            GameObject chest = Rs2GameObject.findChest();
+            if (chest != null) {
+                return hoverOverObject(chest);
+            }
+
+            NPC npc = Rs2Npc.getBankerNPC();
+            if (npc != null) {
+                return hoverOverActor(npc);
+            }
+
+            Microbot.log("No bank objects or NPC found to hover over.");
+        } catch (Exception ex) {
+            Microbot.log("An error occurred while hovering over the bank: " + ex.getMessage());
+        }
+
+        return false;
     }
 }

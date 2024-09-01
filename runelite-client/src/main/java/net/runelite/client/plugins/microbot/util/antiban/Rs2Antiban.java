@@ -267,15 +267,19 @@ public class Rs2Antiban {
             logDebug("PlayStyle not enabled, cannot perform action cooldown");
             return;
         }
+        if (Rs2AntibanSettings.actionCooldownChance == 1.0) {
+            performActionCooldown();
+            return;
+        }
         if (Rs2AntibanSettings.actionCooldownChance <= 0.0) {
             logDebug("Action cooldown chance is 0%, cannot perform action cooldown");
             return;
         }
         if (Rs2AntibanSettings.actionCooldownChance <= 0.99 && Rs2Random.diceFractional(Rs2AntibanSettings.actionCooldownChance)) {
             performActionCooldown();
-            return;
+
         }
-        performActionCooldown();
+
     }
 
     private static void logDebug(String message) {
