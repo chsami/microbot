@@ -132,6 +132,8 @@ public class Rs2Tile {
         List<WorldPoint> worldPoints = new ArrayList<>();
         LocalPoint playerLocalPosition = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
 
+        if (playerLocalPosition == null) return new ArrayList<>();
+
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {
                 if (dx == 0 && dy == 0) continue; // Skip the player's current position

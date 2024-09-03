@@ -24,17 +24,18 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.conditional;
 
+import lombok.Setter;
+import net.runelite.api.Client;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.util.Utils;
+
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import net.runelite.client.plugins.questhelper.util.Utils;
-import lombok.Setter;
-import net.runelite.api.Client;
 
 public class Conditions extends ConditionForStep
 {
@@ -73,7 +74,7 @@ public class Conditions extends ConditionForStep
 	 */
 	public Conditions(LogicType logicType, Requirement... conditions)
 	{
-		assert(Utils.varargsNotNull(conditions));
+		if (conditions == null) return;
 
 		this.conditions = new ArrayList<>();
 		Collections.addAll(this.conditions, conditions);
