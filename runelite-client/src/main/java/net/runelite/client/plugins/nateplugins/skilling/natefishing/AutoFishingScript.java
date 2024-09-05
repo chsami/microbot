@@ -46,13 +46,13 @@ public class AutoFishingScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
-                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
-
                 if (!hasRequiredItems(fish)) {
                     Microbot.showMessage("You are missing the required tools to catch this fish");
                     shutdown();
                     return;
                 }
+
+                if (Rs2Player.isMoving() || Rs2Antiban.getCategory().isBusy() || Microbot.pauseAllScripts) return;
 
                 switch (state) {
                     case FISHING:
@@ -68,7 +68,6 @@ public class AutoFishingScript extends Script {
                         if (Rs2Npc.interact(fishingSpot, fish.getAction())) {
                             Rs2Antiban.actionCooldown();
                             Rs2Antiban.takeMicroBreakByChance();
-                            Rs2Player.waitForAnimation(30000);
                         }
                         break;
                     case RESETTING:
