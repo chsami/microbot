@@ -125,6 +125,7 @@ public class ShootingStarPlugin extends Plugin {
 
             addToList(star);
         }
+        updatePanelList(true);
     }
 
     private ShootingStarLocation findLocation(String locationKey, String rawLocation) {
@@ -167,7 +168,6 @@ public class ShootingStarPlugin extends Plugin {
         oldStar.setObjectID(oldStar.getObjectIDBasedOnTier());
         oldStar.setEndsAt(newStar.getEndsAt());
         oldStar.setMiningLevel(oldStar.getRequiredMiningLevel());
-        SwingUtilities.invokeLater(() -> panel.refreshList(starList));
     }
     
     private void checkDepletedStars() {
