@@ -43,7 +43,7 @@ public interface ShootingStarConfig extends Config {
     @ConfigItem(
             keyName = "inventorySetupName",
             name = "MInventorySetup Name",
-            description = "Name of MInventory Setup for mining ",
+            description = "Name of mInventory Setup for mining",
             position = 0,
             section = generalSection
     )
@@ -54,7 +54,7 @@ public interface ShootingStarConfig extends Config {
     @ConfigItem(
             keyName = useNearestHighTierStar,
             name = "Use Nearest High Tier Star",
-            description = "The star with the highest tier the is closet to you will be selected",
+            description = "Toggles automatic mode - when enabled script will automatically check all stars within an acceptable tier range & find the closest star that has the highest tier",
             position = 2,
             section = generalSection
     )
@@ -101,6 +101,4 @@ public interface ShootingStarConfig extends Config {
     default boolean isDisplayAsMinutes() {
         return false;
     }
-
-
 }
