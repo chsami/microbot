@@ -335,7 +335,6 @@ public class ShootingStarPlugin extends Plugin {
     }
 
     public Star getClosestHighestTierStar() {
-
         // Get the highest tier available
         int highestTier = starList.stream()
                 .filter(Star::hasRequirements)
@@ -358,10 +357,23 @@ public class ShootingStarPlugin extends Plugin {
         for (Star star : starList) {
             if (panel.getHiddenStars().contains(star)) continue;
             if (!star.hasRequirements()) continue;
+
             int starTier = star.getTier();
             if (starTier >= minTier && starTier <= maxTier) {
                 WorldPoint starLocation = ShootingStarLocation.valueOf(star.getShootingStarLocation().name()).getWorldPoint();
-                int distance = Rs2Player.shortestDistanceTo(starLocation);
+
+                // Check if the star's location is already in the distanceMap
+                Integer existingDistance = distanceMap.entrySet().stream()
+                        .filter(entry -> entry.getValue().stream()
+                                .anyMatch(s -> ShootingStarLocation.valueOf(s.getShootingStarLocation().name()).getWorldPoint().equals(starLocation)))
+                        .map(Map.Entry::getKey)
+                        .findFirst()
+                        .orElse(null);
+                
+                // Set distance to the distance that is found in the map for the duplicate location or calculate shortest distance if not found
+                int distance;
+                distance = Objects.requireNonNullElseGet(existingDistance, () -> Rs2Player.shortestDistanceTo(starLocation));
+
                 distanceMap.computeIfAbsent(distance, k -> new ArrayList<>()).add(star);
             }
         }
