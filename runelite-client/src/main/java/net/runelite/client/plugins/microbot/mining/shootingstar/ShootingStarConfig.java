@@ -71,24 +71,24 @@ public interface ShootingStarConfig extends Config {
 
     @ConfigItem(
             keyName = displayMembersWorlds,
-            name = "Display Members Worlds",
-            description = "Shows Members worlds inside of the panel",
+            name = "Hide Members Worlds",
+            description = "Hide Members worlds inside of the panel",
             position = 0,
             section = panelSection
     )
     default boolean isDisplayMembersWorlds() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
             keyName = displayWildernessLocations,
-            name = "Display Wilderness Locations",
-            description = "Shows Members worlds inside of the panel",
+            name = "Hide Wilderness Locations",
+            description = "Hide Wilderness locations inside of the panel",
             position = 1,
             section = panelSection
     )
     default boolean isDisplayWildernessLocations() {
-        return false;
+        return true;
     }
 
     @ConfigItem(

@@ -125,6 +125,7 @@ public class ShootingStarPlugin extends Plugin {
 
             addToList(star);
         }
+        filterPanelList(displayWildernessLocations || displayMembersWorlds);
         updatePanelList(true);
     }
 
@@ -260,25 +261,13 @@ public class ShootingStarPlugin extends Plugin {
 
         if (event.getKey().equals(ShootingStarConfig.displayMembersWorlds)) {
             displayMembersWorlds = config.isDisplayMembersWorlds();
-
-            if (displayMembersWorlds) {
-                SwingUtilities.invokeLater(() -> panel.showStars());
-            } else {
-                SwingUtilities.invokeLater(() -> panel.hideStars(starList));
-            }
-
+            filterPanelList(displayWildernessLocations);
             updatePanelList(true);
         }
 
         if (event.getKey().equals(ShootingStarConfig.displayWildernessLocations)) {
             displayWildernessLocations = config.isDisplayWildernessLocations();
-
-            if (displayWildernessLocations) {
-                SwingUtilities.invokeLater(() -> panel.showStars());
-            } else {
-                SwingUtilities.invokeLater(() -> panel.hideStars(starList));
-            }
-
+            filterPanelList(displayWildernessLocations);
             updatePanelList(true);
         }
 
@@ -411,6 +400,16 @@ public class ShootingStarPlugin extends Plugin {
             oldStar.setSelected(false);
         }
         star.setSelected(!star.isSelected());
+    }
+
+    private void filterPanelList(boolean toggle) {
+        List<Star> stars = new ArrayList<>(starList);
+        
+        if (toggle) {
+            SwingUtilities.invokeLater(() -> panel.hideStars(stars));
+        } else {
+            SwingUtilities.invokeLater(() -> panel.showStars());
+        }
     }
 
     public void updatePanelList(boolean fullUpdate) {

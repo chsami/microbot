@@ -274,10 +274,10 @@ public class ShootingStarPanel extends PluginPanel {
 
     public void hideStars(List<Star> starList) {
         for (Star star : starList) {
-            if (!plugin.isDisplayMembersWorlds() && star.isMemberWorld()) {
+            if (plugin.isDisplayMembersWorlds() && star.isMemberWorld()) {
                 hiddenStars.add(star);
             }
-            if (!plugin.isDisplayWildernessLocations() && star.isInWilderness()) {
+            if (plugin.isDisplayWildernessLocations() && star.isInWilderness()) {
                 hiddenStars.add(star);
             }
         }
@@ -286,12 +286,12 @@ public class ShootingStarPanel extends PluginPanel {
     public void showStars() {
         List<Star> starsToRemove = new ArrayList<>();
         for (Star star : hiddenStars) {
-            if (plugin.isDisplayMembersWorlds() && star.isMemberWorld()) {
-                if (!plugin.isDisplayWildernessLocations() && star.isInWilderness()) continue;
+            if (!plugin.isDisplayMembersWorlds() && star.isMemberWorld()) {
+                if (plugin.isDisplayWildernessLocations() && star.isInWilderness()) continue;
                 starsToRemove.add(star);
             }
-            if (plugin.isDisplayWildernessLocations() && star.isInWilderness()) {
-                if (!plugin.isDisplayMembersWorlds() && star.isMemberWorld()) continue;
+            if (!plugin.isDisplayWildernessLocations() && star.isInWilderness()) {
+                if (plugin.isDisplayMembersWorlds() && star.isMemberWorld()) continue;
                 starsToRemove.add(star);
             }
         }
