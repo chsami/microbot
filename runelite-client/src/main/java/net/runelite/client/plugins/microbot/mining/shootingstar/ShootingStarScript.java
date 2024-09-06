@@ -243,8 +243,11 @@ public class ShootingStarScript extends Script {
                     return null;
                 }
             } else {
-                if (Rs2Inventory.hasItem("pickaxe")) {
-                    pickaxe = getBestPickaxe(Rs2Inventory.items());
+                if (Rs2Inventory.hasItem("pickaxe") || Rs2Equipment.isWearing("pickaxe")) {
+                    pickaxe = getBestPickaxe(Rs2Equipment.items());
+                    if (pickaxe == null) {
+                        pickaxe = getBestPickaxe(Rs2Inventory.items());
+                    }
                 }
             }
             return getState(config);
