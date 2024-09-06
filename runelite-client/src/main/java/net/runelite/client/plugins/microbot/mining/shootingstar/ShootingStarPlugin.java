@@ -261,7 +261,7 @@ public class ShootingStarPlugin extends Plugin {
 
         if (event.getKey().equals(ShootingStarConfig.displayMembersWorlds)) {
             displayMembersWorlds = config.isDisplayMembersWorlds();
-            filterPanelList(displayWildernessLocations);
+            filterPanelList(displayMembersWorlds);
             updatePanelList(true);
         }
 
