@@ -196,9 +196,10 @@ public class QoLScript extends Script {
     }
 
     private boolean openFurnace() {
-        sleepUntil(Rs2Widget::isProductionWidgetOpen, 10000);
-        return Rs2Widget.isProductionWidgetOpen();
+        sleepUntil(() -> Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen(), 10000);
+        return Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen();
     }
+
 
     private boolean openAnvil() {
         sleepUntil(Rs2Widget::isSmithingWidgetOpen, 10000);

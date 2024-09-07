@@ -369,6 +369,11 @@ public class Rs2Widget {
         return isWidgetVisible(270, 0);
     }
 
+    // check if GoldCrafting widget is open
+    public static boolean isGoldCraftingWidgetOpen() {
+        return isWidgetVisible(446, 0);
+    }
+
     // check if smithing widget is open
     public static boolean isSmithingWidgetOpen() {
         return isWidgetVisible(InterfaceID.SMITHING, 0);

@@ -131,13 +131,13 @@ public class QoLPlugin extends Plugin {
                 Microbot.log("<col=5F1515>Stopped recording actions</col>");
             }
         }
-        if (Rs2Widget.isProductionWidgetOpen() && config.useDoLastFurnace() && recordActions) {
+        if ((Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen()) && config.useDoLastFurnace() && recordActions) {
             MenuEntry menuEntry = event.getMenuEntry();
             NewMenuEntry cachedMenuEntry = new NewMenuEntry(menuEntry.getOption(), menuEntry.getTarget(), menuEntry.getIdentifier(), menuEntry.getType(), menuEntry.getParam0(), menuEntry.getParam1(), menuEntry.isForceLeftClick());
             cachedMenuEntry.setItemId(menuEntry.getItemId());
             cachedMenuEntry.setWidget(menuEntry.getWidget());
             furnaceMenuEntries.add(cachedMenuEntry);
-            if (menuEntry.getOption().equals("Make sets:") || menuEntry.getOption().equals("Smelt")) {
+            if (menuEntry.getOption().equals("Make sets:") || menuEntry.getOption().equals("Smelt") || menuEntry.getOption().contains("Make")) {
                 recordActions = false;
                 Microbot.log("<col=5F1515>Stopped recording actions</col>");
             }
