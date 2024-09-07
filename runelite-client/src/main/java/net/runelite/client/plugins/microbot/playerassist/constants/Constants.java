@@ -204,19 +204,7 @@ public class Constants {
             ItemID.SUPER_RESTORE1,
             ItemID.SUPER_RESTORE2,
             ItemID.SUPER_RESTORE3,
-            ItemID.SUPER_RESTORE4,
-            ItemID.BLIGHTED_SUPER_RESTORE1,
-            ItemID.BLIGHTED_SUPER_RESTORE2,
-            ItemID.BLIGHTED_SUPER_RESTORE3,
-            ItemID.BLIGHTED_SUPER_RESTORE4,
-            ItemID.EGNIOL_POTION_1,
-            ItemID.EGNIOL_POTION_2,
-            ItemID.EGNIOL_POTION_3,
-            ItemID.EGNIOL_POTION_4,
-            ItemID.SANFEW_SERUM1,
-            ItemID.SANFEW_SERUM2,
-            ItemID.SANFEW_SERUM3,
-            ItemID.SANFEW_SERUM4
+            ItemID.SUPER_RESTORE4
     );
 
     public static final Set<Integer> ANTI_POISON_POTION_IDS = ImmutableSet.of(
@@ -1070,6 +1058,7 @@ public class Constants {
     public static final Set<Integer> FOOD_ITEM_IDS = ImmutableSet.of(
             ItemID.ANGLERFISH, ItemID.BLIGHTED_ANGLERFISH,
             ItemID.DARK_CRAB,
+            ItemID.COOKED_KARAMBWAN,
             ItemID.TUNA_POTATO,
             ItemID.MANTA_RAY, ItemID.BLIGHTED_MANTA_RAY,
             ItemID.SEA_TURTLE,
