@@ -809,7 +809,7 @@ public class Rs2Walker {
      * @param endpoint
      * @return distance
      */
-    public static int shortestDistanceTo(WorldPoint startpoint, WorldPoint endpoint) {
+    public static int getDistanceBetween(WorldPoint startpoint, WorldPoint endpoint) {
         ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
         Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), startpoint, endpoint);
         pathfindingExecutor.submit(pathfinder);

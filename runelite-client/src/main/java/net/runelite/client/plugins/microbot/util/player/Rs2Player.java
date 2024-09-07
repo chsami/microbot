@@ -616,9 +616,9 @@ public class Rs2Player {
      * @return distance
      */
     public static int shortestDistanceTo(WorldPoint endpoint) {
-        if(Microbot.getClient().isInInstancedRegion()) {
+        if (Microbot.getClient().isInInstancedRegion()) {
             return getWorldLocation().distanceTo(endpoint);
         }
-        return Rs2Walker.shortestDistanceTo(getWorldLocation(), endpoint);
+        return Rs2Walker.getDistanceBetween(getWorldLocation(), endpoint);
     }
 }
