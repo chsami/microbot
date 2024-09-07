@@ -1,13 +1,12 @@
 package net.runelite.client.plugins.microbot.blackjack.enums;
 
 import lombok.AllArgsConstructor;
-import net.runelite.api.coords.WorldArea;
-import net.runelite.api.coords.WorldPoint;
 
 @AllArgsConstructor
 public enum Area {
-ThugHut(3340, 2956, 3344,2953),
-ShopsArea(3355, 2992, 3363,2984);
+MenaphiteHut(3340, 2953, 3344,2955),
+BeardedBanditHut(3363, 3000, 3364,3002),
+ShopsArea(3355, 2984, 3363,2992);
 
     public final int ax;
     public final int ay;
