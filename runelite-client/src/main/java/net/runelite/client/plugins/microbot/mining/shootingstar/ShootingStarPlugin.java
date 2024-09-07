@@ -361,7 +361,7 @@ public class ShootingStarPlugin extends Plugin {
                 
                 // Set distance to the distance that is found in the map for the duplicate location or calculate shortest distance if not found
                 int distance;
-                distance = Objects.requireNonNullElseGet(existingDistance, () -> Rs2Player.shortestDistanceTo(starLocation));
+                distance = Objects.requireNonNullElseGet(existingDistance, () -> Rs2Player.distanceTo(starLocation));
 
                 distanceMap.computeIfAbsent(distance, k -> new ArrayList<>()).add(star);
             }

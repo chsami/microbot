@@ -615,7 +615,7 @@ public class Rs2Player {
      * @param endpoint
      * @return distance
      */
-    public static int shortestDistanceTo(WorldPoint endpoint) {
+    public static int distanceTo(WorldPoint endpoint) {
         if (Microbot.getClient().isInInstancedRegion()) {
             return getWorldLocation().distanceTo(endpoint);
         }
