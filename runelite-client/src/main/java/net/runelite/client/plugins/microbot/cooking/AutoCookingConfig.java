@@ -35,7 +35,7 @@ public interface AutoCookingConfig extends Config {
         return "This plugin allows for semi-AFK cooking, start the script with an empty inventory\n" +
                 "1. Ensure to prepare your bank with ingredients\n" +
                 "2. Use nearest cooking location will override the configured cooking location & choose the nearest from the configured locations\n\n" +
-                "At the moment, only plain pizza & cooked fish are supported. Other cooking activities will be added in the future";
+                "At the moment, only cooked fish are supported. Other cooking activities will be added in the future";
     }
 
     @ConfigItem(
