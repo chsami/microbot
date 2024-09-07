@@ -340,6 +340,8 @@ public class MQuestScript extends Script {
             WorldPoint stepLocation = object == null ? step.getWorldPoint() : object.getWorldLocation();
             int radius = 0;
             while (targetTile == null) {
+                if (mainScheduledFuture.isCancelled())
+                    break;
                 radius++;
                 TileObject finalObject = object;
                 targetTile = Rs2Tile.getWalkableTilesAroundTile(stepLocation, radius)
