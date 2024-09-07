@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.widget;
 
 import net.runelite.api.MenuAction;
+import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -366,5 +367,10 @@ public class Rs2Widget {
     // check if production widget is open
     public static boolean isProductionWidgetOpen() {
         return isWidgetVisible(270, 0);
+    }
+
+    // check if smithing widget is open
+    public static boolean isSmithingWidgetOpen() {
+        return isWidgetVisible(InterfaceID.SMITHING, 0);
     }
 }
