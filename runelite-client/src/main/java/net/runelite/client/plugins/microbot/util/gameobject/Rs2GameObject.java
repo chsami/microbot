@@ -8,7 +8,6 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
-import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -17,7 +16,6 @@ import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import javax.annotation.Nullable;
-import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1085,10 +1083,6 @@ public class Rs2GameObject {
 
             if (!Rs2Camera.isTileOnScreen(object.getLocalLocation())) {
                 Rs2Camera.turnTo(object);
-            } else {
-                Rs2Keyboard.keyRelease(KeyEvent.VK_RIGHT);
-                Rs2Keyboard.keyRelease(KeyEvent.VK_LEFT);
-
             }
 
             Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(), -1, objComp.getName(), object), Rs2UiHelper.getObjectClickbox(object));

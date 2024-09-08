@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static net.runelite.api.TileItem.OWNERSHIP_GROUP;
-import static net.runelite.api.TileItem.OWNERSHIP_OTHER;
+import static net.runelite.api.TileItem.OWNERSHIP_SELF;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
+
 @Slf4j
 public class Rs2GroundItem {
 
@@ -46,6 +46,7 @@ public class Rs2GroundItem {
      *
      * @param groundItem The ground item to interact with.
      * @param action     The action to perform on the ground item.
+     *
      * @return true if the interaction was successful, false otherwise.
      */
     private static boolean interact(InteractModel groundItem, String action) {
@@ -93,13 +94,13 @@ public class Rs2GroundItem {
             } else if (index == 4) {
                 menuAction = MenuAction.GROUND_ITEM_FIFTH_OPTION;
             }
-            LocalPoint localPoint1 =  LocalPoint.fromWorld(Microbot.getClient(), groundItem.location);
+            LocalPoint localPoint1 = LocalPoint.fromWorld(Microbot.getClient(), groundItem.location);
             if (localPoint1 != null) {
                 Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, -1, target),
                         Perspective.getCanvasTilePoly(Microbot.getClient(), localPoint1).getBounds());
             } else {
                 Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, -1, target),
-                         new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+                        new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
 
             }
             //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, -1, option, target, -1, -1);
@@ -112,17 +113,15 @@ public class Rs2GroundItem {
     public static boolean interact(GroundItem groundItem) {
         return interact(new InteractModel(groundItem.getId(), groundItem.getLocation(), groundItem.getName()), "Take");
     }
-    private static int calculateDespawnTime(GroundItem groundItem)
-    {
+
+    private static int calculateDespawnTime(GroundItem groundItem) {
         Instant spawnTime = groundItem.getSpawnTime();
-        if (spawnTime == null)
-        {
+        if (spawnTime == null) {
             return 0;
         }
 
         Instant despawnTime = spawnTime.plus(groundItem.getDespawnTime());
-        if (Instant.now().isAfter(despawnTime))
-        {
+        if (Instant.now().isAfter(despawnTime)) {
             // that's weird
             return 0;
         }
@@ -130,11 +129,13 @@ public class Rs2GroundItem {
 
         return (int) (despawnTimeMillis / 600);
     }
+
     /**
      * Returns all the ground items at a tile on the current plane.
      *
      * @param x The x position of the tile in the world.
      * @param y The y position of the tile in the world.
+     *
      * @return An array of the ground items on the specified tile.
      */
     public static RS2Item[] getAllAt(int x, int y) {
@@ -258,10 +259,9 @@ public class Rs2GroundItem {
 
 
     public static boolean lootItemBasedOnValue(LootingParameters params) {
-        Predicate<GroundItem> filter = groundItem -> groundItem.getGePrice() > params.getMinValue() && groundItem.getGePrice() < params.getMaxValue() &&
+        Predicate<GroundItem> filter = groundItem -> (groundItem.getGePrice() / groundItem.getQuantity()) > params.getMinValue() && (groundItem.getGePrice() / groundItem.getQuantity()) < params.getMaxValue() &&
                 groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < params.getRange() &&
-                (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
-                (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_OTHER);
+                (!params.isAntiLureProtection() || (params.isAntiLureProtection() && groundItem.getOwnership() == OWNERSHIP_SELF));
 
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
                 .filter(filter)
@@ -278,10 +278,13 @@ public class Rs2GroundItem {
         for (GroundItem groundItem : groundItems) {
             if (groundItem.getQuantity() < params.getMinItems()) continue;
             if (Rs2Inventory.getEmptySlots() <= params.getMinInvSlots()) return true;
-            if (interact(groundItem)) {
-                Microbot.pauseAllScripts = true;
-                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 5000);
+            for (int i = groundItem.getQuantity(); i > 0; i--) {
+                if (interact(groundItem)) {
+                    Microbot.pauseAllScripts = true;
+                    sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 10, 5000);
+                }
             }
+
         }
         sleepUntil(() -> !isLooting(filter));
         return !groundItems.isEmpty();
@@ -290,8 +293,7 @@ public class Rs2GroundItem {
     public static boolean lootItemsBasedOnNames(LootingParameters params) {
         final Predicate<GroundItem> filter = groundItem ->
                 groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < params.getRange() &&
-                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
-                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_OTHER) &&
+                        (!params.isAntiLureProtection() || (params.isAntiLureProtection() && groundItem.getOwnership() == OWNERSHIP_SELF)) &&
                         Arrays.stream(params.getNames()).anyMatch(name -> groundItem.getName().toLowerCase().contains(name.toLowerCase()));
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
                 .filter(filter)
@@ -301,7 +303,7 @@ public class Rs2GroundItem {
             // Get the ground item with the lowest despawn time
             GroundItem item = groundItems.stream().min(Comparator.comparingInt(Rs2GroundItem::calculateDespawnTime)).orElse(null);
             assert item != null;
-            if(calculateDespawnTime(item) > 150) return false;
+            if (calculateDespawnTime(item) > 150) return false;
         }
 
         for (GroundItem groundItem : groundItems) {
@@ -309,7 +311,7 @@ public class Rs2GroundItem {
             if (Rs2Inventory.getEmptySlots() <= params.getMinInvSlots()) return true;
             if (interact(groundItem)) {
                 Microbot.pauseAllScripts = true;
-                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100,5000);
+                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 2000);
             }
         }
         sleepUntil(() -> !isLooting(filter));
@@ -320,8 +322,7 @@ public class Rs2GroundItem {
     public static boolean lootUntradables(LootingParameters params) {
         final Predicate<GroundItem> filter = groundItem ->
                 groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < params.getRange() &&
-                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
-                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_OTHER) &&
+                        (!params.isAntiLureProtection() || (params.isAntiLureProtection() && groundItem.getOwnership() == OWNERSHIP_SELF)) &&
                         !groundItem.isTradeable() &&
                         groundItem.getId() != ItemID.COINS_995;
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
@@ -340,7 +341,7 @@ public class Rs2GroundItem {
             if (Rs2Inventory.getEmptySlots() <= params.getMinInvSlots()) return true;
             if (interact(groundItem)) {
                 Microbot.pauseAllScripts = true;
-                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 5000);
+                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 2000);
             }
         }
         sleepUntil(() -> !isLooting(filter));
@@ -351,8 +352,7 @@ public class Rs2GroundItem {
     public static boolean lootCoins(LootingParameters params) {
         final Predicate<GroundItem> filter = groundItem ->
                 groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < params.getRange() &&
-                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_GROUP) &&
-                        (!params.isAntiLureProtection() || groundItem.getOwnership() != OWNERSHIP_OTHER) &&
+                        (!params.isAntiLureProtection() || (params.isAntiLureProtection() && groundItem.getOwnership() == OWNERSHIP_SELF)) &&
                         groundItem.getId() == ItemID.COINS_995;
         List<GroundItem> groundItems = GroundItemsPlugin.getCollectedGroundItems().values().stream()
                 .filter(filter)
@@ -370,7 +370,7 @@ public class Rs2GroundItem {
             if (Rs2Inventory.getEmptySlots() <= params.getMinInvSlots()) return true;
             if (interact(groundItem)) {
                 Microbot.pauseAllScripts = true;
-                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 5000);
+                sleepUntilTrue(Rs2Inventory::waitForInventoryChanges, 100, 2000);
             }
         }
         sleepUntil(() -> !isLooting(filter));
@@ -472,7 +472,7 @@ public class Rs2GroundItem {
         return false;
     }
 
-    @Deprecated(since="1.0.0")
+    @Deprecated(since = "1.0.0")
     public static boolean interact(String itemName, String action, int x, int y) {
         RS2Item[] itemsAtTile = getAllAt(x, y);
         if (itemsAtTile != null) {
@@ -485,7 +485,7 @@ public class Rs2GroundItem {
         return false;
     }
 
-    @Deprecated(since="1.0.0")
+    @Deprecated(since = "1.0.0")
     public static boolean interact(int itemId, String action, int x, int y) {
         RS2Item[] itemsAtTile = getAllAt(x, y);
         if (itemsAtTile != null) {
@@ -519,7 +519,7 @@ public class Rs2GroundItem {
         return false;
     }
 
-    @Deprecated(since="1.0.0")
+    @Deprecated(since = "1.0.0")
     public static boolean exists(String itemName, int x, int y) {
         RS2Item[] itemsAtTile = getAllAt(x, y);
         if (itemsAtTile != null) {

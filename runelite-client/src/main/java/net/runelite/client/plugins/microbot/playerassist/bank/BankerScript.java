@@ -5,16 +5,14 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.constants.Constants;
-import net.runelite.client.plugins.microbot.util.MicrobotInventorySetup;
+import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -79,10 +77,11 @@ public class BankerScript extends Script {
 
     public boolean withdrawUpkeepItems(PlayerAssistConfig config) {
         if (config.useInventorySetup()) {
-            if (!MicrobotInventorySetup.doesEquipmentMatch(config.inventorySetup())) {
-                MicrobotInventorySetup.loadEquipment(config.inventorySetup(), mainScheduledFuture);
+            Rs2InventorySetup inventorySetup = new Rs2InventorySetup(config.inventorySetup(), mainScheduledFuture);
+            if (!inventorySetup.doesEquipmentMatch()) {
+                inventorySetup.loadEquipment();
             }
-            MicrobotInventorySetup.loadInventory(config.inventorySetup(), mainScheduledFuture);
+            inventorySetup.loadInventory();
             return true;
         }
 
@@ -92,11 +91,23 @@ public class BankerScript extends Script {
                 log.info("Item: {} Count: {}", item.name(), count);
                 if (count < item.getValue(config)) {
                     log.info("Withdrawing {} {}(s)", item.getValue(config) - count, item.name());
-                    for (int id : item.getIds().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList())) {
-                        log.info("Checking bank for item: {}", id);
-                        if (Rs2Bank.hasBankItem(id, item.getValue(config) - count)) {
-                            Rs2Bank.withdrawX(true, id, item.getValue(config) - count);
-                            break;
+                    if (item.name().equals("FOOD")) {
+                        for (Rs2Food food : Arrays.stream(Rs2Food.values()).sorted(Comparator.comparingInt(Rs2Food::getHeal).reversed()).collect(Collectors.toList())) {
+                            log.info("Checking bank for food: {}", food.getName());
+                            if (Rs2Bank.hasBankItem(food.getId(), item.getValue(config) - count)) {
+                                Rs2Bank.withdrawX(true, food.getId(), item.getValue(config) - count);
+                                break;
+                            }
+                        }
+                    } else {
+                        ArrayList<Integer> ids = new ArrayList<>(item.getIds());
+                        Collections.reverse(ids);
+                        for (int id : ids) {
+                            log.info("Checking bank for item: {}", id);
+                            if (Rs2Bank.hasBankItem(id, item.getValue(config) - count)) {
+                                Rs2Bank.withdrawX(true, id, item.getValue(config) - count);
+                                break;
+                            }
                         }
                     }
                 }
@@ -110,7 +121,8 @@ public class BankerScript extends Script {
                 .filter(item -> item.isEnabled(config))
                 .flatMap(item -> item.getIds().stream())
                 .collect(Collectors.toList());
-        return Rs2Bank.isOpen() && Rs2Bank.depositAllExcept(ids.toArray(new Integer[0]));
+        Rs2Bank.depositAllExcept(ids.toArray(new Integer[0]));
+        return Rs2Bank.isOpen();
     }
 
     public boolean isUpkeepItemDepleted(PlayerAssistConfig config) {
