@@ -22,7 +22,6 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Potion;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -70,8 +69,6 @@ public class VorkathScript extends Script {
     NPC vorkath;
     boolean hasEquipment = false;
     boolean hasInventory = false;
-    boolean clickedSafeTile = false;
-    boolean clickedVorkath = false;
     boolean init = true;
     String primaryBolts = "";
     Rs2InventorySetup rs2InventorySetup;
@@ -91,15 +88,19 @@ public class VorkathScript extends Script {
     private void calculateState() {
         if (Rs2Npc.getNpc(NpcID.VORKATH_8061) != null) {
             state = State.FIGHT_VORKATH;
+            return;
         }
         if (Rs2Npc.getNpc(NpcID.VORKATH_8059) != null) {
             state = State.PREPARE_FIGHT;
+            return;
         }
         if (Rs2GameObject.findObjectById(ObjectID.ICE_CHUNKS_31990) != null) {
             state = State.WALK_TO_VORKATH;
+            return;
         }
         if (isCloseToRelleka()) {
             state = State.WALK_TO_VORKATH_ISLAND;
+            return;
         }
         if (Rs2Npc.getNpc(NpcID.TORFINN_10406) != null) {
             state = State.WALK_TO_VORKATH;
@@ -450,7 +451,11 @@ public class VorkathScript extends Script {
                     Rs2Inventory.interact(config.teleportMode().getItemName(), config.teleportMode().getAction());
                     break;
                 case CRAFTING_CAPE:
-                    Rs2Inventory.interact("crafting cape", "teleport");
+                    if (Rs2Equipment.isWearing("crafting cape")) {
+                        Rs2Equipment.interact("crafting cape", "teleport");
+                    } else {
+                        Rs2Inventory.interact("crafting cape", "teleport");
+                    }
                     break;
             }
             Rs2Player.waitForAnimation();
@@ -552,8 +557,6 @@ public class VorkathScript extends Script {
     private void handleAcidWalk() {
         if (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_32000).isEmpty()) {
             Rs2Npc.interact("Vorkath", "attack");
-            clickedVorkath = false;
-            clickedSafeTile = false;
             state = State.FIGHT_VORKATH;
             acidPools.clear();
             return;
@@ -570,27 +573,10 @@ public class VorkathScript extends Script {
 
         if (safeTile != null) {
             if (playerLocation.equals(safeTile)) {
-                clickedSafeTile = false;
-                if (clickedVorkath) {
-                    return;
-                }
-                WorldPoint wooxTile = new WorldPoint(safeTile.getX(), safeTile.getY() + 1, safeTile.getPlane());
-                //Rs2Player.eatAt(75);
-                //Rs2Walker.walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), wooxTile));
-                Rs2Npc.interact("Vorkath", "attack");
-                clickedVorkath = true;
-                Microbot.log("Walking to woox tile");
-                Rs2Random.wait(100, 150);
+                Rs2Npc.interact(vorkath, "attack");
             } else {
-                if (clickedSafeTile) {
-                    clickedVorkath = false;
-                    return;
-                }
-                Rs2Player.eatAt(60);
+                Rs2Player.eatAt(75);
                 Rs2Walker.walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), safeTile));
-                clickedSafeTile = true;
-                Microbot.log("Walking to safe tile");
-                Rs2Random.wait(100, 150);
             }
         }
     }

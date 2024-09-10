@@ -287,7 +287,7 @@ public class Microbot {
 
 
         if (!Microbot.getClient().isClientThread()) {
-            sleep(50, 80);
+            sleep(50, 100);
         }
     }
 
