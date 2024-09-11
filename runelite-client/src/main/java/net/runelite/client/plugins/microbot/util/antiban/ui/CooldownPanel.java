@@ -14,7 +14,7 @@ public class CooldownPanel extends JPanel {
     private final JSlider actionCooldownChance = new JSlider(0, 100, (int) (Rs2AntibanSettings.actionCooldownChance * 100));
     private final JSlider timeout = new JSlider(0, 60, Rs2Antiban.getTIMEOUT());
     private final JLabel actionCooldownChanceLabel = new JLabel("Action Cooldown Chance (%): " + (int) (Rs2AntibanSettings.actionCooldownChance * 100));
-    private final JLabel timeoutLabel = new JLabel("Timeout (min): " + Rs2Antiban.getTIMEOUT());
+    private final JLabel timeoutLabel = new JLabel("Timeout (ticks): " + Rs2Antiban.getTIMEOUT());
 
     public CooldownPanel() {
         // Set the layout manager for the panel to GridBagLayout
