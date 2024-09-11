@@ -6,10 +6,12 @@ import net.runelite.api.TileObject;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.cooking.AutoCookingConfig;
-import net.runelite.client.plugins.microbot.cooking.AutoCookingPlugin;
 import net.runelite.client.plugins.microbot.cooking.enums.CookingAreaType;
 import net.runelite.client.plugins.microbot.cooking.enums.CookingItem;
 import net.runelite.client.plugins.microbot.cooking.enums.CookingLocation;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
+import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
@@ -17,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -44,11 +47,15 @@ public class AutoCookingScript extends Script {
     public boolean run(AutoCookingConfig config) {
         Microbot.enableAutoRunOn = false;
         CookingItem cookingItem = config.cookingItem();
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyCookingSetup();
+        Rs2Antiban.setActivity(Activity.GENERAL_COOKING);
         init = true;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+                if (Rs2AntibanSettings.actionCooldownActive) return;
 
                 if (init) {
                     if (initialPlayerLocation == null) {
@@ -93,6 +100,9 @@ public class AutoCookingScript extends Script {
 
                             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                             Microbot.status = "Cooking " + cookingItem.getRawItemName();
+                            
+                            Rs2Antiban.actionCooldown();
+                            Rs2Antiban.takeMicroBreakByChance();
 
                             sleepUntil(() -> (Rs2Player.getAnimation() != AnimationID.IDLE));
                             sleepUntilTrue(() -> (!hasRawItem(cookingItem) && !Rs2Player.isAnimating(3500))
@@ -126,47 +136,16 @@ public class AutoCookingScript extends Script {
 
                         if (hasCookedItem(cookingItem)) {
                             Rs2Bank.depositAll(cookingItem.getCookedItemName(), true);
-                            sleep(Random.random(800, 1600));
+                            Rs2Random.wait(800, 1600);
                         }
-
-                        if (cookingItem.equals(CookingItem.UNCOOKED_PIZZA)) {
-                            Rs2Bank.depositAll();
-                            if (Rs2Bank.count("pot of flour") > 9 && Rs2Bank.count(config.humidifyItem().getFilledItemName()) > 9) {
-                                Rs2Bank.withdrawX("pot of flour", 9);
-                                sleep(Random.random(600, 800));
-                                Rs2Bank.withdrawX(config.humidifyItem().getFilledItemName(), 9);
-                                sleep(Random.random(800, 1600));
-                                state = CookingState.COMBINE;
-                                Rs2Bank.closeBank();
-                                return;
-                            }
-                            if (Rs2Bank.count("pizza base") >= 1 && Rs2Bank.count("tomato") >= 1) {
-                                Rs2Bank.withdrawX("pizza base", 14);
-                                sleep(Random.random(600, 800));
-                                Rs2Bank.withdrawX("tomato", 14);
-                                sleep(Random.random(800, 1600));
-                                state = CookingState.COMBINE;
-                                Rs2Bank.closeBank();
-                                return;
-                            }
-                            if (Rs2Bank.count("incomplete pizza") >= 1 && Rs2Bank.count("cheese") >= 1) {
-                                Rs2Bank.withdrawX("incomplete pizza", 14);
-                                sleep(Random.random(600, 800));
-                                Rs2Bank.withdrawX("cheese", 14);
-                                sleep(Random.random(800, 1600));
-                                state = CookingState.COMBINE;
-                                Rs2Bank.closeBank();
-                                return;
-                            }
-
-                        }
+                        
                         if (!hasRawItem(cookingItem)) {
                             Microbot.showMessage("No Raw Food Item found in Bank");
                             shutdown();
                             return;
                         }
                         Rs2Bank.withdrawAll(cookingItem.getRawItemName(), true);
-                        sleep(Random.random(800, 1600));
+                        Rs2Random.wait(800, 1600);
                         state = CookingState.WALKING;
                         Rs2Bank.closeBank();
                         break;
@@ -182,34 +161,6 @@ public class AutoCookingScript extends Script {
                             state = CookingState.COOKING;
                         } else {
                             state = CookingState.BANKING;
-                        }
-                        break;
-                    case COMBINE:
-                        if (Rs2Inventory.contains("pot of flour") && Rs2Inventory.contains(config.humidifyItem().getFilledItemName())) {
-                            Rs2Inventory.combine("pot of flour", config.humidifyItem().getFilledItemName());
-                            Rs2Widget.sleepUntilHasWidget("what sort of dough do you wish to make?");
-                            Rs2Widget.clickWidget("pizza base");
-                            sleep(Random.random(10600, 11800));
-                            state = CookingState.BANKING;
-                            return;
-                        }
-
-                        if (Rs2Inventory.contains("pizza base") && Rs2Inventory.contains("tomato")) {
-                            Rs2Inventory.combine("pizza base", "tomato");
-                            Rs2Widget.sleepUntilHasWidget("how many do you wish to make?");
-                            Rs2Widget.clickWidget("pizza base with tomato");
-                            sleep(Random.random(10600, 11800));
-                            state = CookingState.BANKING;
-                            return;
-                        }
-
-                        if (Rs2Inventory.contains("incomplete pizza") && Rs2Inventory.contains("cheese")) {
-                            Rs2Inventory.combine("incomplete pizza", "cheese");
-                            Rs2Widget.sleepUntilHasWidget("how many do you wish to make?");
-                            Rs2Widget.clickWidget("uncooked pizza");
-                            sleep(Random.random(10600, 11800));
-                            state = CookingState.BANKING;
-                            return;
                         }
                         break;
                 }

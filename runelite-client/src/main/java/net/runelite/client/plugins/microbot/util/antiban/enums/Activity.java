@@ -74,6 +74,7 @@ public enum Activity {
     GENERAL_FARMING("General Farming", Category.SKILLING_FARMING, ActivityIntensity.MODERATE),
     GENERAL_PRAYER("General Prayer", Category.SKILLING_PRAYER, ActivityIntensity.HIGH),
     GENERAL_CONSTRUCTION("General Construction", Category.SKILLING_CONSTRUCTION, ActivityIntensity.MODERATE),
+    GENERAL_COLLECTING("General Collecting", Category.COLLECTING, ActivityIntensity.MODERATE),
     COMPLETING_THE_FORTIS_COLOSSEUM_WAVE_12("Completing the Fortis Colosseum (Wave 12)", Category.COMBAT_HIGH, ActivityIntensity.HIGH),
     KILLING_NEX_DUO("Killing Nex (Duo)", Category.COMBAT_HIGH, ActivityIntensity.HIGH),
     TOMBS_OF_AMASCUT_SOLO_500_RAID_LEVEL("Tombs of Amascut (solo 500 raid level)", Category.COMBAT_HIGH, ActivityIntensity.HIGH),
@@ -463,8 +464,9 @@ public enum Activity {
     COLLECTING_AIR_TALISMANS("Collecting air talismans", Category.COLLECTING, ActivityIntensity.MODERATE),
     KILLING_DARK_WIZARDS("Killing dark wizards", Category.COMBAT_LOW, ActivityIntensity.LOW),
     MINING_GOLD_ORE_FREE_TO_PLAY("Mining gold ore (free-to-play)", Category.SKILLING_MINING, ActivityIntensity.LOW),
-    GETTING_INFINITE_MONEY("Getting infinite money", Category.COLLECTING_NONE, ActivityIntensity.HIGH);
-
+    GETTING_INFINITE_MONEY("Getting infinite money", Category.COLLECTING_NONE, ActivityIntensity.HIGH),
+    SPLASHING("Splashing spells on monsters", Category.SKILLING_MAGIC, ActivityIntensity.VERY_LOW);
+    
     @Getter
     private final String method;
     @Getter

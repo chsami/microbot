@@ -107,7 +107,9 @@ public enum BankLocation {
             case CRAFTING_GUILD:
                 boolean hasFaladorHardDiary = Microbot.getVarbitValue(Varbits.DIARY_FALADOR_HARD) == 1;
                 boolean hasMaxedCrafting = Rs2Player.getSkillRequirement(Skill.CRAFTING, 99, false);
-                boolean isWearingCraftingGuild = (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron"));
+                boolean isWearingCraftingGuild = (Rs2Equipment.isWearing("brown apron") || Rs2Equipment.isWearing("golden apron")) ||
+                        (Rs2Equipment.isWearing("max cape") || Rs2Equipment.isWearing("max hood")) ||
+                        (Rs2Equipment.isWearing("crafting cape") || Rs2Equipment.isWearing("crafting hood"));
 
                 if (hasLineOfSight && Rs2Player.isMember() && (hasMaxedCrafting || hasFaladorHardDiary)) return true;
                 return Rs2Player.isMember() && isWearingCraftingGuild &&

@@ -25,8 +25,8 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.NaturalMouse;
-import net.runelite.client.plugins.timers.GameTimer;
-import net.runelite.client.plugins.timers.TimersPlugin;
+import net.runelite.client.plugins.timersandbuffs.GameTimer;
+import net.runelite.client.plugins.timersandbuffs.TimersAndBuffsPlugin;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
@@ -287,7 +287,7 @@ public class Microbot {
 
 
         if (!Microbot.getClient().isClientThread()) {
-            sleep(50, 80);
+            sleep(50, 100);
         }
     }
 
@@ -321,7 +321,7 @@ public class Microbot {
     }
 
     public static boolean isTimerActive(GameTimer gameTimer) {
-        if (!isPluginEnabled(TimersPlugin.class.getName())) {
+        if (!isPluginEnabled(TimersAndBuffsPlugin.class.getName())) {
             log("Please enable the timers plugin to make sure the script is working properly.");
             return true;
         }

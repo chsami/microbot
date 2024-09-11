@@ -90,11 +90,13 @@ public class LootTrackerPlugin extends Plugin
 {
 	private static final int MAX_DROPS = 1024;
 	private static final Duration MAX_AGE = Duration.ofDays(365L);
+	private static final int INVCHANGE_TIMEOUT = 10; // server ticks
 
 	// Activity/Event loot handling
 	private static final Pattern CLUE_SCROLL_PATTERN = Pattern.compile("You have completed [0-9]+ ([a-z]+) Treasure Trails?\\.");
 	private static final int THEATRE_OF_BLOOD_REGION = 12867;
 	private static final int THEATRE_OF_BLOOD_LOBBY = 14642;
+	private static final int ARAXXOR_LAIR = 14489;
 
 	// Herbiboar loot handling
 	@VisibleForTesting
@@ -326,6 +328,7 @@ public class LootTrackerPlugin extends Plugin
 	private InventoryID inventoryId;
 	private Multiset<Integer> inventorySnapshot;
 	private InvChangeCallback inventorySnapshotCb;
+	private int inventoryTimeout;
 
 	private String groundSnapshotName;
 	private int groundSnapshotCombatLevel;
@@ -660,6 +663,15 @@ public class LootTrackerPlugin extends Plugin
 	@Subscribe
 	public void onPostClientTick(PostClientTick postClientTick)
 	{
+		if (inventoryTimeout > 0)
+		{
+			if (--inventoryTimeout == 0)
+			{
+				log.debug("Inventory snapshot: Loot timeout");
+				resetEvent();
+			}
+		}
+
 		if (groundSnapshotCycleDelay > 0)
 		{
 			groundSnapshotCycleDelay--;
@@ -1129,9 +1141,7 @@ public class LootTrackerPlugin extends Plugin
 			inventorySnapshotCb.accept(items, groundItems, diffr);
 		}
 
-		inventoryId = null;
-		inventorySnapshot = null;
-		inventorySnapshotCb = null;
+		resetEvent();
 	}
 
 	@Subscribe
@@ -1245,6 +1255,17 @@ public class LootTrackerPlugin extends Plugin
 		}
 	}
 
+	@Subscribe
+	public void onAnimationChanged(AnimationChanged animationChanged)
+	{
+		Actor actor = animationChanged.getActor();
+		if (actor == client.getLocalPlayer() && actor.getAnimation() == AnimationID.FARMING_HARVEST_HERB && inAraxxorRegion())
+		{
+			log.debug("Harvest Araxxor");
+			onInvChange(InventoryID.INVENTORY, collectInvAndGroundItems(LootRecordType.NPC, "Araxxor"), 4);
+		}
+	}
+
 	private static boolean isNPCOp(MenuAction menuAction)
 	{
 		final int id = menuAction.getId();
@@ -1325,6 +1346,7 @@ public class LootTrackerPlugin extends Plugin
 		inventoryId = null;
 		inventorySnapshot = null;
 		inventorySnapshotCb = null;
+		inventoryTimeout = 0;
 	}
 
 	@FunctionalInterface
@@ -1367,9 +1389,15 @@ public class LootTrackerPlugin extends Plugin
 
 	private void onInvChange(InventoryID inv, InvChangeCallback cb)
 	{
+		onInvChange(inv, cb, INVCHANGE_TIMEOUT);
+	}
+
+	private void onInvChange(InventoryID inv, InvChangeCallback cb, int timeout)
+	{
 		inventoryId = inv;
 		inventorySnapshot = HashMultiset.create();
 		inventorySnapshotCb = cb;
+		inventoryTimeout = timeout * Constants.GAME_TICK_LENGTH / Constants.CLIENT_TICK_LENGTH;
 
 		final ItemContainer itemContainer = client.getItemContainer(inv);
 		if (itemContainer != null)
@@ -1413,6 +1441,12 @@ public class LootTrackerPlugin extends Plugin
 	{
 		int region = WorldPoint.fromLocalInstance(client, client.getLocalPlayer().getLocalLocation()).getRegionID();
 		return region == THEATRE_OF_BLOOD_REGION || region == THEATRE_OF_BLOOD_LOBBY;
+	}
+
+	private boolean inAraxxorRegion()
+	{
+		int region = WorldPoint.fromLocalInstance(client, client.getLocalPlayer().getLocalLocation()).getRegionID();
+		return region == ARAXXOR_LAIR;
 	}
 
 	void toggleItem(String name, boolean ignore)

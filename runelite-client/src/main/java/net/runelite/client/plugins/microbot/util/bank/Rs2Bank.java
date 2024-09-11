@@ -130,6 +130,10 @@ public class Rs2Bank {
         return Rs2Widget.findWidget("Rearrange mode", null) != null;
     }
 
+    public static List<Rs2Item> bankItems() {
+        return bankItems;
+    }
+
     /**
      * Closes the bank interface if it is open.
      *

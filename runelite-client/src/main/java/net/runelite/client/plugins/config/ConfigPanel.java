@@ -29,65 +29,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.lang.reflect.ParameterizedType;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.JTextComponent;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.config.ConfigDescriptor;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigItemDescriptor;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.config.ConfigObject;
-import net.runelite.client.config.ConfigSection;
-import net.runelite.client.config.ConfigSectionDescriptor;
-import net.runelite.client.config.Keybind;
-import net.runelite.client.config.ModifierlessKeybind;
-import net.runelite.client.config.Notification;
-import net.runelite.client.config.Range;
-import net.runelite.client.config.Units;
+import net.runelite.client.config.*;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ExternalPluginsChanged;
 import net.runelite.client.events.PluginChanged;
@@ -108,6 +51,22 @@ import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.SwingUtil;
 import net.runelite.client.util.Text;
 import org.apache.commons.lang3.ArrayUtils;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+import java.util.*;
 
 @Slf4j
 class ConfigPanel extends PluginPanel
@@ -203,6 +162,7 @@ class ConfigPanel extends PluginPanel
 		title.setForeground(Color.WHITE);
 
 		topPanel.add(title);
+
 	}
 
 	void init(PluginConfigurationDescriptor pluginConfig)
@@ -263,6 +223,7 @@ class ConfigPanel extends PluginPanel
 	{
 		mainPanel.removeAll();
 
+
 		ConfigDescriptor cd = pluginConfig.getConfigDescriptor();
 
 		final Map<String, JPanel> sectionWidgets = new HashMap<>();
@@ -271,6 +232,10 @@ class ConfigPanel extends PluginPanel
 			.compare(a.position(), b.position())
 			.compare(a.name(), b.name())
 			.result());
+
+		if (cd.getInformation() != null) {
+			buildInformationPanel(cd.getInformation());
+		}
 
 		for (ConfigSectionDescriptor csd : cd.getSections())
 		{
@@ -439,6 +404,30 @@ class ConfigPanel extends PluginPanel
 		mainPanel.add(backButton);
 
 		revalidate();
+	}
+
+	private void buildInformationPanel(ConfigInformation ci) {
+		// Create the main panel (similar to a Bootstrap panel)
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		panel.setBorder(new CompoundBorder(
+				new EmptyBorder(10, 10, 10, 10), // Outer padding
+				new LineBorder(Color.GRAY, 1)    // Border around the panel
+		));
+
+		// Create the body/content panel
+		JPanel bodyPanel = new JPanel();
+		bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS)); // Vertical alignment
+		bodyPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Padding inside the body
+		bodyPanel.setBackground(new Color(0, 142, 255, 50));
+		JLabel bodyLabel1 = new JLabel("<html>" + ci.value() + "</html>");
+		bodyLabel1.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		bodyPanel.add(bodyLabel1);
+		bodyPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Spacer between components
+
+		panel.add(bodyPanel, BorderLayout.CENTER);
+
+		mainPanel.add(panel);
 	}
 
 	private JCheckBox createCheckbox(ConfigDescriptor cd, ConfigItemDescriptor cid)

@@ -5,6 +5,7 @@ import net.runelite.client.config.*;
 import java.awt.*;
 
 @ConfigGroup(ShortestPathPlugin.CONFIG_GROUP)
+@ConfigInformation("Press 'ESC' to stop the webwalker automatically.")
 public interface ShortestPathConfig extends Config {
     @ConfigSection(
         name = "Settings",

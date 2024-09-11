@@ -24,11 +24,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.timers;
+package net.runelite.client.plugins.timersandbuffs;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.*;
+import net.runelite.api.annotations.Varp;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.*;
+import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.ItemVariationMapping;
+import net.runelite.client.game.SpriteManager;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
+import net.runelite.client.util.RSTimeUnit;
+import org.apache.commons.lang3.ArrayUtils;
+
+import javax.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.EnumMap;
@@ -38,57 +56,22 @@ import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Actor;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.api.InventoryID;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
-import net.runelite.api.ItemID;
+
 import static net.runelite.api.ItemID.FIRE_CAPE;
 import static net.runelite.api.ItemID.INFERNAL_CAPE;
-import net.runelite.api.NPC;
-import net.runelite.api.NpcID;
-import net.runelite.api.Player;
-import net.runelite.api.Skill;
-import net.runelite.api.VarPlayer;
 import static net.runelite.api.VarPlayer.LAST_HOME_TELEPORT;
 import static net.runelite.api.VarPlayer.LAST_MINIGAME_TELEPORT;
-import net.runelite.api.Varbits;
-import net.runelite.api.annotations.Varp;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ActorDeath;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.GraphicChanged;
-import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.events.NpcDespawned;
-import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.game.ItemVariationMapping;
-import net.runelite.client.game.SpriteManager;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDescriptor;
-import static net.runelite.client.plugins.timers.GameIndicator.VENGEANCE_ACTIVE;
-import static net.runelite.client.plugins.timers.GameTimer.*;
-import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
-import net.runelite.client.util.RSTimeUnit;
-import org.apache.commons.lang3.ArrayUtils;
+import static net.runelite.client.plugins.timersandbuffs.GameCounter.*;
+import static net.runelite.client.plugins.timersandbuffs.GameTimer.*;
 
 @PluginDescriptor(
-		name = "Timers",
-		description = "Show various timers in an infobox",
-		tags = {"combat", "items", "magic", "potions", "prayer", "overlay", "abyssal", "sire", "inferno", "fight", "caves", "cape", "timer", "tzhaar", "thieving", "pickpocket", "hunter", "impling", "puro"}
+	name = "Timers & Buffs",
+	configName = "TimersPlugin",
+	description = "Show various timers and buffs in an infobox",
+	tags = {"combat", "items", "magic", "potions", "prayer", "overlay", "abyssal", "sire", "inferno", "fight", "caves", "cape", "timer", "tzhaar", "thieving", "pickpocket", "hunter", "impling", "puro", "buff"}
 )
 @Slf4j
-public class TimersPlugin extends Plugin
+public class TimersAndBuffsPlugin extends Plugin
 {
 	private static final String ABYSSAL_SIRE_STUN_MESSAGE = "The Sire has been disorientated temporarily.";
 	private static final String CANNON_BASE_MESSAGE = "You place the cannon base on the ground.";
@@ -144,7 +127,8 @@ public class TimersPlugin extends Plugin
 	private WorldPoint lastPoint;
 	private ElapsedTimer tzhaarTimer;
 
-	public static TimerTimer t;
+	private final Map<GameCounter, BuffCounter> varCounters = new EnumMap<>(GameCounter.class);
+	private static final int ECLIPSE_MOON_REGION_ID = 6038;
 
 	@Inject
 	private ItemManager itemManager;
@@ -156,15 +140,17 @@ public class TimersPlugin extends Plugin
 	private Client client;
 
 	@Inject
-	private TimersConfig config;
+	private TimersAndBuffsConfig config;
 
 	@Inject
 	private InfoBoxManager infoBoxManager;
 
+	public static TimerTimer t;
+
 	@Provides
-	TimersConfig getConfig(ConfigManager configManager)
+	TimersAndBuffsConfig getConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(TimersConfig.class);
+		return configManager.getConfig(TimersAndBuffsConfig.class);
 	}
 
 	@Override
@@ -188,6 +174,8 @@ public class TimersPlugin extends Plugin
 		nextSuperAntifireTick = 0;
 		removeTzhaarTimer();
 		varTimers.clear();
+		infoBoxManager.removeIf(buffCounter -> buffCounter instanceof BuffCounter);
+		varCounters.clear();
 	}
 
 	@Subscribe
@@ -297,14 +285,7 @@ public class TimersPlugin extends Plugin
 
 		if (event.getVarbitId() == Varbits.VENGEANCE_ACTIVE && config.showVengeanceActive())
 		{
-			if (event.getValue() == 1)
-			{
-				createGameIndicator(VENGEANCE_ACTIVE);
-			}
-			else
-			{
-				removeGameIndicator(VENGEANCE_ACTIVE);
-			}
+			updateVarCounter(VENGEANCE_ACTIVE, event.getValue());
 		}
 
 		if (event.getVarbitId() == Varbits.DEATH_CHARGE && config.showArceuus())
@@ -478,10 +459,19 @@ public class TimersPlugin extends Plugin
 		if (event.getVarbitId() == Varbits.DIVINE_SUPER_DEFENCE && config.showDivine())
 		{
 			if (client.getVarbitValue(Varbits.DIVINE_SUPER_COMBAT) > event.getValue()
-					|| client.getVarbitValue(Varbits.DIVINE_BASTION) > event.getValue()
-					|| client.getVarbitValue(Varbits.DIVINE_BATTLEMAGE) > event.getValue())
+				|| client.getVarbitValue(Varbits.DIVINE_BASTION) > event.getValue()
+				|| client.getVarbitValue(Varbits.DIVINE_BATTLEMAGE) > event.getValue()
+				// When drinking a dose of moonlight potion while already under its effects, desync between
+				// Varbits.MOONLIGHT_POTION and Varbits.DIVINE_SUPER_DEFENCE can occur, with the latter being 1 tick
+				// greater
+				|| client.getVarbitValue(Varbits.MOONLIGHT_POTION) >= event.getValue())
 			{
 				return;
+			}
+
+			if (client.getVarbitValue(Varbits.MOONLIGHT_POTION) < event.getValue())
+			{
+				removeVarTimer(MOONLIGHT_POTION);
 			}
 
 			updateVarTimer(DIVINE_SUPER_DEFENCE, event.getValue(), IntUnaryOperator.identity());
@@ -577,12 +567,43 @@ public class TimersPlugin extends Plugin
 		{
 			updateVarTimer(GOD_WARS_ALTAR, event.getValue(), i -> i * 100);
 		}
+
+		if (event.getVarbitId() == Varbits.CURSE_OF_THE_MOONS && config.showCurseOfTheMoons())
+		{
+			final int regionID = WorldPoint.fromLocal(client, client.getLocalPlayer().getLocalLocation()).getRegionID();
+			if (regionID == ECLIPSE_MOON_REGION_ID)
+			{
+				updateVarCounter(CURSE_OF_THE_MOONS_ECLIPSE, event.getValue());
+			}
+			else
+			{
+				updateVarCounter(CURSE_OF_THE_MOONS_BLUE, event.getValue());
+			}
+		}
+
+		if (event.getVarbitId() == Varbits.COLOSSEUM_DOOM && config.showColosseumDoom())
+		{
+			updateVarCounter(COLOSSEUM_DOOM, event.getValue());
+		}
+
+		if (event.getVarbitId() == Varbits.MOONLIGHT_POTION && config.showMoonlightPotion())
+		{
+			int moonlightValue = event.getValue();
+			// Increase the timer by 1 tick in case of desync due to drinking a dose of moonlight potion while already
+			// under its effects. Otherwise, the timer would be 1 tick shorter than it is meant to be.
+			if (client.getVarbitValue(Varbits.DIVINE_SUPER_DEFENCE) == moonlightValue + 1)
+			{
+				moonlightValue++;
+			}
+
+			updateVarTimer(MOONLIGHT_POTION, moonlightValue, IntUnaryOperator.identity());
+		}
 	}
 
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if (!event.getGroup().equals(TimersConfig.GROUP))
+		if (!event.getGroup().equals(TimersAndBuffsConfig.GROUP))
 		{
 			return;
 		}
@@ -676,7 +697,7 @@ public class TimersPlugin extends Plugin
 
 		if (!config.showVengeanceActive())
 		{
-			removeGameIndicator(VENGEANCE_ACTIVE);
+			removeVarCounter(VENGEANCE_ACTIVE);
 		}
 
 		if (!config.showTeleblock())
@@ -772,6 +793,22 @@ public class TimersPlugin extends Plugin
 		if (!config.showSpellbookSwap())
 		{
 			removeGameTimer(SPELLBOOK_SWAP);
+		}
+
+		if (!config.showCurseOfTheMoons())
+		{
+			removeVarCounter(CURSE_OF_THE_MOONS_BLUE);
+			removeVarCounter(CURSE_OF_THE_MOONS_ECLIPSE);
+		}
+
+		if (!config.showColosseumDoom())
+		{
+			removeVarCounter(COLOSSEUM_DOOM);
+		}
+
+		if (!config.showMoonlightPotion())
+		{
+			removeVarTimer(MOONLIGHT_POTION);
 		}
 	}
 
@@ -1061,6 +1098,8 @@ public class TimersPlugin extends Plugin
 					config.tzhaarStartTime(null);
 					config.tzhaarLastTime(null);
 				}
+				// Varbits.COLOSSEUM_DOOM is not set to 0 when teleporting out of the Colosseum.
+				removeVarCounter(COLOSSEUM_DOOM);
 				break;
 			case LOGIN_SCREEN:
 				// fall through
@@ -1077,7 +1116,6 @@ public class TimersPlugin extends Plugin
 				break;
 		}
 	}
-
 
 	@Subscribe
 	public void onGraphicChanged(GraphicChanged event)
@@ -1144,7 +1182,7 @@ public class TimersPlugin extends Plugin
 		ItemContainer container = itemContainerChanged.getItemContainer();
 
 		Item weapon = container.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
-		if (weapon == null || STAVES_OF_THE_DEAD.contains(weapon.getId()))
+		if (weapon == null || !STAVES_OF_THE_DEAD.contains(weapon.getId()))
 		{
 			// remove sotd timer if the staff has been unwielded
 			removeGameTimer(STAFF_OF_THE_DEAD);
@@ -1213,31 +1251,6 @@ public class TimersPlugin extends Plugin
 		infoBoxManager.removeIf(t -> t instanceof TimerTimer && ((TimerTimer) t).getTimer() == timer);
 	}
 
-	private IndicatorIndicator createGameIndicator(GameIndicator gameIndicator)
-	{
-		removeGameIndicator(gameIndicator);
-
-		IndicatorIndicator indicator = new IndicatorIndicator(gameIndicator, this);
-		switch (gameIndicator.getImageType())
-		{
-			case SPRITE:
-				spriteManager.getSpriteAsync(gameIndicator.getImageId(), 0, indicator);
-				break;
-			case ITEM:
-				indicator.setImage(itemManager.getImage(gameIndicator.getImageId()));
-				break;
-		}
-		indicator.setTooltip(gameIndicator.getDescription());
-		infoBoxManager.addInfoBox(indicator);
-
-		return indicator;
-	}
-
-	private void removeGameIndicator(GameIndicator indicator)
-	{
-		infoBoxManager.removeIf(t -> t instanceof IndicatorIndicator && ((IndicatorIndicator) t).getIndicator() == indicator);
-	}
-
 	private void updateVarTimer(final GameTimer gameTimer, final int varValue, final IntUnaryOperator tickDuration)
 	{
 		updateVarTimer(gameTimer, varValue, i -> i == 0, tickDuration);
@@ -1271,5 +1284,54 @@ public class TimersPlugin extends Plugin
 	{
 		removeGameTimer(gameTimer);
 		varTimers.remove(gameTimer);
+	}
+
+	private void updateVarCounter(final GameCounter gameCounter, final int varValue)
+	{
+		BuffCounter buffCounter = varCounters.get(gameCounter);
+
+		if (varValue == 0)
+		{
+			removeVarCounter(gameCounter);
+		}
+		else if (buffCounter == null)
+		{
+			buffCounter = createBuffCounter(gameCounter, varValue);
+			varCounters.put(gameCounter, buffCounter);
+		}
+		else
+		{
+			buffCounter.setCount(varValue);
+		}
+	}
+
+	private BuffCounter createBuffCounter(GameCounter gameCounter, int count)
+	{
+		removeBuffCounter(gameCounter);
+
+		BuffCounter buffCounter = new BuffCounter(this, gameCounter, count);
+		switch (gameCounter.getImageType())
+		{
+			case SPRITE:
+				spriteManager.getSpriteAsync(gameCounter.getImageId(), 0, buffCounter);
+				break;
+			case ITEM:
+				buffCounter.setImage(itemManager.getImage(gameCounter.getImageId()));
+				break;
+		}
+		buffCounter.setTooltip(gameCounter.getDescription());
+		infoBoxManager.addInfoBox(buffCounter);
+		return buffCounter;
+	}
+
+	private void removeVarCounter(final GameCounter gameCounter)
+	{
+		removeBuffCounter(gameCounter);
+		varCounters.remove(gameCounter);
+	}
+
+	private void removeBuffCounter(GameCounter gameCounter)
+	{
+		infoBoxManager.removeIf(b -> b instanceof BuffCounter && ((BuffCounter) b).getGameCounter() == gameCounter);
 	}
 }

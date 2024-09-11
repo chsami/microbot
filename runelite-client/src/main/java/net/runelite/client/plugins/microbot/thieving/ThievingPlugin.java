@@ -8,8 +8,8 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.timers.TimersPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.plugins.timersandbuffs.TimersAndBuffsPlugin;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -56,7 +56,7 @@ public class ThievingPlugin extends Plugin {
     public void onChatMessage(ChatMessage chatMessage)
     {
         if (chatMessage.getType() == ChatMessageType.GAMEMESSAGE && chatMessage.getMessage().contains("protects you")) {
-            TimersPlugin.t = null;
+            TimersAndBuffsPlugin.t = null;
         }
     }
 }

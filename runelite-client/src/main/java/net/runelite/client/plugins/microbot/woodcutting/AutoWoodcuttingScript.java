@@ -2,9 +2,12 @@ package net.runelite.client.plugins.microbot.woodcutting;
 
 import net.runelite.api.AnimationID;
 import net.runelite.api.GameObject;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -16,8 +19,7 @@ import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingWalkBack;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,8 @@ public class AutoWoodcuttingScript extends Script {
         if (config.hopWhenPlayerDetected()) {
             Microbot.showMessage("Make sure autologin plugin is enabled and randomWorld checkbox is checked!");
         }
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyWoodcuttingSetup();
         initialPlayerLocation = null;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -71,6 +75,9 @@ public class AutoWoodcuttingScript extends Script {
 
                 switch (state) {
                     case WOODCUTTING:
+                        if(!Rs2Antiban.getActivity().equals(Activity.GENERAL_WOODCUTTING))
+                            Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
+                        
                         if (config.hopWhenPlayerDetected()) {
                             Rs2Player.logoutIfPlayerDetected(1, 10);
                             return;
@@ -90,7 +97,7 @@ public class AutoWoodcuttingScript extends Script {
                             if(Rs2GameObject.interact(tree, config.TREE().getAction())) {
                                 Rs2Player.waitForAnimation();
                                 if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
-                                    returnPoint = Microbot.getClient().getLocalPlayer().getWorldLocation();
+                                    returnPoint = Rs2Player.getWorldLocation();
                                 }
                             }
                         }
@@ -121,6 +128,9 @@ public class AutoWoodcuttingScript extends Script {
                 state = State.WOODCUTTING;
                 break;
             case FIREMAKE:
+                if(!Rs2Antiban.getActivity().equals(Activity.GENERAL_FIREMAKING))
+                    Rs2Antiban.setActivity(Activity.GENERAL_FIREMAKING);
+                
                 do {
                     burnLog(config);
                 }
@@ -145,21 +155,38 @@ public class AutoWoodcuttingScript extends Script {
             Rs2Inventory.use(config.TREE().getLog());
             sleepUntil(Rs2Inventory::waitForInventoryChanges);
         }
-        sleepUntil(() -> !isFiremake() && !Rs2Player.isStandingOnGameObject() && !Rs2Player.isStandingOnGroundItem(), 2500);
+        sleepUntil(() -> !isFiremake() && !Rs2Player.isStandingOnGameObject() && !Rs2Player.isStandingOnGroundItem(), 3500);
     }
 
     private WorldPoint fireSpot(int distance) {
         List<WorldPoint> worldPoints = Rs2Tile.getWalkableTilesAroundPlayer(distance);
+        WorldPoint playerLocation = Rs2Player.getWorldLocation();
+
+        // Create a map to group tiles by their distance from the player
+        Map<Integer, List<WorldPoint>> distanceMap = new HashMap<>();
 
         for (WorldPoint walkablePoint : worldPoints) {
             if (Rs2GameObject.getGameObject(walkablePoint) == null) {
-                return walkablePoint;
+                int tileDistance = playerLocation.distanceTo(walkablePoint);
+                distanceMap.computeIfAbsent(tileDistance, k -> new ArrayList<>()).add(walkablePoint);
             }
         }
 
-        fireSpot(distance + 1);
+        // Find the minimum distance that has walkable points
+        Optional<Integer> minDistanceOpt = distanceMap.keySet().stream().min(Integer::compare);
 
-        return null;
+        if (minDistanceOpt.isPresent()) {
+            List<WorldPoint> closestPoints = distanceMap.get(minDistanceOpt.get());
+
+            // Return a random point from the closest points
+            if (!closestPoints.isEmpty()) {
+                int randomIndex = Random.random(0, closestPoints.size());
+                return closestPoints.get(randomIndex);
+            }
+        }
+
+        // Recursively increase the distance if no valid point is found
+        return fireSpot(distance + 1);
     }
 
     private boolean isFiremake() {
