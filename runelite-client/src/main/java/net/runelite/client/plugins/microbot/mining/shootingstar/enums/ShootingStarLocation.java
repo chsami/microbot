@@ -27,7 +27,7 @@ public enum ShootingStarLocation {
     DWARVEN_MINE_NORTHERN_ENTRANCE(new WorldPoint(3017, 3445, 0), "North Dwarven Mine entrance", "Dwarven Mine", false),
     NARDAH(new WorldPoint(3434, 2891, 0), "Nardah bank", "Nardah", false),
     AGILITY_PYRAMID_MINE(new WorldPoint(3314, 2867, 0), "Agility Pyramid mine", "Agility Pyramid", false),
-    UZER_MINE(new WorldPoint(3424, 3160, 0), "Nw of Uzer (Eagle's Eyrie)", "Uzer Mine", false),
+    UZER_MINE(new WorldPoint(3422, 3159, 0), "Nw of Uzer (Eagle's Eyrie)", "Uzer Mine", false),
     PORT_KHAZARD_MINE(new WorldPoint(2625, 3143, 0), "Port Khazard mine", "Port Khazard", false),
     GRAND_TREE(new WorldPoint(2446, 3491, 0), "West of Grand Tree", "Grand Tree", false),
     BANDIT_CAMP_MINE__HOBGOBLINS(new WorldPoint(3093, 3751, 0), "Hobgoblin mine (lvl 30 Wildy)", "Hobgoblin mine", true),
@@ -171,6 +171,15 @@ public enum ShootingStarLocation {
             case MINE_NORTH_WEST_OF_HUNTER_GUILD:
                 // Requires Children of the Sun
                 return Rs2Player.getQuestState(Quest.CHILDREN_OF_THE_SUN) == QuestState.FINISHED;
+            case CORSAIR_COVE:
+                // Requires The Corsair Curse if not Member
+                if (!Rs2Player.isMember()) {
+                    return (Rs2Player.getQuestState(Quest.THE_CORSAIR_CURSE) == QuestState.IN_PROGRESS || Rs2Player.getQuestState(Quest.THE_CORSAIR_CURSE) == QuestState.FINISHED);
+                }
+                return true;
+            case CORSAIR_COVE_RESOURCE_AREA:
+                // Requires Dragon Slayer I
+                return Rs2Player.getQuestState(Quest.DRAGON_SLAYER_I) == QuestState.FINISHED;
             default:
                 return true;
         }

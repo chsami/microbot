@@ -274,10 +274,13 @@ public class ShootingStarPanel extends PluginPanel {
 
     public void hideStars(List<Star> starList) {
         for (Star star : starList) {
-            if (plugin.isDisplayMembersWorlds() && star.isMemberWorld()) {
+            if (plugin.isHideMembersWorlds() && star.isMemberWorld()) {
                 hiddenStars.add(star);
             }
-            if (plugin.isDisplayWildernessLocations() && star.isInWilderness()) {
+            if (plugin.isHideF2PWorlds() && star.isF2PWorld()) {
+                hiddenStars.add(star);
+            }
+            if (plugin.isHideWildernessLocations() && star.isInWilderness()) {
                 hiddenStars.add(star);
             }
         }
@@ -286,12 +289,19 @@ public class ShootingStarPanel extends PluginPanel {
     public void showStars() {
         List<Star> starsToRemove = new ArrayList<>();
         for (Star star : hiddenStars) {
-            if (!plugin.isDisplayMembersWorlds() && star.isMemberWorld()) {
-                if (plugin.isDisplayWildernessLocations() && star.isInWilderness()) continue;
+            if (!plugin.isHideMembersWorlds() && star.isMemberWorld()) {
+                if (plugin.isHideF2PWorlds() && star.isF2PWorld()) continue;
+                if (plugin.isHideWildernessLocations() && star.isInWilderness()) continue;
                 starsToRemove.add(star);
             }
-            if (!plugin.isDisplayWildernessLocations() && star.isInWilderness()) {
-                if (plugin.isDisplayMembersWorlds() && star.isMemberWorld()) continue;
+            if (!plugin.isHideF2PWorlds() && star.isF2PWorld()) {
+                if (plugin.isHideMembersWorlds() && star.isMemberWorld()) continue;
+                if (plugin.isHideWildernessLocations() && star.isInWilderness()) continue;
+                starsToRemove.add(star);
+            }
+            if (!plugin.isHideWildernessLocations() && star.isInWilderness()) {
+                if (plugin.isHideMembersWorlds() && star.isMemberWorld()) continue;
+                if (plugin.isHideF2PWorlds() && star.isF2PWorld()) continue;
                 starsToRemove.add(star);
             }
         }
