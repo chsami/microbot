@@ -108,6 +108,9 @@ public class Star {
     public boolean isMemberWorld() {
         return !this.isGameModeWorld() && this.getWorldObject().getTypes().contains(WorldType.MEMBERS);
     }
+    public boolean isF2PWorld() {
+        return !this.isGameModeWorld() && !this.getWorldObject().getTypes().contains(WorldType.MEMBERS);
+    }
     
     @Override
     public boolean equals(Object obj) {
