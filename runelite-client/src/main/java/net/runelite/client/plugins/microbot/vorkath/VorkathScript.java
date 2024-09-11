@@ -56,7 +56,7 @@ enum State {
 }
 
 public class VorkathScript extends Script {
-    public static String version = "1.3.8";
+    public static String version = "1.3.9";
     public static VorkathConfig config;
     @Getter
     public final int acidProjectileId = 1483;
@@ -328,9 +328,7 @@ public class VorkathScript extends Script {
                         );
 
                         Rs2GroundItem.loot("Vorkath's head", 20);
-                        if (Rs2GroundItem.lootItemBasedOnValue(valueParams)) {
-                            Microbot.pauseAllScripts = false;
-                        }
+                        Rs2GroundItem.lootItemBasedOnValue(valueParams);
                         int foodInventorySize = Rs2Inventory.getInventoryFood().size();
                         boolean hasVenom = Rs2Inventory.hasItem("venom");
                         boolean hasSuperAntifire = Rs2Inventory.hasItem("super antifire");
