@@ -41,7 +41,6 @@ public class Rs2Shop {
      * @return
      */
     public static boolean isOpen() {
-        Microbot.status = "Checking if Shop is open";
         return Rs2Widget.getWidget(WidgetInfo.SHOP_INVENTORY_ITEMS_CONTAINER) != null
                 && !Rs2Widget.isHidden(WidgetInfo.SHOP_INVENTORY_ITEMS_CONTAINER.getId());
     }
