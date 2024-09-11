@@ -53,7 +53,7 @@ enum State {
 }
 
 public class VorkathScript extends Script {
-    public static String version = "1.3.7";
+    public static String version = "1.3.8";
     public static VorkathConfig config;
     @Getter
     public final int acidProjectileId = 1483;
@@ -556,7 +556,7 @@ public class VorkathScript extends Script {
 
     private void handleAcidWalk() {
         if (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_32000).isEmpty()) {
-            Rs2Npc.interact("Vorkath", "attack");
+            Rs2Npc.interact(vorkath, "attack");
             state = State.FIGHT_VORKATH;
             acidPools.clear();
             return;
