@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Potion;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1573,6 +1575,15 @@ public class Rs2Inventory {
     }
 
     /**
+     * Gets the total size of stackables of the inventory.
+     *
+     * @return The total size of stackable items of the inventory.
+     */
+    public static int stackableSize() {
+        return items().stream().filter(x -> x.isNoted || x.isStackable).mapToInt(x -> x.quantity).sum();
+    }
+
+    /**
      * Gets the slot for the item with the specified ID.
      *
      * @param id The ID of the item.
@@ -2121,17 +2132,15 @@ public class Rs2Inventory {
         }
     }
 
-    public static boolean waitForInventoryChanges() {
-        isTrackingInventory = true;
-        sleepUntil(() -> isInventoryChanged);
-        if (isInventoryChanged) {
-            isTrackingInventory = false;
-            isInventoryChanged = false;
-            return true;
-        }
-        isTrackingInventory = false;
-        isInventoryChanged = false;
-        return isInventoryChanged;
+    public static boolean waitForInventoryChanges(Runnable actionWhileWaiting) {
+        final int currentInventorySize = size();
+        final int currentInventoryStackableSize = stackableSize();
+        sleepUntil(() ->  {
+            actionWhileWaiting.run();
+            sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), Random.random(600, 2100));
+            return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
+        });
+        return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
     }
 
     /**
