@@ -39,7 +39,7 @@ import java.time.temporal.TemporalUnit;
 
 import static net.runelite.client.util.RSTimeUnit.GAME_TICKS;
 
-@Getter(AccessLevel.PACKAGE)
+@Getter(AccessLevel.PUBLIC)
 public enum GameTimer
 {
 	STAMINA(ItemID.STAMINA_POTION4, GameTimerImageType.ITEM, "Stamina", false),

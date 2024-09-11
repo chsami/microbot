@@ -16,7 +16,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
-import net.runelite.client.plugins.timers.GameTimer;
+import net.runelite.client.plugins.timersandbuffs.GameTimer;
 
 import java.util.Arrays;
 import java.util.List;
