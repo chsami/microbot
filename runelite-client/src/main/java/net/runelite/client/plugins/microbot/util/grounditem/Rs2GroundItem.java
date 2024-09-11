@@ -265,8 +265,10 @@ public class Rs2GroundItem {
              *  return true only if the item is stackable and is already present in the inventory.
              *  Otherwise, return false.
              */
-            if (Rs2Inventory.getEmptySlots() < groundItem.getQuantity() && !groundItem.isStackable()) {
-                if (!(groundItem.isStackable() && Rs2Inventory.hasItem(groundItem.getId())))
+            if (Rs2Inventory.getEmptySlots() < quantity) {
+                if (!groundItem.isStackable())
+                    return false;
+                if (!Rs2Inventory.hasItem(groundItem.getId()))
                     return false;
             }
             Microbot.pauseAllScripts = true;
@@ -276,7 +278,7 @@ public class Rs2GroundItem {
     }
 
     private static boolean validateLoot(Predicate<GroundItem> filter) {
-        boolean hasLootableItems = sleepUntilTrue(() -> !hasLootableItems(filter), 100, 5000);
+        boolean hasLootableItems = sleepUntilTrue(() -> hasLootableItems(filter), 600, 5000);
         //If there are no more lootable items we succesfully looted everything in the filter
         // true to let the script know that we succesfully looted
         if (!hasLootableItems) {
@@ -290,7 +292,7 @@ public class Rs2GroundItem {
 
 
     public static boolean lootItemBasedOnValue(LootingParameters params) {
-        Predicate<GroundItem> filter = groundItem -> (groundItem.getGePrice() / groundItem.getQuantity()) > params.getMinValue() && (groundItem.getGePrice() / groundItem.getQuantity()) < params.getMaxValue() &&
+        Predicate<GroundItem> filter = groundItem -> groundItem.getGePrice() > params.getMinValue() && (groundItem.getGePrice() / groundItem.getQuantity()) < params.getMaxValue() &&
                 groundItem.getLocation().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < params.getRange() &&
                 (!params.isAntiLureProtection() || (params.isAntiLureProtection() && groundItem.getOwnership() == OWNERSHIP_SELF));
 
