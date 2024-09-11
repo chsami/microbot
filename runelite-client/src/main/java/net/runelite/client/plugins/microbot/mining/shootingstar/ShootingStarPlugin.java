@@ -70,9 +70,11 @@ public class ShootingStarPlugin extends Plugin {
     @Getter
     private boolean displayAsMinutes;
     @Getter
-    private boolean displayMembersWorlds;
+    private boolean hideMembersWorlds;
     @Getter
-    private boolean displayWildernessLocations;
+    private boolean hideF2PWorlds;
+    @Getter
+    private boolean hideWildernessLocations;
     private boolean useNearestHighTierStar;
     @Inject
     private WorldService worldService;
@@ -125,7 +127,7 @@ public class ShootingStarPlugin extends Plugin {
 
             addToList(star);
         }
-        filterPanelList(displayWildernessLocations || displayMembersWorlds);
+        filterPanelList(hideWildernessLocations || hideMembersWorlds || hideF2PWorlds);
         updatePanelList(true);
     }
 
@@ -223,9 +225,10 @@ public class ShootingStarPlugin extends Plugin {
     @Override
     protected void startUp() throws AWTException {
         displayAsMinutes = config.isDisplayAsMinutes();
-        displayMembersWorlds = config.isDisplayMembersWorlds();
+        hideMembersWorlds = config.isHideMembersWorlds();
+        hideF2PWorlds = config.isHideF2PWorlds();
         useNearestHighTierStar = config.useNearestHighTierStar();
-        displayWildernessLocations = config.isDisplayWildernessLocations();
+        hideWildernessLocations = config.isHideWildernessLocations();
         try {
             loadUrlFromProperties();
         } catch (IOException e) {
@@ -259,15 +262,21 @@ public class ShootingStarPlugin extends Plugin {
             updatePanelList(true);
         }
 
-        if (event.getKey().equals(ShootingStarConfig.displayMembersWorlds)) {
-            displayMembersWorlds = config.isDisplayMembersWorlds();
-            filterPanelList(displayMembersWorlds);
+        if (event.getKey().equals(ShootingStarConfig.hideMembersWorlds)) {
+            hideMembersWorlds = config.isHideMembersWorlds();
+            filterPanelList(hideMembersWorlds);
             updatePanelList(true);
         }
 
-        if (event.getKey().equals(ShootingStarConfig.displayWildernessLocations)) {
-            displayWildernessLocations = config.isDisplayWildernessLocations();
-            filterPanelList(displayWildernessLocations);
+        if (event.getKey().equals(ShootingStarConfig.hideF2PWorlds)) {
+            hideF2PWorlds = config.isHideF2PWorlds();
+            filterPanelList(hideF2PWorlds);
+            updatePanelList(true);
+        }
+
+        if (event.getKey().equals(ShootingStarConfig.hideWildernessLocations)) {
+            hideWildernessLocations = config.isHideWildernessLocations();
+            filterPanelList(hideWildernessLocations);
             updatePanelList(true);
         }
 
@@ -327,7 +336,7 @@ public class ShootingStarPlugin extends Plugin {
         // Get the highest tier available
         int highestTier = starList.stream()
                 .filter(Star::hasRequirements)
-                .filter(x -> !panel.getHiddenStars().contains(x))
+                .filter(s -> panel.getHiddenStars().stream().noneMatch(h -> h.equals(s)))
                 .mapToInt(Star::getTier)
                 .max()
                 .orElse(-1);  // Return -1 if no star meets the requirements
@@ -344,7 +353,7 @@ public class ShootingStarPlugin extends Plugin {
 
         // Iterate through all stars and categorize them by distance
         for (Star star : starList) {
-            if (panel.getHiddenStars().contains(star)) continue;
+            if (panel.getHiddenStars().stream().anyMatch(h -> h.equals(star))) continue;
             if (!star.hasRequirements()) continue;
 
             int starTier = star.getTier();

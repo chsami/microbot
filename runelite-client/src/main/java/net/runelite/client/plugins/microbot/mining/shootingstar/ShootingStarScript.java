@@ -78,6 +78,13 @@ public class ShootingStarScript extends Script {
 
                         if (plugin.useNearestHighTierStar()) {
                             star = plugin.getClosestHighestTierStar();
+                            
+                            if (star == null) {
+                                Microbot.showMessage("Unable to find a star within your tier range. Consider disabling useNearestHighTierStar until higher mining level.");
+                                shutdown();
+                                return;
+                            }
+                            
                             plugin.updateSelectedStar(star);
                         } else {
                             star = plugin.getSelectedStar();
@@ -291,6 +298,7 @@ public class ShootingStarScript extends Script {
 
             star.setObjectID(starObject.getId());
             star.setTier(star.getTierBasedOnObjectID());
+            star.setMiningLevel(star.getRequiredMiningLevel());
         }
         return ShootingStarState.MINING;
     }
