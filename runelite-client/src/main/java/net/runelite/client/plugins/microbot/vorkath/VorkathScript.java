@@ -13,6 +13,7 @@ import net.runelite.client.plugins.loottracker.LootTrackerRecord;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -35,6 +36,8 @@ import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static net.runelite.client.plugins.microbot.Microbot.log;
 
 
 enum State {
@@ -122,6 +125,10 @@ public class VorkathScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+                if (Rs2AntibanSettings.naturalMouse) {
+                    Rs2AntibanSettings.naturalMouse = false;
+                    log("Woox walk is not compatible with natural mouse.");
+                }
 
                 if (init) {
                     rs2InventorySetup = new Rs2InventorySetup("vorkath", mainScheduledFuture);
