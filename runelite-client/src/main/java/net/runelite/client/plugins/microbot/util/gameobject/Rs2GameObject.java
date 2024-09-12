@@ -58,9 +58,13 @@ public class Rs2GameObject {
 
     public static boolean interact(TileObject tileObject, String action, boolean checkCanReach) {
         if (tileObject == null) return false;
+        if (!checkCanReach) return clickObject(tileObject, action);
+
         if (checkCanReach && Rs2GameObject.hasLineOfSight(tileObject))
             return clickObject(tileObject, action);
+
         Rs2Walker.walkFastCanvas(tileObject.getWorldLocation());
+
         return false;
     }
 
