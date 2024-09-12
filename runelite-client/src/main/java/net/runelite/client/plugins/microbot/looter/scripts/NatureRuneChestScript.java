@@ -86,8 +86,9 @@ public class NatureRuneChestScript extends Script {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown(){
         super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
     }
 
     private void getState(AutoLooterConfig config) {

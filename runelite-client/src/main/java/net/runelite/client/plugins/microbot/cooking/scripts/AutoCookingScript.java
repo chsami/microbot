@@ -170,6 +170,12 @@ public class AutoCookingScript extends Script {
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
     }
+    
+    @Override
+    public void shutdown(){
+        super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
+    }
 
     private void getState(AutoCookingConfig config, CookingLocation location) {
         if (!hasRawItem(config.cookingItem())) {

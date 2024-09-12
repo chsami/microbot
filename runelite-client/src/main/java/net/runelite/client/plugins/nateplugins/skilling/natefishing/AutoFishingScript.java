@@ -119,4 +119,10 @@ public class AutoFishingScript extends Script {
         }
         return null;
     }
+    
+    @Override
+    public void shutdown(){
+        super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
+    }
 }
