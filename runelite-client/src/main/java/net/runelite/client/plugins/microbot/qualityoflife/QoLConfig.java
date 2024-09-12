@@ -171,6 +171,17 @@ public interface QoLConfig extends Config {
     default int eatFoodPercentage() {
         return 50;
     }
+    // avoid logging out
+    @ConfigItem(
+            keyName = "neverLogOut",
+            name = "Never log out",
+            description = "Never log out",
+            position = 3,
+            section = upkeepSection
+    )
+    default boolean neverLogout() {
+        return false;
+    }
 
     // boolean to display Inventory setups as a menu option in the bank
     @ConfigItem(

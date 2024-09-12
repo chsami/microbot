@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.BeforeRender;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.client.config.ConfigManager;
@@ -12,6 +13,7 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.NeverLogoutScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -114,6 +116,13 @@ public class QoLPlugin extends Plugin {
     protected void shutDown() {
         qoLScript.shutdown();
         overlayManager.remove(qoLOverlay);
+    }
+
+    @Subscribe
+    public void onGameTick(GameTick event)
+    {
+        if (!Microbot.isLoggedIn()) return;
+        NeverLogoutScript.onGameTick(event);
     }
 
     @Subscribe

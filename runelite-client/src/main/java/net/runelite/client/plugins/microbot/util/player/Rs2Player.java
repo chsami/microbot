@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -620,5 +621,26 @@ public class Rs2Player {
             return getWorldLocation().distanceTo(endpoint);
         }
         return Rs2Walker.getDistanceBetween(getWorldLocation(), endpoint);
+    }
+
+    /**
+     * Checks whether a player is about to logout
+     * @return
+     */
+    public static boolean checkIdleLogout() {
+        int idleClientTicks = Microbot.getClient().getKeyboardIdleTicks();
+
+        return (long)idleClientTicks >= Random.randomDelay();
+    }
+
+    /**
+     * Checks whether a player is about to logout
+     * @param randomDelay
+     * @return
+     */
+    public static boolean checkIdleLogout(long randomDelay) {
+        int idleClientTicks = Microbot.getClient().getKeyboardIdleTicks();
+
+        return (long)idleClientTicks >= randomDelay;
     }
 }
