@@ -82,7 +82,7 @@ public class ThievingScript extends Script {
                 "Hendor", "Idril", "Imin", "Iminye", "Indis", "Ingwe", "Ingwion",
                 "Lenwe", "Lindir", "Maeglin", "Mahtan", "Miriel", "Mithrellas",
                 "Nellas", "Nerdanel", "Nimloth", "Oropher", "Orophin", "Saeros",
-                "Salgant", "Tatie", "Thingol", "Turgon", "Vaire"
+                "Salgant", "Tatie", "Thingol", "Turgon", "Vaire", "Goreu"
         );
         net.runelite.api.NPC npc = Rs2Npc.getNpcs()
                 .filter(x -> names.stream()
