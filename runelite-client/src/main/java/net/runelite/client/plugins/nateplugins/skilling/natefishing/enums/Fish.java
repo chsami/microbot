@@ -10,6 +10,7 @@ public enum Fish {
     SHRIMP("shrimp", FishingSpot.SHRIMP.getIds(),"net"),
     TROUT("trout/salmon", FishingSpot.SALMON.getIds(),"lure"),
     TUNA("tuna/swordfish", FishingSpot.LOBSTER.getIds(),"harpoon"),
+    CAVE_EEL("cave eel", FishingSpot.CAVE_EEL.getIds(), "bait"),
     LOBSTER("lobster", FishingSpot.LOBSTER.getIds(),"cage"),
     MONKFISH("monkfish", FishingSpot.MONKFISH.getIds(),"net"),
     KARAMBWANJI("karambwanji", FishingSpot.KARAMBWANJI.getIds(), "net"),

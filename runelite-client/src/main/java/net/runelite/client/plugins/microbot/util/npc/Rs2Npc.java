@@ -6,16 +6,16 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.game.npcoverlay.HighlightedNpc;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,7 +65,7 @@ public class Rs2Npc {
         int ratio = npc.getHealthRatio();
         int scale = npc.getHealthScale();
 
-        double targetHpPercent = (double) ratio  / (double) scale * 100;
+        double targetHpPercent = (double) ratio / (double) scale * 100;
 
         return targetHpPercent;
     }
@@ -84,6 +84,7 @@ public class Rs2Npc {
 
     /**
      * @param name
+     *
      * @return
      */
     public static Stream<NPC> getNpcs(String name) {
@@ -93,6 +94,7 @@ public class Rs2Npc {
     /**
      * @param name
      * @param exact
+     *
      * @return
      */
     public static Stream<NPC> getNpcs(String name, boolean exact) {
@@ -109,6 +111,7 @@ public class Rs2Npc {
 
     /**
      * @param id
+     *
      * @return
      */
     public static Stream<NPC> getNpcs(int id) {
@@ -165,7 +168,7 @@ public class Rs2Npc {
 
     public static NPC getRandomEventNPC() {
         return getNpcs()
-                .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null && 
+                .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null &&
                         Arrays.asList(value.getComposition().getActions()).contains("Dismiss")) && value.getInteracting() == Microbot.getClient().getLocalPlayer())
                 .findFirst()
                 .orElse(null);
@@ -195,7 +198,7 @@ public class Rs2Npc {
             MenuAction menuAction = getMenuAction(index);
 
             if (menuAction != null) {
-                Microbot.doInvoke(new NewMenuEntry(0, 0, menuAction.getId(), npc.getIndex(), -1, npc.getName()), new Rectangle(npc.getCanvasTilePoly().getBounds()));
+                Microbot.doInvoke(new NewMenuEntry(0, 0, menuAction.getId(), npc.getIndex(), -1, npc.getName(), npc), Rs2UiHelper.getActorClickbox(npc));
             }
 
         } catch (Exception ex) {
@@ -255,7 +258,7 @@ public class Rs2Npc {
     }
 
     public static boolean attack(String npcName) {
-        return attack(Arrays.asList(npcName));
+        return attack(Collections.singletonList(npcName));
     }
 
     public static boolean attack(List<String> npcNames) {
@@ -292,7 +295,7 @@ public class Rs2Npc {
     }
 
     public static boolean pickpocket(Map<NPC, HighlightedNpc> highlightedNpcs) {
-        for (NPC npc: highlightedNpcs.keySet()) {
+        for (NPC npc : highlightedNpcs.keySet()) {
             if (!hasLineOfSight(npc)) {
                 Rs2Walker.walkTo(npc.getWorldLocation(), 1);
                 return false;
@@ -330,7 +333,7 @@ public class Rs2Npc {
         var location = getWorldLocation(npc);
 
         var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance);
-        for (var tile : tiles.keySet()){
+        for (var tile : tiles.keySet()) {
             if (tile.equals(location))
                 return true;
         }
@@ -344,6 +347,7 @@ public class Rs2Npc {
 
     /**
      * @param player
+     *
      * @return
      */
     public static List<NPC> getNpcsAttackingPlayer(Player player) {
@@ -352,7 +356,9 @@ public class Rs2Npc {
 
     /**
      * gets list of npcs within line of sight for a player by name
+     *
      * @param name of the npc
+     *
      * @return list of npcs
      */
     public static List<NPC> getNpcsInLineOfSight(String name) {
@@ -361,7 +367,9 @@ public class Rs2Npc {
 
     /**
      * gets the npc within line of sight for a player by name
+     *
      * @param name of the npc
+     *
      * @return npc
      */
     public static NPC getNpcInLineOfSight(String name) {
@@ -369,5 +377,25 @@ public class Rs2Npc {
         if (npcsInLineOfSight.isEmpty()) return null;
 
         return npcsInLineOfSight.get(0);
+    }
+
+    /**
+     * Hovers over the given actor (e.g., NPC).
+     *
+     * @param actor The actor to hover over.
+     *
+     * @return True if successfully hovered, otherwise false.
+     */
+    public static boolean hoverOverActor(Actor actor) {
+        if (!Rs2AntibanSettings.naturalMouse) {
+            Microbot.log("Natural mouse is not enabled, can't hover");
+            return false;
+        }
+        Point point = Rs2UiHelper.getClickingPoint(Rs2UiHelper.getActorClickbox(actor), true);
+        if (point.getX() == 1 && point.getY() == 1) {
+            return false;
+        }
+        Microbot.getNaturalMouse().moveTo(point.getX(), point.getY());
+        return true;
     }
 }

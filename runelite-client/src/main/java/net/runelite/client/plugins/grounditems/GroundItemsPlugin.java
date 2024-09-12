@@ -32,50 +32,14 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import com.google.inject.Provides;
-import java.applet.Applet;
-import java.awt.Color;
-import java.awt.Rectangle;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.inject.Inject;
-import javax.swing.SwingUtilities;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Value;
+import net.runelite.api.Menu;
 import net.runelite.api.*;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.ItemComposition;
-import net.runelite.api.ItemID;
-import net.runelite.api.KeyCode;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.Tile;
-import net.runelite.api.TileItem;
-import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.FocusChanged;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.ItemDespawned;
-import net.runelite.api.events.ItemQuantityChanged;
-import net.runelite.api.events.ItemSpawned;
-import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.*;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -89,9 +53,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.grounditems.config.HighlightTier;
 import net.runelite.client.plugins.grounditems.config.ItemHighlightMode;
 import net.runelite.client.plugins.grounditems.config.MenuHighlightMode;
-import static net.runelite.client.plugins.grounditems.config.MenuHighlightMode.BOTH;
-import static net.runelite.client.plugins.grounditems.config.MenuHighlightMode.NAME;
-import static net.runelite.client.plugins.grounditems.config.MenuHighlightMode.OPTION;
 import net.runelite.client.ui.components.colorpicker.ColorPickerManager;
 import net.runelite.client.ui.components.colorpicker.RuneliteColorPicker;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -101,14 +62,18 @@ import net.runelite.client.util.RSTimeUnit;
 import net.runelite.client.util.Text;
 
 import javax.inject.Inject;
+import javax.swing.*;
+import java.applet.Applet;
 import java.awt.*;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Queue;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -511,6 +476,8 @@ public class GroundItemsPlugin extends Plugin
 			final WorldPoint worldPoint = WorldPoint.fromScene(client, sceneX, sceneY, client.getPlane());
 			GroundItem groundItem = collectedGroundItems.get(worldPoint, itemId);
 
+			if (groundItem == null) return;
+
 			updateItemColor(groundItem);
 
 			int quantity = groundItem.getQuantity();
@@ -552,23 +519,22 @@ public class GroundItemsPlugin extends Plugin
 			MenuEntry parent = client.createMenuEntry(-1)
 				.setOption("Color")
 				.setTarget(event.getTarget())
-				.setType(MenuAction.RUNELITE_SUBMENU);
+				.setType(MenuAction.RUNELITE);
+			Menu submenu = parent.createSubMenu();
 			final int itemId = event.getIdentifier();
 			Color color = getItemColor(itemId);
 
 			if (color != null)
 			{
-				client.createMenuEntry(-1)
+				submenu.createMenuEntry(-1)
 					.setOption("Reset")
 					.setType(MenuAction.RUNELITE)
-					.setParent(parent)
 					.onClick(e -> unsetItemColor(itemId));
 			}
 
-			client.createMenuEntry(-1)
+			submenu.createMenuEntry(-1)
 				.setOption("Pick")
 				.setType(MenuAction.RUNELITE)
-				.setParent(parent)
 				.onClick(e ->
 					SwingUtilities.invokeLater(() ->
 					{
@@ -591,10 +557,9 @@ public class GroundItemsPlugin extends Plugin
 
 			colors.stream()
 				.filter(c -> !c.equals(color))
-				.forEach(c -> client.createMenuEntry(-1)
+				.forEach(c -> submenu.createMenuEntry(-1)
 					.setOption(ColorUtil.prependColorTag("Color", c))
 					.setType(MenuAction.RUNELITE)
-					.setParent(parent)
 					.onClick(e -> setItemColor(itemId, c)));
 		}
 	}

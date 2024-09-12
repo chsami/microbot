@@ -11,13 +11,11 @@ import javax.inject.Named;
 import java.awt.*;
 
 public class ExampleOverlay extends OverlayPanel {
-    private final String examplePluginVersion;
 
     @Inject
-    ExampleOverlay(ExamplePlugin plugin, @Named("example.plugin.version") String examplePluginVersion)
+    ExampleOverlay(ExamplePlugin plugin)
     {
         super(plugin);
-        this.examplePluginVersion = examplePluginVersion;
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }
@@ -26,7 +24,7 @@ public class ExampleOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V" + examplePluginVersion)
+                    .text("Micro Example V1.0.0")
                     .color(Color.GREEN)
                     .build());
 

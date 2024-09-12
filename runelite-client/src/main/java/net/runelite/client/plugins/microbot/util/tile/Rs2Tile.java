@@ -1,10 +1,7 @@
 package net.runelite.client.plugins.microbot.util.tile;
 
 import lombok.Getter;
-import net.runelite.api.Client;
-import net.runelite.api.CollisionDataFlag;
-import net.runelite.api.GraphicsObject;
-import net.runelite.api.Tile;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.devtools.MovementFlag;
@@ -135,6 +132,8 @@ public class Rs2Tile {
         List<WorldPoint> worldPoints = new ArrayList<>();
         LocalPoint playerLocalPosition = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
 
+        if (playerLocalPosition == null) return new ArrayList<>();
+
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {
                 if (dx == 0 && dy == 0) continue; // Skip the player's current position
@@ -218,10 +217,21 @@ public class Rs2Tile {
     public static boolean isTileReachable(WorldPoint targetPoint) {
         boolean[][] visited = new boolean[104][104];
         int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
-        WorldPoint playerLoc = Microbot.getClient().getLocalPlayer().getWorldLocation();
-        int startX = playerLoc.getX() - Microbot.getClient().getBaseX();
-        int startY = playerLoc.getY() - Microbot.getClient().getBaseY();
-        int startPoint = (startX << 16) | startY;
+        WorldPoint playerLoc = Rs2Player.getWorldLocation();
+        int startX = 0;
+        int startY = 0;
+        int startPoint = 0;
+        if (Microbot.getClient().isInInstancedRegion()) {
+            LocalPoint localPoint = Rs2Player.getLocalLocation();
+             startX = localPoint.getSceneX();
+             startY = localPoint.getSceneY();
+             startPoint = (startX << 16) | startY;
+        } else {
+             startX = playerLoc.getX() - Microbot.getClient().getBaseX();
+             startY = playerLoc.getY() - Microbot.getClient().getBaseY();
+             startPoint = (startX << 16) | startY;
+        }
+
         ArrayDeque<Integer> queue = new ArrayDeque<>();
         queue.add(startPoint);
         visited[startX][startY] = true;
@@ -242,6 +252,26 @@ public class Rs2Tile {
         return isVisited(targetPoint, visited);
     }
 
+    public static boolean areSurroundingTilesWalkable(WorldPoint worldPoint, int sizeX, int sizeY) {
+        for (int dx = -1; dx <= sizeX; dx++) {
+            for (int dy = -1; dy <= sizeY; dy++) {
+                // Skip the inside tiles, only check the border
+                if (dx >= 0 && dx < sizeX && dy >= 0 && dy < sizeY) {
+                    continue;
+                }
+
+                int checkX = worldPoint.getX() + dx;
+                int checkY = worldPoint.getY() + dy;
+
+                if (isTileReachable(new WorldPoint(checkX, checkY, worldPoint.getPlane()))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private static boolean isWithinBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < 104 && y < 104;
     }
@@ -257,10 +287,21 @@ public class Rs2Tile {
     }
 
     private static boolean isVisited(WorldPoint worldPoint, boolean[][] visited) {
-        int baseX = Microbot.getClient().getTopLevelWorldView().getBaseX();
-        int baseY = Microbot.getClient().getTopLevelWorldView().getBaseY();
-        int x = worldPoint.getX() - baseX;
-        int y = worldPoint.getY() - baseY;
+        int baseX = 0;
+        int baseY = 0;
+        int x = 0;
+        int y = 0;
+        if (Microbot.getClient().isInInstancedRegion()) {
+            LocalPoint localPoint = Rs2Player.getLocalLocation();
+            x = localPoint.getSceneX();
+            y = localPoint.getSceneY();
+        } else {
+             baseX = Microbot.getClient().getTopLevelWorldView().getBaseX();
+             baseY = Microbot.getClient().getTopLevelWorldView().getBaseY();
+             x = worldPoint.getX() - baseX;
+             y = worldPoint.getY() - baseY;
+        }
+
 
         return isWithinBounds(x, y) && visited[x][y];
     }

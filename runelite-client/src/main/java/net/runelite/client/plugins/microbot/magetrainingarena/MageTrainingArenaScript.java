@@ -29,7 +29,6 @@ import net.runelite.client.plugins.mta.alchemy.AlchemyRoomTimer;
 import net.runelite.client.plugins.mta.telekinetic.TelekineticRoom;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import net.runelite.client.ui.overlay.infobox.Counter;
-import net.runelite.client.ui.overlay.infobox.Timer;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +36,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 
 public class MageTrainingArenaScript extends Script {
@@ -275,10 +273,12 @@ public class MageTrainingArenaScript extends Script {
             return;
         }
 
-        if (Rs2GroundItem.loot(ItemID.DRAGONSTONE_6903) && Rs2Inventory.getEmptySlots() > 0){
-            Rs2Inventory.waitForInventoryChanges();
+        boolean successFullLoot = Rs2Inventory.waitForInventoryChanges(() -> {
+            Rs2GroundItem.loot(ItemID.DRAGONSTONE_6903);
+        });
+
+        if (successFullLoot && Rs2Inventory.getEmptySlots() > 0)
             return;
-        }
 
         var bonusShape = getBonusShape();
         if (bonusShape == null) return;
@@ -315,9 +315,8 @@ public class MageTrainingArenaScript extends Script {
             Rs2Inventory.interact(itemId);
 
             sleepUntil(() -> !Rs2Inventory.contains(itemId) || itemId != ItemID.DRAGONSTONE_6903 && bonusShape != getBonusShape(), 20_000);
-        } else if (Rs2GameObject.interact(object, "Take-from")) {
+        } else if (Rs2Inventory.waitForInventoryChanges(() -> Rs2GameObject.interact(object, "Take-from"))) {
             Rs2Walker.setTarget(null);
-            Rs2Inventory.waitForInventoryChanges();
         } else
             Rs2Walker.walkFastCanvas(object.getWorldLocation());
     }
@@ -421,8 +420,7 @@ public class MageTrainingArenaScript extends Script {
                 }
             }
 
-            Rs2GameObject.interact(foodChute, "Deposit");
-            Rs2Inventory.waitForInventoryChanges();
+            Rs2Inventory.waitForInventoryChanges(() -> Rs2GameObject.interact(foodChute, "Deposit"));
             return;
         }
 
@@ -463,8 +461,7 @@ public class MageTrainingArenaScript extends Script {
                 sleepUntil(() -> !Rs2Player.isWalking());
         }
         else {
-            Rs2GameObject.interact(room.getSuggestion().getGameObject(), "Take-5");
-            Rs2Inventory.waitForInventoryChanges();
+            Rs2Inventory.waitForInventoryChanges(() -> Rs2GameObject.interact(room.getSuggestion().getGameObject(), "Take-5"));
         }
     }
 
@@ -477,12 +474,14 @@ public class MageTrainingArenaScript extends Script {
             sleepUntil(() -> Rs2Widget.isWidgetVisible(197, 0));
             sleep(400, 600);
         }
-        var rewardWidgets = Rs2Widget.getWidget(197, 11).getDynamicChildren();
-        var widget = Arrays.stream(rewardWidgets).filter(x -> x.getItemId() == reward.getItemId()).findFirst().orElse(null);
-        Rs2Widget.clickWidgetFast(widget, Arrays.asList(rewardWidgets).indexOf(widget));
-        sleep(400, 600);
-        Rs2Widget.clickWidget(197, 9);
-        Rs2Inventory.waitForInventoryChanges();
+
+        Rs2Inventory.waitForInventoryChanges(() -> {
+            var rewardWidgets = Rs2Widget.getWidget(197, 11).getDynamicChildren();
+            var widget = Arrays.stream(rewardWidgets).filter(x -> x.getItemId() == reward.getItemId()).findFirst().orElse(null);
+            Rs2Widget.clickWidgetFast(widget, Arrays.asList(rewardWidgets).indexOf(widget));
+            sleep(400, 600);
+            Rs2Widget.clickWidget(197, 9);
+        });
 
         if (reward == config.reward())
             bought++;

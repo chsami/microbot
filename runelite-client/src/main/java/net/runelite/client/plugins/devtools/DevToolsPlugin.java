@@ -32,6 +32,7 @@ import com.google.common.primitives.Ints;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Menu;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
@@ -114,10 +115,50 @@ public class DevToolsPlugin extends Plugin
 
 	@Inject
 	private ChatMessageManager chatMessageManager;
-
 	@Inject
 	private DevToolsConfig config;
+	private final HotkeyListener swingInspectorHotkeyListener = new HotkeyListener(() -> config.swingInspectorHotkey()) {
+		Object inspector;
 
+		@Override
+		public void hotkeyPressed() {
+			Window window = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+			try {
+				if (inspector == null) {
+					JRootPane rootPane = ((RootPaneContainer) window).getRootPane();
+					FlatInspector fi = new FlatInspector(rootPane);
+					fi.setEnabled(true);
+					inspector = fi;
+					fi.addPropertyChangeListener(ev ->
+					{
+						if ("enabled".equals(ev.getPropertyName()) && !fi.isEnabled() && inspector == ev.getSource()) {
+							inspector = null;
+						}
+					});
+				} else {
+					((FlatInspector) inspector).setEnabled(false);
+				}
+			} catch (LinkageError | Exception e) {
+				log.warn("unable to open swing inspector", e);
+				JOptionPane.showMessageDialog(window, "The swing inspector is not available.");
+			}
+		}
+	};
+	private final AWTEventListener swingInspectorKeyListener = rawEv ->
+	{
+		if (rawEv instanceof KeyEvent) {
+			KeyEvent kev = (KeyEvent) rawEv;
+			if (kev.getID() == KeyEvent.KEY_PRESSED) {
+				swingInspectorHotkeyListener.keyPressed(kev);
+			} else if (kev.getID() == KeyEvent.KEY_RELEASED) {
+				swingInspectorHotkeyListener.keyReleased(kev);
+			}
+		}
+	};
+	@Inject
+	private MicrobotClickOverlay microbotClickOverlay;
+	@Inject
+	private MicrobotMouseOverlay microbotMouseOverlay;
 	private DevToolsButton players;
 	private DevToolsButton npcs;
 	private DevToolsButton inventory;
@@ -150,60 +191,9 @@ public class DevToolsPlugin extends Plugin
 	private DevToolsButton shell;
 	private DevToolsButton menus;
 	private DevToolsButton uiDefaultsInspector;
+	private DevToolsButton mouseClick;
+	private DevToolsButton mouseMovement;
 	private NavigationButton navButton;
-
-	private final HotkeyListener swingInspectorHotkeyListener = new HotkeyListener(() -> config.swingInspectorHotkey())
-	{
-		Object inspector;
-
-		@Override
-		public void hotkeyPressed()
-		{
-			Window window = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
-			try
-			{
-				if (inspector == null)
-				{
-					JRootPane rootPane = ((RootPaneContainer) window).getRootPane();
-					FlatInspector fi = new FlatInspector(rootPane);
-					fi.setEnabled(true);
-					inspector = fi;
-					fi.addPropertyChangeListener(ev ->
-					{
-						if ("enabled".equals(ev.getPropertyName()) && !fi.isEnabled() && inspector == ev.getSource())
-						{
-							inspector = null;
-						}
-					});
-				}
-				else
-				{
-					((FlatInspector) inspector).setEnabled(false);
-				}
-			}
-			catch (LinkageError | Exception e)
-			{
-				log.warn("unable to open swing inspector", e);
-				JOptionPane.showMessageDialog(window, "The swing inspector is not available.");
-			}
-		}
-	};
-
-	private final AWTEventListener swingInspectorKeyListener = rawEv ->
-	{
-		if (rawEv instanceof KeyEvent)
-		{
-			KeyEvent kev = (KeyEvent) rawEv;
-			if (kev.getID() == KeyEvent.KEY_PRESSED)
-			{
-				swingInspectorHotkeyListener.keyPressed(kev);
-			}
-			else if (kev.getID() == KeyEvent.KEY_RELEASED)
-			{
-				swingInspectorHotkeyListener.keyReleased(kev);
-			}
-		}
-	};
 
 	@Provides
 	DevToolsConfig provideConfig(ConfigManager configManager)
@@ -254,6 +244,10 @@ public class DevToolsPlugin extends Plugin
 
 		uiDefaultsInspector = new DevToolsButton("Swing Defaults");
 
+		mouseClick = new DevToolsButton("Bot Clicks");
+		mouseMovement = new DevToolsButton("Bot Mouse");
+		mouseMovement.setActive(true);
+
 		overlayManager.add(overlay);
 		overlayManager.add(locationOverlay);
 		overlayManager.add(sceneOverlay);
@@ -261,6 +255,8 @@ public class DevToolsPlugin extends Plugin
 		overlayManager.add(worldMapLocationOverlay);
 		overlayManager.add(mapRegionOverlay);
 		overlayManager.add(soundEffectOverlay);
+		overlayManager.add(microbotClickOverlay);
+		overlayManager.add(microbotMouseOverlay);
 
 		final DevToolsPanel panel = injector.getInstance(DevToolsPanel.class);
 
@@ -291,6 +287,8 @@ public class DevToolsPlugin extends Plugin
 		overlayManager.remove(worldMapLocationOverlay);
 		overlayManager.remove(mapRegionOverlay);
 		overlayManager.remove(soundEffectOverlay);
+		overlayManager.remove(microbotClickOverlay);
+		overlayManager.remove(microbotMouseOverlay);
 		clientToolbar.removeNavigation(navButton);
 		Toolkit.getDefaultToolkit().removeAWTEventListener(swingInspectorKeyListener);
 	}
@@ -441,28 +439,28 @@ public class DevToolsPlugin extends Plugin
 				int slot = Integer.parseInt(args[0]);
 				int id = Integer.parseInt(args[1]);
 				Player player = client.getLocalPlayer();
-				player.getPlayerComposition().getEquipmentIds()[slot] = id + 512;
+				player.getPlayerComposition().getEquipmentIds()[slot] = id + PlayerComposition.ITEM_OFFSET;
 				player.getPlayerComposition().setHash();
 				break;
 			}
 			case "tex":
 			{
 				Player player = client.getLocalPlayer();
-				player.getPlayerComposition().getEquipmentIds()[KitType.CAPE.getIndex()] = ItemID.FIRE_CAPE + 512;
-				player.getPlayerComposition().getEquipmentIds()[KitType.SHIELD.getIndex()] = ItemID.MIRROR_SHIELD + 512;
+				player.getPlayerComposition().getEquipmentIds()[KitType.CAPE.getIndex()] = ItemID.FIRE_CAPE + PlayerComposition.ITEM_OFFSET;
+				player.getPlayerComposition().getEquipmentIds()[KitType.SHIELD.getIndex()] = ItemID.MIRROR_SHIELD + PlayerComposition.ITEM_OFFSET;
 				player.getPlayerComposition().setHash();
 				break;
 			}
 			case "alpha":
 			{
 				Player player = client.getLocalPlayer();
-				player.getPlayerComposition().getEquipmentIds()[KitType.HEAD.getIndex()] = ItemID.GHOSTLY_HOOD + 512;
-				player.getPlayerComposition().getEquipmentIds()[KitType.AMULET.getIndex()] = ItemID.AMULET_OF_TORTURE_OR + 512;
-				player.getPlayerComposition().getEquipmentIds()[KitType.CAPE.getIndex()] = ItemID.GHOSTLY_CLOAK + 512;
-				player.getPlayerComposition().getEquipmentIds()[KitType.TORSO.getIndex()] = ItemID.GHOSTLY_ROBE + 512;
-				player.getPlayerComposition().getEquipmentIds()[KitType.SHIELD.getIndex()] = ItemID.ELYSIAN_SPIRIT_SHIELD + 512;
+				player.getPlayerComposition().getEquipmentIds()[KitType.HEAD.getIndex()] = ItemID.GHOSTLY_HOOD + PlayerComposition.ITEM_OFFSET;
+				player.getPlayerComposition().getEquipmentIds()[KitType.AMULET.getIndex()] = ItemID.AMULET_OF_TORTURE_OR + PlayerComposition.ITEM_OFFSET;
+				player.getPlayerComposition().getEquipmentIds()[KitType.CAPE.getIndex()] = ItemID.GHOSTLY_CLOAK + PlayerComposition.ITEM_OFFSET;
+				player.getPlayerComposition().getEquipmentIds()[KitType.TORSO.getIndex()] = ItemID.GHOSTLY_ROBE + PlayerComposition.ITEM_OFFSET;
+				player.getPlayerComposition().getEquipmentIds()[KitType.SHIELD.getIndex()] = ItemID.ELYSIAN_SPIRIT_SHIELD + PlayerComposition.ITEM_OFFSET;
 				player.getPlayerComposition().getEquipmentIds()[KitType.ARMS.getIndex()] = -1;
-				player.getPlayerComposition().getEquipmentIds()[KitType.LEGS.getIndex()] = ItemID.GHOSTLY_ROBE_6108 + 512;
+				player.getPlayerComposition().getEquipmentIds()[KitType.LEGS.getIndex()] = ItemID.GHOSTLY_ROBE_6108 + PlayerComposition.ITEM_OFFSET;
 				player.getPlayerComposition().getEquipmentIds()[KitType.HAIR.getIndex()] = -1;
 				player.getPlayerComposition().getEquipmentIds()[KitType.HANDS.getIndex()] = ItemID.GHOSTLY_GLOVES;
 				player.getPlayerComposition().getEquipmentIds()[KitType.BOOTS.getIndex()] = ItemID.GHOSTLY_BOOTS;
@@ -605,17 +603,17 @@ public class DevToolsPlugin extends Plugin
 				{
 					MenuEntry parent = client.createMenuEntry(1)
 						.setOption("pmenu" + i)
-						.setTarget("devtools")
-						.setType(MenuAction.RUNELITE_SUBMENU);
+						.setTarget(i % 60 == 0 ? "devtools devtools devtools devtools" : "devtools")
+						.setType(MenuAction.RUNELITE);
+					Menu submenu = parent.createSubMenu();
 
 					for (int j = 0; j < 4; ++j)
 					{
 						final int j_ = j;
-						client.createMenuEntry(1)
+						submenu.createMenuEntry(0)
 							.setOption("submenu" + j)
 							.setTarget("devtools")
 							.setType(MenuAction.RUNELITE)
-							.setParent(parent)
 							.onClick(c -> client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "menu " + i_ + " sub " + j_, null));
 					}
 					continue;

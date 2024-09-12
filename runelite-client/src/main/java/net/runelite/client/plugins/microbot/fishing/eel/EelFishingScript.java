@@ -6,11 +6,13 @@ import net.runelite.client.game.FishingSpot;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.fishing.eel.enums.EelFishingSpot;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
+import net.runelite.client.plugins.microbot.util.antiban.enums.ActivityIntensity;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +20,7 @@ import static net.runelite.client.plugins.microbot.util.npc.Rs2Npc.validateInter
 
 public class EelFishingScript extends Script {
 
-    public static String version = "1.0.0";
+    public static String version = "1.1.0";
     private EelFishingConfig config;
 
     public static boolean hasRequiredGloves() {
@@ -27,18 +29,18 @@ public class EelFishingScript extends Script {
 
     public boolean run(EelFishingConfig config) {
         this.config = config;
-        //Rs2Antiban.resetAntiban();
-        //Rs2Antiban.advancedPlayStyleSetup(Activity.GENERAL_FISHING);
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyFishingSetup();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run() || !Microbot.isLoggedIn() || !Rs2Inventory.hasItem("bait") || !Rs2Inventory.hasItem("rod")) {
                 return;
             }
 
-            //if(Rs2Antiban.isActionCooldownActive)
-            //    return;
-
-            if (Rs2Player.isInteracting())
+            if (Rs2AntibanSettings.actionCooldownActive)
                 return;
+
+//            if (Rs2Player.isInteracting())
+//                return;
 
             if (config.fishingSpot().equals(EelFishingSpot.INFERNAL_EEL) && !hasRequiredGloves()) {
                 Microbot.log("You need ice gloves to fish infernal eels.");
@@ -60,7 +62,8 @@ public class EelFishingScript extends Script {
             }
 
             if (Rs2Npc.interact(fishingspot)) {
-                //Rs2Antiban.actionCooldown();
+                Rs2Antiban.actionCooldown();
+                Rs2Antiban.takeMicroBreakByChance();
             }
 
 
@@ -96,19 +99,27 @@ public class EelFishingScript extends Script {
     private void processEels(EelFishingConfig config) {
         if (config.fishingSpot() == EelFishingSpot.INFERNAL_EEL) {
             if (Rs2Inventory.hasItem(ItemID.HAMMER)) {
+                if (config.useFastCombination()) {
+                    Rs2Antiban.setActivityIntensity(ActivityIntensity.EXTREME);
+                    while (Rs2Inventory.hasItem("Infernal eel")) {
+                        Rs2Inventory.combineClosest("Infernal eel", "Hammer");
+                    }
+                    return;
+                }
                 Rs2Inventory.combineClosest("Infernal eel", "Hammer");
-                sleepUntil(() -> !Rs2Inventory.hasItem("Infernal eel"), 40000); // Wait until all eels are processed
+                sleepUntil(() -> !Rs2Inventory.hasItem("Infernal eel"), 50000); // Wait until all eels are processed
             }
         } else if (config.fishingSpot() == EelFishingSpot.SACRED_EEL) {
             if (Rs2Inventory.hasItem(ItemID.KNIFE)) {
                 Rs2Inventory.combineClosest("Sacred eel", "Knife");
-                sleepUntil(() -> !Rs2Inventory.hasItem("Sacred eel"), 40000); // Wait until all eels are processed
+                sleepUntil(() -> !Rs2Inventory.hasItem("Sacred eel"), 50000); // Wait until all eels are processed
             }
         }
+        Rs2Antiban.takeMicroBreakByChance();
     }
 
     public void shutdown() {
-        //Rs2Antiban.resetAntiban();
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
     }
 }

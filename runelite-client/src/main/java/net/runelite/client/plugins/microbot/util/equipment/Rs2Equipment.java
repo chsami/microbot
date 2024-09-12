@@ -19,6 +19,10 @@ public class Rs2Equipment {
     }
 
     public static List<Rs2Item> equipmentItems = new ArrayList<>();
+    
+    public static List<Rs2Item> items() {
+        return equipmentItems;
+    }
 
     public static void storeEquipmentItemsInMemory(ItemContainerChanged e) {
         if (e.getContainerId() == InventoryID.EQUIPMENT.getId() && e.getItemContainer() != null) {

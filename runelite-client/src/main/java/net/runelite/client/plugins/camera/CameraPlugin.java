@@ -29,23 +29,8 @@ package net.runelite.client.plugins.camera;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
 import com.google.inject.Provides;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import javax.inject.Inject;
-import javax.swing.SwingUtilities;
-import net.runelite.api.Client;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.ScriptID;
-import net.runelite.api.SettingID;
-import net.runelite.api.VarClientInt;
-import net.runelite.api.VarPlayer;
-import net.runelite.api.events.BeforeRender;
-import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.FocusChanged;
-import net.runelite.api.events.ScriptCallbackEvent;
-import net.runelite.api.events.ScriptPreFired;
-import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.*;
+import net.runelite.api.events.*;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.JavaScriptCallback;
@@ -62,6 +47,11 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.tooltip.Tooltip;
 import net.runelite.client.ui.overlay.tooltip.TooltipManager;
+
+import javax.inject.Inject;
+import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 @PluginDescriptor(
 	name = "Camera",
@@ -145,6 +135,7 @@ public class CameraPlugin extends Plugin implements KeyListener, MouseListener
 		client.setCameraPitchRelaxerEnabled(false);
 		client.setInvertYaw(false);
 		client.setInvertPitch(false);
+		client.setCameraShakeDisabled(false);
 		keyManager.unregisterKeyListener(this);
 		mouseManager.unregisterMouseListener(this);
 		controlDown = false;
@@ -180,6 +171,7 @@ public class CameraPlugin extends Plugin implements KeyListener, MouseListener
 		client.setCameraPitchRelaxerEnabled(config.relaxCameraPitch());
 		client.setInvertYaw(config.invertYaw());
 		client.setInvertPitch(config.invertPitch());
+		client.setCameraShakeDisabled(config.disableCameraShake());
 	}
 
 	@Subscribe
@@ -272,7 +264,7 @@ public class CameraPlugin extends Plugin implements KeyListener, MouseListener
 	@Override
 	public void keyPressed(KeyEvent e)
 	{
-		if (e.getKeyCode() == KeyEvent.VK_CONTROL)
+		if (e.getKeyCode() == KeyEvent.VK_F1)
 		{
 			controlDown = true;
 		}

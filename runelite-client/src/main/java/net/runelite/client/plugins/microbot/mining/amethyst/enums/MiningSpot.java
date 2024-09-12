@@ -14,7 +14,7 @@ public enum MiningSpot {
     RANDOM_POINT_3(new WorldPoint(3018, 9703, 0)),
     RANDOM_POINT_4(new WorldPoint(3019, 9703, 0)),
     RANDOM_POINT_5(new WorldPoint(3020, 9700, 0)),
-    NULL(new WorldPoint(0, 0, 0));
+    NULL(null);
     private static final Random RANDOM = new Random();
     private final WorldPoint worldPoint;
 

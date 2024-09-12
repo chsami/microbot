@@ -5,6 +5,9 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.looter.AutoLooterConfig;
 import net.runelite.client.plugins.microbot.looter.enums.LooterState;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
+import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -28,10 +31,14 @@ public class NatureRuneChestScript extends Script {
         if (config.hopWhenPlayerDetected()) {
             Microbot.showMessage("Make sure autologin plugin is enabled and randomWorld checkbox is checked!");
         }
+        Rs2Antiban.resetAntibanSettings();
+        applyAntiBanSettings();
+        Rs2Antiban.setActivity(Activity.GENERAL_COLLECTING);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run()) return;
                 if (!Microbot.isLoggedIn()) return;
+                if (Rs2AntibanSettings.actionCooldownActive) return;
                 long startTime = System.currentTimeMillis();
 
                 if(init){
@@ -51,9 +58,12 @@ public class NatureRuneChestScript extends Script {
                                         .sorted(Comparator.comparingInt(obj -> Rs2Player.getWorldLocation().distanceTo(obj.getWorldLocation())))
                                         .findFirst();
                         if (natureRuneChest.isPresent()) {
-                            Rs2GameObject.interact(natureRuneChest.get(), "Search for traps");
-                            sleepUntilTrue(() -> !Rs2Player.isInteracting(), 500, 8000);
-                            sleep(Random.random(18000, 20000));
+                            if(Rs2GameObject.interact(natureRuneChest.get(), "Search for traps")){
+                                Rs2Antiban.actionCooldown();
+                                Rs2Antiban.takeMicroBreakByChance();
+                                sleepUntilTrue(() -> !Rs2Player.isInteracting(), 500, 8000);
+                                sleep(Random.random(18000, 20000));
+                            }
                         }
                         break;
                     case WALKING:
@@ -92,5 +102,26 @@ public class NatureRuneChestScript extends Script {
 
     private boolean isNearNatureRuneChest(AutoLooterConfig config, int distance) {
         return Rs2Player.getWorldLocation().distanceTo(config.natureRuneChestLocation().getWorldPoint()) <= distance;
+    }
+
+    private void applyAntiBanSettings() {
+        Rs2AntibanSettings.antibanEnabled = true;
+        Rs2AntibanSettings.usePlayStyle = true;
+        Rs2AntibanSettings.simulateFatigue = true;
+        Rs2AntibanSettings.simulateAttentionSpan = true;
+        Rs2AntibanSettings.behavioralVariability = true;
+        Rs2AntibanSettings.nonLinearIntervals = true;
+        Rs2AntibanSettings.naturalMouse = true;
+        Rs2AntibanSettings.moveMouseOffScreen = true;
+        Rs2AntibanSettings.contextualVariability = true;
+        Rs2AntibanSettings.dynamicIntensity = true;
+        Rs2AntibanSettings.devDebug = false;
+        Rs2AntibanSettings.moveMouseRandomly = true;
+        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.microBreakDurationLow = 3;
+        Rs2AntibanSettings.microBreakDurationHigh = 15;
+        Rs2AntibanSettings.actionCooldownChance = 0.4;
+        Rs2AntibanSettings.microBreakChance = 0.15;
+        Rs2AntibanSettings.moveMouseRandomlyChance = 0.1;
     }
 }

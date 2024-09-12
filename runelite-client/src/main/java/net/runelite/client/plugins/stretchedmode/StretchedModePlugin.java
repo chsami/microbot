@@ -34,7 +34,6 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.input.MouseManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.microbot.Microbot;
 
 import javax.inject.Inject;
 
@@ -76,7 +75,7 @@ public class StretchedModePlugin extends Plugin
 		client.setStretchedEnabled(true);
 		updateConfig();
 
-		Microbot.showMessage("ALERT! Microbot has noticed that your StretchMode plugin is enabled. Please disable this plugin to avoid weird behavior.");
+		//Microbot.showMessage("ALERT! Microbot has noticed that your StretchMode plugin is enabled. Please disable this plugin to avoid weird behavior.");
 	}
 
 	@Override

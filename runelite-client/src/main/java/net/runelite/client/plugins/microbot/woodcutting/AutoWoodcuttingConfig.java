@@ -93,5 +93,4 @@ public interface AutoWoodcuttingConfig extends Config {
     {
         return WoodcuttingWalkBack.LAST_LOCATION;
     }
-
 }

@@ -33,11 +33,13 @@ public class ConfigDescriptor
 	private final ConfigGroup group;
 	private final Collection<ConfigSectionDescriptor> sections;
 	private final Collection<ConfigItemDescriptor> items;
+	private final ConfigInformation information;
 
-	public ConfigDescriptor(ConfigGroup group, Collection<ConfigSectionDescriptor> sections, Collection<ConfigItemDescriptor> items)
+	public ConfigDescriptor(ConfigGroup group, Collection<ConfigSectionDescriptor> sections, Collection<ConfigItemDescriptor> items, ConfigInformation information)
 	{
 		this.group = group;
 		this.sections = sections;
 		this.items = items;
+		this.information = information;
 	}
 }

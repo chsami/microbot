@@ -6,19 +6,17 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
-import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import javax.annotation.Nullable;
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -432,10 +430,13 @@ public class Rs2GameObject {
         }
 
         for (GameObject gameObject : gameObjects) {
-            ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
+            if (!Rs2Tile.areSurroundingTilesWalkable(gameObject.getWorldLocation(), gameObject.sizeX(), gameObject.sizeY()))
+                continue;
 
             if (hasLineOfSight && !hasLineOfSight(gameObject))
                 continue;
+
+            ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
 
             if (objComp == null) {
                 continue;
@@ -738,6 +739,7 @@ public class Rs2GameObject {
      * TODO remove this method, maybe use find or get(int id)
      *
      * @param id
+     *
      * @return
      */
     public static List<GameObject> getGameObjects(int id) {
@@ -773,7 +775,7 @@ public class Rs2GameObject {
                 .collect(Collectors.toList());
     }
 
-    public static List<TileObject> getTileObjects(int id){
+    public static List<TileObject> getTileObjects(int id) {
         return getTileObjects(id, Rs2Player.getWorldLocation());
     }
 
@@ -986,9 +988,9 @@ public class Rs2GameObject {
                 if (tile == null) {
                     continue;
                 }
-                    if (tile.getWallObject() != null
-                            && tile.getWallObject().getId() == id)
-                        tileObjects.add(tile.getWallObject());
+                if (tile.getWallObject() != null
+                        && tile.getWallObject().getId() == id)
+                    tileObjects.add(tile.getWallObject());
             }
         }
 
@@ -1081,13 +1083,9 @@ public class Rs2GameObject {
 
             if (!Rs2Camera.isTileOnScreen(object.getLocalLocation())) {
                 Rs2Camera.turnTo(object);
-            } else {
-                Rs2Keyboard.keyRelease(KeyEvent.VK_RIGHT);
-                Rs2Keyboard.keyRelease(KeyEvent.VK_LEFT);
-
             }
 
-            Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(), -1, objComp.getName()), new Rectangle(object.getCanvasTilePoly().getBounds()));
+            Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(), -1, objComp.getName(), object), Rs2UiHelper.getObjectClickbox(object));
 
             //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), object.getId(),-1, "", "", -1, -1);
 
@@ -1158,7 +1156,7 @@ public class Rs2GameObject {
             GameObject gameObject = (GameObject) tileObject;
             WorldPoint worldPoint = WorldPoint.fromScene(Microbot.getClient(), gameObject.getSceneMinLocation().getX(), gameObject.getSceneMinLocation().getY(), gameObject.getPlane());
 
-            if (Microbot.getClient().isInInstancedRegion()){
+            if (Microbot.getClient().isInInstancedRegion()) {
                 var localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
                 worldPoint = WorldPoint.fromLocalInstance(Microbot.getClient(), localPoint);
             }
@@ -1175,11 +1173,32 @@ public class Rs2GameObject {
         }
 
         var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance);
-        for (var tile : tiles.keySet()){
+        for (var tile : tiles.keySet()) {
             if (tile.distanceTo(objectArea) < 2)
                 return true;
         }
 
         return false;
+    }
+
+    /**
+     * Hovers over the given game object using the natural mouse.
+     *
+     * @param object The game object to hover over.
+     *
+     * @return True if successfully hovered, otherwise false.
+     */
+    public static boolean hoverOverObject(TileObject object) {
+        if (!Rs2AntibanSettings.naturalMouse) {
+            Microbot.log("Natural mouse is not enabled, can't hover");
+            return false;
+        }
+        Point point = Rs2UiHelper.getClickingPoint(Rs2UiHelper.getObjectClickbox(object), true);
+        // if the point is 1,1 then the object is not on screen and we should return false
+        if (point.getX() == 1 && point.getY() == 1) {
+            return false;
+        }
+        Microbot.getNaturalMouse().moveTo(point.getX(), point.getY());
+        return true;
     }
 }

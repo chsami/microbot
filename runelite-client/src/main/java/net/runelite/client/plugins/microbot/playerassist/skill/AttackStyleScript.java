@@ -58,7 +58,7 @@ public class AttackStyleScript extends Script {
         currentAttackStyleChangeDelayCounter = 0;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!Microbot.isLoggedIn() || !super.run() || disableIfMaxed(config.toggleDisableOnMaxCombat())) return;
-            if(currentAttackStyleChangeDelayCounter-- > 0) return;
+            if (currentAttackStyleChangeDelayCounter-- > 0) return;
 
             if (!initializedLevels) {
                 initializeLevels();
@@ -90,13 +90,13 @@ public class AttackStyleScript extends Script {
         initializedLevels = true;
     }
 
-    private void changeAttackStyle(PlayerAssistConfig config,WidgetInfo componentToDisplay) {
+    private void changeAttackStyle(PlayerAssistConfig config, WidgetInfo attackStyleWidgetInfo) {
         if (Rs2Tab.getCurrentTab() != InterfaceTab.COMBAT) {
             Rs2Tab.switchToCombatOptionsTab();
             sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.COMBAT, 2000);
         }
         log.info("Changing Attack Style to: {}", attackStyleToTrain);
-        Rs2Combat.setAttackStyle(componentToDisplay);
+        Rs2Combat.setAttackStyle(attackStyleWidgetInfo);
     }
 
     // has any of the skills leveled up
@@ -152,7 +152,7 @@ public class AttackStyleScript extends Script {
 
     // compare Players skill levels to the level target in the config
     private boolean needLevel(int levelRequired, Skill skill) {
-        if(isMaxed()) {
+        if (isMaxed()) {
             log.info("Maxed, switching between any combat style.");
             return true;
         }
@@ -290,9 +290,11 @@ public class AttackStyleScript extends Script {
         // Return a random component if the list is not empty, otherwise return null
         return componentToDisplay;
     }
+
     private boolean isMaxed() {
         return getSkillLevel(Skill.ATTACK) == 99 && getSkillLevel(Skill.STRENGTH) == 99 && getSkillLevel(Skill.DEFENCE) == 99;
     }
+
     private boolean disableIfMaxed(boolean disable) {
         return isMaxed() && disable;
     }

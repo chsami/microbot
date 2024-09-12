@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.util.magic;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
@@ -14,7 +13,6 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
-import net.runelite.client.plugins.timers.GameTimer;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
@@ -70,7 +68,7 @@ public class Rs2Magic {
         if (magicSpell.getWidgetId() == -1)
             throw new NotImplementedException("This spell has not been configured yet in the MagicAction.java class");
 
-        Microbot.doInvoke(new NewMenuEntry(-1, magicSpell.getWidgetId(), menuAction.getId(), identifier, -1, "<col=00ff00>" + magicSpell.getName() + "</col>"), new Rectangle(0, 0, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        Microbot.doInvoke(new NewMenuEntry("cast", -1, magicSpell.getWidgetId(), menuAction.getId(), identifier, -1, magicSpell.getName()), new Rectangle(Rs2Widget.getWidget(magicSpell.getWidgetId()).getBounds()));
         //Rs2Reflection.invokeMenu(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "Cast", "<col=00ff00>" + magicSpell.getName() + "</col>", -1, -1);
     }
 
@@ -230,6 +228,19 @@ public class Rs2Magic {
         } else {
             Microbot.status = "Superheating " + item.name;
             Rs2Inventory.interact(item, "cast");
+        }
+    }
+
+    // humidify
+    public static void humidify() {
+        sleepUntil(() -> {
+            Rs2Tab.switchToMagicTab();
+            sleep(50, 150);
+            return Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC;
+        });
+        Widget humidify = Rs2Widget.findWidget(MagicAction.HUMIDIFY.getName());
+        if (humidify.getSpriteId() == 1972) {
+            Microbot.click(humidify.getBounds());
         }
     }
 

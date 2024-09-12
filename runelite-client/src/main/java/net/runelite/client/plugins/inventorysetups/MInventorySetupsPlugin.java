@@ -540,7 +540,7 @@ public class MInventorySetupsPlugin extends Plugin
 				MenuEntry menuEntry = client.createMenuEntry(1)
 						.setOption(OPEN_SECTION_MENU_ENTRY)
 						.setTarget(ColorUtil.prependColorTag(section.getName(), sectionMenuTargetColor))
-						.setType(MenuAction.RUNELITE_SUBMENU);
+						.setType(MenuAction.RUNELITE_WIDGET);
 
 				for (final InventorySetup inventorySetup : sectionsToDisplay.get(section.getName()))
 				{
@@ -554,7 +554,7 @@ public class MInventorySetupsPlugin extends Plugin
 				MenuEntry unassignedSectionMenuEntry = client.createMenuEntry(1)
 						.setOption(OPEN_SECTION_MENU_ENTRY)
 						.setTarget(ColorUtil.prependColorTag(UNASSIGNED_SECTION_SETUP_MENU_ENTRY, JagexColors.MENU_TARGET))
-						.setType(MenuAction.RUNELITE_SUBMENU);
+						.setType(MenuAction.RUNELITE_WIDGET);
 
 				unassignedSetups.forEach(setup -> createSectionSubMenuOnWornItems(setup, unassignedSectionMenuEntry));
 			}
@@ -616,16 +616,15 @@ public class MInventorySetupsPlugin extends Plugin
 	{
 		Color setupMenuTargetColor = setup.getDisplayColor() == null ? JagexColors.MENU_TARGET : setup.getDisplayColor();
 
-		client.createMenuEntry(1)
-				.setOption(OPEN_SETUP_MENU_ENTRY)
-				.setTarget(ColorUtil.prependColorTag(setup.getName(), setupMenuTargetColor))
-				.setParent(menuEntry)
-				.setType(MenuAction.RUNELITE)
-				.onClick(e ->
-				{
-					resetBankSearch(true);
-					panel.setCurrentInventorySetup(setup, true);
-				});
+		menuEntry.createSubMenu().createMenuEntry(-1)
+			.setOption(OPEN_SETUP_MENU_ENTRY)
+			.setTarget(ColorUtil.prependColorTag(setup.getName(), setupMenuTargetColor))
+			.setType(MenuAction.RUNELITE)
+			.onClick(e ->
+			{
+				resetBankSearch(true);
+				panel.setCurrentInventorySetup(setup, true);
+			});
 	}
 
 	private void createMenuEntryToAddAdditionalFilteredItem(int inventoryIndex)

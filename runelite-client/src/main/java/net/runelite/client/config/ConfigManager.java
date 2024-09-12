@@ -1087,7 +1087,9 @@ public class ConfigManager
 				.result())
 			.collect(Collectors.toList());
 
-		return new ConfigDescriptor(group, sections, items);
+		ConfigInformation information = inter.getAnnotation(ConfigInformation.class);
+
+		return new ConfigDescriptor(group, sections, items, information);
 	}
 
 	/**
