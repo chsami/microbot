@@ -122,7 +122,9 @@ public class QoLPlugin extends Plugin {
     public void onGameTick(GameTick event)
     {
         if (!Microbot.isLoggedIn()) return;
-        NeverLogoutScript.onGameTick(event);
+        if (config.neverLogout()) {
+            NeverLogoutScript.onGameTick(event);
+        }
     }
 
     @Subscribe
