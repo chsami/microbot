@@ -26,8 +26,10 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.5.6";
+    public static String version = "1.5.7";
     ThievingConfig config;
+
+    boolean isPickpocketting = false;
 
     public boolean run(ThievingConfig config) {
         this.config = config;
@@ -80,7 +82,7 @@ public class ThievingScript extends Script {
                 "Hendor", "Idril", "Imin", "Iminye", "Indis", "Ingwe", "Ingwion",
                 "Lenwe", "Lindir", "Maeglin", "Mahtan", "Miriel", "Mithrellas",
                 "Nellas", "Nerdanel", "Nimloth", "Oropher", "Orophin", "Saeros",
-                "Salgant", "Tatie", "Thingol", "Turgon", "Vaire"
+                "Salgant", "Tatie", "Thingol", "Turgon", "Vaire", "Goreu"
         );
         net.runelite.api.NPC npc = Rs2Npc.getNpcs()
                 .filter(x -> names.stream()
@@ -109,7 +111,9 @@ public class ThievingScript extends Script {
 
     private void pickpocket() {
         if (config.THIEVING_NPC() != ThievingNpc.NONE) {
-            if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
+            if (config.THIEVING_NPC() == ThievingNpc.WEALTHY_CITIZEN) {
+                handleWealthyCitizen();
+            } else if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
                 handleElves();
             } else {
                 Map<NPC, HighlightedNpc> highlightedNpcs =  net.runelite.client.plugins.npchighlight.NpcIndicatorsPlugin.getHighlightedNpcs();
@@ -126,6 +130,24 @@ public class ThievingScript extends Script {
                     }
                 }
             }
+        }
+    }
+
+    private void handleWealthyCitizen() {
+        List<NPC> wealthyCitizenInteracting = Rs2Npc.getNpcs("Wealthy citizen")
+                .filter(x -> x.isInteracting()
+                        && x.getInteracting() != null
+                        && x.getInteracting().getCombatLevel() == 0)
+                .collect(Collectors.toList());
+        NPC wealthyCitizenToPickpocket = wealthyCitizenInteracting.stream().findFirst().orElse(null);
+        if (wealthyCitizenToPickpocket != null) {
+            if (!isPickpocketting && Rs2Npc.pickpocket(wealthyCitizenToPickpocket)) {
+                Microbot.status = "Pickpocketting " + wealthyCitizenToPickpocket.getName();
+                sleep(300, 600);
+                isPickpocketting = true;
+            }
+        } else {
+            isPickpocketting = false;
         }
     }
 

@@ -13,6 +13,7 @@ import net.runelite.client.plugins.loottracker.LootTrackerRecord;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -36,6 +37,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.Microbot.log;
+
 
 enum State {
     BANKING,
@@ -53,7 +56,7 @@ enum State {
 }
 
 public class VorkathScript extends Script {
-    public static String version = "1.3.7";
+    public static String version = "1.3.9";
     public static VorkathConfig config;
     @Getter
     public final int acidProjectileId = 1483;
@@ -122,6 +125,10 @@ public class VorkathScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+                if (Rs2AntibanSettings.naturalMouse) {
+                    Rs2AntibanSettings.naturalMouse = false;
+                    log("Woox walk is not compatible with natural mouse.");
+                }
 
                 if (init) {
                     rs2InventorySetup = new Rs2InventorySetup("vorkath", mainScheduledFuture);
@@ -321,9 +328,7 @@ public class VorkathScript extends Script {
                         );
 
                         Rs2GroundItem.loot("Vorkath's head", 20);
-                        if (Rs2GroundItem.lootItemBasedOnValue(valueParams)) {
-                            Microbot.pauseAllScripts = false;
-                        }
+                        Rs2GroundItem.lootItemBasedOnValue(valueParams);
                         int foodInventorySize = Rs2Inventory.getInventoryFood().size();
                         boolean hasVenom = Rs2Inventory.hasItem("venom");
                         boolean hasSuperAntifire = Rs2Inventory.hasItem("super antifire");
@@ -556,7 +561,7 @@ public class VorkathScript extends Script {
 
     private void handleAcidWalk() {
         if (!doesProjectileExistById(acidProjectileId) && !doesProjectileExistById(acidRedProjectileId) && Rs2GameObject.getGameObjects(ObjectID.ACID_POOL_32000).isEmpty()) {
-            Rs2Npc.interact("Vorkath", "attack");
+            Rs2Npc.interact(vorkath, "attack");
             state = State.FIGHT_VORKATH;
             acidPools.clear();
             return;

@@ -688,7 +688,8 @@ public class Rs2Walker {
                                             .thenComparing(x -> ((TileObject)x).getWorldLocation().distanceTo(b.getDestination()))).orElse(null);
 
                         if (tileObject != null && tileObject.getId() == b.getObjectId()) {
-                            boolean interact = Rs2GameObject.interact(tileObject, b.getAction(), true);
+                            boolean checkCanReach = tileObject.getId() != 16533;
+                            boolean interact = Rs2GameObject.interact(tileObject, b.getAction(), checkCanReach);
                         if (!interact) {
                             Rs2Walker.walkMiniMap(path.get(i));
                             sleep(1600, 2000);

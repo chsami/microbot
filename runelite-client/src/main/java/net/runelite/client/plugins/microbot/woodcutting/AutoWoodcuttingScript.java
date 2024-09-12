@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.woodcutting;
 
 import net.runelite.api.AnimationID;
 import net.runelite.api.GameObject;
-import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -150,10 +149,11 @@ public class AutoWoodcuttingScript extends Script {
             cannotLightFire = false;
         }
         if (!isFiremake()) {
-            Rs2Inventory.use("tinderbox");
-            sleep(Random.random(300, 600));
-            Rs2Inventory.use(config.TREE().getLog());
-            sleepUntil(Rs2Inventory::waitForInventoryChanges);
+            Rs2Inventory.waitForInventoryChanges(() -> {
+                Rs2Inventory.use("tinderbox");
+                sleep(Random.random(300, 600));
+                Rs2Inventory.use(config.TREE().getLog());
+            });
         }
         sleepUntil(() -> !isFiremake() && !Rs2Player.isStandingOnGameObject() && !Rs2Player.isStandingOnGroundItem(), 3500);
     }
