@@ -50,6 +50,8 @@ public class AutoWoodcuttingScript extends Script {
         }
         Rs2Antiban.resetAntibanSettings();
         Rs2Antiban.antibanSetupTemplates.applyWoodcuttingSetup();
+        Rs2AntibanSettings.dynamicActivity = true;
+        Rs2AntibanSettings.dynamicIntensity = true;
         initialPlayerLocation = null;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -76,9 +78,6 @@ public class AutoWoodcuttingScript extends Script {
 
                 switch (state) {
                     case WOODCUTTING:
-                        if(!Rs2Antiban.getActivity().equals(Activity.GENERAL_WOODCUTTING))
-                            Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
-                        
                         if (config.hopWhenPlayerDetected()) {
                             Rs2Player.logoutIfPlayerDetected(1, 10);
                             return;
@@ -132,9 +131,6 @@ public class AutoWoodcuttingScript extends Script {
                 state = State.WOODCUTTING;
                 break;
             case FIREMAKE:
-                if(!Rs2Antiban.getActivity().equals(Activity.GENERAL_FIREMAKING))
-                    Rs2Antiban.setActivity(Activity.GENERAL_FIREMAKING);
-                
                 do {
                     burnLog(config);
                 }
