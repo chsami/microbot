@@ -131,10 +131,9 @@ public class AutoWoodcuttingScript extends Script {
                 state = State.WOODCUTTING;
                 break;
             case FIREMAKE:
-                do {
-                    burnLog(config);
-                }
-                while (Rs2Inventory.contains(config.TREE().getLog()));
+                burnLog(config);
+                
+                if (Rs2Inventory.contains(config.TREE().getLog())) return;
 
                 walkBack(config);
                 state = State.WOODCUTTING;
