@@ -68,7 +68,7 @@ public class LootScript extends Script {
                     config.minFreeSlots(),
                     config.toggleDelayedLooting(),
                     config.toggleOnlyLootMyItems(),
-                    "bones"
+                    config.boneNames().split(",")
             );
             if (Rs2GroundItem.lootItemsBasedOnNames(bonesParams)) {
                 Microbot.pauseAllScripts = false;

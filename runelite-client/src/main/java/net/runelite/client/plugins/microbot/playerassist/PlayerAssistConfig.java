@@ -319,6 +319,15 @@ public interface PlayerAssistConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "Bone names",
+            name = "Bone names",
+            description = "The name of the bones you want to pickup and bury",
+            position = 96,
+            section = lootSection
+    )
+    default String boneNames() { return "bones,big bones"; }
+
+    @ConfigItem(
             keyName = "Scatter",
             name = "Scatter",
             description = "Picks up and Scatter ashes",
