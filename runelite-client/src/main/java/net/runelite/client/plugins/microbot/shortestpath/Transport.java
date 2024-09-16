@@ -545,7 +545,7 @@ public class Transport {
             rotateSlotToDesiredRotation(SLOT_TWO, Rs2Widget.getWidget(SLOT_TWO).getRotationY(), getDesiredRotation(getDisplayInfo().charAt(1)), SLOT_TWO_ACW_ROTATION, SLOT_TWO_CW_ROTATION);
             rotateSlotToDesiredRotation(SLOT_THREE, Rs2Widget.getWidget(SLOT_THREE).getRotationY(), getDesiredRotation(getDisplayInfo().charAt(2)), SLOT_THREE_ACW_ROTATION, SLOT_THREE_CW_ROTATION);
             Rs2Widget.clickWidget(TELEPORT_BUTTON);
-            sleep(1200,1800);
+            Rs2Player.waitForAnimation();
             if (!Rs2Equipment.isWearing(startingWeaponId)) {
                 sleep(3000,3600); // Required due to long animation time
                 System.out.println("Equipping Starting Weapon: " + startingWeaponId);
