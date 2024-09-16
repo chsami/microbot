@@ -25,7 +25,6 @@ public class QoLScript extends Script {
     public boolean run(QoLConfig config) {
         Microbot.enableAutoRunOn = false;
         loadNpcData();
-
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn() || !super.run()) {
@@ -61,10 +60,11 @@ public class QoLScript extends Script {
                     handleDialogueContinue();
                 }
 
+
             } catch (Exception ex) {
                 log.error("Error in QoLScript execution: {}", ex.getMessage(), ex);
             }
-        }, 0, 100, TimeUnit.MILLISECONDS);
+        }, 0, 5000, TimeUnit.MILLISECONDS);
         return true;
     }
 

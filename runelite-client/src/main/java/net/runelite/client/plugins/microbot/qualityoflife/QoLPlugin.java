@@ -3,10 +3,7 @@ package net.runelite.client.plugins.microbot.qualityoflife;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.MenuEntry;
-import net.runelite.api.events.BeforeRender;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.MenuEntryAdded;
-import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -14,6 +11,8 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.NeverLogoutScript;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchOverlay;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -51,12 +50,15 @@ public class QoLPlugin extends Plugin {
     @Inject
     QoLScript qoLScript;
     @Inject
+    PouchScript pouchScript;
+    @Inject
     private QoLConfig config;
     @Inject
     private OverlayManager overlayManager;
     @Inject
     private QoLOverlay qoLOverlay;
-
+    @Inject
+    private PouchOverlay pouchOverlay;
     @Provides
     QoLConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(QoLConfig.class);
@@ -110,10 +112,15 @@ public class QoLPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(qoLOverlay);
         }
+        if (config.displayPouchCounter()) {
+            overlayManager.add(pouchOverlay);
+            pouchScript.startUp();
+        }
         qoLScript.run(config);
     }
 
     protected void shutDown() {
+        pouchScript.shutdown();
         qoLScript.shutdown();
         overlayManager.remove(qoLOverlay);
     }
@@ -129,6 +136,7 @@ public class QoLPlugin extends Plugin {
 
     @Subscribe
     private void onMenuOptionClicked(MenuOptionClicked event) {
+        pouchScript.onMenuOptionClicked(event);
         if (Rs2Bank.isOpen() && config.useDoLastBank() && recordActions) {
             MenuEntry menuEntry = event.getMenuEntry();
             if (menuEntry.getOption().contains("Withdraw")) {
@@ -236,15 +244,18 @@ public class QoLPlugin extends Plugin {
 
     @Subscribe
     public void onConfigChanged(ConfigChanged ev) {
-        if (ev.getKey().equals("autoEatFood")) {
-            if (config.autoEatFood()) {
-            } else {
-                qoLScript.shutdown();
-            }
-        }
         if (ev.getKey().equals("smoothRotation")) {
             if (config.smoothCameraTracking()) {
                 previousCamera[YAW_INDEX] = Microbot.getClient().getMapAngle();
+            }
+        }
+        if (ev.getKey().equals("displayPouchCounter")) {
+            if (config.displayPouchCounter()) {
+                overlayManager.add(pouchOverlay);
+                pouchScript.startUp();
+            } else {
+                pouchScript.shutdown();
+                overlayManager.remove(pouchOverlay);
             }
         }
     }
@@ -263,6 +274,13 @@ public class QoLPlugin extends Plugin {
         }
 
 
+    }
+
+
+    @Subscribe
+    public void onItemContainerChanged(final ItemContainerChanged event)
+    {
+        pouchScript.onItemContainerChanged(event);
     }
 
     private void customLoadoutOnClicked(MenuEntry event, String loadoutName) {
