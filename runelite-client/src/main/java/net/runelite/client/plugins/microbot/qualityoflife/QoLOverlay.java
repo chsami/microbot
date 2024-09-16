@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.Microbot.log;
+
 public class QoLOverlay extends OverlayPanel {
     QoLConfig config;
 
@@ -33,24 +35,11 @@ public class QoLOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-//            panelComponent.setPreferredSize(new Dimension(200, 300));
-//            panelComponent.getChildren().add(TitleComponent.builder()
-//                    .text("Micro Example V1.0.0")
-//                    .color(Color.GREEN)
-//                    .build());
-//
-//            panelComponent.getChildren().add(LineComponent.builder().build());
-//
-//            panelComponent.getChildren().add(LineComponent.builder()
-//                    .left(Microbot.status)
-//                    .build());
-//
             if (config.renderMaxHitOverlay())
                 renderNpcs(graphics);
 
-
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            log(ex.getMessage());
         }
         return super.render(graphics);
     }
