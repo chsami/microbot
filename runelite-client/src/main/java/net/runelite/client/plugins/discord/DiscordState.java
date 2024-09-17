@@ -27,18 +27,19 @@ package net.runelite.client.plugins.discord;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ComparisonChain;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.discord.DiscordPresence;
+import net.runelite.client.discord.DiscordService;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Named;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.discord.DiscordPresence;
-import net.runelite.client.discord.DiscordService;
 
 /**
  * This class contains data about currently active discord state.
@@ -171,7 +172,7 @@ class DiscordState
 		// Replace snapshot with + to make tooltip shorter (so it will span only 1 line)
 		final String versionShortHand = runeliteVersion.replace("-SNAPSHOT", "+");
 
-		StringBuilder largeImageTooltipText = new StringBuilder(runeliteTitle).append(" v").append(versionShortHand);
+		StringBuilder largeImageTooltipText = new StringBuilder("Runelite").append(" v").append(versionShortHand);
 		if (safeMode)
 		{
 			largeImageTooltipText.append(" (safe mode)");
