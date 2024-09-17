@@ -48,7 +48,7 @@ public enum CookingLocation {
     private final CookingAreaType cookingAreaType;
     private final int cookingObjectID;
 
-    public static CookingLocation findNearestCookingLocation(CookingItem item, WorldPoint playerWorldPoint) {
+    public static CookingLocation findNearestCookingLocation(CookingItem item) {
         Map<Integer, CookingLocation> distanceMap = new HashMap<>();
 
         for (CookingLocation location : values()) {

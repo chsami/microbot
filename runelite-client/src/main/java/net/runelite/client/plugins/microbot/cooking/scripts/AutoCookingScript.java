@@ -63,7 +63,7 @@ public class AutoCookingScript extends Script {
                     }
 
                     if (config.useNearestCookingLocation()) {
-                        location = CookingLocation.findNearestCookingLocation(cookingItem, initialPlayerLocation);
+                        location = CookingLocation.findNearestCookingLocation(cookingItem);
                     } else {
                         location = config.cookingLocation();
                         if (cookingItem.getCookingAreaType() != CookingAreaType.BOTH) {
