@@ -48,7 +48,7 @@ After you've done setting it up follow these two steps:
 
 Make sure to follow this guide if it's your first time running the project
 
-https://github.com/runelite/runelite/wiki/Building-with-IntelliJ-IDEA
+[https://github.com/runelite/runelite/wiki/Building-with-IntelliJ-IDEA](https://github.com/chsami/microbot/wiki/Building-with-IntelliJ-IDEA)
 
 ## Microbot ChatGPT Chatbot
 
