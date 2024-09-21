@@ -34,6 +34,8 @@ public class Login {
     }
 
     public Login(String username, String password, int world) {
+        if(Microbot.isLoggedIn())
+            return;
         if (Microbot.getClient().getLoginIndex() == 3 || Microbot.getClient().getLoginIndex() == 24) { // you were disconnected from the server.
             int loginScreenWidth = 804;
             int startingWidth = (Microbot.getClient().getCanvasWidth() / 2) - (loginScreenWidth / 2);

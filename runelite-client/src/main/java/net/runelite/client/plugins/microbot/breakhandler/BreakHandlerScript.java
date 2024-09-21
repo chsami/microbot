@@ -81,8 +81,8 @@ public class BreakHandlerScript extends Script {
                     Microbot.pauseAllScripts = false;
                     if (breakIn <= 0)
                         breakIn = Random.random(config.timeUntilBreakStart() * 60, config.timeUntilBreakEnd() * 60);
-                    if (!Microbot.isLoggedIn())
-                        new Login();
+
+                    new Login();
                     totalBreaks++;
                     ClientUI.getFrame().setTitle(title);
                     if (Rs2AntibanSettings.takeMicroBreaks) {
