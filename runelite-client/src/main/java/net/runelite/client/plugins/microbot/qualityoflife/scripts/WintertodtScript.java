@@ -1,20 +1,19 @@
 package net.runelite.client.plugins.microbot.qualityoflife.scripts;
 
-import net.runelite.api.*;
+import net.runelite.api.GameObject;
+import net.runelite.api.ItemID;
+import net.runelite.api.NPC;
+import net.runelite.api.ObjectID;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.NpcChanged;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.chat.ChatColorType;
-import net.runelite.client.chat.ChatMessageBuilder;
-import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.qualityoflife.QoLConfig;
 import net.runelite.client.plugins.microbot.qualityoflife.QoLPlugin;
 import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
-import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -58,8 +57,8 @@ public class WintertodtScript extends Script {
                 } else {
                     wintertodtHp = -1;
                 }
-                brokenBrazier = Rs2GameObject.getGameObjects(ObjectID.BRAZIER_29313).stream().findFirst().orElse(null);
-                unlitBrazier = Rs2GameObject.getGameObjects(ObjectID.BRAZIER_29312).stream().findFirst().orElse(null);
+                brokenBrazier = Rs2GameObject.getGameObjects(ObjectID.BRAZIER_29313).stream().filter(gameObject -> gameObject.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) < 5).findFirst().orElse(null);
+                unlitBrazier = Rs2GameObject.getGameObjects(ObjectID.BRAZIER_29312).stream().filter(gameObject -> gameObject.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) < 5).findFirst().orElse(null);
 
                 if (!config.interrupted())
                     return;
@@ -90,8 +89,8 @@ public class WintertodtScript extends Script {
                     qolPlugin.updateWintertodtInterupted(false);
                 }
 
-            } catch (Exception ignore) {
-
+            } catch (Exception e) {
+                Microbot.log("Error in QoL Wintertodt script: " + e.getMessage());
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
@@ -115,7 +114,7 @@ public class WintertodtScript extends Script {
             if (helpedIncapitatedPyromancer) {
                 if (config.lightUnlitBrazier()) {
                     if (Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH) || Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH_OFFHAND) || Rs2Inventory.hasItem(ItemID.TINDERBOX)) {
-                        Microbot.getClientThread().invokeLater(() -> Rs2GameObject.interact(unlitBrazier, "Light"));
+                        scheduledFuture = scheduledExecutorService.schedule(() -> Rs2GameObject.interact(unlitBrazier, "Light"), 300, TimeUnit.MILLISECONDS);
                     }
                 }
             }
@@ -146,69 +145,59 @@ public class WintertodtScript extends Script {
 
     public void onNpcDespawned(NpcDespawned event) {
         if (event.getNpc().equals(incapitatedPyromancer)) {
-            incapitatedPyromancer = Microbot.getClientThread().runOnClientThread(() -> Rs2Npc.getNpc("Incapacitated Pyromancer"));
+            incapitatedPyromancer = Rs2Npc.getNpc("Incapacitated Pyromancer");
         }
         if (event.getNpc().equals(pyromancer)) {
-            pyromancer = Microbot.getClientThread().runOnClientThread(() -> Rs2Npc.getNpc("Pyromancer"));
+            pyromancer = Rs2Npc.getNpc("Pyromancer");
         }
     }
 
     public void onChatMessage(ChatMessage chatMessage) {
         var message = chatMessage.getMessage();
         if (message.contains("The brazier is broken and shrapnel")) {
-            brokenBrazier = Microbot.getClientThread().runOnClientThread(() -> Rs2GameObject.getGameObjects(ObjectID.BRAZIER_29313).stream().filter(gameObject -> gameObject.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) < 5).findFirst().orElse(null));
-            Microbot.log("Broken brazier: " + brokenBrazier);
             if (config.fixBrokenBrazier()) {
                 qolPlugin.updateWintertodtInterupted(false);
-                Global.sleepUntilOnClientThread(() -> (brokenBrazier != null && brokenBrazier.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) < 5), 1000);
-                Microbot.getClientThread().invokeLater(() -> Rs2GameObject.interact(brokenBrazier, "Fix"));
+                scheduledFuture = scheduledExecutorService.schedule(() -> Rs2GameObject.interact(brokenBrazier, "Fix"), 300, TimeUnit.MILLISECONDS);
             }
         }
 
         if (message.startsWith("The brazier has gone out")) {
-            unlitBrazier = Microbot.getClientThread().runOnClientThread(() -> Rs2GameObject.getGameObjects(ObjectID.BRAZIER_29312).stream().filter(gameObject -> gameObject.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) < 5).findFirst().orElse(null));
             if (incapitatedPyromancer != null) {
                 if (!config.healPyromancer())
                     return;
-                if (Rs2Npc.interact(incapitatedPyromancer, "Help")) {
-                    helpedIncapitatedPyromancer = true;
-                }
+                scheduledFuture = scheduledExecutorService.schedule(() -> Rs2Npc.interact(incapitatedPyromancer, "Help"), 300, TimeUnit.MILLISECONDS);
+                helpedIncapitatedPyromancer = true;
             } else {
                 if (config.lightUnlitBrazier()) {
                     if (Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH) || Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH_OFFHAND) || Rs2Inventory.hasItem(ItemID.TINDERBOX)) {
-                        Global.sleepUntilOnClientThread(() -> unlitBrazier != null && unlitBrazier.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) < 5, 1000);
-                        Microbot.getClientThread().invokeLater(() -> Rs2GameObject.interact(unlitBrazier, "Light"));
+                        scheduledFuture = scheduledExecutorService.schedule(() -> Rs2GameObject.interact(unlitBrazier, "Light"), 300, TimeUnit.MILLISECONDS);
                     }
                 }
             }
         }
 
         if (message.startsWith("You fix the brazier")) {
-            unlitBrazier = Microbot.getClientThread().runOnClientThread(() -> Rs2GameObject.getGameObjects(ObjectID.BRAZIER_29312).stream().filter(gameObject -> gameObject.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) < 5).findFirst().orElse(null));
             if (incapitatedPyromancer != null) {
                 if (!config.healPyromancer())
                     return;
-                if (Rs2Npc.interact(incapitatedPyromancer, "Help")) {
-                    helpedIncapitatedPyromancer = true;
-                }
+                scheduledFuture = scheduledExecutorService.schedule(() -> Rs2Npc.interact(incapitatedPyromancer, "Help"), 300, TimeUnit.MILLISECONDS);
+                helpedIncapitatedPyromancer = true;
             } else {
                 if (config.lightUnlitBrazier()) {
                     if (Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH) || Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH_OFFHAND) || Rs2Inventory.hasItem(ItemID.TINDERBOX)) {
-                        Global.sleepUntil(() -> unlitBrazier.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) < 5, 1000);
-                        Microbot.getClientThread().invokeLater(() -> Rs2GameObject.interact(unlitBrazier, "Light"));
+                        scheduledFuture = scheduledExecutorService.schedule(() -> Rs2GameObject.interact(unlitBrazier, "Light"), 300, TimeUnit.MILLISECONDS);
                     }
                 }
             }
         }
 
         if (message.startsWith("Heal the Pyromancer")) {
-            if (incapitatedPyromancer != null) {
+
                 if (!config.healPyromancer())
                     return;
-                if (Rs2Npc.interact(incapitatedPyromancer, "Help")) {
-                    helpedIncapitatedPyromancer = true;
-                }
-            }
+                scheduledFuture = scheduledExecutorService.schedule(() -> Rs2Npc.interact(incapitatedPyromancer, "Help"), 300, TimeUnit.MILLISECONDS);
+                helpedIncapitatedPyromancer = true;
+
         }
 
         if (message.startsWith("You light the brazier")) {
@@ -232,19 +221,5 @@ public class WintertodtScript extends Script {
             qolPlugin.updateWintertodtInterupted(false);
             qolPlugin.updateLastWinthertodtAction(WintertodtActions.NONE);
         }
-    }
-
-    private void broadcastMessage(String message) {
-        Microbot.getChatMessageManager().queue(QueuedMessage.builder()
-                .runeLiteFormattedMessage(
-                        new ChatMessageBuilder()
-                                .append(ChatColorType.NORMAL)
-                                .append("[QoL Wintertodt] ")
-                                .append(ChatColorType.HIGHLIGHT)
-                                .append(message)
-                                .build()
-                )
-                .type(ChatMessageType.BROADCAST)
-                .build());
     }
 }
