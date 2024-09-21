@@ -378,4 +378,9 @@ public class Rs2Widget {
     public static boolean isSmithingWidgetOpen() {
         return isWidgetVisible(InterfaceID.SMITHING, 0);
     }
+
+    // check if deposit box widget is open
+    public static boolean isDepositBoxWidgetOpen() {
+        return isWidgetVisible(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER);
+    }
 }
