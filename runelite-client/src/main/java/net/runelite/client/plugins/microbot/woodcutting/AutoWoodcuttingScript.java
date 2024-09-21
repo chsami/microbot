@@ -6,6 +6,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
@@ -49,12 +50,15 @@ public class AutoWoodcuttingScript extends Script {
         }
         Rs2Antiban.resetAntibanSettings();
         Rs2Antiban.antibanSetupTemplates.applyWoodcuttingSetup();
+        Rs2AntibanSettings.dynamicActivity = true;
+        Rs2AntibanSettings.dynamicIntensity = true;
         initialPlayerLocation = null;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
 
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+                if(Rs2AntibanSettings.actionCooldownActive) return;
 
                 if (initialPlayerLocation == null) {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
@@ -74,9 +78,6 @@ public class AutoWoodcuttingScript extends Script {
 
                 switch (state) {
                     case WOODCUTTING:
-                        if(!Rs2Antiban.getActivity().equals(Activity.GENERAL_WOODCUTTING))
-                            Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
-                        
                         if (config.hopWhenPlayerDetected()) {
                             Rs2Player.logoutIfPlayerDetected(1, 10);
                             return;
@@ -95,6 +96,9 @@ public class AutoWoodcuttingScript extends Script {
                         if (tree != null) {
                             if(Rs2GameObject.interact(tree, config.TREE().getAction())) {
                                 Rs2Player.waitForAnimation();
+                                Rs2Antiban.actionCooldown();
+                                Rs2Antiban.takeMicroBreakByChance();
+                                
                                 if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
                                     returnPoint = Rs2Player.getWorldLocation();
                                 }
@@ -127,13 +131,9 @@ public class AutoWoodcuttingScript extends Script {
                 state = State.WOODCUTTING;
                 break;
             case FIREMAKE:
-                if(!Rs2Antiban.getActivity().equals(Activity.GENERAL_FIREMAKING))
-                    Rs2Antiban.setActivity(Activity.GENERAL_FIREMAKING);
+                burnLog(config);
                 
-                do {
-                    burnLog(config);
-                }
-                while (Rs2Inventory.contains(config.TREE().getLog()));
+                if (Rs2Inventory.contains(config.TREE().getLog())) return;
 
                 walkBack(config);
                 state = State.WOODCUTTING;
@@ -211,5 +211,6 @@ public class AutoWoodcuttingScript extends Script {
         super.shutdown();
         returnPoint = null;
         initialPlayerLocation = null;
+        Rs2Antiban.resetAntibanSettings();
     }
 }
