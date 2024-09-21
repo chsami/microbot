@@ -17,10 +17,10 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
@@ -28,7 +28,8 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 @Slf4j
 public class MotherloadMineScript extends Script {
     public static final String version = "1.6.5";
-    private static final WorldArea UPSTAIRS = new WorldArea(new WorldPoint(3747, 5676, 0), 7, 8);
+    private static final WorldArea WEST_UPPER_AREA = new WorldArea(3748, 5676, 7, 9, 0);
+    private static final WorldArea EAST_UPPER_AREA = new WorldArea(3755, 5668, 8, 8, 0);
     private static final WorldPoint HOPPER = new WorldPoint(3748, 5674, 0);
     private static final int UPPER_FLOOR_HEIGHT = -490;
     private static final int SACK_LARGE_SIZE = 162;
@@ -257,11 +258,7 @@ public class MotherloadMineScript extends Script {
 
     private WallObject findClosestVein() {
         return Rs2GameObject.getWallObjects().stream()
-                .filter(this::isVein)
-                .sorted(Comparator.comparingInt(this::distanceToPlayer))
-                .filter(Rs2GameObject::hasLineOfSight)
-                .findFirst()
-                .orElse(null);
+                .filter(this::isVein).filter(this::isWithinMiningArea).min((a, b) -> Integer.compare(distanceToPlayer(a), distanceToPlayer(b))).orElse(null);
     }
 
     private boolean isVein(WallObject wallObject) {
@@ -269,8 +266,17 @@ public class MotherloadMineScript extends Script {
         return id == 26661 || id == 26662 || id == 26663 || id == 26664;
     }
 
+    private boolean isWithinMiningArea(WallObject wallObject) {
+        if (!config.mineUpstairs())
+            return true;
+        WorldPoint walkableTile = wallObject.getWorldLocation();
+        return WEST_UPPER_AREA.contains(walkableTile) || EAST_UPPER_AREA.contains(walkableTile);
+    }
+
     private int distanceToPlayer(WallObject wallObject) {
-        return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(wallObject.getWorldLocation());
+        WorldPoint closestWalkableNeighbour = Rs2Tile.getNearestWalkableTile(wallObject.getWorldLocation());
+        if (closestWalkableNeighbour == null) return 999;
+        return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(closestWalkableNeighbour);
     }
 
     private void moveToMiningSpot() {
