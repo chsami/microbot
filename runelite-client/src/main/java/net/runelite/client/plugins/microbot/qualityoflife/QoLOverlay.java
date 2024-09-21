@@ -15,6 +15,7 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.ProgressBarComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -44,17 +45,8 @@ public class QoLOverlay extends OverlayPanel {
         try {
             //graphics.setFont(new Font("Arial", Font.PLAIN, 14));
             if (WintertodtScript.isInWintertodtRegion()) {
-                final ProgressBarComponent wintertodtHealthBar = new ProgressBarComponent();
-                wintertodtHealthBar.setBackgroundColor(new Color(255, 0, 0, 255));
-                wintertodtHealthBar.setForegroundColor(new Color(37, 196, 37, 255));
-                wintertodtHealthBar.setMaximum(100);
-                wintertodtHealthBar.setValue(WintertodtScript.wintertodtHp);
-//                wintertodtHealthBar.setLeftLabel("0");
-//                wintertodtHealthBar.setRightLabel("100");
-//                wintertodtHealthBar.setCenterLabel(String.valueOf(WintertodtScript.wintertodtHp));
-                wintertodtHealthBar.setPreferredSize(new Dimension(500, 40));
-                wintertodtHealthBar.setLabelDisplayMode(ProgressBarComponent.LabelDisplayMode.PERCENTAGE);
-                //wintertodtHealthBar.setFontColor(new Color(35, 58, 118, 255));
+                setPosition(OverlayPosition.TOP_LEFT);
+                final ProgressBarComponent wintertodtHealthBar = getWintertodtHealthBar();
 
                 panelComponent.setPreferredSize(new Dimension(500, 300));
                 panelComponent.setBackgroundColor(new Color(93, 72, 41, 255));
@@ -95,6 +87,17 @@ public class QoLOverlay extends OverlayPanel {
             log("Error in QoLOverlay: " + ex.getMessage());
         }
         return super.render(graphics);
+    }
+
+    private static @NotNull ProgressBarComponent getWintertodtHealthBar() {
+        final ProgressBarComponent wintertodtHealthBar = new ProgressBarComponent();
+        wintertodtHealthBar.setBackgroundColor(new Color(255, 0, 0, 255));
+        wintertodtHealthBar.setForegroundColor(new Color(37, 196, 37, 255));
+        wintertodtHealthBar.setMaximum(100);
+        wintertodtHealthBar.setValue(WintertodtScript.wintertodtHp);
+        wintertodtHealthBar.setPreferredSize(new Dimension(500, 40));
+        wintertodtHealthBar.setLabelDisplayMode(ProgressBarComponent.LabelDisplayMode.PERCENTAGE);
+        return wintertodtHealthBar;
     }
 
     private void renderNpcs(Graphics2D graphics) {

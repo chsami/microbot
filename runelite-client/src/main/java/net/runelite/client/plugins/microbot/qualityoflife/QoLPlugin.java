@@ -40,7 +40,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import static net.runelite.client.plugins.microbot.qualityoflife.scripts.WintertodtScript.isInWintertodtRegion;
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 @PluginDescriptor(
         name = PluginDescriptor.See1Duck + "QoL",
@@ -131,8 +131,15 @@ public class QoLPlugin extends Plugin {
             overlayManager.add(pouchOverlay);
             pouchScript.startUp();
         }
+        if (config.useSpecWeapon()) {
+            Microbot.getSpecialAttackConfigs().setSpecialAttack(true);
+            Microbot.getSpecialAttackConfigs().setSpecialAttackWeapon(config.specWeapon());
+            Microbot.getSpecialAttackConfigs().setMinimumSpecEnergy(config.specWeapon().getEnergyRequired());
+        }
+
         qoLScript.run(config);
         wintertodtScript.run(config);
+        updateUiElements();
     }
 
     @Override
@@ -161,6 +168,13 @@ public class QoLPlugin extends Plugin {
         if (!Microbot.isLoggedIn()) return;
         if (config.neverLogout()) {
             NeverLogoutScript.onGameTick(event);
+        }
+        if (config.useSpecWeapon()) {
+            if (Microbot.getSpecialAttackConfigs().getSpecialAttackWeapon() != config.specWeapon()) {
+                Microbot.getSpecialAttackConfigs().setSpecialAttack(true);
+                Microbot.getSpecialAttackConfigs().setSpecialAttackWeapon(config.specWeapon());
+                Microbot.getSpecialAttackConfigs().setMinimumSpecEnergy(config.specWeapon().getEnergyRequired());
+            }
         }
     }
 
@@ -346,6 +360,7 @@ public class QoLPlugin extends Plugin {
         }
     }
 
+
     @Subscribe
     public void onConfigChanged(ConfigChanged ev) {
         if ("smoothRotation".equals(ev.getKey()) && config.smoothCameraTracking()) {
@@ -366,6 +381,15 @@ public class QoLPlugin extends Plugin {
             } else {
                 pouchScript.shutdown();
                 overlayManager.remove(pouchOverlay);
+            }
+        }
+        if (ev.getKey().equals("useSpecWeapon") || ev.getKey().equals("specWeapon")) {
+            if (config.useSpecWeapon()) {
+                Microbot.getSpecialAttackConfigs().setSpecialAttack(true);
+                Microbot.getSpecialAttackConfigs().setSpecialAttackWeapon(config.specWeapon());
+                Microbot.getSpecialAttackConfigs().setMinimumSpecEnergy(config.specWeapon().getEnergyRequired());
+            } else {
+                Microbot.getSpecialAttackConfigs().reset();
             }
         }
     }
@@ -529,20 +553,29 @@ public class QoLPlugin extends Plugin {
             ConfigPlugin configPlugin = (ConfigPlugin) Microbot.getPluginManager().getPlugins().stream().filter((plugin) ->
                     plugin instanceof ConfigPlugin).findAny().orElse(null);
             if (configPlugin == null) {
-                throw new RuntimeException("Config Plugin not found");
+                Microbot.log("Config Plugin not found");
             } else {
                 try {
                     Class<?> pluginListPanelClass = Class.forName("net.runelite.client.plugins.config.PluginListPanel");
                     JPanel pluginListPanel = (JPanel) configPlugin.getInjector().getProvider(pluginListPanelClass).get();
-                    java.util.List<?> pluginList = (java.util.List<?>) FieldUtils.readDeclaredField(pluginListPanel, "pluginList", true);
+                    final List<?>[] pluginList = {(List<?>) FieldUtils.readDeclaredField(pluginListPanel, "pluginList", true)};
 
-                    if (pluginList == null) {
-                        sleep(8000);
-                        pluginList = (java.util.List<?>) FieldUtils.readDeclaredField(pluginListPanel, "pluginList", true);
+                    if (pluginList[0] == null) {
+                        log.info("Plugin list is null, waiting for it to be initialized");
+                        sleepUntil(() -> {
+                            try {
+                                pluginList[0] = (List<?>) FieldUtils.readDeclaredField(pluginListPanel, "pluginList", true);
+                                return pluginList[0] != null;
+                            } catch (Exception e) {
+                                log.error("QoL Error updating plugin list: " + e.getMessage());
+                                return false;
+                            }
+                        },10000);
+
                     }
 
 
-                    for (Object plugin : pluginList) {
+                    for (Object plugin : pluginList[0]) {
                         if (plugin instanceof JPanel) {
                             Component[] var12 = ((JPanel) plugin).getComponents();
                             for (Component c : var12) {
@@ -558,14 +591,16 @@ public class QoLPlugin extends Plugin {
                     }
 
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    log.error("QoL Error updating plugin list panel: " + e.getMessage());
+                    Microbot.log("QoL Error updating inner UI elements: " + e.getMessage());
                 }
 
             }
 
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("QoL Error updating UI elements: " + e.getMessage());
+            Microbot.log("QoL Error updating UI elements: " + e.getMessage());
         }
     }
 }

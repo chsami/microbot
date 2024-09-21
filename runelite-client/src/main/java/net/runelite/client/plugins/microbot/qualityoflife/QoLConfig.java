@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.qualityoflife;
 
 import net.runelite.client.config.*;
 import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
+import net.runelite.client.plugins.microbot.util.misc.SpecialAttackWeaponEnum;
 
 import java.awt.*;
 
@@ -212,6 +213,30 @@ public interface QoLConfig extends Config {
     )
     default boolean displayPouchCounter() {
         return false;
+    }
+
+    // boolean to use custom spec weapon
+    @ConfigItem(
+            keyName = "useSpecWeapon",
+            name = "Use Spec Weapon",
+            description = "Use Spec Weapon",
+            position = 5,
+            section = upkeepSection
+    )
+    default boolean useSpecWeapon() {
+        return false;
+    }
+
+    // spec weapon
+    @ConfigItem(
+            keyName = "specWeapon",
+            name = "Spec Weapon",
+            description = "Spec Weapon",
+            position = 6,
+            section = upkeepSection
+    )
+    default SpecialAttackWeaponEnum specWeapon() {
+        return SpecialAttackWeaponEnum.DRAGON_DAGGER;
     }
 
 
