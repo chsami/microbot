@@ -1,6 +1,9 @@
 package net.runelite.client.plugins.microbot.qualityoflife;
 
 import net.runelite.client.config.*;
+import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
+
+import java.awt.*;
 
 @ConfigGroup("QoL")
 public interface QoLConfig extends Config {
@@ -132,6 +135,22 @@ public interface QoLConfig extends Config {
         return true;
     }
 
+    // UI section
+    @ConfigSection(
+            name = "UI",
+            description = "Settings related to UI",
+            position = 6
+    )
+    String uiSection = "uiSection";
+    // Wintertodt section
+    @ConfigSection(
+            name = "Wintertodt",
+            description = "Wintertodt settings",
+            position = 7
+    )
+    String wintertodtSection = "wintertodtSection";
+
+
     // boolean to use Dialogue auto continue
     @ConfigItem(
             keyName = "useDialogueAutoContinue",
@@ -171,6 +190,7 @@ public interface QoLConfig extends Config {
     default int eatFoodPercentage() {
         return 50;
     }
+
     // avoid logging out
     @ConfigItem(
             keyName = "neverLogOut",
@@ -193,6 +213,7 @@ public interface QoLConfig extends Config {
     default boolean displayPouchCounter() {
         return false;
     }
+
 
     // boolean to display Inventory setups as a menu option in the bank
     @ConfigItem(
@@ -301,5 +322,162 @@ public interface QoLConfig extends Config {
     default String Setup4() {
         return "";
     }
+
+    // boolean to fix camera pitch on login
+    @ConfigItem(
+            keyName = "fixCameraPitch",
+            name = "Fix Login Camera Pitch",
+            description = "Fixes the camera pitch on login",
+            position = 2,
+            section = cameraSection
+    )
+    default boolean fixCameraPitch() {
+        return true;
+    }
+
+    // boolean to fix camera zoom on login
+    @ConfigItem(
+            keyName = "fixCameraZoom",
+            name = "Fix Login Camera Zoom",
+            description = "Fixes the camera zoom on login",
+            position = 3,
+            section = cameraSection
+    )
+    default boolean fixCameraZoom() {
+        return true;
+    }
+
+    // color picker for Accent Color
+    @ConfigItem(
+            keyName = "accentColor",
+            name = "Accent Color",
+            description = "Accent Color",
+            position = 0,
+            section = uiSection
+    )
+    default Color accentColor() {
+        return new Color(220, 138, 0);
+    }
+
+    // color picker for toggle button color
+    @ConfigItem(
+            keyName = "toggleButtonColor",
+            name = "Toggle Button Color",
+            description = "Toggle Button Color",
+            position = 1,
+            section = uiSection
+    )
+    default Color toggleButtonColor() {
+        return new Color(220, 138, 0);
+    }
+
+    // color picker for plugin label color
+    @ConfigItem(
+            keyName = "pluginLabelColor",
+            name = "Plugin Label Color",
+            description = "Plugin Label Color",
+            position = 2,
+            section = uiSection
+    )
+    default Color pluginLabelColor() {
+        return new Color(255, 255, 255);
+    }
+
+    // boolean to quick fletch kindling
+    @ConfigItem(
+            keyName = "quickFletchKindling",
+            name = "Quick Fletch Kindling",
+            description = "Quick Fletch Kindling",
+            position = 0,
+            section = wintertodtSection
+    )
+    default boolean quickFletchKindling() {
+        return true;
+    }
+
+    // boolean to resume fletching kindling if interrupted
+    @ConfigItem(
+            keyName = "resumeFletchingKindling",
+            name = "Resume Fletching",
+            description = "Resume Fletching Kindling if interrupted",
+            position = 1,
+            section = wintertodtSection
+    )
+    default boolean resumeFletchingKindling() {
+        return true;
+    }
+
+    // boolean to resume feeding brazier if interrupted
+    @ConfigItem(
+            keyName = "resumeFeedingBrazier",
+            name = "Resume Feeding Brazier",
+            description = "Resume Feeding Brazier if interrupted",
+            position = 2,
+            section = wintertodtSection
+    )
+    default boolean resumeFeedingBrazier() {
+        return true;
+    }
+
+    // boolean to fix brazier
+
+    @ConfigItem(
+            keyName = "fixBrazier",
+            name = "Fix Brazier",
+            description = "Fix Brazier",
+            position = 3,
+            section = wintertodtSection
+    )
+    default boolean fixBrokenBrazier() {
+        return true;
+    }
+
+    // boolean to light unlit brazier
+    @ConfigItem(
+            keyName = "lightUnlitBrazier",
+            name = "Light Unlit Brazier",
+            description = "Light Unlit Brazier",
+            position = 4,
+            section = wintertodtSection
+    )
+    default boolean lightUnlitBrazier() {
+        return true;
+    }
+
+    // boolean to heal Pyromancer
+    @ConfigItem(
+            keyName = "healPyromancer",
+            name = "Heal Pyromancer",
+            description = "Heal Pyromancer",
+            position = 5,
+            section = wintertodtSection
+    )
+    default boolean healPyromancer() {
+        return true;
+    }
+
+
+    // Hidden enum for Wintertodt actions
+    @ConfigItem(
+            keyName = "wintertodtActions",
+            name = "Wintertodt Actions",
+            description = "Wintertodt Actions",
+            hidden = true
+    )
+    default WintertodtActions wintertodtActions() {
+        return WintertodtActions.NONE;
+    }
+
+    // Hidden boolean to check if we were interrupted
+    @ConfigItem(
+            keyName = "interrupted",
+            name = "Interrupted",
+            description = "Interrupted",
+            hidden = true
+    )
+    default boolean interrupted() {
+        return false;
+    }
+
 
 }
