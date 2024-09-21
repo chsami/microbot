@@ -218,12 +218,6 @@ public class QoLPlugin extends Plugin {
             }
         }
 
-        if ("Track".equals(event.getMenuOption())) {
-            event.consume();
-        }
-
-        if ("Work-at".equals(event.getMenuOption())) {
-            workbenchMenuEntry = createCachedMenuEntry(menuEntry);
         }
 
         if ((config.resumeFletchingKindling() || config.resumeFeedingBrazier()) && isInWintertodtRegion()) {

@@ -196,8 +196,8 @@ public class QoLScript extends Script {
     }
 
     private boolean openFurnace() {
-        sleepUntil(() -> Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen(), 10000);
-        return Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen();
+        sleepUntil(() -> Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen() || Rs2Widget.isSilverCraftingWidgetOpen(), 10000);
+        return Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen() || Rs2Widget.isSilverCraftingWidgetOpen();
     }
 
 

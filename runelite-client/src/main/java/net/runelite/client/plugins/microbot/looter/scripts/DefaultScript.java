@@ -97,8 +97,9 @@ public class DefaultScript extends Script {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown(){
         super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
     }
 
     private void applyAntiBanSettings() {
