@@ -50,7 +50,7 @@ public class DefaultScript extends Script {
                                     config.minFreeSlots(),
                                     config.toggleDelayedLooting(),
                                     config.toggleLootMyItemsOnly(),
-                                    config.listOfItemsToLoot()
+                                    config.listOfItemsToLoot().split(",")
                             );
                             if (Rs2GroundItem.lootItemsBasedOnNames(itemLootParams)) {
                                 Microbot.pauseAllScripts = false;
