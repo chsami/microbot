@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.blastoisefurnace.enums;
 
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
+
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

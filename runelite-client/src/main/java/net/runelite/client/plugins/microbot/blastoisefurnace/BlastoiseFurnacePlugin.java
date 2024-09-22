@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 
+
 @PluginDescriptor(
         name = "<html>[<font color=#00ffff>§</font>] " + "BlastoiseFurnace",
         description = "Storm's test plugin",

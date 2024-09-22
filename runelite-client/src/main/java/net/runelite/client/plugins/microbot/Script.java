@@ -67,6 +67,7 @@ public abstract class Script implements IScript {
         return done;
     }
 
+
     public boolean sleepUntil(BooleanSupplier awaitedCondition, BooleanSupplier resetCondition, int timeout) {
         final Stopwatch watch = Stopwatch.createStarted();
         while (!awaitedCondition.getAsBoolean() && watch.elapsed(TimeUnit.MILLISECONDS) < timeout) {
