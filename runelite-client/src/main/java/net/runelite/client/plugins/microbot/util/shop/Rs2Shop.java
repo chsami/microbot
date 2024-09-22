@@ -97,6 +97,7 @@ public class Rs2Shop {
      * Checks if the specified item is in stock in the shop. **Note** if the item has stock 0 this will still return true.
      *
      * @param itemName The name of the item to check.
+     *
      * @return true if the item is in stock, false otherwise.
      */
     public static boolean hasStock(String itemName) {
@@ -117,6 +118,7 @@ public class Rs2Shop {
      *
      * @param itemName        The name of the item to check.
      * @param minimumQuantity The minimum quantity required.
+     *
      * @return true if the item is in stock with quantity >= minimumQuantity, false otherwise.
      */
     public static boolean hasMinimumStock(String itemName, int minimumQuantity) {
@@ -159,6 +161,7 @@ public class Rs2Shop {
      * Retrieves the slot number of the specified item in the shop.
      *
      * @param itemName The name of the item to find.
+     *
      * @return The slot number of the item, or -1 if the item is not found.
      */
     public static int getSlot(String itemName) {
@@ -238,10 +241,19 @@ public class Rs2Shop {
 
         }
 
-        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
+        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), (itemBounds(rs2Item) == null) ? new Rectangle(1, 1) : itemBounds(rs2Item));
         //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
     }
 
-
+    /**
+     * Method to get the bounds of the item
+     *
+     * @param rs2Item Current item to interact with
+     *
+     * @return Rectangle of the item
+     */
+    private static Rectangle itemBounds(Rs2Item rs2Item) {
+        return Rs2Widget.getWidget(19660816).getDynamicChildren()[getSlot(rs2Item.getName())+1].getBounds();
+    }
 }
 

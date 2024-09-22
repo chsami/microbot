@@ -557,6 +557,7 @@ public class Rs2GameObject {
         ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"chest"}, false);
 
         possibleBankIds.add(12308); // RFD chest lumbridge basement
+        possibleBankIds.add(31427); // Fossil island chest
 
         for (GameObject gameObject : gameObjects) {
             if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
@@ -577,6 +578,43 @@ public class Rs2GameObject {
                     .anyMatch(action -> action != null && (
                             action.toLowerCase().contains("bank") ||
                                     action.toLowerCase().contains("collect"))))
+                return gameObject;
+
+        }
+
+        return null;
+    }
+
+    /**
+     * Find nearest Deposit box
+     *
+     * @return GameObject
+     */
+    public static GameObject findDepositBox() {
+        List<GameObject> gameObjects = getGameObjects();
+
+        ArrayList<Integer> possibleBankIds = Rs2Reflection.getObjectByName(new String[]{"bank"}, false);
+//        possibleBankIds.add(ObjectID.BANK_DEPOSIT_BOX);
+//        possibleBankIds.add(ObjectID.BANK_DEPOSIT_CHEST);
+
+
+        for (GameObject gameObject : gameObjects) {
+            if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
+
+            ObjectComposition objectComposition = convertGameObjectToObjectComposition(gameObject);
+
+            if (objectComposition == null) continue;
+
+            if (objectComposition.getImpostorIds() != null && objectComposition.getImpostorIds().length > 0) {
+                if (Arrays.stream(objectComposition.getImpostor().getActions())
+                        .anyMatch(action -> action != null && (
+                                action.toLowerCase().contains("deposit"))))
+                    return gameObject;
+            }
+
+            if (Arrays.stream(objectComposition.getActions())
+                    .anyMatch(action -> action != null && (
+                            action.toLowerCase().contains("deposit"))))
                 return gameObject;
 
         }
@@ -626,7 +664,7 @@ public class Rs2GameObject {
 
     public static ObjectComposition convertGameObjectToObjectComposition(TileObject tileObject) {
         Player player = Microbot.getClient().getLocalPlayer();
-        if (player.getLocalLocation().distanceTo(tileObject.getLocalLocation()) > 2400) return null;
+        if (player.getLocalLocation().distanceTo(tileObject.getLocalLocation()) > 4800) return null;
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(tileObject.getId()));
     }
 
@@ -1011,10 +1049,10 @@ public class Rs2GameObject {
 
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 17) {
-            Rs2Walker.walkFastCanvas(object.getWorldLocation());
-            return false;
-        }
+//        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 17) {
+//            Rs2Walker.walkFastCanvas(object.getWorldLocation());
+//            return false;
+//        }
 
         try {
 
