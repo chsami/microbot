@@ -218,7 +218,6 @@ public class QoLPlugin extends Plugin {
             }
         }
 
-        }
 
         if ((config.resumeFletchingKindling() || config.resumeFeedingBrazier()) && isInWintertodtRegion()) {
             if (event.getMenuOption().contains("Fletch") && event.getMenuTarget().isEmpty() && config.resumeFletchingKindling()) {
