@@ -1,30 +1,6 @@
-package net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch;/*
- * Copyright (c) 2019 Adam <Adam@sigterm.info>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+package net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch;
 
 import com.google.common.collect.ImmutableMap;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
@@ -32,11 +8,9 @@ import net.runelite.api.ItemID;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 
-import javax.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.regex.Matcher;
@@ -44,13 +18,6 @@ import java.util.regex.Pattern;
 
 import static java.lang.Math.min;
 
-@Slf4j
-@PluginDescriptor(
-        name = "Essence Pouch",
-        description = "Shows how many essence are in an essence pouch",
-        tags = {"pouch", "runecraft"},
-        enabledByDefault = false
-)
 public class PouchScript extends Script {
     private final int INVENTORY_SIZE = 28;
 
@@ -71,13 +38,11 @@ public class PouchScript extends Script {
             .put("twelve", 12)
             .build();
 
-    @Inject
-    private PouchOverlay essencePouchOverlay;
-
     private final Deque<ClickOperation> clickedItems = new ArrayDeque<>();
     private final Deque<ClickOperation> checkedPouches = new ArrayDeque<>();
     private int lastEssence;
     private int lastSpace;
+    private boolean isRunning = false;
 
     public void startUp() {
         // Reset pouch state
@@ -88,16 +53,18 @@ public class PouchScript extends Script {
         }
 
         lastEssence = lastSpace = -1;
+        isRunning = true;
     }
 
 
     @Override
     public void shutdown() {
+        isRunning = false;
         super.shutdown();
     }
 
     public void onChatMessage(ChatMessage event) {
-        if (event.getType() != ChatMessageType.GAMEMESSAGE) {
+        if (!isRunning || event.getType() != ChatMessageType.GAMEMESSAGE) {
             return;
         }
 
@@ -117,10 +84,38 @@ public class PouchScript extends Script {
                 }
                 while (!checkedPouches.isEmpty());
             }
+        } else if (!clickedItems.isEmpty()) {
+            if (event.getMessage().contains("You cannot add any more")) {
+                do {
+                    final ClickOperation op = clickedItems.pop();
+                    if (op.tick >= Microbot.getClient().getTickCount()) {
+                        Pouch pouch = op.pouch;
+                        pouch.setHolding(pouch.getHoldAmount());
+                        System.out.println(pouch.getHolding());
+                        pouch.setUnknown(false);
+                        break;
+                    }
+                }
+                while (!clickedItems.isEmpty());
+            } else if (event.getMessage().contains("There is no")) {
+                do {
+                    final ClickOperation op = clickedItems.pop();
+                    if (op.tick >= Microbot.getClient().getTickCount()) {
+                        Pouch pouch = op.pouch;
+                        pouch.setHolding(0);
+                        pouch.setUnknown(false);
+                        break;
+                    }
+                }
+                while (!clickedItems.isEmpty());
+            }
         }
     }
 
     public void onItemContainerChanged(ItemContainerChanged event) {
+        if (!isRunning)
+            return;
+
         if (InventoryID.INVENTORY.getId() != event.getContainerId()) {
             return;
         }
@@ -203,23 +198,22 @@ public class PouchScript extends Script {
                 pouch.setUnknown(false);
             }
 
-            log.debug("{}: {}", pouch.name(), essenceGot);
-
             essence -= essenceGot;
             space += essenceGot;
 
             pouch.addHolding(essenceGot);
         }
 
-        if (!clickedItems.isEmpty()) {
-            log.debug("End processing with {} events left", clickedItems.size());
-        }
 
         lastSpace = newSpace;
         lastEssence = newEss;
     }
 
     public void onMenuOptionClicked(MenuOptionClicked event) {
+        if (!isRunning) {
+            return;
+        }
+
         int itemId = event.getItemId();
 
         if (itemId == -1) {
@@ -232,17 +226,17 @@ public class PouchScript extends Script {
         }
         final int tick = Microbot.getClient().getTickCount() + 3;
         System.out.println(event.getMenuOption());
-        switch (event.getMenuOption()) {
-            case "Fill":
+        switch (event.getMenuOption().toLowerCase()) {
+            case "fill":
                 clickedItems.add(new ClickOperation(pouch, tick, 1));
                 break;
-            case "Empty":
+            case "empty":
                 clickedItems.add(new ClickOperation(pouch, tick, -1));
                 break;
-            case "Check":
+            case "check":
                 checkedPouches.add(new ClickOperation(pouch, tick));
                 break;
-            case "Take":
+            case "take":
                 // Dropping pouches clears them, so clear when picked up
                 pouch.setHolding(0);
                 break;

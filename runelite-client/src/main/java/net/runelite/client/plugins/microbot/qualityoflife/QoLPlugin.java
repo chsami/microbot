@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.qualityoflife;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.MenuEntry;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
@@ -15,8 +14,6 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.CameraScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.NeverLogoutScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchOverlay;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.WintertodtScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchOverlay;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
@@ -84,8 +81,6 @@ public class QoLPlugin extends Plugin {
     @Inject
     PouchScript pouchScript;
     @Inject
-    PouchScript pouchScript;
-    @Inject
     private QoLConfig config;
     @Inject
     private QoLScript qoLScript;
@@ -129,6 +124,7 @@ public class QoLPlugin extends Plugin {
     @Override
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
+            overlayManager.add(pouchOverlay);
             overlayManager.add(qoLOverlay);
         }
         if (config.displayPouchCounter()) {
@@ -147,9 +143,8 @@ public class QoLPlugin extends Plugin {
 
     @Override
     protected void shutDown() {
-        pouchScript.shutdown();
         qoLScript.shutdown();
-
+        overlayManager.remove(pouchOverlay);
         overlayManager.remove(qoLOverlay);
     }
 
@@ -181,41 +176,6 @@ public class QoLPlugin extends Plugin {
         }
     }
 
-    @Subscribe
-    private void onMenuOptionClicked(MenuOptionClicked event) {
-          pouchScript.onMenuOptionClicked(event);
-        MenuEntry menuEntry = event.getMenuEntry();
-        if (recordActions) {
-            if (Rs2Bank.isOpen() && config.useDoLastBank()) {
-                handleMenuOptionClicked(menuEntry, bankMenuEntries, "Close");
-            } else if ((Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen()) && config.useDoLastFurnace()) {
-                handleMenuOptionClicked(menuEntry, furnaceMenuEntries, "Make", "Smelt");
-            } else if (Rs2Widget.isSmithingWidgetOpen() && config.useDoLastAnvil()) {
-                handleMenuOptionClicked(menuEntry, anvilMenuEntries, "Smith");
-            }
-        }
-
-
-        if ((config.resumeFletchingKindling() || config.resumeFeedingBrazier()) && isInWintertodtRegion()) {
-            if (event.getMenuOption().contains("Fletch") && event.getMenuTarget().isEmpty() && config.resumeFletchingKindling()) {
-                WintertodtActions action = WintertodtActions.FLETCH;
-                action.setMenuEntry(createCachedMenuEntry(menuEntry));
-                updateLastWinthertodtAction(action);
-                updateWintertodtInterupted(false);
-                Microbot.log("Setting action to Fletch Kindle");
-            }
-            if (event.getMenuOption().contains("Feed") && config.resumeFeedingBrazier()) {
-                WintertodtActions action = WintertodtActions.FEED;
-                action.setMenuEntry(createCachedMenuEntry(menuEntry));
-                updateLastWinthertodtAction(action);
-                updateWintertodtInterupted(false);
-            }
-            if (event.getMenuOption().contains("Chop") || event.getMenuOption().contains("Walk")) {
-                updateLastWinthertodtAction(WintertodtActions.NONE);
-                updateWintertodtInterupted(false);
-            }
-        }
-    }
     public void onGameStateChanged(GameStateChanged event) {
         if (event.getGameState() != GameState.UNKNOWN && lastGameState == GameState.UNKNOWN) {
             updateUiElements();
@@ -431,12 +391,6 @@ public class QoLPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onItemContainerChanged(final ItemContainerChanged event) {
-        pouchScript.onItemContainerChanged(event);
-    }
-
-
-    @Subscribe
     public void onItemContainerChanged(final ItemContainerChanged event)
     {
         pouchScript.onItemContainerChanged(event);
@@ -638,4 +592,5 @@ public class QoLPlugin extends Plugin {
             Microbot.log("QoL Error updating UI elements: " + e.getMessage());
         }
     }
+
 }
