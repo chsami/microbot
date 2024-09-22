@@ -1021,6 +1021,15 @@ public class Rs2Inventory {
         return get(names) != null;
     }
 
+    /**
+     * Checks if the inventory has any item with the specified IDs.
+     *
+     * @param ids The array of IDs to check.
+     * @return true if any item with the specified IDs is found, false otherwise.
+     */
+    public static boolean hasItem(int[] ids) {
+        return Arrays.stream(ids).anyMatch(id -> get(id) != null);
+    }
 
     /**
      * @param names

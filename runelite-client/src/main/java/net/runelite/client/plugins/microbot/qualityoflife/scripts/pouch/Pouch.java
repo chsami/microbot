@@ -149,7 +149,7 @@ public enum Pouch
 	}
 
 	public boolean hasPouchInInventory() {
-		return Rs2Inventory.hasItem(Arrays.stream(itemIds).boxed().toArray(Integer[]::new));
+		return Rs2Inventory.hasItem(itemIds);
 	}
 
 	public boolean isDegraded() {
