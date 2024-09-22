@@ -74,16 +74,21 @@ public class AutoWoodcuttingScript extends Script {
                     return;
                 }
 
-                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
+                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts || Rs2AntibanSettings.actionCooldownActive)
+                    return;
+
+                if (Rs2AntibanSettings.actionCooldownActive)
+                    return;
 
                 switch (state) {
                     case WOODCUTTING:
+
                         if (config.hopWhenPlayerDetected()) {
-                            Rs2Player.logoutIfPlayerDetected(1, 10);
-                            return;
+                            if (Rs2Player.logoutIfPlayerDetected(1, 10))
+                                return;
                         }
 
-                        if (Rs2Equipment.isWearing("Dragon axe"))
+                        if (Rs2Equipment.isWearing("Dragon axe") || Rs2Equipment.isWearing("Dragon felling axe"))
                             Rs2Combat.setSpecState(true, 1000);
 
                         if (Rs2Inventory.isFull()) {
@@ -94,11 +99,10 @@ public class AutoWoodcuttingScript extends Script {
                         GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), false, getInitialPlayerLocation());
 
                         if (tree != null) {
-                            if(Rs2GameObject.interact(tree, config.TREE().getAction())) {
+                            if (Rs2GameObject.interact(tree, config.TREE().getAction())) {
                                 Rs2Player.waitForAnimation();
                                 Rs2Antiban.actionCooldown();
-                                Rs2Antiban.takeMicroBreakByChance();
-                                
+
                                 if (config.walkBack().equals(WoodcuttingWalkBack.LAST_LOCATION)) {
                                     returnPoint = Rs2Player.getWorldLocation();
                                 }
@@ -131,9 +135,7 @@ public class AutoWoodcuttingScript extends Script {
                 state = State.WOODCUTTING;
                 break;
             case FIREMAKE:
-                burnLog(config);
-                
-                if (Rs2Inventory.contains(config.TREE().getLog())) return;
+
 
                 walkBack(config);
                 state = State.WOODCUTTING;
