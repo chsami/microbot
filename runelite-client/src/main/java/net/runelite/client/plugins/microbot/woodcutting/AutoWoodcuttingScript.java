@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.woodcutting;
 
 import net.runelite.api.AnimationID;
 import net.runelite.api.GameObject;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -135,7 +136,9 @@ public class AutoWoodcuttingScript extends Script {
                 state = State.WOODCUTTING;
                 break;
             case FIREMAKE:
-
+                burnLog(config);
+                
+                if (Rs2Inventory.contains(config.TREE().getLog())) return;
 
                 walkBack(config);
                 state = State.WOODCUTTING;
@@ -157,7 +160,7 @@ public class AutoWoodcuttingScript extends Script {
                 Rs2Inventory.use(config.TREE().getLog());
             });
         }
-        sleepUntil(() -> !isFiremake() && !Rs2Player.isStandingOnGameObject() && !Rs2Player.isStandingOnGroundItem(), 3500);
+        sleepUntil(() -> (!isFiremake() && Rs2Player.waitForXpDrop(Skill.FIREMAKING)) || cannotLightFire, 5000);
     }
 
     private WorldPoint fireSpot(int distance) {
@@ -192,7 +195,7 @@ public class AutoWoodcuttingScript extends Script {
     }
 
     private boolean isFiremake() {
-        return Rs2Player.getAnimation() == AnimationID.FIREMAKING;
+        return Rs2Player.isAnimating(1800) && Rs2Player.getLastAnimationID() == AnimationID.FIREMAKING;
     }
 
     private WorldPoint calculateReturnPoint(AutoWoodcuttingConfig config) {
