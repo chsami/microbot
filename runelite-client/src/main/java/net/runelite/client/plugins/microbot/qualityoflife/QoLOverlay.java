@@ -78,10 +78,8 @@ public class QoLOverlay extends OverlayPanel {
                 panelComponent.getChildren().add(wintertodtHealthBar);
             }
 
-//
             if (config.renderMaxHitOverlay())
                 renderNpcs(graphics);
-
 
         } catch (Exception ex) {
             log("Error in QoLOverlay: " + ex.getMessage());
