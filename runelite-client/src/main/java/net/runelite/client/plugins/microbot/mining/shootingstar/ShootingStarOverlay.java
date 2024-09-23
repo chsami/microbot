@@ -10,7 +10,6 @@ import net.runelite.client.util.ColorUtil;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 public class ShootingStarOverlay extends OverlayPanel {
 
     ShootingStarPlugin plugin;
-    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Inject
     ShootingStarOverlay(ShootingStarPlugin plugin) {

@@ -25,7 +25,7 @@ import static net.runelite.client.ui.ColorScheme.*;
 
 public class ShootingStarTableRow extends JPanel {
 
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final ZoneId utcZoneId = ZoneId.of("UTC");
     private static final Color COLOR_NEGATIVE = new Color(255, 80, 80);
 
