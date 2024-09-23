@@ -362,7 +362,7 @@ public class ShootingStarPlugin extends Plugin {
 
     private void toggleOverlay(boolean hideOverlay) {
         if (overlayManager != null) {
-            boolean hasOverlay = overlayManager.anyMatch(ov -> ov.getName().equalsIgnoreCase(ShootingStarOverlay.class.getName()));
+            boolean hasOverlay = overlayManager.anyMatch(ov -> ov.getName().equalsIgnoreCase(ShootingStarOverlay.class.getSimpleName()));
 
             if (hideOverlay) {
                 if(!hasOverlay) return;
