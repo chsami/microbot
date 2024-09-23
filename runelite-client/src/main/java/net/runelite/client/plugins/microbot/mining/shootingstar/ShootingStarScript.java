@@ -32,7 +32,7 @@ public class ShootingStarScript extends Script {
     private final ShootingStarPlugin plugin;
     Rs2InventorySetup rs2InventorySetup;
     Pickaxe pickaxe;
-    ShootingStarState state;
+    public static ShootingStarState state;
     Star star;
     private boolean hasEquipment = false;
     private boolean hasInventory = false;
@@ -292,15 +292,18 @@ public class ShootingStarScript extends Script {
                 plugin.updatePanelList(true);
 
                 if (shouldBank(config)) {
+                    plugin.setTotalStarsMined(plugin.getTotalStarsMined() + 1);
                     return ShootingStarState.BANKING;
                 }
 
+                plugin.setTotalStarsMined(plugin.getTotalStarsMined() + 1);
                 return ShootingStarState.WAITING_FOR_STAR;
             }
 
             star.setObjectID(starObject.getId());
-            star.setTier(star.getTierBasedOnObjectID());
-            star.setMiningLevel(star.getRequiredMiningLevel());
+            plugin.updateSelectedStar(star);
+            plugin.updatePanelList(true);
+            star = selectedStar;
         }
         return ShootingStarState.MINING;
     }

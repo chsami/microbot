@@ -1,11 +1,13 @@
 package net.runelite.client.plugins.microbot.mining.shootingstar;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 
 @ConfigGroup(ShootingStarConfig.configGroup)
+@ConfigInformation(
+        "• This plugin will assist in finding & traveling to shooting stars. <br />" +
+        "• Configure inventory setup name or the plugin will look for best owned pickaxe <br />" +
+        "• Start the plugin it will configure the inventory, if needed, then travel based on configuration settings <br />"
+)
 public interface ShootingStarConfig extends Config {
     
     String configGroup = "shooting-star";
@@ -14,25 +16,7 @@ public interface ShootingStarConfig extends Config {
     String hideMembersWorlds = "hideMembersWorlds";
     String hideWildernessLocations = "hideWildernessLocations";
     String useNearestHighTierStar = "useNearestHighTierStar";
-
-    @ConfigSection(
-            name = "",
-            description = "",
-            position = 0
-    )
-    String guideSection = "guide";
-
-    @ConfigItem(
-            keyName = "guide",
-            name = "Guide",
-            description = "",
-            position = 0,
-            section = guideSection
-    )
-    default String guide() {
-        return "This plugin will assist in finding & traveling to shooting stars.\n" +
-                "Start this plugin in any state & it will setup inventory, then travel based on configuration settings";
-    }
+    String hideDevOverlay = "hideDevOverlay";
 
     @ConfigSection(
             name = "General Settings",
@@ -112,5 +96,24 @@ public interface ShootingStarConfig extends Config {
     )
     default boolean isDisplayAsMinutes() {
         return false;
+    }
+
+    @ConfigSection(
+            name = "Overlay Settings",
+            description = "Configure overlay settings",
+            position = 2
+    )
+    String overlaySection = "overlay";
+    
+
+    @ConfigItem(
+            keyName = hideDevOverlay,
+            name = "Hide Dev Overlay",
+            description = "Hide developer overlay",
+            position = 0,
+            section = overlaySection
+    )
+    default boolean isHideDevOverlay() {
+        return true;
     }
 }

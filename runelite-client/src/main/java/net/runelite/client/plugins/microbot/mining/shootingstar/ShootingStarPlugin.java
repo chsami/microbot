@@ -7,7 +7,6 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.GameState;
-import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -41,6 +40,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -55,18 +55,27 @@ import java.util.regex.Pattern;
         enabledByDefault = false
 )
 public class ShootingStarPlugin extends Plugin {
-    private static final int TICKS_PER_MINUTE = 100;
-    private static final int UPDATE_INTERVAL = 3;
-    private static final ZoneId utcZoneId = ZoneId.of("UTC");
-    public static String version = "1.0.0";
     @Getter
     public List<Star> starList = new ArrayList<>();
+    
     @Inject
     ShootingStarScript shootingStarScript;
+
+    public static String version = "1.1.0";
     private String httpEndpoint;
+    
+    @Getter
+    @Setter
+    public int totalStarsMined = 0;
+    @Getter
+    public Instant startTime;
     private int apiTickCounter = 0;
     private int updateListTickCounter = 0;
     private int lastWorld;
+    private static final int TICKS_PER_MINUTE = 100;
+    private static final int UPDATE_INTERVAL = 3;
+    private static final ZoneId utcZoneId = ZoneId.of("UTC");
+    
     @Getter
     private boolean displayAsMinutes;
     @Getter
@@ -75,7 +84,10 @@ public class ShootingStarPlugin extends Plugin {
     private boolean hideF2PWorlds;
     @Getter
     private boolean hideWildernessLocations;
+    @Getter
+    private boolean hideDevOverlay;
     private boolean useNearestHighTierStar;
+    
     @Inject
     private WorldService worldService;
     @Inject
@@ -84,6 +96,7 @@ public class ShootingStarPlugin extends Plugin {
     private OverlayManager overlayManager;
     @Inject
     private ShootingStarOverlay shootingStarOverlay;
+    
     @Inject
     private ClientToolbar clientToolbar;
     private NavigationButton navButton;
@@ -229,11 +242,14 @@ public class ShootingStarPlugin extends Plugin {
         hideF2PWorlds = config.isHideF2PWorlds();
         useNearestHighTierStar = config.useNearestHighTierStar();
         hideWildernessLocations = config.isHideWildernessLocations();
+        hideDevOverlay = config.isHideDevOverlay();
+        
         try {
             loadUrlFromProperties();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        
         fetchStars();
         createPanel();
         SwingUtilities.invokeLater(() -> panel.hideStars(starList));
@@ -241,6 +257,9 @@ public class ShootingStarPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(shootingStarOverlay);
         }
+        
+        startTime = Instant.now();
+        
         shootingStarScript.run(config);
     }
 
@@ -259,7 +278,7 @@ public class ShootingStarPlugin extends Plugin {
 
         if (event.getKey().equals(ShootingStarConfig.displayAsMinutes)) {
             displayAsMinutes = config.isDisplayAsMinutes();
-            updatePanelList(true);
+            updatePanelList(false);
         }
 
         if (event.getKey().equals(ShootingStarConfig.hideMembersWorlds)) {
@@ -282,6 +301,10 @@ public class ShootingStarPlugin extends Plugin {
 
         if (event.getKey().equals(ShootingStarConfig.useNearestHighTierStar)) {
             useNearestHighTierStar = config.useNearestHighTierStar();
+        }
+
+        if (event.getKey().equals(ShootingStarConfig.hideDevOverlay)) {
+            hideDevOverlay = config.isHideDevOverlay();
         }
     }
 
@@ -404,11 +427,18 @@ public class ShootingStarPlugin extends Plugin {
     }
 
     public void updateSelectedStar(Star star) {
-        if (getSelectedStar() != null) {
-            Star oldStar = getSelectedStar();
+        Star oldStar = getSelectedStar();
+        if (oldStar == null) {
+            star.setSelected(!star.isSelected());
+            return;
+        } else if (!oldStar.equals(star)) {
             oldStar.setSelected(false);
+            star.setSelected(!star.isSelected());
+            return;
         }
-        star.setSelected(!star.isSelected());
+        
+        oldStar.setTier(star.getTierBasedOnObjectID());
+        oldStar.setMiningLevel(star.getRequiredMiningLevel());
     }
 
     private void filterPanelList(boolean toggle) {

@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
-import net.runelite.api.Varbits;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.mining.shootingstar.enums.ShootingStarLocation;
-import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldType;
@@ -108,6 +105,7 @@ public class Star {
     public boolean isMemberWorld() {
         return !this.isGameModeWorld() && this.getWorldObject().getTypes().contains(WorldType.MEMBERS);
     }
+    
     public boolean isF2PWorld() {
         return !this.isGameModeWorld() && !this.getWorldObject().getTypes().contains(WorldType.MEMBERS);
     }
