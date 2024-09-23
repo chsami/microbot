@@ -84,6 +84,7 @@ public class ShootingStarPlugin extends Plugin {
     private boolean hideF2PWorlds;
     @Getter
     private boolean hideWildernessLocations;
+    private boolean hideOverlay;
     @Getter
     private boolean hideDevOverlay;
     private boolean useNearestHighTierStar;
@@ -242,6 +243,7 @@ public class ShootingStarPlugin extends Plugin {
         hideF2PWorlds = config.isHideF2PWorlds();
         useNearestHighTierStar = config.useNearestHighTierStar();
         hideWildernessLocations = config.isHideWildernessLocations();
+        hideOverlay = config.isHideOverlay();
         hideDevOverlay = config.isHideDevOverlay();
         
         try {
@@ -253,10 +255,8 @@ public class ShootingStarPlugin extends Plugin {
         fetchStars();
         createPanel();
         SwingUtilities.invokeLater(() -> panel.hideStars(starList));
-
-        if (overlayManager != null) {
-            overlayManager.add(shootingStarOverlay);
-        }
+        
+        toggleOverlay(hideOverlay);
         
         startTime = Instant.now();
         
@@ -301,6 +301,11 @@ public class ShootingStarPlugin extends Plugin {
 
         if (event.getKey().equals(ShootingStarConfig.useNearestHighTierStar)) {
             useNearestHighTierStar = config.useNearestHighTierStar();
+        }
+
+        if (event.getKey().equals(ShootingStarConfig.hideOverlay)) {
+            hideOverlay = config.isHideOverlay();
+            toggleOverlay(hideOverlay);
         }
 
         if (event.getKey().equals(ShootingStarConfig.hideDevOverlay)) {
@@ -353,6 +358,22 @@ public class ShootingStarPlugin extends Plugin {
         clientToolbar.removeNavigation(navButton);
         navButton = null;
         panel = null;
+    }
+
+    private void toggleOverlay(boolean hideOverlay) {
+        if (overlayManager != null) {
+            boolean hasOverlay = overlayManager.anyMatch(ov -> ov.getName().equalsIgnoreCase(ShootingStarOverlay.class.getName()));
+
+            if (hideOverlay) {
+                if(!hasOverlay) return;
+
+                overlayManager.remove(shootingStarOverlay);
+            } else {
+                if (hasOverlay) return;
+
+                overlayManager.add(shootingStarOverlay);
+            }
+        }
     }
 
     public Star getClosestHighestTierStar() {

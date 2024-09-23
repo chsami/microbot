@@ -16,6 +16,7 @@ public interface ShootingStarConfig extends Config {
     String hideMembersWorlds = "hideMembersWorlds";
     String hideWildernessLocations = "hideWildernessLocations";
     String useNearestHighTierStar = "useNearestHighTierStar";
+    String hideOverlay = "hideOverlay";
     String hideDevOverlay = "hideDevOverlay";
 
     @ConfigSection(
@@ -104,13 +105,23 @@ public interface ShootingStarConfig extends Config {
             position = 2
     )
     String overlaySection = "overlay";
-    
+
+    @ConfigItem(
+            keyName = hideOverlay,
+            name = "Hide Overlay",
+            description = "Hide overlay",
+            position = 0,
+            section = overlaySection
+    )
+    default boolean isHideOverlay() {
+        return false;
+    }
 
     @ConfigItem(
             keyName = hideDevOverlay,
             name = "Hide Dev Overlay",
             description = "Hide developer overlay",
-            position = 0,
+            position = 1,
             section = overlaySection
     )
     default boolean isHideDevOverlay() {
