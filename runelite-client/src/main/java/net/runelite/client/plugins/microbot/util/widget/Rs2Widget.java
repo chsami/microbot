@@ -15,6 +15,27 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2Widget {
 
+    public static boolean clickWidget(String text, int widgetId, int childId, boolean exact) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget rootWidget = getWidget(widgetId, childId);
+            Widget widget = null;
+            if (rootWidget.getChildren() != null)
+                widget = findWidget(text, Arrays.stream(rootWidget.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
+            if (rootWidget.getNestedChildren().length > 0)
+                widget =  findWidget(text, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
+            if (rootWidget.getDynamicChildren().length > 0)
+                widget = findWidget(text, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
+            if (rootWidget.getStaticChildren().length > 0)
+                widget = findWidget(text, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
+
+            if (widget != null) {
+                Microbot.getMouse().click(widget.getBounds());
+                return true;
+            }
+            return false;
+        });
+    }
+
     public static boolean clickWidget(String text) {
         Widget widget = findWidget(text, null);
         if (widget != null) {

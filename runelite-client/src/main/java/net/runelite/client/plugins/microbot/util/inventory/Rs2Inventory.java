@@ -7,6 +7,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.Pouch;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -27,13 +28,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static net.runelite.client.plugins.microbot.Microbot.log;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
@@ -400,7 +401,21 @@ public class Rs2Inventory {
      * @return True if the item was successfully dropped, false otherwise.
      */
     public static boolean drop(String name) {
-        Rs2Item item = items().stream().filter(x -> x.name.equalsIgnoreCase(name)).findFirst().orElse(null);
+        return drop(name, false);
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     */
+    public static boolean drop(String name, boolean exact) {
+        Rs2Item item;
+        if (exact) {
+             item = items().stream().filter(x -> x.name.toLowerCase().equalsIgnoreCase(name)).findFirst().orElse(null);
+        } else {
+             item = items().stream().filter(x -> x.name.toLowerCase().contains(name.toLowerCase())).findFirst().orElse(null);
+        }
         if (item == null) return false;
 
         invokeMenu(item, "Drop");
@@ -992,6 +1007,15 @@ public class Rs2Inventory {
      */
     public static boolean hasItem(int id) {
         return get(id) != null;
+    }
+
+    /**
+     * @param ids
+     *
+     * @return boolean
+     */
+    public static boolean hasItem(Integer... ids) {
+        return get(ids) != null;
     }
 
     /**
@@ -2075,7 +2099,7 @@ public class Rs2Inventory {
             menuAction = MenuAction.WIDGET_TARGET_ON_WIDGET;
         }
 
-        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), (itemBounds(rs2Item) == null) ? new Rectangle(1, 1) : itemBounds(rs2Item));
+        Microbot.doInvoke(new NewMenuEntry(action, param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), (itemBounds(rs2Item) == null) ? new Rectangle(1, 1) : itemBounds(rs2Item));
 
         if (action.equalsIgnoreCase("destroy")) {
             sleepUntil(() -> Rs2Widget.isWidgetVisible(584, 0));
@@ -2202,6 +2226,56 @@ public class Rs2Inventory {
         }
 
         return resultList.toArray(String[]::new);
+    }
+
+    public static boolean fillPouches() {
+        log("Fill pouches...");
+        for (Pouch pouch : Arrays.stream(Pouch.values()).filter(Pouch::hasRequiredRunecraftingLevel).collect(Collectors.toList())) {
+            pouch.fill();
+        }
+        return true;
+    }
+
+    public static boolean emptyPouches() {
+        if (isFull()) return false;
+        log("Empty pouches...");
+        for (Pouch pouch : Arrays.stream(Pouch.values()).filter(Pouch::hasRequiredRunecraftingLevel).collect(Collectors.toList())) {
+            pouch.empty();
+        }
+       return true;
+    }
+
+    public static boolean checkPouches() {
+        if (isFull()) return false;
+        log("Checking pouches...");
+        for (Pouch pouch : Arrays.stream(Pouch.values()).filter(Pouch::hasRequiredRunecraftingLevel).collect(Collectors.toList())) {
+            pouch.check();
+        }
+        return true;
+    }
+
+    public static boolean anyPouchUnknown() {
+        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).anyMatch(x -> x.hasRequiredRunecraftingLevel() && x.isUnknown());
+    }
+
+    public static boolean anyPouchEmpty() {
+        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).anyMatch(x -> x.hasRequiredRunecraftingLevel() && x.getRemaining() > 0);
+    }
+
+    public static boolean anyPouchFull() {
+        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).anyMatch(x -> x.hasRequiredRunecraftingLevel() && x.getHolding() > 0);
+    }
+
+    public static boolean allPouchesFull() {
+        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> x.hasRequiredRunecraftingLevel() && x.getRemaining() == 0);
+    }
+
+    public static boolean allPouchesEmpty() {
+        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> x.hasRequiredRunecraftingLevel() && x.getHoldAmount() == 0);
+    }
+
+    public static boolean hasDegradedPouch() {
+        return Arrays.stream(Pouch.values()).anyMatch(Pouch::isDegraded);
     }
 
 }

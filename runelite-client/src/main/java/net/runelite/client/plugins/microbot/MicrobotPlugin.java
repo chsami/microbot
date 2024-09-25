@@ -177,7 +177,7 @@ public class MicrobotPlugin extends Plugin {
                             .setType(Microbot.targetMenu.getType())
                             .setParam0(Microbot.targetMenu.getParam0())
                             .setParam1(Microbot.targetMenu.getParam1())
-                            .setForceLeftClick(true);
+                            .setForceLeftClick(false);
 
             if (Microbot.targetMenu.getItemId() > 0) {
                 try {

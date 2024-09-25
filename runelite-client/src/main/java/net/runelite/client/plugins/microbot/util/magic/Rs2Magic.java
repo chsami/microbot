@@ -6,10 +6,13 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
@@ -21,8 +24,7 @@ import java.util.stream.Collectors;
 
 import static net.runelite.api.Varbits.SHADOW_VEIL;
 import static net.runelite.client.plugins.microbot.Microbot.log;
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2Magic {
     public static boolean canCast(MagicAction magicSpell) {
@@ -49,14 +51,14 @@ public class Rs2Magic {
         return widget != null;
     }
 
-    public static void cast(MagicAction magicSpell) {
+    public static boolean cast(MagicAction magicSpell) {
         MenuAction menuAction;
         Rs2Tab.switchToMagicTab();
         Microbot.status = "Casting " + magicSpell.getName();
         sleep(150, 300);
         if (!canCast(magicSpell)) {
             log("Unable to cast " + magicSpell.getName());
-            return;
+            return false;
         }
         int identifier = 1;
         if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
@@ -70,6 +72,7 @@ public class Rs2Magic {
 
         Microbot.doInvoke(new NewMenuEntry("cast", -1, magicSpell.getWidgetId(), menuAction.getId(), identifier, -1, magicSpell.getName()), new Rectangle(Rs2Widget.getWidget(magicSpell.getWidgetId()).getBounds()));
         //Rs2Reflection.invokeMenu(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "Cast", "<col=00ff00>" + magicSpell.getName() + "</col>", -1, -1);
+        return true;
     }
 
     public static void castOn(MagicAction magicSpell, Actor actor) {
@@ -242,6 +245,39 @@ public class Rs2Magic {
         if (humidify.getSpriteId() == 1972) {
             Microbot.click(humidify.getBounds());
         }
+    }
+
+    public static boolean npcContact(String npcName) {
+        if (!isLunar()) {
+            Microbot.log("Tried casting npcContact, but lunar spellbook was not found.");
+            return false;
+        }
+        final int chooseCharacterWidgetId = 4915200;
+        boolean didCast = cast(MagicAction.NPC_CONTACT);
+        if (!didCast) return false;
+        boolean result = sleepUntilTrue(() -> Rs2Widget.getWidget(chooseCharacterWidgetId) != null && !Rs2Widget.isHidden(chooseCharacterWidgetId), 100, 5000);
+        if (!result) return false;
+        boolean clickResult = Rs2Widget.clickWidget(npcName, 75, 0, false);
+        if (!clickResult) return false;
+        sleepUntil(() -> !Rs2Player.isAnimating());
+        return true;
+    }
+
+    public static boolean repairPouchesWithLunar() {
+        log("Repairing pouches...");
+        if (npcContact("dark mage")) {
+            sleep(Random.randomGaussian(Random.random(600, 1200), 300));
+            Rs2Dialogue.clickContinue();
+            sleep(Random.randomGaussian(Random.random(1000, 2200), 300));
+            Rs2Widget.sleepUntilHasWidget("Can you repair my pouches?");
+            sleep(Random.randomGaussian(Random.random(600, 1200), 300));
+            Rs2Widget.clickWidget("Can you repair my pouches?", 162, 0, true);
+            sleep(Random.randomGaussian(Random.random(1000, 2200), 300));
+            Rs2Dialogue.clickContinue();
+            sleep(Random.randomGaussian(1500, 300));
+            Rs2Tab.switchToInventoryTab();
+        }
+        return !Rs2Inventory.hasDegradedPouch();
     }
 
     private static void alch(Widget alch) {

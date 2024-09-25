@@ -56,6 +56,13 @@ public class Rs2GameObject {
         return clickObject(object);
     }
 
+    public static int interact(List<Integer> ids) {
+        for (int objectId : ids) {
+            if (interact(objectId)) return objectId;
+        }
+        return -1;
+    }
+
     public static boolean interact(TileObject tileObject, String action, boolean checkCanReach) {
         if (tileObject == null) return false;
         if (!checkCanReach) return clickObject(tileObject, action);
@@ -470,10 +477,10 @@ public class Rs2GameObject {
 
         if (objComp == null) return false;
 
-        result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equals(action));
+        result = Arrays.stream(objComp.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase(action.toLowerCase()));
         if (!result) {
             try {
-                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase(action));
+                result = Arrays.stream(objComp.getImpostor().getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase(action.toLowerCase()));
             } catch (Exception ex) {
                 //do nothing
             }
@@ -817,6 +824,10 @@ public class Rs2GameObject {
                 .collect(Collectors.toList());
     }
 
+    public static TileObject getTileObject(int id) {
+        return getTileObjects(id, Rs2Player.getWorldLocation()).stream().findFirst().orElse(null);
+    }
+
     public static List<TileObject> getTileObjects(int id) {
         return getTileObjects(id, Rs2Player.getWorldLocation());
     }
@@ -1049,10 +1060,10 @@ public class Rs2GameObject {
 
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
-//        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 17) {
-//            Rs2Walker.walkFastCanvas(object.getWorldLocation());
-//            return false;
-//        }
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 30) {
+            Rs2Walker.walkTo(object.getWorldLocation());
+            return false;
+        }
 
         try {
 
@@ -1127,8 +1138,8 @@ public class Rs2GameObject {
                 Rs2Camera.turnTo(object);
             }
 
-            Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(), -1, objComp.getName(), object), Rs2UiHelper.getObjectClickbox(object));
-
+            Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(), -1, action, objComp.getName(), object), Rs2UiHelper.getObjectClickbox(object));
+// MenuEntryImpl(getOption=Use, getTarget=Barrier, getIdentifier=43700, getType=GAME_OBJECT_THIRD_OPTION, getParam0=53, getParam1=51, getItemId=-1, isForceLeftClick=true, getWorldViewId=-1, isDeprioritized=false)
             //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), object.getId(),-1, "", "", -1, -1);
 
         } catch (Exception ex) {
