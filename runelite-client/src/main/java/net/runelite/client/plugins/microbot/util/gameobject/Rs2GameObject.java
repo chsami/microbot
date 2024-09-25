@@ -670,8 +670,6 @@ public class Rs2GameObject {
     }
 
     public static ObjectComposition convertGameObjectToObjectComposition(TileObject tileObject) {
-        Player player = Microbot.getClient().getLocalPlayer();
-        if (player.getLocalLocation().distanceTo(tileObject.getLocalLocation()) > 4800) return null;
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(tileObject.getId()));
     }
 
@@ -875,13 +873,13 @@ public class Rs2GameObject {
     }
 
     public static List<GameObject> getGameObjects() {
-        Scene scene = Microbot.getClient().getScene();
-        Tile[][][] tiles = scene.getTiles();
+        Scene scene = Microbot.getClient().getTopLevelWorldView().getScene();
+        Tile[][][] tiles = scene.getExtendedTiles();
 
         int z = Microbot.getClient().getPlane();
         List<GameObject> tileObjects = new ArrayList<>();
-        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
-            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+        for (int x = 0; x < Constants.EXTENDED_SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.EXTENDED_SCENE_SIZE; ++y) {
                 Tile tile = tiles[z][x][y];
 
                 if (tile == null) {
@@ -1060,7 +1058,7 @@ public class Rs2GameObject {
 
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 30) {
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 51) {
             Rs2Walker.walkTo(object.getWorldLocation());
             return false;
         }
