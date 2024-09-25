@@ -659,7 +659,7 @@ public class Rs2Walker {
                         b.handleGlider();
                     }
 
-                    if (b.isFairyRing()) {
+                    if (b.isFairyRing() && !Rs2Player.getWorldLocation().equals(b.getDestination())) {
                         b.handleFairyRing();
                     }
 

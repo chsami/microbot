@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.util.camera;
 
-import net.runelite.api.Actor;
-import net.runelite.api.Perspective;
-import net.runelite.api.ScriptID;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.RuneLite;
 import net.runelite.client.config.ConfigManager;
@@ -160,18 +157,31 @@ public class Rs2Camera {
 //        }
 //    }
 
-    public static void setPitch(float percentage) {
+    public static void adjustPitch(float percentage) {
         float currentPitchPercentage = cameraPitchPercentage();
 
         if (currentPitchPercentage < percentage) {
             Rs2Keyboard.keyHold(KeyEvent.VK_UP);
-            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_UP),
-                    () -> cameraPitchPercentage() >= percentage, 600);
+            Global.sleepUntilTrue(() -> cameraPitchPercentage() >= percentage, 50, 5000);
+            Rs2Keyboard.keyRelease(KeyEvent.VK_UP);
         } else {
             Rs2Keyboard.keyHold(KeyEvent.VK_DOWN);
-            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_DOWN),
-                    () -> cameraPitchPercentage() <= percentage, 600);
+            Global.sleepUntilTrue(() -> cameraPitchPercentage() <= percentage, 50, 5000);
+            Rs2Keyboard.keyRelease(KeyEvent.VK_DOWN);
         }
+    }
+
+    public static int getPitch() {
+        return Microbot.getClient().getCameraPitch();
+    }
+
+    // set camera pitch
+    public static void setPitch(int pitch) {
+        int minPitch = 128;
+        int maxPitch = 383;
+        // clamp pitch to avoid out of bounds
+        pitch = Math.max(minPitch, Math.min(maxPitch, pitch));
+        Microbot.getClient().setCameraPitchTarget(pitch);
     }
 
     public static float cameraPitchPercentage() {
@@ -263,6 +273,11 @@ public class Rs2Camera {
         if (poly == null) return false;
 
         return poly.getBounds2D().getX() <= viewportWidth && poly.getBounds2D().getY() <= viewportHeight;
+    }
+
+    // get the camera zoom
+    public static int getZoom() {
+        return Microbot.getClient().getVarcIntValue(VarClientInt.CAMERA_ZOOM_RESIZABLE_VIEWPORT);
     }
 
     public static void setZoom(int zoom) {

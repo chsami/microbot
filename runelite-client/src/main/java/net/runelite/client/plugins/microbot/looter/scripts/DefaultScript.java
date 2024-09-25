@@ -50,7 +50,7 @@ public class DefaultScript extends Script {
                                     config.minFreeSlots(),
                                     config.toggleDelayedLooting(),
                                     config.toggleLootMyItemsOnly(),
-                                    config.listOfItemsToLoot()
+                                    config.listOfItemsToLoot().split(",")
                             );
                             if (Rs2GroundItem.lootItemsBasedOnNames(itemLootParams)) {
                                 Microbot.pauseAllScripts = false;
@@ -97,8 +97,9 @@ public class DefaultScript extends Script {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown(){
         super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
     }
 
     private void applyAntiBanSettings() {

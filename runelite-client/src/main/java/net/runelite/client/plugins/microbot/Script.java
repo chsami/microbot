@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot;
 
+import com.google.common.base.Stopwatch;
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.WidgetLoaded;
@@ -18,6 +19,7 @@ import java.awt.event.KeyEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 
@@ -38,6 +40,7 @@ public abstract class Script implements IScript {
 
     public void sleep(int time) {
         try {
+            Microbot.log("Sleeping for " + time);
             Thread.sleep(time);
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
@@ -63,6 +66,19 @@ public abstract class Script implements IScript {
             done = awaitedCondition.getAsBoolean();
         } while (!done && System.currentTimeMillis() - startTime < time);
         return done;
+    }
+
+
+    public boolean sleepUntil(BooleanSupplier awaitedCondition, BooleanSupplier resetCondition, int timeout) {
+        final Stopwatch watch = Stopwatch.createStarted();
+        while (!awaitedCondition.getAsBoolean() && watch.elapsed(TimeUnit.MILLISECONDS) < timeout) {
+            sleep(100);
+            if (resetCondition.getAsBoolean() && Microbot.isLoggedIn()) {
+                watch.reset();
+                watch.start();
+            }
+        }
+        return awaitedCondition.getAsBoolean();
     }
 
     public void sleepUntilOnClientThread(BooleanSupplier awaitedCondition) {

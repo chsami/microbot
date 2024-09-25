@@ -63,7 +63,7 @@ public class AutoCookingScript extends Script {
                     }
 
                     if (config.useNearestCookingLocation()) {
-                        location = CookingLocation.findNearestCookingLocation(cookingItem, initialPlayerLocation);
+                        location = CookingLocation.findNearestCookingLocation(cookingItem);
                     } else {
                         location = config.cookingLocation();
                         if (cookingItem.getCookingAreaType() != CookingAreaType.BOTH) {
@@ -169,6 +169,12 @@ public class AutoCookingScript extends Script {
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
+    }
+    
+    @Override
+    public void shutdown(){
+        super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
     }
 
     private void getState(AutoCookingConfig config, CookingLocation location) {

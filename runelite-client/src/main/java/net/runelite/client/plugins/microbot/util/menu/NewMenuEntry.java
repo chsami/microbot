@@ -27,7 +27,7 @@ public class NewMenuEntry implements MenuEntry {
         this.type = MenuAction.of(opcode);
         this.param0 = param0;
         this.param1 = param1;
-        this.forceLeftClick = true;
+        this.forceLeftClick = false;
         this.itemId = itemId;
     }
 
@@ -38,20 +38,21 @@ public class NewMenuEntry implements MenuEntry {
         this.type = MenuAction.of(opcode);
         this.param0 = param0;
         this.param1 = param1;
-        this.forceLeftClick = true;
+        this.forceLeftClick = false;
         this.itemId = itemId;
         this.actor = actor;
     }
 
-    public NewMenuEntry(int param0, int param1, int opcode, int identifier, int itemId, String target, TileObject gameObject) {
+    public NewMenuEntry(int param0, int param1, int opcode, int identifier, int itemId, String option, String target, TileObject gameObject) {
         this.option = "Use";
         this.target = target;
         this.identifier = identifier;
         this.type = MenuAction.of(opcode);
         this.param0 = param0;
         this.param1 = param1;
-        this.forceLeftClick = true;
+        this.forceLeftClick = false;
         this.itemId = itemId;
+        this.option = option;
         this.gameObject = gameObject;
     }
 
@@ -72,7 +73,7 @@ public class NewMenuEntry implements MenuEntry {
         this.type = MenuAction.of(opcode);
         this.param0 = param0;
         this.param1 = param1;
-        this.forceLeftClick = true;
+        this.forceLeftClick = false;
         this.itemId = itemId;
     }
 

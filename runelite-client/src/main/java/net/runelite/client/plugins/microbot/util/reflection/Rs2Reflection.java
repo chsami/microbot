@@ -49,11 +49,15 @@ public class Rs2Reflection {
                 if (Modifier.isStatic(declaredField.getModifiers())) {
                     continue;
                 }
-                if (npc.getAnimation() == sequence) {
+                int value = declaredField.getInt(npc);
+                declaredField.setInt(npc, 4795789);
+                if (npc.getAnimation() == sequence * 4795789) {
                     animationField = declaredField.getName();
+                    declaredField.setInt(npc, value);
                     declaredField.setAccessible(false);
                     break;
                 }
+                declaredField.setInt(npc, value);
                 declaredField.setAccessible(false);
             }
         }

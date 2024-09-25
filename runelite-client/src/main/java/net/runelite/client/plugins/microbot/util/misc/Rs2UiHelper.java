@@ -24,6 +24,7 @@ public class Rs2UiHelper {
     }
 
     public static Point getClickingPoint(Rectangle rectangle, boolean randomize) {
+        if (rectangle == null) return new Point(1, 1);
         if (rectangle.getX() == 1 && rectangle.getY() == 1) return new Point(1, 1);
         if (rectangle.getX() == 0 && rectangle.getY() == 0) return new Point(1, 1);
 
@@ -68,6 +69,7 @@ public class Rs2UiHelper {
         if (object == null) return new Rectangle(1, 1);  //return a small rectangle if object is null
         Shape clickbox = Microbot.getClientThread().runOnClientThread(object::getClickbox);
         if (clickbox == null) return new Rectangle(1, 1);  //return a small rectangle if clickbox is null
+        if (clickbox.getBounds() == null) return new Rectangle(1, 1);
 
 
         return new Rectangle(clickbox.getBounds());

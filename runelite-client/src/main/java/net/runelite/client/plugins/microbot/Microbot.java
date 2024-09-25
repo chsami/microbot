@@ -19,6 +19,7 @@ import net.runelite.client.plugins.loottracker.LootTrackerPlugin;
 import net.runelite.client.plugins.loottracker.LootTrackerRecord;
 import net.runelite.client.plugins.microbot.configs.SpecialAttackConfigs;
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -116,6 +117,13 @@ public class Microbot {
     private static ChatMessageManager chatMessageManager;
     private static ScheduledFuture<?> xpSchedulorFuture;
     private static net.runelite.api.World quickHopTargetWorld;
+    /**
+     * Pouchscript is injected in the main MicrobotPlugin as it's being used in multiple scripts
+     */
+    @Getter
+    @Setter
+    @Inject
+    private static PouchScript pouchScript;
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {

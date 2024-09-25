@@ -1090,17 +1090,41 @@ public class Rs2Bank {
      * @return true if player location is less than 4 tiles away from the bank location
      */
     public static boolean walkToBank() {
+        return walkToBank(getNearestBank());
+    }
+
+    /**
+     * Walk to bank location
+     * 
+     * @param bankLocation 
+     * @return true if player location is less than 4 tiles away from the bank location
+     */
+    public static boolean walkToBank(BankLocation bankLocation) {
         if (Rs2Bank.isOpen()) return true;
         Rs2Player.toggleRunEnergy(true);
-        BankLocation bankLocation = getNearestBank();
         Microbot.status = "Walking to nearest bank " + bankLocation.toString();
         Rs2Walker.walkTo(bankLocation.getWorldPoint(), 4);
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 4;
     }
 
-    //Distance to bank
+    /**
+     * Distance from the nearest bank location
+     * 
+     * @param distance 
+     * @return true if player location is less than distance away from the bank location
+     */
     public static boolean isNearBank(int distance) {
-        BankLocation bankLocation = getNearestBank();
+        return isNearBank(getNearestBank(), distance);
+    }
+
+    /**
+     * Distance from bank location
+     * 
+     * @param bankLocation 
+     * @param distance 
+     * @return true if player location is less than distance away from the bank location
+     */
+    public static boolean isNearBank(BankLocation bankLocation, int distance) {
         int distanceToBank = Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(bankLocation.getWorldPoint());
         return distanceToBank <= distance;
     }
@@ -1108,13 +1132,22 @@ public class Rs2Bank {
     /**
      * Walk to the closest bank
      *
-     * @return true if player location is less than 4 tiles away from the bank location
+     * @return true if bank interface is open
      */
     public static boolean walkToBankAndUseBank() {
+        return walkToBankAndUseBank(getNearestBank());
+    }
+
+    /**
+     * Walk to bank location & use bank
+     *
+     * @param bankLocation 
+     * @return true if bank interface is open
+     */
+    public static boolean walkToBankAndUseBank(BankLocation bankLocation) {
         if (Rs2Bank.isOpen()) return true;
         Rs2Player.toggleRunEnergy(true);
         if (Rs2Bank.useBank()) return true;
-        BankLocation bankLocation = getNearestBank();
         Microbot.status = "Walking to nearest bank " + bankLocation.toString();
         boolean result = bankLocation.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
         if (result) {
@@ -1160,31 +1193,41 @@ public class Rs2Bank {
     }
 
     /**
-     * Banks items if your inventory not enough emptyslots. Will walk back to the initialplayerlocation passed as param
+     * Banks items if your inventory does not have enough emptyslots (0 emptyslots being full). Will walk back to the initialplayerlocation passed as param
      *
      * @param itemNames
      * @param initialPlayerLocation
      * @param emptySlotCount
-     *
      * @return
      */
     public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount) {
-        return bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation, emptySlotCount, 4);
+        return bankItemsAndWalkBackToOriginalPosition(itemNames, getNearestBank(), initialPlayerLocation, emptySlotCount, 4);
     }
 
     /**
-     * Banks items if your inventory not enough emptyslots. Will walk back to the initialplayerlocation passed as param
+     * Banks items if your inventory is full. Will walk back to the initialplayerlocation passed as param
      *
      * @param itemNames
      * @param initialPlayerLocation
-     * @param emptySlotCount
-     * @param distance
-     *
      * @return
      */
-    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
+        return bankItemsAndWalkBackToOriginalPosition(itemNames, getNearestBank(), initialPlayerLocation, 0, 4);
+    }
+
+    /**
+     * Banks at specific bank location if your inventory does not have enough emptyslots (0 emptyslots being full). Will walk back to the initialplayerlocation passed as param
+     *
+     * @param itemNames
+     * @param initialPlayerLocation
+     * @param bankLocation
+     * @param emptySlotCount
+     * @param distance
+     * @return
+     */
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, BankLocation bankLocation, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
         if (Rs2Inventory.getEmptySlots() <= emptySlotCount) {
-            boolean isBankOpen = Rs2Bank.walkToBankAndUseBank();
+            boolean isBankOpen = Rs2Bank.walkToBankAndUseBank(bankLocation);
             if (isBankOpen) {
                 for (String itemName : itemNames) {
                     Rs2Bank.depositAll(x -> x.name.toLowerCase().contains(itemName));
@@ -1206,15 +1249,17 @@ public class Rs2Bank {
     }
 
     /**
-     * Banks items if your inventory is full. Will walk back to the initialplayerlocation passed as param
+     * Banks items if your inventory does not have enough emptyslots (0 emptyslots being full). Will walk back to the initialplayerlocation passed as param
      *
      * @param itemNames
      * @param initialPlayerLocation
+     * @param emptySlotCount
+     * @param distance
      *
      * @return
      */
-    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
-        return bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation, 0, 4);
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
+        return bankItemsAndWalkBackToOriginalPosition(itemNames, getNearestBank(), initialPlayerLocation, emptySlotCount, distance);
     }
 
     /**
