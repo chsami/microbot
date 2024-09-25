@@ -920,7 +920,7 @@ public class ChatCommandsPluginTest
 	@Test
 	public void testNightmareNoPb()
 	{
-		ChatMessage chatMessage = new ChatMessage(null, GAMEMESSAGE, "", "Your Nightmare kill count is: <col=ff0000>1130</col>", null, 0);
+		ChatMessage chatMessage = new ChatMessage(null, GAMEMESSAGE, "", "Your Nightmare kill count is: <col=ff0000>1,130</col>", null, 0);
 		chatCommandsPlugin.onChatMessage(chatMessage);
 
 		chatMessage = new ChatMessage(null, GAMEMESSAGE, "", "Team size: <col=ff0000>Solo</col> Fight duration: <col=ff0000>10:47</col>. Personal best: 8:44", null, 0);
@@ -1257,10 +1257,10 @@ public class ChatCommandsPluginTest
 	@Test
 	public void testGuardiansOfTheRift()
 	{
-		ChatMessage chatMessage = new ChatMessage(null, GAMEMESSAGE, "", "Amount of rifts you have closed: <col=ff0000>167</col>.", null, 0);
+		ChatMessage chatMessage = new ChatMessage(null, GAMEMESSAGE, "", "Amount of rifts you have closed: <col=ff0000>1,627</col>.", null, 0);
 		chatCommandsPlugin.onChatMessage(chatMessage);
 
-		verify(configManager).setRSProfileConfiguration("killcount", "guardians of the rift", 167);
+		verify(configManager).setRSProfileConfiguration("killcount", "guardians of the rift", 1627);
 	}
 
 	@Test
