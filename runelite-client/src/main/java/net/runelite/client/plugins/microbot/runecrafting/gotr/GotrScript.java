@@ -13,7 +13,6 @@ import net.runelite.client.plugins.microbot.runecrafting.gotr.data.RuneType;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
@@ -256,8 +255,8 @@ public class GotrScript extends Script {
     }
 
     private static boolean lootChisel() {
-        if (!Rs2Inventory.hasItem("chisel")) {
-            Rs2GroundItem.loot("chisel", 20);
+        if (!Rs2Inventory.hasItem("Chisel")) {
+            Rs2GameObject.interact("chisel", "take");
             Rs2Player.waitForWalking();
             log("Looking for chisel...");
             return true;

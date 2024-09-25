@@ -1669,12 +1669,6 @@ public class Rs2Bank {
                 Microbot.getClient().runScript(ScriptID.UPDATE_SCROLLBAR, ComponentID.BANK_SCROLLBAR, BANK_ITEM_CONTAINER, scrollY);
             });
             w.setScrollY(scrollY);
-            Microbot.getClient().setVarcIntValue(VarClientInt.BANK_SCROLL, scrollY);
-            Microbot.getClientThread().invokeLater(() ->
-                    Microbot.getClient().runScript(ScriptID.UPDATE_SCROLLBAR,
-                            ComponentID.BANK_SCROLLBAR,
-                            BANK_ITEM_CONTAINER,
-                            scrollY));
         }
     }
 

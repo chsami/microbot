@@ -215,6 +215,9 @@ public class QoLPlugin extends Plugin {
             }
         }
 
+        if ("Track".equals(event.getMenuOption())) {
+            event.consume();
+        }
 
         if ((config.resumeFletchingKindling() || config.resumeFeedingBrazier()) && isInWintertodtRegion()) {
             if (event.getMenuOption().contains("Fletch") && event.getMenuTarget().isEmpty() && config.resumeFletchingKindling()) {
