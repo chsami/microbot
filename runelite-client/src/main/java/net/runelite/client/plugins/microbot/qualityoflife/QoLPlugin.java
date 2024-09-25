@@ -208,8 +208,8 @@ public class QoLPlugin extends Plugin {
         if (recordActions) {
             if (Rs2Bank.isOpen() && config.useDoLastBank()) {
                 handleMenuOptionClicked(menuEntry, bankMenuEntries, "Close");
-            } else if ((Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen()) && config.useDoLastFurnace()) {
-                handleMenuOptionClicked(menuEntry, furnaceMenuEntries, "Make", "Smelt");
+            } else if ((Rs2Widget.isProductionWidgetOpen() || Rs2Widget.isGoldCraftingWidgetOpen() || Rs2Widget.isSilverCraftingWidgetOpen()) && config.useDoLastFurnace()) {
+                handleMenuOptionClicked(menuEntry, furnaceMenuEntries, "Make", "Smelt", "Craft");
             } else if (Rs2Widget.isSmithingWidgetOpen() && config.useDoLastAnvil()) {
                 handleMenuOptionClicked(menuEntry, anvilMenuEntries, "Smith");
             }
