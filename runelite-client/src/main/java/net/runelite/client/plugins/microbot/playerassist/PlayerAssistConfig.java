@@ -152,6 +152,17 @@ public interface PlayerAssistConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "ReachableNpcs",
+            name = "Only attack reachable npcs",
+            description = "Only attack npcs that we can reach with melee",
+            position = 7,
+            section = combatSection
+    )
+    default boolean attackReachableNpcs() {
+        return true;
+    }
+
+    @ConfigItem(
             keyName = "Food",
             name = "Auto eat food",
             description = "Automatically eats food",

@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,7 +88,7 @@ public class AttackNpcScript extends Script {
                     if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation()))
                         Rs2Camera.turnTo(npc);
 
-                    if (!Rs2Npc.hasLineOfSight(npc))
+                    if (config.attackReachableNpcs() && !Rs2Tile.isTileReachable(npc.getWorldLocation()))
                         continue;
 
 
