@@ -259,7 +259,7 @@ public class Rs2Magic {
         if (!result) return false;
         boolean clickResult = Rs2Widget.clickWidget(npcName, 75, 0, false);
         if (!clickResult) return false;
-        sleepUntil(() -> !Rs2Player.isAnimating());
+        Rs2Player.waitForAnimation();
         return true;
     }
 
