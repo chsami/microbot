@@ -153,6 +153,9 @@ public enum BankLocation {
             case MINING_GUILD_BANK:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
                 return Rs2Player.isMember() && Rs2Player.getSkillRequirement(Skill.MINING, 60);
+            case MAGE_TRAINING_ARENA:
+                if (hasLineOfSight && Rs2Player.isMember()) return true;
+                return Rs2Player.isMember();
             default:
                 return true;
         }
