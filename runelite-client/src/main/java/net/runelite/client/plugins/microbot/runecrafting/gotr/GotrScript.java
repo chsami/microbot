@@ -227,6 +227,7 @@ public class GotrScript extends Script {
             int interactedObjectId = Rs2GameObject.interact(shieldCellIds);
             if (interactedObjectId != -1) {
                 log("Using cell with id " + interactedObjectId);
+                sleep(randomGaussian(1000, 300));
                 sleepUntil(() -> !Rs2Player.isWalking());
             }
             return true;
