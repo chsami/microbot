@@ -8,7 +8,7 @@ import net.runelite.client.plugins.sticktothescript.common.enums.GEWorkLocation;
 import net.runelite.client.plugins.sticktothescript.common.enums.LogType;
 
 
-@ConfigGroup("StickToTheScript GE Firemaker")
+@ConfigGroup("GEFiremaker")
 public interface GEFiremakerConfig extends Config {
 
 

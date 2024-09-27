@@ -9,7 +9,7 @@ import net.runelite.client.plugins.sticktothescript.common.enums.GEWorkLocation;
 import net.runelite.client.plugins.sticktothescript.common.enums.LogType;
 
 
-@ConfigGroup("StickToTheScript GE Cooker")
+@ConfigGroup("GECooker")
 public interface GECookerConfig extends Config {
 
 
