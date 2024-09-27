@@ -24,6 +24,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Encryption;
 import net.runelite.client.plugins.microbot.util.security.Login;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -1239,7 +1240,7 @@ public class Rs2Bank {
         if (distance > 10)
             distance = 10;
 
-        if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > distance) {
+        if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > distance || !Rs2Tile.isTileReachable(initialPlayerLocation)) {
             Rs2Walker.walkTo(initialPlayerLocation, distance);
         } else {
             Rs2Walker.walkFastCanvas(initialPlayerLocation);
