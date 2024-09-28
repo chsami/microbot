@@ -185,6 +185,7 @@ public class GotrScript extends Script {
                 System.out.println("Total time for loop " + totalTime);
 
             } catch (Exception ex) {
+                Microbot.log("Something went wrong in the GOTR Script: " + ex.getMessage() + "If the script is stuck, please contact us on github with this log.");
                 ex.printStackTrace();
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
@@ -366,7 +367,7 @@ public class GotrScript extends Script {
                 if (Rs2Inventory.hasItem(GUARDIAN_ESSENCE)) {
                     state = GotrState.CRAFTING_RUNES;
                     Rs2GameObject.interact(rcAltar.getId());
-                    log("Crafting runes...");
+                    log("Crafting runes on altar " + rcAltar.getId());
                     sleep(Random.randomGaussian(Random.random(1000, 1500), 300));
                 } else if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId()) && !Rs2Player.isWalking()) {
                     state = GotrState.LEAVING_ALTAR;
