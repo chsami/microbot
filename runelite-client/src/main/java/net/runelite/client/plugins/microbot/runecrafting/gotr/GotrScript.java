@@ -37,7 +37,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.randomGaussi
 
 public class GotrScript extends Script {
 
-    public static String version = "1.1.0";
+    public static String version = "1.1.1";
     public static long totalTime = 0;
     public static boolean shouldMineGuardianRemains = true;
     public static final String rewardPointRegex = "Total elemental energy:[^>]+>([\\d,]+).*Total catalytic energy:[^>]+>([\\d,]+).";
