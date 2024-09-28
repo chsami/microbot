@@ -1141,7 +1141,7 @@ public class Rs2GameObject {
             //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), object.getId(),-1, "", "", -1, -1);
 
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            Microbot.log("Failed to interact with object " + ex.getMessage());
         }
 
         return true;
