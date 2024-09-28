@@ -208,7 +208,7 @@ public class GotrScript extends Script {
                 System.out.println("Total time for loop " + totalTime);
 
             } catch (Exception ex) {
-                Microbot.log("Something went wrong in the GOTR Script: " + ex.getMessage() + ". If the script is stuck, please contact us on github with this log.");
+                Microbot.log("Something went wrong in the GOTR Script: " + ex.getMessage() + ". If the script is stuck, please contact us on discord with this log.");
                 ex.printStackTrace();
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
