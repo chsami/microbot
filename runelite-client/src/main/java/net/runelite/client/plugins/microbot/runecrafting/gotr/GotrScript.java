@@ -216,7 +216,7 @@ public class GotrScript extends Script {
     }
 
     private boolean waitingForGameToStart(int timeToStart) {
-        if (getStartTimer() > randomGaussian(Random.random(20, 30), Random.random(1, 10)) || getStartTimer() == -1 || timeToStart > 10) {
+        if (getStartTimer() > randomGaussian(Random.random(20, 30), Random.random(1, 5)) || getStartTimer() == -1 || timeToStart > 10) {
 
             takeUnchargedCells();
             repairPouches();
