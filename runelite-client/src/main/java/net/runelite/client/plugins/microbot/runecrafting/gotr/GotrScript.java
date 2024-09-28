@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.runecrafting.gotr;
 
+import com.google.common.collect.ImmutableList;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
@@ -69,6 +70,28 @@ public class GotrScript extends Script {
     String GUARDIAN_ESSENCE = "guardian essence";
 
     boolean initCheck = false;
+    private final List<Integer> runeIds = ImmutableList.of(
+            ItemID.NATURE_RUNE,
+            ItemID.LAW_RUNE,
+            ItemID.BODY_RUNE,
+            ItemID.DUST_RUNE,
+            ItemID.LAVA_RUNE,
+            ItemID.STEAM_RUNE,
+            ItemID.SMOKE_RUNE,
+            ItemID.SOUL_RUNE,
+            ItemID.WATER_RUNE,
+            ItemID.AIR_RUNE,
+            ItemID.EARTH_RUNE,
+            ItemID.FIRE_RUNE,
+            ItemID.MIND_RUNE,
+            ItemID.CHAOS_RUNE,
+            ItemID.DEATH_RUNE,
+            ItemID.BLOOD_RUNE,
+            ItemID.COSMIC_RUNE,
+            ItemID.ASTRAL_RUNE,
+            ItemID.MIST_RUNE,
+            ItemID.MUD_RUNE,
+            ItemID.WRATH_RUNE);
 
     private void initializeGuardianPortalInfo() {
         guardianPortalInfo.put(ObjectID.GUARDIAN_OF_AIR, new GuardianPortalInfo("AIR", 1, ItemID.AIR_RUNE, 26887, 4353, RuneType.ELEMENTAL, CellType.WEAK, QuestState.FINISHED));
@@ -282,24 +305,13 @@ public class GotrScript extends Script {
     }
 
     private boolean depositRunesIntoPool() {
-        if (Rs2Inventory.hasItem("rune pouch")) {
-            if (Rs2Inventory.hasItemAmount("rune", 2) && !isInLargeMine() && !isInHugeMine() && !Rs2Inventory.isFull()) {
-                if (Rs2Player.isWalking()) return true;
-                if (Rs2GameObject.interact(ObjectID.DEPOSIT_POOL)) {
-                    log("Deposit runes into pool...");
-                    sleep(600, 2400);
-                }
-                return true;
+        if (Rs2Inventory.hasItem(runeIds.toArray(Integer[]::new)) && !isInLargeMine() && !isInHugeMine() && !Rs2Inventory.isFull()) {
+            if (Rs2Player.isWalking()) return true;
+            if (Rs2GameObject.interact(ObjectID.DEPOSIT_POOL)) {
+                log("Deposit runes into pool...");
+                sleep(600, 2400);
             }
-        } else {
-            if (Rs2Inventory.hasItem("rune") && !isInLargeMine() && !isInHugeMine() && !Rs2Inventory.isFull()) {
-                if (Rs2Player.isWalking()) return true;
-                if (Rs2GameObject.interact(ObjectID.DEPOSIT_POOL)) {
-                    log("Deposit runes into pool...");
-                    sleep(600, 2400);
-                }
-                return true;
-            }
+            return true;
         }
         return false;
     }
@@ -546,7 +558,7 @@ public class GotrScript extends Script {
     public static int getStartTimer() {
         Widget timerWidget = Rs2Widget.getWidget(48889861);
         if (timerWidget != null) {
-            String timer = Rs2Widget.getWidget(48889861).getText();
+            String timer = timerWidget.getText();
             if (timer == null) return -1;
             // Split the timer string into minutes and seconds
             String[] timeParts = timer.split(":");
