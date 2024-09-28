@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.settings.Rs2SpellBookSettings;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static net.runelite.api.Varbits.SHADOW_VEIL;
@@ -28,6 +30,9 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2Magic {
     public static boolean canCast(MagicAction magicSpell) {
+        if (!Rs2SpellBookSettings.setAllFiltersOn()) {
+            return false;
+        }
         if (Rs2Tab.getCurrentTab() != InterfaceTab.MAGIC) {
             Rs2Tab.switchToMagicTab();
             sleep(150, 300);
@@ -45,9 +50,7 @@ public class Rs2Magic {
         }
 
         Widget widget = Arrays.stream(Rs2Widget.getWidget(14286851).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
-        if (widget == null) {
-            widget = Arrays.stream(Rs2Widget.getWidget(14286851).getStaticChildren()).filter(x -> x.getId() == magicSpell.getWidgetId()).findFirst().orElse(null);
-        }
+
         return widget != null;
     }
 
@@ -257,7 +260,7 @@ public class Rs2Magic {
         if (!didCast) return false;
         boolean result = sleepUntilTrue(() -> Rs2Widget.getWidget(chooseCharacterWidgetId) != null && !Rs2Widget.isHidden(chooseCharacterWidgetId), 100, 5000);
         if (!result) return false;
-        boolean clickResult = Rs2Widget.clickWidget(npcName, 75, 0, false);
+        boolean clickResult = Rs2Widget.clickWidget(npcName, Optional.of(75), 0, false);
         if (!clickResult) return false;
         Rs2Player.waitForAnimation();
         return true;
@@ -271,7 +274,7 @@ public class Rs2Magic {
             sleep(Random.randomGaussian(Random.random(1000, 2200), 300));
             Rs2Widget.sleepUntilHasWidget("Can you repair my pouches?");
             sleep(Random.randomGaussian(Random.random(600, 1200), 300));
-            Rs2Widget.clickWidget("Can you repair my pouches?", 162, 0, true);
+            Rs2Widget.clickWidget("Can you repair my pouches?", Optional.of(162), 0, true);
             sleep(Random.randomGaussian(Random.random(1000, 2200), 300));
             Rs2Dialogue.clickContinue();
             sleep(Random.randomGaussian(1500, 300));

@@ -4,7 +4,6 @@ import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.Pouch;
@@ -2067,8 +2066,8 @@ public class Rs2Inventory {
         MenuAction menuAction = MenuAction.CC_OP;
         Widget[] inventoryWidgets;
         param0 = rs2Item.slot;
-        boolean isDepositBoxOpen = !Microbot.getClientThread().runOnClientThread(() -> Rs2Widget.getWidget(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER) == null
-                || Rs2Widget.getWidget(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER).isHidden());
+        boolean isDepositBoxOpen = !Microbot.getClientThread().runOnClientThread(() -> Rs2Widget.getWidget(ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER) == null
+                || Rs2Widget.getWidget(ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER).isHidden());
         if (Rs2Bank.isOpen()) {
             param1 = ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
             inventoryWidgets = Rs2Widget.getWidget(ComponentID.BANK_INVENTORY_ITEM_CONTAINER).getChildren();

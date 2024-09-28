@@ -4,6 +4,7 @@ import net.runelite.api.ItemComposition;
 import net.runelite.api.MenuAction;
 import net.runelite.api.NPC;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
@@ -41,7 +42,7 @@ public class Rs2Shop {
      * @return
      */
     public static boolean isOpen() {
-        return Rs2Widget.getWidget(WidgetInfo.SHOP_INVENTORY_ITEMS_CONTAINER) != null
+        return Rs2Widget.getWidget(ComponentID.SHOP_INVENTORY_ITEM_CONTAINER) != null
                 && !Rs2Widget.isHidden(WidgetInfo.SHOP_INVENTORY_ITEMS_CONTAINER.getId());
     }
 

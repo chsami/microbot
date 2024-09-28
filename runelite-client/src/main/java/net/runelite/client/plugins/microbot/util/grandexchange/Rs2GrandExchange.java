@@ -50,8 +50,8 @@ public class Rs2GrandExchange {
      */
     public static boolean isOpen() {
         Microbot.status = "Checking if Grand Exchange is open";
-        return !Microbot.getClientThread().runOnClientThread(() -> Rs2Widget.getWidget(WidgetInfo.GRAND_EXCHANGE_WINDOW_CONTAINER) == null
-                || Rs2Widget.getWidget(WidgetInfo.GRAND_EXCHANGE_WINDOW_CONTAINER).isHidden());
+        return !Microbot.getClientThread().runOnClientThread(() -> Rs2Widget.getWidget(ComponentID.GRAND_EXCHANGE_WINDOW_CONTAINER) == null
+                || Rs2Widget.getWidget(ComponentID.GRAND_EXCHANGE_WINDOW_CONTAINER).isHidden());
     }
 
     /**
@@ -61,7 +61,7 @@ public class Rs2GrandExchange {
      */
     public static boolean isOfferScreenOpen() {
         Microbot.status = "Checking if Offer is open";
-        return Rs2Widget.getWidget(WidgetInfo.GRAND_EXCHANGE_OFFER_CONTAINER) != null;
+        return Rs2Widget.getWidget(ComponentID.GRAND_EXCHANGE_OFFER_CONTAINER) != null;
     }
 
     /**
@@ -532,7 +532,7 @@ public class Rs2GrandExchange {
     }
 
     public static boolean isOfferTextVisible() {
-        return Rs2Widget.isWidgetVisible(WidgetInfo.GRAND_EXCHANGE_OFFER_TEXT);
+        return Rs2Widget.isWidgetVisible(ComponentID.GRAND_EXCHANGE_OFFER_DESCRIPTION);
     }
 
     private static boolean hasOfferPriceChanged(int basePrice) {
