@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class PlayerAssistPlugin extends Plugin {
-    public static final String version = "1.2.2";
+    public static final String version = "1.2.3";
     private static final String SET = "Set";
     private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
     // SAFE_SPOT = "Safe Spot";
@@ -254,9 +254,7 @@ public class PlayerAssistPlugin extends Plugin {
 
         if ((hitsplat.isMine()) && event.getActor().getInteracting() instanceof NPC && config.togglePrayer() && (config.prayerStyle() == PrayerStyle.LAZY_FLICK) || (config.prayerStyle() == PrayerStyle.PERFECT_LAZY_FLICK)) {
 
-
             flickerScript.resetLastAttack(true);
-            log.info("Flick ended on tick: " + Microbot.getClient().getTickCount());
             Rs2Prayer.disableAllPrayers();
             if (config.toggleQuickPray())
                 Rs2Prayer.toggleQuickPrayer(false);

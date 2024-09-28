@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.playerassist.enums.PrayerStyle;
 import net.runelite.client.plugins.microbot.playerassist.model.Monster;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 
@@ -76,7 +77,7 @@ public class FlickerScript extends Script {
                     handlePrayerFlick();
                 }
                 // if currentMonstersAttackingUs is empty, disable all prayers
-                if (currentMonstersAttackingUs.isEmpty()) {
+                if (currentMonstersAttackingUs.isEmpty() && !Rs2Player.isInteracting() && (Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_MELEE) || Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_MAGIC) || Rs2Prayer.isPrayerActive(Rs2PrayerEnum.PROTECT_RANGE) || Rs2Prayer.isQuickPrayerEnabled())){
                     Rs2Prayer.disableAllPrayers();
                 }
 
@@ -84,7 +85,7 @@ public class FlickerScript extends Script {
             } catch (Exception ex) {
                 System.err.println("Error: " + ex.getMessage());
             }
-        }, 0, 50, TimeUnit.MILLISECONDS);
+        }, 0, 200, TimeUnit.MILLISECONDS);
         return true;
     }
 
@@ -94,7 +95,6 @@ public class FlickerScript extends Script {
      */
     private void handlePrayerFlick() {
         lastPrayerTick = currentTick;
-        log.info("Ficked on tick: " + Microbot.getClient().getTickCount());
         Rs2PrayerEnum prayerToToggle;
         switch (prayFlickAttackStyle) {
             case MAGE:
