@@ -30,6 +30,7 @@ public abstract class Script implements IScript {
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
     public static boolean useStaminaPotsIfNeeded = true;
+    public static boolean clickedPlayButton = false;
 
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
@@ -55,6 +56,7 @@ public abstract class Script implements IScript {
             System.out.println(e.getMessage());
         }
     }
+
     public boolean sleepUntil(BooleanSupplier awaitedCondition) {
         return sleepUntil(awaitedCondition, 5000);
     }
@@ -109,7 +111,7 @@ public abstract class Script implements IScript {
 
     public boolean run() {
         hasLeveledUp = false;
-        Microbot.getSpecialAttackConfigs().useSpecWeapon();
+        //Microbot.getSpecialAttackConfigs().useSpecWeapon();
 
         if (Microbot.pauseAllScripts)
             return false;
@@ -122,16 +124,18 @@ public abstract class Script implements IScript {
                 Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
             }
             Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
-            if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden)) {
+            if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden) && !clickedPlayButton) {
                 Rs2Widget.clickWidget(clickHereToPlayButton.getId());
+                clickedPlayButton = true;
             }
 
-            boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
+            boolean hasRunEnergy = Microbot.getClient().getEnergy() > Microbot.runEnergyThreshold;
 
-            if (!hasRunEnergy && useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
+            if (!hasRunEnergy && Microbot.useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
                 Rs2Inventory.useRestoreEnergyItem();
             }
-        }
+        } else
+            clickedPlayButton = false;
 
         return true;
     }
@@ -140,7 +144,7 @@ public abstract class Script implements IScript {
         Rs2Keyboard.keyPress(c);
     }
 
-    @Deprecated(since="Use Rs2Player.logout()", forRemoval = true)
+    @Deprecated(since = "Use Rs2Player.logout()", forRemoval = true)
     public void logout() {
         Rs2Tab.switchToLogout();
         sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.LOGOUT);
