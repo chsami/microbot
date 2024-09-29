@@ -31,8 +31,6 @@ public abstract class Script implements IScript {
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
     public static boolean useStaminaPotsIfNeeded = true;
-    public static boolean clickedPlayButton = false;
-
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
     }
@@ -143,7 +141,6 @@ public abstract class Script implements IScript {
                 Rs2Inventory.useRestoreEnergyItem();
             }
         }
-        //clickedPlayButton = false;
 
         return true;
     }
