@@ -9,6 +9,17 @@ import java.awt.*;
 public interface DriftNetConfig extends Config {
 
         @ConfigItem(
+                keyName = "guide",
+                name = "How to use",
+                description = "How to use this plugin",
+                position = 1
+        )
+        default String GUIDE() {
+            return "Start at the driftnet area\n" +
+                    "MUST HAVE DRIFTNET IN INVENTORY OR STORED WITH THE NPC";
+        }
+
+        @ConfigItem(
                 position = 1,
                 keyName = "showNetStatus",
                 name = "Show net status",
