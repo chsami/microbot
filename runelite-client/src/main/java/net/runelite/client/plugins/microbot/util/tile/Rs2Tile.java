@@ -252,18 +252,36 @@ public class Rs2Tile {
         return isVisited(targetPoint, visited);
     }
 
+    /**
+     * Checks if any of the tiles immediately surrounding the given object are walkable.
+     * The object is defined by its position (worldPoint) and its size (sizeX x sizeY).
+     *
+     * @param worldPoint The central point of the object.
+     * @param sizeX      The size of the object along the X-axis.
+     * @param sizeY      The size of the object along the Y-axis.
+     * @return true if any surrounding tile is walkable, false otherwise.
+     */
     public static boolean areSurroundingTilesWalkable(WorldPoint worldPoint, int sizeX, int sizeY) {
-        for (int dx = -1; dx <= sizeX; dx++) {
-            for (int dy = -1; dy <= sizeY; dy++) {
-                // Skip the inside tiles, only check the border
-                if (dx >= 0 && dx < sizeX && dy >= 0 && dy < sizeY) {
+        int plane = worldPoint.getPlane();
+
+        // Calculate the boundaries of the object
+        int minX = worldPoint.getX() - (sizeX - 1) / 2;
+        int minY = worldPoint.getY() - (sizeY - 1) / 2;
+        int maxX = minX + sizeX - 1;
+        int maxY = minY + sizeY - 1;
+
+        // Loop over the tiles surrounding the object
+        for (int x = minX - 1; x <= maxX + 1; x++) {
+            for (int y = minY - 1; y <= maxY + 1; y++) {
+                // Skip the tiles that are part of the object itself
+                if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
                     continue;
                 }
 
-                int checkX = worldPoint.getX() + dx;
-                int checkY = worldPoint.getY() + dy;
+                System.out.println(x + " " + y);
 
-                if (isTileReachable(new WorldPoint(checkX, checkY, worldPoint.getPlane()))) {
+                // Check if the surrounding tile is walkable
+                if (isTileReachable(new WorldPoint(x, y, plane))) {
                     return true;
                 }
             }
