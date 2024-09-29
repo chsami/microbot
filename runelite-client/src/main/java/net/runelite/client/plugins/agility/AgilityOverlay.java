@@ -25,27 +25,23 @@
  */
 package net.runelite.client.plugins.agility;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.Shape;
-import java.util.List;
-import java.util.Set;
-import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.Point;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.game.AgilityShortcut;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.util.ColorUtil;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.List;
+import java.util.Set;
 
 class AgilityOverlay extends Overlay
 {
@@ -134,8 +130,6 @@ class AgilityOverlay extends Overlay
 					graphics.draw(objectClickbox);
 					graphics.setColor(ColorUtil.colorWithAlpha(configColor, configColor.getAlpha() / 5));
 					graphics.fill(objectClickbox);
-					graphics.setColor(Color.RED);
-					graphics.drawString(Integer.toString(object.getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())), (int) object.getCanvasTilePoly().getBounds().getCenterX(), (int) object.getCanvasTilePoly().getBounds().getCenterY());
 				}
 			}
 		});
