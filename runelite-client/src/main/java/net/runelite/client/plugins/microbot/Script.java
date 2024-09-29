@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot;
 
 import com.google.common.base.Stopwatch;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.InterfaceID;
@@ -22,7 +23,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
-
+@Slf4j
 public abstract class Script implements IScript {
 
     protected ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
@@ -123,10 +124,17 @@ public abstract class Script implements IScript {
             if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
                 Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
             }
-            Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
-            if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden) && !clickedPlayButton) {
-                Rs2Widget.clickWidget(clickHereToPlayButton.getId());
-                clickedPlayButton = true;
+            Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); // on login screen
+
+            if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden)) {
+                // Runs a synchronized block to prevent multiple plugins from clicking the play button
+                synchronized (Rs2Widget.class) {
+                    if (!Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden)) {
+                        Rs2Widget.clickWidget(clickHereToPlayButton.getId());
+
+                        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden), 10000);
+                    }
+                }
             }
 
             boolean hasRunEnergy = Microbot.getClient().getEnergy() > Microbot.runEnergyThreshold;
@@ -134,8 +142,8 @@ public abstract class Script implements IScript {
             if (!hasRunEnergy && Microbot.useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
                 Rs2Inventory.useRestoreEnergyItem();
             }
-        } else
-            clickedPlayButton = false;
+        }
+        //clickedPlayButton = false;
 
         return true;
     }
