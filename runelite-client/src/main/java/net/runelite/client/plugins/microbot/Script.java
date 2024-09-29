@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot;
 
 import com.google.common.base.Stopwatch;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.InterfaceID;
@@ -22,7 +23,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
-
+@Slf4j
 public abstract class Script implements IScript {
 
     protected ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
@@ -30,6 +31,7 @@ public abstract class Script implements IScript {
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
     public static boolean useStaminaPotsIfNeeded = true;
+    public static boolean clickedPlayButton = false;
 
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
@@ -55,6 +57,7 @@ public abstract class Script implements IScript {
             System.out.println(e.getMessage());
         }
     }
+
     public boolean sleepUntil(BooleanSupplier awaitedCondition) {
         return sleepUntil(awaitedCondition, 5000);
     }
@@ -109,7 +112,7 @@ public abstract class Script implements IScript {
 
     public boolean run() {
         hasLeveledUp = false;
-        Microbot.getSpecialAttackConfigs().useSpecWeapon();
+        //Microbot.getSpecialAttackConfigs().useSpecWeapon();
 
         if (Microbot.pauseAllScripts)
             return false;
@@ -121,17 +124,26 @@ public abstract class Script implements IScript {
             if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
                 Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
             }
-            Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); //on login screen
+            Widget clickHereToPlayButton = Rs2Widget.getWidget(24772680); // on login screen
+
             if (clickHereToPlayButton != null && !Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden)) {
-                Rs2Widget.clickWidget(clickHereToPlayButton.getId());
+                // Runs a synchronized block to prevent multiple plugins from clicking the play button
+                synchronized (Rs2Widget.class) {
+                    if (!Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden)) {
+                        Rs2Widget.clickWidget(clickHereToPlayButton.getId());
+
+                        sleepUntil(() -> Microbot.getClientThread().runOnClientThread(clickHereToPlayButton::isHidden), 10000);
+                    }
+                }
             }
 
-            boolean hasRunEnergy = Microbot.getClient().getEnergy() > 4000;
+            boolean hasRunEnergy = Microbot.getClient().getEnergy() > Microbot.runEnergyThreshold;
 
-            if (!hasRunEnergy && useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
+            if (!hasRunEnergy && Microbot.useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
                 Rs2Inventory.useRestoreEnergyItem();
             }
         }
+        //clickedPlayButton = false;
 
         return true;
     }
@@ -140,7 +152,7 @@ public abstract class Script implements IScript {
         Rs2Keyboard.keyPress(c);
     }
 
-    @Deprecated(since="Use Rs2Player.logout()", forRemoval = true)
+    @Deprecated(since = "Use Rs2Player.logout()", forRemoval = true)
     public void logout() {
         Rs2Tab.switchToLogout();
         sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.LOGOUT);

@@ -335,6 +335,18 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
+    //Force loot regardless if we are in combat or not
+    @ConfigItem(
+            keyName = "forceLoot",
+            name = "Force Loot",
+            description = "Force loot regardless if we are in combat or not",
+            position = 100,
+            section = lootSection
+    )
+    default boolean toggleForceLoot() {
+        return false;
+    }
+
     //set center tile manually
     @ConfigItem(
             keyName = "Center Tile",
