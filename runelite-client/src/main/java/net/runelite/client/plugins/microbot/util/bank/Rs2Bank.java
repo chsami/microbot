@@ -1188,7 +1188,6 @@ public class Rs2Bank {
                 Rs2Widget.clickWidget(String.valueOf(c), Optional.of(213), 0, true);
                 sleepGaussian(350, 50);
             }
-            System.out.println("success");
             return true;
         }
         return false;
