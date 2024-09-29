@@ -1870,8 +1870,11 @@ public class Rs2Inventory {
     /**
      * @param id item id
      */
-    public static void wear(int id) {
+    public static boolean wear(int id) {
+        if (!Rs2Inventory.hasItem(id)) return false;
+        if (Rs2Equipment.isWearing(id)) return false;
         invokeMenu(get(id), "wear");
+        return true;
     }
 
     /**

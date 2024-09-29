@@ -74,6 +74,12 @@ public class MageTrainingArenaScript extends Script {
                 if (!super.run()) return;
                 if (mtaPlugin != null && !Microbot.getPluginManager().isActive(mtaPlugin)) return;
 
+                if (!Rs2Magic.isModern()) {
+                    Microbot.log("Wrong spellbook found...please use the modern spellbook for this script.");
+                    sleep(5000);
+                    return;
+                }
+
                 if (mtaPlugin == null) {
                     if (Microbot.getPluginManager() == null) return;
 
@@ -259,7 +265,15 @@ public class MageTrainingArenaScript extends Script {
         }
 
         if (!Rs2Equipment.isWearing(staffId)){
-            Rs2Inventory.wear(staffId);
+            if (!Rs2Inventory.wear(staffId)) {
+                ItemComposition item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(staffId));
+                Microbot.log("Inventory is missing " + item.getName());
+            }
+            return;
+        }
+
+        if (!Rs2Inventory.hasItem("cosmic rune")) {
+            Microbot.log("Inventory is missing cosmic runes.");
             return;
         }
 
@@ -331,7 +345,15 @@ public class MageTrainingArenaScript extends Script {
 
     private void handleTelekineticRoom() {
         if (!Rs2Equipment.isWearing(config.airStaff().getItemId())){
-            Rs2Inventory.wear(config.airStaff().getItemId());
+            if (!Rs2Inventory.wear(config.airStaff().getItemId())) {
+                ItemComposition item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(config.airStaff().getItemId()));
+                Microbot.log("Inventory is missing " + item.getName());
+            }
+            return;
+        }
+
+        if (!Rs2Inventory.hasItem("law runes")) {
+            Microbot.log("Inventory is missing law runes.");
             return;
         }
 
@@ -355,6 +377,10 @@ public class MageTrainingArenaScript extends Script {
         var localTarget = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target);
         var targetConverted = WorldPoint.fromLocalInstance(Microbot.getClient(), Objects.requireNonNull(localTarget));
 
+        if (Microbot.getClient().getScale() < 400) {
+            Rs2Camera.setZoom(Random.random(400, 430));
+        }
+
         if (room.getGuardian().getWorldLocation().equals(room.getFinishLocation())){
             sleepUntil(() -> room.getGuardian().getId() == NpcID.MAZE_GUARDIAN_6779);
             sleep(200, 400);
@@ -364,7 +390,7 @@ public class MageTrainingArenaScript extends Script {
             if (!Rs2Player.getWorldLocation().equals(targetConverted)
                     && (Microbot.getClient().getLocalDestinationLocation() == null
                         || !Microbot.getClient().getLocalDestinationLocation().equals(localTarget))) {
-                if (Rs2Camera.isTileOnScreen(localTarget)) {
+                if (Rs2Camera.isTileOnScreen(localTarget) && Rs2Player.getWorldLocation().distanceTo(targetConverted) < 10) {
                     Rs2Walker.walkFastCanvas(targetConverted);
                     Rs2Walker.setTarget(null);
                     sleep(200, 400);
@@ -387,10 +413,48 @@ public class MageTrainingArenaScript extends Script {
     }
 
     private void handleGraveyardRoom() {
-        if (!Rs2Equipment.isWearing(config.waterStaff().getItemId())) {
-            Rs2Inventory.wear(config.waterStaff().getItemId());
+        if (Rs2Inventory.hasItem(config.waterStaff().getItemId()) || Rs2Equipment.isWearing(config.waterStaff().getItemId())) {
+            if (!Rs2Equipment.isWearing(config.waterStaff().getItemId())) {
+                if (!Rs2Inventory.wear(config.waterStaff().getItemId())) {
+                    ItemComposition item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(config.waterStaff().getItemId()));
+                    Microbot.log("Inventory is missing " + item.getName());
+                }
+                return;
+            }
+
+            if (config.waterStaff().getItemId() == ItemID.STAFF_OF_WATER || config.waterStaff().getItemId() == ItemID.MYSTIC_WATER_STAFF) {
+                if (!Rs2Inventory.hasItem("earth rune")) {
+                    Microbot.log("Your missing earth runes.");
+                    return;
+                }
+            }
+        } else if (Rs2Inventory.hasItem(config.earthStaff().getItemId()) || Rs2Equipment.isWearing(config.earthStaff().getItemId())) {
+            if (!Rs2Equipment.isWearing(config.earthStaff().getItemId())) {
+                if (!Rs2Inventory.wear(config.earthStaff().getItemId())) {
+                    ItemComposition item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(config.earthStaff().getItemId()));
+                    Microbot.log("Inventory is missing " + item.getName());
+                }
+                return;
+            }
+
+            if (config.earthStaff().getItemId() == ItemID.STAFF_OF_EARTH
+                    || config.earthStaff().getItemId() == ItemID.MYSTIC_EARTH_STAFF
+                    || config.earthStaff().getItemId() == ItemID.LAVA_BATTLESTAFF
+                    || config.earthStaff().getItemId() == ItemID.MYSTIC_LAVA_STAFF) {
+                if (!Rs2Inventory.hasItem("water rune")) {
+                    Microbot.log("Your missing water runes.");
+                    return;
+                }
+            }
+        }
+
+
+        if (!Rs2Inventory.hasItem("nature rune")) {
+            Microbot.log("Inventory missing nature runes.");
             return;
         }
+
+
 
         if (btp == null)
             btp = Rs2Magic.canCast(MagicAction.BONES_TO_PEACHES);
@@ -431,7 +495,15 @@ public class MageTrainingArenaScript extends Script {
 
     private void handleAlchemistRoom() {
         if (!Rs2Equipment.isWearing(config.fireStaff().getItemId())){
-            Rs2Inventory.wear(config.fireStaff().getItemId());
+            if (!Rs2Inventory.wear(config.fireStaff().getItemId())) {
+                ItemComposition item = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(config.fireStaff().getItemId()));
+                Microbot.log("Inventory is missing " + item.getName());
+            }
+            return;
+        }
+
+        if (!Rs2Inventory.hasItem("nature rune")) {
+            Microbot.log("Inventory missing nature runes.");
             return;
         }
 
@@ -451,8 +523,10 @@ public class MageTrainingArenaScript extends Script {
         var timer = (AlchemyRoomTimer) Microbot.getInfoBoxManager().getInfoBoxes().stream()
                 .filter(x -> x instanceof AlchemyRoomTimer)
                 .findFirst().orElse(null);
-        if (timer == null || Integer.parseInt(timer.getText().split(":")[1]) < 2)
+        if (timer == null || Integer.parseInt(timer.getText().split(":")[1]) < 2) {
+            Rs2Walker.walkTo(3364, 9636, 2, 2);
             return;
+        }
 
         if (room.getSuggestion() == null) {
             Rs2GameObject.interact("Cupboard", "Search");

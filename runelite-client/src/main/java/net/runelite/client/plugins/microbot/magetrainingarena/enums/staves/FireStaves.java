@@ -8,6 +8,7 @@ import net.runelite.api.ItemID;
 @AllArgsConstructor
 public enum FireStaves {
     STAFF_OF_FIRE(ItemID.STAFF_OF_FIRE),
+    MYSTIC_STAFF_OF_FIRE(ItemID.MYSTIC_FIRE_STAFF),
     LAVA_BATTLESTAFF(ItemID.LAVA_BATTLESTAFF),
     MYSTIC_LAVA_STAFF(ItemID.MYSTIC_LAVA_STAFF);
 
