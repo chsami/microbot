@@ -29,10 +29,8 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -1185,9 +1183,12 @@ public class Rs2Bank {
         boolean isBankPinVisible = Microbot.getClientThread().runOnClientThread(() -> bankPinWidget != null && !bankPinWidget.isHidden());
 
         if (isBankPinVisible) {
-            Rs2Keyboard.typeString(pin);
-            sleep(50, 350);
-            Rs2Keyboard.enter();
+            for (int i = 0; i < pin.length(); i++){
+                char c = pin.charAt(i);
+                Rs2Widget.clickWidget(String.valueOf(c), Optional.of(213), 0, true);
+                sleepGaussian(350, 50);
+            }
+            System.out.println("success");
             return true;
         }
         return false;
