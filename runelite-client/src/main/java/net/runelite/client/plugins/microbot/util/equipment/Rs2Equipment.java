@@ -220,6 +220,24 @@ public class Rs2Equipment {
         return true;
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public static boolean unEquip(int id) {
+        return interact(id, "remove");
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     */
+    public static boolean unEquip(String name) {
+        return interact(name, "remove");
+    }
+
     public static boolean interact(int id, String action) {
         Rs2Item item = get(id);
         if (item != null) {
@@ -265,18 +283,23 @@ public class Rs2Equipment {
 
         int param0 = -1;
         int param1 = -1;
-        int identifier = 0;
+        int identifier = action.equalsIgnoreCase("remove") ? 1 : 0;
         MenuAction menuAction = MenuAction.CC_OP;
-        if (!action.isEmpty()) {
-            List<String> actions = rs2Item.getEquipmentActions();
+        if (identifier == 0) {
+            if (!action.isEmpty()) {
+                List<String> actions = rs2Item.getEquipmentActions();
 
-            for (int i = 0; i < actions.size(); i++) {
-                if (action.equalsIgnoreCase(actions.get(i))) {
-                    identifier = i + 2;
-                    break;
+
+                for (int i = 0; i < actions.size(); i++) {
+                    System.out.println(actions.get(i));
+                    if (action.equalsIgnoreCase(actions.get(i))) {
+                        identifier = i + 2;
+                        break;
+                    }
                 }
             }
         }
+
 
         if (rs2Item.getSlot() == EquipmentInventorySlot.CAPE.getSlotIdx()) {
             param1 = 25362448;
