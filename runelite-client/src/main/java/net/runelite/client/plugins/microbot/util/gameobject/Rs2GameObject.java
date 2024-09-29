@@ -433,7 +433,7 @@ public class Rs2GameObject {
         return null;
     }
 
-    public static GameObject findObject(String objectName, boolean exact, int distance, boolean hasLineOfSight, WorldPoint anchorPoint) {
+    public static GameObject findObject(String objectName, boolean exact, int distance, boolean checkLineOfSight, WorldPoint anchorPoint) {
         List<GameObject> gameObjects = getGameObjectsWithinDistance(distance, anchorPoint);
 
         if (gameObjects == null) {
@@ -444,7 +444,7 @@ public class Rs2GameObject {
             if (!Rs2Tile.areSurroundingTilesWalkable(gameObject.getWorldLocation(), gameObject.sizeX(), gameObject.sizeY()))
                 continue;
 
-            if (hasLineOfSight && !hasLineOfSight(gameObject))
+            if (checkLineOfSight && !hasLineOfSight(gameObject))
                 continue;
 
             ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
@@ -455,7 +455,7 @@ public class Rs2GameObject {
             String compName;
 
             try {
-                compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
+                compName = objComp.getName() != null && !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
             } catch (Exception e) {
                 continue;
             }
