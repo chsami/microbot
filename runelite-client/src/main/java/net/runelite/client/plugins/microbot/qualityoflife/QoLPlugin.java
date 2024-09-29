@@ -12,11 +12,14 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.config.ConfigPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.AutoRunScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.CameraScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.NeverLogoutScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.WintertodtScript;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.SpecialAttackScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchOverlay;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtOverlay;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtScript;
 import net.runelite.client.plugins.microbot.util.antiban.FieldUtil;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
@@ -39,7 +42,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import static net.runelite.client.plugins.microbot.qualityoflife.scripts.WintertodtScript.isInWintertodtRegion;
+import static net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtScript.isInWintertodtRegion;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 @PluginDescriptor(
@@ -85,11 +88,17 @@ public class QoLPlugin extends Plugin {
     @Inject
     private QoLScript qoLScript;
     @Inject
+    private AutoRunScript autoRunScript;
+    @Inject
+    private SpecialAttackScript specialAttackScript;
+    @Inject
     private OverlayManager overlayManager;
     @Inject
     private QoLOverlay qoLOverlay;
     @Inject
     private PouchOverlay pouchOverlay;
+    @Inject
+    private WintertodtOverlay wintertodtOverlay;
 
     @Provides
     QoLConfig provideConfig(ConfigManager configManager) {
@@ -126,6 +135,7 @@ public class QoLPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(pouchOverlay);
             overlayManager.add(qoLOverlay);
+            overlayManager.add(wintertodtOverlay);
         }
         if (config.displayPouchCounter()) {
             overlayManager.add(pouchOverlay);
@@ -136,6 +146,15 @@ public class QoLPlugin extends Plugin {
             Microbot.getSpecialAttackConfigs().setSpecialAttackWeapon(config.specWeapon());
             Microbot.getSpecialAttackConfigs().setMinimumSpecEnergy(config.specWeapon().getEnergyRequired());
         }
+        if (config.autoRun()) {
+            Microbot.enableAutoRunOn = true;
+        }
+        if (config.autoStamina()) {
+            Microbot.useStaminaPotsIfNeeded = true;
+            Microbot.runEnergyThreshold = config.staminaThreshold() * 100;
+        }
+        autoRunScript.run(config);
+        specialAttackScript.run(config);
         qoLScript.run(config);
         wintertodtScript.run(config);
         updateUiElements();
@@ -144,8 +163,11 @@ public class QoLPlugin extends Plugin {
     @Override
     protected void shutDown() {
         qoLScript.shutdown();
+        autoRunScript.shutdown();
+        specialAttackScript.shutdown();
         overlayManager.remove(pouchOverlay);
         overlayManager.remove(qoLOverlay);
+        overlayManager.remove(wintertodtOverlay);
     }
 
     @Subscribe
@@ -382,6 +404,13 @@ public class QoLPlugin extends Plugin {
             } else {
                 Microbot.getSpecialAttackConfigs().reset();
             }
+        }
+
+        if (ev.getKey().equals("autoRun")) {
+            Microbot.enableAutoRunOn = config.autoRun();
+        }
+        if (ev.getKey().equals("autoStamina")) {
+            Microbot.useStaminaPotsIfNeeded = config.autoStamina();
         }
     }
 

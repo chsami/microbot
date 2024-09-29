@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.qualityoflife.scripts;
+package net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt;
 
 import net.runelite.api.GameObject;
 import net.runelite.api.ItemID;
