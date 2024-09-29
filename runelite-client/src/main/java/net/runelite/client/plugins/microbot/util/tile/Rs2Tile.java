@@ -278,8 +278,6 @@ public class Rs2Tile {
                     continue;
                 }
 
-                System.out.println(x + " " + y);
-
                 // Check if the surrounding tile is walkable
                 if (isTileReachable(new WorldPoint(x, y, plane))) {
                     return true;
