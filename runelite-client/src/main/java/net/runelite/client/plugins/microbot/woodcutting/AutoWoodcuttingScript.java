@@ -8,7 +8,6 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
-import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -31,7 +30,7 @@ enum State {
 
 public class AutoWoodcuttingScript extends Script {
 
-    public static String version = "1.6.1";
+    public static String version = "1.6.2";
     public boolean cannotLightFire = false;
 
     State state = State.WOODCUTTING;
