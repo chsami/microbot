@@ -18,4 +18,12 @@ public class Functions {
         }
         return null;
     }
+    public static boolean isGameObjectOnTile(WorldPoint location, int id) {
+        // Return true if the specified tile contains the desired ID.
+        TileObject tile = Rs2GameObject.findGameObjectByLocation(location);
+        if (tile != null && id == tile.getId()) {
+            return true;
+        }
+        return false;
+    }
 }
