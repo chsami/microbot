@@ -18,7 +18,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.microbot.sticktothescript.common.Firemaking;
+import net.runelite.client.plugins.microbot.sticktothescript.common.Functions;
 
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
@@ -78,14 +78,14 @@ public class GECookerScript extends Script {
                     return;
                 }
 
-                if (Rs2Player.waitForXpDrop(Skill.COOKING, 3500)) {
+                if (Rs2Player.waitForXpDrop(Skill.COOKING, 4500)) {
                     debug("Interacting");
                     Rs2Antiban.actionCooldown();
                     Rs2Antiban.takeMicroBreakByChance();
                     return;
                 }
 
-                WorldPoint activeFireLocation = Firemaking.isGameObjectOnTile(FireSpots, FireIDs);
+                WorldPoint activeFireLocation = Functions.isGameObjectOnTile(FireSpots, FireIDs);
 
                 if (activeFireLocation != null && Rs2Player.distanceTo(activeFireLocation) > 3) {
                     debug("Walking to existing fire");

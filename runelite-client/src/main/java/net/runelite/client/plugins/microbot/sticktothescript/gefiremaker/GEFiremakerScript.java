@@ -5,7 +5,7 @@ import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.sticktothescript.common.Firemaking;
+import net.runelite.client.plugins.microbot.sticktothescript.common.Functions;
 import net.runelite.client.plugins.microbot.sticktothescript.common.enums.GEWorkLocation;
 import net.runelite.client.plugins.microbot.sticktothescript.common.enums.LogType;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
@@ -83,7 +83,7 @@ public class GEFiremakerScript extends Script {
                     return;
                 }
 
-                WorldPoint activeFireLocation = Firemaking.isGameObjectOnTile(FireSpots, FireIDs);
+                WorldPoint activeFireLocation = Functions.isGameObjectOnTile(FireSpots, FireIDs);
 
                 if (activeFireLocation != null && Rs2Player.distanceTo(activeFireLocation) > 3) {
                     debug("Walking to existing fire");
