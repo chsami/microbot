@@ -102,7 +102,15 @@ public class Rs2Widget {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id));
     }
 
-    public static boolean isHidden(int id) {
+    public static boolean isHidden(int parentId, int childId) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget widget = Microbot.getClient().getWidget(parentId, childId);
+            if (widget == null) return true;
+            return widget.isHidden();
+        });
+    }
+
+    public static boolean isHidden(@Component int id) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget widget = Microbot.getClient().getWidget(id);
             if (widget == null) return true;
