@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.sticktothescript.common.enums;
+package net.runelite.client.plugins.microbot.sticktothescript.common.enums;
 
 import net.runelite.api.ItemID;
 

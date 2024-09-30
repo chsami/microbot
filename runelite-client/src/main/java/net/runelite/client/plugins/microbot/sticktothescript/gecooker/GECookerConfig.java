@@ -1,15 +1,16 @@
-package net.runelite.client.plugins.sticktothescript.gefiremaker;
+package net.runelite.client.plugins.microbot.sticktothescript.gecooker;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.sticktothescript.common.enums.GEWorkLocation;
-import net.runelite.client.plugins.sticktothescript.common.enums.LogType;
+import net.runelite.client.plugins.microbot.cooking.enums.CookingItem;
+import net.runelite.client.plugins.microbot.sticktothescript.common.enums.GEWorkLocation;
+import net.runelite.client.plugins.microbot.sticktothescript.common.enums.LogType;
 
 
-@ConfigGroup("GEFiremaker")
-public interface GEFiremakerConfig extends Config {
+@ConfigGroup("GECooker")
+public interface GECookerConfig extends Config {
 
 
     @ConfigSection(
@@ -20,18 +21,18 @@ public interface GEFiremakerConfig extends Config {
     String generalSection = "General";
 
     @ConfigSection(
-            name = "Firemaking",
-            description = "Firemaking Settings",
+            name = "Cooking",
+            description = "Cooking Settings",
             position = 1
     )
-    String firemakingSection = "Firemaking";
+    String cookingSection = "Cooking";
 
     @ConfigItem(
-            keyName = "logType",
+            keyName = "Log Type",
             name = "Log Type",
             description = "The type of logs to use to make the fire",
             position = 0,
-            section = firemakingSection
+            section = cookingSection
     )
     default LogType sLogType()
     {
@@ -39,11 +40,23 @@ public interface GEFiremakerConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "Cook Item",
+            name = "Cook Item",
+            description = "What are we going to cook?",
+            position = 1,
+            section = cookingSection
+    )
+    default CookingItem sCookItem()
+    {
+        return CookingItem.RAW_SHRIMP;
+    }
+
+    @ConfigItem(
             keyName = "location",
             name = "Desired Fire Location",
             description = "The desired location to build a fire if a fire does not exist",
-            position = 1,
-            section = firemakingSection
+            position = 2,
+            section = cookingSection
     )
     default GEWorkLocation sLocation()
     {
@@ -51,11 +64,11 @@ public interface GEFiremakerConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "debug",
+            keyName = "Debug",
             name = "Debug",
             description = "Enable debug information",
-            position = 2,
-            section = firemakingSection
+            position = 3,
+            section = cookingSection
     )
     default boolean sDebug()
     {
@@ -70,6 +83,6 @@ public interface GEFiremakerConfig extends Config {
             section = generalSection
     )
     default String about() {
-        return "This plugin adds logs to campfires at the Grand Exchange. If the fire does not already exist, it will create it in the desired location that you select. If you have any desired features, please contact me through Discord.";
+        return "This plugin cooks the selected cooking item at the Grand Exchange using regular fires and campfires. If a fire does not already exist, it will create it in the desired location that you select. If you have any desired features, please contact me through Discord.";
     }
 }

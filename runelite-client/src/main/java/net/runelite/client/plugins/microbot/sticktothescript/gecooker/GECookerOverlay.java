@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.sticktothescript.gefiremaker;
+package net.runelite.client.plugins.microbot.sticktothescript.gecooker;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
@@ -9,12 +9,12 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class GEFiremakerOverlay extends OverlayPanel {
-    private final GEFiremakerConfig config;
-    private final GEFiremakerPlugin plugin;
+public class GECookerOverlay extends OverlayPanel {
+    private final GECookerConfig config;
+    private final GECookerPlugin plugin;
 
     @Inject
-    GEFiremakerOverlay(GEFiremakerPlugin plugin, GEFiremakerConfig config)
+    GECookerOverlay(GECookerPlugin plugin, GECookerConfig config)
     {
         super(plugin);
         this.plugin = plugin;
@@ -27,7 +27,7 @@ public class GEFiremakerOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(250, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("StickToTheScript\'s GE Firemaker v" + GEFiremakerScript.version)
+                    .text("StickToTheScript\'s GE Cooker v" + GECookerScript.version)
                     .color(Color.PINK)
                     .build());
 

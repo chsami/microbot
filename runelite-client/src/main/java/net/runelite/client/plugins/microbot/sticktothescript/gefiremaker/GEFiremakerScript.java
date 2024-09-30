@@ -1,10 +1,13 @@
-package net.runelite.client.plugins.sticktothescript.gefiremaker;
+package net.runelite.client.plugins.microbot.sticktothescript.gefiremaker;
 
 import net.runelite.api.Skill;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.sticktothescript.common.Firemaking;
+import net.runelite.client.plugins.microbot.sticktothescript.common.enums.GEWorkLocation;
+import net.runelite.client.plugins.microbot.sticktothescript.common.enums.LogType;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -15,9 +18,6 @@ import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.sticktothescript.common.Firemaking;
-import net.runelite.client.plugins.sticktothescript.common.enums.GEWorkLocation;
-import net.runelite.client.plugins.sticktothescript.common.enums.LogType;
 
 import java.awt.event.KeyEvent;
 import java.util.Arrays;

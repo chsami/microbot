@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.sticktothescript.common;
+package net.runelite.client.plugins.microbot.sticktothescript.common;
 
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
