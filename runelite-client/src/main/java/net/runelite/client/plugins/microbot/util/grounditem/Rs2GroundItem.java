@@ -27,6 +27,9 @@ import java.util.stream.Collectors;
 import static net.runelite.api.TileItem.OWNERSHIP_SELF;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
+/**
+ * Todo: rework this class to not be dependant on the grounditem plugin
+ */
 @Slf4j
 public class Rs2GroundItem {
 
@@ -444,7 +447,7 @@ public class Rs2GroundItem {
         return false;
     }
 
-    @Deprecated(since = "1.4.6", forRemoval = true)
+    @Deprecated(since = "1.4.6, use lootItemsBasedOnNames(LootingParameters params)", forRemoval = true)
     public static boolean lootAllItemBasedOnValue(int value, int range) {
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
                 Rs2GroundItem.getAll(range)
@@ -461,7 +464,11 @@ public class Rs2GroundItem {
         return false;
     }
 
-    @Deprecated(since = "1.4.6", forRemoval = true)
+    /**
+     * TODO: rework this to make use of the coreloot method
+     * @param itemId
+     * @return
+     */
     public static boolean loot(int itemId) {
         if (Rs2Inventory.isFull(itemId)) return false;
         RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() ->
@@ -512,6 +519,16 @@ public class Rs2GroundItem {
         for (RS2Item rs2Item : groundItems) {
             if (rs2Item.getItem().getId() == itemId) {
                 interact(rs2Item, action);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean exists(int id, int range) {
+        RS2Item[] groundItems = Microbot.getClientThread().runOnClientThread(() -> Rs2GroundItem.getAll(range));
+        for (RS2Item rs2Item : groundItems) {
+            if (rs2Item.getItem().getId() == id) {
                 return true;
             }
         }
