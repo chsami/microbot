@@ -186,12 +186,19 @@ public class Rs2Npc {
         if (npc == null) return false;
         Microbot.status = action + " " + npc.getName();
         try {
-            if (!hasLineOfSight(npc) || !Rs2Tile.isTileReachable(npc.getWorldLocation())) {
+            System.out.println(npc+ " " + npc.getWorldView().getSizeY());
+            if (!hasLineOfSight(npc)) {
                 Rs2Walker.walkTo(npc.getWorldLocation(), 1);
                 return false;
             }
 
             NPCComposition npcComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(npc.getId()));
+
+            if (!Rs2Tile.isTileReachable(npc.getWorldLocation()) &&
+                    !Rs2Tile.areSurroundingTilesWalkable(npc.getWorldLocation(), npcComposition.getSize(), npcComposition.getSize())) {
+                Rs2Walker.walkTo(npc.getWorldLocation(), 1);
+                return false;
+            }
 
             int index = 0;
             for (int i = 0; i < npcComposition.getActions().length; i++) {
