@@ -22,7 +22,6 @@ import org.apache.commons.lang3.NotImplementedException;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static net.runelite.api.Varbits.SHADOW_VEIL;
 import static net.runelite.client.plugins.microbot.Microbot.log;
@@ -39,17 +38,15 @@ public class Rs2Magic {
         }
 
         if (magicSpell.getName().toLowerCase().contains("enchant")){
-            if (Rs2Widget.findWidget(magicSpell.getName(), Arrays.stream(Rs2Widget.getWidget(218, 0).getStaticChildren()).collect(Collectors.toList())) == null) {
-                if (Rs2Widget.isHidden(14286860)) return false;
-                Rs2Widget.clickWidget(14286860);
-                sleep(150, 300);
+            if (Rs2Widget.clickWidget("Jewellery Enchantments", Optional.of(218), 3, true)) {
+                sleepUntil(() -> Rs2Widget.hasWidgetText("Jewellery Enchantments", 218, 3, true), 2000);
             }
-        } else if (Rs2Widget.isWidgetVisible(218, 4) && Arrays.stream(Rs2Widget.getWidget(218, 4).getActions()).anyMatch(x -> x.equalsIgnoreCase("back"))){
-            Rs2Widget.clickWidget(218, 4);
-            sleep(150, 300);
+        } else if (!Rs2Widget.isHidden(14286852)) {
+            // back button inside the enchant jewellery interface has no text, thats why we use hardcoded id
+            Rs2Widget.clickWidget(14286852);
         }
 
-        Widget widget = Arrays.stream(Rs2Widget.getWidget(14286851).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
+        Widget widget = Arrays.stream(Rs2Widget.getWidget(218, 3).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
 
         return widget != null;
     }
