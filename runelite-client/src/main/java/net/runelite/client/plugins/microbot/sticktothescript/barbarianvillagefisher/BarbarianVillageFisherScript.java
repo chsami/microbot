@@ -76,29 +76,21 @@ public class BarbarianVillageFisherScript extends Script {
             case WALK_TO_BANK:
                 debug("Walking to bank");
                 walkToBank();
-                Rs2Antiban.actionCooldown();
-                Rs2Antiban.takeMicroBreakByChance();
                 break;
             
             case BANKING:
                 debug("Banking");
                 bank(rodName, baitName);
-                Rs2Antiban.actionCooldown();
-                Rs2Antiban.takeMicroBreakByChance();
                 break;
             
             case DROPPING:
                 debug("Dropping items");
                 Rs2Inventory.dropAllExcept(rodName, baitName);
-                Rs2Antiban.actionCooldown();
-                Rs2Antiban.takeMicroBreakByChance();
                 break;
             
             case WALK_TO_FISHING_SPOT:
                 debug("Walking to fishing spot");
                 walkToFishingSpot();
-                Rs2Antiban.actionCooldown();
-                Rs2Antiban.takeMicroBreakByChance();
                 break;
             
             case FISHING:
@@ -168,6 +160,9 @@ public class BarbarianVillageFisherScript extends Script {
             default:
                 break;
            }
+
+            Rs2Antiban.actionCooldown();
+            Rs2Antiban.takeMicroBreakByChance();
             return;
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
