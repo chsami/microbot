@@ -17,6 +17,7 @@ import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.breakhandler.BreakHandlerPlugin;
 import net.runelite.client.plugins.microbot.mining.shootingstar.enums.ShootingStarLocation;
 import net.runelite.client.plugins.microbot.mining.shootingstar.model.Star;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -88,6 +89,7 @@ public class ShootingStarPlugin extends Plugin {
     @Getter
     private boolean hideDevOverlay;
     private boolean useNearestHighTierStar;
+    private boolean useBreakAtBank;
     
     @Inject
     private WorldService worldService;
@@ -242,24 +244,25 @@ public class ShootingStarPlugin extends Plugin {
         hideMembersWorlds = config.isHideMembersWorlds();
         hideF2PWorlds = config.isHideF2PWorlds();
         useNearestHighTierStar = config.useNearestHighTierStar();
+        useBreakAtBank = config.useBreakAtBank();
         hideWildernessLocations = config.isHideWildernessLocations();
         hideOverlay = config.isHideOverlay();
         hideDevOverlay = config.isHideDevOverlay();
-        
+
         try {
             loadUrlFromProperties();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        
+
         fetchStars();
         createPanel();
         SwingUtilities.invokeLater(() -> panel.hideStars(starList));
-        
+
         toggleOverlay(hideOverlay);
-        
+
         startTime = Instant.now();
-        
+
         shootingStarScript.run(config);
     }
 
@@ -303,6 +306,10 @@ public class ShootingStarPlugin extends Plugin {
             useNearestHighTierStar = config.useNearestHighTierStar();
         }
 
+        if (event.getKey().equals(ShootingStarConfig.useBreakAtBank)) {
+            useBreakAtBank = config.useBreakAtBank();
+        }
+
         if (event.getKey().equals(ShootingStarConfig.hideOverlay)) {
             hideOverlay = config.isHideOverlay();
             toggleOverlay(hideOverlay);
@@ -326,9 +333,13 @@ public class ShootingStarPlugin extends Plugin {
             fetchStars();
             apiTickCounter = 0;
         }
-
         updateListTickCounter++;
         apiTickCounter++;
+
+        if (useBreakAtBank && !isBreakHandlerEnabled()) {
+            Microbot.log("Break Handler is not enabled to utilize the useBreakAtBank feature, enabling now..");
+            enableBreakHandler();
+        }
     }
 
     @Subscribe
@@ -386,9 +397,7 @@ public class ShootingStarPlugin extends Plugin {
                 .orElse(-1);  // Return -1 if no star meets the requirements
 
         // If no star meets the requirements, return null
-        if (highestTier == -1) {
-            return null;
-        }
+        if (highestTier == -1) return null;
 
         int minTier = Math.max(1, highestTier - 2); // The lowest tier to consider (at least 1)
         int maxTier = Math.min(9, highestTier + 1); // The highest tier to consider (up to 9)
@@ -438,6 +447,23 @@ public class ShootingStarPlugin extends Plugin {
 
     public boolean useNearestHighTierStar() {
         return useNearestHighTierStar;
+    }
+
+    public boolean useBreakAtBank() {
+        return useBreakAtBank;
+    }
+
+    private void enableBreakHandler() {
+        Plugin breakHandlerPlugin = Microbot.getPluginManager().getPlugins().stream()
+                .filter(x -> x.getClass().getName().equals(BreakHandlerPlugin.class.getName()))
+                .findFirst()
+                .orElse(null);
+
+        Microbot.startPlugin(breakHandlerPlugin);
+    }
+
+    public boolean isBreakHandlerEnabled() {
+        return Microbot.isPluginEnabled(BreakHandlerPlugin.class);
     }
 
     public void removeStar(Star star) {

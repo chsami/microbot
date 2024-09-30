@@ -16,13 +16,14 @@ public interface ShootingStarConfig extends Config {
     String hideMembersWorlds = "hideMembersWorlds";
     String hideWildernessLocations = "hideWildernessLocations";
     String useNearestHighTierStar = "useNearestHighTierStar";
+    String useBreakAtBank = "useBreakAtBank";
     String hideOverlay = "hideOverlay";
     String hideDevOverlay = "hideDevOverlay";
 
     @ConfigSection(
             name = "General Settings",
             description = "Configure general plugin configuration & preferences",
-            position = 1
+            position = 0
     )
     String generalSection = "general";
 
@@ -41,10 +42,21 @@ public interface ShootingStarConfig extends Config {
             keyName = useNearestHighTierStar,
             name = "Use Nearest High Tier Star",
             description = "Toggles automatic mode - when enabled script will automatically check all stars within an acceptable tier range & find the closest star that has the highest tier",
-            position = 2,
+            position = 1,
             section = generalSection
     )
     default boolean useNearestHighTierStar() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = useBreakAtBank,
+            name = "Use Break at Bank",
+            description = "Toggles breaks at the bank - when enabled script will force the player to a bank before triggering the Break Handler",
+            position = 2,
+            section = generalSection
+    )
+    default boolean useBreakAtBank() {
         return false;
     }
 
