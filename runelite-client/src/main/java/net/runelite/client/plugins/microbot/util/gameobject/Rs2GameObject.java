@@ -1058,7 +1058,7 @@ public class Rs2GameObject {
 
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(object.getWorldLocation()) > 51) {
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(object.getWorldLocation()) > 51) {
             Microbot.log("Walking to the object...");
             Rs2Walker.walkTo(object.getWorldLocation());
             return false;
