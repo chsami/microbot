@@ -345,6 +345,12 @@ public class Rs2Player {
     public static boolean logoutIfPlayerDetected(int amountOfPlayers, int time, int distance) {
         List<Player> players = getPlayers();
         long currentTime = System.currentTimeMillis();
+        System.out.println(players.size());
+
+        for (Player player: players
+             ) {
+            System.out.println(player.getName());
+        }
 
         if (distance > 0) {
             players = players.stream()
@@ -363,13 +369,16 @@ public class Rs2Player {
             // Check if any player has been detected for longer than the specified time
             for (Player player : players) {
                 long detectionTime = playerDetectionTimes.getOrDefault(player, 0L);
+                var a = currentTime - detectionTime;
                 if (currentTime - detectionTime >= time) { // convert time to milliseconds
                     logout();
+                    playerDetectionTimes.clear();
                     return true;
                 }
             }
-        } else if (players.size() >= amountOfPlayers) {
+        } else if (time <= 0 && players.size() >= amountOfPlayers) {
             logout();
+            playerDetectionTimes.clear();
             return true;
         }
         return false;

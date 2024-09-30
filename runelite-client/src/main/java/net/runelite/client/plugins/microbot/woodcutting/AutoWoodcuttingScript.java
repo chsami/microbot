@@ -84,7 +84,7 @@ public class AutoWoodcuttingScript extends Script {
                     case WOODCUTTING:
 
                         if (config.hopWhenPlayerDetected()) {
-                            if (Rs2Player.logoutIfPlayerDetected(1, 10))
+                            if (Rs2Player.logoutIfPlayerDetected(1, 10000))
                                 return;
                         }
 
