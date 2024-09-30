@@ -2097,8 +2097,6 @@ public class Rs2Inventory {
                     rs2Item.getInventoryActions();
 
             identifier = indexOfIgnoreCase(stripColTags(actions), action) + 1;
-
-            System.out.println(identifier);
         }
 
 
