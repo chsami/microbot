@@ -18,13 +18,6 @@ import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.Water
         "- Rune pouches are not supported yet")
 public interface MageTrainingArenaConfig extends Config {
     @ConfigSection(
-            name = "General",
-            description = "General",
-            position = 0
-    )
-    String generalSection = "general";
-
-    @ConfigSection(
             name = "Rewards",
             description = "Rewards",
             position = 2
