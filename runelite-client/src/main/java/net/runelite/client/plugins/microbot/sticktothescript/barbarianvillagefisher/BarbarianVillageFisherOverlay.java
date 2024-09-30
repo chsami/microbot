@@ -34,7 +34,7 @@ public class BarbarianVillageFisherOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder().build());
 
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("State: " + plugin.fisherScript.state.name())
+                    .left("State: " + plugin.script.state.name())
                     .build());
 
             if (config.sDebug()) {
@@ -42,7 +42,7 @@ public class BarbarianVillageFisherOverlay extends OverlayPanel {
                         .left("---")
                         .build());
                 panelComponent.getChildren().add(LineComponent.builder()
-                        .left("Debug: " + plugin.fisherScript.debug)
+                        .left("Debug: " + plugin.script.debug)
                         .build());
                 panelComponent.getChildren().add(LineComponent.builder()
                         .left("Microbot Status: " + Microbot.status)
