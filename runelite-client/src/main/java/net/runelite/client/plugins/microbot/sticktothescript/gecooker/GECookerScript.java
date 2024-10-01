@@ -37,6 +37,7 @@ public class GECookerScript extends Script {
     public static String version = "1.0.0";
     public State state = State.BANKING;
     public String debug = "";
+    private boolean expectingXPDrop = false;
 
     private static List<WorldPoint> FireSpots = Arrays.asList(
             GEWorkLocation.NORTH_EAST.getWorldPoint(),
@@ -65,6 +66,12 @@ public class GECookerScript extends Script {
 
             determineState(cookingItem, logType);
 
+            // If the state is not cooking, then let's reset the variable as we are not expecting an XP drop
+            if (state != State.COOKING) {
+                expectingXPDrop = false;
+            }
+
+
             if (Rs2Dialogue.hasContinue()) {
                 debug("Click to continue");
                 Rs2Dialogue.clickContinue();
@@ -78,7 +85,7 @@ public class GECookerScript extends Script {
                     return;
                 }
 
-                if (Rs2Player.waitForXpDrop(Skill.COOKING, 4500)) {
+                if (expectingXPDrop && Rs2Player.waitForXpDrop(Skill.COOKING, 4500)) {
                     debug("Interacting");
                     Rs2Antiban.actionCooldown();
                     Rs2Antiban.takeMicroBreakByChance();
@@ -111,7 +118,7 @@ public class GECookerScript extends Script {
                     sleepUntil(() -> !Rs2Player.isMoving() && Rs2Widget.findWidget("How many would you like to cook?", null, false) != null, 5000);
                     sleep(180, 540);
                     Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-                    Rs2Player.waitForXpDrop(Skill.COOKING, 5000);
+                    expectingXPDrop = true; // Subsequent iterations can be expecting an XP drop until the state changes
                 }
                 break;
             

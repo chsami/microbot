@@ -36,6 +36,7 @@ public class GEFiremakerScript extends Script {
     public static String version = "1.0.0";
     public State state = State.BANKING;
     public String debug = "";
+    private boolean expectingXPDrop = false;
 
     private static List<WorldPoint> FireSpots = Arrays.asList(
             GEWorkLocation.NORTH_EAST.getWorldPoint(),
@@ -63,6 +64,11 @@ public class GEFiremakerScript extends Script {
 
             determineState(logType);
 
+            // If the state is not firemaking, then let's reset the variable as we are not expecting an XP drop
+            if (state != State.FIREMAKING) {
+                expectingXPDrop = false;
+            }
+
             if (Rs2Dialogue.hasContinue()) {
                 debug("Click to continue");
                 Rs2Dialogue.clickContinue();
@@ -76,7 +82,7 @@ public class GEFiremakerScript extends Script {
                     return;
                 }
 
-                if (Rs2Player.isAnimating(3500)) {
+                if (expectingXPDrop && Rs2Player.isAnimating(3500)) {
                     debug("Firemaking in progress");
                     Rs2Antiban.actionCooldown();
                     Rs2Antiban.takeMicroBreakByChance();
@@ -109,6 +115,7 @@ public class GEFiremakerScript extends Script {
                     sleepUntil(() -> (!Rs2Player.isMoving() && Rs2Widget.findWidget("How many would you like to burn?", null, false) != null), 5000);
                     sleep(180, 540);
                     Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+                    expectingXPDrop = true;
                     sleep(2220, 5511);
                 }
                 break;

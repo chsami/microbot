@@ -42,6 +42,7 @@ public class BarbarianVillageFisherScript extends Script {
     public static String version = "1.0.0";
     public State state = State.FISHING;
     public String debug = "";
+    private boolean expectingXPDrop = false;
 
     private static int[] RawFish = {335, 331, 349};
     private static int BarbarianVillageFireID = 43475;
@@ -65,6 +66,12 @@ public class BarbarianVillageFisherScript extends Script {
             if (Rs2AntibanSettings.actionCooldownActive) return;
 
             determineState(config, fishingFunction, rodName, baitName);
+
+
+            // If the state is not cooking, then let's reset the variable as we are not expecting an XP drop
+            if (state != State.COOKING) {
+                expectingXPDrop = false;
+            }
 
             if (Rs2Dialogue.hasContinue()) {
                 debug("Click to continue");
@@ -122,7 +129,7 @@ public class BarbarianVillageFisherScript extends Script {
                    return;
                }
 
-               if (Rs2Player.waitForXpDrop(Skill.COOKING, 4500)) {
+               if (expectingXPDrop && Rs2Player.waitForXpDrop(Skill.COOKING, 4500)) {
                    debug("Actively cooking");
                    Rs2Antiban.actionCooldown();
                    Rs2Antiban.takeMicroBreakByChance();
@@ -152,6 +159,7 @@ public class BarbarianVillageFisherScript extends Script {
                    sleepUntil(() -> !Rs2Player.isMoving() && Rs2Widget.findWidget("How many would you like to cook?", null, false) != null, 5000);
                    sleep(180, 540);
                    Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+                   expectingXPDrop = true;
                    Rs2Player.waitForXpDrop(Skill.COOKING, 5000);
                }
 
