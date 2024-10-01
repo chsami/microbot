@@ -43,6 +43,7 @@ public class BarbarianVillageFisherScript extends Script {
     public State state = State.FISHING;
     public String debug = "";
     private boolean expectingXPDrop = false;
+    private int currentlyCookingID = 0;
 
     private static int[] RawFish = {335, 331, 349};
     private static int BarbarianVillageFireID = 43475;
@@ -129,7 +130,7 @@ public class BarbarianVillageFisherScript extends Script {
                    return;
                }
 
-               if (expectingXPDrop && Rs2Player.waitForXpDrop(Skill.COOKING, 4500)) {
+               if (expectingXPDrop && (Rs2Inventory.count(currentlyCookingID) != 0 || Rs2Player.waitForXpDrop(Skill.COOKING, 4500))) {
                    debug("Actively cooking");
                    Rs2Antiban.actionCooldown();
                    Rs2Antiban.takeMicroBreakByChance();
@@ -149,10 +150,13 @@ public class BarbarianVillageFisherScript extends Script {
                debug("Using object on fire");
                if (Rs2Inventory.contains(RawFish[0])) {
                    interacted = Rs2Inventory.useItemOnObject(RawFish[0], BarbarianVillageFireID);
+                   currentlyCookingID = RawFish[0];
                } else if (Rs2Inventory.contains(RawFish[1])) {
                    interacted = Rs2Inventory.useItemOnObject(RawFish[1], BarbarianVillageFireID);
+                   currentlyCookingID = RawFish[1];
                } else if (Rs2Inventory.contains(RawFish[2])) {
                    interacted = Rs2Inventory.useItemOnObject(RawFish[2], BarbarianVillageFireID);
+                   currentlyCookingID = RawFish[2];
                }
 
                if (interacted) {
@@ -160,7 +164,6 @@ public class BarbarianVillageFisherScript extends Script {
                    sleep(180, 540);
                    Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                    expectingXPDrop = true;
-                   Rs2Player.waitForXpDrop(Skill.COOKING, 5000);
                }
 
                break;
