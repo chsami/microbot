@@ -122,6 +122,7 @@ public class BarbarianVillageFisherScript extends Script {
                     debug("Interacted with fishing spot");
                     Rs2Antiban.actionCooldown();
                     Rs2Antiban.takeMicroBreakByChance();
+                    sleep(235, 798);
                 }
                 break;
 
@@ -135,6 +136,7 @@ public class BarbarianVillageFisherScript extends Script {
                    debug("Actively cooking");
                    Rs2Antiban.actionCooldown();
                    Rs2Antiban.takeMicroBreakByChance();
+                   sleep(235, 798);
                    return;
                }
 
@@ -175,6 +177,7 @@ public class BarbarianVillageFisherScript extends Script {
 
             Rs2Antiban.actionCooldown();
             Rs2Antiban.takeMicroBreakByChance();
+            sleep(235, 798);
             return;
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
@@ -253,6 +256,10 @@ public class BarbarianVillageFisherScript extends Script {
 
     // Process for walking to the bank
     private void walkToBank() {
+        if (Rs2Player.isMoving()) {
+            return;
+        }
+
         if (!Rs2Player.isRunEnabled()) {
             debug("Enabled run for bank");
             Rs2Player.toggleRunEnergy(true);
@@ -264,6 +271,10 @@ public class BarbarianVillageFisherScript extends Script {
 
     // Process for walking to the fishing spot
     private void walkToFishingSpot() {
+        if (Rs2Player.isMoving()) {
+            return;
+        }
+
         if (!Rs2Player.isRunEnabled()) {
             debug("Enabled run for fishing spot");
             Rs2Player.toggleRunEnergy(true);
