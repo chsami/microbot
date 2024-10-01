@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.grounditems.GroundItem;
 import net.runelite.client.plugins.grounditems.GroundItemsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -14,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 
 import java.awt.*;
 import java.time.Instant;
@@ -147,7 +147,7 @@ public class Rs2GroundItem {
             }
             List<RS2Item> list = new ArrayList<>();
 
-            Tile tile = getTile(x, y);
+            Tile tile = Rs2Tile.getTile(x, y);
             if (tile == null) {
                 return null;
             }
@@ -162,16 +162,6 @@ public class Rs2GroundItem {
             }
             return list.toArray(new RS2Item[list.size()]);
         });
-    }
-
-    public static Tile getTile(int x, int y) {
-        WorldPoint worldPoint = new WorldPoint(x, y, Microbot.getClient().getPlane());
-        if (worldPoint.isInScene(Microbot.getClient())) {
-            LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
-            if (localPoint == null) return null;
-            return Microbot.getClient().getScene().getTiles()[worldPoint.getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
-        }
-        return null;
     }
 
     public static RS2Item[] getAll(int range) {
