@@ -4461,5 +4461,24 @@
 2748 5374 0	3317 9603 0	Open Bone door 22945
 
 # Mountain camp
-2761 3657 0	2761 3660 0	Clib-over Rockslide 5847
-2761 3660 0	2761 3657 0	Clib-over Rockslide 5847
+2761 3657 0	2761 3660 0	Climb-over Rockslide 5847
+2761 3660 0	2761 3657 0	Climb-over Rockslide 5847
+
+# Varrock pub
+3285 3496 0	3285 3492 1	Climb-up Staircase 11797
+3285 3492 1	3285 3496 0	Climb-down Staircase 11799
+
+# Dungeon Zogre flesh eaters
+2477 9437 2	2485 3045 0	Climb-up Stairs 6842
+2457 3048 0	2455 3048 0	Climb-over Crushed barricade 6878
+2442 9417 0	2446 9417 2	Climb-over Stairs 6842
+
+# Shayzien Encampent
+1482 3633 0	1482 3633 1	Climb-up Ladder 42207
+1482 3633 1	1482 3633 0	Climb-down Ladder 42208
+
+
+# dungeon shayzien mountain camp
+1169 9973 0	1171 9946 0	Magic gate Pass 31967
+9363 1050 0	1214 3557 0	Climb Rope 32507
+

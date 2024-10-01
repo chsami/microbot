@@ -26,6 +26,7 @@ import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.*;
@@ -40,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class MQuestScript extends Script {
-    public static double version = 0.2;
+    public static double version = 0.3;
 
 
     public static List<ItemRequirement> itemRequirements = new ArrayList<>();
@@ -333,6 +334,9 @@ public class MQuestScript extends Script {
             return false;
         }
 
+        /**
+         * TODO: rework this block of code to handle walking closer to an object before interacting with it
+         */
         if (step.getWorldPoint() != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 1
                 && !Rs2GameObject.canWalkTo(object, 10)) {
             WorldPoint targetTile = null;
@@ -453,6 +457,17 @@ public class MQuestScript extends Script {
     private boolean applyDetailedQuestStep(DetailedQuestStep conditionalStep) {
         if (conditionalStep instanceof NpcStep) return false;
 
+        if (conditionalStep.getIconItemID() != -1
+                && conditionalStep.getWorldPoint() != null
+                && !conditionalStep.getWorldPoint().toWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Rs2Player.getWorldLocation())) {
+            if (Rs2Tile.areSurroundingTilesWalkable(conditionalStep.getWorldPoint(), 1, 1)) {
+                WorldPoint nearestUnreachableWalkableTile = Rs2Tile.getNearestWalkableTileWithLineOfSight(conditionalStep.getWorldPoint());
+                if (nearestUnreachableWalkableTile != null) {
+                    return Rs2Walker.walkTo(nearestUnreachableWalkableTile, 0);
+                }
+            }
+        }
+
         boolean usingItems = false;
         for (Requirement requirement : conditionalStep.getRequirements()) {
             if (requirement instanceof ItemRequirement) {
@@ -486,6 +501,15 @@ public class MQuestScript extends Script {
 
         if (!usingItems && conditionalStep.getWorldPoint() != null && !Rs2Walker.walkTo(conditionalStep.getWorldPoint()))
             return true;
+
+        if (conditionalStep.getIconItemID() != -1 && conditionalStep.getWorldPoint() != null
+        && conditionalStep.getWorldPoint().toWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Rs2Player.getWorldLocation())) {
+            if (conditionalStep.getQuestHelper().getQuest() == QuestHelperQuest.ZOGRE_FLESH_EATERS) {
+                if (conditionalStep.getIconItemID() == 4836) { // strange potion
+                    Rs2GroundItem.interact(ItemID.CUP_OF_TEA_4838, "", 20);
+                }
+            }
+        }
 
         return usingItems;
     }
