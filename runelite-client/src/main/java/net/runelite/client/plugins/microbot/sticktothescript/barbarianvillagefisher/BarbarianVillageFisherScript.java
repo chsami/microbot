@@ -104,6 +104,7 @@ public class BarbarianVillageFisherScript extends Script {
             case FISHING:
                 if (Rs2Player.isInteracting()) {
                     debug("Fishing");
+                    sleep(256, 789);
                     return;
                 }
 
