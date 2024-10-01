@@ -88,11 +88,9 @@ public class Rs2Walker {
                         if (ShortestPathPlugin.getMarker() == null) {
                             break;
                         }
-                        Microbot.status = "Waiting for pathfinder...";
                         continue;
                     }
                     if (!ShortestPathPlugin.getPathfinder().isDone()) {
-                        Microbot.status = "Waiting for path calculation...";
                         continue;
                     }
 
