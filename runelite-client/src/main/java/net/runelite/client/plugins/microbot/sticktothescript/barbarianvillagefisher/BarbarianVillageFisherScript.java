@@ -130,7 +130,7 @@ public class BarbarianVillageFisherScript extends Script {
                    return;
                }
 
-               if (expectingXPDrop && (Rs2Inventory.count(currentlyCookingID) != 0 || Rs2Player.waitForXpDrop(Skill.COOKING, 4500))) {
+               if (expectingXPDrop && Rs2Inventory.count(currentlyCookingID) != 0 && (Rs2Player.waitForXpDrop(Skill.COOKING, 4500))) {
                    debug("Actively cooking");
                    Rs2Antiban.actionCooldown();
                    Rs2Antiban.takeMicroBreakByChance();
