@@ -94,7 +94,7 @@ public class Rs2Walker {
                         continue;
                     }
 
-                    if (isNear(ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1))) {
+                    if (ShortestPathPlugin.getPathfinder().getPath().size() > 0 && isNear(ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1))) {
                         setTarget(null);
                         break;
                     }
@@ -182,16 +182,18 @@ public class Rs2Walker {
 
 
                     if (!doorOrTransportResult) {
-                        var moveableTiles = Rs2Tile.getReachableTilesFromTile(path.get(path.size() - 1), Math.min(3, distance)).keySet().toArray(new WorldPoint[0]);
-                        var finalTile = moveableTiles.length > 0 ? moveableTiles[Random.random(0, moveableTiles.length)] : path.get(path.size() - 1);
-                        if (Rs2Tile.isTileReachable(finalTile)) {
+                        if (path.size() > 0) {
+                            var moveableTiles = Rs2Tile.getReachableTilesFromTile(path.get(path.size() - 1), Math.min(3, distance)).keySet().toArray(new WorldPoint[0]);
+                            var finalTile = moveableTiles.length > 0 ? moveableTiles[Random.random(0, moveableTiles.length)] : path.get(path.size() - 1);
+                            if (Rs2Tile.isTileReachable(finalTile)) {
 
-                            if (Microbot.getClient().isInInstancedRegion())
-                                Rs2Walker.walkFastCanvas(finalTile);
-                            else
-                                Rs2Walker.walkMiniMap(finalTile);
+                                if (Microbot.getClient().isInInstancedRegion())
+                                    Rs2Walker.walkFastCanvas(finalTile);
+                                else
+                                    Rs2Walker.walkMiniMap(finalTile);
 
-                            sleepGaussian(1200, 300);
+                                sleepGaussian(1200, 300);
+                            }
                         }
                     }
                 }
