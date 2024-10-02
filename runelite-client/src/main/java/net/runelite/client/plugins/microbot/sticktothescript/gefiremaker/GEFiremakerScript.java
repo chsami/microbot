@@ -58,7 +58,8 @@ public class GEFiremakerScript extends Script {
             }
 
             if (Rs2AntibanSettings.actionCooldownActive) {
-                debug("Cool down active");
+                debug("Cooldown active");
+                Rs2Antiban.actionCooldown();
                 return;
             }
 

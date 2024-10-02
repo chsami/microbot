@@ -64,7 +64,11 @@ public class BarbarianVillageFisherScript extends Script {
                 return;
             }
 
-            if (Rs2AntibanSettings.actionCooldownActive) return;
+            if (Rs2AntibanSettings.actionCooldownActive) {
+                debug("Cooldown active");
+                Rs2Antiban.actionCooldown();
+                return;
+            }
 
             determineState(config, fishingFunction, rodName, baitName);
 
