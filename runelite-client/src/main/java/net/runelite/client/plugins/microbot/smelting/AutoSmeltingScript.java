@@ -54,7 +54,7 @@ public class AutoSmeltingScript extends Script {
                     return;
                 }
 
-                if (expectingXPDrop && Rs2Player.waitForXpDrop(Skill.SMITHING, 4500)) {
+                if (expectingXPDrop && Rs2Inventory.waitForInventoryChanges(4500)) {
                     Rs2Antiban.actionCooldown();
                     Rs2Antiban.takeMicroBreakByChance();
                     return;

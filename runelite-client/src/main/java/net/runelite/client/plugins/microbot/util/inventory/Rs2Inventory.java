@@ -2165,6 +2165,16 @@ public class Rs2Inventory {
         }
     }
 
+    public static boolean waitForInventoryChanges(int time) {
+        final int currentInventorySize = size();
+        final int currentInventoryStackableSize = stackableSize();
+        sleepUntil(() ->  {
+            sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), time);
+            return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
+        });
+        return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
+    }
+
     public static boolean waitForInventoryChanges(Runnable actionWhileWaiting) {
         final int currentInventorySize = size();
         final int currentInventoryStackableSize = stackableSize();
