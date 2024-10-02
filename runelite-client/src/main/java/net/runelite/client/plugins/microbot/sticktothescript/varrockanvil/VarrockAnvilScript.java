@@ -73,6 +73,7 @@ public class VarrockAnvilScript extends Script {
             if (Rs2Dialogue.hasContinue()) {
                 debug("Click to continue");
                 Rs2Dialogue.clickContinue();
+                expectingXPDrop = false;
                 return;
             }
 
