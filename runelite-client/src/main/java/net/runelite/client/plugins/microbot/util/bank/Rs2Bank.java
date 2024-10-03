@@ -899,18 +899,18 @@ public class Rs2Bank {
                 Microbot.getMouse().click();
             if (isOpen()) return true;
             boolean action = false;
-            GameObject bank = Rs2GameObject.findBank();
-            if (bank == null) {
-                GameObject chest = Rs2GameObject.findChest();
-                if (chest == null) {
-                    NPC npc = Rs2Npc.getBankerNPC();
-                    if (npc == null) return false;
-                    action = Rs2Npc.interact(npc, "bank");
-                } else {
+            NPC npc = Rs2Npc.getBankerNPC();
+            if (npc == null) return false;
+            action = Rs2Npc.interact(npc, "bank");
+            if (npc == null) {
+                GameObject bank = Rs2GameObject.findBank();
+                if (bank == null) {
+                    GameObject chest = Rs2GameObject.findChest();
+                    if (chest == null) return false;
                     action = Rs2GameObject.interact(chest, "use");
+                } else {
+                    action = Rs2GameObject.interact(bank, "bank");
                 }
-            } else {
-                action = Rs2GameObject.interact(bank, "bank");
             }
             if (action) {
                 sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 2500);

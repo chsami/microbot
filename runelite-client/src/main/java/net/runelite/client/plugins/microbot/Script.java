@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -105,6 +106,7 @@ public abstract class Script implements IScript {
             initialPlayerLocation = null;
             Microbot.pauseAllScripts = false;
             Microbot.getSpecialAttackConfigs().reset();
+            Rs2Walker.setTarget(null);
         }
     }
 
