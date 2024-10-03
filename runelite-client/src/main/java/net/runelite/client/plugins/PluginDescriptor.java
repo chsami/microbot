@@ -47,6 +47,7 @@ public @interface PluginDescriptor {
     String Bttqjs = "<html>[<font color=#e57373>J</font>] ";
     String zuk = "<html>[<font color=#5F9596>Z</font>] ";
     String GZ = "<html>[<font color=#0077B6>\u2728</font>] ";
+    String StickToTheScript = "<html>[<font color=#FF4F00>STTS</font>] ";
     
     String name();
 

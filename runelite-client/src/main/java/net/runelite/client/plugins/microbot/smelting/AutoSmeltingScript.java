@@ -5,6 +5,7 @@ import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.smelting.enums.Ores;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -19,7 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 public class AutoSmeltingScript extends Script {
 
-    public static String version = "1.0.0";
+    public static String version = "1.0.1";
+    private boolean expectingXPDrop = false;
 
     public boolean run(AutoSmeltingConfig config) {
 
@@ -42,12 +44,19 @@ public class AutoSmeltingScript extends Script {
 
                 // walk to bank until it's open then deposit everything and withdraw materials
                 if (!inventoryHasMaterialsForOneBar(config)) {
+                    expectingXPDrop = false;
                     if (!Rs2Bank.isOpen()) {
                         Rs2Bank.walkToBankAndUseBank();
                         return;
                     }
                     Rs2Bank.depositAll();
                     withdrawRightAmountOfMaterials(config);
+                    return;
+                }
+
+                if (expectingXPDrop && Rs2Inventory.waitForInventoryChanges(4500)) {
+                    Rs2Antiban.actionCooldown();
+                    Rs2Antiban.takeMicroBreakByChance();
                     return;
                 }
 
@@ -66,6 +75,7 @@ public class AutoSmeltingScript extends Script {
                     if (Rs2Widget.getWidget(17694733) != null) {
                         Rs2Widget.clickWidget(17694734 + config.SELECTED_BAR_TYPE().ordinal());
                         Rs2Player.waitForAnimation();
+                        expectingXPDrop = true;
                     }
                 }
 
@@ -96,6 +106,13 @@ public class AutoSmeltingScript extends Script {
                 super.shutdown();
             }
             Rs2Bank.withdrawX(name, totalAmount);
+            sleepUntil(() -> Rs2Inventory.hasItemAmount(name, totalAmount), 3500);
+
+            // Exit if we did not end up finding it.
+            if (!Rs2Inventory.hasItemAmount(name, totalAmount)) {
+                Microbot.showMessage("Could not find item in bank.");
+                shutdown();
+            }
         }
     }
 }
