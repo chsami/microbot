@@ -193,8 +193,7 @@ public class Rs2Npc {
 
             NPCComposition npcComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(npc.getId()));
 
-            if (!Rs2Tile.isTileReachable(npc.getWorldLocation()) &&
-                    !Rs2Tile.areSurroundingTilesWalkable(npc.getWorldLocation(), npcComposition.getSize(), npcComposition.getSize())
+            if (!Rs2Tile.areSurroundingTilesWalkable(npc.getWorldLocation(), npcComposition.getSize(), npcComposition.getSize())
             && !action.equalsIgnoreCase("bank")) {
                 Rs2Walker.walkTo(npc.getWorldLocation(), 1);
                 return false;
