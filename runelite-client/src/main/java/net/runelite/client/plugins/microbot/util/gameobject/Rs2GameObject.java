@@ -1064,6 +1064,7 @@ public class Rs2GameObject {
             return false;
         }
 
+
         try {
 
             int param0;
@@ -1077,6 +1078,10 @@ public class Rs2GameObject {
 
             if (object instanceof GameObject) {
                 GameObject obj = (GameObject) object;
+                if (!Rs2Tile.areSurroundingTilesWalkable(object.getWorldLocation(), obj.sizeX(), obj.sizeY())) {
+                    Rs2Walker.walkTo(obj.getWorldLocation(), 1);
+                    return false;
+                }
                 if (obj.sizeX() > 1) {
                     param0 = obj.getLocalLocation().getSceneX() - obj.sizeX() / 2;
                 } else {
