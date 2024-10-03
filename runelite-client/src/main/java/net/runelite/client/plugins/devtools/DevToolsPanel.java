@@ -117,7 +117,7 @@ class DevToolsPanel extends PluginPanel
 		container.add(plugin.getTileLocation());
 		container.add(plugin.getCameraPosition());
 
-		container.add(plugin.getChunkBorders());
+		container.add(plugin.getZoneBorders());
 		container.add(plugin.getMapSquares());
 		container.add(plugin.getLoadingLines());
 
@@ -186,7 +186,7 @@ class DevToolsPanel extends PluginPanel
 		disconnectBtn.addActionListener(e -> clientThread.invoke(() -> client.setGameState(GameState.CONNECTION_LOST)));
 		container.add(disconnectBtn);
 
-		container.add(plugin.getRoofs());
+		container.add(plugin.getTileFlags());
 
 		try
 		{

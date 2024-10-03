@@ -916,4 +916,24 @@ public final class Varbits
 	 * The amount of Doom stacks received in the Fortis Colosseum.
 	 */
 	public static final int COLOSSEUM_DOOM = 9801;
+
+	public static final int BUFF_GOADING_POTION = 11294;
+
+	public static final int BUFF_PRAYER_REGENERATION = 11361;
+
+	/**
+	 * The player's progress value for the colossal wyrm advanced basic course.
+	 * <p>
+	 * Max value = 6;
+	 * </p>
+	 */
+	public static final int COLOSSAL_WYRM_COURSE_BASIC = 11292;
+
+	/**
+	 * The player's progress value for the colossal wyrm advanced agility course.
+	 * <p>
+	 * Max value = 6;
+	 * </p>
+	 */
+	public static final int COLOSSAL_WYRM_COURSE_ADVANCED = 11293;
 }
