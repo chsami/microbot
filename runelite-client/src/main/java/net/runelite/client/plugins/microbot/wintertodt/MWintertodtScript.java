@@ -23,6 +23,8 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.microbot.wintertodt.enums.State;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.api.Constants.GAME_TICK_LENGTH;
@@ -37,7 +39,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static String version = "1.4.3";
+    public static String version = "1.4.4";
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -263,7 +265,7 @@ public class MWintertodtScript extends Script {
                             }
                             if (burningBrazier.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) < 10 && hasItemsToBurn()) {
 
-                                Rs2GameObject.interact(BURNING_BRAZIER_29314, "feed");
+                                Rs2GameObject.interact(burningBrazier, "feed");
                                 Microbot.log("Feeding brazier");
                                 resetActions = false;
                                 sleep(GAME_TICK_LENGTH * 3);
@@ -401,11 +403,16 @@ public class MWintertodtScript extends Script {
                 System.out.println(WorldPoint.fromLocalInstance(Microbot.getClient(),
                         graphicsObject.getLocation()).distanceTo(Rs2Player.getWorldLocation()));
                 //walk south
+                List<GameObject> gameObjects = new ArrayList<>(Rs2GameObject.getGameObjectsWithinDistance(5));
+                Microbot.log("Game objects: " + gameObjects.size());
+                // we only need to dodge if there are 2 or more snow fall objects
+                if (gameObjects.size() > 2) {
+                    Rs2Walker.walkFastCanvas(new WorldPoint(Rs2Player.getWorldLocation().getX(), Rs2Player.getWorldLocation().getY() - 1, Rs2Player.getWorldLocation().getPlane()));
+                    Rs2Player.waitForWalking(1000);
+                    sleep(GAME_TICK_LENGTH * 2);
+                    resetActions = true;
+                }
 
-                Rs2Walker.walkFastCanvas(new WorldPoint(Rs2Player.getWorldLocation().getX(), Rs2Player.getWorldLocation().getY() - 1, Rs2Player.getWorldLocation().getPlane()));
-                Rs2Player.waitForWalking(1000);
-                sleep(GAME_TICK_LENGTH * 2);
-                resetActions = true;
             }
         }
     }
