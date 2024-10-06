@@ -21,6 +21,7 @@ import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
@@ -195,15 +196,12 @@ public class MotherloadMineScript extends Script {
 
     private void depositHopper() {
         int plane = isUpperFloor() ? 1 : 0;
-        GameObject hopper = Rs2GameObject.getGameObjects().stream().filter(object ->
+        Optional<GameObject> hopper = Rs2GameObject.getGameObjects().stream().filter(object ->
                 object.getPlane() == plane
                 && object.getId() == ObjectID.HOPPER_26674
-        ).findFirst().orElse(null);
+        ).findFirst();
 
-        if(hopper != null)
-            Microbot.log(hopper.getWorldLocation().toString());
-
-        if (Rs2GameObject.interact(hopper)) {
+        if (hopper.isPresent() && Rs2GameObject.interact(hopper.get())) {
             sleepUntil(() -> !Rs2Inventory.isFull());
             if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > maxSackSize - 28) {
                 emptySack = true;
