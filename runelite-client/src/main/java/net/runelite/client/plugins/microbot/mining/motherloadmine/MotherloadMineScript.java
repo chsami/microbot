@@ -30,7 +30,7 @@ public class MotherloadMineScript extends Script {
     public static final String version = "1.6.5";
     private static final WorldArea WEST_UPPER_AREA = new WorldArea(3748, 5676, 7, 9, 0);
     private static final WorldArea EAST_UPPER_AREA = new WorldArea(3755, 5668, 8, 8, 0);
-    private static final WorldPoint HOPPER = new WorldPoint(3748, 5674, 0);
+    private static final WorldPoint HOPPER_DEPOSIT = new WorldPoint(3748, 5674, 0);
     private static final int UPPER_FLOOR_HEIGHT = -490;
     private static final int SACK_LARGE_SIZE = 162;
     private static final int SACK_SIZE = 81;
@@ -194,15 +194,22 @@ public class MotherloadMineScript extends Script {
     }
 
     private void depositHopper() {
-        if (!isUpperFloor() || isUpperFloor()) {
-            if (Rs2GameObject.interact(ObjectID.HOPPER_26674)) {
-                sleepUntil(() -> !Rs2Inventory.isFull());
-                if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > maxSackSize - 28) {
-                    emptySack = true;
-                }
-            } else {
-                Rs2Walker.walkTo(HOPPER, 15);
+        int plane = isUpperFloor() ? 1 : 0;
+        GameObject hopper = Rs2GameObject.getGameObjects().stream().filter(object ->
+                object.getPlane() == plane
+                && object.getId() == ObjectID.HOPPER_26674
+        ).findFirst().orElse(null);
+
+        if(hopper != null)
+            Microbot.log(hopper.getWorldLocation().toString());
+
+        if (Rs2GameObject.interact(hopper)) {
+            sleepUntil(() -> !Rs2Inventory.isFull());
+            if (Microbot.getVarbitValue(Varbits.SACK_NUMBER) > maxSackSize - 28) {
+                emptySack = true;
             }
+        } else {
+            Rs2Walker.walkTo(HOPPER_DEPOSIT, 15);
         }
     }
 
