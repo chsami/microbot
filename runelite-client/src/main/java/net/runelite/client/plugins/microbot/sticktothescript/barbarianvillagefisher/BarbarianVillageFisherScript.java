@@ -59,6 +59,16 @@ public class BarbarianVillageFisherScript extends Script {
         String baitName = fishingType == BarbarianFishingType.BAIT_FISHING ? "Fishing bait" : "Feather";
 
         Microbot.enableAutoRunOn = false;
+
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyFishingSetup();
+        Rs2AntibanSettings.dynamicActivity = true;
+        Rs2AntibanSettings.dynamicIntensity = true;
+        Rs2AntibanSettings.actionCooldownChance = 0.1;
+        Rs2AntibanSettings.microBreakChance = 0.01;
+        Rs2AntibanSettings.microBreakDurationLow = 0;
+        Rs2AntibanSettings.microBreakDurationHigh = 3;
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run() || !Microbot.isLoggedIn()) {
                 return;
@@ -146,7 +156,7 @@ public class BarbarianVillageFisherScript extends Script {
 
                boolean barbarianVillageFire = Functions.isGameObjectOnTile(BarbarianVillageFirePoint, BarbarianVillageFireID);
 
-               if (barbarianVillageFire && !closeToLocation(BarbarianVillageFirePoint)) {
+               if (barbarianVillageFire && !Functions.closeToLocation(BarbarianVillageFirePoint)) {
                    debug("Walking to fire");
                    Rs2Walker.walkTo(BarbarianVillageFirePoint, 1);
                    sleep(180, 540);
@@ -192,7 +202,7 @@ public class BarbarianVillageFisherScript extends Script {
         // If we do not have the required materials to catch fish, we need to go to the bank and get them
         if (!Rs2Inventory.hasItem(rodName) || !Rs2Inventory.hasItem(baitName)) {
             debug("Need to get items");
-            if (!closeToLocation(BankLocation.EDGEVILLE.getWorldPoint())) {
+            if (!Functions.closeToLocation(BankLocation.EDGEVILLE.getWorldPoint())) {
                 state = State.WALK_TO_BANK;
             } else {
                 state = State.BANKING;
@@ -206,7 +216,7 @@ public class BarbarianVillageFisherScript extends Script {
                 debug("Inventory is full. Dropping...");
                 state = State.DROPPING;
             } else if (fishingFunction == BarbarianFishingFunctions.BANK_RAW) {
-                if (!closeToLocation(BankLocation.EDGEVILLE.getWorldPoint())) {
+                if (!Functions.closeToLocation(BankLocation.EDGEVILLE.getWorldPoint())) {
                     debug("Inventory is full. Walking to bank...");
                     state = State.WALK_TO_BANK;
                 } else {
@@ -218,7 +228,7 @@ public class BarbarianVillageFisherScript extends Script {
                     debug("Inventory is full. Cooking...");
                     state = State.COOKING;
                 } else {
-                    if (!closeToLocation(BankLocation.EDGEVILLE.getWorldPoint())) {
+                    if (!Functions.closeToLocation(BankLocation.EDGEVILLE.getWorldPoint())) {
                         state = State.WALK_TO_BANK;
                     } else {
                         state = State.BANKING;
@@ -233,7 +243,7 @@ public class BarbarianVillageFisherScript extends Script {
                     state = State.DROPPING;
                 }
             }
-        } else if (!closeToLocation(BarbarianVilalgeFishingSpot)) {
+        } else if (!Functions.closeToLocation(BarbarianVilalgeFishingSpot)) {
             debug("Walking to fishing spot");
             state = State.WALK_TO_FISHING_SPOT;
         } else {
@@ -251,11 +261,6 @@ public class BarbarianVillageFisherScript extends Script {
             }
         }
         return null;
-    }
-
-    // Check if the player is close to a specific location (withing 10 tiles)
-    private boolean closeToLocation(WorldPoint location) {
-        return Rs2Player.getWorldLocation().distanceTo(location) <= 10;
     }
 
     // Process for walking to the bank
@@ -336,5 +341,6 @@ public class BarbarianVillageFisherScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
     }
 }

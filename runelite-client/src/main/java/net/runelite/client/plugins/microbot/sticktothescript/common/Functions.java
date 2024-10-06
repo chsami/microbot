@@ -3,10 +3,15 @@ package net.runelite.client.plugins.microbot.sticktothescript.common;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.List;
 
 public class Functions {
+    // Check if the player is close to a specific location (withing 10 tiles)
+    public static boolean closeToLocation(WorldPoint location) {
+        return Rs2Player.getWorldLocation().distanceTo(location) <= 10;
+    }
 
     public static WorldPoint isGameObjectOnTile(List<WorldPoint> locations, List<Integer> ids) {
         // Iterate through the different locations and return the first one that has the desired object ID on it

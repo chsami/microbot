@@ -53,6 +53,16 @@ public class GECookerScript extends Script {
         GEWorkLocation desiredLocation = config.sLocation();
 
         Microbot.enableAutoRunOn = false;
+
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyCookingSetup();
+        Rs2AntibanSettings.dynamicActivity = true;
+        Rs2AntibanSettings.dynamicIntensity = true;
+        Rs2AntibanSettings.actionCooldownChance = 0.1;
+        Rs2AntibanSettings.microBreakChance = 0.01;
+        Rs2AntibanSettings.microBreakDurationLow = 0;
+        Rs2AntibanSettings.microBreakDurationHigh = 3;
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run() || !Microbot.isLoggedIn()) {
                 debug("Not running");
@@ -90,6 +100,7 @@ public class GECookerScript extends Script {
                     debug("Interacting");
                     Rs2Antiban.actionCooldown();
                     Rs2Antiban.takeMicroBreakByChance();
+                    sleep(256, 789);
                     return;
                 }
 
@@ -98,7 +109,7 @@ public class GECookerScript extends Script {
                 if (activeFireLocation != null && Rs2Player.distanceTo(activeFireLocation) > 3) {
                     debug("Walking to existing fire");
                     Rs2Walker.walkTo(activeFireLocation);
-                    sleep(180, 540);
+                    sleep(256, 789);
                     return;
                 }
 
@@ -158,6 +169,7 @@ public class GECookerScript extends Script {
 
             Rs2Antiban.actionCooldown();
             Rs2Antiban.takeMicroBreakByChance();
+            sleep(256, 789);
             return;
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
@@ -265,5 +277,6 @@ public class GECookerScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
     }
 }
