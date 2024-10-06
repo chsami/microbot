@@ -429,9 +429,14 @@ public class MWintertodtScript extends Script {
         }
         Rs2Bank.useBank();
         if (!Rs2Bank.isOpen()) return true;
-        Rs2Bank.depositAll();
+        if(!config.fixBrazier()) {
+            Rs2Bank.depositAll();
+        }
+        else {
+            Rs2Bank.depositAllExcept(Rs2Inventory.get("hammer").getId());
+        }
         int foodCount = (int) Rs2Inventory.getInventoryFood().stream().count();
-        if (config.fixBrazier()) {
+        if (config.fixBrazier() && !Rs2Inventory.hasItem("hammer")) {
             Rs2Bank.withdrawX(true, "hammer", 1);
         }
         if (!Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH) && !Rs2Equipment.hasEquipped(ItemID.BRUMA_TORCH_OFFHAND)) {
