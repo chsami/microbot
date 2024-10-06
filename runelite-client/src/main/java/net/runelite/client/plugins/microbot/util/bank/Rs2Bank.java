@@ -29,8 +29,8 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -476,7 +476,7 @@ public class Rs2Bank {
      * @param exact does an exact search equalsIgnoreCase
      */
     public static void depositAll(String name, boolean exact) {
-        Rs2Item rs2Item = Rs2Inventory.get(name);
+        Rs2Item rs2Item = Rs2Inventory.get(name, exact);
         if (rs2Item == null) return;
         depositAll(rs2Item);
     }
@@ -1207,7 +1207,7 @@ public class Rs2Bank {
      * @return
      */
     public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount) {
-        return bankItemsAndWalkBackToOriginalPosition(itemNames, getNearestBank(), initialPlayerLocation, emptySlotCount, 4);
+        return bankItemsAndWalkBackToOriginalPosition(itemNames,false, getNearestBank(), initialPlayerLocation, emptySlotCount, 4);
     }
 
     /**
@@ -1218,25 +1218,27 @@ public class Rs2Bank {
      * @return
      */
     public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
-        return bankItemsAndWalkBackToOriginalPosition(itemNames, getNearestBank(), initialPlayerLocation, 0, 4);
+        return bankItemsAndWalkBackToOriginalPosition(itemNames,false, getNearestBank(), initialPlayerLocation, 0, 4);
     }
 
     /**
      * Banks at specific bank location if your inventory does not have enough emptyslots (0 emptyslots being full). Will walk back to the initialplayerlocation passed as param
      *
      * @param itemNames
+     * @param exactItemNames
      * @param initialPlayerLocation
      * @param bankLocation
      * @param emptySlotCount
      * @param distance
      * @return
      */
-    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, BankLocation bankLocation, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
+    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, boolean exactItemNames, BankLocation bankLocation, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
         if (Rs2Inventory.getEmptySlots() <= emptySlotCount) {
             boolean isBankOpen = Rs2Bank.walkToBankAndUseBank(bankLocation);
             if (isBankOpen) {
                 for (String itemName : itemNames) {
-                    Rs2Bank.depositAll(x -> x.name.toLowerCase().contains(itemName));
+                    depositAll(itemName,false);
+                    //Rs2Bank.depositAll(x -> x.name.toLowerCase().contains(itemName));
                 }
             }
             return false;
@@ -1265,7 +1267,7 @@ public class Rs2Bank {
      * @return
      */
     public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
-        return bankItemsAndWalkBackToOriginalPosition(itemNames, getNearestBank(), initialPlayerLocation, emptySlotCount, distance);
+        return bankItemsAndWalkBackToOriginalPosition(itemNames,false, getNearestBank(), initialPlayerLocation, emptySlotCount, distance);
     }
 
     /**
