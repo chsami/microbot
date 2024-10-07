@@ -12,13 +12,19 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
+import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
 import java.awt.*;
@@ -80,6 +86,7 @@ public class Rs2Walker {
         Microbot.getClientThread().runOnSeperateThread(() -> {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
+                    System.out.println("walker is running");
                     if (!Microbot.isLoggedIn()) {
                         setTarget(null);
                         break;
@@ -478,7 +485,7 @@ public class Rs2Walker {
 
 
             if (found) {
-                System.out.println(action);
+                System.out.println("handling door : " + object.getId());
                 Rs2GameObject.interact(object, action);
                 Rs2Player.waitForWalking();
                 return true;
@@ -605,23 +612,23 @@ public class Rs2Walker {
      * @return
      */
     public static boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
-        for (Transport b : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new ArrayList<>())) {
-            for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), b.getOrigin())) {
-                if (Rs2Player.getWorldLocation().getPlane() != b.getOrigin().getPlane()) {
+        for (Transport transport : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new HashSet<>())) {
+            for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), transport.getOrigin())) {
+                if (Rs2Player.getWorldLocation().getPlane() != transport.getOrigin().getPlane()) {
                     continue;
                 }
 
                 for (int i = indexOfStartPoint; i < path.size(); i++) {
                     if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                         continue;
-                    if (path.stream().noneMatch(x -> x.equals(b.getDestination()))) continue;
+                    if (path.stream().noneMatch(x -> x.equals(transport.getDestination()))) continue;
 
                     int indexOfOrigin = IntStream.range(0, path.size())
-                            .filter(f -> path.get(f).equals(b.getOrigin()))
+                            .filter(f -> path.get(f).equals(transport.getOrigin()))
                             .findFirst()
                             .orElse(-1);
                     int indexOfDestination = IntStream.range(0, path.size())
-                            .filter(f -> path.get(f).equals(b.getDestination()))
+                            .filter(f -> path.get(f).equals(transport.getDestination()))
                             .findFirst()
                             .orElse(-1);
                     if (indexOfDestination == -1) continue;
@@ -629,8 +636,8 @@ public class Rs2Walker {
                     if (indexOfDestination < indexOfOrigin) continue;
 
                     if (path.get(i).equals(origin)) {
-                        if (b.isShip() || b.isNpc() || b.isBoat()) {
-                            var npcAndAction = String.format("%s %s", b.getAction(), b.getNpcName());
+                        if (transport.getType() == TransportType.SHIP || transport.getType() == TransportType.NPC || transport.getType() == TransportType.BOAT) {
+                            var npcAndAction = String.format("%s %s", transport.getAction(), transport.getName());
                             NPC npc = null;
                             String action = "";
                             for (int n = npcAndAction.indexOf(" "); n >= 0; n = npcAndAction.indexOf(" ", n + 1)) {
@@ -651,34 +658,38 @@ public class Rs2Walker {
                         }
                     }
 
-                    if (b.getObjectName() != null && b.getObjectName().contains("trapdoor") && b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
-                        if (handleTrapdoor(b))
+                    System.out.println("handle transport : " + transport.getObjectId());
+
+
+                    if (transport.getName() != null && transport.getName().contains("trapdoor") && transport.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
+                        if (handleTrapdoor(transport))
                             break;
                     }
 
-                    if (b.isSpiritTree()) {
-                        b.handleSpiritTree();
+                    if (transport.getType() == TransportType.SPIRIT_TREE) {
+                        handleSpiritTree(transport);
                     }
 
 
-                    if (b.isGnomeGlider() && b.getOrigin().distanceTo(Rs2Player.getWorldLocation()) < 12) {
-                        b.handleGlider();
+                    if (transport.getType() == TransportType.GNOME_GLIDER && transport.getOrigin().distanceTo(Rs2Player.getWorldLocation()) < 12) {
+                        handleGlider(transport);
                     }
 
-                    if (b.isFairyRing() && !Rs2Player.getWorldLocation().equals(b.getDestination())) {
-                        b.handleFairyRing();
+                    if (transport.getType() == TransportType.FAIRY_RING && !Rs2Player.getWorldLocation().equals(transport.getDestination())) {
+                        handleFairyRing(transport);
                     }
 
 
-                    GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+                    GameObject gameObject = Rs2GameObject.getGameObjects(transport.getObjectId(), transport.getOrigin()).stream().findFirst().orElse(null);
                     //check game objects
-                    if (gameObject != null && gameObject.getId() == b.getObjectId()) {
-                        if (!Rs2Tile.isTileReachable(b.getOrigin())) {
+                    if (gameObject != null && gameObject.getId() == transport.getObjectId()) {
+                        System.out.println(transport.getObjectId());
+                        if (!Rs2Tile.isTileReachable(transport.getOrigin())) {
                             break;
                         }
-                        Rs2GameObject.interact(gameObject, b.getAction());
-                        if (b.getDestination().getPlane() == Rs2Player.getWorldLocation().getPlane()) {
-                            if (b.isAgilityShortcut()) {
+                        Rs2GameObject.interact(gameObject, transport.getAction());
+                        if (transport.getDestination().getPlane() == Rs2Player.getWorldLocation().getPlane()) {
+                            if (transport.getType() == TransportType.AGILITY_SHORTCUT) {
                                 Rs2Player.waitForAnimation();
                             } else {
                                 Rs2Player.waitForWalking();
@@ -692,21 +703,21 @@ public class Rs2Walker {
                     }
 
                     //check tile objects
-                    List<TileObject> tileObjects = Rs2GameObject.getTileObjects(b.getObjectId(), b.getOrigin());
+                    List<TileObject> tileObjects = Rs2GameObject.getTileObjects(transport.getObjectId(), transport.getOrigin());
                     TileObject tileObject = tileObjects.stream().findFirst().orElse(null);
                     if (tileObject instanceof GroundObject)
                         tileObject = tileObjects.stream()
                                 .filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation()))
-                                .min(Comparator.comparing(x -> ((TileObject) x).getWorldLocation().distanceTo(b.getOrigin()))
-                                        .thenComparing(x -> ((TileObject) x).getWorldLocation().distanceTo(b.getDestination()))).orElse(null);
+                                .min(Comparator.comparing(x -> ((TileObject) x).getWorldLocation().distanceTo(transport.getOrigin()))
+                                        .thenComparing(x -> ((TileObject) x).getWorldLocation().distanceTo(transport.getDestination()))).orElse(null);
 
-                    if (tileObject != null && tileObject.getId() == b.getObjectId()) {
-                        if (tileObject.getId() != 16533 && !Rs2Tile.isTileReachable(b.getOrigin())) {
+                    if (tileObject != null && tileObject.getId() == transport.getObjectId()) {
+                        if (tileObject.getId() != 16533 && !Rs2Tile.isTileReachable(transport.getOrigin())) {
                             break;
                         }
-                        Rs2GameObject.interact(tileObject, b.getAction());
-                        if (b.getDestination().getPlane() == Rs2Player.getWorldLocation().getPlane()) {
-                            if (b.isAgilityShortcut()) {
+                        Rs2GameObject.interact(tileObject, transport.getAction());
+                        if (transport.getDestination().getPlane() == Rs2Player.getWorldLocation().getPlane()) {
+                            if (transport.getType() == TransportType.AGILITY_SHORTCUT) {
                                 Rs2Player.waitForAnimation();
                             } else {
                                 Rs2Player.waitForWalking();
@@ -831,5 +842,250 @@ public class Rs2Walker {
         pathfindingExecutor.submit(pathfinder);
         sleepUntil(pathfinder::isDone);
         return pathfinder.getPath().size();
+    }
+
+    private static boolean completedQuests(Transport transport) {
+        for (Quest quest : transport.getQuests()) {
+            if (!QuestState.FINISHED.equals(quest.getState(Microbot.getClient()))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean handleSpiritTree(Transport transport) {
+        int spiritTreeMenu = 12255232;
+
+        // Get Transport Information
+        String displayInfo = transport.getDisplayInfo();
+        String objectName = transport.getName();
+        int objectId = transport.getObjectId();
+        String action = transport.getAction();
+        WorldPoint origin = transport.getOrigin();
+        WorldPoint destination = transport.getDestination();
+
+        System.out.println("Display info: " + displayInfo);
+        System.out.println("Object Name: " + objectName);
+        System.out.println("Object ID: " + objectId);
+        System.out.println("Action: " + action);
+        System.out.println("Origin: " + origin);
+        System.out.println("Destination: " + destination);
+
+        // Check if the widget is already visible
+        if (!Rs2Widget.isHidden(spiritTreeMenu)) {
+            System.out.println("Widget is already visible. Skipping interaction.");
+            char key = displayInfo.charAt(0);
+            System.out.println(key);
+            Rs2Keyboard.keyPress(key);
+            System.out.println("Pressing: " + key);
+            return true;
+        }
+
+        // Find the spirit tree object
+        TileObject spiritTree = Rs2GameObject.findObjectByImposter(objectId, "Travel");
+        if (spiritTree == null) {
+            System.out.println("Spirit tree not found.");
+            return false;
+        }
+
+        // Interact with the spirit tree
+        Rs2GameObject.interact(spiritTree);
+
+        // Wait for the widget to become visible
+        boolean widgetVisible = !Rs2Widget.isHidden(spiritTreeMenu);
+        if (!widgetVisible) {
+            System.out.println("Widget did not become visible within the timeout.");
+            return false;
+        }
+
+        System.out.println("Widget is now visible.");
+        char key = displayInfo.charAt(0);
+        Rs2Keyboard.keyPress(key);
+        System.out.println("Pressing: " + key);
+        return true;
+    }
+
+    public static boolean handleGlider(Transport transport) {
+        int gliderMenu = 9043968;
+        int TA_QUIR_PRIW = 9043972;
+        int SINDARPOS = 9043975;
+        int LEMANTO_ANDRA = 9043978;
+        int KAR_HEWO = 9043981;
+        int GANDIUS = 9043984;
+        int OOKOOKOLLY_UNDRI = 9043993;
+
+        // Get Transport Information
+        String displayInfo = transport.getDisplayInfo();
+        String npcName = transport.getName();
+        int objectId = transport.getObjectId();
+        String action = transport.getAction();
+        WorldPoint origin = transport.getOrigin();
+        WorldPoint destination = transport.getDestination();
+
+        System.out.println("Display info: " + displayInfo);
+        System.out.println("NPC Name: " + npcName);
+        System.out.println("Object ID: " + objectId);
+        System.out.println("Action: " + action);
+        System.out.println("Origin: " + origin);
+        System.out.println("Destination: " + destination);
+
+        // Check if the widget is already visible
+        if (Rs2Widget.isHidden(gliderMenu)) {
+            // Find the glider NPC
+            NPC gnome = Rs2Npc.getNpc(npcName);  // Use the NPC name to find the NPC
+            if (gnome == null) {
+                System.out.println("Gnome not found.");
+                return false;
+            }
+
+            // Interact with the gnome glider NPC
+            Rs2Npc.interact(gnome, action);
+            sleepUntil(() -> !Rs2Widget.isHidden(gliderMenu));
+        }
+
+
+
+        // Wait for the widget to become visible
+        boolean widgetVisible = !Rs2Widget.isHidden(gliderMenu);
+        if (!widgetVisible) {
+            System.out.println("Widget did not become visible within the timeout.");
+            return false;
+        }
+
+        System.out.println("Widget is now visible.");
+
+        switch(displayInfo) {
+            case "Kar-Hewo":
+                Rs2Widget.clickWidget(KAR_HEWO);
+            case "Gnome Stronghold":
+                Rs2Widget.clickWidget(TA_QUIR_PRIW);
+            case "Sindarpos":
+                Rs2Widget.clickWidget(SINDARPOS);
+            case "Lemanto Andra":
+                Rs2Widget.clickWidget(LEMANTO_ANDRA);
+            case "Gandius":
+                Rs2Widget.clickWidget(GANDIUS);
+            case "Ookookolly Undri":
+                Rs2Widget.clickWidget(OOKOOKOLLY_UNDRI);
+        }
+        return true;
+    }
+
+    // Constants for widget IDs
+    private static final int FAIRY_RING_MENU = 26083328;
+
+    private static final int SLOT_ONE = 26083331;
+    private static final int SLOT_TWO = 26083332;
+    private static final int SLOT_THREE = 26083333;
+    private static final int TELEPORT_BUTTON = 26083354;
+
+    private static final int SLOT_ONE_CW_ROTATION = 26083347;
+    private static final int SLOT_ONE_ACW_ROTATION = 26083348;
+    private static final int SLOT_TWO_CW_ROTATION = 26083349;
+    private static final int SLOT_TWO_ACW_ROTATION = 26083350;
+    private static final int SLOT_THREE_CW_ROTATION = 26083351;
+    private static final int SLOT_THREE_ACW_ROTATION = 26083352;
+    private static Rs2Item startingWeapon = null;
+    private static int startingWeaponId;
+
+    public static boolean handleFairyRing(Transport transport) {
+        // Get Transport Information
+        String displayInfo = transport.getDisplayInfo();
+        String objectName = transport.getName();
+        int objectId = transport.getObjectId();
+        String action = transport.getAction();
+        WorldPoint origin = transport.getOrigin();
+        WorldPoint destination = transport.getDestination();
+
+        if (startingWeapon == null) {
+
+
+            startingWeapon = Rs2Equipment.get(EquipmentInventorySlot.WEAPON);
+            System.out.println(startingWeapon);
+            startingWeaponId = startingWeapon.getId();
+        }
+
+        System.out.println("Display info: " + displayInfo);
+        System.out.println("Object Name: " + objectName);
+        System.out.println("Object ID: " + objectId);
+        System.out.println("Action: " + action);
+        System.out.println("Origin: " + origin);
+        System.out.println("Destination: " + destination);
+        System.out.println("Starting Weapon ID: " + startingWeaponId);
+
+        // Check if the widget is already visible
+        if (!Rs2Widget.isHidden(FAIRY_RING_MENU)) {
+            System.out.println("Widget is already visible. Skipping interaction.");
+            rotateSlotToDesiredRotation(SLOT_ONE, Rs2Widget.getWidget(SLOT_ONE).getRotationY(), getDesiredRotation(transport.getDisplayInfo().charAt(0)), SLOT_ONE_ACW_ROTATION, SLOT_ONE_CW_ROTATION);
+            rotateSlotToDesiredRotation(SLOT_TWO, Rs2Widget.getWidget(SLOT_TWO).getRotationY(), getDesiredRotation(transport.getDisplayInfo().charAt(1)), SLOT_TWO_ACW_ROTATION, SLOT_TWO_CW_ROTATION);
+            rotateSlotToDesiredRotation(SLOT_THREE, Rs2Widget.getWidget(SLOT_THREE).getRotationY(), getDesiredRotation(transport.getDisplayInfo().charAt(2)), SLOT_THREE_ACW_ROTATION, SLOT_THREE_CW_ROTATION);
+            Rs2Widget.clickWidget(TELEPORT_BUTTON);
+            Rs2Player.waitForAnimation();
+            if (!Rs2Equipment.isWearing(startingWeaponId)) {
+                sleep(3000,3600); // Required due to long animation time
+                System.out.println("Equipping Starting Weapon: " + startingWeaponId);
+                Rs2Inventory.equip(startingWeaponId);
+            }
+            return true;
+        }
+
+        if (Rs2Equipment.isWearing("Dramen staff") || Rs2Equipment.isWearing("Lunar staff")) {
+            System.out.println("Interacting with the fairy ring directly.");
+            var fairyRing = Rs2GameObject.findObjectByLocation(origin);
+            Rs2GameObject.interact(fairyRing, "Configure");
+            Rs2Player.waitForWalking();
+        } else if (Rs2Inventory.contains("Dramen staff")) {
+            Rs2Inventory.equip("Dramen staff");
+            sleep(600);
+        } else if (Rs2Inventory.contains("Lunar staff")) {
+            Rs2Inventory.equip("Lunar staff");
+            sleep(600);
+        }
+        return true;
+    }
+
+    private static boolean rotateSlotToDesiredRotation(int slotId, int currentRotation, int desiredRotation, int slotAcwRotationId, int slotCwRotationId) {
+        int anticlockwiseTurns = (desiredRotation - currentRotation + 2048) % 2048;
+        int clockwiseTurns = (currentRotation - desiredRotation + 2048) % 2048;
+
+        if (clockwiseTurns <= anticlockwiseTurns) {
+            System.out.println("Rotating slot " + slotId + " clockwise " + (clockwiseTurns / 512) + " times.");
+            for (int i = 0; i < clockwiseTurns / 512; i++) {
+                Rs2Widget.clickWidget(slotCwRotationId);
+                sleep(600, 1200);
+            }
+            return true;
+        } else {
+            System.out.println("Rotating slot " + slotId + " anticlockwise " + (anticlockwiseTurns / 512) + " times.");
+            for (int i = 0; i < anticlockwiseTurns / 512; i++) {
+                Rs2Widget.clickWidget(slotAcwRotationId);
+                sleep(600, 1200);
+            }
+            return true;
+        }
+
+    }
+
+    private static int getDesiredRotation(char letter) {
+        switch (letter) {
+            case 'A':
+            case 'I':
+            case 'P':
+                return 0;
+            case 'B':
+            case 'J':
+            case 'Q':
+                return 512;
+            case 'C':
+            case 'K':
+            case 'R':
+                return 1024;
+            case 'D':
+            case 'L':
+            case 'S':
+                return 1536;
+            default:
+                return -1;
+        }
     }
 }

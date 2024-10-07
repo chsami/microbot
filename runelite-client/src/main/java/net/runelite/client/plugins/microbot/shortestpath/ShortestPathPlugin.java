@@ -1,3 +1,22 @@
+/**
+ *
+ * Credit:
+ *
+ * This project includes code or inspiration from the following open-source project:
+ *
+ * Project: Shortest Path Algorithm
+ * Repository: https://github.com/Skretzo/shortest-path
+ * Author: Skretzo
+ * License: BSD-2-Clause license
+ *
+ * Description:
+ * The shortest-path implementation in this project was adapted or inspired by
+ * the algorithm and code shared in the repository linked above. We thank the original
+ * author for making this available as open-source software.
+ *
+ * Any modifications to the original code have been made by Microbot.
+ */
+
 package net.runelite.client.plugins.microbot.shortestpath;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -8,7 +27,6 @@ import lombok.Setter;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
@@ -19,6 +37,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.events.PluginMessage;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.input.KeyListener;
 import net.runelite.client.input.KeyManager;
@@ -34,7 +53,6 @@ import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.ui.JagexColors;
 import net.runelite.client.ui.overlay.OverlayManager;
-import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ColorUtil;
@@ -42,7 +60,6 @@ import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.Text;
 
 import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
@@ -59,19 +76,19 @@ import java.util.regex.Pattern;
         description = "Draws the shortest path to a chosen destination on the map (right click a spot on the world map to use)",
         tags = {"pathfinder", "map", "waypoint", "navigation", "microbot"},
         enabledByDefault = true,
-        alwaysOn = true
+        alwaysOn = false
 )
 public class ShortestPathPlugin extends Plugin implements KeyListener {
     protected static final String CONFIG_GROUP = "shortestpath";
-    private static final String ADD_START = "Add start";
-    private static final String ADD_END = "Add end";
+    private static final String PLUGIN_MESSAGE_PATH = "path";
+    private static final String PLUGIN_MESSAGE_CLEAR = "clear";
+    private static final String PLUGIN_MESSAGE_START = "start";
+    private static final String PLUGIN_MESSAGE_TARGET = "target";
     private static final String CLEAR = "Clear";
     private static final String PATH = ColorUtil.wrapWithColorTag("Path", JagexColors.MENU_TARGET);
     private static final String SET = "Set";
     private static final String START = ColorUtil.wrapWithColorTag("Start", JagexColors.MENU_TARGET);
     private static final String TARGET = ColorUtil.wrapWithColorTag("Target", JagexColors.MENU_TARGET);
-    private static final String TRANSPORT = ColorUtil.wrapWithColorTag("Transport", JagexColors.MENU_TARGET);
-    private static final String WALK_HERE = "Walk here";
     public static final BufferedImage MARKER_IMAGE = ImageUtil.loadImageResource(ShortestPathPlugin.class, "marker.png");
 
     @Inject
@@ -82,7 +99,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     private ClientThread clientThread;
 
     @Inject
-    public ShortestPathConfig config;
+    private ShortestPathConfig config;
 
     @Inject
     private OverlayManager overlayManager;
@@ -107,47 +124,39 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
 
     @Inject
     private WorldMapPointManager worldMapPointManager;
-
     @Inject
-    private WorldMapOverlay worldMapOverlay;
+    private KeyManager keyManager;
 
     private Point lastMenuOpenedPoint;
     @Getter
     @Setter
-    private static WorldMapPoint marker;
-    private WorldPoint transportStart;
-    @Getter
+    public static WorldMapPoint marker;
     @Setter
-    private static WorldPoint lastLocation = new WorldPoint(0, 0, 0);
-    private MenuEntry lastClick;
+    public static WorldPoint lastLocation = new WorldPoint(0, 0, 0);
     private Shape minimapClipFixed;
     private Shape minimapClipResizeable;
     private BufferedImage minimapSpriteFixed;
     private BufferedImage minimapSpriteResizeable;
     private Rectangle minimapRectangle = new Rectangle();
-    @Getter
-    @Setter
-    private static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
-    @Getter
-    @Setter
-    private static Future<?> pathfinderFuture;
-    @Getter
-    private static final Object pathfinderMutex = new Object();
-    @Getter
-    @Setter
-    private static Pathfinder pathfinder;
-    @Getter
-    private static PathfinderConfig pathfinderConfig;
-    @Getter
-    @Setter
-    private static boolean startPointSet = false;
 
+    @Getter
+    @Setter
+    public static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
+    @Getter
+    @Setter
+    public static Future<?> pathfinderFuture;
+    @Getter
+    public static final Object pathfinderMutex = new Object();
+    @Getter
+    @Setter
+    public static Pathfinder pathfinder;
+    @Getter
+    public static PathfinderConfig pathfinderConfig;
+    @Getter
+    @Setter
+    public static boolean startPointSet = false;
     @Setter
     private static int reachedDistance;
-
-    @Inject
-    private KeyManager keyManager;
-
     @Provides
     public ShortestPathConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(ShortestPathConfig.class);
@@ -156,10 +165,9 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     @Override
     protected void startUp() {
         SplitFlagMap map = SplitFlagMap.fromResources();
-        Map<WorldPoint, List<Transport>> transports = Transport.loadAllFromResources();
+        Map<WorldPoint, Set<Transport>> transports = Transport.loadAllFromResources();
         List<Restriction> restrictions = Restriction.loadAllFromResources();
-
-
+        //TODO: transports contains empty action, name, objectid
         pathfinderConfig = new PathfinderConfig(map, transports, restrictions, client, config);
 
         Rs2Walker.setConfig(config);
@@ -172,7 +180,6 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         if (config.drawDebugPanel()) {
             overlayManager.add(debugOverlayPanel);
         }
-
         keyManager.registerKeyListener(this);
     }
 
@@ -183,10 +190,12 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         overlayManager.remove(pathMapOverlay);
         overlayManager.remove(pathMapTooltipOverlay);
         overlayManager.remove(debugOverlayPanel);
-        keyManager.unregisterKeyListener(this);
+
         exit();
+        keyManager.unregisterKeyListener(this);
     }
 
+    //Method from microbot
     public static void exit() {
         if (pathfindingExecutor != null) {
             Rs2Walker.setTarget(null);
@@ -259,6 +268,31 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     }
 
     @Subscribe
+    public void onPluginMessage(PluginMessage event) {
+        if (!CONFIG_GROUP.equals(event.getNamespace())) {
+            return;
+        }
+
+        String action = event.getName();
+        if (PLUGIN_MESSAGE_PATH.equals(action)) {
+            Map<String, Object> data = event.getData();
+            Object objStart = data.getOrDefault(PLUGIN_MESSAGE_START, null);
+            Object objTarget = data.getOrDefault(PLUGIN_MESSAGE_TARGET, null);
+            WorldPoint start = (objStart instanceof WorldPoint) ? ((WorldPoint) objStart) : null;
+            WorldPoint target = (objTarget instanceof WorldPoint) ? ((WorldPoint) objTarget) : null;
+            if (target == null || (start == null && client.getLocalPlayer() == null)) {
+                return;
+            }
+            if (start == null) {
+                start = client.getLocalPlayer().getWorldLocation();
+            }
+            restartPathfinding(start, target);
+        } else if (PLUGIN_MESSAGE_CLEAR.equals(action)) {
+            setTarget(null);
+        }
+    }
+
+    @Subscribe
     public void onMenuOpened(MenuOpened event) {
         lastMenuOpenedPoint = client.getMouseCanvasPosition();
     }
@@ -292,23 +326,9 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     }
 
     @Subscribe
-    public void onGameStateChanged(GameStateChanged gameStateChanged) {
-        if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
-            getClientThread().invokeLater(() -> {
-                pathfinderConfig.refresh();
-            });
-        }
-    }
-
-    @Subscribe
     public void onMenuEntryAdded(MenuEntryAdded event) {
-        if (client.isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
-            if (config.drawTransports()) {
-                addMenuEntry(event, ADD_START, TRANSPORT, 1);
-                addMenuEntry(event, ADD_END, TRANSPORT, 1);
-                // addMenuEntry(event, "Copy Position");
-            }
-
+        if (client.isKeyPressed(KeyCode.KC_SHIFT)
+                && event.getType() == MenuAction.WALK.getId()) {
             addMenuEntry(event, SET, TARGET, 1);
             if (pathfinder != null) {
                 if (pathfinder.getTarget() != null) {
@@ -328,7 +348,10 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
 
         final Widget map = client.getWidget(ComponentID.WORLD_MAP_MAPVIEW);
 
-        if (map != null && map.getBounds().contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY())) {
+        if (map != null
+                && map.getBounds().contains(
+                client.getMouseCanvasPosition().getX(),
+                client.getMouseCanvasPosition().getY())) {
             addMenuEntry(event, SET, TARGET, 0);
             if (pathfinder != null) {
                 if (pathfinder.getTarget() != null) {
@@ -340,19 +363,21 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
 
         final Shape minimap = getMinimapClipArea();
 
-        if (minimap != null && pathfinder != null &&
-                minimap.contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY())) {
+        if (minimap != null && pathfinder != null
+                && minimap.contains(
+                client.getMouseCanvasPosition().getX(),
+                client.getMouseCanvasPosition().getY())) {
             addMenuEntry(event, CLEAR, PATH, 0);
         }
 
-        if (minimap != null && pathfinder != null &&
-                ("Floating World Map".equals(Text.removeTags(event.getOption())) ||
-                        "Close Floating panel".equals(Text.removeTags(event.getOption())))) {
+        if (minimap != null && pathfinder != null
+                && ("Floating World Map".equals(Text.removeTags(event.getOption()))
+                || "Close Floating panel".equals(Text.removeTags(event.getOption())))) {
             addMenuEntry(event, CLEAR, PATH, 1);
         }
     }
 
-    public static Map<WorldPoint, List<Transport>> getTransports() {
+    public static Map<WorldPoint, Set<Transport>> getTransports() {
         return pathfinderConfig.getTransports();
     }
 
@@ -361,35 +386,6 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     }
 
     private void onMenuOptionClicked(MenuEntry entry) {
-        Player localPlayer = client.getLocalPlayer();
-        if (localPlayer == null) {
-            return;
-        }
-
-        WorldPoint currentLocation = client.isInInstancedRegion() ?
-                WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
-        if (entry.getOption().equals(ADD_START) && entry.getTarget().equals(TRANSPORT)) {
-            transportStart = currentLocation;
-        }
-
-        if (entry.getOption().equals(ADD_END) && entry.getTarget().equals(TRANSPORT)) {
-            WorldPoint transportEnd = client.isInInstancedRegion() ?
-                    WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
-            System.out.println(transportStart.getX() + " " + transportStart.getY() + " " + transportStart.getPlane() + " " +
-                    currentLocation.getX() + " " + currentLocation.getY() + " " + currentLocation.getPlane() + " " +
-                    lastClick.getOption() + " " + Text.removeTags(lastClick.getTarget()) + " " + lastClick.getIdentifier()
-            );
-            Transport transport = new Transport(transportStart, transportEnd);
-            pathfinderConfig.getTransports().computeIfAbsent(transportStart, k -> new ArrayList<>()).add(transport);
-        }
-
-        if (entry.getOption().equals("Copy Position")) {
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
-                    new StringSelection("(" + currentLocation.getX() + ", "
-                            + currentLocation.getY() + ", "
-                            + currentLocation.getPlane() + ")"), null);
-        }
-
         if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
             Rs2Walker.walkTo(getSelectedWorldPoint());
         }
@@ -399,20 +395,16 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         }
 
         if (entry.getOption().equals(CLEAR) && entry.getTarget().equals(PATH)) {
-            Rs2Walker.setTarget(null);
-        }
-
-        if (entry.getType() != MenuAction.WALK) {
-            lastClick = entry;
+            setTarget(null);
         }
     }
 
     private WorldPoint getSelectedWorldPoint() {
         if (client.getWidget(ComponentID.WORLD_MAP_MAPVIEW) == null) {
             if (client.getSelectedSceneTile() != null) {
-                return client.isInInstancedRegion() ?
-                        WorldPoint.fromLocalInstance(client, client.getSelectedSceneTile().getLocalLocation()) :
-                        client.getSelectedSceneTile().getWorldLocation();
+                return client.isInInstancedRegion()
+                        ? WorldPoint.fromLocalInstance(client, client.getSelectedSceneTile().getLocalLocation())
+                        : client.getSelectedSceneTile().getWorldLocation();
             }
         } else {
             return calculateMapPoint(client.isMenuOpen() ? lastMenuOpenedPoint : client.getMouseCanvasPosition());
@@ -420,7 +412,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         return null;
     }
 
-    public void setTarget(WorldPoint target) {
+    private void setTarget(WorldPoint target) {
         Player localPlayer = client.getLocalPlayer();
         if (!startPointSet && localPlayer == null) {
             return;
@@ -445,8 +437,9 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
             marker.setJumpOnClick(true);
             worldMapPointManager.add(marker);
 
-            WorldPoint start = client.isInInstancedRegion() ?
-                    WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
+            WorldPoint start = client.isInInstancedRegion()
+                    ? WorldPoint.fromLocalInstance(client, localPlayer.getLocalLocation())
+                    : localPlayer.getWorldLocation();
             lastLocation = start;
             if (startPointSet && pathfinder != null) {
                 start = pathfinder.getStart();

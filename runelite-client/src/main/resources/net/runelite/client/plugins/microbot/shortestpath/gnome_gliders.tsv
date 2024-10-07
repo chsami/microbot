@@ -1,102 +1,42 @@
-# X Y Z	X Y Z	menuOption menuTarget objectID	Skill requirements	Item requirements	Quest	Travel time	Info
-# Ta Quir Priw (Gnome Stronghold)							
-2465 3501 3	2971 2968 0	Glider Captain Errdo 10467				4	Gandius
-2465 3501 3	3284 3210 0	Glider Captain Errdo 10467				4	Kar-Hewo
-2465 3501 3	2850 3498 0	Glider Captain Errdo 10467				4	Sindarpos
-2465 3501 3	3321 3429 0	Glider Captain Errdo 10467				4	Lemanto Andra
-2465 3501 3	2550 2970 0	Glider Captain Errdo 10467			One Small Favour	4	Lemantolly Undri
-2465 3501 3	2711 2803 0	Glider Captain Errdo 10467			Monkey Madness II	4	Ookookolly Undri
-							
-# Gandius (Karamja)							
-2970 2972 0	2465 3501 3	Glider Captain Klemfoodle 10479				4	Gnome Stronghold
-2970 2972 0	3284 3210 0	Glider Captain Klemfoodle 10479				4	Kar-Hewo
-2970 2972 0	2850 3498 0	Glider Captain Klemfoodle 10479				4	Sindarpos
-2970 2972 0	3321 3429 0	Glider Captain Klemfoodle 10479				4	Lemanto Andra
-2970 2972 0	2550 2970 0	Glider Captain Klemfoodle 10479			One Small Favour	4	Lemantolly Undri
-2970 2972 0	2711 2803 0	Glider Captain Klemfoodle 10479			Monkey Madness II	4	Ookookolly Undri
-2969 2973 0	2465 3501 3	Glider Captain Klemfoodle 10479				4	Gnome Stronghold
-2969 2973 0	3284 3210 0	Glider Captain Klemfoodle 10479				4	Kar-Hewo
-2969 2973 0	2850 3498 0	Glider Captain Klemfoodle 10479				4	Sindarpos
-2969 2973 0	3321 3429 0	Glider Captain Klemfoodle 10479				4	Lemanto Andra
-2969 2973 0	2550 2970 0	Glider Captain Klemfoodle 10479			One Small Favour	4	Lemantolly Undri
-2969 2973 0	2711 2803 0	Glider Captain Klemfoodle 10479			Monkey Madness II	4	Ookookolly Undri
-2970 2974 0	2465 3501 3	Glider Captain Klemfoodle 10479				4	Gnome Stronghold
-2970 2974 0	3284 3210 0	Glider Captain Klemfoodle 10479				4	Kar-Hewo
-2970 2974 0	2850 3498 0	Glider Captain Klemfoodle 10479				4	Sindarpos
-2970 2974 0	3321 3429 0	Glider Captain Klemfoodle 10479				4	Lemanto Andra
-2970 2974 0	2550 2970 0	Glider Captain Klemfoodle 10479			One Small Favour	4	Lemantolly Undri
-2970 2974 0	2711 2803 0	Glider Captain Klemfoodle 10479			Monkey Madness II	4	Ookookolly Undri
-							
-# Kar-Hewo (Al-Kharid)							
-3284 3211 0	2465 3501 3	Glider Captain Dalbur 10452				4	Gnome Stronghold
-3284 3211 0	2971 2968 0	Glider Captain Dalbur 10452				4	Gandius
-3284 3211 0	2850 3498 0	Glider Captain Dalbur 10452				4	Sindarpos
-3284 3211 0	3321 3429 0	Glider Captain Dalbur 10452				4	Lemanto Andra
-3284 3211 0	2550 2970 0	Glider Captain Dalbur 10452			One Small Favour	4	Lemantolly Undri
-3284 3211 0	2711 2803 0	Glider Captain Dalbur 10452			Monkey Madness II	4	Ookookolly Undri
-3285 3212 0	2465 3501 3	Glider Captain Dalbur 10452				4	Gnome Stronghold
-3285 3212 0	2971 2968 0	Glider Captain Dalbur 10452				4	Gandius
-3285 3212 0	2850 3498 0	Glider Captain Dalbur 10452				4	Sindarpos
-3285 3212 0	3321 3429 0	Glider Captain Dalbur 10452				4	Lemanto Andra
-3285 3212 0	2550 2970 0	Glider Captain Dalbur 10452			One Small Favour	4	Lemantolly Undri
-3285 3212 0	2711 2803 0	Glider Captain Dalbur 10452			Monkey Madness II	4	Ookookolly Undri
-3284 3213 0	2465 3501 3	Glider Captain Dalbur 10452				4	Gnome Stronghold
-3284 3213 0	2971 2968 0	Glider Captain Dalbur 10452				4	Gandius
-3284 3213 0	2850 3498 0	Glider Captain Dalbur 10452				4	Sindarpos
-3284 3213 0	3321 3429 0	Glider Captain Dalbur 10452				4	Lemanto Andra
-3284 3213 0	2550 2970 0	Glider Captain Dalbur 10452			One Small Favour	4	Lemantolly Undri
-3284 3213 0	2711 2803 0	Glider Captain Dalbur 10452			Monkey Madness II	4	Ookookolly Undri
-							
-# Sindarpos (White Wolf Mountain)							
-2847 3498 0	2465 3501 3	Glider Captain Bleemadge 10459				4	Gnome Stronghold
-2847 3498 0	2971 2968 0	Glider Captain Bleemadge 10459				4	Gandius
-2847 3498 0	3284 3210 0	Glider Captain Bleemadge 10459				4	Kar-Hewo
-2847 3498 0	3321 3429 0	Glider Captain Bleemadge 10459				4	Lemanto Andra
-2847 3498 0	2550 2970 0	Glider Captain Bleemadge 10459			One Small Favour	4	Lemantolly Undri
-2847 3498 0	2711 2803 0	Glider Captain Bleemadge 10459			Monkey Madness II	4	Ookookolly Undri
-2846 3499 0	2465 3501 3	Glider Captain Bleemadge 10459				4	Gnome Stronghold
-2846 3499 0	2971 2968 0	Glider Captain Bleemadge 10459				4	Gandius
-2846 3499 0	3284 3210 0	Glider Captain Bleemadge 10459				4	Kar-Hewo
-2846 3499 0	3321 3429 0	Glider Captain Bleemadge 10459				4	Lemanto Andra
-2846 3499 0	2550 2970 0	Glider Captain Bleemadge 10459			One Small Favour	4	Lemantolly Undri
-2846 3499 0	2711 2803 0	Glider Captain Bleemadge 10459			Monkey Madness II	4	Ookookolly Undri
-							
-# Lemantolly Undri (Feldip Hills)							
-2544 2972 0	2465 3501 3	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Gnome Stronghold
-2544 2972 0	2971 2968 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Gandius
-2544 2972 0	3284 3210 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Kar-Hewo
-2544 2972 0	2850 3498 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Sindarpos
-2544 2972 0	3321 3429 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Lemanto Andra
-2544 2972 0	2711 2803 0	Glider Gnormadium Avlafrim 7517			One Small Favour;Monkey Madness II	4	Ookookolly Undri
-2545 2973 0	2465 3501 3	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Gnome Stronghold
-2545 2973 0	2971 2968 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Gandius
-2545 2973 0	3284 3210 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Kar-Hewo
-2545 2973 0	2850 3498 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Sindarpos
-2545 2973 0	3321 3429 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Lemanto Andra
-2545 2973 0	2711 2803 0	Glider Gnormadium Avlafrim 7517			One Small Favour;Monkey Madness II	4	Ookookolly Undri
-2544 2974 0	2465 3501 3	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Gnome Stronghold
-2544 2974 0	2971 2968 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Gandius
-2544 2974 0	3284 3210 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Kar-Hewo
-2544 2974 0	2850 3498 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Sindarpos
-2544 2974 0	3321 3429 0	Glider Gnormadium Avlafrim 7517			One Small Favour	4	Lemanto Andra
-2544 2974 0	2711 2803 0	Glider Gnormadium Avlafrim 7517			One Small Favour;Monkey Madness II	4	Ookookolly Undri
-							
-# Ookookolly Undri (Ape Atoll)							
-2711 2801 0	2465 3501 3	Glider Captain Shoracks 7178			Monkey Madness II	4	Gnome Stronghold
-2711 2801 0	2971 2968 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Gandius
-2711 2801 0	3284 3210 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Kar-Hewo
-2711 2801 0	2850 3498 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Sindarpos
-2711 2801 0	3321 3429 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Lemanto Andra
-2711 2801 0	2550 2970 0	Glider Captain Shoracks 7178			Monkey Madness II;One Small Favour	4	Lemantolly Undri
-2711 2803 0	2465 3501 3	Glider Captain Shoracks 7178			Monkey Madness II	4	Gnome Stronghold
-2711 2803 0	2971 2968 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Gandius
-2711 2803 0	3284 3210 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Kar-Hewo
-2711 2803 0	2850 3498 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Sindarpos
-2711 2803 0	3321 3429 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Lemanto Andra
-2711 2803 0	2550 2970 0	Glider Captain Shoracks 7178			Monkey Madness II;One Small Favour	4	Lemantolly Undri
-2710 2802 0	2465 3501 3	Glider Captain Shoracks 7178			Monkey Madness II	4	Gnome Stronghold
-2710 2802 0	2971 2968 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Gandius
-2710 2802 0	3284 3210 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Kar-Hewo
-2710 2802 0	2850 3498 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Sindarpos
-2710 2802 0	3321 3429 0	Glider Captain Shoracks 7178			Monkey Madness II	4	Lemanto Andra
-2710 2802 0	2550 2970 0	Glider Captain Shoracks 7178			Monkey Madness II;One Small Favour	4	Lemantolly Undri
+# Origin	Destination	menuOption menuTarget objectID	Quests	Duration	Display info
+# Ta Quir Priw (Gnome Stronghold)
+2465 3501 3		Glider Captain Errdo 10467	The Grand Tree
+
+# Gandius (Karamja)
+2970 2972 0		Glider Captain Klemfoodle 10479	The Grand Tree
+2969 2973 0		Glider Captain Klemfoodle 10479	The Grand Tree
+2970 2974 0		Glider Captain Klemfoodle 10479	The Grand Tree
+
+# Kar-Hewo (Al-Kharid)
+3284 3211 0		Glider Captain Dalbur 10452	The Grand Tree
+3285 3212 0		Glider Captain Dalbur 10452	The Grand Tree
+3284 3213 0		Glider Captain Dalbur 10452	The Grand Tree
+
+# Sindarpos (White Wolf Mountain)
+2847 3498 0		Glider Captain Bleemadge 10459	The Grand Tree
+2846 3499 0		Glider Captain Bleemadge 10459	The Grand Tree
+
+# Lemantolly Undri (Feldip Hills)
+2544 2972 0		Glider Gnormadium Avlafrim 7517	The Grand Tree;One Small Favour
+2545 2973 0		Glider Gnormadium Avlafrim 7517	The Grand Tree;One Small Favour
+2544 2974 0		Glider Gnormadium Avlafrim 7517	The Grand Tree;One Small Favour
+
+# Ookookolly Undri (Ape Atoll)
+2711 2801 0		Glider Captain Shoracks 7178	The Grand Tree;Monkey Madness II
+2711 2803 0		Glider Captain Shoracks 7178	The Grand Tree;Monkey Madness II
+2710 2802 0		Glider Captain Shoracks 7178	The Grand Tree;Monkey Madness II
+
+# Ta Quir Priw (Gnome Stronghold)
+	2465 3501 3		The Grand Tree	4	Ta Quir Priw
+# Gandius (Karamja)
+	2971 2968 0		The Grand Tree	4	Gandius
+# Kar-Hewo (Al-Kharid)
+	3284 3210 0		The Grand Tree	4	Kar-Hewo
+# Sindarpos (White Wolf Mountain)
+	2850 3498 0		The Grand Tree	4	Sindarpos
+# Lemanto Andra (Digsite)
+	3321 3429 0		The Grand Tree	4	Lemanto Andra
+# Lemantolly Undri (Feldip Hills)
+	2550 2970 0		The Grand Tree;One Small Favour	4	Lemantolly Undri
+# Ookookolly Undri (Ape Atoll)
+	2711 2803 0		The Grand Tree;Monkey Madness II	4	Ookookolly Undri

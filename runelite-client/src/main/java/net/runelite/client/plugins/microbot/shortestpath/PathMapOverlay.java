@@ -16,6 +16,7 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class PathMapOverlay extends Overlay {
@@ -32,15 +33,13 @@ public class PathMapOverlay extends Overlay {
         this.plugin = plugin;
         this.config = config;
         setPosition(OverlayPosition.DYNAMIC);
-        setPriority(OverlayPriority.LOW);
+        setPriority(Overlay.PRIORITY_LOW);
         setLayer(OverlayLayer.MANUAL);
         drawAfterLayer(ComponentID.WORLD_MAP_MAPVIEW);
     }
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (ShortestPathPlugin.getPathfinder() == null)
-            return null;
         if (!config.drawMap()) {
             return null;
         }
@@ -74,7 +73,7 @@ public class PathMapOverlay extends Overlay {
                     continue;
                 }
 
-                for (Transport b : plugin.getTransports().getOrDefault(a, new ArrayList<>())) {
+                for (Transport b : plugin.getTransports().getOrDefault(a, new HashSet<>())) {
                     Point mapB = worldMapOverlay.mapWorldPointToGraphicsPoint(b.getDestination());
                     if (mapB == null || !worldMapClipArea.contains(mapB.getX(), mapB.getY())) {
                         continue;
