@@ -7,16 +7,20 @@ import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.events.ProfileChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.config.ConfigPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.AutoRunScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.CameraScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.NeverLogoutScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.WintertodtScript;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.SpecialAttackScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchOverlay;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtOverlay;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtScript;
 import net.runelite.client.plugins.microbot.util.antiban.FieldUtil;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
@@ -24,6 +28,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.SplashScreen;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ImageUtil;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -37,10 +42,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static net.runelite.client.plugins.microbot.qualityoflife.scripts.WintertodtScript.isInWintertodtRegion;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtScript.isInWintertodtRegion;
+import static net.runelite.client.plugins.microbot.util.Global.awaitExecutionUntil;
 
 @PluginDescriptor(
         name = PluginDescriptor.See1Duck + "QoL",
@@ -53,6 +59,7 @@ public class QoLPlugin extends Plugin {
     public static final List<NewMenuEntry> bankMenuEntries = new LinkedList<>();
     public static final List<NewMenuEntry> furnaceMenuEntries = new LinkedList<>();
     public static final List<NewMenuEntry> anvilMenuEntries = new LinkedList<>();
+    private static final AtomicReference<List<?>> pluginList = new AtomicReference<>();
     private static final int HALF_ROTATION = 1024;
     private static final int FULL_ROTATION = 2048;
     private static final int PITCH_INDEX = 0;
@@ -85,11 +92,17 @@ public class QoLPlugin extends Plugin {
     @Inject
     private QoLScript qoLScript;
     @Inject
+    private AutoRunScript autoRunScript;
+    @Inject
+    private SpecialAttackScript specialAttackScript;
+    @Inject
     private OverlayManager overlayManager;
     @Inject
     private QoLOverlay qoLOverlay;
     @Inject
     private PouchOverlay pouchOverlay;
+    @Inject
+    private WintertodtOverlay wintertodtOverlay;
 
     @Provides
     QoLConfig provideConfig(ConfigManager configManager) {
@@ -126,6 +139,7 @@ public class QoLPlugin extends Plugin {
         if (overlayManager != null) {
             overlayManager.add(pouchOverlay);
             overlayManager.add(qoLOverlay);
+            overlayManager.add(wintertodtOverlay);
         }
         if (config.displayPouchCounter()) {
             overlayManager.add(pouchOverlay);
@@ -136,23 +150,46 @@ public class QoLPlugin extends Plugin {
             Microbot.getSpecialAttackConfigs().setSpecialAttackWeapon(config.specWeapon());
             Microbot.getSpecialAttackConfigs().setMinimumSpecEnergy(config.specWeapon().getEnergyRequired());
         }
+        if (config.autoRun()) {
+            Microbot.enableAutoRunOn = true;
+        }
+        if (config.autoStamina()) {
+            Microbot.useStaminaPotsIfNeeded = true;
+            Microbot.runEnergyThreshold = config.staminaThreshold() * 100;
+        }
+        autoRunScript.run(config);
+        specialAttackScript.run(config);
         qoLScript.run(config);
         wintertodtScript.run(config);
-        updateUiElements();
+        awaitExecutionUntil(() ->Microbot.getClientThread().invokeLater(this::updateUiElements), () -> !SplashScreen.isOpen(), 600);
     }
 
     @Override
     protected void shutDown() {
         qoLScript.shutdown();
+        autoRunScript.shutdown();
+        specialAttackScript.shutdown();
         overlayManager.remove(pouchOverlay);
         overlayManager.remove(qoLOverlay);
+        overlayManager.remove(wintertodtOverlay);
+    }
+
+    @Subscribe(
+            priority = -999
+    )
+    public void onProfileChanged(ProfileChanged event) {
+        log.info("Profile changed");
+        log.info("Updating UI elements");
+        // Wait for the splash screen to close before updating the UI elements
+        awaitExecutionUntil(() ->Microbot.getClientThread().invokeLater(this::updateUiElements), () -> !SplashScreen.isOpen(), 1000);
+
     }
 
     @Subscribe
     public void onChatMessage(ChatMessage chatMessage) {
         ChatMessageType chatMessageType = chatMessage.getType();
 
-
+        if (!Microbot.isLoggedIn()) return;
         if (isInWintertodtRegion()
                 && (chatMessageType == ChatMessageType.GAMEMESSAGE || chatMessageType == ChatMessageType.SPAM)) {
             wintertodtScript.onChatMessage(chatMessage);
@@ -356,7 +393,7 @@ public class QoLPlugin extends Plugin {
 
     @Subscribe
     public void onConfigChanged(ConfigChanged ev) {
-        if ("smoothRotation".equals(ev.getKey()) && config.smoothCameraTracking()) {
+        if ("smoothRotation".equals(ev.getKey()) && config.smoothCameraTracking() && Microbot.isLoggedIn()) {
             previousCamera[YAW_INDEX] = Microbot.getClient().getMapAngle();
         }
         if (ev.getKey().equals("accentColor") || ev.getKey().equals("toggleButtonColor") || ev.getKey().equals("pluginLabelColor")) {
@@ -382,6 +419,13 @@ public class QoLPlugin extends Plugin {
             } else {
                 Microbot.getSpecialAttackConfigs().reset();
             }
+        }
+
+        if (ev.getKey().equals("autoRun")) {
+            Microbot.enableAutoRunOn = config.autoRun();
+        }
+        if (ev.getKey().equals("autoStamina")) {
+            Microbot.useStaminaPotsIfNeeded = config.autoStamina();
         }
     }
 
@@ -452,7 +496,7 @@ public class QoLPlugin extends Plugin {
     private void recordNewActions(MenuEntry event) {
         recordActions = true;
         String option = event.getOption();
-        if (BANK_OPTION.equals(option)) {
+        if (BANK_OPTION.equals(option) || "Use".equals(option) && event.getTarget().contains("Bank chest")){
             bankMenuEntries.clear();
         } else if (SMELT_OPTION.equals(option)) {
             furnaceMenuEntries.clear();
@@ -530,70 +574,87 @@ public class QoLPlugin extends Plugin {
     }
 
 
-    private void updateUiElements() {
+    /**
+     * Updates the UI elements by modifying various fields and components based on the provided configuration.
+     *
+     * This method updates the accent color, the plugin toggle button's ON_SWITCHER field, and modifies the color of labels
+     * and toggle buttons for plugins in the plugin list. If any part of the process fails (e.g., the ConfigPlugin is not found),
+     * it logs an appropriate error message and returns false.
+     *
+     * @return true if the UI elements are successfully updated, false otherwise.
+     */
+    private boolean updateUiElements() {
         try {
-            // Get the Field object for BRAND_ORANGE(Accent color)
+            // Get the Field object for the accent color (BRAND_ORANGE) in the ColorScheme class
             Field accentColorField = ColorScheme.class.getDeclaredField("BRAND_ORANGE");
+            // Update the accent color with the value from the config
+            FieldUtil.setFinalStatic(accentColorField, config.accentColor());
+
+            // Get the PluginToggleButton class to access its ON_SWITCHER field
             Class<?> pluginButton = Class.forName("net.runelite.client.plugins.config.PluginToggleButton");
             Field onSwitcherPluginPanel = pluginButton.getDeclaredField("ON_SWITCHER");
             onSwitcherPluginPanel.setAccessible(true);
-
-
-            FieldUtil.setFinalStatic(accentColorField, config.accentColor());
-
+            // Update the ON_SWITCHER field with a remapped image based on the config toggle button color
             FieldUtil.setFinalStatic(onSwitcherPluginPanel, remapImage(SWITCHER_ON_IMG, config.toggleButtonColor()));
-            ConfigPlugin configPlugin = (ConfigPlugin) Microbot.getPluginManager().getPlugins().stream().filter((plugin) ->
-                    plugin instanceof ConfigPlugin).findAny().orElse(null);
+
+            // Find the ConfigPlugin instance from the plugin manager
+            ConfigPlugin configPlugin = (ConfigPlugin) Microbot.getPluginManager().getPlugins().stream()
+                    .filter(plugin -> plugin instanceof ConfigPlugin)
+                    .findAny().orElse(null);
+
+            // If ConfigPlugin is not found, log an error and return false
             if (configPlugin == null) {
                 Microbot.log("Config Plugin not found");
-            } else {
-                try {
-                    Class<?> pluginListPanelClass = Class.forName("net.runelite.client.plugins.config.PluginListPanel");
-                    JPanel pluginListPanel = (JPanel) configPlugin.getInjector().getProvider(pluginListPanelClass).get();
-                    final List<?>[] pluginList = {(List<?>) FieldUtils.readDeclaredField(pluginListPanel, "pluginList", true)};
-
-                    if (pluginList[0] == null) {
-                        log.info("Plugin list is null, waiting for it to be initialized");
-                        sleepUntil(() -> {
-                            try {
-                                pluginList[0] = (List<?>) FieldUtils.readDeclaredField(pluginListPanel, "pluginList", true);
-                                return pluginList[0] != null;
-                            } catch (Exception e) {
-                                log.error("QoL Error updating plugin list: " + e.getMessage());
-                                return false;
-                            }
-                        },10000);
-
-                    }
-
-
-                    for (Object plugin : pluginList[0]) {
-                        if (plugin instanceof JPanel) {
-                            Component[] var12 = ((JPanel) plugin).getComponents();
-                            for (Component c : var12) {
-                                if (c instanceof JLabel) {
-                                    c.setForeground(config.pluginLabelColor());
-                                }
-                            }
-                        }
-
-
-                        JToggleButton onOffToggle = (JToggleButton) FieldUtils.readDeclaredField(plugin, "onOffToggle", true);
-                        onOffToggle.setSelectedIcon(remapImage(SWITCHER_ON_IMG, config.toggleButtonColor()));
-                    }
-
-                } catch (Exception e) {
-                    log.error("QoL Error updating plugin list panel: " + e.getMessage());
-                    Microbot.log("QoL Error updating inner UI elements: " + e.getMessage());
-                }
-
+                return false;
             }
 
+            // Get the plugin list panel from the ConfigPlugin instance
+            JPanel pluginListPanel = getPluginListPanel(configPlugin);
+            // Set the plugin list using the retrieved plugin list panel
+            pluginList.set(getPluginList(pluginListPanel));
 
+            // If the plugin list is still null, log an error and return false
+            if (pluginList.get() == null) {
+                Microbot.log("Plugin list is null, waiting for it to be initialized");
+                return false;
+            }
+
+            // Iterate through each plugin in the plugin list
+            for (Object plugin : pluginList.get()) {
+                // If the plugin is a JPanel, update the color of any JLabel components within it
+                if (plugin instanceof JPanel) {
+                    for (Component component : ((JPanel) plugin).getComponents()) {
+                        if (component instanceof JLabel) {
+                            // Set the label color based on the config
+                            component.setForeground(config.pluginLabelColor());
+                        }
+                    }
+                }
+
+                // Get the on/off toggle button for the plugin and update its selected icon
+                JToggleButton onOffToggle = (JToggleButton) FieldUtils.readDeclaredField(plugin, "onOffToggle", true);
+                onOffToggle.setSelectedIcon(remapImage(SWITCHER_ON_IMG, config.toggleButtonColor()));
+            }
+
+            return true;
         } catch (Exception e) {
-            log.error("QoL Error updating UI elements: " + e.getMessage());
-            Microbot.log("QoL Error updating UI elements: " + e.getMessage());
+            // Log any exceptions that occur during the UI update process
+            String errorMessage = "QoL Error updating UI elements: " + e.getMessage();
+            log.error(errorMessage);
+            Microbot.log(errorMessage);
+            return false;
         }
+    }
+
+    private JPanel getPluginListPanel(ConfigPlugin configPlugin) throws ClassNotFoundException {
+
+        Class<?> pluginListPanelClass = Class.forName("net.runelite.client.plugins.config.PluginListPanel");
+        assert configPlugin != null;
+        return (JPanel) configPlugin.getInjector().getProvider(pluginListPanelClass).get();
+    }
+
+    private List<?> getPluginList(JPanel pluginListPanel) throws IllegalAccessException {
+        return (List<?>) FieldUtils.readDeclaredField(pluginListPanel, "pluginList", true);
     }
 
 }

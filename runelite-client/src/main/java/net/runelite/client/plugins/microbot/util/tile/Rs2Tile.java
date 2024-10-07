@@ -10,6 +10,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -252,18 +253,34 @@ public class Rs2Tile {
         return isVisited(targetPoint, visited);
     }
 
+    /**
+     * Checks if any of the tiles immediately surrounding the given object are walkable.
+     * The object is defined by its position (worldPoint) and its size (sizeX x sizeY).
+     *
+     * @param worldPoint The central point of the object.
+     * @param sizeX      The size of the object along the X-axis.
+     * @param sizeY      The size of the object along the Y-axis.
+     * @return true if any surrounding tile is walkable, false otherwise.
+     */
     public static boolean areSurroundingTilesWalkable(WorldPoint worldPoint, int sizeX, int sizeY) {
-        for (int dx = -1; dx <= sizeX; dx++) {
-            for (int dy = -1; dy <= sizeY; dy++) {
-                // Skip the inside tiles, only check the border
-                if (dx >= 0 && dx < sizeX && dy >= 0 && dy < sizeY) {
+        int plane = worldPoint.getPlane();
+
+        // Calculate the boundaries of the object
+        int minX = worldPoint.getX() - (sizeX - 1) / 2;
+        int minY = worldPoint.getY() - (sizeY - 1) / 2;
+        int maxX = minX + sizeX - 1;
+        int maxY = minY + sizeY - 1;
+
+        // Loop over the tiles surrounding the object
+        for (int x = minX - 1; x <= maxX + 1; x++) {
+            for (int y = minY - 1; y <= maxY + 1; y++) {
+                // Skip the tiles that are part of the object itself
+                if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
                     continue;
                 }
 
-                int checkX = worldPoint.getX() + dx;
-                int checkY = worldPoint.getY() + dy;
-
-                if (isTileReachable(new WorldPoint(checkX, checkY, worldPoint.getPlane()))) {
+                // Check if the surrounding tile is walkable
+                if (isTileReachable(new WorldPoint(x, y, plane))) {
                     return true;
                 }
             }
@@ -348,11 +365,46 @@ public class Rs2Tile {
     public static WorldPoint getNearestWalkableTile(WorldPoint source) {
         for (Direction direction : Direction.values()) {
             WorldPoint neighbour = getNeighbour(direction, source);
+            if (neighbour.equals(Rs2Player.getWorldLocation())) continue;
             if (isTileReachable(neighbour)) {
                 return neighbour;
             }
         }
 
         return null;
+    }
+
+    public static WorldPoint getNearestWalkableTileWithLineOfSight(WorldPoint source) {
+        for (Direction direction : Direction.values()) {
+            WorldPoint neighbour = getNeighbour(direction, source);
+            if (neighbour.equals(Rs2Player.getWorldLocation())) continue;
+            if (!tileHasWalls(neighbour)
+                    && isValidTile(getTile(neighbour.getX(), neighbour.getY()))
+                    && isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), neighbour.getX(), neighbour.getY()))) {
+                System.out.println(neighbour);
+                return neighbour;
+            }
+        }
+
+        return null;
+    }
+
+    public static boolean tileHasWalls(WorldPoint source) {
+        return Rs2GameObject.getWallObjects().stream().filter(x -> x.getWorldLocation().equals(source)).findFirst().orElse(null) != null;
+    }
+
+    public static Tile getTile(int x, int y) {
+        WorldPoint worldPoint = new WorldPoint(x, y, Microbot.getClient().getPlane());
+        if (worldPoint.isInScene(Microbot.getClient())) {
+            LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+            if (localPoint == null) return null;
+            return Microbot.getClient().getScene().getTiles()[worldPoint.getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
+        }
+        return null;
+    }
+
+    public static boolean isValidTile(Tile tile) {
+        byte flags = Microbot.getClient().getTileSettings()[tile.getRenderLevel()][tile.getSceneLocation().getX()][tile.getSceneLocation().getY()];
+        return flags == 4;
     }
 }

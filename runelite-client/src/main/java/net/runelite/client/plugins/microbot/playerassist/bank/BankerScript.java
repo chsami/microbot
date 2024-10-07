@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
@@ -61,8 +62,11 @@ public class BankerScript extends Script {
         this.config = config;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (Microbot.isLoggedIn() && config.bank() && needsBanking() && handleBanking()) {
+                if (Microbot.isLoggedIn() && config.bank() && needsBanking()) {
+                    handleBanking();
+                } else if (!needsBanking() && config.centerLocation().distanceTo(Rs2Player.getWorldLocation()) > config.attackRadius()) {
                     Microbot.pauseAllScripts = false;
+                    Rs2Walker.walkTo(config.centerLocation());
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -139,9 +143,8 @@ public class BankerScript extends Script {
         Microbot.pauseAllScripts = true;
         Rs2Prayer.disableAllPrayers();
         if (goToBank() && Rs2Bank.openBank()) {
-            if (depositAllExcept(config) && withdrawUpkeepItems(config)) {
-                Rs2Walker.walkTo(config.centerLocation());
-            }
+            depositAllExcept(config);
+            withdrawUpkeepItems(config);
         }
         return !needsBanking();
     }

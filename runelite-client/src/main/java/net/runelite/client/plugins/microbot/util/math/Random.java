@@ -34,7 +34,12 @@ public class Random {
             s = u * u + v * v;
         } while (s >= 1 || s == 0);
         double multiplier = Math.sqrt(-2.0 * Math.log(s) / s);
-        return (int) (mean + stddev * u * multiplier);
+        int value = (int) (mean + stddev * u * multiplier);
+        if (value < 0)
+        {
+            value = 0;
+        }
+        return value;
     }
 
     public static int randomWithNoise(int base, int noise) {

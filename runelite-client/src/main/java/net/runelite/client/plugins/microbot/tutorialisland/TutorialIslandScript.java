@@ -190,11 +190,11 @@ public class TutorialIslandScript extends Script {
     //config 281 needed
     public void GettingStarted() {
         NPC npc = Rs2Npc.getNpc(3308);
-        if (isInDialogue()) return;
         if (Rs2Widget.getWidget(219, 1) != null) {
             Rs2Keyboard.typeString(Integer.toString(random(1, 3)));
             return;
         }
+        if (isInDialogue()) return;
         if (Microbot.getVarbitPlayerValue(281) == 3) {
             Rs2Widget.clickWidget(10747945);
             sleep(1000);

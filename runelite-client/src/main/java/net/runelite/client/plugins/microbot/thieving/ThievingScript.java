@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.5.7";
+    public static String version = "1.5.8";
     ThievingConfig config;
 
     boolean isPickpocketting = false;
@@ -89,10 +89,15 @@ public class ThievingScript extends Script {
                         .anyMatch(n -> n.equalsIgnoreCase(x.getName())))
                 .findFirst()
                 .orElse(null);
-        if (npc != null) {
+        Map<NPC, HighlightedNpc> highlightedNpcs =  net.runelite.client.plugins.npchighlight.NpcIndicatorsPlugin.getHighlightedNpcs();
+        if (highlightedNpcs.isEmpty()) {
             if (Rs2Npc.pickpocket(npc)) {
-                Microbot.status = "Pickpocketting " + npc.getName();
-                sleep(300, 600);
+                Rs2Walker.setTarget(null);
+                sleep(50, 250);
+            }
+        } else {
+            if (Rs2Npc.pickpocket(highlightedNpcs)) {
+                sleep(50, 250);
             }
         }
     }

@@ -42,6 +42,15 @@ public class Global {
         }
     }
 
+    public static void sleepGaussian(int mean, int stddev) {
+        int randomSleep = Random.randomGaussian(mean, stddev);
+        try {
+            Thread.sleep(randomSleep);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public static void sleepUntil(BooleanSupplier awaitedCondition) {
       sleepUntil(awaitedCondition, 5000);
     }

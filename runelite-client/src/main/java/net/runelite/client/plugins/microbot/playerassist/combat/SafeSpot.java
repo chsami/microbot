@@ -25,7 +25,7 @@ public boolean run(PlayerAssistConfig config) {
     AtomicReference<List<String>> npcsToAttack = new AtomicReference<>(Arrays.stream(Arrays.stream(config.attackableNpcs().split(",")).map(String::trim).toArray(String[]::new)).collect(Collectors.toList()));
     mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
         try {
-            if (!Microbot.isLoggedIn() || !super.run() || !config.toggleSafeSpot() || Microbot.isMoving()) return;
+            if (!Microbot.isLoggedIn() || !super.run() || !config.toggleSafeSpot() || Rs2Player.isMoving()) return;
 
             currentSafeSpot = config.safeSpot();
             if(isDefaultSafeSpot(currentSafeSpot)){

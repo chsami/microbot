@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.agility.models.AgilityObstacleModel;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -182,7 +183,7 @@ public class AgilityScript extends Script {
                     }
                 }
 
-                if (!marksOfGrace.isEmpty()) {
+                if (!marksOfGrace.isEmpty() && !Rs2Inventory.isFull()) {
                     for (RS2Item markOfGraceTile : marksOfGrace) {
                         if (Microbot.getClient().getTopLevelWorldView().getPlane() != markOfGraceTile.getTile().getPlane())
                             continue;
@@ -222,7 +223,7 @@ public class AgilityScript extends Script {
                                 .map(AgilityObstacleModel::getObjectID).collect(Collectors.toList()));
 
                         if (gameObject == null) {
-                            System.out.println("NO agility obstacle found.");
+                            Microbot.log("NO agility obstacle found. Please report this as a bug if this keeps happening.");
                             return;
                         }
 
@@ -243,7 +244,8 @@ public class AgilityScript extends Script {
                     }
                 }
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                Microbot.log(ex.getMessage());
+                ex.printStackTrace();
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
         return true;

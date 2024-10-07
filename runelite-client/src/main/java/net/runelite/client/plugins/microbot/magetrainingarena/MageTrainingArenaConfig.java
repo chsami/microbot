@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.microbot.magetrainingarena;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.*;
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.AirStaves;
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.EarthStaves;
@@ -11,14 +8,15 @@ import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.FireS
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.WaterStaves;
 
 @ConfigGroup("mta")
+@ConfigInformation("- Make sure to enable the official RuneLite plugin 'Mage Training Arena'<br />" +
+        "- You need to configure the staves to use and have the requirements to equip all of them <br />" +
+        "- Your inventory should only contain all configured staves and Law/Cosmic/Nature runes <br />" +
+        "- To use T6 enchants you need to have any lava staff configured as your fire staff <br />" +
+        "- If set to buy rewards, the rooms are cycled though until the requirements are met and the reward will be stored in your bank <br />" +
+        "- If not set to buy rewards, the rooms are cycled as if it would buy the rewards but just keep going the same way afterwards <br />" +
+        "- The bot will stop if you are out of runes <br />" +
+        "- Rune pouches are not supported yet")
 public interface MageTrainingArenaConfig extends Config {
-    @ConfigSection(
-            name = "General",
-            description = "General",
-            position = 0
-    )
-    String generalSection = "general";
-
     @ConfigSection(
             name = "Rewards",
             description = "Rewards",
@@ -41,24 +39,6 @@ public interface MageTrainingArenaConfig extends Config {
             closedByDefault = true
     )
     String graveyardSection = "graveyard";
-
-    @ConfigItem(
-            keyName = "GUIDE",
-            name = "GUIDE",
-            description = "GUIDE",
-            position = 0,
-            section = generalSection
-    )
-    default String GUIDE() {
-        return "- Make sure to enable the official RuneLite plugin 'Mage Training Arena'\n" +
-                "- You need to configure the staves to use and have the requirements to equip all of them\n" +
-                "- Your inventory should only contain all configured staves and Law/Cosmic/Nature runes\n" +
-                "- To use T6 enchants you need to have any lava staff configured as your fire staff\n" +
-                "- If set to buy rewards, the rooms are cycled though until the requirements are met and the reward will be stored in your bank\n" +
-                "- If not set to buy rewards, the rooms are cycled as if it would buy the rewards but just keep going the same way afterwards\n" +
-                "- The bot will stop if you are out of runes\n" +
-                "- Rune pouches are not supported yet";
-    }
 
     @ConfigItem(
             keyName = "Buy rewards",
@@ -85,7 +65,7 @@ public interface MageTrainingArenaConfig extends Config {
     @ConfigItem(
             keyName = "Air staff",
             name = "Air staff",
-            description = "Air staff",
+            description = "Air staff is used for teleknetic room",
             position = 3,
             section = stavesSection
     )
@@ -96,7 +76,7 @@ public interface MageTrainingArenaConfig extends Config {
     @ConfigItem(
             keyName = "Water staff",
             name = "Water staff",
-            description = "Water staff",
+            description = "Water staff is used for graveyard room",
             position = 4,
             section = stavesSection
     )

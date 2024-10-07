@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.runecrafting.gotr;
 
+import com.google.common.collect.ImmutableList;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
@@ -36,7 +37,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.randomGaussi
 
 public class GotrScript extends Script {
 
-    public static String version = "1.1.0";
+    public static String version = "1.1.1";
     public static long totalTime = 0;
     public static boolean shouldMineGuardianRemains = true;
     public static final String rewardPointRegex = "Total elemental energy:[^>]+>([\\d,]+).*Total catalytic energy:[^>]+>([\\d,]+).";
@@ -69,6 +70,28 @@ public class GotrScript extends Script {
     String GUARDIAN_ESSENCE = "guardian essence";
 
     boolean initCheck = false;
+    private final List<Integer> runeIds = ImmutableList.of(
+            ItemID.NATURE_RUNE,
+            ItemID.LAW_RUNE,
+            ItemID.BODY_RUNE,
+            ItemID.DUST_RUNE,
+            ItemID.LAVA_RUNE,
+            ItemID.STEAM_RUNE,
+            ItemID.SMOKE_RUNE,
+            ItemID.SOUL_RUNE,
+            ItemID.WATER_RUNE,
+            ItemID.AIR_RUNE,
+            ItemID.EARTH_RUNE,
+            ItemID.FIRE_RUNE,
+            ItemID.MIND_RUNE,
+            ItemID.CHAOS_RUNE,
+            ItemID.DEATH_RUNE,
+            ItemID.BLOOD_RUNE,
+            ItemID.COSMIC_RUNE,
+            ItemID.ASTRAL_RUNE,
+            ItemID.MIST_RUNE,
+            ItemID.MUD_RUNE,
+            ItemID.WRATH_RUNE);
 
     private void initializeGuardianPortalInfo() {
         guardianPortalInfo.put(ObjectID.GUARDIAN_OF_AIR, new GuardianPortalInfo("AIR", 1, ItemID.AIR_RUNE, 26887, 4353, RuneType.ELEMENTAL, CellType.WEAK, QuestState.FINISHED));
@@ -185,6 +208,7 @@ public class GotrScript extends Script {
                 System.out.println("Total time for loop " + totalTime);
 
             } catch (Exception ex) {
+                Microbot.log("Something went wrong in the GOTR Script: " + ex.getMessage() + ". If the script is stuck, please contact us on discord with this log.");
                 ex.printStackTrace();
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
@@ -192,7 +216,7 @@ public class GotrScript extends Script {
     }
 
     private boolean waitingForGameToStart(int timeToStart) {
-        if (getStartTimer() > randomGaussian(Random.random(20, 30), Random.random(1, 10)) || getStartTimer() == -1 || timeToStart > 10) {
+        if (getStartTimer() > randomGaussian(Random.random(20, 30), Random.random(1, 5)) || getStartTimer() == -1 || timeToStart > 10) {
 
             takeUnchargedCells();
             repairPouches();
@@ -227,6 +251,7 @@ public class GotrScript extends Script {
             int interactedObjectId = Rs2GameObject.interact(shieldCellIds);
             if (interactedObjectId != -1) {
                 log("Using cell with id " + interactedObjectId);
+                sleep(randomGaussian(1000, 300));
                 sleepUntil(() -> !Rs2Player.isWalking());
             }
             return true;
@@ -280,24 +305,13 @@ public class GotrScript extends Script {
     }
 
     private boolean depositRunesIntoPool() {
-        if (Rs2Inventory.hasItem("rune pouch")) {
-            if (Rs2Inventory.hasItemAmount("rune", 2) && !isInLargeMine() && !isInHugeMine() && !Rs2Inventory.isFull()) {
-                if (Rs2Player.isWalking()) return true;
-                if (Rs2GameObject.interact(ObjectID.DEPOSIT_POOL)) {
-                    log("Deposit runes into pool...");
-                    sleep(600, 2400);
-                }
-                return true;
+        if (Rs2Inventory.hasItem(runeIds.toArray(Integer[]::new)) && !isInLargeMine() && !isInHugeMine() && !Rs2Inventory.isFull()) {
+            if (Rs2Player.isWalking()) return true;
+            if (Rs2GameObject.interact(ObjectID.DEPOSIT_POOL)) {
+                log("Deposit runes into pool...");
+                sleep(600, 2400);
             }
-        } else {
-            if (Rs2Inventory.hasItem("rune") && !isInLargeMine() && !isInHugeMine() && !Rs2Inventory.isFull()) {
-                if (Rs2Player.isWalking()) return true;
-                if (Rs2GameObject.interact(ObjectID.DEPOSIT_POOL)) {
-                    log("Deposit runes into pool...");
-                    sleep(600, 2400);
-                }
-                return true;
-            }
+            return true;
         }
         return false;
     }
@@ -365,7 +379,7 @@ public class GotrScript extends Script {
                 if (Rs2Inventory.hasItem(GUARDIAN_ESSENCE)) {
                     state = GotrState.CRAFTING_RUNES;
                     Rs2GameObject.interact(rcAltar.getId());
-                    log("Crafting runes...");
+                    log("Crafting runes on altar " + rcAltar.getId());
                     sleep(Random.randomGaussian(Random.random(1000, 1500), 300));
                 } else if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId()) && !Rs2Player.isWalking()) {
                     state = GotrState.LEAVING_ALTAR;
@@ -544,7 +558,7 @@ public class GotrScript extends Script {
     public static int getStartTimer() {
         Widget timerWidget = Rs2Widget.getWidget(48889861);
         if (timerWidget != null) {
-            String timer = Rs2Widget.getWidget(48889861).getText();
+            String timer = timerWidget.getText();
             if (timer == null) return -1;
             // Split the timer string into minutes and seconds
             String[] timeParts = timer.split(":");

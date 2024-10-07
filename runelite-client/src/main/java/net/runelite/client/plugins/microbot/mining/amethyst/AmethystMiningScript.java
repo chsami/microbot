@@ -22,14 +22,14 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
-import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
 public class AmethystMiningScript extends Script {
-    public static String version = "1.1.1";
+    public static String version = "1.1.2";
     public static Status status = Status.IDLE;
     public static WallObject oreVein;
     private static AmethystMiningConfig config;
@@ -174,11 +174,7 @@ public class AmethystMiningScript extends Script {
 
     private WallObject findClosestVein() {
         return Rs2GameObject.getWallObjects().stream()
-                .filter(this::isVein)
-                .sorted(Comparator.comparingInt(this::distanceToPlayer))
-                .filter(Rs2GameObject::hasLineOfSight)
-                .findFirst()
-                .orElse(null);
+                .filter(this::isVein).min((a, b) -> Integer.compare(distanceToPlayer(a), distanceToPlayer(b))).orElse(null);
     }
 
     private boolean isVein(WallObject wallObject) {
@@ -187,7 +183,9 @@ public class AmethystMiningScript extends Script {
     }
 
     private int distanceToPlayer(WallObject wallObject) {
-        return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(wallObject.getWorldLocation());
+        WorldPoint closestWalkableNeighbour = Rs2Tile.getNearestWalkableTile(wallObject.getWorldLocation());
+        if (closestWalkableNeighbour == null) return 999;
+        return Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(closestWalkableNeighbour);
     }
 
     private void interactWithVein(WallObject vein) {
@@ -201,7 +199,7 @@ public class AmethystMiningScript extends Script {
 
     private boolean walkToMiningSpot() {
         WorldPoint miningWorldPoint = miningSpot.getWorldPoint();
-        return Rs2Walker.walkTo(miningWorldPoint, 5);
+        return Rs2Walker.walkTo(miningWorldPoint, 8);
     }
 
     private void moveToMiningSpot() {

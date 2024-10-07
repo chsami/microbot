@@ -152,6 +152,17 @@ public interface PlayerAssistConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "ReachableNpcs",
+            name = "Only attack reachable npcs",
+            description = "Only attack npcs that we can reach with melee",
+            position = 7,
+            section = combatSection
+    )
+    default boolean attackReachableNpcs() {
+        return true;
+    }
+
+    @ConfigItem(
             keyName = "Food",
             name = "Auto eat food",
             description = "Automatically eats food",
@@ -332,6 +343,18 @@ public interface PlayerAssistConfig extends Config {
             section = lootSection
     )
     default boolean toggleOnlyLootMyItems() {
+        return false;
+    }
+
+    //Force loot regardless if we are in combat or not
+    @ConfigItem(
+            keyName = "forceLoot",
+            name = "Force Loot",
+            description = "Force loot regardless if we are in combat or not",
+            position = 100,
+            section = lootSection
+    )
+    default boolean toggleForceLoot() {
         return false;
     }
 

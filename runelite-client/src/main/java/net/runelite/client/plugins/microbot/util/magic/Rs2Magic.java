@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.settings.Rs2SpellBookSettings;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
@@ -20,7 +21,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static net.runelite.api.Varbits.SHADOW_VEIL;
 import static net.runelite.client.plugins.microbot.Microbot.log;
@@ -28,26 +29,25 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2Magic {
     public static boolean canCast(MagicAction magicSpell) {
+        if (!Rs2SpellBookSettings.setAllFiltersOn()) {
+            return false;
+        }
         if (Rs2Tab.getCurrentTab() != InterfaceTab.MAGIC) {
             Rs2Tab.switchToMagicTab();
             sleep(150, 300);
         }
 
         if (magicSpell.getName().toLowerCase().contains("enchant")){
-            if (Rs2Widget.findWidget(magicSpell.getName(), Arrays.stream(Rs2Widget.getWidget(218, 0).getStaticChildren()).collect(Collectors.toList())) == null) {
-                if (Rs2Widget.isHidden(14286860)) return false;
-                Rs2Widget.clickWidget(14286860);
-                sleep(150, 300);
+            if (Rs2Widget.clickWidget("Jewellery Enchantments", Optional.of(218), 3, true)) {
+                sleepUntil(() -> Rs2Widget.hasWidgetText("Jewellery Enchantments", 218, 3, true), 2000);
             }
-        } else if (Rs2Widget.isWidgetVisible(218, 4) && Arrays.stream(Rs2Widget.getWidget(218, 4).getActions()).anyMatch(x -> x.equalsIgnoreCase("back"))){
-            Rs2Widget.clickWidget(218, 4);
-            sleep(150, 300);
+        } else if (!Rs2Widget.isHidden(14286852)) {
+            // back button inside the enchant jewellery interface has no text, thats why we use hardcoded id
+            Rs2Widget.clickWidget(14286852);
         }
 
-        Widget widget = Arrays.stream(Rs2Widget.getWidget(14286851).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
-        if (widget == null) {
-            widget = Arrays.stream(Rs2Widget.getWidget(14286851).getStaticChildren()).filter(x -> x.getId() == magicSpell.getWidgetId()).findFirst().orElse(null);
-        }
+        Widget widget = Arrays.stream(Rs2Widget.getWidget(218, 3).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
+
         return widget != null;
     }
 
@@ -257,9 +257,9 @@ public class Rs2Magic {
         if (!didCast) return false;
         boolean result = sleepUntilTrue(() -> Rs2Widget.getWidget(chooseCharacterWidgetId) != null && !Rs2Widget.isHidden(chooseCharacterWidgetId), 100, 5000);
         if (!result) return false;
-        boolean clickResult = Rs2Widget.clickWidget(npcName, 75, 0, false);
+        boolean clickResult = Rs2Widget.clickWidget(npcName, Optional.of(75), 0, false);
         if (!clickResult) return false;
-        sleepUntil(() -> !Rs2Player.isAnimating());
+        Rs2Player.waitForAnimation();
         return true;
     }
 
@@ -271,7 +271,7 @@ public class Rs2Magic {
             sleep(Random.randomGaussian(Random.random(1000, 2200), 300));
             Rs2Widget.sleepUntilHasWidget("Can you repair my pouches?");
             sleep(Random.randomGaussian(Random.random(600, 1200), 300));
-            Rs2Widget.clickWidget("Can you repair my pouches?", 162, 0, true);
+            Rs2Widget.clickWidget("Can you repair my pouches?", Optional.of(162), 0, true);
             sleep(Random.randomGaussian(Random.random(1000, 2200), 300));
             Rs2Dialogue.clickContinue();
             sleep(Random.randomGaussian(1500, 300));

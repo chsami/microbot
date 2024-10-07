@@ -1,21 +1,34 @@
 package net.runelite.client.plugins.microbot.util.widget;
 
 import net.runelite.api.MenuAction;
+import net.runelite.api.annotations.Component;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 
 public class Rs2Widget {
 
-    public static boolean clickWidget(String text, int widgetId, int childId, boolean exact) {
+    public static boolean sleepUntilHasWidgetText(String text, int widgetId, int childId, boolean exact, int sleep) {
+        return sleepUntilTrue(() -> hasWidgetText(text, widgetId, childId, exact), 300, sleep);
+    }
+
+    public static boolean sleepUntilHasNotWidgetText(String text, int widgetId, int childId, boolean exact, int sleep) {
+        return sleepUntilTrue(() -> !hasWidgetText(text, widgetId, childId, exact), 300, sleep);
+    }
+
+
+    public static boolean hasWidgetText(String text, int widgetId, int childId, boolean exact) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget rootWidget = getWidget(widgetId, childId);
             Widget widget = null;
@@ -28,16 +41,34 @@ public class Rs2Widget {
             if (rootWidget.getStaticChildren().length > 0)
                 widget = findWidget(text, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
 
-            if (widget != null) {
-                Microbot.getMouse().click(widget.getBounds());
-                return true;
-            }
-            return false;
+            return widget != null;
         });
     }
 
-    public static boolean clickWidget(String text) {
-        Widget widget = findWidget(text, null);
+
+    public static boolean clickWidget(String text, Optional<Integer> widgetId, int childId, boolean exact) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+
+            Widget widget;
+            if (!widgetId.isPresent()) {
+                widget = findWidget(text, null, exact);
+            } else {
+                Widget rootWidget = getWidget(widgetId.get(), childId);
+                List<Widget> rootWidgets = new ArrayList<>();
+                rootWidgets.add(rootWidget);
+                widget  = findWidget(text, rootWidgets, true);
+            }
+
+            if (widget != null) {
+                clickWidget(widget);
+            }
+
+            return widget != null;
+
+        });
+    }
+
+    public static boolean clickWidget(Widget widget) {
         if (widget != null) {
             Microbot.getMouse().click(widget.getBounds());
             return true;
@@ -45,50 +76,41 @@ public class Rs2Widget {
         return false;
     }
 
+    public static boolean clickWidget(String text) {
+        return clickWidget(text, Optional.empty(), 0, false);
+    }
+
     public static boolean clickWidget(String text, boolean exact) {
-        Widget widget = findWidget(text, null, exact);
-        if (widget != null) {
-            Microbot.getMouse().click(widget.getBounds());
-            return true;
-        }
-        return false;
+        return clickWidget(text, Optional.empty(), 0, exact);
     }
 
     public static boolean clickWidget(int parentId, int childId) {
         Widget widget = getWidget(parentId, childId);
-        if (widget != null) {
-            Microbot.getMouse().click(widget.getBounds());
-            return true;
-        }
-        return false;
+        return clickWidget(widget);
     }
 
-    public static boolean clickWidget(WidgetInfo widgetInfo) {
-        Widget widget = getWidget(widgetInfo);
-        if (widget != null) {
-            Microbot.getMouse().click(widget.getBounds());
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean isWidgetVisible(WidgetInfo wiget) {
-        return !Microbot.getClientThread().runOnClientThread(() -> getWidget(wiget) == null || getWidget(wiget).isHidden());
+    public static boolean isWidgetVisible(@Component int id) {
+        Widget widget = getWidget(id);
+        return !Microbot.getClientThread().runOnClientThread(() -> widget == null || widget.isHidden());
     }
 
     public static boolean isWidgetVisible(int widgetId, int childId) {
         return !Microbot.getClientThread().runOnClientThread(() -> getWidget(widgetId, childId) == null || getWidget(widgetId, childId).isHidden());
     }
 
-    public static Widget getWidget(WidgetInfo wiget) {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(wiget));
-    }
-
-    public static Widget getWidget(int id) {
+    public static Widget getWidget(@Component int id) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id));
     }
 
-    public static boolean isHidden(int id) {
+    public static boolean isHidden(int parentId, int childId) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget widget = Microbot.getClient().getWidget(parentId, childId);
+            if (widget == null) return true;
+            return widget.isHidden();
+        });
+    }
+
+    public static boolean isHidden(@Component int id) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget widget = Microbot.getClient().getWidget(id);
             if (widget == null) return true;
@@ -101,48 +123,16 @@ public class Rs2Widget {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id, child));
     }
 
-    public static boolean getWidgetChildText(int id, String matchingText) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget widget = Microbot.getClient().getWidget(id);
-            if (widget == null) return false;
-            if (widget.getChildren().length == 0) return false;
-            return Arrays.stream(widget.getChildren()).anyMatch(x -> x.getText().contains(matchingText));
-        });
-    }
-
-    public static Widget getWidgetChildName(int id, String matchingText) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget widget = Microbot.getClient().getWidget(id);
-            if (widget == null) return null;
-            if (widget.getChildren().length == 0) return null;
-            return Arrays.stream(widget.getChildren()).filter(x -> x.getName().contains(matchingText)).findFirst().orElse(null);
-        });
-    }
-
-    public static Widget getWidgetChildtxt(int id, String matchingText) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget widget = Microbot.getClient().getWidget(id);
-            if (widget == null) return null;
-            if (widget.getChildren().length == 0) return null;
-            return Arrays.stream(widget.getChildren()).filter(x -> x.getText().contains(matchingText)).findFirst().orElse(null);
-        });
-    }
-
-    public static Widget getWidgetChildSprite(int id, int matchingSpriteId) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget widget = Microbot.getClient().getWidget(id);
-            if (widget == null) return null;
-            if (widget.getChildren().length == 0) return null;
-            return Arrays.stream(widget.getChildren()).filter(x -> x.getSpriteId() == (matchingSpriteId)).findFirst().orElse(null);
-        });
-    }
-
     public static int getChildWidgetSpriteID(int id, int childId) {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId).getSpriteId());
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id, childId).getSpriteId());
     }
 
     public static String getChildWidgetText(int id, int childId) {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId).getText());
+        Widget widget = getWidget(id, childId);
+        if (widget != null) {
+            return widget.getText();
+        }
+        return "";
     }
 
     public static boolean clickWidget(int id) {
@@ -159,21 +149,8 @@ public class Rs2Widget {
         return true;
     }
 
-    public static boolean childWidgetExits(int id, int childId) {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id).getChild(childId) != null);
-    }
-
-    public static void changeWidgetText(String textToSearch, String newText) {
-        do {
-            try {
-                Widget widget = findWidget(textToSearch, null);
-                if (widget == null) break;
-                Microbot.getClientThread().runOnClientThread(() -> widget.setText(newText));
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-
-        } while (true);
+    public static Widget findWidget(String text, List<Widget> children) {
+        return findWidget(text, children, false);
     }
 
     public static Widget findWidget(String text, List<Widget> children, boolean exact) {
@@ -183,7 +160,9 @@ public class Rs2Widget {
                 List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
                 for (Widget rootWidget : rootWidgets) {
                     if (exact) {
-                        if (rootWidget.getText().toLowerCase().contains(text.toLowerCase()) || rootWidget.getName().toLowerCase().contains(">" + text.toLowerCase() + "<")) {
+                        String cleanText = rootWidget.getText() != null ? rootWidget.getText().replaceAll("<col=[^>]+>|</col>", "") : "";
+                        String cleanName = rootWidget.getName() != null ? rootWidget.getName().replaceAll("<col=[^>]+>|</col>", "") : "";
+                        if (cleanText.equalsIgnoreCase(text) || cleanName.equalsIgnoreCase(text)) {
                             return rootWidget;
                         }
                     } else {
@@ -214,8 +193,8 @@ public class Rs2Widget {
         return findWidget(text, null, false);
     }
 
-    public static Widget findWidgetExact(String text) {
-        return findWidget(text, null, true);
+    public static Widget findWidget(String text, boolean exact) {
+        return findWidget(text, null, exact);
     }
 
     public static boolean hasWidget(String text) {
@@ -227,16 +206,14 @@ public class Rs2Widget {
         return findWidget(text, null, false) != null;
     }
 
-    public static Widget findWidget(String text, List<Widget> children) {
-        return findWidget(text, children, false);
-    }
-
 
     public static Widget searchChildren(String text, Widget child, boolean exact) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget found = null;
             if (exact) {
-                if (child.getText().toLowerCase().contains(text.toLowerCase()) || child.getName().toLowerCase().contains(">" + text.toLowerCase() + "<")) {
+                String cleanText = child.getText() != null ? child.getText().replaceAll("<col=[^>]+>|</col>", "") : "";
+                String cleanName = child.getName() != null ? child.getName().replaceAll("<col=[^>]+>|</col>", "") : "";
+                if (cleanText.equalsIgnoreCase(text) || cleanName.equalsIgnoreCase(text)) {
                     return child;
                 }
             } else {
@@ -270,10 +247,6 @@ public class Rs2Widget {
             }
             return found;
         });
-    }
-
-    public static Widget searchChildren(String text, Widget child) {
-        return searchChildren(text, child, false);
     }
 
     public static Widget findWidget(int spriteId, List<Widget> children) {
@@ -342,40 +315,15 @@ public class Rs2Widget {
         clickWidgetFast(widget, -1, identifier);
     }
 
-    public static void clickWidgetFast(int packetId, MenuAction menuAction) {
-        Widget widget = getWidget(packetId);
-        clickWidgetFast(widget, menuAction);
-    }
-
-    public static void clickWidgetFast(int packetId) {
-        Widget widget = getWidget(packetId, 1);
-        clickWidgetFast(widget);
-    }
-
-    public static void clickWidgetFast(Widget widget, MenuAction menuAction) {
-        int param1 = widget.getId();
-        String option = "Select";
-        String target = "";
-        Microbot.doInvoke(new NewMenuEntry(-1, param1, menuAction.getId(), 0, widget.getItemId(), target), widget.getBounds());
-        // Rs2Reflection.invokeMenu(-1, param1, menuAction.getId(), 0, widget.getItemId(), option, target, -1, -1);
-    }
-
     public static void clickWidgetFast(Widget widget, int param0, int identifier) {
         int param1 = widget.getId();
         String option = "Select";
         String target = "";
         MenuAction menuAction = MenuAction.CC_OP;
         Microbot.doInvoke(new NewMenuEntry(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), target), widget.getBounds());
-        // Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
     }
 
-    public static void clickWidgetFast(Widget widget, int param0, int identifier, MenuAction menuAction) {
-        int param1 = widget.getId();
-        String option = "Select";
-        String target = "";
-        Microbot.doInvoke(new NewMenuEntry(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), target), widget.getBounds());
-        // Rs2Reflection.invokeMenu(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), option, target, -1, -1);
-    }
+
 
     public static void clickWidgetFast(Widget widget, int param0) {
         clickWidgetFast(widget, param0, 1);
@@ -407,6 +355,6 @@ public class Rs2Widget {
 
     // check if deposit box widget is open
     public static boolean isDepositBoxWidgetOpen() {
-        return isWidgetVisible(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER);
+        return isWidgetVisible(ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER);
     }
 }

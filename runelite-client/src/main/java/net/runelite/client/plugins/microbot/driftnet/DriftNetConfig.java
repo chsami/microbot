@@ -5,6 +5,7 @@ import net.runelite.client.config.*;
 import java.awt.*;
 
 @ConfigGroup(DriftNetPlugin.CONFIG_GROUP)
+@ConfigInformation("Start this script at the driftet fishing area. <br /> Make sure to have driftnet in your inventory or driftnet stored with anetta.")
 public interface DriftNetConfig extends Config {
 
         @ConfigItem(

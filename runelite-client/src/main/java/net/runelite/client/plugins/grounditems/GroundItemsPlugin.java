@@ -45,6 +45,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.events.ProfileChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.input.MouseManager;
@@ -53,6 +54,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.grounditems.config.HighlightTier;
 import net.runelite.client.plugins.grounditems.config.ItemHighlightMode;
 import net.runelite.client.plugins.grounditems.config.MenuHighlightMode;
+import net.runelite.client.plugins.grounditems.config.OwnershipFilterMode;
 import net.runelite.client.ui.components.colorpicker.ColorPickerManager;
 import net.runelite.client.ui.components.colorpicker.RuneliteColorPicker;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -77,6 +79,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static net.runelite.api.TileItem.*;
 import static net.runelite.client.plugins.grounditems.config.MenuHighlightMode.*;
 
 @PluginDescriptor(
@@ -182,6 +185,7 @@ public class GroundItemsPlugin extends Plugin
 		overlayManager.add(overlay);
 		mouseManager.registerMouseListener(mouseAdapter);
 		keyManager.registerKeyListener(hotkeyListener);
+		migrate();
 		executor.execute(this::reset);
 	}
 
@@ -207,6 +211,27 @@ public class GroundItemsPlugin extends Plugin
 		if (event.getGroup().equals(GroundItemsConfig.GROUP))
 		{
 			executor.execute(this::reset);
+		}
+	}
+
+	@Subscribe
+	public void onProfileChanged(ProfileChanged profileChanged)
+	{
+		migrate();
+	}
+
+	private void migrate()
+	{
+		//This was the old "Only show own items" config, which is now obsolete and replaced by ownership filter
+		Boolean onlyShowOwnItems = configManager.getConfiguration(GroundItemsConfig.GROUP, "onlyShowLoot", Boolean.class);
+		if (onlyShowOwnItems != null)
+		{
+			if (onlyShowOwnItems)
+			{
+				//The old behavior maps to 'Drops' in the new dropdown
+				configManager.setConfiguration(GroundItemsConfig.GROUP, GroundItemsConfig.OWNERSHIP_FILTER_MODE, OwnershipFilterMode.DROPS);
+			}
+			configManager.unsetConfiguration(GroundItemsConfig.GROUP, "onlyShowLoot");
 		}
 	}
 
@@ -239,7 +264,7 @@ public class GroundItemsPlugin extends Plugin
 			collectedGroundItems.put(tile.getWorldLocation(), item.getId(), groundItem);
 		}
 
-		if (groundItem.isMine() || !config.onlyShowOwnItems())
+		if (shouldDisplayItem(config.ownershipFilterMode(), groundItem.getOwnership(), client.getVarbitValue(Varbits.ACCOUNT_TYPE)))
 		{
 			notifyHighlightedItem(groundItem);
 		}
@@ -368,16 +393,6 @@ public class GroundItemsPlugin extends Plugin
 		final int alchPrice = itemComposition.getHaPrice();
 		final int despawnTime = item.getDespawnTime() - client.getTickCount();
 		final int visibleTime = item.getVisibleTime() - client.getTickCount();
-		int ownership = item.getOwnership();
-		final int accountType = client.getVarbitValue(Varbits.ACCOUNT_TYPE);
-		boolean isGim = accountType >= 4 && accountType <= 6; // ~is_group_iron
-
-		// from ~script7240
-		if (ownership == TileItem.OWNERSHIP_GROUP && !isGim)
-		{
-			// non-gims see loot from other people as "group" loop since they are both group -1.
-			ownership = TileItem.OWNERSHIP_OTHER;
-		}
 
 		final GroundItem groundItem = GroundItem.builder()
 			.id(itemId)
@@ -388,7 +403,7 @@ public class GroundItemsPlugin extends Plugin
 			.haPrice(alchPrice)
 			.height(tile.getItemLayer().getHeight())
 			.tradeable(itemComposition.isTradeable())
-			.ownership(ownership)
+			.ownership(item.getOwnership())
 			.isPrivate(item.isPrivate())
 			.spawnTime(Instant.now())
 			.stackable(itemComposition.isStackable())
@@ -728,9 +743,11 @@ public class GroundItemsPlugin extends Plugin
 		int highestPrice = -1;
 		GroundItem highestItem = null;
 		Collection<GroundItem> groundItems = collectedGroundItems.row(worldPoint).values();
+		final OwnershipFilterMode ownershipFilterMode = config.ownershipFilterMode();
+		final int accountType = client.getVarbitValue(Varbits.ACCOUNT_TYPE);
 		for (GroundItem groundItem : groundItems)
 		{
-			if ((config.onlyShowOwnItems() && !groundItem.isMine()))
+			if (!shouldDisplayItem(ownershipFilterMode, groundItem.getOwnership(), accountType))
 			{
 				continue;
 			}
@@ -834,5 +851,23 @@ public class GroundItemsPlugin extends Plugin
 	void unsetItemColor(int itemId)
 	{
 		configManager.unsetConfiguration(GroundItemsConfig.GROUP, HIGHLIGHT_COLOR_PREFIX + itemId);
+	}
+
+	/*
+	 * All      -> none | self | other | group
+	 * Drops    -> self | group
+	 * Takeable -> none | self | group | (if a main then other)
+	 */
+	boolean shouldDisplayItem(OwnershipFilterMode filterMode, int ownership, int accountType)
+	{
+		switch (filterMode)
+		{
+			case DROPS:
+				return ownership == OWNERSHIP_SELF || ownership == OWNERSHIP_GROUP;
+			case TAKEABLE:
+				return ownership != OWNERSHIP_OTHER || accountType == 0; // Mains can always take items
+			default:
+				return true;
+		}
 	}
 }

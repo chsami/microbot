@@ -239,6 +239,46 @@ public interface QoLConfig extends Config {
         return SpecialAttackWeaponEnum.DRAGON_DAGGER;
     }
 
+    // boolean to enable auto run
+    @ConfigItem(
+            keyName = "autoRun",
+            name = "Auto Run",
+            description = "Auto Run",
+            position = 7,
+            section = upkeepSection
+    )
+    default boolean autoRun() {
+        return true;
+    }
+
+    // boolean to auto use stamina potion
+    @ConfigItem(
+            keyName = "autoStamina",
+            name = "Auto Stamina",
+            description = "Auto Stamina",
+            position = 8,
+            section = upkeepSection
+    )
+    default boolean autoStamina() {
+        return true;
+    }
+
+    // run energy threshold to use stamina potion
+    @Range(
+            min = 1,
+            max = 99
+    )
+    @ConfigItem(
+            keyName = "staminaThreshold",
+            name = "Stamina Threshold",
+            description = "Stamina Threshold",
+            position = 9,
+            section = upkeepSection
+    )
+    default int staminaThreshold() {
+        return 50;
+    }
+
 
     // boolean to display Inventory setups as a menu option in the bank
     @ConfigItem(

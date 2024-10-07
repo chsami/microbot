@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 /**
  * This class represents a travel point between two WorldPoints.
@@ -453,22 +454,20 @@ public class Transport {
         System.out.println("Destination: " + destination);
 
         // Check if the widget is already visible
-        if (!Rs2Widget.isHidden(gliderMenu)) {
-            System.out.println("Widget is already visible. Skipping interaction.");
-            return true;
+        if (Rs2Widget.isHidden(gliderMenu)) {
+            // Find the glider NPC
+            NPC gnome = Rs2Npc.getNpc(npcName);  // Use the NPC name to find the NPC
+            if (gnome == null) {
+                System.out.println("Gnome not found.");
+                return false;
+            }
+
+            // Interact with the gnome glider NPC
+            Rs2Npc.interact(gnome, action);
+            sleepUntil(() -> !Rs2Widget.isHidden(gliderMenu));
         }
 
-        // Find the glider NPC
-        NPC gnome = Rs2Npc.getNpc(npcName);  // Use the NPC name to find the NPC
-        if (gnome == null) {
-            System.out.println("Gnome not found.");
-            return false;
-        }
 
-        // Interact with the gnome glider NPC
-        Rs2Npc.interact(gnome, action);
-
-        sleep(1200,2400);
 
         // Wait for the widget to become visible
         boolean widgetVisible = !Rs2Widget.isHidden(gliderMenu);

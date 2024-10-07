@@ -4,7 +4,6 @@ import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.Pouch;
@@ -1871,8 +1870,11 @@ public class Rs2Inventory {
     /**
      * @param id item id
      */
-    public static void wear(int id) {
+    public static boolean wear(int id) {
+        if (!Rs2Inventory.hasItem(id)) return false;
+        if (Rs2Equipment.isWearing(id)) return false;
         invokeMenu(get(id), "wear");
+        return true;
     }
 
     /**
@@ -2067,8 +2069,8 @@ public class Rs2Inventory {
         MenuAction menuAction = MenuAction.CC_OP;
         Widget[] inventoryWidgets;
         param0 = rs2Item.slot;
-        boolean isDepositBoxOpen = !Microbot.getClientThread().runOnClientThread(() -> Rs2Widget.getWidget(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER) == null
-                || Rs2Widget.getWidget(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER).isHidden());
+        boolean isDepositBoxOpen = !Microbot.getClientThread().runOnClientThread(() -> Rs2Widget.getWidget(ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER) == null
+                || Rs2Widget.getWidget(ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER).isHidden());
         if (Rs2Bank.isOpen()) {
             param1 = ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
             inventoryWidgets = Rs2Widget.getWidget(ComponentID.BANK_INVENTORY_ITEM_CONTAINER).getChildren();
@@ -2095,8 +2097,6 @@ public class Rs2Inventory {
                     rs2Item.getInventoryActions();
 
             identifier = indexOfIgnoreCase(stripColTags(actions), action) + 1;
-
-            System.out.println(identifier);
         }
 
 
@@ -2163,6 +2163,16 @@ public class Rs2Inventory {
             System.out.println(ex.getMessage());
             return false;
         }
+    }
+
+    public static boolean waitForInventoryChanges(int time) {
+        final int currentInventorySize = size();
+        final int currentInventoryStackableSize = stackableSize();
+        sleepUntil(() ->  {
+            sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), time);
+            return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
+        });
+        return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
     }
 
     public static boolean waitForInventoryChanges(Runnable actionWhileWaiting) {
@@ -2276,11 +2286,11 @@ public class Rs2Inventory {
     }
 
     public static boolean allPouchesFull() {
-        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> x.hasRequiredRunecraftingLevel() && x.getRemaining() == 0);
+        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> (x.hasRequiredRunecraftingLevel() && x.getRemaining() == 0) || !x.hasRequiredRunecraftingLevel());
     }
 
     public static boolean allPouchesEmpty() {
-        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> x.hasRequiredRunecraftingLevel() && x.getHoldAmount() == 0);
+        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> (x.hasRequiredRunecraftingLevel() && x.getHoldAmount() == 0) || !x.hasRequiredRunecraftingLevel());
     }
 
     public static boolean hasDegradedPouch() {

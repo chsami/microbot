@@ -26,7 +26,7 @@ enum State {
 
 public class AutoFishingScript extends Script {
 
-    public static String version = "1.4.0";
+    public static String version = "1.4.1";
     State state;
 
     public boolean run(AutoFishConfig config) {
@@ -93,6 +93,10 @@ public class AutoFishingScript extends Script {
             case KARAMBWANJI:
             case SHRIMP:
                 return Rs2Inventory.hasItem("small fishing net");
+            case SARDINE:
+                return Rs2Inventory.hasItem("fishing rod") && Rs2Inventory.hasItem("bait");
+            case MACKEREL:
+                return Rs2Inventory.hasItem("big fishing net");
             case TROUT:
                 return Rs2Inventory.hasItem("fly fishing rod") && Rs2Inventory.hasItem("feather");
             case TUNA:
