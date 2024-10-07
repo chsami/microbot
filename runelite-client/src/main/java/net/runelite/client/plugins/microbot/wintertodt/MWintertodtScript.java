@@ -127,7 +127,7 @@ public class MWintertodtScript extends Script {
                 boolean playerIsLowHealth = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) <= config.hpTreshhold();
                 boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
                         && playerIsLowHealth || !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
-                        && !isWintertodtAlive || Rs2Inventory.hasItem("supply crate");
+                        && !isWintertodtAlive || Rs2Inventory.hasItem(SUPPLY_CRATE);
                 Widget wintertodtHealthbar = Rs2Widget.getWidget(25952276);
 
                 if (wintertodtHealthbar != null && isWintertodtAlive) {
