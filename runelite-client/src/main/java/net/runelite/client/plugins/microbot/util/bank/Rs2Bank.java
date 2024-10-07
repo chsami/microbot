@@ -898,12 +898,7 @@ public class Rs2Bank {
             if (Microbot.getClient().isWidgetSelected())
                 Microbot.getMouse().click();
             if (isOpen()) return true;
-            boolean action = false;
-            BankLocation bankLocation = getNearestBank();
-            if (bankLocation.getWorldPoint().distanceTo(Rs2Player.getWorldLocation()) > 12) {
-                walkToBank();
-                return false;
-            }
+            boolean action;
             NPC npc = Rs2Npc.getBankerNPC();
             if (npc == null) {
                 GameObject bank = Rs2GameObject.findBank();
