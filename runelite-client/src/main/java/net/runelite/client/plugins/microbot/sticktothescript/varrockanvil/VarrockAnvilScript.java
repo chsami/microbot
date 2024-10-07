@@ -12,11 +12,9 @@ import net.runelite.client.plugins.microbot.sticktothescript.common.Functions;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -29,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 enum State {
     SMITHING,
     BANKING,
+    WALK_TO_ANVIL,
+    WALK_TO_BANK,
 }
 
 public class VarrockAnvilScript extends Script {
@@ -38,10 +38,8 @@ public class VarrockAnvilScript extends Script {
     public String debug = "";
     private boolean expectingXPDrop = false;
 
-    private static List<WorldPoint> AnvilSpots = Arrays.asList(
-            new WorldPoint(3188, 3426, 0),
-            new WorldPoint(3188, 3424, 0)
-    );
+    private static WorldPoint AnvilLocation = new WorldPoint(3188, 3426, 0);
+    private static WorldPoint BankLocation = new WorldPoint(3185, 3438, 0);
     private static List<Integer> AnvilIDs = Arrays.asList(2097);
     private static int AnvilMakeVarbitPlayer = 2224;
     private static int AnvilContainerWidgetID = 312;
@@ -51,6 +49,16 @@ public class VarrockAnvilScript extends Script {
         AnvilItem anvilItem = config.sAnvilItem();
 
         Microbot.enableAutoRunOn = false;
+
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applySmithingSetup();
+        Rs2AntibanSettings.dynamicActivity = true;
+        Rs2AntibanSettings.dynamicIntensity = true;
+        Rs2AntibanSettings.actionCooldownChance = 0.1;
+        Rs2AntibanSettings.microBreakChance = 0.01;
+        Rs2AntibanSettings.microBreakDurationLow = 0;
+        Rs2AntibanSettings.microBreakDurationHigh = 3;
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run() || !Microbot.isLoggedIn()) {
                 debug("Not running");
@@ -88,6 +96,7 @@ public class VarrockAnvilScript extends Script {
                     debug("Smithing in progress");
                     Rs2Antiban.actionCooldown();
                     Rs2Antiban.takeMicroBreakByChance();
+                    sleep(256, 789);
                     return;
                 }
 
@@ -117,7 +126,7 @@ public class VarrockAnvilScript extends Script {
                     }
 
                     debug("Walking to anvil");
-                    Rs2Walker.walkTo(AnvilSpots.get(0), 2);
+                    Rs2Walker.walkTo(AnvilLocation, 8);
                     sleep(180, 540);
                 }
 
@@ -128,12 +137,41 @@ public class VarrockAnvilScript extends Script {
                 bank(barType);
                 break;
 
+           case WALK_TO_BANK:
+               if (Rs2Player.isMoving()) {
+                   return;
+               }
+
+               if (!Rs2Player.isRunEnabled()) {
+                   debug("Enabled run for bank");
+                   Rs2Player.toggleRunEnergy(true);
+               }
+
+               debug("Walking to bank");
+               Rs2Walker.walkTo(BankLocation, 10);
+               break;
+
+           case WALK_TO_ANVIL:
+               if (Rs2Player.isMoving()) {
+                   return;
+               }
+
+               if (!Rs2Player.isRunEnabled()) {
+                   debug("Enabled run for fishing spot");
+                   Rs2Player.toggleRunEnergy(true);
+               }
+
+               debug("Walking to anvil");
+               Rs2Walker.walkTo(AnvilLocation, 10);
+               break;
+
             default:
                 break;
            }
 
             Rs2Antiban.actionCooldown();
             Rs2Antiban.takeMicroBreakByChance();
+            sleep(256, 789);
             return;
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
@@ -144,11 +182,21 @@ public class VarrockAnvilScript extends Script {
         debug("Determine state");
 
         if (Rs2Inventory.hasItemAmount(barType.toString(), anvilItem.getRequiredBars()) && Rs2Inventory.hasItem(ItemID.HAMMER)) {
-            debug("Smithing");
-            state = State.SMITHING;
+            if (!Functions.closeToLocation(AnvilLocation)) {
+                state = State.WALK_TO_ANVIL;
+                debug("Walking to anvil");
+            } else {
+                state = State.SMITHING;
+                debug("Smithing");
+            }
         } else {
-            debug("Banking for supplies");
-            state = State.BANKING;
+            if (!Functions.closeToLocation(BankLocation)) {
+                state = State.WALK_TO_BANK;
+                debug("Walking to bank");
+            } else {
+                debug("Banking for supplies");
+                state = State.BANKING;
+            }
         }
     }
 
@@ -160,6 +208,20 @@ public class VarrockAnvilScript extends Script {
             Rs2Bank.depositAllExcept(ItemID.HAMMER, barType.getId());
             debug("Items deposited");
             sleep(180, 540);
+
+            if (!Rs2Inventory.hasItem("Hammer")) {
+                Rs2Bank.withdrawOne("Hammer");
+                sleepUntil(() -> Rs2Inventory.hasItem("Hammer"), 3500);
+
+                // Exit if we did not end up finding it.
+                if (!Rs2Inventory.hasItem("Hammer")) {
+                    debug("Could not find hammer in bank.");
+                    Microbot.showMessage("Could not find hammer in bank.");
+                    shutdown();
+                }
+                sleep(180, 540);
+
+            }
 
             Rs2Bank.withdrawAll(barType.toString());
             sleepUntil(() -> Rs2Inventory.hasItem(barType.toString()), 3500);
@@ -183,5 +245,6 @@ public class VarrockAnvilScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
     }
 }

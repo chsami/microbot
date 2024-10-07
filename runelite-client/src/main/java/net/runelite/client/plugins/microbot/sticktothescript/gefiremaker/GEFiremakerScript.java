@@ -51,6 +51,16 @@ public class GEFiremakerScript extends Script {
         GEWorkLocation desiredLocation = config.sLocation();
 
         Microbot.enableAutoRunOn = false;
+
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyFiremakingSetup();
+        Rs2AntibanSettings.dynamicActivity = true;
+        Rs2AntibanSettings.dynamicIntensity = true;
+        Rs2AntibanSettings.actionCooldownChance = 0.1;
+        Rs2AntibanSettings.microBreakChance = 0.01;
+        Rs2AntibanSettings.microBreakDurationLow = 0;
+        Rs2AntibanSettings.microBreakDurationHigh = 3;
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!super.run() || !Microbot.isLoggedIn()) {
                 debug("Not running");
@@ -83,10 +93,11 @@ public class GEFiremakerScript extends Script {
                     return;
                 }
 
-                if (expectingXPDrop && Rs2Player.isAnimating(3500)) {
+                if (expectingXPDrop && Rs2Player.waitForXpDrop(Skill.FIREMAKING, 4500)) {
                     debug("Firemaking in progress");
                     Rs2Antiban.actionCooldown();
                     Rs2Antiban.takeMicroBreakByChance();
+                    sleep(256, 789);
                     return;
                 }
 
@@ -156,6 +167,7 @@ public class GEFiremakerScript extends Script {
 
             Rs2Antiban.actionCooldown();
             Rs2Antiban.takeMicroBreakByChance();
+            sleep(256, 789);
             return;
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
@@ -264,5 +276,6 @@ public class GEFiremakerScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
+        Rs2Antiban.resetAntibanSettings();
     }
 }
