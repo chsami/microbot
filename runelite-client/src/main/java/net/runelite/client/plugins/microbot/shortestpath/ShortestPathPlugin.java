@@ -318,7 +318,6 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
 
         if (!startPointSet && !isNearPath(Rs2Player.getWorldLocation())) {
             if (config.cancelInstead()) {
-                setTarget(null);
                 return;
             }
             restartPathfinding(Rs2Player.getWorldLocation(), pathfinder.getTarget());
