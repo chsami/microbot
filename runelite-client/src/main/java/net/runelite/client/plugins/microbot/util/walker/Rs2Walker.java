@@ -150,8 +150,6 @@ public class Rs2Walker {
                         /**
                          * CHECK DOORS
                          */
-                        Microbot.status = "Checking for doors...";
-
                         doorOrTransportResult = handleDoors(path, i);
                         if (doorOrTransportResult) {
                             break;

@@ -630,26 +630,23 @@ public class Rs2GameObject {
     }
 
     public static TileObject findObject(List<Integer> ids) {
-        int distance = 17; // render distance seems to be around 17
         for (int id : ids) {
             TileObject object = findObjectById(id);
             if (object == null) continue;
-            if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance) {
-                if (Rs2Player.getWorldLocation().getPlane() != object.getPlane()) continue;
-                if (object instanceof GroundObject && !Rs2Walker.canReach(object.getWorldLocation()))
+            if (Rs2Player.getWorldLocation().getPlane() != object.getPlane()) continue;
+            if (object instanceof GroundObject && !Rs2Walker.canReach(object.getWorldLocation()))
+                continue;
+
+            //exceptions if the pathsize needs to be bigger
+            if (object.getId() == ObjectID.MARKET_STALL_14936) {
+                if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY(), 4, 4))
                     continue;
-
-                //exceptions if the pathsize needs to be bigger
-                if (object.getId() == ObjectID.MARKET_STALL_14936) {
-                    if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY(), 4, 4))
-                        continue;
-                } else {
-                    if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY()))
-                        continue;
-                }
-
-                return object;
+            } else {
+                if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY()))
+                    continue;
             }
+
+            return object;
         }
         return null;
     }
@@ -786,7 +783,6 @@ public class Rs2GameObject {
      * TODO remove this method, maybe use find or get(int id)
      *
      * @param id
-     *
      * @return
      */
     public static List<GameObject> getGameObjects(int id) {
@@ -1242,7 +1238,6 @@ public class Rs2GameObject {
      * Hovers over the given game object using the natural mouse.
      *
      * @param object The game object to hover over.
-     *
      * @return True if successfully hovered, otherwise false.
      */
     public static boolean hoverOverObject(TileObject object) {

@@ -41,7 +41,6 @@ public abstract class Script implements IScript {
 
     public void sleep(int time) {
         try {
-            Microbot.log("Sleeping for " + time);
             Thread.sleep(time);
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());

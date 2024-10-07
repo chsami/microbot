@@ -84,7 +84,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -115,7 +115,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -146,7 +146,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -178,7 +178,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -209,7 +209,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -240,7 +240,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -271,7 +271,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -302,7 +302,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -337,7 +337,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -368,7 +368,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 1;
@@ -399,7 +399,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -430,7 +430,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -461,7 +461,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -492,7 +492,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -523,7 +523,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;
@@ -554,7 +554,7 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.dynamicIntensity = false;
         Rs2AntibanSettings.dynamicActivity = false;
         Rs2AntibanSettings.devDebug = false;
-        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.takeMicroBreaks = false;
         Rs2AntibanSettings.playSchedule = true;
         Rs2AntibanSettings.universalAntiban = false;
         Rs2AntibanSettings.microBreakDurationLow = 3;

@@ -23,6 +23,8 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.microbot.wintertodt.enums.State;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.api.Constants.GAME_TICK_LENGTH;
@@ -37,7 +39,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static String version = "1.4.3";
+    public static String version = "1.4.4";
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -97,21 +99,6 @@ public class MWintertodtScript extends Script {
         Rs2Antiban.resetAntibanSettings();
         Rs2Antiban.antibanSetupTemplates.applyGeneralBasicSetup();
         Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
-        Rs2AntibanSettings.usePlayStyle = true;
-        Rs2AntibanSettings.universalAntiban = false;
-        Rs2AntibanSettings.contextualVariability = true;
-        Rs2AntibanSettings.dynamicActivity = true;
-        Rs2AntibanSettings.behavioralVariability = true;
-        Rs2AntibanSettings.simulateAttentionSpan = false;
-        Rs2AntibanSettings.simulateFatigue = true;
-        Rs2AntibanSettings.simulateMistakes = true;
-        Rs2AntibanSettings.moveMouseRandomly = true;
-        Rs2AntibanSettings.moveMouseOffScreen = true;
-        Rs2AntibanSettings.naturalMouse = true;
-        Rs2AntibanSettings.takeMicroBreaks = true;
-        Rs2AntibanSettings.profileSwitching = false;
-        Rs2AntibanSettings.actionCooldownChance = 0.15;
-        Rs2AntibanSettings.microBreakChance = 0.05;
         Rs2Antiban.setPlayStyle(PlayStyle.EXTREME_AGGRESSIVE);
         state = State.BANKING;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -137,8 +124,10 @@ public class MWintertodtScript extends Script {
                 brazier = Rs2GameObject.findObject(BRAZIER_29312, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
                 GameObject brokenBrazier = Rs2GameObject.findObject(ObjectID.BRAZIER_29313, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
                 GameObject fireBrazier = Rs2GameObject.findObject(ObjectID.BURNING_BRAZIER_29314, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
+                boolean playerIsLowHealth = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) <= config.hpTreshhold();
                 boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
-                        && !isWintertodtAlive;
+                        && playerIsLowHealth || !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
+                        && !isWintertodtAlive || Rs2Inventory.hasItem(SUPPLY_CRATE);
                 Widget wintertodtHealthbar = Rs2Widget.getWidget(25952276);
 
                 if (wintertodtHealthbar != null && isWintertodtAlive) {
@@ -263,7 +252,7 @@ public class MWintertodtScript extends Script {
                             }
                             if (burningBrazier.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) < 10 && hasItemsToBurn()) {
 
-                                Rs2GameObject.interact(BURNING_BRAZIER_29314, "feed");
+                                Rs2GameObject.interact(burningBrazier, "feed");
                                 Microbot.log("Feeding brazier");
                                 resetActions = false;
                                 sleep(GAME_TICK_LENGTH * 3);
@@ -280,7 +269,8 @@ public class MWintertodtScript extends Script {
                 System.out.println("Total time for loop " + totalTime);
 
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                 Microbot.log(ex.getMessage());
+                ex.printStackTrace();
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
@@ -401,11 +391,16 @@ public class MWintertodtScript extends Script {
                 System.out.println(WorldPoint.fromLocalInstance(Microbot.getClient(),
                         graphicsObject.getLocation()).distanceTo(Rs2Player.getWorldLocation()));
                 //walk south
+                List<GameObject> gameObjects = new ArrayList<>(Rs2GameObject.getGameObjectsWithinDistance(5));
+                Microbot.log("Game objects: " + gameObjects.size());
+                // we only need to dodge if there are 2 or more snow fall objects
+                if (gameObjects.size() > 2) {
+                    Rs2Walker.walkFastCanvas(new WorldPoint(Rs2Player.getWorldLocation().getX(), Rs2Player.getWorldLocation().getY() - 1, Rs2Player.getWorldLocation().getPlane()));
+                    Rs2Player.waitForWalking(1000);
+                    sleep(GAME_TICK_LENGTH * 2);
+                    resetActions = true;
+                }
 
-                Rs2Walker.walkFastCanvas(new WorldPoint(Rs2Player.getWorldLocation().getX(), Rs2Player.getWorldLocation().getY() - 1, Rs2Player.getWorldLocation().getPlane()));
-                Rs2Player.waitForWalking(1000);
-                sleep(GAME_TICK_LENGTH * 2);
-                resetActions = true;
             }
         }
     }
@@ -433,7 +428,7 @@ public class MWintertodtScript extends Script {
             Rs2Bank.depositAll();
         }
         else {
-            Rs2Bank.depositAllExcept(Rs2Inventory.get("hammer").getId());
+            Rs2Bank.depositAllExcept("hammer", "tinderbox", "knife", config.food().getName());
         }
         int foodCount = (int) Rs2Inventory.getInventoryFood().stream().count();
         if (config.fixBrazier() && !Rs2Inventory.hasItem("hammer")) {
