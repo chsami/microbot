@@ -656,8 +656,6 @@ public class Rs2Walker {
                         }
                     }
 
-                    System.out.println("handle transport : " + transport.getObjectId());
-
 
                     if (transport.getName() != null && transport.getName().contains("trapdoor") && transport.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
                         if (handleTrapdoor(transport))
