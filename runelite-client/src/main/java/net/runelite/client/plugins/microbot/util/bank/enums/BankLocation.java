@@ -96,8 +96,7 @@ public enum BankLocation {
     WOODCUTTING_GUILD(new WorldPoint(1591, 3479, 0)),
     YANILLE(new WorldPoint(2613, 3093, 0)),
     ZANARIS(new WorldPoint(2383, 4458, 0)),
-    ZEAH_SAND_BANK(new WorldPoint(1719, 3465, 0)),
-    MINING_GUILD_BANK(new WorldPoint(3012, 9718, 0));
+    ZEAH_SAND_BANK(new WorldPoint(1719, 3465, 0));
 
     private final WorldPoint worldPoint;
 
@@ -150,9 +149,6 @@ public enum BankLocation {
             case LEGENDS_GUILD:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
                 return Rs2Player.isMember() && Rs2Player.getQuestState(Quest.LEGENDS_QUEST) == QuestState.FINISHED;
-            case MINING_GUILD_BANK:
-                if (hasLineOfSight && Rs2Player.isMember()) return true;
-                return Rs2Player.isMember() && Rs2Player.getSkillRequirement(Skill.MINING, 60);
             case MAGE_TRAINING_ARENA:
                 if (hasLineOfSight && Rs2Player.isMember()) return true;
                 return Rs2Player.isMember();
@@ -162,7 +158,7 @@ public enum BankLocation {
     }
     public boolean hasException() {
         switch (this) {
-            case MINING_GUILD_BANK:
+            case MINING_GUILD:
                 boolean inRegion = Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID() == 12183 || Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID() == 12184;
                 return inRegion;
             default:
