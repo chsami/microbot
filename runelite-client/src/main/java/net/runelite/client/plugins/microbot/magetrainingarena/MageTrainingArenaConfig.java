@@ -65,7 +65,7 @@ public interface MageTrainingArenaConfig extends Config {
     @ConfigItem(
             keyName = "Air staff",
             name = "Air staff",
-            description = "Air staff",
+            description = "Air staff is used for teleknetic room",
             position = 3,
             section = stavesSection
     )
@@ -76,7 +76,7 @@ public interface MageTrainingArenaConfig extends Config {
     @ConfigItem(
             keyName = "Water staff",
             name = "Water staff",
-            description = "Water staff",
+            description = "Water staff is used for graveyard room",
             position = 4,
             section = stavesSection
     )
