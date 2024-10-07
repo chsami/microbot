@@ -37,14 +37,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Value;
 import net.runelite.api.Menu;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.Tile;
-import net.runelite.api.TileItem;
-import static net.runelite.api.TileItem.OWNERSHIP_GROUP;
-import static net.runelite.api.TileItem.OWNERSHIP_OTHER;
-import static net.runelite.api.TileItem.OWNERSHIP_SELF;
-import net.runelite.api.Varbits;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.client.Notifier;
@@ -61,9 +54,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.grounditems.config.HighlightTier;
 import net.runelite.client.plugins.grounditems.config.ItemHighlightMode;
 import net.runelite.client.plugins.grounditems.config.MenuHighlightMode;
-import static net.runelite.client.plugins.grounditems.config.MenuHighlightMode.BOTH;
-import static net.runelite.client.plugins.grounditems.config.MenuHighlightMode.NAME;
-import static net.runelite.client.plugins.grounditems.config.MenuHighlightMode.OPTION;
 import net.runelite.client.plugins.grounditems.config.OwnershipFilterMode;
 import net.runelite.client.ui.components.colorpicker.ColorPickerManager;
 import net.runelite.client.ui.components.colorpicker.RuneliteColorPicker;
@@ -89,6 +79,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static net.runelite.api.TileItem.*;
 import static net.runelite.client.plugins.grounditems.config.MenuHighlightMode.*;
 
 @PluginDescriptor(
