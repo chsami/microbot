@@ -1064,17 +1064,14 @@ public class Rs2Bank {
         BankLocation nearest = null;
         double dist = Double.MAX_VALUE;
         int y = Microbot.getClient().getLocalPlayer().getWorldLocation().getY();
+        System.out.println(y);
         boolean isInCave = y > 9000;
         if (isInCave) {
-            y -= 6300; //minus -6300 to set y to the surface
+            y -= 6400; //minus -6400 to set y to the surface
         }
         WorldPoint local = new WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(), y, Microbot.getClient().getPlane());
         for (BankLocation bankLocation : BankLocation.values()) {
-            if (!bankLocation.hasRequirements()) continue;
-            if (bankLocation.hasException()) {
-                nearest = bankLocation;
-                break;
-            }
+            if (!bankLocation.hasRequirements() && !bankLocation.hasException()) continue;
             double currDist = local.distanceTo2D(bankLocation.getWorldPoint());
             if (nearest == null || currDist < dist) {
                 dist = currDist;
