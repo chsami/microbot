@@ -899,27 +899,32 @@ public class Rs2Bank {
                 Microbot.getMouse().click();
             if (isOpen()) return true;
             boolean action;
-            NPC npc = Rs2Npc.getBankerNPC();
-            if (npc == null) {
-                GameObject bank = Rs2GameObject.findBank();
-                if (bank == null) {
-                    GameObject chest = Rs2GameObject.findChest();
-                    if (chest == null) return false;
+            WallObject grandExchangeBooth = Rs2GameObject.getWallObjects().stream().filter(x -> x.getId() == 10060 || x.getId() == 30389).findFirst().orElse(null);
+            GameObject bank = Rs2GameObject.findBank();
+
+            if (bank != null && (grandExchangeBooth == null ||
+                    bank.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) <= grandExchangeBooth.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()))) {
+                action = Rs2GameObject.interact(bank, "bank");
+            } else if (grandExchangeBooth != null) {
+                action = Rs2GameObject.interact(grandExchangeBooth, "bank");
+            } else {
+                GameObject chest = Rs2GameObject.findChest();
+                if (chest != null) {
                     action = Rs2GameObject.interact(chest, "use");
                 } else {
-                    action = Rs2GameObject.interact(bank, "bank");
+                    NPC npc = Rs2Npc.getNpc("banker");
+                    if (npc == null) return false;
+                    action = Rs2Npc.interact(npc, "bank");
                 }
-            } else {
-                action = Rs2Npc.interact(npc, "bank");
             }
+
             if (action) {
                 sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 2500);
                 sleep(600, 1000);
             }
             return action;
         } catch (Exception ex) {
-            Microbot.log(ex.getMessage());
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
         }
         return false;
     }
