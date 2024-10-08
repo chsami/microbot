@@ -7,6 +7,7 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
+import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
@@ -540,6 +541,10 @@ public class Rs2GameObject {
 
         for (GameObject gameObject : gameObjects) {
             if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
+
+            if (gameObject.getWorldLocation().equals(new WorldPoint(3147, 3449, 0)) || gameObject.getWorldLocation().equals(new WorldPoint(3148, 3449, 0))) {
+                if (!BankLocation.COOKS_GUILD.hasRequirements()) continue;
+            }
 
             ObjectComposition objectComposition = convertGameObjectToObjectComposition(gameObject);
 
