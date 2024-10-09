@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import static net.runelite.api.Constants.GAME_TICK_LENGTH;
 import static net.runelite.api.ObjectID.BRAZIER_29312;
 import static net.runelite.api.ObjectID.BURNING_BRAZIER_29314;
+import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
 
@@ -41,7 +42,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static String version = "1.4.4";
+    public static String version = "1.4.5";
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -129,8 +130,8 @@ public class MWintertodtScript extends Script {
                 boolean playerIsLowWarmth = getWarmthLevel() < config.warmthTreshhold();
                 boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
                         && playerIsLowWarmth || !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
-                        && !isWintertodtAlive || Rs2Inventory.hasItem(SUPPLY_CRATE);
-                Widget wintertodtHealthbar = Rs2Widget.getWidget(25952276);
+                        && !isWintertodtAlive;
+                Widget wintertodtHealthbar = Rs2Widget.getWidget(396, 26);
 
                 if (wintertodtHealthbar != null && isWintertodtAlive) {
                     String widgetText = wintertodtHealthbar.getText();
@@ -302,7 +303,8 @@ public class MWintertodtScript extends Script {
 
     private boolean shouldEat() {
         if (getWarmthLevel() <= config.eatAtWarmthLevel()) {
-            sleep(600, 800);
+            Rs2Player.useFood();
+            sleepGaussian(600, 150);
             plugin.setFoodConsumed(plugin.getFoodConsumed() + 1);
             Rs2Inventory.dropAll("jug");
             resetActions = true;
