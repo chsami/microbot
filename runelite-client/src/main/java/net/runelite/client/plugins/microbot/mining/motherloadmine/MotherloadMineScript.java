@@ -65,7 +65,7 @@ public class MotherloadMineScript extends Script {
     }
 
     private void executeTask() {
-        if (!super.run() || !Microbot.isLoggedIn() || Rs2Antiban.isIdleTooLong(50)) {
+        if (!super.run() || !Microbot.isLoggedIn()) {
             oreVein = null;
             miningSpot = MLMMiningSpot.IDLE;
             return;
