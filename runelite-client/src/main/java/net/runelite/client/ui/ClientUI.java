@@ -935,6 +935,7 @@ public class ClientUI
 		{
 			case MacOS:
 				OSXUtil.requestForeground();
+				frame.setState(Frame.NORMAL);
 				break;
 			case Windows:
 				WinUtil.requestForeground(frame);
