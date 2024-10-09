@@ -455,7 +455,7 @@ public class Rs2Player {
     public static boolean eatAt(int percentage) {
         double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
         if (treshHold <= percentage) {
-            useFood();
+            return useFood();
         }
         return false;
     }
