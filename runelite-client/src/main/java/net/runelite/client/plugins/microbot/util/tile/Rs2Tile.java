@@ -1,10 +1,7 @@
 package net.runelite.client.plugins.microbot.util.tile;
 
 import lombok.Getter;
-import net.runelite.api.Client;
-import net.runelite.api.CollisionDataFlag;
-import net.runelite.api.GraphicsObject;
-import net.runelite.api.Tile;
+import net.runelite.api.*;
 import net.runelite.api.coords.Direction;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
@@ -380,7 +377,7 @@ public class Rs2Tile {
             if (neighbour.equals(Rs2Player.getWorldLocation())) continue;
             if (!tileHasWalls(neighbour)
                     && isValidTile(getTile(neighbour.getX(), neighbour.getY()))
-                    && isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), neighbour.getX(), neighbour.getY()))) {
+                    && (isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), neighbour.getX(), neighbour.getY())) || isBankBooth(neighbour))) {
                 System.out.println(neighbour);
                 return neighbour;
             }
@@ -391,6 +388,15 @@ public class Rs2Tile {
 
     public static boolean tileHasWalls(WorldPoint source) {
         return Rs2GameObject.getWallObjects().stream().filter(x -> x.getWorldLocation().equals(source)).findFirst().orElse(null) != null;
+    }
+
+    public static boolean isBankBooth(WorldPoint source) {
+        GameObject gameObject = Rs2GameObject.getGameObjects().stream().filter(x -> x.getWorldLocation().equals(source)).findFirst().orElse(null);
+        if (gameObject != null) {
+            ObjectComposition objectComposition = Rs2GameObject.convertGameObjectToObjectComposition(gameObject);
+            return objectComposition != null && objectComposition.getName().equalsIgnoreCase("bank booth");
+        }
+        return false;
     }
 
     public static Tile getTile(int x, int y) {
@@ -404,6 +410,7 @@ public class Rs2Tile {
     }
 
     public static boolean isValidTile(Tile tile) {
+        if (tile == null) return false;
         byte flags = Microbot.getClient().getTileSettings()[tile.getRenderLevel()][tile.getSceneLocation().getX()][tile.getSceneLocation().getY()];
         return flags == 4;
     }

@@ -127,6 +127,9 @@ public class Microbot {
     @Inject
     private static PouchScript pouchScript;
 
+    public static boolean cantReachTarget = false;
+    public static int cantReachTargetRetries = 0;
+
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
