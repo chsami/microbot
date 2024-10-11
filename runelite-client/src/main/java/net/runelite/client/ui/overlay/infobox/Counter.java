@@ -24,19 +24,20 @@
  */
 package net.runelite.client.ui.overlay.infobox;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import net.runelite.client.plugins.Plugin;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 @ToString
 public class Counter extends InfoBox
 {
 	@Getter
 	@Setter
-	private static int count;
+	private int count;
 
 	public Counter(BufferedImage image, Plugin plugin, int count)
 	{
