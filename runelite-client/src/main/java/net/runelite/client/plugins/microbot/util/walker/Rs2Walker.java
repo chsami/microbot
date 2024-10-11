@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
+import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -86,7 +87,6 @@ public class Rs2Walker {
         Microbot.getClientThread().runOnSeperateThread(() -> {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    System.out.println("walker is running");
                     if (!Microbot.isLoggedIn()) {
                         setTarget(null);
                         break;
@@ -483,7 +483,6 @@ public class Rs2Walker {
 
 
             if (found) {
-                System.out.println("handling door : " + object.getId());
                 Rs2GameObject.interact(object, action);
                 Rs2Player.waitForWalking();
                 return true;
@@ -521,7 +520,7 @@ public class Rs2Walker {
      * @param target
      */
     public static void setTarget(WorldPoint target) {
-        if (!Microbot.isLoggedIn()) return;
+        if (!Microbot.isLoggedIn() && target != null) return;
         Player localPlayer = Microbot.getClient().getLocalPlayer();
         if (!ShortestPathPlugin.isStartPointSet() && localPlayer == null) {
             return;
@@ -612,26 +611,28 @@ public class Rs2Walker {
     public static boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
         for (Transport transport : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new HashSet<>())) {
             for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), transport.getOrigin())) {
-                if (Rs2Player.getWorldLocation().getPlane() != transport.getOrigin().getPlane()) {
+                if (transport.getOrigin() != null && Rs2Player.getWorldLocation().getPlane() != transport.getOrigin().getPlane()) {
                     continue;
                 }
 
                 for (int i = indexOfStartPoint; i < path.size(); i++) {
-                    if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
+                    if (origin != null && origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                         continue;
                     if (path.stream().noneMatch(x -> x.equals(transport.getDestination()))) continue;
 
-                    int indexOfOrigin = IntStream.range(0, path.size())
-                            .filter(f -> path.get(f).equals(transport.getOrigin()))
-                            .findFirst()
-                            .orElse(-1);
-                    int indexOfDestination = IntStream.range(0, path.size())
-                            .filter(f -> path.get(f).equals(transport.getDestination()))
-                            .findFirst()
-                            .orElse(-1);
-                    if (indexOfDestination == -1) continue;
-                    if (indexOfOrigin == -1) continue;
-                    if (indexOfDestination < indexOfOrigin) continue;
+                    if (transport.getType() != TransportType.TELEPORTATION_ITEM && transport.getType() != TransportType.TELEPORTATION_SPELL) {
+                        int indexOfOrigin = IntStream.range(0, path.size())
+                                .filter(f -> path.get(f).equals(transport.getOrigin()))
+                                .findFirst()
+                                .orElse(-1);
+                        int indexOfDestination = IntStream.range(0, path.size())
+                                .filter(f -> path.get(f).equals(transport.getDestination()))
+                                .findFirst()
+                                .orElse(-1);
+                        if (indexOfDestination == -1) continue;
+                        if (indexOfOrigin == -1) continue;
+                        if (indexOfDestination < indexOfOrigin) continue;
+                    }
 
                     if (path.get(i).equals(origin)) {
                         if (transport.getType() == TransportType.SHIP || transport.getType() == TransportType.NPC || transport.getType() == TransportType.BOAT) {
@@ -675,11 +676,42 @@ public class Rs2Walker {
                         handleFairyRing(transport);
                     }
 
+                    if (transport.getType() == TransportType.TELEPORTATION_ITEM) {
+                        boolean succesfullAction = false;
+                        for (Set<Integer> itemIds : transport.getItemIdRequirements()) {
+                            if (succesfullAction)
+                                break;
+                            for (Integer itemId : itemIds) {
+                                //TODO: jewellery teleport in inventory
+                                if (Rs2Walker.currentTarget == null) break;
+                                if (Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < config.reachedDistance())
+                                    break;
+                                if (succesfullAction) break;
+
+                                //If an action is succesfully we break out of the loop
+                                succesfullAction = handleInventoryTeleports(transport, itemId) || handleWearableTeleports(transport, itemId);
+
+                            }
+                        }
+                    }
+
+                    if (transport.getType() == TransportType.TELEPORTATION_SPELL) {
+                        for (Set<Integer> itemIds : transport.getItemIdRequirements()) {
+                            for (Integer itemId : itemIds) {
+                                if (Rs2Inventory.hasItem(itemId)) {
+                                    if (Rs2Inventory.use(itemId)) {
+                                        sleep(GAME_TICK_LENGTH * transport.getDuration());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
 
                     GameObject gameObject = Rs2GameObject.getGameObjects(transport.getObjectId(), transport.getOrigin()).stream().findFirst().orElse(null);
                     //check game objects
                     if (gameObject != null && gameObject.getId() == transport.getObjectId()) {
-                        System.out.println(transport.getObjectId());
                         if (!Rs2Tile.isTileReachable(transport.getOrigin())) {
                             break;
                         }
@@ -732,6 +764,67 @@ public class Rs2Walker {
         return false;
     }
 
+    public static boolean handleInventoryTeleports(Transport transport, int itemId) {
+        Rs2Item rs2Item = Rs2Inventory.get(itemId);
+        boolean hasItem = rs2Item != null;
+        List<String> actions = Arrays.asList("break", "teleport", "empty", "lletya", "prifddinas", "commune", "Rellekka", "Waterbirth Island", "Neitiznot", "Jatiszo",
+                "Ver Sinhaza", "Darkmeyer", "Slepe", "Troll Stronghold", "Weiss", "invoke", "rub");
+        if (!hasItem) return false;
+        boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
+        //hasMultipleDestination is stuff like: games neck, ring of dueling etc...
+        if (hasMultipleDestination) {
+            String[] values = transport.getDisplayInfo().split(":");
+            String destination = values[1].trim().toLowerCase();
+            String itemAction = Arrays.stream(rs2Item.getInventoryActions())
+                    .filter(action -> action != null && actions.contains(action.toLowerCase()))
+                    .findFirst()
+                    .orElse(null);
+            if (itemAction == null) return false;
+            if (itemAction.equalsIgnoreCase("rub")) {
+                if (Rs2Inventory.interact(itemId, itemAction)) {
+                    sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
+                    Rs2Widget.sleepUntilHasWidgetText(destination, 219, 1, false, 5000);
+                    Rs2Widget.clickWidget(destination, Optional.of(219), 1, false);
+                    return sleepUntilTrue(() -> Rs2Player.getWorldLocation().equals(transport.getDestination()), 100, 5000);
+                }
+            }
+        }
+
+        //Simple items with one destination like teleport tabs, teleport scrolls etc...
+        String itemAction = Arrays.stream(rs2Item.getInventoryActions())
+                .filter(action -> action != null && actions.contains(action.toLowerCase()))
+                .findFirst()
+                .orElse(null);
+        if (itemAction == null) return false;
+        if (Rs2Inventory.interact(itemId, itemAction)) {
+            return sleepUntilTrue(() -> Rs2Player.getWorldLocation().equals(transport.getDestination()), 100, 5000);
+        }
+
+        return false;
+    }
+
+    private static boolean handleWearableTeleports(Transport transport, int itemId) {
+        if (Rs2Equipment.isWearing(itemId)) {
+            if (transport.getDisplayInfo().contains(":")) {
+                String[] values = transport.getDisplayInfo().split(":");
+                String jewelleryName = values[0].trim().toLowerCase();
+                String destination = values[1].trim().toLowerCase();
+                JewelleryLocationEnum jewelleryTransport = Arrays.stream(JewelleryLocationEnum.values()).filter(x -> x.getTooltip().toLowerCase().contains(jewelleryName) && x.getDestination().toLowerCase().contains(destination)).findFirst().orElse(null);
+                if (jewelleryTransport == null) return false;
+                if (Rs2Equipment.useAmuletAction(jewelleryTransport) || Rs2Equipment.useRingAction(jewelleryTransport)) {
+                    return sleepUntilTrue(() -> Rs2Player.getWorldLocation().equals(transport.getDestination()), 100, 5000);
+                }
+            } else {
+                JewelleryLocationEnum jewelleryTransport = Arrays.stream(JewelleryLocationEnum.values()).filter(x -> x.getTooltip().toLowerCase().contains(transport.getDisplayInfo().toLowerCase())).findFirst().orElse(null);
+                if (jewelleryTransport == null) return false;
+                if (Rs2Equipment.useAmuletAction(jewelleryTransport) || Rs2Equipment.useRingAction(jewelleryTransport)) {
+                    return sleepUntilTrue(() -> Rs2Player.getWorldLocation().equals(transport.getDestination()), 100, 5000);
+                }
+            }
+        }
+        return false;
+    }
+
     private static boolean handleTrapdoor(Transport b) {
         List<GroundObject> gameObjects = Rs2GameObject.getGroundObjects(25);
         gameObjects = gameObjects.stream().filter(g -> Rs2GameObject.getObjectIdsByName("trapdoor").stream().anyMatch(x -> g.getId() == x)).collect(Collectors.toList());
@@ -755,7 +848,7 @@ public class Rs2Walker {
                 .findFirst().orElse(null);
         if (trapdoor != null) {
             Rs2GameObject.interact(trapdoor, "open");
-            sleepGaussian( 1200, 300);
+            sleepGaussian(1200, 300);
             return true;
         }
         return false;
@@ -940,7 +1033,6 @@ public class Rs2Walker {
         }
 
 
-
         // Wait for the widget to become visible
         boolean widgetVisible = !Rs2Widget.isHidden(gliderMenu);
         if (!widgetVisible) {
@@ -950,7 +1042,7 @@ public class Rs2Walker {
 
         System.out.println("Widget is now visible.");
 
-        switch(displayInfo) {
+        switch (displayInfo) {
             case "Kar-Hewo":
                 Rs2Widget.clickWidget(KAR_HEWO);
             case "Gnome Stronghold":
@@ -1018,7 +1110,7 @@ public class Rs2Walker {
             Rs2Widget.clickWidget(TELEPORT_BUTTON);
             Rs2Player.waitForAnimation();
             if (!Rs2Equipment.isWearing(startingWeaponId)) {
-                sleep(3000,3600); // Required due to long animation time
+                sleep(3000, 3600); // Required due to long animation time
                 System.out.println("Equipping Starting Weapon: " + startingWeaponId);
                 Rs2Inventory.equip(startingWeaponId);
             }

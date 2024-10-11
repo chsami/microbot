@@ -32,13 +32,14 @@ public class Rs2Widget {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget rootWidget = getWidget(widgetId, childId);
             Widget widget = null;
+            if (rootWidget == null) return false;
             if (rootWidget.getChildren() != null)
                 widget = findWidget(text, Arrays.stream(rootWidget.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-            if (rootWidget.getNestedChildren().length > 0)
+            if (widget == null && rootWidget.getNestedChildren().length > 0)
                 widget =  findWidget(text, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-            if (rootWidget.getDynamicChildren().length > 0)
+            if (widget == null && rootWidget.getDynamicChildren().length > 0)
                 widget = findWidget(text, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-            if (rootWidget.getStaticChildren().length > 0)
+            if (widget == null && rootWidget.getStaticChildren().length > 0)
                 widget = findWidget(text, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
 
             return widget != null;
@@ -56,7 +57,7 @@ public class Rs2Widget {
                 Widget rootWidget = getWidget(widgetId.get(), childId);
                 List<Widget> rootWidgets = new ArrayList<>();
                 rootWidgets.add(rootWidget);
-                widget  = findWidget(text, rootWidgets, true);
+                widget  = findWidget(text, rootWidgets, exact);
             }
 
             if (widget != null) {

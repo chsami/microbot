@@ -156,10 +156,7 @@ public class Transport {
                 action = matcher.group(1);   // First group: the action (e.g., "Travel")
                 name = matcher.group(2);   // Second group: the target (e.g., "Spirit tree")
                 objectId = Integer.parseInt(matcher.group(3)); // Third group: the objectId (e.g., "26263")
-                System.out.println(action + " " + name + " " + objectId);
             }
-        } else {
-            System.out.println(fieldMap);
         }
 
         isMember = TransportType.TELEPORTATION_LEVER.equals(transportType)

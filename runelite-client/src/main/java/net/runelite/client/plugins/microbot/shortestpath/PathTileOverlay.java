@@ -11,12 +11,10 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -137,13 +135,19 @@ public class PathTileOverlay extends Overlay {
             int counter = 0;
             if (TileStyle.LINES.equals(config.pathStyle())) {
                 for (int i = 1; i < path.size(); i++) {
-                    drawLine(graphics, path.get(i - 1), path.get(i), color, 1 + counter++);
+                    float step = i / (float) path.size();
+                    Color newColor = generateGradient(step);
+                    newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), 75);
+                    drawLine(graphics, path.get(i - 1), path.get(i), newColor, 1 + counter++);
                     drawTransportInfo(graphics, path.get(i - 1), path.get(i));
                 }
             } else {
                 boolean showTiles = TileStyle.TILES.equals(config.pathStyle());
-                for (int i = 0; i <  path.size(); i++) {
-                    drawTile(graphics, path.get(i), color, counter++, showTiles);
+                for (int i = 0; i < path.size(); i++) {
+                    float step = i / (float) path.size();
+                    Color newColor = generateGradient(step);
+                    newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), 75);
+                    drawTile(graphics, path.get(i), newColor, counter++, showTiles);
                     drawTransportInfo(graphics, path.get(i), (i + 1 == path.size()) ? null : path.get(i + 1));
                 }
             }
@@ -308,5 +312,24 @@ public class PathTileOverlay extends Overlay {
                 }
             }
         }
+    }
+
+    public static Color generateGradient(float step) {
+        if (step < 0) {
+            step = 0;
+        } else if (step > 1) {
+            step = 1;
+        }
+
+        float[] startComponents = Color.RED.getRGBColorComponents(null);
+        float[] endComponents = Color.GREEN.getRGBColorComponents(null);
+
+        float[] interpolatedComponents = new float[3];
+
+        for (int j = 0; j < 3; j++) {
+            interpolatedComponents[j] = startComponents[j] + step * (endComponents[j] - startComponents[j]);
+        }
+
+        return new Color(interpolatedComponents[0], interpolatedComponents[1], interpolatedComponents[2]);
     }
 }
