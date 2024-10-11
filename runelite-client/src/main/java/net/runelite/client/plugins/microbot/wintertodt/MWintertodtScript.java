@@ -414,7 +414,7 @@ public class MWintertodtScript extends Script {
             eatAt(99);
             return true;
         }
-        if (Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), true)) {
+        if (Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount())) {
             state = State.ENTER_ROOM;
             return true;
         }
@@ -466,6 +466,6 @@ public class MWintertodtScript extends Script {
             int warmthLevel = Integer.parseInt(matcher.group());
             return warmthLevel;
         }
-        return -1;
+        return 100;
     }
 }
