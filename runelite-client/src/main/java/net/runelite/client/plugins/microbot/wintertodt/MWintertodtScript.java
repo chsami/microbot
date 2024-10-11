@@ -50,7 +50,6 @@ public class MWintertodtScript extends Script {
     static MWintertodtPlugin plugin;
     private static boolean lockState = false;
     final WorldPoint BOSS_ROOM = new WorldPoint(1630, 3982, 0);
-    final String SUPPLY_CRATE = "supply crate";
     String axe = "";
     int wintertodtHp = -1;
     private GameObject brazier;
@@ -119,6 +118,15 @@ public class MWintertodtScript extends Script {
                         return;
                     }
                     axe = Rs2Inventory.get("axe").name;
+                } else if (!Rs2Equipment.isWearing("axe")){
+                    if (Rs2Inventory.hasItem("axe")) {
+                        Rs2Inventory.wear("axe");
+                        sleepUntil(() -> Rs2Equipment.isWearing("axe"));
+                        return;
+                    }
+                    Microbot.showMessage("Please wear an axe OR If you'd like to have an axe in your inventory, you can enable the setting 'Axe In Inventory'.");
+                    sleep(5000);
+                    return;
                 }
 
 
@@ -422,9 +430,6 @@ public class MWintertodtScript extends Script {
         if (Rs2Player.getWorldLocation().distanceTo(bankLocation) > 6) {
             Rs2Walker.walkTo(bankLocation);
             Rs2Player.waitForWalking();
-            if (config.openCrates()) {
-                Rs2Inventory.interact(SUPPLY_CRATE, "open");
-            }
         }
         Rs2Bank.useBank();
         if (!Rs2Bank.isOpen()) return true;
