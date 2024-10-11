@@ -42,7 +42,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static String version = "1.4.5";
+    public static String version = "1.4.6";
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
