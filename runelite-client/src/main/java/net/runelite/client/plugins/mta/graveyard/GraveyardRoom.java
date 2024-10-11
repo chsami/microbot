@@ -24,17 +24,8 @@
  */
 package net.runelite.client.plugins.mta.graveyard;
 
-import java.awt.image.BufferedImage;
-import javax.inject.Inject;
-import net.runelite.api.Client;
-import net.runelite.api.InventoryID;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
-import static net.runelite.api.ItemID.ANIMALS_BONES;
-import static net.runelite.api.ItemID.ANIMALS_BONES_6905;
-import static net.runelite.api.ItemID.ANIMALS_BONES_6906;
-import static net.runelite.api.ItemID.ANIMALS_BONES_6907;
-import net.runelite.api.Player;
+import lombok.Getter;
+import net.runelite.api.*;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.eventbus.Subscribe;
@@ -43,6 +34,11 @@ import net.runelite.client.plugins.mta.MTAConfig;
 import net.runelite.client.plugins.mta.MTAPlugin;
 import net.runelite.client.plugins.mta.MTARoom;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
+
+import javax.inject.Inject;
+import java.awt.image.BufferedImage;
+
+import static net.runelite.api.ItemID.*;
 
 public class GraveyardRoom extends MTARoom
 {
@@ -56,6 +52,7 @@ public class GraveyardRoom extends MTARoom
 	private final InfoBoxManager infoBoxManager;
 	private int score;
 
+	@Getter
 	private GraveyardCounter counter;
 
 	@Inject

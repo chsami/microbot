@@ -542,8 +542,14 @@ public class Rs2GameObject {
         for (GameObject gameObject : gameObjects) {
             if (possibleBankIds.stream().noneMatch(x -> x == gameObject.getId())) continue;
 
+            //cooks guild (exception)
             if (gameObject.getWorldLocation().equals(new WorldPoint(3147, 3449, 0)) || gameObject.getWorldLocation().equals(new WorldPoint(3148, 3449, 0))) {
                 if (!BankLocation.COOKS_GUILD.hasRequirements()) continue;
+            }
+            //farming guild (exception)
+            //At the farming guild there’s 2 banks, one in the southern half of the guild and one northern part of the guild which requires a certain higher farming level to enter
+            if (gameObject.getWorldLocation().equals(new WorldPoint(1248, 3759, 0)) || gameObject.getWorldLocation().equals(new WorldPoint(1249, 3759, 0))) {
+                if (!Rs2Player.getSkillRequirement(Skill.FARMING, 85, true)) continue;
             }
 
             ObjectComposition objectComposition = convertGameObjectToObjectComposition(gameObject);
@@ -1060,11 +1066,9 @@ public class Rs2GameObject {
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
         if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(object.getWorldLocation()) > 51) {
-            Microbot.log("Walking to the object...");
             Rs2Walker.walkTo(object.getWorldLocation());
             return false;
         }
-
 
         try {
 

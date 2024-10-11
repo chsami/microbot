@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -186,18 +187,24 @@ public class Rs2Npc {
         if (npc == null) return false;
         Microbot.status = action + " " + npc.getName();
         try {
-            if (!hasLineOfSight(npc) && !action.equalsIgnoreCase("bank")) {
-                Rs2Walker.walkTo(npc.getWorldLocation(), 1);
-                return false;
+
+            if (Microbot.cantReachTarget) {
+                if (!hasLineOfSight(npc)) {
+                    if (Microbot.cantReachTargetRetries >= Random.random(3, 5)) {
+                        Microbot.pauseAllScripts = true;
+                        Microbot.showMessage("Your bot tries to interact with an npc for " + Microbot.cantReachTargetRetries + " times but failed. Please take a look at what is happening.");
+                        return false;
+                    }
+                    Rs2Walker.walkTo(Rs2Tile.getNearestWalkableTileWithLineOfSight(npc.getWorldLocation()), 0);
+                    Microbot.cantReachTargetRetries++;
+                    return false;
+                } else {
+                    Microbot.cantReachTarget = false;
+                    Microbot.cantReachTargetRetries = 0;
+                }
             }
 
             NPCComposition npcComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(npc.getId()));
-
-            if (!Rs2Tile.areSurroundingTilesWalkable(npc.getWorldLocation(), npcComposition.getSize(), npcComposition.getSize())
-            && !action.equalsIgnoreCase("bank")) {
-                Rs2Walker.walkTo(npc.getWorldLocation(), 1);
-                return false;
-            }
 
             int index = 0;
             for (int i = 0; i < npcComposition.getActions().length; i++) {

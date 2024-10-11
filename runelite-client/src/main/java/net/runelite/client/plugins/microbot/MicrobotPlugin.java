@@ -199,6 +199,9 @@ public class MicrobotPlugin extends Plugin {
 
     @Subscribe
     private void onChatMessage(ChatMessage event) {
+        if (event.getType() == ChatMessageType.ENGINE && event.getMessage().equalsIgnoreCase("I can't reach that!")) {
+            Microbot.cantReachTarget = true;
+        }
         Microbot.getPouchScript().onChatMessage(event);
     }
 

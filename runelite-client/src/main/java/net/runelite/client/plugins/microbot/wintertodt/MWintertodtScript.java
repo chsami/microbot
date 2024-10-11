@@ -42,7 +42,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static String version = "1.4.5";
+    public static String version = "1.4.6";
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -50,7 +50,6 @@ public class MWintertodtScript extends Script {
     static MWintertodtPlugin plugin;
     private static boolean lockState = false;
     final WorldPoint BOSS_ROOM = new WorldPoint(1630, 3982, 0);
-    final String SUPPLY_CRATE = "supply crate";
     String axe = "";
     int wintertodtHp = -1;
     private GameObject brazier;
@@ -119,6 +118,15 @@ public class MWintertodtScript extends Script {
                         return;
                     }
                     axe = Rs2Inventory.get("axe").name;
+                } else if (!Rs2Equipment.isWearing("axe")){
+                    if (Rs2Inventory.hasItem("axe")) {
+                        Rs2Inventory.wear("axe");
+                        sleepUntil(() -> Rs2Equipment.isWearing("axe"));
+                        return;
+                    }
+                    Microbot.showMessage("Please wear an axe OR If you'd like to have an axe in your inventory, you can enable the setting 'Axe In Inventory'.");
+                    sleep(5000);
+                    return;
                 }
 
 
@@ -414,7 +422,7 @@ public class MWintertodtScript extends Script {
             eatAt(99);
             return true;
         }
-        if (Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount(), true)) {
+        if (Rs2Inventory.hasItemAmount(config.food().getName(), config.foodAmount())) {
             state = State.ENTER_ROOM;
             return true;
         }
@@ -422,9 +430,6 @@ public class MWintertodtScript extends Script {
         if (Rs2Player.getWorldLocation().distanceTo(bankLocation) > 6) {
             Rs2Walker.walkTo(bankLocation);
             Rs2Player.waitForWalking();
-            if (config.openCrates()) {
-                Rs2Inventory.interact(SUPPLY_CRATE, "open");
-            }
         }
         Rs2Bank.useBank();
         if (!Rs2Bank.isOpen()) return true;
@@ -466,6 +471,6 @@ public class MWintertodtScript extends Script {
             int warmthLevel = Integer.parseInt(matcher.group());
             return warmthLevel;
         }
-        return -1;
+        return 100;
     }
 }

@@ -74,17 +74,6 @@ public interface MWintertodtConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "OpenCrates",
-            name = "Open Supply Crates",
-            description = "Open supply crates",
-            position = 4,
-            section = generalSection
-    )
-    default boolean openCrates() {
-        return true;
-    }
-
-    @ConfigItem(
             keyName = "AxeInventory",
             name = "Axe In Inventory?",
             description = "Axe in inventory?",

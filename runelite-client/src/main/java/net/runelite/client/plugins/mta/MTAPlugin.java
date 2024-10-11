@@ -25,7 +25,6 @@
 package net.runelite.client.plugins.mta;
 
 import com.google.inject.Provides;
-import javax.inject.Inject;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.runelite.client.config.ConfigManager;
@@ -37,6 +36,8 @@ import net.runelite.client.plugins.mta.enchantment.EnchantmentRoom;
 import net.runelite.client.plugins.mta.graveyard.GraveyardRoom;
 import net.runelite.client.plugins.mta.telekinetic.TelekineticRoom;
 import net.runelite.client.ui.overlay.OverlayManager;
+
+import javax.inject.Inject;
 
 @PluginDescriptor(
 	name = "Mage Training Arena",
@@ -53,11 +54,13 @@ public class MTAPlugin extends Plugin
 	@Inject
 	private AlchemyRoom alchemyRoom;
 	@Inject
+	@Getter
 	private GraveyardRoom graveyardRoom;
 	@Getter
 	@Inject
 	private TelekineticRoom telekineticRoom;
 	@Inject
+	@Getter
 	private EnchantmentRoom enchantmentRoom;
 
 	@Inject
