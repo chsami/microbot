@@ -41,7 +41,7 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 
 public class MageTrainingArenaScript extends Script {
-    public static String version = "1.1.0";
+    public static String version = "1.1.1";
 
     private static boolean firstTime = false;
 
