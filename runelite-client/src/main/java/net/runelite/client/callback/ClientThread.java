@@ -69,6 +69,19 @@ public class ClientThread
 		scheduledFuture = scheduledExecutorService.submit(() -> method.call());
 	}
 
+	/***
+	 * Runs a Callable<Boolean> on a seperate thread. Similar to runOnSeperateThread except this
+	 * method blocks until the callable returns.
+	 * @param method Callable to submit
+	 * @return the result of the callable
+	 */
+	@SneakyThrows
+	public boolean runBlockingCallable(Callable<Boolean> method) {
+		if (scheduledFuture != null && !scheduledFuture.isDone()) return false;
+		scheduledFuture = scheduledExecutorService.submit(method);
+		return (boolean) scheduledFuture.get();
+	}
+
 
 	/**
 	 * Will run r on the game thread, at an unspecified point in the future.
