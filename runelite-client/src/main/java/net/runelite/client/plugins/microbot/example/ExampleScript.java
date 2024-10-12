@@ -1,7 +1,9 @@
 package net.runelite.client.plugins.microbot.example;
 
+import net.runelite.api.ItemID;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.inventory.RunePouch;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +21,9 @@ public class ExampleScript extends Script {
 
                 test = false;
 
+              //  Rs2Widget.clickWidget("burthorpe", Optional.of(219), 1, false);
+
+                Microbot.log("Runepouch contains astral rune? " + RunePouch.contains(ItemID.ASTRAL_RUNE));
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
