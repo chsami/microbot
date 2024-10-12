@@ -899,27 +899,32 @@ public class Rs2Bank {
                 Microbot.getMouse().click();
             if (isOpen()) return true;
             boolean action;
-            NPC npc = Rs2Npc.getBankerNPC();
-            if (npc == null) {
-                GameObject bank = Rs2GameObject.findBank();
-                if (bank == null) {
-                    GameObject chest = Rs2GameObject.findChest();
-                    if (chest == null) return false;
+            WallObject grandExchangeBooth = Rs2GameObject.getWallObjects().stream().filter(x -> x.getId() == 10060 || x.getId() == 30389).findFirst().orElse(null);
+            GameObject bank = Rs2GameObject.findBank();
+
+            if (bank != null && (grandExchangeBooth == null ||
+                    bank.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) <= grandExchangeBooth.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()))) {
+                action = Rs2GameObject.interact(bank, "bank");
+            } else if (grandExchangeBooth != null) {
+                action = Rs2GameObject.interact(grandExchangeBooth, "bank");
+            } else {
+                GameObject chest = Rs2GameObject.findChest();
+                if (chest != null) {
                     action = Rs2GameObject.interact(chest, "use");
                 } else {
-                    action = Rs2GameObject.interact(bank, "bank");
+                    NPC npc = Rs2Npc.getNpc("banker");
+                    if (npc == null) return false;
+                    action = Rs2Npc.interact(npc, "bank");
                 }
-            } else {
-                action = Rs2Npc.interact(npc, "bank");
             }
+
             if (action) {
                 sleepUntil(() -> isOpen() || Rs2Widget.hasWidget("Please enter your PIN"), 2500);
                 sleep(600, 1000);
             }
             return action;
         } catch (Exception ex) {
-            Microbot.log(ex.getMessage());
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
         }
         return false;
     }
@@ -1064,15 +1069,24 @@ public class Rs2Bank {
         BankLocation nearest = null;
         double dist = Double.MAX_VALUE;
         int y = Microbot.getClient().getLocalPlayer().getWorldLocation().getY();
-        System.out.println(y);
-        boolean isInCave = y > 9000;
-        if (isInCave) {
-            y -= 6400; //minus -6400 to set y to the surface
-        }
-        WorldPoint local = new WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(), y, Microbot.getClient().getPlane());
+        boolean playerIsInCave = y > 9000;
+        WorldPoint playerLocation;
+        double currDist;
+        final int penalty = 10; // penalty if the bank is outside the cave and player is inside cave. This is to avoid being closer than banks in a cave
         for (BankLocation bankLocation : BankLocation.values()) {
             if (!bankLocation.hasRequirements() && !bankLocation.hasException()) continue;
-            double currDist = local.distanceTo2D(bankLocation.getWorldPoint());
+
+            boolean bankisInCave = bankLocation.getWorldPoint().getY() > 9000;
+
+            if (!bankisInCave && playerIsInCave) {
+                playerLocation = new WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(),  Microbot.getClient().getLocalPlayer().getWorldLocation().getY() - 6400, Microbot.getClient().getPlane());
+                currDist = playerLocation.distanceTo2D(bankLocation.getWorldPoint()) + penalty;
+            } else {
+                playerLocation = new WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(),  Microbot.getClient().getLocalPlayer().getWorldLocation().getY(), Microbot.getClient().getPlane());
+                currDist = playerLocation.distanceTo2D(bankLocation.getWorldPoint());
+            }
+
+
             if (nearest == null || currDist < dist) {
                 dist = currDist;
                 nearest = bankLocation;

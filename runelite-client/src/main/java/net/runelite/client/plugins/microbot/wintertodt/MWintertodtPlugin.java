@@ -132,7 +132,7 @@ public class MWintertodtPlugin extends Plugin {
             braziersLit++;
         }
 
-        if (messageNode.getValue().startsWith("You have gained a supply crate")) {
+        if (messageNode.getValue().startsWith("You have helped enough to earn a supply crate")) {
             won++;
         }
 

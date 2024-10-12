@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2024 Macweese
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,39 +22,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.ui.overlay.infobox;
+package net.runelite.client.plugins.itemstats.food;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import net.runelite.client.plugins.Plugin;
+import net.runelite.api.Client;
+import net.runelite.client.plugins.itemstats.FoodBase;
+import static net.runelite.client.plugins.itemstats.stats.Stats.COOKING;
+import static net.runelite.client.plugins.itemstats.stats.Stats.HUNTER;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-
-@ToString
-public class Counter extends InfoBox
+public class CookedMossLizard extends FoodBase
 {
-	@Getter
-	@Setter
-	private int count;
-
-	public Counter(BufferedImage image, Plugin plugin, int count)
-	{
-		super(image, plugin);
-		this.count = count;
-	}
-
 	@Override
-	public String getText()
+	public int heals(Client client)
 	{
-		return Integer.toString(getCount());
+		int cooking = COOKING.getValue(client) / 3;
+		int hunter = HUNTER.getValue(client) / 2;
+		return Math.min(cooking, hunter);
 	}
-
-	@Override
-	public Color getTextColor()
-	{
-		return Color.WHITE;
-	}
-
 }

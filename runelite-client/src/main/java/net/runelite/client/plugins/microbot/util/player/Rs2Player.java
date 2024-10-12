@@ -455,13 +455,18 @@ public class Rs2Player {
     public static boolean eatAt(int percentage) {
         double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
         if (treshHold <= percentage) {
-            List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
-            if (!foods.isEmpty()) {
-                if (foods.get(0).getName().toLowerCase().contains("jug of wine")) {
-                    return Rs2Inventory.interact(foods.get(0), "drink");
-                } else {
-                    return Rs2Inventory.interact(foods.get(0), "eat");
-                }
+            return useFood();
+        }
+        return false;
+    }
+
+    public static boolean useFood() {
+        List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
+        if (!foods.isEmpty()) {
+            if (foods.get(0).getName().toLowerCase().contains("jug of wine")) {
+                return Rs2Inventory.interact(foods.get(0), "drink");
+            } else {
+                return Rs2Inventory.interact(foods.get(0), "eat");
             }
         }
         return false;

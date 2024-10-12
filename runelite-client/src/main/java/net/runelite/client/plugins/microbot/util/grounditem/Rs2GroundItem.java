@@ -59,7 +59,6 @@ public class Rs2GroundItem {
             int param1;
             int identifier;
             String target;
-            String option;
             MenuAction menuAction = MenuAction.CANCEL;
             ItemComposition item;
 
@@ -72,7 +71,6 @@ public class Rs2GroundItem {
             param0 = localPoint.getSceneX();
             target = "<col=ff9040>" + groundItem.getName();
             param1 = localPoint.getSceneY();
-            option = action;
 
             String[] groundActions = Rs2Reflection.getGroundItemActions(item);
 
@@ -105,9 +103,9 @@ public class Rs2GroundItem {
                         new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
 
             }
-            //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, -1, option, target, -1, -1);
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            Microbot.log(ex.getMessage());
+            ex.printStackTrace();
         }
         return true;
     }
