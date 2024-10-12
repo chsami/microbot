@@ -700,7 +700,7 @@ public class Rs2Walker {
                             for (Integer itemId : itemIds) {
                                 if (Rs2Inventory.hasItem(itemId)) {
                                     if (Rs2Inventory.use(itemId)) {
-                                        sleep(GAME_TICK_LENGTH * transport.getDuration());
+                                        //sleep(GAME_TICK_LENGTH * transport.getDuration());
                                         break;
                                     }
                                 }
@@ -953,13 +953,6 @@ public class Rs2Walker {
         WorldPoint origin = transport.getOrigin();
         WorldPoint destination = transport.getDestination();
 
-        System.out.println("Display info: " + displayInfo);
-        System.out.println("Object Name: " + objectName);
-        System.out.println("Object ID: " + objectId);
-        System.out.println("Action: " + action);
-        System.out.println("Origin: " + origin);
-        System.out.println("Destination: " + destination);
-
         // Check if the widget is already visible
         if (!Rs2Widget.isHidden(spiritTreeMenu)) {
             System.out.println("Widget is already visible. Skipping interaction.");
@@ -971,7 +964,8 @@ public class Rs2Walker {
         }
 
         // Find the spirit tree object
-        TileObject spiritTree = Rs2GameObject.findObjectByImposter(objectId, "Travel");
+        TileObject spiritTree = Rs2GameObject.findObjectById(objectId);
+        System.out.println(objectId);
         if (spiritTree == null) {
             System.out.println("Spirit tree not found.");
             return false;

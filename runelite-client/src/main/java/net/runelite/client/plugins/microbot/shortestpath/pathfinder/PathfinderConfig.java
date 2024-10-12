@@ -7,6 +7,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.shortestpath.*;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -174,7 +175,7 @@ public class PathfinderConfig {
                     varbitValues.put(varbitCheck.getVarbitId(), client.getVarbitValue(varbitCheck.getVarbitId()));
                 }
 
-                if (point == null && hasRequiredItems(transport) && useTransport(transport)) {
+                if (point == null && useTransport(transport) && hasRequiredItems(transport)) {
                     usableTeleports.add(transport);
                 } else if (useTransport(transport)) {
                     usableTransports.add(transport);
@@ -355,16 +356,23 @@ public class PathfinderConfig {
                 TransportType.TELEPORTATION_ITEM.equals(transport.getType())) {
             return false;
         }
-        List<Integer> inventoryItems = Arrays.stream(new InventoryID[]{InventoryID.INVENTORY, InventoryID.EQUIPMENT})
-                .map(client::getItemContainer)
-                .filter(Objects::nonNull)
-                .map(ItemContainer::getItems)
-                .flatMap(Arrays::stream)
-                .map(Item::getId)
-                .filter(itemId -> itemId != -1)
-                .collect(Collectors.toList());
-        // TODO: this does not check quantity
-        return transport.getItemIdRequirements().stream().anyMatch(requirements -> requirements.stream().allMatch(inventoryItems::contains));
+
+        if (transport.getType() == TELEPORTATION_SPELL) {
+            //START microbot variables
+            return Rs2Magic.canCast(transport.getDisplayInfo());
+            //END microbot variables
+        } else {
+            // TODO: this does not check quantity
+            List<Integer> inventoryItems = Arrays.stream(new InventoryID[]{InventoryID.INVENTORY, InventoryID.EQUIPMENT})
+                    .map(client::getItemContainer)
+                    .filter(Objects::nonNull)
+                    .map(ItemContainer::getItems)
+                    .flatMap(Arrays::stream)
+                    .map(Item::getId)
+                    .filter(itemId -> itemId != -1)
+                    .collect(Collectors.toList());
+            return transport.getItemIdRequirements().stream().anyMatch(requirements -> requirements.stream().allMatch(inventoryItems::contains));
+        }
     }
 
     //microbot method
