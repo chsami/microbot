@@ -1299,15 +1299,36 @@ public class Rs2Bank {
     }
 
     /**
+     * Check if "item" button is toggled on
+     *
+     * @return
+     */
+    public static boolean hasWithdrawAsItem() {
+        return Microbot.getVarbitValue(WITHDRAW_AS_NOTE_VARBIT) != 1;
+    }
+
+    /**
      * enable withdraw noted in your bank
      *
      * @return
      */
     public static boolean setWithdrawAsNote() {
         if (hasWithdrawAsNote()) return true;
-        Rs2Widget.clickWidget(786456);
+        Rs2Widget.clickWidget(786458);
         sleep(600);
         return hasWithdrawAsNote();
+    }
+
+    /**
+     * enable withdraw item in your bank
+     *
+     * @return
+     */
+    public static boolean setWithdrawAsItem() {
+        if (hasWithdrawAsItem()) return true;
+        Rs2Widget.clickWidget(786456);
+        sleep(600);
+        return hasWithdrawAsItem();
     }
 
     /**
