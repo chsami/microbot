@@ -7,6 +7,7 @@ import javax.swing.border.LineBorder;
 import lombok.Getter;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.mining.shootingstar.ShootingStarPanel;
+import net.runelite.client.plugins.microbot.util.misc.TimeUtils;
 import net.runelite.client.ui.ColorScheme;
 
 import net.runelite.client.ui.FontManager;
@@ -19,13 +20,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.ui.ColorScheme.*;
 
 public class ShootingStarTableRow extends JPanel {
 
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final ZoneId utcZoneId = ZoneId.of("UTC");
     private static final Color COLOR_NEGATIVE = new Color(255, 80, 80);
 
@@ -75,21 +75,6 @@ public class ShootingStarTableRow extends JPanel {
         timeLeftField.setPreferredSize(new Dimension(ShootingStarPanel.TIME_WIDTH, 20));
         timeLeftField.setOpaque(false);
         add(timeLeftField);
-    }
-
-    public static String convertTime(long epoch) {
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(epoch - Instant.now().toEpochMilli());
-        boolean negative = seconds < 0;
-        seconds = Math.abs(seconds);
-        String time = negative ? "-" : "";
-        long minutes = seconds / 60;
-        seconds %= 60;
-        if (minutes >= 100) {
-            time += minutes + "m";
-        } else {
-            time += String.format("%d:%02d", minutes, seconds);
-        }
-        return time;
     }
 
     private MouseAdapter createMouseOptions(Star starData, Color backgroundColor) {
@@ -192,7 +177,7 @@ public class ShootingStarTableRow extends JPanel {
     public void updateTime() {
         String endTime;
         if (displayAsMinutes) {
-            endTime = convertTime(starData.getEndsAt());
+            endTime = TimeUtils.getFormattedDurationBetween(Instant.now(), Instant.ofEpochMilli(starData.getEndsAt()));
         } else {
             Instant endInstant = Instant.ofEpochMilli(starData.getEndsAt());
             endTime = LocalDateTime.ofInstant(endInstant, ZoneId.systemDefault()).format(dtf);
