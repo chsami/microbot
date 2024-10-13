@@ -140,6 +140,12 @@ public class GotrScript extends Script {
                     Rs2Inventory.drop("portal talisman");
                     log("Dropping portal talisman...");
                 }
+                //Repair colossal pouch asap to avoid disintegrate completely
+                if (Rs2Inventory.hasItem("colossal pouch") && Rs2Inventory.hasDegradedPouch()) {
+                    if (!repairPouches()) {
+                        return;
+                    }
+                }
 
                 boolean isInMinigame = !isOutsideBarrier() && isInMainRegion();
 
@@ -507,10 +513,11 @@ public class GotrScript extends Script {
         }
     }
 
-    private static void repairPouches() {
+    private static boolean repairPouches() {
         if (Rs2Inventory.hasDegradedPouch()) {
-            Rs2Magic.repairPouchesWithLunar();
+            return Rs2Magic.repairPouchesWithLunar();
         }
+        return false;
     }
 
     @Override

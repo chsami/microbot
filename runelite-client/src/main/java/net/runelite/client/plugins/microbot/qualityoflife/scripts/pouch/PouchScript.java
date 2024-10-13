@@ -139,12 +139,14 @@ public class PouchScript extends Script {
                 case ItemID.MEDIUM_POUCH:
                 case ItemID.LARGE_POUCH:
                 case ItemID.GIANT_POUCH:
+                case ItemID.COLOSSAL_POUCH:
                     Pouch pouch = Pouch.forItem(item.getId());
                     pouch.degrade(false);
                     break;
                 case ItemID.MEDIUM_POUCH_5511:
                 case ItemID.LARGE_POUCH_5513:
                 case ItemID.GIANT_POUCH_5515:
+                case ItemID.COLOSSAL_POUCH_26786:
                     pouch = Pouch.forItem(item.getId());
                     pouch.degrade(true);
                     break;
