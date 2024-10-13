@@ -14,9 +14,11 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingWalkBack;
 
 import java.util.*;
@@ -74,7 +76,7 @@ public class AutoWoodcuttingScript extends Script {
                     return;
                 }
 
-                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts || Rs2AntibanSettings.actionCooldownActive)
+                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts)
                     return;
 
                 if (Rs2AntibanSettings.actionCooldownActive)
@@ -142,6 +144,12 @@ public class AutoWoodcuttingScript extends Script {
                 walkBack(config);
                 state = State.WOODCUTTING;
                 break;
+            case FLETCH_ARROWSHAFT:
+                fletchArrowShaft(config);
+                
+                walkBack(config);
+                state = State.WOODCUTTING;
+                break;
         }
     }
 
@@ -195,6 +203,17 @@ public class AutoWoodcuttingScript extends Script {
 
     private boolean isFiremake() {
         return Rs2Player.isAnimating(1800) && Rs2Player.getLastAnimationID() == AnimationID.FIREMAKING;
+    }
+    
+    private void fletchArrowShaft(AutoWoodcuttingConfig config) {
+        Rs2Inventory.combineClosest("knife", config.TREE().getLog());
+        Rs2Random.waitEx(1200, 300);
+        Rs2Widget.clickWidget("arrow shafts");
+        sleepUntil(() -> !isFlectching(), 5000);
+    }
+    
+    private boolean isFlectching() {
+        return Rs2Player.isAnimating(3000) && Rs2Player.getLastAnimationID() == AnimationID.FLETCHING_BOW_CUTTING;
     }
 
     private WorldPoint calculateReturnPoint(AutoWoodcuttingConfig config) {

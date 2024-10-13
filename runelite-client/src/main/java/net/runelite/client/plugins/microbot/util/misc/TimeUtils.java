@@ -13,9 +13,20 @@ public class TimeUtils {
      */
     public static String getFormattedDurationBetween(Instant start, Instant finish) {
         Duration duration = Duration.between(start, finish);
-        return String.format("%d:%02d:%02d",
+
+        // Check if the duration is negative
+        boolean isNegative = duration.isNegative();
+
+        // Use the absolute value of the duration for formatting
+        duration = duration.abs();
+
+        // Format the time components
+        String formattedDuration = String.format("%d:%02d:%02d",
                 duration.toHours(),
                 duration.toMinutesPart(),
                 duration.toSecondsPart());
+
+        // Prefix with "-" if the original duration was negative
+        return (isNegative ? "-" : "") + formattedDuration;
     }
 }
