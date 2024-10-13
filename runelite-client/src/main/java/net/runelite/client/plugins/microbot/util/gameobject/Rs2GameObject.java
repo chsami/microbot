@@ -881,12 +881,12 @@ public class Rs2GameObject {
 
     public static List<GameObject> getGameObjects() {
         Scene scene = Microbot.getClient().getTopLevelWorldView().getScene();
-        Tile[][][] tiles = scene.getExtendedTiles();
+        Tile[][][] tiles = scene.getTiles();
 
         int z = Microbot.getClient().getPlane();
         List<GameObject> tileObjects = new ArrayList<>();
-        for (int x = 0; x < Constants.EXTENDED_SCENE_SIZE; ++x) {
-            for (int y = 0; y < Constants.EXTENDED_SCENE_SIZE; ++y) {
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
                 Tile tile = tiles[z][x][y];
 
                 if (tile == null) {

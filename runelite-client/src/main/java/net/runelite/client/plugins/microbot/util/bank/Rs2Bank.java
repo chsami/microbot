@@ -903,23 +903,28 @@ public class Rs2Bank {
                 Microbot.getMouse().click();
             if (isOpen()) return true;
             boolean action;
-            WallObject grandExchangeBooth = Rs2GameObject.getWallObjects().stream().filter(x -> x.getId() == 10060 || x.getId() == 30389).findFirst().orElse(null);
+            WallObject grandExchangeBooth = Rs2GameObject.getWallObjects()
+                    .stream()
+                    .filter(x -> x.getId() == 10060 || x.getId() == 30389)
+                    .findFirst()
+                    .orElse(null);
             GameObject bank = Rs2GameObject.findBank();
+            GameObject chest = Rs2GameObject.findChest();
 
-            if (bank != null && (grandExchangeBooth == null ||
+            // Determine if bank should be skipped in favor of chest
+            boolean useChest = bank != null && chest != null && bank.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) > chest.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation());
+
+            if (!useChest && bank != null && (grandExchangeBooth == null ||
                     bank.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) <= grandExchangeBooth.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()))) {
                 action = Rs2GameObject.interact(bank, "bank");
             } else if (grandExchangeBooth != null) {
                 action = Rs2GameObject.interact(grandExchangeBooth, "bank");
+            } else if (chest != null) {
+                action = Rs2GameObject.interact(chest, "use");
             } else {
-                GameObject chest = Rs2GameObject.findChest();
-                if (chest != null) {
-                    action = Rs2GameObject.interact(chest, "use");
-                } else {
-                    NPC npc = Rs2Npc.getNpc("banker");
-                    if (npc == null) return false;
-                    action = Rs2Npc.interact(npc, "bank");
-                }
+                NPC npc = Rs2Npc.getNpc("banker");
+                if (npc == null) return false;
+                action = Rs2Npc.interact(npc, "bank");
             }
 
             if (action) {
