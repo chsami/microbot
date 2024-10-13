@@ -38,7 +38,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.randomGaussi
 
 public class GotrScript extends Script {
 
-    public static String version = "1.1.1";
+    public static String version = "1.1.2";
     public static long totalTime = 0;
     public static boolean shouldMineGuardianRemains = true;
     public static final String rewardPointRegex = "Total elemental energy:[^>]+>([\\d,]+).*Total catalytic energy:[^>]+>([\\d,]+).";
@@ -46,10 +46,6 @@ public class GotrScript extends Script {
 
     public static boolean isInMiniGame = false;
     public static final int portalId = ObjectID.PORTAL_43729;
-    public static final int depositPoolId = 43696;
-    public static final int elementalEssencePileId = 43722;
-    public static final int catalyticEssencePileId = 43723;
-    public static final int unchargedCellsTableId = 43732;
     public static final int greatGuardianId = 11403;
     public static final Map<Integer, GuardianPortalInfo> guardianPortalInfo = new HashMap<>();
     public static Optional<Instant> nextGameStart = Optional.empty();
