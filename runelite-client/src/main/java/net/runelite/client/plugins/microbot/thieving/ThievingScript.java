@@ -175,7 +175,12 @@ public class ThievingScript extends Script {
             boolean isBankOpen = Rs2Bank.useBank();
             if (!isBankOpen) return;
             Rs2Bank.depositAll();
-            Rs2Bank.withdrawX(true, config.food().getName(), config.foodAmount(), true);
+            boolean successfullyWithdrawFood = Rs2Bank.withdrawX(true, config.food().getName(), config.foodAmount(), true);
+            if (!successfullyWithdrawFood) {
+                Microbot.showMessage(config.food().getName() + " not found in bank");
+                sleep(5000);
+                return;
+            }
             Rs2Bank.withdrawX(true, "dodgy necklace", config.dodgyNecklaceAmount());
             if (config.shadowVeil()) {
                 Rs2Bank.withdrawAll(true,"Fire rune", true);

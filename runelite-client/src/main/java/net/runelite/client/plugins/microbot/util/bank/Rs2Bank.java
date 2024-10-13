@@ -347,8 +347,8 @@ public class Rs2Bank {
      * @param rs2Item The item to handle.
      * @param amount  The desired amount to set.
      */
-    private static void handleAmount(Rs2Item rs2Item, int amount) {
-        handleAmount(rs2Item, amount, false);
+    private static boolean handleAmount(Rs2Item rs2Item, int amount) {
+        return handleAmount(rs2Item, amount, false);
     }
 
     /**
@@ -363,12 +363,15 @@ public class Rs2Bank {
      * @param amount  The desired amount to set.
      * @param safe    will wait for item to appear in inventory before continuing if set to true
      */
-    private static void handleAmount(Rs2Item rs2Item, int amount, boolean safe) {
+    private static boolean handleAmount(Rs2Item rs2Item, int amount, boolean safe) {
         int inventorySize = Rs2Inventory.size();
         if (Microbot.getVarbitValue(X_AMOUNT_VARBIT) == amount) {
             invokeMenu(HANDLE_X_SET, rs2Item);
+
             if (safe)
-                sleepUntil(() -> inventorySize != Rs2Inventory.size(), 2500);
+                return sleepUntilTrue(() -> inventorySize != Rs2Inventory.size(), 100, 2500);
+
+            return true;
         } else {
             invokeMenu(HANDLE_X_UNSET, rs2Item);
 
@@ -376,6 +379,7 @@ public class Rs2Bank {
             Rs2Keyboard.typeString(String.valueOf(amount));
             Rs2Keyboard.enter();
             sleepUntil(() -> Rs2Inventory.hasItem(rs2Item.id), 2500);
+            return true;
         }
     }
 
@@ -633,13 +637,13 @@ public class Rs2Bank {
      * @param rs2Item Item to handle
      * @param amount  int
      */
-    private static void withdrawXItem(Rs2Item rs2Item, int amount) {
-        if (!isOpen()) return;
-        if (rs2Item == null) return;
-        if (Rs2Inventory.isFull() && !Rs2Inventory.hasItem(rs2Item.id) && !rs2Item.isStackable()) return;
+    private static boolean withdrawXItem(Rs2Item rs2Item, int amount) {
+        if (!isOpen()) return false;
+        if (rs2Item == null) return false;
+        if (Rs2Inventory.isFull() && !Rs2Inventory.hasItem(rs2Item.id) && !rs2Item.isStackable()) return false;
         container = BANK_ITEM_CONTAINER;
 
-        handleAmount(rs2Item, amount);
+        return handleAmount(rs2Item, amount);
     }
 
     /**
@@ -673,9 +677,9 @@ public class Rs2Bank {
      * @param amount   amount to withdraw
      * @param exact    exact search based on equalsIgnoreCase
      */
-    public static void withdrawX(boolean checkInv, String name, int amount, boolean exact) {
-        if (checkInv && Rs2Inventory.hasItem(name)) return;
-        withdrawX(name, amount, exact);
+    public static boolean withdrawX(boolean checkInv, String name, int amount, boolean exact) {
+        if (checkInv && Rs2Inventory.hasItem(name)) return false;
+        return withdrawX(name, amount, exact);
     }
 
     /**
@@ -696,8 +700,8 @@ public class Rs2Bank {
      * @param amount amount to withdraw
      * @param exact  exact search based on equalsIgnoreCase
      */
-    private static void withdrawX(String name, int amount, boolean exact) {
-        withdrawXItem(findBankItem(name, exact), amount);
+    private static boolean withdrawX(String name, int amount, boolean exact) {
+        return withdrawXItem(findBankItem(name, exact), amount);
     }
 
     /**
