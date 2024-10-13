@@ -663,18 +663,15 @@ public class Rs2GameObject {
     }
 
     public static TileObject findObject(int[] ids) {
-        int distance = 0;
-        TileObject tileObject = null;
-        for (int id :
-                ids) {
-            TileObject object = findObjectById(id);
-            if (object == null) continue;
-            if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance || tileObject == null) {
-                tileObject = object;
-                distance = Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation());
+        List<GameObject> gameObjects = getGameObjects();
+        if (gameObjects == null) return null;
+        for (int id : ids) {
+            for (net.runelite.api.GameObject gameObject : gameObjects) {
+                if (gameObject.getId() == id)
+                    return gameObject;
             }
         }
-        return tileObject;
+        return null;
     }
 
     public static ObjectComposition convertGameObjectToObjectComposition(TileObject tileObject) {

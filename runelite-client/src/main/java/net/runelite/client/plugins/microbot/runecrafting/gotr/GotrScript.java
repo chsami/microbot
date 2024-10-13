@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.Microbot.log;
+import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
 import static net.runelite.client.plugins.microbot.util.math.Random.randomGaussian;
 
 
@@ -54,16 +55,9 @@ public class GotrScript extends Script {
     public static Optional<Instant> nextGameStart = Optional.empty();
     public static final Set<GameObject> guardians = new HashSet<>();
     public static final List<GameObject> activeGuardianPortals = new ArrayList<>();
-    public static GameObject minePortal;
-    public static GameObject depositPool;
-    public static GameObject unchargedCellTable;
-    public static GameObject catalyticEssencePile;
-    public static GameObject elementalEssencePile;
     public static NPC greatGuardian;
     public static int elementalRewardPoints;
     public static int catalyticRewardPoints;
-    public static GameObject rcAltar;
-    public static GameObject rcPortal;
     public static GotrState state;
     static GotrConfig config;
     String GUARDIAN_FRAGMENTS = "guardian fragments";
@@ -376,6 +370,7 @@ public class GotrScript extends Script {
 
     private boolean craftRunes() {
         if (isInMiniGame() && !isInMainRegion()) {
+            TileObject rcAltar = findRcAltar();
             if (rcAltar != null) {
                 if (Rs2Player.isWalking()) return true;
                 if (Rs2Inventory.anyPouchFull() && !Rs2Inventory.isFull()) {
@@ -386,12 +381,15 @@ public class GotrScript extends Script {
                     state = GotrState.CRAFTING_RUNES;
                     Rs2GameObject.interact(rcAltar.getId());
                     log("Crafting runes on altar " + rcAltar.getId());
-                    sleep(Random.randomGaussian(Random.random(1000, 1500), 300));
-                } else if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId()) && !Rs2Player.isWalking()) {
+                    sleep(Random.randomGaussian(Random.random(1000, 3500), 300));
+                } else if (!Rs2Player.isWalking()) {
                     state = GotrState.LEAVING_ALTAR;
-                    Rs2GameObject.interact(rcPortal.getId());
-                    log("Leaving the altar...");
-                    sleepUntil(GotrScript::isInMainRegion, 5000);
+                    TileObject rcPortal = findPortalToLeaveAltar();
+                    if (Rs2GameObject.interact(rcPortal.getId())) {
+                        log("Leaving the altar...");
+                        sleepUntil(GotrScript::isInMainRegion, 5000);
+                        sleepGaussian(1500, 300);
+                    }
                 }
             }
             return true;
@@ -401,6 +399,7 @@ public class GotrScript extends Script {
 
     private static boolean waitForMinigameToStart() {
         if (shouldMineGuardianRemains) {
+            TileObject rcPortal = findPortalToLeaveAltar();
             if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId())) {
                 state = GotrState.LEAVING_ALTAR;
                 return true;
@@ -486,6 +485,7 @@ public class GotrScript extends Script {
                         }
                     }
                 }
+                sleepGaussian(2500, 350);
             } else {
                 if (!Rs2Player.isAnimating() && getStartTimer() != -1) {
                     if (Rs2Equipment.isWearing("dragon pickaxe")) {
@@ -629,14 +629,21 @@ public class GotrScript extends Script {
     public static void resetPlugin() {
         guardians.clear();
         activeGuardianPortals.clear();
-        unchargedCellTable = null;
         greatGuardian = null;
-        catalyticEssencePile = null;
-        elementalEssencePile = null;
-        depositPool = null;
-        minePortal = null;
-        rcPortal = null;
-        rcAltar = null;
         Microbot.getClient().clearHintArrow();
+    }
+
+    public static TileObject findRcAltar() {
+        int[] altarIds = new int[] {ObjectID.ALTAR_34760, ObjectID.ALTAR_34761, ObjectID.ALTAR_34762, ObjectID.ALTAR_34763, ObjectID.ALTAR_34764,
+                ObjectID.ALTAR_34765, ObjectID.ALTAR_34766, ObjectID.ALTAR_34767, ObjectID.ALTAR_34768, ObjectID.ALTAR_34769, ObjectID.ALTAR_34770,
+                ObjectID.ALTAR_34771, ObjectID.ALTAR_34772, ObjectID.ALTAR_43479};
+        return Rs2GameObject.findObject(altarIds);
+    }
+
+    public static TileObject findPortalToLeaveAltar() {
+        int[] altarIds = new int[] {ObjectID.PORTAL_34748, ObjectID.PORTAL_34749, ObjectID.PORTAL_34750, ObjectID.PORTAL_34751, ObjectID.PORTAL_34752,
+                ObjectID.PORTAL_34753, ObjectID.PORTAL_34754, ObjectID.PORTAL_34755, ObjectID.PORTAL_34756, ObjectID.PORTAL_34757, ObjectID.PORTAL_34758,
+                ObjectID.PORTAL_34758, ObjectID.PORTAL_34759};
+        return Rs2GameObject.findObject(altarIds);
     }
 }
