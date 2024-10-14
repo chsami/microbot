@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -616,6 +617,24 @@ public class Rs2Walker {
                 }
 
                 for (int i = indexOfStartPoint; i < path.size(); i++) {
+                    // Edgeville/ardy wilderness lever warning
+                    if (Rs2Widget.isWidgetVisible(229, 1))
+                    {
+                        Microbot.log("Detected Wilderness lever warning, interacting...");
+                        Rs2Dialogue.clickContinue();
+                        sleep(1200, 2400);
+                        return true;
+                    }
+
+                    // Wilderness ditch warning
+                    if (Rs2Widget.isWidgetVisible(475, 11))
+                    {
+                        Microbot.log("Detected Wilderness warning, interacting...");
+                        Rs2Widget.clickWidget(475, 11);
+                        sleepUntil(Rs2Player::isAnimating);
+                        return true;
+                    }
+
                     if (origin != null && origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                         continue;
                     if (path.stream().noneMatch(x -> x.equals(transport.getDestination()))) continue;
@@ -1034,21 +1053,33 @@ public class Rs2Walker {
             return false;
         }
 
-        System.out.println("Widget is now visible.");
+        System.out.println("Widget is now visible. " + displayInfo);
 
         switch (displayInfo) {
             case "Kar-Hewo":
                 Rs2Widget.clickWidget(KAR_HEWO);
-            case "Gnome Stronghold":
+                sleep(5000);
+                break;
+            case "Ta Quir Priw":
                 Rs2Widget.clickWidget(TA_QUIR_PRIW);
+                sleep(5000);
+                break;
             case "Sindarpos":
                 Rs2Widget.clickWidget(SINDARPOS);
+                sleep(5000);
+                break;
             case "Lemanto Andra":
                 Rs2Widget.clickWidget(LEMANTO_ANDRA);
+                sleep(5000);
+                break;
             case "Gandius":
                 Rs2Widget.clickWidget(GANDIUS);
+                sleep(5000);
+                break;
             case "Ookookolly Undri":
                 Rs2Widget.clickWidget(OOKOOKOLLY_UNDRI);
+                sleep(5000);
+                break;
         }
         return true;
     }
