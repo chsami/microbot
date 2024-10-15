@@ -639,7 +639,7 @@ public class GotrScript extends Script {
     public static TileObject findPortalToLeaveAltar() {
         int[] altarIds = new int[] {ObjectID.PORTAL_34748, ObjectID.PORTAL_34749, ObjectID.PORTAL_34750, ObjectID.PORTAL_34751, ObjectID.PORTAL_34752,
                 ObjectID.PORTAL_34753, ObjectID.PORTAL_34754, ObjectID.PORTAL_34755, ObjectID.PORTAL_34756, ObjectID.PORTAL_34757, ObjectID.PORTAL_34758,
-                ObjectID.PORTAL_34758, ObjectID.PORTAL_34759};
+                ObjectID.PORTAL_34758, ObjectID.PORTAL_34759, ObjectID.PORTAL_43478};
         return Rs2GameObject.findObject(altarIds);
     }
 }
