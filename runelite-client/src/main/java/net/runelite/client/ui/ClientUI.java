@@ -167,7 +167,7 @@ public class ClientUI
 		this.clientThreadProvider = clientThreadProvider;
 		this.eventBus = eventBus;
 		this.safeMode = safeMode;
-		this.title = title + (safeMode ? " (safe mode)" : " V" + version) + " " + proxyMessage;
+		this.title = title + (safeMode ? " (safe mode)" : " V" + version) + " " + proxyMessage.split(":")[0] + ":" + proxyMessage.split(":")[1];
 
 		normalBoundsTimer = new Timer(250, _ev -> setLastNormalBounds());
 		normalBoundsTimer.setRepeats(false);
