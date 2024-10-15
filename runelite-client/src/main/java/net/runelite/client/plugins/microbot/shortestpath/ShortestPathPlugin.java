@@ -385,8 +385,8 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
 
     private void onMenuOptionClicked(MenuEntry entry) {
         if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
-            //Rs2Walker.walkTo(getSelectedWorldPoint());
-            setTarget(getSelectedWorldPoint());
+            Rs2Walker.walkTo(getSelectedWorldPoint());
+            //setTarget(getSelectedWorldPoint());
         }
 
         if (entry.getOption().equals(SET) && entry.getTarget().equals(START)) {

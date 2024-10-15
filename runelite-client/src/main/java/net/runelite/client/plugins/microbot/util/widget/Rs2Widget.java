@@ -160,6 +160,7 @@ public class Rs2Widget {
             if (children == null) {
                 List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
                 for (Widget rootWidget : rootWidgets) {
+                    if (rootWidget == null) continue;
                     if (exact) {
                         String cleanText = rootWidget.getText() != null ? rootWidget.getText().replaceAll("<col=[^>]+>|</col>", "") : "";
                         String cleanName = rootWidget.getName() != null ? rootWidget.getName().replaceAll("<col=[^>]+>|</col>", "") : "";
@@ -211,6 +212,7 @@ public class Rs2Widget {
     public static Widget searchChildren(String text, Widget child, boolean exact) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget found = null;
+            if (child == null) return null;
             if (exact) {
                 String cleanText = child.getText() != null ? child.getText().replaceAll("<col=[^>]+>|</col>", "") : "";
                 String cleanName = child.getName() != null ? child.getName().replaceAll("<col=[^>]+>|</col>", "") : "";

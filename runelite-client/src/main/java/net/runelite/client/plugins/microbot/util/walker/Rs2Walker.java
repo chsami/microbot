@@ -209,7 +209,6 @@ public class Rs2Walker {
                 Microbot.log("Microbot Walker Exception " + ex.getMessage());
                 System.out.println(ex.getMessage());
                 ex.printStackTrace(System.out);
-                currentTarget = null;
             }
             return false;
         });
@@ -610,6 +609,22 @@ public class Rs2Walker {
      * @return
      */
     public static boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
+        // Edgeville/ardy wilderness lever warning
+        if (Rs2Widget.isWidgetVisible(229, 1)) {
+            Microbot.log("Detected Wilderness lever warning, interacting...");
+            Rs2Dialogue.clickContinue();
+            sleep(1200, 2400);
+            return true;
+        }
+
+        // Wilderness ditch warning
+        if (Rs2Widget.isWidgetVisible(475, 11)) {
+            Microbot.log("Detected Wilderness warning, interacting...");
+            Rs2Widget.clickWidget(475, 11);
+            sleepUntil(Rs2Player::isAnimating);
+            return true;
+        }
+
         for (Transport transport : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new HashSet<>())) {
             for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), transport.getOrigin())) {
                 if (transport.getOrigin() != null && Rs2Player.getWorldLocation().getPlane() != transport.getOrigin().getPlane()) {
@@ -617,24 +632,6 @@ public class Rs2Walker {
                 }
 
                 for (int i = indexOfStartPoint; i < path.size(); i++) {
-                    // Edgeville/ardy wilderness lever warning
-                    if (Rs2Widget.isWidgetVisible(229, 1))
-                    {
-                        Microbot.log("Detected Wilderness lever warning, interacting...");
-                        Rs2Dialogue.clickContinue();
-                        sleep(1200, 2400);
-                        return true;
-                    }
-
-                    // Wilderness ditch warning
-                    if (Rs2Widget.isWidgetVisible(475, 11))
-                    {
-                        Microbot.log("Detected Wilderness warning, interacting...");
-                        Rs2Widget.clickWidget(475, 11);
-                        sleepUntil(Rs2Player::isAnimating);
-                        return true;
-                    }
-
                     if (origin != null && origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                         continue;
                     if (path.stream().noneMatch(x -> x.equals(transport.getDestination()))) continue;
@@ -701,11 +698,12 @@ public class Rs2Walker {
                             if (succesfullAction)
                                 break;
                             for (Integer itemId : itemIds) {
-                                //TODO: jewellery teleport in inventory
                                 if (Rs2Walker.currentTarget == null) break;
                                 if (Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < config.reachedDistance())
                                     break;
                                 if (succesfullAction) break;
+
+                                System.out.println(itemId);
 
                                 //If an action is succesfully we break out of the loop
                                 succesfullAction = handleInventoryTeleports(transport, itemId) || handleWearableTeleports(transport, itemId);
@@ -791,6 +789,7 @@ public class Rs2Walker {
         if (!hasItem) return false;
         boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
         //hasMultipleDestination is stuff like: games neck, ring of dueling etc...
+        final int OFFSET = 10;// max offset of the exact area we teleport to
         if (hasMultipleDestination) {
             String[] values = transport.getDisplayInfo().split(":");
             String destination = values[1].trim().toLowerCase();
@@ -804,7 +803,7 @@ public class Rs2Walker {
                     sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
                     Rs2Widget.sleepUntilHasWidgetText(destination, 219, 1, false, 5000);
                     Rs2Widget.clickWidget(destination, Optional.of(219), 1, false);
-                    return sleepUntilTrue(() -> Rs2Player.getWorldLocation().equals(transport.getDestination()), 100, 5000);
+                    return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
                 }
             }
         }
@@ -816,7 +815,7 @@ public class Rs2Walker {
                 .orElse(null);
         if (itemAction == null) return false;
         if (Rs2Inventory.interact(itemId, itemAction)) {
-            return sleepUntilTrue(() -> Rs2Player.getWorldLocation().equals(transport.getDestination()), 100, 5000);
+            return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
         }
 
         return false;
@@ -824,22 +823,38 @@ public class Rs2Walker {
 
     private static boolean handleWearableTeleports(Transport transport, int itemId) {
         if (Rs2Equipment.isWearing(itemId)) {
+            System.out.println("is wearing " + itemId);
+            JewelleryLocationEnum jewelleryTransport;
             if (transport.getDisplayInfo().contains(":")) {
                 String[] values = transport.getDisplayInfo().split(":");
                 String jewelleryName = values[0].trim().toLowerCase();
                 String destination = values[1].trim().toLowerCase();
-                JewelleryLocationEnum jewelleryTransport = Arrays.stream(JewelleryLocationEnum.values()).filter(x -> x.getTooltip().toLowerCase().contains(jewelleryName) && x.getDestination().toLowerCase().contains(destination)).findFirst().orElse(null);
-                if (jewelleryTransport == null) return false;
-                if (Rs2Equipment.useAmuletAction(jewelleryTransport) || Rs2Equipment.useRingAction(jewelleryTransport)) {
-                    return sleepUntilTrue(() -> Rs2Player.getWorldLocation().equals(transport.getDestination()), 100, 5000);
-                }
+                jewelleryTransport = Arrays
+                        .stream(JewelleryLocationEnum.values())
+                        .filter(x -> x.getTooltip().toLowerCase().contains(jewelleryName)
+                                && x.getDestination().toLowerCase().contains(destination)
+                                || x.getLocation().equals(transport.getDestination()))
+                        .findFirst()
+                        .orElse(null);
             } else {
-                JewelleryLocationEnum jewelleryTransport = Arrays.stream(JewelleryLocationEnum.values()).filter(x -> x.getTooltip().toLowerCase().contains(transport.getDisplayInfo().toLowerCase())).findFirst().orElse(null);
-                if (jewelleryTransport == null) return false;
-                if (Rs2Equipment.useAmuletAction(jewelleryTransport) || Rs2Equipment.useRingAction(jewelleryTransport)) {
-                    return sleepUntilTrue(() -> Rs2Player.getWorldLocation().equals(transport.getDestination()), 100, 5000);
-                }
+                jewelleryTransport = Arrays.stream(JewelleryLocationEnum.values()).filter(x -> x.getTooltip().toLowerCase().contains(transport.getDisplayInfo().toLowerCase())).findFirst().orElse(null);
             }
+            if (jewelleryTransport == null) return false;
+            return interactWithJewellery(transport, jewelleryTransport);
+        }
+        return false;
+    }
+
+    private static boolean interactWithJewellery(Transport transport, JewelleryLocationEnum jewelleryTransport) {
+        final int OFFSET = 10;
+        boolean action;
+        if (jewelleryTransport.getTooltip().toLowerCase().contains("ring")) {
+            action = Rs2Equipment.useRingAction(jewelleryTransport);
+        } else {
+            action = Rs2Equipment.useAmuletAction(jewelleryTransport);
+        }
+        if (action) {
+            return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
         }
         return false;
     }
