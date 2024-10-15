@@ -8,14 +8,16 @@ import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
-import java.util.Arrays;
-
 public enum Pouch
 {
 	SMALL(new int[] {ItemID.SMALL_POUCH}, 3, 3, 1),
 	MEDIUM(new int[] { ItemID.MEDIUM_POUCH, ItemID.MEDIUM_POUCH_5511}, 6, 3, 25),
 	LARGE(new int[] {ItemID.LARGE_POUCH, ItemID.LARGE_POUCH_5513}, 9, 7, 50),
-	GIANT(new int[] {ItemID.GIANT_POUCH, ItemID.GIANT_POUCH_5515}, 12, 9, 75);
+	GIANT(new int[] {ItemID.GIANT_POUCH, ItemID.GIANT_POUCH_5515}, 12, 9, 75),
+	// degradedBaseHoldAmount for colossal pouch is dynamic, it starts at 35 and lowers
+	// each time you use the degraded pouch. We'll see it to 25 to be safe
+	COLOSSAL(new int[] {ItemID.GIANT_POUCH, ItemID.COLOSSAL_POUCH_26786}, 40, 25, 85);
+
 
 	private final int baseHoldAmount;
 	private final int degradedBaseHoldAmount;
@@ -95,6 +97,8 @@ public enum Pouch
 			case ItemID.GIANT_POUCH:
 			case ItemID.GIANT_POUCH_5515:
 				return GIANT;
+			case ItemID.COLOSSAL_POUCH:
+				return COLOSSAL;
 			default:
 				return null;
 		}

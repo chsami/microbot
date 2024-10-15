@@ -662,19 +662,31 @@ public class Rs2GameObject {
         return null;
     }
 
+    /**
+     * Finds the closest matching object id
+     * The reason we take the closest matching is to avoid interacting with an object that is to far away
+     * @param ids
+     * @return
+     */
     public static TileObject findObject(int[] ids) {
-        int distance = 0;
-        TileObject tileObject = null;
-        for (int id :
-                ids) {
-            TileObject object = findObjectById(id);
-            if (object == null) continue;
-            if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance || tileObject == null) {
-                tileObject = object;
-                distance = Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation());
+        List<GameObject> gameObjects = getGameObjects();
+        if (gameObjects == null) return null;
+
+        TileObject closestObject = null;
+        double closestDistance = Double.MAX_VALUE;
+
+        for (net.runelite.api.GameObject gameObject : gameObjects) {
+            for (int id : ids) {
+                if (gameObject.getId() == id) {
+                    double distance = gameObject.getWorldLocation().distanceTo(Rs2Player.getWorldLocation());
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestObject = gameObject;
+                    }
+                }
             }
         }
-        return tileObject;
+        return closestObject;
     }
 
     public static ObjectComposition convertGameObjectToObjectComposition(TileObject tileObject) {
@@ -881,12 +893,12 @@ public class Rs2GameObject {
 
     public static List<GameObject> getGameObjects() {
         Scene scene = Microbot.getClient().getTopLevelWorldView().getScene();
-        Tile[][][] tiles = scene.getExtendedTiles();
+        Tile[][][] tiles = scene.getTiles();
 
         int z = Microbot.getClient().getPlane();
         List<GameObject> tileObjects = new ArrayList<>();
-        for (int x = 0; x < Constants.EXTENDED_SCENE_SIZE; ++x) {
-            for (int y = 0; y < Constants.EXTENDED_SCENE_SIZE; ++y) {
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
                 Tile tile = tiles[z][x][y];
 
                 if (tile == null) {
@@ -1066,6 +1078,7 @@ public class Rs2GameObject {
     private static boolean clickObject(TileObject object, String action) {
         if (object == null) return false;
         if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(object.getWorldLocation()) > 51) {
+            Microbot.log("Object with id " + object.getId() + " is not close enough to interact with. Walking to the object....");
             Rs2Walker.walkTo(object.getWorldLocation());
             return false;
         }

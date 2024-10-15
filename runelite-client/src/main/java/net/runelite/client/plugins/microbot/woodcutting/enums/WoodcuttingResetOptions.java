@@ -6,5 +6,6 @@ import lombok.Getter;
 public enum WoodcuttingResetOptions {
     BANK,
     DROP,
-    FIREMAKE
+    FIREMAKE,
+    FLETCH_ARROWSHAFT
 }

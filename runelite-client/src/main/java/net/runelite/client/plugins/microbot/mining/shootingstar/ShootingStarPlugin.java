@@ -7,7 +7,6 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.GameState;
-import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -18,6 +17,7 @@ import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.breakhandler.BreakHandlerPlugin;
 import net.runelite.client.plugins.microbot.mining.shootingstar.enums.ShootingStarLocation;
 import net.runelite.client.plugins.microbot.mining.shootingstar.model.Star;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -41,6 +41,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -55,18 +56,27 @@ import java.util.regex.Pattern;
         enabledByDefault = false
 )
 public class ShootingStarPlugin extends Plugin {
-    private static final int TICKS_PER_MINUTE = 100;
-    private static final int UPDATE_INTERVAL = 3;
-    private static final ZoneId utcZoneId = ZoneId.of("UTC");
-    public static String version = "1.0.0";
     @Getter
     public List<Star> starList = new ArrayList<>();
+    
     @Inject
     ShootingStarScript shootingStarScript;
+
+    public static String version = "1.1.0";
     private String httpEndpoint;
+    
+    @Getter
+    @Setter
+    public int totalStarsMined = 0;
+    @Getter
+    public Instant startTime;
     private int apiTickCounter = 0;
     private int updateListTickCounter = 0;
     private int lastWorld;
+    private static final int TICKS_PER_MINUTE = 100;
+    private static final int UPDATE_INTERVAL = 3;
+    private static final ZoneId utcZoneId = ZoneId.of("UTC");
+    
     @Getter
     private boolean displayAsMinutes;
     @Getter
@@ -75,7 +85,12 @@ public class ShootingStarPlugin extends Plugin {
     private boolean hideF2PWorlds;
     @Getter
     private boolean hideWildernessLocations;
+    private boolean hideOverlay;
+    @Getter
+    private boolean hideDevOverlay;
     private boolean useNearestHighTierStar;
+    private boolean useBreakAtBank;
+    
     @Inject
     private WorldService worldService;
     @Inject
@@ -84,6 +99,7 @@ public class ShootingStarPlugin extends Plugin {
     private OverlayManager overlayManager;
     @Inject
     private ShootingStarOverlay shootingStarOverlay;
+    
     @Inject
     private ClientToolbar clientToolbar;
     private NavigationButton navButton;
@@ -228,19 +244,25 @@ public class ShootingStarPlugin extends Plugin {
         hideMembersWorlds = config.isHideMembersWorlds();
         hideF2PWorlds = config.isHideF2PWorlds();
         useNearestHighTierStar = config.useNearestHighTierStar();
+        useBreakAtBank = config.useBreakAtBank();
         hideWildernessLocations = config.isHideWildernessLocations();
+        hideOverlay = config.isHideOverlay();
+        hideDevOverlay = config.isHideDevOverlay();
+
         try {
             loadUrlFromProperties();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         fetchStars();
         createPanel();
         SwingUtilities.invokeLater(() -> panel.hideStars(starList));
 
-        if (overlayManager != null) {
-            overlayManager.add(shootingStarOverlay);
-        }
+        toggleOverlay(hideOverlay);
+
+        startTime = Instant.now();
+
         shootingStarScript.run(config);
     }
 
@@ -259,7 +281,7 @@ public class ShootingStarPlugin extends Plugin {
 
         if (event.getKey().equals(ShootingStarConfig.displayAsMinutes)) {
             displayAsMinutes = config.isDisplayAsMinutes();
-            updatePanelList(true);
+            updatePanelList(false);
         }
 
         if (event.getKey().equals(ShootingStarConfig.hideMembersWorlds)) {
@@ -283,6 +305,19 @@ public class ShootingStarPlugin extends Plugin {
         if (event.getKey().equals(ShootingStarConfig.useNearestHighTierStar)) {
             useNearestHighTierStar = config.useNearestHighTierStar();
         }
+
+        if (event.getKey().equals(ShootingStarConfig.useBreakAtBank)) {
+            useBreakAtBank = config.useBreakAtBank();
+        }
+
+        if (event.getKey().equals(ShootingStarConfig.hideOverlay)) {
+            hideOverlay = config.isHideOverlay();
+            toggleOverlay(hideOverlay);
+        }
+
+        if (event.getKey().equals(ShootingStarConfig.hideDevOverlay)) {
+            hideDevOverlay = config.isHideDevOverlay();
+        }
     }
 
     @Subscribe
@@ -298,9 +333,13 @@ public class ShootingStarPlugin extends Plugin {
             fetchStars();
             apiTickCounter = 0;
         }
-
         updateListTickCounter++;
         apiTickCounter++;
+
+        if (useBreakAtBank && !isBreakHandlerEnabled()) {
+            Microbot.log("Break Handler is not enabled to utilize the useBreakAtBank feature, enabling now..");
+            enableBreakHandler();
+        }
     }
 
     @Subscribe
@@ -332,6 +371,22 @@ public class ShootingStarPlugin extends Plugin {
         panel = null;
     }
 
+    private void toggleOverlay(boolean hideOverlay) {
+        if (overlayManager != null) {
+            boolean hasOverlay = overlayManager.anyMatch(ov -> ov.getName().equalsIgnoreCase(ShootingStarOverlay.class.getSimpleName()));
+
+            if (hideOverlay) {
+                if(!hasOverlay) return;
+
+                overlayManager.remove(shootingStarOverlay);
+            } else {
+                if (hasOverlay) return;
+
+                overlayManager.add(shootingStarOverlay);
+            }
+        }
+    }
+
     public Star getClosestHighestTierStar() {
         // Get the highest tier available
         int highestTier = starList.stream()
@@ -342,9 +397,7 @@ public class ShootingStarPlugin extends Plugin {
                 .orElse(-1);  // Return -1 if no star meets the requirements
 
         // If no star meets the requirements, return null
-        if (highestTier == -1) {
-            return null;
-        }
+        if (highestTier == -1) return null;
 
         int minTier = Math.max(1, highestTier - 2); // The lowest tier to consider (at least 1)
         int maxTier = Math.min(9, highestTier + 1); // The highest tier to consider (up to 9)
@@ -396,6 +449,23 @@ public class ShootingStarPlugin extends Plugin {
         return useNearestHighTierStar;
     }
 
+    public boolean useBreakAtBank() {
+        return useBreakAtBank;
+    }
+
+    private void enableBreakHandler() {
+        Plugin breakHandlerPlugin = Microbot.getPluginManager().getPlugins().stream()
+                .filter(x -> x.getClass().getName().equals(BreakHandlerPlugin.class.getName()))
+                .findFirst()
+                .orElse(null);
+
+        Microbot.startPlugin(breakHandlerPlugin);
+    }
+
+    public boolean isBreakHandlerEnabled() {
+        return Microbot.isPluginEnabled(BreakHandlerPlugin.class);
+    }
+
     public void removeStar(Star star) {
         if (star.equals(getSelectedStar()))
             star.setSelected(false);
@@ -404,11 +474,18 @@ public class ShootingStarPlugin extends Plugin {
     }
 
     public void updateSelectedStar(Star star) {
-        if (getSelectedStar() != null) {
-            Star oldStar = getSelectedStar();
+        Star oldStar = getSelectedStar();
+        if (oldStar == null) {
+            star.setSelected(!star.isSelected());
+            return;
+        } else if (!oldStar.equals(star)) {
             oldStar.setSelected(false);
+            star.setSelected(!star.isSelected());
+            return;
         }
-        star.setSelected(!star.isSelected());
+        
+        oldStar.setTier(star.getTierBasedOnObjectID());
+        oldStar.setMiningLevel(star.getRequiredMiningLevel());
     }
 
     private void filterPanelList(boolean toggle) {

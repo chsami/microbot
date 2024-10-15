@@ -10,13 +10,16 @@ import javax.inject.Inject;
 import java.awt.*;
 
 public class TutorialIslandOverlay extends OverlayPanel {
+    
+    TutorialislandPlugin plugin;
     @Inject
-    TutorialIslandOverlay(TutorialislandPlugin plugin)
-    {
+    TutorialIslandOverlay(TutorialislandPlugin plugin) {
         super(plugin);
+        this.plugin = plugin;
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }
+    
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
@@ -29,14 +32,22 @@ public class TutorialIslandOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder().build());
 
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left(Microbot.status + " - " + Microbot.getVarbitValue(281))
+                    .left(Microbot.status)
                     .build());
+            
+            if (plugin.isToggleDevOverlay()) {
+                if (TutorialIslandScript.status != null) {
+                    panelComponent.getChildren().add(LineComponent.builder()
+                            .left("State:")
+                            .right(TutorialIslandScript.status.toString())
+                            .build());
+                }
 
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left(TutorialIslandScript.status.toString())
-                    .build());
-
-
+                panelComponent.getChildren().add(LineComponent.builder()
+                        .left("Progress (281):")
+                        .right(Integer.toString(Microbot.getVarbitPlayerValue(281)))
+                        .build());
+            }
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }

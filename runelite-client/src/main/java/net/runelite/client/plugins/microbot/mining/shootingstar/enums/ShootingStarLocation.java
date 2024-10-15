@@ -46,7 +46,7 @@ public enum ShootingStarLocation {
     CATHERBY_BANK(new WorldPoint(2804, 3438, 0), "Catherby bank", "Catherby", false),
     CORSAIR_COVE(new WorldPoint(2566, 2858, 0), "Corsair Cove bank", "Corsair Cove bank", false),
     CORSAIR_COVE_RESOURCE_AREA(new WorldPoint(2482, 2881, 0), "Corsair Resource Area", "Corsair Resource Area", false),
-    COAL_TRUCKS(new WorldPoint(2590, 3479, 0), "Coal Trucks west of Seers'", "Seers Village", false),
+    COAL_TRUCKS(new WorldPoint(2594, 3479, 0), "Coal Trucks west of Seers'", "Seers Village", false),
     KELDAGRIM_ENTRANCE_MINE(new WorldPoint(2725, 3683, 0), "Keldagrim entrance mine", "Keldagrim entrance", false),
     PISCATORIS_MINE(new WorldPoint(2342, 3632, 0), "Piscatoris mine", "Piscatoris mine", false),
     SOUTH_BRIMHAVEN_MINE(new WorldPoint(2743, 3145, 0), "Southwest of Brimhaven Poh", "SW Brimhaven", false),

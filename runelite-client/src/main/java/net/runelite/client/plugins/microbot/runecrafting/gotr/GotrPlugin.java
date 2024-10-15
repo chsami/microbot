@@ -135,34 +135,7 @@ public class GotrPlugin extends Plugin {
         }
 
         if (gameObject.getId() == GotrScript.portalId) {
-            GotrScript.minePortal = gameObject;
-            Microbot.getClient().setHintArrow(GotrScript.minePortal.getWorldLocation());
-        }
-
-        if (gameObject.getId() == GotrScript.depositPoolId) {
-            GotrScript.depositPool = gameObject;
-        }
-
-        if (gameObject.getId() == GotrScript.elementalEssencePileId) {
-            GotrScript.elementalEssencePile = gameObject;
-        }
-
-        if (gameObject.getId() == GotrScript.catalyticEssencePileId) {
-            GotrScript.catalyticEssencePile = gameObject;
-        }
-
-        if (gameObject.getId() == GotrScript.unchargedCellsTableId) {
-            GotrScript.unchargedCellTable = gameObject;
-        }
-        ObjectComposition objectComposition = Microbot.getClient().getObjectDefinition(gameObject.getId());
-        String[] actions = objectComposition.getActions();
-        if (actions != null && actions.length > 0 && Arrays.stream(actions).anyMatch(x -> x != null && x.contains("Craft-rune"))) {
-            Microbot.log("Altar with id: " + gameObject.getId() + " deleted.");
-            GotrScript.rcAltar = gameObject;
-        }
-        if (objectComposition.getName().equalsIgnoreCase("portal") && !GotrScript.isInMainRegion()) {
-            Microbot.log("portal with id: " + gameObject.getId() + " deleted.");
-            GotrScript.rcPortal = gameObject;
+            Microbot.getClient().setHintArrow(gameObject.getWorldLocation());
         }
     }
 
@@ -175,33 +148,6 @@ public class GotrPlugin extends Plugin {
 
         if (gameObject.getId() == GotrScript.portalId) {
             Microbot.getClient().clearHintArrow();
-            GotrScript.minePortal = null;
-        }
-
-        if (gameObject.getId() == GotrScript.depositPoolId) {
-            GotrScript.depositPool = null;
-        }
-
-        if (gameObject.getId() == GotrScript.elementalEssencePileId) {
-            GotrScript.elementalEssencePile = null;
-        }
-
-        if (gameObject.getId() == GotrScript.catalyticEssencePileId) {
-            GotrScript.catalyticEssencePile = null;
-        }
-
-        if (gameObject.getId() == GotrScript.unchargedCellsTableId) {
-            GotrScript.unchargedCellTable = null;
-        }
-        ObjectComposition objectComposition = Microbot.getClient().getObjectDefinition(gameObject.getId());
-        String[] actions = objectComposition.getActions();
-        if (actions != null && actions.length > 0 && Arrays.stream(actions).anyMatch(x -> x != null && x.contains("Craft-rune"))) {
-            Microbot.log("Altar with id: " + gameObject.getId() + " deleted.");
-            GotrScript.rcAltar = null;
-        }
-        if (objectComposition.getName().equalsIgnoreCase("portal") && !GotrScript.isInMainRegion()) {
-            Microbot.log("portal with id: " + gameObject.getId() + " deleted.");
-            GotrScript.rcPortal = null;
         }
     }
 
