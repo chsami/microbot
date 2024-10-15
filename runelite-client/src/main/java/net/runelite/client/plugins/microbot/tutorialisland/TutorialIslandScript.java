@@ -27,6 +27,7 @@ import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
 import javax.inject.Inject;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue.*;
@@ -384,15 +385,35 @@ public class TutorialIslandScript extends Script {
 
         } else if (Microbot.getVarbitPlayerValue(281) == 520) {
             Rs2Bank.closeBank();
+            sleepUntil(() -> !Rs2Bank.isOpen());
             Rs2GameObject.interact(26815); //interactWithPollBooth
             sleepUntil(() -> Microbot.getVarbitPlayerValue(281) != 520);
         } else if (Microbot.getVarbitPlayerValue(281) == 525 || Microbot.getVarbitPlayerValue(281) == 530) {
+            if (Rs2Widget.isWidgetVisible(310, 2)) {
+                Widget widgetOptions = Rs2Widget.getWidget(310, 2);
+                Widget[] dynamicWidgetOptions = widgetOptions.getDynamicChildren();
+
+                for (Widget dynamicWidgetOption : dynamicWidgetOptions) {
+                    String[] actionsText = dynamicWidgetOption.getActions();
+
+                    if (actionsText != null) {
+                        if (Arrays.stream(actionsText).anyMatch(at -> at.equalsIgnoreCase("close"))) {
+                            Rs2Widget.clickWidget(dynamicWidgetOption);
+                            break;
+                        }
+                    }
+                }
+            }
+
             Rs2Walker.walkTo(new WorldPoint(3127, 3123, 0), 2);
+            Rs2Player.waitForWalking();
             Rs2Npc.interact(npc, "Talk-to");
+            sleepUntil(Rs2Dialogue::isInDialogue);
         } else if (Microbot.getVarbitPlayerValue(281) == 531) {
             Rs2Widget.clickWidget(10747943); //switchToAccountManagementTab
         } else if (Microbot.getVarbitPlayerValue(281) == 532) {
             Rs2Npc.interact(npc, "Talk-to");
+            sleepUntil(Rs2Dialogue::isInDialogue);
         }
     }
 
