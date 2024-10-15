@@ -38,7 +38,6 @@ public class TutorialIslandScript extends Script {
 
     public static double version = 1.1;
     public static Status status = Status.NAME;
-    final int Anvil = 312;
     final int CharacterCreation = 679;
     final int[] CharacterCreation_Arrows = new int[]{13, 17, 21, 25, 29, 33, 37, 44, 48, 52, 56, 60};
     private final TutorialislandPlugin plugin;
@@ -396,6 +395,23 @@ public class TutorialIslandScript extends Script {
 
 
         } else if (Microbot.getVarbitPlayerValue(281) == 520) {
+            if (Rs2Widget.isWidgetVisible(289, 5)) {
+                Widget widgetOptions = Rs2Widget.getWidget(289, 4);
+                Widget[] dynamicWidgetOptions = widgetOptions.getDynamicChildren();
+
+                for (Widget dynamicWidgetOption : dynamicWidgetOptions) {
+                    String widgetText = dynamicWidgetOption.getText();
+
+                    if (widgetText != null) {
+                        if (widgetText.equalsIgnoreCase("Want more bank space?")) {
+                            Rs2Widget.clickWidget(289, 7);
+                            Rs2Random.waitEx(1200, 300);
+                            break;
+                        }
+                    }
+                }
+            }
+            
             Rs2Bank.closeBank();
             sleepUntil(() -> !Rs2Bank.isOpen());
             Rs2GameObject.interact(26815); //interactWithPollBooth
@@ -543,16 +559,17 @@ public class TutorialIslandScript extends Script {
             }
             if (Rs2Inventory.contains("Bronze pickaxe") && (!Rs2Inventory.contains("Copper ore") || !Rs2Inventory.contains("Tin ore"))) {
                 if (!Rs2Inventory.contains("Copper ore")) {
-                    Rs2GameObject.interact(10079, "Mine");
+                    Rs2GameObject.interact(ObjectID.COPPER_ROCKS, "Mine");
                     sleepUntil(() -> Rs2Inventory.contains("Copper ore") && !Rs2Player.isAnimating(1800));
                 }
                 if (!Rs2Inventory.contains("Tin ore")) {
-                    Rs2GameObject.interact(10080, "Mine");
+                    Rs2GameObject.interact(ObjectID.TIN_ROCKS, "Mine");
                     sleepUntil(() -> Rs2Inventory.contains("Tin ore")&& !Rs2Player.isAnimating(1800));
                 }
             } else if (Rs2Inventory.contains("Copper ore") && Rs2Inventory.contains("Tin ore")) {
-                Rs2Inventory.interact("Tin ore");
-                Rs2GameObject.interact("Furnace");
+                int[] ores = {ItemID.TIN_ORE, ItemID.COPPER_ORE};
+                int selectedOreId = ores[(int) (System.currentTimeMillis() / 1000) % ores.length];
+                Rs2Inventory.useItemOnObject(selectedOreId, ObjectID.FURNACE_10082);
                 sleepUntil(() -> Rs2Inventory.contains("Bronze bar") && !Rs2Player.isAnimating(1800));
             }
         }
