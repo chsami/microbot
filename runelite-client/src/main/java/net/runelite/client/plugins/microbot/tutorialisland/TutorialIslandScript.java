@@ -317,8 +317,8 @@ public class TutorialIslandScript extends Script {
 
         if (Microbot.getVarbitPlayerValue(281) == 610 || Microbot.getVarbitPlayerValue(281) == 620) {
             WorldPoint worldPoint = new WorldPoint(3141, 3088, 0);
-            if (Rs2Player.distanceTo(worldPoint) > 2) {
-                Rs2Walker.walkTo(worldPoint, 2);
+            if (Rs2Player.distanceTo(worldPoint) >= 4) {
+                Rs2Walker.walkTo(worldPoint, 4);
             } else {
                 if (Rs2Npc.interact(npc, "Talk-to")) {
                     sleepUntil(Rs2Dialogue::isInDialogue);
