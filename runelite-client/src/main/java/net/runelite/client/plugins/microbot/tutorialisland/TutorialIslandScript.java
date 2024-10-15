@@ -287,8 +287,7 @@ public class TutorialIslandScript extends Script {
             Rs2Widget.clickWidget(164, 55); // switchToInventoryTab
             Rs2Random.waitEx(1200, 100);
         } else if (Microbot.getVarbitPlayerValue(281) < 50) {
-            Rs2Npc.interact(NpcID.FISHING_SPOT_3317, "Net");
-            sleepUntil(() -> Rs2Inventory.contains("Raw shrimps"));
+            fishShrimp();
         } else if (Microbot.getVarbitPlayerValue(281) < 70) {
             Rs2Widget.clickWidget(164, 53); // switchToSkillsTab
             Rs2Random.waitEx(1200, 100);
@@ -296,6 +295,10 @@ public class TutorialIslandScript extends Script {
                 sleepUntil(Rs2Dialogue::isInDialogue);
             }
         } else if (Microbot.getVarbitPlayerValue(281) <= 90) {
+            if (!Rs2Inventory.contains("Raw shrimps")) {
+                fishShrimp();
+                return;
+            }
             if (!Rs2Inventory.contains("Logs") && !Rs2GameObject.exists(ObjectID.FIRE_26185)){
                 CutTree();
                 return;
@@ -559,6 +562,11 @@ public class TutorialIslandScript extends Script {
     public void CutTree() {
         Rs2GameObject.interact("Tree", "Chop down");
         sleepUntil(() -> Rs2Inventory.hasItem("Logs") && !Rs2Player.isAnimating(2400));
+    }
+    
+    public void fishShrimp() {
+        Rs2Npc.interact(NpcID.FISHING_SPOT_3317, "Net");
+        sleepUntil(() -> Rs2Inventory.contains("Raw shrimps"));
     }
 
     enum Status {
