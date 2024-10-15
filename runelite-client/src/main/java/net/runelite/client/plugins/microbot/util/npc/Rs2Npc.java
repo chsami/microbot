@@ -221,6 +221,7 @@ public class Rs2Npc {
 
         } catch (Exception ex) {
             Microbot.log(ex.getMessage());
+            ex.printStackTrace();
         }
 
         return true;

@@ -372,13 +372,19 @@ public class Rs2Tile {
     }
 
     public static WorldPoint getNearestWalkableTileWithLineOfSight(WorldPoint source) {
+        // check if source is walkable
+        if (!tileHasWalls(source)
+                && isValidTile(getTile(source.getX(), source.getY()))
+                && (isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), source.getX(), source.getY())) || isBankBooth(source))) {
+            return source;
+        }
+        //check if neightbours are walkable
         for (Direction direction : Direction.values()) {
             WorldPoint neighbour = getNeighbour(direction, source);
             if (neighbour.equals(Rs2Player.getWorldLocation())) continue;
             if (!tileHasWalls(neighbour)
                     && isValidTile(getTile(neighbour.getX(), neighbour.getY()))
                     && (isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), neighbour.getX(), neighbour.getY())) || isBankBooth(neighbour))) {
-                System.out.println(neighbour);
                 return neighbour;
             }
         }
@@ -411,7 +417,15 @@ public class Rs2Tile {
 
     public static boolean isValidTile(Tile tile) {
         if (tile == null) return false;
-        byte flags = Microbot.getClient().getTileSettings()[tile.getRenderLevel()][tile.getSceneLocation().getX()][tile.getSceneLocation().getY()];
-        return flags == 4;
+        int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
+        int data = flags[tile.getSceneLocation().getX()][tile.getSceneLocation().getY()];
+
+        Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
+
+        if (movementFlags.isEmpty())
+        {
+            return true;
+        }
+        return false;
     }
 }
