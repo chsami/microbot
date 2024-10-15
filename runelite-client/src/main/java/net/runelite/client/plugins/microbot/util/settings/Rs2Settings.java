@@ -14,76 +14,103 @@ import static net.runelite.client.plugins.microbot.util.Global.*;
 public class Rs2Settings {
 
     static final int DROP_SHIFT_SETTING = 5542;
-    
+    static final int SETTINGS_INTERFACE = 8781825;
+    static final int SETTINGS_SEARCHBAR = 8781834;
+    static final int ALL_SETTINGS_BUTTON = 7602208;
+
     public static boolean isDropShiftSettingEnabled() {
         return Microbot.getVarbitValue(DROP_SHIFT_SETTING) == 1;
     }
-    
-    public static boolean enableDropShiftSetting() {
+
+    public static boolean enableDropShiftSetting(boolean closeInterface) {
         if (Rs2Widget.hasWidget("Click here to continue")) {
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
         }
-        if (Microbot.getVarbitValue(DROP_SHIFT_SETTING) == 0) {
-            final int ALL_SETTINGS_BUTTON = 7602208;
-            final int SETTINGS_INTERFACE = 8781825;
+        if (!isDropShiftSettingEnabled()) {
             Rs2Tab.switchToSettingsTab();
-            Rs2Widget.clickWidget(ALL_SETTINGS_BUTTON);
-            sleepUntilOnClientThread(() -> Rs2Widget.getWidget(SETTINGS_INTERFACE) != null);
-            final boolean isSettingsInterfaceVisible = Rs2Widget.getWidget(SETTINGS_INTERFACE) != null;
-            if (isSettingsInterfaceVisible) {
-                Rs2Widget.clickWidget("controls", true);
-                sleep(600);
-                Rs2Widget.clickWidget("Shift click to drop items");
-                sleep(600);
+
+            boolean isSettingsInterfaceVisible = Rs2Widget.isWidgetVisible(SETTINGS_INTERFACE);
+            if (!isSettingsInterfaceVisible) {
+                Rs2Widget.clickWidget(ALL_SETTINGS_BUTTON);
+                return false;
+            }
+
+            Rs2Widget.clickWidget("controls", true);
+            sleep(600);
+            Rs2Widget.clickWidget("Shift click to drop items");
+            sleep(600);
+            if (closeInterface) {
                 Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
                 Rs2Tab.switchToInventoryTab();
             }
         }
-        return Microbot.getVarbitValue(DROP_SHIFT_SETTING) == 1;
+        return isDropShiftSettingEnabled();
+    }
+
+    public static boolean enableDropShiftSetting() {
+        return enableDropShiftSetting(true);
     }
 
     public static boolean isHideRoofsEnabled() {
         return Microbot.getVarbitValue(TOGGLE_ROOFS) == 1;
     }
 
-    public static void hideRoofs() {
+    public static boolean hideRoofs(boolean closeInterface) {
         if (!isHideRoofsEnabled()) {
             Rs2Tab.switchToSettingsTab();
-            Rs2Widget.clickWidget(7602208);
-            final boolean isSettingsInterfaceVisible = Rs2Widget.getWidget(8781825) != null;
-            sleepUntilOnClientThread(() -> isSettingsInterfaceVisible);
-            if (isSettingsInterfaceVisible) {
-                Rs2Widget.clickWidget(8781834);
-                Rs2Keyboard.typeString("roofs");
-                sleep(600);
-                Rs2Widget.clickWidget("Hide roofs");
-                sleep(600);
+
+            boolean isSettingsInterfaceVisible = Rs2Widget.isWidgetVisible(SETTINGS_INTERFACE);
+            if (!isSettingsInterfaceVisible) {
+                Rs2Widget.clickWidget(ALL_SETTINGS_BUTTON);
+                return false;
+            }
+
+            Rs2Widget.clickWidget(SETTINGS_SEARCHBAR);
+            Rs2Keyboard.typeString("roofs");
+            sleep(600);
+            Rs2Widget.clickWidget("Hide roofs");
+            sleep(600);
+            if (closeInterface) {
                 Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
                 Rs2Tab.switchToInventoryTab();
             }
         }
+        return isHideRoofsEnabled();
+    }
+
+    public static boolean hideRoofs() {
+        return hideRoofs(true);
     }
 
     public static boolean isLevelUpNotificationsEnabled() {
         return Microbot.getVarbitValue(Varbits.DISABLE_LEVEL_UP_INTERFACE) == 1;
     }
 
-    public static void disableLevelUpNotifications() {
+    public static boolean disableLevelUpNotifications(boolean closeInterface) {
         if (!isLevelUpNotificationsEnabled()) {
             Rs2Tab.switchToSettingsTab();
-            Rs2Widget.clickWidget(7602208);
-            final boolean isSettingsInterfaceVisible = Rs2Widget.getWidget(8781825) != null;
-            sleepUntilOnClientThread(() -> isSettingsInterfaceVisible);
-            if (isSettingsInterfaceVisible) {
-                Rs2Widget.clickWidget(8781834);
-                Rs2Keyboard.typeString("level-");
-                sleep(600);
-                Rs2Widget.clickWidget("Disable level-up interface");
-                sleep(600);
+
+            boolean isSettingsInterfaceVisible = Rs2Widget.isWidgetVisible(SETTINGS_INTERFACE);
+            if (!isSettingsInterfaceVisible) {
+                Rs2Widget.clickWidget(ALL_SETTINGS_BUTTON);
+                return false;
+            }
+
+            Rs2Widget.clickWidget(SETTINGS_SEARCHBAR);
+            Rs2Keyboard.typeString("level-");
+            sleep(600);
+            Rs2Widget.clickWidget("Disable level-up interface");
+            sleep(600);
+            if (closeInterface) {
                 Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
                 Rs2Tab.switchToInventoryTab();
             }
         }
+        return isLevelUpNotificationsEnabled();
+    }
+
+    public static boolean disableLevelUpNotifications() {
+        return disableLevelUpNotifications(true);
     }
 
     public static void turnOffMusic() {
