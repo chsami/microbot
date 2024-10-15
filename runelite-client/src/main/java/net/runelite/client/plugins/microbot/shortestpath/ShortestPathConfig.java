@@ -212,6 +212,18 @@ public interface ShortestPathConfig extends Config {
         return false;
     }
 
+    @ConfigItem(
+            keyName = "distanceBeforeUsingTeleports",
+            name = "Teleport distance",
+            description = "Distance before using a teleport<br>" +
+                    "(This is to avoid using teleports when you are to close",
+            position = 14,
+            section = sectionSettings
+    )
+    default int distanceBeforeUsingTeleport() {
+        return 20;
+    }
+
     @Range(
             min = -1,
             max = 20000

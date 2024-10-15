@@ -719,4 +719,12 @@ public class Rs2Player {
 
         return (long) idleClientTicks >= randomDelay;
     }
+
+    /**
+     * Checks wether a player is in a cave
+     * @return
+     */
+    public static boolean isInCave() {
+        return Rs2Player.getWorldLocation().getY() >= 6400;
+    }
 }

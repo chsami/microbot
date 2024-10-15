@@ -242,7 +242,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         return false;
     }
 
-    private final Pattern TRANSPORT_OPTIONS_REGEX = Pattern.compile("^(avoidWilderness|use\\w+)$");
+    private final Pattern TRANSPORT_OPTIONS_REGEX = Pattern.compile("^(avoidWilderness|use\\w+|useTeleportationItems)$");
 
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {

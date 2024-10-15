@@ -60,6 +60,8 @@ public class PathfinderConfig {
             useWildernessObelisks;
     //START microbot variables
     @Getter
+    private int distanceBeforeUsingTeleport;
+    @Getter
     private final List<Restriction> resourceRestrictions;
     private List<Restriction> customRestrictions;
     @Getter
@@ -111,6 +113,7 @@ public class PathfinderConfig {
         useTeleportationPortals = config.useTeleportationPortals();
         useTeleportationSpells = config.useTeleportationSpells();
         useWildernessObelisks = config.useWildernessObelisks();
+        distanceBeforeUsingTeleport = config.distanceBeforeUsingTeleport();
 
         //START microbot variables
         useNpcs = config.useNpcs();

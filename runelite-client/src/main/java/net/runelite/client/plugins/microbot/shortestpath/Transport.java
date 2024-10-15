@@ -216,7 +216,8 @@ public class Transport {
                 || TransportType.TELEPORTATION_SPELL.equals(transportType)) {
             // Teleportation items and spells should always have a non-zero wait,
             // so the pathfinder doesn't calculate the cost by distance
-            this.duration = Math.max(this.duration, 1);
+            //MICROBOT - The reason we commented this out is to avoid using teleport items when being to close to the target
+           // this.duration = duration;
         }
 
         if ((value = fieldMap.get("Display info")) != null) {

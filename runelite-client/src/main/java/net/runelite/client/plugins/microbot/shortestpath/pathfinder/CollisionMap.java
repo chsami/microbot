@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 import net.runelite.api.WorldType;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
+import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
 
 import java.util.ArrayList;
@@ -88,10 +89,16 @@ public class CollisionMap {
         // Transports are pre-filtered by PathfinderConfig.refreshTransports
         // Thus any transports in the list are guaranteed to be valid per the user's settings
         for (Transport transport : transports) {
+            //START microbot variables
             if (transport.isMember() && !Microbot.getClient().getWorldType().contains(WorldType.MEMBERS))
                 continue;
             if (visited.get(transport.getDestination())) continue;
-            neighbors.add(new TransportNode(transport.getDestination(), node, transport.getDuration()));
+            if (transport.getType() == TransportType.TELEPORTATION_ITEM || transport.getType() == TransportType.TELEPORTATION_SPELL) {
+                neighbors.add(new TransportNode(transport.getDestination(), node, config.getDistanceBeforeUsingTeleport(), transport.getType()));
+            } else {
+                neighbors.add(new TransportNode(transport.getDestination(), node, transport.getDuration(), transport.getType()));
+            }
+            //END microbot variables
         }
 
 
