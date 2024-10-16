@@ -16,9 +16,11 @@ public enum Rocks {
     COAL("coal rocks", 30),
     GOLD("gold rocks", 40),
     GEM("gem rocks", 40),
+    CALCIFIED_ROCKS("calcified rocks", 41),
     MITHRIL("mithril rocks", 55),
     ADAMANTITE("adamantite rocks", 70),
     RUNITE("runite rocks", 85);
+
 
     private final String name;
     private final int miningLevel;

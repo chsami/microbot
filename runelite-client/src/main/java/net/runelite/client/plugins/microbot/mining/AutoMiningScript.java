@@ -28,6 +28,9 @@ public class AutoMiningScript extends Script {
     public static String version = "1.4.2";
     State state = State.MINING;
 
+    // Create an instance of CalcifiedMine
+    private final CalcifiedMine calcifiedMine = new CalcifiedMine();
+
     public boolean run(AutoMiningConfig config) {
         initialPlayerLocation = null;
         Rs2Antiban.resetAntibanSettings();
@@ -59,8 +62,17 @@ public class AutoMiningScript extends Script {
                             return;
                         }
 
-                        GameObject rock = Rs2GameObject.findObject(config.ORE().getName(), true, config.distanceToStray(), true, initialPlayerLocation);
+                        GameObject rock;
 
+                        // Use CalcifiedMine logic if Calcified Rocks are selected in the config
+                        if (config.ORE().getName().equalsIgnoreCase("calcified rocks")) {
+                            rock = calcifiedMine.findPriorityRock(); // Use priority mining logic
+                        } else {
+                            // Otherwise, use normal mining logic
+                            rock = Rs2GameObject.findObject(config.ORE().getName(), true, config.distanceToStray(), true, initialPlayerLocation);
+                        }
+
+                        // Interact with the found rock
                         if (rock != null) {
                             if (Rs2GameObject.interact(rock)) {
                                 Rs2Player.waitForXpDrop(Skill.MINING, true);
