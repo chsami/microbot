@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.*;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -262,8 +263,12 @@ public class PathfinderConfig {
 
     private boolean useTransport(Transport transport) {
         final boolean isQuestLocked = transport.isQuestLocked();
+
         //START microbot variables
         final boolean isNpc = transport.getType() == TransportType.NPC;
+        if (isNpc && !useNpcs){
+            return false;
+        }
         //END microbot variables
 
         if (!hasRequiredLevels(transport)) {
@@ -272,25 +277,25 @@ public class PathfinderConfig {
 
         TransportType type = transport.getType();
 
-        if (AGILITY_SHORTCUT.equals(type) && !useAgilityShortcuts) {
+        if (AGILITY_SHORTCUT.equals(type) && !useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS)) {
             return false;
-        } else if (GRAPPLE_SHORTCUT.equals(type) && !useGrappleShortcuts) {
+        } else if (GRAPPLE_SHORTCUT.equals(type) && !useGrappleShortcuts || !client.getWorldType().contains(WorldType.MEMBERS)) {
             return false;
-        } else if (BOAT.equals(type) && !useBoats) {
+        } else if (BOAT.equals(type) && !useBoats || !client.getWorldType().contains(WorldType.MEMBERS)) {
             return false;
-        } else if (CANOE.equals(type) && !useCanoes) {
+        } else if (CANOE.equals(type) && !useCanoes || !client.getWorldType().contains(WorldType.MEMBERS)) {
             return false;
-        } else if (CHARTER_SHIP.equals(type) && !useCharterShips) {
+        } else if (CHARTER_SHIP.equals(type) && !useCharterShips || !client.getWorldType().contains(WorldType.MEMBERS)) {
             return false;
         } else if (SHIP.equals(type) && !useShips) {
             return false;
-        } else if (FAIRY_RING.equals(type) && !useFairyRings) {
+        } else if (FAIRY_RING.equals(type) && !useFairyRings || !client.getWorldType().contains(WorldType.MEMBERS)) {
             return false;
-        } else if (GNOME_GLIDER.equals(type) && !useGnomeGliders) {
+        } else if (GNOME_GLIDER.equals(type) && !useGnomeGliders || !client.getWorldType().contains(WorldType.MEMBERS)) {
             return false;
-        } else if (MINECART.equals(type) && !useMinecarts) {
+        } else if (MINECART.equals(type) && !useMinecarts || !client.getWorldType().contains(WorldType.MEMBERS)) {
             return false;
-        } else if (SPIRIT_TREE.equals(type) && !useSpiritTrees) {
+        } else if (SPIRIT_TREE.equals(type) && !useSpiritTrees || !client.getWorldType().contains(WorldType.MEMBERS)) {
             return false;
         } else if (TELEPORTATION_ITEM.equals(type)) {
             switch (useTeleportationItems) {
@@ -323,14 +328,6 @@ public class PathfinderConfig {
         if (!varbitChecks(transport)) {
             return false;
         }
-
-        //START microbot variables
-
-        if (isNpc && !useNpcs){
-            return false;
-        }
-
-        //END microbot variables
 
         return true;
     }
@@ -365,6 +362,9 @@ public class PathfinderConfig {
             return Rs2Magic.canCast(transport.getDisplayInfo());
             //END microbot variables
         } else {
+            //START microbot variables
+            if (!Microbot.getClient().getWorldType().contains(WorldType.MEMBERS)) return false;
+            //END microbot variables
             // TODO: this does not check quantity
             List<Integer> inventoryItems = Arrays.stream(new InventoryID[]{InventoryID.INVENTORY, InventoryID.EQUIPMENT})
                     .map(client::getItemContainer)

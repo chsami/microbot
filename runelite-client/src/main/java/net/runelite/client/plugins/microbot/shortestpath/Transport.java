@@ -21,8 +21,6 @@ public class Transport {
     private int objectId;
     @Getter
     private String name;
-    @Getter
-    private boolean isMember;
     //END microbot variables
 
     /** A location placeholder different from null to use for permutation transports */
@@ -158,14 +156,6 @@ public class Transport {
                 objectId = Integer.parseInt(matcher.group(3)); // Third group: the objectId (e.g., "26263")
             }
         }
-
-        isMember = TransportType.TELEPORTATION_LEVER.equals(transportType)
-                ||  TransportType.SPIRIT_TREE.equals(transportType)
-                || TransportType.GNOME_GLIDER.equals(transportType)
-                || TransportType.CANOE.equals(transportType)
-                || TransportType.AGILITY_SHORTCUT.equals(transportType)
-                || TransportType.GRAPPLE_SHORTCUT.equals(transportType);
-
         //END microbot variables
 
         if ((value = fieldMap.get("Skills")) != null) {

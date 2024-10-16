@@ -627,7 +627,12 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         {
             return;
         }
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+        /**
+         * We took decided to avoid "ESC" as this conflicts with the
+         * osrs keybindings and closing the world map
+         * Therefor CTRL + X seemed a bit more robust and userfriendly
+         */
+        if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
             Rs2Walker.setTarget(null);
         }
     }

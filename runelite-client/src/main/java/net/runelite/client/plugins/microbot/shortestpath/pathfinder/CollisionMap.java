@@ -90,8 +90,6 @@ public class CollisionMap {
         // Thus any transports in the list are guaranteed to be valid per the user's settings
         for (Transport transport : transports) {
             //START microbot variables
-            if (transport.isMember() && !Microbot.getClient().getWorldType().contains(WorldType.MEMBERS))
-                continue;
             if (visited.get(transport.getDestination())) continue;
             if (transport.getType() == TransportType.TELEPORTATION_ITEM || transport.getType() == TransportType.TELEPORTATION_SPELL) {
                 neighbors.add(new TransportNode(transport.getDestination(), node, config.getDistanceBeforeUsingTeleport(), transport.getType()));

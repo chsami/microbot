@@ -119,7 +119,6 @@ public class Rs2Widget {
         });
     }
 
-
     public static Widget getWidget(int id, int child) {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWidget(id, child));
     }

@@ -17,9 +17,9 @@ public class ExampleScript extends Script {
                 if (!super.run()) return;
                 long startTime = System.currentTimeMillis();
 
-                int spiritTreeMenu = 12255232;
 
-                System.out.println(Rs2Widget.isHidden(spiritTreeMenu));
+                sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
+                Rs2Widget.sleepUntilHasWidgetText("Al Kharid", 219, 1, false, 5000);
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
