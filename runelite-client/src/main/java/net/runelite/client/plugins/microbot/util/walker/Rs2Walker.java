@@ -487,12 +487,10 @@ public class Rs2Walker {
     }
 
     private static boolean searchNeighborPoint(int orientation, WorldPoint point, WorldPoint neighborPoint) {
-        if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
+        return orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
                 || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
                 || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
-                || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
-            return true;
-        return false;
+                || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY();
     }
 
     /**
