@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.util.magic;
 
+import com.google.common.collect.ImmutableList;
+import lombok.Getter;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
@@ -21,6 +23,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static net.runelite.api.Varbits.SHADOW_VEIL;
@@ -49,6 +52,12 @@ public class Rs2Magic {
         Widget widget = Arrays.stream(Rs2Widget.getWidget(218, 3).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
 
         return widget != null;
+    }
+
+    public static boolean canCast(String spellName) {
+        MagicAction magicAction = Arrays.stream(MagicAction.values()).filter(x -> x.getName().toLowerCase().contains(spellName.toLowerCase())).findFirst().orElse(null);
+        if (magicAction == null) return false;
+        return canCast(magicAction);
     }
 
     public static boolean cast(MagicAction magicSpell) {
@@ -307,4 +316,32 @@ public class Rs2Magic {
     public static boolean isShadowVeilActive() {
         return Microbot.getVarbitValue(SHADOW_VEIL) == 1;
     }
+
+
+    //DATA
+
+    @Getter
+    private final List<Integer> runeIds = ImmutableList.of(
+            ItemID.NATURE_RUNE,
+            ItemID.LAW_RUNE,
+            ItemID.BODY_RUNE,
+            ItemID.DUST_RUNE,
+            ItemID.LAVA_RUNE,
+            ItemID.STEAM_RUNE,
+            ItemID.SMOKE_RUNE,
+            ItemID.SOUL_RUNE,
+            ItemID.WATER_RUNE,
+            ItemID.AIR_RUNE,
+            ItemID.EARTH_RUNE,
+            ItemID.FIRE_RUNE,
+            ItemID.MIND_RUNE,
+            ItemID.CHAOS_RUNE,
+            ItemID.DEATH_RUNE,
+            ItemID.BLOOD_RUNE,
+            ItemID.COSMIC_RUNE,
+            ItemID.ASTRAL_RUNE,
+            ItemID.MIST_RUNE,
+            ItemID.MUD_RUNE,
+            ItemID.WRATH_RUNE,
+            ItemID.SUNFIRE_RUNE);
 }
