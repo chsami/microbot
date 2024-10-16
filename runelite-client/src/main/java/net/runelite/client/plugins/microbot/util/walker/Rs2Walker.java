@@ -7,6 +7,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
@@ -21,12 +22,14 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
 import java.awt.*;
@@ -102,7 +105,7 @@ public class Rs2Walker {
                         continue;
                     }
 
-                    if (ShortestPathPlugin.getPathfinder().getPath().size() > 0 && isNear(ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1))) {
+                    if (!ShortestPathPlugin.getPathfinder().getPath().isEmpty() && isNear(ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1))) {
                         setTarget(null);
                         break;
                     }
@@ -133,14 +136,11 @@ public class Rs2Walker {
                     }
 
 
-                    /**
-                     * MAIN WALK LOOP
-                     */
                     boolean doorOrTransportResult = false;
                     for (int i = indexOfStartPoint; i < path.size(); i++) {
                         WorldPoint currentWorldPoint = path.get(i);
 
-                        if (i > 0 && !Rs2Tile.isTileReachable(path.get(i - 1)) && !Microbot.getClient().isInInstancedRegion()) {
+                        if (i > 0 && !Rs2Tile.isTileReachable(path.get(i - 1)) && !Microbot.getClient().getTopLevelWorldView().isInstance()) {
                             continue;
                         }
 
@@ -148,15 +148,13 @@ public class Rs2Walker {
                             break;
                         }
 
-                        /**
-                         * CHECK DOORS
-                         */
+
                         doorOrTransportResult = handleDoors(path, i);
                         if (doorOrTransportResult) {
                             break;
                         }
 
-                        if (!Microbot.getClient().isInInstancedRegion()) {
+                        if (!Microbot.getClient().getTopLevelWorldView().isInstance()) {
                             doorOrTransportResult = handleTransports(path, i);
                         }
 
@@ -164,13 +162,13 @@ public class Rs2Walker {
                             break;
                         }
 
-                        if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().isInInstancedRegion()) {
+                        if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().getTopLevelWorldView().isInstance()) {
                             continue;
                         }
 
                         if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > nextWalkingDistance) {
                             nextWalkingDistance = Random.random(7, 11);
-                            if (Microbot.getClient().isInInstancedRegion()) {
+                            if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
                                 Rs2Walker.walkFastCanvas(currentWorldPoint);
                                 sleepGaussian(1200, 300);
                             } else {
@@ -188,12 +186,12 @@ public class Rs2Walker {
 
 
                     if (!doorOrTransportResult) {
-                        if (path.size() > 0) {
+                        if (!path.isEmpty()) {
                             var moveableTiles = Rs2Tile.getReachableTilesFromTile(path.get(path.size() - 1), Math.min(3, distance)).keySet().toArray(new WorldPoint[0]);
                             var finalTile = moveableTiles.length > 0 ? moveableTiles[Random.random(0, moveableTiles.length)] : path.get(path.size() - 1);
                             if (Rs2Tile.isTileReachable(finalTile)) {
 
-                                if (Microbot.getClient().isInInstancedRegion())
+                                if (Microbot.getClient().getTopLevelWorldView().isInstance())
                                     Rs2Walker.walkFastCanvas(finalTile);
                                 else
                                     Rs2Walker.walkMiniMap(finalTile);
@@ -219,8 +217,8 @@ public class Rs2Walker {
         var tiles = Rs2Tile.getReachableTilesFromTile(target, 1);
 
         var localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target);
-        if (Microbot.getClient().getCollisionMaps() != null && localPoint != null) {
-            int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
+        if (Microbot.getClient().getTopLevelWorldView().getCollisionMaps() != null && localPoint != null) {
+            int[][] flags = Microbot.getClient().getTopLevelWorldView().getCollisionMaps()[Microbot.getClient().getTopLevelWorldView().getPlane()].getFlags();
 
             if (hasMinimapRelevantMovementFlag(localPoint, flags)) {
                 for (var tile : tiles.keySet()) {
@@ -296,19 +294,13 @@ public class Rs2Walker {
         return walkMiniMap(worldPoint, 5);
     }
 
-    public static boolean walkMiniMap(WorldArea area) {
-        var points = area.toWorldPointList();
-        var index = new java.util.Random().nextInt(points.size());
-        return Rs2Walker.walkMiniMap(points.get(index));
-    }
-
     /**
-     * Used in instances like vorkath, jad
+     * Used in instances like vorkath, jad, nmz
      *
-     * @param localPoint
+     * @param localPoint  A two-dimensional point in the local coordinate space.
      */
     public static void walkFastLocal(LocalPoint localPoint) {
-        Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
+        Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getTopLevelWorldView().getPlane());
         int canvasX = canv != null ? canv.getX() : -1;
         int canvasY = canv != null ? canv.getY() : -1;
 
@@ -323,12 +315,20 @@ public class Rs2Walker {
     public static void walkFastCanvas(WorldPoint worldPoint, boolean toogleRun) {
         Rs2Player.toggleRunEnergy(toogleRun);
         Point canv;
-        if (Microbot.getClient().isInInstancedRegion()) {
-            worldPoint = WorldPoint.toLocalInstance(Microbot.getClient(), worldPoint).stream().findFirst().get();
-            LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
-            canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
+        if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
+            worldPoint = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), worldPoint).stream().findFirst().orElse(null);
+            if (worldPoint == null) {
+                Microbot.log("Tried to walk using the canvas but worldPoint returned null");
+                return;
+            }
+            LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), worldPoint);
+            if (localPoint == null) {
+                Microbot.log("Tried to walk using the canvas but localpoint returned null");
+                return;
+            }
+            canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getTopLevelWorldView().getPlane());
         } else {
-            canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getBaseX(), worldPoint.getY() - Microbot.getClient().getBaseY(), Microbot.getClient().getTopLevelWorldView().getScene()), Microbot.getClient().getPlane());
+            canv = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getTopLevelWorldView().getBaseX(), worldPoint.getY() - Microbot.getClient().getTopLevelWorldView().getBaseY(), Microbot.getClient().getTopLevelWorldView().getScene()), Microbot.getClient().getTopLevelWorldView().getPlane());
         }
 
         int canvasX = canv != null ? canv.getX() : -1;
@@ -339,7 +339,12 @@ public class Rs2Walker {
     }
 
     public static WorldPoint walkCanvas(WorldPoint worldPoint) {
-        Point point = Perspective.localToCanvas(Microbot.getClient(), LocalPoint.fromWorld(Microbot.getClient(), worldPoint), Microbot.getClient().getPlane());
+        LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), worldPoint);
+        if (localPoint == null) {
+            Microbot.log("Tried to walkCanvas but localpoint returned null");
+            return null;
+        }
+        Point point = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getTopLevelWorldView().getPlane());
 
         if (point == null) return null;
 
@@ -356,9 +361,8 @@ public class Rs2Walker {
         sleepUntil(pathfinder::isDone);
         WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), pathSizeX, pathSizeY);
         WorldArea objectArea = new WorldArea(worldPoint, sizeX + 2, sizeY + 2);
-        boolean result = pathArea
+        return pathArea
                 .intersectsWith2D(objectArea);
-        return result;
     }
 
     // takes an avg 200-300 ms
@@ -369,9 +373,8 @@ public class Rs2Walker {
         sleepUntil(pathfinder::isDone);
         WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 3, 3);
         WorldArea objectArea = new WorldArea(worldPoint, sizeX + 2, sizeY + 2);
-        boolean result = pathArea
+        return pathArea
                 .intersectsWith2D(objectArea);
-        return result;
     }
 
     public static boolean canReach(WorldPoint worldPoint) {
@@ -381,16 +384,15 @@ public class Rs2Walker {
         if (pathfinder.getPath().get(pathfinder.getPath().size() - 1).getPlane() != worldPoint.getPlane()) return false;
         WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 2, 2);
         WorldArea objectArea = new WorldArea(worldPoint, 2, 2);
-        boolean result = pathArea
+        return pathArea
                 .intersectsWith2D(objectArea);
-        return result;
     }
 
     public static boolean isCloseToRegion(int distance, int regionX, int regionY) {
         WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
                 regionX,
                 regionY,
-                Microbot.getClient().getPlane());
+                Microbot.getClient().getTopLevelWorldView().getPlane());
 
         return worldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) < distance;
     }
@@ -399,7 +401,7 @@ public class Rs2Walker {
         WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
                 regionX,
                 regionY,
-                Microbot.getClient().getPlane());
+                Microbot.getClient().getTopLevelWorldView().getPlane());
 
         return worldPoint.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation());
     }
@@ -475,7 +477,7 @@ public class Rs2Walker {
             } else if (object instanceof GameObject) {
                 // Match game objects by name
                 // Orientation does not work as game objects are not strictly oriented like walls
-                var objectNames = Arrays.asList("door");
+                var objectNames = List.of("door");
 
                 if (objectNames.contains(objectComp.getName().toLowerCase()))
                     found = true;
@@ -493,8 +495,8 @@ public class Rs2Walker {
     }
 
     /**
-     * @param path
-     * @return
+     * @param path list of worldpoints
+     * @return closest tile index
      */
     public static int getClosestTileIndex(List<WorldPoint> path) {
         WorldPoint startPoint;
@@ -517,6 +519,7 @@ public class Rs2Walker {
     }
 
     /**
+     *
      * @param target
      */
     public static void setTarget(WorldPoint target) {
@@ -547,7 +550,7 @@ public class Rs2Walker {
             ShortestPathPlugin.getMarker().setJumpOnClick(true);
             Microbot.getWorldMapPointManager().add(ShortestPathPlugin.getMarker());
 
-            WorldPoint start = Microbot.getClient().isInInstancedRegion() ?
+            WorldPoint start = Microbot.getClient().getTopLevelWorldView().isInstance() ?
                     WorldPoint.fromLocalInstance(Microbot.getClient(), localPlayer.getLocalLocation()) : localPlayer.getWorldLocation();
             ShortestPathPlugin.setLastLocation(start);
             if (ShortestPathPlugin.isStartPointSet() && ShortestPathPlugin.getPathfinder() != null) {
@@ -591,16 +594,20 @@ public class Rs2Walker {
      */
     public static Tile getTile(WorldPoint point) {
         LocalPoint a;
-        if (Microbot.getClient().isInInstancedRegion()) {
-            WorldPoint instancedWorldPoint = WorldPoint.toLocalInstance(Microbot.getClient(), point).stream().findFirst().get();
-            a = LocalPoint.fromWorld(Microbot.getClient(), instancedWorldPoint);
+        if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
+            WorldPoint instancedWorldPoint = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), point).stream().findFirst().orElse(null);
+            if (instancedWorldPoint == null) {
+                Microbot.log("getTile instancedWorldPoint is null");
+                return null;
+            }
+            a = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), instancedWorldPoint);
         } else {
-            a = LocalPoint.fromWorld(Microbot.getClient(), point);
+            a = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
         }
         if (a == null) {
             return null;
         }
-        return Microbot.getClient().getScene().getTiles()[point.getPlane()][a.getSceneX()][a.getSceneY()];
+        return Microbot.getClient().getTopLevelWorldView().getScene().getTiles()[point.getPlane()][a.getSceneX()][a.getSceneY()];
     }
 
     /**
@@ -626,7 +633,7 @@ public class Rs2Walker {
         }
 
         for (Transport transport : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new HashSet<>())) {
-            for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), transport.getOrigin())) {
+            for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), transport.getOrigin())) {
                 if (transport.getOrigin() != null && Rs2Player.getWorldLocation().getPlane() != transport.getOrigin().getPlane()) {
                     continue;
                 }
@@ -713,14 +720,10 @@ public class Rs2Walker {
                     }
 
                     if (transport.getType() == TransportType.TELEPORTATION_SPELL) {
-                        for (Set<Integer> itemIds : transport.getItemIdRequirements()) {
-                            for (Integer itemId : itemIds) {
-                                if (Rs2Inventory.hasItem(itemId)) {
-                                    if (Rs2Inventory.use(itemId)) {
-                                        //sleep(GAME_TICK_LENGTH * transport.getDuration());
-                                        break;
-                                    }
-                                }
+                        MagicAction magicSpell = Arrays.stream(MagicAction.values()).filter(x -> x.getName().toLowerCase().contains(transport.getDisplayInfo())).findFirst().orElse(null);
+                        if (magicSpell != null) {
+                            if (Rs2Magic.cast(magicSpell)) {
+                                break;
                             }
                         }
                     }
@@ -910,6 +913,7 @@ public class Rs2Walker {
      * @param range        an int of range to which the boundaries will be drawn in a square,
      * @return true if the player's current location is within the specified area, false otherwise
      */
+    @Deprecated(since="1.5.5", forRemoval = true)
     public static boolean isInArea(WorldPoint centerOfArea, int range) {
         WorldPoint nwCorner = new WorldPoint(centerOfArea.getX() + range + range, centerOfArea.getY() - range, centerOfArea.getPlane());
         WorldPoint seCorner = new WorldPoint(centerOfArea.getX() - range - range, centerOfArea.getY() + range, centerOfArea.getPlane());
@@ -967,25 +971,12 @@ public class Rs2Walker {
         return pathfinder.getPath().size();
     }
 
-    private static boolean completedQuests(Transport transport) {
-        for (Quest quest : transport.getQuests()) {
-            if (!QuestState.FINISHED.equals(quest.getState(Microbot.getClient()))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static boolean handleSpiritTree(Transport transport) {
         int spiritTreeMenu = 12255232;
 
         // Get Transport Information
         String displayInfo = transport.getDisplayInfo();
-        String objectName = transport.getName();
         int objectId = transport.getObjectId();
-        String action = transport.getAction();
-        WorldPoint origin = transport.getOrigin();
-        WorldPoint destination = transport.getDestination();
 
         // Check if the widget is already visible
         if (!Rs2Widget.isHidden(spiritTreeMenu)) {
@@ -999,7 +990,6 @@ public class Rs2Walker {
 
         // Find the spirit tree object
         TileObject spiritTree = Rs2GameObject.findObjectById(objectId);
-        System.out.println(objectId);
         if (spiritTree == null) {
             System.out.println("Spirit tree not found.");
             return false;
@@ -1100,8 +1090,6 @@ public class Rs2Walker {
     }
 
     // Constants for widget IDs
-    private static final int FAIRY_RING_MENU = 26083328;
-
     private static final int SLOT_ONE = 26083331;
     private static final int SLOT_TWO = 26083332;
     private static final int SLOT_THREE = 26083333;
@@ -1117,13 +1105,8 @@ public class Rs2Walker {
     private static int startingWeaponId;
 
     public static boolean handleFairyRing(Transport transport) {
-        // Get Transport Information
-        String displayInfo = transport.getDisplayInfo();
-        String objectName = transport.getName();
-        int objectId = transport.getObjectId();
-        String action = transport.getAction();
+
         WorldPoint origin = transport.getOrigin();
-        WorldPoint destination = transport.getDestination();
 
         if (startingWeapon == null) {
 
@@ -1133,16 +1116,8 @@ public class Rs2Walker {
             startingWeaponId = startingWeapon.getId();
         }
 
-        System.out.println("Display info: " + displayInfo);
-        System.out.println("Object Name: " + objectName);
-        System.out.println("Object ID: " + objectId);
-        System.out.println("Action: " + action);
-        System.out.println("Origin: " + origin);
-        System.out.println("Destination: " + destination);
-        System.out.println("Starting Weapon ID: " + startingWeaponId);
-
         // Check if the widget is already visible
-        if (!Rs2Widget.isHidden(FAIRY_RING_MENU)) {
+        if (!Rs2Widget.isHidden(ComponentID.FAIRY_RING_TELEPORT_BUTTON)) {
             System.out.println("Widget is already visible. Skipping interaction.");
             rotateSlotToDesiredRotation(SLOT_ONE, Rs2Widget.getWidget(SLOT_ONE).getRotationY(), getDesiredRotation(transport.getDisplayInfo().charAt(0)), SLOT_ONE_ACW_ROTATION, SLOT_ONE_CW_ROTATION);
             rotateSlotToDesiredRotation(SLOT_TWO, Rs2Widget.getWidget(SLOT_TWO).getRotationY(), getDesiredRotation(transport.getDisplayInfo().charAt(1)), SLOT_TWO_ACW_ROTATION, SLOT_TWO_CW_ROTATION);

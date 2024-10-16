@@ -213,6 +213,7 @@ public class Rs2Tile {
     }
 
     public static boolean isTileReachable(WorldPoint targetPoint) {
+        if (targetPoint == null) return false;
         boolean[][] visited = new boolean[104][104];
         int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
         WorldPoint playerLoc = Rs2Player.getWorldLocation();
