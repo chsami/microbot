@@ -1146,7 +1146,7 @@ public class Rs2Walker {
         }
     }
 
-    private static boolean rotateSlotToDesiredRotation(int slotId, int currentRotation, int desiredRotation, int slotAcwRotationId, int slotCwRotationId) {
+    private static void rotateSlotToDesiredRotation(int slotId, int currentRotation, int desiredRotation, int slotAcwRotationId, int slotCwRotationId) {
         int anticlockwiseTurns = (desiredRotation - currentRotation + 2048) % 2048;
         int clockwiseTurns = (currentRotation - desiredRotation + 2048) % 2048;
 
@@ -1156,14 +1156,12 @@ public class Rs2Walker {
                 Rs2Widget.clickWidget(slotCwRotationId);
                 sleep(600, 1200);
             }
-            return true;
         } else {
             System.out.println("Rotating slot " + slotId + " anticlockwise " + (anticlockwiseTurns / 512) + " times.");
             for (int i = 0; i < anticlockwiseTurns / 512; i++) {
                 Rs2Widget.clickWidget(slotAcwRotationId);
                 sleep(600, 1200);
             }
-            return true;
         }
 
     }
