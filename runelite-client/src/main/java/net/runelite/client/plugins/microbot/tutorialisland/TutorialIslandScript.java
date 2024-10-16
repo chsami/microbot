@@ -444,16 +444,17 @@ public class TutorialIslandScript extends Script {
 
             Rs2Walker.walkTo(new WorldPoint(3127, 3123, 0), 2);
             Rs2Player.waitForWalking();
-            Rs2Npc.interact(npc, "Talk-to");
-            Rs2Random.waitEx(1200, 300);
-            if (!(Microbot.getClient().getLocalPlayer().getInteracting() == npc)){
-                Rs2Npc.interact(npc, "Talk-to");
+            if (Rs2Npc.interact(npc, "Talk-to")) {
+                sleepUntil(Rs2Dialogue::isInDialogue);
             }
-            sleepUntil(Rs2Dialogue::isInDialogue);
         } else if (Microbot.getVarbitPlayerValue(281) == 531) {
             Rs2Widget.clickWidget(10747943); //switchToAccountManagementTab
             Rs2Random.waitEx(1200, 300);
         } else if (Microbot.getVarbitPlayerValue(281) == 532) {
+            if (Rs2Dialogue.isInDialogue()) {
+                clickContinue();
+                return;
+            }
             if (Rs2Npc.interact(npc, "Talk-to")) {
                 sleepUntil(Rs2Dialogue::isInDialogue);
             }
