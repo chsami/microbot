@@ -196,9 +196,11 @@ public class Rs2Npc {
                         return false;
                     }
                     Rs2Walker.walkTo(Rs2Tile.getNearestWalkableTileWithLineOfSight(npc.getWorldLocation()), 0);
+                    Microbot.pauseAllScripts = false;
                     Microbot.cantReachTargetRetries++;
                     return false;
                 } else {
+                    Microbot.pauseAllScripts = false;
                     Microbot.cantReachTarget = false;
                     Microbot.cantReachTargetRetries = 0;
                 }
