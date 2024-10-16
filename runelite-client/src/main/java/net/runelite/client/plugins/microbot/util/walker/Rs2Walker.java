@@ -451,19 +451,11 @@ public class Rs2Walker {
                 if (doorIndex == index) {
                     // Forward
                     var neighborPoint = path.get(doorIndex + 1);
-                    if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
-                            || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
-                            || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
-                            || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
-                        found = true;
+                    found = searchNeighborPoint(orientation, point, neighborPoint);
                 } else if (doorIndex == index + 1) {
                     // Backward
                     var neighborPoint = path.get(doorIndex - 1);
-                    if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
-                            || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
-                            || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
-                            || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
-                        found = true;
+                    found = searchNeighborPoint(orientation, point, neighborPoint);
 
                     // Diagonal objects with any orientation
                     if (index + 2 < path.size() && (orientation == 16 || orientation == 32 || orientation == 64 || orientation == 128)) {
@@ -491,6 +483,15 @@ public class Rs2Walker {
             }
         }
 
+        return false;
+    }
+
+    private static boolean searchNeighborPoint(int orientation, WorldPoint point, WorldPoint neighborPoint) {
+        if (orientation == 1 && point.dx(-1).getX() == neighborPoint.getX()
+                || orientation == 4 && point.dx(+1).getX() == neighborPoint.getX()
+                || orientation == 2 && point.dy(1).getY() == neighborPoint.getY()
+                || orientation == 8 && point.dy(-1).getY() == neighborPoint.getY())
+            return true;
         return false;
     }
 
@@ -716,7 +717,8 @@ public class Rs2Walker {
                         if (!Rs2Tile.isTileReachable(transport.getOrigin())) {
                             break;
                         }
-                        return handleObject(transport, gameObject);
+                        handleObject(transport, gameObject);
+                        return true;
                     }
 
                     //check tile objects
@@ -732,7 +734,8 @@ public class Rs2Walker {
                         if (tileObject.getId() != 16533 && !Rs2Tile.isTileReachable(transport.getOrigin())) {
                             break;
                         }
-                        return handleObject(transport, tileObject);
+                        handleObject(transport, tileObject);
+                        return true;
                     }
                 }
 
@@ -741,10 +744,10 @@ public class Rs2Walker {
         return false;
     }
 
-    private static boolean handleObject(Transport transport, TileObject tileObject) {
+    private static void handleObject(Transport transport, TileObject tileObject) {
         Rs2GameObject.interact(tileObject, transport.getAction());
         if (transport.getDestination().getPlane() == Rs2Player.getWorldLocation().getPlane()) {
-            if (handleObjectExceptions(tileObject)) return true;
+            if (handleObjectExceptions(tileObject)) return;
             if (transport.getType() == TransportType.AGILITY_SHORTCUT) {
                 Rs2Player.waitForAnimation();
             } else {
@@ -755,7 +758,6 @@ public class Rs2Walker {
             sleepUntil(() -> Rs2Player.getWorldLocation().getPlane() != z);
             sleep(Random.randomGaussian(1000, 300));
         }
-        return true;
     }
 
     private static boolean handleObjectExceptions(TileObject tileObject) {
@@ -984,7 +986,7 @@ public class Rs2Walker {
         return pathfinder.getPath().size();
     }
 
-    public static boolean handleSpiritTree(Transport transport) {
+    public static void handleSpiritTree(Transport transport) {
         // Get Transport Information
         String displayInfo = transport.getDisplayInfo();
         int objectId = transport.getObjectId();
@@ -993,17 +995,16 @@ public class Rs2Walker {
         if (!Rs2Widget.isHidden(ComponentID.ADVENTURE_LOG_CONTAINER)) {
             System.out.println("Widget is already visible. Skipping interaction.");
             char key = displayInfo.charAt(0);
-            System.out.println(key);
             Rs2Keyboard.keyPress(key);
-            System.out.println("Pressing: " + key);
-            return true;
+            Microbot.log("Pressing: " + key);
+            return;
         }
 
         // Find the spirit tree object
         TileObject spiritTree = Rs2GameObject.findObjectById(objectId);
         if (spiritTree == null) {
             Microbot.log("Spirit tree not found.");
-            return false;
+            return;
         }
 
         // Interact with the spirit tree
@@ -1013,17 +1014,15 @@ public class Rs2Walker {
         boolean widgetVisible = !Rs2Widget.isHidden(ComponentID.ADVENTURE_LOG_CONTAINER);
         if (!widgetVisible) {
             Microbot.log("Widget did not become visible within the timeout.");
-            return false;
+            return;
         }
 
-        System.out.println("Widget is now visible.");
         char key = displayInfo.charAt(0);
         Rs2Keyboard.keyPress(key);
-        System.out.println("Pressing: " + key);
-        return true;
+        Microbot.log("Pressing: " + key);
     }
 
-    public static boolean handleGlider(Transport transport) {
+    public static void handleGlider(Transport transport) {
         int TA_QUIR_PRIW = 9043972;
         int SINDARPOS = 9043975;
         int LEMANTO_ANDRA = 9043978;
@@ -1047,7 +1046,7 @@ public class Rs2Walker {
             NPC gnome = Rs2Npc.getNpc(npcName);  // Use the NPC name to find the NPC
             if (gnome == null) {
                 Microbot.log("Gnome not found.");
-                return false;
+                return;
             }
 
             // Interact with the gnome glider NPC
@@ -1061,10 +1060,10 @@ public class Rs2Walker {
         boolean widgetVisible = !Rs2Widget.isHidden(GLIDER_PARENT_WIDGET, GLIDER_CHILD_WIDGET);
         if (!widgetVisible) {
             Microbot.log("Widget did not become visible within the timeout.");
-            return false;
+            return;
         }
 
-        if (displayInfo.isEmpty()) return false;
+        if (displayInfo.isEmpty()) return;
 
         switch (displayInfo) {
             case "Kar-Hewo":
@@ -1096,7 +1095,6 @@ public class Rs2Walker {
                 sleepUntil(() -> transport.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) < 10);
                 break;
         }
-        return true;
     }
 
     // Constants for widget IDs
@@ -1114,7 +1112,7 @@ public class Rs2Walker {
     private static Rs2Item startingWeapon = null;
     private static int startingWeaponId;
 
-    public static boolean handleFairyRing(WorldPoint origin, String fairyRingCode) {
+    public static void handleFairyRing(WorldPoint origin, String fairyRingCode) {
 
         if (startingWeapon == null) {
             startingWeapon = Rs2Equipment.get(EquipmentInventorySlot.WEAPON);
@@ -1133,7 +1131,6 @@ public class Rs2Walker {
                 Microbot.log("Equipping Starting Weapon: " + startingWeaponId);
                 Rs2Inventory.equip(startingWeaponId);
             }
-            return true;
         }
 
 
@@ -1149,7 +1146,6 @@ public class Rs2Walker {
             Rs2Inventory.equip("Lunar staff");
             sleep(600);
         }
-        return true;
     }
 
     private static boolean rotateSlotToDesiredRotation(int slotId, int currentRotation, int desiredRotation, int slotAcwRotationId, int slotCwRotationId) {
