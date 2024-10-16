@@ -38,7 +38,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.randomGaussi
 
 public class GotrScript extends Script {
 
-    public static String version = "1.1.2";
+    public static String version = "1.1.3";
     public static long totalTime = 0;
     public static boolean shouldMineGuardianRemains = true;
     public static final String rewardPointRegex = "Total elemental energy:[^>]+>([\\d,]+).*Total catalytic energy:[^>]+>([\\d,]+).";
@@ -268,7 +268,7 @@ public class GotrScript extends Script {
     }
 
     private static void takeUnchargedCells() {
-        if (!Rs2Inventory.hasItem("Uncharged cell")) {
+        if (!Rs2Inventory.isFull() && !Rs2Inventory.hasItem("Uncharged cell")) {
             Rs2GameObject.interact(ObjectID.UNCHARGED_CELLS_43732, "Take-10");
             log("Taking uncharged cells...");
             Rs2Player.waitForAnimation();
@@ -276,7 +276,7 @@ public class GotrScript extends Script {
     }
 
     private static boolean lootChisel() {
-        if (!Rs2Inventory.hasItem("Chisel")) {
+        if (!Rs2Inventory.isFull() && !Rs2Inventory.hasItem("Chisel")) {
             Rs2GameObject.interact("chisel", "take");
             Rs2Player.waitForWalking();
             log("Looking for chisel...");
@@ -286,15 +286,13 @@ public class GotrScript extends Script {
     }
 
     private boolean usePortal() {
-        if (Microbot.getClient().hasHintArrow() && Rs2Inventory.size() < config.maxAmountEssence()) {
+        if (!isInHugeMine() && Microbot.getClient().hasHintArrow() && Rs2Inventory.size() < config.maxAmountEssence()) {
             if (leaveLargeMine()) return true;
-            if (!isInLargeMine()) {
-                Rs2Walker.walkFastCanvas(Microbot.getClient().getHintArrowPoint());
-                Rs2GameObject.interact(Microbot.getClient().getHintArrowPoint());
-                log("Found a portal spawn...interacting with it...");
-                Rs2Player.waitForWalking();
-                sleep(randomGaussian(Random.random(1000, 2000), Random.random(100, 300)));
-            }
+            Rs2Walker.walkFastCanvas(Microbot.getClient().getHintArrowPoint());
+            Rs2GameObject.interact(Microbot.getClient().getHintArrowPoint());
+            log("Found a portal spawn...interacting with it...");
+            Rs2Player.waitForWalking();
+            sleep(randomGaussian(Random.random(1000, 2000), Random.random(100, 300)));
             return true;
         }
         return false;
@@ -365,7 +363,7 @@ public class GotrScript extends Script {
     }
 
     private boolean craftRunes() {
-        if (isInMiniGame() && !isInMainRegion()) {
+        if (!isInMainRegion()) {
             TileObject rcAltar = findRcAltar();
             if (rcAltar != null) {
                 if (Rs2Player.isWalking()) return true;
@@ -377,37 +375,35 @@ public class GotrScript extends Script {
                     state = GotrState.CRAFTING_RUNES;
                     Rs2GameObject.interact(rcAltar.getId());
                     log("Crafting runes on altar " + rcAltar.getId());
-                    sleep(Random.randomGaussian(Random.random(1000, 3500), 300));
+                    sleep(Random.randomGaussian(Random.random(1000, 1500), 300));
                 } else if (!Rs2Player.isWalking()) {
                     state = GotrState.LEAVING_ALTAR;
                     TileObject rcPortal = findPortalToLeaveAltar();
                     if (Rs2GameObject.interact(rcPortal.getId())) {
                         log("Leaving the altar...");
                         sleepUntil(GotrScript::isInMainRegion, 5000);
-                        sleepGaussian(1500, 300);
+                        sleepGaussian(600, 150);
                     }
                 }
+                return true;
             }
-            return true;
         }
         return false;
     }
 
     private static boolean waitForMinigameToStart() {
-        if (shouldMineGuardianRemains) {
-            TileObject rcPortal = findPortalToLeaveAltar();
-            if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId())) {
-                state = GotrState.LEAVING_ALTAR;
-                return true;
-            }
-            resetPlugin();
-            if (state != GotrState.WAITING) {
-                state = GotrState.WAITING;
-                log("Make sure to start the script near the minigame barrier.");
-                Rs2GameObject.interact(ObjectID.BARRIER_43849, "Peek");
-            }
+        TileObject rcPortal = findPortalToLeaveAltar();
+        if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId())) {
+            state = GotrState.LEAVING_ALTAR;
+            return true;
         }
-        return false;
+        resetPlugin();
+        if (state != GotrState.WAITING) {
+            state = GotrState.WAITING;
+            log("Make sure to start the script near the minigame barrier.");
+            Rs2GameObject.interact(ObjectID.BARRIER_43849, "Peek");
+        }
+        return state == GotrState.WAITING;
     }
 
     private static boolean enterMinigame() {
@@ -481,7 +477,7 @@ public class GotrScript extends Script {
                         }
                     }
                 }
-                sleepGaussian(2500, 350);
+                sleepGaussian(600, 150);
             } else {
                 if (!Rs2Player.isAnimating() && getStartTimer() != -1) {
                     if (Rs2Equipment.isWearing("dragon pickaxe")) {
@@ -639,7 +635,7 @@ public class GotrScript extends Script {
     public static TileObject findPortalToLeaveAltar() {
         int[] altarIds = new int[] {ObjectID.PORTAL_34748, ObjectID.PORTAL_34749, ObjectID.PORTAL_34750, ObjectID.PORTAL_34751, ObjectID.PORTAL_34752,
                 ObjectID.PORTAL_34753, ObjectID.PORTAL_34754, ObjectID.PORTAL_34755, ObjectID.PORTAL_34756, ObjectID.PORTAL_34757, ObjectID.PORTAL_34758,
-                ObjectID.PORTAL_34758, ObjectID.PORTAL_34759};
+                ObjectID.PORTAL_34758, ObjectID.PORTAL_34759, ObjectID.PORTAL_43478};
         return Rs2GameObject.findObject(altarIds);
     }
 }
