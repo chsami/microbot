@@ -21,8 +21,8 @@ public class NewMenuEntry implements MenuEntry {
     private Widget widget;
 
     public NewMenuEntry(int param0, int param1, int opcode, int identifier, int itemId, String target) {
-        this.option = "Use";
-        this.target = target;
+        this.option = target;
+        this.target = "";
         this.identifier = identifier;
         this.type = MenuAction.of(opcode);
         this.param0 = param0;
