@@ -41,7 +41,7 @@ public class TutorialIslandScript extends Script {
     final int CharacterCreation = 679;
     final int[] CharacterCreation_Arrows = new int[]{13, 17, 21, 25, 29, 33, 37, 44, 48, 52, 56, 60};
     private final TutorialislandPlugin plugin;
-    int LOOKUPNAME = 558;
+    private final int NameCreation = 558;
     private boolean toggledSettings = false;
     private boolean toggledMusic = false;
 
@@ -72,15 +72,34 @@ public class TutorialIslandScript extends Script {
 
                 switch (status) {
                     case NAME:
+                        Widget nameSearchBar = Rs2Widget.getWidget(NameCreation, 12); // enterName Field text
+                        
+                        String nameSearchBarText = nameSearchBar.getText();
+
+                        if (nameSearchBarText.endsWith("*")) {
+                            nameSearchBarText = nameSearchBarText.substring(0, nameSearchBarText.length() - 1);
+                        }
+                        
+                        if (!nameSearchBarText.isEmpty()) {
+                            Rs2Widget.clickWidget(NameCreation, 7); // enterName Field
+                            
+                            for (int i = 0; i < nameSearchBarText.length(); i++) {
+                                Rs2Keyboard.keyPress(KeyEvent.VK_BACK_SPACE);
+                                Rs2Random.waitEx(600, 100);
+                            }
+                            
+                            return;
+                        }
+                        
                         String name = new NameGenerator(random(7, 10)).getName();
-                        Rs2Widget.clickWidget(36569095);
+                        Rs2Widget.clickWidget(NameCreation, 7); // enterName Field
                         Rs2Random.waitEx(1200, 300);
                         Rs2Keyboard.typeString(name);
                         Rs2Random.waitEx(2400, 600);
-                        Rs2Widget.clickWidget("Look up name");
+                        Rs2Widget.clickWidget(NameCreation, 18); // lookupName Button
                         Rs2Random.waitEx(4800, 600);
 
-                        Widget responseWidget = Rs2Widget.getWidget(36569101);
+                        Widget responseWidget = Rs2Widget.getWidget(NameCreation, 13); // responseText Widget
 
                         if (responseWidget != null) {
                             String widgetText = responseWidget.getText();
@@ -89,21 +108,10 @@ public class TutorialIslandScript extends Script {
                             boolean nameAvailable = cleanedWidgetText.startsWith(expectedText);
 
                             if (nameAvailable) {
-                                Rs2Widget.clickWidget("Set name");
+                                Rs2Widget.clickWidget(NameCreation, 19); // setName Button
                                 Rs2Random.waitEx(4800, 600);
 
-                                if (isLookupNameButtonVisible()) {
-                                    Rs2Widget.clickWidget("Set name");
-                                    Rs2Random.waitEx(1200, 300);
-                                }
-
-                                sleepUntil(() -> !isLookupNameButtonVisible());
-                            } else {
-                                Rs2Widget.clickWidget(36569095);
-                                for (int i = 0; i < name.length(); i++) {
-                                    Rs2Keyboard.keyPress(KeyEvent.VK_BACK_SPACE);
-                                    Rs2Random.waitEx(600, 100);
-                                }
+                                sleepUntil(() -> !isNameCreationVisible());
                             }
                         }
                         break;
@@ -154,16 +162,16 @@ public class TutorialIslandScript extends Script {
         Rs2Antiban.resetAntibanSettings();
     }
 
-    private boolean isLookupNameButtonVisible() {
-        return Rs2Widget.getWidget(LOOKUPNAME, 1) != null;
+    private boolean isNameCreationVisible() {
+        return Rs2Widget.isWidgetVisible(NameCreation, 2);
     }
 
     private boolean isCharacterCreationVisible() {
-        return Rs2Widget.getWidget(CharacterCreation, 1) != null;
+        return Rs2Widget.isWidgetVisible(CharacterCreation, 2);
     }
 
     public void CalculateStatus() {
-        if (isLookupNameButtonVisible()) {
+        if (isNameCreationVisible()) {
             status = Status.NAME;
         } else if (isCharacterCreationVisible()) {
             status = Status.CHARACTER;
@@ -436,9 +444,12 @@ public class TutorialIslandScript extends Script {
 
             Rs2Walker.walkTo(new WorldPoint(3127, 3123, 0), 2);
             Rs2Player.waitForWalking();
-            if (Rs2Npc.interact(npc, "Talk-to")) {
-                sleepUntil(Rs2Dialogue::isInDialogue);
+            Rs2Npc.interact(npc, "Talk-to");
+            Rs2Random.waitEx(1200, 300);
+            if (!(Microbot.getClient().getLocalPlayer().getInteracting() == npc)){
+                Rs2Npc.interact(npc, "Talk-to");
             }
+            sleepUntil(Rs2Dialogue::isInDialogue);
         } else if (Microbot.getVarbitPlayerValue(281) == 531) {
             Rs2Widget.clickWidget(10747943); //switchToAccountManagementTab
             Rs2Random.waitEx(1200, 300);
