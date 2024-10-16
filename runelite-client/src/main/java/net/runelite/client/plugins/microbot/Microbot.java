@@ -294,10 +294,12 @@ public class Microbot {
     }
 
     public static void click(Rectangle rectangle, NewMenuEntry entry) {
-
-        Point point = Rs2UiHelper.getClickingPoint(rectangle, true);
-        mouse.click(point, entry);
-
+        if (entry.getType() == MenuAction.WALK) {
+            mouse.click(new Point(entry.getParam0(), entry.getParam1()), entry);
+        } else {
+            Point point = Rs2UiHelper.getClickingPoint(rectangle, true);
+            mouse.click(point, entry);
+        }
 
         if (!Microbot.getClient().isClientThread()) {
             sleep(50, 100);
