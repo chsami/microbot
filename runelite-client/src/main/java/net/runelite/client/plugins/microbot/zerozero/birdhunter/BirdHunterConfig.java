@@ -4,6 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.plugins.microbot.zerozero.enums.hunter.Birds;
+import net.runelite.api.coords.WorldArea;
 
 @ConfigGroup("birdhunter")
 public interface BirdHunterConfig extends Config {
@@ -17,7 +18,6 @@ public interface BirdHunterConfig extends Config {
     default Birds BIRD() {
         return Birds.CRIMSON;
     }
-
 
     @ConfigItem(
             keyName = "buryBones",
@@ -36,6 +36,11 @@ public interface BirdHunterConfig extends Config {
             position = 3
     )
     default String keepItemNames() {
-        return "Bird snare";  // Default to Bird Snare
+        return "Bird snare";
+    }
+
+    // Method to get the WorldArea of the selected bird
+    default WorldArea getBirdArea() {
+        return BIRD().getArea();
     }
 }

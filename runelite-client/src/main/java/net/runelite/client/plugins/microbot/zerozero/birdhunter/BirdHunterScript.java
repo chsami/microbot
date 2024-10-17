@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.zerozero.birdhunter;
 
 import net.runelite.api.GameObject;
 import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -27,9 +28,26 @@ public class BirdHunterScript extends Script {
     public static String version = "1.0.0";
 
     public boolean run(BirdHunterConfig config) {
+        // Get the WorldArea for the selected bird
+        WorldArea birdArea = config.getBirdArea();
+        WorldPoint playerLocation = Rs2Player.getWorldLocation();
+
+        // Ensure the player is inside the bird's WorldArea before starting
+        if (!birdArea.contains(playerLocation)) {
+            Microbot.log("Player is not in the correct area for bird hunting.");
+            Microbot.showMessage("Start the bot inside the correct area for the selected bird.");
+            return false;  // Stop the bot if the player is not in the bird area
+        }
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run() || !Microbot.isLoggedIn()) return;
+
+                // Ensure the player stays inside the bird area
+                if (!birdArea.contains(Rs2Player.getWorldLocation())) {
+                    Microbot.log("Player left the designated bird hunting area.");
+                    return;  // Stop any further actions if the player leaves the area
+                }
 
                 handleTraps(config);
                 checkForBonesAndHandleInventory(config);
@@ -38,6 +56,7 @@ public class BirdHunterScript extends Script {
                 Microbot.log(ex.getMessage());
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
+
         return true;
     }
 
@@ -115,16 +134,19 @@ public class BirdHunterScript extends Script {
 
     private boolean interactWithTrap(GameObject birdSnare) {
         if (Rs2GameObject.interact(birdSnare)) {
-            if (!sleepUntil(Rs2Player::isAnimating, 2000)) {
+            // Wait for the player to start the interaction (animation)
+            if (!sleepUntil(Rs2Player::isAnimating, 3000)) {  // Increased to 3 seconds
                 Microbot.log("Failed to start interacting with the trap.");
                 return false;
             }
 
-            if (!sleepUntil(() -> !Rs2Player.isAnimating(), 2000)) {
+            // Wait for the player to finish interacting with the trap
+            if (!sleepUntil(() -> !Rs2Player.isAnimating(), 4000)) {  // Increased to 4 seconds
                 Microbot.log("Failed to finish interacting with the trap.");
                 return false;
             }
 
+            // Wait for the XP drop to confirm trap success (Hunter XP drop)
             if (Rs2Player.waitForXpDrop(Skill.HUNTER, true)) {
                 Microbot.log("Bird snare interaction was successful.");
                 return true;
@@ -133,6 +155,7 @@ public class BirdHunterScript extends Script {
         Microbot.log("Failed to interact with the bird snare.");
         return false;
     }
+
 
     private void pickUpBirdSnare() {
         if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {
