@@ -21,13 +21,17 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.NameGenerator;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
 import javax.inject.Inject;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue.*;
@@ -82,6 +86,7 @@ public class TutorialIslandScript extends Script {
                         
                         if (!nameSearchBarText.isEmpty()) {
                             Rs2Widget.clickWidget(NameCreation, 7); // enterName Field
+                            Rs2Random.waitEx(1200, 300);
                             
                             for (int i = 0; i < nameSearchBarText.length(); i++) {
                                 Rs2Keyboard.keyPress(KeyEvent.VK_BACK_SPACE);
@@ -305,11 +310,17 @@ public class TutorialIslandScript extends Script {
                 sleepUntil(Rs2Dialogue::isInDialogue);
             }
         } else if (Microbot.getVarbitPlayerValue(281) <= 90) {
+            if (!Rs2Inventory.hasItem("Bronze Axe") || !Rs2Inventory.hasItem("Tinderbox")) {
+                if (Rs2Npc.interact(npc, "talk-to")) {
+                    sleepUntil(Rs2Dialogue::isInDialogue);
+                }
+                return;
+            }
             if (!Rs2Inventory.contains("Raw shrimps")) {
                 fishShrimp();
                 return;
             }
-            if (!Rs2Inventory.contains("Logs") && !Rs2GameObject.exists(ObjectID.FIRE_26185)) {
+            if (!Rs2Inventory.contains("Logs") && (!Rs2GameObject.exists(ObjectID.FIRE_26185) || Rs2Player.getRealSkillLevel(Skill.WOODCUTTING) == 0)) {
                 CutTree();
                 return;
             }
@@ -570,18 +581,29 @@ public class TutorialIslandScript extends Script {
                 return;
             }
             if (Rs2Inventory.contains("Bronze pickaxe") && (!Rs2Inventory.contains("Copper ore") || !Rs2Inventory.contains("Tin ore"))) {
+                List<Integer> rockIds = new ArrayList<>();
                 if (!Rs2Inventory.contains("Copper ore")) {
-                    Rs2GameObject.interact(ObjectID.COPPER_ROCKS, "Mine");
-                    sleepUntil(() -> Rs2Inventory.contains("Copper ore") && !Rs2Player.isAnimating(1800));
+                    rockIds.add(ObjectID.COPPER_ROCKS);
                 }
                 if (!Rs2Inventory.contains("Tin ore")) {
-                    Rs2GameObject.interact(ObjectID.TIN_ROCKS, "Mine");
-                    sleepUntil(() -> Rs2Inventory.contains("Tin ore")&& !Rs2Player.isAnimating(1800));
+                    rockIds.add(ObjectID.TIN_ROCKS);
                 }
+
+                Collections.shuffle(rockIds);
+                int rockId = rockIds.get(0);
+
+                Rs2GameObject.interact(rockId, "Mine");
+                sleepUntil(() -> {
+                    if (rockId == ObjectID.COPPER_ROCKS) {
+                        return Rs2Inventory.contains("Copper ore") && !Rs2Player.isAnimating(1800);
+                    } else {
+                        return Rs2Inventory.contains("Tin ore") && !Rs2Player.isAnimating(1800);
+                    }
+                });
             } else if (Rs2Inventory.contains("Copper ore") && Rs2Inventory.contains("Tin ore")) {
                 int[] ores = {ItemID.TIN_ORE, ItemID.COPPER_ORE};
-                int selectedOreId = ores[(int) (System.currentTimeMillis() / 1000) % ores.length];
-                Rs2Inventory.useItemOnObject(selectedOreId, ObjectID.FURNACE_10082);
+                Collections.shuffle(Arrays.asList(ores));
+                Rs2Inventory.useItemOnObject(ores[0], ObjectID.FURNACE_10082);
                 sleepUntil(() -> Rs2Inventory.contains("Bronze bar") && !Rs2Player.isAnimating(1800));
             }
         }
@@ -601,6 +623,8 @@ public class TutorialIslandScript extends Script {
             Rs2Widget.clickWidget(164, 54); // switchToQuestTab
             Rs2Random.waitEx(1200, 300);
         } else {
+            Rs2Tab.switchToInventoryTab();
+            Rs2Random.waitEx(600, 100);
             Rs2GameObject.interact(9726, "Climb-down");
             Rs2Random.waitEx(2400, 100);
         }
@@ -638,13 +662,13 @@ public class TutorialIslandScript extends Script {
     }
 
     public void LightFire() {
-        if (Rs2GameObject.findObjectById(ObjectID.FIRE_26185) == null && Rs2GameObject.findGameObjectByLocation(Microbot.getClient().getLocalPlayer().getWorldLocation()) == null) {
-            Rs2Inventory.combine("Logs", "Tinderbox");
-            sleepUntil(() -> !Rs2Inventory.hasItem("Logs") && !Rs2Player.isAnimating(2400));
-        } else {
-            if (!Rs2Inventory.hasItem("Bronze Axe") || !Rs2Inventory.hasItem("Tinderbox"))
-                Rs2Npc.interact(NpcID.SURVIVAL_EXPERT);
+        if (Rs2GameObject.getGameObject(Rs2Player.getWorldLocation()) != null) {
+            WorldPoint nearestWalkable = Rs2Tile.getNearestWalkableTileWithLineOfSight(Rs2Player.getWorldLocation());
+            Rs2Walker.walkFastCanvas(nearestWalkable);
+            Rs2Player.waitForWalking();
         }
+        Rs2Inventory.combine("Logs", "Tinderbox");
+        sleepUntil(() -> !Rs2Inventory.hasItem("Logs") && !Rs2Player.isAnimating(2400));
     }
 
     public void CutTree() {
