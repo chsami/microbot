@@ -141,6 +141,14 @@ public class AgilityScript extends Script {
                     return;
                 }
 
+                // add summer pie support
+
+                  if (Microbot.getClient().getBoostedSkillLevel(Skill.AGILITY) < config.agilityBoost()){
+                    Rs2Inventory.interact("Summer pie", "Eat");
+                    sleep(600,1200);
+                    return;
+                }
+
                 final List<RS2Item> marksOfGrace = AgilityPlugin.getMarksOfGrace();
                 final LocalPoint playerLocation = Microbot.getClient().getLocalPlayer().getLocalLocation();
                 final WorldPoint playerWorldLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
