@@ -662,7 +662,7 @@ public class TutorialIslandScript extends Script {
     }
 
     public void LightFire() {
-        if (Rs2GameObject.getGameObject(Rs2Player.getWorldLocation()) != null) {
+        if (Rs2Player.isStandingOnGameObject()) {
             WorldPoint nearestWalkable = Rs2Tile.getNearestWalkableTileWithLineOfSight(Rs2Player.getWorldLocation());
             Rs2Walker.walkFastCanvas(nearestWalkable);
             Rs2Player.waitForWalking();
