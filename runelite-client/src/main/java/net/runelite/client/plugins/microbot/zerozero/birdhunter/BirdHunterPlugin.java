@@ -13,7 +13,7 @@ import java.awt.*;
 @PluginDescriptor(
         name = PluginDescriptor.zerozero + "Bird Hunter",
         description = "Hunts birds",
-        tags = {"hunting", "mntn", "bird", "skilling"},
+        tags = {"hunting", "00", "bird", "skilling"},
         enabledByDefault = false
 )
 @Slf4j

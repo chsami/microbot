@@ -3,52 +3,39 @@ package net.runelite.client.plugins.microbot.zerozero.birdhunter;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.zerozero.enums.hunter.Birds;
 
-@ConfigGroup("Hunter")
+@ConfigGroup("birdhunter")
 public interface BirdHunterConfig extends Config {
-    @ConfigSection(
-            name = "General",
-            description = "General",
+
+    @ConfigItem(
+            keyName = "bird",
+            name = "Bird Type",
+            description = "Select the type of bird to hunt",
             position = 0
     )
-    String generalSection = "general";
-
-    @ConfigItem(
-            keyName = "Bird",
-            name = "Bird",
-            description = "Choose the bird type",
-            position = 0,
-            section = generalSection
-    )
-    default Birds BIRD()
-    {
-        return Birds.TROPICAL;
+    default Birds BIRD() {
+        return Birds.CRIMSON;
     }
 
+
     @ConfigItem(
-            keyName = "BuryBones",
+            keyName = "buryBones",
             name = "Bury Bones",
-            description = "Bury Bones?",
-            position = 0,
-            section = generalSection
+            description = "Select whether to bury bones during hunting",
+            position = 2
     )
-    default boolean buryBones()
-    {
-        return false;
+    default boolean buryBones() {
+        return true;
     }
 
     @ConfigItem(
-            keyName = "DistanceToStray",
-            name = "Distance to Stray",
-            description = "Set how far you can travel from your initial position in tiles",
-            position = 2,
-            section = generalSection
+            keyName = "keepItemNames",
+            name = "Keep Item Names",
+            description = "Comma-separated list of item names that should not be dropped",
+            position = 3
     )
-    default int distanceToStray()
-    {
-        return 10;
+    default String keepItemNames() {
+        return "Bird snare";  // Default to Bird Snare
     }
-
 }

@@ -5,181 +5,35 @@ import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
-import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.client.plugins.microbot.breakhandler.BreakHandlerScript;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-enum State {
-    HANDLE_TRAP,
-    MOVE_AWAY
-
-}
-
-//TODO: if player is around, pickup traps and world hop.
-
 
 public class BirdHunterScript extends Script {
 
-    public final int BIRD_SNARE = 10006;
-
-    public final int IDLE_TRAP = 9345;
-    public final int MID_TRAP = 9347;
-    public final int SUCCESSFUL_TRAP = 9348;
-    public final int FAILED_TRAP = 9344;
+    private static final int BIRD_SNARE = 10006;
+    private static final int SUCCESSFUL_TRAP = 9373;
+    private static final int FAILED_TRAP = 9344;
+    private static final int IDLE_TRAP = 9345;
 
     public static String version = "1.0.0";
-    State state = State.HANDLE_TRAP;
 
-    WorldPoint playerStartingLocation = null;
-    
-    int availableBirdTrapsPerLevel = 1;
-    boolean hasRanAway = false;
-    boolean recheckTraps = false;
-
-    
     public boolean run(BirdHunterConfig config) {
-        Rs2Antiban.resetAntibanSettings();
-        Rs2Antiban.antibanSetupTemplates.applyHunterSetup();
-        Rs2AntibanSettings.actionCooldownChance = 0.1;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!super.run()) return;
-                if (!Microbot.isLoggedIn()) return;
-                if (Rs2AntibanSettings.actionCooldownActive) return;
-                if (playerStartingLocation == null) {
-                    Microbot.log("Setting player starting location.");
-                    playerStartingLocation = Rs2Player.getWorldLocation();
-                    Microbot.log(String.valueOf(playerStartingLocation));
-                }
+                if (!super.run() || !Microbot.isLoggedIn()) return;
 
-                if(BreakHandlerScript.breakIn <= 60){
-                    pickupAllTraps();
-                    sleep(1000, 2000);
-                    return;
-                }
+                handleTraps(config);
+                checkForBonesAndHandleInventory(config);
 
-                if (!config.BIRD().hasRequiredLevel()) {
-                    Microbot.showMessage("You do not have the required hunter level to trap this bird.");
-                    shutdown();
-                    return;
-                }
-
-                availableBirdTrapsPerLevel = getAvailableTraps();
-
-
-                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
-                switch (state) {
-                    case HANDLE_TRAP:
-                        sleep(100, 600);
-                        /*
-                                1) check if caught/fallen trap is near
-                                    - if caught/fallen trap, pick it up
-                                        - random chance of burying bones right then (0.2% of the time) if enabled
-                                    - if not caught/fallen trap
-                                        - check if another trap is near if proper level allows it
-                                            - if another trap is near and level doesn't allow more, MOVE_AWAY
-                                        - if no trap found, set trap
-                                            - check if trap is set
-                                        - MOVE_AWAY
-                         */
-                        if (Rs2Inventory.isFull()) {
-                            handleInventory(config);
-                            break;
-                        }
-
-                        //TODO: FIX
-//                        if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {
-//                            pickUpBirdSnare(config);
-//                            break;
-//                        }
-
-
-                        List<GameObject> successfulBirdSnares = Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP);
-                        if (!successfulBirdSnares.isEmpty()) {
-                            handleInventory(config);
-                            if (interactWithTrap(successfulBirdSnares.get(0))) {
-                                Rs2Player.waitForXpDrop(Skill.HUNTER, true);
-                                Rs2Antiban.actionCooldown();
-                                Rs2Antiban.takeMicroBreakByChance();
-                            } else {
-                                break;
-                            }
-                        }
-
-                        List<GameObject> middleBirdSnares = Rs2GameObject.getGameObjects(MID_TRAP);
-                        if (!middleBirdSnares.isEmpty()) {
-                            break;
-                        }
-
-                        List<GameObject> failedBirdSnares = Rs2GameObject.getGameObjects(FAILED_TRAP);
-                        if (!failedBirdSnares.isEmpty()) {
-                            if (interactWithTrap(failedBirdSnares.get(0))) {
-                                Rs2Antiban.actionCooldown();
-                                Rs2Antiban.takeMicroBreakByChance();
-                            } else {
-                                break;
-                            }
-                        }
-
-
-                        List<GameObject> idleTraps = Rs2GameObject.getGameObjects(IDLE_TRAP);
-                        if (idleTraps.size() < availableBirdTrapsPerLevel) {
-                            if (!recheckTraps) {
-                                recheckTraps = true;
-                                return;
-                            }
-                            setTrap(config);
-                        } else {
-                            state = State.MOVE_AWAY;
-                        }
-
-
-                        break;
-                    case MOVE_AWAY:
-                        if (hasRanAway) {
-                            state = State.HANDLE_TRAP;
-                            break;
-                        }
-
-                        // Get current player position
-                        WorldPoint currentPosition = Rs2Player.getWorldLocation();
-                        
-                        Random randomX = new Random();
-                        Random randomY = new Random();
-                        int randomXOffset = 1 + randomX.nextInt(config.distanceToStray());
-                        int randomYOffset = 1 + randomY.nextInt(config.distanceToStray());
-
-// Randomly choose the direction (positive or negative)
-                        if (Math.random() < 0.5) randomXOffset *= -1;
-                        if (Math.random() < 0.5) randomYOffset *= -1;
-
-// Calculate the target position
-                        WorldPoint targetPosition = new WorldPoint(
-                                currentPosition.getX() + randomXOffset,
-                                currentPosition.getY() + randomYOffset,
-                                currentPosition.getPlane()
-                        );
-
-
-// Move to the target position
-                        Rs2Walker.walkFastCanvas(targetPosition);
-                        sleepUntil(Rs2Player::isAnimating, 3000);
-                        handleInventory(config);
-                        hasRanAway = true;
-                        state = State.HANDLE_TRAP;
-                        break;
-                }
             } catch (Exception ex) {
                 Microbot.log(ex.getMessage());
             }
@@ -187,182 +41,159 @@ public class BirdHunterScript extends Script {
         return true;
     }
 
-    public void pickupAllTraps(){
-        BreakHandlerScript.setLockState(true);
+    private void handleTraps(BirdHunterConfig config) {
+        // Prioritize interacting with traps (successful, then failed)
+        List<GameObject> successfulTraps = Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP);
+        List<GameObject> failedTraps = Rs2GameObject.getGameObjects(FAILED_TRAP);
 
-        List<GameObject> successfulBirdSnares = Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP);
-        List<GameObject> middleBirdSnares = Rs2GameObject.getGameObjects(MID_TRAP);
-        List<GameObject> failedBirdSnares = Rs2GameObject.getGameObjects(FAILED_TRAP);
+        // Prioritize picking up successful traps first
+        if (!successfulTraps.isEmpty()) {
+            interactWithTraps(successfulTraps);
+            return; // Return immediately after interacting with traps
+        }
+
+        // Then prioritize failed traps
+        if (!failedTraps.isEmpty()) {
+            interactWithTraps(failedTraps);
+            return; // Return immediately after interacting with traps
+        }
+
+        // Pick up bird snares from the ground
+        if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {
+            pickUpBirdSnare();
+            return;
+        }
+
+        // If traps are less than allowed, set a trap after dealing with all existing ones
+        int availableTraps = getAvailableTraps();
         List<GameObject> idleTraps = Rs2GameObject.getGameObjects(IDLE_TRAP);
+        int totalTraps = successfulTraps.size() + failedTraps.size() + idleTraps.size();
 
-        List<GameObject> allTraps = new ArrayList<>();
-        allTraps.addAll(successfulBirdSnares);
-        allTraps.addAll(middleBirdSnares);
-        allTraps.addAll(failedBirdSnares);
-        allTraps.addAll(idleTraps);
-
-
-        for (GameObject trap : allTraps) {
-            interactWithTrap(trap);
-            sleepUntil(Rs2Player::isAnimating);
-            sleep(500, 1000);
+        if (totalTraps < availableTraps) {
+            setTrap(config);
         }
-
-        BreakHandlerScript.setLockState(false);
     }
 
-    public void setTrap(BirdHunterConfig config) {
-        hasRanAway = false;
-        recheckTraps = false;
+    private void interactWithTraps(List<GameObject> traps) {
+        for (GameObject trap : traps) {
+            if (interactWithTrap(trap)) {
+                continue;
+            }
+        }
+    }
 
-        if (!Rs2Inventory.contains(BIRD_SNARE)) {
-            System.out.println("No bird snare found in inventory.");
-            return;
+    private void setTrap(BirdHunterConfig config) {
+        if (!Rs2Inventory.contains(BIRD_SNARE)) return;
+
+        if (Rs2Player.isStandingOnGameObject()) {
+            movePlayerOffObject();
         }
 
-        if(Rs2Player.getWorldLocation().distanceTo(playerStartingLocation) > config.distanceToStray()){
-            Rs2Walker.walkTo(playerStartingLocation, availableBirdTrapsPerLevel);
-            sleepUntil(Rs2Player::isAnimating, 3000);
-        }
+        layBirdSnare();
+    }
 
-        if (isObjectOnTile(null)) {
-          moveRandomly();
-            return;
-        }
-
-        // Get the bird snare item from the inventory
+    private void layBirdSnare() {
         Rs2Item birdSnare = Rs2Inventory.get(BIRD_SNARE);
-
-        // Interact with the bird snare to lay it
         if (Rs2Inventory.interact(birdSnare, "Lay")) {
-            // Wait for the trap to be placed
-            sleepUntil(Rs2Player::isAnimating, 3000);
+            if (sleepUntil(Rs2Player::isAnimating, 2000)) {
+                sleepUntil(() -> !Rs2Player.isAnimating(), 3000);
+                Microbot.log("Bird snare was successfully laid.");
 
-            //todo: implement success check
-            System.out.println("Bird snare was successfully laid.");
+                // Introduce a short delay after laying the trap to avoid rushing to interact with traps too quickly
+                sleep(1000, 1500);  // Wait for 1 to 1.5 seconds before interacting with successful traps
+            }
         } else {
-            System.out.println("Failed to interact with the bird snare.");
+            Microbot.log("Failed to interact with the bird snare.");
         }
     }
 
-    public void handleInventory(BirdHunterConfig config){
-        if (Math.random() < 0.5){
-            buryBones(config);
-            sleep(100, 800);
-            dropItems(config);
-            sleep(100, 500);
-        } else {
-            dropItems(config);
-            sleep(100, 800);
-            buryBones(config);
-            sleep(100, 500);
+    private void movePlayerOffObject() {
+        WorldPoint nearestWalkable = Rs2Tile.getNearestWalkableTileWithLineOfSight(Rs2Player.getWorldLocation());
+        Rs2Walker.walkFastCanvas(nearestWalkable);
+        Rs2Player.waitForWalking();
+    }
+
+    private boolean interactWithTrap(GameObject birdSnare) {
+        if (Rs2GameObject.interact(birdSnare)) {
+            if (!sleepUntil(Rs2Player::isAnimating, 2000)) {
+                Microbot.log("Failed to start interacting with the trap.");
+                return false;
+            }
+
+            if (!sleepUntil(() -> !Rs2Player.isAnimating(), 2000)) {
+                Microbot.log("Failed to finish interacting with the trap.");
+                return false;
+            }
+
+            if (Rs2Player.waitForXpDrop(Skill.HUNTER, true)) {
+                Microbot.log("Bird snare interaction was successful.");
+                return true;
+            }
         }
-    }
-
-    public void pickUpBirdSnare(BirdHunterConfig config) {
-//        if (!Rs2GroundItem.exists(BIRD_SNARE, 20)) {
-//            return;
-//        }
-//        handleInventory(config);
-//
-//        Rs2GroundItem.loot(BIRD_SNARE);
-    }
-
-    public boolean isObjectOnTile(WorldPoint point) {
-        // Get the player's current location
-        WorldPoint location = point != null ? point : Rs2Player.getWorldLocation();
-        // Check if there is a bird snare at the player's location
-        return Rs2GameObject.getGameObject(location) != null;
-    }
-
-
-    public boolean interactWithTrap(GameObject birdSnare) {
-        Rs2GameObject.interact(birdSnare);
-
-        // Wait a moment to allow the game to process the click
-        sleepUntil(Rs2Player::isAnimating, 3000);
-
-        // Check for success
-        boolean success = !Rs2GameObject.getGameObjects(birdSnare.getId()).contains(birdSnare); // Or check for a chat message
-
-        if (success) {
-            System.out.println("Bird snare interaction was successful.");
-            return true;
-        } else {
-            System.out.println("Bird snare interaction failed.");
-        }
+        Microbot.log("Failed to interact with the bird snare.");
         return false;
     }
 
-    //TODO: check if something is in the new location before going there. if something is there, generate a new location (recursion?)
-    public void moveRandomly() {
-        WorldPoint currentLocation = Rs2Player.getWorldLocation();
-        Random random = new Random();
-
-        // Calculate the new location based on the direction
-        int direction = random.nextInt(4); // 0 = North, 1 = East, 2 = South, 3 = West
-        WorldPoint newLocation;
-        switch (direction) {
-            case 0: // North
-                newLocation = new WorldPoint(currentLocation.getX(), currentLocation.getY() + 1, currentLocation.getPlane());
-                break;
-            case 1: // East
-                newLocation = new WorldPoint(currentLocation.getX() + 1, currentLocation.getY(), currentLocation.getPlane());
-                break;
-            case 2: // South
-                newLocation = new WorldPoint(currentLocation.getX(), currentLocation.getY() - 1, currentLocation.getPlane());
-                break;
-            case 3: // West
-                newLocation = new WorldPoint(currentLocation.getX() - 1, currentLocation.getY(), currentLocation.getPlane());
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + direction);
+    private void pickUpBirdSnare() {
+        if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {
+            Rs2GroundItem.loot(BIRD_SNARE);
+            Microbot.log("Picked up bird snare from the ground.");
         }
-
-        if(isObjectOnTile(newLocation)){
-            moveRandomly();
-            return;
-        }
-
-        // Move the player to the new location
-        Rs2Walker.walkFastCanvas(newLocation);
-        sleepUntil(Rs2Player::isAnimating, 3000);
     }
 
-    public void dropItems(BirdHunterConfig config) {
-        // drop all items except bird snares, coins, etc
+    private void checkForBonesAndHandleInventory(BirdHunterConfig config) {
+        // Randomized threshold between 8 and 12 for handling inventory
+        int randomBoneThreshold = ThreadLocalRandom.current().nextInt(8, 13);
+
+        if (Rs2Inventory.count("Bones") > randomBoneThreshold) {
+            handleInventory(config);
+        }
+
+        if (Rs2Inventory.isFull()) {
+            handleInventory(config);
+        }
+    }
+
+    private void handleInventory(BirdHunterConfig config) {
         if (config.buryBones()) {
-            Rs2Inventory.dropAllExcept("bird snare", "coins", "bones");
-        } else {
-            Rs2Inventory.dropAllExcept("bird snare", "coins");
+            buryBones(config);
         }
-
+        dropItems(config);
     }
 
-    public void buryBones(BirdHunterConfig config) {
-        //
-        if (!config.buryBones() || !Rs2Inventory.hasItem("Bones")) {
-            return;
-        }
+    private void buryBones(BirdHunterConfig config) {
+        if (!config.buryBones() || !Rs2Inventory.hasItem("Bones")) return;
+
         List<Rs2Item> bones = Rs2Inventory.getBones();
         for (Rs2Item bone : bones) {
-            Rs2Inventory.interact(bone, "Bury");
+            if (Rs2Inventory.interact(bone, "Bury")) {
+                if (Rs2Player.waitForXpDrop(Skill.PRAYER, true)) {
+                    Microbot.log("Bone was successfully buried.");
+                } else {
+                    Microbot.log("Failed to bury bone.");
+                }
+            }
+            sleep(300, 600);  // Slight pause after each bone burial
         }
-        sleep(400, 2000);
     }
+
+    private void dropItems(BirdHunterConfig config) {
+        String keepItemsConfig = config.keepItemNames();
+        List<String> keepItemNames = List.of(keepItemsConfig.split("\\s*,\\s*"));
+
+        if (!keepItemNames.contains("Bird snare")) {
+            keepItemNames.add("Bird snare");
+        }
+        Rs2Inventory.dropAllExcept(keepItemNames.toArray(new String[0]));
+    }
+
 
     public int getAvailableTraps() {
         int hunterLevel = Rs2Player.getRealSkillLevel(Skill.HUNTER);
-        if (hunterLevel >= 80) {
-            return 5;
-        } else if (hunterLevel >= 60) {
-            return 4;
-        } else if (hunterLevel >= 40) {
-            return 3;
-        } else if (hunterLevel >= 20) {
-            return 2;
-        } else {
-            return 1;
-        }
+        if (hunterLevel >= 80) return 5;
+        if (hunterLevel >= 60) return 4;
+        if (hunterLevel >= 40) return 3;
+        if (hunterLevel >= 20) return 2;
+        return 1;
     }
 }

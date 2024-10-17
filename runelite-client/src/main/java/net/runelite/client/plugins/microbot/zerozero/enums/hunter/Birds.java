@@ -2,8 +2,7 @@ package net.runelite.client.plugins.microbot.zerozero.enums.hunter;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.runelite.api.Skill;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+
 
 @Getter
 @RequiredArgsConstructor
@@ -14,12 +13,9 @@ public enum Birds {
     CERULEAN(4, "Cerulean twitch", 11),
     TROPICAL(5, "Tropical wagtail", 15);
 
-    @Getter
     private final int id;
     private final String name;
     private final int hunterLevel;
 
-    public boolean hasRequiredLevel() {
-        return Rs2Player.getSkillRequirement(Skill.HUNTER, this.hunterLevel);
-    }
+
 }
