@@ -28,6 +28,18 @@ public interface MicroAgilityConfig extends Config {
         return AgilityCourseLocation.CANIFIS_ROOFTOP_COURSE;
     }
 
+     @ConfigItem(
+            keyName = "agilityBoost",
+            name = "Agility Boost Level",
+            description = "Agility Boost Level",
+            position = 1,
+            section = generalSection
+    )
+    default int agilityBoost()
+    {
+        return 40;
+    }
+
     @ConfigItem(
             keyName = "Hitpoints",
             name = "Hitpoints treshhold",
