@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
+import net.runelite.client.plugins.microbot.zerozero.enums.hunter.Birds;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -28,22 +29,17 @@ public class BirdHunterScript extends Script {
     public static String version = "1.0.0";
 
     public boolean run(BirdHunterConfig config) {
-        // Get the WorldArea for the selected bird
-        WorldArea birdArea = config.getBirdArea();
-        WorldPoint playerLocation = Rs2Player.getWorldLocation();
-
-        // Ensure the player is inside the bird's WorldArea before starting
-        if (!birdArea.contains(playerLocation)) {
-            Microbot.log("Player is not in the correct area for bird hunting.");
-            Microbot.showMessage("Start the bot inside the correct area for the selected bird.");
-            return false;  // Stop the bot if the player is not in the bird area
+        WorldArea birdArea = getBirdArea(config.BIRD());
+        if (birdArea == null) {
+            Microbot.log("No valid hunting area for the selected bird.");
+            return false;
         }
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run() || !Microbot.isLoggedIn()) return;
 
-                // Ensure the player stays inside the bird area
+                // Ensure the player stays inside the bird's area
                 if (!birdArea.contains(Rs2Player.getWorldLocation())) {
                     Microbot.log("Player left the designated bird hunting area.");
                     return;  // Stop any further actions if the player leaves the area
@@ -58,6 +54,10 @@ public class BirdHunterScript extends Script {
         }, 0, 100, TimeUnit.MILLISECONDS);
 
         return true;
+    }
+
+    private WorldArea getBirdArea(Birds bird) {
+        return bird.getArea();
     }
 
     private void handleTraps(BirdHunterConfig config) {
