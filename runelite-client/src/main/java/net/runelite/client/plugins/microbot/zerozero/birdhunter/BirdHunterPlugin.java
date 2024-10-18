@@ -39,41 +39,38 @@ public class BirdHunterPlugin extends Plugin {
 
     @Override
     protected void startUp() {
-        // Add overlay if the config allows it
         if (config.showAreaOverlay()) {
             overlayManager.add(birdHunterOverlay);
         }
 
         if (config.startScript()) {
-            birdHunterScript.run(config); // Start script if the toggle is on
+            birdHunterScript.run(config);
         }
     }
 
     @Override
     protected void shutDown() {
-        birdHunterScript.shutdown();  // Stop the script if the plugin is disabled
-        overlayManager.remove(birdHunterOverlay);  // Remove the overlay when the plugin is disabled
+        birdHunterScript.shutdown();
+        overlayManager.remove(birdHunterOverlay);
     }
 
-    // Listen for changes in config
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
         if (event.getGroup().equals("birdhunter")) {
-            // Handle the start/stop toggle
             if (event.getKey().equals("startScript")) {
                 if (config.startScript()) {
-                    birdHunterScript.run(config);  // Start script when the toggle is checked
+                    birdHunterScript.run(config);
                 } else {
-                    birdHunterScript.shutdown();   // Stop script when the toggle is unchecked
+                    birdHunterScript.shutdown();
                 }
             }
 
             // Handle the area overlay toggle
             if (event.getKey().equals("showAreaOverlay")) {
                 if (config.showAreaOverlay()) {
-                    overlayManager.add(birdHunterOverlay);  // Add the overlay when it's enabled
+                    overlayManager.add(birdHunterOverlay);
                 } else {
-                    overlayManager.remove(birdHunterOverlay);  // Remove the overlay when it's disabled
+                    overlayManager.remove(birdHunterOverlay);
                 }
             }
         }

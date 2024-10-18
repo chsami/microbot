@@ -35,7 +35,7 @@ public interface BirdHunterConfig extends Config {
             position = 3
     )
     default String keepItemNames() {
-        return "Bird snare";  // Default to Bird Snare
+        return "Bird snare";
     }
 
     @ConfigItem(
@@ -45,7 +45,7 @@ public interface BirdHunterConfig extends Config {
             position = 4
     )
     default boolean showAreaOverlay() {
-        return true;  // Default to show the area overlay
+        return true;
     }
 
     @ConfigItem(
@@ -55,6 +55,6 @@ public interface BirdHunterConfig extends Config {
             position = 5
     )
     default boolean startScript() {
-        return false; // Default is off
+        return false;
     }
 }
