@@ -49,6 +49,10 @@ public class BirdHunterScript extends Script {
     public boolean run(BirdHunterConfig config) {
         Microbot.log("Bird Hunter script started.");
 
+        if (!hasRequiredSnares()) {
+            Microbot.log("Not enough bird snares in inventory. Stopping the script.");
+            return false;  // Stop the script if there aren't enough snares
+        }
         huntingCenter = Rs2Player.getWorldLocation();
         updateHuntingArea(config);
 
@@ -75,6 +79,16 @@ public class BirdHunterScript extends Script {
         }, 0, 100, TimeUnit.MILLISECONDS);
 
         return true;
+    }
+
+    private boolean hasRequiredSnares() {
+        int hunterLevel = Rs2Player.getRealSkillLevel(Skill.HUNTER);
+        int allowedSnares = getAvailableTraps(hunterLevel);  // Calculate the allowed number of snares
+
+        int snaresInInventory = Rs2Inventory.count(BIRD_SNARE);
+        Microbot.log("Allowed snares: " + allowedSnares + ", Snares in inventory: " + snaresInInventory);
+
+        return snaresInInventory >= allowedSnares;  // Return true if enough snares, false otherwise
     }
 
     public void updateHuntingArea(BirdHunterConfig config) {
@@ -128,7 +142,7 @@ public class BirdHunterScript extends Script {
         List<GameObject> failedTraps = Rs2GameObject.getGameObjects(FAILED_TRAP);
         List<GameObject> idleTraps = Rs2GameObject.getGameObjects(IDLE_TRAP);
 
-        int availableTraps = getAvailableTraps();
+        int availableTraps = getAvailableTraps(Rs2Player.getRealSkillLevel(Skill.HUNTER));
         int totalTraps = successfulTraps.size() + failedTraps.size() + idleTraps.size() + catchingTraps.size();
 
         if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {
@@ -300,8 +314,7 @@ public class BirdHunterScript extends Script {
         Rs2Inventory.dropAllExcept(keepItemNames.toArray(new String[0]));
     }
 
-    public int getAvailableTraps() {
-        int hunterLevel = Rs2Player.getRealSkillLevel(Skill.HUNTER);
+    public int getAvailableTraps(int hunterLevel) {
         if (hunterLevel >= 80) return 5;
         if (hunterLevel >= 60) return 4;
         if (hunterLevel >= 40) return 3;
