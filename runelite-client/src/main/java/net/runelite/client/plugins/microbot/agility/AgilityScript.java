@@ -18,6 +18,7 @@ import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.models.RS2Item;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -159,6 +160,10 @@ public class AgilityScript extends Script {
     public boolean run(MicroAgilityConfig config) {
         Microbot.enableAutoRunOn = true;
         currentObstacle = 0;
+
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyAgilitySetup();
+
         init(config);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
