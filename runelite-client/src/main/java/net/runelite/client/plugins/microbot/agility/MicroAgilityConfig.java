@@ -4,6 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.plugins.microbot.agility.enums.AgilityCourseName;
 import net.runelite.client.plugins.worldmap.AgilityCourseLocation;
 
 @ConfigGroup("MicroAgility")
@@ -23,9 +24,9 @@ public interface MicroAgilityConfig extends Config {
             position = 1,
             section = generalSection
     )
-    default AgilityCourseLocation agilityCourse()
+    default AgilityCourseName agilityCourse()
     {
-        return AgilityCourseLocation.CANIFIS_ROOFTOP_COURSE;
+        return AgilityCourseName.CANIFIS_ROOFTOP_COURSE;
     }
 
     @ConfigItem(
