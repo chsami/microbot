@@ -23,6 +23,7 @@ public class BirdHunterScript extends Script {
     private static final int SUCCESSFUL_TRAP = 9373;
     private static final int FAILED_TRAP = 9344;
     private static final int IDLE_TRAP = 9345;
+    private static final int CATCHING_TRAP = 9349;
 
     public static String version = "1.0.0";
 
@@ -45,6 +46,7 @@ public class BirdHunterScript extends Script {
         // Prioritize interacting with traps (successful, then failed)
         List<GameObject> successfulTraps = Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP);
         List<GameObject> failedTraps = Rs2GameObject.getGameObjects(FAILED_TRAP);
+        List<GameObject> catchingTraps = Rs2GameObject.getGameObjects(CATCHING_TRAP);
 
         // Prioritize picking up successful traps first
         if (!successfulTraps.isEmpty()) {
@@ -67,7 +69,7 @@ public class BirdHunterScript extends Script {
         // If traps are less than allowed, set a trap after dealing with all existing ones
         int availableTraps = getAvailableTraps();
         List<GameObject> idleTraps = Rs2GameObject.getGameObjects(IDLE_TRAP);
-        int totalTraps = successfulTraps.size() + failedTraps.size() + idleTraps.size();
+        int totalTraps = successfulTraps.size() + failedTraps.size() + idleTraps.size() + catchingTraps.size();
 
         if (totalTraps < availableTraps) {
             setTrap(config);
