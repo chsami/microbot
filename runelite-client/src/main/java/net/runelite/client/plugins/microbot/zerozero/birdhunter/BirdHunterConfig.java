@@ -18,7 +18,6 @@ public interface BirdHunterConfig extends Config {
         return Birds.CRIMSON;
     }
 
-
     @ConfigItem(
             keyName = "buryBones",
             name = "Bury Bones",
@@ -37,5 +36,25 @@ public interface BirdHunterConfig extends Config {
     )
     default String keepItemNames() {
         return "Bird snare";  // Default to Bird Snare
+    }
+
+    @ConfigItem(
+            keyName = "showAreaOverlay",
+            name = "Area Overlay",
+            description = "Toggle to show or hide the bird hunting area overlay",
+            position = 4
+    )
+    default boolean showAreaOverlay() {
+        return true;  // Default to show the area overlay
+    }
+
+    @ConfigItem(
+            keyName = "startScript",
+            name = "Start/Stop Script",
+            description = "Toggle to start or stop the Bird Hunter script",
+            position = 5
+    )
+    default boolean startScript() {
+        return false; // Default is off
     }
 }

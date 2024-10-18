@@ -28,6 +28,8 @@ public class BirdHunterScript extends Script {
     public static String version = "1.0.0";
 
     public boolean run(BirdHunterConfig config) {
+        // Start the script when the toggle is enabled
+        Microbot.log("Bird Hunter script started.");
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run() || !Microbot.isLoggedIn()) return;
@@ -42,39 +44,60 @@ public class BirdHunterScript extends Script {
         return true;
     }
 
+    // Method to handle script shutdown
+    public void shutdown() {
+        if (mainScheduledFuture != null) {
+            mainScheduledFuture.cancel(true);
+            Microbot.log("Bird Hunter script stopped.");
+        }
+    }
+
     private void handleTraps(BirdHunterConfig config) {
-        // Prioritize interacting with traps (successful, then failed)
         List<GameObject> successfulTraps = Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP);
         List<GameObject> failedTraps = Rs2GameObject.getGameObjects(FAILED_TRAP);
         List<GameObject> catchingTraps = Rs2GameObject.getGameObjects(CATCHING_TRAP);
-
-        // Prioritize picking up successful traps first
-        if (!successfulTraps.isEmpty()) {
-            interactWithTraps(successfulTraps);
-            return; // Return immediately after interacting with traps
-        }
-
-        // Then prioritize failed traps
-        if (!failedTraps.isEmpty()) {
-            interactWithTraps(failedTraps);
-            return; // Return immediately after interacting with traps
-        }
-
-        // Pick up bird snares from the ground
-        if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {
-            pickUpBirdSnare();
-            return;
-        }
-
-        // If traps are less than allowed, set a trap after dealing with all existing ones
-        int availableTraps = getAvailableTraps();
         List<GameObject> idleTraps = Rs2GameObject.getGameObjects(IDLE_TRAP);
+        int availableTraps = getAvailableTraps();
         int totalTraps = successfulTraps.size() + failedTraps.size() + idleTraps.size() + catchingTraps.size();
 
+        // Pick up bird snares from the ground if they exist (highest priority)
+        if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {
+            pickUpBirdSnare();
+            return; // Prioritize picking up snares
+        }
+
+        // Prioritize placing traps to ensure 4 traps are always down
         if (totalTraps < availableTraps) {
             setTrap(config);
+            return; // Immediately return after placing a trap to avoid interaction first
+        }
+
+
+
+        // Interact with successful traps and ensure a new trap is placed after each interaction
+        if (!successfulTraps.isEmpty()) {
+            for (GameObject successfulTrap : successfulTraps) {
+                if (interactWithTrap(successfulTrap)) {
+                    // Immediately place a new trap after interacting
+                    setTrap(config);
+                    return; // Return after placing a trap to prevent moving to the next trap too quickly
+                }
+            }
+        }
+
+        // Then interact with failed traps and place a new trap after each interaction
+        if (!failedTraps.isEmpty()) {
+            for (GameObject failedTrap : failedTraps) {
+                if (interactWithTrap(failedTrap)) {
+                    // Immediately place a new trap after interacting
+                    setTrap(config);
+                    return; // Return after placing a trap to prevent moving to the next trap too quickly
+                }
+            }
         }
     }
+
+
 
     private void interactWithTraps(List<GameObject> traps) {
         for (GameObject trap : traps) {
@@ -116,25 +139,34 @@ public class BirdHunterScript extends Script {
     }
 
     private boolean interactWithTrap(GameObject birdSnare) {
+        Microbot.log("Attempting to interact with bird snare at: " + birdSnare.getWorldLocation());
+
         if (Rs2GameObject.interact(birdSnare)) {
+            Microbot.log("Interaction initiated successfully.");
+
             if (!sleepUntil(Rs2Player::isAnimating, 2000)) {
-                Microbot.log("Failed to start interacting with the trap.");
+                Microbot.log("Failed to start animating during interaction with bird snare.");
                 return false;
             }
 
-            if (!sleepUntil(() -> !Rs2Player.isAnimating(), 2000)) {
-                Microbot.log("Failed to finish interacting with the trap.");
+            if (!sleepUntil(() -> !Rs2Player.isAnimating(), 3000)) {
+                Microbot.log("Failed to finish interacting with the bird snare.");
                 return false;
             }
 
             if (Rs2Player.waitForXpDrop(Skill.HUNTER, true)) {
                 Microbot.log("Bird snare interaction was successful.");
                 return true;
+            } else {
+                Microbot.log("No Hunter XP drop detected after interacting with bird snare.");
             }
+        } else {
+            Microbot.log("Failed to initiate interaction with bird snare.");
         }
-        Microbot.log("Failed to interact with the bird snare.");
+
         return false;
     }
+
 
     private void pickUpBirdSnare() {
         if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {

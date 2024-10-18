@@ -7,7 +7,6 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
-
 import javax.inject.Inject;
 import java.awt.*;
 
@@ -26,6 +25,11 @@ public class BirdHunterOverlay extends OverlayPanel {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        // Check if the overlay toggle is enabled
+        if (!config.showAreaOverlay()) {
+            return null;  // Don't render anything if the overlay is disabled
+        }
+
         // Get the WorldArea for the selected bird from the config
         WorldArea birdHuntingArea = config.BIRD().getArea();
 
