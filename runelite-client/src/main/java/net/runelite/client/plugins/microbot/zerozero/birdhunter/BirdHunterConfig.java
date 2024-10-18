@@ -8,6 +8,20 @@ import net.runelite.client.config.ConfigItem;
 public interface BirdHunterConfig extends Config {
 
     @ConfigItem(
+            keyName = "guide",
+            name = "How to use",
+            description = "How to use this plugin",
+            position = 0
+    )
+    default String GUIDE() {
+        return "Make sure you have at least 4 snareso\n" +
+                "Enable the plugin and press the start button when you are in the hunting location\n" +
+                "The plugin will automatically catch birds and stay in the hunting area\n" +
+                "The is a drop filter, incase you want to keep things like feathers or runes etc\n" +
+                "Happy botting!";
+    }
+
+    @ConfigItem(
             keyName = "radius",
             name = "Hunting Radius",
             description = "Set the radius for the hunting area",
