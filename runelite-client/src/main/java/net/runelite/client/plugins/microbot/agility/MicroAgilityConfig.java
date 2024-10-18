@@ -18,6 +18,19 @@ public interface MicroAgilityConfig extends Config {
     String generalSection = "general";
 
     @ConfigItem(
+            keyName = "guide",
+            name = "How to use",
+            description = "How to use this plugin",
+            position = 0,
+            section = generalSection
+    )
+    default String GUIDE() {
+        return "Enable the plugin near the start of your selected agility course. \n\n" +
+                "Course requirements: \n" +
+                "Ape Atoll - Kruk or Ninja greegree equipped. Stamina pots recommended. \n" +
+                "Shayzien Advanced - Crossbow and Mith Grapple equipped.";
+    }
+    @ConfigItem(
             keyName = "Course",
             name = "Course",
             description = "Choose your agility course",
@@ -41,47 +54,12 @@ public interface MicroAgilityConfig extends Config {
         return 20;
     }
 
-    @ConfigItem(
-            keyName = "BreakTime",
-            name = "Pause Randomly",
-            description = "Pauses randomly before clicking the next obstacle.",
-            position = 3,
-            section = generalSection
-    )
-    default boolean pauseRandomly()
-    {
-        return true;
-    }
-
-    @ConfigItem(
-            keyName = "pauseMinTime",
-            name = "Pause Min Time",
-            description = "Minimum amount of time to randomly pause for.",
-            position = 4,
-            section = generalSection
-    )
-    default int pauseMinTime()
-    {
-        return 10;
-    }
-
-    @ConfigItem(
-            keyName = "pauseMaxTime",
-            name = "Pause Max Time",
-            description = "Maximum amount of time to randomly pause for.",
-            position = 5,
-            section = generalSection
-    )
-    default int pauseMaxTime()
-    {
-        return 5000;
-    }
 
     @ConfigItem(
             keyName = "Alchemy",
             name = "Alch",
             description = "Use Low/High Alchemy while doing agility",
-            position = 5,
+            position = 3,
             section = generalSection
     )
     default boolean alchemy()
@@ -93,7 +71,7 @@ public interface MicroAgilityConfig extends Config {
             keyName = "item",
             name = "Item To Alch",
             description = "Item to alch",
-            position = 5,
+            position = 3,
             section = generalSection
     )
     default String item()

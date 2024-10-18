@@ -181,9 +181,6 @@ public class AgilityScript extends Script {
 
                 // Eat food.
                 Rs2Player.eatAt(config.hitpoints());
-                if (random(1, 10) == 2 && config.pauseRandomly()) {
-                    sleep(random(config.pauseMinTime(), config.pauseMaxTime()));
-                }
 
                 if (Rs2Player.isMoving()) return;
                 if (Rs2Player.isAnimating()) return;
