@@ -164,7 +164,7 @@ public class MicroAgilityPlugin extends Plugin {
 
         //Ape Atoll
         agilityScript.apeatollCourse.add(new AgilityObstacleModel(STEPPING_STONE_15412, 2755, -1, Operation.GREATER_EQUAL, Operation.GREATER));
-        agilityScript.apeatollCourse.add(new AgilityObstacleModel(TROPICAL_TREE_15414, -1, 2741, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.apeatollCourse.add(new AgilityObstacleModel(TROPICAL_TREE_15414, -1, 2742, Operation.GREATER, Operation.GREATER_EQUAL));
         agilityScript.apeatollCourse.add(new AgilityObstacleModel(MONKEYBARS_15417));
         agilityScript.apeatollCourse.add(new AgilityObstacleModel(SKULL_SLOPE));
         agilityScript.apeatollCourse.add(new AgilityObstacleModel(ROPE_15487, 2752, -1, Operation.LESS_EQUAL, Operation.GREATER));
