@@ -585,4 +585,19 @@ public class VorkathScript extends Script {
             }
         }
     }
+    //Only use this for testing purpose on sleeping vorkath
+    private void testWooxWalk() {
+        vorkath = Rs2Npc.getNpc(NpcID.VORKATH_8059);
+        WorldPoint safeTile = findSafeTile();
+        WorldPoint playerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
+
+        if (safeTile != null) {
+            if (playerLocation.equals(safeTile)) {
+                Rs2Npc.interact(vorkath, "attack");
+            } else {
+                Rs2Player.eatAt(75);
+                Rs2Walker.walkFastLocal(LocalPoint.fromWorld(Microbot.getClient(), safeTile));
+            }
+        }
+    }
 }

@@ -21,7 +21,6 @@ import net.runelite.client.plugins.microbot.configs.SpecialAttackConfigs;
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
@@ -260,14 +259,6 @@ public class Microbot {
 
     }
 
-    @Deprecated(since = "1.3.8 - use Rs2UiHelper", forRemoval = true)
-    public static Point calculateClickingPoint(Rectangle rect) {
-        if (rect.getX() == 1 && rect.getY() == 1) return new Point(1, 1);
-        int x = (int) (rect.getX() + (double) Random.random((int) rect.getWidth() / 6 * -1, (int) rect.getWidth() / 6) + rect.getWidth() / 2.0);
-        int y = (int) (rect.getY() + (double) Random.random((int) rect.getHeight() / 6 * -1, (int) rect.getHeight() / 6) + rect.getHeight() / 2.0);
-        return new Point(x, y);
-    }
-
     public static void doInvoke(NewMenuEntry entry, Rectangle rectangle) {
 
         try {
@@ -294,10 +285,12 @@ public class Microbot {
     }
 
     public static void click(Rectangle rectangle, NewMenuEntry entry) {
-
-        Point point = Rs2UiHelper.getClickingPoint(rectangle, true);
-        mouse.click(point, entry);
-
+        if (entry.getType() == MenuAction.WALK) {
+            mouse.click(new Point(entry.getParam0(), entry.getParam1()), entry);
+        } else {
+            Point point = Rs2UiHelper.getClickingPoint(rectangle, true);
+            mouse.click(point, entry);
+        }
 
         if (!Microbot.getClient().isClientThread()) {
             sleep(50, 100);
