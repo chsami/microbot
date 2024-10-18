@@ -1,4 +1,4 @@
-# X Y Z	X Y Z	menuOption menuTarget objectID	Skill requirements	Item requirements	Quest	Travel time	Info
+# Origin	Destination	menuOption menuTarget objectID	Skill Requirements	Item Requirements	Quest	Wait	Display Info
 # Fishing Platform							
 2720 3301 0	2782 3273 0	Travel Holgart 7789			Sea Slug	9	
 2782 3273 0	2720 3301 0	Travel Holgart 5070			Sea Slug	9	
