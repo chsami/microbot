@@ -18,6 +18,7 @@ public interface BirdHunterConfig extends Config {
         return Birds.CRIMSON;
     }
 
+
     @ConfigItem(
             keyName = "buryBones",
             name = "Bury Bones",
@@ -35,6 +36,6 @@ public interface BirdHunterConfig extends Config {
             position = 3
     )
     default String keepItemNames() {
-        return "Bird snare";
+        return "Bird snare";  // Default to Bird Snare
     }
 }
