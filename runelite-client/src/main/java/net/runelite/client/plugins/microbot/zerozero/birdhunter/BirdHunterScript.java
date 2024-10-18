@@ -2,6 +2,8 @@ package net.runelite.client.plugins.microbot.zerozero.birdhunter;
 
 import net.runelite.api.GameObject;
 import net.runelite.api.Skill;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -15,28 +17,54 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class BirdHunterScript extends Script {
 
+
+    private static final int CATCHING_TRAP_1 = 9348;
+    private static final int CATCHING_TRAP_2 = 9376;
+    private static final int CATCHING_TRAP_3 = 9378;
+    private static final int CATCHING_TRAP_4 = 9374;
+    private static final int CATCHING_TRAP_5 = 9373;
+
+    private static final int SUCCESSFUL_TRAP_1 = 9349;
+    private static final int SUCCESSFUL_TRAP_2 = 9347;
+    private static final int SUCCESSFUL_TRAP_3 = 9377;
+    private static final int SUCCESSFUL_TRAP_4 = 9379;
+    private static final int SUCCESSFUL_TRAP_5 = 9375;
+
     private static final int BIRD_SNARE = 10006;
-    private static final int SUCCESSFUL_TRAP = 9373;
     private static final int FAILED_TRAP = 9344;
     private static final int IDLE_TRAP = 9345;
-    private static final int CATCHING_TRAP = 9349;
+
 
     public static String version = "1.0.0";
+    private WorldArea dynamicHuntingArea;
+    private WorldPoint huntingCenter;
 
     public boolean run(BirdHunterConfig config) {
         Microbot.log("Bird Hunter script started.");
+
+        huntingCenter = Rs2Player.getWorldLocation();
+        updateHuntingArea(config);
+
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             Rs2Antiban.resetAntibanSettings();
             Rs2Antiban.antibanSetupTemplates.applyHunterSetup();
             Rs2AntibanSettings.actionCooldownChance = 0.1;
+
             try {
                 if (!super.run() || !Microbot.isLoggedIn()) return;
+
+                if (!isInHuntingArea()) {
+                    Microbot.log("Player is outside the designated hunting area.");
+                    walkBackToArea();
+                    return;
+                }
 
                 handleTraps(config);
                 checkForBonesAndHandleInventory(config);
@@ -45,21 +73,61 @@ public class BirdHunterScript extends Script {
                 Microbot.log(ex.getMessage());
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
+
         return true;
     }
 
-    public void shutdown() {
-        if (mainScheduledFuture != null) {
-            mainScheduledFuture.cancel(true);
-            Microbot.log("Bird Hunter script stopped.");
+    public void updateHuntingArea(BirdHunterConfig config) {
+        int radius = config.radius();
+        dynamicHuntingArea = new WorldArea(
+                huntingCenter.getX() - radius,
+                huntingCenter.getY() - radius,
+                radius * 2, radius * 2,
+                huntingCenter.getPlane()
+        );
+        Microbot.log("Hunting area radius updated to " + radius + " around center: " + huntingCenter);
+    }
+
+    public WorldArea getDynamicHuntingArea() {
+        return dynamicHuntingArea;
+    }
+
+    private boolean isInHuntingArea() {
+        WorldPoint playerLocation = Rs2Player.getWorldLocation();
+        return dynamicHuntingArea.contains(playerLocation);
+    }
+
+    private void walkBackToArea() {
+        WorldPoint centerTile = dynamicHuntingArea.toWorldPoint();
+        WorldPoint walkableTile = getSafeWalkableTile(centerTile, dynamicHuntingArea);
+
+        if (walkableTile != null) {
+            Rs2Walker.walkFastCanvas(walkableTile);
+            Rs2Player.waitForWalking();
+            Microbot.log("Walking back to the center of the hunting area: " + walkableTile);
+        } else {
+            Microbot.log("No safe walkable tile found inside the hunting area.");
         }
     }
 
     private void handleTraps(BirdHunterConfig config) {
-        List<GameObject> successfulTraps = Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP);
+        List<GameObject> successfulTraps = new ArrayList<>();
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_1));
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_2));
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_3));
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_4));
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_5));
+
+        List<GameObject> catchingTraps = new ArrayList<>();
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_1));
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_2));
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_3));
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_4));
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_5));
+
         List<GameObject> failedTraps = Rs2GameObject.getGameObjects(FAILED_TRAP);
-        List<GameObject> catchingTraps = Rs2GameObject.getGameObjects(CATCHING_TRAP);
         List<GameObject> idleTraps = Rs2GameObject.getGameObjects(IDLE_TRAP);
+
         int availableTraps = getAvailableTraps();
         int totalTraps = successfulTraps.size() + failedTraps.size() + idleTraps.size() + catchingTraps.size();
 
@@ -92,6 +160,7 @@ public class BirdHunterScript extends Script {
         }
     }
 
+
     private void setTrap(BirdHunterConfig config) {
         if (!Rs2Inventory.contains(BIRD_SNARE)) return;
 
@@ -115,11 +184,40 @@ public class BirdHunterScript extends Script {
         }
     }
 
-    private void movePlayerOffObject() {
-        WorldPoint nearestWalkable = Rs2Tile.getNearestWalkableTile(Rs2Player.getWorldLocation());
-        Rs2Walker.walkFastCanvas(nearestWalkable);
-        Rs2Player.waitForWalking();
+    private boolean isGameObjectAt(WorldPoint point) {
+        return Rs2GameObject.findObjectByLocation(point) != null;
     }
+
+
+    private WorldPoint getSafeWalkableTile(WorldPoint targetPoint, WorldArea huntingArea) {
+        int searchRadius = 1;
+
+        for (int x = targetPoint.getX() - searchRadius; x <= targetPoint.getX() + searchRadius; x++) {
+            for (int y = targetPoint.getY() - searchRadius; y <= targetPoint.getY() + searchRadius; y++) {
+                WorldPoint candidateTile = new WorldPoint(x, y, targetPoint.getPlane());
+                LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), candidateTile);
+
+                if (localPoint != null && huntingArea.contains(candidateTile)) {
+                    if (Rs2Tile.isWalkable(localPoint) && !isGameObjectAt(candidateTile)) {
+                        return candidateTile;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private void movePlayerOffObject() {
+        WorldPoint nearestWalkable = getSafeWalkableTile(Rs2Player.getWorldLocation(), dynamicHuntingArea);
+        if (nearestWalkable != null) {
+            Rs2Walker.walkFastCanvas(nearestWalkable);
+            Rs2Player.waitForWalking();
+        } else {
+            Microbot.log("No safe walkable tile found inside the hunting area.");
+        }
+    }
+
+
 
     private boolean interactWithTrap(GameObject birdSnare) {
         Microbot.log("Attempting to interact with bird snare at: " + birdSnare.getWorldLocation());
@@ -140,8 +238,9 @@ public class BirdHunterScript extends Script {
             if (Rs2Player.waitForXpDrop(Skill.HUNTER, true)) {
                 Microbot.log("Bird snare interaction was successful.");
                 return true;
+            } else {
+                Microbot.log("No Hunter XP drop detected after interacting with bird snare.");
             }
-
         } else {
             Microbot.log("Failed to initiate interaction with bird snare.");
         }
