@@ -236,23 +236,25 @@ public class TutorialIslandScript extends Script {
                 Widget[] dynamicPronounWidgets = Rs2Widget.getWidget(CharacterCreation, 78).getDynamicChildren();
                 Widget pronounSelectionWidget;
                 
-                if (currentPronoun != null && currentPronoun.getText().toLowerCase().contains("he/him")) {
-                    if (Rs2Random.diceFractional(0.5)) {
-                        pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("they/them")).findFirst().orElse(null);
+                if (currentPronoun != null) {
+                    if (currentPronoun.getText().toLowerCase().contains("he/him")) {
+                        if (Rs2Random.diceFractional(0.5)) {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("they/them")).findFirst().orElse(null);
+                        } else {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("she/her")).findFirst().orElse(null);
+                        }
                     } else {
-                        pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("she/her")).findFirst().orElse(null);
+                        if (Rs2Random.diceFractional(0.5)) {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("they/them")).findFirst().orElse(null);
+                        } else {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("he/him")).findFirst().orElse(null);
+                        }
                     }
-                } else {
-                    if (Rs2Random.diceFractional(0.5)) {
-                        pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("they/them")).findFirst().orElse(null);
-                    } else {
-                        pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("he/him")).findFirst().orElse(null);
-                    }
+                    
+                    Rs2Widget.clickWidget(pronounSelectionWidget);
+                    Rs2Random.waitEx(1200, 300);
+                    sleepUntil(() -> !Rs2Widget.isWidgetVisible(CharacterCreation, 76)); // Pronoun DropDown Options
                 }
-                
-                Rs2Widget.clickWidget(pronounSelectionWidget);
-                Rs2Random.waitEx(1200, 300);
-                sleepUntil(() -> !Rs2Widget.isWidgetVisible(CharacterCreation, 76)); // Pronoun DropDown Options
             }
             
             Rs2Widget.clickWidget(CharacterCreation, 74); // confirm Button
