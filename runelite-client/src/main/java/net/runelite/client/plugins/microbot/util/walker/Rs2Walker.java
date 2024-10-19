@@ -35,9 +35,7 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -54,6 +52,10 @@ public class Rs2Walker {
     static int idle = 0;
     static WorldPoint currentTarget;
     static int nextWalkingDistance = 10;
+    public static final Object pathfinderMutex = new Object();
+    private static ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    private static Future<?> scheduledFuture;
+
 
     public static boolean walkTo(WorldArea area, int distanceThreshold) {
         if (area.distanceTo(Rs2Player.getWorldLocation()) > distanceThreshold) {
@@ -82,135 +84,171 @@ public class Rs2Walker {
                 || !Rs2Tile.isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target)) && Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
             return true;
         }
-        if (currentTarget != null && currentTarget.equals(target) && ShortestPathPlugin.getMarker() != null && !Microbot.getClientThread().scheduledFuture.isDone())
+        if (currentTarget != null && currentTarget.equals(target) && ShortestPathPlugin.getMarker() != null && Microbot.getClientThread().scheduledFuture != null && !Microbot.getClientThread().scheduledFuture.isDone())
             return false;
         setTarget(target);
         ShortestPathPlugin.setReachedDistance(distance);
         stuckCount = 0;
         idle = 0;
-        Microbot.getClientThread().runOnSeperateThread(() -> {
-            try {
-                while (!Thread.currentThread().isInterrupted()) {
-                    if (!Microbot.isLoggedIn()) {
-                        setTarget(null);
-                        break;
-                    }
-                    if (ShortestPathPlugin.getPathfinder() == null) {
-                        if (ShortestPathPlugin.getMarker() == null) {
-                            break;
-                        }
-                        continue;
-                    }
-                    if (!ShortestPathPlugin.getPathfinder().isDone()) {
-                        continue;
-                    }
+        /**
+         * Run the walker on a seperate thread if this method is called on the main thread
+         * When running the walker from the worldmap, it will be on the client thread
+         * thats why we added an extra check to run it on another thread so it doesn't
+         * block the client thread
+         */
+        if (Microbot.getClient().isClientThread()) {
+            synchronized (pathfinderMutex) {
+                scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+                    coreWalk(target, distance);
+                }, 0, 100, TimeUnit.MILLISECONDS);
+            }
+        } else {
+            /**
+             * When running the walkTo method from scripts
+             * the code will run on the script thread
+             * If you really like to run this on a seperate thread because you want to do
+             * other actions while walking you can wrap the walkTo from within the script
+             * on a seperate thread
+             */
+            coreWalk(target, distance);
+        }
 
-                    if (!ShortestPathPlugin.getPathfinder().getPath().isEmpty() && isNear(ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1))) {
-                        setTarget(null);
-                        break;
-                    }
+        return false;
+    }
 
-                    if (Rs2Npc.getNpcsAttackingPlayer(Microbot.getClient().getLocalPlayer()) != null
-                            && Rs2Npc.getNpcsAttackingPlayer(Microbot.getClient().getLocalPlayer()).stream().anyMatch(x -> x.getId() == 4417)) { //dead tree in draynor
-                        var moveableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet().toArray(new WorldPoint[0]);
-                        walkMiniMap(moveableTiles[Random.random(0, moveableTiles.length)]);
-                        sleepGaussian(1000, 300);
-                    }
+    /**
+     * Core walk method contains all the logic to succesfully walk to the destination
+     * this contains doors, gameobjects, teleports, spells etc...
+     * @param target
+     * @param distance
+     */
+    private static void coreWalk(WorldPoint target, int distance) {
+        try {
+            if (!Microbot.isLoggedIn()) {
+                setTarget(null);
+                scheduledFuture.cancel(true);
+            }
+            if (ShortestPathPlugin.getPathfinder() == null) {
+                if (ShortestPathPlugin.getMarker() == null) {
+                    setTarget(null);
+                    scheduledFuture.cancel(true);
+                }
+                return;
+            }
+            if (!ShortestPathPlugin.getPathfinder().isDone()) {
+                return;
+            }
 
-                    //avoid tree attacking you in draynor
-                    checkIfStuck();
-                    if (stuckCount > 10) {
-                        var moveableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet().toArray(new WorldPoint[0]);
-                        walkMiniMap(moveableTiles[Random.random(0, moveableTiles.length)]);
-                        sleepGaussian(1000, 300);
-                    }
+            if (ShortestPathPlugin.getPathfinder() == null) return;
 
-                    if (ShortestPathPlugin.getPathfinder() == null) break;
+            if (!ShortestPathPlugin.getPathfinder().getPath().isEmpty() && isNear(ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1))) {
+                setTarget(null);
+                scheduledFuture.cancel(true);
+            }
 
-                    List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
-                    int indexOfStartPoint = getClosestTileIndex(path);
-                    lastPosition = Rs2Player.getWorldLocation();
+            if (Rs2Npc.getNpcsAttackingPlayer(Microbot.getClient().getLocalPlayer()) != null
+                    && Rs2Npc.getNpcsAttackingPlayer(Microbot.getClient().getLocalPlayer()).stream().anyMatch(x -> x.getId() == 4417)) { //dead tree in draynor
+                var moveableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet().toArray(new WorldPoint[0]);
+                walkMiniMap(moveableTiles[Random.random(0, moveableTiles.length)]);
+                sleepGaussian(1000, 300);
+            }
 
-                    if (Rs2Player.getWorldLocation().distanceTo(target) == 0) {
-                        break;
-                    }
+            //avoid tree attacking you in draynor
+            checkIfStuck();
+            if (stuckCount > 10) {
+                var moveableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet().toArray(new WorldPoint[0]);
+                walkMiniMap(moveableTiles[Random.random(0, moveableTiles.length)]);
+                sleepGaussian(1000, 300);
+            }
 
+            if (ShortestPathPlugin.getPathfinder() == null) {
+                scheduledFuture.cancel(true);
+                return;
+            }
 
-                    boolean doorOrTransportResult = false;
-                    for (int i = indexOfStartPoint; i < path.size(); i++) {
-                        WorldPoint currentWorldPoint = path.get(i);
+            List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
+            int indexOfStartPoint = getClosestTileIndex(path);
+            lastPosition = Rs2Player.getWorldLocation();
 
-                        if (i > 0 && !Rs2Tile.isTileReachable(path.get(i - 1)) && !Microbot.getClient().getTopLevelWorldView().isInstance()) {
-                            continue;
-                        }
+            if (Rs2Player.getWorldLocation().distanceTo(target) == 0) {
+                scheduledFuture.cancel(true);
+            }
 
-                        if (ShortestPathPlugin.getMarker() == null) {
-                            break;
-                        }
+            boolean doorOrTransportResult = false;
+            for (int i = indexOfStartPoint; i < path.size(); i++) {
+                WorldPoint currentWorldPoint = path.get(i);
 
+                System.out.println("start loop " + i);
 
-                        doorOrTransportResult = handleDoors(path, i);
-                        if (doorOrTransportResult) {
-                            break;
-                        }
+                if (i > 0 && !Rs2Tile.isTileReachable(path.get(i - 1)) && !Microbot.getClient().getTopLevelWorldView().isInstance()) {
+                    continue;
+                }
 
-                        if (!Microbot.getClient().getTopLevelWorldView().isInstance()) {
-                            doorOrTransportResult = handleTransports(path, i);
-                        }
+                if (ShortestPathPlugin.getMarker() == null) {
+                    System.out.println("market is null");
+                    break;
+                }
 
-                        if (doorOrTransportResult) {
-                            break;
-                        }
+                doorOrTransportResult = handleDoors(path, i);
+                if (doorOrTransportResult) {
+                    System.out.println("break out of door");
+                    break;
+                }
 
-                        if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().getTopLevelWorldView().isInstance()) {
-                            continue;
-                        }
+                if (!Microbot.getClient().getTopLevelWorldView().isInstance()) {
+                    doorOrTransportResult = handleTransports(path, i);
+                }
 
+                if (doorOrTransportResult) {
+                    System.out.println("break out of transport");
+                    break;
+                }
+
+                if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().getTopLevelWorldView().isInstance()) {
+                    continue;
+                }
+
+                if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > nextWalkingDistance) {
+                    nextWalkingDistance = Random.random(7, 11);
+                    if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
+                        Rs2Walker.walkFastCanvas(currentWorldPoint);
+                        sleepGaussian(1200, 300);
+                    } else {
                         if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > nextWalkingDistance) {
-                            nextWalkingDistance = Random.random(7, 11);
-                            if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
-                                Rs2Walker.walkFastCanvas(currentWorldPoint);
-                                sleepGaussian(1200, 300);
-                            } else {
-                                long movingStart = System.currentTimeMillis();
-                                if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > nextWalkingDistance) {
-                                    Rs2Walker.walkMiniMap(getPointWithWallDistance(currentWorldPoint));
-                                    sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < nextWalkingDistance, 100, 2000);
-                                    if (System.currentTimeMillis() - movingStart < 120) {
-                                        sleepGaussian(600, 150);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-
-                    if (!doorOrTransportResult) {
-                        if (!path.isEmpty()) {
-                            var moveableTiles = Rs2Tile.getReachableTilesFromTile(path.get(path.size() - 1), Math.min(3, distance)).keySet().toArray(new WorldPoint[0]);
-                            var finalTile = moveableTiles.length > 0 ? moveableTiles[Random.random(0, moveableTiles.length)] : path.get(path.size() - 1);
-                            if (Rs2Tile.isTileReachable(finalTile)) {
-
-                                if (Microbot.getClient().getTopLevelWorldView().isInstance())
-                                    Rs2Walker.walkFastCanvas(finalTile);
-                                else
-                                    Rs2Walker.walkMiniMap(finalTile);
-
-                                sleepGaussian(1200, 300);
+                            if (Rs2Walker.walkMiniMap(getPointWithWallDistance(currentWorldPoint))) {
+                                final WorldPoint b = currentWorldPoint;
+                                sleepUntil(() -> b.distanceTo2D(Rs2Player.getWorldLocation()) < nextWalkingDistance, 2000);
                             }
                         }
                     }
                 }
-                return Rs2Player.getWorldLocation().distanceTo(target) < distance;
-            } catch (Exception ex) {
-                if (ex instanceof InterruptedException) return false;
-                Microbot.log("Microbot Walker Exception " + ex.getMessage());
-                System.out.println(ex.getMessage());
-                ex.printStackTrace(System.out);
             }
-            return false;
-        });
-        return false;
+
+
+            if (!doorOrTransportResult) {
+                if (!path.isEmpty()) {
+                    var moveableTiles = Rs2Tile.getReachableTilesFromTile(path.get(path.size() - 1), Math.min(3, distance)).keySet().toArray(new WorldPoint[0]);
+                    var finalTile = moveableTiles.length > 0 ? moveableTiles[Random.random(0, moveableTiles.length)] : path.get(path.size() - 1);
+                    if (Rs2Tile.isTileReachable(finalTile)) {
+
+                        if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
+                            if (Rs2Walker.walkFastCanvas(finalTile))
+                                sleepGaussian(1200, 300);
+                        } else if (Rs2Walker.walkMiniMap(finalTile))
+                            sleepGaussian(1200, 300);
+                    }
+                }
+            }
+            if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
+                setTarget(null);
+                scheduledFuture.cancel(true);
+            }
+        } catch (Exception ex) {
+            if (ex instanceof InterruptedException) return;
+            ex.printStackTrace(System.out);
+            Microbot.log("Microbot Walker Exception " + ex.getMessage());
+            System.out.println(ex.getMessage());
+        }
     }
 
     public static WorldPoint getPointWithWallDistance(WorldPoint target) {
@@ -297,7 +335,7 @@ public class Rs2Walker {
     /**
      * Used in instances like vorkath, jad, nmz
      *
-     * @param localPoint  A two-dimensional point in the local coordinate space.
+     * @param localPoint A two-dimensional point in the local coordinate space.
      */
     public static void walkFastLocal(LocalPoint localPoint) {
         Point canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getTopLevelWorldView().getPlane());
@@ -308,23 +346,23 @@ public class Rs2Walker {
         //Rs2Reflection.invokeMenu(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here", "", -1, -1);
     }
 
-    public static void walkFastCanvas(WorldPoint worldPoint) {
-        walkFastCanvas(worldPoint, true);
+    public static boolean walkFastCanvas(WorldPoint worldPoint) {
+        return walkFastCanvas(worldPoint, true);
     }
 
-    public static void walkFastCanvas(WorldPoint worldPoint, boolean toogleRun) {
-        Rs2Player.toggleRunEnergy(toogleRun);
+    public static boolean walkFastCanvas(WorldPoint worldPoint, boolean toggleRun) {
+        Rs2Player.toggleRunEnergy(toggleRun);
         Point canv;
         if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
             worldPoint = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), worldPoint).stream().findFirst().orElse(null);
             if (worldPoint == null) {
                 Microbot.log("Tried to walk using the canvas but worldPoint returned null");
-                return;
+                return false;
             }
             LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), worldPoint);
             if (localPoint == null) {
                 Microbot.log("Tried to walk using the canvas but localpoint returned null");
-                return;
+                return false;
             }
             canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getTopLevelWorldView().getPlane());
         } else {
@@ -335,6 +373,7 @@ public class Rs2Walker {
         int canvasY = canv != null ? canv.getY() : -1;
 
         Microbot.doInvoke(new NewMenuEntry(canvasX, canvasY, MenuAction.WALK.getId(), 0, 0, "Walk here"), new Rectangle(canvasX, canvasY, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        return true;
     }
 
     public static WorldPoint walkCanvas(WorldPoint worldPoint) {
@@ -451,18 +490,21 @@ public class Rs2Walker {
                     // Forward
                     var neighborPoint = path.get(doorIndex + 1);
                     found = searchNeighborPoint(orientation, point, neighborPoint);
+                    System.out.println(doorIndex + " wallobject ");
                 } else if (doorIndex == index + 1) {
                     // Backward
                     var neighborPoint = path.get(doorIndex - 1);
                     found = searchNeighborPoint(orientation, point, neighborPoint);
-
+                    System.out.println(doorIndex + " else  wallobject ");
                     // Diagonal objects with any orientation
                     if (index + 2 < path.size() && (orientation == 16 || orientation == 32 || orientation == 64 || orientation == 128)) {
                         var prevPoint = path.get(doorIndex - 1);
                         var nextPoint = path.get(doorIndex + 1);
 
-                        if (Math.abs(prevPoint.getX() - nextPoint.getX()) > 0 && Math.abs(prevPoint.getY() - nextPoint.getY()) > 0)
+                        if (Math.abs(prevPoint.getX() - nextPoint.getX()) > 0 && Math.abs(prevPoint.getY() - nextPoint.getY()) > 0) {
+                            System.out.println("math abs found door");
                             found = true;
+                        }
                     }
                 }
             } else if (object instanceof GameObject) {
@@ -470,8 +512,10 @@ public class Rs2Walker {
                 // Orientation does not work as game objects are not strictly oriented like walls
                 var objectNames = List.of("door");
 
-                if (objectNames.contains(objectComp.getName().toLowerCase()))
+                if (objectNames.contains(objectComp.getName().toLowerCase())) {
+                    System.out.println("found door " + objectComp.getName());
                     found = true;
+                }
             }
 
 
@@ -517,7 +561,6 @@ public class Rs2Walker {
     }
 
     /**
-     *
      * @param target
      */
     public static void setTarget(WorldPoint target) {
@@ -555,8 +598,6 @@ public class Rs2Walker {
                 start = ShortestPathPlugin.getPathfinder().getStart();
             }
             restartPathfinding(start, target);
-            if (Microbot.getClientThread().scheduledFuture != null)
-                Microbot.getClientThread().scheduledFuture.cancel(true);
         }
     }
 
@@ -925,7 +966,7 @@ public class Rs2Walker {
      * @param range        an int of range to which the boundaries will be drawn in a square,
      * @return true if the player's current location is within the specified area, false otherwise
      */
-    @Deprecated(since="1.5.5", forRemoval = true)
+    @Deprecated(since = "1.5.5", forRemoval = true)
     public static boolean isInArea(WorldPoint centerOfArea, int range) {
         WorldPoint nwCorner = new WorldPoint(centerOfArea.getX() + range + range, centerOfArea.getY() - range, centerOfArea.getPlane());
         WorldPoint seCorner = new WorldPoint(centerOfArea.getX() - range - range, centerOfArea.getY() + range, centerOfArea.getPlane());

@@ -359,7 +359,7 @@ public class PathfinderConfig {
 
         if (transport.getType() == TELEPORTATION_SPELL) {
             //START microbot variables
-            return Rs2Magic.canCast(transport.getDisplayInfo());
+            return Rs2Magic.quickCanCast(transport.getDisplayInfo());
             //END microbot variables
         } else {
             //START microbot variables

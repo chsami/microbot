@@ -31,10 +31,33 @@ import static net.runelite.client.plugins.microbot.Microbot.log;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2Magic {
-    public static boolean canCast(MagicAction magicSpell) {
-        if (!Rs2SpellBookSettings.setAllFiltersOn()) {
+    //use this boolean to do one time checks
+    private static boolean firstInteractionWithSpellBook = true;
+
+    /**
+     * Check if all the settings are correct before we start interacting with spellbook
+     */
+    private static boolean oneTimeSpellBookCheck() {
+        // We add a one time check to avoid performanec issues. Checking varbits is expensive
+        if (firstInteractionWithSpellBook && !Rs2SpellBookSettings.setAllFiltersOn()) {
             return false;
         }
+        firstInteractionWithSpellBook = false;
+        return true;
+    }
+
+    /**
+     * Checks if a specific spell can be cast
+     * contains all the necessary checks to do a succesfull check
+     * use quickCanCast if the performance of this method is to slow for you
+     * @param magicSpell
+     * @return
+     */
+    public static boolean canCast(MagicAction magicSpell) {
+        if (!oneTimeSpellBookCheck()) {
+            return false;
+        }
+
         if (Rs2Tab.getCurrentTab() != InterfaceTab.MAGIC) {
             Rs2Tab.switchToMagicTab();
             sleep(150, 300);
@@ -54,10 +77,28 @@ public class Rs2Magic {
         return widget != null;
     }
 
-    public static boolean canCast(String spellName) {
+    /**
+     * Checks if a specific spell can be cast without checking settings first
+     * This method is more performant than the canCast, use this one if you are sure
+     * that the settings are correct
+     * @param magicSpell
+     * @return
+     */
+    public static boolean quickCanCast(MagicAction magicSpell) {
+        if (Rs2Tab.getCurrentTab() != InterfaceTab.MAGIC) {
+            Rs2Tab.switchToMagicTab();
+            sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC);
+        }
+
+        Widget widget = Arrays.stream(Rs2Widget.getWidget(218, 3).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
+
+        return widget != null;
+    }
+
+    public static boolean quickCanCast(String spellName) {
         MagicAction magicAction = Arrays.stream(MagicAction.values()).filter(x -> x.getName().toLowerCase().contains(spellName.toLowerCase())).findFirst().orElse(null);
         if (magicAction == null) return false;
-        return canCast(magicAction);
+        return quickCanCast(magicAction);
     }
 
     public static boolean cast(MagicAction magicSpell) {
