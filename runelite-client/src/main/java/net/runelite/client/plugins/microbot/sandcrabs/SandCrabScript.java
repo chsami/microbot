@@ -63,7 +63,7 @@ public class SandCrabScript extends Script {
                 }
                 long startTime = System.currentTimeMillis();
 
-               Rs2Combat.enableAutoRetialiate();
+                Rs2Combat.enableAutoRetialiate();
 
                 if (otherPlayerDetected() && !Rs2Combat.inCombat())
                     hijackTimer++;
