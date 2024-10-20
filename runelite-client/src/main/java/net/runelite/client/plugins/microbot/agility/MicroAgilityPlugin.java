@@ -130,6 +130,7 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.polnivCourse.add(new AgilityObstacleModel(TREE_14944, -1, 2996, Operation.GREATER, Operation.LESS_EQUAL));
         agilityScript.polnivCourse.add(new AgilityObstacleModel(DRYING_LINE));
 
+        // Rellekka
         agilityScript.rellekkaCourse.add(new AgilityObstacleModel(ROUGH_WALL_14946));
         agilityScript.rellekkaCourse.add(new AgilityObstacleModel(GAP_14947, -1, 3672, Operation.GREATER, Operation.GREATER));
         agilityScript.rellekkaCourse.add(new AgilityObstacleModel(TIGHTROPE_14987));
@@ -138,6 +139,7 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.rellekkaCourse.add(new AgilityObstacleModel(TIGHTROPE_14992));
         agilityScript.rellekkaCourse.add(new AgilityObstacleModel(PILE_OF_FISH));
 
+        // Ardougne
         agilityScript.ardougneCourse.add(new AgilityObstacleModel(WOODEN_BEAMS));
         agilityScript.ardougneCourse.add(new AgilityObstacleModel(GAP_15609));
         agilityScript.ardougneCourse.add(new AgilityObstacleModel(PLANK_26635));
@@ -146,6 +148,7 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.ardougneCourse.add(new AgilityObstacleModel(STEEP_ROOF));
         agilityScript.ardougneCourse.add(new AgilityObstacleModel(GAP_15612));
 
+        //Prifddinas
         agilityScript.prifddinasCourse.add(new AgilityObstacleModel(LADDER_36221));
         agilityScript.prifddinasCourse.add(new AgilityObstacleModel(TIGHTROPE_36225));
         agilityScript.prifddinasCourse.add(new AgilityObstacleModel(CHIMNEY_36227));
@@ -159,7 +162,56 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.prifddinasCourse.add(new AgilityObstacleModel(TIGHTROPE_36237));
         agilityScript.prifddinasCourse.add(new AgilityObstacleModel(DARK_HOLE_36238));
 
+        //Ape Atoll
+        agilityScript.apeatollCourse.add(new AgilityObstacleModel(STEPPING_STONE_15412, 2755, -1, Operation.GREATER_EQUAL, Operation.GREATER));
+        agilityScript.apeatollCourse.add(new AgilityObstacleModel(TROPICAL_TREE_15414, -1, 2742, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.apeatollCourse.add(new AgilityObstacleModel(MONKEYBARS_15417));
+        agilityScript.apeatollCourse.add(new AgilityObstacleModel(SKULL_SLOPE));
+        agilityScript.apeatollCourse.add(new AgilityObstacleModel(ROPE_15487, 2752, -1, Operation.LESS_EQUAL, Operation.GREATER));
+        agilityScript.apeatollCourse.add(new AgilityObstacleModel(TROPICAL_TREE_16062, 2756, -1, Operation.GREATER_EQUAL, Operation.GREATER));
 
+        //Wyrm Basic
+        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(LADDER_55178));
+        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(TIGHTROPE_55180, -1, 2926, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(TIGHTROPE_55184));
+        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(ROPE_55186));
+        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(LADDER_55190, 1628, -1, Operation.LESS_EQUAL, Operation.GREATER));
+        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(ZIPLINE_55179));
+
+        //Wyrm Advanced
+        agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(LADDER_55178));
+        agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(TIGHTROPE_55180, -1, 2926, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(LADDER_55191, -1, 2911, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(EDGE_55192));
+        agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(TIGHTROPE_55194));
+        agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(ZIPLINE_55179));
+
+        //Shayzien Basic
+        agilityScript.shayzienbasicCourse.add(new AgilityObstacleModel(LADDER_42209));
+        agilityScript.shayzienbasicCourse.add(new AgilityObstacleModel(MONKEYBARS_42211));
+        agilityScript.shayzienbasicCourse.add(new AgilityObstacleModel(TIGHTROPE_42212, -1, 3635, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.shayzienbasicCourse.add(new AgilityObstacleModel(BAR_42213));
+        agilityScript.shayzienbasicCourse.add(new AgilityObstacleModel(TIGHTROPE_42214));
+        agilityScript.shayzienbasicCourse.add(new AgilityObstacleModel(TIGHTROPE_42215, -1, 3643, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.shayzienbasicCourse.add(new AgilityObstacleModel(GAP_42216));
+
+        //Shayzien Advanced
+        agilityScript.shayzienadvancedCourse.add(new AgilityObstacleModel(LADDER_42209));
+        agilityScript.shayzienadvancedCourse.add(new AgilityObstacleModel(MONKEYBARS_42211));
+        agilityScript.shayzienadvancedCourse.add(new AgilityObstacleModel(TIGHTROPE_42212, -1, 3635, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.shayzienadvancedCourse.add(new AgilityObstacleModel(BEAM, -1, -3633, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.shayzienadvancedCourse.add(new AgilityObstacleModel(EDGE_42218, -1, 3635, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.shayzienadvancedCourse.add(new AgilityObstacleModel(EDGE_42219, -1, 3630, Operation.GREATER, Operation.LESS_EQUAL));
+        agilityScript.shayzienadvancedCourse.add(new AgilityObstacleModel(BEAM_42220));
+        agilityScript.shayzienadvancedCourse.add(new AgilityObstacleModel(ZIPLINE));
+
+        //Penguin
+
+        //Barbarian Outpost
+
+        //Werewolf
+
+        //Wilderness
 
         agilityScript.run(config);
     }
@@ -176,6 +228,11 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.rellekkaCourse = new ArrayList<>();
         agilityScript.ardougneCourse = new ArrayList<>();
         agilityScript.prifddinasCourse = new ArrayList<>();
+        agilityScript.wyrmbasicCourse = new ArrayList<>();
+        agilityScript.wyrmadvancedCourse = new ArrayList<>();
+        agilityScript.shayzienbasicCourse = new ArrayList<>();
+        agilityScript.shayzienadvancedCourse = new ArrayList<>();
+
 
         overlayManager.remove(agilityOverlay);
     }
