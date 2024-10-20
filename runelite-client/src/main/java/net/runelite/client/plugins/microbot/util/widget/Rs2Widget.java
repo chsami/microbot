@@ -359,4 +359,17 @@ public class Rs2Widget {
     public static boolean isDepositBoxWidgetOpen() {
         return isWidgetVisible(ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER);
     }
+
+    public static boolean isWildernessInterfaceOpen() {
+        return isWidgetVisible(475, 11);
+    }
+    public static boolean enterWilderness() {
+        if (!isWildernessInterfaceOpen()) return false;
+
+        Microbot.log("Detected Wilderness warning, interacting...");
+        Rs2Widget.clickWidget(475, 11);
+
+        return true;
+    }
+
 }

@@ -727,4 +727,8 @@ public class Rs2Player {
     public static boolean isInCave() {
         return Rs2Player.getWorldLocation().getY() >= 6400 && !Microbot.getClient().getTopLevelWorldView().isInstance();
     }
+
+    public static boolean IsInInstance() {
+        return Microbot.getClient().getTopLevelWorldView().isInstance();
+    }
 }

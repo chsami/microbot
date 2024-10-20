@@ -44,7 +44,15 @@ import java.util.stream.IntStream;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.walker.Rs2MiniMap.worldToMinimap;
 
-
+/**
+ * TODO:
+ * 1. fix teleports starting from inside the POH
+ * 2. fix herb run for ectoplasm. Start at grand exchange.
+ * Instead of using ectophial
+ * it's trying to use fairy ring from edgeville.
+ * Difference between steps is around +- 50 tiles
+ * 3. Teleport scroll should work, todo: testing
+ */
 public class Rs2Walker {
     private static final ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
     @Setter
@@ -680,10 +688,7 @@ public class Rs2Walker {
             return true;
         }
 
-        // Wilderness ditch warning
-        if (Rs2Widget.isWidgetVisible(475, 11)) {
-            Microbot.log("Detected Wilderness warning, interacting...");
-            Rs2Widget.clickWidget(475, 11);
+        if (Rs2Widget.enterWilderness()) {
             sleepUntil(Rs2Player::isAnimating);
             return true;
         }

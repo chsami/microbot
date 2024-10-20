@@ -154,21 +154,21 @@
 3352 3782 0			24251		4	Wilderness Crabs tablet	T	20	
 									
 #  Teleport Scrolls (todo: how to detect these in the master scroll book?)									
-3419 2917 0			24251		4	Nardah teleport	T	20	
-3325 3412 0			24251		4	Digsite teleport	T	20	
-2541 2925 0			24251		4	Feldip hills teleport	T	20	
-2094 3913 0			24251	Lunar Diplomacy	4	Lunar isle teleport	T	20	
-3488 3288 0			24251	Priest in Peril	4	Mort'ton teleport	T	20	
-2658 2659 0			24251		4	Pest control teleport	T	20	
-2339 3649 0			24251		4	Piscatoris teleport	T	20	
-2789 3066 0			24251	Tai Bwo Wannai Trio	4	Tai bwo wannai teleport	T	20	
-2194 3258 0			24251	Regicide	4	Iorwerth camp teleport	T	20	
-3701 2996 0			24251	Cabin Fever	4	Mos le'harmless teleport	T	20	
-3302 3487 0			24251		4	Lumberyard teleport	T	20	
-2196 3056 0			24251	Regicide	4	Zul-andra teleport	T	20	
-1310 1250 0			24251		4	Key master teleport	T	20	
-3128 3832 0			24251		4	Revenant cave teleport	T	20	
-1645 3580 0			24251		4	Watson teleport	T	20	
+3419 2917 0			12402		4	Nardah teleport	T	20
+3325 3412 0			12403		4	Digsite teleport	T	20
+2541 2925 0			12404		4	Feldip hills teleport	T	20
+2094 3913 0			12405	Lunar Diplomacy	4	Lunar isle teleport	T	20
+3488 3288 0			12406	Priest in Peril	4	Mort'ton teleport	T	20
+2658 2659 0			12407		4	Pest control teleport	T	20
+2339 3649 0			12408		4	Piscatoris teleport	T	20
+2789 3066 0			12409	Tai Bwo Wannai Trio	4	Tai bwo wannai teleport	T	20
+2194 3258 0			12410	Regicide	4	Iorwerth camp teleport	T	20
+3701 2996 0			12411	Cabin Fever	4	Mos le'harmless teleport	T	20
+3302 3487 0			12412		4	Lumberyard teleport	T	20
+2196 3056 0			12413	Regicide	4	Zul-andra teleport	T	20
+1310 1250 0			12414		4	Key master teleport	T	20
+3128 3832 0			12415		4	Revenant cave teleport	T	20
+1645 3580 0			12416		4	Watson teleport	T	20
 									
 # capes									
 2931 3286 0			9780;9781		4	Crafting cape	F	20	
