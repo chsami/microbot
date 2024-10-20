@@ -191,7 +191,7 @@ public class HouseTabScript extends Script {
                     return;
                 }
 
-                boolean isInHouse = Rs2GameObject.findObject(new int[] {ObjectID.LECTERN_37349}) != null;
+                boolean isInHouse = Rs2GameObject.findObject(new Integer[] {ObjectID.LECTERN_37349}) != null;
                 if (isInHouse) {
                     lookForLectern();
                     createHouseTablet();
