@@ -85,4 +85,13 @@ public class Rs2UiHelper {
         return entry.getGameObject() != null;
     }
 
+    /**
+     * Removes col tags from text
+     * 
+     * @param text
+     * @return cleanedText
+     */
+    public static String stripColTags(String text) {
+        return text.replaceAll("<.*?>", "");
+    }
 }
