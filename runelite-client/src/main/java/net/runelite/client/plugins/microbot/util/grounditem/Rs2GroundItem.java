@@ -96,8 +96,11 @@ public class Rs2GroundItem {
             }
             LocalPoint localPoint1 = LocalPoint.fromWorld(Microbot.getClient(), groundItem.location);
             if (localPoint1 != null) {
-                Microbot.doInvoke(new NewMenuEntry(action, param0, param1, menuAction.getId(), identifier, -1, target),
-                        Perspective.getCanvasTilePoly(Microbot.getClient(), localPoint1).getBounds());
+                Polygon canvas = Perspective.getCanvasTilePoly(Microbot.getClient(), localPoint1);
+                if (canvas != null) {
+                    Microbot.doInvoke(new NewMenuEntry(action, param0, param1, menuAction.getId(), identifier, -1, target),
+                            canvas.getBounds());
+                }
             } else {
                 Microbot.doInvoke(new NewMenuEntry(action, param0, param1, menuAction.getId(), identifier, -1, target),
                         new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
