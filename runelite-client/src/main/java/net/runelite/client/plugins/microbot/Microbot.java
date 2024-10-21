@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
@@ -21,11 +22,11 @@ import net.runelite.client.plugins.microbot.configs.SpecialAttackConfigs;
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.NaturalMouse;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.timersandbuffs.GameTimer;
 import net.runelite.client.plugins.timersandbuffs.TimersAndBuffsPlugin;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
@@ -43,13 +44,15 @@ import java.awt.event.MouseEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Microbot {
     private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
@@ -181,14 +184,22 @@ public class Microbot {
         GameState idx = client.getGameState();
         return idx == GameState.LOGGED_IN;
     }
-    
+
+    public static boolean isHopping() {
+        if (client == null) return false;
+        GameState idx = client.getGameState();
+        return idx == GameState.HOPPING;
+    }
+
     @Deprecated(since = "1.4.0 - use Rs2Player variant", forRemoval = true)
     public static boolean hasLevel(int levelRequired, Skill skill) {
         return Microbot.getClient().getRealSkillLevel(skill) >= levelRequired;
     }
 
     public static boolean hopToWorld(int worldNumber) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
+        if (!Microbot.isLoggedIn()) return false;
+        if (Microbot.isHopping()) return true;
+        boolean isHopping = Microbot.getClientThread().runOnClientThread(() -> {
             if (Microbot.getClient().getLocalPlayer() != null && Microbot.getClient().getLocalPlayer().isInteracting())
                 return false;
             if (quickHopTargetWorld != null || Microbot.getClient().getGameState() != GameState.LOGGED_IN) return false;
@@ -215,8 +226,16 @@ public class Microbot {
             Microbot.getClient().openWorldHopper();
             Microbot.getClient().hopToWorld(rsWorld);
             quickHopTargetWorld = null;
-            return true;
+            sleep(600);
+            sleepUntil(() -> Microbot.isHopping() || Rs2Widget.getWidget(193, 0) != null, 2000);
+            return Microbot.isHopping();
         });
+        if (!isHopping && Rs2Widget.getWidget(193, 0) != null) {
+            List<Widget> areYouSureToSwitchWorldWidget = Arrays.stream(Rs2Widget.getWidget(193, 0).getDynamicChildren()).collect(Collectors.toList());
+            Widget switchWorldWidget = sleepUntilNotNull(() -> Rs2Widget.findWidget("Switch world", areYouSureToSwitchWorldWidget, true), 2000);
+            return Rs2Widget.clickWidget(switchWorldWidget);
+        }
+        return false;
     }
 
     public static void showMessage(String message) {
@@ -352,6 +371,7 @@ public class Microbot {
                 Microbot.getClient().addChatMessage(ChatMessageType.ENGINE, "", "[" + formattedTime + "]: " + message, "", false)
         );
     }
+
     private static boolean isPluginEnabled(String name) {
         Plugin dashboard = Microbot.getPluginManager().getPlugins().stream()
                 .filter(x -> x.getClass().getName().equals(name))
@@ -362,7 +382,7 @@ public class Microbot {
 
         return Microbot.getPluginManager().isPluginEnabled(dashboard);
     }
-    
+
     public static boolean isPluginEnabled(Class c) {
         return isPluginEnabled(c.getName());
     }
