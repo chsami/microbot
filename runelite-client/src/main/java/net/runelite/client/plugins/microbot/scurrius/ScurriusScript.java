@@ -128,7 +128,7 @@ public class ScurriusScript extends Script {
                         if (Rs2Bank.isOpen()) {
                             Rs2Bank.depositAll();
                             int foodAmount = config.foodAmount();
-                            int foodItemId = config.foodSelection().getItemId();
+                            int foodItemId = config.foodSelection().getId();
                             int prayerPotionAmount = config.prayerPotionAmount();
                             int potionItemId = config.potionSelection().getItemId();
                             Rs2Bank.withdrawX(true, foodItemId, foodAmount);
@@ -272,7 +272,7 @@ public class ScurriusScript extends Script {
 
     private boolean hasRequiredSupplies() {
         int foodAmount = config.foodAmount();
-        int foodItemId = config.foodSelection().getItemId();
+        int foodItemId = config.foodSelection().getId();
         int prayerPotionAmount = config.prayerPotionAmount();
         int potionItemId = config.potionSelection().getItemId();
 
@@ -293,7 +293,7 @@ public class ScurriusScript extends Script {
 
 
     private void handlePrayerLogic() {
-        if (scurrius != null && scurrius.getInteracting() == Microbot.getClient().getLocalPlayer()) {
+        if (scurrius != null && scurrius.getInteracting() != null && scurrius.getInteracting() == Microbot.getClient().getLocalPlayer()) {
             if (currentPrayer != Rs2PrayerEnum.PROTECT_MELEE) {
                 Rs2Prayer.toggle(currentPrayer, false);
                 Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
@@ -306,6 +306,7 @@ public class ScurriusScript extends Script {
             }
         }
     }
+
 
     public void disableAllPrayers() {
         Rs2Prayer.disableAllPrayers();

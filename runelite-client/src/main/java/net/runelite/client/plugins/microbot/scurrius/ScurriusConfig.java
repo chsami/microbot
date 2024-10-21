@@ -6,6 +6,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.Range;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 
 @ConfigGroup("Scurrius")
 public interface ScurriusConfig extends Config {
@@ -15,8 +16,8 @@ public interface ScurriusConfig extends Config {
             description = "Select the type of food you want to use",
             position = 0
     )
-    default FoodSelection foodSelection() {
-        return FoodSelection.SHARK;
+    default Rs2Food foodSelection() {
+        return Rs2Food.SHARK;  // Default to Shark as an example
     }
 
     @ConfigItem(
@@ -122,27 +123,6 @@ public interface ScurriusConfig extends Config {
     )
     default boolean prioritizeRats() {
         return false;
-    }
-
-    @Getter
-    enum FoodSelection {
-        TROUT(ItemID.TROUT),
-        SALMON(ItemID.SALMON),
-        KARAMBWAN(ItemID.COOKED_KARAMBWAN),
-        BASS(ItemID.BASS),
-        SWORDFISH(ItemID.SWORDFISH),
-        LOBSTER(ItemID.LOBSTER),
-        MONKFISH(ItemID.MONKFISH),
-        SHARK(ItemID.SHARK),
-        MANTARAY(ItemID.MANTA_RAY),
-        ANGLERFISH(ItemID.ANGLERFISH);
-
-        private final int itemId;
-
-        FoodSelection(int itemId) {
-            this.itemId = itemId;
-        }
-
     }
 
     @Getter
