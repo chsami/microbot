@@ -160,20 +160,27 @@ public class PathfinderConfig {
         transports.clear();
         transportsPacked.clear();
         usableTeleports.clear();
+         Microbot.getClientThread().runOnClientThread(() -> {
+            for (Map.Entry<WorldPoint, Set<Transport>> entry : allTransports.entrySet()) {
+                for (Transport transport : entry.getValue()) {
+                    for (Quest quest : transport.getQuests()) {
+                        try {
+                            questStates.put(quest, Microbot.getQuestState(quest));
+                        } catch (NullPointerException ignored) {
+                        }
+                    }
+                    for (TransportVarbit varbitCheck : transport.getVarbits()) {
+                        varbitValues.put(varbitCheck.getVarbitId(), Microbot.getVarbitValue(varbitCheck.getVarbitId()));
+                    }
+                }
+            }
+            return true;
+        });
+
         for (Map.Entry<WorldPoint, Set<Transport>> entry : allTransports.entrySet()) {
             WorldPoint point = entry.getKey();
             Set<Transport> usableTransports = new HashSet<>(entry.getValue().size());
             for (Transport transport : entry.getValue()) {
-                for (Quest quest : transport.getQuests()) {
-                    try {
-                        questStates.put(quest, Microbot.getQuestState(quest));
-                    } catch (NullPointerException ignored) {
-                    }
-                }
-
-                for (TransportVarbit varbitCheck : transport.getVarbits()) {
-                    varbitValues.put(varbitCheck.getVarbitId(), Microbot.getVarbitValue(varbitCheck.getVarbitId()));
-                }
 
                 if (point == null && useTransport(transport) && hasRequiredItems(transport)) {
                     usableTeleports.add(transport);
@@ -187,6 +194,8 @@ public class PathfinderConfig {
                 transportsPacked.put(WorldPointUtil.packWorldPoint(point), usableTransports);
             }
         }
+        Transport t = transports.values().stream().flatMap(Collection::stream).filter(x -> x.getDisplayInfo()  != null && x.getDestination().equals(new WorldPoint(3659, 3523, 0	))).findFirst().orElse(null);
+        System.out.println("finihsed");
     }
 
     private void refreshRestrictionData() {
@@ -241,6 +250,7 @@ public class PathfinderConfig {
     }
 
     private boolean varbitChecks(Transport transport) {
+        if (varbitValues.isEmpty()) return true;
         for (TransportVarbit varbitCheck : transport.getVarbits()) {
             if (!varbitValues.get(varbitCheck.getVarbitId()).equals(varbitCheck.getValue())) {
                 return false;

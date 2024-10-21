@@ -1,7 +1,5 @@
 package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
-import net.runelite.api.WorldType;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
@@ -91,10 +89,10 @@ public class CollisionMap {
         for (Transport transport : transports) {
             //START microbot variables
             if (visited.get(transport.getDestination())) continue;
-            if (transport.getType() == TransportType.TELEPORTATION_ITEM || transport.getType() == TransportType.TELEPORTATION_SPELL) {
-                neighbors.add(new TransportNode(transport.getDestination(), node, config.getDistanceBeforeUsingTeleport(), transport.getType()));
+            if (transport.getType() != TransportType.TRANSPORT) {
+                neighbors.add(new TransportNode(transport.getDestination(), node, config.getDistanceBeforeUsingTeleport(), transport.getType(), transport.getDisplayInfo()));
             } else {
-                neighbors.add(new TransportNode(transport.getDestination(), node, transport.getDuration(), transport.getType()));
+                neighbors.add(new TransportNode(transport.getDestination(), node, transport.getDuration(), transport.getType(), transport.getDisplayInfo()));
             }
             //END microbot variables
         }

@@ -257,6 +257,8 @@ public class Rs2Walker {
             if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
                 setTarget(null);
                 cancelScheduleFuture();
+            } else {
+                coreWalk(target, distance);
             }
         } catch (Exception ex) {
             if (ex instanceof InterruptedException) return;
@@ -622,7 +624,12 @@ public class Rs2Walker {
             if (ShortestPathPlugin.isStartPointSet() && ShortestPathPlugin.getPathfinder() != null) {
                 start = ShortestPathPlugin.getPathfinder().getStart();
             }
-            restartPathfinding(start, target);
+            if (Microbot.getClient().isClientThread()) {
+                final WorldPoint _start = start;
+                Microbot.getClientThread().runOnSeperateThread(() -> restartPathfinding(_start, target));
+            } else {
+                restartPathfinding(start, target);
+            }
         }
     }
 
@@ -630,8 +637,8 @@ public class Rs2Walker {
      * @param start
      * @param end
      */
-    public static void restartPathfinding(WorldPoint start, WorldPoint end) {
-        if (Microbot.getClient().isClientThread()) return;
+    public static boolean restartPathfinding(WorldPoint start, WorldPoint end) {
+        if (Microbot.getClient().isClientThread()) return false;
 
         if (ShortestPathPlugin.getPathfinder() != null) {
             ShortestPathPlugin.getPathfinder().cancel();
@@ -646,6 +653,7 @@ public class Rs2Walker {
         ShortestPathPlugin.getPathfinderConfig().refresh();
         ShortestPathPlugin.setPathfinder(new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), start, end));
         ShortestPathPlugin.setPathfinderFuture(ShortestPathPlugin.getPathfindingExecutor().submit(ShortestPathPlugin.getPathfinder()));
+        return true;
     }
 
     /**
@@ -1024,7 +1032,11 @@ public class Rs2Walker {
             return;
         }
         ShortestPathPlugin.setStartPointSet(true);
-        restartPathfinding(start, ShortestPathPlugin.getPathfinder().getTarget());
+        if (Microbot.getClient().isClientThread()) {
+            Microbot.getClientThread().runOnSeperateThread(() -> restartPathfinding(start, ShortestPathPlugin.getPathfinder().getTarget()));
+        } else {
+            restartPathfinding(start, ShortestPathPlugin.getPathfinder().getTarget());
+        }
     }
 
     /**

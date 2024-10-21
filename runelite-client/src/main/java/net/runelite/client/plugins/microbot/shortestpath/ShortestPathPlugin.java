@@ -385,7 +385,8 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
 
     private void onMenuOptionClicked(MenuEntry entry) {
         if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
-            Rs2Walker.walkTo(getSelectedWorldPoint());
+            WorldPoint worldPoint = getSelectedWorldPoint();
+            Microbot.getClientThread().runOnSeperateThread(() -> Rs2Walker.walkTo(worldPoint));
             //For debugging you can use setTarget, it will calculate path without walking
             //setTarget(getSelectedWorldPoint());
         }
