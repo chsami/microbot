@@ -95,7 +95,7 @@ public enum TeleportLocationData
 	EDGEVILLE(TeleportType.JEWELLERY, "Amulet of Glory" , "Edgeville", new WorldPoint(3087, 3496, 0), "amulet_of_glory_teleport_icon.png", 2),
 	KARAMJA(TeleportType.JEWELLERY, "Amulet of Glory" , "Karamja", new WorldPoint(2918, 3176, 0), "amulet_of_glory_teleport_icon.png", 3),
 	DRAYNOR_VILLAGE(TeleportType.JEWELLERY, "Amulet of Glory" , "Draynor Village", new WorldPoint(3105, 3251, 0), "amulet_of_glory_teleport_icon.png", 4),
-	AL_KHARID(TeleportType.JEWELLERY, "Amulet of Glory" , "Al-Kharid", new WorldPoint(3293, 3163, 0), "amulet_of_glory_teleport_icon.png", 5),
+	AL_KHARID(TeleportType.JEWELLERY, "Amulet of Glory" , "Al Kharid", new WorldPoint(3293, 3163, 0), "amulet_of_glory_teleport_icon.png", 5),
 	MISCELLANIA(TeleportType.JEWELLERY, "Ring of Wealth" , "Miscellania", new WorldPoint(2535, 3862, 0), "ring_of_wealth_teleport_icon.png", 2),
 	GRAND_EXCHANGE(TeleportType.JEWELLERY, "Ring of Wealth" , "Grand Exchange", new WorldPoint(3162, 3480, 0), "ring_of_wealth_teleport_icon.png", 3),
 	FALADOR_PARK(TeleportType.JEWELLERY, "Ring of Wealth" , "Falador Park", new WorldPoint(2995, 3375, 0), "ring_of_wealth_teleport_icon.png", 4),

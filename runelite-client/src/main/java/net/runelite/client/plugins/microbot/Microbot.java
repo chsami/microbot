@@ -21,7 +21,6 @@ import net.runelite.client.plugins.microbot.configs.SpecialAttackConfigs;
 import net.runelite.client.plugins.microbot.dashboard.PluginRequestModel;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
@@ -365,6 +364,10 @@ public class Microbot {
     
     public static boolean isPluginEnabled(Class c) {
         return isPluginEnabled(c.getName());
+    }
+
+    public static QuestState getQuestState(Quest quest) {
+        return getClientThread().runOnClientThread(() -> quest.getState(client));
     }
 }
 
