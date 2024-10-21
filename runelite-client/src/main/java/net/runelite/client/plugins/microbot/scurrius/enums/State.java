@@ -4,5 +4,6 @@ public enum State {
     BANKING,
     FIGHTING,
     TELEPORT_AWAY,
-    WALK_TO_BOSS
+    WALK_TO_BOSS,
+    WAITING_FOR_BOSS
 }
