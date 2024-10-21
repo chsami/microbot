@@ -203,7 +203,8 @@ public class ScurriusScript extends Script {
                         }
 
                         Rs2Walker.walkTo(bossLocation);
-                        Rs2GameObject.interact(ObjectID.BROKEN_BARS, "Climb-through (private)");
+                        String interactionType = config.bossRoomEntryType().getInteractionText();
+                        Rs2GameObject.interact(ObjectID.BROKEN_BARS, interactionType);
                         break;
 
                     case WAITING_FOR_BOSS:
