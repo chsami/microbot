@@ -56,8 +56,8 @@ public interface PVirewatchKillerConfig extends Config {
 
     @ConfigItem(
             keyName = "Hitpoints",
-            name = "Hitpoints treshhold",
-            description = "Use food at certain hitpoint treshhold. If there's no food in the inventory, the script stops. Set to 0 in order to disable.",
+            name = "Eat at %",
+            description = "Use food below certain hitpoint percent. If there's no food in the inventory, the script stops. Set to 0 in order to disable.",
             position = 4,
             section = combatSection
     )
