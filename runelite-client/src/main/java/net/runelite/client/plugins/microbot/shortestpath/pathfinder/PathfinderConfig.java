@@ -167,6 +167,7 @@ public class PathfinderConfig {
                         try {
                             questStates.put(quest, Microbot.getQuestState(quest));
                         } catch (NullPointerException ignored) {
+                            System.out.println(ignored.getMessage());
                         }
                     }
                     for (TransportVarbit varbitCheck : transport.getVarbits()) {
