@@ -365,5 +365,9 @@ public class Microbot {
     public static boolean isPluginEnabled(Class c) {
         return isPluginEnabled(c.getName());
     }
+
+    public static QuestState getQuestState(Quest quest) {
+        return getClientThread().runOnClientThread(() -> quest.getState(client));
+    }
 }
 

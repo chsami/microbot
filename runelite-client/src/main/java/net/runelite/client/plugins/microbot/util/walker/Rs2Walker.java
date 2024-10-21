@@ -631,25 +631,21 @@ public class Rs2Walker {
      * @param end
      */
     public static void restartPathfinding(WorldPoint start, WorldPoint end) {
-        synchronized (ShortestPathPlugin.getPathfinderMutex()) {
-            if (ShortestPathPlugin.getPathfinder() != null) {
-                ShortestPathPlugin.getPathfinder().cancel();
-                ShortestPathPlugin.getPathfinderFuture().cancel(true);
-            }
+        if (Microbot.getClient().isClientThread()) return;
 
-            if (ShortestPathPlugin.getPathfindingExecutor() == null) {
-                ThreadFactory shortestPathNaming = new ThreadFactoryBuilder().setNameFormat("shortest-path-%d").build();
-                ShortestPathPlugin.setPathfindingExecutor(Executors.newSingleThreadExecutor(shortestPathNaming));
-            }
+        if (ShortestPathPlugin.getPathfinder() != null) {
+            ShortestPathPlugin.getPathfinder().cancel();
+            ShortestPathPlugin.getPathfinderFuture().cancel(true);
         }
 
-        Microbot.getClientThread().invokeLater(() -> {
-            ShortestPathPlugin.getPathfinderConfig().refresh();
-            synchronized (ShortestPathPlugin.getPathfinderMutex()) {
-                ShortestPathPlugin.setPathfinder(new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), start, end));
-                ShortestPathPlugin.setPathfinderFuture(ShortestPathPlugin.getPathfindingExecutor().submit(ShortestPathPlugin.getPathfinder()));
-            }
-        });
+        if (ShortestPathPlugin.getPathfindingExecutor() == null) {
+            ThreadFactory shortestPathNaming = new ThreadFactoryBuilder().setNameFormat("shortest-path-%d").build();
+            ShortestPathPlugin.setPathfindingExecutor(Executors.newSingleThreadExecutor(shortestPathNaming));
+        }
+
+        ShortestPathPlugin.getPathfinderConfig().refresh();
+        ShortestPathPlugin.setPathfinder(new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), start, end));
+        ShortestPathPlugin.setPathfinderFuture(ShortestPathPlugin.getPathfindingExecutor().submit(ShortestPathPlugin.getPathfinder()));
     }
 
     /**

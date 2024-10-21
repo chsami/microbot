@@ -149,17 +149,13 @@ public class PathfinderConfig {
     }
 
     private void refreshTransports() {
-        if (!Thread.currentThread().equals(client.getClientThread())) {
-            return; // Has to run on the client thread; data will be refreshed when path finding commences
-        }
-
-        useFairyRings &= !QuestState.NOT_STARTED.equals(getQuestState(Quest.FAIRYTALE_II__CURE_A_QUEEN))
+        useFairyRings &= !QuestState.NOT_STARTED.equals(Microbot.getQuestState(Quest.FAIRYTALE_II__CURE_A_QUEEN))
                 && (Rs2Inventory.contains(ItemID.DRAMEN_STAFF, ItemID.LUNAR_STAFF)
                 || Rs2Equipment.isWearing(ItemID.DRAMEN_STAFF)
                 || Rs2Equipment.isWearing(ItemID.LUNAR_STAFF)
-                || client.getVarbitValue(Varbits.DIARY_LUMBRIDGE_ELITE)  == 1);
-        useGnomeGliders &= QuestState.FINISHED.equals(getQuestState(Quest.THE_GRAND_TREE));
-        useSpiritTrees &= QuestState.FINISHED.equals(getQuestState(Quest.TREE_GNOME_VILLAGE));
+                || Microbot.getVarbitValue(Varbits.DIARY_LUMBRIDGE_ELITE)  == 1);
+        useGnomeGliders &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.THE_GRAND_TREE));
+        useSpiritTrees &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.TREE_GNOME_VILLAGE));
 
         transports.clear();
         transportsPacked.clear();
@@ -170,13 +166,13 @@ public class PathfinderConfig {
             for (Transport transport : entry.getValue()) {
                 for (Quest quest : transport.getQuests()) {
                     try {
-                        questStates.put(quest, getQuestState(quest));
+                        questStates.put(quest, Microbot.getQuestState(quest));
                     } catch (NullPointerException ignored) {
                     }
                 }
 
                 for (TransportVarbit varbitCheck : transport.getVarbits()) {
-                    varbitValues.put(varbitCheck.getVarbitId(), client.getVarbitValue(varbitCheck.getVarbitId()));
+                    varbitValues.put(varbitCheck.getVarbitId(), Microbot.getVarbitValue(varbitCheck.getVarbitId()));
                 }
 
                 if (point == null && useTransport(transport) && hasRequiredItems(transport)) {
@@ -194,16 +190,12 @@ public class PathfinderConfig {
     }
 
     private void refreshRestrictionData() {
-        if (!Thread.currentThread().equals(client.getClientThread())) {
-            return;
-        }
-
         restrictedPointsPacked.clear();
         for (var entry : Stream.concat(resourceRestrictions.stream(), customRestrictions.stream()).collect(Collectors.toList())){
             for (Quest quest : entry.getQuests()) {
                 if (!questStates.containsKey(quest)){
                     try {
-                        questStates.put(quest, getQuestState(quest));
+                        questStates.put(quest, Microbot.getQuestState(quest));
                     } catch (NullPointerException ignored) {
                     }
                 }
@@ -237,10 +229,6 @@ public class PathfinderConfig {
         return WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_ABOVE_GROUND_LEVEL_30) == 0
                 || WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_UNDERGROUND_LEVEL_30) == 0;
 
-    }
-
-    public QuestState getQuestState(Quest quest) {
-        return quest.getState(client);
     }
 
     private boolean completedQuests(Transport transport) {
@@ -366,7 +354,8 @@ public class PathfinderConfig {
             if (!Microbot.getClient().getWorldType().contains(WorldType.MEMBERS)) return false;
             //END microbot variables
             // TODO: this does not check quantity
-            List<Integer> inventoryItems = Arrays.stream(new InventoryID[]{InventoryID.INVENTORY, InventoryID.EQUIPMENT})
+            return transport.getItemIdRequirements().stream().flatMap(Collection::stream).anyMatch(x -> Rs2Equipment.isWearing(x) || Rs2Inventory.hasItem(x));
+       /*     List<Integer> inventoryItems = Arrays.stream(new InventoryID[]{InventoryID.INVENTORY, InventoryID.EQUIPMENT})
                     .map(client::getItemContainer)
                     .filter(Objects::nonNull)
                     .map(ItemContainer::getItems)
@@ -374,7 +363,7 @@ public class PathfinderConfig {
                     .map(Item::getId)
                     .filter(itemId -> itemId != -1)
                     .collect(Collectors.toList());
-            return transport.getItemIdRequirements().stream().anyMatch(requirements -> requirements.stream().allMatch(inventoryItems::contains));
+            return transport.getItemIdRequirements().stream().anyMatch(requirements -> requirements.stream().allMatch(inventoryItems::contains));*/
         }
     }
 
