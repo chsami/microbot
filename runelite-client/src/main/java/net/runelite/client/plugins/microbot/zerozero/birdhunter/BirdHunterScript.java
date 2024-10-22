@@ -25,17 +25,17 @@ import java.util.concurrent.TimeUnit;
 public class BirdHunterScript extends Script {
 
 
-    private static final int CATCHING_TRAP_1 = 9348;
-    private static final int CATCHING_TRAP_2 = 9376;
-    private static final int CATCHING_TRAP_3 = 9378;
-    private static final int CATCHING_TRAP_4 = 9374;
-    private static final int CATCHING_TRAP_5 = 9373;
+    private static final int SUCCESSFUL_TRAP_1 = 9348;
+    private static final int SUCCESSFUL_TRAP_2 = 9376;
+    private static final int SUCCESSFUL_TRAP_3 = 9378;
+    private static final int SUCCESSFUL_TRAP_4 = 9374;
+    private static final int SUCCESSFUL_TRAP_5 = 9373;
 
-    private static final int SUCCESSFUL_TRAP_1 = 9349;
-    private static final int SUCCESSFUL_TRAP_2 = 9347;
-    private static final int SUCCESSFUL_TRAP_3 = 9377;
-    private static final int SUCCESSFUL_TRAP_4 = 9379;
-    private static final int SUCCESSFUL_TRAP_5 = 9375;
+    private static final int CATCHING_TRAP_1 = 9349;
+    private static final int CATCHING_TRAP_2 = 9347;
+    private static final int CATCHING_TRAP_3 = 9377;
+    private static final int CATCHING_TRAP_4 = 9379;
+    private static final int CATCHING_TRAP_5 = 9375;
 
     private static final int BIRD_SNARE = 10006;
     private static final int FAILED_TRAP = 9344;
