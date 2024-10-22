@@ -392,7 +392,7 @@ public class TutorialIslandScript extends Script {
             WorldPoint targetPoint = (npc != null) ? npc.getWorldLocation() : worldPoint;
             int distance = Rs2Player.distanceTo(targetPoint);
 
-            if (distance >= 8) {
+            if (distance > 8) {
                 Rs2Walker.walkTo(targetPoint, 8);
             } else {
                 if (Rs2Npc.interact(npc, "Talk-to")) {
