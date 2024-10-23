@@ -235,28 +235,29 @@
 2931 3286 0			9789;9790		4	Max cape: Crafting Guild	F	20	
 2556 2917 0			9789;9790		4	Hunter cape: Feldip Hills	F	20	
 3144 3772 0			9789;9790		4	Hunter cape: Black chinchompa	F	20	
-3144 3772 0			9789;9790		4	Hunter cape: Black chinchompa	F	20	
-3144 3772 0			9813;13068		4	Quest point cape	F	20	
+3144 3772 0			9789;9790		4	Hunter cape: Black chinchompa	F	20
+#Quest point cape (instead of using the item name we use the action teleport, we use the itemids to verifiy the item)
+3144 3772 0			9813;13068		4	Teleport	F	20
 2689 3547 0			13221;13222		4	Music cape	F	20	
-2574 3323 0			13069;19476		4	Achievement diary cape: 1. Two-pints	F	20	
-3302 3122 0			13069;19476		4	Achievement diary cape: 2. Jarr	F	20	
-2689 3547 0			13069;19476		4	Achievement diary cape: 3. Sir Rebral	F	20	
-2689 3547 0			13069;19476		4	Achievement diary cape: 4. Thorodin	F	20	
-2978 3347 0			13069;19476		4	Achievement diary cape: 3. Sir Rebral	F	20	
-2659 3627 0			13069;19476		4	Achievement diary cape: 4. Thorodin	F	20	
-2744 3443 0			13069;19476		4	Achievement diary cape: 5. Flax keeper	F	20	
-2808 3192 0			13069;19476		4	Achievement diary cape: 6. Pirate Jackie the Fruit	F	20	
-# The wiki lists these as (retired), so they are left out									
-#2862 2997 0			13069;19476		4	Achievement diary cape: 7. Kaleb Paramaya	F	20	
-#2795 2947 0			13069;19476		4	Achievement diary cape: 8. Jungle forester	F	20	
-#2453 5133 0			13069;19476		4	Achievement diary cape: 9. TzHaar-Mej	F	20	
-1648 3665 0			13069;19476		4	Achievement diary cape: A. Elise	F	20	
-3234 3214 0			13069;19476		4	Achievement diary cape: B. Hatius Cosaintus	F	20	
-3465 3478 0			13069;19476		4	Achievement diary cape: C. Le-sabrè	F	20	
-3225 3415 0			13069;19476		4	Achievement diary cape: D. Toby	F	20	
-3121 3516 0			13069;19476		4	Achievement diary cape: E. Lesser Fanatic	F	20	
-2467 3459 0			13069;19476		4	Achievement diary cape: F. Elder Gnome child	F	20	
-3096 3227 0			13069;19476		4	Achievement diary cape: G. Twiggy O'Korn	F	20	
+2574 3323 0			13069;19476		4	1. Achievement diary cape: Two-pints	F	20
+3302 3122 0			13069;19476		4	2. Achievement diary cape: Jarr	F	20
+2978 3347 0			13069;19476		4	3. Achievement diary cape: Sir Rebral	F	20
+#2689 3547 0			13069;19476		4	4. Achievement diary cape: Thorodin	F	20
+#2978 3347 0			13069;19476		4	3. Achievement diary cape: Sir Rebral	F	20
+2659 3627 0			13069;19476		4	4. Achievement diary cape: Thorodin	F	20
+2744 3443 0			13069;19476		4	5. Achievement diary cape: Flax keeper	F	20
+2808 3192 0			13069;19476		4	6. Achievement diary cape: Pirate Jackie the Fruit	F	20
+# The wiki lists these as (retired), so they are left out
+#2862 2997 0			13069;19476		4	7. Achievement diary cape: Kaleb Paramaya	F	20
+#2795 2947 0			13069;19476		4	8. Achievement diary cape: Jungle forester	F	20
+#2453 5133 0			13069;19476		4	9. Achievement diary cape: TzHaar-Mej	F	20
+1648 3665 0			13069;19476		4	A. Achievement diary cape: Elise	F	20
+3234 3214 0			13069;19476		4	B. Achievement diary cape: Hatius Cosaintus	F	20
+3465 3478 0			13069;19476		4	C. Achievement diary cape: Le-sabrè	F	20
+3225 3415 0			13069;19476		4	D. Achievement diary cape: Toby	F	20
+3121 3516 0			13069;19476		4	E. Achievement diary cape: Lesser Fanatic	F	20
+2467 3459 0			13069;19476		4	F. Achievement diary cape: Elder Gnome child	F	20
+3096 3227 0			13069;19476		4	G. Achievement diary cape: Twiggy O'Korn	F	20
 									
 # Quest Items									
 # Ectophial - includes the empty version									
@@ -286,8 +287,9 @@
 3649 3230 0			22400		4	Drakan's medallion: Ver Sinhaza	F	20	
 3592 3337 0			22400	Sins of the Father	4	Drakan's medallion: Darkmeyer	F	20	
 # todo: this only works if you've used a Slepey tablet on the medallion									
-3808 9700 0			22400		4	Drakan's medallion: Slepe	F	20	
-2457 2850 0			21913;22114;24855		4	Mythical cape	F	20	
+3808 9700 0			22400		4	Drakan's medallion: Slepe	F	20
+#mythical cape (instead of using the item name we use the action teleport, we use the itemids to verifiy the item)
+2457 2850 0			21913;22114;24855		4	Teleport	F	20
 # Stony Basalt - 4493 is DIARY_FREMENNIK_HARD									
 2845 3694 0			22601		4	Stony basalt	T	20	
 2837 3695 0		73 Agility	22601		4	Stony basalt: Roof	T	20	4493=1
@@ -299,12 +301,12 @@
 3232 2897 0			26948		4	Pharaoh's sceptre: Jaldraocht	T	20	
 3313 2718 0			26948		4	Pharaoh's sceptre: Jaltevas	T	20	
 3081 3421 0			9013;21276		4	Skull sceptre	T	20	
-1579 3530 0			13393		4	Xeric's talisman: 1. Xeric's Lookout	T	20	
-1752 3566 0			13393		4	Xeric's talisman: 2. Xeric's Glade	T	20	
-1504 3815 0			13393		4	Xeric's talisman: 3. Xeric's Inferno	T	20	
-1644 3673 0			13393		4	Xeric's talisman: 4. Xeric's Heart	T	20	
+1579 3530 0			13393		4	1. Xeric's talisman: Xeric's Lookout	T	20
+1752 3566 0			13393		4	2. Xeric's talisman: Xeric's Glade	T	20
+1504 3815 0			13393		4	3. Xeric's talisman: Xeric's Inferno	T	20
+1644 3673 0			13393		4	4. Xeric's talisman: Xeric's Heart	T	20
 # Requires the use of an ancient tablet to activate									
-1254 3560 0			13393		4	Xeric's talisman: 5. Xeric's Honour	T	20	
+1254 3560 0			13393		4	5. Xeric's talisman: Xeric's Honour	T	20
 3200 3355 0			13660		4	Chronicle	T	20	
 3615 9461 0			26914		4	Amulet of the eye	F	20	
 2981 3276 0			26818		4	Ring of the elements: Air	T	20	
