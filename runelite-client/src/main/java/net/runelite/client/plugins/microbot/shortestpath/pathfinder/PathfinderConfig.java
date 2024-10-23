@@ -143,7 +143,18 @@ public class PathfinderConfig {
         }
 
         if (!usableWildyTeleports.isEmpty()) {
-            transports.put(WorldPointUtil.unpackWorldPoint(packedLocation), usableWildyTeleports);
+            // Added extra code to check if the key already exists
+            // if the key already exists we append instead of overwriting
+            // The issue was that the transport list would contain a transport object on the same
+            // tile as the player, this would then be overwritten by the usableWildyTeleports
+            // therefor losing the original transport object
+            WorldPoint key = WorldPointUtil.unpackWorldPoint(packedLocation);
+            Set<Transport> existingTeleports = transports.get(key);
+            if (existingTeleports != null) {
+                existingTeleports.addAll(usableWildyTeleports);
+            } else {
+                transports.put(key, usableWildyTeleports);
+            }
             transportsPacked.put(packedLocation, usableWildyTeleports);
         }
     }
@@ -195,8 +206,6 @@ public class PathfinderConfig {
                 transportsPacked.put(WorldPointUtil.packWorldPoint(point), usableTransports);
             }
         }
-        Transport t = transports.values().stream().flatMap(Collection::stream).filter(x -> x.getDisplayInfo()  != null && x.getDestination().equals(new WorldPoint(3659, 3523, 0	))).findFirst().orElse(null);
-        System.out.println("finihsed");
     }
 
     private void refreshRestrictionData() {
@@ -273,6 +282,10 @@ public class PathfinderConfig {
         if (!hasRequiredLevels(transport)) {
             return false;
         }
+
+        //ship charters, mine cart will check for coins before using them
+        if (transport.getAmtCoinsRequired() > 0 && !Rs2Inventory.hasItem(995, transport.getAmtCoinsRequired()))
+            return false;
 
         TransportType type = transport.getType();
 
