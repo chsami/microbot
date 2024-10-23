@@ -355,7 +355,9 @@ public class MQuestScript extends Script {
                     targetTile = stepLocation;
             }
 
-            Rs2Walker.walkTo(targetTile, 1);
+            //target distance set to 3, because some npcs walk away from a player
+            //so it can take a while to interact with the npc
+            Rs2Walker.walkTo(targetTile, 3);
 
             if (ShortestPathPlugin.getPathfinder() != null){
                 var path = ShortestPathPlugin.getPathfinder().getPath();

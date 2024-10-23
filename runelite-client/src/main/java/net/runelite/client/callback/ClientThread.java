@@ -28,6 +28,7 @@ import com.google.inject.Inject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.client.plugins.microbot.Microbot;
 
 import javax.inject.Singleton;
 import java.util.Iterator;
@@ -58,6 +59,9 @@ public class ClientThread
 
 	@SneakyThrows
 	public <T> T runOnClientThread(Callable<T> method) {
+		if (Microbot.getClient().isClientThread()) {
+			return method.call();
+		}
 		final FutureTask<?> task = new FutureTask<Object>(() -> (method.call()));
 		invoke(task);
 		return (T) task.get();

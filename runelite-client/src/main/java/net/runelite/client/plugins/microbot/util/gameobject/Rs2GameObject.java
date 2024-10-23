@@ -640,6 +640,7 @@ public class Rs2GameObject {
         return null;
     }
 
+    @Deprecated(since="1.5.7 - use signature with Integer[] ids", forRemoval = true)
     public static TileObject findObject(List<Integer> ids) {
         for (int id : ids) {
             TileObject object = findObjectById(id);
@@ -668,7 +669,7 @@ public class Rs2GameObject {
      * @param ids
      * @return
      */
-    public static TileObject findObject(int[] ids) {
+    public static TileObject findObject(Integer[] ids) {
         List<GameObject> gameObjects = getGameObjects();
         if (gameObjects == null) return null;
 

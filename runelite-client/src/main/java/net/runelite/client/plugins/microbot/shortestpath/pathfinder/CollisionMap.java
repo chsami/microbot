@@ -1,16 +1,15 @@
 package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
-import net.runelite.api.WorldType;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
+import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class CollisionMap {
-
     // Enum.values() makes copies every time which hurts performance in the hotpath
     private static final OrdinalDirection[] ORDINAL_VALUES = OrdinalDirection.values();
 
@@ -83,17 +82,21 @@ public class CollisionMap {
         neighbors.clear();
 
         @SuppressWarnings("unchecked") // Casting EMPTY_LIST to List<Transport> is safe here
-        List<Transport> transports = config.getTransportsPacked().getOrDefault(node.packedPosition, (List<Transport>) Collections.EMPTY_LIST);
+        Set<Transport> transports = config.getTransportsPacked().getOrDefault(node.packedPosition, (Set<Transport>)Collections.EMPTY_SET);
 
-        // Transports are pre-filtered by PathfinderConfig.refreshTransportData
+        // Transports are pre-filtered by PathfinderConfig.refreshTransports
         // Thus any transports in the list are guaranteed to be valid per the user's settings
-        for (int i = 0; i < transports.size(); ++i) {
-            Transport transport = transports.get(i);
+        for (Transport transport : transports) {
+            //START microbot variables
             if (visited.get(transport.getDestination())) continue;
-            if (transport.isMember() && !Microbot.getClient().getWorldType().contains(WorldType.MEMBERS))
-                continue;
-            neighbors.add(new TransportNode(transport.getDestination(), node, transport.getWait()));
+            if (transport.getType() != TransportType.TRANSPORT) {
+                neighbors.add(new TransportNode(transport.getDestination(), node, config.getDistanceBeforeUsingTeleport(), transport.getType(), transport.getDisplayInfo()));
+            } else {
+                neighbors.add(new TransportNode(transport.getDestination(), node, transport.getDuration(), transport.getType(), transport.getDisplayInfo()));
+            }
+            //END microbot variables
         }
+
 
         if (isBlocked(x, y, z)) {
             boolean westBlocked = isBlocked(x - 1, y, z);
@@ -132,13 +135,14 @@ public class CollisionMap {
             if (traversable[i]) {
                 neighbors.add(new Node(neighborPacked, node));
             } else if (Math.abs(d.x + d.y) == 1 && isBlocked(x + d.x, y + d.y, z)) {
+                // The transport starts from a blocked adjacent tile, e.g. fairy ring
+                // Only checks non-teleport transports (includes portals and levers, but not items and spells)
                 @SuppressWarnings("unchecked") // Casting EMPTY_LIST to List<Transport> is safe here
-                List<Transport> neighborTransports = config.getTransportsPacked().getOrDefault(neighborPacked, (List<Transport>) Collections.EMPTY_LIST);
-                for (int t = 0; t < neighborTransports.size(); ++t) {
-                    Transport transport = neighborTransports.get(t);
-                    if (visited.get(transport.getOrigin())) continue;
-                    if (transport.isMember() && !Microbot.getClient().getWorldType().contains(WorldType.MEMBERS))
+                Set<Transport> neighborTransports = config.getTransportsPacked().getOrDefault(neighborPacked, (Set<Transport>)Collections.EMPTY_SET);
+                for (Transport transport : neighborTransports) {
+                    if (transport.getOrigin() == null || visited.get(transport.getOrigin())) {
                         continue;
+                    }
                     neighbors.add(new Node(transport.getOrigin(), node));
                 }
             }
