@@ -175,7 +175,7 @@ public class Transport {
 
         if ((value = fieldMap.get("menuOption menuTarget objectID")) != null) {
             // Use a regular expression to capture the action, target, and objectId
-            String regex = "([\\w]+\\s+[\\w]+)\\s+([a-zA-Z ]+)\\s+(\\d+)";
+            String regex = "(.+?)\\s+(\\w+ \\w+)\\s+(\\d+)";
             java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
             java.util.regex.Matcher matcher = pattern.matcher(value);
 
