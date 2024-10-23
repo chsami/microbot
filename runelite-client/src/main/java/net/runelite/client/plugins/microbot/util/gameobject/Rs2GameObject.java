@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -22,6 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.runelite.api.NullObjectID.NULL_34810;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 /**
  * TODO: This class should be cleaned up, less methods by passing filters instead of multiple parameters
@@ -1156,6 +1158,14 @@ public class Rs2GameObject {
             if (!Rs2Camera.isTileOnScreen(object.getLocalLocation())) {
                 Rs2Camera.turnTo(object);
             }
+
+            // both hands must be free before using MINECART
+            if (objComp.getName().toLowerCase().contains("train cart")) {
+                Rs2Equipment.unEquip(EquipmentInventorySlot.WEAPON);
+                Rs2Equipment.unEquip(EquipmentInventorySlot.SHIELD);
+                sleepUntil(() -> Rs2Equipment.get(EquipmentInventorySlot.WEAPON) == null && Rs2Equipment.get(EquipmentInventorySlot.SHIELD) == null);
+            }
+
 
             Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(), -1, action, objComp.getName(), object), Rs2UiHelper.getObjectClickbox(object));
 // MenuEntryImpl(getOption=Use, getTarget=Barrier, getIdentifier=43700, getType=GAME_OBJECT_THIRD_OPTION, getParam0=53, getParam1=51, getItemId=-1, isForceLeftClick=true, getWorldViewId=-1, isDeprioritized=false)
