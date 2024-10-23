@@ -110,7 +110,7 @@ public class Rs2Magic {
             log("Unable to cast " + magicSpell.getName());
             return false;
         }
-        int identifier = 1;
+        int identifier = magicSpell.getName().toLowerCase().contains("teleport to house") ? 2 : 1;
         if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
             menuAction = MenuAction.CC_OP;
         } else {
