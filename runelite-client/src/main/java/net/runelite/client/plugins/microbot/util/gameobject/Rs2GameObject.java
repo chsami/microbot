@@ -1126,6 +1126,7 @@ public class Rs2GameObject {
                 }
 
                 for (int i = 0; i < actions.length; i++) {
+                    if (actions[i] == null) continue;
                     if (action.equalsIgnoreCase(actions[i])) {
                         index = i;
                         break;
