@@ -23,58 +23,87 @@ public class Transport {
     private String name;
     //END microbot variables
 
-    /** A location placeholder different from null to use for permutation transports */
+    /**
+     * A location placeholder different from null to use for permutation transports
+     */
     private static final WorldPoint LOCATION_PERMUTATION = new WorldPoint(-1, -1, -1);
 
-    /** The starting point of this transport */
+    /**
+     * The starting point of this transport
+     */
     @Getter
     private WorldPoint origin = null;
 
-    /** The ending point of this transport */
+    /**
+     * The ending point of this transport
+     */
     @Getter
     private WorldPoint destination = null;
 
-    /** The skill levels required to use this transport */
+    /**
+     * The skill levels required to use this transport
+     */
     @Getter
     private final int[] skillLevels = new int[Skill.values().length];
 
-    /** The quests required to use this transport */
+    /**
+     * The quests required to use this transport
+     */
     @Getter
     private Set<Quest> quests = new HashSet<>();
 
-    /** The ids of items required to use this transport.
+    /**
+     * The ids of items required to use this transport.
      * If the player has **any** of the matching list of items,
-     * this transport is valid */
+     * this transport is valid
+     */
     @Getter
     private Set<Set<Integer>> itemIdRequirements = new HashSet<>();
 
-    /** The type of transport */
+    /**
+     * The type of transport
+     */
     @Getter
     private TransportType type;
 
-    /** The travel waiting time in number of ticks */
+    /**
+     * The travel waiting time in number of ticks
+     */
     @Getter
     private int duration;
 
-    /** Info to display for this transport. For spirit trees, fairy rings,
-     * and others, this is the destination option to pick. */
+    /**
+     * Info to display for this transport. For spirit trees, fairy rings,
+     * and others, this is the destination option to pick.
+     */
     @Getter
     private String displayInfo;
 
-    /** If this is an item transport, this tracks if it is consumable (as opposed to having infinite uses) */
+    /**
+     * If this is an item transport, this tracks if it is consumable (as opposed to having infinite uses)
+     */
     @Getter
     private boolean isConsumable = false;
 
-    /** The maximum wilderness level that the transport can be used in */
+    /**
+     * The maximum wilderness level that the transport can be used in
+     */
     @Getter
     private int maxWildernessLevel = -1;
 
-    /** Any varbits to check for the transport to be valid. All must pass for a transport to be valid */
+    /**
+     * Any varbits to check for the transport to be valid. All must pass for a transport to be valid
+     */
     @Getter
     private final Set<TransportVarbit> varbits = new HashSet<>();
 
-    /** Creates a new transport from an origin-only transport
-     * and a destination-only transport, and merges requirements */
+    @Getter
+    private int amtCoinsRequired = 0;
+
+    /**
+     * Creates a new transport from an origin-only transport
+     * and a destination-only transport, and merges requirements
+     */
     Transport(Transport origin, Transport destination) {
         this.origin = origin.origin;
         this.destination = destination.destination;
@@ -146,7 +175,7 @@ public class Transport {
 
         if ((value = fieldMap.get("menuOption menuTarget objectID")) != null) {
             // Use a regular expression to capture the action, target, and objectId
-            String regex = "([\\w-]+)\\s+([a-zA-Z ]+)\\s+(\\d+)";
+            String regex = "([\\w]+\\s+[\\w]+)\\s+([a-zA-Z ]+)\\s+(\\d+)";
             java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
             java.util.regex.Matcher matcher = pattern.matcher(value);
 
@@ -155,6 +184,12 @@ public class Transport {
                 name = matcher.group(2);   // Second group: the target (e.g., "Spirit tree")
                 objectId = Integer.parseInt(matcher.group(3)); // Third group: the objectId (e.g., "26263")
             }
+        }
+        if ((value = fieldMap.get("Items")) != null && value.toLowerCase().contains("coins")) {
+            // Split the string by space
+            String[] parts = value.split(" ");
+            // Parse the first part as an integer amount
+            amtCoinsRequired = Integer.parseInt(parts[0]);
         }
         //END microbot variables
 
@@ -183,8 +218,7 @@ public class Transport {
 
         if ((value = fieldMap.get("Item IDs")) != null) {
             String[] itemIdsList = value.split(DELIM_MULTI);
-            for (String listIds : itemIdsList)
-            {
+            for (String listIds : itemIdsList) {
                 Set<Integer> multiitemList = new HashSet<>();
                 String[] itemIds = listIds.split(DELIM);
                 for (String item : itemIds) {
@@ -207,7 +241,7 @@ public class Transport {
             // Teleportation items and spells should always have a non-zero wait,
             // so the pathfinder doesn't calculate the cost by distance
             //MICROBOT - The reason we commented this out is to avoid using teleport items when being to close to the target
-           // this.duration = duration;
+            // this.duration = duration;
         }
 
         if ((value = fieldMap.get("Display info")) != null) {
@@ -219,7 +253,7 @@ public class Transport {
         }
 
         if ((value = fieldMap.get("Wilderness level")) != null && !value.isEmpty()) {
-            this.maxWildernessLevel =  Integer.parseInt(value);
+            this.maxWildernessLevel = Integer.parseInt(value);
         }
 
         if ((value = fieldMap.get("Varbits")) != null) {
@@ -238,12 +272,16 @@ public class Transport {
         }
     }
 
-    /** The skill level required to use this transport */
+    /**
+     * The skill level required to use this transport
+     */
     private int getRequiredLevel(Skill skill) {
         return skillLevels[skill.ordinal()];
     }
 
-    /** Whether the transport has one or more quest requirements */
+    /**
+     * Whether the transport has one or more quest requirements
+     */
     public boolean isQuestLocked() {
         return !quests.isEmpty();
     }
@@ -296,7 +334,6 @@ public class Transport {
                         fieldMap.put(headers[i], fields[i]);
                     }
                 }
-
 
 
                 Transport transport = new Transport(fieldMap, transportType);
