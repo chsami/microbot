@@ -65,6 +65,18 @@ public class Global {
         } while (!done && System.currentTimeMillis() - startTime < time);
     }
 
+    public static boolean sleepUntilTrue(BooleanSupplier awaitedCondition) {
+        if (Microbot.getClient().isClientThread()) return false;
+        long startTime = System.currentTimeMillis();
+        do {
+            if (awaitedCondition.getAsBoolean()) {
+                return true;
+            }
+            sleep(100);
+        } while (System.currentTimeMillis() - startTime < 5000);
+        return false;
+    }
+
     public static boolean sleepUntilTrue(BooleanSupplier awaitedCondition, int time, int timeout) {
         if (Microbot.getClient().isClientThread()) return false;
         long startTime = System.currentTimeMillis();
