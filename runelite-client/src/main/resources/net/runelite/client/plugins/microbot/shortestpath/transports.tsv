@@ -780,7 +780,7 @@
 3083 3512 1	3083 3512 0	Climb-down Ladder 16679					
 3082 3513 0	3082 3513 1	Climb-up Ladder 16683					
 3082 3513 1	3082 3513 0	Climb-down Ladder 16679					
-3096 3468 0	3096 9867 0	Climb-down Trapdoor 1581					
+3096 3468 0	3096 9867 0	Climb-down Trapdoor 1581
 3096 9867 0	3096 3468 0	Climb-up Ladder 17385					
 3097 9868 0	3096 3468 0	Climb-up Ladder 17385					
 3094 9895 0	3093 9895 0	Push Odd looking wall 1736					
@@ -1496,7 +1496,7 @@
 2957 3158 1	2954 3158 0	Cross Gangplank 17399				3	
 							
 # Brimhaven							
-2763 3238 1	2760 3238 0	Cross Gangplank 17401				3	
+2763 3238 1	2760 3238 0	Cross Gangplank 17401				3
 2760 3238 0	2763 3238 1	Cross Gangplank 17400				3	
 2772 3234 0	2775 3234 1	Cross Gangplank 2087				3	
 2775 3234 1	2772 3234 0	Cross Gangplank 2088				3	
@@ -4372,16 +4372,16 @@
 2779 3211 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
 2777 3210 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
 2778 3210 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2830 2953 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2830 2952 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2831 2954 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2832 2954 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2833 2954 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2831 2951 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2832 2951 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2833 2951 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2834 2953 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2834 2952 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
+2830 2953 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
+2830 2952 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
+2831 2954 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
+2832 2954 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
+2833 2954 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
+2831 2951 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
+2832 2951 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
+2833 2951 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
+2834 2953 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
+2834 2952 0	2776 3214 0	Pay-fare Travel cart 2265			Shilo Village	5
 2836 9599 0	2836 9600 0	Open Wall 2606			Dragon Slayer I	2	
 2836 9600 0	2836 9599 0	Open Wall 2606				2	
 2832 9657 0	2834 3258 0	Climb Climbing rope 25213				1	
@@ -4481,4 +4481,12 @@
 # dungeon shayzien mountain camp
 1169 9973 0	1171 9946 0	Magic gate Pass 31967
 9363 1050 0	1214 3557 0	Climb Rope 32507
+
+# dragon slayer 2 Magical Barrier
+2458 2860 0	2458 2862 0	Pass Magical Barrier 31616
+2457 2860 0	2457 2862 0	Pass Magical Barrier 31616
+2456 2860 0	2456 2862 0	Pass Magical Barrier 31616
+2458 2862 0	2458 2860 0	Pass Magical Barrier 31616
+2457 2862 0	2457 2860 0	Pass Magical Barrier 31616
+2456 2862 0	2456 2860 0	Pass Magical Barrier 31616
 
