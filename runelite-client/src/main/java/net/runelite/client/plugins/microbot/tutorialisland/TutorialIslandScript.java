@@ -17,6 +17,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.NameGenerator;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -40,7 +41,7 @@ import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.*;
 
 public class TutorialIslandScript extends Script {
 
-    public static double version = 1.1;
+    public static double version = 1.2;
     public static Status status = Status.NAME;
     final int CharacterCreation = 679;
     final int[] CharacterCreation_Arrows = new int[]{13, 17, 21, 25, 29, 33, 37, 44, 48, 52, 56, 60};
@@ -108,7 +109,7 @@ public class TutorialIslandScript extends Script {
 
                         if (responseWidget != null) {
                             String widgetText = responseWidget.getText();
-                            String cleanedWidgetText = widgetText.replaceAll("<.*?>", "");
+                            String cleanedWidgetText = Rs2UiHelper.stripColTags(widgetText);
                             String expectedText = "Great! The display name " + name + " is available";
                             boolean nameAvailable = cleanedWidgetText.startsWith(expectedText);
 
@@ -172,7 +173,7 @@ public class TutorialIslandScript extends Script {
     }
 
     private boolean isCharacterCreationVisible() {
-        return Rs2Widget.isWidgetVisible(CharacterCreation, 2);
+        return Rs2Widget.isWidgetVisible(CharacterCreation, 4);
     }
 
     public void CalculateStatus() {
@@ -204,8 +205,59 @@ public class TutorialIslandScript extends Script {
     }
 
     public void RandomizeCharacter() {
-        if (random(1, 10) == 2) {
-            Rs2Widget.clickWidget("Confirm");
+        if (Rs2Random.diceFractional(0.2)) {
+            if (Rs2Random.diceFractional(0.25)) { // chance to change gender 
+                System.out.println("changing gender...");
+                Widget maleWidget = Rs2Widget.getWidget(CharacterCreation, 68); // maleButton
+                Widget femaleWidget = Rs2Widget.getWidget(CharacterCreation, 69); // femaleButton.. nice..
+                int selectedColor = 0xaaaaaa;
+                
+                boolean hasMaleSelected = Arrays.stream(maleWidget.getDynamicChildren()).anyMatch(mdw -> mdw != null && mdw.getTextColor() == selectedColor);
+                boolean hasFemaleSelected = Arrays.stream(femaleWidget.getDynamicChildren()).anyMatch(fdw -> fdw != null && fdw.getTextColor() == selectedColor);
+                
+                if (hasFemaleSelected) {
+                    Rs2Widget.clickWidget(maleWidget);
+                    Rs2Random.waitEx(1200, 300);
+                    sleepUntil(() -> hasMaleSelected);
+                } else if (hasMaleSelected) {
+                    Rs2Widget.clickWidget(femaleWidget);
+                    Rs2Random.waitEx(1200, 300);
+                    sleepUntil(() -> hasFemaleSelected);
+                }
+            }
+            
+            if (Rs2Random.diceFractional(0.25)) { // chance to change pronouns 
+                System.out.println("changing pronouns...");
+                Widget pronounWidget = Rs2Widget.getWidget(CharacterCreation, 72); // open pronouns DropDown
+                Widget currentPronoun = Arrays.stream(pronounWidget.getDynamicChildren()).filter(pnw -> pnw.getText().toLowerCase().contains("he/him") || pnw.getText().toLowerCase().contains("they/them") || pnw.getText().toLowerCase().contains("she/her")).findFirst().orElse(null);
+                Rs2Widget.clickWidget(pronounWidget);
+                Rs2Random.waitEx(1200, 300);
+                sleepUntil(() -> Rs2Widget.isWidgetVisible(CharacterCreation, 76)); // Pronoun DropDown Options
+                Widget[] dynamicPronounWidgets = Rs2Widget.getWidget(CharacterCreation, 78).getDynamicChildren();
+                Widget pronounSelectionWidget;
+                
+                if (currentPronoun != null) {
+                    if (currentPronoun.getText().toLowerCase().contains("he/him")) {
+                        if (Rs2Random.diceFractional(0.5)) {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("they/them")).findFirst().orElse(null);
+                        } else {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("she/her")).findFirst().orElse(null);
+                        }
+                    } else {
+                        if (Rs2Random.diceFractional(0.5)) {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("they/them")).findFirst().orElse(null);
+                        } else {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("he/him")).findFirst().orElse(null);
+                        }
+                    }
+                    
+                    Rs2Widget.clickWidget(pronounSelectionWidget);
+                    Rs2Random.waitEx(1200, 300);
+                    sleepUntil(() -> !Rs2Widget.isWidgetVisible(CharacterCreation, 76)); // Pronoun DropDown Options
+                }
+            }
+            
+            Rs2Widget.clickWidget(CharacterCreation, 74); // confirm Button
             Rs2Random.waitEx(1200, 300);
             sleepUntil(() -> !isCharacterCreationVisible());
         }
@@ -337,8 +389,11 @@ public class TutorialIslandScript extends Script {
 
         if (Microbot.getVarbitPlayerValue(281) == 610 || Microbot.getVarbitPlayerValue(281) == 620) {
             WorldPoint worldPoint = new WorldPoint(3141, 3088, 0);
-            if (Rs2Player.distanceTo(worldPoint) >= 4) {
-                Rs2Walker.walkTo(worldPoint, 4);
+            WorldPoint targetPoint = (npc != null) ? npc.getWorldLocation() : worldPoint;
+            int distance = Rs2Player.distanceTo(targetPoint);
+
+            if (distance > 8) {
+                Rs2Walker.walkTo(targetPoint, 8);
             } else {
                 if (Rs2Npc.interact(npc, "Talk-to")) {
                     sleepUntil(Rs2Dialogue::isInDialogue);
@@ -453,7 +508,7 @@ public class TutorialIslandScript extends Script {
                 }
             }
 
-            Rs2Walker.walkTo(new WorldPoint(3127, 3123, 0), 2);
+            Rs2Walker.walkTo(npc.getWorldLocation(), 3);
             Rs2Player.waitForWalking();
             if (Rs2Npc.interact(npc, "Talk-to")) {
                 sleepUntil(Rs2Dialogue::isInDialogue);
@@ -526,9 +581,11 @@ public class TutorialIslandScript extends Script {
             Rs2Random.waitEx(600, 100);
             Rs2Inventory.wield("Bronze arrow");
             Rs2Random.waitEx(600, 100);
+            Rs2Walker.walkTo(new WorldPoint(3110, 9523, 0), 4);
+            Rs2Player.waitForWalking();
             Rs2Npc.attack("Giant rat");
         } else if (Microbot.getVarbitPlayerValue(281) == 470) {
-            Rs2Walker.walkTo(new WorldPoint(3107, 9510, 0));
+            Rs2Walker.walkTo(npc.getWorldLocation());
             Rs2Player.waitForWalking();
             if (Rs2Npc.interact(npc, "Talk-to")) {
                 sleepUntil(Rs2Dialogue::isInDialogue);
@@ -539,7 +596,7 @@ public class TutorialIslandScript extends Script {
                 Rs2Widget.clickWidget(164, 52); //switchToCombatOptions
                 Rs2Random.waitEx(1200, 300);
                 WorldPoint worldPoint = new WorldPoint(3105, 9517, 0);
-                Rs2Walker.walkTo(worldPoint);
+                Rs2Walker.walkTo(worldPoint, 3);
                 Rs2Player.waitForWalking();
                 Rs2Npc.attack("Giant rat");
             } else {
