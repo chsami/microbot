@@ -48,6 +48,7 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.SplitFlagMap;
+import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -157,6 +158,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     public static boolean startPointSet = false;
     @Setter
     private static int reachedDistance;
+    private ShortestPathScript shortestPathScript;
     @Provides
     public ShortestPathConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(ShortestPathConfig.class);
@@ -171,6 +173,8 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         pathfinderConfig = new PathfinderConfig(map, transports, restrictions, client, config);
 
         Rs2Walker.setConfig(config);
+        shortestPathScript = new ShortestPathScript();
+        shortestPathScript.run();
 
         overlayManager.add(pathOverlay);
         overlayManager.add(pathMinimapOverlay);
@@ -190,6 +194,8 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         overlayManager.remove(pathMapOverlay);
         overlayManager.remove(pathMapTooltipOverlay);
         overlayManager.remove(debugOverlayPanel);
+
+        shortestPathScript.shutdown();
 
         exit();
         keyManager.unregisterKeyListener(this);
@@ -386,9 +392,9 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     private void onMenuOptionClicked(MenuEntry entry) {
         if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
             WorldPoint worldPoint = getSelectedWorldPoint();
-            Rs2Walker.walkTo(worldPoint);
+            // shortestPathScript.setTriggerWalker(worldPoint);
             //For debugging you can use setTarget, it will calculate path without walking
-            //setTarget(getSelectedWorldPoint());
+            setTarget(BankLocation.MINING_GUILD.getWorldPoint());
         }
 
         if (entry.getOption().equals(SET) && entry.getTarget().equals(START)) {
@@ -636,6 +642,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
          */
         if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
             Rs2Walker.setTarget(null);
+            shortestPathScript.setTriggerWalker(null);
         }
     }
 
