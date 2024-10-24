@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.blackjack;
+package net.runelite.client.plugins.microbot.storm.plugins.blackjack;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +23,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @PluginDescriptor(
-        //name = PluginDescriptor.Default + "Blackjack",
-        name = "<html>[<font color=#ff00ff>§</font>] " + "Blackjack",
+        name = PluginDescriptor.eXioStorm + "Blackjack",
         description = "Pollniveach Blackjack script",
-        tags = {"Thieving", "StormScript"},
+        tags = {"Thieving", "Storm", "eXioStorm"},
         enabledByDefault = false
 )
 @Slf4j

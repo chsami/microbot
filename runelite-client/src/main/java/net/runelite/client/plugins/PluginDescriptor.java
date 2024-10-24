@@ -49,6 +49,7 @@ public @interface PluginDescriptor {
     String GZ = "<html>[<font color=#0077B6>\u2728</font>] ";
     String StickToTheScript = "<html>[<font color=#FF4F00>STTS</font>] ";
     String zerozero ="<html>[<font color=#000000>00</font>] " ;
+    String eXioStorm ="<html>[<font color=#8400ff>§</font>] " ;
 
     String name();
 

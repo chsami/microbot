@@ -1,11 +1,10 @@
-package net.runelite.client.plugins.microbot.blackjack;
+package net.runelite.client.plugins.microbot.storm.plugins.blackjack;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.microbot.blackjack.enums.Thugs;
-import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
+import net.runelite.client.plugins.microbot.storm.plugins.blackjack.enums.Thugs;
 
 @ConfigGroup("BlackJack")
 public interface BlackJackConfig extends Config {
