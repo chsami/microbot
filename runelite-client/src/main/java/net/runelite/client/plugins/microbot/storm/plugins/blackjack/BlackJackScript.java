@@ -27,13 +27,14 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.storm.plugins.blackjack.enums.State.*;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile;
 
 public class BlackJackScript extends Script {
     public static double version = 3.2;
-    public static State state = State.BANKING;
+    public static State state = BANKING;
     BlackJackConfig config;
     static boolean firstHit=false;
     boolean firstPlayerOpenCurtain = false;
@@ -98,7 +99,7 @@ public class BlackJackScript extends Script {
         pickpomin = config.minTime();
         pickpomax = config.maxTime();
         initScript = true;
-        state = State.BANKING;
+        state = BANKING;
         Microbot.enableAutoRunOn = false;
         useStaminaPotsIfNeeded = false;
 
@@ -112,7 +113,7 @@ public class BlackJackScript extends Script {
                     previousHP = Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
                     if(hasRequiredItems()) {
                         if (Rs2Player.getWorldLocation().distanceTo(config.THUGS().location) < 30) {
-                            state = State.WALK_TO_THUGS;
+                            state = WALK_TO_THUGS;
                         } else {
                             if(Rs2Inventory.hasItem(pollniveachTeleport)){
                                 Rs2Inventory.interact(pollniveachTeleport, "break");
@@ -121,7 +122,7 @@ public class BlackJackScript extends Script {
                             }
                         }
                     } else {
-                        state = State.BANKING;
+                        state = BANKING;
                     }
                     initScript = false;
                 }
@@ -144,7 +145,7 @@ public class BlackJackScript extends Script {
                             bjCycle = 0;
                             sleep(120, 240);
                             if (state == State.BLACKJACK) {
-                                state = State.WALK_TO_THUGS;
+                                state = WALK_TO_THUGS;
                             }
                         } else {
                             int r = random(1,4);
@@ -155,7 +156,7 @@ public class BlackJackScript extends Script {
                                 bjCycle = 0;
                                 sleep(400, 600);
                                 if (state == State.BLACKJACK) {
-                                    state = State.WALK_TO_THUGS;
+                                    state = WALK_TO_THUGS;
                                 }
                             }
                             if (npcsCanSeeEachother) {
@@ -177,7 +178,7 @@ public class BlackJackScript extends Script {
                                 }
                                 if (e==3){
                                     npcsCanSeeEachother=false;
-                                    state = State.BANKING;
+                                    state = BANKING;
                                 }
                             }
                             if(bjCycle==0 && !firstPlayerOpenCurtain) {
@@ -193,9 +194,9 @@ public class BlackJackScript extends Script {
                 if (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) <= config.healAt() || !Rs2Inventory.hasItem(unnotedWine)) {
                     if (!Rs2Inventory.hasItem(unnotedWine)) {
                         if (!Rs2Inventory.hasItem(notedWine)) {
-                            state = State.BANKING;
+                            state = BANKING;
                         } else {
-                            state = State.UN_NOTING;
+                            state = UN_NOTING;
                         }
                     } else {
                         sleep(120,240);
@@ -250,7 +251,7 @@ public class BlackJackScript extends Script {
                                 }
                             }
 
-                        state = State.UN_NOTING;
+                        state = UN_NOTING;
                         break;
                     case UN_NOTING:
                         if (Microbot.getClient().getLocalPlayer().hasSpotAnim(245)) {
@@ -322,13 +323,13 @@ public class BlackJackScript extends Script {
                             }
                         }
                         if(!Rs2Inventory.hasItem(notedWine)){
-                            state = State.BANKING;
+                            state = BANKING;
                             return;
                         }
                         if(!Rs2Inventory.hasItem(unnotedWine)){
                             return;
                         }
-                        state = State.WALK_TO_THUGS;
+                        state = WALK_TO_THUGS;
                         break;
                     case WALK_TO_THUGS:
                         if (inArea(Rs2Player.getWorldLocation(), config.THUGS().thugArea)) {
@@ -346,7 +347,7 @@ public class BlackJackScript extends Script {
                                     sleep(120, 240);
                                 }
                                 npcIsTrapped=false;
-                                state = State.TRAP_NPC;
+                                state = TRAP_NPC;
                                 npc = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcs().stream()
                                         .filter(x -> x != null && x.getName() != null && !x.isDead()
                                         && Objects.requireNonNull(x.getName()).contains(config.THUGS().displayName)
@@ -356,7 +357,7 @@ public class BlackJackScript extends Script {
                                 return;
                             } else {
                                 if(npcsInArea.size()>1){
-                                    state = State.LURE_AWAY;
+                                    state = LURE_AWAY;
                                     return;
                                 }
                                 sleep(120,240);
@@ -365,10 +366,10 @@ public class BlackJackScript extends Script {
                                     if (!npcIsTrapped) {
                                         npcIsTrapped = true;
                                     }
-                                      state = State.BLACKJACK;
+                                      state = BLACKJACK;
                                 } else {
                                     npcIsTrapped = true;
-                                    state = State.BLACKJACK;
+                                    state = BLACKJACK;
                                 }
                                   npc = npcsInArea.stream().findFirst().get();
                             }
@@ -385,7 +386,7 @@ public class BlackJackScript extends Script {
                         sleep(120,240);
                         if(lure_NPC(npc)){
                             sleep(60, 180);
-                            state = State.RUN_AWAY;
+                            state = RUN_AWAY;
                         }
 
                         break;
@@ -397,17 +398,17 @@ public class BlackJackScript extends Script {
                                     lureFailed=0;
                                 }
                                 sleep(60, 180);
-                                state = State.WALK_TO_THUGS;
+                                state = WALK_TO_THUGS;
                                 return;
                             } else {
                                 lureFailed++;
                                 if(lureFailed==5){
                                     lureFailed=0;
-                                    state = State.BANKING;
+                                    state = BANKING;
                                 }
                             }
                         } else {
-                            state = State.BLACKJACK;
+                            state = BLACKJACK;
                             return;
                         }
                         //break;
@@ -438,13 +439,13 @@ public class BlackJackScript extends Script {
                         Rs2GameObject.interact(config.THUGS().escapeObjectTile[1],true);
                         sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().getPlane()==0,8000);
                         sleep(320,380);
-                        state = State.WALK_TO_THUGS;
+                        state = WALK_TO_THUGS;
                         return;
 
                     case BLACKJACK:
                         //System.out.println("state == BLACKJACK");
                         if(!npcIsTrapped){
-                            state = State.TRAP_NPC;
+                            state = TRAP_NPC;
                             return;
                         }
                         if (bjCycle == 0){
@@ -526,7 +527,7 @@ public class BlackJackScript extends Script {
                     playerHit = 0;
                 } else {
                     playerHit = 0;
-                    state = State.RUN_AWAY;
+                    state = RUN_AWAY;
                     knockout = false;
                     bjCycle = 0;
                 }
