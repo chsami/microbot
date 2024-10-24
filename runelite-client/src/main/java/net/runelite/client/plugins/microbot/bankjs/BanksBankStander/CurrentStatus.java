@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.storm.plugins.BankStander;
+package net.runelite.client.plugins.microbot.bankjs.BanksBankStander;
 
 public enum CurrentStatus {
     FETCH_SUPPLIES,

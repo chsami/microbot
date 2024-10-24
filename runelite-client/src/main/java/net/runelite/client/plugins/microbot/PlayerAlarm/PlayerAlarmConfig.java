@@ -1,4 +1,4 @@
- package net.runelite.client.plugins.microbot.storm.plugins.PlayerAlarm;
+ package net.runelite.client.plugins.microbot.PlayerAlarm;
  
  import java.awt.Color;
  import net.runelite.client.config.Alpha;

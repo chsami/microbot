@@ -1,5 +1,4 @@
-package net.runelite.client.plugins.microbot.storm.plugins.blackjack;
-
+package net.runelite.client.plugins.microbot.bankjs.BanksBankStander;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
@@ -10,20 +9,20 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class BlackJackOverlay extends OverlayPanel {
+public class BanksBankStanderOverlay extends OverlayPanel {
     @Inject
-    BlackJackOverlay(BlackJackPlugin plugin)
-    {
+    BanksBankStanderOverlay(BanksBankStanderPlugin plugin) {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }
+
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Blackjack thieving training : " + BlackJackScript.version)
+                    .text("Bank's BankStander V" + BanksBankStanderScript.version)
                     .color(Color.GREEN)
                     .build());
 
@@ -34,7 +33,7 @@ public class BlackJackOverlay extends OverlayPanel {
                     .build());
 
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         return super.render(graphics);

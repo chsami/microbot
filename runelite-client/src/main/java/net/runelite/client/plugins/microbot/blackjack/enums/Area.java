@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.storm.plugins.blackjack.enums;
+package net.runelite.client.plugins.microbot.blackjack.enums;
 
 import lombok.AllArgsConstructor;
 
