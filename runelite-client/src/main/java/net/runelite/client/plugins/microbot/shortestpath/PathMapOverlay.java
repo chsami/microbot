@@ -10,12 +10,10 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
 import java.awt.*;
 import java.awt.geom.Area;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -67,6 +65,9 @@ public class PathMapOverlay extends Overlay {
 
         if (config.drawTransports()) {
             graphics.setColor(Color.WHITE);
+            if (plugin == null) return null;
+            if (plugin.getTransports() == null) return null;
+            if (plugin.getPathfinder() == null || !plugin.getPathfinder().isDone()) return null;
             for (WorldPoint a : plugin.getTransports().keySet()) {
                 Point mapA = worldMapOverlay.mapWorldPointToGraphicsPoint(a);
                 if (mapA == null || !worldMapClipArea.contains(mapA.getX(), mapA.getY())) {
