@@ -1,10 +1,10 @@
-package net.runelite.client.plugins.microbot.blackjack;
+package net.runelite.client.plugins.microbot.storm.plugins.blackjack;
 
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.microbot.blackjack.enums.Area;
-import net.runelite.client.plugins.microbot.blackjack.enums.State;
+import net.runelite.client.plugins.microbot.storm.plugins.blackjack.enums.Area;
+import net.runelite.client.plugins.microbot.storm.plugins.blackjack.enums.State;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.blackjack.enums.State.*;
+import static net.runelite.client.plugins.microbot.storm.plugins.blackjack.enums.State.*;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.getTile;
@@ -126,7 +126,7 @@ public class BlackJackScript extends Script {
                     }
                     initScript = false;
                 }
-                if(state==BLACKJACK){
+                if(state== State.BLACKJACK){
                     if(knockout&&Microbot.getClient().getLocalPlayer().getAnimation()!=401&&!koPassed){
                         hitReactStart=System.currentTimeMillis();
                         sleepUntil(() ->Microbot.getClient().getLocalPlayer().getAnimation()==401, (hitReactTime-10));
@@ -136,7 +136,7 @@ public class BlackJackScript extends Script {
                     }
                 }
                 handlePlayerHit();
-                if(state==BLACKJACK){
+                if(state== State.BLACKJACK){
                     if(!checkCurtain(config.THUGS().door)) {
                         if (!isPlayerNearby) {
                             sleep(120, 240);
@@ -144,7 +144,7 @@ public class BlackJackScript extends Script {
                             sleepUntil(() -> checkCurtain(config.THUGS().door), 5000);
                             bjCycle = 0;
                             sleep(120, 240);
-                            if (state == BLACKJACK) {
+                            if (state == State.BLACKJACK) {
                                 state = WALK_TO_THUGS;
                             }
                         } else {
@@ -155,7 +155,7 @@ public class BlackJackScript extends Script {
                                 sleepUntil(() -> checkCurtain(config.THUGS().door), 3000);
                                 bjCycle = 0;
                                 sleep(400, 600);
-                                if (state == BLACKJACK) {
+                                if (state == State.BLACKJACK) {
                                     state = WALK_TO_THUGS;
                                 }
                             }

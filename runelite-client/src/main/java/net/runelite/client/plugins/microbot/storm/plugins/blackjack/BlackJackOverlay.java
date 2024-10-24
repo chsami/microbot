@@ -1,6 +1,7 @@
-package net.runelite.client.plugins.microbot.blackjack;
+package net.runelite.client.plugins.microbot.storm.plugins.blackjack;
 
 
+import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -24,7 +25,7 @@ public class BlackJackOverlay extends OverlayPanel {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Blackjack thieving training : " + BlackJackScript.version)
-                    .color(Color.GREEN)
+                    .color(PluginDescriptor.stormColor)
                     .build());
 
             panelComponent.getChildren().add(LineComponent.builder().build());

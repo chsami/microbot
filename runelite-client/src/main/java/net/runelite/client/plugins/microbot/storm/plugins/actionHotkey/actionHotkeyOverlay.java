@@ -1,6 +1,8 @@
-package net.runelite.client.plugins.microbot.bankjs.BanksBankStander;
+package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey;
 
+import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.storm.plugins.BankStander.BankStanderScript;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -9,23 +11,26 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class BanksBankStanderOverlay extends OverlayPanel {
+public class actionHotkeyOverlay extends OverlayPanel {
     @Inject
-    BanksBankStanderOverlay(BanksBankStanderPlugin plugin) {
+    actionHotkeyOverlay(actionHotkeyPlugin plugin)
+    {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
         setNaughty();
     }
-
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Bank's BankStander V" + BanksBankStanderScript.version)
-                    .color(Color.GREEN)
+                    .text("Storm's Action Hotkey V" + actionHotkeyScript.version)
+                    .color(PluginDescriptor.stormColor)
                     .build());
-
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Previous Key : " + actionHotkeyScript.previousKey)
+                    .leftColor(PluginDescriptor.stormColor)
+                    .build());
             panelComponent.getChildren().add(LineComponent.builder().build());
 
             panelComponent.getChildren().add(LineComponent.builder()
@@ -33,7 +38,7 @@ public class BanksBankStanderOverlay extends OverlayPanel {
                     .build());
 
 
-        } catch (Exception ex) {
+        } catch(Exception ex) {
             System.out.println(ex.getMessage());
         }
         return super.render(graphics);
