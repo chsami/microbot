@@ -98,7 +98,9 @@ public class Transport {
     private final Set<TransportVarbit> varbits = new HashSet<>();
 
     @Getter
-    private int amtCoinsRequired = 0;
+    private int amtItemRequired = 0;
+    @Getter
+    private String itemRequired = "";
 
     /**
      * Creates a new transport from an origin-only transport
@@ -142,6 +144,8 @@ public class Transport {
         this.name = origin.getName();
         this.objectId = origin.getObjectId();
         this.action = origin.getAction();
+        this.amtItemRequired = origin.getAmtItemRequired();
+        this.itemRequired = origin.getItemRequired();
         //END microbot variables
     }
 
@@ -169,13 +173,16 @@ public class Transport {
                     Integer.parseInt(destinationArray[0]),
                     Integer.parseInt(destinationArray[1]),
                     Integer.parseInt(destinationArray[2])) : LOCATION_PERMUTATION;
+            if (destination != null && destination.equals(new WorldPoint(1670, 3833, 0))) {
+                System.out.println("yes");
+            }
         }
 
         //START microbot variables
 
         if ((value = fieldMap.get("menuOption menuTarget objectID")) != null) {
             // Use a regular expression to capture the action, target, and objectId
-            String regex = "(.+?)\\s+(\\w+ \\w+)\\s+(\\d+)";
+            String regex = "^([^\\s-]+(?:-[^ ]+)*)\\s+(.*?)\\s+(\\d+)$";
             java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
             java.util.regex.Matcher matcher = pattern.matcher(value);
 
@@ -183,13 +190,16 @@ public class Transport {
                 action = matcher.group(1);   // First group: the action (e.g., "Travel")
                 name = matcher.group(2);   // Second group: the target (e.g., "Spirit tree")
                 objectId = Integer.parseInt(matcher.group(3)); // Third group: the objectId (e.g., "26263")
+            } else if (value != null && !value.isEmpty()){
+                System.out.println("failed to load transport " + value);
             }
         }
         if ((value = fieldMap.get("Items")) != null && value.toLowerCase().contains("coins")) {
             // Split the string by space
             String[] parts = value.split(" ");
             // Parse the first part as an integer amount
-            amtCoinsRequired = Integer.parseInt(parts[0]);
+            amtItemRequired = Integer.parseInt(parts[0]);
+            itemRequired = parts[1];
         }
         //END microbot variables
 
