@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.blackjack;
+package net.runelite.client.plugins.microbot.storm.plugins.blackjack;
 
 
 import net.runelite.client.plugins.microbot.Microbot;

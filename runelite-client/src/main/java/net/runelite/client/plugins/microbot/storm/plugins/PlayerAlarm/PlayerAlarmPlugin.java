@@ -1,4 +1,4 @@
- package net.runelite.client.plugins.microbot.PlayerAlarm;
+ package net.runelite.client.plugins.microbot.storm.plugins.PlayerAlarm;
 
  import com.google.inject.Provides;
  import net.runelite.api.Actor;
@@ -21,7 +21,7 @@
  import java.util.stream.Collectors;
 
  @PluginDescriptor(
-         name = "<html>[<font color=#ff00ff>§</font>] " + "Player Alarm",
+         name = PluginDescriptor.eXioStorm + "Player Alarm",
          enabledByDefault = false
 
  )
