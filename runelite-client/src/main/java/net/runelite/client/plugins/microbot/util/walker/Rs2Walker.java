@@ -38,7 +38,10 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -63,9 +66,7 @@ public class Rs2Walker {
     static int idle = 0;
     static WorldPoint currentTarget;
     static int nextWalkingDistance = 10;
-    public static final Object pathfinderMutex = new Object();
     private static ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-    private static Future<?> scheduledFuture;
 
 
     public static boolean walkTo(WorldArea area, int distanceThreshold) {
@@ -95,40 +96,26 @@ public class Rs2Walker {
                 || !Rs2Tile.isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target)) && Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
             return true;
         }
+        if (ShortestPathPlugin.getPathfinder() != null && !ShortestPathPlugin.getPathfinder().isDone()) return false;
         if ((currentTarget != null && currentTarget.equals(target)) && ShortestPathPlugin.getMarker() != null)
             return false;
         setTarget(target);
         ShortestPathPlugin.setReachedDistance(distance);
         stuckCount = 0;
         idle = 0;
-        /**
-         * Run the walker on a seperate thread if this method is called on the main thread
-         * When running the walker from the worldmap, it will be on the client thread
-         * thats why we added an extra check to run it on another thread so it doesn't
-         * block the client thread
-         */
-        if (Microbot.getClient().isClientThread()) {
-            if (scheduledFuture != null && !scheduledFuture.isDone()) {
-                Microbot.log("Current walking thread is still bussy...");
-                return false;
-            }
-            synchronized (pathfinderMutex) {
-                scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-                    coreWalk(target, distance);
-                }, 0, 100, TimeUnit.MILLISECONDS);
-            }
-        } else {
-            /**
-             * When running the walkTo method from scripts
-             * the code will run on the script thread
-             * If you really like to run this on a seperate thread because you want to do
-             * other actions while walking you can wrap the walkTo from within the script
-             * on a seperate thread
-             */
-            coreWalk(target, distance);
-        }
 
-        return false;
+        if (Microbot.getClient().isClientThread()) {
+            Microbot.log("Please do not call the walker from the main thread");
+            return false;
+        }
+        /**
+         * When running the walkTo method from scripts
+         * the code will run on the script thread
+         * If you really like to run this on a seperate thread because you want to do
+         * other actions while walking you can wrap the walkTo from within the script
+         * on a seperate thread
+         */
+        return coreWalk(target, distance);
     }
 
     /**
@@ -138,45 +125,49 @@ public class Rs2Walker {
      * @param target
      * @param distance
      */
-    private static void coreWalk(WorldPoint target, int distance) {
+    private static boolean coreWalk(WorldPoint target, int distance) {
         try {
             if (!Microbot.isLoggedIn()) {
                 setTarget(null);
-                cancelScheduleFuture();
             }
             if (ShortestPathPlugin.getPathfinder() == null) {
                 if (ShortestPathPlugin.getMarker() == null) {
                     setTarget(null);
-                    cancelScheduleFuture();
                 }
                 boolean isInit = sleepUntilTrue(() -> ShortestPathPlugin.getPathfinder() != null, 100, 2000);
                 if (!isInit) {
-                    System.out.println("pathfinder is null: 148");
+                    System.out.println("pathfinder is null: 139");
                     setTarget(null);
-                    cancelScheduleFuture();
-                    return;
+                    return false;
                 }
             }
             if (!ShortestPathPlugin.getPathfinder().isDone()) {
                 boolean isDone = sleepUntilTrue(() -> ShortestPathPlugin.getPathfinder().isDone(), 100, 5000);
                 if (!isDone) {
-                    System.out.println("pathfinder is not done: 155");
+                    System.out.println("pathfinder is not done: 147");
                     setTarget(null);
-                    cancelScheduleFuture();
-                    return;
+                    return false;
                 }
             }
 
             if (ShortestPathPlugin.getPathfinder() == null) {
-                System.out.println("pathfinder is null: 161");
+                System.out.println("pathfinder is null: 154");
                 setTarget(null);
-                cancelScheduleFuture();
-                return;
+                return false;
             }
 
-            if (!ShortestPathPlugin.getPathfinder().getPath().isEmpty() && isNear(ShortestPathPlugin.getPathfinder().getPath().get(ShortestPathPlugin.getPathfinder().getPath().size() - 1))) {
+            List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
+            int pathSize = path.size();
+
+
+            if (!path.get(pathSize - 1).equals(target)) {
+                Microbot.log("Location impossible to reach");
                 setTarget(null);
-                cancelScheduleFuture();
+                return false;
+            }
+
+            if (!path.isEmpty() && isNear(path.get(pathSize - 1))) {
+                setTarget(null);
             }
 
             if (Rs2Npc.getNpcsAttackingPlayer(Microbot.getClient().getLocalPlayer()) != null
@@ -199,18 +190,35 @@ public class Rs2Walker {
 
             if (ShortestPathPlugin.getPathfinder() == null) {
                 setTarget(null);
-                cancelScheduleFuture();
-                return;
+                return false;
             }
 
-            List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
             int indexOfStartPoint = getClosestTileIndex(path);
             lastPosition = Rs2Player.getWorldLocation();
 
             if (Rs2Player.getWorldLocation().distanceTo(target) == 0) {
                 setTarget(null);
-                cancelScheduleFuture();
-                return;
+                return true;
+            }
+
+            // Edgeville/ardy wilderness lever warning
+            if (Rs2Widget.isWidgetVisible(229, 1)) {
+                Microbot.log("Detected Wilderness lever warning, interacting...");
+                Rs2Dialogue.clickContinue();
+                sleep(1200, 2400);
+                return true;
+            }
+
+            // entering desert warning
+            if (Rs2Widget.clickWidget(565, 20)) {
+                sleep(600);
+                Rs2Widget.clickWidget(565, 17);
+            }
+
+
+            if (Rs2Widget.enterWilderness()) {
+                sleepUntil(Rs2Player::isAnimating);
+                return true;
             }
 
             boolean doorOrTransportResult = false;
@@ -276,23 +284,17 @@ public class Rs2Walker {
             }
             if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
                 setTarget(null);
-                cancelScheduleFuture();
+                return true;
             } else {
-                coreWalk(target, distance);
+                return coreWalk(target, distance);
             }
         } catch (Exception ex) {
-            if (ex instanceof InterruptedException) return;
+            if (ex instanceof InterruptedException) return false;
             ex.printStackTrace(System.out);
             Microbot.log("Microbot Walker Exception " + ex.getMessage());
             System.out.println(ex.getMessage());
         }
-    }
-
-    private static void cancelScheduleFuture() {
-        if (scheduledFuture != null) {
-            scheduledFuture.cancel(true);
-            Microbot.log("walker thread cancelled");
-        }
+        return false;
     }
 
     public static WorldPoint getPointWithWallDistance(WorldPoint target) {
@@ -705,18 +707,6 @@ public class Rs2Walker {
      * @return
      */
     public static boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
-        // Edgeville/ardy wilderness lever warning
-        if (Rs2Widget.isWidgetVisible(229, 1)) {
-            Microbot.log("Detected Wilderness lever warning, interacting...");
-            Rs2Dialogue.clickContinue();
-            sleep(1200, 2400);
-            return true;
-        }
-
-        if (Rs2Widget.enterWilderness()) {
-            sleepUntil(Rs2Player::isAnimating);
-            return true;
-        }
 
         for (Transport transport : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new HashSet<>())) {
             for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), transport.getOrigin())) {
@@ -760,6 +750,11 @@ public class Rs2Walker {
                             if (Rs2Npc.canWalkTo(npc, 20)) {
                                 Rs2Npc.interact(npc, action);
                                 Rs2Player.waitForWalking();
+                                sleep(600 * 2);
+                               if (Rs2Dialogue.clickOption("I'm just going to Pirates' cove")) {
+                                   sleep(600 * 2);
+                                   Rs2Dialogue.clickContinue();
+                               }
                             } else {
                                 Rs2Walker.walkFastCanvas(path.get(i));
                                 sleep(1200, 1600);
@@ -815,6 +810,7 @@ public class Rs2Walker {
                     }
 
                     if (transport.getType() == TransportType.TELEPORTATION_SPELL) {
+                        //if (Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < config.distanceBeforeUsingTeleport()) break;
                         if (handleTeleportSpell(transport)) {
                             sleepUntil(() -> !Rs2Player.isAnimating());
                             sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
@@ -822,6 +818,11 @@ public class Rs2Walker {
                         }
                     }
 
+                    if (transport.getType() == TransportType.MINECART) {
+                        if (interactWithAdventureLog(transport)) {
+                            sleep(600 * 2); // wait extra 2 game ticks before moving
+                        }
+                    }
 
                     GameObject gameObject = Rs2GameObject.getGameObjects(transport.getObjectId(), transport.getOrigin()).stream().findFirst().orElse(null);
                     //check game objects
@@ -832,12 +833,6 @@ public class Rs2Walker {
                         handleObject(transport, gameObject);
                         sleepUntil(() -> !Rs2Player.isAnimating());
                         return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
-                    }
-
-                    //display transport on overlay to verifiy
-
-                    if (transport.getObjectId() == 31616) {
-                        System.out.println("transport portal");
                     }
 
                     //check tile objects
@@ -872,6 +867,7 @@ public class Rs2Walker {
                 Rs2Player.waitForAnimation();
             } else {
                 Rs2Player.waitForWalking();
+                Rs2Dialogue.clickOption("Yes please"); //shillo village cart
             }
         } else {
             int z = Rs2Player.getWorldLocation().getPlane();
@@ -1111,6 +1107,8 @@ public class Rs2Walker {
         String displayInfo = transport.getDisplayInfo();
         int objectId = transport.getObjectId();
 
+        if (displayInfo == null || displayInfo.isEmpty()) return false;
+
         // Check if the widget is already visible
         if (!Rs2Widget.isHidden(ComponentID.ADVENTURE_LOG_CONTAINER)) {
             System.out.println("Widget is already visible. Skipping interaction.");
@@ -1142,9 +1140,10 @@ public class Rs2Walker {
      * @param transport
      */
     private static boolean interactWithAdventureLog(Transport transport) {
+        if (transport.getDisplayInfo() == null || transport.getDisplayInfo().isEmpty()) return false;
+
         // Wait for the widget to become visible
-        boolean widgetVisible = sleepUntilTrue(() -> !Rs2Widget.isHidden(ComponentID.ADVENTURE_LOG_CONTAINER));
-        if (!widgetVisible) {
+        if (Rs2Widget.isHidden(ComponentID.ADVENTURE_LOG_CONTAINER)) {
             Microbot.log("Widget did not become visible within the timeout.");
             return false;
         }
