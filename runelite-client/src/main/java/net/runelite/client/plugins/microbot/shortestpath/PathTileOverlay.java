@@ -36,6 +36,9 @@ public class PathTileOverlay extends Overlay {
     }
 
     private void renderTransports(Graphics2D graphics) {
+        if (plugin == null) return;
+        if (plugin.getTransports() == null) return;
+        if (plugin.getPathfinderFuture() == null || !plugin.getPathfinderFuture().isDone()) return;
         for (WorldPoint a : plugin.getTransports().keySet()) {
             drawTile(graphics, a, config.colourTransports(), -1, true);
 
