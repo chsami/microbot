@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
+import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
@@ -79,16 +80,27 @@ public class CollisionMap {
         final int y = WorldPointUtil.unpackWorldY(node.packedPosition);
         final int z = WorldPointUtil.unpackWorldPlane(node.packedPosition);
 
+
         neighbors.clear();
 
         @SuppressWarnings("unchecked") // Casting EMPTY_LIST to List<Transport> is safe here
-        Set<Transport> transports = config.getTransportsPacked().getOrDefault(node.packedPosition, (Set<Transport>)Collections.EMPTY_SET);
+        Set<Transport> transports = config.getTransportsPacked().getOrDefault(node.packedPosition, (Set<Transport>) Collections.EMPTY_SET);
 
         // Transports are pre-filtered by PathfinderConfig.refreshTransports
         // Thus any transports in the list are guaranteed to be valid per the user's settings
         for (Transport transport : transports) {
             //START microbot variables
             if (visited.get(transport.getDestination())) continue;
+
+            //EXCEPTION
+            if (transport.getType() == TransportType.MINECART) {
+                //avoid using minecart if you ned to go dwarven mines or mining guild
+                if (ShortestPathPlugin.getPathfinder().getTarget().getRegionID() == 12183 || ShortestPathPlugin.getPathfinder().getTarget().getRegionID() == 12184
+                        || ShortestPathPlugin.getPathfinder().getTarget().getRegionID() == 12439 || ShortestPathPlugin.getPathfinder().getTarget().getRegionID() == 12951) {
+                    continue;
+                }
+            }
+
             if (transport.getType() != TransportType.TRANSPORT) {
                 neighbors.add(new TransportNode(transport.getDestination(), node, config.getDistanceBeforeUsingTeleport(), transport.getType(), transport.getDisplayInfo()));
             } else {
@@ -138,7 +150,7 @@ public class CollisionMap {
                 // The transport starts from a blocked adjacent tile, e.g. fairy ring
                 // Only checks non-teleport transports (includes portals and levers, but not items and spells)
                 @SuppressWarnings("unchecked") // Casting EMPTY_LIST to List<Transport> is safe here
-                Set<Transport> neighborTransports = config.getTransportsPacked().getOrDefault(neighborPacked, (Set<Transport>)Collections.EMPTY_SET);
+                Set<Transport> neighborTransports = config.getTransportsPacked().getOrDefault(neighborPacked, (Set<Transport>) Collections.EMPTY_SET);
                 for (Transport transport : neighborTransports) {
                     if (transport.getOrigin() == null || visited.get(transport.getOrigin())) {
                         continue;
