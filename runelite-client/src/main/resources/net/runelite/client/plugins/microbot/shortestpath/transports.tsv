@@ -4490,3 +4490,8 @@
 2457 2862 0	2457 2860 0	Pass Magical Barrier 31616
 2456 2862 0	2456 2860 0	Pass Magical Barrier 31616
 
+# watchtower
+2933 4712 2	2549 3112 1	Climb-down Ladder 2797
+2549 3112 1	2933 4712 2	Climb-down Ladder 2797
+2544 3112 1	2544 3112 0	Climb-down Ladder 17122
+2544 3112 0	2544 3112 1	Climb-down Ladder 17122
