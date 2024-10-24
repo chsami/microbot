@@ -1,8 +1,8 @@
-package net.runelite.client.plugins.microbot.storm.plugins.blackjack;
-
+package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey;
 
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.storm.plugins.BankStander.BankStanderScript;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -11,9 +11,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class BlackJackOverlay extends OverlayPanel {
+public class actionHotkeyOverlay extends OverlayPanel {
     @Inject
-    BlackJackOverlay(BlackJackPlugin plugin)
+    actionHotkeyOverlay(actionHotkeyPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -24,10 +24,13 @@ public class BlackJackOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Blackjack thieving training : " + BlackJackScript.version)
+                    .text("Storm's Action Hotkey V" + actionHotkeyScript.version)
                     .color(PluginDescriptor.stormColor)
                     .build());
-
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Previous Key : " + actionHotkeyScript.previousKey)
+                    .leftColor(PluginDescriptor.stormColor)
+                    .build());
             panelComponent.getChildren().add(LineComponent.builder().build());
 
             panelComponent.getChildren().add(LineComponent.builder()

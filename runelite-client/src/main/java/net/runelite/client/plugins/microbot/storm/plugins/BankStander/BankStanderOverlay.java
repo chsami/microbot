@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.storm.plugins.BankStander;
 
+import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -23,11 +24,11 @@ public class BankStanderOverlay extends OverlayPanel {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Storm's BankStander V" + BankStanderScript.version)
-                    .color(BankStanderPlugin.fontColor)
+                    .color(PluginDescriptor.stormColor)
                     .build());
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Items processed : " + BankStanderScript.itemsProcessed)
-                    .leftColor(BankStanderPlugin.fontColor)
+                    .leftColor(PluginDescriptor.stormColor)
                     .build());
             panelComponent.getChildren().add(LineComponent.builder().build());
 

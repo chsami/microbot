@@ -24,7 +24,6 @@ import java.util.Arrays;
 )
 @Slf4j
 public class BankStanderPlugin extends Plugin {
-    public static Color fontColor = new Color(132, 0, 255);
     @Inject
     private BankStanderConfig config;
 
