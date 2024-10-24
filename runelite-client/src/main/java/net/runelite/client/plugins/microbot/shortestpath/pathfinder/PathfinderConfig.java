@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ public class PathfinderConfig {
     private final Set<Transport> usableTeleports;
 
     @Getter
-    private Map<WorldPoint, Set<Transport>> transports;
+    private ConcurrentHashMap<WorldPoint, Set<Transport>> transports;
     // Copy of transports with packed positions for the hotpath; lists are not copied and are the same reference in both maps
     @Getter
     private PrimitiveIntHashMap<Set<Transport>> transportsPacked;
@@ -81,7 +82,7 @@ public class PathfinderConfig {
         this.map = ThreadLocal.withInitial(() -> new CollisionMap(this.mapData));
         this.allTransports = transports;
         this.usableTeleports = new HashSet<>(allTransports.size() / 20);
-        this.transports = new HashMap<>(allTransports.size() / 2);
+        this.transports = new ConcurrentHashMap<>(allTransports.size() / 2);
         this.transportsPacked = new PrimitiveIntHashMap<>(allTransports.size() / 2);
         this.client = client;
         this.config = config;
@@ -284,7 +285,7 @@ public class PathfinderConfig {
         }
 
         //ship charters, mine cart will check for coins before using them
-        if (transport.getAmtCoinsRequired() > 0 && !Rs2Inventory.hasItem(995, transport.getAmtCoinsRequired()))
+        if (transport.getAmtItemRequired() > 0 && !Rs2Inventory.hasItemAmount(transport.getItemRequired(), transport.getAmtItemRequired()))
             return false;
 
         TransportType type = transport.getType();
