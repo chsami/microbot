@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.farming.herbrun;
+package net.runelite.client.plugins.microbot.herbrun;
 
 import java.awt.*;
 import net.runelite.api.*;
@@ -17,7 +17,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.Microbot.log;
-import static net.runelite.client.plugins.microbot.farming.herbrun.HerbrunInfo.*;
+import static net.runelite.client.plugins.microbot.herbrun.HerbrunInfo.*;
 
 
 public class HerbrunScript extends Script {
@@ -202,6 +202,11 @@ public class HerbrunScript extends Script {
                         if (Rs2Player.getWorldLocation().distanceTo(hosidiusHerb) < 15) {
                             printHerbPatchActions(hosidiusHerbPatchID);
                             handleHerbPatch(hosidiusHerbPatchID, seedToPlant, config, 0);
+
+                        }
+                        if (!Rs2Player.isMoving() &&
+                                !Rs2Player.isAnimating() &&
+                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
                             addCompost(config, hosidiusHerbPatchID);
                             plantSeed(hosidiusHerbPatchID, seedToPlant, states.ARDOUGNE_TELEPORT);
                         }
@@ -220,6 +225,10 @@ public class HerbrunScript extends Script {
                         if (Rs2Player.getWorldLocation().distanceTo(ardougneHerb) < 15) {
                             printHerbPatchActions(ardougneHerbPatchID);
                             handleHerbPatch(ardougneHerbPatchID, seedToPlant, config, 0);
+                        }
+                        if (!Rs2Player.isMoving() &&
+                                !Rs2Player.isAnimating() &&
+                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
                             addCompost(config, ardougneHerbPatchID);
                             plantSeed(ardougneHerbPatchID, seedToPlant, states.FALADOR_TELEPORT);
                         }

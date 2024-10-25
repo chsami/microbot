@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.farming.herbrun;
+package net.runelite.client.plugins.microbot.herbrun;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.LiftedMango + "herb runner",
+        name = PluginDescriptor.LiftedMango + "Herb runner",
         description = "LiftedMango's Herb runner",
         tags = {"herb", "liftedmango", "farming", "money making"},
         enabledByDefault = false

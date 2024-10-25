@@ -49,7 +49,7 @@ public @interface PluginDescriptor {
     String GZ = "<html>[<font color=#0077B6>\u2728</font>] ";
     String StickToTheScript = "<html>[<font color=#FF4F00>STTS</font>] ";
     String zerozero ="<html>[<font color=#000000>00</font>] " ;
-    String LiftedMango = "<html>[<font>\uD83E\uDD6D</font>] ";
+    String LiftedMango = "<html>[<font color=#FF7F50>\uD83E\uDD6D</font>] ";
 
     String name();
 

@@ -1,6 +1,5 @@
-package net.runelite.client.plugins.microbot.farming.herbrun;
+package net.runelite.client.plugins.microbot.herbrun;
 
-import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
