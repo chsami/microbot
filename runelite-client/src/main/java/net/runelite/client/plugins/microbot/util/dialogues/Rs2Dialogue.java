@@ -18,18 +18,12 @@ public class Rs2Dialogue {
     /**
      * Checks if the player is currently in a dialogue state.
      * This includes NPC dialogues, option dialogues, and other types of interactive dialogues.
+     * The method specifically checks if the scroll bar is not visible, indicating an ongoing dialogue.
      *
-     * @return true if any dialogue-related widget is visible, false otherwise.
+     * @return true if any dialogue-related widget is visible and the scroll bar is not visible, false otherwise.
      */
     public static boolean isInDialogue() {
-        return Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_NPC, 5)
-                || Rs2Widget.isWidgetVisible(229, 0)
-                || Rs2Widget.isWidgetVisible(229, 2)
-                || Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_OPTION, 1)
-                || Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_PLAYER, 5)
-                || Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_SPRITE, 0)
-                || Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_SPRITE, 4)
-                || hasContinue();
+        return !Rs2Widget.isWidgetVisible(162, 557) && (hasContinue() || hasSelectAnOption());
     }
 
     /**
@@ -47,16 +41,68 @@ public class Rs2Dialogue {
      * @return true if the "Click here to continue" widget is visible, false otherwise.
      */
     public static boolean hasContinue() {
-        return Rs2Widget.hasWidget("Click here to continue");
+        return hasNPCContinue() || hasPlayerContinue() || hasDeathContinue() ||
+                hasSpriteContinue() || hasTutContinue();
+    }
+
+    /**
+     * Checks if there is a "Continue" option in an NPC dialogue.
+     * This typically indicates the presence of an interactive NPC dialogue.
+     *
+     * @return true if the "Continue" option is visible in the NPC dialogue, false otherwise.
+     */
+    private static boolean hasNPCContinue() {
+        return Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_NPC, 5);
+    }
+
+    /**
+     * Checks if there is a "Continue" option in a player dialogue.
+     * This typically indicates the presence of an interactive player dialogue.
+     *
+     * @return true if the "Continue" option is visible in the player dialogue, false otherwise.
+     */
+    private static boolean hasPlayerContinue() {
+        return Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_PLAYER, 5);
+    }
+
+    /**
+     * Checks if there is a "Continue" option in a death dialogue.
+     * This typically indicates the presence of a death screen dialogue.
+     *
+     * @return true if the "Continue" option is visible in the death dialogue, false otherwise.
+     */
+    private static boolean hasDeathContinue() {
+        return Rs2Widget.isWidgetVisible(663, 0);
+    }
+
+    /**
+     * Checks if there is a "Continue" option in a sprite-based dialogue.
+     * This includes single and double sprite dialogues.
+     *
+     * @return true if the "Continue" option is visible in either sprite-based dialogue, false otherwise.
+     */
+    
+    private static boolean hasSpriteContinue() {
+        return Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_SPRITE, 0) || Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_SPRITE, 3) || Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_DOUBLE_SPRITE, 4);
+    }
+
+    /**
+     * Checks if there is a "Continue" option in a tutorial dialogue.
+     * This includes the presence of the "Continue" option in tutorial-based interfaces.
+     *
+     * @return true if the "Continue" option is visible in the tutorial dialogue, false otherwise.
+     */
+    private static boolean hasTutContinue() {
+        return Rs2Widget.isWidgetVisible(229, 0) || Rs2Widget.isWidgetVisible(229, 2);
     }
 
     /**
      * Checks if the current dialogue contains selectable options.
      *
-     * @return true if the "Select an option" widget is visible, false otherwise.
+     * @return true if has dialog options is visible
      */
     public static boolean hasSelectAnOption() {
-        return Rs2Widget.hasWidget("Select an option");
+        return Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_OPTION, 1) && Rs2Widget.getWidget(InterfaceID.DIALOG_OPTION, 1).getDynamicChildren() != null;
     }
 
     /**
@@ -70,7 +116,6 @@ public class Rs2Dialogue {
 
         List<Widget> out = new ArrayList<>();
         Widget[] dynamicWidgetOptions = Rs2Widget.getWidget(InterfaceID.DIALOG_OPTION, 1).getDynamicChildren();
-        if (dynamicWidgetOptions == null) return out;
 
         // Skip the first dynamic widget option, as it is never an option
         for (int i = 1; i < dynamicWidgetOptions.length; i++) {
@@ -87,13 +132,12 @@ public class Rs2Dialogue {
     /**
      * Finds a dialogue option widget that matches the specified text.
      *
-     * @param text the text to match with the dialogue option.
+     * @param text  the text to match with the dialogue option.
      * @param exact whether to match the text exactly or allow partial matches.
      * @return the widget representing the matching dialogue option, or null if no match is found.
      */
     public static Widget getDialogueOption(String text, boolean exact) {
-        if (!hasSelectAnOption()) return null;
-        if (getDialogueOptions().isEmpty()) return null;
+        if (!hasSelectAnOption() || getDialogueOptions().isEmpty()) return null;
 
         Widget dialogueOption;
 
@@ -125,7 +169,7 @@ public class Rs2Dialogue {
     /**
      * Checks if the specified dialogue option text is present among the current options.
      *
-     * @param text the text to look for.
+     * @param text  the text to look for.
      * @param exact whether to match the text exactly or allow partial matches.
      * @return true if the specified text is found among the dialogue options, false otherwise.
      */
@@ -154,28 +198,25 @@ public class Rs2Dialogue {
     /**
      * Simulates a key press to select a dialogue option that matches the specified text.
      *
-     * @param text the text to match with the dialogue option.
+     * @param text  the text to match with the dialogue option.
      * @param exact whether to match the text exactly or allow partial matches.
-     * @return true if the key press was successful, false if no matching option was found.
      */
-    public static boolean keyPressForDialogueOption(String text, boolean exact) {
-        if (!hasSelectAnOption()) return false;
+    public static void keyPressForDialogueOption(String text, boolean exact) {
+        if (!hasSelectAnOption()) return;
 
         Widget dialogueOption = getDialogueOption(text, exact);
-        if (dialogueOption == null) return false;
+        if (dialogueOption == null) return;
 
         Rs2Keyboard.keyPress(dialogueOption.getOnKeyListener()[7].toString().charAt(0));
-        return true;
     }
 
     /**
      * Simulates a key press to select a dialogue option that matches the specified text, allowing partial matches.
      *
      * @param text the text to match with the dialogue option.
-     * @return true if the key press was successful, false if no matching option was found.
      */
-    public static boolean keyPressForDialogueOption(String text) {
-        return keyPressForDialogueOption(text, false);
+    public static void keyPressForDialogueOption(String text) {
+        keyPressForDialogueOption(text, false);
     }
 
     public static Widget getOption(String option) {
