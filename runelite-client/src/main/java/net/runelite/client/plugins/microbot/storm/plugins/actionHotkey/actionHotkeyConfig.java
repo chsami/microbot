@@ -84,32 +84,40 @@ public interface actionHotkeyConfig extends Config {
     default String secondActionMenu() { return ""; }
 
     @ConfigItem(keyName = "firstRs2Bank", name = "Rs2Bank Action", description = "pick action for Rs2Bank", position = 0, section = firstCategories)
-    default Rs2Bank firstRs2Bank() { return Rs2Bank.OPEN_BANK; }
+    default sRs2Bank firstRs2Bank() { return sRs2Bank.OPEN_BANK; }
     @ConfigItem(keyName = "firstRs2GameObject", name = "Rs2GameObject Action", description = "pick action for Rs2GameObject", position = 1, section = firstCategories)
-    default Rs2GameObject firstRs2GameObject() { return Rs2GameObject.OBJ_INTERACT; }
+    default sRs2GameObject firstRs2GameObject() { return sRs2GameObject.OBJ_INTERACT; }
     @ConfigItem(keyName = "firstRs2Inventory", name = "Rs2Inventory Action", description = "pick action for Rs2Inventory", position = 1, section = firstCategories)
-    default Rs2Inventory firstRs2Inventory() { return Rs2Inventory.INV_INTERACT; }
+    default sRs2Inventory firstRs2Inventory() { return sRs2Inventory.INV_INTERACT; }
     @ConfigItem(keyName = "firstRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 1, section = firstCategories)
-    default Rs2Npc firstRs2Npc() { return Rs2Npc.NPC_INTERACT; }
+    default sRs2Npc firstRs2Npc() { return sRs2Npc.NPC_INTERACT; }
+    @ConfigItem(keyName = "firstRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 1, section = firstCategories)
+    default sRs2Player firstRs2Player() { return sRs2Player.LOGOUT; }
     @ConfigItem(keyName = "firstRs2Walker", name = "Rs2Walker Action", description = "pick action for Rs2Walker", position = 1, section = firstCategories)
-    default Rs2Walker firstRs2Walker() { return Rs2Walker.WALK_FAST_CANVAS; }
+    default sRs2Walker firstRs2Walker() { return sRs2Walker.WALK_FAST_CANVAS; }
     @ConfigItem(keyName = "firstRs2Widget", name = "Rs2Widget Action", description = "pick action for Rs2Widget", position = 1, section = firstCategories)
-    default Rs2Widget firstRs2Widget() { return Rs2Widget.GET_WIDGET; }
+    default sRs2Widget firstRs2Widget() { return sRs2Widget.GET_WIDGET; }
+    @ConfigItem(keyName = "firstRs2Magic", name = "Rs2Magic Action", description = "pick action for Rs2Magic", position = 1, section = firstCategories)
+    default sRs2Magic firstRs2Magic() { return sRs2Magic.ALCH; }
     @ConfigItem(keyName = "firstOther", name = "Other Action", description = "pick action for Other", position = 1, section = firstCategories)
     default Other firstOther() { return Other.PRINTLN; }
 
     @ConfigItem(keyName = "secondRs2Bank", name = "Rs2Bank Action", description = "pick action for Rs2Bank", position = 0, section = secondCategories)
-    default Rs2Bank secondRs2Bank() { return Rs2Bank.OPEN_BANK; }
+    default sRs2Bank secondRs2Bank() { return sRs2Bank.OPEN_BANK; }
     @ConfigItem(keyName = "secondRs2GameObject", name = "Rs2GameObject Action", description = "pick action for Rs2GameObject", position = 1, section = secondCategories)
-    default Rs2GameObject secondRs2GameObject() { return Rs2GameObject.OBJ_INTERACT; }
+    default sRs2GameObject secondRs2GameObject() { return sRs2GameObject.OBJ_INTERACT; }
     @ConfigItem(keyName = "secondRs2Inventory", name = "Rs2Inventory Action", description = "pick action for Rs2Inventory", position = 1, section = secondCategories)
-    default Rs2Inventory secondRs2Inventory() { return Rs2Inventory.INV_INTERACT; }
+    default sRs2Inventory secondRs2Inventory() { return sRs2Inventory.INV_INTERACT; }
     @ConfigItem(keyName = "secondRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 1, section = secondCategories)
-    default Rs2Npc secondRs2Npc() { return Rs2Npc.NPC_INTERACT; }
+    default sRs2Npc secondRs2Npc() { return sRs2Npc.NPC_INTERACT; }
+    @ConfigItem(keyName = "secondRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 1, section = secondCategories)
+    default sRs2Player secondRs2Player() { return sRs2Player.LOGOUT; }
     @ConfigItem(keyName = "secondRs2Walker", name = "Rs2Walker Action", description = "pick action for Rs2Walker", position = 1, section = secondCategories)
-    default Rs2Walker secondRs2Walker() { return Rs2Walker.WALK_FAST_CANVAS; }
+    default sRs2Walker secondRs2Walker() { return sRs2Walker.WALK_FAST_CANVAS; }
     @ConfigItem(keyName = "secondRs2Widget", name = "Rs2Widget Action", description = "pick action for Rs2Widget", position = 1, section = secondCategories)
-    default Rs2Widget secondRs2Widget() { return Rs2Widget.GET_WIDGET; }
+    default sRs2Widget secondRs2Widget() { return sRs2Widget.GET_WIDGET; }
+    @ConfigItem(keyName = "secondRs2Magic", name = "Rs2Magic Action", description = "pick action for Rs2Magic", position = 1, section = firstCategories)
+    default sRs2Magic secondRs2Magic() { return sRs2Magic.ALCH; }
     @ConfigItem(keyName = "secondOther", name = "Other Action", description = "pick action for Other", position = 1, section = secondCategories)
     default Other secondOther() { return Other.PRINTLN; }
 

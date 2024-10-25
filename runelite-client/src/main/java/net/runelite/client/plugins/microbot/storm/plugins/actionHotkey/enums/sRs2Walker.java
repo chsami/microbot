@@ -1,10 +1,10 @@
 package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums;
 
-public enum Other implements Actionable {
-    PRINTLN("println");
+public enum sRs2Walker implements Actionable {
+    WALK_FAST_CANVAS("walkFastCanvas");
 
     private final String actions;
-    Other(String actions) {
+    sRs2Walker(String actions) {
         this.actions = actions;
     }
 

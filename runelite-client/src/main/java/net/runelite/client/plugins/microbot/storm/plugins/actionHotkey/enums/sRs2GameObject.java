@@ -1,10 +1,10 @@
 package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums;
 
-public enum Other implements Actionable {
-    PRINTLN("println");
+public enum sRs2GameObject implements Actionable {
+    OBJ_INTERACT("objinteract");
 
     private final String actions;
-    Other(String actions) {
+    sRs2GameObject(String actions) {
         this.actions = actions;
     }
 
