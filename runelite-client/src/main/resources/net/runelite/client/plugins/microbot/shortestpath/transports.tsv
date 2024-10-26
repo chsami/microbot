@@ -4495,3 +4495,11 @@
 2549 3112 1	2933 4712 2	Climb-down Ladder 2797
 2544 3112 1	2544 3112 0	Climb-down Ladder 17122
 2544 3112 0	2544 3112 1	Climb-down Ladder 17122
+
+# kourend
+1618 3680 0	1614 3680 1	Climb-up Staircase 11807
+1614 3680 1	1618 3680 0	Climb-down Staircase 11799
+1616 3686 1	1616 3686 2	Climb-up Staircase 12536
+1616 3686 2	1616 3686 1	Climb-down Staircase 12538
+1639 3673 0	1666 10050 0	Investigate Statue 27785
+1666 10050 0    1639 3673 0	Climb-up Vine ladder 28894
