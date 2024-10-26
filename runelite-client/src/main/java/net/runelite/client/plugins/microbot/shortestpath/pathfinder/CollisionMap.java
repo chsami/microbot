@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
-import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
@@ -75,7 +75,7 @@ public class CollisionMap {
     private final List<Node> neighbors = new ArrayList<>(16);
     private final boolean[] traversable = new boolean[8];
 
-    public List<Node> getNeighbors(Node node, VisitedTiles visited, PathfinderConfig config) {
+    public List<Node> getNeighbors(Node node, VisitedTiles visited, PathfinderConfig config, WorldPoint target) {
         final int x = WorldPointUtil.unpackWorldX(node.packedPosition);
         final int y = WorldPointUtil.unpackWorldY(node.packedPosition);
         final int z = WorldPointUtil.unpackWorldPlane(node.packedPosition);
@@ -95,8 +95,8 @@ public class CollisionMap {
             //EXCEPTION
             if (transport.getType() == TransportType.MINECART) {
                 //avoid using minecart if you ned to go dwarven mines or mining guild
-                if (ShortestPathPlugin.getPathfinder().getTarget().getRegionID() == 12183 || ShortestPathPlugin.getPathfinder().getTarget().getRegionID() == 12184
-                        || ShortestPathPlugin.getPathfinder().getTarget().getRegionID() == 12439 || ShortestPathPlugin.getPathfinder().getTarget().getRegionID() == 12951) {
+                if (target.getRegionID() == 12183 || target.getRegionID() == 12184
+                        || target.getRegionID() == 12439 || target.getRegionID() == 12951) {
                     continue;
                 }
             }

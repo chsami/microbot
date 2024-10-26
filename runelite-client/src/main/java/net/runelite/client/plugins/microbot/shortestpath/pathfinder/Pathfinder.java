@@ -86,7 +86,7 @@ public class Pathfinder implements Runnable {
     }
 
     private Node addNeighbors(Node node) {
-        List<Node> nodes = map.getNeighbors(node, visited, config);
+        List<Node> nodes = map.getNeighbors(node, visited, config, target);
         for (int i = 0; i < nodes.size(); ++i) {
             Node neighbor = nodes.get(i);
             if (neighbor.packedPosition == targetPacked) {

@@ -106,11 +106,13 @@ public class ShootingStarScript extends Script {
                         break;
                     case WALKING:
                         toggleLockState(true);
-
-                        if (Rs2Player.getWorld() != star.getWorldObject().getId()) {
-                            Microbot.hopToWorld(star.getWorldObject().getId());
-                            sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
-                            return;
+                        // if the player is in members area and want to hop to a f2p world, we detect this by the cantHopWorld boolean
+                        if (!Microbot.cantHopWorld) {
+                            if (Rs2Player.getWorld() != star.getWorldObject().getId()) {
+                                Microbot.hopToWorld(star.getWorldObject().getId());
+                                sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
+                                return;
+                            }
                         }
 
                         boolean isNearShootingStar = Rs2Player.getWorldLocation().distanceTo(star.getShootingStarLocation().getWorldPoint()) < 6;
@@ -118,11 +120,21 @@ public class ShootingStarScript extends Script {
                         if (!isNearShootingStar) {
                             WalkerState walkerState = Rs2Walker.walkWithState(star.getShootingStarLocation().getWorldPoint(), 6);
                             if (walkerState == WalkerState.UNREACHABLE) {
+                                plugin.ignoreStars.add(plugin.getSelectedStar());
                                 plugin.removeStar(plugin.getSelectedStar());
                                 plugin.updatePanelList(true);
                                 state = ShootingStarState.WAITING_FOR_STAR;
                             }
                             return;
+                        }
+
+                        // if the player is in members area and want to hop to a f2p world, we detect this by the cantHopWorld boolean
+                        if (Microbot.cantHopWorld) {
+                            if (Rs2Player.getWorld() != star.getWorldObject().getId()) {
+                                Microbot.hopToWorld(star.getWorldObject().getId());
+                                sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
+                                return;
+                            }
                         }
 
                         initialPlayerLocation = Rs2Player.getWorldLocation();
@@ -210,6 +222,7 @@ public class ShootingStarScript extends Script {
                 System.out.println("Total time for loop " + totalTime);
 
             } catch (Exception ex) {
+                ex.printStackTrace();
                 Microbot.log(ex.getMessage());
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
