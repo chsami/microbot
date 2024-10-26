@@ -160,7 +160,7 @@ public class Rs2Walker {
             int pathSize = path.size();
 
 
-            if (!path.get(pathSize - 1).equals(target)) {
+            if (path.get(pathSize - 1).distanceTo(target) > config.reachedDistance()) {
                 Microbot.log("Location impossible to reach");
                 setTarget(null);
                 return false;
@@ -194,6 +194,11 @@ public class Rs2Walker {
             }
 
             int indexOfStartPoint = getClosestTileIndex(path);
+            if (indexOfStartPoint == -1) {
+                Microbot.log("The walker is confused, unable to find our starting point in the web.");
+                setTarget(null);
+                return false;
+            }
             lastPosition = Rs2Player.getWorldLocation();
 
             if (Rs2Player.getWorldLocation().distanceTo(target) == 0) {
@@ -607,7 +612,7 @@ public class Rs2Walker {
         return IntStream.range(0, path.size())
                 .filter(i -> path.get(i).equals(startPoint))
                 .findFirst()
-                .orElse(0);
+                .orElse(-1);
     }
 
     /**
@@ -719,6 +724,7 @@ public class Rs2Walker {
                         continue;
                     if (path.stream().noneMatch(x -> x.equals(transport.getDestination()))) continue;
 
+                    // we don't need to check for teleportation_item & teleportation_spell as they will be set on the first tile
                     if (transport.getType() != TransportType.TELEPORTATION_ITEM && transport.getType() != TransportType.TELEPORTATION_SPELL) {
                         int indexOfOrigin = IntStream.range(0, path.size())
                                 .filter(f -> path.get(f).equals(transport.getOrigin()))
@@ -793,6 +799,7 @@ public class Rs2Walker {
                         if (handleGlider(transport)) {
                             sleepUntil(() -> !Rs2Player.isAnimating());
                             sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
+                            sleep(600 * 2); // wait 2 extra ticks before walking
                             break;
                         }
                     }
@@ -815,12 +822,6 @@ public class Rs2Walker {
                             sleepUntil(() -> !Rs2Player.isAnimating());
                             sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
                             break;
-                        }
-                    }
-
-                    if (transport.getType() == TransportType.MINECART) {
-                        if (interactWithAdventureLog(transport)) {
-                            sleep(600 * 2); // wait extra 2 game ticks before moving
                         }
                     }
 
@@ -865,6 +866,10 @@ public class Rs2Walker {
             if (handleObjectExceptions(tileObject)) return;
             if (transport.getType() == TransportType.AGILITY_SHORTCUT) {
                 Rs2Player.waitForAnimation();
+            }  if (transport.getType() == TransportType.MINECART) {
+                if (interactWithAdventureLog(transport)) {
+                    sleep(600 * 2); // wait extra 2 game ticks before moving
+                }
             } else {
                 Rs2Player.waitForWalking();
                 Rs2Dialogue.clickOption("Yes please"); //shillo village cart
@@ -1121,7 +1126,6 @@ public class Rs2Walker {
         // Find the spirit tree object
         TileObject spiritTree = Rs2GameObject.findObjectById(objectId);
         if (spiritTree == null) {
-            Microbot.log("Spirit tree not found.");
             return false;
         }
 
@@ -1143,14 +1147,16 @@ public class Rs2Walker {
         if (transport.getDisplayInfo() == null || transport.getDisplayInfo().isEmpty()) return false;
 
         // Wait for the widget to become visible
-        if (Rs2Widget.isHidden(ComponentID.ADVENTURE_LOG_CONTAINER)) {
+        boolean isAdventureLogVisible = sleepUntilTrue(() -> !Rs2Widget.isHidden(ComponentID.ADVENTURE_LOG_CONTAINER));
+
+        if (!isAdventureLogVisible) {
             Microbot.log("Widget did not become visible within the timeout.");
             return false;
         }
 
         char key = transport.getDisplayInfo().charAt(0);
         Rs2Keyboard.keyPress(key);
-        Microbot.log("Pressing: " + key);
+        Microbot.log("Traveling to " + transport.getDisplayInfo());
         return true;
     }
 
@@ -1177,7 +1183,6 @@ public class Rs2Walker {
             // Find the glider NPC
             NPC gnome = Rs2Npc.getNpc(npcName);  // Use the NPC name to find the NPC
             if (gnome == null) {
-                Microbot.log("Gnome not found.");
                 return false;
             }
 
