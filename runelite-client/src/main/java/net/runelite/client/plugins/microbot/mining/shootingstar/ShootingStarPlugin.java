@@ -62,7 +62,7 @@ public class ShootingStarPlugin extends Plugin {
     @Inject
     ShootingStarScript shootingStarScript;
 
-    public static String version = "1.1.0";
+    public static String version = "1.1.1";
     private String httpEndpoint;
     
     @Getter

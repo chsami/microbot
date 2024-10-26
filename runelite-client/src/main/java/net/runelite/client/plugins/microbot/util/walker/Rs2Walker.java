@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -53,14 +52,12 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2MiniMap.worldT
  * 1. fix teleports starting from inside the POH
  */
 public class Rs2Walker {
-    private static final ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
     @Setter
     public static ShortestPathConfig config;
     static int stuckCount = 0;
     static WorldPoint lastPosition;
     static WorldPoint currentTarget;
     static int nextWalkingDistance = 10;
-    private static ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     public static boolean walkTo(int x, int y, int plane) {
         return walkTo(x, y, plane, config.reachedDistance());
@@ -451,8 +448,11 @@ public class Rs2Walker {
     // takes an avg 200-300 ms
     // Used mainly for agility, might have to tweak this for other stuff
     public static boolean canReach(WorldPoint worldPoint, int sizeX, int sizeY, int pathSizeX, int pathSizeY) {
+        if (ShortestPathPlugin.getPathfinderConfig().getTransports().isEmpty()) {
+            ShortestPathPlugin.getPathfinderConfig().refresh();
+        }
         Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
-        pathfindingExecutor.submit(pathfinder);
+        pathfinder.run();
         sleepUntil(pathfinder::isDone);
         WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), pathSizeX, pathSizeY);
         WorldArea objectArea = new WorldArea(worldPoint, sizeX + 2, sizeY + 2);
@@ -463,8 +463,11 @@ public class Rs2Walker {
     // takes an avg 200-300 ms
     // Used mainly for agility, might have to tweak this for other stuff
     public static boolean canReach(WorldPoint worldPoint, int sizeX, int sizeY) {
+        if (ShortestPathPlugin.getPathfinderConfig().getTransports().isEmpty()) {
+            ShortestPathPlugin.getPathfinderConfig().refresh();
+        }
         Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
-        pathfindingExecutor.submit(pathfinder);
+        pathfinder.run();
         sleepUntil(pathfinder::isDone);
         WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 3, 3);
         WorldArea objectArea = new WorldArea(worldPoint, sizeX + 2, sizeY + 2);
@@ -473,11 +476,15 @@ public class Rs2Walker {
     }
 
     public static boolean canReach(WorldPoint worldPoint) {
+        if (ShortestPathPlugin.getPathfinderConfig().getTransports().isEmpty()) {
+            ShortestPathPlugin.getPathfinderConfig().refresh();
+        }
         Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
-        pathfindingExecutor.submit(pathfinder);
+        pathfinder.run();
         sleepUntil(pathfinder::isDone);
-        if (pathfinder.getPath().get(pathfinder.getPath().size() - 1).getPlane() != worldPoint.getPlane()) return false;
-        WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 2, 2);
+        List<WorldPoint> path = pathfinder.getPath();
+        if (path.get(path.size() - 1).getPlane() != worldPoint.getPlane()) return false;
+        WorldArea pathArea = new WorldArea(path.get(path.size() - 1), 2, 2);
         WorldArea objectArea = new WorldArea(worldPoint, 2, 2);
         return pathArea
                 .intersectsWith2D(objectArea);
