@@ -173,9 +173,6 @@ public class Transport {
                     Integer.parseInt(destinationArray[0]),
                     Integer.parseInt(destinationArray[1]),
                     Integer.parseInt(destinationArray[2])) : LOCATION_PERMUTATION;
-            if (destination != null && destination.equals(new WorldPoint(1670, 3833, 0))) {
-                System.out.println("yes");
-            }
         }
 
         //START microbot variables
@@ -190,16 +187,18 @@ public class Transport {
                 action = matcher.group(1);   // First group: the action (e.g., "Travel")
                 name = matcher.group(2);   // Second group: the target (e.g., "Spirit tree")
                 objectId = Integer.parseInt(matcher.group(3)); // Third group: the objectId (e.g., "26263")
-            } else if (value != null && !value.isEmpty()){
+            } else if (!value.isEmpty()){
                 System.out.println("failed to load transport " + value);
             }
         }
-        if ((value = fieldMap.get("Items")) != null && value.toLowerCase().contains("coins")) {
+        if ((value = fieldMap.get("Items")) != null) {
             // Split the string by space
             String[] parts = value.split(" ");
-            // Parse the first part as an integer amount
-            amtItemRequired = Integer.parseInt(parts[0]);
-            itemRequired = parts[1];
+            if (parts.length > 1) {
+                // Parse the first part as an integer amount
+                amtItemRequired = Integer.parseInt(parts[0]);
+                itemRequired = parts[1];
+            }
         }
         //END microbot variables
 
