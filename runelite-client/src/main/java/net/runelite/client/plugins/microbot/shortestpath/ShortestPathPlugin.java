@@ -48,7 +48,6 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.SplitFlagMap;
-import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -169,12 +168,10 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         SplitFlagMap map = SplitFlagMap.fromResources();
         Map<WorldPoint, Set<Transport>> transports = Transport.loadAllFromResources();
         List<Restriction> restrictions = Restriction.loadAllFromResources();
-        //TODO: transports contains empty action, name, objectid
         pathfinderConfig = new PathfinderConfig(map, transports, restrictions, client, config);
 
         Rs2Walker.setConfig(config);
         shortestPathScript = new ShortestPathScript();
-        shortestPathScript.run();
 
         overlayManager.add(pathOverlay);
         overlayManager.add(pathMinimapOverlay);
@@ -392,9 +389,9 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     private void onMenuOptionClicked(MenuEntry entry) {
         if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
             WorldPoint worldPoint = getSelectedWorldPoint();
-            // shortestPathScript.setTriggerWalker(worldPoint);
+             shortestPathScript.run(worldPoint);
             //For debugging you can use setTarget, it will calculate path without walking
-            setTarget(BankLocation.MINING_GUILD.getWorldPoint());
+            //setTarget(BankLocation.MINING_GUILD.getWorldPoint());
         }
 
         if (entry.getOption().equals(SET) && entry.getTarget().equals(START)) {
@@ -642,7 +639,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
          */
         if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
             Rs2Walker.setTarget(null);
-            shortestPathScript.setTriggerWalker(null);
+            shortestPathScript.shutdown();
         }
     }
 

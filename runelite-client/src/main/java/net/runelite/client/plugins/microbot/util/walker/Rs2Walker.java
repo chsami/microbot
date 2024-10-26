@@ -51,11 +51,6 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2MiniMap.worldT
 /**
  * TODO:
  * 1. fix teleports starting from inside the POH
- * 2. fix herb run for ectoplasm. Start at grand exchange.
- * Instead of using ectophial
- * it's trying to use fairy ring from edgeville.
- * Difference between steps is around +- 50 tiles
- * 3. Teleport scroll should work, todo: testing
  */
 public class Rs2Walker {
     private static final ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
@@ -63,50 +58,48 @@ public class Rs2Walker {
     public static ShortestPathConfig config;
     static int stuckCount = 0;
     static WorldPoint lastPosition;
-    static int idle = 0;
     static WorldPoint currentTarget;
     static int nextWalkingDistance = 10;
     private static ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-
-    public static boolean walkTo(WorldArea area, int distanceThreshold) {
-        if (area.distanceTo(Rs2Player.getWorldLocation()) > distanceThreshold) {
-            var points = area.toWorldPointList();
-            var index = new java.util.Random().nextInt(points.size());
-            return Rs2Walker.walkTo(points.get(index));
-        }
-        return true;
-    }
-
     public static boolean walkTo(int x, int y, int plane) {
-        return walkTo(x, y, plane, 6);
+        return walkTo(x, y, plane, config.reachedDistance());
     }
 
     public static boolean walkTo(int x, int y, int plane, int distance) {
-        return walkTo(new WorldPoint(x, y, plane), distance);
+        return walkWithState(new WorldPoint(x, y, plane), distance) == WalkerState.ARRIVED;
     }
 
 
     public static boolean walkTo(WorldPoint target) {
-        return walkTo(target, config.reachedDistance());
+        return walkWithState(target, config.reachedDistance()) == WalkerState.ARRIVED;
     }
 
     public static boolean walkTo(WorldPoint target, int distance) {
+        return walkWithState(target, distance) == WalkerState.ARRIVED;
+    }
+
+    /**
+     * Replaces the walkTo method
+     * @param target
+     * @param distance
+     * @return
+     */
+    public static WalkerState walkWithState(WorldPoint target, int distance) {
         if (Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance).containsKey(target)
                 || !Rs2Tile.isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target)) && Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
-            return true;
+            return WalkerState.ARRIVED;
         }
-        if (ShortestPathPlugin.getPathfinder() != null && !ShortestPathPlugin.getPathfinder().isDone()) return false;
+        if (ShortestPathPlugin.getPathfinder() != null && !ShortestPathPlugin.getPathfinder().isDone()) return WalkerState.MOVING;
         if ((currentTarget != null && currentTarget.equals(target)) && ShortestPathPlugin.getMarker() != null)
-            return false;
+            return WalkerState.MOVING;
         setTarget(target);
         ShortestPathPlugin.setReachedDistance(distance);
         stuckCount = 0;
-        idle = 0;
 
         if (Microbot.getClient().isClientThread()) {
             Microbot.log("Please do not call the walker from the main thread");
-            return false;
+            return WalkerState.EXIT;
         }
         /**
          * When running the walkTo method from scripts
@@ -115,7 +108,16 @@ public class Rs2Walker {
          * other actions while walking you can wrap the walkTo from within the script
          * on a seperate thread
          */
-        return coreWalk(target, distance);
+        return processWalk(target, distance);
+    }
+
+    /**
+     *
+     * @param target
+     * @return
+     */
+    public static WalkerState walkWithState(WorldPoint target) {
+        return walkWithState(target, config.reachedDistance());
     }
 
     /**
@@ -125,7 +127,7 @@ public class Rs2Walker {
      * @param target
      * @param distance
      */
-    private static boolean coreWalk(WorldPoint target, int distance) {
+    private static WalkerState processWalk(WorldPoint target, int distance) {
         try {
             if (!Microbot.isLoggedIn()) {
                 setTarget(null);
@@ -136,24 +138,24 @@ public class Rs2Walker {
                 }
                 boolean isInit = sleepUntilTrue(() -> ShortestPathPlugin.getPathfinder() != null, 100, 2000);
                 if (!isInit) {
-                    System.out.println("pathfinder is null: 139");
+                    Microbot.log("Pathfinder took to long to initialize, exiting walker: 139");
                     setTarget(null);
-                    return false;
+                    return WalkerState.EXIT;
                 }
             }
             if (!ShortestPathPlugin.getPathfinder().isDone()) {
                 boolean isDone = sleepUntilTrue(() -> ShortestPathPlugin.getPathfinder().isDone(), 100, 5000);
                 if (!isDone) {
-                    System.out.println("pathfinder is not done: 147");
+                    System.out.println("Pathfinder took to long to calculate path, exiting: 147");
                     setTarget(null);
-                    return false;
+                    return WalkerState.EXIT;
                 }
             }
 
             if (ShortestPathPlugin.getPathfinder() == null) {
-                System.out.println("pathfinder is null: 154");
+                Microbot.log("pathfinder is null, exiting: 154");
                 setTarget(null);
-                return false;
+                return WalkerState.EXIT;
             }
 
             List<WorldPoint> path = ShortestPathPlugin.getPathfinder().getPath();
@@ -163,7 +165,7 @@ public class Rs2Walker {
             if (path.get(pathSize - 1).distanceTo(target) > config.reachedDistance()) {
                 Microbot.log("Location impossible to reach");
                 setTarget(null);
-                return false;
+                return WalkerState.UNREACHABLE;
             }
 
             if (!path.isEmpty() && isNear(path.get(pathSize - 1))) {
@@ -190,20 +192,20 @@ public class Rs2Walker {
 
             if (ShortestPathPlugin.getPathfinder() == null) {
                 setTarget(null);
-                return false;
+                return WalkerState.EXIT;
             }
 
             int indexOfStartPoint = getClosestTileIndex(path);
             if (indexOfStartPoint == -1) {
-                Microbot.log("The walker is confused, unable to find our starting point in the web.");
+                Microbot.log("The walker is confused, unable to find our starting point in the web, exiting.");
                 setTarget(null);
-                return false;
+                return WalkerState.EXIT;
             }
             lastPosition = Rs2Player.getWorldLocation();
 
             if (Rs2Player.getWorldLocation().distanceTo(target) == 0) {
                 setTarget(null);
-                return true;
+                return WalkerState.ARRIVED;
             }
 
             // Edgeville/ardy wilderness lever warning
@@ -211,7 +213,7 @@ public class Rs2Walker {
                 Microbot.log("Detected Wilderness lever warning, interacting...");
                 Rs2Dialogue.clickContinue();
                 sleep(1200, 2400);
-                return true;
+                return WalkerState.MOVING;
             }
 
             // entering desert warning
@@ -223,7 +225,7 @@ public class Rs2Walker {
 
             if (Rs2Widget.enterWilderness()) {
                 sleepUntil(Rs2Player::isAnimating);
-                return true;
+                return WalkerState.MOVING;
             }
 
             boolean doorOrTransportResult = false;
@@ -289,17 +291,17 @@ public class Rs2Walker {
             }
             if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
                 setTarget(null);
-                return true;
+                return WalkerState.ARRIVED;
             } else {
-                return coreWalk(target, distance);
+                return processWalk(target, distance);
             }
         } catch (Exception ex) {
-            if (ex instanceof InterruptedException) return false;
+            if (ex instanceof InterruptedException) return WalkerState.EXIT;
             ex.printStackTrace(System.out);
             Microbot.log("Microbot Walker Exception " + ex.getMessage());
             System.out.println(ex.getMessage());
         }
-        return false;
+        return WalkerState.EXIT;
     }
 
     public static WorldPoint getPointWithWallDistance(WorldPoint target) {
