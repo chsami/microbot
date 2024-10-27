@@ -102,9 +102,9 @@ public class Rs2Npc {
         Stream<NPC> npcs = getNpcs();
 
         if (exact) {
-            npcs = npcs.filter(x -> x.getName().equalsIgnoreCase(name));
+            npcs = npcs.filter(x -> x!= null && x.getName().equalsIgnoreCase(name));
         } else {
-            npcs = npcs.filter(x -> x.getName().toLowerCase().contains(name.toLowerCase()));
+            npcs = npcs.filter(x -> x!= null && x.getName().toLowerCase().contains(name.toLowerCase()));
         }
 
         return npcs;

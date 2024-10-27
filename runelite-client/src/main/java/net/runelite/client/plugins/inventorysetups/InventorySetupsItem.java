@@ -33,7 +33,6 @@ public class InventorySetupsItem
 {
 	@Getter
 	private final int id;
-	@Getter
 	@Setter
 	private String name;
 	@Getter
@@ -63,6 +62,20 @@ public class InventorySetupsItem
 				item.getQuantity() == 0 &&
 				!item.isFuzzy() &&
 				(item.getStackCompare() == InventorySetupsStackCompareID.None || item.getStackCompare() == null);
+	}
+
+	public String getName() {
+		if (isFuzzy()) {
+			String[] splitItemName = name.split("\\(\\d+\\)$");
+			String itemName = "";
+			if (splitItemName.length == 0) {
+				itemName = name;
+			} else {
+				itemName = splitItemName[0];
+			}
+			return itemName;
+		}
+		return name;
 	}
 
 }

@@ -202,6 +202,9 @@ public class MicrobotPlugin extends Plugin {
         if (event.getType() == ChatMessageType.ENGINE && event.getMessage().equalsIgnoreCase("I can't reach that!")) {
             Microbot.cantReachTarget = true;
         }
+        if (event.getType() == ChatMessageType.GAMEMESSAGE && event.getMessage().toLowerCase().contains("you can't log into a non-members")) {
+            Microbot.cantHopWorld = true;
+        }
         Microbot.getPouchScript().onChatMessage(event);
     }
 

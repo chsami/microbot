@@ -41,25 +41,54 @@ public class Rs2Equipment {
         }
     }
 
-    public static void useRingAction(JewelleryLocationEnum jewelleryLocationEnum) {
+    public static boolean useCapeAction(int itemId, String action) {
+        if (!hasEquippedSlot(EquipmentInventorySlot.CAPE)) {
+            Microbot.status = "Cape is missing in the equipment slot";
+            return false;
+        }
+
+        Rs2Item item = get(itemId);
+
+        if (item== null) {
+            return false;
+        }
+
+        int identifier = -1;
+        for (int i = 0; i < item.getEquipmentActions().size(); i++) {
+            if (item.getEquipmentActions().get(i) != null && item.getEquipmentActions().get(i).toLowerCase().contains(action.toLowerCase())) {
+                identifier = i + 2;
+                break;
+            }
+        }
+
+        if (identifier < 0) {
+            Microbot.log("Failed to find action: " + action + " in your cape slot");
+            return false;
+        }
+
+        Microbot.doInvoke(new NewMenuEntry(-1, 25362448, MenuAction.CC_OP.getId(), identifier, -1, action),
+                new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+        return true;
+    }
+
+    public static boolean useRingAction(JewelleryLocationEnum jewelleryLocationEnum) {
         if (!hasEquippedSlot(EquipmentInventorySlot.RING)) {
             Microbot.status = "Amulet is missing in the equipment slot";
-            return;
+            return false;
         }
         Microbot.doInvoke(new NewMenuEntry(-1, 25362456, MenuAction.CC_OP.getId(), jewelleryLocationEnum.getIdentifier(), -1, "Equip"),
                 new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
-
-        //Rs2Reflection.invokeMenu(-1, 25362456, MenuAction.CC_OP.getId(), jewelleryLocationEnum.getIdentifier(), -1, "Equip", "", -1, -1);
+        return true;
     }
 
-    public static void useAmuletAction(JewelleryLocationEnum jewelleryLocationEnum) {
+    public static boolean useAmuletAction(JewelleryLocationEnum jewelleryLocationEnum) {
         if (!hasEquippedSlot(EquipmentInventorySlot.AMULET) || !hasEquippedContains(jewelleryLocationEnum.getTooltip())) {
             Microbot.status = "Amulet is missing in the equipment slot";
-            return;
+            return false;
         }
         Microbot.doInvoke(new NewMenuEntry(-1, 25362449, MenuAction.CC_OP.getId(), jewelleryLocationEnum.getIdentifier(), -1, "Equip"),
                 new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
-        //Rs2Reflection.invokeMenu(-1, 25362449, MenuAction.CC_OP.getId(), jewelleryLocationEnum.getIdentifier(), -1, "Equip", "", -1, -1);
+        return true;
     }
 
 
@@ -227,6 +256,19 @@ public class Rs2Equipment {
      */
     public static boolean unEquip(int id) {
         return interact(id, "remove");
+    }
+
+    public static boolean unEquip(EquipmentInventorySlot slot) {
+        return interact(slot, "remove");
+    }
+
+    public static boolean interact(EquipmentInventorySlot slot, String action) {
+        Rs2Item item = get(slot);
+        if (item != null) {
+            invokeMenu(item, action);
+            return true;
+        }
+        return false;
     }
 
     /**

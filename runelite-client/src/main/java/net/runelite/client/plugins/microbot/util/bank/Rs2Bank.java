@@ -1097,8 +1097,10 @@ public class Rs2Bank {
 
 
             if (nearest == null || currDist < dist) {
-                dist = currDist;
-                nearest = bankLocation;
+                if (Rs2Walker.canReach(bankLocation.getWorldPoint())) {
+                    dist = currDist;
+                    nearest = bankLocation;
+                }
             }
         }
         return nearest;

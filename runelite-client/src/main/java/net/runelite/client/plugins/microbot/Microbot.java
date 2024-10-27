@@ -131,6 +131,8 @@ public class Microbot {
     private static PouchScript pouchScript;
 
     public static boolean cantReachTarget = false;
+    public static boolean cantHopWorld = false;
+
     public static int cantReachTargetRetries = 0;
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
@@ -199,6 +201,7 @@ public class Microbot {
     public static boolean hopToWorld(int worldNumber) {
         if (!Microbot.isLoggedIn()) return false;
         if (Microbot.isHopping()) return true;
+        if (Microbot.cantHopWorld) return false;
         boolean isHopping = Microbot.getClientThread().runOnClientThread(() -> {
             if (Microbot.getClient().getLocalPlayer() != null && Microbot.getClient().getLocalPlayer().isInteracting())
                 return false;
@@ -385,6 +388,10 @@ public class Microbot {
 
     public static boolean isPluginEnabled(Class c) {
         return isPluginEnabled(c.getName());
+    }
+
+    public static QuestState getQuestState(Quest quest) {
+        return getClientThread().runOnClientThread(() -> quest.getState(client));
     }
 }
 

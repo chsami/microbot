@@ -41,7 +41,7 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 
 public class MageTrainingArenaScript extends Script {
-    public static String version = "1.1.1";
+    public static String version = "1.1.2";
 
     private static boolean firstTime = false;
 
@@ -52,7 +52,6 @@ public class MageTrainingArenaScript extends Script {
     private Rooms currentRoom;
     private int nextHpThreshold = 50;
     private Boolean btp = null;
-    private int lastAlchTick = 0;
     private int shapesToPick = 3;
 
     @Getter
@@ -293,7 +292,6 @@ public class MageTrainingArenaScript extends Script {
             if (!Rs2Walker.walkTo(new WorldPoint(3363, 9640, 0)))
                 return;
 
-            Rs2Walker.setTarget(null);
             Rs2GameObject.interact(ObjectID.HOLE_23698, "Deposit");
             Rs2Player.waitForWalking();
             return;
@@ -378,9 +376,15 @@ public class MageTrainingArenaScript extends Script {
         if (room.getTarget() != null)
             target = room.getTarget();
         else {
-            Rs2Walker.walkTo(teleRoom.getMaze());
+            Rs2Walker.walkTo(teleRoom.getMaze(), 2);
             sleepUntil(() -> room.getTarget() != null, 10_000);
-            Rs2Walker.setTarget(null);
+            // MageTrainingArenaScript is dependant on the official mage arena plugin of runelite
+            // In some cases it glitches out and target is not defined by an arrow, in this case we will reset them room
+            if (room.getTarget() == null) {
+                Microbot.log("Something seems wrong, room target was still not found...leaving room to reset.");
+                leaveRoom();
+                return;
+            }
             target = room.getTarget();
             sleep(400, 600);
         }
@@ -403,7 +407,6 @@ public class MageTrainingArenaScript extends Script {
                         || !Microbot.getClient().getLocalDestinationLocation().equals(localTarget))) {
                 if (Rs2Camera.isTileOnScreen(localTarget) && Rs2Player.getWorldLocation().distanceTo(targetConverted) < 10) {
                     Rs2Walker.walkFastCanvas(targetConverted);
-                    Rs2Walker.setTarget(null);
                     sleepGaussian(600, 150);
                 } else {
                     Rs2Walker.walkTo(targetConverted);
@@ -498,12 +501,7 @@ public class MageTrainingArenaScript extends Script {
         var best = room.getBest();
         var item = Rs2Inventory.get(best.getId());
         if (item != null) {
-            if (lastAlchTick + 3 > Microbot.getClient().getTickCount()) {
-                sleepUntil(() -> lastAlchTick + 3 <= Microbot.getClient().getTickCount());
-                sleepGaussian(150, 30);
-            }
             Rs2Magic.alch(item);
-            lastAlchTick = Microbot.getClient().getTickCount();
             return;
         }
 
@@ -602,7 +600,6 @@ public class MageTrainingArenaScript extends Script {
         if (!Rs2Walker.walkTo(exit))
             return;
 
-        Rs2Walker.setTarget(null);
         Rs2GameObject.interact(ObjectID.EXIT_TELEPORT, "Enter");
         Rs2Player.waitForWalking();
     }
