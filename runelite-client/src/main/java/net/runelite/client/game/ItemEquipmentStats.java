@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
- * Copyright (c) 2018, Ron Young <https://github.com/raiyni>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,29 +22,59 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.banktags.tabs;
+package net.runelite.client.game;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.google.gson.annotations.SerializedName;
+import lombok.Builder;
+import lombok.Value;
 
-/**
- * A bank tag tab. This represents one of the tabs on the left hand side of the bank.
- *
- * @see TabManager#add(TagTab)
- * @see TabManager#remove(String)
- */
-@Data
-@EqualsAndHashCode(of = "tag")
-@NoArgsConstructor
-public class TagTab
+@Value
+@Builder
+public class ItemEquipmentStats
 {
-	private String tag;
-	private int iconItemId;
+	int slot;
 
-	TagTab(int iconItemId, String tag)
+	@SerializedName("is2h")
+	boolean isTwoHanded;
+
+	int astab;
+	int aslash;
+	int acrush;
+	int amagic;
+	int arange;
+
+	int dstab;
+	int dslash;
+	int dcrush;
+	int dmagic;
+	int drange;
+
+	int str;
+	int rstr;
+	float mdmg;
+	int prayer;
+	int aspeed;
+
+	net.runelite.http.api.item.ItemEquipmentStats toHttpApiFormat()
 	{
-		this.iconItemId = iconItemId;
-		this.tag = tag;
+		return net.runelite.http.api.item.ItemEquipmentStats.builder()
+			.slot(this.slot)
+			.isTwoHanded(this.isTwoHanded)
+			.astab(this.astab)
+			.aslash(this.aslash)
+			.acrush(this.acrush)
+			.amagic(this.amagic)
+			.arange(this.arange)
+			.dstab(this.dstab)
+			.dslash(this.dslash)
+			.dcrush(this.dcrush)
+			.dmagic(this.dmagic)
+			.drange(this.drange)
+			.str(this.str)
+			.rstr(this.rstr)
+			.mdmg((int) this.mdmg)
+			.prayer(this.prayer)
+			.aspeed(this.aspeed)
+			.build();
 	}
 }

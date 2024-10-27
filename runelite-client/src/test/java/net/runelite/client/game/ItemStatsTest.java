@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
- * Copyright (c) 2018, Ron Young <https://github.com/raiyni>
+ * Copyright (c) 2024, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,29 +22,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.banktags.tabs;
+package net.runelite.client.game;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import net.runelite.api.EquipmentInventorySlot;
+import org.junit.Test;
 
-/**
- * A bank tag tab. This represents one of the tabs on the left hand side of the bank.
- *
- * @see TabManager#add(TagTab)
- * @see TabManager#remove(String)
- */
-@Data
-@EqualsAndHashCode(of = "tag")
-@NoArgsConstructor
-public class TagTab
+public class ItemStatsTest
 {
-	private String tag;
-	private int iconItemId;
+	private static final ItemStats WEAPON = new ItemStats(true, 0, 0,
+		ItemEquipmentStats.builder()
+			.slot(EquipmentInventorySlot.WEAPON.getSlotIdx())
+			.build());
 
-	TagTab(int iconItemId, String tag)
+	@Test
+	public void testMigratedApiDoesNotThrow()
 	{
-		this.iconItemId = iconItemId;
-		this.tag = tag;
+		new ItemStats(true, 0, 0, null).toHttpApiFormat();
+		WEAPON.toHttpApiFormat();
 	}
 }
