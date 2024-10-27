@@ -6,6 +6,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.plugins.microbot.util.walker.WalkerState;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +25,10 @@ public class ShortestPathScript extends Script {
                 if (!Microbot.isLoggedIn()) return;
 
                 if (getTriggerWalker() != null) {
-                    Rs2Walker.walkWithState(getTriggerWalker());
+                    WalkerState state = Rs2Walker.walkWithState(getTriggerWalker());
+                    if (state == WalkerState.ARRIVED || state == WalkerState.UNREACHABLE) {
+                        setTriggerWalker(null);
+                    }
                 }
 
             } catch (Exception ex) {
