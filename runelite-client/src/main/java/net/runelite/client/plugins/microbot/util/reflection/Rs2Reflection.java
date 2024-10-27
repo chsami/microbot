@@ -1,10 +1,7 @@
 package net.runelite.client.plugins.microbot.util.reflection;
 
 import lombok.SneakyThrows;
-import net.runelite.api.ItemComposition;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.NPC;
-import net.runelite.api.ObjectID;
+import net.runelite.api.*;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -29,6 +26,11 @@ public class Rs2Reflection {
      */
     static int sequence = 1036457443;
 
+    /**
+     * Credits to EthanApi
+     * @param npc
+     * @return
+     */
     @SneakyThrows
     public static int getAnimation(NPC npc) {
         if (npc == null) {
@@ -149,5 +151,66 @@ public class Rs2Reflection {
         }
         System.out.println("[INVOKE] => param0: " + param0 + " param1: " + param1 + " opcode: " + opcode + " id: " + identifier + " itemid: " + itemId);
         doAction.setAccessible(false);
+    }
+
+    /**
+     * Credits to EthanApi
+     * @param npc
+     * @return
+     */
+    @SneakyThrows
+    public static HeadIcon getHeadIcon(NPC npc) {
+        Field aq = npc.getClass().getDeclaredField("aq");
+        aq.setAccessible(true);
+        Object aqObj = aq.get(npc);
+        if (aqObj == null) {
+            aq.setAccessible(false);
+            return getOldHeadIcon(npc);
+        }
+        Field aeField = aqObj.getClass().getDeclaredField("ae");
+        aeField.setAccessible(true);
+        short[] ae = (short[]) aeField.get(aqObj);
+        aeField.setAccessible(false);
+        aq.setAccessible(false);
+        if (ae == null) {
+            return getOldHeadIcon(npc);
+        }
+        if (ae.length == 0) {
+            return getOldHeadIcon(npc);
+        }
+        short headIcon = ae[0];
+        if (headIcon == -1) {
+            return getOldHeadIcon(npc);
+        }
+        return HeadIcon.values()[headIcon];
+    }
+
+    /**
+     * Credits to EthanApi
+     * @param npc
+     * @return
+     */
+    @SneakyThrows
+    public static HeadIcon getOldHeadIcon(NPC npc) {
+        Method getHeadIconMethod;
+        for (Method declaredMethod : npc.getClass().getDeclaredMethods()) {
+            if (declaredMethod.getName().length() == 2 && declaredMethod.getReturnType() == short[].class && declaredMethod.getParameterCount() == 0) {
+                getHeadIconMethod = declaredMethod;
+                getHeadIconMethod.setAccessible(true);
+                short[] headIcon = null;
+                try {
+                    headIcon = (short[]) getHeadIconMethod.invoke(npc);
+                } catch (Exception e) {
+                    //nothing
+                }
+                getHeadIconMethod.setAccessible(false);
+
+                if (headIcon == null) {
+                    continue;
+                }
+                return HeadIcon.values()[headIcon[0]];
+            }
+        }
+        return null;
     }
 }
