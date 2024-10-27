@@ -148,7 +148,8 @@ public interface ShortestPathConfig extends Config {
             description = "Whether to include teleportation items from the player's inventory and equipment.<br>" +
                     "Options labelled (perm) only use permanent non-charge items.",
             position = 12,
-            section = sectionSettings
+            section = sectionSettings,
+            hidden = true
     )
     default TeleportationItem useTeleportationItems() {
         return TeleportationItem.INVENTORY;
