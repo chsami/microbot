@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
- * Copyright (c) 2018, Ron Young <https://github.com/raiyni>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,29 +22,25 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.banktags.tabs;
+package net.runelite.client.game;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.google.gson.annotations.SerializedName;
+import lombok.Value;
 
-/**
- * A bank tag tab. This represents one of the tabs on the left hand side of the bank.
- *
- * @see TabManager#add(TagTab)
- * @see TabManager#remove(String)
- */
-@Data
-@EqualsAndHashCode(of = "tag")
-@NoArgsConstructor
-public class TagTab
+@Value
+public class ItemStats
 {
-	private String tag;
-	private int iconItemId;
+	boolean equipable;
+	double weight;
+	@SerializedName("ge_limit")
+	int geLimit;
 
-	TagTab(int iconItemId, String tag)
+	ItemEquipmentStats equipment;
+
+	net.runelite.http.api.item.ItemStats toHttpApiFormat()
 	{
-		this.iconItemId = iconItemId;
-		this.tag = tag;
+		var equipment = this.equipment == null ? null : this.equipment.toHttpApiFormat();
+		return new net.runelite.http.api.item.ItemStats(this.equipable, this.weight, this.geLimit, equipment);
 	}
 }
+
