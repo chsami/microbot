@@ -250,6 +250,7 @@ public class PathTileOverlay extends Overlay {
     }
 
     private void drawCounter(Graphics2D graphics, double x, double y, int counter) {
+        if (plugin.getPathfinder() == null) return;
         if (counter >= 0 && !TileCounter.DISABLED.equals(config.showTileCounter())) {
             int n = config.tileCounterStep() > 0 ? config.tileCounterStep() : 1;
             int s = plugin.getPathfinder().getPath().size();

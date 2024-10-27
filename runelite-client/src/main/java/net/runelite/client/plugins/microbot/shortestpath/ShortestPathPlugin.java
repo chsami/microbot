@@ -172,6 +172,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
 
         Rs2Walker.setConfig(config);
         shortestPathScript = new ShortestPathScript();
+        shortestPathScript.run();
 
         overlayManager.add(pathOverlay);
         overlayManager.add(pathMinimapOverlay);
@@ -389,7 +390,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     private void onMenuOptionClicked(MenuEntry entry) {
         if (entry.getOption().equals(SET) && entry.getTarget().equals(TARGET)) {
             WorldPoint worldPoint = getSelectedWorldPoint();
-             shortestPathScript.run(worldPoint);
+            shortestPathScript.setTriggerWalker(worldPoint);
             //For debugging you can use setTarget, it will calculate path without walking
             //setTarget(BankLocation.MINING_GUILD.getWorldPoint());
         }
@@ -639,7 +640,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
          */
         if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
             Rs2Walker.setTarget(null);
-            shortestPathScript.shutdown();
+            shortestPathScript.setTriggerWalker(null);
         }
     }
 

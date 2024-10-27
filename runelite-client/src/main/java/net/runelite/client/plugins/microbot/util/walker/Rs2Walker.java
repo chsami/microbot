@@ -78,6 +78,7 @@ public class Rs2Walker {
 
     /**
      * Replaces the walkTo method
+     *
      * @param target
      * @param distance
      * @return
@@ -87,7 +88,8 @@ public class Rs2Walker {
                 || !Rs2Tile.isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target)) && Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
             return WalkerState.ARRIVED;
         }
-        if (ShortestPathPlugin.getPathfinder() != null && !ShortestPathPlugin.getPathfinder().isDone()) return WalkerState.MOVING;
+        if (ShortestPathPlugin.getPathfinder() != null && !ShortestPathPlugin.getPathfinder().isDone())
+            return WalkerState.MOVING;
         if ((currentTarget != null && currentTarget.equals(target)) && ShortestPathPlugin.getMarker() != null)
             return WalkerState.MOVING;
         setTarget(target);
@@ -109,7 +111,6 @@ public class Rs2Walker {
     }
 
     /**
-     *
      * @param target
      * @return
      */
@@ -198,6 +199,7 @@ public class Rs2Walker {
                 setTarget(null);
                 return WalkerState.EXIT;
             }
+
             lastPosition = Rs2Player.getWorldLocation();
 
             if (Rs2Player.getWorldLocation().distanceTo(target) == 0) {
@@ -605,18 +607,21 @@ public class Rs2Walker {
      * @return closest tile index
      */
     public static int getClosestTileIndex(List<WorldPoint> path) {
-        WorldPoint startPoint;
 
         var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 20);
 
-        startPoint = path.stream()
-                .min(Comparator.comparingInt(a -> {
-                    if (tiles.containsKey(a))
-                        return tiles.get(a);
+        if (tiles.keySet().isEmpty()) return 1; //start on index 1, instead of 0. 0 can contain teleports
 
-                    return Integer.MAX_VALUE;
-                }))
+        WorldPoint startPoint = path.stream()
+                .min(Comparator.comparingInt(a -> tiles.getOrDefault(a, Integer.MAX_VALUE)))
                 .orElse(null);
+
+        boolean noMatchingTileFound = path.stream()
+                .allMatch(a -> tiles.getOrDefault(a, Integer.MAX_VALUE) == Integer.MAX_VALUE);
+
+        if (startPoint == null || noMatchingTileFound) {
+           return 1; //start on index 1, instead of 0. 0 can contain teleports
+        }
 
         return IntStream.range(0, path.size())
                 .filter(i -> path.get(i).equals(startPoint))
@@ -766,10 +771,10 @@ public class Rs2Walker {
                                 Rs2Npc.interact(npc, action);
                                 Rs2Player.waitForWalking();
                                 sleep(600 * 2);
-                               if (Rs2Dialogue.clickOption("I'm just going to Pirates' cove")) {
-                                   sleep(600 * 2);
-                                   Rs2Dialogue.clickContinue();
-                               }
+                                if (Rs2Dialogue.clickOption("I'm just going to Pirates' cove")) {
+                                    sleep(600 * 2);
+                                    Rs2Dialogue.clickContinue();
+                                }
                             } else {
                                 Rs2Walker.walkFastCanvas(path.get(i));
                                 sleep(1200, 1600);
@@ -875,7 +880,8 @@ public class Rs2Walker {
             if (handleObjectExceptions(tileObject)) return;
             if (transport.getType() == TransportType.AGILITY_SHORTCUT) {
                 Rs2Player.waitForAnimation();
-            }  if (transport.getType() == TransportType.MINECART) {
+            }
+            if (transport.getType() == TransportType.MINECART) {
                 if (interactWithAdventureLog(transport)) {
                     sleep(600 * 2); // wait extra 2 game ticks before moving
                 }
