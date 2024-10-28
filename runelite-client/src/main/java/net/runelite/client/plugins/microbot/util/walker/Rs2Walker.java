@@ -30,6 +30,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
@@ -737,6 +738,7 @@ public class Rs2Walker {
                     if (origin != null && origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                         continue;
                     if (path.stream().noneMatch(x -> x.equals(transport.getDestination()))) continue;
+                    if (Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 3) continue;
 
                     // we don't need to check for teleportation_item & teleportation_spell as they will be set on the first tile
                     if (transport.getType() != TransportType.TELEPORTATION_ITEM && transport.getType() != TransportType.TELEPORTATION_SPELL) {
@@ -835,6 +837,7 @@ public class Rs2Walker {
                         if (handleTeleportSpell(transport)) {
                             sleepUntil(() -> !Rs2Player.isAnimating());
                             sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
+                            Rs2Tab.switchToInventoryTab();
                             break;
                         }
                     }
@@ -955,7 +958,7 @@ public class Rs2Walker {
             if (itemAction.equalsIgnoreCase("rub")) {
                 //Xeric talisman opens a different interface than amulet of glory
                 if (Rs2Inventory.interact(itemId, itemAction)) {
-                    if (itemId == ItemID.XERICS_TALISMAN) {
+                    if (itemId == ItemID.XERICS_TALISMAN ||  transport.getDisplayInfo().toLowerCase().contains("skills necklace")) {
                         interactWithAdventureLog(transport);
                     } else {
                         sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
@@ -985,9 +988,8 @@ public class Rs2Walker {
         if (Rs2Equipment.isWearing(itemId)) {
             if (transport.getDisplayInfo().contains(":")) {
                 String[] values = transport.getDisplayInfo().split(":");
-                String itemName = values[0].trim().toLowerCase();
                 String destination = values[1].trim().toLowerCase();
-                Rs2Item rs2Item = Rs2Equipment.get(itemName);
+                Rs2Item rs2Item = Rs2Equipment.get(itemId);
                 Rs2Equipment.invokeMenu(rs2Item, destination);
                 return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
             }

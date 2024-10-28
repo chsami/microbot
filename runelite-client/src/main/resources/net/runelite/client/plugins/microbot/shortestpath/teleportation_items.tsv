@@ -43,12 +43,12 @@
 2653 3439 0			11118;11120;11122;11124;11972;11974		4	Combat bracelet: Ranging Guild	T	30	
 									
 # Skills Necklace (1-6) (uncharged is 11113)									
-2611 3390 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Fishing Guild	T	30	
-3049 9763 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Mining Guild	T	30	
-2933 3295 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Crafting Guild	T	30	
-3144 3438 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Cooks' Guild	T	30	
-1662 3505 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Woodcutting Guild	T	30	
-1248 3719 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Farming Guild	T	30	
+2611 3390 0			11105;11107;11109;11111;11968;11970		4	1. Skills necklace: Fishing Guild	T	30
+3049 9763 0			11105;11107;11109;11111;11968;11970		4	2. Skills necklace: Mining Guild	T	30
+2933 3295 0			11105;11107;11109;11111;11968;11970		4	3. Skills necklace: Crafting Guild	T	30
+3144 3438 0			11105;11107;11109;11111;11968;11970		4	4. Skills necklace: Cooks' Guild	T	30
+1662 3505 0			11105;11107;11109;11111;11968;11970		4	5. Skills necklace: Woodcutting Guild	T	30
+1248 3719 0			11105;11107;11109;11111;11968;11970		4	6. Skills necklace: Farming Guild	T	30
 									
 # Amulet of Glory (1-6, 1t-6t, Eternal) (uncharged is 1704, trimmed 10362)									
 3087 3496 0			1706;1708;1710;1712;11976;11978;10360;10358;10356;10354;11966;11964;19707		4	Amulet of glory: Edgeville	T	30	
@@ -289,7 +289,7 @@
 # todo: this only works if you've used a Slepey tablet on the medallion									
 3808 9700 0			22400		4	Drakan's medallion: Slepe	F	20
 #mythical cape (instead of using the item name we use the action teleport, we use the itemids to verifiy the item)
-2457 2850 0			21913;22114;24855		4	Teleport	F	20
+2457 2850 0			21913;22114;24855		4	Mythical cape: Teleport	F	20
 # Stony Basalt - 4493 is DIARY_FREMENNIK_HARD									
 2845 3694 0			22601		4	Stony basalt	T	20	
 2837 3695 0		73 Agility	22601		4	Stony basalt: Roof	T	20	4493=1

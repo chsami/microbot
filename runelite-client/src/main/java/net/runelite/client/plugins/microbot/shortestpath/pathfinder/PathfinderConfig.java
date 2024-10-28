@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.shortestpath.*;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -129,6 +130,7 @@ public class PathfinderConfig {
             refreshTransports();
             //START microbot variables
             refreshRestrictionData();
+            Rs2Tab.switchToInventoryTab();
             //END microbot variables
         }
     }
