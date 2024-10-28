@@ -295,18 +295,6 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
             }
         }
     }
-    
-    public void startTravelToLocation(WorldPoint point) {
-        if (point != null) {
-            Microbot.log("Web walking starting. Traveling to Custom Location (" + point.getX() + ", " + point.getY() + ", " + point.getPlane() + ").");
-            Rs2Walker.walkTo(point);
-        }
-    }
-    
-    void stopTraveling() {
-        Microbot.log("Web walking stopping...");
-        Rs2Walker.setTarget(null);
-    }
 
     @Subscribe
     public void onPluginMessage(PluginMessage event) {
