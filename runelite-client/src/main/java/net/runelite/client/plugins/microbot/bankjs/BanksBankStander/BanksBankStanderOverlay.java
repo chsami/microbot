@@ -25,7 +25,28 @@ public class BanksBankStanderOverlay extends OverlayPanel {
                     .text("Bank's BankStander V" + BanksBankStanderScript.version)
                     .color(Color.GREEN)
                     .build());
-
+            ///* Added by Storm
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Items processed : " + BanksBankStanderScript.itemsProcessed)
+                    .leftColor(Color.GREEN)
+                    .build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Item 1 : " + BanksBankStanderScript.firstIdentity)
+                    .leftColor(Color.GREEN)
+                    .build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Item 2 : " + BanksBankStanderScript.secondIdentity)
+                    .leftColor(Color.GREEN)
+                    .build());
+            if(BanksBankStanderScript.fourItems){
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Item 3 : " + BanksBankStanderScript.thirdIdentity)
+                    .leftColor(Color.GREEN)
+                    .build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Item 4 : " + BanksBankStanderScript.fourthIdentity)
+                    .leftColor(Color.GREEN)
+                    .build()); }//*/ Added by Storm
             panelComponent.getChildren().add(LineComponent.builder().build());
 
             panelComponent.getChildren().add(LineComponent.builder()
