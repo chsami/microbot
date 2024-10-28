@@ -22,6 +22,7 @@ package net.runelite.client.plugins.microbot.shortestpath;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Point;
@@ -48,10 +49,13 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.SplitFlagMap;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.JagexColors;
+import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
@@ -117,6 +121,9 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     private PathMapTooltipOverlay pathMapTooltipOverlay;
 
     @Inject
+    private ClientToolbar clientToolbar;
+
+    @Inject
     private DebugOverlayPanel debugOverlayPanel;
 
     @Inject
@@ -128,11 +135,13 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     private KeyManager keyManager;
 
     private Point lastMenuOpenedPoint;
+    private ShortestPathPanel panel;
     @Getter
     @Setter
     public static WorldMapPoint marker;
     @Setter
     public static WorldPoint lastLocation = new WorldPoint(0, 0, 0);
+    private NavigationButton navButton;
     private Shape minimapClipFixed;
     private Shape minimapClipResizeable;
     private BufferedImage minimapSpriteFixed;
@@ -157,6 +166,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
     public static boolean startPointSet = false;
     @Setter
     private static int reachedDistance;
+    @Getter(AccessLevel.PACKAGE)
     private ShortestPathScript shortestPathScript;
     @Provides
     public ShortestPathConfig provideConfig(ConfigManager configManager) {
@@ -169,6 +179,21 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         Map<WorldPoint, Set<Transport>> transports = Transport.loadAllFromResources();
         List<Restriction> restrictions = Restriction.loadAllFromResources();
         pathfinderConfig = new PathfinderConfig(map, transports, restrictions, client, config);
+
+        panel = injector.getInstance(ShortestPathPanel.class);
+        BufferedImage icon;
+        try {
+            icon = ImageUtil.loadImageResource(ShortestPathPlugin.class, "/net/runelite/client/plugins/microbot/shortestpath/panel_icon.png");
+        } catch (IllegalArgumentException e) {
+            icon = null;
+        }
+        navButton = NavigationButton.builder()
+                .tooltip("Web Walker")
+                .icon(icon)
+                .priority(8)
+                .panel(panel)
+                .build();
+        clientToolbar.addNavigation(navButton);
 
         Rs2Walker.setConfig(config);
         shortestPathScript = new ShortestPathScript();
@@ -269,6 +294,18 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
                 restartPathfinding(pathfinder.getStart(), pathfinder.getTarget());
             }
         }
+    }
+    
+    public void startTravelToLocation(WorldPoint point) {
+        if (point != null) {
+            Microbot.log("Web walking starting. Traveling to Custom Location (" + point.getX() + ", " + point.getY() + ", " + point.getPlane() + ").");
+            Rs2Walker.walkTo(point);
+        }
+    }
+    
+    void stopTraveling() {
+        Microbot.log("Web walking stopping...");
+        Rs2Walker.setTarget(null);
     }
 
     @Subscribe
