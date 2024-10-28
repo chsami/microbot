@@ -7,6 +7,7 @@ public enum Farming {
     NONE("None"),
     ALLOTMENTS("Allotments"),
     BUSHES("Bushes"),
+    COMPOST_BINS("Compost Bins"),
     FRUIT_TREES("Fruit Trees"),
     HERBS("Herbs"),
     HOPS("Hops"),

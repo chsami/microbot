@@ -31,6 +31,7 @@ public class ShortestPathPanel extends PluginPanel {
     private JComboBox<Herbs> herbsComboBox;
     private JComboBox<Hops> hopsComboBox;
     private JComboBox<Trees> treesComboBox;
+    private JComboBox<CompostBins> compostBinsComboBox;
 
     @Inject
     private ShortestPathPanel(ShortestPathPlugin plugin) {
@@ -215,8 +216,9 @@ public class ShortestPathPanel extends PluginPanel {
         herbsComboBox = new JComboBox<>(Herbs.values());
         hopsComboBox = new JComboBox<>(Hops.values());
         treesComboBox = new JComboBox<>(Trees.values());
+        compostBinsComboBox = new JComboBox<>(CompostBins.values());
 
-        JComboBox<?>[] subComboBoxes = {allotmentsComboBox, bushesComboBox, fruitTreesComboBox, herbsComboBox, hopsComboBox, treesComboBox};
+        JComboBox<?>[] subComboBoxes = {allotmentsComboBox, bushesComboBox, fruitTreesComboBox, herbsComboBox, hopsComboBox, treesComboBox, compostBinsComboBox};
 
         for (JComboBox<?> comboBox : subComboBoxes) {
             comboBox.setRenderer(new ComboBoxListRenderer());
@@ -234,6 +236,7 @@ public class ShortestPathPanel extends PluginPanel {
             herbsComboBox.setVisible(selectedFarming == Farming.HERBS);
             hopsComboBox.setVisible(selectedFarming == Farming.HOPS);
             treesComboBox.setVisible(selectedFarming == Farming.TREES);
+            compostBinsComboBox.setVisible(selectedFarming == Farming.COMPOST_BINS);
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -294,6 +297,8 @@ public class ShortestPathPanel extends PluginPanel {
                 return ((Hops) hopsComboBox.getSelectedItem()).getWorldPoint();
             case TREES:
                 return ((Trees) treesComboBox.getSelectedItem()).getWorldPoint();
+            case COMPOST_BINS:
+                return ((CompostBins) compostBinsComboBox.getSelectedItem()).getWorldPoint();
             default:
                 return null;
         }
@@ -314,6 +319,8 @@ public class ShortestPathPanel extends PluginPanel {
                 return ((Hops) hopsComboBox.getSelectedItem()).name();
             case TREES:
                 return ((Trees) treesComboBox.getSelectedItem()).name();
+            case COMPOST_BINS:
+                return ((CompostBins) compostBinsComboBox.getSelectedItem()).name();
             default:
                 return "Unknown";
         }
