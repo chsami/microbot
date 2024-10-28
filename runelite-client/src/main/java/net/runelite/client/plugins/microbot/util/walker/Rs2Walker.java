@@ -981,26 +981,15 @@ public class Rs2Walker {
     }
 
     private static boolean handleWearableTeleports(Transport transport, int itemId) {
+        final int OFFSET = 10;
         if (Rs2Equipment.isWearing(itemId)) {
-            JewelleryLocationEnum jewelleryTransport;
             if (transport.getDisplayInfo().contains(":")) {
                 String[] values = transport.getDisplayInfo().split(":");
-                String jewelleryName = values[0].trim().toLowerCase();
+                String itemName = values[0].trim().toLowerCase();
                 String destination = values[1].trim().toLowerCase();
-                jewelleryTransport = Arrays
-                        .stream(JewelleryLocationEnum.values())
-                        .filter(x -> x.getTooltip().toLowerCase().contains(jewelleryName)
-                                && x.getDestination().toLowerCase().contains(destination)
-                                || x.getLocation().equals(transport.getDestination()))
-                        .findFirst()
-                        .orElse(null);
-            } else {
-                jewelleryTransport = Arrays.stream(JewelleryLocationEnum.values()).filter(x -> x.getTooltip().toLowerCase().contains(transport.getDisplayInfo().toLowerCase())).findFirst().orElse(null);
-            }
-            if (jewelleryTransport != null) {
-                return interactWithJewellery(transport, jewelleryTransport);
-            } else {
-                return Rs2Equipment.useCapeAction(itemId, transport.getDisplayInfo());
+                Rs2Item rs2Item = Rs2Equipment.get(itemName);
+                Rs2Equipment.invokeMenu(rs2Item, destination);
+                return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
             }
         }
         return false;

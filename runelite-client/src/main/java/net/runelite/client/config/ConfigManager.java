@@ -333,6 +333,25 @@ public class ConfigManager
 		}
 	}
 
+	public void setDiscordWebhookUrl(ConfigProfile profile, String discordWebhookUrl) {
+		// Flush pending config changes first in case the profile being
+		// synced is the active profile.
+		sendConfig();
+
+		try (ProfileManager.Lock lock = profileManager.lock()) {
+			profile = lock.findProfile(profile.getId());
+			if (profile == null) {
+				return;
+			}
+
+			// Update the discordWebhookUrl only if it's changed
+			if (!Objects.equals(profile.getDiscordWebhookUrl(), discordWebhookUrl)) {
+				profile.setDiscordWebhookUrl(discordWebhookUrl);
+				lock.dirty();
+			}
+		}
+	}
+
 	public void toggleSync(ConfigProfile profile, boolean sync)
 	{
 		log.debug("Setting sync for {}: {}", profile.getName(), sync);

@@ -459,6 +459,7 @@ class ProfilePanel extends PluginPanel {
         private final JTextField name;
         private final JTextField password;
         private final JTextField bankPin;
+        private final JTextField discordWebhookUrl;
         private final JCheckBox member;
 
         private final JButton activate;
@@ -524,6 +525,27 @@ class ProfilePanel extends PluginPanel {
                 public void keyPressed(KeyEvent e) {
                     if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                         stopRenamingBankPin(true);
+                    }
+                }
+            });
+
+            discordWebhookUrl = new JTextField();
+            if (profile.getDiscordWebhookUrl() == null || profile.getDiscordWebhookUrl().isEmpty()) {
+                discordWebhookUrl.setText("**discord webhook**");
+            } else {
+                discordWebhookUrl.setText(profile.getDiscordWebhookUrl());
+            }
+            
+            discordWebhookUrl.setEditable(false);
+            discordWebhookUrl.setEnabled(false);
+            discordWebhookUrl.setOpaque(false);
+            discordWebhookUrl.setBorder(null);
+            discordWebhookUrl.addActionListener(ev -> stopRenamingDiscordWebhookUrl(true));
+            discordWebhookUrl.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                        stopRenamingDiscordWebhookUrl(true);
                     }
                 }
             });
@@ -699,6 +721,7 @@ class ProfilePanel extends PluginPanel {
                                 .addComponent(name, 24, 24, 24)
                                 .addComponent(password, 24, 24, 24)
                                 .addComponent(bankPin, 24, 24, 24)
+                                .addComponent(discordWebhookUrl, 24, 24, 24)
                                 .addComponent(member, 24, 24, 24)
                                 .addComponent(expand))
                         .addComponent(activate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
@@ -709,6 +732,7 @@ class ProfilePanel extends PluginPanel {
                                 .addComponent(name, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
                                 .addComponent(password, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
                                 .addComponent(bankPin, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
+                                .addComponent(discordWebhookUrl, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
                                 .addComponent(member, GroupLayout.DEFAULT_SIZE, 0x7000, 0x7000)
                                 .addComponent(expand))
                         .addComponent(activate));
@@ -767,6 +791,8 @@ class ProfilePanel extends PluginPanel {
             name.addMouseMotionListener(expandListener);
             password.addMouseListener(expandListener);
             password.addMouseMotionListener(expandListener);
+            discordWebhookUrl.addMouseListener(expandListener);
+            discordWebhookUrl.addMouseMotionListener(expandListener);
             bankPin.addMouseListener(expandListener);
             bankPin.addMouseMotionListener(expandListener);
             activate.addMouseListener(expandListener);
@@ -803,6 +829,7 @@ class ProfilePanel extends PluginPanel {
             name.selectAll();
             startRenamingPassword();
             startRenamingBankPin();
+            startRenamingDiscordWebhookUrl();
         }
 
         private void stopRenaming(boolean save) {
@@ -819,6 +846,7 @@ class ProfilePanel extends PluginPanel {
             }
             stopRenamingPassword(save);
             stopRenamingBankPin(save);
+            stopRenamingDiscordWebhookUrl(save);
         }
 
         private void startRenamingPassword() {
@@ -835,6 +863,33 @@ class ProfilePanel extends PluginPanel {
             bankPin.setOpaque(true);
             bankPin.requestFocusInWindow();
             bankPin.selectAll();
+        }
+        
+        private void startRenamingDiscordWebhookUrl() {
+            discordWebhookUrl.setEnabled(true);
+            discordWebhookUrl.setEditable(true);
+            discordWebhookUrl.setOpaque(true);
+            discordWebhookUrl.requestFocusInWindow();
+            discordWebhookUrl.selectAll();
+        }
+
+        private void stopRenamingDiscordWebhookUrl(boolean save) {
+            discordWebhookUrl.setEditable(false);
+            discordWebhookUrl.setEnabled(false);
+            discordWebhookUrl.setOpaque(false);
+
+            if (discordWebhookUrl.getText() == null || discordWebhookUrl.getText().isEmpty()) {
+                return;
+            }
+
+            rename.setSelected(false);
+
+            if (save) {
+                configManager.setDiscordWebhookUrl(profile, discordWebhookUrl.getText());
+            } else {
+                String currentWebhookUrl = profile.getDiscordWebhookUrl();
+                discordWebhookUrl.setText(currentWebhookUrl != null ? currentWebhookUrl : "**discord webhook**");
+            }
         }
 
         private void stopRenamingPassword(boolean save) {
