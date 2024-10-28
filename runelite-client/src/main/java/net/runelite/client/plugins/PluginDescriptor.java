@@ -24,6 +24,7 @@
  */
 package net.runelite.client.plugins;
 
+import java.awt.*;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -50,6 +51,7 @@ public @interface PluginDescriptor {
     String StickToTheScript = "<html>[<font color=#FF4F00>STTS</font>] ";
     String zerozero ="<html>[<font color=#000000>00</font>] " ;
     String LiftedMango = "<html>[<font color=#FF7F50>\uD83E\uDD6D</font>] ";
+    String eXioStorm = "<html>[<font color=#ff00dc>§</font>] "; Color stormColor = new Color(255, 0, 220);
 
     String name();
 
