@@ -140,7 +140,7 @@ public class Rs2Discord {
      * @param color the Color object to convert
      * @return an integer representation of the color in the format 0xRRGGBB
      */
-    public int convertColorToInt(Color color) {
+    public static int convertColorToInt(Color color) {
         int red = color.getRed();
         int green = color.getGreen();
         int blue = color.getBlue();
