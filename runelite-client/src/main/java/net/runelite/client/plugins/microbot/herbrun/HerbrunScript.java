@@ -85,7 +85,7 @@ public class HerbrunScript extends Script {
                             if (config.GRACEFUL()) {
                                 Rs2Bank.depositEquipment();
                                 sleep(200);
-                                equipGraceful();
+                                equipGraceful(config);
                             }
                         }
                         withdrawHerbSetup(config);
@@ -317,7 +317,7 @@ public class HerbrunScript extends Script {
                         }
                     case GUILD_TELEPORT:
                         if (config.enableGuild()) {
-                            handleTeleportToGuild();
+                            handleTeleportToGuild(config);
                             sleep(400);
                             botStatus = states.GUILD_WALKING_TO_PATCH;
                             break;
@@ -382,9 +382,13 @@ public class HerbrunScript extends Script {
         return true;
     }
 
-    private void equipGraceful() {
+    private void equipGraceful(HerbrunConfig config) {
         checkBeforeWithdrawAndEquip("GRACEFUL HOOD");
-        checkBeforeWithdrawAndEquip("GRACEFUL CAPE");
+        if(config.FARMING_CAPE()) {
+            checkBeforeWithdrawAndEquip(ItemID.FARMING_CAPE);
+        } else {
+            checkBeforeWithdrawAndEquip("GRACEFUL CAPE");
+        }
         checkBeforeWithdrawAndEquip("GRACEFUL BOOTS");
         checkBeforeWithdrawAndEquip("GRACEFUL GLOVES");
         checkBeforeWithdrawAndEquip("GRACEFUL TOP");
@@ -424,18 +428,22 @@ public class HerbrunScript extends Script {
         }
         Rs2Bank.withdrawOne(ItemID.RAKE);
         if (config.enableGuild()) {
-            if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE1)) {
-                Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE1);
-            } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE2)) {
-                Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE2);
-            } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE3)) {
-                Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE3);
-            } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE4)) {
-                Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE4);
-            } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE5)) {
-                Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE5);
+            if (!config.FARMING_CAPE()) {
+                if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE1)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE1);
+                } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE2)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE2);
+                } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE3)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE3);
+                } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE4)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE4);
+                } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE5)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE5);
+                } else {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE6);
+                }
             } else {
-                Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE6);
+                Rs2Bank.withdrawOne(ItemID.FARMING_CAPE);
             }
         }
         if (config.enableFalador()) {
@@ -696,37 +704,42 @@ public class HerbrunScript extends Script {
         }
     }
 
-    private boolean guildTeleport() {
+    private boolean guildTeleport(HerbrunConfig config) {
         sleep(100);
         if (!Rs2Player.isAnimating()) {
             System.out.println("Teleporting to the Farming guild");
-            if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE1)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE1, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE2)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE2, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE3)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE3, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE4)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE4, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE5)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE5, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE6)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE6, "rub");
+            if (!config.FARMING_CAPE()) {
+                if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE1)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE1, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE2)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE2, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE3)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE3, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE4)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE4, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE5)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE5, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE6)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE6, "rub");
+                }
+                sleep(700, 1100);
+                Rs2Keyboard.keyPress('6');
+                Rs2Player.waitForAnimation();
+                sleepUntil(() -> !Rs2Player.isAnimating());
+                return true;
+            } else {
+                Rs2Equipment.interact(ItemID.FARMING_CAPE, "teleport");
+                return true;
             }
-            sleep(700, 1100);
-            Rs2Keyboard.keyPress('6');
-            Rs2Player.waitForAnimation();
-            sleepUntil(() -> !Rs2Player.isAnimating());
-            return true;
         }
         return false;
     }
 
-    private void handleTeleportToGuild() {
+    private void handleTeleportToGuild(HerbrunConfig config) {
         boolean hasTeleported = false;
         if (!hasTeleported) {
             System.out.println("Teleporting to the Farming guild...");
-            guildTeleport();  // Perform guild teleport
+            guildTeleport(config);  // Perform guild teleport
             hasTeleported = true;
         }
         botStatus = states.GUILD_WALKING_TO_PATCH;

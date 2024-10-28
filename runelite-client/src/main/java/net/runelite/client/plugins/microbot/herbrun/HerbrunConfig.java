@@ -89,6 +89,17 @@ public interface HerbrunConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "farmingCape",
+            name = "Use Farming cape?",
+            description = "Use Farming cape instead of Skills necklace?",
+            position = 4,
+            section = settingsSection
+    )
+    default boolean FARMING_CAPE() {
+        return false;
+    }
+
+    @ConfigItem(
             keyName = "ardougne_teleport",
             name = "Use Ardougne cloak?",
             description = "Does your adougne cloak still have charges for today? If not the script will use Ardy tab",
