@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.util.dialogues;
 
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -201,13 +200,14 @@ public class Rs2Dialogue {
      * @param text  the text to match with the dialogue option.
      * @param exact whether to match the text exactly or allow partial matches.
      */
-    public static void keyPressForDialogueOption(String text, boolean exact) {
-        if (!hasSelectAnOption()) return;
+    public static boolean keyPressForDialogueOption(String text, boolean exact) {
+        if (!hasSelectAnOption()) return false;
 
         Widget dialogueOption = getDialogueOption(text, exact);
-        if (dialogueOption == null) return;
+        if (dialogueOption == null) return false;
 
         Rs2Keyboard.keyPress(dialogueOption.getOnKeyListener()[7].toString().charAt(0));
+        return true;
     }
 
     /**
@@ -215,21 +215,38 @@ public class Rs2Dialogue {
      *
      * @param text the text to match with the dialogue option.
      */
-    public static void keyPressForDialogueOption(String text) {
-        keyPressForDialogueOption(text, false);
+    public static boolean keyPressForDialogueOption(String text) {
+        return keyPressForDialogueOption(text, false);
     }
 
-    public static Widget getOption(String option) {
-        Widget parent =  Rs2Widget.getWidget(219, 1);
-        if (parent == null) return null;
-        return Rs2Widget.findWidget(option, Arrays.stream(parent.getDynamicChildren()).collect(Collectors.toList()));
+    /**
+     * Simulates a key press to select a dialogue option for the specified index
+     *
+     * @param index the index of the dialogue option
+     */
+    public static boolean keyPressForDialogueOption(int index) {
+        if (!hasSelectAnOption()) return false;
+
+        Rs2Keyboard.keyPress(index);
+        return true;
     }
 
-    public static boolean clickOption(String option) {
-        Widget widgetOption = getOption(option);
-        if (widgetOption != null) {
-            return Rs2Widget.clickWidget(getOption(option));
-        }
-        return false;
+    /**
+     * Attempts to click on a dialogue option widget with the specified text.
+     *
+     * <p>This method searches for a widget that contains the specified option text within the dialogue.
+     * If such a widget is found, it triggers a click action on it using the {@code Rs2Widget.clickWidget} method.
+     * If no matching widget is found, the method returns {@code false}.
+     *
+     * @param text the text of the dialogue option to click, e.g., "Yes" or "No"
+     * @return {@code true} if the widget was found and clicked successfully; {@code false} if no matching widget was found
+     */
+    public static boolean clickOption(String text) {
+        if (!hasSelectAnOption()) return false;
+        
+        Widget dialogueOption = getDialogueOption(text);
+        if (dialogueOption == null) return false;
+        
+        return Rs2Widget.clickWidget(dialogueOption);
     }
 }
