@@ -10,22 +10,11 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-//import static net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums.*;
-import static net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums.sRs2Bank.*;
-import static net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums.sRs2Walker.*;
-import static net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums.sRs2Inventory.*;
-import static net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums.sRs2GameObject.*;
-import static net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums.sRs2Widget.*;
-import static net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums.Other.*;
-import static net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums.sRs2Npc.*;
-import static net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums.sRs2Player.*;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class actionHotkeyScript extends Script {

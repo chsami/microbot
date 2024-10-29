@@ -115,7 +115,7 @@ public interface actionHotkeyConfig extends Config {
     default sRs2Inventory firstRs2Inventory() { return sRs2Inventory.INV_INTERACT; }
     @ConfigItem(keyName = "firstRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 1, section = firstCategories)
     default sRs2Npc firstRs2Npc() { return sRs2Npc.NPC_INTERACT; }
-    @ConfigItem(keyName = "firstRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 1, section = firstCategories)
+    @ConfigItem(keyName = "firstRs2Player", name = "Rs2Player Action", description = "pick action for Rs2Player", position = 1, section = firstCategories)
     default sRs2Player firstRs2Player() { return sRs2Player.LOGOUT; }
     @ConfigItem(keyName = "firstRs2Walker", name = "Rs2Walker Action", description = "pick action for Rs2Walker", position = 1, section = firstCategories)
     default sRs2Walker firstRs2Walker() { return sRs2Walker.WALK_FAST_CANVAS; }
@@ -134,8 +134,8 @@ public interface actionHotkeyConfig extends Config {
     default sRs2Inventory secondRs2Inventory() { return sRs2Inventory.INV_INTERACT; }
     @ConfigItem(keyName = "secondRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 1, section = secondCategories)
     default sRs2Npc secondRs2Npc() { return sRs2Npc.NPC_INTERACT; }
-    @ConfigItem(keyName = "secondRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 1, section = secondCategories)
-    default sRs2Player secondRs2Player() { return sRs2Player.LOGOUT; }
+    @ConfigItem(keyName = "secondRs2Player", name = "Rs2Player Action", description = "pick action for Rs2Player", position = 1, section = secondCategories)
+    default sRs2Player secondRs2Player() { return sRs2Player.USE_FOOD; }
     @ConfigItem(keyName = "secondRs2Walker", name = "Rs2Walker Action", description = "pick action for Rs2Walker", position = 1, section = secondCategories)
     default sRs2Walker secondRs2Walker() { return sRs2Walker.WALK_FAST_CANVAS; }
     @ConfigItem(keyName = "secondRs2Widget", name = "Rs2Widget Action", description = "pick action for Rs2Widget", position = 1, section = secondCategories)
