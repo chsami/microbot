@@ -4,6 +4,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.walker.enums.*;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.plugins.microbot.shortestpath.components.ComboBoxListRenderer;
@@ -334,5 +335,6 @@ public class ShortestPathPanel extends PluginPanel {
     private void stopWalking() {
         Microbot.log("Web walking stopping..");
         plugin.getShortestPathScript().setTriggerWalker(null);
+        Rs2Walker.setTarget(null);
     }
 }
