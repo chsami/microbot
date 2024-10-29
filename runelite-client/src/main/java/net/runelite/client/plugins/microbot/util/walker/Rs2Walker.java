@@ -28,6 +28,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -209,7 +210,7 @@ public class Rs2Walker {
             }
 
             // Edgeville/ardy wilderness lever warning
-            if (Rs2Widget.isWidgetVisible(229, 1)) {
+            if (Rs2Widget.isWidgetVisible(229, 1) && Rs2UiHelper.stripColTags(Rs2Widget.getWidget(229, 1).getText()).equalsIgnoreCase("Warning! The lever will teleport you deep into the Wilderness.")) {
                 Microbot.log("Detected Wilderness lever warning, interacting...");
                 Rs2Dialogue.clickContinue();
                 sleep(1200, 2400);
