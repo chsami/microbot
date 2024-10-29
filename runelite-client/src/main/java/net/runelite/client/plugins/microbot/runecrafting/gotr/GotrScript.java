@@ -150,11 +150,14 @@ public class GotrScript extends Script {
 
                     if (usePortal()) return;
 
+                    //mine huge guardian remains
                     if (mineHugeGuardianRemain()) return;
 
+                    //deposit runes
                     if (depositRunesIntoPool()) return;
 
                     if (!shouldMineGuardianRemains) {
+                        //Create fragments into whatever
                         if (isOutOfFragments()) return;
 
                         if (fillPouches()) {
@@ -491,10 +494,12 @@ public class GotrScript extends Script {
                         repairPouches();
                     }
                     Rs2GameObject.interact(ObjectID.LARGE_GUARDIAN_REMAINS);
+                    // we can assume that if the player is mining within the startTimer range, he will get enough guardian remains for the game
                     shouldMineGuardianRemains = false;
                 }
             }
         } else {
+            //guardian parts
             if (!Rs2Player.isAnimating() && getStartTimer() != -1) {
                 if (Rs2Equipment.isWearing("dragon pickaxe")) {
                     Rs2Combat.setSpecState(true, 1000);
@@ -503,6 +508,7 @@ public class GotrScript extends Script {
                     repairPouches();
                 }
                 Rs2GameObject.interact(ObjectID.GUARDIAN_PARTS_43716);
+                // we can assume that if the player is mining within the startTimer range, he will get enough guardian remains for the game
                 shouldMineGuardianRemains = false;
             }
         }
@@ -562,11 +568,15 @@ public class GotrScript extends Script {
         if (timerWidget != null) {
             String timer = timerWidget.getText();
             if (timer == null) return -1;
+            // Split the timer string into minutes and seconds
             String[] timeParts = timer.split(":");
 
+            // Ensure there are two parts (minutes and seconds)
             if (timeParts.length == 2) {
                 int minutes = Integer.parseInt(timeParts[0]);
                 int seconds = Integer.parseInt(timeParts[1]);
+
+                // Convert the timer to total seconds
                 int totalSeconds = (minutes * 60) + seconds;
                 return totalSeconds;
             }
