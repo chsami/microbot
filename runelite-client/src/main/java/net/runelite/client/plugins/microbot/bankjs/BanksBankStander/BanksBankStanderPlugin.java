@@ -52,14 +52,49 @@ public class BanksBankStanderPlugin extends Plugin {
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged inventory){
         if(inventory.getContainerId()==93){
-            if(BanksBankStanderScript.currentStatus== CurrentStatus.COMBINE_ITEMS) {
-                if (BanksBankStanderScript.secondItemId != null) {
-                    if (Rs2Inventory.items().stream().filter(item -> item.id == BanksBankStanderScript.secondItemId).mapToInt(item -> item.quantity).sum() < config.secondItemQuantity()) {
+            if(BanksBankStanderScript.currentStatus == CurrentStatus.COMBINE_ITEMS) {
+                if (BanksBankStanderScript.firstItemId != null) {
+                    if (Rs2Inventory.items().stream().filter(item -> item.id == BanksBankStanderScript.firstItemId).mapToInt(item -> item.quantity).sum() < config.firstItemQuantity()) {
+                        if (BanksBankStanderScript.firstItemSum > 0) { BanksBankStanderScript.firstItemSum--; }
                         BanksBankStanderScript.itemsProcessed++;
                     }
                 } else {
-                    if (Rs2Inventory.count(BanksBankStanderScript.secondItemIdentifier) < config.secondItemQuantity()) {
+                    if (Rs2Inventory.count(BanksBankStanderScript.firstItemIdentifier) < config.firstItemQuantity()) {
+                        if (BanksBankStanderScript.firstItemSum > 0) { BanksBankStanderScript.firstItemSum--; }
                         BanksBankStanderScript.itemsProcessed++;
+                    }
+                }
+                if(config.secondItemQuantity() > 0) {
+                    if (BanksBankStanderScript.secondItemId != null) {
+                        if (Rs2Inventory.items().stream().filter(item -> item.id == BanksBankStanderScript.secondItemId).mapToInt(item -> item.quantity).sum() < config.secondItemQuantity()) {
+                            if (BanksBankStanderScript.secondItemSum > 0) { BanksBankStanderScript.secondItemSum--; }
+                        }
+                    } else {
+                        if (Rs2Inventory.count(BanksBankStanderScript.secondItemIdentifier) < config.secondItemQuantity()) {
+                            if (BanksBankStanderScript.secondItemSum > 0) { BanksBankStanderScript.secondItemSum--; }
+                        }
+                    }
+                }
+                if(config.thirdItemQuantity() > 0) {
+                    if (BanksBankStanderScript.thirdItemId != null) {
+                        if (Rs2Inventory.items().stream().filter(item -> item.id == BanksBankStanderScript.thirdItemId).mapToInt(item -> item.quantity).sum() < config.thirdItemQuantity()) {
+                            if (BanksBankStanderScript.thirdItemSum > 0) { BanksBankStanderScript.thirdItemSum--; }
+                        }
+                    } else {
+                        if (Rs2Inventory.count(BanksBankStanderScript.thirdItemIdentifier) < config.thirdItemQuantity()) {
+                            if (BanksBankStanderScript.thirdItemSum > 0) { BanksBankStanderScript.thirdItemSum--; }
+                        }
+                    }
+                }
+                if(config.fourthItemQuantity() > 0) {
+                    if (BanksBankStanderScript.fourthItemId != null) {
+                        if (Rs2Inventory.items().stream().filter(item -> item.id == BanksBankStanderScript.fourthItemId).mapToInt(item -> item.quantity).sum() < config.fourthItemQuantity()) {
+                            if (BanksBankStanderScript.fourthItemSum > 0) { BanksBankStanderScript.fourthItemSum--; }
+                        }
+                    } else {
+                        if (Rs2Inventory.count(BanksBankStanderScript.fourthItemIdentifier) < config.fourthItemQuantity()) {
+                            if (BanksBankStanderScript.fourthItemSum > 0) { BanksBankStanderScript.fourthItemSum--; }
+                        }
                     }
                 }
             } else { System.out.println("currentStatus : " + BanksBankStanderScript.currentStatus); }

@@ -69,7 +69,7 @@ public interface BanksBankStanderConfig extends Config {
     )
     @Range(
             min = 1,
-            max = 27
+            max = 28
     )
 
     default int firstItemQuantity() {
@@ -96,7 +96,7 @@ public interface BanksBankStanderConfig extends Config {
             section = itemSection
     )
     @Range(
-            min = 1,
+            min = 0,
             max = 27
     )
 
@@ -112,7 +112,7 @@ public interface BanksBankStanderConfig extends Config {
     )
 
     default String thirdItemIdentifier() {
-        return "Knife";
+        return "";
     }
 
     @ConfigItem(
@@ -123,12 +123,12 @@ public interface BanksBankStanderConfig extends Config {
             section = itemSection
     )
     @Range(
-            min = 1,
+            min = 0,
             max = 27
     )
 
     default int thirdItemQuantity() {
-        return 1;
+        return 0;
     }
 
     @ConfigItem(
@@ -140,7 +140,7 @@ public interface BanksBankStanderConfig extends Config {
     )
 
     default String fourthItemIdentifier() {
-        return "Knife";
+        return "";
     }
 
     @ConfigItem(
@@ -151,12 +151,12 @@ public interface BanksBankStanderConfig extends Config {
             section = itemSection
     )
     @Range(
-            min = 1,
+            min = 0,
             max = 27
     )
 
     default int fourthItemQuantity() {
-        return 1;
+        return 0;
     }
 
     @ConfigItem(
@@ -178,16 +178,6 @@ public interface BanksBankStanderConfig extends Config {
             section = toggles
     )
     default boolean needMenuEntry() {
-        return false;
-    }
-    @ConfigItem(
-            keyName = "fourItems",
-            name = "Four Items",
-            description = "does this process need 4 items? e.g. super combat potions",
-            position = 3,
-            section = toggles
-    )
-    default boolean fourItems() {
         return false;
     }
     @ConfigItem(

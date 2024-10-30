@@ -4,7 +4,6 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -16,16 +15,15 @@ import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.storm.common.Rs2Storm.getRandomItemWithLimit;
 import static net.runelite.client.plugins.microbot.util.Global.*;
+import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.items;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 // heaps of new features added by Storm
 public class BanksBankStanderScript extends Script {
     @Inject
     private BanksBankStanderConfig config;
-    public static double version = 1.2;
+    public static double version = 1.3;
 
     public static long previousItemChange;
-    private static final int MAX_TRIES = 3;
-    private Set<Integer> recentItems = new HashSet<>();
 
     public static CurrentStatus currentStatus = CurrentStatus.FETCH_SUPPLIES;
 
@@ -33,13 +31,13 @@ public class BanksBankStanderScript extends Script {
 
 
 
-    private static Integer thirdItemId;
-    private static Integer fourthItemId;
+    static Integer thirdItemId;
+    static Integer fourthItemId;
 
-    String firstItemIdentifier;
+    static String firstItemIdentifier;
 
-    String thirdItemIdentifier;
-    String fourthItemIdentifier;
+    static String thirdItemIdentifier;
+    static String fourthItemIdentifier;
 
     private int firstItemQuantity;
     static Integer firstItemId;
@@ -48,6 +46,10 @@ public class BanksBankStanderScript extends Script {
     private int secondItemQuantity;
     private int thirdItemQuantity;
     private int fourthItemQuantity;
+    static int firstItemSum;
+    static int secondItemSum;
+    static int thirdItemSum;
+    static int fourthItemSum;
 
     private int sleepMin;
     private int sleepMax;
@@ -55,7 +57,7 @@ public class BanksBankStanderScript extends Script {
 
     public static boolean isWaitingForPrompt=false;
     private static boolean sleep;
-    public static boolean fourItems;
+    private static String menu;
     public static String firstIdentity;
     public static String secondIdentity;
     public static String thirdIdentity;
@@ -64,7 +66,10 @@ public class BanksBankStanderScript extends Script {
     public boolean run(BanksBankStanderConfig config) {
         this.config = config; // Initialize the config object before accessing its parameters
         itemsProcessed = 0;
-
+        firstItemSum = 0;
+        secondItemSum = 0;
+        thirdItemSum = 0;
+        fourthItemSum = 0;
         // Initialize other variables
         firstItemIdentifier = config.firstItemIdentifier();
         firstItemQuantity = config.firstItemQuantity();
@@ -95,29 +100,30 @@ public class BanksBankStanderScript extends Script {
         secondIdentity = secondItemId != null ? "identified by ID" : "identified by name";
         thirdIdentity = thirdItemId != null ? "identified by ID" : "identified by name";
         fourthIdentity = fourthItemId != null ? "identified by ID" : "identified by name";
-        fourItems = config.fourItems();
         // Print the types of firstItemIdentifier and firstItemId
         System.out.println("Type of firstItemIdentifier: " + firstItemIdentifier.getClass().getSimpleName());
         System.out.println("Type of firstItemId: " + (firstItemId != null ? firstItemId.getClass().getSimpleName() : "null"));
-        // Print the types of secondItemIdentifier and secondItemId
-        System.out.println("Type of secondItemIdentifier: " + secondItemIdentifier.getClass().getSimpleName());
-        System.out.println("Type of secondItemId: " + (secondItemId != null ? secondItemId.getClass().getSimpleName() : "null"));
-        if(config.fourItems()) {
+        if(config.secondItemQuantity()>0) {
+            // Print the types of secondItemIdentifier and secondItemId
+            System.out.println("Type of secondItemIdentifier: " + secondItemIdentifier.getClass().getSimpleName());
+            System.out.println("Type of secondItemId: " + (secondItemId != null ? secondItemId.getClass().getSimpleName() : "null"));
+        }
+        if(config.thirdItemQuantity()>0) {
             // Print the types of thirdItemIdentifier and thirdItemId
             System.out.println("Type of thirdItemIdentifier: " + thirdItemIdentifier.getClass().getSimpleName());
             System.out.println("Type of thirdItemId: " + (thirdItemId != null ? thirdItemId.getClass().getSimpleName() : "null"));
+        }
+        if(config.fourthItemQuantity()>0) {
             // Print the types of fourthItemIdentifier and fourthItemId
             System.out.println("Type of fourthItemIdentifier: " + fourthItemIdentifier.getClass().getSimpleName());
             System.out.println("Type of fourthItemId: " + (fourthItemId != null ? fourthItemId.getClass().getSimpleName() : "null"));
 
         }
+        menu = (firstItemId != null ? Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(firstItemId).getName().toLowerCase().contains("grimy")) : firstItemIdentifier.toLowerCase().contains("grimy")) ? "clean" : "use";
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!Microbot.isLoggedIn()) return;
             try {
                 //start
-                if(fourItems!=config.fourItems()){
-                    fourItems=config.fourItems();
-                }
                 combineItems();
 
             } catch (Exception ex) {
@@ -168,9 +174,9 @@ public class BanksBankStanderScript extends Script {
             }
             sleep = sleepUntilTrue(() -> Rs2Bank.isOpen(), random(67,97), 18000);
             sleep(61,97);
-            if (firstItemId != null && secondItemId != null && !config.fourItems()) {
+            if (firstItemId != null && secondItemId != null && thirdItemId != null && fourthItemId !=null) {
                 Rs2Bank.depositAllExcept(firstItemId, secondItemId, thirdItemId, fourthItemId);
-            } else if (firstItemId == null && secondItemId == null && !config.fourItems()){
+            } else if (firstItemId == null && secondItemId == null && thirdItemId == null && fourthItemId ==null){
                 Rs2Bank.depositAllExcept(firstItemIdentifier, secondItemIdentifier, thirdItemIdentifier, fourthItemIdentifier);
             } else {
                 Rs2Bank.depositAll();
@@ -189,35 +195,39 @@ public class BanksBankStanderScript extends Script {
                     sleep(100,300);
                 }
             }
-            if (secondItemId != null) {
-                if (Rs2Bank.hasItem(secondItemId)) {
-                    if(!config.withdrawAll()) {
-                        Rs2Bank.withdrawX(true, secondItemId, secondItemQuantity);
-                    } else {
-                        Rs2Bank.withdrawAll(secondItemId);
+            if(config.secondItemQuantity() > 0) {
+                if (secondItemId != null) {
+                    if (Rs2Bank.hasItem(secondItemId)) {
+                        if (!config.withdrawAll()) {
+                            Rs2Bank.withdrawX(true, secondItemId, secondItemQuantity);
+                        } else {
+                            Rs2Bank.withdrawAll(secondItemId);
+                        }
                     }
-                }
-            } else {
-                if (Rs2Bank.hasItem(secondItemIdentifier)) {
-                    if(!config.withdrawAll()) {
-                        Rs2Bank.withdrawX(true, secondItemIdentifier, secondItemQuantity);
-                    } else {
-                        Rs2Bank.withdrawAll(true, secondItemIdentifier);
+                } else {
+                    if (Rs2Bank.hasItem(secondItemIdentifier) && config.secondItemQuantity() > 0) {
+                        if (!config.withdrawAll()) {
+                            Rs2Bank.withdrawX(true, secondItemIdentifier, secondItemQuantity);
+                        } else {
+                            Rs2Bank.withdrawAll(true, secondItemIdentifier);
+                        }
                     }
                 }
             }
-            if(config.fourItems()){
+            if(config.thirdItemQuantity() > 0) {
                 if (thirdItemId != null) {
                     if (Rs2Bank.hasItem(thirdItemId) && !Rs2Inventory.hasItem(thirdItemId)) {
                         Rs2Bank.withdrawX(true, thirdItemId, thirdItemQuantity);
-                        sleep(100,300);
+                        sleep(100, 300);
                     }
                 } else {
-                    if (Rs2Bank.hasItem(thirdItemIdentifier)&& !Rs2Inventory.hasItem(thirdItemIdentifier)) {
+                    if (Rs2Bank.hasItem(thirdItemIdentifier) && !Rs2Inventory.hasItem(thirdItemIdentifier)) {
                         Rs2Bank.withdrawX(true, thirdItemIdentifier, thirdItemQuantity);
-                        sleep(100,300);
+                        sleep(100, 300);
                     }
                 }
+            }
+            if(config.fourthItemQuantity() > 0) {
                 if (fourthItemId != null) {
                     if (Rs2Bank.hasItem(fourthItemId)) {
                         if(!config.withdrawAll()) {
@@ -240,6 +250,18 @@ public class BanksBankStanderScript extends Script {
             if(!hasItems()) { Rs2Inventory.waitForInventoryChanges(700); }
             if (hasItems()) {
                 previousItemChange=(System.currentTimeMillis()-2500);
+                if(firstItemSum==0) {
+                    firstItemSum = firstItemId != null ? (Rs2Bank.bankItems.stream().filter(item -> item.id == firstItemId).mapToInt(item -> item.quantity).sum()+Rs2Inventory.count(firstItemId)) : (Rs2Bank.count(firstItemIdentifier)+Rs2Inventory.count(firstItemIdentifier));
+                }
+                if(config.secondItemQuantity() > 0 && secondItemSum==0) {
+                    secondItemSum = secondItemId != null ? (Rs2Bank.bankItems.stream().filter(item -> item.id == secondItemId).mapToInt(item -> item.quantity).sum()+Rs2Inventory.count(secondItemId)) : (Rs2Bank.count(secondItemIdentifier)+Rs2Inventory.count(secondItemIdentifier));
+                }
+                if(config.thirdItemQuantity() > 0 && thirdItemSum==0) {
+                    thirdItemSum = thirdItemId != null ? (Rs2Bank.bankItems.stream().filter(item -> item.id == thirdItemId).mapToInt(item -> item.quantity).sum()+Rs2Inventory.count(thirdItemId)) : (Rs2Bank.count(thirdItemIdentifier)+Rs2Inventory.count(thirdItemIdentifier));
+                }
+                if(config.fourthItemQuantity() > 0 && fourthItemSum==0) {
+                    fourthItemSum = fourthItemId != null ? (Rs2Bank.bankItems.stream().filter(item -> item.id == fourthItemId).mapToInt(item -> item.quantity).sum()+Rs2Inventory.count(fourthItemId)) : (Rs2Bank.count(fourthItemIdentifier)+Rs2Inventory.count(fourthItemIdentifier));
+                }
                 long bankCloseTime = System.currentTimeMillis();
                 while(this.isRunning() && Rs2Bank.isOpen() && (System.currentTimeMillis()-bankCloseTime<32000)) {
                     closeBank();
@@ -275,15 +297,6 @@ public class BanksBankStanderScript extends Script {
         if(config.waitForAnimation()) {
             if (Rs2Player.isAnimating() || (System.currentTimeMillis()-previousItemChange)<2400) { return false; }
         }
-        Rs2Item randomItem = null;
-        if (config.randomSelection()) {
-            // Use item name or ID to get random item
-            if (secondItemId != null) {
-                randomItem = getRandomItemWithLimit(secondItemId); // Use item ID
-            } else if (secondItemIdentifier != null) {
-                randomItem = getRandomItemWithLimit(secondItemIdentifier); // Use item name
-            }
-        }
         if(currentStatus != CurrentStatus.COMBINE_ITEMS) { currentStatus = CurrentStatus.COMBINE_ITEMS; }
         if(config.pause()){
             while(this.isRunning() && config.pause()){
@@ -292,28 +305,34 @@ public class BanksBankStanderScript extends Script {
             }
         }
         if (firstItemId != null && secondItemId != null) {
-            Rs2Inventory.use(getRandomItemWithLimit(firstItemId)); // Use first Rs2Item (random or not)
+            Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(firstItemId) : items().stream().filter(x -> x.id == firstItemId).findFirst().orElse(null), menu); // Use first Rs2Item (random or not)
             sleep(calculateSleepDuration());
 
-            Rs2Inventory.use(randomItem != null ? randomItem : getRandomItemWithLimit(secondItemId)); // Use second Rs2Item (random or not)
+            if(config.secondItemQuantity()>0) {
+                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemId) : items().stream().filter(x -> x.id == secondItemId).findFirst().orElse(null), menu);
+            }
 
         } else if (firstItemId != null) {
-            Rs2Inventory.use(getRandomItemWithLimit(firstItemId)); // Use first Rs2Item (random or not)
+            Rs2Inventory.interact(getRandomItemWithLimit(firstItemId), menu); // Use first Rs2Item (random or not)
             sleep(calculateSleepDuration());
 
-            Rs2Inventory.use(randomItem != null ? randomItem : getRandomItemWithLimit(secondItemIdentifier)); // Use second Rs2Item (random or fallback to name)
-
+            if(config.secondItemQuantity()>0) {
+                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemIdentifier) : items().stream().filter(x -> x.name.equalsIgnoreCase(secondItemIdentifier.toLowerCase())).findFirst().orElse(null), menu);
+            }
         } else if (secondItemId != null) {
-            Rs2Inventory.use(getRandomItemWithLimit(firstItemIdentifier)); // Use first Rs2Item (random or not)
+            Rs2Inventory.interact(getRandomItemWithLimit(firstItemIdentifier), menu); // Use first Rs2Item (random or not)
             sleep(calculateSleepDuration());
 
-            Rs2Inventory.use(randomItem != null ? randomItem : getRandomItemWithLimit(secondItemId)); // Use second Rs2Item (random or not)
-
+            if(config.secondItemQuantity()>0) {
+                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemId) : items().stream().filter(x -> x.id == secondItemId).findFirst().orElse(null), menu);
+            }
         } else {
-            Rs2Inventory.use(getRandomItemWithLimit(firstItemIdentifier)); // Use first Rs2Item (random or not)
+            Rs2Inventory.interact(getRandomItemWithLimit(firstItemIdentifier), menu); // Use first Rs2Item (random or not)
             sleep(calculateSleepDuration());
 
-            Rs2Inventory.use(randomItem != null ? randomItem : getRandomItemWithLimit(secondItemIdentifier)); // Use second Rs2Item (random or fallback to name)
+            if(config.secondItemQuantity()>0) {
+                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemIdentifier) : items().stream().filter(x -> x.name.equalsIgnoreCase(secondItemIdentifier.toLowerCase())).findFirst().orElse(null), menu);
+            }
         }
 
         if (config.needMenuEntry()) {
@@ -367,18 +386,22 @@ public class BanksBankStanderScript extends Script {
             return false;
         }
         //System.out.println("Attempting to check second item");
-        if (secondItemId != null && (Rs2Bank.bankItems.stream().filter(item -> item.id == secondItemId).mapToInt(item -> item.quantity).sum())<config.secondItemQuantity()) {
-            return false;
-        } else if (secondItemId == null && Rs2Bank.count(secondItemIdentifier)<config.secondItemQuantity()) {
-            return false;
+        if(config.secondItemQuantity() > 0) {
+            if (secondItemId != null && (Rs2Bank.bankItems.stream().filter(item -> item.id == secondItemId).mapToInt(item -> item.quantity).sum()) < config.secondItemQuantity()) {
+                return false;
+            } else if (secondItemId == null && Rs2Bank.count(secondItemIdentifier) < config.secondItemQuantity()) {
+                return false;
+            }
         }
-        if(config.fourItems()) {
+        if(config.thirdItemQuantity() > 0) {
             //System.out.println("Attempting to check third item");
-            if (thirdItemId != null && (Rs2Bank.bankItems.stream().filter(item -> item.id == thirdItemId).mapToInt(item -> item.quantity).sum())<config.thirdItemQuantity()) {
+            if (thirdItemId != null && (Rs2Bank.bankItems.stream().filter(item -> item.id == thirdItemId).mapToInt(item -> item.quantity).sum()) < config.thirdItemQuantity()) {
                 return false;
             } else if (thirdItemId == null && Rs2Bank.count(thirdItemIdentifier) < config.thirdItemQuantity()) {
                 return false;
             }
+        }
+        if (config.fourthItemQuantity() > 0) {
             //System.out.println("Attempting to check fourth item");
             if (fourthItemId != null && (Rs2Bank.bankItems.stream().filter(item -> item.id == fourthItemId).mapToInt(item -> item.quantity).sum())<config.fourthItemQuantity()) {
                 return false;
