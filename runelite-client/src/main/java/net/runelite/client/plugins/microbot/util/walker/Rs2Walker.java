@@ -776,13 +776,13 @@ public class Rs2Walker {
 
                             if (Rs2Npc.canWalkTo(npc, 20) && Rs2Npc.interact(npc, transport.getAction())) {
                                 Rs2Player.waitForWalking();
-                                sleep(600 * 2);
                                 if (Rs2Dialogue.clickOption("I'm just going to Pirates' cove")) {
                                     sleep(600 * 2);
                                     Rs2Dialogue.clickContinue();
                                 }
                                 sleepUntil(() -> !Rs2Player.isAnimating());
                                 sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
+                                sleep(600 * 2);
                             } else {
                                 Rs2Walker.walkFastCanvas(path.get(i));
                                 sleep(1200, 1600);
