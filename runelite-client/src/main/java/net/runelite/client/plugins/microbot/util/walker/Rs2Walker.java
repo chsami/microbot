@@ -627,7 +627,7 @@ public class Rs2Walker {
                 .allMatch(a -> tiles.getOrDefault(a, Integer.MAX_VALUE) == Integer.MAX_VALUE);
 
         if (startPoint == null || noMatchingTileFound) {
-           return 1; //start on index 1, instead of 0. 0 can contain teleports
+            return 1; //start on index 1, instead of 0. 0 can contain teleports
         }
 
         return IntStream.range(0, path.size())
@@ -740,7 +740,7 @@ public class Rs2Walker {
             if (transport.getOrigin() == null) {
                 worldPointCollections = Collections.singleton(null);
             } else {
-                worldPointCollections  = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), transport.getOrigin());
+                worldPointCollections = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), transport.getOrigin());
             }
             for (WorldPoint origin : worldPointCollections) {
                 if (transport.getOrigin() != null && Rs2Player.getWorldLocation().getPlane() != transport.getOrigin().getPlane()) {
@@ -751,7 +751,9 @@ public class Rs2Walker {
                     if (origin != null && origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                         continue;
                     if (path.stream().noneMatch(x -> x.equals(transport.getDestination()))) continue;
-                    if (Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 3) continue;
+                    if ((transport.getType() == TransportType.TELEPORTATION_ITEM ||
+                            transport.getType() == TransportType.TELEPORTATION_SPELL) &&
+                                    Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 3) continue;
 
                     // we don't need to check for teleportation_item & teleportation_spell as they will be set on the first tile
                     if (transport.getType() != TransportType.TELEPORTATION_ITEM && transport.getType() != TransportType.TELEPORTATION_SPELL) {
@@ -889,8 +891,7 @@ public class Rs2Walker {
             if (handleObjectExceptions(tileObject)) return;
             if (transport.getType() == TransportType.AGILITY_SHORTCUT) {
                 Rs2Player.waitForAnimation();
-            }
-            if (transport.getType() == TransportType.MINECART) {
+            } else if (transport.getType() == TransportType.MINECART) {
                 if (interactWithAdventureLog(transport)) {
                     sleep(600 * 2); // wait extra 2 game ticks before moving
                 }
@@ -964,7 +965,7 @@ public class Rs2Walker {
             if (itemAction.equalsIgnoreCase("rub")) {
                 //Xeric talisman opens a different interface than amulet of glory
                 if (Rs2Inventory.interact(itemId, itemAction)) {
-                    if (itemId == ItemID.XERICS_TALISMAN ||  transport.getDisplayInfo().toLowerCase().contains("skills necklace")) {
+                    if (itemId == ItemID.XERICS_TALISMAN || transport.getDisplayInfo().toLowerCase().contains("skills necklace")) {
                         interactWithAdventureLog(transport);
                     } else {
                         sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
