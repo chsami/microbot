@@ -158,6 +158,11 @@ public class GiantsFoundryScript extends Script {
                 && !Rs2Inventory.hasItemAmount(config.FirstBar().getName(), 14) && !canPour()) {
             Rs2Bank.useBank();
             //check if inv is empty and deposit all inv items
+            if(Rs2Bank.count(config.FirstBar().getName()) < 14 || Rs2Bank.count(config.SecondBar().getName()) < 14) {
+                Microbot.log("Insufficient bars in bank to continue");
+                this.shutdown();
+                return;
+            }
             Rs2Bank.withdrawX(true, config.FirstBar().getName(), 14);
             Rs2Bank.withdrawX(true, config.SecondBar().getName(), 14);
             Rs2Bank.closeBank();
@@ -229,8 +234,10 @@ public class GiantsFoundryScript extends Script {
         if (remainingDuration == 0 && change == 0 && state != State.CRAFTING_WEAPON) {
             setState(State.CRAFTING_WEAPON);
         }
-        if (remainingDuration != 0) return;
-        
+
+        doAction = !Rs2Player.isAnimating();
+        if (!doAction && remainingDuration != 0) return;
+
         if (change < 0) {
             setState(State.COOLING_DOWN);
         } else if (change > 0) {
@@ -245,6 +252,7 @@ public class GiantsFoundryScript extends Script {
                         || Rs2Player.getWorldLocation().equals(new WorldPoint(3371, 11498, 0));
                 if (!doAction && isAtLavaTile) return;
                 Rs2GameObject.interact(LAVA_POOL, "Heat-preform");
+                Rs2Player.waitForAnimation();
                 GiantsFoundryState.heatingCoolingState.stop();
                 GiantsFoundryState.heatingCoolingState.setup(7, 0, "heats");
                 GiantsFoundryState.heatingCoolingState.start(GiantsFoundryState.getHeatAmount());
@@ -254,6 +262,7 @@ public class GiantsFoundryScript extends Script {
                 boolean isAtWaterFallTile = Rs2Player.getWorldLocation().equals(new WorldPoint(3360, 11489, 0));
                 if (!doAction && isAtWaterFallTile) return;
                 Rs2GameObject.interact(WATERFALL, "Cool-preform");
+                Rs2Player.waitForAnimation();
                 GiantsFoundryState.heatingCoolingState.stop();
                 GiantsFoundryState.heatingCoolingState.setup(-7, 0, "cools");
                 GiantsFoundryState.heatingCoolingState.start(GiantsFoundryState.getHeatAmount());
@@ -268,7 +277,6 @@ public class GiantsFoundryScript extends Script {
         }
 
         doAction = false;
-
     }
 
 
