@@ -161,7 +161,8 @@ public class Rs2Tile {
                 var point = kvp.getKey();
                 LocalPoint localPoint;
                 if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
-                    var worldPoint = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), point).stream().findFirst().get();
+                    var worldPoint = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), point).stream().findFirst().orElse(null);
+                    if (worldPoint == null) break;
                     localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), worldPoint);
                 } else
                     localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
@@ -218,6 +219,7 @@ public class Rs2Tile {
 
     public static boolean isTileReachable(WorldPoint targetPoint) {
         if (targetPoint == null) return false;
+        if (targetPoint.getPlane() != Rs2Player.getWorldLocation().getPlane()) return false;
         boolean[][] visited = new boolean[104][104];
         int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
         WorldPoint playerLoc = Rs2Player.getWorldLocation();

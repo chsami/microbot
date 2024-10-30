@@ -192,7 +192,7 @@ public class Rs2Npc {
                 if (!hasLineOfSight(npc)) {
                     if (Microbot.cantReachTargetRetries >= Random.random(3, 5)) {
                         Microbot.pauseAllScripts = true;
-                        Microbot.showMessage("Your bot tries to interact with an npc for " + Microbot.cantReachTargetRetries + " times but failed. Please take a look at what is happening.");
+                        Microbot.showMessage("Your bot tried to interact with an npc for " + Microbot.cantReachTargetRetries + " times but failed. Please take a look at what is happening.");
                         return false;
                     }
                     Rs2Walker.walkTo(Rs2Tile.getNearestWalkableTileWithLineOfSight(npc.getWorldLocation()), 0);
