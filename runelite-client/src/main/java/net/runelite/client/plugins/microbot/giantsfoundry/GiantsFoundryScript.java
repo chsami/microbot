@@ -235,7 +235,10 @@ public class GiantsFoundryScript extends Script {
             setState(State.CRAFTING_WEAPON);
         }
 
-        doAction = !Rs2Player.isAnimating();
+        if(!Rs2Player.isAnimating(3000)) {
+            Microbot.log("Not animating, doAction -> true");
+            doAction = true;
+        }
         if (!doAction && remainingDuration != 0) return;
 
         if (change < 0) {
