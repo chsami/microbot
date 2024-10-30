@@ -947,8 +947,8 @@ public class Rs2Walker {
     public static boolean handleInventoryTeleports(Transport transport, int itemId) {
         Rs2Item rs2Item = Rs2Inventory.get(itemId);
         boolean hasItem = rs2Item != null;
-        List<String> actions = Arrays.asList("break", "teleport", "empty", "lletya", "prifddinas", "commune", "Rellekka", "Waterbirth Island", "Neitiznot", "Jatiszo",
-                "Ver Sinhaza", "Darkmeyer", "Slepe", "Troll Stronghold", "Weiss", "invoke", "rub");
+        List<String> actions = Arrays.asList("break", "teleport", "empty", "lletya", "prifddinas", "commune", "rellekka", "waterbirth island", "neitiznot", "jatiszo",
+                "ver sinhaza", "darkmeyer", "slepe", "troll stronghold", "weiss", "invoke", "rub");
         if (!hasItem) return false;
         boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
         //hasMultipleDestination is stuff like: games neck, ring of dueling etc...
