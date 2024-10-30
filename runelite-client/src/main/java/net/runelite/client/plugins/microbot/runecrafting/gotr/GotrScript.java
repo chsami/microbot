@@ -35,7 +35,6 @@ import static net.runelite.client.plugins.microbot.Microbot.log;
 import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
 import static net.runelite.client.plugins.microbot.util.math.Random.randomGaussian;
 
-
 public class GotrScript extends Script {
 
     public static String version = "1.1.3";
@@ -120,7 +119,7 @@ public class GotrScript extends Script {
 
                 checkPouches(Rs2Inventory.anyPouchUnknown(), 1500, 300);
 
-                //IS INSIDE THE MINIGAME
+                // IS INSIDE THE MINIGAME
                 int timeToStart = 0;
                 if (nextGameStart.isPresent()) {
                     timeToStart = ((int) ChronoUnit.SECONDS.between(Instant.now(), nextGameStart.get()));
@@ -130,15 +129,15 @@ public class GotrScript extends Script {
                     Rs2Inventory.drop("portal talisman");
                     log("Dropping portal talisman...");
                 }
-                //Repair colossal pouch asap to avoid disintegrate completely
+
+                // Repair colossal pouch if config option is enabled
                 if (Rs2Inventory.hasItem("colossal pouch") && Rs2Inventory.hasDegradedPouch()) {
-                    if (!repairPouches()) {
+                    if (config.repairPouch() && !repairPouches()) {
                         return;
                     }
                 }
 
                 boolean isInMinigame = !isOutsideBarrier() && isInMainRegion();
-
 
                 if (isInMinigame) {
 
@@ -150,8 +149,10 @@ public class GotrScript extends Script {
                     if (repairCells()) return;
 
                     if (usePortal()) return;
+
                     //mine huge guardian remains
                     if (mineHugeGuardianRemain()) return;
+
                     //deposit runes
                     if (depositRunesIntoPool()) return;
 
@@ -189,15 +190,13 @@ public class GotrScript extends Script {
                     return;
                 }
 
-
-                //IS NOT IN THE MINIGAME
+                // IS NOT IN THE MINIGAME
 
                 if (craftRunes()) return;
 
                 if (enterMinigame()) return;
 
                 if (waitForMinigameToStart()) return;
-
 
                 long endTime = System.currentTimeMillis();
                 totalTime = endTime - startTime;
@@ -215,7 +214,11 @@ public class GotrScript extends Script {
         if (getStartTimer() > randomGaussian(Random.random(20, 30), Random.random(1, 5)) || getStartTimer() == -1 || timeToStart > 10) {
 
             takeUnchargedCells();
-            repairPouches();
+
+            // Conditional repair based on config
+            if (config.repairPouch()) {
+                repairPouches();
+            }
 
             if (!shouldMineGuardianRemains) return true;
 
@@ -330,7 +333,7 @@ public class GotrScript extends Script {
             log("Crafting guardian essences...");
             return true;
         }
-       return false;
+        return false;
     }
 
     private boolean leaveLargeMine() {
@@ -427,7 +430,9 @@ public class GotrScript extends Script {
     private boolean mineHugeGuardianRemain() {
         if (isInHugeMine()) {
             if (getStartTimer() == -1) {
-                repairPouches();
+                if (config.repairPouch()) {
+                    repairPouches();
+                }
                 return false;
             }
             if (!Rs2Inventory.isFull()) {
@@ -485,7 +490,9 @@ public class GotrScript extends Script {
                     }
                     checkPouches(Random.random(1, 20) == 2, Random.random(100, 600), Random.random(100, 300));
 
-                    repairPouches();
+                    if (config.repairPouch()) {
+                        repairPouches();
+                    }
                     Rs2GameObject.interact(ObjectID.LARGE_GUARDIAN_REMAINS);
                     // we can assume that if the player is mining within the startTimer range, he will get enough guardian remains for the game
                     shouldMineGuardianRemains = false;
@@ -497,7 +504,9 @@ public class GotrScript extends Script {
                 if (Rs2Equipment.isWearing("dragon pickaxe")) {
                     Rs2Combat.setSpecState(true, 1000);
                 }
-                repairPouches();
+                if (config.repairPouch()) {
+                    repairPouches();
+                }
                 Rs2GameObject.interact(ObjectID.GUARDIAN_PARTS_43716);
                 // we can assume that if the player is mining within the startTimer range, he will get enough guardian remains for the game
                 shouldMineGuardianRemains = false;
@@ -579,11 +588,10 @@ public class GotrScript extends Script {
         int elementalPoints = Microbot.getVarbitValue(13686);
         int catalyticPoints = Microbot.getVarbitValue(13685);
         if (config.Mode() == Mode.BALANCED) {
-            Microbot.log(elementalPoints < catalyticPoints ? "We have " + elementalPoints + " elemental points, looking for elemental altar..." : "We have " + catalyticPoints +" catalytic points, looking for catalytic altar...");
+            Microbot.log(elementalPoints < catalyticPoints ? "We have " + elementalPoints + " elemental points, looking for elemental altar..." : "We have " + catalyticPoints + " catalytic points, looking for catalytic altar...");
         }
         return Rs2GameObject.getGameObjects().stream()
                 .filter(x -> {
-
                     if (!guardianPortalInfo.containsKey(x.getId())) return false;
                     if (GotrScript.guardianPortalInfo.get(x.getId()).getRequiredLevel()
                             > Microbot.getClient().getBoostedSkillLevel(Skill.RUNECRAFT)) {

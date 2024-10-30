@@ -39,4 +39,14 @@ public interface GotrConfig extends Config {
     default int maxAmountEssence() {
         return 20;
     }
+
+    @ConfigItem(
+            keyName = "repairPouches",
+            name = "Repair pouches with Lunar",
+            description = "Repair your pouches with the lunar spell book",
+            position = 3
+    )
+    default boolean repairPouch() {
+        return true;
+    }
 }
