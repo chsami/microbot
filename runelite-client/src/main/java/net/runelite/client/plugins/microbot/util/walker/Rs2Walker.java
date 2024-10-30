@@ -217,7 +217,6 @@ public class Rs2Walker {
                     sleepUntil(() -> Rs2Dialogue.hasDialogueOption("Yes, I'm brave."));
                     Rs2Dialogue.clickOption("Yes, I'm brave.");
                     sleep(1200, 2400);
-                    return WalkerState.MOVING;
                 }
             }
 
@@ -230,7 +229,6 @@ public class Rs2Walker {
 
             if (Rs2Widget.enterWilderness()) {
                 sleepUntil(Rs2Player::isAnimating);
-                return WalkerState.MOVING;
             }
 
             boolean doorOrTransportResult = false;
@@ -301,7 +299,10 @@ public class Rs2Walker {
                 return processWalk(target, distance);
             }
         } catch (Exception ex) {
-            if (ex instanceof InterruptedException) return WalkerState.EXIT;
+            if (ex instanceof InterruptedException) {
+                setTarget(null);
+                return WalkerState.EXIT;
+            }
             ex.printStackTrace(System.out);
             Microbot.log("Microbot Walker Exception " + ex.getMessage());
             System.out.println(ex.getMessage());
@@ -734,7 +735,14 @@ public class Rs2Walker {
     public static boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
 
         for (Transport transport : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new HashSet<>())) {
-            for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), transport.getOrigin())) {
+            Collection<WorldPoint> worldPointCollections;
+            //in some cases the getOrigin is null, for teleports that start the player location
+            if (transport.getOrigin() == null) {
+                worldPointCollections = Collections.singleton(null);
+            } else {
+                worldPointCollections  = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), transport.getOrigin());
+            }
+            for (WorldPoint origin : worldPointCollections) {
                 if (transport.getOrigin() != null && Rs2Player.getWorldLocation().getPlane() != transport.getOrigin().getPlane()) {
                     continue;
                 }
@@ -763,25 +771,18 @@ public class Rs2Walker {
                     if (path.get(i).equals(origin)) {
                         if (transport.getType() == TransportType.SHIP || transport.getType() == TransportType.NPC || transport.getType() == TransportType.BOAT
                                 || transport.getType() == TransportType.CHARTER_SHIP) {
-                            var npcAndAction = String.format("%s %s", transport.getAction(), transport.getName());
-                            NPC npc = null;
-                            String action = "";
-                            for (int n = npcAndAction.indexOf(" "); n >= 0; n = npcAndAction.indexOf(" ", n + 1)) {
-                                npc = Rs2Npc.getNpc(npcAndAction.substring(n + 1));
-                                if (npc != null) {
-                                    action = npcAndAction.substring(0, n);
-                                    break;
-                                }
-                            }
 
-                            if (Rs2Npc.canWalkTo(npc, 20)) {
-                                Rs2Npc.interact(npc, action);
+                            NPC npc = Rs2Npc.getNpc(transport.getObjectId());
+
+                            if (Rs2Npc.canWalkTo(npc, 20) && Rs2Npc.interact(npc, transport.getAction())) {
                                 Rs2Player.waitForWalking();
                                 sleep(600 * 2);
                                 if (Rs2Dialogue.clickOption("I'm just going to Pirates' cove")) {
                                     sleep(600 * 2);
                                     Rs2Dialogue.clickContinue();
                                 }
+                                sleepUntil(() -> !Rs2Player.isAnimating());
+                                sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
                             } else {
                                 Rs2Walker.walkFastCanvas(path.get(i));
                                 sleep(1200, 1600);
