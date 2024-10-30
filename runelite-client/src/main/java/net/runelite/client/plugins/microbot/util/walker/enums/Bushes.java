@@ -9,7 +9,7 @@ public enum Bushes {
     ARDOUGNE("Ardougne", new WorldPoint(2616, 3227, 0)),
     CHAMPIONS_GUILD("Champions Guild", new WorldPoint(3182, 3360, 0)),
     ETCETERIA("Etceteria", new WorldPoint(2592, 3865, 0)),
-    FARMING_GUILD("Farming Guild", new WorldPoint(1249, 3719, 0)),
+    FARMING_GUILD("Farming Guild", new WorldPoint(1260, 3731, 0)),
     RIMMINGTON("Rimmington", new WorldPoint(2942, 3223, 0));
 
     private final String name;

@@ -7,7 +7,7 @@ import net.runelite.api.coords.WorldPoint;
 public enum Trees {
     NONE("None"),
     FALADOR("Falador", new WorldPoint(3002, 3374, 0)),
-    FARMING_GUILD("Farming Guild", new WorldPoint(1249, 3719, 0)),
+    FARMING_GUILD("Farming Guild", new WorldPoint(1233, 3733, 0)),
     GNOME_STRONGHOLD("Gnome Stronghold", new WorldPoint(2437, 3418, 0)),
     LUMBRIDGE("Lumbridge", new WorldPoint(3195, 3230, 0)),
     TAVERLEY("Taverley", new WorldPoint(2936, 3450, 0)),
