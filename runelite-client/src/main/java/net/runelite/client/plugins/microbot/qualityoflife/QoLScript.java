@@ -114,8 +114,8 @@ public class QoLScript extends Script {
         Rs2Player.eatAt(percent);
     }
 
-    private void handleAutoDrinkPrayPot(int percent) {
-        Rs2Player.drinkPrayerPotionAt(percent);
+    private void handleAutoDrinkPrayPot(int points) {
+        Rs2Player.drinkPrayerPotionAt(points);
     }
 
     // handle dialogue continue
