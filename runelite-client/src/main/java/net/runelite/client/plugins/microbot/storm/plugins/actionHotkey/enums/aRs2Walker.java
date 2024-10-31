@@ -1,11 +1,10 @@
 package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums;
 
-public enum sRs2Npc implements Actionable {
-    ATTACK("attack"),
-    NPC_INTERACT("npcinteract");
+public enum aRs2Walker implements Actionable {
+    WALK_FAST_CANVAS("walkFastCanvas");
 
     private final String actions;
-    sRs2Npc(String actions) {
+    aRs2Walker(String actions) {
         this.actions = actions;
     }
 

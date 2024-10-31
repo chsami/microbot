@@ -1,12 +1,11 @@
 package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums;
 
-public enum Conditionals implements Actionable{
-    HAS_ITEM("hasItem"),
+public enum cOther implements Actionable{
     NONE("none");
 
 
     private final String conditionals;
-    Conditionals(String conditionals) {
+    cOther(String conditionals) {
         this.conditionals = conditionals;
     }
 

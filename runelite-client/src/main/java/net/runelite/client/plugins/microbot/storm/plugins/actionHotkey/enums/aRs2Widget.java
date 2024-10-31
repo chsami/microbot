@@ -1,10 +1,10 @@
 package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums;
 
-public enum sRs2GameObject implements Actionable {
-    OBJ_INTERACT("objinteract");
+public enum aRs2Widget implements Actionable {
+    GET_WIDGET("getWidget");
 
     private final String actions;
-    sRs2GameObject(String actions) {
+    aRs2Widget(String actions) {
         this.actions = actions;
     }
 

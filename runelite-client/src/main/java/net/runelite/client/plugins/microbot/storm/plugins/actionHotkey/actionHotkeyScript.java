@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class actionHotkeyScript extends Script {
-    public static double version = 1.1;
+    public static double version = 1.2;
     public static int previousKey;
     public static boolean key1isdown;
     public static boolean key2isdown;
@@ -117,41 +117,41 @@ public class actionHotkeyScript extends Script {
         if(this.isRunning()) { System.out.println("you should see this if the script is running"); }
     }
     public void firstHotKey() {
-        if (conditional(config.conditionsForTwo())) {
-            switch (config.firstCategoryName()) {
+        if (firstConditional()) {
+            switch (config.firstActionCategoryName()) {
                 case RS2NPC:
-                    handleCommonAction(config.firstRs2Npc(), config.firstParameterOne(), config.firstParameterTwo());
+                    handleCommonAction(config.firstARs2Npc(), config.firstParameterOne(), config.firstParameterTwo());
                     break;
                 case RS2PLAYER:
-                    handleCommonAction(config.firstRs2Player(), config.firstParameterOne(), config.firstParameterTwo());
+                    handleCommonAction(config.firstARs2Player(), config.firstParameterOne(), config.firstParameterTwo());
                     break;
                 case RS2INVENTORY:
-                    handleCommonAction(config.firstRs2Inventory(), config.firstParameterOne(), config.firstParameterTwo());
+                    handleCommonAction(config.firstARs2Inventory(), config.firstParameterOne(), config.firstParameterTwo());
                     break;
                 case RS2WALKER:
-                    handleCommonAction(config.firstRs2Walker(), config.firstParameterOne(), config.firstParameterTwo());
+                    handleCommonAction(config.firstARs2Walker(), config.firstParameterOne(), config.firstParameterTwo());
                     break;
                 case RS2GAMEOBJECT:
-                    handleCommonAction(config.firstRs2GameObject(), config.firstParameterOne(), config.firstParameterTwo());
+                    handleCommonAction(config.firstARs2GameObject(), config.firstParameterOne(), config.firstParameterTwo());
                     break;
                 case RS2WIDGET:
-                    handleCommonAction(config.firstRs2Widget(), config.firstParameterOne(), config.firstParameterTwo());
+                    handleCommonAction(config.firstARs2Widget(), config.firstParameterOne(), config.firstParameterTwo());
                     break;
                 case RS2BANK:
-                    handleCommonAction(config.firstRs2Bank(), config.firstParameterOne(), config.firstParameterTwo());
+                    handleCommonAction(config.firstARs2Bank(), config.firstParameterOne(), config.firstParameterTwo());
                     break;
                 case RS2MAGIC:
-                    handleCommonAction(config.firstRs2Magic(), config.firstParameterOne(), config.firstParameterTwo());
+                    handleCommonAction(config.firstARs2Magic(), config.firstParameterOne(), config.firstParameterTwo());
                     break;
                 case OTHER:
-                    handleCommonAction(config.firstOther(), config.firstParameterOne(), config.firstParameterTwo());
+                    handleCommonAction(config.firstAOther(), config.firstParameterOne(), config.firstParameterTwo());
                     break;
                 default:
-                    String currentCategory = config.firstCategoryName().getAction();
+                    String currentCategory = config.firstActionCategoryName().getAction();
                     if(key1isdown){key1isdown=false;} else {key2isdown=false;}
                     Microbot.showMessage("Unknown category: " + currentCategory);
                     while(this.isRunning()) {
-                        if(!Objects.equals(config.firstCategoryName().getAction(), currentCategory) || !this.isRunning()){
+                        if(!Objects.equals(config.firstActionCategoryName().getAction(), currentCategory) || !this.isRunning()){
                             break;
                         }
                         sleep(100,1000);
@@ -160,41 +160,41 @@ public class actionHotkeyScript extends Script {
         }
     }
     public void secondHotKey() {
-        if (conditional(config.conditionsForTwo())) {
-            switch (config.secondCategoryName()) {
+        if (secondConditional()) {
+            switch (config.secondActionCategoryName()) {
                 case RS2NPC:
-                    handleCommonAction(config.secondRs2Npc(), config.secondParameterOne(), config.secondParameterTwo());
+                    handleCommonAction(config.secondARs2Npc(), config.secondParameterOne(), config.secondParameterTwo());
                     break;
                 case RS2PLAYER:
-                    handleCommonAction(config.secondRs2Player(), config.secondParameterOne(), config.secondParameterTwo());
+                    handleCommonAction(config.secondARs2Player(), config.secondParameterOne(), config.secondParameterTwo());
                     break;
                 case RS2INVENTORY:
-                    handleCommonAction(config.secondRs2Inventory(), config.secondParameterOne(), config.secondParameterTwo());
+                    handleCommonAction(config.secondARs2Inventory(), config.secondParameterOne(), config.secondParameterTwo());
                     break;
                 case RS2WALKER:
-                    handleCommonAction(config.secondRs2Walker(), config.secondParameterOne(), config.secondParameterTwo());
+                    handleCommonAction(config.secondARs2Walker(), config.secondParameterOne(), config.secondParameterTwo());
                     break;
                 case RS2GAMEOBJECT:
-                    handleCommonAction(config.secondRs2GameObject(), config.secondParameterOne(), config.secondParameterTwo());
+                    handleCommonAction(config.secondARs2GameObject(), config.secondParameterOne(), config.secondParameterTwo());
                     break;
                 case RS2WIDGET:
-                    handleCommonAction(config.secondRs2Widget(), config.secondParameterOne(), config.secondParameterTwo());
+                    handleCommonAction(config.secondARs2Widget(), config.secondParameterOne(), config.secondParameterTwo());
                     break;
                 case RS2BANK:
-                    handleCommonAction(config.secondRs2Bank(), config.secondParameterOne(), config.secondParameterTwo());
+                    handleCommonAction(config.secondARs2Bank(), config.secondParameterOne(), config.secondParameterTwo());
                     break;
                 case RS2MAGIC:
-                    handleCommonAction(config.secondRs2Magic(), config.secondParameterOne(), config.secondParameterTwo());
+                    handleCommonAction(config.secondARs2Magic(), config.secondParameterOne(), config.secondParameterTwo());
                     break;
                 case OTHER:
-                    handleCommonAction(config.secondOther(), config.secondParameterOne(), config.secondParameterTwo());
+                    handleCommonAction(config.secondAOther(), config.secondParameterOne(), config.secondParameterTwo());
                     break;
                 default:
-                    String currentCategory = config.secondCategoryName().getAction();
+                    String currentCategory = config.secondActionCategoryName().getAction();
                     if(key1isdown){key1isdown=false;} else {key2isdown=false;}
                     Microbot.showMessage("Unknown category: " + currentCategory);
                     while(this.isRunning()) {
-                        if(!Objects.equals(config.secondCategoryName().getAction(), currentCategory) || !this.isRunning()){
+                        if(!Objects.equals(config.secondActionCategoryName().getAction(), currentCategory) || !this.isRunning()){
                             break;
                         }
                         sleep(100,1000);
@@ -202,50 +202,49 @@ public class actionHotkeyScript extends Script {
             }
         }
     }
-    public boolean conditional(Actionable actionable) {
-        if (actionable == config.conditionsForOne()) {
-            switch (config.conditionsForOne()) {
+    public boolean firstConditional() {
+            switch (config.firstConditionCategoryName()) {
                 case NONE:
-                    return true;
-                case HAS_ITEM:
-                    return handleCommonCondition(config.conditionsForOne(), config.firstConditionParameterOne(), config.firstConditionParameterTwo());
+                    return handleCommonCondition(config.firstCOther(), config.firstConditionParameterOne(), config.firstConditionParameterTwo());
+                case RS2INVENTORY:
+                    return handleCommonCondition(config.firstCRs2Inventory(), config.firstConditionParameterOne(), config.firstConditionParameterTwo());
                 default:
-                    String currentCondition = config.conditionsForOne().getAction();
+                    String currentCategory = config.firstConditionCategoryName().getAction();
                     if(key1isdown){key1isdown=false;} else {key2isdown=false;}
-                    Microbot.showMessage("Unknown condition: " + currentCondition);
+                    Microbot.showMessage("Unknown category: " + currentCategory);
                     while(this.isRunning()) {
-                        if(!Objects.equals(config.conditionsForOne().getAction(), currentCondition) || !this.isRunning()){
+                        if(!Objects.equals(config.firstConditionCategoryName().getAction(), currentCategory) || !this.isRunning()){
                             break;
                         }
                         sleep(100,1000);
                     }
-                    return false;
             }
-        } else {
-            switch (config.conditionsForTwo()) {
-                case NONE:
-                    return true;
-                case HAS_ITEM:
-                    return handleCommonCondition(config.conditionsForTwo(), config.secondConditionParameterOne(), config.secondConditionParameterTwo());
-                default:
-                    String currentCondition = config.conditionsForTwo().getAction();
-                    if(key1isdown){key1isdown=false;} else {key2isdown=false;}
-                    Microbot.showMessage("Unknown condition: " + currentCondition);
-                    while(this.isRunning()) {
-                        if(!Objects.equals(config.conditionsForTwo().getAction(), currentCondition) || !this.isRunning()){
-                            break;
-                        }
-                        sleep(100,1000);
+            return false;
+    }
+    public boolean secondConditional() {
+        switch (config.secondConditionCategoryName()) {
+            case NONE:
+                return handleCommonCondition(config.secondCOther(), config.secondConditionParameterOne(), config.secondConditionParameterTwo());
+            case RS2INVENTORY:
+                return handleCommonCondition(config.secondCRs2Inventory(), config.secondConditionParameterOne(), config.secondConditionParameterTwo());
+            default:
+                String currentCategory = config.secondConditionCategoryName().getAction();
+                if(key1isdown){key1isdown=false;} else {key2isdown=false;}
+                Microbot.showMessage("Unknown category: " + currentCategory);
+                while(this.isRunning()) {
+                    if(!Objects.equals(config.secondActionCategoryName().getAction(), currentCategory) || !this.isRunning()){
+                        break;
                     }
-                    return false;
-            }
+                    sleep(100,1000);
+                }
         }
+        return false;
     }
     public void action(Actionable action, int ID) {
         if (minInterval == 0 || System.currentTimeMillis() > (previousAction + minInterval)) {
             if (this.isRunning()) {
-                if (action instanceof sRs2Bank) {
-                    switch ((sRs2Bank) action) {
+                if (action instanceof aRs2Bank) {
+                    switch ((aRs2Bank) action) {
                         case WITHDRAW_ALL:
                             Rs2Bank.withdrawAll(ID);
                             break;
@@ -256,14 +255,14 @@ public class actionHotkeyScript extends Script {
                             Rs2Bank.depositAll(ID);
                             break;
                     }
-                } else if (action instanceof sRs2Walker) {
-                    switch ((sRs2Walker) action) {
+                } else if (action instanceof aRs2Walker) {
+                    switch ((aRs2Walker) action) {
                         case WALK_FAST_CANVAS:
                             Rs2Walker.walkFastCanvas(new WorldPoint(ID, 0, Rs2Player.getWorldLocation().getPlane()));
                             break;
                     }
-                } else if (action instanceof sRs2Inventory) {
-                    switch ((sRs2Inventory) action) {
+                } else if (action instanceof aRs2Inventory) {
+                    switch ((aRs2Inventory) action) {
                         case DROP_ITEM:
                             Rs2Inventory.drop(ID);
                             break;
@@ -289,14 +288,14 @@ public class actionHotkeyScript extends Script {
                             Rs2Inventory.dropAll(ID);
                             break;
                     }
-                } else if (action instanceof sRs2GameObject) {
-                    switch ((sRs2GameObject) action) {
+                } else if (action instanceof aRs2GameObject) {
+                    switch ((aRs2GameObject) action) {
                         case OBJ_INTERACT:
                             Rs2GameObject.interact(ID);
                             break;
                     }
-                } else if (action instanceof sRs2Npc) {
-                    switch ((sRs2Npc) action) {
+                } else if (action instanceof aRs2Npc) {
+                    switch ((aRs2Npc) action) {
                         case ATTACK:
                             Rs2Npc.attack(ID);
                             break;
@@ -319,8 +318,8 @@ public class actionHotkeyScript extends Script {
     public void action(Actionable action, String name) {
         if (minInterval == 0 || System.currentTimeMillis() > (previousAction + minInterval)) {
             if (this.isRunning()) {
-                if (action instanceof sRs2Bank) {
-                    switch ((sRs2Bank) action) {
+                if (action instanceof aRs2Bank) {
+                    switch ((aRs2Bank) action) {
                         case WITHDRAW_ALL:
                             Rs2Bank.withdrawAll(name);
                             break;
@@ -328,14 +327,14 @@ public class actionHotkeyScript extends Script {
                             Rs2Bank.withdrawOne(name);
                             break;
                     }
-                } else if (action instanceof sRs2Npc) {
-                    switch ((sRs2Npc) action) {
+                } else if (action instanceof aRs2Npc) {
+                    switch ((aRs2Npc) action) {
                         case ATTACK:
                             Rs2Npc.attack(name);
                             break;
                     }
-                } else if (action instanceof sRs2Inventory) {
-                    switch ((sRs2Inventory) action) {
+                } else if (action instanceof aRs2Inventory) {
+                    switch ((aRs2Inventory) action) {
                         case DROP_ITEM:
                             Rs2Inventory.drop(name);
                             break;
@@ -358,26 +357,26 @@ public class actionHotkeyScript extends Script {
     public void action(Actionable action, int ID, String menu) {
         if (minInterval == 0 || System.currentTimeMillis() > (previousAction + minInterval)) {
             if (this.isRunning()) {
-                if (action instanceof sRs2Inventory) {
-                    switch ((sRs2Inventory) action) {
+                if (action instanceof aRs2Inventory) {
+                    switch ((aRs2Inventory) action) {
                         case INV_INTERACT:
                             Rs2Inventory.interact(ID, menu);
                             break;
                     }
-                } else if (action instanceof sRs2Npc) {
-                    switch ((sRs2Npc) action) {
+                } else if (action instanceof aRs2Npc) {
+                    switch ((aRs2Npc) action) {
                         case NPC_INTERACT:
                             Rs2Npc.interact(ID, menu);
                             break;
                     }
-                } else if (action instanceof sRs2GameObject) {
-                    switch ((sRs2GameObject) action) {
+                } else if (action instanceof aRs2GameObject) {
+                    switch ((aRs2GameObject) action) {
                         case OBJ_INTERACT:
                             Rs2GameObject.interact(ID, menu);
                             break;
                     }
-                } else if (action instanceof Other) {
-                    switch ((Other) action) {
+                } else if (action instanceof aOther) {
+                    switch ((aOther) action) {
                         case PRINTLN:
                             //at some point add something to pass parameters to eachother so we can do things like print anything like we do here for widgets.
                             //System.out.println(Rs2Widget.getWidget(ID));
@@ -423,8 +422,8 @@ public class actionHotkeyScript extends Script {
     public void action(Actionable action, int ID, int value){
         if (minInterval == 0 || System.currentTimeMillis() > (previousAction + minInterval)) {
             if (this.isRunning()) {
-                if (action instanceof sRs2Walker) {
-                    switch ((sRs2Walker) action) {
+                if (action instanceof aRs2Walker) {
+                    switch ((aRs2Walker) action) {
                         case WALK_FAST_CANVAS:
                             Rs2Walker.walkFastCanvas(new WorldPoint(ID, value, Rs2Player.getWorldLocation().getPlane()));
                     }
@@ -435,8 +434,8 @@ public class actionHotkeyScript extends Script {
     public void action(Actionable action){
         if (minInterval == 0 || System.currentTimeMillis() > (previousAction + minInterval)) {
             if (this.isRunning()) {
-                if (action instanceof sRs2Player) {
-                    switch ((sRs2Player) action) {
+                if (action instanceof aRs2Player) {
+                    switch ((aRs2Player) action) {
                         case LOGOUT:
                             Rs2Player.logout();
                             break;
@@ -444,8 +443,8 @@ public class actionHotkeyScript extends Script {
                             Rs2Player.useFood();
                             break;
                     }
-                } else if (action instanceof sRs2Bank) {
-                    switch ((sRs2Bank) action) {
+                } else if (action instanceof aRs2Bank) {
+                    switch ((aRs2Bank) action) {
                         case OPEN_BANK:
                             Rs2Bank.openBank();
                             break;
@@ -466,8 +465,8 @@ public class actionHotkeyScript extends Script {
     }
     public boolean condition(Actionable action){
         if (this.isRunning()) {
-            if(action instanceof Conditionals) {
-                switch ((Conditionals) action) {
+            if(action instanceof cOther) {
+                switch ((cOther) action) {
                     case NONE:
                         return true;
                 }
@@ -477,34 +476,38 @@ public class actionHotkeyScript extends Script {
     }
     public boolean condition(Actionable action, int ID){
         if (this.isRunning()) {
-            if(action instanceof Conditionals) {
-                switch ((Conditionals) action) {
+            if(action instanceof cOther) {
+                switch ((cOther) action) {
                     case NONE:
                         return true;
+                }
+            } else if (action instanceof cRs2Inventory)
+                switch ((cRs2Inventory) action) {
                     case HAS_ITEM:
                         return Rs2Inventory.hasItem(ID);
                 }
-            }
         }
         return false;
     }
     public boolean condition(Actionable action, String name){
         if (this.isRunning()) {
-            if(action instanceof Conditionals) {
-                switch ((Conditionals) action) {
+            if(action instanceof cOther) {
+                switch ((cOther) action) {
                     case NONE:
                         return true;
+                }
+            } else if (action instanceof cRs2Inventory)
+                switch ((cRs2Inventory) action) {
                     case HAS_ITEM:
                         return Rs2Inventory.hasItem(name);
                 }
-            }
         }
         return false;
     }
     public boolean condition(Actionable action, int ID, String name){
         if (this.isRunning()) {
-            if(action instanceof Conditionals) {
-                switch ((Conditionals) action) {
+            if(action instanceof cOther) {
+                switch ((cOther) action) {
                     case NONE:
                         return true;
                 }
@@ -514,8 +517,8 @@ public class actionHotkeyScript extends Script {
     }
     public boolean condition(Actionable action, String name, int value){
         if (this.isRunning()) {
-            if(action instanceof Conditionals) {
-                switch ((Conditionals) action) {
+            if(action instanceof cOther) {
+                switch ((cOther) action) {
                     case NONE:
                         return true;
                 }
@@ -525,8 +528,8 @@ public class actionHotkeyScript extends Script {
     }
     public boolean condition(Actionable action, int ID, int value){
         if (this.isRunning()) {
-            if(action instanceof Conditionals) {
-                switch ((Conditionals) action) {
+            if(action instanceof cOther) {
+                switch ((cOther) action) {
                     case NONE:
                         return true;
                 }
@@ -536,8 +539,8 @@ public class actionHotkeyScript extends Script {
     }
     public boolean condition(Actionable action, String name, String ID){
         if (this.isRunning()) {
-            if(action instanceof Conditionals) {
-                switch ((Conditionals) action) {
+            if(action instanceof cOther) {
+                switch ((cOther) action) {
                     case NONE:
                         return true;
                 }
@@ -592,7 +595,7 @@ public class actionHotkeyScript extends Script {
         boolean isP2Numeric = Pattern.compile("[0-9]+").matcher(parameterTwo).matches();
         if (parameterOne.isEmpty()) {
             if (parameterTwo.isEmpty()) {
-                action(condition);//(empty, empty)
+                condition(condition);//(empty, empty)
             } else if (isP2Numeric) {//(empty, int)
                 firstEmpty(condition,"int");
             } else {//(empty, String)

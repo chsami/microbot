@@ -33,7 +33,8 @@ public interface actionHotkeyConfig extends Config {
         return "Set the mode of operation and \n" +
                 "Category under Options, then \n" +
                 "go to the same Category to \n" +
-                "set your parameters, and action.";
+                "set your parameters, and action. \n" +
+                "the same applies for conditions.";
     }
     @ConfigSection(
             name = "Options",
@@ -43,30 +44,38 @@ public interface actionHotkeyConfig extends Config {
     )
     String options = "Options";
     @ConfigSection(
-            name = "Conditions",
-            description = "Conditions",
-            position = 7,
-            closedByDefault = true
-    )
-    String conditionsSection = "Conditions";
-    @ConfigSection(
-            name = "First Category",
-            description = "first category",
+            name = "First Action Category",
+            description = "first action category",
             position = 8,
             closedByDefault = true
     )
-    String firstCategories = "First Category";
+    String firstActionCategories = "First Action Category";
     @ConfigSection(
-            name = "Second Category",
-            description = "second category",
+            name = "Second Action Category",
+            description = "second action category",
             position = 9,
             closedByDefault = true
     )
-    String secondCategories = "Second Category";
+    String secondActionCategories = "Second Action Category";
+
+    @ConfigSection(
+            name = "First Condition Category",
+            description = "first condition category",
+            position = 10,
+            closedByDefault = true
+    )
+    String firstConditionCategories = "First Condition Category";
+    @ConfigSection(
+            name = "Second Condition Category",
+            description = "second condition category",
+            position = 11,
+            closedByDefault = true
+    )
+    String secondConditionCategories = "Second Condition Category";
     @ConfigSection(
             name = "debug",
             description = "debug",
-            position = 10,
+            position = 12,
             closedByDefault = true
     )
     String debug = "Debug";
@@ -76,80 +85,90 @@ public interface actionHotkeyConfig extends Config {
     default boolean alternate() { return false; }
     @ConfigItem(keyName = "First Key", name = "First Key", description = "what should first key be?", position = 2, section = options)
     default Keys key1() { return Keys.VK_ESCAPE; }
-    @ConfigItem(keyName = "firstCategory", name = "1 Category ", description = "pick category for first action", position = 3, section = options)
-    default Categories firstCategoryName() { return Categories.RS2BANK; }
-    @ConfigItem(keyName = "Second Key", name = "Second Key", description = "what should Second Key be?", position = 4, section = options)
+    @ConfigItem(keyName = "firstActionCategory", name = "1A Category ", description = "pick category for first action", position = 3, section = options)
+    default actionsCategories firstActionCategoryName() { return actionsCategories.RS2BANK; }
+    @ConfigItem(keyName = "firstConditionCategory", name = "1C Category ", description = "pick category for first condition", position = 4, section = options)
+    default conditionsCategories firstConditionCategoryName() { return conditionsCategories.NONE; }
+    @ConfigItem(keyName = "Second Key", name = "Second Key", description = "what should Second Key be?", position = 5, section = options)
     default Keys key2() { return Keys.VK_CONTROL; }
-    @ConfigItem(keyName = "secondCategory", name = "2 Category ", description = "pick category for second action", position = 5, section = options)
-    default Categories secondCategoryName() { return Categories.RS2BANK; }
-
-    @ConfigItem(keyName = "sleepMin", name = "sleepMin", description = "Minimum sleep time", position = 6, section = options)
+    @ConfigItem(keyName = "secondActionCategory", name = "2A Category ", description = "pick category for second action", position = 6, section = options)
+    default actionsCategories secondActionCategoryName() { return actionsCategories.RS2BANK; }
+    @ConfigItem(keyName = "secondConditionCategory", name = "2C Category ", description = "pick category for second condition", position = 7, section = options)
+    default conditionsCategories secondConditionCategoryName() { return conditionsCategories.NONE; }
+    @ConfigItem(keyName = "sleepMin", name = "sleepMin", description = "Minimum sleep time", position = 8, section = options)
     @Range( min = 60, max = 30000 )
     default int sleepMin() { return 60; }
-    @ConfigItem(keyName = "sleepMax", name = "sleepMax", description = "Maximum sleep time", position = 7, section = options)
+    @ConfigItem(keyName = "sleepMax", name = "sleepMax", description = "Maximum sleep time", position = 9, section = options)
     @Range( min = 90, max = 30000 )
     default int sleepMax() { return 160; }
 
 
-    @ConfigItem(keyName = "firstCondition", name = "condition for first", description = "What should the condition be for hotkey 1?", position = 0, section = conditionsSection)
-    default Conditionals conditionsForOne() { return Conditionals.NONE; }
-    @ConfigItem(keyName = "firstConditionIDEntry", name = "first parameter for condition one?", description = "what ID to send to first condition?", position = 1, section = conditionsSection)
-    default String firstConditionParameterOne() { return ""; }
-    @ConfigItem(keyName = "firstConditionMenu", name = "second parameter for condition one?", description = "what condition one menu?", position = 2, section = conditionsSection)
-    default String firstConditionParameterTwo() { return ""; }
-    @ConfigItem(keyName = "secondCondition", name = "condition for second", description = "What should the condition be for hotkey 2?", position = 3, section = conditionsSection)
-    default Conditionals conditionsForTwo() { return Conditionals.NONE; }
-    @ConfigItem(keyName = "secondConditionIDEntry", name = "first parameter for condition two?", description = "what ID to send to second condition?", position = 4, section = conditionsSection)
-    default String secondConditionParameterOne() { return ""; }
-    @ConfigItem(keyName = "secondConditionMenu", name = "second parameter for condition two?", description = "what condition two menu?", position = 5, section = conditionsSection)
-    default String secondConditionParameterTwo() { return ""; }
 
-    @ConfigItem(keyName = "firstActionIDEntry", name = "first parameter for first action?", description = "what ID to send to action?", position = 0, section = firstCategories)
+    @ConfigItem(keyName = "firstActionIDEntry", name = "first parameter for first action?", description = "what ID to send to action?", position = 0, section = firstActionCategories)
     default String firstParameterOne() { return ""; }
-    @ConfigItem(keyName = "firstActionMenu", name = "second parameter for first action?", description = "what action menu", position = 1, section = firstCategories)
+    @ConfigItem(keyName = "firstActionMenu", name = "second parameter for first action?", description = "what action menu", position = 1, section = firstActionCategories)
     default String firstParameterTwo() { return ""; }
-    @ConfigItem(keyName = "firstRs2Bank", name = "Rs2Bank Action", description = "pick action for Rs2Bank", position = 3, section = firstCategories)
-    default sRs2Bank firstRs2Bank() { return sRs2Bank.OPEN_BANK; }
-    @ConfigItem(keyName = "firstRs2GameObject", name = "Rs2GameObject Action", description = "pick action for Rs2GameObject", position = 3, section = firstCategories)
-    default sRs2GameObject firstRs2GameObject() { return sRs2GameObject.OBJ_INTERACT; }
-    @ConfigItem(keyName = "firstRs2Inventory", name = "Rs2Inventory Action", description = "pick action for Rs2Inventory", position = 3, section = firstCategories)
-    default sRs2Inventory firstRs2Inventory() { return sRs2Inventory.INV_INTERACT; }
-    @ConfigItem(keyName = "firstRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 3, section = firstCategories)
-    default sRs2Npc firstRs2Npc() { return sRs2Npc.NPC_INTERACT; }
-    @ConfigItem(keyName = "firstRs2Player", name = "Rs2Player Action", description = "pick action for Rs2Player", position = 3, section = firstCategories)
-    default sRs2Player firstRs2Player() { return sRs2Player.USE_FOOD; }
-    @ConfigItem(keyName = "firstRs2Walker", name = "Rs2Walker Action", description = "pick action for Rs2Walker", position = 3, section = firstCategories)
-    default sRs2Walker firstRs2Walker() { return sRs2Walker.WALK_FAST_CANVAS; }
-    @ConfigItem(keyName = "firstRs2Widget", name = "Rs2Widget Action", description = "pick action for Rs2Widget", position = 3, section = firstCategories)
-    default sRs2Widget firstRs2Widget() { return sRs2Widget.GET_WIDGET; }
-    @ConfigItem(keyName = "firstRs2Magic", name = "Rs2Magic Action", description = "pick action for Rs2Magic", position = 3, section = firstCategories)
-    default sRs2Magic firstRs2Magic() { return sRs2Magic.ALCH; }
-    @ConfigItem(keyName = "firstOther", name = "Other Action", description = "pick action for Other", position = 3, section = firstCategories)
-    default Other firstOther() { return Other.PRINTLN; }
+    @ConfigItem(keyName = "firstARs2Bank", name = "Rs2Bank Action", description = "pick action for Rs2Bank", position = 3, section = firstActionCategories)
+    default aRs2Bank firstARs2Bank() { return aRs2Bank.OPEN_BANK; }
+    @ConfigItem(keyName = "firstARs2GameObject", name = "Rs2GameObject Action", description = "pick action for Rs2GameObject", position = 3, section = firstActionCategories)
+    default aRs2GameObject firstARs2GameObject() { return aRs2GameObject.OBJ_INTERACT; }
+    @ConfigItem(keyName = "firstARs2Inventory", name = "Rs2Inventory Action", description = "pick action for Rs2Inventory", position = 3, section = firstActionCategories)
+    default aRs2Inventory firstARs2Inventory() { return aRs2Inventory.INV_INTERACT; }
+    @ConfigItem(keyName = "firstARs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 3, section = firstActionCategories)
+    default aRs2Npc firstARs2Npc() { return aRs2Npc.NPC_INTERACT; }
+    @ConfigItem(keyName = "firstARs2Player", name = "Rs2Player Action", description = "pick action for Rs2Player", position = 3, section = firstActionCategories)
+    default aRs2Player firstARs2Player() { return aRs2Player.USE_FOOD; }
+    @ConfigItem(keyName = "firstARs2Walker", name = "Rs2Walker Action", description = "pick action for Rs2Walker", position = 3, section = firstActionCategories)
+    default aRs2Walker firstARs2Walker() { return aRs2Walker.WALK_FAST_CANVAS; }
+    @ConfigItem(keyName = "firstARs2Widget", name = "Rs2Widget Action", description = "pick action for Rs2Widget", position = 3, section = firstActionCategories)
+    default aRs2Widget firstARs2Widget() { return aRs2Widget.GET_WIDGET; }
+    @ConfigItem(keyName = "firstARs2Magic", name = "Rs2Magic Action", description = "pick action for Rs2Magic", position = 3, section = firstActionCategories)
+    default aRs2Magic firstARs2Magic() { return aRs2Magic.ALCH; }
+    @ConfigItem(keyName = "firstAOther", name = "Other Action", description = "pick action for aOther", position = 3, section = firstActionCategories)
+    default aOther firstAOther() { return aOther.PRINTLN; }
 
 
-    @ConfigItem(keyName = "secondActionIDEntry", name = "first parameter for second action?", description = "what ID to send to action?", position = 0, section = secondCategories)
+    @ConfigItem(keyName = "secondParameterOne", name = "first parameter for second action?", description = "what ID to send to action?", position = 0, section = secondActionCategories)
     default String secondParameterOne() { return ""; }
-    @ConfigItem(keyName = "secondActionMenu", name = "second parameter for second action?", description = "what action menu", position = 1, section = secondCategories)
+    @ConfigItem(keyName = "secondParameterTwo", name = "second parameter for second action?", description = "what action menu", position = 1, section = secondActionCategories)
     default String secondParameterTwo() { return ""; }
-    @ConfigItem(keyName = "secondRs2Bank", name = "Rs2Bank Action", description = "pick action for Rs2Bank", position = 3, section = secondCategories)
-    default sRs2Bank secondRs2Bank() { return sRs2Bank.OPEN_BANK; }
-    @ConfigItem(keyName = "secondRs2GameObject", name = "Rs2GameObject Action", description = "pick action for Rs2GameObject", position = 3, section = secondCategories)
-    default sRs2GameObject secondRs2GameObject() { return sRs2GameObject.OBJ_INTERACT; }
-    @ConfigItem(keyName = "secondRs2Inventory", name = "Rs2Inventory Action", description = "pick action for Rs2Inventory", position = 3, section = secondCategories)
-    default sRs2Inventory secondRs2Inventory() { return sRs2Inventory.INV_INTERACT; }
-    @ConfigItem(keyName = "secondRs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 3, section = secondCategories)
-    default sRs2Npc secondRs2Npc() { return sRs2Npc.NPC_INTERACT; }
-    @ConfigItem(keyName = "secondRs2Player", name = "Rs2Player Action", description = "pick action for Rs2Player", position = 3, section = secondCategories)
-    default sRs2Player secondRs2Player() { return sRs2Player.USE_FOOD; }
-    @ConfigItem(keyName = "secondRs2Walker", name = "Rs2Walker Action", description = "pick action for Rs2Walker", position = 3, section = secondCategories)
-    default sRs2Walker secondRs2Walker() { return sRs2Walker.WALK_FAST_CANVAS; }
-    @ConfigItem(keyName = "secondRs2Widget", name = "Rs2Widget Action", description = "pick action for Rs2Widget", position = 3, section = secondCategories)
-    default sRs2Widget secondRs2Widget() { return sRs2Widget.GET_WIDGET; }
-    @ConfigItem(keyName = "secondRs2Magic", name = "Rs2Magic Action", description = "pick action for Rs2Magic", position = 3, section = secondCategories)
-    default sRs2Magic secondRs2Magic() { return sRs2Magic.ALCH; }
-    @ConfigItem(keyName = "secondOther", name = "Other Action", description = "pick action for Other", position = 3, section = secondCategories)
-    default Other secondOther() { return Other.PRINTLN; }
+    @ConfigItem(keyName = "secondARs2Bank", name = "Rs2Bank Action", description = "pick action for Rs2Bank", position = 3, section = secondActionCategories)
+    default aRs2Bank secondARs2Bank() { return aRs2Bank.OPEN_BANK; }
+    @ConfigItem(keyName = "secondARs2GameObject", name = "Rs2GameObject Action", description = "pick action for Rs2GameObject", position = 3, section = secondActionCategories)
+    default aRs2GameObject secondARs2GameObject() { return aRs2GameObject.OBJ_INTERACT; }
+    @ConfigItem(keyName = "secondARs2Inventory", name = "Rs2Inventory Action", description = "pick action for Rs2Inventory", position = 3, section = secondActionCategories)
+    default aRs2Inventory secondARs2Inventory() { return aRs2Inventory.INV_INTERACT; }
+    @ConfigItem(keyName = "secondARs2Npc", name = "Rs2Npc Action", description = "pick action for Rs2Npc", position = 3, section = secondActionCategories)
+    default aRs2Npc secondARs2Npc() { return aRs2Npc.NPC_INTERACT; }
+    @ConfigItem(keyName = "secondARs2Player", name = "Rs2Player Action", description = "pick action for Rs2Player", position = 3, section = secondActionCategories)
+    default aRs2Player secondARs2Player() { return aRs2Player.USE_FOOD; }
+    @ConfigItem(keyName = "secondARs2Walker", name = "Rs2Walker Action", description = "pick action for Rs2Walker", position = 3, section = secondActionCategories)
+    default aRs2Walker secondARs2Walker() { return aRs2Walker.WALK_FAST_CANVAS; }
+    @ConfigItem(keyName = "secondARs2Widget", name = "Rs2Widget Action", description = "pick action for Rs2Widget", position = 3, section = secondActionCategories)
+    default aRs2Widget secondARs2Widget() { return aRs2Widget.GET_WIDGET; }
+    @ConfigItem(keyName = "secondARs2Magic", name = "Rs2Magic Action", description = "pick action for Rs2Magic", position = 3, section = secondActionCategories)
+    default aRs2Magic secondARs2Magic() { return aRs2Magic.ALCH; }
+    @ConfigItem(keyName = "secondAOther", name = "Other Action", description = "pick action for aOther", position = 3, section = secondActionCategories)
+    default aOther secondAOther() { return aOther.PRINTLN; }
+
+    @ConfigItem(keyName = "firstConditionParameterOne", name = "first parameter for condition one?", description = "what parameter one for first condition?", position = 0, section = firstConditionCategories)
+    default String firstConditionParameterOne() { return ""; }
+    @ConfigItem(keyName = "firstConditionParameterTwo", name = "second parameter for condition one?", description = "what parameter two for first condition?", position = 1, section = firstConditionCategories)
+    default String firstConditionParameterTwo() { return ""; }
+    @ConfigItem(keyName = "firstCRs2Inventory", name = "condition for firstCRs2Inventory", description = "What should the condition be for hotkey 1?", position = 3, section = firstConditionCategories)
+    default cRs2Inventory firstCRs2Inventory() { return cRs2Inventory.HAS_ITEM; }
+    @ConfigItem(keyName = "firstCOther", name = "condition for firstCOther", description = "What should the condition be for hotkey 1?", position = 3, section = firstConditionCategories)
+    default cOther firstCOther() { return cOther.NONE; }
+
+    @ConfigItem(keyName = "secondParameterOne", name = "first parameter for condition two?", description = "what ID to send to second condition?", position = 0, section = secondConditionCategories)
+    default String secondConditionParameterOne() { return ""; }
+    @ConfigItem(keyName = "secondParameterTwo", name = "second parameter for condition two?", description = "what condition two menu?", position = 1, section = secondConditionCategories)
+    default String secondConditionParameterTwo() { return ""; }
+    @ConfigItem(keyName = "secondCondition", name = "condition for second", description = "What should the condition be for hotkey 1?", position = 3, section = secondConditionCategories)
+    default cRs2Inventory secondCRs2Inventory() { return cRs2Inventory.HAS_ITEM; }
+    @ConfigItem(keyName = "secondCondition", name = "condition for second", description = "What should the condition be for hotkey 2?", position = 3, section = secondConditionCategories)
+    default cOther secondCOther() { return cOther.NONE; }
+
 
     @ConfigItem(keyName = "doAction", name = "Do Action?", description = "do you want this action done?", position = 0, section = debug)
     default boolean doAction() { return true; }

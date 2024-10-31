@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums;
 
-public enum sRs2Inventory implements Actionable {
+public enum aRs2Inventory implements Actionable {
     INV_INTERACT("invInteract"),
     WIELD("wield"),
     WEAR("wield"),
@@ -11,7 +11,7 @@ public enum sRs2Inventory implements Actionable {
     DROP_ITEM("dropItem");
 
     private final String actions;
-    sRs2Inventory(String actions) {
+    aRs2Inventory(String actions) {
         this.actions = actions;
     }
 

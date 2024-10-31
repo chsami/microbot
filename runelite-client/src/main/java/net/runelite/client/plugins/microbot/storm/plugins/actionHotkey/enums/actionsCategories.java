@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums;
 
-public enum Categories implements Actionable {
+public enum actionsCategories implements Actionable {
     RS2NPC("Rs2Npc"),
     RS2PLAYER("Rs2Player"),
     RS2INVENTORY("Rs2Inventory"),
@@ -9,15 +9,15 @@ public enum Categories implements Actionable {
     RS2WIDGET("Rs2Widget"),
     RS2BANK("Rs2Bank"),
     RS2MAGIC("Rs2Magic"),
-    OTHER("Other");
+    OTHER("aOther");
 
-    private final String categories;
-    Categories(String categories) {
-        this.categories = categories;
+    private final String actionscategories;
+    actionsCategories(String actionscategories) {
+        this.actionscategories = actionscategories;
     }
 
     @Override
     public String getAction() {
-        return categories;
+        return actionscategories;
     }
 }

@@ -1,11 +1,10 @@
 package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey.enums;
 
-public enum sRs2Player implements Actionable {
-    LOGOUT("logout"),
-    USE_FOOD("useFood");
+public enum aRs2GameObject implements Actionable {
+    OBJ_INTERACT("objinteract");
 
     private final String actions;
-    sRs2Player(String actions) {
+    aRs2GameObject(String actions) {
         this.actions = actions;
     }
 
