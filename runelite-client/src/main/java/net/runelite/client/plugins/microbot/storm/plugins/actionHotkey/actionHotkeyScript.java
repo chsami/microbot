@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.storm.plugins.actionHotkey;
 
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.config.Config;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.storm.common.Rs2Storm;
@@ -12,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -296,7 +298,15 @@ public class actionHotkeyScript extends Script {
                     }
                     break;
                 default:
-                    Microbot.showMessage("Unknown category: " + config.firstCategoryName().getAction());
+                    String currentCategory = config.firstCategoryName().getAction();
+                    if(key1isdown){key1isdown=false;} else {key2isdown=false;}
+                    Microbot.showMessage("Unknown category: " + currentCategory);
+                    while(this.isRunning()) {
+                        if(!Objects.equals(config.firstCategoryName().getAction(), currentCategory) || !this.isRunning()){
+                            break;
+                        }
+                        sleep(100,1000);
+                    }
             }
         }
     }
@@ -483,7 +493,15 @@ public class actionHotkeyScript extends Script {
                     }
                     break;
                 default:
-                    Microbot.showMessage("Unknown category: " + config.secondCategoryName().getAction());
+                    String currentCategory = config.secondCategoryName().getAction();
+                    if(key1isdown){key1isdown=false;} else {key2isdown=false;}
+                    Microbot.showMessage("Unknown category: " + currentCategory);
+                    while(this.isRunning()) {
+                        if(!Objects.equals(config.secondCategoryName().getAction(), currentCategory) || !this.isRunning()){
+                            break;
+                        }
+                        sleep(100,1000);
+                    }
             }
         }
     }
@@ -511,7 +529,15 @@ public class actionHotkeyScript extends Script {
                         return condition(config.conditionsForOne(), config.firstConditionIDEntry(), config.firstConditionMenu());
                     }
                 default:
-                    Microbot.showMessage("Unknown condition: " + config.conditionsForOne().getAction());
+                    String currentCondition = config.conditionsForOne().getAction();
+                    if(key1isdown){key1isdown=false;} else {key2isdown=false;}
+                    Microbot.showMessage("Unknown condition: " + currentCondition);
+                    while(this.isRunning()) {
+                        if(!Objects.equals(config.conditionsForOne().getAction(), currentCondition) || !this.isRunning()){
+                            break;
+                        }
+                        sleep(100,1000);
+                    }
                     return false;
             }
         } else {
@@ -537,7 +563,15 @@ public class actionHotkeyScript extends Script {
                         return condition(config.conditionsForTwo(), config.secondConditionIDEntry(), config.secondConditionMenu());
                     }
                 default:
-                    Microbot.showMessage("Unknown condition: " + config.conditionsForTwo().getAction());
+                    String currentCondition = config.conditionsForTwo().getAction();
+                    if(key1isdown){key1isdown=false;} else {key2isdown=false;}
+                    Microbot.showMessage("Unknown condition: " + currentCondition);
+                    while(this.isRunning()) {
+                        if(!Objects.equals(config.conditionsForTwo().getAction(), currentCondition) || !this.isRunning()){
+                            break;
+                        }
+                        sleep(100,1000);
+                    }
                     return false;
             }
         }
@@ -582,7 +616,7 @@ public class actionHotkeyScript extends Script {
                             Rs2Inventory.equip(ID);
                             break;
                         case USE_RANDOM:
-                            Rs2Inventory.use(Rs2Storm.getRandomItemWithLimit(ID));
+                            Rs2Inventory.use(Rs2Storm.getRandomItemWithLimit(ID, 4));
                             break;
                         case USE_LAST:
                             Rs2Inventory.useLast(ID);
@@ -604,7 +638,15 @@ public class actionHotkeyScript extends Script {
                             break;
                     }
                 } else {
+                    Config oldConfig = config;
+                    if(key1isdown){key1isdown=false;} else {key2isdown=false;}
                     Microbot.showMessage("Unknown action : " + action.getAction() + "(int "+ID+");");
+                    while(this.isRunning()) {
+                        if(!Objects.equals(oldConfig, config) || !this.isRunning()){
+                            break;
+                        }
+                        sleep(100,1000);
+                    }
                 }
             }
         }
@@ -623,13 +665,21 @@ public class actionHotkeyScript extends Script {
                             break;
                     }
                 } else if (action instanceof sRs2Npc) {
-                switch ((sRs2Npc) action) {
-                    case ATTACK:
-                        Rs2Npc.attack(name);
-                        break;
-                }
-            } else {
+                    switch ((sRs2Npc) action) {
+                        case ATTACK:
+                            Rs2Npc.attack(name);
+                            break;
+                    }
+                } else {
+                    Config oldConfig = config;
+                    if(key1isdown){key1isdown=false;} else {key2isdown=false;}
                     Microbot.showMessage("Unknown action : " + action.getAction() + "(String "+name+");");
+                    while(this.isRunning()) {
+                        if(!Objects.equals(oldConfig, config) || !this.isRunning()){
+                            break;
+                        }
+                        sleep(100,1000);
+                    }
                 }
             }
         }
@@ -664,17 +714,41 @@ public class actionHotkeyScript extends Script {
                             break;
                     }
                 } else {
+                    Config oldConfig = config;
+                    if(key1isdown){key1isdown=false;} else {key2isdown=false;}
                     Microbot.showMessage("Unknown action : " + action.getAction() + "(int "+ID+", String "+menu+");");
+                    while(this.isRunning()) {
+                        if(!Objects.equals(oldConfig, config) || !this.isRunning()){
+                            break;
+                        }
+                        sleep(100,1000);
+                    }
                 }
             }
         }
     }
 
     public void action(Actionable action, String menu, String ID){
+        Config oldConfig = config;
+        if(key1isdown){key1isdown=false;} else {key2isdown=false;}
         Microbot.showMessage("Unknown action : " + action.getAction() + "(String "+menu+", String "+ID+");");
+        while(this.isRunning()) {
+            if(!Objects.equals(oldConfig, config) || !this.isRunning()){
+                break;
+            }
+            sleep(100,1000);
+        }
     }
     public void action(Actionable action, String menu, int ID){
+        Config oldConfig = config;
+        if(key1isdown){key1isdown=false;} else {key2isdown=false;}
         Microbot.showMessage("Unknown action : " + action.getAction() + "(String "+menu+", int "+ID+");");
+        while(this.isRunning()) {
+            if(!Objects.equals(oldConfig, config) || !this.isRunning()){
+                break;
+            }
+            sleep(100,1000);
+        }
     }
     public void action(Actionable action, int ID, int value){
         if (minInterval == 0 || System.currentTimeMillis() > (previousAction + minInterval)) {
@@ -700,8 +774,22 @@ public class actionHotkeyScript extends Script {
                             Rs2Player.useFood();
                             break;
                     }
+                } else if (action instanceof sRs2Bank) {
+                    switch ((sRs2Bank) action) {
+                        case OPEN_BANK:
+                            Rs2Bank.openBank();
+                            break;
+                    }
                 } else {
+                    Config oldConfig = config;
+                    if(key1isdown){key1isdown=false;} else {key2isdown=false;}
                     Microbot.showMessage("Unknown action : " + action.getAction() + "();");
+                    while(this.isRunning()) {
+                        if(!Objects.equals(oldConfig, config) || !this.isRunning()){
+                            break;
+                        }
+                        sleep(100,1000);
+                    }
                 }
             }
         }
