@@ -63,6 +63,7 @@ public class GiantsFoundryScript extends Script {
                 } else {
                     if (weapon != null) {
                         handleGameLoop();
+
                     } else {
                         getCommission();
                         selectMould();
@@ -255,7 +256,6 @@ public class GiantsFoundryScript extends Script {
                         || Rs2Player.getWorldLocation().equals(new WorldPoint(3371, 11498, 0));
                 if (!doAction && isAtLavaTile) return;
                 Rs2GameObject.interact(LAVA_POOL, "Heat-preform");
-                Rs2Player.waitForAnimation();
                 GiantsFoundryState.heatingCoolingState.stop();
                 GiantsFoundryState.heatingCoolingState.setup(7, 0, "heats");
                 GiantsFoundryState.heatingCoolingState.start(GiantsFoundryState.getHeatAmount());
@@ -265,7 +265,6 @@ public class GiantsFoundryScript extends Script {
                 boolean isAtWaterFallTile = Rs2Player.getWorldLocation().equals(new WorldPoint(3360, 11489, 0));
                 if (!doAction && isAtWaterFallTile) return;
                 Rs2GameObject.interact(WATERFALL, "Cool-preform");
-                Rs2Player.waitForAnimation();
                 GiantsFoundryState.heatingCoolingState.stop();
                 GiantsFoundryState.heatingCoolingState.setup(-7, 0, "cools");
                 GiantsFoundryState.heatingCoolingState.start(GiantsFoundryState.getHeatAmount());
