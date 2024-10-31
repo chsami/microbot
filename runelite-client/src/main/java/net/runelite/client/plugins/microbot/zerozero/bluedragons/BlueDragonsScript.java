@@ -239,7 +239,6 @@ public class BlueDragonsScript extends Script {
     private boolean attackDragon(NPC dragon) {
         final int dragonId = dragon.getId();
         if (Rs2Npc.attack(dragon)) {
-            Microbot.log("Attacking Blue Dragon with ID: " + dragonId);
             sleepUntil(() -> Rs2Npc.getNpc(dragonId) == null, 5000);
             return true;
         }
