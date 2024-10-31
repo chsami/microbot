@@ -146,7 +146,7 @@ public interface actionHotkeyConfig extends Config {
     default sRs2Walker secondRs2Walker() { return sRs2Walker.WALK_FAST_CANVAS; }
     @ConfigItem(keyName = "secondRs2Widget", name = "Rs2Widget Action", description = "pick action for Rs2Widget", position = 3, section = secondCategories)
     default sRs2Widget secondRs2Widget() { return sRs2Widget.GET_WIDGET; }
-    @ConfigItem(keyName = "secondRs2Magic", name = "Rs2Magic Action", description = "pick action for Rs2Magic", position = 3, section = firstCategories)
+    @ConfigItem(keyName = "secondRs2Magic", name = "Rs2Magic Action", description = "pick action for Rs2Magic", position = 3, section = secondCategories)
     default sRs2Magic secondRs2Magic() { return sRs2Magic.ALCH; }
     @ConfigItem(keyName = "secondOther", name = "Other Action", description = "pick action for Other", position = 3, section = secondCategories)
     default Other secondOther() { return Other.PRINTLN; }
