@@ -104,9 +104,9 @@ public interface actionHotkeyConfig extends Config {
 
 
 
-    @ConfigItem(keyName = "firstActionIDEntry", name = "first parameter for first action?", description = "what ID to send to action?", position = 0, section = firstActionCategories)
+    @ConfigItem(keyName = "firstActionIDEntry", name = "first parameter for first action?", description = "first parameter for first action?", position = 0, section = firstActionCategories)
     default String firstParameterOne() { return ""; }
-    @ConfigItem(keyName = "firstActionMenu", name = "second parameter for first action?", description = "what action menu", position = 1, section = firstActionCategories)
+    @ConfigItem(keyName = "firstActionParameter", name = "second parameter for first action?", description = "second parameter for first action?", position = 1, section = firstActionCategories)
     default String firstParameterTwo() { return ""; }
     @ConfigItem(keyName = "firstARs2Bank", name = "Rs2Bank Action", description = "pick action for Rs2Bank", position = 3, section = firstActionCategories)
     default aRs2Bank firstARs2Bank() { return aRs2Bank.OPEN_BANK; }
@@ -128,9 +128,9 @@ public interface actionHotkeyConfig extends Config {
     default aOther firstAOther() { return aOther.PRINTLN; }
 
 
-    @ConfigItem(keyName = "secondParameterOne", name = "first parameter for second action?", description = "what ID to send to action?", position = 0, section = secondActionCategories)
+    @ConfigItem(keyName = "secondParameterOne", name = "first parameter for second action?", description = "first parameter for second action?", position = 0, section = secondActionCategories)
     default String secondParameterOne() { return ""; }
-    @ConfigItem(keyName = "secondParameterTwo", name = "second parameter for second action?", description = "what action menu", position = 1, section = secondActionCategories)
+    @ConfigItem(keyName = "secondParameterTwo", name = "second parameter for second action?", description = "second parameter for second action?", position = 1, section = secondActionCategories)
     default String secondParameterTwo() { return ""; }
     @ConfigItem(keyName = "secondARs2Bank", name = "Rs2Bank Action", description = "pick action for Rs2Bank", position = 3, section = secondActionCategories)
     default aRs2Bank secondARs2Bank() { return aRs2Bank.OPEN_BANK; }
@@ -160,9 +160,9 @@ public interface actionHotkeyConfig extends Config {
     @ConfigItem(keyName = "firstCOther", name = "condition for firstCOther", description = "What should the condition be for hotkey 1?", position = 3, section = firstConditionCategories)
     default cOther firstCOther() { return cOther.NONE; }
 
-    @ConfigItem(keyName = "secondParameterOne", name = "first parameter for condition two?", description = "what ID to send to second condition?", position = 0, section = secondConditionCategories)
+    @ConfigItem(keyName = "secondParameterOne", name = "first parameter for condition two?", description = "first parameter for second condition?", position = 0, section = secondConditionCategories)
     default String secondConditionParameterOne() { return ""; }
-    @ConfigItem(keyName = "secondParameterTwo", name = "second parameter for condition two?", description = "what condition two menu?", position = 1, section = secondConditionCategories)
+    @ConfigItem(keyName = "secondParameterTwo", name = "second parameter for condition two?", description = "second parameter for second condition?", position = 1, section = secondConditionCategories)
     default String secondConditionParameterTwo() { return ""; }
     @ConfigItem(keyName = "secondCondition", name = "condition for second", description = "What should the condition be for hotkey 1?", position = 3, section = secondConditionCategories)
     default cRs2Inventory secondCRs2Inventory() { return cRs2Inventory.HAS_ITEM; }
