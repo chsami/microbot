@@ -3,19 +3,17 @@ package net.runelite.client.plugins.microbot.zerozero.bluedragons;
 import net.runelite.client.config.*;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 
-@ConfigGroup("bluedragons")
-public interface BlueDragonsConfig extends Config {
+@ConfigGroup(BlueDragonsPlugin.CONFIG)
+@ConfigInformation("<center><p style='font-weight: bold;'>[00] BLUE DRAGON FARMER</p> <br />" +
+        "<hr style='width: 75%; border-top: 1px solid #000;'/>" +
+        "<p style='color: black;'>The plugin will travel/kill and bank as needed. Early prayer farmer!</p>" +
+        "<hr style='width: 75%; border-top: 1px solid #000;'/> </center> <br />" +
+        "1. Equip your gear <br />" +
+        "2. <b style='color: red;'>MUST</b> have Falador teleport (runes/teletab) <br />" +
+        "3. Correct food amount from config <br /> <br />" +
+        "<center>Press <b style='color: green;'>START</b> and enjoy :)</center>")
 
-    @ConfigItem(
-            keyName = "How To",
-            name = "How to use",
-            description = "How to use the blue dragon plugin",
-            position = 0
-    )
-    default String howTo()
-    {
-        return "Start with falador runes/teletab and correct number of food from config";
-    }
+public interface BlueDragonsConfig extends Config {
 
     @ConfigItem(
             keyName = "startPlugin",

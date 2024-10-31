@@ -16,6 +16,7 @@ import javax.inject.Inject;
         tags = {"blue", "dragons", "prayer"}
 )
 public class BlueDragonsPlugin extends Plugin {
+    static final String CONFIG = "bluedragons";
 
     @Inject
     private BlueDragonsScript script;
