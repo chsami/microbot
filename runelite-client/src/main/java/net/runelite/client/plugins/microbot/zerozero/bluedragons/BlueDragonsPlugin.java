@@ -13,7 +13,8 @@ import javax.inject.Inject;
 @PluginDescriptor(
         name = PluginDescriptor.zerozero + "Blue Dragons",
         description = "Blue dragon farmer for bones",
-        tags = {"blue", "dragons", "prayer"}
+        tags = {"blue", "dragons", "prayer"},
+        enabledByDefault = false
 )
 public class BlueDragonsPlugin extends Plugin {
     static final String CONFIG = "bluedragons";

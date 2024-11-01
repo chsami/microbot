@@ -926,6 +926,7 @@ public class Rs2Walker {
 
     private static boolean handleTeleportItem(Transport transport) {
         boolean succesfullAction = false;
+        System.out.println("Required Transport: " + transport.getDisplayInfo());
         for (Set<Integer> itemIds : transport.getItemIdRequirements()) {
             if (succesfullAction)
                 break;
@@ -948,8 +949,9 @@ public class Rs2Walker {
     public static boolean handleInventoryTeleports(Transport transport, int itemId) {
         Rs2Item rs2Item = Rs2Inventory.get(itemId);
         boolean hasItem = rs2Item != null;
-        List<String> actions = Arrays.asList("break", "teleport", "empty", "lletya", "prifddinas", "commune", "rellekka", "waterbirth island", "neitiznot", "jatiszo",
-                "ver sinhaza", "darkmeyer", "slepe", "troll stronghold", "weiss", "invoke", "rub");
+        // prioritize location names first, then use generic action names such as 'break' or 'teleport' to avoid conflicts with menu actions called 'monastery teleport'
+        List<String> actions = Arrays.asList("farm", "monastery", "lletya", "prifddinas", "rellekka", "waterbirth island", "neitiznot", "jatiszo",
+                "ver sinhaza", "darkmeyer", "slepe", "troll stronghold", "weiss", "invoke", "empty", "consume", "rub", "break", "teleport");
         if (!hasItem) return false;
         boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
         //hasMultipleDestination is stuff like: games neck, ring of dueling etc...
@@ -958,7 +960,7 @@ public class Rs2Walker {
             String[] values = transport.getDisplayInfo().split(":");
             String destination = values[1].trim().toLowerCase();
             String itemAction = Arrays.stream(rs2Item.getInventoryActions())
-                    .filter(action -> action != null && actions.contains(action.toLowerCase()))
+                    .filter(action -> action != null && actions.stream().anyMatch(keyword -> action.toLowerCase().contains(keyword))) // stream actions to allow for a partial match
                     .findFirst()
                     .orElse(null);
             if (itemAction == null) return false;
@@ -979,7 +981,7 @@ public class Rs2Walker {
 
         //Simple items with one destination like teleport tabs, teleport scrolls etc...
         String itemAction = Arrays.stream(rs2Item.getInventoryActions())
-                .filter(action -> action != null && actions.contains(action.toLowerCase()))
+                .filter(action -> action != null && actions.stream().anyMatch(keyword -> action.toLowerCase().contains(keyword))) // stream actions to allow for a partial match
                 .findFirst()
                 .orElse(null);
         if (itemAction == null) return false;
