@@ -2,10 +2,8 @@ package net.runelite.client.plugins.microbot.scurrius;
 
 import com.google.inject.Inject;
 import net.runelite.api.ObjectID;
-import net.runelite.api.Projectile;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ProjectileMoved;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.scurrius.enums.State;
@@ -44,9 +42,12 @@ public class ScurriusScript extends Script {
     private State previousState = null;
     private boolean hasLoggedRespawnWait = false;
     private Boolean previousInFightRoom = null;
-    private Rs2PrayerEnum currentPrayer = Rs2PrayerEnum.PROTECT_MELEE;
-    boolean isProjectileActive = false;
+    private Rs2PrayerEnum currentDefensivePrayer = Rs2PrayerEnum.PROTECT_MELEE;
 
+    // Animation constants
+    private static final int MELEE_ATTACK_ANIMATION = 10693;
+    private static final int RANGE_ATTACK_ANIMATION = 10695;
+    private static final int MAGIC_ATTACK_ANIMATION = 10697;
 
     public boolean run(ScurriusConfig config) {
         this.config = config;
@@ -134,10 +135,12 @@ public class ScurriusScript extends Script {
                             Rs2Bank.withdrawX(true, foodItemId, foodAmount);
                             Rs2Bank.withdrawX(true, potionItemId, prayerPotionAmount);
                             Rs2Bank.withdrawX(true, "varrock teleport", 3);
+                            Rs2Bank.closeBank();
                         }
                         break;
 
                     case FIGHTING:
+                        handlePrayerLogic();
                         List<WorldPoint> dangerousWorldPoints = Rs2Tile.getDangerousGraphicsObjectTiles()
                                 .stream()
                                 .map(Pair::getKey)
@@ -292,52 +295,41 @@ public class ScurriusScript extends Script {
         return true;
     }
 
-
     private void handlePrayerLogic() {
-        if (scurrius != null && scurrius.getInteracting() != null && scurrius.getInteracting() == Microbot.getClient().getLocalPlayer()) {
-            if (currentPrayer != Rs2PrayerEnum.PROTECT_MELEE) {
-                Rs2Prayer.toggle(currentPrayer, false);
-                Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
-                currentPrayer = Rs2PrayerEnum.PROTECT_MELEE;
-                Microbot.log("Scurrius is attacking, activated Protect from Melee.");
-            }
-        } else if (!isProjectileActive) {
-            if (currentPrayer != null) {
-                disableAllPrayers();
-            }
+        if (scurrius == null) return;
+
+        int npcAnimation = scurrius.getAnimation();
+        Rs2PrayerEnum newDefensivePrayer = null;
+
+        switch (npcAnimation) {
+            case MELEE_ATTACK_ANIMATION:
+                newDefensivePrayer = Rs2PrayerEnum.PROTECT_MELEE;
+                break;
+            case RANGE_ATTACK_ANIMATION:
+                newDefensivePrayer = Rs2PrayerEnum.PROTECT_RANGE;
+                break;
+            case MAGIC_ATTACK_ANIMATION:
+                newDefensivePrayer = Rs2PrayerEnum.PROTECT_MAGIC;
+                break;
+        }
+
+        if (newDefensivePrayer != null && newDefensivePrayer != currentDefensivePrayer) {
+            switchDefensivePrayer(newDefensivePrayer);
         }
     }
 
+    private void switchDefensivePrayer(Rs2PrayerEnum newDefensivePrayer) {
+        if (currentDefensivePrayer != null) {
+            Rs2Prayer.toggle(currentDefensivePrayer, false);
+        }
+        Rs2Prayer.toggle(newDefensivePrayer, true);
+        currentDefensivePrayer = newDefensivePrayer;
+    }
 
     public void disableAllPrayers() {
         Rs2Prayer.disableAllPrayers();
-        currentPrayer = Rs2PrayerEnum.PROTECT_MELEE;
         Microbot.log("All prayers disabled to preserve prayer points.");
-    }
-
-    public void prayAgainstProjectiles(Projectile projectile) {
-        if (projectile.getId() == 2642 && currentPrayer != Rs2PrayerEnum.PROTECT_RANGE) {
-            Rs2Prayer.toggle(currentPrayer, false);
-            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true);
-            currentPrayer = Rs2PrayerEnum.PROTECT_RANGE;
-            isProjectileActive = true;
-            Microbot.log("Switched to Protect from Missiles.");
-        } else if (projectile.getId() == 2640 && currentPrayer != Rs2PrayerEnum.PROTECT_MAGIC) {
-            Rs2Prayer.toggle(currentPrayer, false);
-            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, true);
-            currentPrayer = Rs2PrayerEnum.PROTECT_MAGIC;
-            isProjectileActive = true;
-            Microbot.log("Switched to Protect from Magic.");
-        }
-    }
-
-    public void onProjectileMoved(ProjectileMoved event) {
-        final Projectile projectile = event.getProjectile();
-        prayAgainstProjectiles(projectile);
-        if (projectile.getRemainingCycles() <= 0) {
-            isProjectileActive = false;
-            handlePrayerLogic();
-        }
+        currentDefensivePrayer = null;
     }
 
     @Override
