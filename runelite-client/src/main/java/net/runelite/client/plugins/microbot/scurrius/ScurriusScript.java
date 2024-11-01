@@ -14,10 +14,13 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
+import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
+import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -102,6 +105,7 @@ public class ScurriusScript extends Script {
                 }
 
                 if (state != State.WAITING_FOR_BOSS) {
+                    attemptLooting(config);
                     if (isScurriusPresent && hasFood && hasLineOfSightWithScurrius) {
                         state = State.FIGHTING;
                     }
@@ -293,6 +297,17 @@ public class ScurriusScript extends Script {
         }
 
         return true;
+    }
+
+    private void attemptLooting(ScurriusConfig config) {
+        List<String> lootItems = parseLootItems(config.lootItems());
+        LootingParameters nameParams = new LootingParameters(10, 1, 1, 0, false, true, lootItems.toArray(new String[0]));
+        Rs2GroundItem.lootItemsBasedOnNames(nameParams);
+        LootingParameters valueParams = new LootingParameters(10, 1, config.lootValueThreshold(), 0, false, true);
+        Rs2GroundItem.lootItemBasedOnValue(valueParams);
+    }
+    private List<String> parseLootItems(String lootFilter) {
+        return Arrays.asList(lootFilter.toLowerCase().split(","));
     }
 
     private void handlePrayerLogic() {
