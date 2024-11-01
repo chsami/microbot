@@ -94,6 +94,7 @@ public class AutoFishingScript extends Script {
             case SHRIMP:
                 return Rs2Inventory.hasItem("small fishing net");
             case SARDINE:
+            case PIKE:
                 return Rs2Inventory.hasItem("fishing rod") && Rs2Inventory.hasItem("bait");
             case MACKEREL:
                 return Rs2Inventory.hasItem("big fishing net");

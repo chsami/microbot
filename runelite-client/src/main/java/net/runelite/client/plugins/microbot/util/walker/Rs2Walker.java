@@ -926,7 +926,6 @@ public class Rs2Walker {
 
     private static boolean handleTeleportItem(Transport transport) {
         boolean succesfullAction = false;
-        System.out.println("Required Transport: " + transport.getDisplayInfo());
         for (Set<Integer> itemIds : transport.getItemIdRequirements()) {
             if (succesfullAction)
                 break;
