@@ -242,14 +242,16 @@ public class Microbot {
     }
 
     public static void showMessage(String message) {
-        Microbot.getClientThread().runOnSeperateThread(() -> {
+        try {
             SwingUtilities.invokeAndWait(() ->
             {
                 JOptionPane.showConfirmDialog(null, message, "Message",
                         JOptionPane.DEFAULT_OPTION);
             });
-            return null;
-        });
+        } catch(Exception ex) {
+            ex.getStackTrace();
+            Microbot.log(ex.getMessage());
+        }
     }
 
 
