@@ -138,7 +138,7 @@ public class Rs2Walker {
                 }
                 boolean isInit = sleepUntilTrue(() -> ShortestPathPlugin.getPathfinder() != null, 100, 2000);
                 if (!isInit) {
-                    Microbot.log("Pathfinder took to long to initialize, exiting walker: 139");
+                    Microbot.log("Pathfinder took to long to initialize, exiting walker: 140");
                     setTarget(null);
                     return WalkerState.EXIT;
                 }
@@ -146,14 +146,20 @@ public class Rs2Walker {
             if (!ShortestPathPlugin.getPathfinder().isDone()) {
                 boolean isDone = sleepUntilTrue(() -> ShortestPathPlugin.getPathfinder().isDone(), 100, 5000);
                 if (!isDone) {
-                    System.out.println("Pathfinder took to long to calculate path, exiting: 147");
+                    System.out.println("Pathfinder took to long to calculate path, exiting: 149");
                     setTarget(null);
                     return WalkerState.EXIT;
                 }
             }
 
+            if (ShortestPathPlugin.getMarker() == null) {
+                Microbot.log("marker is null, exiting: 156");
+                setTarget(null);
+                return WalkerState.EXIT;
+            }
+
             if (ShortestPathPlugin.getPathfinder() == null) {
-                Microbot.log("pathfinder is null, exiting: 154");
+                Microbot.log("pathfinder is null, exiting: 162");
                 setTarget(null);
                 return WalkerState.EXIT;
             }

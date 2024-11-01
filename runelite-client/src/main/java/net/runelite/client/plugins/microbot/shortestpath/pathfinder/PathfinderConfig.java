@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.shortestpath.*;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import java.util.*;
@@ -66,6 +67,7 @@ public class PathfinderConfig {
     private int distanceBeforeUsingTeleport;
     @Getter
     private final List<Restriction> resourceRestrictions;
+    @Getter
     private List<Restriction> customRestrictions;
     @Getter
     private Set<Integer> restrictedPointsPacked;
@@ -225,6 +227,13 @@ public class PathfinderConfig {
 
             if (entry.getQuests().isEmpty() || entry.getQuests().stream().anyMatch(x -> questStates.get(x) != QuestState.FINISHED))
                 restrictedPointsPacked.add(entry.getPackedWorldPoint());
+        }
+        if (Rs2Player.getQuestState(Quest.RECIPE_FOR_DISASTER) == QuestState.IN_PROGRESS) {
+            Restriction[] restrictions = new Restriction[] {
+                    new Restriction(3207, 3217, 0),
+                    new Restriction(3213, 3222, 0),
+                    new Restriction(3213, 3221, 0)};
+            setRestrictedTiles(restrictions);
         }
     }
 

@@ -143,6 +143,7 @@ public class CollisionMap {
             int neighborPacked = packedPointFromOrdinal(node.packedPosition, d);
             if (visited.get(neighborPacked)) continue;
             if (config.getRestrictedPointsPacked().contains(neighborPacked)) continue;
+            if (config.getCustomRestrictions().contains(neighborPacked)) continue;
 
             if (traversable[i]) {
                 neighbors.add(new Node(neighborPacked, node));
