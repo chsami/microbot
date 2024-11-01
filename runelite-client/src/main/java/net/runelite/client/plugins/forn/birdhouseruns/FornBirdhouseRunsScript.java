@@ -35,7 +35,7 @@ public class FornBirdhouseRunsScript extends Script {
 
 
     public boolean run(FornBirdhouseRunsConfig config) {
-        Microbot.enableAutoRunOn = false;
+        Microbot.enableAutoRunOn = true;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
@@ -65,7 +65,7 @@ public class FornBirdhouseRunsScript extends Script {
                         break;
                     case TELEPORTING:
                         Microbot.doInvoke(new NewMenuEntry(-1, 25362449, MenuAction.CC_OP.getId(), 3, -1, "Equip"),
-                            new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
+                                new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
                         sleep(3000, 4000);
                         botStatus = states.VERDANT_TELEPORT;
                         break;
@@ -125,6 +125,9 @@ public class FornBirdhouseRunsScript extends Script {
                         if (config.TELEPORT()) {
                             Rs2Magic.cast(MagicAction.VARROCK_TELEPORT);
                         }
+
+                        emptyNests();
+
                         botStatus = states.FINISHED;
                         notifier.notify(Notification.ON, "Birdhouse run is finished.");
                         break;
@@ -139,15 +142,23 @@ public class FornBirdhouseRunsScript extends Script {
         return true;
     }
 
+    private void emptyNests() {
+        do {
+            Rs2Inventory.interact(22798, "search");
+            sleep(1000);
+        }
+        while (Rs2Inventory.contains(22798));
+
+        do {
+            Rs2Inventory.interact(5074, "search");
+            sleep(1000);
+        }
+        while (Rs2Inventory.contains(5074));
+    }
+
     @Override
     public void shutdown() {
         super.shutdown();
-    }
-
-    private void checkBeforeWithdrawAndEquip(int itemId) {
-        if (!Rs2Equipment.isWearing(itemId)) {
-            Rs2Bank.withdrawAndEquip(itemId);
-        }
     }
 
     private void checkBeforeWithdrawAndEquip(String itemName) {
@@ -173,16 +184,23 @@ public class FornBirdhouseRunsScript extends Script {
     }
 
     private void withdrawDigsitePendant() {
+        if (Rs2Equipment.isWearing(ItemID.DIGSITE_PENDANT_1)
+                || Rs2Equipment.isWearing(ItemID.DIGSITE_PENDANT_2)
+                || Rs2Equipment.isWearing(ItemID.DIGSITE_PENDANT_3)
+                || Rs2Equipment.isWearing(ItemID.DIGSITE_PENDANT_4)
+                || Rs2Equipment.isWearing(ItemID.DIGSITE_PENDANT_5)
+        ) return;
+
         if (Rs2Bank.hasItem(ItemID.DIGSITE_PENDANT_1)) {
-            checkBeforeWithdrawAndEquip(ItemID.DIGSITE_PENDANT_1);
+            Rs2Bank.withdrawAndEquip(ItemID.DIGSITE_PENDANT_1);
         } else if (Rs2Bank.hasItem(ItemID.DIGSITE_PENDANT_2)) {
-            checkBeforeWithdrawAndEquip(ItemID.DIGSITE_PENDANT_2);
+            Rs2Bank.withdrawAndEquip(ItemID.DIGSITE_PENDANT_2);
         } else if (Rs2Bank.hasItem(ItemID.DIGSITE_PENDANT_3)) {
-            checkBeforeWithdrawAndEquip(ItemID.DIGSITE_PENDANT_3);
+            Rs2Bank.withdrawAndEquip(ItemID.DIGSITE_PENDANT_3);
         } else if (Rs2Bank.hasItem(ItemID.DIGSITE_PENDANT_4)) {
-            checkBeforeWithdrawAndEquip(ItemID.DIGSITE_PENDANT_4);
+            Rs2Bank.withdrawAndEquip(ItemID.DIGSITE_PENDANT_4);
         } else {
-            checkBeforeWithdrawAndEquip(ItemID.DIGSITE_PENDANT_5);
+            Rs2Bank.withdrawAndEquip(ItemID.DIGSITE_PENDANT_5);
         }
     }
 
@@ -199,8 +217,8 @@ public class FornBirdhouseRunsScript extends Script {
             Rs2Inventory.use(selectedLogs);
             sleep(1500, 2500);
         }
-        if (!Microbot.isAnimating() &&
-            !Microbot.getClient().getLocalPlayer().isInteracting() &&
+        if (!Rs2Player.isAnimating() &&
+            !Rs2Player.isInteracting() &&
             Rs2GameObject.interact(worldPoint, "build")) {
             sleep(2000, 2500);
             if (!Rs2Inventory.hasItem(birdhouseType)) {
@@ -212,10 +230,10 @@ public class FornBirdhouseRunsScript extends Script {
     private void dismantleBirdhouse(int itemId, states status) {
         if (Rs2Inventory.hasItem(ItemID.CLOCKWORK)) {
             botStatus = status;
-        }
-        else if (!Microbot.isMoving() &&
-            !Microbot.isAnimating() &&
-            !Microbot.getClient().getLocalPlayer().isInteracting()) {
+        } else if (!Rs2Player.isMoving() &&
+                !Rs2Player.isAnimating() &&
+                !Rs2Player.isInteracting()
+        ) {
             Rs2GameObject.interact(itemId, "empty");
         }
     }
