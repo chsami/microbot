@@ -2,11 +2,8 @@ package net.runelite.client.plugins.microbot.zerozero.varrockcleaner;
 
 import com.google.inject.Provides;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.microbot.Microbot;
 
 import javax.inject.Inject;
 
@@ -27,9 +24,7 @@ public class VarrockCleanerPlugin extends Plugin {
 
     @Override
     protected void startUp() {
-        if (config.startPlugin()) {
-            script.run(config);
-        }
+        script.run(config);
     }
 
     @Override
