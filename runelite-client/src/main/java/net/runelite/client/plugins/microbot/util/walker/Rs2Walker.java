@@ -61,6 +61,8 @@ public class Rs2Walker {
     static WorldPoint currentTarget;
     static int nextWalkingDistance = 10;
 
+    static final int OFFSET = 10; // max offset of the exact area we teleport to
+
     public static boolean walkTo(int x, int y, int plane) {
         return walkTo(x, y, plane, config.reachedDistance());
     }
@@ -955,61 +957,45 @@ public class Rs2Walker {
 
     public static boolean handleInventoryTeleports(Transport transport, int itemId) {
         Rs2Item rs2Item = Rs2Inventory.get(itemId);
-        boolean hasItem = rs2Item != null;
-        // prioritize location names first, then use generic action names such as 'break' or 'teleport' to avoid conflicts with menu actions called 'monastery teleport'
+        if (rs2Item == null) return false;
+
         List<String> locationKeyWords = Arrays.asList("farm", "monastery", "lletya", "prifddinas", "rellekka", "waterbirth island", "neitiznot", "jatiszo",
-                "ver sinhaza", "darkmeyer", "slepe", "troll stronghold", "weiss", "ecto", "burgh", "duradel", "gem mine", "nardah", "kalphite cave", 
+                "ver sinhaza", "darkmeyer", "slepe", "troll stronghold", "weiss", "ecto", "burgh", "duradel", "gem mine", "nardah", "kalphite cave",
                 "kourend woodland", "mount karuulm");
         List<String> genericKeyWords = Arrays.asList("invoke", "empty", "consume", "rub", "break", "teleport", "reminisce");
-        if (!hasItem) return false;
-        boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
-        //hasMultipleDestination is stuff like: games neck, ring of dueling etc...
-        final int OFFSET = 10;// max offset of the exact area we teleport to
-        if (hasMultipleDestination) {
-            String[] values = transport.getDisplayInfo().split(":");
-            String destination = values[1].trim().toLowerCase();
 
-            // search for destination partially matches locationKeyWords
-            String itemAction = Arrays.stream(rs2Item.getInventoryActions())
-                    .filter(action -> action != null && locationKeyWords.stream().anyMatch(keyword ->
-                            destination.contains(keyword.toLowerCase()) && action.toLowerCase().contains(keyword.toLowerCase())))
-                    .findFirst()
-                    .orElse(null);
-            if (itemAction == null) {
-                // search for generic keywords if we are not able to find the locationKeyWord in the list of actions
-                itemAction = Arrays.stream(rs2Item.getInventoryActions())
-                        .filter(action -> action != null && genericKeyWords.stream().anyMatch(keyword -> action.toLowerCase().contains(keyword.toLowerCase()))) // stream actions to allow for a partial match
-                        .findFirst()
-                        .orElse(null);
-                if (itemAction == null) return false;
-                if (itemAction.equalsIgnoreCase("rub")) {
-                    //Xeric talisman opens a different interface than amulet of glory
-                    if (Rs2Inventory.interact(itemId, itemAction)) {
-                        if (itemId == ItemID.XERICS_TALISMAN || transport.getDisplayInfo().toLowerCase().contains("skills necklace")) {
-                            interactWithAdventureLog(transport);
-                        } else {
-                            sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
-                            Rs2Widget.sleepUntilHasWidgetText(destination, 219, 1, false, 5000);
-                            Rs2Widget.clickWidget(destination, Optional.of(219), 1, false);
-                            return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
-                        }
-                    }
-                }
-            } else {
-                if (Rs2Inventory.interact(itemId, itemAction)) {
-                    return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
-                }
-                return false;
-            }
-        }
+        String destination = transport.getDisplayInfo().contains(":")
+                ? transport.getDisplayInfo().split(":")[1].trim().toLowerCase()
+                : transport.getDisplayInfo().trim().toLowerCase();
 
-        //Simple items with one destination like teleport tabs, teleport scrolls etc...
+        // Try to find a location-based action
         String itemAction = Arrays.stream(rs2Item.getInventoryActions())
-                .filter(action -> action != null && genericKeyWords.stream().anyMatch(keyword -> action.toLowerCase().contains(keyword.toLowerCase()))) // stream actions to allow for a partial match
+                .filter(action -> action != null && locationKeyWords.stream().anyMatch(keyword ->
+                        destination.contains(keyword.toLowerCase()) && action.toLowerCase().contains(keyword.toLowerCase())))
                 .findFirst()
                 .orElse(null);
+
+        // If no location-based action found, try generic actions
+        if (itemAction == null) {
+            itemAction = Arrays.stream(rs2Item.getInventoryActions())
+                    .filter(action -> action != null && genericKeyWords.stream().anyMatch(keyword -> action.toLowerCase().contains(keyword.toLowerCase())))
+                    .findFirst()
+                    .orElse(null);
+        }
+
         if (itemAction == null) return false;
+
         if (Rs2Inventory.interact(itemId, itemAction)) {
+            if (itemAction.equalsIgnoreCase("rub") && (itemId == ItemID.XERICS_TALISMAN || transport.getDisplayInfo().toLowerCase().contains("skills necklace"))) {
+                return interactWithAdventureLog(transport);
+            }
+
+            if (itemAction.equalsIgnoreCase("rub")) {
+                sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
+                Rs2Widget.sleepUntilHasWidgetText(destination, 219, 1, false, 5000);
+                Rs2Widget.clickWidget(destination, Optional.of(219), 1, false);
+            }
+
             return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
         }
 
@@ -1017,7 +1003,6 @@ public class Rs2Walker {
     }
 
     private static boolean handleWearableTeleports(Transport transport, int itemId) {
-        final int OFFSET = 10;
         if (Rs2Equipment.isWearing(itemId)) {
             if (transport.getDisplayInfo().contains(":")) {
                 String[] values = transport.getDisplayInfo().split(":");
@@ -1031,7 +1016,6 @@ public class Rs2Walker {
     }
 
     private static boolean interactWithJewellery(Transport transport, JewelleryLocationEnum jewelleryTransport) {
-        final int OFFSET = 10;
         boolean action;
         if (jewelleryTransport.getTooltip().toLowerCase().contains("ring")) {
             action = Rs2Equipment.useRingAction(jewelleryTransport);
@@ -1196,7 +1180,7 @@ public class Rs2Walker {
         char key = transport.getDisplayInfo().charAt(0);
         Rs2Keyboard.keyPress(key);
         Microbot.log("Traveling to " + transport.getDisplayInfo());
-        return true;
+        return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
     }
 
     public static boolean handleGlider(Transport transport) {
