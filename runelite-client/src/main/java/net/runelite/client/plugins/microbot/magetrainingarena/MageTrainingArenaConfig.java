@@ -19,7 +19,7 @@ import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.Water
         "- When set to buy rewards, the rooms are cycled until the points are met, the reward will be stored in your bank. <br />" +
         "- If not set to buy rewards, the rooms are cycled as if it would buy the rewards then continues cycling the rooms afterwards. <br />" +
         "  <br />" +
-        "- Ensure 'Buy rewards' is turned off if using Max Points option!")
+        "- 'All items' will get enough points for you to finish Collection Log'")
 public interface MageTrainingArenaConfig extends Config {
     @ConfigSection(
             name = "Rewards",
