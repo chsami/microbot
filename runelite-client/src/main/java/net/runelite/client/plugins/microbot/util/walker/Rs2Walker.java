@@ -385,7 +385,10 @@ public class Rs2Walker {
 
         Point point = worldToMinimap(worldPoint);
 
-        if (point == null) return false;
+        if (point == null) {
+            Microbot.log("Worldpoint to minimap conversion failed...");
+            return false;
+        }
 
         Microbot.getMouse().click(point);
 
@@ -419,19 +422,18 @@ public class Rs2Walker {
 
         Rs2Player.toggleRunEnergy(toggleRun);
         Point canv;
-        LocalPoint localPoint;
-        if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
-            localPoint = Rs2LocalPoint.fromWorldInstance(worldPoint);
-            if (localPoint == null) {
-                Microbot.log("Tried to walk worldpoint " + worldPoint + " using the canvas but localpoint returned null");
-                return false;
-            }
+        LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
 
-            canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getTopLevelWorldView().getPlane());
-        } else {
-            localPoint = LocalPoint.fromScene(worldPoint.getX() - Microbot.getClient().getTopLevelWorldView().getBaseX(), worldPoint.getY() - Microbot.getClient().getTopLevelWorldView().getBaseY(), Microbot.getClient().getTopLevelWorldView().getScene());
-            canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getTopLevelWorldView().getPlane());
+        if (Microbot.getClient().getTopLevelWorldView().isInstance() && localPoint == null) {
+            localPoint = Rs2LocalPoint.fromWorldInstance(worldPoint);
         }
+
+        if (localPoint == null) {
+            Microbot.log("Tried to walk worldpoint " + worldPoint + " using the canvas but localpoint returned null");
+            return false;
+        }
+
+        canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getTopLevelWorldView().getPlane());
 
         int canvasX = canv != null ? canv.getX() : -1;
         int canvasY = canv != null ? canv.getY() : -1;
