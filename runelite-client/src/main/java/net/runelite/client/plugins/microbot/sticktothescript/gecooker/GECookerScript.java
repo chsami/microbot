@@ -160,7 +160,7 @@ public class GECookerScript extends Script {
                    }
 
                    Rs2Inventory.combine("Tinderbox", logType.getLogName());
-                   Rs2Player.waitForXpDrop(Skill.FIREMAKING, 5000);
+                   Rs2Player.waitForXpDrop(Skill.FIREMAKING, 20000);
                 break;
 
             default:

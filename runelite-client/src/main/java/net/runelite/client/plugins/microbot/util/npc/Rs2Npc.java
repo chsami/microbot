@@ -102,9 +102,9 @@ public class Rs2Npc {
         Stream<NPC> npcs = getNpcs();
 
         if (exact) {
-            npcs = npcs.filter(x -> x.getName().equalsIgnoreCase(name));
+            npcs = npcs.filter(x -> x!= null && x.getName().equalsIgnoreCase(name));
         } else {
-            npcs = npcs.filter(x -> x.getName().toLowerCase().contains(name.toLowerCase()));
+            npcs = npcs.filter(x -> x!= null && x.getName().toLowerCase().contains(name.toLowerCase()));
         }
 
         return npcs;
@@ -192,7 +192,7 @@ public class Rs2Npc {
                 if (!hasLineOfSight(npc)) {
                     if (Microbot.cantReachTargetRetries >= Random.random(3, 5)) {
                         Microbot.pauseAllScripts = true;
-                        Microbot.showMessage("Your bot tries to interact with an npc for " + Microbot.cantReachTargetRetries + " times but failed. Please take a look at what is happening.");
+                        Microbot.showMessage("Your bot tried to interact with an npc for " + Microbot.cantReachTargetRetries + " times but failed. Please take a look at what is happening.");
                         return false;
                     }
                     Rs2Walker.walkTo(Rs2Tile.getNearestWalkableTileWithLineOfSight(npc.getWorldLocation()), 0);

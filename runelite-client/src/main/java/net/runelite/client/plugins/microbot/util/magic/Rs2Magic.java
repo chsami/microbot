@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.util.magic;
 
+import com.google.common.collect.ImmutableList;
+import lombok.Getter;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
@@ -21,6 +23,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static net.runelite.api.Varbits.SHADOW_VEIL;
@@ -28,10 +31,33 @@ import static net.runelite.client.plugins.microbot.Microbot.log;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2Magic {
-    public static boolean canCast(MagicAction magicSpell) {
-        if (!Rs2SpellBookSettings.setAllFiltersOn()) {
+    //use this boolean to do one time checks
+    private static boolean firstInteractionWithSpellBook = true;
+
+    /**
+     * Check if all the settings are correct before we start interacting with spellbook
+     */
+    private static boolean oneTimeSpellBookCheck() {
+        // We add a one time check to avoid performanec issues. Checking varbits is expensive
+        if (firstInteractionWithSpellBook && !Rs2SpellBookSettings.setAllFiltersOn()) {
             return false;
         }
+        firstInteractionWithSpellBook = false;
+        return true;
+    }
+
+    /**
+     * Checks if a specific spell can be cast
+     * contains all the necessary checks to do a succesfull check
+     * use quickCanCast if the performance of this method is to slow for you
+     * @param magicSpell
+     * @return
+     */
+    public static boolean canCast(MagicAction magicSpell) {
+        if (!oneTimeSpellBookCheck()) {
+            return false;
+        }
+
         if (Rs2Tab.getCurrentTab() != InterfaceTab.MAGIC) {
             Rs2Tab.switchToMagicTab();
             sleep(150, 300);
@@ -51,6 +77,30 @@ public class Rs2Magic {
         return widget != null;
     }
 
+    /**
+     * Checks if a specific spell can be cast without checking settings first
+     * This method is more performant than the canCast, use this one if you are sure
+     * that the settings are correct
+     * @param magicSpell
+     * @return
+     */
+    public static boolean quickCanCast(MagicAction magicSpell) {
+        if (Rs2Tab.getCurrentTab() != InterfaceTab.MAGIC) {
+            Rs2Tab.switchToMagicTab();
+            sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.MAGIC);
+        }
+
+        Widget widget = Arrays.stream(Rs2Widget.getWidget(218, 3).getStaticChildren()).filter(x -> x.getSpriteId() == magicSpell.getSprite()).findFirst().orElse(null);
+
+        return widget != null;
+    }
+
+    public static boolean quickCanCast(String spellName) {
+        MagicAction magicAction = Arrays.stream(MagicAction.values()).filter(x -> x.getName().toLowerCase().contains(spellName.toLowerCase())).findFirst().orElse(null);
+        if (magicAction == null) return false;
+        return quickCanCast(magicAction);
+    }
+
     public static boolean cast(MagicAction magicSpell) {
         MenuAction menuAction;
         Rs2Tab.switchToMagicTab();
@@ -60,7 +110,7 @@ public class Rs2Magic {
             log("Unable to cast " + magicSpell.getName());
             return false;
         }
-        int identifier = 1;
+        int identifier = magicSpell.getName().toLowerCase().contains("teleport to house") ? 2 : 1;
         if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
             menuAction = MenuAction.CC_OP;
         } else {
@@ -307,4 +357,32 @@ public class Rs2Magic {
     public static boolean isShadowVeilActive() {
         return Microbot.getVarbitValue(SHADOW_VEIL) == 1;
     }
+
+
+    //DATA
+
+    @Getter
+    private final List<Integer> runeIds = ImmutableList.of(
+            ItemID.NATURE_RUNE,
+            ItemID.LAW_RUNE,
+            ItemID.BODY_RUNE,
+            ItemID.DUST_RUNE,
+            ItemID.LAVA_RUNE,
+            ItemID.STEAM_RUNE,
+            ItemID.SMOKE_RUNE,
+            ItemID.SOUL_RUNE,
+            ItemID.WATER_RUNE,
+            ItemID.AIR_RUNE,
+            ItemID.EARTH_RUNE,
+            ItemID.FIRE_RUNE,
+            ItemID.MIND_RUNE,
+            ItemID.CHAOS_RUNE,
+            ItemID.DEATH_RUNE,
+            ItemID.BLOOD_RUNE,
+            ItemID.COSMIC_RUNE,
+            ItemID.ASTRAL_RUNE,
+            ItemID.MIST_RUNE,
+            ItemID.MUD_RUNE,
+            ItemID.WRATH_RUNE,
+            ItemID.SUNFIRE_RUNE);
 }

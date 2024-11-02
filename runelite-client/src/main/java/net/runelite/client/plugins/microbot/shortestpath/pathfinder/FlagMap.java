@@ -49,11 +49,11 @@ public class FlagMap {
     private int index(int x, int y, int z, int flag) {
         if (x < minX || x >= (minX + REGION_SIZE) || y < minY || y >= (minY + REGION_SIZE) || z < 0 || z >= planeCount || flag < 0 || flag >= FLAG_COUNT) {
             throw new IndexOutOfBoundsException(
-                String.format(Locale.ENGLISH, "[%d,%d,%d,%d] when extents are [>=%d,>=%d,>=%d,>=%d] - [<=%d,<=%d,<%d,<%d]",
-                        x, y, z, flag,
-                        minX, minY, 0, 0,
-                        minX + REGION_SIZE - 1, minY + REGION_SIZE - 1, planeCount, FLAG_COUNT
-                )
+                    String.format(Locale.ENGLISH, "[%d,%d,%d,%d] when extents are [>=%d,>=%d,>=%d,>=%d] - [<=%d,<=%d,<%d,<%d]",
+                            x, y, z, flag,
+                            minX, minY, 0, 0,
+                            minX + REGION_SIZE - 1, minY + REGION_SIZE - 1, planeCount, FLAG_COUNT
+                    )
             );
         }
 

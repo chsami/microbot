@@ -202,18 +202,20 @@ public class Rs2SpellBookSettings {
      * @return
      */
     public static boolean setAllFiltersOn() {
-        boolean success = toggleCombatSpells(true, false) &&
-                toggleTeleportSpells(true, false) &&
-                toggleUtilitySpells(true, false) &&
-                toggleLackMagicLevel(true, false) &&
-                toggleLackRunes(true, false) &&
-                toggleLackRequirements(true, false) &&
-                toggleIconResizing(true, false);
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            boolean success = toggleCombatSpells(true, false) &&
+                    toggleTeleportSpells(true, false) &&
+                    toggleUtilitySpells(true, false) &&
+                    toggleLackMagicLevel(true, false) &&
+                    toggleLackRunes(true, false) &&
+                    toggleLackRequirements(true, false) &&
+                    toggleIconResizing(true, false);
 
-        if (success) {
-            closeSpellBookFilter();
-        }
-        return success;
+            if (success) {
+                closeSpellBookFilter();
+            }
+            return success;
+        });
     }
 
     /**

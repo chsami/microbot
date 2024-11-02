@@ -63,7 +63,7 @@ public class SandCrabScript extends Script {
                 }
                 long startTime = System.currentTimeMillis();
 
-               Rs2Combat.enableAutoRetialiate();
+                Rs2Combat.enableAutoRetialiate();
 
                 if (otherPlayerDetected() && !Rs2Combat.inCombat())
                     hijackTimer++;
@@ -79,7 +79,7 @@ public class SandCrabScript extends Script {
                     }
                 }
 
-                if (currentScanLocation != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentScanLocation.getWorldPoint()) > 10 && (state != State.RESET_AGGRO && state != State.WALK_BACK)) {
+                if (currentScanLocation != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo(currentScanLocation.getWorldPoint()) > 10 && (state != State.RESET_AGGRO && state != State.WALK_BACK && state != State.BANK)) {
                     state = State.WALK_BACK;
                     resetAggro();
                     resetAfkTimer();
@@ -102,9 +102,11 @@ public class SandCrabScript extends Script {
                     Rs2Player.eatAt(50);
 
                     if (Rs2Inventory.getInventoryFood().isEmpty()) {
+                        state = State.BANK;
                         Rs2Walker.walkTo(new WorldPoint(1720, 3465, 0));
                         if (Rs2Bank.useBank()) {
                             Rs2Bank.withdrawAll(config.food().getName(), true);
+                            state = State.WALK_BACK;
                         }
                         return;
                     }

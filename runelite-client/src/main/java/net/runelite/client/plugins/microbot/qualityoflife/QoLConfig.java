@@ -192,6 +192,34 @@ public interface QoLConfig extends Config {
         return 50;
     }
 
+    // boolean to drink prayer pot
+    @ConfigItem(
+            keyName = "autoDrinkPrayerPot",
+            name = "Auto Drink Prayer Pot",
+            description = "Auto Drink Prayer Pot",
+            position = 0,
+            section = upkeepSection
+    )
+    default boolean autoDrinkPrayerPot() {
+        return false;
+    }
+
+    @Range(
+            min = 1,
+            max = 99
+    )
+
+    @ConfigItem(
+            keyName = "drinkPrayerPotPoints",
+            name = "Drink Prayer Pot Points",
+            description = "Drink Prayer Pot Points",
+            position = 0,
+            section = upkeepSection
+    )
+    default int drinkPrayerPotPoints() {
+        return 35;
+    }
+
     // avoid logging out
     @ConfigItem(
             keyName = "neverLogOut",
@@ -260,7 +288,7 @@ public interface QoLConfig extends Config {
             section = upkeepSection
     )
     default boolean autoStamina() {
-        return true;
+        return false;
     }
 
     // run energy threshold to use stamina potion

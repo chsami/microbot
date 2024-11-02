@@ -92,7 +92,7 @@ public class BlastoiseFurnaceScript extends Script {
                         Microbot.status = "Banking";
                         if (!Rs2Bank.isOpen()) {
                             System.out.println("Opening bank");
-                            this.openBank();
+                            Rs2Bank.openBank();
                             this.sleepUntil(Rs2Bank::isOpen, 60000);
                         }
 

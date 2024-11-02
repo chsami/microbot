@@ -32,6 +32,10 @@ public class QoLScript extends Script {
                     return;
                 }
 
+                if (config.autoDrinkPrayerPot()) {
+                    handleAutoDrinkPrayPot(config.drinkPrayerPotPoints());
+                }
+
                 if (config.autoEatFood()) {
                     handleAutoEat(config.eatFoodPercentage());
                 }
@@ -108,6 +112,10 @@ public class QoLScript extends Script {
     // handle auto eat
     private void handleAutoEat(int percent) {
         Rs2Player.eatAt(percent);
+    }
+
+    private void handleAutoDrinkPrayPot(int points) {
+        Rs2Player.drinkPrayerPotionAt(points);
     }
 
     // handle dialogue continue

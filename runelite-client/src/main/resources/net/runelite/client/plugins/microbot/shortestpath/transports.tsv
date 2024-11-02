@@ -1,4 +1,4 @@
-# X Y Z	X Y Z	menuOption menuTarget objectID	Skill requirements	Item requirements	Quest	Travel time	Info
+# Origin	Destination	menuOption menuTarget objectID	Skills	Items	Quests	Duration	Info
 # Tutorial Island							
 3097 3107 0	3098 3107 0	Open Door 9398				1	
 3098 3107 0	3097 3107 0	Open Door 9398				1	
@@ -780,7 +780,7 @@
 3083 3512 1	3083 3512 0	Climb-down Ladder 16679					
 3082 3513 0	3082 3513 1	Climb-up Ladder 16683					
 3082 3513 1	3082 3513 0	Climb-down Ladder 16679					
-3096 3468 0	3096 9867 0	Climb-down Trapdoor 1581					
+3096 3468 0	3096 9867 0	Climb-down Trapdoor 1581
 3096 9867 0	3096 3468 0	Climb-up Ladder 17385					
 3097 9868 0	3096 3468 0	Climb-up Ladder 17385					
 3094 9895 0	3093 9895 0	Push Odd looking wall 1736					
@@ -1070,7 +1070,9 @@
 3041 3202 0	3041 3199 1	Cross Gangplank 14304				3	
 3041 3199 1	3041 3202 0	Cross Gangplank 14305				3	
 3038 3192 0	3038 3189 1	Cross Gangplank 17404				3	
-3038 3189 1	3038 3192 0	Cross Gangplank 17405				3	
+3038 3189 1	3038 3192 0	Cross Gangplank 17405				3
+#pest control
+2662 2677 1	2659 2676 0	Cross Gangplank 14307				3
 3013 3204 0	3013 3204 1	Climb-up Ladder 16683					
 3013 3204 1	3013 3204 0	Climb-down Ladder 16679					
 3014 3203 0	3014 3203 1	Climb-up Ladder 16683					
@@ -1336,7 +1338,7 @@
 2512 3476 0	2527 3413 0	Swim to Rock 1996					
 2511 3463 0	2575 9861 0	Open Door 2010		1 Glarial's amulet	Waterfall Quest		
 2575 9861 0	2511 3463 0	Open Door 2000					
-2568 9893 0	2568 9894 0	Open Door 2002		Key, id 298			
+2568 9893 0	2568 9894 0	Open Door 2002		1 Key
 2568 9894 0	2568 9893 0	Open Door 2002					
 2566 9901 0	2604 9901 0	Open Door 2002					
 2604 9901 0	2566 9901 0	Open Door 2002					
@@ -1496,7 +1498,7 @@
 2957 3158 1	2954 3158 0	Cross Gangplank 17399				3	
 							
 # Brimhaven							
-2763 3238 1	2760 3238 0	Cross Gangplank 17401				3	
+2763 3238 1	2760 3238 0	Cross Gangplank 17401				3
 2760 3238 0	2763 3238 1	Cross Gangplank 17400				3	
 2772 3234 0	2775 3234 1	Cross Gangplank 2087				3	
 2775 3234 1	2772 3234 0	Cross Gangplank 2088				3	
@@ -4352,36 +4354,36 @@
 # Karamja							
 2910 3049 0	2906 3049 0	Cross A wooden log 23644				5	
 2906 3049 0	2910 3049 0	Cross A wooden log 23644				5	
-2879 2954 0	2876 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2880 2953 0	2876 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2880 2952 0	2876 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2880 2951 0	2876 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2879 2950 0	2876 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2877 2954 0	2880 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2876 2953 0	2880 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2876 2952 0	2880 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2876 2951 0	2880 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2877 2950 0	2880 2952 0	Climb over Broken cart 2216			Shilo Village	2	
-2777 3214 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2778 3214 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2776 3213 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2776 3212 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2776 3211 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2779 3213 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2779 3212 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2779 3211 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2777 3210 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2778 3210 0	2834 2951 0	Board Travel cart 2230			Shilo Village	5	
-2830 2953 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2830 2952 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2831 2954 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2832 2954 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2833 2954 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2831 2951 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2832 2951 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2833 2951 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2834 2953 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
-2834 2952 0	2776 3214 0	Pay-fare Travel cart 2256			Shilo Village	5	
+2879 2954 0	2876 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2880 2953 0	2876 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2880 2952 0	2876 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2880 2951 0	2876 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2879 2950 0	2876 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2877 2954 0	2880 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2876 2953 0	2880 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2876 2952 0	2880 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2876 2951 0	2880 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2877 2950 0	2880 2952 0	Climb-over Broken cart 2216			Shilo Village	2
+2777 3214 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2778 3214 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2776 3213 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2776 3212 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2776 3211 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2779 3213 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2779 3212 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2779 3211 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2777 3210 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2778 3210 0	2834 2951 0	Board Travel cart 2230		10 coins	Shilo Village	5
+2830 2953 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
+2830 2952 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
+2831 2954 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
+2832 2954 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
+2833 2954 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
+2831 2951 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
+2832 2951 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
+2833 2951 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
+2834 2953 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
+2834 2952 0	2776 3214 0	Pay-fare Travel cart 2265		200 coins	Shilo Village	5
 2836 9599 0	2836 9600 0	Open Wall 2606			Dragon Slayer I	2	
 2836 9600 0	2836 9599 0	Open Wall 2606				2	
 2832 9657 0	2834 3258 0	Climb Climbing rope 25213				1	
@@ -4482,3 +4484,31 @@
 1169 9973 0	1171 9946 0	Magic gate Pass 31967
 9363 1050 0	1214 3557 0	Climb Rope 32507
 
+# dragon slayer 2 Magical Barrier
+2458 2860 0	2458 2862 0	Pass Magical Barrier 31616
+2457 2860 0	2457 2862 0	Pass Magical Barrier 31616
+2456 2860 0	2456 2862 0	Pass Magical Barrier 31616
+2458 2862 0	2458 2860 0	Pass Magical Barrier 31616
+2457 2862 0	2457 2860 0	Pass Magical Barrier 31616
+2456 2862 0	2456 2860 0	Pass Magical Barrier 31616
+
+# watchtower
+2933 4712 2	2549 3112 1	Climb-down Ladder 2797
+2549 3112 1	2933 4712 2	Climb-down Ladder 2797
+2544 3112 1	2544 3112 0	Climb-down Ladder 17122
+2544 3112 0	2544 3112 1	Climb-down Ladder 17122
+
+# kourend
+1618 3680 0	1614 3680 1	Climb-up Staircase 11807
+1614 3680 1	1618 3680 0	Climb-down Staircase 11799
+1616 3686 1	1616 3686 2	Climb-up Staircase 12536
+1616 3686 2	1616 3686 1	Climb-down Staircase 12538
+1639 3673 0	1666 10050 0	Investigate Statue 27785
+1666 10050 0    1639 3673 0	Climb-up Vine ladder 28894
+
+#corsair cove
+2578 2837 1	2578 2840 0	Cross Gangplank 31756
+
+#mining guild
+3021 9739 0	3021 3339 0	Climb-up Ladder 17385
+3021 3339 0	3021 9739 0	Climb-down Ladder 30367

@@ -160,22 +160,27 @@ public class Rs2Tile {
             for (var kvp : tileDistances.entrySet().stream().filter(x -> x.getValue() == dist).collect(Collectors.toList())) {
                 var point = kvp.getKey();
                 LocalPoint localPoint;
-                if (Microbot.getClient().isInInstancedRegion()) {
-                    var worldPoint = WorldPoint.toLocalInstance(Microbot.getClient(), point).stream().findFirst().get();
-                    localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+                if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
+                    var worldPoint = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), point).stream().findFirst().orElse(null);
+                    if (worldPoint == null) break;
+                    localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), worldPoint);
                 } else
                     localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
 
-                if (Microbot.getClient().getCollisionMaps() != null && localPoint != null) {
-                    int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
+                CollisionData[] collisionMap = Microbot.getClient().getTopLevelWorldView().getCollisionMaps();
+                if (collisionMap != null && localPoint != null) {
+                    CollisionData collisionData = collisionMap[Microbot.getClient().getTopLevelWorldView().getPlane()];
+                    int[][] flags = collisionData.getFlags();
                     int data = flags[localPoint.getSceneX()][localPoint.getSceneY()];
 
                     Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
 
-                    if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FULL)
-                            || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FLOOR)) {
-                        tileDistances.remove(point);
-                        continue;
+                    if (!tile.equals(point)) {
+                        if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FULL)
+                                || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FLOOR)) {
+                            tileDistances.remove(point);
+                            continue;
+                        }
                     }
 
                     if (kvp.getValue() >= distance)
@@ -213,6 +218,8 @@ public class Rs2Tile {
     }
 
     public static boolean isTileReachable(WorldPoint targetPoint) {
+        if (targetPoint == null) return false;
+        if (targetPoint.getPlane() != Rs2Player.getWorldLocation().getPlane()) return false;
         boolean[][] visited = new boolean[104][104];
         int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
         WorldPoint playerLoc = Rs2Player.getWorldLocation();
