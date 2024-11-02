@@ -72,8 +72,8 @@ public class ShootingStarScript extends Script {
                     return;
                 }
 
-                if (Rs2AntibanSettings.actionCooldownActive) return;
                 if (Rs2Player.isMoving() || Rs2Antiban.getCategory().isBusy() || Microbot.pauseAllScripts) return;
+                if (Rs2AntibanSettings.actionCooldownActive) return;
 
                 switch (state) {
                     case WAITING_FOR_STAR:
@@ -107,22 +107,21 @@ public class ShootingStarScript extends Script {
                     case WALKING:
                         toggleLockState(true);
 
+                        if (Rs2Player.getWorld() != star.getWorldObject().getId()) {
+                            Microbot.hopToWorld(star.getWorldObject().getId());
+                            sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
+                            return;
+                        }
+
                         boolean isNearShootingStar = Rs2Player.getWorldLocation().distanceTo(star.getShootingStarLocation().getWorldPoint()) < 6;
 
                         if (!isNearShootingStar) {
                             WalkerState walkerState = Rs2Walker.walkWithState(star.getShootingStarLocation().getWorldPoint(), 6);
                             if (walkerState == WalkerState.UNREACHABLE) {
-                                plugin.ignoreStars.add(plugin.getSelectedStar());
                                 plugin.removeStar(plugin.getSelectedStar());
                                 plugin.updatePanelList(true);
                                 state = ShootingStarState.WAITING_FOR_STAR;
                             }
-                            return;
-                        }
-
-                        if (Rs2Player.getWorld() != star.getWorldObject().getId()) {
-                            Microbot.hopToWorld(star.getWorldObject().getId());
-                            sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
                             return;
                         }
 
