@@ -22,7 +22,11 @@ public interface GabulhasKarambwansConfig extends Config {
             section = guideSection
     )
     default String GUIDE() {
-        return "";
+        return
+                "1. Configure the fairy rings to DKP at least once\n" +
+                "2. Make sure to have karambwan vessel and raw karambwanji\n"+
+                "3. Start the script next to the karambwan fishing spot"
+                ;
     }
 
     @ConfigSection(
@@ -33,8 +37,8 @@ public interface GabulhasKarambwansConfig extends Config {
     String startingStateSection = "startingStateSection";
     @ConfigItem(
             keyName = "startingState",
-            name = "Starting State",
-            description = "Starting State",
+            name = "(Debug) Starting State",
+            description = "Starting State. Only used for development.",
             position = 2,
             section = startingStateSection
     )

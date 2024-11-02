@@ -118,8 +118,9 @@ public class GabulhasKarambwansScript extends Script {
 
     private void walkToRingToFish() {
 
-        while(!Rs2Walker.isInArea(zanarisRing.dx(2), 3)  && super.isRunning()) {
-            Rs2Walker.walkTo(new WorldArea(zanarisRing.dx(2), 1, 1), 1);
+        while(!Rs2Walker.isInArea(zanarisRing.dx(2), zanarisRing.dy(-2))  && super.isRunning()) {
+
+            Rs2Walker.walkTo(zanarisRing.dx(2), 2);
             sleep(1000, 2000);
             var fairyRing = Rs2GameObject.findObjectById(29560);
             if(!Objects.isNull(fairyRing)) {
