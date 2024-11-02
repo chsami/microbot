@@ -50,11 +50,4 @@ public class ScurriusPlugin extends Plugin {
         scurriusScript.shutdown();
         overlayManager.remove(exampleOverlay);
     }
-
-    @Subscribe
-    private void onProjectileMoved(ProjectileMoved event) {
-        if (scurriusScript != null) {
-            scurriusScript.onProjectileMoved(event);  // Pass the event to the script for handling
-        }
-    }
 }
