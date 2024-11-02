@@ -27,7 +27,7 @@ public class Rs2Reflection {
      * sequence maps to an actor animation
      * actor can be an npc/player
      */
-    static int sequence = 1036457443;
+    static int sequence = -1489920319;
 
     @SneakyThrows
     public static int getAnimation(NPC npc) {
