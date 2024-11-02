@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.gabplugs.goldrush;
+package net.runelite.client.plugins.microbot.gabplugs.goldrush;
 
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;

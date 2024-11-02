@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.gabplugs.karambwans;
+package net.runelite.client.plugins.microbot.gabplugs.goldrush;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -13,18 +13,18 @@ import java.awt.*;
 
 
 @PluginDescriptor(
-        name = PluginDescriptor.Gabulhas + "Karambwan fisher",
+        name = PluginDescriptor.Gabulhas + "Gold Rush",
         description = "",
-        tags = {"GabulhasKarambwans", "Gabulhas"},
+        tags = {"GabulhasGoldRush", "Gabulhas"},
         enabledByDefault = false
 )
 @Slf4j
-public class GabulhasKarambwansPlugin extends Plugin {
+public class GabulhasGoldRushPlugin extends Plugin {
     @Inject
-    private GabulhasKarambwansConfig config;
+    private GabulhasGoldRushConfig config;
     @Provides
-    GabulhasKarambwansConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(GabulhasKarambwansConfig.class);
+    GabulhasGoldRushConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(GabulhasGoldRushConfig.class);
     }
 
     @Inject
@@ -32,10 +32,10 @@ public class GabulhasKarambwansPlugin extends Plugin {
     @Inject
     private PluginManager pluginManager;
     @Inject
-    private GabulhasKarambwansOverlay fornBirdhouseRunsOverlay;
+    private GabulhasGoldRushOverlay fornBirdhouseRunsOverlay;
 
     @Inject
-    GabulhasKarambwansScript gabulhasKarambwansScript;
+    GabulhasGoldRushScript gabulhasKarambwansScript;
 
 
     @Override
@@ -45,7 +45,7 @@ public class GabulhasKarambwansPlugin extends Plugin {
         }
         gabulhasKarambwansScript.run(config);
 //        botStatus = config.STEP(); for debugging
-        GabulhasKarambwansInfo.botStatus = config.STARTINGSTATE();
+        GabulhasGoldRushInfo.botStatus = config.STARTINGSTATE();
     }
 
     protected void shutDown() {

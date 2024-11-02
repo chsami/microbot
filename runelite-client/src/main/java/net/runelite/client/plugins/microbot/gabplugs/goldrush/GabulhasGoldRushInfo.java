@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.gabplugs.goldrush;
+package net.runelite.client.plugins.microbot.gabplugs.goldrush;
 
 public class GabulhasGoldRushInfo {
     public static states botStatus;

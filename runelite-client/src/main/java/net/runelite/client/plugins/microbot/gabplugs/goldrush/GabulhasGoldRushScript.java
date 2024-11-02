@@ -1,8 +1,7 @@
-package net.runelite.client.plugins.gabplugs.goldrush;
+package net.runelite.client.plugins.microbot.gabplugs.goldrush;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.Notifier;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -13,17 +12,14 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import javax.inject.Inject;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.gabplugs.goldrush.GabulhasGoldRushInfo.botStatus;
-import static net.runelite.client.plugins.gabplugs.goldrush.GabulhasGoldRushInfo.states;
+import static net.runelite.client.plugins.microbot.gabplugs.goldrush.GabulhasGoldRushInfo.botStatus;
+import static net.runelite.client.plugins.microbot.gabplugs.goldrush.GabulhasGoldRushInfo.states;
 
 @Slf4j
 public class GabulhasGoldRushScript extends Script {

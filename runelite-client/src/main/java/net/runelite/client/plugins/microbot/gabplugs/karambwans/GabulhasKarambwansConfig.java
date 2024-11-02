@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.gabplugs.karambwans;
+package net.runelite.client.plugins.microbot.gabplugs.karambwans;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;

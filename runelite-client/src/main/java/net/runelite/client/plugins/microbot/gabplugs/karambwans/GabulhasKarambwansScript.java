@@ -1,37 +1,24 @@
-package net.runelite.client.plugins.gabplugs.karambwans;
+package net.runelite.client.plugins.microbot.gabplugs.karambwans;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ItemID;
-import net.runelite.api.MenuAction;
-import net.runelite.api.World;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.Notifier;
-import net.runelite.client.config.Notification;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
-import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
-import org.apache.commons.lang3.ObjectUtils;
 
 import javax.inject.Inject;
-import java.awt.*;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.gabplugs.karambwans.GabulhasKarambwansInfo.*;
-import static net.runelite.client.plugins.gabplugs.karambwans.GabulhasKarambwansInfo.botStatus;
+import static net.runelite.client.plugins.microbot.gabplugs.karambwans.GabulhasKarambwansInfo.*;
+import static net.runelite.client.plugins.microbot.gabplugs.karambwans.GabulhasKarambwansInfo.botStatus;
 
 @Slf4j
 public class GabulhasKarambwansScript extends Script {
