@@ -21,8 +21,9 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 public class BanksBankStanderScript extends Script {
     @Inject
     private BanksBankStanderConfig config;
-    public static double version = 1.3;
+    public static double version = 1.4;
 
+    int MAX_TRIES = 4;
     public static long previousItemChange;
 
     public static CurrentStatus currentStatus = CurrentStatus.FETCH_SUPPLIES;
@@ -119,7 +120,7 @@ public class BanksBankStanderScript extends Script {
             System.out.println("Type of fourthItemId: " + (fourthItemId != null ? fourthItemId.getClass().getSimpleName() : "null"));
 
         }
-        menu = (firstItemId != null ? Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(firstItemId).getName().toLowerCase().contains("grimy")) : firstItemIdentifier.toLowerCase().contains("grimy")) ? "clean" : "use";
+        menu = config.menu();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             if (!Microbot.isLoggedIn()) return;
             try {
@@ -294,6 +295,12 @@ public class BanksBankStanderScript extends Script {
             }
             return false;
         }
+        if (Rs2Bank.isOpen()) {
+            Rs2Bank.closeBank();
+            sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), random(60, 97), 5000);
+            sleep(calculateSleepDuration());
+            return false;
+        }
         if(config.waitForAnimation()) {
             if (Rs2Player.isAnimating() || (System.currentTimeMillis()-previousItemChange)<2400) { return false; }
         }
@@ -305,37 +312,37 @@ public class BanksBankStanderScript extends Script {
             }
         }
         if (firstItemId != null && secondItemId != null) {
-            Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(firstItemId) : items().stream().filter(x -> x.id == firstItemId).findFirst().orElse(null), menu); // Use first Rs2Item (random or not)
+            Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(firstItemId, MAX_TRIES) : items().stream().filter(x -> x.id == firstItemId).findFirst().orElse(null), menu); // Use first Rs2Item (random or not)
             sleep(calculateSleepDuration());
 
             if(config.secondItemQuantity()>0) {
-                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemId) : items().stream().filter(x -> x.id == secondItemId).findFirst().orElse(null), menu);
+                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemId, MAX_TRIES) : items().stream().filter(x -> x.id == secondItemId).findFirst().orElse(null), menu);
             }
 
         } else if (firstItemId != null) {
-            Rs2Inventory.interact(getRandomItemWithLimit(firstItemId), menu); // Use first Rs2Item (random or not)
+            Rs2Inventory.interact(getRandomItemWithLimit(firstItemId, MAX_TRIES), menu); // Use first Rs2Item (random or not)
             sleep(calculateSleepDuration());
 
             if(config.secondItemQuantity()>0) {
-                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemIdentifier) : items().stream().filter(x -> x.name.equalsIgnoreCase(secondItemIdentifier.toLowerCase())).findFirst().orElse(null), menu);
+                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemIdentifier, MAX_TRIES) : items().stream().filter(x -> x.name.equalsIgnoreCase(secondItemIdentifier.toLowerCase())).findFirst().orElse(null), menu);
             }
         } else if (secondItemId != null) {
-            Rs2Inventory.interact(getRandomItemWithLimit(firstItemIdentifier), menu); // Use first Rs2Item (random or not)
+            Rs2Inventory.interact(getRandomItemWithLimit(firstItemIdentifier, MAX_TRIES), menu); // Use first Rs2Item (random or not)
             sleep(calculateSleepDuration());
 
             if(config.secondItemQuantity()>0) {
-                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemId) : items().stream().filter(x -> x.id == secondItemId).findFirst().orElse(null), menu);
+                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemId, MAX_TRIES) : items().stream().filter(x -> x.id == secondItemId).findFirst().orElse(null), menu);
             }
         } else {
-            Rs2Inventory.interact(getRandomItemWithLimit(firstItemIdentifier), menu); // Use first Rs2Item (random or not)
+            Rs2Inventory.interact(getRandomItemWithLimit(firstItemIdentifier, MAX_TRIES), menu); // Use first Rs2Item (random or not)
             sleep(calculateSleepDuration());
 
             if(config.secondItemQuantity()>0) {
-                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemIdentifier) : items().stream().filter(x -> x.name.equalsIgnoreCase(secondItemIdentifier.toLowerCase())).findFirst().orElse(null), menu);
+                Rs2Inventory.interact(config.randomSelection() ? getRandomItemWithLimit(secondItemIdentifier, MAX_TRIES) : items().stream().filter(x -> x.name.equalsIgnoreCase(secondItemIdentifier.toLowerCase())).findFirst().orElse(null), menu);
             }
         }
 
-        if (config.needMenuEntry()) {
+        if (config.needPromptEntry()) {
             sleep(calculateSleepDuration());
             isWaitingForPrompt=true;
             sleep = sleepUntilTrue(() -> !isWaitingForPrompt, random(7,31), random(800,1200));
