@@ -11,10 +11,7 @@ import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
-import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
-import net.runelite.client.plugins.microbot.shortestpath.Transport;
-import net.runelite.client.plugins.microbot.shortestpath.TransportType;
+import net.runelite.client.plugins.microbot.shortestpath.*;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.coords.Rs2LocalPoint;
@@ -62,6 +59,9 @@ public class Rs2Walker {
     static int nextWalkingDistance = 10;
 
     static final int OFFSET = 10; // max offset of the exact area we teleport to
+
+    // Set this to true, if you want to calculate the path but do not want to walk to it
+    static boolean debug = false;
 
     public static boolean walkTo(int x, int y, int plane) {
         return walkTo(x, y, plane, config.reachedDistance());
@@ -130,6 +130,7 @@ public class Rs2Walker {
      * @param distance
      */
     private static WalkerState processWalk(WorldPoint target, int distance) {
+        if (debug) return WalkerState.EXIT;
         try {
             if (!Microbot.isLoggedIn()) {
                 setTarget(null);
@@ -472,7 +473,6 @@ public class Rs2Walker {
         }
         Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
         pathfinder.run();
-        sleepUntil(pathfinder::isDone);
         WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), pathSizeX, pathSizeY);
         WorldArea objectArea = new WorldArea(worldPoint, sizeX + 2, sizeY + 2);
         return pathArea
@@ -487,7 +487,6 @@ public class Rs2Walker {
         }
         Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
         pathfinder.run();
-        sleepUntil(pathfinder::isDone);
         WorldArea pathArea = new WorldArea(pathfinder.getPath().get(pathfinder.getPath().size() - 1), 3, 3);
         WorldArea objectArea = new WorldArea(worldPoint, sizeX + 2, sizeY + 2);
         return pathArea
@@ -500,7 +499,6 @@ public class Rs2Walker {
         }
         Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), worldPoint);
         pathfinder.run();
-        sleepUntil(pathfinder::isDone);
         List<WorldPoint> path = pathfinder.getPath();
         if (path.isEmpty() || path.get(path.size() - 1).getPlane() != worldPoint.getPlane()) return false;
         WorldArea pathArea = new WorldArea(path.get(path.size() - 1), 2, 2);
@@ -710,8 +708,22 @@ public class Rs2Walker {
         }
 
         ShortestPathPlugin.getPathfinderConfig().refresh();
-        ShortestPathPlugin.setPathfinder(new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), start, end));
-        ShortestPathPlugin.setPathfinderFuture(ShortestPathPlugin.getPathfindingExecutor().submit(ShortestPathPlugin.getPathfinder()));
+        if (Rs2Player.isInCave()) {
+            Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), start, end);
+            pathfinder.run();
+            ShortestPathPlugin.getPathfinderConfig().setIgnoreTeleportAndItems(true);
+            Pathfinder pathfinderWithoutTeleports = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), start, end);
+            pathfinderWithoutTeleports.run();
+            if (pathfinder.getPath().size() > pathfinderWithoutTeleports.getPath().size()) {
+                ShortestPathPlugin.setPathfinder(pathfinderWithoutTeleports);
+            } else {
+                ShortestPathPlugin.setPathfinder(pathfinder);
+            }
+            ShortestPathPlugin.getPathfinderConfig().setIgnoreTeleportAndItems(false);
+        } else {
+            ShortestPathPlugin.setPathfinder(new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), start, end));
+            ShortestPathPlugin.setPathfinderFuture(ShortestPathPlugin.getPathfindingExecutor().submit(ShortestPathPlugin.getPathfinder()));
+        }
         return true;
     }
 

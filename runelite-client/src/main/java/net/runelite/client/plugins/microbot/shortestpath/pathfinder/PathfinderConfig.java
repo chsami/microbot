@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -33,12 +34,14 @@ public class PathfinderConfig {
     private final ThreadLocal<CollisionMap> map;
     /** All transports by origin {@link WorldPoint}. The null key is used for transports centered on the player. */
     private final Map<WorldPoint, Set<Transport>> allTransports;
-    private final Set<Transport> usableTeleports;
+    @Setter
+    private Set<Transport> usableTeleports;
 
     @Getter
     private ConcurrentHashMap<WorldPoint, Set<Transport>> transports;
     // Copy of transports with packed positions for the hotpath; lists are not copied and are the same reference in both maps
     @Getter
+    @Setter
     private PrimitiveIntHashMap<Set<Transport>> transportsPacked;
 
     private final Client client;
@@ -77,6 +80,11 @@ public class PathfinderConfig {
     private final int[] boostedLevels = new int[Skill.values().length];
     private Map<Quest, QuestState> questStates = new HashMap<>();
     private Map<Integer, Integer> varbitValues = new HashMap<>();
+
+    @Getter
+    @Setter
+    // Used for manual calculating paths without teleport & items in caves
+    private boolean ignoreTeleportAndItems = false;
 
     public PathfinderConfig(SplitFlagMap mapData, Map<WorldPoint, Set<Transport>> transports,
                             List<Restriction> restrictions,
@@ -140,6 +148,7 @@ public class PathfinderConfig {
     /** Specialized method for only updating player-held item and spell transports */
     public void refreshTeleports(int packedLocation, int wildernessLevel) {
         Set<Transport> usableWildyTeleports = new HashSet<>(usableTeleports.size());
+        if (ignoreTeleportAndItems) return;
 
         for (Transport teleport : usableTeleports) {
             if (wildernessLevel <= teleport.getMaxWildernessLevel()) {

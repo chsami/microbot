@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.*;
 
@@ -156,16 +155,14 @@ public class Pathfinder implements Runnable {
             if (node.packedPosition == targetPacked) {
                 bestLastNode = node;
                 pathNeedsUpdate = true;
-                //START microbot variables
-                if (!Rs2Player.isInCave())
-                    break;
-                //END microbot variables
+                break;
             }
 
             int distance = WorldPointUtil.distanceBetween(node.packedPosition, targetPacked);
             long heuristic = distance + (long) WorldPointUtil.distanceBetween(node.packedPosition, targetPacked, 2);
 
             if (heuristic < bestHeuristic || (heuristic <= bestHeuristic && distance < bestDistance)) {
+
                 bestLastNode = node;
                 pathNeedsUpdate = true;
                 bestDistance = distance;
@@ -181,10 +178,7 @@ public class Pathfinder implements Runnable {
             if ((p = addNeighbors(node)) != null) {
                 bestLastNode = p;
                 pathNeedsUpdate = true;
-                //START microbot variables
-                if (!Rs2Player.isInCave())
-                    break;
-                //END microbot variables
+                break;
             }
         }
 
