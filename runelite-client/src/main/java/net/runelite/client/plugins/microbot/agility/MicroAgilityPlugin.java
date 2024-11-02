@@ -77,13 +77,13 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.varrockCourse.add(new AgilityObstacleModel(EDGE));
 
         //gnome stronghold
-        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(LOG_BALANCE_23145));
-        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_NET_23134));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(LOG_BALANCE_23145, -1, 3436, Operation.GREATER, Operation.GREATER_EQUAL));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_NET_23134, 2476, 3426, Operation.LESS_EQUAL, Operation.GREATER_EQUAL));
         agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(TREE_BRANCH_23559));
-        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(BALANCING_ROPE_23557));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(BALANCING_ROPE_23557, 2477, -1, Operation.LESS_EQUAL, Operation.GREATER));
         agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(TREE_BRANCH_23560));
-        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_NET_23135));
-        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_PIPE_23138));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_NET_23135, 2483, 3425, Operation.GREATER_EQUAL, Operation.LESS_EQUAL));
+        agilityScript.gnomeStrongholdCourse.add(new AgilityObstacleModel(OBSTACLE_PIPE_23138, -1, 3430, Operation.GREATER, Operation.LESS_EQUAL));
 
 
         //canafis
