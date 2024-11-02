@@ -1,11 +1,11 @@
 package net.runelite.client.plugins.microbot.gabplugs.karambwans;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 
 @ConfigGroup("GabulhasKarambwans")
+@ConfigInformation(
+        "<ol><li>Configure the fairy rings to DKP at least once</li><li>Make sure to have karambwan vessel and raw karambwanji</li><li>Start the script next to the karambwan fishing spot</li></ol>"
+)
 public interface GabulhasKarambwansConfig extends Config {
     @ConfigSection(
             name = "Guide",

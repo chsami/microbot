@@ -1,11 +1,9 @@
 package net.runelite.client.plugins.microbot.gabplugs.goldrush;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 
 @ConfigGroup("GabulhasGoldRush")
+@ConfigInformation("<ol><li>Make sure to have gold ore in your bank</li><li>Start inside the Blast Furnace room</li></ol>")
 public interface GabulhasGoldRushConfig extends Config {
     @ConfigSection(
             name = "Guide",
@@ -22,7 +20,10 @@ public interface GabulhasGoldRushConfig extends Config {
             section = guideSection
     )
     default String GUIDE() {
-        return "";
+        return
+                "1. make sure to have gold ore in your bank\n" +
+                "2. start inside the Blast Furnace room"
+                ;
     }
 
     @ConfigSection(

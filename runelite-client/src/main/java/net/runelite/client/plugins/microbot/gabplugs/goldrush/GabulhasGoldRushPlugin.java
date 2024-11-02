@@ -32,24 +32,24 @@ public class GabulhasGoldRushPlugin extends Plugin {
     @Inject
     private PluginManager pluginManager;
     @Inject
-    private GabulhasGoldRushOverlay fornBirdhouseRunsOverlay;
+    private GabulhasGoldRushOverlay gabulhasGoldRushOverlay;
 
     @Inject
-    GabulhasGoldRushScript gabulhasKarambwansScript;
+    GabulhasGoldRushScript gabulhasGoldRushScript;
 
 
     @Override
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
-            overlayManager.add(fornBirdhouseRunsOverlay);
+            overlayManager.add(gabulhasGoldRushOverlay);
         }
-        gabulhasKarambwansScript.run(config);
+        gabulhasGoldRushScript.run(config);
 //        botStatus = config.STEP(); for debugging
         GabulhasGoldRushInfo.botStatus = config.STARTINGSTATE();
     }
 
     protected void shutDown() {
-        gabulhasKarambwansScript.shutdown();
-        overlayManager.remove(fornBirdhouseRunsOverlay);
+        gabulhasGoldRushScript.shutdown();
+        overlayManager.remove(gabulhasGoldRushOverlay);
     }
 }

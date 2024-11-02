@@ -11,7 +11,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
 
-
 @PluginDescriptor(
         name = PluginDescriptor.Gabulhas + "Karambwan fisher",
         description = "",
@@ -32,7 +31,7 @@ public class GabulhasKarambwansPlugin extends Plugin {
     @Inject
     private PluginManager pluginManager;
     @Inject
-    private GabulhasKarambwansOverlay fornBirdhouseRunsOverlay;
+    private GabulhasKarambwansOverlay gabulhasKarambwansOverlay;
 
     @Inject
     GabulhasKarambwansScript gabulhasKarambwansScript;
@@ -41,15 +40,14 @@ public class GabulhasKarambwansPlugin extends Plugin {
     @Override
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
-            overlayManager.add(fornBirdhouseRunsOverlay);
+            overlayManager.add(gabulhasKarambwansOverlay);
         }
         gabulhasKarambwansScript.run(config);
-//        botStatus = config.STEP(); for debugging
         GabulhasKarambwansInfo.botStatus = config.STARTINGSTATE();
     }
 
     protected void shutDown() {
         gabulhasKarambwansScript.shutdown();
-        overlayManager.remove(fornBirdhouseRunsOverlay);
+        overlayManager.remove(gabulhasKarambwansOverlay);
     }
 }

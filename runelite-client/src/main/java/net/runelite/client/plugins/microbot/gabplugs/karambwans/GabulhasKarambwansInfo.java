@@ -1,8 +1,5 @@
 package net.runelite.client.plugins.microbot.gabplugs.karambwans;
 
-import lombok.Getter;
-import net.runelite.api.ItemID;
-
 public class GabulhasKarambwansInfo {
     public static states botStatus;
 
