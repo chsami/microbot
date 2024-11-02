@@ -44,7 +44,7 @@ public interface BanksBankStanderConfig extends Config {
             name = "Interaction Menu",
             description = "Change the interaction menu; e.g. clean grimy herbs",
             position = 3,
-            closedByDefault = false
+            closedByDefault = true
     )
     String interaction = "interaction";
     @ConfigSection(
