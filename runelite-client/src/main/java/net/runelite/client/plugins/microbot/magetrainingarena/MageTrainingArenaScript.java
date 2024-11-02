@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.*;
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.FireStaves;
+import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.WaterStaves;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
@@ -183,6 +184,7 @@ public class MageTrainingArenaScript extends Script {
 
         Predicate<Rs2Item> additionalItemPredicate = x -> !x.name.toLowerCase().contains("rune")
                 && !x.name.toLowerCase().contains("staff")
+                && !x.name.toLowerCase().contains("tome")
                 && !previousRewards.contains(x.id);
 
         if (Rs2Inventory.contains(additionalItemPredicate)){
@@ -249,12 +251,25 @@ public class MageTrainingArenaScript extends Script {
     private void handleEnchantmentRoom() {
         MagicAction enchant;
         int staffId;
-
         var magicLevel = Microbot.getClient().getBoostedSkillLevel(Skill.MAGIC);
-        if (magicLevel >= 87 && (config.fireStaff() == FireStaves.LAVA_BATTLESTAFF || config.fireStaff() == FireStaves.MYSTIC_LAVA_STAFF)){
+
+        if (magicLevel >= 87 && (config.fireStaff() == FireStaves.TOME_OF_FIRE)){
             enchant = MagicAction.ENCHANT_ONYX_JEWELLERY;
-            staffId = config.fireStaff().getItemId();
-        } else if (magicLevel >= 68){
+            staffId = config.earthStaff().getItemId();
+            if (Rs2Inventory.hasItem("tome of fire")) {
+                staffId = config.fireStaff().getItemId();}}
+
+        else if (magicLevel >= 87 && (config.fireStaff() == FireStaves.LAVA_BATTLESTAFF || config.fireStaff() == FireStaves.MYSTIC_LAVA_STAFF)){
+            enchant = MagicAction.ENCHANT_ONYX_JEWELLERY;
+            staffId = config.fireStaff().getItemId();}
+
+        else if (magicLevel >= 68 && (config.waterStaff() == WaterStaves.TOME_OF_WATER)){
+            enchant = MagicAction.ENCHANT_DRAGONSTONE_JEWELLERY;
+            staffId = config.earthStaff().getItemId();
+            if (Rs2Inventory.hasItem("tome of water")) {
+                staffId = config.waterStaff().getItemId();}}
+
+        else if (magicLevel >= 68){
             enchant = MagicAction.ENCHANT_DRAGONSTONE_JEWELLERY;
             staffId = config.waterStaff().getItemId();
             if (Rs2Inventory.hasItem("water rune")) {

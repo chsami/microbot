@@ -10,6 +10,12 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public enum Rewards {
+    MAX_POINTS(ItemID.MAX_CAPE, Map.of(
+            Points.TELEKINETIC, 8000,
+            Points.GRAVEYARD, 8000,
+            Points.ENCHANTMENT, 32000,
+            Points.ALCHEMIST, 16000), null),
+
     INFINITY_HAT(ItemID.INFINITY_HAT, Map.of(
             Points.TELEKINETIC, 350,
             Points.GRAVEYARD, 350,
