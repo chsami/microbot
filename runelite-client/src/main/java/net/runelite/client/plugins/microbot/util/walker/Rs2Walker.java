@@ -976,14 +976,20 @@ public class Rs2Walker {
                 "kourend woodland", "mount karuulm");
         List<String> genericKeyWords = Arrays.asList("invoke", "empty", "consume", "rub", "break", "teleport", "reminisce");
 
-        String destination = transport.getDisplayInfo().contains(":")
+        boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
+        String destination = hasMultipleDestination
                 ? transport.getDisplayInfo().split(":")[1].trim().toLowerCase()
                 : transport.getDisplayInfo().trim().toLowerCase();
 
-        // Try to find a location-based action
-        String itemAction = Arrays.stream(rs2Item.getInventoryActions())
+        // Check location keywords based on multiple destinations
+        String itemAction = hasMultipleDestination
+                ? Arrays.stream(rs2Item.getInventoryActions())
                 .filter(action -> action != null && locationKeyWords.stream().anyMatch(keyword ->
                         destination.contains(keyword.toLowerCase()) && action.toLowerCase().contains(keyword.toLowerCase())))
+                .findFirst()
+                .orElse(null)
+                : Arrays.stream(rs2Item.getInventoryActions())
+                .filter(action -> action != null && locationKeyWords.stream().anyMatch(keyword -> action.toLowerCase().contains(keyword.toLowerCase())))
                 .findFirst()
                 .orElse(null);
 
@@ -1008,6 +1014,7 @@ public class Rs2Walker {
                 Rs2Widget.clickWidget(destination, Optional.of(219), 1, false);
             }
 
+            Microbot.log("Traveling to " + transport.getDisplayInfo());
             return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
         }
 
@@ -1021,6 +1028,7 @@ public class Rs2Walker {
                 String destination = values[1].trim().toLowerCase();
                 Rs2Item rs2Item = Rs2Equipment.get(itemId);
                 Rs2Equipment.invokeMenu(rs2Item, destination);
+                Microbot.log("Traveling to " + transport.getDisplayInfo());
                 return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
             }
         }
