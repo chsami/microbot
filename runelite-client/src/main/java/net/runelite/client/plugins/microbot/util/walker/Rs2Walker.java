@@ -500,7 +500,7 @@ public class Rs2Walker {
         pathfinder.run();
         sleepUntil(pathfinder::isDone);
         List<WorldPoint> path = pathfinder.getPath();
-        if (path.get(path.size() - 1).getPlane() != worldPoint.getPlane()) return false;
+        if (path.isEmpty() || path.get(path.size() - 1).getPlane() != worldPoint.getPlane()) return false;
         WorldArea pathArea = new WorldArea(path.get(path.size() - 1), 2, 2);
         WorldArea objectArea = new WorldArea(worldPoint, 2, 2);
         return pathArea

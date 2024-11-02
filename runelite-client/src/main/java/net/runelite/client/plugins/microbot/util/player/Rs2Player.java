@@ -21,6 +21,8 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.http.api.worlds.WorldResult;
+import net.runelite.http.api.worlds.WorldType;
 
 import java.awt.*;
 import java.time.Duration;
@@ -272,6 +274,25 @@ public class Rs2Player {
     public static boolean isMember() {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.MEMBERSHIP_DAYS) > 0);
     }
+
+    /**
+     * Checks if a player is in a member world
+     * @return true if in a member world
+     */
+    public static boolean isInMemberWorld() {
+        WorldResult worldResult = Microbot.getWorldService().getWorlds();
+
+        List<net.runelite.http.api.worlds.World> worlds;
+        if (worldResult != null) {
+            worlds = worldResult.getWorlds();
+            Random r = new Random();
+            return worlds.stream()
+                    .anyMatch(x -> x.getId() == Microbot.getClient().getWorld() && x.getTypes().contains(WorldType.MEMBERS));
+        }
+
+        return false;
+    }
+
 
     @Deprecated(since = "Use the Rs2Combat.specState method", forRemoval = true)
     public static void toggleSpecialAttack(int energyRequired) {
