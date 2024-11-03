@@ -313,7 +313,7 @@ public class Rs2Player {
         if (Microbot.getVarbitPlayerValue(173) == 1 && toggle) return true;
         Widget widget = Rs2Widget.getWidget(WidgetInfo.MINIMAP_TOGGLE_RUN_ORB.getId());
         if (widget == null) return false;
-        if (Microbot.getClient().getEnergy() > 1000 && toggle) {
+        if (toggle) {
             Microbot.getMouse().click(widget.getCanvasLocation());
             sleep(150, 300);
             return true;
