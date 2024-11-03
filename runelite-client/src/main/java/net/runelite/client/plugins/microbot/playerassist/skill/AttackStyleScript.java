@@ -361,9 +361,8 @@ public class AttackStyleScript extends Script {
         return isMaxed() && disable;
     }
 
-    // shutdown
+    @Override
     public void shutdown() {
-        mainScheduledFuture.cancel(true);
         super.shutdown();
 
     }

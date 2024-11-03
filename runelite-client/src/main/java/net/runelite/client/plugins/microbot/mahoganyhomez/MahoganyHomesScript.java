@@ -310,7 +310,6 @@ public class MahoganyHomesScript extends Script {
 
     @Override
     public void shutdown() {
-        mainScheduledFuture.cancel(true);
         super.shutdown();
     }
 }
