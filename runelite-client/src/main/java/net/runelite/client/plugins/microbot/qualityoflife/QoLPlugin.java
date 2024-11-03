@@ -198,6 +198,7 @@ public class QoLPlugin extends Plugin {
 
     }
 
+
     @Subscribe
     public void onGameTick(GameTick event) {
         if (!Microbot.isLoggedIn()) return;
@@ -213,10 +214,17 @@ public class QoLPlugin extends Plugin {
         }
     }
 
+    @Subscribe
     public void onGameStateChanged(GameStateChanged event) {
         if (event.getGameState() != GameState.UNKNOWN && lastGameState == GameState.UNKNOWN) {
             updateUiElements();
         }
+
+        if (event.getGameState() == GameState.LOGIN_SCREEN)
+        {
+            resetMenuEntries();
+        }
+
         if (event.getGameState() == GameState.LOGGED_IN) {
             if (config.fixCameraPitch())
                 CameraScript.fixPitch();
@@ -657,4 +665,15 @@ public class QoLPlugin extends Plugin {
         return (List<?>) FieldUtils.readDeclaredField(pluginListPanel, "pluginList", true);
     }
 
+    public static void resetMenuEntries() {
+        bankMenuEntries.clear();
+        furnaceMenuEntries.clear();
+        anvilMenuEntries.clear();
+        recordActions = false;
+        executeBankActions = false;
+        executeFurnaceActions = false;
+        executeAnvilActions = false;
+        executeWorkbenchActions = false;
+        executeLoadoutActions = false;
+    }
 }

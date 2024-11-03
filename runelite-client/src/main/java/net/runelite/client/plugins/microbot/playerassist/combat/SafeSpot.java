@@ -31,7 +31,7 @@ public boolean run(PlayerAssistConfig config) {
             if(isDefaultSafeSpot(currentSafeSpot)){
 
                 if(!messageShown){
-                    Microbot.showMessage("Please set a center location");
+                    Microbot.showMessage("Please set a safespot location");
                     messageShown = true;
                 }
                 return;
@@ -58,7 +58,7 @@ public boolean run(PlayerAssistConfig config) {
 
             messageShown = false;
 
-            if(Rs2Walker.walkMiniMap(currentSafeSpot)) {
+            Rs2Walker.walkFastCanvas(currentSafeSpot);
                 Microbot.pauseAllScripts = true;
                 sleepUntil(() -> isPlayerAtSafeSpot(currentSafeSpot));
                 Microbot.pauseAllScripts = false;
@@ -79,7 +79,7 @@ public boolean run(PlayerAssistConfig config) {
                 }
 
 
-            }
+
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -93,7 +93,7 @@ private boolean isDefaultSafeSpot(WorldPoint safeSpot) {
 }
 
 private boolean isPlayerAtSafeSpot(WorldPoint safeSpot) {
-    return safeSpot.distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 0;
+    return safeSpot.equals(Microbot.getClient().getLocalPlayer().getWorldLocation());
 }
 
     @Override
