@@ -251,9 +251,7 @@ public interface HerbrunConfig extends Config {
             position = 6,
             section = locationSection
     )
-    default boolean enableArdougne() {
-        return true;
-    }
+    default boolean enableArdougne() { return true; }
 
     @ConfigItem(
             keyName = "enableFalador",
