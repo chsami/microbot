@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldArea;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
@@ -1262,6 +1263,31 @@ public class Rs2GameObject {
         }
 
         return false;
+    }
+
+    public static WorldArea getWorldArea(GameObject gameObject)
+    {
+        if (!gameObject.getLocalLocation().isInScene())
+        {
+            return null;
+        }
+
+        LocalPoint localSWTile = new LocalPoint(
+                gameObject.getLocalLocation().getX() - (gameObject.sizeX() - 1) * Perspective.LOCAL_TILE_SIZE / 2,
+                gameObject.getLocalLocation().getY() - (gameObject.sizeY() - 1) * Perspective.LOCAL_TILE_SIZE / 2
+        );
+
+        LocalPoint localNETile = new LocalPoint(
+                gameObject.getLocalLocation().getX() + (gameObject.sizeX() - 1) * Perspective.LOCAL_TILE_SIZE / 2,
+                gameObject.getLocalLocation().getY() + (gameObject.sizeY() - 1) * Perspective.LOCAL_TILE_SIZE / 2
+        );
+
+
+
+        return new Rs2WorldArea(
+                WorldPoint.fromLocal(Microbot.getClient(), localSWTile),
+                WorldPoint.fromLocal(Microbot.getClient(), localNETile)
+        );
     }
 
     /**
