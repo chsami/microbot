@@ -44,6 +44,18 @@ public interface MageTrainingArenaConfig extends Config {
     String graveyardSection = "graveyard";
 
     @ConfigItem(
+            keyName = "Bones to peaches",
+            name = "Bones to peaches unlocked?",
+            description = "Use bones to peaches spell if unlocked",
+            position = 1,
+            section = rewardsSection,
+            hidden = true
+    )
+    default boolean btp() {
+        return false;
+    }
+
+    @ConfigItem(
             keyName = "Buy rewards",
             name = "Buy rewards",
             description = "Determines whether the bot should buy the selected reward.",
