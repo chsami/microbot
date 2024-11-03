@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Arrays;
 
 public class Rs2Dialogue {
 
@@ -227,7 +226,7 @@ public class Rs2Dialogue {
     public static boolean keyPressForDialogueOption(int index) {
         if (!hasSelectAnOption()) return false;
 
-        Rs2Keyboard.keyPress(index);
+        Rs2Keyboard.keyPress(String.valueOf(index).charAt(0));
         return true;
     }
 

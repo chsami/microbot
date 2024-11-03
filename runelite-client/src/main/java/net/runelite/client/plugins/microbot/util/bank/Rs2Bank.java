@@ -1079,14 +1079,14 @@ public class Rs2Bank {
         BankLocation nearest = null;
         double dist = Double.MAX_VALUE;
         int y = Microbot.getClient().getLocalPlayer().getWorldLocation().getY();
-        boolean playerIsInCave = y > 9000;
+        boolean playerIsInCave = y > 6400;
         WorldPoint playerLocation;
         double currDist;
         final int penalty = 10; // penalty if the bank is outside the cave and player is inside cave. This is to avoid being closer than banks in a cave
         for (BankLocation bankLocation : BankLocation.values()) {
             if (!bankLocation.hasRequirements()) continue;
 
-            boolean bankisInCave = bankLocation.getWorldPoint().getY() > 9000;
+            boolean bankisInCave = bankLocation.getWorldPoint().getY() > 6400;
 
             if (!bankisInCave && playerIsInCave) {
                 playerLocation = new WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(),  Microbot.getClient().getLocalPlayer().getWorldLocation().getY() - 6400, Microbot.getClient().getPlane());
@@ -1104,7 +1104,11 @@ public class Rs2Bank {
                 }
             }
         }
-        Microbot.log("Found nearest bank: " + nearest.name());
+        if (nearest != null) {
+            Microbot.log("Found nearest bank: " + nearest.name());
+        } else {
+            Microbot.log("Unable to find a bank");
+        }
         return nearest;
     }
 

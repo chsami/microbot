@@ -11,10 +11,14 @@ import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.shortestpath.*;
+import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
+import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.client.plugins.microbot.shortestpath.Transport;
+import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.coords.Rs2LocalPoint;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldArea;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -319,6 +323,49 @@ public class Rs2Walker {
         return WalkerState.EXIT;
     }
 
+    public static boolean walkNextTo(GameObject target) {
+        Rs2WorldArea gameObjectArea = new Rs2WorldArea(Objects.requireNonNull(Rs2GameObject.getWorldArea(target)));
+        List<WorldPoint> interactablePoints = gameObjectArea.getInteractable();
+
+        if (interactablePoints.isEmpty()) {
+            interactablePoints.addAll(gameObjectArea.offset(1).toWorldPointList());
+            interactablePoints.removeIf(gameObjectArea::contains);
+        }
+
+        WorldPoint walkableInteractPoint = interactablePoints.stream()
+                .filter(Rs2Tile::isWalkable)
+                .findFirst()
+                .orElse(null);
+        // Priority to a walkable tile, otherwise walk to the first tile next to locatable
+
+        if(walkableInteractPoint != null && walkableInteractPoint.equals(Rs2Player.getWorldLocation()))
+            return true;
+        return walkableInteractPoint != null ? walkTo(walkableInteractPoint) : walkTo(interactablePoints.get(0));
+    }
+
+    public static void walkNextToInstance(GameObject target) {
+        Rs2WorldArea gameObjectArea = new Rs2WorldArea(Objects.requireNonNull(Rs2GameObject.getWorldArea(target)));
+        List<WorldPoint> interactablePoints = gameObjectArea.getInteractable();
+
+        if (interactablePoints.isEmpty()) {
+            interactablePoints.addAll(gameObjectArea.offset(1).toWorldPointList());
+            interactablePoints.removeIf(gameObjectArea::contains);
+        }
+
+        WorldPoint walkableInteractPoint = interactablePoints.stream()
+                .filter(Rs2Tile::isWalkable)
+                .findFirst()
+                .orElse(null);
+        // Priority to a walkable tile, otherwise walk to the first tile next to locatable
+        if (walkableInteractPoint != null) {
+            if(walkableInteractPoint.equals(Rs2Player.getWorldLocation()))
+                return;
+            walkFastLocal(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), walkableInteractPoint));
+        } else {
+            walkFastLocal(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), interactablePoints.get(0)));
+        }
+    }
+
     public static WorldPoint getPointWithWallDistance(WorldPoint target) {
         var tiles = Rs2Tile.getReachableTilesFromTile(target, 1);
 
@@ -389,7 +436,6 @@ public class Rs2Walker {
         Point point = worldToMinimap(worldPoint);
 
         if (point == null) {
-            Microbot.log("Worldpoint to minimap conversion failed...");
             return false;
         }
 
@@ -714,7 +760,7 @@ public class Rs2Walker {
             ShortestPathPlugin.getPathfinderConfig().setIgnoreTeleportAndItems(true);
             Pathfinder pathfinderWithoutTeleports = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), start, end);
             pathfinderWithoutTeleports.run();
-            if (pathfinder.getPath().size() > pathfinderWithoutTeleports.getPath().size()) {
+            if (pathfinder.getPath().size() >= pathfinderWithoutTeleports.getPath().size()) {
                 ShortestPathPlugin.setPathfinder(pathfinderWithoutTeleports);
             } else {
                 ShortestPathPlugin.setPathfinder(pathfinder);
