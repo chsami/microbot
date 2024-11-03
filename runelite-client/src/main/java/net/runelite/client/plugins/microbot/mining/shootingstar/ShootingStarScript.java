@@ -24,6 +24,7 @@ import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.plugins.microbot.util.walker.WalkerState;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -71,8 +72,8 @@ public class ShootingStarScript extends Script {
                     return;
                 }
 
-                if (Rs2AntibanSettings.actionCooldownActive) return;
                 if (Rs2Player.isMoving() || Rs2Antiban.getCategory().isBusy() || Microbot.pauseAllScripts) return;
+                if (Rs2AntibanSettings.actionCooldownActive) return;
 
                 switch (state) {
                     case WAITING_FOR_STAR:
@@ -98,6 +99,7 @@ public class ShootingStarScript extends Script {
                             }
                         }
 
+                        Microbot.log("Found star @ " + star.getShootingStarLocation().getLocationName());
                         plugin.updateSelectedStar(star);
 
                         state = ShootingStarState.WALKING;
@@ -114,7 +116,12 @@ public class ShootingStarScript extends Script {
                         boolean isNearShootingStar = Rs2Player.getWorldLocation().distanceTo(star.getShootingStarLocation().getWorldPoint()) < 6;
 
                         if (!isNearShootingStar) {
-                            Rs2Walker.walkTo(star.getShootingStarLocation().getWorldPoint(), 6);
+                            WalkerState walkerState = Rs2Walker.walkWithState(star.getShootingStarLocation().getWorldPoint(), 6);
+                            if (walkerState == WalkerState.UNREACHABLE) {
+                                plugin.removeStar(plugin.getSelectedStar());
+                                plugin.updatePanelList(true);
+                                state = ShootingStarState.WAITING_FOR_STAR;
+                            }
                             return;
                         }
 
@@ -203,6 +210,7 @@ public class ShootingStarScript extends Script {
                 System.out.println("Total time for loop " + totalTime);
 
             } catch (Exception ex) {
+                ex.printStackTrace();
                 Microbot.log(ex.getMessage());
             }
         }, 0, 600, TimeUnit.MILLISECONDS);

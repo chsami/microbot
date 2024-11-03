@@ -36,6 +36,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
@@ -237,13 +238,13 @@ public class FarmingScript extends Script {
 
     private boolean RakeAndPlantTree(int patchId, String treeToPlant, ObjectComposition tree) {
 
-        if (Microbot.isAnimating()) return false;
+        if (Rs2Player.isAnimating()) return false;
 
         GameObject farmingPatch = Rs2GameObject.findObjectByImposter(patchId, "rake");
         if (farmingPatch != null) {
             Rs2GameObject.interact(farmingPatch, "rake");
             sleep(2000);
-            sleepUntil(() -> !Microbot.isAnimating());
+            sleepUntil(() -> !Rs2Player.isAnimating());
         } else {
             Rs2Inventory.use(treeToPlant);
             boolean success = Rs2GameObject.interact(patchId);

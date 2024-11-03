@@ -17,17 +17,22 @@ import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.NameGenerator;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
 import javax.inject.Inject;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue.*;
@@ -36,12 +41,12 @@ import static net.runelite.client.plugins.microbot.util.settings.Rs2Settings.*;
 
 public class TutorialIslandScript extends Script {
 
-    public static double version = 1.1;
+    public static double version = 1.2;
     public static Status status = Status.NAME;
     final int CharacterCreation = 679;
     final int[] CharacterCreation_Arrows = new int[]{13, 17, 21, 25, 29, 33, 37, 44, 48, 52, 56, 60};
     private final TutorialislandPlugin plugin;
-    int LOOKUPNAME = 558;
+    private final int NameCreation = 558;
     private boolean toggledSettings = false;
     private boolean toggledMusic = false;
 
@@ -72,38 +77,47 @@ public class TutorialIslandScript extends Script {
 
                 switch (status) {
                     case NAME:
+                        Widget nameSearchBar = Rs2Widget.getWidget(NameCreation, 12); // enterName Field text
+                        
+                        String nameSearchBarText = nameSearchBar.getText();
+
+                        if (nameSearchBarText.endsWith("*")) {
+                            nameSearchBarText = nameSearchBarText.substring(0, nameSearchBarText.length() - 1);
+                        }
+                        
+                        if (!nameSearchBarText.isEmpty()) {
+                            Rs2Widget.clickWidget(NameCreation, 7); // enterName Field
+                            Rs2Random.waitEx(1200, 300);
+                            
+                            for (int i = 0; i < nameSearchBarText.length(); i++) {
+                                Rs2Keyboard.keyPress(KeyEvent.VK_BACK_SPACE);
+                                Rs2Random.waitEx(600, 100);
+                            }
+                            
+                            return;
+                        }
+                        
                         String name = new NameGenerator(random(7, 10)).getName();
-                        Rs2Widget.clickWidget(36569095);
+                        Rs2Widget.clickWidget(NameCreation, 7); // enterName Field
                         Rs2Random.waitEx(1200, 300);
                         Rs2Keyboard.typeString(name);
                         Rs2Random.waitEx(2400, 600);
-                        Rs2Widget.clickWidget("Look up name");
+                        Rs2Widget.clickWidget(NameCreation, 18); // lookupName Button
                         Rs2Random.waitEx(4800, 600);
 
-                        Widget responseWidget = Rs2Widget.getWidget(36569101);
+                        Widget responseWidget = Rs2Widget.getWidget(NameCreation, 13); // responseText Widget
 
                         if (responseWidget != null) {
                             String widgetText = responseWidget.getText();
-                            String cleanedWidgetText = widgetText.replaceAll("<.*?>", "");
+                            String cleanedWidgetText = Rs2UiHelper.stripColTags(widgetText);
                             String expectedText = "Great! The display name " + name + " is available";
                             boolean nameAvailable = cleanedWidgetText.startsWith(expectedText);
 
                             if (nameAvailable) {
-                                Rs2Widget.clickWidget("Set name");
+                                Rs2Widget.clickWidget(NameCreation, 19); // setName Button
                                 Rs2Random.waitEx(4800, 600);
 
-                                if (isLookupNameButtonVisible()) {
-                                    Rs2Widget.clickWidget("Set name");
-                                    Rs2Random.waitEx(1200, 300);
-                                }
-
-                                sleepUntil(() -> !isLookupNameButtonVisible());
-                            } else {
-                                Rs2Widget.clickWidget(36569095);
-                                for (int i = 0; i < name.length(); i++) {
-                                    Rs2Keyboard.keyPress(KeyEvent.VK_BACK_SPACE);
-                                    Rs2Random.waitEx(600, 100);
-                                }
+                                sleepUntil(() -> !isNameCreationVisible());
                             }
                         }
                         break;
@@ -154,16 +168,16 @@ public class TutorialIslandScript extends Script {
         Rs2Antiban.resetAntibanSettings();
     }
 
-    private boolean isLookupNameButtonVisible() {
-        return Rs2Widget.getWidget(LOOKUPNAME, 1) != null;
+    private boolean isNameCreationVisible() {
+        return Rs2Widget.isWidgetVisible(NameCreation, 2);
     }
 
     private boolean isCharacterCreationVisible() {
-        return Rs2Widget.getWidget(CharacterCreation, 1) != null;
+        return Rs2Widget.isWidgetVisible(CharacterCreation, 4);
     }
 
     public void CalculateStatus() {
-        if (isLookupNameButtonVisible()) {
+        if (isNameCreationVisible()) {
             status = Status.NAME;
         } else if (isCharacterCreationVisible()) {
             status = Status.CHARACTER;
@@ -191,8 +205,59 @@ public class TutorialIslandScript extends Script {
     }
 
     public void RandomizeCharacter() {
-        if (random(1, 10) == 2) {
-            Rs2Widget.clickWidget("Confirm");
+        if (Rs2Random.diceFractional(0.2)) {
+            if (Rs2Random.diceFractional(0.25)) { // chance to change gender 
+                System.out.println("changing gender...");
+                Widget maleWidget = Rs2Widget.getWidget(CharacterCreation, 68); // maleButton
+                Widget femaleWidget = Rs2Widget.getWidget(CharacterCreation, 69); // femaleButton.. nice..
+                int selectedColor = 0xaaaaaa;
+                
+                boolean hasMaleSelected = Arrays.stream(maleWidget.getDynamicChildren()).anyMatch(mdw -> mdw != null && mdw.getTextColor() == selectedColor);
+                boolean hasFemaleSelected = Arrays.stream(femaleWidget.getDynamicChildren()).anyMatch(fdw -> fdw != null && fdw.getTextColor() == selectedColor);
+                
+                if (hasFemaleSelected) {
+                    Rs2Widget.clickWidget(maleWidget);
+                    Rs2Random.waitEx(1200, 300);
+                    sleepUntil(() -> hasMaleSelected);
+                } else if (hasMaleSelected) {
+                    Rs2Widget.clickWidget(femaleWidget);
+                    Rs2Random.waitEx(1200, 300);
+                    sleepUntil(() -> hasFemaleSelected);
+                }
+            }
+            
+            if (Rs2Random.diceFractional(0.25)) { // chance to change pronouns 
+                System.out.println("changing pronouns...");
+                Widget pronounWidget = Rs2Widget.getWidget(CharacterCreation, 72); // open pronouns DropDown
+                Widget currentPronoun = Arrays.stream(pronounWidget.getDynamicChildren()).filter(pnw -> pnw.getText().toLowerCase().contains("he/him") || pnw.getText().toLowerCase().contains("they/them") || pnw.getText().toLowerCase().contains("she/her")).findFirst().orElse(null);
+                Rs2Widget.clickWidget(pronounWidget);
+                Rs2Random.waitEx(1200, 300);
+                sleepUntil(() -> Rs2Widget.isWidgetVisible(CharacterCreation, 76)); // Pronoun DropDown Options
+                Widget[] dynamicPronounWidgets = Rs2Widget.getWidget(CharacterCreation, 78).getDynamicChildren();
+                Widget pronounSelectionWidget;
+                
+                if (currentPronoun != null) {
+                    if (currentPronoun.getText().toLowerCase().contains("he/him")) {
+                        if (Rs2Random.diceFractional(0.5)) {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("they/them")).findFirst().orElse(null);
+                        } else {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("she/her")).findFirst().orElse(null);
+                        }
+                    } else {
+                        if (Rs2Random.diceFractional(0.5)) {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("they/them")).findFirst().orElse(null);
+                        } else {
+                            pronounSelectionWidget = Arrays.stream(dynamicPronounWidgets).filter(dpw -> dpw.getText().toLowerCase().contains("he/him")).findFirst().orElse(null);
+                        }
+                    }
+                    
+                    Rs2Widget.clickWidget(pronounSelectionWidget);
+                    Rs2Random.waitEx(1200, 300);
+                    sleepUntil(() -> !Rs2Widget.isWidgetVisible(CharacterCreation, 76)); // Pronoun DropDown Options
+                }
+            }
+            
+            Rs2Widget.clickWidget(CharacterCreation, 74); // confirm Button
             Rs2Random.waitEx(1200, 300);
             sleepUntil(() -> !isCharacterCreationVisible());
         }
@@ -297,11 +362,17 @@ public class TutorialIslandScript extends Script {
                 sleepUntil(Rs2Dialogue::isInDialogue);
             }
         } else if (Microbot.getVarbitPlayerValue(281) <= 90) {
+            if (!Rs2Inventory.hasItem("Bronze Axe") || !Rs2Inventory.hasItem("Tinderbox")) {
+                if (Rs2Npc.interact(npc, "talk-to")) {
+                    sleepUntil(Rs2Dialogue::isInDialogue);
+                }
+                return;
+            }
             if (!Rs2Inventory.contains("Raw shrimps")) {
                 fishShrimp();
                 return;
             }
-            if (!Rs2Inventory.contains("Logs") && !Rs2GameObject.exists(ObjectID.FIRE_26185)) {
+            if (!Rs2Inventory.contains("Logs") && (!Rs2GameObject.exists(ObjectID.FIRE_26185) || Rs2Player.getRealSkillLevel(Skill.WOODCUTTING) == 0)) {
                 CutTree();
                 return;
             }
@@ -318,8 +389,11 @@ public class TutorialIslandScript extends Script {
 
         if (Microbot.getVarbitPlayerValue(281) == 610 || Microbot.getVarbitPlayerValue(281) == 620) {
             WorldPoint worldPoint = new WorldPoint(3141, 3088, 0);
-            if (Rs2Player.distanceTo(worldPoint) >= 4) {
-                Rs2Walker.walkTo(worldPoint, 4);
+            WorldPoint targetPoint = (npc != null) ? npc.getWorldLocation() : worldPoint;
+            int distance = Rs2Player.distanceTo(targetPoint);
+
+            if (distance > 8) {
+                Rs2Walker.walkTo(targetPoint, 8);
             } else {
                 if (Rs2Npc.interact(npc, "Talk-to")) {
                     sleepUntil(Rs2Dialogue::isInDialogue);
@@ -434,7 +508,7 @@ public class TutorialIslandScript extends Script {
                 }
             }
 
-            Rs2Walker.walkTo(new WorldPoint(3127, 3123, 0), 2);
+            Rs2Walker.walkTo(npc.getWorldLocation(), 3);
             Rs2Player.waitForWalking();
             if (Rs2Npc.interact(npc, "Talk-to")) {
                 sleepUntil(Rs2Dialogue::isInDialogue);
@@ -443,6 +517,10 @@ public class TutorialIslandScript extends Script {
             Rs2Widget.clickWidget(10747943); //switchToAccountManagementTab
             Rs2Random.waitEx(1200, 300);
         } else if (Microbot.getVarbitPlayerValue(281) == 532) {
+            if (Rs2Dialogue.isInDialogue()) {
+                clickContinue();
+                return;
+            }
             if (Rs2Npc.interact(npc, "Talk-to")) {
                 sleepUntil(Rs2Dialogue::isInDialogue);
             }
@@ -503,9 +581,11 @@ public class TutorialIslandScript extends Script {
             Rs2Random.waitEx(600, 100);
             Rs2Inventory.wield("Bronze arrow");
             Rs2Random.waitEx(600, 100);
+            Rs2Walker.walkTo(new WorldPoint(3110, 9523, 0), 4);
+            Rs2Player.waitForWalking();
             Rs2Npc.attack("Giant rat");
         } else if (Microbot.getVarbitPlayerValue(281) == 470) {
-            Rs2Walker.walkTo(new WorldPoint(3107, 9510, 0));
+            Rs2Walker.walkTo(npc.getWorldLocation());
             Rs2Player.waitForWalking();
             if (Rs2Npc.interact(npc, "Talk-to")) {
                 sleepUntil(Rs2Dialogue::isInDialogue);
@@ -516,7 +596,7 @@ public class TutorialIslandScript extends Script {
                 Rs2Widget.clickWidget(164, 52); //switchToCombatOptions
                 Rs2Random.waitEx(1200, 300);
                 WorldPoint worldPoint = new WorldPoint(3105, 9517, 0);
-                Rs2Walker.walkTo(worldPoint);
+                Rs2Walker.walkTo(worldPoint, 3);
                 Rs2Player.waitForWalking();
                 Rs2Npc.attack("Giant rat");
             } else {
@@ -558,18 +638,29 @@ public class TutorialIslandScript extends Script {
                 return;
             }
             if (Rs2Inventory.contains("Bronze pickaxe") && (!Rs2Inventory.contains("Copper ore") || !Rs2Inventory.contains("Tin ore"))) {
+                List<Integer> rockIds = new ArrayList<>();
                 if (!Rs2Inventory.contains("Copper ore")) {
-                    Rs2GameObject.interact(ObjectID.COPPER_ROCKS, "Mine");
-                    sleepUntil(() -> Rs2Inventory.contains("Copper ore") && !Rs2Player.isAnimating(1800));
+                    rockIds.add(ObjectID.COPPER_ROCKS);
                 }
                 if (!Rs2Inventory.contains("Tin ore")) {
-                    Rs2GameObject.interact(ObjectID.TIN_ROCKS, "Mine");
-                    sleepUntil(() -> Rs2Inventory.contains("Tin ore")&& !Rs2Player.isAnimating(1800));
+                    rockIds.add(ObjectID.TIN_ROCKS);
                 }
+
+                Collections.shuffle(rockIds);
+                int rockId = rockIds.get(0);
+
+                Rs2GameObject.interact(rockId, "Mine");
+                sleepUntil(() -> {
+                    if (rockId == ObjectID.COPPER_ROCKS) {
+                        return Rs2Inventory.contains("Copper ore") && !Rs2Player.isAnimating(1800);
+                    } else {
+                        return Rs2Inventory.contains("Tin ore") && !Rs2Player.isAnimating(1800);
+                    }
+                });
             } else if (Rs2Inventory.contains("Copper ore") && Rs2Inventory.contains("Tin ore")) {
                 int[] ores = {ItemID.TIN_ORE, ItemID.COPPER_ORE};
-                int selectedOreId = ores[(int) (System.currentTimeMillis() / 1000) % ores.length];
-                Rs2Inventory.useItemOnObject(selectedOreId, ObjectID.FURNACE_10082);
+                Collections.shuffle(Arrays.asList(ores));
+                Rs2Inventory.useItemOnObject(ores[0], ObjectID.FURNACE_10082);
                 sleepUntil(() -> Rs2Inventory.contains("Bronze bar") && !Rs2Player.isAnimating(1800));
             }
         }
@@ -589,6 +680,8 @@ public class TutorialIslandScript extends Script {
             Rs2Widget.clickWidget(164, 54); // switchToQuestTab
             Rs2Random.waitEx(1200, 300);
         } else {
+            Rs2Tab.switchToInventoryTab();
+            Rs2Random.waitEx(600, 100);
             Rs2GameObject.interact(9726, "Climb-down");
             Rs2Random.waitEx(2400, 100);
         }
@@ -626,13 +719,13 @@ public class TutorialIslandScript extends Script {
     }
 
     public void LightFire() {
-        if (Rs2GameObject.findObjectById(ObjectID.FIRE_26185) == null && Rs2GameObject.findGameObjectByLocation(Microbot.getClient().getLocalPlayer().getWorldLocation()) == null) {
-            Rs2Inventory.combine("Logs", "Tinderbox");
-            sleepUntil(() -> !Rs2Inventory.hasItem("Logs") && !Rs2Player.isAnimating(2400));
-        } else {
-            if (!Rs2Inventory.hasItem("Bronze Axe") || !Rs2Inventory.hasItem("Tinderbox"))
-                Rs2Npc.interact(NpcID.SURVIVAL_EXPERT);
+        if (Rs2Player.isStandingOnGameObject()) {
+            WorldPoint nearestWalkable = Rs2Tile.getNearestWalkableTileWithLineOfSight(Rs2Player.getWorldLocation());
+            Rs2Walker.walkFastCanvas(nearestWalkable);
+            Rs2Player.waitForWalking();
         }
+        Rs2Inventory.combine("Logs", "Tinderbox");
+        sleepUntil(() -> !Rs2Inventory.hasItem("Logs") && !Rs2Player.isAnimating(2400));
     }
 
     public void CutTree() {

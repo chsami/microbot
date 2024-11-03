@@ -21,6 +21,8 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.http.api.worlds.WorldResult;
+import net.runelite.http.api.worlds.WorldType;
 
 import java.awt.*;
 import java.time.Duration;
@@ -156,7 +158,6 @@ public class Rs2Player {
      * Wait for XP Drop
      *
      * @param skill
-     *
      * @return
      */
     public static boolean waitForXpDrop(Skill skill) {
@@ -168,7 +169,6 @@ public class Rs2Player {
      *
      * @param skill
      * @param time
-     *
      * @return
      */
     public static boolean waitForXpDrop(Skill skill, int time) {
@@ -180,7 +180,6 @@ public class Rs2Player {
      *
      * @param skill
      * @param inventoryFullCheck
-     *
      * @return
      */
     public static boolean waitForXpDrop(Skill skill, boolean inventoryFullCheck) {
@@ -193,7 +192,6 @@ public class Rs2Player {
      * @param skill
      * @param time
      * @param inventoryFullCheck
-     *
      * @return
      */
     public static boolean waitForXpDrop(Skill skill, int time, boolean inventoryFullCheck) {
@@ -225,7 +223,6 @@ public class Rs2Player {
      * Chek if the player is animating within the past ms
      *
      * @param ms
-     *
      * @return
      */
     public static boolean isAnimating(int ms) {
@@ -278,6 +275,25 @@ public class Rs2Player {
         return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getVarpValue(VarPlayer.MEMBERSHIP_DAYS) > 0);
     }
 
+    /**
+     * Checks if a player is in a member world
+     * @return true if in a member world
+     */
+    public static boolean isInMemberWorld() {
+        WorldResult worldResult = Microbot.getWorldService().getWorlds();
+
+        List<net.runelite.http.api.worlds.World> worlds;
+        if (worldResult != null) {
+            worlds = worldResult.getWorlds();
+            Random r = new Random();
+            return worlds.stream()
+                    .anyMatch(x -> x.getId() == Microbot.getClient().getWorld() && x.getTypes().contains(WorldType.MEMBERS));
+        }
+
+        return false;
+    }
+
+
     @Deprecated(since = "Use the Rs2Combat.specState method", forRemoval = true)
     public static void toggleSpecialAttack(int energyRequired) {
         int currentSpecEnergy = Microbot.getClient().getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
@@ -290,7 +306,6 @@ public class Rs2Player {
      * Toggles player run
      *
      * @param toggle
-     *
      * @return
      */
     public static boolean toggleRunEnergy(boolean toggle) {
@@ -298,7 +313,7 @@ public class Rs2Player {
         if (Microbot.getVarbitPlayerValue(173) == 1 && toggle) return true;
         Widget widget = Rs2Widget.getWidget(WidgetInfo.MINIMAP_TOGGLE_RUN_ORB.getId());
         if (widget == null) return false;
-        if (Microbot.getClient().getEnergy() > 1000 && toggle) {
+        if (toggle) {
             Microbot.getMouse().click(widget.getCanvasLocation());
             sleep(150, 300);
             return true;
@@ -339,7 +354,6 @@ public class Rs2Player {
      * @param amountOfPlayers to detect before triggering logout
      * @param time            in milliseconds
      * @param distance        from the player
-     *
      * @return
      */
     public static boolean logoutIfPlayerDetected(int amountOfPlayers, int time, int distance) {
@@ -347,8 +361,8 @@ public class Rs2Player {
         long currentTime = System.currentTimeMillis();
         System.out.println(players.size());
 
-        for (Player player: players
-             ) {
+        for (Player player : players
+        ) {
             System.out.println(player.getName());
         }
 
@@ -387,7 +401,6 @@ public class Rs2Player {
     /**
      * @param amountOfPlayers
      * @param time
-     *
      * @return
      */
     public static boolean logoutIfPlayerDetected(int amountOfPlayers, int time) {
@@ -396,7 +409,6 @@ public class Rs2Player {
 
     /**
      * @param amountOfPlayers
-     *
      * @return
      */
     public static boolean logoutIfPlayerDetected(int amountOfPlayers) {
@@ -407,7 +419,6 @@ public class Rs2Player {
      * Hop if player is detected
      *
      * @param amountOfPlayers, time, distance
-     *
      * @return true if player is detected and hopped
      */
     public static boolean hopIfPlayerDetected(int amountOfPlayers, int time, int distance) {
@@ -449,7 +460,6 @@ public class Rs2Player {
      * Eat food at a certain health percentage, will search inventory for first possible food item.
      *
      * @param percentage
-     *
      * @return
      */
     public static boolean eatAt(int percentage) {
@@ -465,7 +475,9 @@ public class Rs2Player {
         if (!foods.isEmpty()) {
             if (foods.get(0).getName().toLowerCase().contains("jug of wine")) {
                 return Rs2Inventory.interact(foods.get(0), "drink");
-            } else {
+            } else if (foods.get(0).getName().toLowerCase().contains("blighted") && Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
+                return Rs2Inventory.interact(foods.get(0), "eat");
+            } else if (!foods.get(0).getName().toLowerCase().contains("blighted")) {
                 return Rs2Inventory.interact(foods.get(0), "eat");
             }
         }
@@ -535,12 +547,21 @@ public class Rs2Player {
      * Drink prayer potion at prayer point level
      *
      * @param prayerPoints
-     *
      * @return
      */
     public static boolean drinkPrayerPotionAt(int prayerPoints) {
         if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= prayerPoints) {
-            return Rs2Inventory.interact("prayer potion", "drink");
+            // Check and use prayer potion first
+            if (Rs2Inventory.contains(ItemID.PRAYER_POTION1, ItemID.PRAYER_POTION2, ItemID.PRAYER_POTION3, ItemID.PRAYER_POTION4)) {
+                return Rs2Inventory.interact("prayer potion", "drink");
+            }
+            // If no prayer potion, try to use super restore
+            if (Rs2Inventory.contains(ItemID.SUPER_RESTORE1, ItemID.SUPER_RESTORE2, ItemID.SUPER_RESTORE3, ItemID.SUPER_RESTORE4)) {
+                return Rs2Inventory.interact("super restore", "drink");
+            }
+            if (Rs2Inventory.contains(ItemID.BLIGHTED_SUPER_RESTORE1, ItemID.BLIGHTED_SUPER_RESTORE2, ItemID.BLIGHTED_SUPER_RESTORE3, ItemID.BLIGHTED_SUPER_RESTORE4) && Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
+                return Rs2Inventory.interact("super restore", "drink");
+            }
         }
         return false;
     }
@@ -597,7 +618,6 @@ public class Rs2Player {
      * Gets player's current QuestState for quest
      *
      * @param quest
-     *
      * @return queststate
      */
     public static QuestState getQuestState(Quest quest) {
@@ -609,7 +629,6 @@ public class Rs2Player {
      * Gets player's real level for skill
      *
      * @param skill
-     *
      * @return level
      */
     public static int getRealSkillLevel(Skill skill) {
@@ -620,7 +639,6 @@ public class Rs2Player {
      * Gets player's boosted level for skill
      *
      * @param skill
-     *
      * @return level
      */
     public static int getBoostedSkillLevel(Skill skill) {
@@ -633,7 +651,6 @@ public class Rs2Player {
      * @param skill
      * @param levelRequired
      * @param isBoosted
-     *
      * @return
      */
     public static boolean getSkillRequirement(Skill skill, int levelRequired, boolean isBoosted) {
@@ -646,7 +663,6 @@ public class Rs2Player {
      *
      * @param skill
      * @param levelRequired
-     *
      * @return
      */
     public static boolean getSkillRequirement(Skill skill, int levelRequired) {
@@ -686,7 +702,6 @@ public class Rs2Player {
      * Gets the distance from current player location to endpoint using ShortestPath (does not work in instanced regions)
      *
      * @param endpoint
-     *
      * @return distance
      */
     public static int distanceTo(WorldPoint endpoint) {
@@ -711,12 +726,23 @@ public class Rs2Player {
      * Checks whether a player is about to logout
      *
      * @param randomDelay
-     *
      * @return
      */
     public static boolean checkIdleLogout(long randomDelay) {
         int idleClientTicks = Microbot.getClient().getKeyboardIdleTicks();
 
         return (long) idleClientTicks >= randomDelay;
+    }
+
+    /**
+     * Checks wether a player is in a cave
+     * @return
+     */
+    public static boolean isInCave() {
+        return Rs2Player.getWorldLocation().getY() >= 6400 && !Microbot.getClient().getTopLevelWorldView().isInstance();
+    }
+
+    public static boolean IsInInstance() {
+        return Microbot.getClient().getTopLevelWorldView().isInstance();
     }
 }

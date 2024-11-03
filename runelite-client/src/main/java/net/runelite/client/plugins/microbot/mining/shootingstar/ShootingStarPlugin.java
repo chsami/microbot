@@ -21,6 +21,7 @@ import net.runelite.client.plugins.microbot.breakhandler.BreakHandlerPlugin;
 import net.runelite.client.plugins.microbot.mining.shootingstar.enums.ShootingStarLocation;
 import net.runelite.client.plugins.microbot.mining.shootingstar.model.Star;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -62,7 +63,7 @@ public class ShootingStarPlugin extends Plugin {
     @Inject
     ShootingStarScript shootingStarScript;
 
-    public static String version = "1.1.0";
+    public static String version = "1.1.1";
     private String httpEndpoint;
     
     @Getter
@@ -241,8 +242,8 @@ public class ShootingStarPlugin extends Plugin {
     @Override
     protected void startUp() throws AWTException {
         displayAsMinutes = config.isDisplayAsMinutes();
-        hideMembersWorlds = config.isHideMembersWorlds();
-        hideF2PWorlds = config.isHideF2PWorlds();
+        hideMembersWorlds = !Login.activeProfile.isMember();
+        hideF2PWorlds = Login.activeProfile.isMember();
         useNearestHighTierStar = config.useNearestHighTierStar();
         useBreakAtBank = config.useBreakAtBank();
         hideWildernessLocations = config.isHideWildernessLocations();
@@ -282,18 +283,6 @@ public class ShootingStarPlugin extends Plugin {
         if (event.getKey().equals(ShootingStarConfig.displayAsMinutes)) {
             displayAsMinutes = config.isDisplayAsMinutes();
             updatePanelList(false);
-        }
-
-        if (event.getKey().equals(ShootingStarConfig.hideMembersWorlds)) {
-            hideMembersWorlds = config.isHideMembersWorlds();
-            filterPanelList(hideMembersWorlds);
-            updatePanelList(true);
-        }
-
-        if (event.getKey().equals(ShootingStarConfig.hideF2PWorlds)) {
-            hideF2PWorlds = config.isHideF2PWorlds();
-            filterPanelList(hideF2PWorlds);
-            updatePanelList(true);
         }
 
         if (event.getKey().equals(ShootingStarConfig.hideWildernessLocations)) {

@@ -35,11 +35,11 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-        name = PluginDescriptor.Mocrosoft + "Farming",
+        name = PluginDescriptor.Mocrosoft + "Tree runner",
         description = "Microbot farming plugin",
         tags = {"farming", "microbot"},
         enabledByDefault = false,
-        hidden = true
+        hidden = false
 )
 @Slf4j
 public class FarmingPlugin extends Plugin {

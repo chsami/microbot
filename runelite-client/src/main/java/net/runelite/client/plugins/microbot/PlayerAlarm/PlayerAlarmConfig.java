@@ -1,12 +1,12 @@
  package net.runelite.client.plugins.microbot.PlayerAlarm;
- 
+
  import java.awt.Color;
  import net.runelite.client.config.Alpha;
  import net.runelite.client.config.Config;
  import net.runelite.client.config.ConfigGroup;
  import net.runelite.client.config.ConfigItem;
  import net.runelite.client.config.Range;
- 
+
 
  @ConfigGroup("PlayerAlarm")
  public interface PlayerAlarmConfig
@@ -35,4 +35,6 @@
    { return new Color(255, 255, 0, 70); }
    @ConfigItem(keyName = "playSound", name = "Play Sound?", description = "Would you like the alarm to be audible as well?", position = 9)
    default boolean playSound() { return true; }
+   @ConfigItem(keyName = "seedPod", name = "Seed pod", description = "Use seed pod if player detected?", position = 10)
+   default boolean seedPod() { return false; }
  }

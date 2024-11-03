@@ -199,7 +199,7 @@ public class FornBirdhouseRunsScript extends Script {
             Rs2Inventory.use(selectedLogs);
             sleep(1500, 2500);
         }
-        if (!Microbot.isAnimating() &&
+        if (!Rs2Player.isAnimating() &&
             !Microbot.getClient().getLocalPlayer().isInteracting() &&
             Rs2GameObject.interact(worldPoint, "build")) {
             sleep(2000, 2500);
@@ -213,8 +213,8 @@ public class FornBirdhouseRunsScript extends Script {
         if (Rs2Inventory.hasItem(ItemID.CLOCKWORK)) {
             botStatus = status;
         }
-        else if (!Microbot.isMoving() &&
-            !Microbot.isAnimating() &&
+        else if (!Rs2Player.isMoving() &&
+            !Rs2Player.isAnimating() &&
             !Microbot.getClient().getLocalPlayer().isInteracting()) {
             Rs2GameObject.interact(itemId, "empty");
         }

@@ -1,12 +1,10 @@
 package net.runelite.client.plugins.microbot.util;
 
+import lombok.SneakyThrows;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.math.Random;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.BooleanSupplier;
 
 public class Global {
@@ -54,6 +52,20 @@ public class Global {
     public static void sleepUntil(BooleanSupplier awaitedCondition) {
       sleepUntil(awaitedCondition, 5000);
     }
+    @SneakyThrows
+    public static <T> T sleepUntilNotNull(Callable<T> method, int time) {
+        if (Microbot.getClient().isClientThread()) return null;
+        boolean done;
+        T methodResponse;
+        long startTime = System.currentTimeMillis();
+        do {
+            methodResponse = method.call();
+            done = methodResponse != null;
+            sleep(100);
+        } while (!done && System.currentTimeMillis() - startTime < time);
+        return methodResponse;
+    }
+
 
     public static void sleepUntil(BooleanSupplier awaitedCondition, int time) {
         if (Microbot.getClient().isClientThread()) return;
@@ -63,6 +75,18 @@ public class Global {
             done = awaitedCondition.getAsBoolean();
             sleep(100);
         } while (!done && System.currentTimeMillis() - startTime < time);
+    }
+
+    public static boolean sleepUntilTrue(BooleanSupplier awaitedCondition) {
+        if (Microbot.getClient().isClientThread()) return false;
+        long startTime = System.currentTimeMillis();
+        do {
+            if (awaitedCondition.getAsBoolean()) {
+                return true;
+            }
+            sleep(100);
+        } while (System.currentTimeMillis() - startTime < 5000);
+        return false;
     }
 
     public static boolean sleepUntilTrue(BooleanSupplier awaitedCondition, int time, int timeout) {
