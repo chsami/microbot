@@ -310,25 +310,25 @@ public class PathfinderConfig {
 
         TransportType type = transport.getType();
 
-        if (AGILITY_SHORTCUT.equals(type) && !useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        if (AGILITY_SHORTCUT.equals(type) && (!useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (GRAPPLE_SHORTCUT.equals(type) && !useGrappleShortcuts || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (GRAPPLE_SHORTCUT.equals(type) && (!useGrappleShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (BOAT.equals(type) && !useBoats || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (BOAT.equals(type) && (!useBoats || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (CANOE.equals(type) && !useCanoes || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (CANOE.equals(type) && (!useCanoes || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (CHARTER_SHIP.equals(type) && !useCharterShips || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (CHARTER_SHIP.equals(type) && (!useCharterShips || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
         } else if (SHIP.equals(type) && !useShips) {
             return false;
-        } else if (FAIRY_RING.equals(type) && !useFairyRings || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (FAIRY_RING.equals(type) && (!useFairyRings || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (GNOME_GLIDER.equals(type) && !useGnomeGliders || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (GNOME_GLIDER.equals(type) && (!useGnomeGliders || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (MINECART.equals(type) && !useMinecarts || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (MINECART.equals(type) && (!useMinecarts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (SPIRIT_TREE.equals(type) && !useSpiritTrees || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (SPIRIT_TREE.equals(type) && (!useSpiritTrees || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
         } else if (TELEPORTATION_ITEM.equals(type)) {
             switch (useTeleportationItems) {

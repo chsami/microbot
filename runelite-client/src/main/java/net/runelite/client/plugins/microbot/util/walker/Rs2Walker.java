@@ -389,7 +389,6 @@ public class Rs2Walker {
         Point point = worldToMinimap(worldPoint);
 
         if (point == null) {
-            Microbot.log("Worldpoint to minimap conversion failed...");
             return false;
         }
 
@@ -714,7 +713,7 @@ public class Rs2Walker {
             ShortestPathPlugin.getPathfinderConfig().setIgnoreTeleportAndItems(true);
             Pathfinder pathfinderWithoutTeleports = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), start, end);
             pathfinderWithoutTeleports.run();
-            if (pathfinder.getPath().size() > pathfinderWithoutTeleports.getPath().size()) {
+            if (pathfinder.getPath().size() >= pathfinderWithoutTeleports.getPath().size()) {
                 ShortestPathPlugin.setPathfinder(pathfinderWithoutTeleports);
             } else {
                 ShortestPathPlugin.setPathfinder(pathfinder);
