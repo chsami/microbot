@@ -225,10 +225,10 @@ public class HerbrunScript extends Script {
                         }
                         break;
                     case ARDOUGNE_TELEPORT:
-                        if (config.enableArdougne()) {
-                            handleTeleportToArdougne(config);
-                        } else {
+                        if (!config.enableArdougne()) {
                             botStatus = states.FALADOR_TELEPORT;
+                        } else {
+                            handleTeleportToArdougne(config);
                         }
                     case ARDOUGNE_WALKING_TO_PATCH:
                         if (!Rs2Player.isMoving() &&
@@ -382,13 +382,7 @@ public class HerbrunScript extends Script {
         } else {
             Rs2Bank.withdrawX(ItemID.ULTRACOMPOST, 8);
         }
-        if (config.enableArdougne()) {
-            if (config.ARDOUGNE_TELEPORT_OPTION()) {
-                Rs2Bank.withdrawOne(config.CLOAK().getItemId());
-            } else {
-                Rs2Bank.withdrawOne(ItemID.ARDOUGNE_TELEPORT);
-            }
-        }
+        Rs2Bank.withdrawOne(ItemID.RAKE);
         Rs2Bank.withdrawOne(ItemID.SEED_DIBBER);
         Rs2Bank.withdrawOne(ItemID.SPADE);
         if (config.enableMorytania()) {
@@ -406,7 +400,13 @@ public class HerbrunScript extends Script {
         if (config.enableHosidius()) {
             Rs2Bank.withdrawOne(ItemID.XERICS_TALISMAN);
         }
-        Rs2Bank.withdrawOne(ItemID.RAKE);
+        if (config.enableArdougne()) {
+            if (config.ARDOUGNE_TELEPORT_OPTION()) {
+                Rs2Bank.withdrawOne(config.CLOAK().getItemId());
+            } else {
+                Rs2Bank.withdrawOne(ItemID.ARDOUGNE_TELEPORT);
+            }
+        }
         if (config.enableGuild()) {
             if (!config.FARMING_CAPE()) {
                 if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE1)) {
@@ -423,7 +423,11 @@ public class HerbrunScript extends Script {
                     Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE6);
                 }
             } else {
+                if (Rs2Bank.hasItem(ItemID.FARMING_CAPE)) {
                 Rs2Bank.withdrawOne(ItemID.FARMING_CAPE);
+                } else if (Rs2Bank.hasItem(ItemID.FARMING_CAPET)) {
+                    Rs2Bank.withdrawOne(ItemID.FARMING_CAPET);
+                }
             }
         }
         if (config.enableFalador()) {
@@ -724,8 +728,11 @@ public class HerbrunScript extends Script {
                 Rs2Player.waitForAnimation();
                 sleepUntil(() -> !Rs2Player.isAnimating());
                 return true;
-            } else {
+            } else if (Rs2Equipment.hasEquipped(ItemID.FARMING_CAPE)) {
                 Rs2Equipment.interact(ItemID.FARMING_CAPE, "teleport");
+                return true;
+            } else if (Rs2Equipment.hasEquipped(ItemID.FARMING_CAPET)) {
+                Rs2Equipment.interact(ItemID.FARMING_CAPET, "teleport");
                 return true;
             }
         }
