@@ -402,7 +402,6 @@ public class Rs2Npc {
                 .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null &&
                         Arrays.asList(value.getComposition().getActions()).contains(action)))
                 .min(Comparator.comparingInt(value -> playerLocation.distanceToPath(Microbot.getClient(),value.getWorldLocation()))).orElse(null);
-        //return getNpcs().filter(npc -> Arrays.asList(npc.getComposition().getActions()).contains(action)).findFirst().orElse(null);
     }
 
     /**
@@ -414,7 +413,6 @@ public class Rs2Npc {
         return getNpcs()
                 .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null &&
                         Arrays.asList(value.getComposition().getActions()).contains(action))).findFirst().orElse(null);
-        //return getNpcs().filter(npc -> Arrays.asList(npc.getComposition().getActions()).contains(action)).findFirst().orElse(null);
     }
     /**
      * Hovers over the given actor (e.g., NPC).
