@@ -1,8 +1,7 @@
 package net.runelite.client.plugins.microbot.GirdyScripts.cannonballsmelter;
 
 
-import net.runelite.api.Client;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.GirdyScripts.cannonballsmelter.enums.CannonballSmelterStates;
@@ -38,23 +37,23 @@ public class CannonballSmelterScript extends Script {
 
 
     private boolean hasBalls() {
-        return Rs2Inventory.hasItem(2);
+        return Rs2Inventory.hasItem(ItemID.CANNONBALL);
     }
     private boolean hasBars() {
-        return Rs2Inventory.hasItem(2353);
+        return Rs2Inventory.hasItem(ItemID.STEEL_BAR);
     }
-    private boolean required() {return Rs2Inventory.hasItem("ammo mould");}
+    private boolean required() {return Rs2Inventory.hasItem(ItemID.AMMO_MOULD);}
 
     public boolean run(CannonballSmelterConfig config) {
         Rs2Antiban.resetAntibanSettings();
         cannonballAntiBan();
         Rs2AntibanSettings.actionCooldownChance = 0.1;
+        Microbot.enableAutoRunOn = true;
+        Microbot.runEnergyThreshold = 5000;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run() || !Microbot.isLoggedIn() || Microbot.pauseAllScripts) return;
                 if (Rs2AntibanSettings.actionCooldownActive) return;
-                boolean hasEnergy = (Microbot.getClient().getEnergy() / 100) > 50;
-                if(hasEnergy) Rs2Player.toggleRunEnergy(true);
                 startTime = System.currentTimeMillis();
 
 
@@ -93,7 +92,7 @@ public class CannonballSmelterScript extends Script {
     }
 
     public void smelt() {
-        TileObject furnace = Rs2GameObject.findObjectById(16469);
+        TileObject furnace = Rs2GameObject.findObjectById(ObjectID.FURNACE_16469);
         if (furnace != null) {
             Rs2GameObject.interact(furnace, "Smelt");
             Microbot.status = "Moving to furnace...";
@@ -103,7 +102,7 @@ public class CannonballSmelterScript extends Script {
                 Microbot.status = "Smelting Cannonballs...";
                 sleep(200,600);
                 mouseOff();
-                sleepUntil(() -> !Rs2Inventory.hasItem("steel bar"), 162000);
+                sleepUntil(() -> !hasBars(), 162000);
                 Rs2Antiban.actionCooldown();
                 Rs2Antiban.takeMicroBreakByChance();
             }
@@ -114,24 +113,24 @@ public class CannonballSmelterScript extends Script {
     }
 
     public void bank() {
-        if (Rs2Inventory.hasItem("cannonball") && !Rs2Inventory.hasItem("steel bar")) {
+        if (hasBalls() && !hasBars()) {
             Microbot.status = "Banking...";
             if(!Rs2Bank.isOpen()) {
                 Rs2Bank.openBank();
                 Microbot.status = "Banking...";
                 sleepUntil(() -> Rs2Bank.isOpen());
             }
-            if(!Rs2Bank.hasItem("steel bar")) {
+            if(!Rs2Bank.hasItem(ItemID.STEEL_BAR)) {
                 Microbot.showMessage("Can't find Steel bars in bank, exiting...");
                 sleep(3000,5000);
                 shutdown();
             }
-            Rs2Bank.withdrawAll(2353);
-            sleepUntil(() -> Rs2Inventory.hasItem("steel bar"));
-            if(Rs2Inventory.hasItem("steel bar")) {
+            Rs2Bank.withdrawAll(ItemID.STEEL_BAR);
+            sleepUntil(() -> hasBars());
+            if(hasBars()) {
                 Rs2Keyboard.keyPress(KeyEvent.VK_ESCAPE);
             }
-            if (!Rs2Inventory.hasItem("steel bar")) {
+            if (!hasBars()) {
                 Microbot.showMessage("Could not find item in bank.");
                 shutdown();
             }
@@ -207,13 +206,9 @@ public class CannonballSmelterScript extends Script {
         }
     }
 
+    @Override
     public void shutdown() {
+        super.shutdown();
         Rs2Antiban.resetAntibanSettings();
-        if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
-            mainScheduledFuture.cancel(true);
-            if (Microbot.getClientThread().scheduledFuture != null)
-                Microbot.getClientThread().scheduledFuture.cancel(true);
-            Microbot.pauseAllScripts = false;
-        }
     }
 }
