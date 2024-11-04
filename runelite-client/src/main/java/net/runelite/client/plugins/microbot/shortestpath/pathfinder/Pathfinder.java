@@ -2,9 +2,7 @@ package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.util.*;
 
@@ -34,6 +32,14 @@ public class Pathfinder implements Runnable {
     private List<WorldPoint> path = (List<WorldPoint>)Collections.EMPTY_LIST;
     private boolean pathNeedsUpdate = false;
     private Node bestLastNode;
+    /**
+     * Teleportation transports are updated when this changes.
+     * Can be either:
+     * 20 = all teleports can be used (e.g. Varrock Teleport)
+     * 30 = some teleports can be used (e.g. Amulet of Glory)
+     * 31 = no teleports can be used
+     */
+    private int wildernessLevel;
 
     public Pathfinder(PathfinderConfig config, WorldPoint start, WorldPoint target) {
         stats = new PathfinderStats();
@@ -44,6 +50,7 @@ public class Pathfinder implements Runnable {
         visited = new VisitedTiles(map);
         targetPacked = WorldPointUtil.packWorldPoint(target);
         targetInWilderness = PathfinderConfig.isInWilderness(target);
+        wildernessLevel = 31;
     }
 
     public boolean isDone() {
@@ -78,13 +85,9 @@ public class Pathfinder implements Runnable {
     }
 
     private Node addNeighbors(Node node) {
-        List<Node> nodes = map.getNeighbors(node, visited, config);
+        List<Node> nodes = map.getNeighbors(node, visited, config, target);
         for (int i = 0; i < nodes.size(); ++i) {
             Node neighbor = nodes.get(i);
-            final int x = WorldPointUtil.unpackWorldX(neighbor.packedPosition);
-            final int y = WorldPointUtil.unpackWorldY(neighbor.packedPosition);
-            final int z = WorldPointUtil.unpackWorldPlane(neighbor.packedPosition);
-
             if (neighbor.packedPosition == targetPacked) {
                 return neighbor;
             }
@@ -96,7 +99,7 @@ public class Pathfinder implements Runnable {
             visited.set(neighbor.packedPosition);
             if (neighbor instanceof TransportNode) {
                 pending.add(neighbor);
-                stats.transportsChecked.add(WorldPointUtil.unpackWorldPoint(neighbor.packedPosition));
+                ++stats.transportsChecked;
             } else {
                 boundary.addLast(neighbor);
                 ++stats.nodesChecked;
@@ -127,6 +130,28 @@ public class Pathfinder implements Runnable {
 
             node = boundary.removeFirst();
 
+            if (wildernessLevel > 20) {
+                // We don't need to remove teleports when going from 20 to 21 or higher,
+                // because the teleport is either used at the very start of the
+                // path or when going from 31 or higher to 30, or from 21 or higher to 20.
+
+                boolean update = false;
+
+                // These are overlapping boundaries, so if the node isn't in level 30, it's in 0-29
+                // likewise, if the node isn't in level 20, it's in 0-19
+                if (wildernessLevel > 30 && !config.isInLevel30Wilderness(node.packedPosition)) {
+                    wildernessLevel = 30;
+                    update = true;
+                }
+                if (wildernessLevel > 20 && !config.isInLevel20Wilderness(node.packedPosition)) {
+                    wildernessLevel = 20;
+                    update = true;
+                }
+                if (update) {
+                    config.refreshTeleports(node.packedPosition, wildernessLevel);
+                }
+            }
+
             if (node.packedPosition == targetPacked) {
                 bestLastNode = node;
                 pathNeedsUpdate = true;
@@ -134,8 +159,10 @@ public class Pathfinder implements Runnable {
             }
 
             int distance = WorldPointUtil.distanceBetween(node.packedPosition, targetPacked);
-            long heuristic = distance + WorldPointUtil.distanceBetween(node.packedPosition, targetPacked, 2);
+            long heuristic = distance + (long) WorldPointUtil.distanceBetween(node.packedPosition, targetPacked, 2);
+
             if (heuristic < bestHeuristic || (heuristic <= bestHeuristic && distance < bestDistance)) {
+
                 bestLastNode = node;
                 pathNeedsUpdate = true;
                 bestDistance = distance;
@@ -166,14 +193,12 @@ public class Pathfinder implements Runnable {
 
     public static class PathfinderStats {
         @Getter
-        private int nodesChecked = 0;
-        @Getter
-        List<WorldPoint> transportsChecked = new ArrayList<>();
+        private int nodesChecked = 0, transportsChecked = 0;
         private long startNanos, endNanos;
         private volatile boolean started = false, ended = false;
 
         public int getTotalNodesChecked() {
-            return nodesChecked + transportsChecked.size();
+            return nodesChecked + transportsChecked;
         }
 
         public long getElapsedTimeNanos() {
@@ -183,7 +208,7 @@ public class Pathfinder implements Runnable {
         private void start() {
             started = true;
             nodesChecked = 0;
-            transportsChecked = new ArrayList<>();
+            transportsChecked = 0;
             startNanos = System.nanoTime();
         }
 

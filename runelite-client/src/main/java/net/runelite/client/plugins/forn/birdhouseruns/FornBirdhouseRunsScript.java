@@ -248,6 +248,7 @@ public class FornBirdhouseRunsScript extends Script {
                 !Rs2Player.isAnimating() &&
                 !Rs2Player.isInteracting()
         ) {
+
             Rs2GameObject.interact(itemId, "empty");
         }
     }

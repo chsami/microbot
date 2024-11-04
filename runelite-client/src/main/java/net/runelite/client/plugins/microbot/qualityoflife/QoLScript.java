@@ -28,8 +28,11 @@ public class QoLScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn() || !super.run()) {
-                    resetMenuEntries();
                     return;
+                }
+
+                if (config.autoDrinkPrayerPot()) {
+                    handleAutoDrinkPrayPot(config.drinkPrayerPotPoints());
                 }
 
                 if (config.autoEatFood()) {
@@ -108,6 +111,10 @@ public class QoLScript extends Script {
     // handle auto eat
     private void handleAutoEat(int percent) {
         Rs2Player.eatAt(percent);
+    }
+
+    private void handleAutoDrinkPrayPot(int points) {
+        Rs2Player.drinkPrayerPotionAt(points);
     }
 
     // handle dialogue continue
@@ -232,6 +239,8 @@ public class QoLScript extends Script {
     }
 
     // reset all stored menu entries
+    //Decrepatated use resetMenuEntries method in main class
+    @Deprecated(since = "1.5.8 Use resetMenuEntries method in main class" , forRemoval = true)
     public void resetMenuEntries() {
         QoLPlugin.bankMenuEntries.clear();
         QoLPlugin.furnaceMenuEntries.clear();

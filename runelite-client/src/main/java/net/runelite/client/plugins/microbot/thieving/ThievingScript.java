@@ -115,24 +115,22 @@ public class ThievingScript extends Script {
     }
 
     private void pickpocket() {
-        if (config.THIEVING_NPC() != ThievingNpc.NONE) {
-            if (config.THIEVING_NPC() == ThievingNpc.WEALTHY_CITIZEN) {
-                handleWealthyCitizen();
-            } else if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
-                handleElves();
+        if (config.THIEVING_NPC() == ThievingNpc.WEALTHY_CITIZEN) {
+            handleWealthyCitizen();
+        } else if (config.THIEVING_NPC() == ThievingNpc.ELVES) {
+            handleElves();
+        } else {
+            Map<NPC, HighlightedNpc> highlightedNpcs =  net.runelite.client.plugins.npchighlight.NpcIndicatorsPlugin.getHighlightedNpcs();
+            if (highlightedNpcs.isEmpty()) {
+                if (Rs2Npc.pickpocket(config.THIEVING_NPC().getName())) {
+                    Rs2Walker.setTarget(null);
+                    sleep(50, 250);
+                } else if (Rs2Npc.getNpc(config.THIEVING_NPC().getName()) == null){
+                    Rs2Walker.walkTo(initialPlayerLocation);
+                }
             } else {
-                Map<NPC, HighlightedNpc> highlightedNpcs =  net.runelite.client.plugins.npchighlight.NpcIndicatorsPlugin.getHighlightedNpcs();
-                if (highlightedNpcs.isEmpty()) {
-                    if (Rs2Npc.pickpocket(config.THIEVING_NPC().getName())) {
-                        Rs2Walker.setTarget(null);
-                        sleep(50, 250);
-                    } else if (Rs2Npc.getNpc(config.THIEVING_NPC().getName()) == null){
-                        Rs2Walker.walkTo(initialPlayerLocation);
-                    }
-                } else {
-                    if (Rs2Npc.pickpocket(highlightedNpcs)) {
-                        sleep(50, 250);
-                    }
+                if (Rs2Npc.pickpocket(highlightedNpcs)) {
+                    sleep(50, 250);
                 }
             }
         }

@@ -1,172 +1,229 @@
-# X Y Z	X Y Z	menuOption menuTarget objectID	Skill requirements	Item requirements	Quest	Travel time	Info
-# Brimhaven							
-2760 3238 0	2792 3414 0	Charter Trader Crewmember 1330		460 Coins		6	Catherby
-2760 3238 0	2589 2851 0	Charter Trader Crewmember 1330		680 Coins		6	Corsair Cove
-2760 3238 0	1496 3403 0	Charter Trader Crewmember 1330		2200 Coins		6	Land's End
-2760 3238 0	2954 3158 0	Charter Trader Crewmember 1330		480 Coins		6	Musa Point
-2760 3238 0	3671 2931 0	Charter Trader Crewmember 1330		1950 Coins	Cabin Fever	6	Mos Le'Harmless
-2760 3238 0	2674 3144 0	Charter Trader Crewmember 1330		400 Coins		6	Port Khazard
-2760 3238 0	3702 3503 0	Charter Trader Crewmember 1330		2900 Coins	Priest in Peril	6	Port Phasmatys
-2760 3238 0	1808 3679 0	Charter Trader Crewmember 1330		2000 Coins		6	Port Piscarilius
-2760 3238 0	3038 3192 0	Charter Trader Crewmember 1330		1600 Coins		6	Port Sarim
-2760 3238 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-2760 3238 0	3001 3032 0	Charter Trader Crewmember 1330		400 Coins	The Grand Tree	6	Shipyard
-2760 3238 0	2157 3330 0	Charter Trader Crewmember 1330		3450 Coins	Song of the Elves	6	Prifddinas
-							
-# Catherby							
-2792 3414 0	2760 3238 0	Charter Trader Crewmember 1330		480 Coins		6	Brimhaven
-2792 3414 0	2589 2851 0	Charter Trader Crewmember 1330		1000 Coins		6	Corsair Cove
-2792 3414 0	1496 3403 0	Charter Trader Crewmember 1330		2200 Coins		6	Land's End
-2792 3414 0	2954 3158 0	Charter Trader Crewmember 1330		480 Coins		6	Musa Point
-2792 3414 0	3671 2931 0	Charter Trader Crewmember 1330		1750 Coins	Cabin Fever	6	Mos Le'Harmless
-2792 3414 0	2674 3144 0	Charter Trader Crewmember 1330		1600 Coins		6	Port Khazard
-2792 3414 0	3702 3503 0	Charter Trader Crewmember 1330		3500 Coins	Priest in Peril	6	Port Phasmatys
-2792 3414 0	1808 3679 0	Charter Trader Crewmember 1330		2000 Coins		6	Port Piscarilius
-2792 3414 0	3038 3192 0	Charter Trader Crewmember 1330		1000 Coins		6	Port Sarim
-2792 3414 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-2792 3414 0	3001 3032 0	Charter Trader Crewmember 1330		1600 Coins	The Grand Tree	6	Shipyard
-2792 3414 0	2157 3330 0	Charter Trader Crewmember 1330		3560 Coins	Song of the Elves	6	Prifddinas
-							
-# Corsair Cove							
-2589 2851 0	2760 3238 0	Charter Trader Crewmember 1330		680 Coins		6	Brimhaven
-2589 2851 0	2792 3414 0	Charter Trader Crewmember 1330		1000 Coins		6	Catherby
-2589 2851 0	1496 3403 0	Charter Trader Crewmember 1330		1800 Coins		6	Land's End
-2589 2851 0	2954 3158 0	Charter Trader Crewmember 1330		800 Coins		6	Musa Point
-2589 2851 0	3671 2931 0	Charter Trader Crewmember 1330		2040 Coins	Cabin Fever	6	Mos Le'Harmless
-2589 2851 0	2674 3144 0	Charter Trader Crewmember 1330		600 Coins		6	Port Khazard
-2589 2851 0	3702 3503 0	Charter Trader Crewmember 1330		4040 Coins	Priest in Peril	6	Port Phasmatys
-2589 2851 0	1808 3679 0	Charter Trader Crewmember 1330		1500 Coins		6	Port Piscarilius
-2589 2851 0	3038 3192 0	Charter Trader Crewmember 1330		1200 Coins		6	Port Sarim
-2589 2851 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-2589 2851 0	3001 3032 0	Charter Trader Crewmember 1330		800 Coins	The Grand Tree	6	Shipyard
-2589 2851 0	2157 3330 0	Charter Trader Crewmember 1330		1420 Coins	Song of the Elves	6	Prifddinas
-							
-# Land's End							
-1496 3403 0	2760 3238 0	Charter Trader Crewmember 1330		2200 Coins		6	Brimhaven
-1496 3403 0	2792 3414 0	Charter Trader Crewmember 1330		2200 Coins		6	Catherby
-1496 3403 0	2589 2851 0	Charter Trader Crewmember 1330		1800 Coins		6	Corsair Cove
-1496 3403 0	2954 3158 0	Charter Trader Crewmember 1330		2700 Coins		6	Musa Point
-1496 3403 0	3671 2931 0	Charter Trader Crewmember 1330		2200 Coins	Cabin Fever	6	Mos Le'Harmless
-1496 3403 0	2674 3144 0	Charter Trader Crewmember 1330		2000 Coins		6	Port Khazard
-1496 3403 0	3702 3503 0	Charter Trader Crewmember 1330		4200 Coins	Priest in Peril	6	Port Phasmatys
-1496 3403 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-1496 3403 0	3001 3032 0	Charter Trader Crewmember 1330		2800 Coins	The Grand Tree	6	Shipyard
-1496 3403 0	2157 3330 0	Charter Trader Crewmember 1330		1500 Coins	Song of the Elves	6	Prifddinas
-							
-# Musa Point							
-2954 3158 0	2760 3238 0	Charter Trader Crewmember 1330		200 Coins		6	Brimhaven
-2954 3158 0	2792 3414 0	Charter Trader Crewmember 1330		480 Coins		6	Catherby
-2954 3158 0	2589 2851 0	Charter Trader Crewmember 1330		800 Coins		6	Corsair Cove
-2954 3158 0	1496 3403 0	Charter Trader Crewmember 1330		2700 Coins		6	Land's End
-2954 3158 0	3671 2931 0	Charter Trader Crewmember 1330		550 Coins	Cabin Fever	6	Mos Le'Harmless
-2954 3158 0	2674 3144 0	Charter Trader Crewmember 1330		400 Coins		6	Port Khazard
-2954 3158 0	3702 3503 0	Charter Trader Crewmember 1330		1100 Coins	Priest in Peril	6	Port Phasmatys
-2954 3158 0	1808 3679 0	Charter Trader Crewmember 1330		2500 Coins		6	Port Piscarilius
-2954 3158 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-2954 3158 0	3001 3032 0	Charter Trader Crewmember 1330		200 Coins	The Grand Tree	6	Shipyard
-2954 3158 0	2157 3330 0	Charter Trader Crewmember 1330		4400 Coins	Song of the Elves	6	Prifddinas
-							
-# Mos Le'Harmless							
-3671 2931 0	2760 3238 0	Charter Trader Crewmember 1330		1450 Coins		6	Brimhaven
-3671 2931 0	2792 3414 0	Charter Trader Crewmember 1330		1250 Coins		6	Catherby
-3671 2931 0	2589 2851 0	Charter Trader Crewmember 1330		2040 Coins		6	Corsair Cove
-3671 2931 0	1496 3403 0	Charter Trader Crewmember 1330		2200 Coins		6	Land's End
-3671 2931 0	2954 3158 0	Charter Trader Crewmember 1330		2050 Coins		6	Musa Point
-3671 2931 0	2674 3144 0	Charter Trader Crewmember 1330		550 Coins		6	Port Khazard
-3671 2931 0	1808 3679 0	Charter Trader Crewmember 1330		2100 Coins		6	Port Piscarilius
-3671 2931 0	3038 3192 0	Charter Trader Crewmember 1330		650 Coins		6	Port Sarim
-3671 2931 0	2142 3122 0	Charter Trader Crewmember 1330		1600 Coins	Regicide	6	Port Tyras
-3671 2931 0	3001 3032 0	Charter Trader Crewmember 1330		550 Coins	The Grand Tree	6	Shipyard
-3671 2931 0	2157 3330 0	Charter Trader Crewmember 1330		2475 Coins	Song of the Elves	6	Prifddinas
-							
-# Port Khazard							
-2674 3144 0	2760 3238 0	Charter Trader Crewmember 1330		1600 Coins		6	Brimhaven
-2674 3144 0	2792 3414 0	Charter Trader Crewmember 1330		1600 Coins		6	Catherby
-2674 3144 0	2589 2851 0	Charter Trader Crewmember 1330		600 Coins		6	Corsair Cove
-2674 3144 0	1496 3403 0	Charter Trader Crewmember 1330		2000 Coins		6	Land's End
-2674 3144 0	2954 3158 0	Charter Trader Crewmember 1330		1600 Coins		6	Musa Point
-2674 3144 0	3671 2931 0	Charter Trader Crewmember 1330		2050 Coins	Cabin Fever	6	Mos Le'Harmless
-2674 3144 0	3702 3503 0	Charter Trader Crewmember 1330		4100 Coins	Priest in Peril	6	Port Phasmatys
-2674 3144 0	1808 3679 0	Charter Trader Crewmember 1330		1800 Coins		6	Port Piscarilius
-2674 3144 0	3038 3192 0	Charter Trader Crewmember 1330		1280 Coins		6	Port Sarim
-2674 3144 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-2674 3144 0	3001 3032 0	Charter Trader Crewmember 1330		1600 Coins	The Grand Tree	6	Shipyard
-2674 3144 0	2157 3330 0	Charter Trader Crewmember 1330		2800 Coins	Song of the Elves	6	Prifddinas
-							
-# Port Phasmatys							
-3702 3503 0	2760 3238 0	Charter Trader Crewmember 1330		2900 Coins		6	Brimhaven
-3702 3503 0	2792 3414 0	Charter Trader Crewmember 1330		3500 Coins		6	Catherby
-3702 3503 0	2589 2851 0	Charter Trader Crewmember 1330		4040 Coins		6	Corsair Cove
-3702 3503 0	1496 3403 0	Charter Trader Crewmember 1330		4200 Coins		6	Land's End
-3702 3503 0	2954 3158 0	Charter Trader Crewmember 1330		1100 Coins		6	Musa Point
-3702 3503 0	2674 3144 0	Charter Trader Crewmember 1330		4100 Coins		6	Port Khazard
-3702 3503 0	1808 3679 0	Charter Trader Crewmember 1330		4000 Coins		6	Port Piscarilius
-3702 3503 0	3038 3192 0	Charter Trader Crewmember 1330		1300 Coins		6	Port Sarim
-3702 3503 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-3702 3503 0	3001 3032 0	Charter Trader Crewmember 1330		3200 Coins	The Grand Tree	6	Shipyard
-3702 3503 0	2157 3330 0	Charter Trader Crewmember 1330		5200 Coins	Song of the Elves	6	Prifddinas
-							
-# Port Piscarilius							
-1808 3679 0	2760 3238 0	Charter Trader Crewmember 1330		2000 Coins		6	Brimhaven
-1808 3679 0	2792 3414 0	Charter Trader Crewmember 1330		2000 Coins		6	Catherby
-1808 3679 0	2589 2851 0	Charter Trader Crewmember 1330		1500 Coins		6	Corsair Cove
-1808 3679 0	2954 3158 0	Charter Trader Crewmember 1330		2500 Coins		6	Musa Point
-1808 3679 0	3671 2931 0	Charter Trader Crewmember 1330		2100 Coins	Cabin Fever	6	Mos Le'Harmless
-1808 3679 0	2674 3144 0	Charter Trader Crewmember 1330		1800 Coins		6	Port Khazard
-1808 3679 0	3702 3503 0	Charter Trader Crewmember 1330		4000 Coins		6	Port Phasmatys
-1808 3679 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-1808 3679 0	3001 3032 0	Charter Trader Crewmember 1330		2600 Coins	The Grand Tree	6	Shipyard
-1808 3679 0	2157 3330 0	Charter Trader Crewmember 1330		1200 Coins	Song of the Elves	6	Prifddinas
-							
-# Port Sarim							
-3038 3192 0	2760 3238 0	Charter Trader Crewmember 1330		1600 Coins		6	Brimhaven
-3038 3192 0	2792 3414 0	Charter Trader Crewmember 1330		1000 Coins		6	Catherby
-3038 3192 0	2589 2851 0	Charter Trader Crewmember 1330		1200 Coins		6	Corsair Cove
-3038 3192 0	3671 2931 0	Charter Trader Crewmember 1330		650 Coins	Cabin Fever	6	Mos Le'Harmless
-3038 3192 0	2674 3144 0	Charter Trader Crewmember 1330		1280 Coins		6	Port Khazard
-3038 3192 0	3702 3503 0	Charter Trader Crewmember 1330		1300 Coins	Priest in Peril	6	Port Phasmatys
-3038 3192 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-3038 3192 0	3001 3032 0	Charter Trader Crewmember 1330		400 Coins	The Grand Tree	6	Shipyard
-3038 3192 0	2157 3330 0	Charter Trader Crewmember 1330		4800 Coins	Song of the Elves	6	Prifddinas
-							
-# Port Tyras							
-2142 3122 0	2760 3238 0	Charter Trader Crewmember 1330		3200 Coins		6	Brimhaven
-2142 3122 0	2792 3414 0	Charter Trader Crewmember 1330		3200 Coins		6	Catherby
-2142 3122 0	2589 2851 0	Charter Trader Crewmember 1330		3200 Coins		6	Corsair Cove
-2142 3122 0	1496 3403 0	Charter Trader Crewmember 1330		3200 Coins		6	Land's End
-2142 3122 0	2954 3158 0	Charter Trader Crewmember 1330		3200 Coins		6	Musa Point
-2142 3122 0	3671 2931 0	Charter Trader Crewmember 1330		1600 Coins	Cabin Fever	6	Mos Le'Harmless
-2142 3122 0	2674 3144 0	Charter Trader Crewmember 1330		3200 Coins		6	Port Khazard
-2142 3122 0	3702 3503 0	Charter Trader Crewmember 1330		3200 Coins	Priest in Peril	6	Port Phasmatys
-2142 3122 0	1808 3679 0	Charter Trader Crewmember 1330		3200 Coins		6	Port Piscarilius
-2142 3122 0	3038 3192 0	Charter Trader Crewmember 1330		3200 Coins		6	Port Sarim
-2142 3122 0	3001 3032 0	Charter Trader Crewmember 1330		3200 Coins	The Grand Tree	6	Shipyard
-2142 3122 0	2157 3330 0	Charter Trader Crewmember 1330		3200 Coins	Song of the Elves	6	Prifddinas
-							
-# Ship Yard							
-3001 3032 0	2760 3238 0	Charter Trader Crewmember 1330		400 Coins		6	Brimhaven
-3001 3032 0	2792 3414 0	Charter Trader Crewmember 1330		1600 Coins		6	Catherby
-3001 3032 0	2589 2851 0	Charter Trader Crewmember 1330		800 Coins		6	Corsair Cove
-3001 3032 0	1496 3403 0	Charter Trader Crewmember 1330		2800 Coins		6	Land's End
-3001 3032 0	2954 3158 0	Charter Trader Crewmember 1330		200 Coins		6	Musa Point
-3001 3032 0	3671 2931 0	Charter Trader Crewmember 1330		550 Coins	Cabin Fever	6	Mos Le'Harmless
-3001 3032 0	2674 3144 0	Charter Trader Crewmember 1330		720 Coins		6	Port Khazard
-3001 3032 0	3702 3503 0	Charter Trader Crewmember 1330		1100 Coins	Priest in Peril	6	Port Phasmatys
-3001 3032 0	1808 3679 0	Charter Trader Crewmember 1330		2600 Coins		6	Port Piscarilius
-3001 3032 0	3038 3192 0	Charter Trader Crewmember 1330		400 Coins		6	Port Sarim
-3001 3032 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-3001 3032 0	2157 3330 0	Charter Trader Crewmember 1330		4000 Coins	Song of the Elves	6	Prifddinas
-							
-# Prifddinas							
-2157 3330 0	2760 3238 0	Charter Trader Crewmember 1330		3450 Coins		6	Brimhaven
-2157 3330 0	2792 3414 0	Charter Trader Crewmember 1330		3560 Coins		6	Catherby
-2157 3330 0	2589 2851 0	Charter Trader Crewmember 1330		1420 Coins		6	Corsair Cove
-2157 3330 0	1496 3403 0	Charter Trader Crewmember 1330		1500 Coins		6	Land's End
-2157 3330 0	2954 3158 0	Charter Trader Crewmember 1330		4400 Coins		6	Musa Point
-2157 3330 0	3671 2931 0	Charter Trader Crewmember 1330		2475 Coins	Cabin Fever	6	Mos Le'Harmless
-2157 3330 0	2674 3144 0	Charter Trader Crewmember 1330		2800 Coins		6	Port Khazard
-2157 3330 0	3702 3503 0	Charter Trader Crewmember 1330		5200 Coins	Priest in Peril	6	Port Phasmatys
-2157 3330 0	1808 3679 0	Charter Trader Crewmember 1330		1200 Coins		6	Port Piscarilius
-2157 3330 0	3038 3192 0	Charter Trader Crewmember 1330		4800 Coins		6	Port Sarim
-2157 3330 0	2142 3122 0	Charter Trader Crewmember 1330		3200 Coins	Regicide	6	Port Tyras
-2157 3330 0	3001 3032 0	Charter Trader Crewmember 1330		4000 Coins	The Grand Tree	6	Shipyard
+# Origin	Destination	menuOption menuTarget objectID	Items	Quests	Duration	Display info
+# Brimhaven
+2760 3238 0	2792 3417 1	Charter Trader Crewmember 1330	460 Coins		6	Catherby
+2760 3238 0	1747 3135 1	Charter Trader Crewmember 1330	2400 Coins		6	Civitas illa Fortis
+2760 3238 0	2592 2851 1	Charter Trader Crewmember 1330	680 Coins		6	Corsair Cove
+2760 3238 0	1493 3403 1	Charter Trader Crewmember 1330	2200 Coins		6	Land's End
+2760 3238 0	2957 3158 1	Charter Trader Crewmember 1330	480 Coins		6	Musa Point
+2760 3238 0	3669 2931 1	Charter Trader Crewmember 1330	1950 Coins	Cabin Fever	6	Mos Le'Harmless
+2760 3238 0	2674 3141 1	Charter Trader Crewmember 1330	400 Coins		6	Port Khazard
+2760 3238 0	3705 3503 1	Charter Trader Crewmember 1330	2900 Coins	Priest in Peril	6	Port Phasmatys
+2760 3238 0	1811 3679 1	Charter Trader Crewmember 1330	2000 Coins		6	Port Piscarilius
+2760 3238 0	3038 3189 1	Charter Trader Crewmember 1330	1600 Coins		6	Port Sarim
+2760 3238 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+2760 3238 0	2156 3331 1	Charter Trader Crewmember 1330	3450 Coins	Song of the Elves	6	Prifddinas
+2760 3238 0	2998 3032 1	Charter Trader Crewmember 1330	400 Coins	The Grand Tree	6	Shipyard
+2760 3238 0	1514 2968 1	Charter Trader Crewmember 1330	1250 Coins		6	Sunset Coast
+
+# Catherby
+2792 3414 0	2763 3238 1	Charter Trader Crewmember 1330	480 Coins		6	Brimhaven
+2792 3414 0	1747 3135 1	Charter Trader Crewmember 1330	2400 Coins		6	Civitas illa Fortis
+2792 3414 0	2592 2851 1	Charter Trader Crewmember 1330	1000 Coins		6	Corsair Cove
+2792 3414 0	1493 3403 1	Charter Trader Crewmember 1330	2200 Coins		6	Land's End
+2792 3414 0	2957 3158 1	Charter Trader Crewmember 1330	480 Coins		6	Musa Point
+2792 3414 0	3669 2931 1	Charter Trader Crewmember 1330	1750 Coins	Cabin Fever	6	Mos Le'Harmless
+2792 3414 0	2674 3141 1	Charter Trader Crewmember 1330	1600 Coins		6	Port Khazard
+2792 3414 0	3705 3503 1	Charter Trader Crewmember 1330	3500 Coins	Priest in Peril	6	Port Phasmatys
+2792 3414 0	1811 3679 1	Charter Trader Crewmember 1330	2000 Coins		6	Port Piscarilius
+2792 3414 0	3038 3189 1	Charter Trader Crewmember 1330	1000 Coins		6	Port Sarim
+2792 3414 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+2792 3414 0	2156 3331 1	Charter Trader Crewmember 1330	3560 Coins	Song of the Elves	6	Prifddinas
+2792 3414 0	2998 3032 1	Charter Trader Crewmember 1330	1600 Coins	The Grand Tree	6	Shipyard
+2792 3414 0	1514 2968 1	Charter Trader Crewmember 1330	1250 Coins		6	Sunset Coast
+
+# Civitas illa Fortis
+1743 3136 0	2763 3238 1	Charter Trader Crewmember 1330			6	Brimhaven
+1743 3136 0	2792 3417 1	Charter Trader Crewmember 1330			6	Catherby
+1743 3136 0	2592 2851 1	Charter Trader Crewmember 1330			6	Corsair Cove
+1743 3136 0	1493 3403 1	Charter Trader Crewmember 1330			6	Land's End
+1743 3136 0	2957 3158 1	Charter Trader Crewmember 1330			6	Musa Point
+1743 3136 0	3669 2931 1	Charter Trader Crewmember 1330		Cabin Fever	6	Mos Le'Harmless
+1743 3136 0	2674 3141 1	Charter Trader Crewmember 1330			6	Port Khazard
+1743 3136 0	3705 3503 1	Charter Trader Crewmember 1330		Priest in Peril	6	Port Phasmatys
+1743 3136 0	1811 3679 1	Charter Trader Crewmember 1330			6	Port Piscarilius
+1743 3136 0	3038 3189 1	Charter Trader Crewmember 1330			6	Port Sarim
+1743 3136 0	2142 3125 1	Charter Trader Crewmember 1330		Regicide	6	Port Tyras
+1743 3136 0	2156 3331 1	Charter Trader Crewmember 1330		Song of the Elves	6	Prifddinas
+1743 3136 0	2998 3032 1	Charter Trader Crewmember 1330		The Grand Tree	6	Shipyard
+1743 3136 0	1514 2968 1	Charter Trader Crewmember 1330	250 Coins		6	Sunset Coast
+
+# Corsair Cove
+2589 2851 0	2763 3238 1	Charter Trader Crewmember 1330	680 Coins		6	Brimhaven
+2589 2851 0	2792 3417 1	Charter Trader Crewmember 1330	1000 Coins		6	Catherby
+2589 2851 0	1747 3135 1	Charter Trader Crewmember 1330	2000 Coins		6	Civitas illa Fortis
+2589 2851 0	1493 3403 1	Charter Trader Crewmember 1330	1800 Coins		6	Land's End
+2589 2851 0	2957 3158 1	Charter Trader Crewmember 1330	800 Coins		6	Musa Point
+2589 2851 0	3669 2931 1	Charter Trader Crewmember 1330	2040 Coins	Cabin Fever	6	Mos Le'Harmless
+2589 2851 0	2674 3141 1	Charter Trader Crewmember 1330	600 Coins		6	Port Khazard
+2589 2851 0	3705 3503 1	Charter Trader Crewmember 1330	4040 Coins	Priest in Peril	6	Port Phasmatys
+2589 2851 0	1811 3679 1	Charter Trader Crewmember 1330	1500 Coins		6	Port Piscarilius
+2589 2851 0	3038 3189 1	Charter Trader Crewmember 1330	1200 Coins		6	Port Sarim
+2589 2851 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+2589 2851 0	2156 3331 1	Charter Trader Crewmember 1330	1420 Coins	Song of the Elves	6	Prifddinas
+2589 2851 0	2998 3032 1	Charter Trader Crewmember 1330	800 Coins	The Grand Tree	6	Shipyard
+2589 2851 0	1514 2968 1	Charter Trader Crewmember 1330	1050 Coins		6	Sunset Coast
+
+# Land's End
+1496 3403 0	2763 3238 1	Charter Trader Crewmember 1330	2200 Coins		6	Brimhaven
+1496 3403 0	2792 3417 1	Charter Trader Crewmember 1330	2200 Coins		6	Catherby
+1496 3403 0	1747 3135 1	Charter Trader Crewmember 1330	800 Coins		6	Civitas illa Fortis
+1496 3403 0	2592 2851 1	Charter Trader Crewmember 1330	1800 Coins		6	Corsair Cove
+1496 3403 0	2957 3158 1	Charter Trader Crewmember 1330	2700 Coins		6	Musa Point
+1496 3403 0	3669 2931 1	Charter Trader Crewmember 1330	2200 Coins	Cabin Fever	6	Mos Le'Harmless
+1496 3403 0	2674 3141 1	Charter Trader Crewmember 1330	2000 Coins		6	Port Khazard
+1496 3403 0	3705 3503 1	Charter Trader Crewmember 1330	4200 Coins	Priest in Peril	6	Port Phasmatys
+1496 3403 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+1496 3403 0	2156 3331 1	Charter Trader Crewmember 1330	1500 Coins	Song of the Elves	6	Prifddinas
+1496 3403 0	2998 3032 1	Charter Trader Crewmember 1330	2800 Coins	The Grand Tree	6	Shipyard
+1496 3403 0	1514 2968 1	Charter Trader Crewmember 1330	450 Coins		6	Sunset Coast
+
+# Musa Point
+2954 3158 0	2763 3238 1	Charter Trader Crewmember 1330	200 Coins		6	Brimhaven
+2954 3158 0	2792 3417 1	Charter Trader Crewmember 1330	480 Coins		6	Catherby
+2954 3158 0	1747 3135 1	Charter Trader Crewmember 1330	2900 Coins		6	Civitas illa Fortis
+2954 3158 0	2592 2851 1	Charter Trader Crewmember 1330	800 Coins		6	Corsair Cove
+2954 3158 0	1493 3403 1	Charter Trader Crewmember 1330	2700 Coins		6	Land's End
+2954 3158 0	3669 2931 1	Charter Trader Crewmember 1330	550 Coins	Cabin Fever	6	Mos Le'Harmless
+2954 3158 0	2674 3141 1	Charter Trader Crewmember 1330	400 Coins		6	Port Khazard
+2954 3158 0	3705 3503 1	Charter Trader Crewmember 1330	1100 Coins	Priest in Peril	6	Port Phasmatys
+2954 3158 0	1811 3679 1	Charter Trader Crewmember 1330	2500 Coins		6	Port Piscarilius
+2954 3158 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+2954 3158 0	2156 3331 1	Charter Trader Crewmember 1330	4400 Coins	Song of the Elves	6	Prifddinas
+2954 3158 0	2998 3032 1	Charter Trader Crewmember 1330	200 Coins	The Grand Tree	6	Shipyard
+2954 3158 0	1514 2968 1	Charter Trader Crewmember 1330	1500 Coins		6	Sunset Coast
+
+# Mos Le'Harmless
+3671 2931 0	2763 3238 1	Charter Trader Crewmember 1330	1450 Coins		6	Brimhaven
+3671 2931 0	2792 3417 1	Charter Trader Crewmember 1330	1250 Coins		6	Catherby
+3671 2931 0	1747 3135 1	Charter Trader Crewmember 1330	2300 Coins		6	Civitas illa Fortis
+3671 2931 0	2592 2851 1	Charter Trader Crewmember 1330	2040 Coins		6	Corsair Cove
+3671 2931 0	1493 3403 1	Charter Trader Crewmember 1330	2200 Coins		6	Land's End
+3671 2931 0	2957 3158 1	Charter Trader Crewmember 1330	2050 Coins		6	Musa Point
+3671 2931 0	2674 3141 1	Charter Trader Crewmember 1330	550 Coins		6	Port Khazard
+3671 2931 0	1811 3679 1	Charter Trader Crewmember 1330	2100 Coins		6	Port Piscarilius
+3671 2931 0	3038 3189 1	Charter Trader Crewmember 1330	650 Coins		6	Port Sarim
+3671 2931 0	2142 3125 1	Charter Trader Crewmember 1330	1600 Coins	Regicide	6	Port Tyras
+3671 2931 0	2156 3331 1	Charter Trader Crewmember 1330	2475 Coins	Song of the Elves	6	Prifddinas
+3671 2931 0	2998 3032 1	Charter Trader Crewmember 1330	550 Coins	The Grand Tree	6	Shipyard
+3671 2931 0	1514 2968 1	Charter Trader Crewmember 1330	2350 Coins		6	Sunset Coast
+
+# Port Khazard
+2674 3144 0	2763 3238 1	Charter Trader Crewmember 1330	1600 Coins		6	Brimhaven
+2674 3144 0	2792 3417 1	Charter Trader Crewmember 1330	1600 Coins		6	Catherby
+2674 3144 0	1747 3135 1	Charter Trader Crewmember 1330	2200 Coins		6	Civitas illa Fortis
+2674 3144 0	2592 2851 1	Charter Trader Crewmember 1330	600 Coins		6	Corsair Cove
+2674 3144 0	1493 3403 1	Charter Trader Crewmember 1330	2000 Coins		6	Land's End
+2674 3144 0	2957 3158 1	Charter Trader Crewmember 1330	1600 Coins		6	Musa Point
+2674 3144 0	3669 2931 1	Charter Trader Crewmember 1330	2050 Coins	Cabin Fever	6	Mos Le'Harmless
+2674 3144 0	3705 3503 1	Charter Trader Crewmember 1330	4100 Coins	Priest in Peril	6	Port Phasmatys
+2674 3144 0	1811 3679 1	Charter Trader Crewmember 1330	1800 Coins		6	Port Piscarilius
+2674 3144 0	3038 3189 1	Charter Trader Crewmember 1330	1280 Coins		6	Port Sarim
+2674 3144 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+2674 3144 0	2156 3331 1	Charter Trader Crewmember 1330	2800 Coins	Song of the Elves	6	Prifddinas
+2674 3144 0	2998 3032 1	Charter Trader Crewmember 1330	1600 Coins	The Grand Tree	6	Shipyard
+2674 3144 0	1514 2968 1	Charter Trader Crewmember 1330	1150 Coins		6	Sunset Coast
+
+# Port Phasmatys
+3702 3503 0	2763 3238 1	Charter Trader Crewmember 1330	2900 Coins		6	Brimhaven
+3702 3503 0	2792 3417 1	Charter Trader Crewmember 1330	3500 Coins		6	Catherby
+3702 3503 0	1747 3135 1	Charter Trader Crewmember 1330	4400 Coins		6	Civitas illa Fortis
+3702 3503 0	2592 2851 1	Charter Trader Crewmember 1330	4040 Coins		6	Corsair Cove
+3702 3503 0	1493 3403 1	Charter Trader Crewmember 1330	4200 Coins		6	Land's End
+3702 3503 0	2957 3158 1	Charter Trader Crewmember 1330	1100 Coins		6	Musa Point
+3702 3503 0	2674 3141 1	Charter Trader Crewmember 1330	4100 Coins		6	Port Khazard
+3702 3503 0	1811 3679 1	Charter Trader Crewmember 1330	4000 Coins		6	Port Piscarilius
+3702 3503 0	3038 3189 1	Charter Trader Crewmember 1330	1300 Coins		6	Port Sarim
+3702 3503 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+3702 3503 0	2156 3331 1	Charter Trader Crewmember 1330	5200 Coins	Song of the Elves	6	Prifddinas
+3702 3503 0	2998 3032 1	Charter Trader Crewmember 1330	3200 Coins	The Grand Tree	6	Shipyard
+3702 3503 0	1514 2968 1	Charter Trader Crewmember 1330	2250 Coins		6	Sunset Coast
+
+# Port Piscarilius
+1808 3679 0	2763 3238 1	Charter Trader Crewmember 1330	2000 Coins		6	Brimhaven
+1808 3679 0	2792 3417 1	Charter Trader Crewmember 1330	2000 Coins		6	Catherby
+1808 3679 0	1747 3135 1	Charter Trader Crewmember 1330	1000 Coins		6	Civitas illa Fortis
+1808 3679 0	2592 2851 1	Charter Trader Crewmember 1330	1500 Coins		6	Corsair Cove
+1808 3679 0	2957 3158 1	Charter Trader Crewmember 1330	2500 Coins		6	Musa Point
+1808 3679 0	3669 2931 1	Charter Trader Crewmember 1330	2100 Coins	Cabin Fever	6	Mos Le'Harmless
+1808 3679 0	2674 3141 1	Charter Trader Crewmember 1330	1800 Coins		6	Port Khazard
+1808 3679 0	3705 3503 1	Charter Trader Crewmember 1330	4000 Coins		6	Port Phasmatys
+1808 3679 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+1808 3679 0	2156 3331 1	Charter Trader Crewmember 1330	1200 Coins	Song of the Elves	6	Prifddinas
+1808 3679 0	2998 3032 1	Charter Trader Crewmember 1330	2600 Coins	The Grand Tree	6	Shipyard
+1808 3679 0	1514 2968 1	Charter Trader Crewmember 1330	550 Coins		6	Sunset Coast
+
+# Port Sarim
+3038 3192 0	2763 3238 1	Charter Trader Crewmember 1330	1600 Coins		6	Brimhaven
+3038 3192 0	2792 3417 1	Charter Trader Crewmember 1330	1000 Coins		6	Catherby
+3038 3192 0	2592 2851 1	Charter Trader Crewmember 1330	1200 Coins		6	Corsair Cove
+3038 3192 0	3669 2931 1	Charter Trader Crewmember 1330	650 Coins	Cabin Fever	6	Mos Le'Harmless
+3038 3192 0	2674 3141 1	Charter Trader Crewmember 1330	1280 Coins		6	Port Khazard
+3038 3192 0	3705 3503 1	Charter Trader Crewmember 1330	1300 Coins	Priest in Peril	6	Port Phasmatys
+3038 3192 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+3038 3192 0	2156 3331 1	Charter Trader Crewmember 1330	4800 Coins	Song of the Elves	6	Prifddinas
+3038 3192 0	2998 3032 1	Charter Trader Crewmember 1330	400 Coins	The Grand Tree	6	Shipyard
+3038 3192 0	1514 2968 1	Charter Trader Crewmember 1330	1550 Coins		6	Sunset Coast
+
+# Port Tyras
+2142 3122 0	2763 3238 1	Charter Trader Crewmember 1330	3200 Coins		6	Brimhaven
+2142 3122 0	2792 3417 1	Charter Trader Crewmember 1330	3200 Coins		6	Catherby
+2142 3122 0	1747 3135 1	Charter Trader Crewmember 1330	3200 Coins		6	Civitas illa Fortis
+2142 3122 0	2592 2851 1	Charter Trader Crewmember 1330	3200 Coins		6	Corsair Cove
+2142 3122 0	1493 3403 1	Charter Trader Crewmember 1330	3200 Coins		6	Land's End
+2142 3122 0	2957 3158 1	Charter Trader Crewmember 1330	3200 Coins		6	Musa Point
+2142 3122 0	3669 2931 1	Charter Trader Crewmember 1330	1600 Coins	Cabin Fever	6	Mos Le'Harmless
+2142 3122 0	2674 3141 1	Charter Trader Crewmember 1330	3200 Coins		6	Port Khazard
+2142 3122 0	3705 3503 1	Charter Trader Crewmember 1330	3200 Coins	Priest in Peril	6	Port Phasmatys
+2142 3122 0	1811 3679 1	Charter Trader Crewmember 1330	3200 Coins		6	Port Piscarilius
+2142 3122 0	3038 3189 1	Charter Trader Crewmember 1330	3200 Coins		6	Port Sarim
+2142 3122 0	2156 3331 1	Charter Trader Crewmember 1330	3200 Coins	Song of the Elves	6	Prifddinas
+2142 3122 0	2998 3032 1	Charter Trader Crewmember 1330	3200 Coins	The Grand Tree	6	Shipyard
+2142 3122 0	1514 2968 1	Charter Trader Crewmember 1330	1600 Coins		6	Sunset Coast
+
+# Prifddinas
+2157 3330 0	2763 3238 1	Charter Trader Crewmember 1330	3450 Coins		6	Brimhaven
+2157 3330 0	2792 3417 1	Charter Trader Crewmember 1330	3560 Coins		6	Catherby
+2157 3330 0	1747 3135 1	Charter Trader Crewmember 1330	1700 Coins		6	Civitas illa Fortis
+2157 3330 0	2592 2851 1	Charter Trader Crewmember 1330	1420 Coins		6	Corsair Cove
+2157 3330 0	1493 3403 1	Charter Trader Crewmember 1330	1500 Coins		6	Land's End
+2157 3330 0	2957 3158 1	Charter Trader Crewmember 1330	4400 Coins		6	Musa Point
+2157 3330 0	3669 2931 1	Charter Trader Crewmember 1330	2475 Coins	Cabin Fever	6	Mos Le'Harmless
+2157 3330 0	2674 3141 1	Charter Trader Crewmember 1330	2800 Coins		6	Port Khazard
+2157 3330 0	3705 3503 1	Charter Trader Crewmember 1330	5200 Coins	Priest in Peril	6	Port Phasmatys
+2157 3330 0	1811 3679 1	Charter Trader Crewmember 1330	1200 Coins		6	Port Piscarilius
+2157 3330 0	3038 3189 1	Charter Trader Crewmember 1330	4800 Coins		6	Port Sarim
+2157 3330 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+2157 3330 0	2998 3032 1	Charter Trader Crewmember 1330	4000 Coins	The Grand Tree	6	Shipyard
+2157 3330 0	1514 2968 1	Charter Trader Crewmember 1330	1800 Coins		6	Sunset Coast
+
+# Ship Yard
+3001 3032 0	2763 3238 1	Charter Trader Crewmember 1330	400 Coins		6	Brimhaven
+3001 3032 0	2792 3417 1	Charter Trader Crewmember 1330	1600 Coins		6	Catherby
+3001 3032 0	1747 3135 1	Charter Trader Crewmember 1330	3000 Coins		6	Civitas illa Fortis
+3001 3032 0	2592 2851 1	Charter Trader Crewmember 1330	800 Coins		6	Corsair Cove
+3001 3032 0	1493 3403 1	Charter Trader Crewmember 1330	2800 Coins		6	Land's End
+3001 3032 0	2957 3158 1	Charter Trader Crewmember 1330	200 Coins		6	Musa Point
+3001 3032 0	3669 2931 1	Charter Trader Crewmember 1330	550 Coins	Cabin Fever	6	Mos Le'Harmless
+3001 3032 0	2674 3141 1	Charter Trader Crewmember 1330	720 Coins		6	Port Khazard
+3001 3032 0	3705 3503 1	Charter Trader Crewmember 1330	1100 Coins	Priest in Peril	6	Port Phasmatys
+3001 3032 0	1811 3679 1	Charter Trader Crewmember 1330	2600 Coins		6	Port Piscarilius
+3001 3032 0	3038 3189 1	Charter Trader Crewmember 1330	400 Coins		6	Port Sarim
+3001 3032 0	2142 3125 1	Charter Trader Crewmember 1330	3200 Coins	Regicide	6	Port Tyras
+3001 3032 0	2156 3331 1	Charter Trader Crewmember 1330	4000 Coins	Song of the Elves	6	Prifddinas
+3001 3032 0	1514 2968 1	Charter Trader Crewmember 1330	1550 Coins		6	Sunset Coast
+
+# Sunset Coast
+1514 2971 0	2763 3238 1	Charter Trader Crewmember 1330	1250 Coins		6	Brimhaven
+1514 2971 0	2792 3417 1	Charter Trader Crewmember 1330	1250 Coins		6	Catherby
+1514 2971 0	1747 3135 1	Charter Trader Crewmember 1330	250 Coins		6	Civitas illa Fortis
+1514 2971 0	2592 2851 1	Charter Trader Crewmember 1330	1050 Coins		6	Corsair Cove
+1514 2971 0	1493 3403 1	Charter Trader Crewmember 1330	450 Coins		6	Land's End
+1514 2971 0	2957 3158 1	Charter Trader Crewmember 1330	1500 Coins		6	Musa Point
+1514 2971 0	3669 2931 1	Charter Trader Crewmember 1330	2350 Coins	Cabin Fever	6	Mos Le'Harmless
+1514 2971 0	2674 3141 1	Charter Trader Crewmember 1330	1150 Coins		6	Port Khazard
+1514 2971 0	3705 3503 1	Charter Trader Crewmember 1330	2250 Coins	Priest in Peril	6	Port Phasmatys
+1514 2971 0	1811 3679 1	Charter Trader Crewmember 1330	550 Coins		6	Port Piscarilius
+1514 2971 0	3038 3189 1	Charter Trader Crewmember 1330	1550 Coins		6	Port Sarim
+1514 2971 0	2142 3125 1	Charter Trader Crewmember 1330	1600 Coins	Regicide	6	Port Tyras
+1514 2971 0	2156 3331 1	Charter Trader Crewmember 1330	1800 Coins	Song of the Elves	6	Prifddinas
+1514 2971 0	2998 3032 1	Charter Trader Crewmember 1330	1550 Coins	The Grand Tree	6	Shipyard

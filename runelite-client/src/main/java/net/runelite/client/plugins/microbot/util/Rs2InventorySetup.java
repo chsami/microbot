@@ -197,8 +197,10 @@ public class Rs2InventorySetup {
     public boolean doesEquipmentMatch() {
         for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
             if (inventorySetupsItem.getId() == -1) continue;
-            if (!Rs2Equipment.isWearing(inventorySetupsItem.getName(), true)) {
-                return false;
+            if (inventorySetupsItem.isFuzzy()) {
+                return Rs2Equipment.isWearing(inventorySetupsItem.getName(), false);
+            } else {
+                return Rs2Equipment.isWearing(inventorySetupsItem.getName(), true);
             }
         }
         return true;
