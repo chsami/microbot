@@ -91,6 +91,9 @@ public class CollisionMap {
         for (Transport transport : transports) {
             //START microbot variables
             if (visited.get(transport.getDestination())) continue;
+            if (config.isIgnoreTeleportAndItems() &&
+                    (transport.getType() == TransportType.TELEPORTATION_SPELL ||
+                            transport.getType() == TransportType.TELEPORTATION_ITEM)) continue;
 
             //EXCEPTION
             if (transport.getType() == TransportType.MINECART) {

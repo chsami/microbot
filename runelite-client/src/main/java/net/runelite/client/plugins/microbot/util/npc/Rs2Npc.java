@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldPoint;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
@@ -390,6 +391,29 @@ public class Rs2Npc {
         return npcsInLineOfSight.get(0);
     }
 
+    /**
+     * Get the nearest npc with the given action
+     * @param action
+     * @return npc
+     */
+    public static NPC getNearestNpcWithAction(String action) {
+        Rs2WorldPoint playerLocation = new Rs2WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation());
+        return getNpcs()
+                .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null &&
+                        Arrays.asList(value.getComposition().getActions()).contains(action)))
+                .min(Comparator.comparingInt(value -> playerLocation.distanceToPath(Microbot.getClient(),value.getWorldLocation()))).orElse(null);
+    }
+
+    /**
+     * Get the first npc with the given action
+     * @param action
+     * @return npc
+     */
+    public static NPC getNpcWithAction(String action) {
+        return getNpcs()
+                .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null &&
+                        Arrays.asList(value.getComposition().getActions()).contains(action))).findFirst().orElse(null);
+    }
     /**
      * Hovers over the given actor (e.g., NPC).
      *

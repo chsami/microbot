@@ -28,8 +28,8 @@ public class Rs2Camera {
     }
 
     public static int angleToTile(LocalPoint localPoint) {
-        int angle = (int) Math.toDegrees(Math.atan2(localPoint.getY() - Microbot.getClient().getLocalPlayer().getWorldLocation().getY(),
-                localPoint.getX() - Microbot.getClient().getLocalPlayer().getWorldLocation().getX()));
+        int angle = (int) Math.toDegrees(Math.atan2(localPoint.getY() - Microbot.getClient().getLocalPlayer().getLocalLocation().getY(),
+                localPoint.getX() - Microbot.getClient().getLocalPlayer().getLocalLocation().getX()));
         return angle >= 0 ? angle : 360 + angle;
     }
 
@@ -54,12 +54,12 @@ public class Rs2Camera {
     }
 
     public static void turnTo(final LocalPoint localPoint) {
-        int angle = angleToTile(localPoint);
+        int angle = (angleToTile(localPoint) - 90) % 360;
         setAngle(angle, 40);
     }
 
     public static void turnTo(final LocalPoint localPoint, int maxAngle) {
-        int angle = angleToTile(localPoint);
+        int angle = (angleToTile(localPoint) - 90) % 360;
         setAngle(angle, maxAngle);
     }
 
@@ -119,43 +119,6 @@ public class Rs2Camera {
         }
         Microbot.getClient().setCameraSpeed((float) defaultCameraSpeed);
     }
-
-//    todo: These methods are not working as intended, do more testing with the method above and see if its enough
-//    public static void setAngle(int degrees, Actor actor) {
-//        if (getAngleTo(degrees) > 5) {
-//            Rs2Keyboard.keyHold(KeyEvent.VK_LEFT);
-//            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT),
-//                    () -> Perspective.localToCanvas(Microbot.getClient(), actor.getLocalLocation(), Microbot.getClient().getPlane()) != null, 10);
-//        } else if (getAngleTo(degrees) < -5) {
-//            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
-//            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
-//                    () -> Perspective.localToCanvas(Microbot.getClient(), actor.getLocalLocation(), Microbot.getClient().getPlane()) != null, 10);
-//        }
-//    }
-//
-//    public static void setAngle(int degrees, TileObject tileObject) {
-//        if (getAngleTo(degrees) > 5) {
-//            Rs2Keyboard.keyHold(KeyEvent.VK_LEFT);
-//            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT),
-//                    () -> Perspective.localToCanvas(Microbot.getClient(), tileObject.getLocalLocation(), Microbot.getClient().getPlane()) != null, 600);
-//        } else if (getAngleTo(degrees) < -5) {
-//            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
-//            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
-//                    () -> Perspective.localToCanvas(Microbot.getClient(), tileObject.getLocalLocation(), Microbot.getClient().getPlane()) != null, 600);
-//        }
-//    }
-//
-//    public static void setAngle(int degrees, LocalPoint localPoint) {
-//        if (getAngleTo(degrees) > 5) {
-//            Rs2Keyboard.keyHold(KeyEvent.VK_LEFT);
-//            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_LEFT),
-//                    () -> Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane()) != null, 600);
-//        } else if (getAngleTo(degrees) < -5) {
-//            Rs2Keyboard.keyHold(KeyEvent.VK_RIGHT);
-//            Global.awaitExecutionUntil(() -> Rs2Keyboard.keyRelease((char) KeyEvent.VK_RIGHT),
-//                    () -> Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane()) != null, 600);
-//        }
-//    }
 
     public static void adjustPitch(float percentage) {
         float currentPitchPercentage = cameraPitchPercentage();
