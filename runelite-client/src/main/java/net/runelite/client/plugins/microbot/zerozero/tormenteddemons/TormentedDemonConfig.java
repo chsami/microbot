@@ -1,12 +1,39 @@
 package net.runelite.client.plugins.microbot.zerozero.tormenteddemons;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 
+@ConfigInformation("")
 @ConfigGroup("tormenteddemon")
 public interface TormentedDemonConfig extends Config {
+
+    @ConfigSection(
+            name = "General Settings",
+            description = "Full Auto or Combat only",
+            position = 0
+    )
+    String generalSettings = "generalSettings";
+
+    @ConfigItem(
+            keyName = "fullAuto",
+            name = "Full Auto",
+            description = "Enable full auto mode (banking, traveling, fighting, and restocking)",
+            section = generalSettings,
+            position = 0
+    )
+    default boolean fullAuto() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "combatOnly",
+            name = "Combat Only",
+            description = "Only fight Tormented Demons, without banking or traveling",
+            section = generalSettings,
+            position = 1
+    )
+    default boolean combatOnly() {
+        return false;
+    }
 
     @ConfigSection(
             name = "Tormented Demon Settings",
@@ -20,7 +47,7 @@ public interface TormentedDemonConfig extends Config {
             name = "Enable Defensive Prayer",
             description = "Automatically switch prayers for Tormented Demon.",
             section = tormentedDemonSection,
-            position = 1
+            position = 2
     )
     default boolean enableDefensivePrayer() {
         return true;
@@ -31,7 +58,7 @@ public interface TormentedDemonConfig extends Config {
             name = "Enable Offensive Prayer",
             description = "Toggle to enable or disable offensive prayer during combat",
             section = tormentedDemonSection,
-            position = 2
+            position = 3
     )
     default boolean enableOffensivePrayer() {
         return false;
@@ -42,7 +69,7 @@ public interface TormentedDemonConfig extends Config {
             name = "Auto Gear Switch",
             description = "Automatically switch gear for Tormented Demon.",
             section = tormentedDemonSection,
-            position = 3
+            position = 4
     )
     default boolean autoGearSwitch() {
         return true;
@@ -53,7 +80,7 @@ public interface TormentedDemonConfig extends Config {
             name = "Copy Gear Setup",
             description = "Specify a setup name to copy gear from your other configurations",
             section = tormentedDemonSection,
-            position = 4
+            position = 5
     )
     default boolean copyGear() {
         return false;
@@ -85,7 +112,7 @@ public interface TormentedDemonConfig extends Config {
             position = 1
     )
     default int lootValueThreshold() {
-        return 1000; // Default threshold in coins
+        return 1000;
     }
 
 

@@ -27,6 +27,10 @@ public class TormentedDemonOverlay extends OverlayPanel {
                     .text("Status: " + TormentedDemonScript.BOT_STATUS)
                     .color(Color.GREEN)
                     .build());
+            panelComponent.getChildren().add(TitleComponent.builder()
+                    .text("Version: " + TormentedDemonScript.VERSION)
+                    .color(Color.GREEN)
+                    .build());
 
 
         } catch(Exception ex) {

@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TormentedDemonScript extends Script {
 
+    public static final double VERSION = 1.0;
     private boolean isRunning = false;
     private Rs2PrayerEnum currentDefensivePrayer = null;
     private Rs2PrayerEnum currentOffensivePrayer = null;
@@ -38,8 +39,7 @@ public class TormentedDemonScript extends Script {
     private static final int RANGE_ATTACK_ANIMATION = 11389;
     private static final int MELEE_ATTACK_ANIMATION = 11392;
 
-    private static final WorldPoint SAFE_LOCATION = new WorldPoint(6976, 6592, 0);
-
+    private static final WorldPoint SAFE_LOCATION = new WorldPoint(3150, 3634, 0);
 
     private enum State { BANKING, TRAVEL_TO_TORMENTED, FIGHTING }
     public static State BOT_STATUS = State.BANKING;
@@ -51,7 +51,13 @@ public class TormentedDemonScript extends Script {
     private BankingStep bankingStep = BankingStep.DRINK;
 
     public boolean run(TormentedDemonConfig config) {
-        BOT_STATUS = State.BANKING;
+        // Set starting state based on config
+        if (config.fullAuto()) {
+            BOT_STATUS = State.BANKING;
+        } else if (config.combatOnly()) {
+            BOT_STATUS = State.FIGHTING;
+        }
+
         bankingStep = BankingStep.DRINK;
         travelStep = TravelStep.LOCATION_ONE;
         Microbot.enableAutoRunOn = false;
@@ -73,11 +79,12 @@ public class TormentedDemonScript extends Script {
                         break;
                 }
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                System.out.println("Error in main loop: " + ex.getMessage());
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
     }
+
 
     private void handleTravel(TormentedDemonConfig config) {
         WorldPoint targetLocationOne = new WorldPoint(4062, 4558, 0);
@@ -161,8 +168,8 @@ public class TormentedDemonScript extends Script {
                 Microbot.status = "Opening bank...";
                 Rs2Bank.openBank();
                 sleepUntil(Rs2Bank::isOpen);
-                Rs2Bank.depositAll();  // Deposit all inventory items
-                Rs2Bank.depositEquipment();  // Deposit all equipped items
+                Rs2Bank.depositAll();
+                Rs2Bank.depositEquipment();
                 bankingStep = BankingStep.LOAD_INVENTORY;
                 break;
 
@@ -187,22 +194,28 @@ public class TormentedDemonScript extends Script {
         if (currentTarget == null || currentTarget.isDead()) {
             disableAllPrayers();
 
-            // Only loot if the current target is dead
             if (currentTarget != null && currentTarget.isDead()) {
+                Microbot.pauseAllScripts = true;
                 attemptLooting(config);
-                sleep(500); // Delay to ensure looting is processed before moving to next target
+                sleep(3000);
+                Microbot.pauseAllScripts = false;
             }
 
-            // Find new target after looting
             currentTarget = findNewTarget(config);
             if (currentTarget != null) {
-                currentOverheadIcon = getHeadIcon(currentTarget);
+                currentOverheadIcon = getHeadIcon(currentTarget);                if (currentOverheadIcon == null) {
+                    System.out.println("Failed to retrieve HeadIcon for target.");
+                    return;
+                }
                 switchGear(config, currentOverheadIcon);
+            } else {
+                System.out.println("No target found for attack.");
+                return;
             }
         }
 
-        // Retreat check
-        if (shouldRetreat(config)) {
+        // Only check retreat if fullAuto is enabled
+        if (config.fullAuto() && shouldRetreat(config)) {
             Microbot.pauseAllScripts = true;
             Rs2Walker.walkTo(SAFE_LOCATION);
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(SAFE_LOCATION), 5000);
@@ -221,6 +234,7 @@ public class TormentedDemonScript extends Script {
                 Rs2Player.waitForAnimation();
                 sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == currentTarget, 3000);
             } else {
+                System.out.println("Attack failed for target: " + (currentTarget != null ? currentTarget.getName() : "null"));
                 currentTarget = null;
                 return;
             }
@@ -235,7 +249,7 @@ public class TormentedDemonScript extends Script {
                 sleepUntil(Rs2Inventory::isOpen, 1000);
             }
             switchGear(config, currentOverheadIcon);
-            sleep(100); // Short delay to avoid rapid re-checks
+            sleep(100);
         }
 
         // Defensive prayer based on target animation
@@ -280,7 +294,7 @@ public class TormentedDemonScript extends Script {
 
         if (newOffensivePrayer != null && newOffensivePrayer != currentOffensivePrayer) {
             switchOffensivePrayer(newOffensivePrayer);
-            sleep(100);  // Add delay to prevent overlapping actions
+            sleep(100);
         }
     }
 
@@ -301,6 +315,7 @@ public class TormentedDemonScript extends Script {
                         switchGear(config, demonHeadIcon);
                         return true;
                     }
+                    System.out.println("Null HeadIcon for NPC " + npc.getName());
                     return false;
                 })
                 .findFirst()
@@ -365,7 +380,7 @@ public class TormentedDemonScript extends Script {
     private void equipGear(List<String> gear) {
         for (String item : gear) {
             Rs2Inventory.wield(item);
-            sleep(100);  // Adding a slight delay between item switches for stability
+            sleep(50);
         }
     }
 
@@ -399,8 +414,6 @@ public class TormentedDemonScript extends Script {
         return Arrays.asList(lootFilter.toLowerCase().split(","));
     }
 
-
-
     @SneakyThrows
     public static HeadIcon getHeadIcon(NPC npc) {
         Field aq = npc.getClass().getDeclaredField("ay");
@@ -408,11 +421,8 @@ public class TormentedDemonScript extends Script {
         Object aqObj = aq.get(npc);
         if (aqObj == null) {
             aq.setAccessible(false);
-            HeadIcon icon = getOldHeadIcon(npc);
-            if (icon == null) {
-                return getOlderHeadicon(npc);
-            }
-            return icon;
+            System.out.println("Error: aqObj is null for NPC " + npc.getName());
+            return getOldHeadIcon(npc);
         }
         Field aeField = aqObj.getClass().getDeclaredField("aw");
         aeField.setAccessible(true);
@@ -420,27 +430,19 @@ public class TormentedDemonScript extends Script {
         aeField.setAccessible(false);
         aq.setAccessible(false);
         if (ae == null) {
-            HeadIcon icon = getOldHeadIcon(npc);
-            if (icon == null) {
-                return getOlderHeadicon(npc);
-            }
-            return icon;
+            System.out.println("Error: ae is null for NPC " + npc.getName());
+            return getOldHeadIcon(npc);
         }
         short headIcon = ae[0];
-        if (headIcon == -1) {
-            HeadIcon icon = getOldHeadIcon(npc);
-            if (icon == null) {
-                return getOlderHeadicon(npc);
-            }
-            return icon;
-        }
-        return HeadIcon.values()[headIcon];
+        return headIcon == -1 ? getOldHeadIcon(npc) : HeadIcon.values()[headIcon];
     }
 
-    @SneakyThrows
-    private static HeadIcon getOldHeadIcon(NPC npc) { return null; }
-    @SneakyThrows
-    private static HeadIcon getOlderHeadicon(NPC npc) { return null; }
+    private static HeadIcon getOldHeadIcon(NPC npc) {
+        return null;
+    }
+    private static HeadIcon getOlderHeadicon(NPC npc) {
+        return null;
+    }
 
     @Override
     public void shutdown() {

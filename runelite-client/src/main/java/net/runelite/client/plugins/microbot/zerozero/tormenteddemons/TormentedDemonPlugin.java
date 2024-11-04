@@ -37,6 +37,9 @@ public class TormentedDemonPlugin extends Plugin {
     private ScheduledExecutorService scheduledExecutorService;
 
     @Inject
+    private ConfigManager configManager;
+
+    @Inject
     private TormentedDemonConfig config;
 
     @Provides
@@ -70,35 +73,42 @@ public class TormentedDemonPlugin extends Plugin {
             scheduledExecutorService.shutdown();
         }
     }
+
     @Subscribe
     private void onConfigChanged(ConfigChanged event) {
-        if (event.getGroup().equals("tormenteddemon") && event.getKey().equals("copyGear")) {
-            Microbot.getClientThread().invoke(() -> {
-                try {
-                    StringJoiner gearList = new StringJoiner(",");
-                    for (Item item : Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems()) {
-                        if (item != null && item.getId() != -1 && item.getId() != 6512) {
-                            ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.getId());
-                            gearList.add(itemComposition.getName());
+        if (event.getGroup().equals("tormenteddemon")) {
+            if (event.getKey().equals("fullAuto") && config.fullAuto()) {
+                configManager.setConfiguration("tormenteddemon", "combatOnly", false);
+            } else if (event.getKey().equals("combatOnly") && config.combatOnly()) {
+                configManager.setConfiguration("tormenteddemon", "fullAuto", false);
+            }
+            if (event.getKey().equals("copyGear")) {
+                Microbot.getClientThread().invoke(() -> {
+                    try {
+                        StringJoiner gearList = new StringJoiner(",");
+                        for (Item item : Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems()) {
+                            if (item != null && item.getId() != -1 && item.getId() != 6512) {
+                                ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.getId());
+                                gearList.add(itemComposition.getName());
+                            }
                         }
-                    }
 
-                    String gearString = gearList.toString();
-                    if (gearString.isEmpty()) {
-                        Microbot.log("No gear found to copy.");
-                        return;
-                    }
+                        String gearString = gearList.toString();
+                        if (gearString.isEmpty()) {
+                            Microbot.log("No gear found to copy.");
+                            return;
+                        }
 
-                    StringSelection selection = new StringSelection(gearString);
-                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
-                    Microbot.log("Current gear copied to clipboard: " + gearString);
-                } catch (Exception e) {
-                    Microbot.log("Failed to copy gear to clipboard: " + e.getMessage());
-                }
-            });
+                        StringSelection selection = new StringSelection(gearString);
+                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+                        Microbot.log("Current gear copied to clipboard: " + gearString);
+                    } catch (Exception e) {
+                        Microbot.log("Failed to copy gear to clipboard: " + e.getMessage());
+                    }
+                });
+            }
         }
     }
-
 
     @Subscribe
     public void onGraphicsObjectCreated(GraphicsObjectCreated event) {
@@ -109,18 +119,13 @@ public class TormentedDemonPlugin extends Plugin {
             Rs2Tile.init();
             int ticks = 4;
 
-            // Pause all other scripts to prioritize dodging
             Microbot.pauseAllScripts = true;
             try {
-                // Schedule dodging with a delay
                 scheduledExecutorService.schedule(() -> {
                     Rs2Tile.addDangerousGraphicsObjectTile(graphicsObject, 600 * ticks);
-
-                    // Resume all other scripts after dodging
                     Microbot.pauseAllScripts = false;
                 }, 1200, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
-                // Ensure scripts resume even if there's an exception
                 Microbot.pauseAllScripts = false;
                 System.err.println("Error during dodging: " + e.getMessage());
             }
