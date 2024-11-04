@@ -68,7 +68,7 @@ public class Microbot {
     public static String status = "IDLE";
     public static boolean enableAutoRunOn = true;
     public static boolean useStaminaPotsIfNeeded = true;
-    public static int runEnergyThreshold = 4000;
+    public static int runEnergyThreshold = 1000;
     @Getter
     @Setter
     public static NaturalMouse naturalMouse;

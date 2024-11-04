@@ -8,14 +8,18 @@ import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.FireS
 import net.runelite.client.plugins.microbot.magetrainingarena.enums.staves.WaterStaves;
 
 @ConfigGroup("mta")
-@ConfigInformation("- Make sure to enable the official RuneLite plugin 'Mage Training Arena'<br />" +
-        "- You need to configure the staves to use and have the requirements to equip all of them <br />" +
-        "- Your inventory should only contain all configured staves and Law/Cosmic/Nature runes <br />" +
-        "- To use T6 enchants you need to have any lava staff configured as your fire staff <br />" +
-        "- If set to buy rewards, the rooms are cycled though until the requirements are met and the reward will be stored in your bank <br />" +
-        "- If not set to buy rewards, the rooms are cycled as if it would buy the rewards but just keep going the same way afterwards <br />" +
-        "- The bot will stop if you are out of runes <br />" +
-        "- Rune pouches are not supported yet")
+@ConfigInformation("- Enable the official RuneLite plugin 'Mage Training Arena'<br />" +
+        "  <br />" +
+        "- Configure staves and tomes, make sure you can equip them.<br />" +
+        "- Staves, Tomes, Laws, Cosmic and Nature runes in inventory only, No rune pouch! <br />" +
+        "  <br />" +
+        "- T6 enchant requires Lava staff OR Tome of Fire and any Earth staff. <br />" +
+        "- T5 enchant requires Tome of Water and any Earth staff, OR either water/earth runes. <br />"+
+        "  <br />" +
+        "- When set to buy rewards, the rooms are cycled until the points are met, the reward will be stored in your bank. <br />" +
+        "- If not set to buy rewards, the rooms are cycled as if it would buy the rewards then continues cycling the rooms afterwards. <br />" +
+        "  <br />" +
+        "- 'All items' will get enough points for you to finish Collection Log'")
 public interface MageTrainingArenaConfig extends Config {
     @ConfigSection(
             name = "Rewards",
@@ -27,8 +31,7 @@ public interface MageTrainingArenaConfig extends Config {
     @ConfigSection(
             name = "Staves",
             description = "Staves",
-            position = 3,
-            closedByDefault = true
+            position = 3
     )
     String stavesSection = "staves";
 

@@ -41,9 +41,16 @@ public interface BanksBankStanderConfig extends Config {
     )
     String toggles = "toggles";
     @ConfigSection(
+            name = "Interaction Menu",
+            description = "Change the interaction menu; e.g. clean grimy herbs",
+            position = 3,
+            closedByDefault = true
+    )
+    String interaction = "interaction";
+    @ConfigSection(
             name = "Sleep Settings",
             description = "Set Sleep Settings",
-            position = 3,
+            position = 4,
             closedByDefault = false
     )
     String sleepSection = "sleepSection";
@@ -171,13 +178,13 @@ public interface BanksBankStanderConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "useMenu",
-            name = "Use Menu?",
-            description = "Does this combination need menu entry?",
+            keyName = "usePrompt",
+            name = "Use Prompt?",
+            description = "Does this combination need to respond to a prompt?",
             position = 2,
             section = toggles
     )
-    default boolean needMenuEntry() {
+    default boolean needPromptEntry() {
         return false;
     }
     @ConfigItem(
@@ -209,6 +216,17 @@ public interface BanksBankStanderConfig extends Config {
     )
     default boolean randomSelection() {
         return false;
+    }
+    @ConfigItem(
+            keyName = "Interaction Option",
+            name = "Interaction Option",
+            description = "default is \"use\".",
+            position = 0,
+            section = interaction
+    )
+
+    default String menu() {
+        return "use";
     }
     @ConfigItem(
             keyName = "Sleep Min",

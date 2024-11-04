@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -33,12 +34,14 @@ public class PathfinderConfig {
     private final ThreadLocal<CollisionMap> map;
     /** All transports by origin {@link WorldPoint}. The null key is used for transports centered on the player. */
     private final Map<WorldPoint, Set<Transport>> allTransports;
-    private final Set<Transport> usableTeleports;
+    @Setter
+    private Set<Transport> usableTeleports;
 
     @Getter
     private ConcurrentHashMap<WorldPoint, Set<Transport>> transports;
     // Copy of transports with packed positions for the hotpath; lists are not copied and are the same reference in both maps
     @Getter
+    @Setter
     private PrimitiveIntHashMap<Set<Transport>> transportsPacked;
 
     private final Client client;
@@ -77,6 +80,11 @@ public class PathfinderConfig {
     private final int[] boostedLevels = new int[Skill.values().length];
     private Map<Quest, QuestState> questStates = new HashMap<>();
     private Map<Integer, Integer> varbitValues = new HashMap<>();
+
+    @Getter
+    @Setter
+    // Used for manual calculating paths without teleport & items in caves
+    private boolean ignoreTeleportAndItems = false;
 
     public PathfinderConfig(SplitFlagMap mapData, Map<WorldPoint, Set<Transport>> transports,
                             List<Restriction> restrictions,
@@ -140,6 +148,7 @@ public class PathfinderConfig {
     /** Specialized method for only updating player-held item and spell transports */
     public void refreshTeleports(int packedLocation, int wildernessLevel) {
         Set<Transport> usableWildyTeleports = new HashSet<>(usableTeleports.size());
+        if (ignoreTeleportAndItems) return;
 
         for (Transport teleport : usableTeleports) {
             if (wildernessLevel <= teleport.getMaxWildernessLevel()) {
@@ -301,25 +310,25 @@ public class PathfinderConfig {
 
         TransportType type = transport.getType();
 
-        if (AGILITY_SHORTCUT.equals(type) && !useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        if (AGILITY_SHORTCUT.equals(type) && (!useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (GRAPPLE_SHORTCUT.equals(type) && !useGrappleShortcuts || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (GRAPPLE_SHORTCUT.equals(type) && (!useGrappleShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (BOAT.equals(type) && !useBoats || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (BOAT.equals(type) && (!useBoats || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (CANOE.equals(type) && !useCanoes || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (CANOE.equals(type) && (!useCanoes || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (CHARTER_SHIP.equals(type) && !useCharterShips || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (CHARTER_SHIP.equals(type) && (!useCharterShips || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
         } else if (SHIP.equals(type) && !useShips) {
             return false;
-        } else if (FAIRY_RING.equals(type) && !useFairyRings || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (FAIRY_RING.equals(type) && (!useFairyRings || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (GNOME_GLIDER.equals(type) && !useGnomeGliders || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (GNOME_GLIDER.equals(type) && (!useGnomeGliders || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (MINECART.equals(type) && !useMinecarts || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (MINECART.equals(type) && (!useMinecarts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (SPIRIT_TREE.equals(type) && !useSpiritTrees || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (SPIRIT_TREE.equals(type) && (!useSpiritTrees || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
         } else if (TELEPORTATION_ITEM.equals(type)) {
             switch (useTeleportationItems) {

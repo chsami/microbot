@@ -117,7 +117,9 @@ public abstract class Script implements IScript {
             return false;
 
         if (Microbot.isLoggedIn()) {
-            if (Microbot.enableAutoRunOn)
+            boolean hasRunEnergy = Microbot.getClient().getEnergy() > Microbot.runEnergyThreshold;
+
+            if (Microbot.enableAutoRunOn && hasRunEnergy)
                 Rs2Player.toggleRunEnergy(true);
 
             if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
@@ -136,7 +138,6 @@ public abstract class Script implements IScript {
                 }
             }
 
-            boolean hasRunEnergy = Microbot.getClient().getEnergy() > Microbot.runEnergyThreshold;
 
             if (!hasRunEnergy && Microbot.useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
                 Rs2Inventory.useRestoreEnergyItem();
