@@ -87,6 +87,7 @@ public class PlayerAssistPlugin extends Plugin {
     private PlayerAssistInfoOverlay playerAssistInfoOverlay;
     private MenuEntry lastClick;
     private Point lastMenuOpenedPoint;
+    private WorldPoint trueTile;
 
     @Provides
     PlayerAssistConfig provideConfig(ConfigManager configManager) {
@@ -265,6 +266,7 @@ public class PlayerAssistPlugin extends Plugin {
     @Subscribe
     public void onMenuOpened(MenuOpened event) {
         lastMenuOpenedPoint = Microbot.getClient().getMouseCanvasPosition();
+        trueTile = getSelectedWorldPoint();
     }
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event) {
@@ -347,10 +349,10 @@ public class PlayerAssistPlugin extends Plugin {
 
 
         if (entry.getOption().equals(SET) && entry.getTarget().equals(CENTER_TILE)) {
-            setCenter(getSelectedWorldPoint());
+            setCenter(trueTile);
         }
         if (entry.getOption().equals(SET) && entry.getTarget().equals(SAFE_SPOT)) {
-            setSafeSpot(getSelectedWorldPoint());
+            setSafeSpot(trueTile);
         }
 
 

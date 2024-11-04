@@ -177,6 +177,17 @@ public interface HerbrunConfig extends Config {
         return HerbrunInfo.trollheimTeleport.STONY_BASALT;
     }
 
+    @ConfigItem(
+            keyName = "enableGearing",
+            name = "Enable Gearing",
+            description = "Enable Gearing? Helps with debugging a specific location...",
+            position = 0,
+            section = locationSection
+    )
+    default boolean enableGearing() {
+        return true;
+    }
+
     // Location toggles for each patch location
     @ConfigItem(
             keyName = "enableTrollheim",
@@ -240,9 +251,7 @@ public interface HerbrunConfig extends Config {
             position = 6,
             section = locationSection
     )
-    default boolean enableArdougne() {
-        return true;
-    }
+    default boolean enableArdougne() { return true; }
 
     @ConfigItem(
             keyName = "enableFalador",
