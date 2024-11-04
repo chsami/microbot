@@ -1329,37 +1329,52 @@ public class Rs2Walker {
 
     public static void handleFairyRing(WorldPoint origin, String fairyRingCode) {
 
-        if (startingWeapon == null) {
-            startingWeapon = Rs2Equipment.get(EquipmentInventorySlot.WEAPON);
-            startingWeaponId = startingWeapon.getId();
-        }
-
         // Check if the widget is already visible
         if (!Rs2Widget.isHidden(ComponentID.FAIRY_RING_TELEPORT_BUTTON)) {
             rotateSlotToDesiredRotation(SLOT_ONE, Rs2Widget.getWidget(SLOT_ONE).getRotationY(), getDesiredRotation(fairyRingCode.charAt(0)), SLOT_ONE_ACW_ROTATION, SLOT_ONE_CW_ROTATION);
             rotateSlotToDesiredRotation(SLOT_TWO, Rs2Widget.getWidget(SLOT_TWO).getRotationY(), getDesiredRotation(fairyRingCode.charAt(1)), SLOT_TWO_ACW_ROTATION, SLOT_TWO_CW_ROTATION);
             rotateSlotToDesiredRotation(SLOT_THREE, Rs2Widget.getWidget(SLOT_THREE).getRotationY(), getDesiredRotation(fairyRingCode.charAt(2)), SLOT_THREE_ACW_ROTATION, SLOT_THREE_CW_ROTATION);
             Rs2Widget.clickWidget(TELEPORT_BUTTON);
-            Rs2Player.waitForAnimation();
-            if (!Rs2Equipment.isWearing(startingWeaponId)) {
-                sleep(3000, 3600); // Required due to long animation time
+            
+            Rs2Player.waitForAnimation(Random.random(3800, 4200)); // Required due to long animation time
+            
+            // Re-equip the starting weapon if it was unequipped
+            if (startingWeapon != null & !Rs2Equipment.isWearing(startingWeaponId)) {
                 Microbot.log("Equipping Starting Weapon: " + startingWeaponId);
                 Rs2Inventory.equip(startingWeaponId);
             }
+            return;
         }
 
-
-        if (Rs2Equipment.isWearing("Dramen staff") || Rs2Equipment.isWearing("Lunar staff")) {
+        if (Microbot.getVarbitValue(Varbits.DIARY_LUMBRIDGE_ELITE) == 1) {
+            // Direct interaction without staff if elite Lumbridge Diary is complete
             Microbot.log("Interacting with the fairy ring directly.");
             var fairyRing = Rs2GameObject.findObjectByLocation(origin);
             Rs2GameObject.interact(fairyRing, "Configure");
             Rs2Player.waitForWalking();
-        } else if (Rs2Inventory.contains("Dramen staff")) {
-            Rs2Inventory.equip("Dramen staff");
-            sleep(600);
-        } else if (Rs2Inventory.contains("Lunar staff")) {
-            Rs2Inventory.equip("Lunar staff");
-            sleep(600);
+        } else {
+            // Manage weapon and staff as needed if elite Lumbridge Diary is not complete
+            if (startingWeapon == null) {
+                startingWeapon = Rs2Equipment.get(EquipmentInventorySlot.WEAPON);
+                startingWeaponId = startingWeapon.getId();
+            }
+
+            if (!Rs2Equipment.isWearing("Dramen staff") && !Rs2Equipment.isWearing("Lunar staff")) {
+                // Equip Dramen or Lunar staff if not already equipped
+                if (Rs2Inventory.contains("Dramen staff")) {
+                    Rs2Inventory.equip("Dramen staff");
+                    sleep(600);
+                } else if (Rs2Inventory.contains("Lunar staff")) {
+                    Rs2Inventory.equip("Lunar staff");
+                    sleep(600);
+                }
+            }
+
+            // Interact with fairy ring after equipping the staff
+            Microbot.log("Interacting with the fairy ring using a staff.");
+            var fairyRing = Rs2GameObject.findObjectByLocation(origin);
+            Rs2GameObject.interact(fairyRing, "Configure");
+            Rs2Player.waitForWalking();
         }
     }
 
