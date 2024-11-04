@@ -4,7 +4,7 @@ import net.runelite.client.config.*;
 
 @ConfigGroup("GabulhasSandMiner")
 @ConfigInformation(
-        "<ol><li>Configure the fairy rings to DKP at least once</li><li>Make sure to have karambwan vessel and raw karambwanji</li><li>Start the script next to the karambwan fishing spot</li></ol>"
+    "Mines sandstone and deposits it in the Quarry. Just start next to the grinder with a pickaxe. Optionally you can use waterskins + humidify runes (Lunar Spells)"
 )
 public interface GabulhasSandMinerConfig extends Config {
 
