@@ -27,10 +27,6 @@ public class VarrockCleanerPlugin extends Plugin {
         script.run(config);
     }
 
-    @Override
-    protected void shutDown() {
-        script.stop();
-    }
 
     @Provides
     VarrockCleanerConfig provideConfig(ConfigManager configManager) {
