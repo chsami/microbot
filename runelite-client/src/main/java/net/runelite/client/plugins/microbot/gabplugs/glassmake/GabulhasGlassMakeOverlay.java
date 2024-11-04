@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.gabplugs.karambwans;
+package net.runelite.client.plugins.microbot.gabplugs.glassmake;
 
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -7,9 +7,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class GabulhasKarambwansOverlay extends OverlayPanel {
+public class GabulhasGlassMakeOverlay extends OverlayPanel {
     @Inject
-    GabulhasKarambwansOverlay(GabulhasKarambwansPlugin plugin)
+    GabulhasGlassMakeOverlay(GabulhasGlassMakePlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -20,7 +20,7 @@ public class GabulhasKarambwansOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Status: " + GabulhasKarambwansInfo.botStatus.toString().replace("_", " "))
+                    .text("Status: " + GabulhasGlassMakeInfo.botStatus.toString().replace("_", " "))
                     .color(Color.GREEN)
                     .build());
 

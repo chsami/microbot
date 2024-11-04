@@ -1,12 +1,12 @@
-package net.runelite.client.plugins.microbot.gabplugs.karambwans;
+package net.runelite.client.plugins.microbot.gabplugs.sandminer;
 
 import net.runelite.client.config.*;
 
-@ConfigGroup("GabulhasKarambwans")
+@ConfigGroup("GabulhasSandMiner")
 @ConfigInformation(
         "<ol><li>Configure the fairy rings to DKP at least once</li><li>Make sure to have karambwan vessel and raw karambwanji</li><li>Start the script next to the karambwan fishing spot</li></ol>"
 )
-public interface GabulhasKarambwansConfig extends Config {
+public interface GabulhasSandMinerConfig extends Config {
 
     @ConfigSection(
             name="Starting State",
@@ -21,8 +21,8 @@ public interface GabulhasKarambwansConfig extends Config {
             position = 1,
             section = startingStateSection
     )
-    default GabulhasKarambwansInfo.states STARTINGSTATE(){
-        return GabulhasKarambwansInfo.states.FISHING;
+    default GabulhasSandMinerInfo.states STARTINGSTATE(){
+        return GabulhasSandMinerInfo.states.Mining;
     }
 
 }
