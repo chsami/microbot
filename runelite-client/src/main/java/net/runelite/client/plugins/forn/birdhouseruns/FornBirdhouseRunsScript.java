@@ -124,12 +124,14 @@ public class FornBirdhouseRunsScript extends Script {
                     case FINISHING:
                         if (config.TELEPORT()) {
                             Rs2Magic.cast(MagicAction.VARROCK_TELEPORT);
+                            sleep(2500);
                         }
 
                         emptyNests();
 
                         botStatus = states.FINISHED;
                         notifier.notify(Notification.ON, "Birdhouse run is finished.");
+                        super.shutdown();
                         break;
                     case FINISHED:
 
@@ -154,6 +156,18 @@ public class FornBirdhouseRunsScript extends Script {
             sleep(1000);
         }
         while (Rs2Inventory.contains(5074));
+
+        do {
+            Rs2Inventory.interact(5072, "search");
+            sleep(1000);
+        }
+        while (Rs2Inventory.contains(5072));
+
+        do {
+            Rs2Inventory.interact(5070, "search");
+            sleep(1000);
+        }
+        while (Rs2Inventory.contains(5070));
     }
 
     @Override
@@ -215,12 +229,12 @@ public class FornBirdhouseRunsScript extends Script {
         if (!Rs2Inventory.hasItem(birdhouseType) && Rs2Inventory.hasItem(ItemID.CLOCKWORK)) {
             Rs2Inventory.use(ItemID.HAMMER);
             Rs2Inventory.use(selectedLogs);
-            sleep(1500, 2500);
+            sleep(1000, 2000);
         }
         if (!Rs2Player.isAnimating() &&
             !Rs2Player.isInteracting() &&
             Rs2GameObject.interact(worldPoint, "build")) {
-            sleep(2000, 2500);
+            sleep(1000, 1500);
             if (!Rs2Inventory.hasItem(birdhouseType)) {
                 botStatus = status;
             }
