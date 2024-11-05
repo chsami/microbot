@@ -1,29 +1,25 @@
 {
-  "subTitle": "Ask us anything about our brand and products, and get factual responses.",
+  "subTitle": "Ask us anything about our software, scripts and community.",
   "faqs": [
     {
-      "question": "What types of tools are included in the Starter Kit?",
-      "answer": "The Starter Kit features essential hand and power tools for diverse DIY projects, including hammers, drills, screwdrivers, and a variety of fasteners. It's a curated selection to help beginners and experienced DIYers alike tackle most home improvement tasks."
+      "question": "What types of tools are included in the Microbot?",
+      "answer": "Microbot is built on the RuneLite client and includes a suite of automation plugins and scripts. These tools are designed to enhance gameplay and streamline in-game tasks, offering a powerful base for players looking to customize and automate their RuneLite experience."
     },
     {
-      "question": "Can I upgrade from the Starter Kit to the Professional Toolbox?",
-      "answer": "Absolutely! You can upgrade to the Professional Toolbox at any time to access a wider range of high-quality tools, enjoy priority customer support, and receive exclusive content. Contact our support team for a seamless transition."
+      "question": "Can I get started really quickly?",
+      "answer": "Absolutely! Getting started is straightforward. Simply download the Microbot client and ensure Java is installed on your system. If you’re using a Jagex account, you might also need the Jagex launcher for initial setup. Follow our step-by-step guide, and you’ll be ready to start automating in no time!"
     },
     {
-      "question": "What discounts are available for bulk orders through the Professional Toolbox plan?",
-      "answer": "Professional Toolbox members are entitled to exclusive discounts on bulk orders, the percentage of which may vary depending on the order volume. Get in touch with us to discuss your needs, and we'll provide a tailored discount structure."
+      "question": "What plugins are already included?",
+      "answer": "Microbot includes the default RuneLite plugins along with a collection of custom plugins developed by the community. These plugins are designed to enhance gameplay and support various automation features, providing powerful tools for an optimized in-game experience."
     },
     {
-      "question": "What kind of customer support can I expect?",
-      "answer": "All our customers receive dedicated email support. With the Starter Kit, you'll receive our standard support, while the Professional Toolbox plan upgrades you to priority support, meaning faster response times and specialized assistance."
+      "question": "What kind of user support can I expect?",
+      "answer": "Users can get support directly through our Discord server or by submitting issues on our GitHub page. For the quickest assistance, joining our Discord and using the help and support channel is highly recommended. Our community and team are active and ready to help resolve any issues you encounter."
     },
     {
       "question": "How current are the online resources and tutorials?",
-      "answer": "We regularly update our online resources and tutorials to reflect the latest trends in DIY and construction, as well as introductions to new tools and techniques. Our material aims to be comprehensive and user-friendly for all skill levels."
-    },
-    {
-      "question": "Does ScrewFast offer services for large-scale construction projects?",
-      "answer": "Yes, our Enterprise Solutions are designed for larger companies requiring comprehensive services. We provide consultation, planning, and supply of high-grade tools and materials, as well as staffing solutions for substantial construction needs. Contact us for a customized quote."
+      "answer": "Our online resources and tutorials are frequently updated to reflect the latest changes in the RuneLite client and Microbot’s custom plugins. We strive to keep all documentation current and user-friendly, ensuring developers and users can easily stay informed about new features and improvements."
     }
   ]
 }
