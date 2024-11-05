@@ -1,0 +1,77 @@
+---
+title: Plugin & Script Example
+description: Explore Microbot’s documentation for practical examples of plugins and scripts to enhance your RuneLite automation.
+sidebar:
+  label: Plugin Examples
+  order: 2
+---
+
+import {
+  Card
+} from "@astrojs/starlight/components";
+
+Elevate your RuneLite experience with Microbot’s example plugins and scripts. These examples provide a hands-on approach to scripting and automation, illustrating essential techniques for successful integration and customization.
+
+<Card title="Our example plugins and scripts demonstrate:" icon="seti:notebook">
+    - Step-by-step script creation for common in-game tasks
+    - Efficient resource management within scripts
+    - Methods for tracking progress and handling events
+    - Tips for optimizing performance and reducing detection risk
+</Card>
+
+By following these examples, you’ll gain practical knowledge in developing effective scripts and plugins, empowering you to automate tasks with precision and efficiency.
+
+## Combat
+
+Lets try to make a script that attacks a man.
+
+### Attack Npc
+
+---
+
+
+To attack an npc we'll have to look into our Rs2Npc utility class.
+
+```java
+Rs2Npc.attack("man")
+```
+
+Our example script should look like this now.
+
+  ```java
+  
+    public class ExampleScript extends Script {
+    public static double version = 1.0;
+
+    public boolean run(ExampleConfig config) {
+    Microbot.enableAutoRunOn = false;
+    mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+      if (!super.run()) return;
+      try {
+
+        long startTime = System.currentTimeMillis();
+
+        //SCRIPT CODE COMES HERE
+
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        System.out.println("Total time for loop " + totalTime);
+
+        } catch (Exception ex) {
+          System.out.println(ex.getMessage());
+        }
+      }, 0, 1000, TimeUnit.MILLISECONDS);
+      return true;
+    }
+
+    @Override
+    public void shutdown() {
+      super.shutdown();
+      }
+  }
+```
+
+The script should now attack the man!
+
+
+
