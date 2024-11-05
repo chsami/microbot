@@ -232,7 +232,6 @@ public class TormentedDemonScript extends Script {
         Rs2Player.eatAt(config.minEatPercent());
         Rs2Player.drinkPrayerPotionAt(config.minPrayerPercent());
 
-        // Attempt to interact with the NPC using "attack" without line-of-sight restrictions
         if (Microbot.getClient().getLocalPlayer().getInteracting() != currentTarget) {
             boolean attackSuccessful = Rs2Npc.interact(currentTarget, "attack");
 
@@ -257,7 +256,6 @@ public class TormentedDemonScript extends Script {
             sleep(100);
         }
 
-        // Defensive prayer based on target animation
         int npcAnimation = currentTarget.getAnimation();
         if (config.enableDefensivePrayer()) {
             Rs2PrayerEnum newDefensivePrayer = null;
@@ -423,12 +421,9 @@ public class TormentedDemonScript extends Script {
     private void lootAndScatterInfernalAshes() {
         String ashesName = "Infernal ashes";
 
-        // Check if inventory has space and loot Infernal Ashes
         if (!Rs2Inventory.isFull() && Rs2GroundItem.lootItemsBasedOnNames(new LootingParameters(10, 1, 1, 0, false, true, ashesName))) {
-            // Wait for ashes to be looted into inventory
             sleepUntil(() -> Rs2Inventory.contains(ashesName), 2000);
 
-            // Scatter ashes if present in inventory
             if (Rs2Inventory.contains(ashesName)) {
                 Rs2Inventory.interact(ashesName, "Scatter");
                 sleep(600); // Wait briefly for scattering action
