@@ -22,6 +22,7 @@
     "@preline/tabs": "^2.5.0",
     "astro": "^4.16.9",
     "astro-compressor": "^0.4.1",
+    "astro-embed": "^0.8.0",
     "clipboard": "^2.0.11",
     "globby": "^14.0.2",
     "gsap": "^3.12.5",

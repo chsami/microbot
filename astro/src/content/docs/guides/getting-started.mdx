@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Explore ScrewFast's comprehensive documentation for an in-depth look at our premium tools and construction services. 
+description: Explore Micrbot's comprehensive documentation for an in-depth look at our tools and scripts. 
 sidebar:
   label: Getting Started
   order: 1
@@ -16,49 +16,83 @@ import {
   TabItem,
 } from "@astrojs/starlight/components";
 
-Welcome to ScrewFast Docs! We're excited to help you get started with our premium tools. This guide is designed to introduce you to our tool range, help you understand the basics, and get you up to speed for your first project. Let's jump right into the world of high-quality, reliable craftsmanship with ScrewFast.
+import { YouTube } from 'astro-embed';
+
+
+Welcome to Microbot Docs!
+We're thrilled to support your journey with our powerful development tools.
+This guide will introduce you to our toolset, walk you through the basics, and prepare you for your first project.
+Let’s dive into the world of high-quality, reliable automation with Microbot.
 
 ## Tools Overview
 
+
 <CardGrid>
-  <Card title="ScrewDriver Set" icon="seti:config">
-    Versatile and ergonomic, suitable for all screw types.
-    <LinkCard title="Learn More " href="/guides/getting-started" />
+  <Card title="Automation Toolkit" icon="seti:config">
+    A comprehensive set of tools to kickstart automation workflows and optimize performance.
+    <LinkCard title="Learn More" href="/guides/getting-started" />
   </Card>
-  <Card title="Hammer Drill" icon="seti:pipeline">
-    Powerful performance for drilling and impact driving.
-    <LinkCard title="Learn More " href="/guides/getting-started" />
+  <Card title="Script Engine" icon="seti:pipeline">
+    Execute and manage scripts with powerful, customizable options for efficient task handling.
+    <LinkCard title="Learn More" href="/guides/getting-started" />
   </Card>
-  <Card title="Power Saws" icon="seti:crystal">
-    Precision cutting with adjustable settings for various materials.
-    <LinkCard title="Learn More " href="/guides/getting-started" />
+  <Card title="Data Processing Module" icon="seti:crystal">
+    Process data with precision, offering flexible configurations for varied data types and structures.
+    <LinkCard title="Learn More" href="/guides/getting-started" />
   </Card>
 </CardGrid>
+
 
 ## Setup Instructions
 
 <Steps>
 
-1. Unboxing Icon Unbox Your ScrewFast Tools
-   Carefully open the packaging and verify all components are present. Familiarize yourself with the tool and any accessories.
+1.  📦 Download the Microbot Client & Java  
+    Visit the [Microbot GitHub Releases](https://github.com/chsami/microbot/releases) page to download the latest client snapshot **SHADED** release build. You’ll also find nightly builds, which are unstable development versions—recommended only if you’re exploring experimental features.
 
-2. Safety Check Icon Initial Setup and Safety Checks
-   Read the safety manual before handling the tool. Check the tool for any shipping damage and ensure safety guards are in place.
+    <YouTube id="EbtdZnxq5iw" />
 
-3. Calibration Icon Calibration and Preparation for First Use
-   Follow the manufacturer's instructions to calibrate your tools as required. Ensure batteries are charged or electrical connections are secure.
+2.  Jagex Account
+    Youtube video explaining microbot with jagex accounts: 
+    <YouTube id="ga-lg1oAnhM" />
+
+    If you don't have java installed yet, watch the youtube video in step 1.
+
+    - Simply login with the jagex launcher for the first time. This will create a token for your account. Close everything after succesfully login in through the jagex launcher.
+    
+    - Open the shaded.jar from microbot and this should prompt you with the jagex account to login.
+
+
+3.  Jagex Launcher
+  
+    If you don't have java installed yet, watch the youtube video in step 1.
+
+    Simply replace the Official RuneLite.jar with the microbot.jar and make sure the name is the same!
+    
+    After that you can start up the jagex launcher and select runelite, this will startup microbot.
+
+4.  Run Microbot on Linux
+
+    Make sure you have Java installed, get it from your package manager.
+    Run the "shaded" .jar from the nightly build with: 
+    ```bash
+    java --jar client-1.10.26-SNAPSHOT-shaded.jar
+    ```
+    If you have a Jagex account, download and run Bolt launcher (https://github.com/Adamcake/Bolt). 
+    After signing in, run the "shaded" .jar by enabling "Use custom RuneLite JAR" and navigating to the Microbot .jar.
+    Download and extract the RuneLite AppImage. Replace RuneLite.jar with the Microbot one. Run RuneLite
 
 </Steps>
 
 
-## Cleaning and Maintenance
+## Help
 
 <Aside type="tip">
-  Always unplug tools before cleaning. Use a soft, dry cloth to wipe the
-  exterior and store in a dry place.
+  Check out our discord if you are stuck!
+  [Discord](https://discord.gg/zaGrfqFEWE)
 </Aside>
 
-Regular maintenance ensures longevity and safety. Clean your tools after each use, check for wear, and lubricate moving parts as specified in the tool's manual.
+Additional information will be added here for getting it all started.
 
 ## Additional Resources
 
@@ -75,7 +109,7 @@ Regular maintenance ensures longevity and safety. Clean your tools after each us
 />
 
 <LinkCard
-  title="Warranty Information"
-  description="Understand your coverage and how to make a claim if needed."
+  title="AntiBan Information"
+  description="Understand your risks."
   href="/guides/getting-started"
 />
