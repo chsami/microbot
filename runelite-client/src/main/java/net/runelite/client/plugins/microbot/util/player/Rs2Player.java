@@ -210,13 +210,11 @@ public class Rs2Player {
 
     /**
      * Wait for animation
-     *
-     * @param time
      */
     public static void waitForAnimation(int time) {
-        boolean result = sleepUntilTrue(Rs2Player::isAnimating, 100, time);
+        boolean result = sleepUntilTrue(() -> Rs2Player.isAnimating(time), 100, 5000);
         if (!result) return;
-        sleepUntil(() -> !Rs2Player.isAnimating(), time);
+        sleepUntil(() -> !Rs2Player.isAnimating(time));
     }
 
     /**

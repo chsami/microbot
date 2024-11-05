@@ -29,7 +29,7 @@
 2898 3553 0			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Burthorpe	T	20	
 2965 4254 2			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Corporeal Beast	T	20	
 3245 9500 2			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Tears of Guthix	T	20	
-1631 3940 0			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Wintertodt	T	20	
+1631 3940 0			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Wintertodt Camp	T	20	
 									
 # Ring of Dueling (1-8)									
 3315 3235 0			2566;2564;2562;2560;2558;2556;2554;2552		4	Ring of dueling: Emir's Arena	T	20	
@@ -238,7 +238,7 @@
 3144 3772 0			9789;9790		4	Hunter cape: Black chinchompa	F	20	
 3144 3772 0			9789;9790		4	Hunter cape: Black chinchompa	F	20
 #Quest point cape (instead of using the item name we use the action teleport, we use the itemids to verifiy the item)
-3144 3772 0			9813;13068		4	Teleport	F	20
+3144 3772 0			9813;13068		4	Quest point cape	F	20
 2689 3547 0			13221;13222		4	Music cape	F	20	
 2574 3323 0			13069;19476		4	1. Achievement diary cape: Two-pints	F	20
 3302 3122 0			13069;19476		4	2. Achievement diary cape: Jarr	F	20

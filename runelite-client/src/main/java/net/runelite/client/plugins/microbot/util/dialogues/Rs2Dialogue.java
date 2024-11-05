@@ -11,6 +11,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
+
 public class Rs2Dialogue {
 
     /**
@@ -100,7 +103,9 @@ public class Rs2Dialogue {
      * @return true if has dialog options is visible
      */
     public static boolean hasSelectAnOption() {
-        return Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_OPTION, 1) && Rs2Widget.getWidget(InterfaceID.DIALOG_OPTION, 1).getDynamicChildren() != null;
+        boolean isWidgetVisible = Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_OPTION, 1);
+        if (!isWidgetVisible) return false;
+        return Rs2Widget.getWidget(InterfaceID.DIALOG_OPTION, 1).getDynamicChildren() != null;
     }
 
     /**
@@ -247,5 +252,42 @@ public class Rs2Dialogue {
         if (dialogueOption == null) return false;
         
         return Rs2Widget.clickWidget(dialogueOption);
+    }
+
+    /**
+     * Pauses the current thread until a specified dialogue option becomes available.
+     *
+     * @param text the text of the dialogue option to wait for
+     * @return true if the specified dialogue option appears within the timeout period, otherwise false
+     */
+    public static boolean sleepUntilHasDialogueOption(String text) {
+        return sleepUntilTrue(() -> hasDialogueOption(text));
+    }
+
+    /**
+     * Pauses the current thread until the player is in a dialogue.
+     *
+     * @return true if the player enters a dialogue within the timeout period, otherwise false
+     */
+    public static boolean sleepUntilInDialogue() {
+        return sleepUntilTrue(Rs2Dialogue::isInDialogue);
+    }
+
+    /**
+     * Pauses the current thread until the "Select an Option" dialogue appears.
+     *
+     * @return true if the "Select an Option" dialogue appears within the timeout period, otherwise false
+     */
+    public static boolean sleepUntilSelectAnOption() {
+        return sleepUntilTrue(Rs2Dialogue::hasSelectAnOption);
+    }
+
+    /**
+     * Pauses the current thread until a "Continue" option becomes available in the dialogue.
+     *
+     * @return true if the "Continue" option appears within the timeout period, otherwise false
+     */
+    public static boolean sleepUntilHasContinue() {
+        return sleepUntilTrue(Rs2Dialogue::hasContinue);
     }
 }
