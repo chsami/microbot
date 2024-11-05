@@ -37,6 +37,7 @@ public class TormentedDemonScript extends Script {
     private NPC currentTarget;
     private boolean lootAttempted = false;
     private String lastChatMessage = "";
+    private boolean isRestocking = false;
 
 
     private static final int MAGIC_ATTACK_ANIMATION = 11388;
@@ -168,11 +169,15 @@ public class TormentedDemonScript extends Script {
                 break;
 
             case BANK:
+                if (isRestocking) {
+                    Rs2InventorySetup inventorySetup = new Rs2InventorySetup("tormented", mainScheduledFuture);
+                    inventorySetup.wearEquipment();
+                }
+
                 Microbot.status = "Opening bank...";
                 Rs2Bank.openBank();
                 sleepUntil(Rs2Bank::isOpen);
                 Rs2Bank.depositAll();
-                Rs2Bank.depositEquipment();
                 bankingStep = BankingStep.LOAD_INVENTORY;
                 break;
 
@@ -186,6 +191,7 @@ public class TormentedDemonScript extends Script {
                     Rs2Bank.closeBank();
                     bankingStep = BankingStep.DRINK;
                     BOT_STATUS = State.TRAVEL_TO_TORMENTED;
+                    isRestocking = true;
                 } else {
                     shutdown();
                 }
@@ -410,7 +416,7 @@ public class TormentedDemonScript extends Script {
         Microbot.log("Checking loot..");
         List<String> lootItems = parseLootItems(config.lootItems());
 
-        LootingParameters nameParams = new LootingParameters(10, 1, 1, 0, false, true, lootItems.toArray(new String[0]));
+        LootingParameters nameParams = new LootingParameters(10, 1, 1, 1, false, true, lootItems.toArray(new String[0]));
         Rs2GroundItem.lootItemsBasedOnNames(nameParams);
 
         if (config.scatterAshes()) {
