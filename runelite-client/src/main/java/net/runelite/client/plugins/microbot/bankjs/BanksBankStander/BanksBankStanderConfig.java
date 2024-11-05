@@ -185,7 +185,7 @@ public interface BanksBankStanderConfig extends Config {
             section = toggles
     )
     default boolean needPromptEntry() {
-        return false;
+        return true;
     }
     @ConfigItem(
             keyName = "WaitForProcess",
@@ -195,7 +195,7 @@ public interface BanksBankStanderConfig extends Config {
             section = toggles
     )
     default boolean waitForAnimation() {
-        return false;
+        return true;
     }
     @ConfigItem(
             keyName = "withdrawAll",
@@ -205,7 +205,7 @@ public interface BanksBankStanderConfig extends Config {
             section = toggles
     )
     default boolean withdrawAll() {
-        return false;
+        return true;
     }
     @ConfigItem(
             keyName = "randomSelection",

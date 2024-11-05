@@ -21,7 +21,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 public class BanksBankStanderScript extends Script {
     @Inject
     private BanksBankStanderConfig config;
-    public static double version = 1.5;
+    public static double version = 1.6;
 
     int MAX_TRIES = 4;
     public static long previousItemChange;
@@ -296,7 +296,7 @@ public class BanksBankStanderScript extends Script {
                 }
                 if(Rs2Bank.isOpen()){
                     sleep(calculateSleepDuration());
-                    Rs2Player.logout();
+                    if(this.isRunning()) { Rs2Player.logout(); }
                     sleep(calculateSleepDuration());
                 }
                 currentStatus = CurrentStatus.COMBINE_ITEMS;
