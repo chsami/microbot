@@ -16,9 +16,10 @@ interface Props {
   features?: Feature[];
   src?: any;
   alt?: string;
+  yt?: string;
 }
 // Define props from Astro
-const { title, subTitle, src, alt, features } = Astro.props;
+const { title, subTitle, src, alt, features, yt } = Astro.props;
 ---
 
 <section
@@ -36,6 +37,13 @@ const { title, subTitle, src, alt, features } = Astro.props;
           format={"avif"}
           loading={"eager"}
         />
+      )
+    }
+    {
+      yt && (
+        <div>
+          <iframe src={`https://www.youtube.com/embed/${yt}`} class="w-full aspect-video" title="Microbot Release 1.10.28" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
       )
     }
   </div>

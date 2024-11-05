@@ -90,45 +90,39 @@ interface Props {
     }
   </div>
   <!-- Hero Image Section -->
-  <div class="flex w-full">
-    {
-      discord && (
-        <div class="w-1/2">
-          <iframe
-            src={`https://discord.com/widget?id=${discord}&amp;theme=dark`}
-            width="100%"
-            height="500"
-            allowtransparency="true"
-            sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-            title="Discord Iframe"
-          ></iframe>
-        </div>
-      )
-    }
-    <div class="top-12 overflow-hidden">
-      {
-        src && alt && (
-          <Image
-            src={src}
-            alt={alt}
-            class="h-full w-full scale-110 object-cover object-center"
-            draggable={"false"}
-            loading={"eager"}
-            format={"avif"}
-          />
-        )
-      }
-
-      {
-        lottie && (
-          <>
-            <AstroLottie />
-            <div class="w-full hover:scale-110 ease-in-out duration-500 object-cover object-center">
-              <dotlottie-player autoplay loop mode="normal" src={`${lottie}`} />
-            </div>
-          </>
-        )
-      }
+  <div class="flex flex-col md:flex-row w-full">
+    {discord && (
+      <div class="w-full md:w-1/2">
+        <iframe
+          src={`https://discord.com/widget?id=${discord}&amp;theme=dark`}
+          width="100%"
+          height="500"
+          allowtransparency="true"
+          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+          title="Discord Iframe"
+        />
+      </div>
+    )}
+    <div class="top-12 overflow-hidden w-full md:w-1/2">
+      {src && alt && (
+        <Image
+          src={src}
+          alt={alt}
+          class="h-full w-full scale-110 object-cover object-center"
+          draggable="false"
+          loading="eager"
+          format="avif"
+        />
+      )}
+      {lottie && (
+        <>
+          <AstroLottie />
+          <div class="w-full hover:scale-110 ease-in-out duration-500 object-cover object-center">
+            <dotlottie-player autoplay loop mode="normal" src={`${lottie}`} />
+          </div>
+        </>
+      )}
     </div>
   </div>
+  
 </section>
