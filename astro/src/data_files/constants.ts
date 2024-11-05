@@ -1,12 +1,12 @@
 import ogImageSrc from "@images/social.png";
 
 export const SITE = {
-  title: "ScrewFast",
-  tagline: "Top-quality Hardware Tools",
-  description: "ScrewFast offers top-tier hardware tools and expert construction services to meet all your project needs. Start exploring and contact our sales team for superior quality and reliability.",
-  description_short: "ScrewFast offers top-tier hardware tools and expert construction services to meet all your project needs.",
-  url: "https://screwfast.uk",
-  author: "Emil Gulamov",
+  title: "Microbot Docs",
+  tagline: "The best open source client on the market, check out our github!",
+  description: "Microbot is the golden standard of open source automated clients based on runelite. It uses a plugin system to enable scripting. Check out our youtube channel for examples of our scripts",
+  description_short: "Microbot offers top-tier software tools and expert services to meet all your project needs.",
+  url: "https://microbot.kbve.com",
+  author: "Microbot Team",
 };
 
 export const SEO = {
@@ -33,7 +33,7 @@ export const OG = {
   locale: "en_US",
   type: "website",
   url: SITE.url,
-  title: `${SITE.title}: : Hardware Tools & Construction Services`,
-  description: "Equip your projects with ScrewFast's top-quality hardware tools and expert construction services. Trusted by industry leaders, ScrewFast offers simplicity, affordability, and reliability. Experience the difference with user-centric design and cutting-edge tools. Start exploring now!",
+  title: `${SITE.title}: : Open Source Client`,
+  description: "Microbot is an opensource automated oldschool runescape client based on runelite. It uses a plugin system to enable scripting. Here is a youtube channel showing off some of the scripts",
   image: ogImageSrc,
 };
