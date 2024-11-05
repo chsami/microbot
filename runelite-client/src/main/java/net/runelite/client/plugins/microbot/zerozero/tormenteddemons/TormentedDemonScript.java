@@ -137,6 +137,7 @@ public class TormentedDemonScript extends Script {
                 Microbot.status = "Approaching Tormented Demon location...";
                 if (Rs2Walker.walkTo(targetFinalLocation, 2)) {
                     sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(targetFinalLocation), 5000);
+                    travelStep = TravelStep.LOCATION_ONE;
                     BOT_STATUS = State.FIGHTING;
                 }
                 break;
