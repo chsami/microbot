@@ -407,7 +407,7 @@ public class TormentedDemonScript extends Script {
     }
 
     private void attemptLooting(TormentedDemonConfig config) {
-        Microbot.log("Checking loot...");
+        Microbot.log("Checking loot..");
         List<String> lootItems = parseLootItems(config.lootItems());
 
         LootingParameters nameParams = new LootingParameters(10, 1, 1, 0, false, true, lootItems.toArray(new String[0]));
