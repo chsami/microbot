@@ -8,8 +8,7 @@ import starlight from "@astrojs/starlight";
 // https://astro.build/config
 export default defineConfig({
   // https://docs.astro.build/en/guides/images/#authorizing-remote-images
-  site: "https://h0lybyte.github.io",
-  base: "microbot",
+  site: "https://microbot.kbve.com",
   image: {
     domains: ["images.unsplash.com"],
   },
