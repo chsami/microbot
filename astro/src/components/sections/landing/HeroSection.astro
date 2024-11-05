@@ -4,6 +4,7 @@ import { Image } from "astro:assets";
 import PrimaryCTA from "@components/ui/buttons/PrimaryCTA.astro";
 import SecondaryCTA from "@components/ui/buttons/SecondaryCTA.astro";
 import ReviewComponent from "@components/ui/blocks/ReviewComponent.astro";
+import AstroLottie from "@components/astropad/AstroLottie.astro";
 
 // Define props from Astro
 const {
@@ -19,7 +20,9 @@ const {
   rating,
   reviews,
   src,
-  alt
+  alt,
+  lottie,
+  discord,
 } = Astro.props;
 
 // Define TypeScript interface for props
@@ -37,6 +40,8 @@ interface Props {
   reviews?: string;
   src?: any;
   alt?: string;
+  lottie?: string;
+  discord?: string;
 }
 ---
 
@@ -53,42 +58,77 @@ interface Props {
       <!-- About Fragment: https://docs.astro.build/en/basics/astro-syntax/#fragments -->
       <Fragment set:html={title} />
     </h1>
-    {subTitle &&
-    <p
-      class="mt-3 text-pretty text-lg leading-relaxed text-neutral-700 dark:text-neutral-400 lg:w-4/5"
-    >
-      {subTitle}
-    </p>
-  }
+    {
+      subTitle && (
+        <p class="mt-3 text-pretty text-lg leading-relaxed text-neutral-700 dark:text-neutral-400 lg:w-4/5">
+          {subTitle}
+        </p>
+      )
+    }
     <!-- Action Button Section: This section includes two CTAs with their own styles and URL -->
     <div class="mt-7 grid w-full gap-3 sm:inline-flex">
-      {primaryBtn && 
-      <PrimaryCTA title={primaryBtn} url={primaryBtnURL} />
-      }
-      {secondaryBtn && 
-      <SecondaryCTA title={secondaryBtn} url={secondaryBtnURL} />
+      {primaryBtn && <PrimaryCTA title={primaryBtn} url={primaryBtnURL} />}
+      {
+        secondaryBtn && (
+          <SecondaryCTA title={secondaryBtn} url={secondaryBtnURL} />
+        )
       }
     </div>
 
     <!-- Review Section: This section presents avatars, review ratings and the number of reviews -->
-    { withReview ? (
-    <ReviewComponent avatars={avatars} starCount={starCount} rating={rating} reviews={reviews} />
-    ) : "" }
-
+    {
+      withReview ? (
+        <ReviewComponent
+          avatars={avatars}
+          starCount={starCount}
+          rating={rating}
+          reviews={reviews}
+        />
+      ) : (
+        ""
+      )
+    }
   </div>
   <!-- Hero Image Section -->
   <div class="flex w-full">
-      <div class="top-12 overflow-hidden">
-	{src && alt &&
-	<Image
-        src={src}
-        alt={alt}
-        class="h-full w-full scale-110 object-cover object-center"
-        draggable={"false"}
-        loading={"eager"}
-        format={"avif"}
-	 />
-	}
+    {
+      discord && (
+        <div class="w-1/2">
+          <iframe
+            src={`https://discord.com/widget?id=${discord}&amp;theme=dark`}
+            width="100%"
+            height="500"
+            allowtransparency="true"
+            sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+            title="Discord Iframe"
+          ></iframe>
+        </div>
+      )
+    }
+    <div class="top-12 overflow-hidden">
+      {
+        src && alt && (
+          <Image
+            src={src}
+            alt={alt}
+            class="h-full w-full scale-110 object-cover object-center"
+            draggable={"false"}
+            loading={"eager"}
+            format={"avif"}
+          />
+        )
+      }
+
+      {
+        lottie && (
+          <>
+            <AstroLottie />
+            <div class="w-full hover:scale-110 ease-in-out duration-500 object-cover object-center">
+              <dotlottie-player autoplay loop mode="normal" src={`${lottie}`} />
+            </div>
+          </>
+        )
+      }
     </div>
   </div>
 </section>

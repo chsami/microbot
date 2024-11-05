@@ -1,0 +1,15 @@
+---
+// @kbve/astropad
+export interface Props {
+  lottie?: string;
+  lazy?: boolean;
+}
+const { lottie, lazy = false } = Astro.props;
+---
+
+<script
+  type="module"
+  async
+  is:inline
+  src="https://unpkg.com/@dotlottie/player-component@1.0.0/dist/dotlottie-player.js"
+></script>
