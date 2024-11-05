@@ -224,25 +224,62 @@ public class PathfinderConfig {
 
     private void refreshRestrictionData() {
         restrictedPointsPacked.clear();
-        for (var entry : Stream.concat(resourceRestrictions.stream(), customRestrictions.stream()).collect(Collectors.toList())){
+
+        Set<Quest> questsToFetch = new HashSet<>();
+        Set<Integer> varbitsToFetch = new HashSet<>();
+        List<Restriction> allRestrictions = Stream.concat(resourceRestrictions.stream(), customRestrictions.stream())
+                .collect(Collectors.toList());
+
+        for (Restriction entry : allRestrictions) {
+            questsToFetch.addAll(entry.getQuests());
+            for (TransportVarbit varbitCheck : entry.getVarbits()) {
+                varbitsToFetch.add(varbitCheck.getVarbitId());
+            }
+        }
+
+        // Fetch quest states and varbit values directly
+        for (Quest quest : questsToFetch) {
+            try {
+                questStates.put(quest, Microbot.getQuestState(quest));
+            } catch (NullPointerException ignored) {
+                // Handle exceptions if necessary
+            }
+        }
+        for (Integer varbitId : varbitsToFetch) {
+            varbitValues.put(varbitId, Microbot.getVarbitValue(varbitId));
+        }
+
+        for (Restriction entry : allRestrictions) {
+            boolean restrictionApplies = false;
+
+            // Quest check
             for (Quest quest : entry.getQuests()) {
-                if (!questStates.containsKey(quest)){
-                    try {
-                        questStates.put(quest, Microbot.getQuestState(quest));
-                    } catch (NullPointerException ignored) {
+                if (questStates.getOrDefault(quest, QuestState.NOT_STARTED) != QuestState.FINISHED) {
+                    restrictionApplies = true;
+                    break;
+                }
+            }
+
+            // Varbit check
+            if (!restrictionApplies) {
+                for (TransportVarbit varbitCheck : entry.getVarbits()) {
+                    int varbitId = varbitCheck.getVarbitId();
+                    int expectedValue = varbitCheck.getValue();
+                    if (varbitValues.getOrDefault(varbitId, -1) != expectedValue) {
+                        restrictionApplies = true;
+                        break;
                     }
                 }
             }
 
-            if (entry.getQuests().isEmpty() || entry.getQuests().stream().anyMatch(x -> questStates.get(x) != QuestState.FINISHED))
+            // Skill level check
+            if (!restrictionApplies && !hasRequiredLevels(entry)) {
+                restrictionApplies = true;
+            }
+
+            if (restrictionApplies) {
                 restrictedPointsPacked.add(entry.getPackedWorldPoint());
-        }
-        if (Rs2Player.getQuestState(Quest.RECIPE_FOR_DISASTER) == QuestState.IN_PROGRESS) {
-            Restriction[] restrictions = new Restriction[] {
-                    new Restriction(3207, 3217, 0),
-                    new Restriction(3213, 3222, 0),
-                    new Restriction(3213, 3221, 0)};
-            setRestrictedTiles(restrictions);
+            }
         }
     }
 
@@ -368,6 +405,19 @@ public class PathfinderConfig {
     /** Checks if the player has all the required skill levels for the transport */
     private boolean hasRequiredLevels(Transport transport) {
         int[] requiredLevels = transport.getSkillLevels();
+        for (int i = 0; i < boostedLevels.length; i++) {
+            int boostedLevel = boostedLevels[i];
+            int requiredLevel = requiredLevels[i];
+            if (boostedLevel < requiredLevel) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Checks if the player has all the required skill levels for the restriction */
+    private boolean hasRequiredLevels(Restriction restriction) {
+        int[] requiredLevels = restriction.getSkillLevels();
         for (int i = 0; i < boostedLevels.length; i++) {
             int boostedLevel = boostedLevels[i];
             int requiredLevel = requiredLevels[i];
