@@ -252,6 +252,11 @@ public class PathfinderConfig {
         for (Restriction entry : allRestrictions) {
             boolean restrictionApplies = false;
 
+            // Check if there are no quests, varbits, or skills, used for explicit restrictions
+            if (entry.getQuests().isEmpty() && entry.getVarbits().isEmpty() && Arrays.stream(entry.getSkillLevels()).allMatch(level -> level == 0)) {
+                restrictionApplies = true;
+            }
+
             // Quest check
             for (Quest quest : entry.getQuests()) {
                 if (questStates.getOrDefault(quest, QuestState.NOT_STARTED) != QuestState.FINISHED) {
