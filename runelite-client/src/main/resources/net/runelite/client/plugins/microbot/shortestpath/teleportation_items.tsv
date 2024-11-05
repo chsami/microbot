@@ -165,11 +165,11 @@
 2789 3066 0			12409	Tai Bwo Wannai Trio	4	Tai bwo wannai teleport	T	20
 2194 3258 0			12410	Regicide	4	Iorwerth camp teleport	T	20
 3701 2996 0			12411	Cabin Fever	4	Mos le'harmless teleport	T	20
-3302 3487 0			12412		4	Lumberyard teleport	T	20
-2196 3056 0			12413	Regicide	4	Zul-andra teleport	T	20
-1310 1250 0			12414		4	Key master teleport	T	20
-3128 3832 0			12415		4	Revenant cave teleport	T	20
-1645 3580 0			12416		4	Watson teleport	T	20
+3302 3487 0			12642		4	Lumberyard teleport	T	20
+2196 3056 0			12938	Regicide	4	Zul-andra teleport	T	20
+1310 1250 0			13249		4	Key master teleport	T	20
+3128 3832 0			21802		4	Revenant cave teleport	T	20
+1645 3580 0			23387		4	Watson teleport	T	20
 									
 # capes									
 2931 3286 0			9780;9781		4	Crafting cape	F	20	
@@ -268,7 +268,7 @@
 2330 3171 0			23946		4	Eternal teleport crystal: Lletya	F	20	
 3264 6066 0			23946	Song of the Elves	4	Eternal teleport crystal: Prifddinas	F	20	
 2465 3495 0			19564		4	Royal seed pod	F	30
-2465 3495 0			24251		4	Grand seed pod	T	30	
+2465 3495 0			9469		4	Grand seed pod	T	30	
 # Enchanted lyre - 4493 is DIARY_FREMENNIK_HARD, 4494 is DIARY_FREMENNIK_ELITE									
 2662 3644 0			3691;6125;6126;6127;13079		4	Enchanted lyre: Rellekka	T	20	
 2551 3755 0			3691;6125;6126;6127;13079		4	Enchanted lyre: Waterbirth Island	T	20	4493=1
