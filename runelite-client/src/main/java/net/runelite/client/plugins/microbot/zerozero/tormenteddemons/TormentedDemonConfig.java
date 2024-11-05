@@ -2,8 +2,23 @@ package net.runelite.client.plugins.microbot.zerozero.tormenteddemons;
 
 import net.runelite.client.config.*;
 
-@ConfigInformation("")
-@ConfigGroup("tormenteddemon")
+@ConfigInformation("IMPORTANT!<br/>"
+        + "This plugin automates Tormented Demon kills, including combat, prayer, banking, and restocking.<br/><br/>"
+        + "For <b>Full Auto</b> mode, ensure you have the required items and setup in your bank:<br/><br />"
+        + "<p>Have the following in your bank and inventory setup:</p>\n"
+        +"<ol>\n"
+        + "    <li><b>Inventory Setup named \"tormented\"</b> – includes all required supplies</li>\n"
+        + "    <li>Guthixian Temple teleport scrolls</li>\n"
+        + "    <li>Ring of dueling</li>\n"
+        + "</ol>\n"
+        + "Full Auto mode also supports auto-looting and retreating when low on supplies to restock.<br/><br/>"
+        + "<br/>"
+        + "<b>For Combat Only</b>: Position your character near the demons and start the plugin.<br/>"
+        + "Configure options in the settings to enable prayer switching, auto gear change, and looting preferences.<br/>"
+        + "</html>")
+
+
+        @ConfigGroup("tormenteddemon")
 public interface TormentedDemonConfig extends Config {
 
     @ConfigSection(
@@ -23,7 +38,6 @@ public interface TormentedDemonConfig extends Config {
     default boolean fullAuto() {
         return true;
     }
-
     @ConfigItem(
             keyName = "combatOnly",
             name = "Combat Only",
@@ -75,17 +89,6 @@ public interface TormentedDemonConfig extends Config {
         return true;
     }
 
-    @ConfigItem(
-            keyName = "copyGear",
-            name = "Copy Gear Setup",
-            description = "Specify a setup name to copy gear from your other configurations",
-            section = tormentedDemonSection,
-            position = 5
-    )
-    default boolean copyGear() {
-        return false;
-    }
-
     @ConfigSection(
             name = "Looting",
             description = "Settings for item looting",
@@ -105,15 +108,16 @@ public interface TormentedDemonConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "lootValueThreshold",
-            name = "Loot Value Threshold",
-            description = "Minimum value of items to loot if not specified in the loot list",
+            keyName = "scatterAshes",
+            name = "Scatter Ashes",
+            description = "Scatter Infernal Ashes upon looting",
             section = lootingSection,
-            position = 1
+            position = 2
     )
-    default int lootValueThreshold() {
-        return 1000;
+    default boolean scatterAshes() {
+        return false;
     }
+
 
 
     @ConfigSection(
@@ -163,6 +167,17 @@ public interface TormentedDemonConfig extends Config {
             closedByDefault = true
     )
     String gearSettingsSection = "gearSettings";
+
+    @ConfigItem(
+            keyName = "copyGear",
+            name = "Copy Gear Setup",
+            description = "Specify a setup name to copy gear from your other configurations",
+            section = gearSettingsSection,
+            position = 0
+    )
+    default boolean copyGear() {
+        return false;
+    }
 
     @ConfigItem(
             keyName = "useRangeStyle",

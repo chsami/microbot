@@ -123,13 +123,16 @@ public class TormentedDemonPlugin extends Plugin {
             try {
                 scheduledExecutorService.schedule(() -> {
                     Rs2Tile.addDangerousGraphicsObjectTile(graphicsObject, 600 * ticks);
+                    tormentedDemonScript.logOnceToChat("Successfully dodged Tormented Demon special attack.");
                     Microbot.pauseAllScripts = false;
                 }, 1200, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
                 Microbot.pauseAllScripts = false;
-                System.err.println("Error during dodging: " + e.getMessage());
+                tormentedDemonScript.logOnceToChat("Error during dodging: " + e.getMessage());
             }
         }
     }
+
+
 
 }

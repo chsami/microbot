@@ -24,14 +24,17 @@ public class TormentedDemonOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
+                    .text("00 TormentedDemon - Version: " + TormentedDemonScript.VERSION)
+                    .color(Color.RED)
+                    .build());
+            panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Status: " + TormentedDemonScript.BOT_STATUS)
                     .color(Color.GREEN)
                     .build());
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Version: " + TormentedDemonScript.VERSION)
-                    .color(Color.GREEN)
+                    .text("Kill Count: " + TormentedDemonScript.killCount)  // Add kill count display
+                    .color(Color.YELLOW)
                     .build());
-
 
         } catch(Exception ex) {
             System.out.println(ex.getMessage());

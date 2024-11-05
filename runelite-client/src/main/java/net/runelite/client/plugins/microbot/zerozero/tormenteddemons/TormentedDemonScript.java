@@ -30,10 +30,14 @@ public class TormentedDemonScript extends Script {
 
     public static final double VERSION = 1.0;
     private boolean isRunning = false;
+    public static int killCount = 0;
     private Rs2PrayerEnum currentDefensivePrayer = null;
     private Rs2PrayerEnum currentOffensivePrayer = null;
     private HeadIcon currentOverheadIcon = null;
     private NPC currentTarget;
+    private boolean lootAttempted = false;
+    private String lastChatMessage = "";
+
 
     private static final int MAGIC_ATTACK_ANIMATION = 11388;
     private static final int RANGE_ATTACK_ANIMATION = 11389;
@@ -51,7 +55,6 @@ public class TormentedDemonScript extends Script {
     private BankingStep bankingStep = BankingStep.DRINK;
 
     public boolean run(TormentedDemonConfig config) {
-        // Set starting state based on config
         if (config.fullAuto()) {
             BOT_STATUS = State.BANKING;
         } else if (config.combatOnly()) {
@@ -79,7 +82,7 @@ public class TormentedDemonScript extends Script {
                         break;
                 }
             } catch (Exception ex) {
-                System.out.println("Error in main loop: " + ex.getMessage());
+                logOnceToChat("Error in main loop: " + ex.getMessage());
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
@@ -88,7 +91,7 @@ public class TormentedDemonScript extends Script {
 
     private void handleTravel(TormentedDemonConfig config) {
         WorldPoint targetLocationOne = new WorldPoint(4062, 4558, 0);
-        WorldPoint targetLocationThree = new WorldPoint(4073, 4432, 0);
+        WorldPoint targetFinalLocation = new WorldPoint(4073, 4432, 0);
         WorldPoint playerLocation = Microbot.getClient().getLocalPlayer().getWorldLocation();
 
         switch (travelStep) {
@@ -131,8 +134,8 @@ public class TormentedDemonScript extends Script {
 
             case LOCATION_THREE:
                 Microbot.status = "Approaching Tormented Demon location...";
-                if (Rs2Walker.walkTo(targetLocationThree, 2)) {
-                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(targetLocationThree), 5000);
+                if (Rs2Walker.walkTo(targetFinalLocation, 2)) {
+                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(targetFinalLocation), 5000);
                     BOT_STATUS = State.FIGHTING;
                 }
                 break;
@@ -189,32 +192,34 @@ public class TormentedDemonScript extends Script {
                 break;
         }
     }
-
     private void handleFighting(TormentedDemonConfig config) {
         if (currentTarget == null || currentTarget.isDead()) {
             disableAllPrayers();
 
-            if (currentTarget != null && currentTarget.isDead()) {
+            if (!lootAttempted) {
                 Microbot.pauseAllScripts = true;
+                sleep(5000);
                 attemptLooting(config);
-                sleep(3000);
+                lootAttempted = true;
                 Microbot.pauseAllScripts = false;
+                killCount++;
             }
 
             currentTarget = findNewTarget(config);
             if (currentTarget != null) {
-                currentOverheadIcon = getHeadIcon(currentTarget);                if (currentOverheadIcon == null) {
-                    System.out.println("Failed to retrieve HeadIcon for target.");
+                currentOverheadIcon = getHeadIcon(currentTarget);
+                if (currentOverheadIcon == null) {
+                    logOnceToChat("Failed to retrieve HeadIcon for target.");
                     return;
                 }
                 switchGear(config, currentOverheadIcon);
+                lootAttempted = false;
             } else {
-                System.out.println("No target found for attack.");
+                logOnceToChat("No target found for attack.");
                 return;
             }
         }
 
-        // Only check retreat if fullAuto is enabled
         if (config.fullAuto() && shouldRetreat(config)) {
             Microbot.pauseAllScripts = true;
             Rs2Walker.walkTo(SAFE_LOCATION);
@@ -224,23 +229,23 @@ public class TormentedDemonScript extends Script {
             return;
         }
 
-        // Eating and drinking thresholds
         Rs2Player.eatAt(config.minEatPercent());
         Rs2Player.drinkPrayerPotionAt(config.minPrayerPercent());
 
-        // Engage with the target
+        // Attempt to interact with the NPC using "attack" without line-of-sight restrictions
         if (Microbot.getClient().getLocalPlayer().getInteracting() != currentTarget) {
-            if (Rs2Npc.attack(currentTarget)) {
+            boolean attackSuccessful = Rs2Npc.interact(currentTarget, "attack");
+
+            if (attackSuccessful) {
                 Rs2Player.waitForAnimation();
                 sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == currentTarget, 3000);
             } else {
-                System.out.println("Attack failed for target: " + (currentTarget != null ? currentTarget.getName() : "null"));
+                logOnceToChat("Attack failed for target: " + (currentTarget != null ? currentTarget.getName() : "null"));
                 currentTarget = null;
                 return;
             }
         }
 
-        // Gear switching based on target overhead icon
         HeadIcon newOverheadIcon = getHeadIcon(currentTarget);
         if (newOverheadIcon != currentOverheadIcon) {
             currentOverheadIcon = newOverheadIcon;
@@ -264,6 +269,7 @@ public class TormentedDemonScript extends Script {
                 newDefensivePrayer = Rs2PrayerEnum.PROTECT_MELEE;
             }
             if (newDefensivePrayer != null && newDefensivePrayer != currentDefensivePrayer) {
+                logOnceToChat("Changing defensive prayer to " + newDefensivePrayer);
                 switchDefensivePrayer(newDefensivePrayer);
             }
         }
@@ -293,6 +299,7 @@ public class TormentedDemonScript extends Script {
         }
 
         if (newOffensivePrayer != null && newOffensivePrayer != currentOffensivePrayer) {
+            logOnceToChat("Changing offensive prayer to " + newOffensivePrayer);
             switchOffensivePrayer(newOffensivePrayer);
             sleep(100);
         }
@@ -315,7 +322,7 @@ public class TormentedDemonScript extends Script {
                         switchGear(config, demonHeadIcon);
                         return true;
                     }
-                    System.out.println("Null HeadIcon for NPC " + npc.getName());
+                    logOnceToChat("Null HeadIcon for NPC " + npc.getName());
                     return false;
                 })
                 .findFirst()
@@ -365,6 +372,7 @@ public class TormentedDemonScript extends Script {
         }
 
         if (!isGearEquipped(gearToEquip)) {
+            logOnceToChat("Changing gear to " + gearToEquip);
             equipGear(gearToEquip);
         }
     }
@@ -401,17 +409,42 @@ public class TormentedDemonScript extends Script {
     }
 
     private void attemptLooting(TormentedDemonConfig config) {
+        Microbot.log("Checking loot...");
         List<String> lootItems = parseLootItems(config.lootItems());
 
         LootingParameters nameParams = new LootingParameters(10, 1, 1, 0, false, true, lootItems.toArray(new String[0]));
         Rs2GroundItem.lootItemsBasedOnNames(nameParams);
 
-        LootingParameters valueParams = new LootingParameters(10, 1, config.lootValueThreshold(), 0, false, true);
-        Rs2GroundItem.lootItemBasedOnValue(valueParams);
+        if (config.scatterAshes()) {
+            lootAndScatterInfernalAshes();
+        }
+    }
+
+    private void lootAndScatterInfernalAshes() {
+        String ashesName = "Infernal ashes";
+
+        // Check if inventory has space and loot Infernal Ashes
+        if (!Rs2Inventory.isFull() && Rs2GroundItem.lootItemsBasedOnNames(new LootingParameters(10, 1, 1, 0, false, true, ashesName))) {
+            // Wait for ashes to be looted into inventory
+            sleepUntil(() -> Rs2Inventory.contains(ashesName), 2000);
+
+            // Scatter ashes if present in inventory
+            if (Rs2Inventory.contains(ashesName)) {
+                Rs2Inventory.interact(ashesName, "Scatter");
+                sleep(600); // Wait briefly for scattering action
+            }
+        }
     }
 
     private List<String> parseLootItems(String lootFilter) {
         return Arrays.asList(lootFilter.toLowerCase().split(","));
+    }
+
+    void logOnceToChat(String message) {
+        if (!message.equals(lastChatMessage)) {
+            Microbot.log(message);
+            lastChatMessage = message;
+        }
     }
 
     @SneakyThrows
@@ -440,9 +473,6 @@ public class TormentedDemonScript extends Script {
     private static HeadIcon getOldHeadIcon(NPC npc) {
         return null;
     }
-    private static HeadIcon getOlderHeadicon(NPC npc) {
-        return null;
-    }
 
     @Override
     public void shutdown() {
@@ -451,6 +481,19 @@ public class TormentedDemonScript extends Script {
         disableAllPrayers();
         BOT_STATUS = State.BANKING;
         travelStep = TravelStep.LOCATION_ONE;
-        Microbot.log("Shutting down Tormented Demon script");
+        bankingStep = BankingStep.DRINK;
+        currentTarget = null;
+        killCount = 0;
+        lootAttempted = false;  // Reset here
+        currentDefensivePrayer = null;
+        currentOffensivePrayer = null;
+        currentOverheadIcon = null;
+        if (mainScheduledFuture != null && !mainScheduledFuture.isCancelled()) {
+            mainScheduledFuture.cancel(true);
+        }
+        logOnceToChat("Shutting down Tormented Demon script");
     }
+
+
+
 }
