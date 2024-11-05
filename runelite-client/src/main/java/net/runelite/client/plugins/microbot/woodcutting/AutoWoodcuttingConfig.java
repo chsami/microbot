@@ -53,6 +53,17 @@ public interface AutoWoodcuttingConfig extends Config {
         return false;
     }
 
+    @ConfigItem(
+            keyName = "nests",
+            name = "Loot Bird Nests",
+            description = "Automatically loot bird nests while woodcutting",
+            position = 3,
+            section = generalSection
+    )
+    default boolean Nests() {
+        return true;
+    }
+
     @ConfigSection(
             name = "Reset",
             description = "Options for clearing logs from inventory",
@@ -79,7 +90,7 @@ public interface AutoWoodcuttingConfig extends Config {
             position = 1
     )
     default String itemsToBank() {
-        return "logs";
+        return "logs,nest,clue";
     }
 
     @ConfigItem(
