@@ -1342,6 +1342,7 @@ public class Rs2Walker {
             if (startingWeapon != null & !Rs2Equipment.isWearing(startingWeaponId)) {
                 Microbot.log("Equipping Starting Weapon: " + startingWeaponId);
                 Rs2Inventory.equip(startingWeaponId);
+                sleep(600);
             }
             return;
         }
@@ -1352,7 +1353,8 @@ public class Rs2Walker {
             var fairyRing = Rs2GameObject.findObjectByLocation(origin);
             Rs2GameObject.interact(fairyRing, "Configure");
             Rs2Player.waitForWalking();
-        } else {
+        } 
+        else {
             // Manage weapon and staff as needed if elite Lumbridge Diary is not complete
             if (startingWeapon == null) {
                 startingWeapon = Rs2Equipment.get(EquipmentInventorySlot.WEAPON);
