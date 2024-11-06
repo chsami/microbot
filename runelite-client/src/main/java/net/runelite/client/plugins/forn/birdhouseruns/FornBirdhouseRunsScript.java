@@ -146,28 +146,35 @@ public class FornBirdhouseRunsScript extends Script {
 
     private void emptyNests() {
         do {
-            Rs2Inventory.interact(22798, "search");
+            Rs2Inventory.interact(ItemID.BIRD_NEST, "search");
             sleep(1000);
         }
-        while (Rs2Inventory.contains(22798));
+        while (Rs2Inventory.contains(ItemID.BIRD_NEST));
 
         do {
-            Rs2Inventory.interact(5074, "search");
+            Rs2Inventory.interact(ItemID.BIRD_NEST_5071, "search");
             sleep(1000);
         }
-        while (Rs2Inventory.contains(5074));
+        while (Rs2Inventory.contains(ItemID.BIRD_NEST_5071));
 
         do {
-            Rs2Inventory.interact(5072, "search");
+            Rs2Inventory.interact(ItemID.BIRD_NEST_5072, "search");
             sleep(1000);
         }
-        while (Rs2Inventory.contains(5072));
+        while (Rs2Inventory.contains(ItemID.BIRD_NEST_5072));
 
         do {
-            Rs2Inventory.interact(5070, "search");
+            Rs2Inventory.interact(ItemID.BIRD_NEST_5073, "search");
             sleep(1000);
         }
-        while (Rs2Inventory.contains(5070));
+        while (Rs2Inventory.contains(ItemID.BIRD_NEST_5073));
+
+        do {
+            Rs2Inventory.interact(ItemID.BIRD_NEST_5074, "search");
+            sleep(1000);
+        }
+        while (Rs2Inventory.contains(ItemID.BIRD_NEST_5074));
+
     }
 
     @Override
