@@ -2,12 +2,14 @@ package net.runelite.client.plugins.microbot.zerozero.tormenteddemons;
 
 import lombok.SneakyThrows;
 import net.runelite.api.HeadIcon;
+import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
@@ -230,7 +232,7 @@ public class TormentedDemonScript extends Script {
 
         if (config.mode() == MODE.FULL_AUTO && shouldRetreat(config)) {
             Microbot.pauseAllScripts = true;
-            Rs2Walker.walkTo(SAFE_LOCATION);
+            teleportToFeroxEnclave();
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(SAFE_LOCATION), 5000);
             Microbot.pauseAllScripts = false;
             BOT_STATUS = State.BANKING;
@@ -442,6 +444,32 @@ public class TormentedDemonScript extends Script {
     private List<String> parseLootItems(String lootFilter) {
         return Arrays.asList(lootFilter.toLowerCase().split(","));
     }
+
+    private void teleportToFeroxEnclave() {
+        int[] duelingRingIds = {
+                ItemID.RING_OF_DUELING1,
+                ItemID.RING_OF_DUELING2,
+                ItemID.RING_OF_DUELING3,
+                ItemID.RING_OF_DUELING4,
+                ItemID.RING_OF_DUELING5,
+                ItemID.RING_OF_DUELING6,
+                ItemID.RING_OF_DUELING7,
+                ItemID.RING_OF_DUELING8
+        };
+        for (int ringId : duelingRingIds) {
+            if (Rs2Inventory.hasItem(ringId)) {
+                Rs2Prayer.disableAllPrayers();
+                Rs2Inventory.interact(ringId, "Wear");
+                sleep(800);
+
+                Rs2Equipment.useRingAction(JewelleryLocationEnum.FEROX_ENCLAVE);
+                logOnceToChat("Teleporting to Ferox Enclave using Ring of Dueling");
+                return;
+            }
+        }
+        logOnceToChat("No Ring of Dueling found in inventory for teleporting to Ferox Enclave.");
+    }
+
 
     void logOnceToChat(String message) {
         if (!message.equals(lastChatMessage)) {
