@@ -885,7 +885,13 @@ public class Rs2Walker {
                             break;
                         }
                     }
-
+                    
+                    if (transport.getType() == TransportType.QUETZAL) {
+                        if (handleQuetzal(transport)) {
+                            sleep(600 * 2); // wait 2 extra ticks before walking
+                            break;
+                        }
+                    }
 
                     if (transport.getType() == TransportType.GNOME_GLIDER) {
                         if (handleGlider(transport)) {
@@ -1020,7 +1026,7 @@ public class Rs2Walker {
         List<String> locationKeyWords = Arrays.asList("farm", "monastery", "lletya", "prifddinas", "rellekka", "waterbirth island", "neitiznot", "jatiszo",
                 "ver sinhaza", "darkmeyer", "slepe", "troll stronghold", "weiss", "ecto", "burgh", "duradel", "gem mine", "nardah", "kalphite cave",
                 "kourend woodland", "mount karuulm");
-        List<String> genericKeyWords = Arrays.asList("invoke", "empty", "consume", "rub", "break", "teleport", "reminisce");
+        List<String> genericKeyWords = Arrays.asList("invoke", "empty", "consume", "rub", "break", "teleport", "reminisce", "signal");
 
         boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
         String destination = hasMultipleDestination
@@ -1226,6 +1232,32 @@ public class Rs2Walker {
         return false;
 
     }
+    
+    private static boolean handleQuetzal(Transport transport) {
+        int varlamoreMapParentID = 874;
+        String displayInfo = transport.getDisplayInfo();
+        if (displayInfo == null || displayInfo.isEmpty()) return false;
+        
+        NPC renu = Rs2Npc.getNpc(NpcID.RENU_13350);
+
+        if (Rs2Npc.canWalkTo(renu, 20) && Rs2Npc.interact(renu, "travel")) {
+            Rs2Player.waitForWalking();
+            sleepUntil(() -> Rs2Widget.isWidgetVisible(varlamoreMapParentID, 2));
+            List<Widget> dynamicWidgetChildren = Arrays.stream(Rs2Widget.getWidget(varlamoreMapParentID, 15).getDynamicChildren())
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            Widget actionWidget = dynamicWidgetChildren.stream()
+                    .filter(w -> Arrays.stream(Objects.requireNonNull(w.getActions())).anyMatch(act -> act.toLowerCase().contains(displayInfo.toLowerCase())))
+                    .findFirst()
+                    .orElse(null);
+            if (actionWidget != null) {
+                Rs2Widget.clickWidget(actionWidget);
+                Microbot.log("Traveling to " + transport.getDisplayInfo());
+                return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
+            }
+        }
+        return false;
+    } 
 
     /**
      * interact with interfaces like spirit tree & xeric talisman etc...

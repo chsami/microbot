@@ -9,6 +9,7 @@ public enum TransportType {
     CHARTER_SHIP,
     SHIP,
     FAIRY_RING,
+    QUETZAL,
     GNOME_GLIDER,
     MINECART,
     SPIRIT_TREE,
