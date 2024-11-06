@@ -33,6 +33,16 @@ public interface TitheFarmingConfig extends Config {
     )
     String scriptSettings = "Script Settings";
     @ConfigItem(
+            keyName = "storing",
+            name = "Store fruit treshhold",
+            description = "Amount of fruits to have in your inventory before storing them in the sack",
+            position = 0,
+            section = scriptSettings
+    )
+    default int storeFruitTreshhold() {
+        return 100;
+    }
+    @ConfigItem(
             keyName = "Lanes",
             name = "Tithe farm lanes",
             description = "Choose a lane starting from the entrance",
