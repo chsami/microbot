@@ -204,8 +204,9 @@ public class MWintertodtScript extends Script {
                         break;
                     case LIGHT_BRAZIER:
                         if (brazier != null && !Rs2Player.isAnimating()) {
-                            Rs2GameObject.interact(brazier, "light");
-                            sleep(1000);
+                            if (Rs2GameObject.interact(brazier, "light")) {
+                                sleepGaussian(600, 150);
+                            }
                             return;
                         }
                         break;
@@ -242,7 +243,7 @@ public class MWintertodtScript extends Script {
                             if (brokenBrazier != null && config.fixBrazier()) {
                                 Rs2GameObject.interact(brokenBrazier, "fix");
                                 Microbot.log("Fixing brazier");
-                                sleep(1500);
+                                sleepGaussian(300, 50);
                                 return;
                             }
                             // this extra check is needed in case all braziers are broken or not burning
@@ -400,16 +401,12 @@ public class MWintertodtScript extends Script {
             if (!resetActions && graphicsObject.getId() == 502
                     && WorldPoint.fromLocalInstance(Microbot.getClient(),
                     graphicsObject.getLocation()).distanceTo(Rs2Player.getWorldLocation()) == 1) {
-                System.out.println(WorldPoint.fromLocalInstance(Microbot.getClient(),
-                        graphicsObject.getLocation()).distanceTo(Rs2Player.getWorldLocation()));
                 //walk south
                 List<GameObject> gameObjects = new ArrayList<>(Rs2GameObject.getGameObjectsWithinDistance(5));
-                Microbot.log("Game objects: " + gameObjects.size());
                 // we only need to dodge if there are 2 or more snow fall objects
                 if (gameObjects.size() > 2) {
                     Rs2Walker.walkFastCanvas(new WorldPoint(Rs2Player.getWorldLocation().getX(), Rs2Player.getWorldLocation().getY() - 1, Rs2Player.getWorldLocation().getPlane()));
                     Rs2Player.waitForWalking(1000);
-                    sleep(GAME_TICK_LENGTH * 2);
                     resetActions = true;
                 }
 

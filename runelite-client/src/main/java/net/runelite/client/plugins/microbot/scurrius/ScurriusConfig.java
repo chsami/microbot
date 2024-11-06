@@ -5,37 +5,80 @@ import net.runelite.api.ItemID;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Range;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 
 @ConfigGroup("Scurrius")
 public interface ScurriusConfig extends Config {
 
+    @ConfigSection(
+            name = "General Settings",
+            description = "General settings for the script",
+            position = 0
+    )
+    String generalSettings = "generalSettings";
+
+    @ConfigSection(
+            name = "Food Settings",
+            description = "Settings for food selection and usage",
+            position = 1
+    )
+    String foodSettings = "foodSettings";
+
+    @ConfigSection(
+            name = "Prayer Settings",
+            description = "Settings for prayer potions and prayer usage",
+            position = 2
+    )
+    String prayerSettings = "prayerSettings";
+
+    @ConfigSection(
+            name = "Loot Settings",
+            description = "Settings for looting items",
+            position = 3
+    )
+    String lootSettings = "lootSettings";
+
     @ConfigItem(
             keyName = "bossRoomEntryType",
             name = "Public or Private",
             description = "Select whether to enter through Private or Normal entrance",
-            position = 0
+            position = 0,
+            section = generalSettings
     )
     default BossRoomEntryType bossRoomEntryType() {
         return BossRoomEntryType.PRIVATE;
     }
 
     @ConfigItem(
+            keyName = "prioritizeGiantRats",
+            name = "Prioritize Giant Rats",
+            description = "Prioritize Giant Rats over other targets",
+            position = 1,
+            section = generalSettings
+    )
+    default boolean prioritizeRats() {
+        return false;
+    }
+
+    @ConfigItem(
             keyName = "foodSelection",
             name = "Select Food",
             description = "Select the type of food you want to use",
-            position = 1
+            position = 0,
+            section = foodSettings
     )
     default Rs2Food foodSelection() {
-        return Rs2Food.SHARK;  // Default to Shark as an example
+        return Rs2Food.SHARK;
     }
 
     @ConfigItem(
             keyName = "foodAmount",
             name = "Food Amount",
             description = "Number of food items to withdraw",
-            position = 2
+            position = 1,
+            section = foodSettings
     )
     @Range(
             min = 1,
@@ -44,11 +87,13 @@ public interface ScurriusConfig extends Config {
     default int foodAmount() {
         return 20;
     }
+
     @ConfigItem(
             keyName = "minEatPercent",
             name = "Min Eat Percent",
             description = "The minimum health percent at which to eat",
-            position = 3
+            position = 2,
+            section = foodSettings
     )
     @Range(
             min = 1,
@@ -62,7 +107,8 @@ public interface ScurriusConfig extends Config {
             keyName = "maxEatPercent",
             name = "Max Eat Percent",
             description = "The maximum health percent at which to eat",
-            position = 4
+            position = 3,
+            section = foodSettings
     )
     @Range(
             min = 2,
@@ -76,7 +122,8 @@ public interface ScurriusConfig extends Config {
             keyName = "potionSelection",
             name = "Select Prayer Potion",
             description = "Select whether to use Prayer Potion or Super Restore",
-            position = 5
+            position = 0,
+            section = prayerSettings
     )
     default PotionSelection potionSelection() {
         return PotionSelection.PRAYERPOTION;
@@ -86,7 +133,8 @@ public interface ScurriusConfig extends Config {
             keyName = "prayerPotionAmount",
             name = "Prayer Potion Amount",
             description = "Number of prayer potions to withdraw",
-            position = 6
+            position = 1,
+            section = prayerSettings
     )
     @Range(
             min = 1,
@@ -96,12 +144,12 @@ public interface ScurriusConfig extends Config {
         return 2;
     }
 
-    // Min Prayer percent to drink potion
     @ConfigItem(
             keyName = "minPrayerPercent",
             name = "Min Prayer Percent",
             description = "The minimum prayer percent at which to drink a prayer potion",
-            position = 7
+            position = 2,
+            section = prayerSettings
     )
     @Range(
             min = 1,
@@ -111,12 +159,12 @@ public interface ScurriusConfig extends Config {
         return 10;
     }
 
-    // Max Prayer percent to drink potion
     @ConfigItem(
             keyName = "maxPrayerPercent",
             name = "Max Prayer Percent",
             description = "The maximum prayer percent at which to drink a prayer potion",
-            position = 8
+            position = 3,
+            section = prayerSettings
     )
     @Range(
             min = 2,
@@ -127,16 +175,26 @@ public interface ScurriusConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "Prioritize Giant rats",
-            name = "Prioritize",
-            description = "Prioritize Giant rats",
-            position = 9
+            keyName = "lootItems",
+            name = "Loot Items",
+            description = "Comma-separated list of item names to loot regardless of value",
+            position = 0,
+            section = lootSettings
     )
-    default boolean prioritizeRats() {
-        return false;
+    default String lootItems() {
+        return "";
     }
 
-
+    @ConfigItem(
+            keyName = "lootValueThreshold",
+            name = "Loot Value Threshold",
+            description = "Minimum value of items to loot if not specified in the loot list",
+            position = 1,
+            section = lootSettings
+    )
+    default int lootValueThreshold() {
+        return 1000;
+    }
 
     @Getter
     enum PotionSelection {
@@ -148,7 +206,6 @@ public interface ScurriusConfig extends Config {
         PotionSelection(int itemId) {
             this.itemId = itemId;
         }
-
     }
 
     @Getter
@@ -161,7 +218,5 @@ public interface ScurriusConfig extends Config {
         BossRoomEntryType(String interactionText) {
             this.interactionText = interactionText;
         }
-
     }
-
 }

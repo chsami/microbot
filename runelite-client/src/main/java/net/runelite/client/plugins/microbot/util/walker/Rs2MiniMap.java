@@ -18,16 +18,19 @@ public class Rs2MiniMap {
     }
 
     @Nullable
-    public static Point worldToMinimap(WorldPoint point) {
-        if (point == null) return null;
+    public static Point worldToMinimap(WorldPoint worldPoint) {
+        if (worldPoint == null) return null;
 
-        LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), point);
+        LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
 
-        if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
-            localPoint = Rs2LocalPoint.fromWorldInstance(point);
+        if (Microbot.getClient().getTopLevelWorldView().isInstance() && localPoint == null) {
+            localPoint = Rs2LocalPoint.fromWorldInstance(worldPoint);
         }
 
-        if (localPoint == null) return null;
+        if (localPoint == null) {
+            Microbot.log("Tried to walk worldpoint " + worldPoint + " using the canvas but localpoint returned null");
+            return null;
+        }
 
         final LocalPoint lp = localPoint;
 

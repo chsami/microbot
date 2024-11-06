@@ -46,14 +46,19 @@ public class HerbrunInfo {
         FALADOR_WALKING_TO_PATCH,
         FALADOR_HANDLE_PATCH,
 
+        // Weiss
+        WEISS_TELEPORT,
+        WEISS_HANDLE_PATCH,
+
+        // Weiss
+        HARMONY_TELEPORT,
+        HARMONY_WALKING_TO_PATCH,
+        HARMONY_HANDLE_PATCH,
+
         // Guild
         GUILD_TELEPORT,
         GUILD_WALKING_TO_PATCH,
         GUILD_HANDLE_PATCH,
-
-        // Weiss
-        WEISS_TELEPORT,
-        WEISS_HANDLE_PATCH,
 
         FINISHED
 

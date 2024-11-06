@@ -91,6 +91,9 @@ public class CollisionMap {
         for (Transport transport : transports) {
             //START microbot variables
             if (visited.get(transport.getDestination())) continue;
+            if (config.isIgnoreTeleportAndItems() &&
+                    (transport.getType() == TransportType.TELEPORTATION_SPELL ||
+                            transport.getType() == TransportType.TELEPORTATION_ITEM)) continue;
 
             //EXCEPTION
             if (transport.getType() == TransportType.MINECART) {
@@ -143,6 +146,7 @@ public class CollisionMap {
             int neighborPacked = packedPointFromOrdinal(node.packedPosition, d);
             if (visited.get(neighborPacked)) continue;
             if (config.getRestrictedPointsPacked().contains(neighborPacked)) continue;
+            if (config.getCustomRestrictions().contains(neighborPacked)) continue;
 
             if (traversable[i]) {
                 neighbors.add(new Node(neighborPacked, node));

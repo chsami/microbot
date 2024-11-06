@@ -23,11 +23,11 @@ public class Rs2Combat {
     public static boolean setAttackStyle(WidgetInfo style) {
         Widget widget = Microbot.getClient().getWidget(style);
         if (widget == null) return false;
-        if (isSelected(widget.getId() + 1)) {
-            return true;
-        }
-
-        Microbot.getMouse().click(widget.getBounds());
+//        if (isSelected(widget.getId() + 1)) {
+//            return true;
+//        }
+        log("Setting attack style to " + Rs2Widget.getWidget(widget.getId() + 3).getText());
+        Rs2Widget.clickWidget(widget);
         return true;
     }
 

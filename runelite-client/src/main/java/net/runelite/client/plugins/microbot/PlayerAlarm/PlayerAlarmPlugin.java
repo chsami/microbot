@@ -1,10 +1,7 @@
 package net.runelite.client.plugins.microbot.PlayerAlarm;
 
 import com.google.inject.Provides;
-import net.runelite.api.Actor;
-import net.runelite.api.Client;
-import net.runelite.api.ItemID;
-import net.runelite.api.Player;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.ClientTick;
 import net.runelite.client.Notifier;
@@ -12,6 +9,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.slf4j.Logger;
@@ -21,6 +19,8 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 @PluginDescriptor(
         name = "<html>[<font color=#ff00ff>§</font>] " + "Player Alarm",
@@ -54,8 +54,9 @@ public class PlayerAlarmPlugin extends Plugin {
         }
         boolean shouldAlarm = (dangerousPlayers.size() > 0);
         if (shouldAlarm) {
-            if (config.seedPod()) {
+            if (config.seedPod() && Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
                 Rs2Inventory.interact(ItemID.ROYAL_SEED_POD, "Commune");
+                sleep(1000);
             }
         }
         if (shouldAlarm && !this.overlayOn) {

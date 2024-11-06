@@ -107,6 +107,9 @@ public enum ShootingStarLocation {
     }
 
     public boolean hasRequirements() {
+
+        if (!Microbot.isLoggedIn()) return false;
+
         boolean hasLineOfSight = Microbot.getClient().getLocalPlayer().getWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), this.getWorldPoint());
         switch (this) {
             case CRAFTING_GUILD:

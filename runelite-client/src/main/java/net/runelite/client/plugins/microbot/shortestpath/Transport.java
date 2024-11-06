@@ -190,6 +190,12 @@ public class Transport {
             } else if (!value.isEmpty()){
                 System.out.println("failed to load transport " + value);
             }
+
+            //EXCEPTIONS THAT ARE NOT HANDLED BY THE REGEX
+            //Shillo village cart action is: climb over without a dash
+            if (objectId == 2216) {
+                action = action.replace("-", " ");
+            }
         }
         if ((value = fieldMap.get("Items")) != null) {
             // Split the string by space

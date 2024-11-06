@@ -242,14 +242,26 @@ public interface PlayerAssistConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "lootItems",
+            name = "Loot Items",
+            description = "Comma-separated list of item names to loot regardless of value",
+            position = 1,
+            section = lootSection
+    )
+    default String lootItems() {
+        return "";
+    }
+
+    @ConfigItem(
             keyName = "Max Price of items to loot",
             name = "Max. Price of items to loot",
             description = "Max. Price of items to loot default is set to 10M",
             position = 1,
-            section = lootSection
+            section = lootSection,
+            hidden = true
     )
     default int maxPriceOfItemsToLoot() {
-        return 10000000;
+        return 2147483647;
     }
     // toggle scatter
 
@@ -421,6 +433,17 @@ public interface PlayerAssistConfig extends Config {
                 "Always On: Quick prayer is always on";
     }
 
+    // Enable skilling
+    @ConfigItem(
+            keyName = "enableSkilling",
+            name = "Enable Skilling",
+            description = "Enable Skilling",
+            position = 0,
+            section = skillingSection
+    )
+    default boolean toggleEnableSkilling() {
+        return false;
+    }
     //Balance combat skills
     @ConfigItem(
             keyName = "balanceCombatSkills",
@@ -550,7 +573,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default int minFreeSlots() {
-        return 5;
+        return 1;
     }
 
     // checkbox to use stamina potions when banking

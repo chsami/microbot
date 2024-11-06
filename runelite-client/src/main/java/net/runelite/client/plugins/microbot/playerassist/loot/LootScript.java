@@ -9,6 +9,8 @@ import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -38,6 +40,7 @@ public class LootScript extends Script {
             lootCoins(config);
             lootUntradeableItems(config);
             lootArrows(config);
+            LootList(config);
 
 
         }, 0, 200, TimeUnit.MILLISECONDS);
@@ -162,6 +165,25 @@ public class LootScript extends Script {
         if (Rs2GroundItem.lootItemBasedOnValue(valueParams)) {
             Microbot.pauseAllScripts = false;
         }
+    }
+
+    private void LootList(PlayerAssistConfig config) {
+        List<String> lootItems = parseLootItems(config.lootItems());
+        LootingParameters nameParams = new LootingParameters(
+                config.attackRadius(),
+                1,
+                1,
+                config.minFreeSlots(),
+                config.toggleDelayedLooting(),
+                config.toggleOnlyLootMyItems(),
+                lootItems.toArray(new String[0])
+        );
+        if (Rs2GroundItem.lootItemsBasedOnNames(nameParams)) {
+            Microbot.pauseAllScripts = false;
+        }
+    }
+    private List<String> parseLootItems(String lootFilter) {
+        return Arrays.asList(lootFilter.toLowerCase().split(","));
     }
 
     public void shutdown() {

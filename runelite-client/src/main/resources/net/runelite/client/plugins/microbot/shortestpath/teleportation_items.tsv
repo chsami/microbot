@@ -29,26 +29,27 @@
 2898 3553 0			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Burthorpe	T	20	
 2965 4254 2			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Corporeal Beast	T	20	
 3245 9500 2			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Tears of Guthix	T	20	
-1631 3940 0			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Wintertodt	T	20	
+1631 3940 0			3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Wintertodt Camp	T	20	
 									
 # Ring of Dueling (1-8)									
-3315 3235 0			2566;2564;2562;2560;2558;2556;2554;2552		4	Ring of dueling: PvP Arena	T	20	
+3315 3235 0			2566;2564;2562;2560;2558;2556;2554;2552		4	Ring of dueling: Emir's Arena	T	20	
 2440 3090 0			2566;2564;2562;2560;2558;2556;2554;2552		4	Ring of dueling: Castle Wars	T	20	
 3151 3635 0			2566;2564;2562;2560;2558;2556;2554;2552		4	Ring of dueling: Ferox Enclave	T	20	
 									
 # Combat Bracelet (1-6) (uncharged is 11126)									
 2882 3547 0			11118;11120;11122;11124;11972;11974		4	Combat bracelet: Warriors' Guild	T	30	
 3192 3368 0			11118;11120;11122;11124;11972;11974		4	Combat bracelet: Champions' Guild	T	30	
-3052 3490 0			11118;11120;11122;11124;11972;11974		4	Combat bracelet: Edgeville Monastery	T	30	
+3052 3490 0			11118;11120;11122;11124;11972;11974		4	Combat bracelet: Monastery	T	30	
 2653 3439 0			11118;11120;11122;11124;11972;11974		4	Combat bracelet: Ranging Guild	T	30	
 									
 # Skills Necklace (1-6) (uncharged is 11113)									
-2611 3390 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Fishing Guild	T	30	
-3049 9763 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Mining Guild	T	30	
-2933 3295 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Crafting Guild	T	30	
-3144 3438 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Cooks' Guild	T	30	
-1662 3505 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Woodcutting Guild	T	30	
-1248 3719 0			11105;11107;11109;11111;11968;11970		4	Skills necklace: Farming Guild	T	30	
+2611 3390 0			11105;11107;11109;11111;11968;11970		4	1. Skills necklace: Fishing Guild	T	30
+3049 9763 0			11105;11107;11109;11111;11968;11970		4	2. Skills necklace: Mining Guild	T	30
+2933 3295 0			11105;11107;11109;11111;11968;11970		4	3. Skills necklace: Crafting Guild	T	30
+3144 3438 0			11105;11107;11109;11111;11968;11970		4	4. Skills necklace: Cooks' Guild	T	30
+1662 3505 0			11105;11107;11109;11111;11968;11970		4	5. Skills necklace: Woodcutting Guild	T	30
+1248 3725 0		45 Farming	11105;11107;11109;11111;11968;11970		4	6. Skills necklace: Farming Guild	T	30
+1248 3719 0			11105;11107;11109;11111;11968;11970		4	6. Skills necklace: Farming Guild	T	30
 									
 # Amulet of Glory (1-6, 1t-6t, Eternal) (uncharged is 1704, trimmed 10362)									
 3087 3496 0			1706;1708;1710;1712;11976;11978;10360;10358;10356;10354;11966;11964;19707		4	Amulet of glory: Edgeville	T	30	
@@ -237,7 +238,7 @@
 3144 3772 0			9789;9790		4	Hunter cape: Black chinchompa	F	20	
 3144 3772 0			9789;9790		4	Hunter cape: Black chinchompa	F	20
 #Quest point cape (instead of using the item name we use the action teleport, we use the itemids to verifiy the item)
-3144 3772 0			9813;13068		4	Teleport	F	20
+3144 3772 0			9813;13068		4	Quest point cape	F	20
 2689 3547 0			13221;13222		4	Music cape	F	20	
 2574 3323 0			13069;19476		4	1. Achievement diary cape: Two-pints	F	20
 3302 3122 0			13069;19476		4	2. Achievement diary cape: Jarr	F	20
@@ -289,7 +290,7 @@
 # todo: this only works if you've used a Slepey tablet on the medallion									
 3808 9700 0			22400		4	Drakan's medallion: Slepe	F	20
 #mythical cape (instead of using the item name we use the action teleport, we use the itemids to verifiy the item)
-2457 2850 0			21913;22114;24855		4	Teleport	F	20
+2457 2850 0			21913;22114;24855		4	Mythical cape: Teleport	F	20
 # Stony Basalt - 4493 is DIARY_FREMENNIK_HARD									
 2845 3694 0			22601		4	Stony basalt	T	20	
 2837 3695 0		73 Agility	22601		4	Stony basalt: Roof	T	20	4493=1
@@ -307,7 +308,7 @@
 1644 3673 0			13393		4	4. Xeric's talisman: Xeric's Heart	T	20
 # Requires the use of an ancient tablet to activate									
 1254 3560 0			13393		4	5. Xeric's talisman: Xeric's Honour	T	20
-3200 3355 0			13660		4	Chronicle	T	20	
+3200 3355 0			13660		4	Chronicle: Teleport	T	20	
 3615 9461 0			26914		4	Amulet of the eye	F	20	
 2981 3276 0			26818		4	Ring of the elements: Air	T	20	
 3170 3155 0			26818		4	Ring of the elements: Water	T	20	

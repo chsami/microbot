@@ -11,9 +11,9 @@
 2915 3225 0	2683 3268 1	Ardougne Captain Barnaby 8763		30 Coins		6	Ardougne
 2915 3225 0	2775 3233 1	Brimhaven Captain Barnaby 8763		30 Coins		6	Brimhaven
 
-# Rimmington, Corsair Cove
-2909 3226 0	2578 2840 0	Travel Cabin Boy Colin 7967			The Corsair Curse	6
-2578 2840 0	2909 3226 0	Travel Cabin Boy Colin 7967			The Corsair Curse	6
+# NEEDS FIXING - Rimmington, Corsair Cove
+2909 3226 0	2578 2837 1	Travel Cabin Boy Colin 7967			The Corsair Curse	6
+2578 2837 0	2909 3226 1	Travel Cabin Boy Colin 7967			The Corsair Curse	6
 
 # Digsite, Fossil Island
 3362 3445 0	3724 3807 0	Quick-Travel Barge guard 8012			Bone Voyage	12
@@ -48,6 +48,6 @@
 3048 3234 0	2834 3331 1	Travel-boat Monk of Entrana 1165				15	
 2834 3335 0	3048 3231 1	Travel-boat Monk of Entrana 1168				15	
 							
-# Port Sarim, Void Knights' Outpost							
-3041 3202 0	2659 2676 0	Travel Squire 1770				11	
-2659 2676 0	3041 3202 0	Travel Squire 1769				11	
+# NEEDS TESTING - Port Sarim, Void Knights' Outpost
+3041 3202 0	2662 2677 1	Travel Squire 1770				11
+2659 2676 0	3042 3199 1	Travel Squire 1769				11

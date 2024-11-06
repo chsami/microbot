@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.herbrun;
 
 import java.awt.*;
+
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -32,6 +33,7 @@ public class HerbrunScript extends Script {
     private static final WorldPoint cabbageHerb = new WorldPoint(3058, 3310, 0);
     private static final WorldPoint farmingGuildHerb = new WorldPoint(1239, 3728, 0);
     private static final WorldPoint weissHerb = new WorldPoint(2847, 3935, 0);
+    private static final WorldPoint harmonyHerb = new WorldPoint(3789, 2840, 0);
 
     //herb patch Object ID
     private static final int trollheimHerbPatchID = 18816;
@@ -43,9 +45,10 @@ public class HerbrunScript extends Script {
     private static final int cabbageHerbPatchID = 8150; //50698?
     private static final int farmingGuildHerbPatchID = 33979;
     private static final int weissHerbPatchID = 33176;
+    private static final int harmonyHerbPatchID = 9372;
 
     //Leprechaun IDs:
-    //IDS that are 0: Ardougne, Farming guild, morytania, hosidius, catherby, falador, weiss
+    //IDS that are 0: Ardougne, Farming guild, morytania, hosidius, catherby, falador, weiss, harmony
     private static final int varlamoreLeprechaunID = NpcID.TOOL_LEPRECHAUN_12765;
     private static final int trollHeimLeprechaunID = NpcID.TOOL_LEPRECHAUN_757;
 
@@ -73,28 +76,38 @@ public class HerbrunScript extends Script {
 
                 switch (botStatus) {
                     case GEARING:
-                        //Bank everything and withdraw all farming equipment
-                        System.out.println("Gearing up");
-                        if (!Rs2Bank.isOpen()) {
-                            System.out.println("Bank opened");
-                            Rs2Bank.useBank();
-                            Rs2Bank.depositAll();
-                            if (config.GRACEFUL()) {
-                                Rs2Bank.depositEquipment();
-                                sleep(200);
-                                equipGraceful();
+                        if (!config.enableGearing()) {
+                            botStatus = states.TROLLHEIM_TELEPORT;
+                            break;
+                        } else {
+                            //Bank everything and withdraw all farming equipment
+                            System.out.println("Gearing up");
+                            if (!Rs2Bank.isOpen()) {
+                                System.out.println("Bank opened");
+                                Rs2Bank.useBank();
+                                Rs2Bank.depositAll();
+                                if (config.GRACEFUL()) {
+                                    Rs2Bank.depositEquipment();
+                                    sleep(200);
+                                    equipGraceful(config);
+                                }
                             }
+                            withdrawHerbSetup(config);
+                            Rs2Bank.closeBank();
+                            sleep(100);
+                            System.out.println("Gearing complete");
+                            sleep(200, 800);
+                            botStatus = states.TROLLHEIM_TELEPORT;
+                            break;
                         }
-                        withdrawHerbSetup(config);
-                        Rs2Bank.closeBank();
-                        sleep(100);
-                        System.out.println("Gearing complete");
-                        sleep(200, 800);
-                        botStatus = states.TROLLHEIM_TELEPORT;
-                        break;
                     case TROLLHEIM_TELEPORT:
                         System.out.println("Current state: TROLLHEIM_TELEPORT");
-                        handleTeleportToTrollheim();
+                        if (config.enableTrollheim()) {
+                            handleTeleportToTrollheim();
+//                            botStatus = states.TROLLHEIM_HANDLE_PATCH;
+                        } else {
+                            botStatus = states.CATHERBY_TELEPORT;
+                        }
                         break;
                     case TROLLHEIM_WALKING_TO_PATCH:
                         System.out.println("Current state: TROLLHEIM_WALKING_TO_PATCH");
@@ -106,202 +119,226 @@ public class HerbrunScript extends Script {
                             printHerbPatchActions(trollheimHerbPatchID);
                             handleHerbPatch(trollheimHerbPatchID, seedToPlant, config, trollHeimLeprechaunID);
                             sleep(200);
-                            addCompost(config, trollheimHerbPatchID);
-                            plantSeed(trollheimHerbPatchID, seedToPlant, states.CATHERBY_TELEPORT);
+                            addCompostandSeeds(config, trollheimHerbPatchID, seedToPlant, states.CATHERBY_TELEPORT);
                             break;
                         }
                     case CATHERBY_TELEPORT:
-                        if (!Rs2Player.isMoving() &&
-                                !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                        log("" + config.enableCatherby());
+                        if (config.enableCatherby()) {
                             System.out.println("Current state: CATHERBY_TELEPORT");
                             handleTeleportToCatherby();
+                        } else {
+                            botStatus = states.MORYTANIA_TELEPORT;
+                            break;
                         }
                     case CATHERBY_WALKING_TO_PATCH:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                                !Rs2Player.isInteracting()) {
                             System.out.println("Current state: CATHERBY_WALKING_TO_PATCH");
                             handleWalkingToPatch(catherbyHerb, states.CATHERBY_HANDLE_PATCH);
                         }
                     case CATHERBY_HANDLE_PATCH:
-                        if (Rs2Player.getWorldLocation().distanceTo(catherbyHerb) < 15) {
+                        if (Rs2Player.distanceTo(catherbyHerb) < 15) {
                             System.out.println("Current state: CATHERBY_HANDLE_PATCH");
                             printHerbPatchActions(catherbyHerbPatchID);
                             handleHerbPatch(catherbyHerbPatchID, seedToPlant, config, 0);
                         }
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
-                            addCompost(config, catherbyHerbPatchID);
-                            plantSeed(catherbyHerbPatchID, seedToPlant, states.MORYTANIA_TELEPORT);
+                                !Rs2Player.isInteracting()) {
+                            addCompostandSeeds(config, catherbyHerbPatchID, seedToPlant, states.MORYTANIA_TELEPORT);
                         }
                         break;
                     case MORYTANIA_TELEPORT:
-                        if (!Rs2Player.isMoving() &&
-                                !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                        if (config.enableMorytania()) {
                             handleTeleportToMorytania();
+                            sleep(600,1200);
+                        } else {
+                            botStatus = states.VARLAMORE_TELEPORT;
                         }
                         break;
                     case MORYTANIA_WALKING_TO_PATCH:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                                !Rs2Player.isInteracting()) {
                             handleWalkingToPatch(morytaniaHerb, states.MORYTANIA_HANDLE_PATCH);
                             break;
                         }
                     case MORYTANIA_HANDLE_PATCH:
                         System.out.println("Handling Morytania patch");
-                        if (Rs2Player.getWorldLocation().distanceTo(morytaniaHerb) < 15) {
+                        if (Rs2Player.distanceTo(morytaniaHerb) < 15) {
                             printHerbPatchActions(morytaniaHerbPatchID);
                             handleHerbPatch(morytaniaHerbPatchID, seedToPlant, config, 0);
-                            addCompost(config, morytaniaHerbPatchID);
-                            plantSeed(morytaniaHerbPatchID, seedToPlant, states.VARLAMORE_TELEPORT);
-                            break;
                         }
-                    case VARLAMORE_TELEPORT:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                                !Rs2Player.isInteracting()) {
+                            addCompostandSeeds(config, morytaniaHerbPatchID, seedToPlant, states.VARLAMORE_TELEPORT);
+                        }
+                        break;
+                    case VARLAMORE_TELEPORT:
+                        if (config.enableVarlamore()) {
                             handleTeleportToVarlamore();
+                        } else {
+                            botStatus = states.HOSIDIUS_TELEPORT;
                         }
                         break;
                     case VARLAMORE_WALKING_TO_PATCH:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                                !Rs2Player.isInteracting()) {
                             handleWalkingToPatch(varlamoreHerb, states.VARLAMORE_HANDLE_PATCH);
                         }
                         break;
                     case VARLAMORE_HANDLE_PATCH:
-                        if (!Rs2Player.isMoving() &&
-                                !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                        if (!Rs2Player.isMoving() && !Rs2Player.isAnimating() && !Rs2Player.isInteracting()) {
                             printHerbPatchActions(varlamoreHerbPatchID);
                             handleHerbPatch(varlamoreHerbPatchID, seedToPlant, config, varlamoreLeprechaunID);
-                            addCompost(config, varlamoreHerbPatchID);
-                            plantSeed(varlamoreHerbPatchID, seedToPlant, states.HOSIDIUS_TELEPORT);
-                            break;
+                            addCompostandSeeds(config, varlamoreHerbPatchID, seedToPlant, states.HOSIDIUS_TELEPORT);
                         }
+                        break;
                     case HOSIDIUS_TELEPORT:
-                        if (!Rs2Player.isMoving() &&
-                                !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                        if (config.enableHosidius()) {
                             handleTeleportToHosidius();
+                        } else {
+                            botStatus = states.ARDOUGNE_TELEPORT;
                         }
                         break;
                     case HOSIDIUS_WALKING_TO_PATCH:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                                !Rs2Player.isInteracting()) {
                             handleWalkingToPatch(hosidiusHerb, states.HOSIDIUS_HANDLE_PATCH);
                         }
                         break;
                     case HOSIDIUS_HANDLE_PATCH:
-                        if (Rs2Player.getWorldLocation().distanceTo(hosidiusHerb) < 15) {
+                        if (Rs2Player.distanceTo(hosidiusHerb) < 15) {
                             printHerbPatchActions(hosidiusHerbPatchID);
                             handleHerbPatch(hosidiusHerbPatchID, seedToPlant, config, 0);
 
                         }
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
-                            addCompost(config, hosidiusHerbPatchID);
-                            plantSeed(hosidiusHerbPatchID, seedToPlant, states.ARDOUGNE_TELEPORT);
+                                !Rs2Player.isInteracting()) {
+                            addCompostandSeeds(config, hosidiusHerbPatchID, seedToPlant, states.ARDOUGNE_TELEPORT);
                         }
                         break;
                     case ARDOUGNE_TELEPORT:
-                        handleTeleportToArdougne(config);
+                        if (!config.enableArdougne()) {
+                            botStatus = states.FALADOR_TELEPORT;
+                        } else {
+                            handleTeleportToArdougne(config);
+                        }
                     case ARDOUGNE_WALKING_TO_PATCH:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                                !Rs2Player.isInteracting()) {
                             log("Current state: ARDOUGNE_WALKING_TO_PATCH");
                             handleWalkingToPatch(ardougneHerb, states.ARDOUGNE_HANDLE_PATCH);
                         }
                         break;
                     case ARDOUGNE_HANDLE_PATCH:
-                        if (Rs2Player.getWorldLocation().distanceTo(ardougneHerb) < 15) {
+                        if (Rs2Player.distanceTo(ardougneHerb) < 15) {
                             printHerbPatchActions(ardougneHerbPatchID);
                             handleHerbPatch(ardougneHerbPatchID, seedToPlant, config, 0);
                         }
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
-                            addCompost(config, ardougneHerbPatchID);
-                            plantSeed(ardougneHerbPatchID, seedToPlant, states.FALADOR_TELEPORT);
+                                !Rs2Player.isInteracting()) {
+                            addCompostandSeeds(config, ardougneHerbPatchID, seedToPlant, states.FALADOR_TELEPORT);
                         }
                         break;
                     case FALADOR_TELEPORT:
-                        if (!Rs2Player.isMoving() &&
-                                !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                        if (config.enableFalador()) {
                             handleTeleportToFalador(config);
+                        } else {
+                            botStatus = states.WEISS_TELEPORT;
                         }
                         break;
                     case FALADOR_WALKING_TO_PATCH:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                                !Rs2Player.isInteracting()) {
                             handleWalkingToPatch(cabbageHerb, states.FALADOR_HANDLE_PATCH);
                         }
                         break;
                     case FALADOR_HANDLE_PATCH:
-                        if (Rs2Player.getWorldLocation().distanceTo(cabbageHerb) < 15) {
+                        if (Rs2Player.distanceTo(cabbageHerb) < 15) {
                             printHerbPatchActions(cabbageHerbPatchID);
                             handleHerbPatch(cabbageHerbPatchID, seedToPlant, config, 0);
                         }
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
-                            addCompost(config, cabbageHerbPatchID);
-                            plantSeed(cabbageHerbPatchID, seedToPlant, botStatus = states.WEISS_TELEPORT);
+                                !Rs2Player.isInteracting()) {
+                            addCompostandSeeds(config, cabbageHerbPatchID, seedToPlant, botStatus = states.WEISS_TELEPORT);
                         }
                         break;
                     case WEISS_TELEPORT:
-                        if (!Rs2Player.isMoving() &&
-                                !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                        if (config.enableWeiss()) {
                             handleTeleportToWeiss();
-
+                        } else {
+                            botStatus = states.GUILD_TELEPORT;
                         }
                         break;
                     case WEISS_HANDLE_PATCH:
-                        sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(weissHerb) < 15, 10000);
+                        sleepUntil(() -> Rs2Player.distanceTo(weissHerb) < 15, 10000);
                         printHerbPatchActions(weissHerbPatchID);
                         handleHerbPatch(weissHerbPatchID, seedToPlant, config, 0);
-                        addCompost(config, weissHerbPatchID);
-                        plantSeed(weissHerbPatchID, seedToPlant, states.GUILD_TELEPORT);
-                        break;
-                    case GUILD_TELEPORT:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
-                            handleTeleportToGuild();
+                                !Rs2Player.isInteracting()) {
+                            addCompostandSeeds(config, weissHerbPatchID, seedToPlant, states.HARMONY_TELEPORT);
+                            break;
                         }
-                        sleep(400);
-                        botStatus = states.GUILD_WALKING_TO_PATCH;
+                    case HARMONY_TELEPORT:
+                        if (config.enableHarmony()) {
+                            handleTeleportToHarmony();
+                        } else {
+                            botStatus = states.GUILD_TELEPORT;
+                        }
                         break;
+                    case HARMONY_WALKING_TO_PATCH:
+                        System.out.println("Current state: HARMONY_WALKING_TO_PATCH");
+                        handleWalkingToPatch(harmonyHerb, states.HARMONY_HANDLE_PATCH);
+                        break;
+                    case HARMONY_HANDLE_PATCH:
+                        if (!Rs2Player.isWalking()) {
+                            System.out.println("Current state: HARMONEY_HANDLE_PATCH");
+                            printHerbPatchActions(harmonyHerbPatchID);
+                            handleHerbPatch(harmonyHerbPatchID, seedToPlant, config, 0);
+                            sleep(200);
+                            addCompostandSeeds(config, harmonyHerbPatchID, seedToPlant, states.GUILD_TELEPORT);
+                            break;
+                        }
+                    case GUILD_TELEPORT:
+                        if (config.enableGuild()) {
+                            handleTeleportToGuild(config);
+                            sleep(400);
+                            botStatus = states.GUILD_WALKING_TO_PATCH;
+                            break;
+                        } else {
+                            botStatus = states.FINISHED;
+                            break;
+                        }
                     case GUILD_WALKING_TO_PATCH:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
+                                !Rs2Player.isInteracting()) {
                             handleWalkingToPatch(farmingGuildHerb, states.GUILD_HANDLE_PATCH);
                         }
                         break;
                     case GUILD_HANDLE_PATCH:
                         log(Rs2Player.isAnimating() + "");
                         log("handling herb patch...");
-                        if (Rs2Player.getWorldLocation().distanceTo(farmingGuildHerb) < 20) {
+                        if (Rs2Player.distanceTo(farmingGuildHerb) < 20) {
                             printHerbPatchActions(farmingGuildHerbPatchID);
                             handleHerbPatch(farmingGuildHerbPatchID, seedToPlant, config, 0);
                         }
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
-                                !Microbot.getClient().getLocalPlayer().isInteracting()) {
-                            addCompost(config, farmingGuildHerbPatchID);
-                            plantSeed(farmingGuildHerbPatchID, seedToPlant, botStatus = states.FINISHED);
+                                !Rs2Player.isInteracting()) {
+                            addCompostandSeeds(config, farmingGuildHerbPatchID, seedToPlant, botStatus = states.FINISHED);
                         }
                         break;
                     case FINISHED:
@@ -321,28 +358,17 @@ public class HerbrunScript extends Script {
         super.shutdown();
     }
 
-    private void checkBeforeWithdrawAndEquip(int itemId) {
-        if (!Rs2Equipment.isWearing(itemId)) {
-            Rs2Bank.withdrawAndEquip(itemId);
-        }
-    }
-
     private void checkBeforeWithdrawAndEquip(String itemName) {
         if (!Rs2Equipment.isWearing(itemName)) {
             Rs2Bank.withdrawAndEquip(itemName);
         }
     }
 
-    private boolean interactWithObject(int objectId) {
-        Rs2GameObject.interact(objectId);
-        sleepUntil(Rs2Player::isInteracting);
-        sleepUntil(() -> !Rs2Player.isInteracting());
-        return true;
-    }
-
-    private void equipGraceful() {
+    private void equipGraceful(HerbrunConfig config) {
         checkBeforeWithdrawAndEquip("GRACEFUL HOOD");
-        checkBeforeWithdrawAndEquip("GRACEFUL CAPE");
+        if (!config.FARMING_CAPE()) {
+            checkBeforeWithdrawAndEquip("GRACEFUL CAPE");
+        }
         checkBeforeWithdrawAndEquip("GRACEFUL BOOTS");
         checkBeforeWithdrawAndEquip("GRACEFUL GLOVES");
         checkBeforeWithdrawAndEquip("GRACEFUL TOP");
@@ -350,53 +376,79 @@ public class HerbrunScript extends Script {
     }
 
     private void withdrawHerbSetup(HerbrunConfig config) {
-        Rs2Bank.withdrawX(config.SEED().getItemId(), 9);
+        Rs2Bank.withdrawX(config.SEED().getItemId(), 10);
         if (config.COMPOST()) {
             Rs2Bank.withdrawOne(ItemID.BOTTOMLESS_COMPOST_BUCKET_22997);
         } else {
             Rs2Bank.withdrawX(ItemID.ULTRACOMPOST, 8);
         }
-        if (config.ARDOUGNE_TELEPORT_OPTION()) {
-            Rs2Bank.withdrawOne(config.CLOAK().getItemId());
-        } else {
-            Rs2Bank.withdrawOne(ItemID.ARDOUGNE_TELEPORT);
-        }
-
+        Rs2Bank.withdrawOne(ItemID.RAKE);
         Rs2Bank.withdrawOne(ItemID.SEED_DIBBER);
         Rs2Bank.withdrawOne(ItemID.SPADE);
-        Rs2Bank.withdrawOne(ItemID.ECTOPHIAL);
-        if (Rs2Bank.hasItem(ItemID.PERFECTED_QUETZAL_WHISTLE)) {
-            Rs2Bank.withdrawOne(ItemID.PERFECTED_QUETZAL_WHISTLE);
-        } else if (Rs2Bank.hasItem(ItemID.ENHANCED_QUETZAL_WHISTLE)) {
-            Rs2Bank.withdrawOne(ItemID.ENHANCED_QUETZAL_WHISTLE);
-        } else if (Rs2Bank.hasItem(ItemID.BASIC_QUETZAL_WHISTLE)) {
-            Rs2Bank.withdrawOne(ItemID.BASIC_QUETZAL_WHISTLE);
+        if (config.enableMorytania()) {
+            Rs2Bank.withdrawOne(ItemID.ECTOPHIAL);
         }
-        Rs2Bank.withdrawOne(ItemID.XERICS_TALISMAN);
-        Rs2Bank.withdrawOne(ItemID.RAKE);
-        if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE1)) {
-            Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE1);
-        } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE2)) {
-            Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE2);
-        } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE3)) {
-            Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE3);
-        } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE4)) {
-            Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE4);
-        } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE5)) {
-            Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE5);
-        } else {
-            Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE6);
+        if (config.enableVarlamore()) {
+            if (Rs2Bank.hasItem(ItemID.PERFECTED_QUETZAL_WHISTLE)) {
+                Rs2Bank.withdrawOne(ItemID.PERFECTED_QUETZAL_WHISTLE);
+            } else if (Rs2Bank.hasItem(ItemID.ENHANCED_QUETZAL_WHISTLE)) {
+                Rs2Bank.withdrawOne(ItemID.ENHANCED_QUETZAL_WHISTLE);
+            } else if (Rs2Bank.hasItem(ItemID.BASIC_QUETZAL_WHISTLE)) {
+                Rs2Bank.withdrawOne(ItemID.BASIC_QUETZAL_WHISTLE);
+            }
         }
-        if (config.FALADOR_TELEPORT_OPTION()) {
-            Rs2Bank.withdrawOne(config.RING().getItemId());
-        } else {
-            Rs2Bank.withdrawOne(ItemID.FALADOR_TELEPORT);
+        if (config.enableHosidius()) {
+            Rs2Bank.withdrawOne(ItemID.XERICS_TALISMAN);
         }
-        Rs2Bank.withdrawOne(ItemID.STONY_BASALT);
-        Rs2Bank.withdrawOne(ItemID.ICY_BASALT);
-        Rs2Bank.withdrawOne(ItemID.CAMELOT_TELEPORT);
-//        Rs2Bank.withdrawX(ItemID.AIR_RUNE, 5);
-//        Rs2Bank.withdrawX(ItemID.LAW_RUNE, 1);
+        if (config.enableArdougne()) {
+            if (config.ARDOUGNE_TELEPORT_OPTION()) {
+                Rs2Bank.withdrawOne(config.CLOAK().getItemId());
+            } else {
+                Rs2Bank.withdrawOne(ItemID.ARDOUGNE_TELEPORT);
+            }
+        }
+        if (config.enableGuild()) {
+            if (!config.FARMING_CAPE()) {
+                if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE1)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE1);
+                } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE2)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE2);
+                } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE3)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE3);
+                } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE4)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE4);
+                } else if (Rs2Bank.hasItem(ItemID.SKILLS_NECKLACE5)) {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE5);
+                } else {
+                    Rs2Bank.withdrawOne(ItemID.SKILLS_NECKLACE6);
+                }
+            } else {
+                if (Rs2Bank.hasItem(ItemID.FARMING_CAPE)) {
+                Rs2Bank.withdrawOne(ItemID.FARMING_CAPE);
+                } else if (Rs2Bank.hasItem(ItemID.FARMING_CAPET)) {
+                    Rs2Bank.withdrawOne(ItemID.FARMING_CAPET);
+                }
+            }
+        }
+        if (config.enableFalador()) {
+            if (config.FALADOR_TELEPORT_OPTION()) {
+                Rs2Bank.withdrawOne(config.RING().getItemId());
+            } else {
+                Rs2Bank.withdrawOne(ItemID.FALADOR_TELEPORT);
+            }
+        }
+        if (config.enableWeiss()) {
+            Rs2Bank.withdrawOne(ItemID.ICY_BASALT);
+        }
+        if (config.enableCatherby()) {
+            Rs2Bank.withdrawOne(ItemID.CAMELOT_TELEPORT);
+        }
+        if (config.enableTrollheim()) {
+            Rs2Bank.withdrawOne(ItemID.STONY_BASALT);
+        }
+        if (config.enableHarmony()) {
+            Rs2Bank.withdrawOne(ItemID.HARMONY_ISLAND_TELEPORT);
+        }
         checkBeforeWithdrawAndEquip("Magic secateurs");
     }
 
@@ -419,6 +471,33 @@ public class HerbrunScript extends Script {
                 sleepUntil(() -> !Rs2Player.isAnimating() && !Rs2Player.isMoving());
                 System.out.println("Arrived at Trollheim teleport spot.");
                 botStatus = states.TROLLHEIM_WALKING_TO_PATCH;
+            }
+        }
+    }
+
+    private boolean harmonyTeleport() {
+        sleep(100);
+        if (!Rs2Player.isAnimating()) {
+            System.out.println("Teleporting to Catherby");
+            boolean success = Rs2Inventory.interact(ItemID.HARMONY_ISLAND_TELEPORT, "Break");
+            Rs2Player.waitForAnimation();
+            sleepUntil(() -> !Rs2Player.isAnimating());
+            return success;
+        }
+        return false;
+    }
+
+    private void handleTeleportToHarmony() {
+        if (!Rs2Player.isAnimating()) {
+            System.out.println("Teleporting to Harmony...");
+            boolean success = harmonyTeleport();
+
+            if (success) {
+                sleepUntil(() -> !Rs2Player.isAnimating() && !Rs2Player.isMoving());
+                System.out.println("Arrived at Harmony teleport spot.");
+                botStatus = states.HARMONY_WALKING_TO_PATCH;
+            } else {
+                System.out.println("Teleport to Harmony failed!");
             }
         }
     }
@@ -544,15 +623,32 @@ public class HerbrunScript extends Script {
             System.out.println("Teleporting to Ardougne farm patch");
             if (config.ARDOUGNE_TELEPORT_OPTION()) {
                 boolean success = Rs2Inventory.interact(config.CLOAK().getItemId(), "Farm Teleport");
-            } else {
-                boolean success = Rs2Inventory.interact(ItemID.ARDOUGNE_TELEPORT, "Break");
+            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE1)) {
+                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE1, "rub");
+            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE2)) {
+                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE2, "rub");
+            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE3)) {
+                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE3, "rub");
+            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE4)) {
+                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE4, "rub");
+            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE5)) {
+                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE5, "rub");
+            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE6)) {
+                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE6, "rub");
             }
+            sleep(800, 1200);
+            Rs2Keyboard.keyPress('1');
+            Rs2Player.waitForAnimation();
+            sleepUntil(() -> !Rs2Player.isAnimating());
+            return true;
+        } else {
+            boolean success = Rs2Inventory.interact(ItemID.ARDOUGNE_TELEPORT, "Break");
+
             Rs2Player.waitForAnimation();
             sleepUntil(() -> !Rs2Player.isAnimating());
             sleep(100, 400);
             return true;
         }
-        return false;
     }
 
     private void handleTeleportToArdougne(HerbrunConfig config) {
@@ -609,37 +705,45 @@ public class HerbrunScript extends Script {
         }
     }
 
-    private boolean guildTeleport() {
+    private boolean guildTeleport(HerbrunConfig config) {
         sleep(100);
         if (!Rs2Player.isAnimating()) {
             System.out.println("Teleporting to the Farming guild");
-            if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE1)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE1, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE2)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE2, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE3)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE3, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE4)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE4, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE5)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE5, "rub");
-            } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE6)) {
-                Rs2Inventory.interact(ItemID.SKILLS_NECKLACE6, "rub");
+            if (!config.FARMING_CAPE()) {
+                if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE1)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE1, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE2)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE2, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE3)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE3, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE4)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE4, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE5)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE5, "rub");
+                } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE6)) {
+                    Rs2Inventory.interact(ItemID.SKILLS_NECKLACE6, "rub");
+                }
+                sleep(700, 1100);
+                Rs2Keyboard.keyPress('6');
+                Rs2Player.waitForAnimation();
+                sleepUntil(() -> !Rs2Player.isAnimating());
+                return true;
+            } else if (Rs2Equipment.hasEquipped(ItemID.FARMING_CAPE)) {
+                Rs2Equipment.interact(ItemID.FARMING_CAPE, "teleport");
+                return true;
+            } else if (Rs2Equipment.hasEquipped(ItemID.FARMING_CAPET)) {
+                Rs2Equipment.interact(ItemID.FARMING_CAPET, "teleport");
+                return true;
             }
-            sleep(700, 1100);
-            Rs2Keyboard.keyPress('6');
-            Rs2Player.waitForAnimation();
-            sleepUntil(() -> !Rs2Player.isAnimating());
-            return true;
         }
         return false;
     }
 
-    private void handleTeleportToGuild() {
+    private void handleTeleportToGuild(HerbrunConfig config) {
         boolean hasTeleported = false;
         if (!hasTeleported) {
             System.out.println("Teleporting to the Farming guild...");
-            guildTeleport();  // Perform guild teleport
+            guildTeleport(config);  // Perform guild teleport
             hasTeleported = true;
         }
         botStatus = states.GUILD_WALKING_TO_PATCH;
@@ -674,8 +778,8 @@ public class HerbrunScript extends Script {
         // Start walking to the location
         Rs2Walker.walkTo(location);
         // Wait until the player reaches within 2 tiles of the location and has stopped moving
-        sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(location) < 10);
-        if (Rs2Player.getWorldLocation().distanceTo(location) < 10) {
+        sleepUntil(() -> Rs2Player.distanceTo(location) < 10);
+        if (Rs2Player.distanceTo(location) < 10) {
             log("Arrived at herb patch.");
             botStatus = nextState;
         }
@@ -737,14 +841,14 @@ public class HerbrunScript extends Script {
             Rs2Inventory.useItemOnNpc(config.SEED().getHerbId(), leprechaunID); // Note the herbs with tool leprechaun
             Rs2Player.waitForAnimation();
         }
-        int timesToLoop = 2 + (int)(Math.random() * 6);
+        int timesToLoop = 2 + (int) (Math.random() * 6);
 
         // Pick herbs from the patch
         Rs2GameObject.interact(herbPatch, "pick");
         Rs2Player.waitForXpDrop(Skill.FARMING);
         for (int i = 0; i < timesToLoop; i++) {
             Rs2GameObject.interact(herbPatch, "pick");
-            sleep(25,100);
+            sleep(25, 100);
         }
         Rs2Player.waitForAnimation();
 
@@ -770,10 +874,10 @@ public class HerbrunScript extends Script {
 
             if (config.FAST_HERB()) {
                 Rs2Player.waitForXpDrop(Skill.FARMING);
-                timesToLoop = 2 + (int)(Math.random() * 6);
+                timesToLoop = 2 + (int) (Math.random() * 6);
                 for (int i = 0; i < timesToLoop; i++) {
                     Rs2GameObject.interact(herbPatch, "pick");
-                    sleep(25,100);
+                    sleep(25, 100);
                 }
             }
 
@@ -840,39 +944,30 @@ public class HerbrunScript extends Script {
         }
     }
 
-    private void addCompost(HerbrunConfig config, int patchId) {
+    private void addCompostandSeeds(HerbrunConfig config, int patchId, int seedToPlant, states state) {
+        // Check that the player is idle before interacting with the patch
+        if (!Rs2Player.isMoving() && !Rs2Player.isAnimating() &&
+                !Rs2Player.isInteracting() && !Rs2Player.isWalking()) {
 
-        // Apply bottomless compost bucket on the herb patch
-        if (!Rs2Player.isMoving() &&
-                !Rs2Player.isAnimating() &&
-                !Rs2Player.isInteracting() &&
-                !Rs2Player.isWalking()) {
+            // Apply compost based on configuration
             System.out.println("Applying compost...");
-            if (config.COMPOST()) {
-                Rs2Inventory.use(ItemID.BOTTOMLESS_COMPOST_BUCKET_22997);
-                Rs2GameObject.interact(patchId, "use");
-                sleepUntil(Rs2Player::isInteracting);
-                sleepUntil(() -> !Rs2Player.isInteracting());
-            } else {
-                Rs2Inventory.use(ItemID.ULTRACOMPOST);
-                Rs2GameObject.interact(patchId, "use");
-                sleepUntil(Rs2Player::isInteracting);
-                sleepUntil(() -> !Rs2Player.isInteracting());
-            }
-        }
-    }
+            int compostItemId = config.COMPOST() ? ItemID.BOTTOMLESS_COMPOST_BUCKET_22997 : ItemID.ULTRACOMPOST;
+            Rs2Inventory.use(compostItemId);
+            Rs2GameObject.interact(patchId, "use");
+            // Wait for farming XP drop to confirm compost application
+            Rs2Player.waitForXpDrop(Skill.FARMING);
+            sleep(50, 1200);
 
-    private void plantSeed(int patchId, int seedToPlant, states state) {
-        if (!Rs2Player.isMoving() &&
-                !Rs2Player.isAnimating() &&
-                !Rs2Player.isInteracting() &&
-                !Rs2Player.isWalking()) {
-
+            // Plant seeds in the patch
             System.out.println("Planting seeds...");
             Rs2Inventory.use(seedToPlant);
             Rs2GameObject.interact(patchId, "use");
+
+            // Wait until interaction is complete
             sleepUntil(Rs2Player::isInteracting);
-            sleepUntil(() -> !Rs2Player.isInteracting());
+            if (Rs2Inventory.contains(ItemID.EMPTY_BUCKET)) Rs2Inventory.drop(ItemID.EMPTY_BUCKET);
+
+            // Update the bot status
             botStatus = state;
         }
     }

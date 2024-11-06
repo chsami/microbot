@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.nateplugins.skilling.natefishing;
 
+import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -7,6 +8,7 @@ import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -94,6 +96,7 @@ public class AutoFishingScript extends Script {
             case SHRIMP:
                 return Rs2Inventory.hasItem("small fishing net");
             case SARDINE:
+            case PIKE:
                 return Rs2Inventory.hasItem("fishing rod") && Rs2Inventory.hasItem("bait");
             case MACKEREL:
                 return Rs2Inventory.hasItem("big fishing net");
@@ -101,7 +104,7 @@ public class AutoFishingScript extends Script {
                 return Rs2Inventory.hasItem("fly fishing rod") && Rs2Inventory.hasItem("feather");
             case TUNA:
             case SHARK:
-                return Rs2Inventory.hasItem("harpoon");
+                return Rs2Inventory.hasItem("harpoon") || Rs2Equipment.hasEquipped(ItemID.DRAGON_HARPOON) ||  Rs2Equipment.hasEquipped(ItemID.DRAGON_HARPOON_OR);
             case LOBSTER:
                 return Rs2Inventory.hasItem("lobster pot");
             case LAVA_EEL:
