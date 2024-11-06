@@ -431,7 +431,7 @@ public class TitheFarmingScript extends Script {
             Rs2Inventory.drop(TitheFarmMaterial.getSeedForLevel().getName());
             sleep(400, 600);
         }
-        Rs2GameObject.interact("Seed table");
+        Rs2GameObject.interact(ObjectID.SEED_TABLE);
         boolean result = Rs2Widget.sleepUntilHasWidget(TitheFarmMaterial.getSeedForLevel().getName());
         if (!result) return;
         keyPress(TitheFarmMaterial.getSeedForLevel().getOption());
