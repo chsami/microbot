@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
 import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
+import net.runelite.client.plugins.microbot.zerozero.tormenteddemons.TormentedDemonConfig.MODE;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -56,9 +57,9 @@ public class TormentedDemonScript extends Script {
     private BankingStep bankingStep = BankingStep.DRINK;
 
     public boolean run(TormentedDemonConfig config) {
-        if (config.fullAuto()) {
+        if (config.mode() == MODE.FULL_AUTO) {
             BOT_STATUS = State.BANKING;
-        } else if (config.combatOnly()) {
+        } else if (config.mode() == MODE.COMBAT_ONLY) {
             BOT_STATUS = State.FIGHTING;
         }
 
@@ -227,7 +228,7 @@ public class TormentedDemonScript extends Script {
             }
         }
 
-        if (config.fullAuto() && shouldRetreat(config)) {
+        if (config.mode() == MODE.FULL_AUTO && shouldRetreat(config)) {
             Microbot.pauseAllScripts = true;
             Rs2Walker.walkTo(SAFE_LOCATION);
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(SAFE_LOCATION), 5000);

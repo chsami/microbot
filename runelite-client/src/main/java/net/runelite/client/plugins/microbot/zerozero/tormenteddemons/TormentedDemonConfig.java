@@ -29,24 +29,14 @@ public interface TormentedDemonConfig extends Config {
     String generalSettings = "generalSettings";
 
     @ConfigItem(
-            keyName = "fullAuto",
-            name = "Full Auto",
-            description = "Enable full auto mode (banking, traveling, fighting, and restocking)",
+            keyName = "mode",
+            name = "Mode",
+            description = "Choose the bot mode: Full Auto or Combat Only",
             section = generalSettings,
             position = 0
     )
-    default boolean fullAuto() {
-        return true;
-    }
-    @ConfigItem(
-            keyName = "combatOnly",
-            name = "Combat Only",
-            description = "Only fight Tormented Demons, without banking or traveling",
-            section = generalSettings,
-            position = 1
-    )
-    default boolean combatOnly() {
-        return false;
+    default MODE mode() {
+        return MODE.FULL_AUTO;
     }
 
     @ConfigSection(
@@ -244,4 +234,13 @@ public interface TormentedDemonConfig extends Config {
     default String meleeGear() {
         return " ";
     }
+
+    enum MODE {
+        FULL_AUTO,
+        COMBAT_ONLY
+    }
+
 }
+
+
+

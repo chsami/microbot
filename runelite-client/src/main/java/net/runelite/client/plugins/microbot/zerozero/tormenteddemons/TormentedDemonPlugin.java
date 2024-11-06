@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @PluginDescriptor(
         name = PluginDescriptor.zerozero + "Tormented Demons",
         description = "Automates restocking, prayer flicking, and gear switching during Tormented Demon",
-        tags = {"tormented", "flicker", "weapon", "switch"},
+        tags = {"tormented", "flicker", "weapon", "switch", "microbot"},
         enabledByDefault = false
 )
 @Slf4j
@@ -76,37 +76,34 @@ public class TormentedDemonPlugin extends Plugin {
 
     @Subscribe
     private void onConfigChanged(ConfigChanged event) {
-        if (event.getGroup().equals("tormenteddemon")) {
-            if (event.getKey().equals("fullAuto") && config.fullAuto()) {
-                configManager.setConfiguration("tormenteddemon", "combatOnly", false);
-            } else if (event.getKey().equals("combatOnly") && config.combatOnly()) {
-                configManager.setConfiguration("tormenteddemon", "fullAuto", false);
-            }
-            if (event.getKey().equals("copyGear")) {
-                Microbot.getClientThread().invoke(() -> {
-                    try {
-                        StringJoiner gearList = new StringJoiner(",");
-                        for (Item item : Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems()) {
-                            if (item != null && item.getId() != -1 && item.getId() != 6512) {
-                                ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.getId());
-                                gearList.add(itemComposition.getName());
-                            }
-                        }
+        if (!event.getGroup().equals("tormenteddemon")) {
+            return;
+        }
 
-                        String gearString = gearList.toString();
-                        if (gearString.isEmpty()) {
-                            Microbot.log("No gear found to copy.");
-                            return;
+        if (event.getKey().equals("copyGear")) {
+            Microbot.getClientThread().invoke(() -> {
+                try {
+                    StringJoiner gearList = new StringJoiner(",");
+                    for (Item item : Microbot.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems()) {
+                        if (item != null && item.getId() != -1 && item.getId() != 6512) {
+                            ItemComposition itemComposition = Microbot.getClient().getItemDefinition(item.getId());
+                            gearList.add(itemComposition.getName());
                         }
-
-                        StringSelection selection = new StringSelection(gearString);
-                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
-                        Microbot.log("Current gear copied to clipboard: " + gearString);
-                    } catch (Exception e) {
-                        Microbot.log("Failed to copy gear to clipboard: " + e.getMessage());
                     }
-                });
-            }
+
+                    String gearString = gearList.toString();
+                    if (gearString.isEmpty()) {
+                        Microbot.log("No gear found to copy.");
+                        return;
+                    }
+
+                    StringSelection selection = new StringSelection(gearString);
+                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+                    Microbot.log("Current gear copied to clipboard: " + gearString);
+                } catch (Exception e) {
+                    Microbot.log("Failed to copy gear to clipboard: " + e.getMessage());
+                }
+            });
         }
     }
 
@@ -115,21 +112,23 @@ public class TormentedDemonPlugin extends Plugin {
         final GraphicsObject graphicsObject = event.getGraphicsObject();
         final int TORMENTED_VENGENCE_SPECIAL = 2856;
 
-        if (graphicsObject.getId() == TORMENTED_VENGENCE_SPECIAL) {
-            Rs2Tile.init();
-            int ticks = 4;
+        if (graphicsObject.getId() != TORMENTED_VENGENCE_SPECIAL) {
+            return;
+        }
 
-            Microbot.pauseAllScripts = true;
-            try {
-                scheduledExecutorService.schedule(() -> {
-                    Rs2Tile.addDangerousGraphicsObjectTile(graphicsObject, 600 * ticks);
-                    tormentedDemonScript.logOnceToChat("Successfully dodged Tormented Demon special attack.");
-                    Microbot.pauseAllScripts = false;
-                }, 800, TimeUnit.MILLISECONDS);
-            } catch (Exception e) {
+        Rs2Tile.init();
+        int ticks = 4;
+
+        Microbot.pauseAllScripts = true;
+        try {
+            scheduledExecutorService.schedule(() -> {
+                Rs2Tile.addDangerousGraphicsObjectTile(graphicsObject, 600 * ticks);
+                tormentedDemonScript.logOnceToChat("Successfully dodged Tormented Demon special attack.");
                 Microbot.pauseAllScripts = false;
-                tormentedDemonScript.logOnceToChat("Error during dodging: " + e.getMessage());
-            }
+            }, 800, TimeUnit.MILLISECONDS);  // Adjusted delay as per new condition
+        } catch (Exception e) {
+            Microbot.pauseAllScripts = false;
+            tormentedDemonScript.logOnceToChat("Error during dodging: " + e.getMessage());
         }
     }
 
