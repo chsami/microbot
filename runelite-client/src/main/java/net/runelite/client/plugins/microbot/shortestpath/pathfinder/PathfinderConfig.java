@@ -60,6 +60,7 @@ public class PathfinderConfig {
             useFairyRings,
             useGnomeGliders,
             useMinecarts,
+            useQuetzals,
             useSpiritTrees,
             useTeleportationLevers,
             useTeleportationPortals,
@@ -120,6 +121,7 @@ public class PathfinderConfig {
         useFairyRings = config.useFairyRings();
         useGnomeGliders = config.useGnomeGliders();
         useMinecarts = config.useMinecarts();
+        useQuetzals = config.useQuetzals();
         useSpiritTrees = config.useSpiritTrees();
         useTeleportationItems = config.useTeleportationItems();
         useTeleportationLevers = config.useTeleportationLevers();
@@ -258,10 +260,12 @@ public class PathfinderConfig {
             }
 
             // Quest check
-            for (Quest quest : entry.getQuests()) {
-                if (questStates.getOrDefault(quest, QuestState.NOT_STARTED) != QuestState.FINISHED) {
-                    restrictionApplies = true;
-                    break;
+            if (!restrictionApplies) {
+                for (Quest quest : entry.getQuests()) {
+                    if (questStates.getOrDefault(quest, QuestState.NOT_STARTED) != QuestState.FINISHED) {
+                        restrictionApplies = true;
+                        break;
+                    }
                 }
             }
 
@@ -369,6 +373,8 @@ public class PathfinderConfig {
         } else if (GNOME_GLIDER.equals(type) && (!useGnomeGliders || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
         } else if (MINECART.equals(type) && (!useMinecarts || !client.getWorldType().contains(WorldType.MEMBERS))) {
+            return false;
+        } else if (QUETZAL.equals(type) && (!useQuetzals || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
         } else if (SPIRIT_TREE.equals(type) && (!useSpiritTrees || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;

@@ -165,11 +165,11 @@
 2789 3066 0			12409	Tai Bwo Wannai Trio	4	Tai bwo wannai teleport	T	20
 2194 3258 0			12410	Regicide	4	Iorwerth camp teleport	T	20
 3701 2996 0			12411	Cabin Fever	4	Mos le'harmless teleport	T	20
-3302 3487 0			12412		4	Lumberyard teleport	T	20
-2196 3056 0			12413	Regicide	4	Zul-andra teleport	T	20
-1310 1250 0			12414		4	Key master teleport	T	20
-3128 3832 0			12415		4	Revenant cave teleport	T	20
-1645 3580 0			12416		4	Watson teleport	T	20
+3302 3487 0			12642		4	Lumberyard teleport	T	20
+2196 3056 0			12938	Regicide	4	Zul-andra teleport	T	20
+1310 1250 0			13249		4	Key master teleport	T	20
+3128 3832 0			21802		4	Revenant cave teleport	T	20
+1645 3580 0			23387		4	Watson teleport	T	20
 									
 # capes									
 2931 3286 0			9780;9781		4	Crafting cape	F	20	
@@ -208,38 +208,38 @@
 # The Max cape's home teleports, determined by varbit 2187									
 # 0 - None									
 # 1 - Rimmington									
-2952 3224 0			9789;9790		4	Max cape: Home	F	20	2187=1
+2952 3224 0			13280;13342		4	Max cape: Home	F	20	2187=1
 # 2 - Taverly									
-2892 3465 0			9789;9790		4	Max cape: Home	F	20	2187=2
+2892 3465 0			13280;13342		4	Max cape: Home	F	20	2187=2
 # 3 - Pollnivneach									
-3339 3001 0			9789;9790		4	Max cape: Home	F	20	2187=3
+3339 3001 0			13280;13342		4	Max cape: Home	F	20	2187=3
 # 4 - Rellekka									
-2669 3629 0			9789;9790		4	Max cape: Home	F	20	2187=4
+2669 3629 0			13280;13342		4	Max cape: Home	F	20	2187=4
 # 5 - Brimhaven									
-2756 3176 0			9789;9790		4	Max cape: Home	F	20	2187=5
+2756 3176 0			13280;13342		4	Max cape: Home	F	20	2187=5
 # 6 - Yanille									
-2545 3097 0			9789;9790		4	Max cape: Home	F	20	2187=6
+2545 3097 0			13280;13342		4	Max cape: Home	F	20	2187=6
 # 7 - Prifddinas									
-3239 6077 0			9789;9790		4	Max cape: Home	F	20	2187=7
+3239 6077 0			13280;13342		4	Max cape: Home	F	20	2187=7
 # 8 - Hosidius									
-1740 3517 0			9789;9790		4	Max cape: Home	F	20	2187=8
-2952 3224 0			9789;9790		4	Max cape: Rimmington	F	20	
-2892 3465 0			9789;9790		4	Max cape: Taverley	F	20	
-3339 3001 0			9789;9790		4	Max cape: Pollnivneach	F	20	
-1743 3517 0			9789;9790		4	Max cape: Hosidius	F	20	
-2669 3629 0			9789;9790		4	Max cape: Rellekka	F	20	
-2756 3176 0			9789;9790		4	Max cape: Brimhaven	F	20	
-2545 3097 0			9789;9790		4	Max cape: Yanille	F	20	
-3239 6077 0			9789;9790		4	Max cape: Prifddinas	F	20	
-2865 3546 0			9789;9790		4	Max cape: Warriors' Guild	F	20	
-2604 3401 0			9789;9790		4	Max cape: Fishing Guild	F	20	
-2931 3286 0			9789;9790		4	Max cape: Crafting Guild	F	20	
-2556 2917 0			9789;9790		4	Hunter cape: Feldip Hills	F	20	
-3144 3772 0			9789;9790		4	Hunter cape: Black chinchompa	F	20	
-3144 3772 0			9789;9790		4	Hunter cape: Black chinchompa	F	20
+1740 3517 0			13280;13342		4	Max cape: Home	F	20	2187=8
+2952 3224 0			13280;13342		4	Max cape: Rimmington	F	20	
+2892 3465 0			13280;13342		4	Max cape: Taverley	F	20	
+3339 3001 0			13280;13342		4	Max cape: Pollnivneach	F	20	
+1743 3517 0			13280;13342		4	Max cape: Hosidius	F	20	
+2669 3629 0			13280;13342		4	Max cape: Rellekka	F	20	
+2756 3176 0			13280;13342		4	Max cape: Brimhaven	F	20	
+2545 3097 0			13280;13342		4	Max cape: Yanille	F	20	
+3239 6077 0			13280;13342		4	Max cape: Prifddinas	F	20	
+2865 3546 0			13280;13342		4	Max cape: Warriors' Guild	F	20	
+2604 3401 0			13280;13342		4	Max cape: Fishing Guild	F	20	
+2931 3286 0			13280;13342		4	Max cape: Crafting Guild	F	20	
+2556 2917 0			13280;13342		4	Max cape: Feldip Hills	F	20	
+3144 3772 0			13280;13342		4	Max cape: Black chinchompa	F	20	
+3144 3772 0			13280;13342		4	Max cape: Black chinchompa	F	20
 #Quest point cape (instead of using the item name we use the action teleport, we use the itemids to verifiy the item)
-3144 3772 0			9813;13068		4	Quest point cape	F	20
-2689 3547 0			13221;13222		4	Music cape	F	20	
+3144 3772 0			9813;13068		4	Quest point cape: Teleport	F	20
+2689 3547 0			13221;13222		4	Music cape: Teleport	F	20	
 2574 3323 0			13069;19476		4	1. Achievement diary cape: Two-pints	F	20
 3302 3122 0			13069;19476		4	2. Achievement diary cape: Jarr	F	20
 2978 3347 0			13069;19476		4	3. Achievement diary cape: Sir Rebral	F	20
@@ -268,7 +268,7 @@
 2330 3171 0			23946		4	Eternal teleport crystal: Lletya	F	20	
 3264 6066 0			23946	Song of the Elves	4	Eternal teleport crystal: Prifddinas	F	20	
 2465 3495 0			19564		4	Royal seed pod	F	30
-2465 3495 0			24251		4	Grand seed pod	T	30	
+2465 3495 0			9469		4	Grand seed pod	T	30	
 # Enchanted lyre - 4493 is DIARY_FREMENNIK_HARD, 4494 is DIARY_FREMENNIK_ELITE									
 2662 3644 0			3691;6125;6126;6127;13079		4	Enchanted lyre: Rellekka	T	20	
 2551 3755 0			3691;6125;6126;6127;13079		4	Enchanted lyre: Waterbirth Island	T	20	4493=1
@@ -321,3 +321,6 @@
 2019 6434 0			28327		4	Ring of shadows: The Scar	T	20	
 2588 6435 0			28327		4	Ring of shadows: Lassar Undercity	T	20	
 1175 3424 0			28327		4	Ring of shadows: The Stranglewood	T	20	
+									
+#Quetzal Whistle									
+1585 3053 0			29271;29273;29275	Children of the Sun	4	Quetzal whistle	T	20	
