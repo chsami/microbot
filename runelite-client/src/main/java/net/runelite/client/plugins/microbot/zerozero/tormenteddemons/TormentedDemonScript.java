@@ -231,6 +231,8 @@ public class TormentedDemonScript extends Script {
         }
 
         if (config.mode() == MODE.FULL_AUTO && shouldRetreat(config)) {
+            currentTarget = null;
+            currentOverheadIcon = null;
             Microbot.pauseAllScripts = true;
             teleportToFeroxEnclave();
             sleepUntil(() -> Microbot.getClient().getLocalPlayer().getWorldLocation().equals(SAFE_LOCATION), 5000);
