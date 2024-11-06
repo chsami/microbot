@@ -239,19 +239,21 @@ public class TormentedDemonScript extends Script {
             return;
         }
 
-        Rs2Player.eatAt(config.minEatPercent());
-        Rs2Player.drinkPrayerPotionAt(config.minPrayerPercent());
+        if (currentTarget != null && !currentTarget.isDead()) {
+            Rs2Player.eatAt(config.minEatPercent());
+            Rs2Player.drinkPrayerPotionAt(config.minPrayerPercent());
 
-        if (Microbot.getClient().getLocalPlayer().getInteracting() != currentTarget) {
-            boolean attackSuccessful = Rs2Npc.interact(currentTarget, "attack");
+            if (Microbot.getClient().getLocalPlayer().getInteracting() != currentTarget) {
+                boolean attackSuccessful = Rs2Npc.interact(currentTarget, "attack");
 
-            if (attackSuccessful) {
-                Rs2Player.waitForAnimation();
-                sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == currentTarget, 3000);
-            } else {
-                logOnceToChat("Attack failed for target: " + (currentTarget != null ? currentTarget.getName() : "null"));
-                currentTarget = null;
-                return;
+                if (attackSuccessful) {
+                    Rs2Player.waitForAnimation();
+                    sleepUntil(() -> Microbot.getClient().getLocalPlayer().getInteracting() == currentTarget, 3000);
+                } else {
+                    logOnceToChat("Attack failed for target: " + (currentTarget != null ? currentTarget.getName() : "null"));
+                    currentTarget = null;
+                    return;
+                }
             }
         }
 
