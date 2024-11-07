@@ -3,7 +3,7 @@
 
 
 # Microbot
-Microbot is an opensource automated oldschool runescape client based on runelite. It uses a plugin system to enable scripting. Here is a youtube channel showing off some of the scripts
+Microbot is an opensource oldschool runescape client based on runelite. It uses a plugin system to enable scripting. Here is a youtube channel showing off some of the scripts
 
 ## Youtube
 
