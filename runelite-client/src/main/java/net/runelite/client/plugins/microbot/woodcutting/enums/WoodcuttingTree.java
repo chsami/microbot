@@ -8,16 +8,16 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 @Getter
 @RequiredArgsConstructor
 public enum WoodcuttingTree {
-    TREE("Tree", "Logs",1, "Chop down"),
-    OAK("Oak tree", "Oak logs",15, "Chop down"),
-    WILLOW("Willow tree", "Willow logs",30, "Chop down"),
-    TEAK_TREE("Teak tree", "Teak logs",35, "Chop down"),
-    MAPLE("Maple tree", "Maple logs",45, "Chop down"),
-    MAHOGANY("Mahogany tree", "Mahogany logs",50, "Chop down"),
-    YEW("Yew tree", "Yew logs",60, "Chop down"),
-    BLISTERWOOD("Blisterwood tree", "Blisterwood logs",62, "Chop"),
-    MAGIC("Magic tree", "Magic logs",75, "Chop down"),
-    REDWOOD("Redwood tree", "Redwood logs",90, "Cut");
+    TREE("tree", "Logs",1, "Chop down"),
+    OAK("oak tree", "Oak logs",15, "Chop down"),
+    WILLOW("willow tree", "Willow logs",30, "Chop down"),
+    TEAK_TREE("teak tree", "Teak logs",35, "Chop down"),
+    MAPLE("maple tree", "Maple logs",45, "Chop down"),
+    MAHOGANY("mahogany tree", "Mahogany logs",50, "Chop down"),
+    YEW("yew tree", "Yew logs",60, "Chop down"),
+    BLISTERWOOD("blisterwood tree", "Blisterwood logs",62, "Chop"),
+    MAGIC("magic tree", "Magic logs",75, "Chop down"),
+    REDWOOD("redwood tree", "Redwood logs",90, "Cut");
 
 
     private final String name;

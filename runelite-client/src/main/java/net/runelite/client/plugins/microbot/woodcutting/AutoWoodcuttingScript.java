@@ -4,7 +4,6 @@ import net.runelite.api.AnimationID;
 import net.runelite.api.GameObject;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.ItemID;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
@@ -14,7 +13,6 @@ import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -22,8 +20,6 @@ import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingWalkBack;
-import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
-import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -114,22 +110,6 @@ public class AutoWoodcuttingScript extends Script {
                                 }
                             }
                         }
-
-                        if (config.Nests()) {
-                            LootingParameters nameParams = new LootingParameters(
-                                    config.distanceToStray(),
-                                    1,
-                                    1,
-                                    1,
-                                    false,
-                                    true,
-                                    "nest"
-                            );
-                            if (Rs2GroundItem.lootItemsBasedOnNames(nameParams)) {
-                                Microbot.pauseAllScripts = false;
-                            }
-                        }
-
                         break;
                     case RESETTING:
                         resetInventory(config);
@@ -148,9 +128,8 @@ public class AutoWoodcuttingScript extends Script {
                 Rs2Inventory.dropAllExcept("axe", "tinderbox");
                 state = State.WOODCUTTING;
                 break;
-            case  BANK:
+            case BANK:
                 List<String> itemNames = Arrays.stream(config.itemsToBank().split(",")).map(String::toLowerCase).collect(Collectors.toList());
-                itemNames.addAll(Arrays.asList(Arrays.toString(NestIDs)));
 
                 if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(itemNames, calculateReturnPoint(config)))
                     return;
@@ -249,10 +228,6 @@ public class AutoWoodcuttingScript extends Script {
         Rs2Walker.walkTo(new WorldPoint(calculateReturnPoint(config).getX() - Random.random(-1, 1), calculateReturnPoint(config).getY() - Random.random(-1, 1), calculateReturnPoint(config).getPlane()));
         sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(calculateReturnPoint(config)) <= 4);
     }
-
-    private static final int[] NestIDs = {
-        ItemID.BIRD_NEST,ItemID.BIRD_NEST_5071,ItemID.BIRD_NEST_5072,ItemID.BIRD_NEST_5073,ItemID.BIRD_NEST_5074,ItemID.BIRD_NEST_5075,ItemID.BIRD_NEST_7413,ItemID.BIRD_NEST_13653,ItemID.BIRD_NEST_22798,ItemID.BIRD_NEST_22800
-    };
 
     @Override
     public void shutdown() {
