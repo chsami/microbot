@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.zerozero.bluedragons;
 
+import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
@@ -11,7 +12,6 @@ import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.RunePouch;
-import net.runelite.client.plugins.microbot.util.magic.Runes;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -82,15 +82,10 @@ public class BlueDragonsScript extends Script {
 
     private void determineStartingState(BlueDragonsConfig config) {
         boolean hasFood = hasRequiredFood(config);
-        boolean hasTeleport = hasTeleportToFalador();
         boolean hasAgilityOrKey = Microbot.getClient().getRealSkillLevel(Skill.AGILITY) >= 70 || hasDustyKey();
 
         if (!hasFood) {
             Microbot.log("Missing required food for the trip.");
-        }
-
-        if (!hasTeleport) {
-            Microbot.log("Missing teleport to Falador or required runes.");
         }
 
         if (!hasAgilityOrKey) {
@@ -98,7 +93,7 @@ public class BlueDragonsScript extends Script {
         }
 
         // Check if all requirements are met
-        if (hasFood && hasTeleport && hasAgilityOrKey) {
+        if (hasFood && hasAgilityOrKey) {
             currentState = BlueDragonState.TRAVEL_TO_DRAGONS;
         } else {
             Microbot.log("Starting conditions not met. Stopping the plugin.");
@@ -106,44 +101,11 @@ public class BlueDragonsScript extends Script {
         }
     }
 
-
     private boolean hasRequiredFood(BlueDragonsConfig config) {
         Rs2Food food = config.foodType();
         int amount = config.foodAmount();
         return food != null && Rs2Inventory.count(food.getName()) >= amount;
     }
-
-    private boolean hasTeleportToFalador() {
-        if (Rs2Inventory.contains("Falador teleport")) {
-            Microbot.log("Found Falador teleport in inventory.");
-            return true;
-        }
-
-        int lawRuneId = Runes.LAW.getItemId();
-        int waterRuneId = Runes.WATER.getItemId();
-        int dustRuneId = Runes.DUST.getItemId();
-        int airRuneId = Runes.AIR.getItemId();
-
-        int requiredLawRunes = 1;
-        int requiredAirRunes = 3;
-        int requiredWaterRunes = 1;
-
-        boolean runePouchInInventory = Rs2Inventory.contains("Rune pouch") || Rs2Inventory.contains("Divine rune pouch");
-        boolean hasLawRunes = checkRuneAvailability(lawRuneId, requiredLawRunes, runePouchInInventory);
-        boolean hasWaterRunes = checkRuneAvailability(waterRuneId, requiredWaterRunes, runePouchInInventory);
-        boolean hasAirOrDustRunes = checkRuneAvailability(dustRuneId, requiredAirRunes, runePouchInInventory) ||
-                checkRuneAvailability(airRuneId, requiredAirRunes, runePouchInInventory);
-
-        return hasLawRunes && hasWaterRunes && hasAirOrDustRunes;
-    }
-
-    private boolean checkRuneAvailability(int runeId, int requiredAmount, boolean checkRunePouch) {
-        boolean inInventory = Rs2Inventory.contains(runeId) && Rs2Inventory.count(runeId) >= requiredAmount;
-        boolean inRunePouch = checkRunePouch && RunePouch.contains(runeId, requiredAmount);
-        return inInventory || inRunePouch;
-    }
-
-
 
     private boolean hasDustyKey() {
         return Rs2Inventory.contains("Dusty key");
