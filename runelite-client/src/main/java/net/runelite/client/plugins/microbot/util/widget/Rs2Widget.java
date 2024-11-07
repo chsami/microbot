@@ -9,11 +9,9 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
@@ -200,8 +198,9 @@ public class Rs2Widget {
     public static Widget searchChildren(String text, Widget child, boolean exact) {
         if (matchesText(child, text, exact)) return child;
 
-        List<Widget[]> childGroups = Arrays.asList(child.getChildren(), child.getNestedChildren(),
-                child.getDynamicChildren(), child.getStaticChildren());
+        List<Widget[]> childGroups = Stream.of(child.getChildren(), child.getNestedChildren(), child.getDynamicChildren(), child.getStaticChildren())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         for (Widget[] childGroup : childGroups) {
             if (childGroup != null) {
