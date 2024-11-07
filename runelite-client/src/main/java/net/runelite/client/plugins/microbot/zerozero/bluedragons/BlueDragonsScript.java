@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.zerozero.bluedragons;
 
+import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
@@ -11,7 +12,6 @@ import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.RunePouch;
-import net.runelite.client.plugins.microbot.util.magic.Runes;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -119,10 +119,10 @@ public class BlueDragonsScript extends Script {
             return true;
         }
 
-        int lawRuneId = Runes.LAW.getItemId();
-        int waterRuneId = Runes.WATER.getItemId();
-        int dustRuneId = Runes.DUST.getItemId();
-        int airRuneId = Runes.AIR.getItemId();
+        int lawRuneId = ItemID.LAW_RUNE;
+        int waterRuneId = ItemID.WATER_RUNE;
+        int dustRuneId = ItemID.DUST_RUNE;
+        int airRuneId = ItemID.AIR_RUNE;
 
         int requiredLawRunes = 1;
         int requiredAirRunes = 3;
@@ -138,7 +138,7 @@ public class BlueDragonsScript extends Script {
     }
 
     private boolean checkRuneAvailability(int runeId, int requiredAmount, boolean checkRunePouch) {
-        boolean inInventory = Rs2Inventory.contains(runeId) && Rs2Inventory.count(runeId) >= requiredAmount;
+        boolean inInventory = Rs2Inventory.hasItemAmount(runeId, requiredAmount);
         boolean inRunePouch = checkRunePouch && RunePouch.contains(runeId, requiredAmount);
         return inInventory || inRunePouch;
     }
