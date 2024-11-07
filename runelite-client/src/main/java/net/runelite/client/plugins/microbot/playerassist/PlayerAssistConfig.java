@@ -242,26 +242,14 @@ public interface PlayerAssistConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "lootItems",
-            name = "Loot Items",
-            description = "Comma-separated list of item names to loot regardless of value",
-            position = 1,
-            section = lootSection
-    )
-    default String lootItems() {
-        return "";
-    }
-
-    @ConfigItem(
             keyName = "Max Price of items to loot",
             name = "Max. Price of items to loot",
             description = "Max. Price of items to loot default is set to 10M",
             position = 1,
-            section = lootSection,
-            hidden = true
+            section = lootSection
     )
     default int maxPriceOfItemsToLoot() {
-        return 2147483647;
+        return 10000000;
     }
     // toggle scatter
 
@@ -573,7 +561,7 @@ public interface PlayerAssistConfig extends Config {
             section = banking
     )
     default int minFreeSlots() {
-        return 1;
+        return 5;
     }
 
     // checkbox to use stamina potions when banking
