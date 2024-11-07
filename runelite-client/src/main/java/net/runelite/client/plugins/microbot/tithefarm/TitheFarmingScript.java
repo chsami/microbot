@@ -357,6 +357,24 @@ public class TitheFarmingScript extends Script {
 
 // Helper method to validate run energy and patches
         private void validateRunEnergy() {
+            if (Microbot.getClient().getEnergy() < 6000 &&
+                    hasAllEmptyPatches() && state != RECHARING_RUN_ENERGY &&
+                    !Rs2Player.hasStaminaBuffActive()
+            ) {
+                if(Rs2Inventory.hasItem(ItemID.STAMINA_POTION1)) {
+                    Rs2Inventory.interact(ItemID.STAMINA_POTION1, "drink");
+                }
+                if(Rs2Inventory.hasItem(ItemID.STAMINA_POTION2)) {
+                    Rs2Inventory.interact(ItemID.STAMINA_POTION2, "drink");
+                }
+                if(Rs2Inventory.hasItem(ItemID.STAMINA_POTION3)) {
+                    Rs2Inventory.interact(ItemID.STAMINA_POTION3, "drink");
+                }
+                if(Rs2Inventory.hasItem(ItemID.STAMINA_POTION4)) {
+                    Rs2Inventory.interact(ItemID.STAMINA_POTION4, "drink");
+                }
+            }
+
             if (Microbot.getClient().getEnergy() < 4000 && hasAllEmptyPatches() && state != RECHARING_RUN_ENERGY) {
                 state = RECHARING_RUN_ENERGY;
                 Microbot.log("Recharging run energy...");
