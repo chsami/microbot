@@ -39,7 +39,7 @@ import java.awt.*;
         description = "Microbot farming plugin",
         tags = {"farming", "microbot"},
         enabledByDefault = false,
-        hidden = false
+        hidden = true
 )
 @Slf4j
 public class FarmingPlugin extends Plugin {

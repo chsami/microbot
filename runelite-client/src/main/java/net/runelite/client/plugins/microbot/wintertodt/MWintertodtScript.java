@@ -53,6 +53,7 @@ public class MWintertodtScript extends Script {
     String axe = "";
     int wintertodtHp = -1;
     private GameObject brazier;
+    boolean init = false;
 
     private static void changeState(State scriptState) {
         changeState(scriptState, false);
@@ -95,40 +96,47 @@ public class MWintertodtScript extends Script {
     }
 
     public boolean run(MWintertodtConfig config, MWintertodtPlugin plugin) {
-
-        MWintertodtScript.config = config;
-        MWintertodtScript.plugin = plugin;
-        Rs2Antiban.resetAntibanSettings();
-        Rs2Antiban.antibanSetupTemplates.applyGeneralBasicSetup();
-        Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
-        Rs2Antiban.setPlayStyle(PlayStyle.EXTREME_AGGRESSIVE);
-        state = State.BANKING;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!Microbot.isLoggedIn()) return;
+                if (!Microbot.isLoggedIn()) {
+                    init = false;
+                    return;
+                }
                 if (!super.run()) return;
                 if (Rs2AntibanSettings.actionCooldownActive) return;
 
                 long startTime = System.currentTimeMillis();
 
-                if (config.axeInInventory()) {
-                    if (!Rs2Inventory.hasItem("axe")) {
-                        Microbot.showMessage("It seems that you selected axeInInventory option but no axe was found in your inventory.");
+                if (!init) {
+                    Microbot.log("Script starting...");
+                    MWintertodtScript.config = config;
+                    MWintertodtScript.plugin = plugin;
+                    Rs2Antiban.resetAntibanSettings();
+                    Rs2Antiban.antibanSetupTemplates.applyGeneralBasicSetup();
+                    Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
+                    Rs2Antiban.setPlayStyle(PlayStyle.EXTREME_AGGRESSIVE);
+                    state = State.BANKING;
+                    sleep(2000);
+                    Microbot.log("Validating inventory...");
+                    if (config.axeInInventory()) {
+                        if (!Rs2Inventory.hasItem("axe")) {
+                            Microbot.showMessage("It seems that you selected axeInInventory option but no axe was found in your inventory.");
+                            sleep(5000);
+                            return;
+                        }
+                        axe = Rs2Inventory.get("axe").name;
+                    } else if (!Rs2Equipment.isWearing("axe")){
+                        if (Rs2Inventory.hasItem("axe")) {
+                            Rs2Inventory.wear("axe");
+                            sleepUntil(() -> Rs2Equipment.isWearing("axe"));
+                            return;
+                        }
+                        Microbot.showMessage("Please wear an axe OR If you'd like to have an axe in your inventory, you can enable the setting 'Axe In Inventory'.");
                         sleep(5000);
                         return;
                     }
-                    axe = Rs2Inventory.get("axe").name;
-                } else if (!Rs2Equipment.isWearing("axe")){
-                    if (Rs2Inventory.hasItem("axe")) {
-                        Rs2Inventory.wear("axe");
-                        sleepUntil(() -> Rs2Equipment.isWearing("axe"));
-                        return;
-                    }
-                    Microbot.showMessage("Please wear an axe OR If you'd like to have an axe in your inventory, you can enable the setting 'Axe In Inventory'.");
-                    sleep(5000);
-                    return;
+                    init = true;
                 }
-
 
                 boolean wintertodtRespawning = Rs2Widget.hasWidget("returns in");
                 boolean isWintertodtAlive = Rs2Widget.hasWidget("Wintertodt's Energy");
@@ -211,7 +219,9 @@ public class MWintertodtScript extends Script {
                         }
                         break;
                     case CHOP_ROOTS:
-                        Rs2Combat.setSpecState(true, 1000);
+                        if (Rs2Equipment.isWearing("dragon axe")) {
+                            Rs2Combat.setSpecState(true, 1000);
+                        }
                         if (!Rs2Player.isAnimating()) {
                             Rs2GameObject.interact(ObjectID.BRUMA_ROOTS, "Chop");
                             sleepUntil(Rs2Player::isAnimating, 2000);
@@ -263,13 +273,11 @@ public class MWintertodtScript extends Script {
                                 }
                             }
                             if (burningBrazier.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) < 10 && hasItemsToBurn()) {
-
                                 Rs2GameObject.interact(burningBrazier, "feed");
                                 Microbot.log("Feeding brazier");
                                 resetActions = false;
                                 sleep(GAME_TICK_LENGTH * 3);
                                 Rs2Antiban.actionCooldown();
-
                             }
 
                         }
@@ -430,12 +438,7 @@ public class MWintertodtScript extends Script {
         }
         Rs2Bank.useBank();
         if (!Rs2Bank.isOpen()) return true;
-        if(!config.fixBrazier()) {
-            Rs2Bank.depositAll();
-        }
-        else {
-            Rs2Bank.depositAllExcept("hammer", "tinderbox", "knife", config.food().getName());
-        }
+        Rs2Bank.depositAllExcept("hammer", "tinderbox", "knife", config.food().getName(), axe);
         int foodCount = (int) Rs2Inventory.getInventoryFood().stream().count();
         if (config.fixBrazier() && !Rs2Inventory.hasItem("hammer")) {
             Rs2Bank.withdrawX(true, "hammer", 1);

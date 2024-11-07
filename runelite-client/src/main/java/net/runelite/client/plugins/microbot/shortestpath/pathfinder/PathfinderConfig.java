@@ -10,7 +10,6 @@ import net.runelite.client.plugins.microbot.shortestpath.*;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 
 import java.util.*;
@@ -183,6 +182,7 @@ public class PathfinderConfig {
                 || Microbot.getVarbitValue(Varbits.DIARY_LUMBRIDGE_ELITE)  == 1);
         useGnomeGliders &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.THE_GRAND_TREE));
         useSpiritTrees &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.TREE_GNOME_VILLAGE));
+        useQuetzals &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.TWILIGHTS_PROMISE));
 
         transports.clear();
         transportsPacked.clear();

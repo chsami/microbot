@@ -1,4 +1,4 @@
-# Origin	Destination	menuOption menuTarget objectID	Skill requirements	Item requirements	Quest	Travel time	Info
+# Origin	Destination	menuOption menuTarget objectID	Skill requirements	Item requirements	Quest	Duration	Display info
 # Lumbridge cellar
 3319 9615 0	3232 9610 0	Cellar Mistag 7299			Death to the Dorgeshuun
 3319 9615 0	3245 9648 0	Watermill Mistag 7299			Death to the Dorgeshuun
@@ -13,5 +13,5 @@
 2503 3193 0	2515 3159 0	Follow Elkoy 4968			Tree Gnome Village
 2515 3159 0	2503 3193 0	Follow Elkoy 4968			Tree Gnome Village
 # Quetzals							
-3280 3412 0	1700 3141 0	Travel Primio 12888			Children of the Sun		
-1703 3140 0	3280 3412 0	Travel Primio 12889			Children of the Sun		
+3280 3412 0	1700 3141 0	Travel Primio 12888			Children of the Sun	4	Varlemore
+1703 3140 0	3280 3412 0	Travel Primio 12889			Children of the Sun	4	Varrock
