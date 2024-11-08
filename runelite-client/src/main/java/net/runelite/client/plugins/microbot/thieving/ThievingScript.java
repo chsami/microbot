@@ -48,7 +48,7 @@ public class ThievingScript extends Script {
                 List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
 
                 if (config.useFood()) {
-                    handeFood(foods);
+                    handleFood(foods);
                 }
 
                 if (Rs2Inventory.isFull()) {
@@ -70,7 +70,7 @@ public class ThievingScript extends Script {
         return true;
     }
 
-    private void handeFood(List<Rs2Item> food) {
+    private void handleFood(List<Rs2Item> food) {
         if (food.isEmpty()) {
             openCoinPouches(1);
             bank();
