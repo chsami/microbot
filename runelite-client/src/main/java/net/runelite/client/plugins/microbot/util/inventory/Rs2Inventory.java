@@ -2050,6 +2050,16 @@ public class Rs2Inventory {
     }
 
     /**
+     * Checks if the player has any type of rune pouch in the inventory.
+     *
+     * @return true if a rune pouch is found in the inventory, false otherwise.
+     */
+    public static boolean hasRunePouch() {
+        return Arrays.stream(RunePouchType.values())
+                .anyMatch(pouch -> Rs2Inventory.hasItem(pouch.getItemId()));
+    }
+
+    /**
      * Method executes menu actions
      *
      * @param rs2Item Current item to interact with
