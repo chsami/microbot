@@ -109,6 +109,7 @@ public class ThievingScript extends Script {
     }
 
     private void openCoinPouches(int amt) {
+        if (config.THIEVING_NPC() == ThievingNpc.WEALTHY_CITIZEN && Rs2Player.isAnimating(3000)) return;
         if (Rs2Inventory.hasItemAmount("coin pouch", amt, true)) {
             Rs2Inventory.interact("coin pouch", "Open-all");
         }
