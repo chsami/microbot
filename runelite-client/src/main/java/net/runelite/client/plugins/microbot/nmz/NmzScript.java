@@ -165,9 +165,10 @@ public class NmzScript extends Script {
         int realRangedLevel = Microbot.getClient().getRealSkillLevel(Skill.RANGED);
         boolean hasOverloadPotions = config.overloadPotionAmount() > 0;
 
-        if (currentHP > maxHealth
+        if (currentHP >= maxHealth
                 && !useOverload
                 && (!hasOverloadPotions || currentRangedLevel != realRangedLevel)) {
+            maxHealth = 1;
 
             if (Rs2Inventory.hasItem(ItemID.LOCATOR_ORB)) {
                 Rs2Inventory.interact(ItemID.LOCATOR_ORB, "feel");
@@ -175,7 +176,7 @@ public class NmzScript extends Script {
                 Rs2Inventory.interact(ItemID.DWARVEN_ROCK_CAKE_7510, "guzzle");
             }
 
-            if (currentHP == 2) {
+            if (currentHP == 1) {
                 maxHealth = Random.random(2, 5);
             }
         }
