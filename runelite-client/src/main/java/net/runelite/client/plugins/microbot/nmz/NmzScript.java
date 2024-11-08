@@ -126,8 +126,10 @@ public class NmzScript extends Script {
         sleepUntil(() -> Rs2Widget.hasWidget("Click here to continue"));
         Rs2Widget.clickWidget("Click here to continue");
         sleepUntil(() -> Rs2Widget.hasWidget("Agree to pay"));
-        Rs2Keyboard.typeString("1");
-        Rs2Keyboard.enter();
+        if (Rs2Widget.hasWidget("Agree to pay")) {
+            Rs2Keyboard.typeString("1");
+            Rs2Keyboard.enter();
+        }
     }
 
     public boolean useOrbs() {
@@ -198,7 +200,7 @@ public class NmzScript extends Script {
 
     public void useAbsorptionPotion() {
         if (Microbot.getVarbitValue(NMZ_ABSORPTION) < minAbsorption && Rs2Inventory.hasItem("absorption")) {
-            for (int i = 0; i < Random.random(1, 8); i++) {
+            for (int i = 0; i < Random.random(4, 8); i++) {
                 Rs2Inventory.interact(x -> x.name.toLowerCase().contains("absorption"), "drink");
                 sleep(600, 1000);
             }
