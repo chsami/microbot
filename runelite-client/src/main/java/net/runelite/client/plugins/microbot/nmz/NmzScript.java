@@ -180,7 +180,9 @@ public class NmzScript extends Script {
             }
         }
 
-        randomlyToggleRapidHeal();
+        if (config.randomlyTriggerRapidHeal()) {
+            randomlyToggleRapidHeal();
+        }
     }
 
     public void randomlyToggleRapidHeal() {
