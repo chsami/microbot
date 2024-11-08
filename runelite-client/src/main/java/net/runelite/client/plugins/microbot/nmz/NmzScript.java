@@ -35,8 +35,8 @@ public class NmzScript extends Script {
 
     public static PrayerPotionScript prayerPotionScript;
 
-    public static int maxHealth = Random.random(1, 5);
-    public static int minAbsorption = Random.random(50, 300);
+    public static int maxHealth = Random.random(2, 8);
+    public static int minAbsorption = Random.random(100, 300);
 
     private WorldPoint center = new WorldPoint(Random.random(2270, 2276), Random.random(4693, 4696), 0);
 
@@ -177,7 +177,7 @@ public class NmzScript extends Script {
             }
 
             if (currentHP == 1) {
-                maxHealth = Random.random(2, 5);
+                maxHealth = Random.random(2, 8);
             }
         }
 
