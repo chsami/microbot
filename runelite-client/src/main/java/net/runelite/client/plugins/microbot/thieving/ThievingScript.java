@@ -46,23 +46,14 @@ public class ThievingScript extends Script {
                 if (isStunned())
                     return;
 
-                List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
+                if (config.useFood()) {
+                    handeFood();
+                }
 
-                if (foods.isEmpty()) {
-                    openCoinPouches(1);
-                    bank();
-                    return;
-                }
-                if (Rs2Inventory.isFull()) {
-                    Rs2Player.eatAt(99);
-                    dropItems(foods);
-                }
-                if (Rs2Player.eatAt(config.hitpoints())) {
-                    return;
-                }
                 if (config.shadowVeil()) {
                     handleShadowVeil();
                 }
+
                 openCoinPouches(config.coinPouchTreshHold());
                 wearDodgyNecklace();
                 pickpocket();
@@ -71,6 +62,23 @@ public class ThievingScript extends Script {
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    private void handeFood() {
+        List<Rs2Item> foods = Rs2Inventory.getInventoryFood();
+
+        if (foods.isEmpty()) {
+            openCoinPouches(1);
+            bank();
+            return;
+        }
+        if (Rs2Inventory.isFull()) {
+            Rs2Player.eatAt(99);
+            dropItems(foods);
+        }
+        if (Rs2Player.eatAt(config.hitpoints())) {
+            return;
+        }
     }
 
     private void handleElves() {
