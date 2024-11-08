@@ -29,8 +29,6 @@ public class ThievingScript extends Script {
     public static String version = "1.5.8";
     ThievingConfig config;
 
-    boolean isPickpocketting = false;
-
     public boolean run(ThievingConfig config) {
         this.config = config;
         Rs2Walker.setTarget(null);
@@ -152,13 +150,10 @@ public class ThievingScript extends Script {
                 .collect(Collectors.toList());
         NPC wealthyCitizenToPickpocket = wealthyCitizenInteracting.stream().findFirst().orElse(null);
         if (wealthyCitizenToPickpocket != null) {
-            if (!isPickpocketting && Rs2Npc.pickpocket(wealthyCitizenToPickpocket)) {
+            if (!Rs2Player.isAnimating(3000) && Rs2Npc.pickpocket(wealthyCitizenToPickpocket)) {
                 Microbot.status = "Pickpocketting " + wealthyCitizenToPickpocket.getName();
                 sleep(300, 600);
-                isPickpocketting = true;
             }
-        } else {
-            isPickpocketting = false;
         }
     }
 
