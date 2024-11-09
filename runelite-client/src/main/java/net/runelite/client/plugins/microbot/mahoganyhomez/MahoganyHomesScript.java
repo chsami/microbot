@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.walker.WalkerState;
 
@@ -117,7 +118,7 @@ public class MahoganyHomesScript extends Script {
 
 
         // Find the closest walkable tile around the object
-        Rs2WorldPoint objectLocation = Rs2WorldPoint.getNearestWalkableTile(object);
+        Rs2WorldPoint objectLocation = Rs2Tile.getNearestWalkableTile(object);
 
 
         int pathDistance = objectLocation != null ? objectLocation.distanceToPath(playerLocation.getWorldPoint()) : Integer.MAX_VALUE;
