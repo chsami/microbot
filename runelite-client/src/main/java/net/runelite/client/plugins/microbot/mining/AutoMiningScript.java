@@ -27,7 +27,8 @@ enum State {
 
 public class AutoMiningScript extends Script {
 
-    public static String version = "1.4.2";
+    public static final String version = "1.4.3";
+    private static final int GEM_MINE_UNDERGROUND = 11410;
     State state = State.MINING;
 
     public boolean run(AutoMiningConfig config) {
@@ -61,7 +62,7 @@ public class AutoMiningScript extends Script {
                             return;
                         }
 
-                        GameObject rock = Rs2GameObject.findObject(config.ORE().getName(), true, config.distanceToStray(), true, initialPlayerLocation);
+                        GameObject rock = Rs2GameObject.findReachableObject(config.ORE().getName(), true, config.distanceToStray(), initialPlayerLocation);
 
                         if (rock != null) {
                             if (Rs2GameObject.interact(rock)) {
@@ -75,10 +76,11 @@ public class AutoMiningScript extends Script {
                         List<String> itemNames = Arrays.stream(config.itemsToBank().split(",")).map(String::toLowerCase).collect(Collectors.toList());
 
                         if (config.useBank()) {
-                            if (config.ORE() == Rocks.GEM) {
-                                if (Rs2DepositBox.openDepositBox())
+                            if (config.ORE() == Rocks.GEM && Rs2Player.getWorldLocation().getRegionID() == GEM_MINE_UNDERGROUND) {
+                                if (Rs2DepositBox.openDepositBox()){
                                     Rs2DepositBox.depositAll();
-                                Rs2DepositBox.closeDepositBox();
+                                    Rs2DepositBox.closeDepositBox();
+                                }
                             } else {
                                 if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(itemNames, initialPlayerLocation, 0, config.distanceToStray()))
                                     return;
