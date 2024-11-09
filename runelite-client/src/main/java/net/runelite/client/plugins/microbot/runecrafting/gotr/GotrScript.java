@@ -218,6 +218,7 @@ public class GotrScript extends Script {
     }
 
     private boolean waitingForGameToStart(int timeToStart) {
+        if (!isInHugeMine()) return false;
         if (getStartTimer() > randomGaussian(Random.random(20, 30), Random.random(1, 5)) || getStartTimer() == -1 || timeToStart > 10) {
 
             takeUnchargedCells();
@@ -281,7 +282,8 @@ public class GotrScript extends Script {
         }
     }
 
-    private static boolean lootChisel() {
+    private boolean lootChisel() {
+        if (!isInHugeMine()) return false;
         if (!Rs2Inventory.isFull() && !Rs2Inventory.hasItem("Chisel")) {
             Rs2GameObject.interact("chisel", "take");
             Rs2Player.waitForWalking();
