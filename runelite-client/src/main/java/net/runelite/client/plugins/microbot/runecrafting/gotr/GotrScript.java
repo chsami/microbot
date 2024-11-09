@@ -60,6 +60,8 @@ public class GotrScript extends Script {
     String GUARDIAN_ESSENCE = "guardian essence";
 
     boolean initCheck = false;
+
+    static boolean useNpcContact = false;
     private final List<Integer> runeIds = ImmutableList.of(
             ItemID.NATURE_RUNE,
             ItemID.LAW_RUNE,
@@ -108,6 +110,10 @@ public class GotrScript extends Script {
 
                 if (!initCheck) {
                     initializeGuardianPortalInfo();
+                    if (!Rs2Magic.isLunar()) {
+                        Microbot.log("Lunar spellbook not found...disabling npc contact");
+                        useNpcContact = false;
+                    }
                     initCheck = true;
                 }
 
@@ -132,7 +138,7 @@ public class GotrScript extends Script {
                 }
                 //Repair colossal pouch asap to avoid disintegrate completely
                 if (Rs2Inventory.hasItem("colossal pouch") && Rs2Inventory.hasDegradedPouch()) {
-                    if (!repairPouches()) {
+                    if (repairPouches()) {
                         return;
                     }
                 }
@@ -506,6 +512,9 @@ public class GotrScript extends Script {
     }
 
     private static boolean repairPouches() {
+        if (!useNpcContact) {
+            return true;
+        }
         if (Rs2Inventory.hasDegradedPouch()) {
             return Rs2Magic.repairPouchesWithLunar();
         }
