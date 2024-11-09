@@ -24,7 +24,7 @@ import java.util.Comparator;
         name = PluginDescriptor.Cicire + "Combat hotkeys",
         description = "A plugin to bind hotkeys to combat stuff",
         tags = {"combat", "hotkeys", "microbot"},
-        enabledByDefault = true
+        enabledByDefault = false
 )
 @Slf4j
 public class CombatHotkeysPlugin extends Plugin implements KeyListener {
