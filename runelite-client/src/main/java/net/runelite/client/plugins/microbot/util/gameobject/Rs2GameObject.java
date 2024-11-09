@@ -476,6 +476,106 @@ public class Rs2GameObject {
         return null;
     }
 
+    /**
+ * Finds a reachable game object by name within a specified distance from an anchor point, optionally checking for a specific action.
+ *
+ * @param objectName The name of the game object to find.
+ * @param exact Whether to match the name exactly or partially.
+ * @param distance The maximum distance from the anchor point to search for the game object.
+ * @param anchorPoint The point from which to measure the distance.
+ * @param checkAction Whether to check for a specific action on the game object.
+ * @param action The action to check for if checkAction is true.
+ * @return The nearest reachable game object that matches the criteria, or null if none is found.
+ */
+public static GameObject findReachableObject(String objectName, boolean exact, int distance, WorldPoint anchorPoint, boolean checkAction, String action) {
+    List<GameObject> gameObjects = getGameObjectsWithinDistance(distance, anchorPoint);
+    if (gameObjects == null) {
+        return null;
+    }
+
+    return gameObjects.stream()
+            .filter(Rs2GameObject::isReachable)
+            .filter(gameObject -> {
+                try {
+                    ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
+                    if (objComp == null) return false;
+
+                    String compName = objComp.getName();
+                    if (compName == null || "null".equals(compName)) {
+                        if (objComp.getImpostor() != null) {
+                            compName = objComp.getImpostor().getName();
+                        } else {
+                            return false;
+                        }
+                    }
+
+                    if (compName == null) return false;
+
+                    if (checkAction) {
+                        if (!hasAction(objComp, action)) return false;
+                    }
+
+                    if (exact) {
+                        return compName.equalsIgnoreCase(objectName);
+                    } else {
+                        return compName.toLowerCase().contains(objectName.toLowerCase());
+                    }
+
+                } catch (Exception e) {
+                    return false;
+                }
+            }).min(Comparator.comparingInt(o -> Rs2Player.getRs2WorldPoint().distanceToPath(o.getWorldLocation())))
+            .orElse(null);
+}
+
+/**
+ * Finds a reachable game object by name within a specified distance from an anchor point.
+ *
+ * @param objectName The name of the game object to find.
+ * @param exact Whether to match the name exactly or partially.
+ * @param distance The maximum distance from the anchor point to search for the game object.
+ * @param anchorPoint The point from which to measure the distance.
+ * @return The nearest reachable game object that matches the criteria, or null if none is found.
+ */
+public static GameObject findReachableObject(String objectName, boolean exact, int distance, WorldPoint anchorPoint) {
+    List<GameObject> gameObjects = getGameObjectsWithinDistance(distance, anchorPoint);
+    if (gameObjects == null) {
+        return null;
+    }
+
+    return gameObjects.stream()
+            .filter(Rs2GameObject::isReachable)
+            .sorted(Comparator.comparingInt(o -> Rs2Player.getRs2WorldPoint().distanceToPath(o.getWorldLocation())))
+            .filter(gameObject -> {
+                try {
+                    ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
+                    if (objComp == null) return false;
+
+                    String compName = objComp.getName();
+                    if (compName == null || "null".equals(compName)) {
+                        if (objComp.getImpostor() != null) {
+                            compName = objComp.getImpostor().getName();
+                        } else {
+                            return false;
+                        }
+                    }
+
+                    if (compName == null) return false;
+
+                    if (exact) {
+                        return compName.equalsIgnoreCase(objectName);
+                    } else {
+                        return compName.toLowerCase().contains(objectName.toLowerCase());
+                    }
+                } catch (Exception e) {
+                    return false;
+                }
+            })
+            .findFirst()
+            .orElse(null);
+}
+
+
     public static boolean hasAction(ObjectComposition objComp, String action) {
         boolean result;
 
@@ -1263,6 +1363,28 @@ public class Rs2GameObject {
         }
 
         return false;
+    }
+
+    /**
+     * Returns the object is reachable from the player
+     * @param tileObject
+     * @return boolean
+     */
+    public static boolean isReachable(GameObject tileObject) {
+        Rs2WorldArea gameObjectArea = new Rs2WorldArea(Objects.requireNonNull(getWorldArea(tileObject)));
+        List<WorldPoint> interactablePoints = gameObjectArea.getInteractable();
+
+        if (interactablePoints.isEmpty()) {
+            interactablePoints.addAll(gameObjectArea.offset(1).toWorldPointList());
+            interactablePoints.removeIf(gameObjectArea::contains);
+        }
+
+        WorldPoint walkableInteractPoint = interactablePoints.stream()
+                .filter(Rs2Tile::isWalkable)
+                .filter(Rs2Tile::isTileReachable)
+                .findFirst()
+                .orElse(null);
+        return walkableInteractPoint != null;
     }
 
     public static WorldArea getWorldArea(GameObject gameObject)
