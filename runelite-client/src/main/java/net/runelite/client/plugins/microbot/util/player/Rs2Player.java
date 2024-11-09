@@ -11,6 +11,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.VarbitValues;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldPoint;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -502,6 +503,15 @@ public class Rs2Player {
         } else {
             return Microbot.getClient().getLocalPlayer().getWorldLocation();
         }
+    }
+
+    /**
+     * Gets the players current Rs2WorldPoint
+     *
+     * @return Rs2WorldPoint
+     */
+    public static Rs2WorldPoint getRs2WorldPoint() {
+        return new Rs2WorldPoint(getWorldLocation());
     }
 
     /**
