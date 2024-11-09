@@ -400,10 +400,12 @@ public class GotrScript extends Script {
     }
 
     private static boolean waitForMinigameToStart() {
-        TileObject rcPortal = findPortalToLeaveAltar();
-        if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId())) {
-            state = GotrState.LEAVING_ALTAR;
-            return true;
+        if (!isInMainRegion()) {
+            TileObject rcPortal = findPortalToLeaveAltar();
+            if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId())) {
+                state = GotrState.LEAVING_ALTAR;
+                return true;
+            }
         }
         resetPlugin();
         if (state != GotrState.WAITING) {
@@ -481,6 +483,7 @@ public class GotrScript extends Script {
                             sleep(randomGaussian(Random.random(2500, 3000), Random.random(100, 300)));
                             log("Interacting with large guardian remains...");
                             Rs2GameObject.interact(ObjectID.LARGE_GUARDIAN_REMAINS);
+                            sleepGaussian(1200, 150);
                         }
                     }
                 }
@@ -494,6 +497,7 @@ public class GotrScript extends Script {
 
                     repairPouches();
                     Rs2GameObject.interact(ObjectID.LARGE_GUARDIAN_REMAINS);
+                    sleepGaussian(1200, 150);
                     // we can assume that if the player is mining within the startTimer range, he will get enough guardian remains for the game
                     shouldMineGuardianRemains = false;
                 }
