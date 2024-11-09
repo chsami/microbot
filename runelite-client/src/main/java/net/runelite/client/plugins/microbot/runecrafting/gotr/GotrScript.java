@@ -436,6 +436,7 @@ public class GotrScript extends Script {
         if (isInHugeMine()) {
             if (getStartTimer() == -1) {
                 repairPouches();
+                leaveHugeMine();
                 return false;
             }
             if (!Rs2Inventory.isFull()) {
@@ -466,9 +467,7 @@ public class GotrScript extends Script {
         }
         state = GotrState.MINE_LARGE_GUARDIAN_REMAINS;
         if (isInHugeMine()) {
-            Rs2GameObject.interact(38044);
-            Rs2Player.waitForWalking();
-            log("Leave huge mine...");
+            leaveHugeMine();
             return;
         }
         if (Rs2Player.getSkillRequirement(Skill.AGILITY, 56)) {
@@ -511,6 +510,12 @@ public class GotrScript extends Script {
                 shouldMineGuardianRemains = false;
             }
         }
+    }
+
+    private static void leaveHugeMine() {
+        Rs2GameObject.interact(38044);
+        Rs2Player.waitForWalking();
+        log("Leave huge mine...");
     }
 
     private static boolean repairPouches() {
