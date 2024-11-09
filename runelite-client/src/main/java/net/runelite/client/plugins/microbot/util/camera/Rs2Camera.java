@@ -248,5 +248,23 @@ public class Rs2Camera {
             Microbot.getClient().runScript(ScriptID.CAMERA_DO_ZOOM, zoom, zoom);
         });
     }
+
+    /**
+ * Resets the camera pitch to 280 if it is currently less than 280.
+ */
+public static void resetPitch() {
+    // Set the camera pitch to 280
+    if (getPitch() < 280)
+        setPitch(280);
+}
+
+/**
+ * Resets the camera zoom to 200 if it is currently greater than 200.
+ */
+public static void resetZoom() {
+    // Set the camera zoom to 200
+    if (getZoom() > 200)
+        setZoom(200);
+}
 }
 
