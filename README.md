@@ -25,11 +25,11 @@ If you enjoy my open source work and would like to support me, consider buying m
 
 Thank you for your support! 😊
 
-# I Want To Bot
+# I Want To Play
 
 ## Non jagex account
 
-Here is a youtube video on how to setup the bot from scratch for **NON-JAGEX ACCOUNTS**
+Here is a youtube video on how to setup microbot from scratch for **NON-JAGEX ACCOUNTS**
 
 https://www.youtube.com/watch?v=EbtdZnxq5iw
 
@@ -123,7 +123,7 @@ public static double version = 1.0;
 All our scripts exist of Config. This is the settings for a specific script
 Overlay, this is a visual overlay for a specific script
 Plugin which handles the code for starting and stopping the script
-Script which handles all of the code the bot has to execute.
+Script which handles all of the code that microbot has to execute.
 
 Inside the startup of a plugin we can call the script code like this:
 
