@@ -19,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingTree;
 import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingWalkBack;
 
 import java.util.*;
@@ -32,7 +33,7 @@ enum State {
 
 public class AutoWoodcuttingScript extends Script {
 
-    public static String version = "1.6.2";
+    public static String version = "1.6.3";
     public boolean cannotLightFire = false;
 
     State state = State.WOODCUTTING;
@@ -98,7 +99,7 @@ public class AutoWoodcuttingScript extends Script {
                             return;
                         }
 
-                        GameObject tree = Rs2GameObject.findObject(config.TREE().getName(), true, config.distanceToStray(), false, getInitialPlayerLocation());
+                        GameObject tree = Rs2GameObject.findReachableObject(config.TREE().getName(), true, config.distanceToStray(), getInitialPlayerLocation(), config.TREE().equals(WoodcuttingTree.REDWOOD),config.TREE().getAction());
 
                         if (tree != null) {
                             if (Rs2GameObject.interact(tree, config.TREE().getAction())) {
