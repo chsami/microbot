@@ -67,6 +67,8 @@ public class Rs2Walker {
     // Set this to true, if you want to calculate the path but do not want to walk to it
     static boolean debug = false;
 
+    public static boolean disableTeleports = false;
+
     public static boolean walkTo(int x, int y, int plane) {
         return walkTo(x, y, plane, config.reachedDistance());
     }

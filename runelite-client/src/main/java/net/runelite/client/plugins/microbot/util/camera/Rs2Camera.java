@@ -2,12 +2,14 @@ package net.runelite.client.plugins.microbot.util.camera;
 
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.RuneLite;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.camera.CameraPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -30,6 +32,12 @@ public class Rs2Camera {
     public static int angleToTile(LocalPoint localPoint) {
         int angle = (int) Math.toDegrees(Math.atan2(localPoint.getY() - Microbot.getClient().getLocalPlayer().getLocalLocation().getY(),
                 localPoint.getX() - Microbot.getClient().getLocalPlayer().getLocalLocation().getX()));
+        return angle >= 0 ? angle : 360 + angle;
+    }
+
+    public static int angleToTile(WorldPoint worldPoint) {
+        int angle = (int) Math.toDegrees(Math.atan2(worldPoint.getY() - Rs2Player.getWorldLocation().getY(),
+                worldPoint.getX() - Rs2Player.getWorldLocation().getX()));
         return angle >= 0 ? angle : 360 + angle;
     }
 

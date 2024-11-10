@@ -189,7 +189,7 @@ public class Rs2Npc {
         Microbot.status = action + " " + npc.getName();
         try {
 
-            if (Microbot.cantReachTarget) {
+            if (Microbot.isCantReachTargetDetectionEnabled && Microbot.cantReachTarget) {
                 if (!hasLineOfSight(npc)) {
                     if (Microbot.cantReachTargetRetries >= Random.random(3, 5)) {
                         Microbot.pauseAllScripts = true;

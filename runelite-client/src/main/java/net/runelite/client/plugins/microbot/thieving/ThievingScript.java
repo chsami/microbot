@@ -34,6 +34,7 @@ public class ThievingScript extends Script {
     public boolean run(ThievingConfig config) {
         this.config = config;
         Rs2Walker.setTarget(null);
+        Microbot.isCantReachTargetDetectionEnabled = true;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
@@ -71,6 +72,12 @@ public class ThievingScript extends Script {
             }
         }, 0, 600, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        Microbot.isCantReachTargetDetectionEnabled = false;
     }
 
     private void handleElves() {
