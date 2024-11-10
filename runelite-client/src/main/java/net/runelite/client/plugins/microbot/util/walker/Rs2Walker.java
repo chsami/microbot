@@ -671,7 +671,7 @@ public class Rs2Walker {
 
         var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 20);
 
-        if (tiles.keySet().isEmpty()) return 1; //start on index 1, instead of 0. 0 can contain teleports
+        if (tiles.keySet().isEmpty()) return 2; //start on index 2, instead of 0. 0 can contain teleports
 
         WorldPoint startPoint = path.stream()
                 .min(Comparator.comparingInt(a -> tiles.getOrDefault(a, Integer.MAX_VALUE)))
@@ -681,7 +681,7 @@ public class Rs2Walker {
                 .allMatch(a -> tiles.getOrDefault(a, Integer.MAX_VALUE) == Integer.MAX_VALUE);
 
         if (startPoint == null || noMatchingTileFound) {
-            return 1; //start on index 1, instead of 0. 0 can contain teleports
+            return 2; //start on index 1, instead of 0. 0 can contain teleports
         }
 
         return IntStream.range(0, path.size())
