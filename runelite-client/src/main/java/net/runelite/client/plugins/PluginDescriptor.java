@@ -54,6 +54,7 @@ public @interface PluginDescriptor {
     String LiftedMango = "<html>[<font color=#FF7F50>\uD83E\uDD6D</font>] ";
     String eXioStorm = "<html>[<font color=#ff00dc>§</font>] "; Color stormColor = new Color(255, 0, 220);
     String Girdy = "<html>[<font color=#3DED97>\u01E5</font>] ";
+    String Cicire = "<html>[<font color=#68ff00>Ci</font>] ";
 
 
     String name();

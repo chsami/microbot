@@ -60,6 +60,8 @@ public class GotrScript extends Script {
     String GUARDIAN_ESSENCE = "guardian essence";
 
     boolean initCheck = false;
+
+    static boolean useNpcContact = false;
     private final List<Integer> runeIds = ImmutableList.of(
             ItemID.NATURE_RUNE,
             ItemID.LAW_RUNE,
@@ -108,6 +110,10 @@ public class GotrScript extends Script {
 
                 if (!initCheck) {
                     initializeGuardianPortalInfo();
+                    if (!Rs2Magic.isLunar()) {
+                        Microbot.log("Lunar spellbook not found...disabling npc contact");
+                        useNpcContact = false;
+                    }
                     initCheck = true;
                 }
 
@@ -132,7 +138,7 @@ public class GotrScript extends Script {
                 }
                 //Repair colossal pouch asap to avoid disintegrate completely
                 if (Rs2Inventory.hasItem("colossal pouch") && Rs2Inventory.hasDegradedPouch()) {
-                    if (!repairPouches()) {
+                    if (repairPouches()) {
                         return;
                     }
                 }
@@ -212,6 +218,7 @@ public class GotrScript extends Script {
     }
 
     private boolean waitingForGameToStart(int timeToStart) {
+        if (!isInHugeMine()) return false;
         if (getStartTimer() > randomGaussian(Random.random(20, 30), Random.random(1, 5)) || getStartTimer() == -1 || timeToStart > 10) {
 
             takeUnchargedCells();
@@ -275,7 +282,8 @@ public class GotrScript extends Script {
         }
     }
 
-    private static boolean lootChisel() {
+    private boolean lootChisel() {
+        if (!isInHugeMine()) return false;
         if (!Rs2Inventory.isFull() && !Rs2Inventory.hasItem("Chisel")) {
             Rs2GameObject.interact("chisel", "take");
             Rs2Player.waitForWalking();
@@ -392,10 +400,12 @@ public class GotrScript extends Script {
     }
 
     private static boolean waitForMinigameToStart() {
-        TileObject rcPortal = findPortalToLeaveAltar();
-        if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId())) {
-            state = GotrState.LEAVING_ALTAR;
-            return true;
+        if (!isInMainRegion()) {
+            TileObject rcPortal = findPortalToLeaveAltar();
+            if (rcPortal != null && Rs2GameObject.interact(rcPortal.getId())) {
+                state = GotrState.LEAVING_ALTAR;
+                return true;
+            }
         }
         resetPlugin();
         if (state != GotrState.WAITING) {
@@ -428,6 +438,7 @@ public class GotrScript extends Script {
         if (isInHugeMine()) {
             if (getStartTimer() == -1) {
                 repairPouches();
+                leaveHugeMine();
                 return false;
             }
             if (!Rs2Inventory.isFull()) {
@@ -458,9 +469,7 @@ public class GotrScript extends Script {
         }
         state = GotrState.MINE_LARGE_GUARDIAN_REMAINS;
         if (isInHugeMine()) {
-            Rs2GameObject.interact(38044);
-            Rs2Player.waitForWalking();
-            log("Leave huge mine...");
+            leaveHugeMine();
             return;
         }
         if (Rs2Player.getSkillRequirement(Skill.AGILITY, 56)) {
@@ -474,6 +483,7 @@ public class GotrScript extends Script {
                             sleep(randomGaussian(Random.random(2500, 3000), Random.random(100, 300)));
                             log("Interacting with large guardian remains...");
                             Rs2GameObject.interact(ObjectID.LARGE_GUARDIAN_REMAINS);
+                            sleepGaussian(1200, 150);
                         }
                     }
                 }
@@ -487,6 +497,7 @@ public class GotrScript extends Script {
 
                     repairPouches();
                     Rs2GameObject.interact(ObjectID.LARGE_GUARDIAN_REMAINS);
+                    sleepGaussian(1200, 150);
                     // we can assume that if the player is mining within the startTimer range, he will get enough guardian remains for the game
                     shouldMineGuardianRemains = false;
                 }
@@ -505,7 +516,16 @@ public class GotrScript extends Script {
         }
     }
 
+    private static void leaveHugeMine() {
+        Rs2GameObject.interact(38044);
+        Rs2Player.waitForWalking();
+        log("Leave huge mine...");
+    }
+
     private static boolean repairPouches() {
+        if (!useNpcContact) {
+            return true;
+        }
         if (Rs2Inventory.hasDegradedPouch()) {
             return Rs2Magic.repairPouchesWithLunar();
         }
