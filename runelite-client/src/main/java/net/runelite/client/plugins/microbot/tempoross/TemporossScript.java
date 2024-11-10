@@ -484,9 +484,14 @@ public class TemporossScript extends Script {
                         return;
                     LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(),workArea.totemPoint);
                     Rs2Camera.turnTo(localPoint);
-                    Rs2Walker.walkFastLocal(localPoint);
+                    if (Rs2Camera.isTileOnScreen(localPoint)) {
+                        Rs2Walker.walkFastLocal(localPoint);
+                        log("Can't find the fish spot, walking to the totem pole");
+                        Rs2Player.waitForWalking(2000);
+                        return;
+                    }
                     log("Can't find the fish spot, walking to the totem pole");
-                    Rs2Player.waitForWalking(2000);
+                    Rs2Walker.walkTo(WorldPoint.fromLocalInstance(Microbot.getClient(),localPoint));
                     return;
 
                 }
@@ -597,12 +602,14 @@ public class TemporossScript extends Script {
 
     private void walkToSafePoint() {
         LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(),workArea.safePoint);
+        WorldPoint worldPoint = WorldPoint.fromLocalInstance(Microbot.getClient(),localPoint);
         Rs2Camera.turnTo(localPoint);
-        if(Rs2Camera.isTileOnScreen(localPoint))
+        if (Rs2Camera.isTileOnScreen(localPoint)) {
             Rs2Walker.walkFastLocal(localPoint);
-        else
-            Rs2Walker.walkTo(getTrueWorldPoint(workArea.safePoint));
-        Rs2Player.waitForWalking(2000);
+            Rs2Player.waitForWalking(2000);
+        } else {
+            Rs2Walker.walkTo(worldPoint);
+        }
     }
 
     private void walkToSpiritPool() {
@@ -611,11 +618,12 @@ public class TemporossScript extends Script {
         assert localPoint != null;
         if(Objects.equals(Microbot.getClient().getLocalDestinationLocation(), localPoint) || Objects.equals(Microbot.getClient().getLocalPlayer().getWorldLocation(), workArea.spiritPoolPoint))
             return;
-        if(Rs2Camera.isTileOnScreen(localPoint))
+        if(Rs2Camera.isTileOnScreen(localPoint)) {
             Rs2Walker.walkFastLocal(localPoint);
+            Rs2Player.waitForWalking(2000);
+        }
         else
             Rs2Walker.walkTo(getTrueWorldPoint(workArea.spiritPoolPoint));
-        Rs2Player.waitForWalking(2000);
     }
 
 

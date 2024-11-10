@@ -8,9 +8,7 @@ import net.runelite.client.plugins.microbot.tempoross.enums.HarpoonType;
         "<h3>Version: " + TemporossScript.VERSION + "</h3>\n" +
         "<p>1. <strong>Start the bot outside of the minigame area</strong> to ensure proper functionality.</p>\n" +
         "<p></p>\n" +
-        "<p>2. <strong>Solo Mode:</strong> If selecting solo mode, an <em>Infernal Harpoon</em> is REQUIRED. This allows the bot to manage effectively within the game.</p>\n" +
-        "<p></p>\n" +
-        "<p>3. <strong>Requirements:</strong> You need a minimum of 19 free inventory slots.</p>\n" )
+        "<p>2. <strong>Solo Mode:</strong> If selecting solo mode, an <em>Infernal Harpoon</em> is REQUIRED. You also need a <strong>MINIMUM</strong> of <em>19</em> free inv slots</p>\n")
 public interface TemporossConfig extends Config {
     //sections
     // General

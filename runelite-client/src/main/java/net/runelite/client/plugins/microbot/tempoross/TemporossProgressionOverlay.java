@@ -10,6 +10,9 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
+import static net.runelite.client.plugins.microbot.tempoross.State.getAllFish;
+import static net.runelite.client.plugins.microbot.tempoross.State.getTotalAvailableFishSlots;
+
 public class TemporossProgressionOverlay extends OverlayPanel {
 
     private final TemporossPlugin plugin;
@@ -68,48 +71,48 @@ public class TemporossProgressionOverlay extends OverlayPanel {
             case SECOND_FILL:
                 // Progression goes up as cooked fish decreases (0 fish = 100% progress).
                 int cookedFishSecondFill = State.getCookedFish();
-                return 1.0 - Math.min((double) cookedFishSecondFill / 19.0, 1.0);
+                return 1.0 - Math.min((double) cookedFishSecondFill / (TemporossScript.temporossConfig.solo() ? 19 : getTotalAvailableFishSlots()), 1.0);
 
             case INITIAL_FILL:
                 // Progression goes up as cooked fish decreases (0 fish = 100% progress).
                 int cookedFishInitialFill = State.getCookedFish();
-                return 1.0 - Math.min((double) cookedFishInitialFill / 17.0, 1.0);
+                return 1.0 - Math.min((double) cookedFishInitialFill / (TemporossScript.temporossConfig.solo() ? 17 : getTotalAvailableFishSlots()), 1.0);
 
             case THIRD_COOK:
                 // Progression based on cooked fish count or intensity threshold.
                 int cookedFishThirdCook = State.getCookedFish();
-                return Math.min((double) cookedFishThirdCook / 19.0, 1.0);
+                return Math.min((double) cookedFishThirdCook / (TemporossScript.temporossConfig.solo() ? 19 : getAllFish()), 1.0);
 
             case THIRD_CATCH:
                 // Progression based on total fish count, target is 19.
-                int allFishThirdCatch = State.getAllFish();
-                return Math.min((double) allFishThirdCatch / 19.0, 1.0);
+                int allFishThirdCatch = getAllFish();
+                return Math.min((double) allFishThirdCatch / (TemporossScript.temporossConfig.solo() ? 19 : getTotalAvailableFishSlots()), 1.0);
 
             case EMERGENCY_FILL:
                 // Progression reaches 100% when all fish count is zero.
-                int allFishEmergencyFill = State.getAllFish();
+                int allFishEmergencyFill = getAllFish();
                 return allFishEmergencyFill == 0 ? 1.0 : 0.0;
 
             case SECOND_COOK:
                 // Progression based on cooked fish count reaching 17.
                 int cookedFishSecondCook = State.getCookedFish();
-                return Math.min((double) cookedFishSecondCook / 17.0, 1.0);
+                return Math.min((double) cookedFishSecondCook / (TemporossScript.temporossConfig.solo() ? 17 : getAllFish()), 1.0);
 
             case SECOND_CATCH:
                 // Progression based on total fish count, target is 17.
-                int allFishSecondCatch = State.getAllFish();
-                return Math.min((double) allFishSecondCatch / 17.0, 1.0);
+                int allFishSecondCatch = getAllFish();
+                return Math.min((double) allFishSecondCatch / (TemporossScript.temporossConfig.solo() ? 17 : getTotalAvailableFishSlots()), 1.0);
 
             case INITIAL_COOK:
                 // Progression reaches 100% when raw fish count is zero.
                 int cookedFishInitialCook = State.getCookedFish();
-                int allFishInitialCook = State.getAllFish();
+                int allFishInitialCook = getAllFish();
                 return Math.min((double) cookedFishInitialCook / allFishInitialCook, 1.0);
 
             case INITIAL_CATCH:
                 // Progression based on raw fish count or total fish count; targets are 7 or 10.
                 int rawFishInitialCatch = State.getRawFish();
-                int allFishInitialCatch = State.getAllFish();
+                int allFishInitialCatch = getAllFish();
                 return Math.max(
                         Math.min((double) rawFishInitialCatch / 7.0, 1.0),
                         Math.min((double) allFishInitialCatch / 10.0, 1.0)
