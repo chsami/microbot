@@ -81,6 +81,7 @@ public class ThievingScript extends Script {
         if (Rs2Player.eatAt(config.hitpoints())) {
             return;
         }
+    }
 
     @Override
     public void shutdown() {
