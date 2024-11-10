@@ -31,7 +31,7 @@ import static net.runelite.client.plugins.microbot.Microbot.log;
 public class TemporossScript extends Script {
 
     // Version string
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.0.1";
     public static final Pattern DIGIT_PATTERN = Pattern.compile("(\\d+)");
     public static final int TEMPOROSS_REGION = 12078;
 
@@ -310,8 +310,8 @@ public class TemporossScript extends Script {
         List<NPC> allFires = Rs2Npc.getNpcs().filter(npc -> Arrays.asList(npc.getComposition().getActions()).contains("Douse")).collect(Collectors.toList());
         Rs2WorldPoint playerLocation = new Rs2WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation());
         sortedFires = allFires.stream()
-                .filter(y -> playerLocation.distanceToPath(Microbot.getClient(),y.getWorldLocation()) < 35)
-                .sorted(Comparator.comparingInt(x -> playerLocation.distanceToPath(Microbot.getClient(), x.getWorldLocation())))
+                .filter(y -> playerLocation.distanceToPath(y.getWorldLocation()) < 35)
+                .sorted(Comparator.comparingInt(x -> playerLocation.distanceToPath( x.getWorldLocation())))
                 .collect(Collectors.toList());
         TemporossOverlay.setNpcList(sortedFires);
     }
@@ -322,8 +322,8 @@ public class TemporossScript extends Script {
                 .collect(Collectors.toList());
         Rs2WorldPoint playerLocation = new Rs2WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation());
         sortedClouds = allClouds.stream()
-                .filter(y -> playerLocation.distanceToPath(Microbot.getClient(),y.getWorldLocation()) < 30)
-                .sorted(Comparator.comparingInt(x -> playerLocation.distanceToPath(Microbot.getClient(), x.getWorldLocation())))
+                .filter(y -> playerLocation.distanceToPath(y.getWorldLocation()) < 30)
+                .sorted(Comparator.comparingInt(x -> playerLocation.distanceToPath(x.getWorldLocation())))
                 .collect(Collectors.toList());
         TemporossOverlay.setCloudList(sortedClouds);
     }
@@ -448,6 +448,8 @@ public class TemporossScript extends Script {
     }
 
     private void handleMainLoop() {
+        Rs2Camera.resetZoom();
+        Rs2Camera.resetPitch();
         switch (state) {
             case INITIAL_CATCH:
             case SECOND_CATCH:
@@ -525,7 +527,7 @@ public class TemporossScript extends Script {
                     log("In cloud, walking to safe point");
 
                     NPC ammoCrate = ammoCrates.stream()
-                            .max(Comparator.comparingInt(value -> new Rs2WorldPoint(value.getWorldLocation()).distanceToPath(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation()))).orElse(null);
+                            .max(Comparator.comparingInt(value -> new Rs2WorldPoint(value.getWorldLocation()).distanceToPath( Microbot.getClient().getLocalPlayer().getWorldLocation()))).orElse(null);
                     if (ammoCrate != null) {
 
                         Rs2Camera.turnTo(ammoCrate);
@@ -539,7 +541,7 @@ public class TemporossScript extends Script {
                 }
 
                 NPC ammoCrate =ammoCrates.stream()
-                        .min(Comparator.comparingInt(value -> new Rs2WorldPoint(value.getWorldLocation()).distanceToPath(Microbot.getClient(), Microbot.getClient().getLocalPlayer().getWorldLocation()))).orElse(null);
+                        .min(Comparator.comparingInt(value -> new Rs2WorldPoint(value.getWorldLocation()).distanceToPath(Microbot.getClient().getLocalPlayer().getWorldLocation()))).orElse(null);
 
                 if (ammoCrate != null) {
                     if (Rs2Player.isInteracting()) {
@@ -547,7 +549,6 @@ public class TemporossScript extends Script {
                             return;
                         }
                     }
-                    ShortestPathPlugin.exit();
                     Rs2Walker.setTarget(null);
                     Rs2Camera.turnTo(ammoCrate);
 
@@ -621,7 +622,6 @@ public class TemporossScript extends Script {
     private boolean inCloud(LocalPoint point) {
         GameObject cloud = Rs2GameObject.getGameObject(point);
         return cloud != null && cloud.getId() == NullObjectID.NULL_41006;
-        //return Rs2GameObject.findObject(NullObjectID.NULL_41006, point) != null;
     }
 
     public static boolean inCloud(WorldPoint point, int radius) {
@@ -631,13 +631,8 @@ public class TemporossScript extends Script {
             return false;
         Rs2WorldArea finalArea = area;
         return sortedClouds.stream().anyMatch(cloud -> finalArea.contains(cloud.getWorldLocation()));
-        //return Rs2GameObject.findObject(NullObjectID.NULL_41006, point) != null;
     }
 
-    private GameObject getClosestCloud() {
-        return sortedClouds.stream()
-                .findFirst().orElse(null);
-    }
 
     @Override
     public void shutdown() {

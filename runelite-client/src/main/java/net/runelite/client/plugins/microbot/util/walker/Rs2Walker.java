@@ -555,6 +555,21 @@ public class Rs2Walker {
                 .intersectsWith2D(objectArea);
     }
 
+    /**
+ * Retrieves the walk path from the player's current location to the specified target location.
+ *
+ * @param target The target `WorldPoint` to which the path should be calculated.
+ * @return A list of `WorldPoint` objects representing the path from the player's current location to the target.
+ */
+public static List<WorldPoint> getWalkPath(WorldPoint target) {
+    if (ShortestPathPlugin.getPathfinderConfig().getTransports().isEmpty()) {
+        ShortestPathPlugin.getPathfinderConfig().refresh();
+    }
+    Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), target);
+    pathfinder.run();
+    return pathfinder.getPath();
+}
+
     public static boolean isCloseToRegion(int distance, int regionX, int regionY) {
         WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
                 regionX,
