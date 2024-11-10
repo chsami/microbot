@@ -35,6 +35,9 @@ public class TemporossPlugin extends Plugin {
     private TemporossOverlay temporossOverlay;
 
     @Inject
+    private TemporossProgressionOverlay temporossProgressionOverlay;
+
+    @Inject
     private TemporossScript temporossScript;
 
     @Inject
@@ -63,6 +66,7 @@ public class TemporossPlugin extends Plugin {
     protected void startUp() throws Exception {
         if (overlayManager != null) {
             overlayManager.add(temporossOverlay);
+            overlayManager.add(temporossProgressionOverlay);
         }
         temporossScript.run(config);
     }
@@ -72,6 +76,7 @@ public class TemporossPlugin extends Plugin {
         super.shutDown();
         temporossScript.shutdown();
         overlayManager.remove(temporossOverlay);
+        overlayManager.remove(temporossProgressionOverlay);
     }
 
     @Subscribe
