@@ -239,6 +239,5 @@ public class RoguesDenScript extends Script {
     public void shutdown() {
         super.shutdown();
         init = false;
-        Rs2Walker.disableTeleports = false;
     }
 }

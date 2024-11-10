@@ -131,6 +131,7 @@ public boolean sleepUntil(BooleanSupplier awaitedCondition, Runnable action, lon
                 Microbot.getClientThread().scheduledFuture.cancel(true);
             initialPlayerLocation = null;
             Microbot.pauseAllScripts = false;
+            Rs2Walker.disableTeleports = false;
             Microbot.getSpecialAttackConfigs().reset();
             Rs2Walker.setTarget(null);
         }
