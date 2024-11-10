@@ -1,10 +1,13 @@
 package net.runelite.client.plugins.microbot.GirdyScripts.cannonballsmelter;
 
 
-import net.runelite.api.*;
+import net.runelite.api.Client;
+import net.runelite.api.ItemID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.TileObject;
+import net.runelite.client.plugins.microbot.GirdyScripts.cannonballsmelter.enums.CannonballSmelterStates;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.GirdyScripts.cannonballsmelter.enums.CannonballSmelterStates;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
@@ -12,7 +15,6 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
-import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import javax.inject.Inject;
@@ -23,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CannonballSmelterScript extends Script {
 
-    public static String version = "1.0.0";
+    public static String version = "1.0.1";
     private final ThreadLocalRandom random = ThreadLocalRandom.current();
     @Inject
     private CannonballSmelterConfig config;
@@ -42,7 +44,7 @@ public class CannonballSmelterScript extends Script {
     private boolean hasBars() {
         return Rs2Inventory.hasItem(ItemID.STEEL_BAR);
     }
-    private boolean required() {return Rs2Inventory.hasItem(ItemID.AMMO_MOULD);}
+    private boolean required() {return (Rs2Inventory.hasItem(ItemID.AMMO_MOULD) || Rs2Inventory.hasItem(ItemID.DOUBLE_AMMO_MOULD));}
 
     public boolean run(CannonballSmelterConfig config) {
         Rs2Antiban.resetAntibanSettings();
