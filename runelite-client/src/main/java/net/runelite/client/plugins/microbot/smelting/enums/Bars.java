@@ -10,6 +10,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public enum Bars {
     BRONZE("Bronze bar", ItemID.BRONZE_BAR, 1, Map.of(Ores.COPPER, 1, Ores.TIN, 1)),
+    BLURITE("Blurite bar", ItemID.BLURITE_BAR,  13, Map.of(Ores.BLURITE, 1)),
     IRON("Iron bar", ItemID.IRON_BAR,  15, Map.of(Ores.IRON, 1)),
     SILVER("Silver bar", ItemID.SILVER_BAR,  20, Map.of(Ores.SILVER, 1)),
     STEEL("Steel bar", ItemID.STEEL_BAR,  30, Map.of(Ores.IRON, 1, Ores.COAL, 2)),
