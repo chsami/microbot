@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.camera;
 
+import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
@@ -235,15 +236,20 @@ public class Rs2Camera {
     }
 
     public static boolean isTileOnScreen(LocalPoint localPoint) {
-        int viewportHeight = Microbot.getClient().getViewportHeight();
-        int viewportWidth = Microbot.getClient().getViewportWidth();
+        Client client = Microbot.getClient();
+        int viewportHeight = client.getViewportHeight();
+        int viewportWidth = client.getViewportWidth();
 
-
-        Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), localPoint);
-
+        Polygon poly = Perspective.getCanvasTilePoly(client, localPoint);
         if (poly == null) return false;
 
-        return poly.getBounds2D().getX() <= viewportWidth && poly.getBounds2D().getY() <= viewportHeight;
+        // Check if any part of the polygon intersects with the screen bounds
+        Rectangle viewportBounds = new Rectangle(0, 0, viewportWidth, viewportHeight);
+        if (!poly.intersects(viewportBounds)) return false;
+
+        // Optionally, check if the tile is in front of the camera
+        Point canvasPoint = Perspective.localToCanvas(client, localPoint, client.getPlane());
+        return canvasPoint != null;
     }
 
     // get the camera zoom
