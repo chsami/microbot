@@ -49,7 +49,7 @@ public class TemporossOverlay extends Overlay {
             for (NPC npc : npcList) {
                 Rs2WorldPoint npcLocation = new Rs2WorldPoint(npc.getWorldLocation());
                 Rs2WorldPoint playerLocation = new Rs2WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation());
-                renderNpcOverlay(graphics, npc, Color.RED,    npcLocation.distanceToPath(Microbot.getClient(), playerLocation.getWorldPoint()) + " tiles");
+                renderNpcOverlay(graphics, npc, Color.RED,    npcLocation.distanceToPath(playerLocation.getWorldPoint()) + " tiles");
             }
         }
         if (fishList != null) {

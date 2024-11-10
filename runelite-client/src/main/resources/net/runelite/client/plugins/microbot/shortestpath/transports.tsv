@@ -4512,3 +4512,7 @@
 #mining guild
 3021 9739 0	3021 3339 0	Climb-up Ladder 17385
 3021 3339 0	3021 9739 0	Climb-down Ladder 30367
+
+#portal to gotr
+3104 9573 0	3615 9470 0	Enter Portal 43841
+3615 9470 0	3104 9573 0	Enter Portal 43692

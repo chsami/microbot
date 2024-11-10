@@ -11,6 +11,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.VarbitValues;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldPoint;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -505,6 +506,15 @@ public class Rs2Player {
     }
 
     /**
+     * Gets the players current Rs2WorldPoint
+     *
+     * @return Rs2WorldPoint
+     */
+    public static Rs2WorldPoint getRs2WorldPoint() {
+        return new Rs2WorldPoint(getWorldLocation());
+    }
+
+    /**
      * Checks if the player is near a worldpoint
      *
      * @return
@@ -742,5 +752,21 @@ public class Rs2Player {
 
     public static boolean IsInInstance() {
         return Microbot.getClient().getTopLevelWorldView().isInstance();
+    }
+
+    /**
+     * Returns run energy of a player in 100
+     * @return
+     */
+    public static int getRunEnergy() {
+        return Microbot.getClient().getEnergy() / 100;
+    }
+
+    /**
+     * Returns true if a player has stamina effect active
+     * @return
+     */
+    public static boolean hasStaminaActive() {
+        return Microbot.getVarbitValue(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) != 0;
     }
 }

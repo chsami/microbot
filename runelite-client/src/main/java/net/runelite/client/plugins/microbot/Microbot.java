@@ -129,6 +129,7 @@ public class Microbot {
     @Setter
     @Inject
     private static PouchScript pouchScript;
+    public static boolean isCantReachTargetDetectionEnabled = false;
 
     public static boolean cantReachTarget = false;
     public static boolean cantHopWorld = false;

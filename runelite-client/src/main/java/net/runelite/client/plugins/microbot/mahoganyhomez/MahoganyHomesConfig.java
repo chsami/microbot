@@ -6,7 +6,7 @@ import java.awt.*;
 
 @ConfigGroup(MahoganyHomesConfig.GROUP_NAME)
 @ConfigInformation("<h2>S-1D Home Raider</h2>\n" +
-        "<h3>BETA PREVIEW</h3>\n" +
+        "<h3>BETA PREVIEW 2</h3>\n" +
         "<p>1. <strong>Start anywhere:</strong> Just make sure to have teleports, saw and a hammer.</p>\n" +
         "<p>2. <strong>Contracts:</strong> Select your desired contract <em>BEFORE</em> starting.</p>\n" +
         "<p>3. <strong>Supplies:</strong> Stock up on the correct planks and Steel bars in the bank, the bot will handle resupplying on its own</p>\n" +
@@ -144,6 +144,27 @@ public interface MahoganyHomesConfig extends Config
             position = 1
     )
     default boolean showSessionStats()
+    {
+        return true;
+    }
+
+    // debug section and options
+    @ConfigSection(
+            name = "Debug Options",
+            description = "Settings related to debugging",
+            position = 300
+    )
+    String debugSection = "debugSection";
+
+    // log messages in chat
+    @ConfigItem(
+            keyName = "logMessages",
+            name = "Log Messages",
+            description = "Configures whether or not to log messages in the chat",
+            section = debugSection,
+            position = 0
+    )
+    default boolean logMessages()
     {
         return true;
     }
