@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -441,6 +442,7 @@ public class PathfinderConfig {
 
     /** Checks if the player has all the required equipment and inventory items for the transport */
     private boolean hasRequiredItems(Transport transport) {
+        if (Rs2Walker.disableTeleports) return false;
         if ((TeleportationItem.ALL.equals(useTeleportationItems) ||
                 TeleportationItem.ALL_NON_CONSUMABLE.equals(useTeleportationItems)) &&
                 TransportType.TELEPORTATION_ITEM.equals(transport.getType())) {

@@ -753,4 +753,20 @@ public class Rs2Player {
     public static boolean IsInInstance() {
         return Microbot.getClient().getTopLevelWorldView().isInstance();
     }
+
+    /**
+     * Returns run energy of a player in 100
+     * @return
+     */
+    public static int getRunEnergy() {
+        return Microbot.getClient().getEnergy() / 100;
+    }
+
+    /**
+     * Returns true if a player has stamina effect active
+     * @return
+     */
+    public static boolean hasStaminaActive() {
+        return Microbot.getVarbitValue(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) != 0;
+    }
 }

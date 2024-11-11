@@ -317,6 +317,10 @@ public class Rs2Equipment {
         return equipmentItems.stream().anyMatch(x -> x.getSlot() == EquipmentInventorySlot.SHIELD.getSlotIdx());
     }
 
+    public static boolean isNaked() {
+        return equipmentItems.stream().allMatch(x -> x.id == -1);
+    }
+
     public static void invokeMenu(Rs2Item rs2Item, String action) {
         if (rs2Item == null) return;
 

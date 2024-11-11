@@ -42,7 +42,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static String version = "1.4.6";
+    public static String version = "1.4.7";
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -50,6 +50,8 @@ public class MWintertodtScript extends Script {
     static MWintertodtPlugin plugin;
     private static boolean lockState = false;
     final WorldPoint BOSS_ROOM = new WorldPoint(1630, 3982, 0);
+    final WorldPoint crateLocation = new WorldPoint(1634, 3982, 0);
+    final WorldPoint sproutingRoots = new WorldPoint(1635, 3978, 0);
     String axe = "";
     int wintertodtHp = -1;
     private GameObject brazier;
@@ -144,8 +146,9 @@ public class MWintertodtScript extends Script {
                 GameObject brokenBrazier = Rs2GameObject.findObject(ObjectID.BRAZIER_29313, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
                 GameObject fireBrazier = Rs2GameObject.findObject(ObjectID.BURNING_BRAZIER_29314, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
                 boolean playerIsLowWarmth = getWarmthLevel() < config.warmthTreshhold();
-                boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
-                        && playerIsLowWarmth || !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
+                // if use rejuvenation potion is enabled, we should check for potions instead of food
+                boolean needBanking = !Rs2Inventory.hasItemAmount(config.rejuvenationPotions() ? "Rejuvenation potion " : config.food().getName(), config.minFood(), false, false)
+                        && playerIsLowWarmth || !Rs2Inventory.hasItemAmount(config.rejuvenationPotions() ? "Rejuvenation potion " : config.food().getName(), config.minFood(), false, false)
                         && !isWintertodtAlive;
                 Widget wintertodtHealthbar = Rs2Widget.getWidget(396, 26);
 
@@ -320,6 +323,14 @@ public class MWintertodtScript extends Script {
 
     private boolean shouldEat() {
         if (getWarmthLevel() <= config.eatAtWarmthLevel()) {
+            if(config.rejuvenationPotions()) {
+                List<Rs2Item> rejuvenationPotions = Rs2Inventory.getPotions();
+                Rs2Inventory.interact(rejuvenationPotions.get(0), "Drink");
+                sleepGaussian(600, 150);
+                plugin.setFoodConsumed(plugin.getFoodConsumed() + 1);
+                resetActions = true;
+                return true;
+            }
             Rs2Player.useFood();
             sleepGaussian(600, 150);
             plugin.setFoodConsumed(plugin.getFoodConsumed() + 1);
@@ -423,6 +434,37 @@ public class MWintertodtScript extends Script {
     }
 
     private boolean handleBankLogic(MWintertodtConfig config) {
+        if (config.rejuvenationPotions()) {
+            // Logic to pick up potions inside the minigame from a crate
+            if (Rs2Inventory.hasItemAmount("Rejuvenation potion ", config.foodAmount())) {
+                state = State.ENTER_ROOM;
+                return true;
+            } else {
+                // Logic to interact with the crate to get the potions
+                if (Rs2Player.getWorldLocation().distanceTo(crateLocation) > 5) {
+                    Rs2Walker.walkTo(crateLocation,3);
+                    Rs2Player.waitForWalking(1000);
+                }
+                GameObject crate = Rs2GameObject.getGameObject(crateLocation);
+                if (crate != null) {
+                    sleepUntil(() -> Rs2Inventory.count(ItemID.REJUVENATION_POTION_UNF) >= config.foodAmount(),() -> {
+                        if(Rs2GameObject.interact(crate, "Take-concoction"))
+                            Rs2Inventory.waitForInventoryChanges(3000);
+                    }, 10000, 300);
+                }
+                GameObject roots = Rs2GameObject.getGameObject(sproutingRoots);
+                if (roots != null) {
+                    Rs2GameObject.interact(roots, "Pick");
+                    Rs2Inventory.waitForInventoryChanges(5000);
+                    sleepUntil(() -> Rs2Inventory.count(ItemID.REJUVENATION_POTION_UNF) <= Rs2Inventory.count(ItemID.BRUMA_HERB), 8000);
+                    Rs2Inventory.combineClosest(ItemID.REJUVENATION_POTION_UNF, ItemID.BRUMA_HERB);
+                    Rs2Inventory.waitForInventoryChanges(3000);
+                    sleepUntil(() -> !Rs2Inventory.hasItem(ItemID.REJUVENATION_POTION_UNF), 5000);
+                    return true;
+                }
+            }
+            return true;
+        }
         if (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName(), false)) {
             eatAt(99);
             return true;

@@ -5,10 +5,10 @@ import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 
 @ConfigGroup(BlueDragonsPlugin.CONFIG)
 @ConfigInformation("<center><p style='font-weight: bold;'>[00] BLUE DRAGON FARMER</p> <br />" +
-        "<hr style='width: 75%; border-top: 1px solid #000;'/>" +
-        "<p style='color: black;'>The plugin will travel/kill and bank as needed. Early prayer farmer!</p>" +
+        "<hr style='width: 75%; border-top: 1px solid white;'/>" +
+        "<p style='color: white;'>The plugin will travel/kill and bank as needed. Early prayer farmer!</p>" +
         "<hr style='width: 75%; border-top: 1px solid #000;'/> </center> <br />" +
-        "1. Equip your gear <br />" +
+        "1. Equip your <b>RANGED</b> gear <br />" +
         "2. <b style='color: red;'>MUST</b> have Falador teleport (runes/teletab) <br />" +
         "3. Correct food amount from config <br /> <br />" +
         "<center>Press <b style='color: green;'>START</b> and enjoy :)</center>")
