@@ -1,17 +1,20 @@
 package net.runelite.client.plugins.microbot.cluesolverv2;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.EmoteClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +38,10 @@ public class ClueSolverScriptV2 extends Script {
     private EventBus eventBus;
 
     private ClueTask currentTask;
+
+    @Inject
+    private Provider<EmoteClueTask> emoteClueTaskProvider; // Injected Provider
+
 
     public void start(ClueSolverConfig config) {
         this.config = config;
@@ -78,14 +85,19 @@ public class ClueSolverScriptV2 extends Script {
             }
         } catch (Exception e) {
             log.error("Error in ClueSolverScriptV2", e);
+            currentTask = null;
         }
     }
 
     private ClueTask createTask(ClueScroll clue) {
         log.info("Defining task for clue type: {}", clue.getClass().getSimpleName());
 
+        List<ItemRequirement> requiredItems = clueHelper.determineRequiredItems(clue);
+
         if (clue instanceof EmoteClue) {
-            return new EmoteClueTask(client, (EmoteClue) clue, clueHelper, eventBus, this);
+            EmoteClueTask task = emoteClueTaskProvider.get();
+            task.initialize(client, (EmoteClue) clue, clueHelper, requiredItems, eventBus);
+            return task;
         }
         // Additional clue types can be added here with else-if blocks as needed
 

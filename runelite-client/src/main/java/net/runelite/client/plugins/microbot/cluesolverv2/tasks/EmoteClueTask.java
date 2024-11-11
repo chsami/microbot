@@ -2,107 +2,103 @@ package net.runelite.client.plugins.microbot.cluesolverv2.tasks;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.InteractingChanged;
-import net.runelite.api.events.NpcSpawned;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
-import net.runelite.client.plugins.microbot.cluesolverv2.ClueSolverScriptV2;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.InventoryID;
+import net.runelite.client.eventbus.Subscribe;
 
-import javax.inject.Inject;
 import java.util.List;
 
 @Slf4j
 public class EmoteClueTask implements ClueTask {
 
-    private final EmoteClue clue;
-    private final ClueHelperV2 clueHelper;
-    private final Client client;
-    private final ClueSolverScriptV2 clueSolverScriptV2;
+    private EmoteClue clue;
+    private ClueHelperV2 clueHelper;
+    private Client client;
     private List<ItemRequirement> requiredItems;
-    private NPC doubleAgent;
+    private EventBus eventBus;
     private State state;
 
-    @Inject
-    private EventBus eventBus;
-
-    private static final String DOUBLE_AGENT_NAME = "Double Agent";
     private static final int URI_ID = 7206; // NPC ID for Uri
 
     private enum State {
+        CHECKING_ITEMS,
         RETRIEVING_ITEMS,
+        VERIFYING_WITHDRAWAL,
         NAVIGATING_TO_LOCATION,
-        PERFORMING_EMOTES,
-        WAITING_FOR_ENEMY_SPAWN,
-        FIGHTING_ENEMY,
         COMPLETED
     }
 
-    @Inject
-    public EmoteClueTask(Client client, EmoteClue clue, ClueHelperV2 clueHelper, EventBus eventBus, ClueSolverScriptV2 clueSolverScriptV2) {
+    public EmoteClueTask() {
+        this.state = State.CHECKING_ITEMS;  // Initial state is checking items
+    }
+
+    /**
+     * Initializes the EmoteClueTask with necessary dependencies and data.
+     *
+     * @param client        RuneLite client instance.
+     * @param clue          The EmoteClue instance to solve.
+     * @param clueHelper    Helper class for clue-related operations.
+     * @param requiredItems List of required items for the clue.
+     * @param eventBus      EventBus instance.
+     * @return The initialized EmoteClueTask instance.
+     */
+    public EmoteClueTask initialize(Client client, EmoteClue clue, ClueHelperV2 clueHelper, List<ItemRequirement> requiredItems, EventBus eventBus) {
         this.client = client;
         this.clue = clue;
         this.clueHelper = clueHelper;
-        this.state = State.RETRIEVING_ITEMS;  // Initial state is retrieving items
+        this.requiredItems = requiredItems;
         this.eventBus = eventBus;
-        this.clueSolverScriptV2 = clueSolverScriptV2;
+        this.state = State.CHECKING_ITEMS;
+
+        log.info("EmoteClueTask initialized with {} required items.", requiredItems.size());
+        for (ItemRequirement req : requiredItems) {
+            try {
+                String name = req.getCollectiveName(client);
+                log.info("Initialized with Required Item: {}", name);
+            } catch (Exception e) {
+                log.error("Error retrieving name for ItemRequirement: {}", req.getClass().getSimpleName(), e);
+                log.info("Initialized with Required Item: Unknown Item");
+            }
+        }
+        return this;
     }
 
     @Override
     public void start() {
         log.info("Starting EmoteClueTask for {}", clue.getClass().getSimpleName());
         eventBus.register(this);
-        this.requiredItems = clueHelper.determineRequiredItems(clue);
     }
 
     @Override
     public boolean execute() {
-        if (state == State.COMPLETED) {
-            return true;
-        }
-
+        log.info("Executing EmoteClueTask in state: {}", state);
         switch (state) {
+            case CHECKING_ITEMS:
+                return checkAndHandleMissingItems();
+
             case RETRIEVING_ITEMS:
-                log.info("Retrieving required items from the bank.");
-                if (retrieveRequiredItems()) {
-                    state = State.NAVIGATING_TO_LOCATION;
-                    log.info("All items retrieved. Moving to next state: NAVIGATING_TO_LOCATION");
-                } else {
-                    log.warn("Unable to retrieve all required items. Retrying...");
-                    return false;
-                }
-                break;
+                retrieveRequiredItems();
+                return false; // Wait for next execution to verify
+
+            case VERIFYING_WITHDRAWAL:
+                return verifyItemsPresence();
 
             case NAVIGATING_TO_LOCATION:
-                log.info("Navigating to location for clue.");
                 if (navigateToLocation()) {
-                    state = State.PERFORMING_EMOTES;
-                    log.info("Arrived at location. Moving to next state: PERFORMING_EMOTES");
+                    log.info("Task completed.");
+                    state = State.COMPLETED;
                 }
                 break;
-
-            case PERFORMING_EMOTES:
-                handlePerformingEmotes();
-                break;
-
-            case FIGHTING_ENEMY:
-                attackDoubleAgent();
-                break;
-
-            case WAITING_FOR_ENEMY_SPAWN:
-                log.info("Waiting for Double Agent to spawn...");
-                break;
         }
-
+        log.info("Current state after execution: {}", state);
         return state == State.COMPLETED;
     }
 
@@ -115,112 +111,108 @@ public class EmoteClueTask implements ClueTask {
 
     @Override
     public String getTaskDescription() {
-        return "Performing Emote Clue Task: ";
+        return "Performing Emote Clue Task";
     }
 
-    private boolean retrieveRequiredItems() {
+    /**
+     * Step 1: Check for missing items. If missing items are found, initiate retrieval from the bank.
+     *
+     * @return true if all items are present and task can proceed to navigation; false otherwise.
+     */
+    private boolean checkAndHandleMissingItems() {
+        log.info("Checking for missing items...");
         List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
-        log.info("Missing items (count: {}): {}", missingItems.size(), missingItems);
 
         if (missingItems.isEmpty()) {
-            log.info("All required items are already present.");
-            return true;
+            log.info("All required items are already present. Proceeding to navigation.");
+            state = State.NAVIGATING_TO_LOCATION;
+            return true; // Proceed to navigation
+        } else {
+            log.info("Missing items detected: {}", clueHelper.getItemNames(missingItems));
+            state = State.RETRIEVING_ITEMS; // Transition to retrieve items
+            return false;
         }
-        log.info("Missing items: {}", missingItems);
+    }
 
-        List<String> missingItemNames = clueHelper.getItemNames(missingItems);
-        log.info("Attempting to retrieve missing items from bank: {}", String.join(", ", missingItemNames));
-
+    /**
+     * Step 2: Retrieve required items from the bank if any are missing.
+     * Initiates withdrawal attempts for missing items.
+     */
+    private void retrieveRequiredItems() {
+        log.info("Attempting to retrieve required items from the bank.");
         if (!Rs2Bank.openBank()) {
-            log.warn("Failed to open bank. Retrying...");
-            return false;
+            log.warn("Failed to open bank. Will retry in the next cycle.");
+            return;
         }
 
-       if (!Rs2Bank.walkToBankAndUseBank()) {
-            log.warn("Failed to walk to bank and use bank. Retrying...");
-            return false;
-       }
+        List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
+        List<String> missingItemNames = clueHelper.getItemNames(missingItems);
 
         for (String itemName : missingItemNames) {
             log.info("Attempting to withdraw item: {}", itemName);
-
-            // Try withdrawing the item from the bank
-            Rs2Bank.withdrawItem(itemName);
-
-            // Double-check if the item is in the inventory after withdrawal
-            if (!Rs2Inventory.contains(itemName)) {
-                log.warn("Failed to retrieve item: {}. Closing bank and retrying.", itemName);
-                Rs2Bank.closeBank();
-                return false; // Exit if unable to get the item
-            }
-            log.info("Item {} retrieved successfully.", itemName);
+            Rs2Bank.withdrawItem(itemName); // Withdraw the item without expecting a boolean
         }
 
-        Rs2Bank.closeBank(); // Close bank after all items are retrieved
-        log.info("All required items have been successfully retrieved from the bank.");
-        return true;
+        Rs2Bank.closeBank();
+        state = State.VERIFYING_WITHDRAWAL;
+        log.info("Withdrawal attempts initiated. Waiting to verify item presence.");
     }
 
+    /**
+     * Step 3: Verify that all required items have been successfully withdrawn.
+     *
+     * @return true if all items are present; false otherwise.
+     */
+    private boolean verifyItemsPresence() {
+        log.info("Verifying presence of withdrawn items in inventory.");
+        List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
 
-    private boolean navigateToLocation() {
-        WorldPoint location = (WorldPoint) clueHelper.getFieldValue(clue, "location");
-        if (location != null && !client.getLocalPlayer().getWorldLocation().equals(location)) {
-            Rs2Walker.walkTo(location);
+        if (missingItems.isEmpty()) {
+            log.info("All required items have been successfully withdrawn.");
+            state = State.NAVIGATING_TO_LOCATION;
+            return true;
+        } else {
+            log.warn("Some items are still missing: {}", clueHelper.getItemNames(missingItems));
+            // Optionally, you can decide to retry withdrawal for missing items
             return false;
         }
+    }
+
+    /**
+     * Step 4: Navigate to the specified location.
+     *
+     * @return true if navigation is complete; false otherwise.
+     */
+    private boolean navigateToLocation() {
+        WorldPoint location = clueHelper.getClueLocation(clue);
+        if (location != null && !client.getLocalPlayer().getWorldLocation().equals(location)) {
+            log.info("Navigating to location: {}", location);
+            boolean navigationStarted = Rs2Walker.walkTo(location); // Ensure this method returns a boolean
+            if (!navigationStarted) {
+                log.warn("Failed to initiate navigation to location: {}", location);
+                return false;
+            }
+            return false; // Indicate that navigation is ongoing
+        }
+        log.info("Player has arrived at the clue location.");
         return true;
     }
 
-    private void handlePerformingEmotes() {
-        performEmote(clue.getFirstEmote().getName());
-        if (clue.getEnemy() != null) {
-            state = State.WAITING_FOR_ENEMY_SPAWN;
-            log.info("Waiting for Double Agent to spawn.");
-        } else {
-            interactWithUri();
-            state = State.COMPLETED;
-        }
-    }
-
-    private void performEmote(String emoteName) {
-        log.info("Performing emote: {}", emoteName);
-        // Assume Rs2Tab.switchToEmotesTab() and widget clicking are handled separately
-    }
-
-    private void interactWithUri() {
-        if (Rs2Npc.interact(URI_ID, "Talk-to")) {
-            log.info("Interacted with Uri.");
-        } else {
-            log.warn("Failed to interact with Uri.");
-        }
-    }
-
-    private void attackDoubleAgent() {
-        if (doubleAgent != null) {
-            if (Rs2Npc.interact(doubleAgent, "Attack")) {
-                log.info("Attacking Double Agent.");
-            } else {
-                log.warn("Failed to attack Double Agent.");
-            }
-        }
-    }
-
+    /**
+     * Event listener for inventory changes to verify item withdrawals.
+     *
+     * @param event The ItemContainerChanged event.
+     */
     @Subscribe
-    public void onNpcSpawned(NpcSpawned event) {
-        NPC npc = event.getNpc();
-        if (npc.getName() != null && state == State.WAITING_FOR_ENEMY_SPAWN && npc.getName().equalsIgnoreCase(DOUBLE_AGENT_NAME)) {
-            doubleAgent = npc;
-            log.info("Double Agent spawned.");
-            state = State.FIGHTING_ENEMY;
-        }
-    }
-
-    @Subscribe
-    public void onInteractingChanged(InteractingChanged event) {
-        if (state == State.FIGHTING_ENEMY && event.getSource() == client.getLocalPlayer() && event.getTarget() == null) {
-            if (doubleAgent == null || Rs2Npc.getHealth(doubleAgent) <= 0) {
-                log.info("Double Agent defeated.");
-                state = State.PERFORMING_EMOTES;
+    public void onItemContainerChanged(ItemContainerChanged event) {
+        if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
+            if (state == State.VERIFYING_WITHDRAWAL) {
+                log.info("Inventory updated. Verifying items...");
+                boolean allItemsPresent = verifyItemsPresence();
+                if (allItemsPresent) {
+                    // Proceed to navigation
+                    // This is already handled in verifyItemsPresence()
+                }
             }
         }
     }

@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.cluesolverv2;
 
 import com.google.inject.Provides;
 import com.google.inject.Inject;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -21,8 +20,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 )
 @PluginDependency(ClueScrollPlugin.class)
 public class ClueSolverPlugin extends Plugin {
-
-    @Getter
     @Inject
     private ClueSolverConfig config;
 
@@ -40,7 +37,9 @@ public class ClueSolverPlugin extends Plugin {
 
     @Override
     protected void startUp() {
+
         overlayManager.add(overlay);
+
         if (config.toggleAll()) {
             clueSolverScriptV2.start(config);
         }
@@ -49,6 +48,7 @@ public class ClueSolverPlugin extends Plugin {
 
     @Override
     protected void shutDown() {
+
         clueSolverScriptV2.stop();
         overlayManager.remove(overlay);
         log.info("Clue Solver V2 stopped.");

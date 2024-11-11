@@ -3,11 +3,13 @@ package net.runelite.client.plugins.microbot.cluesolverv2.util;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -15,9 +17,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ClueHelperV2 {
 
-    @Inject
-    private Client client;
-
+    private final Client client;
     private final ConcurrentHashMap<Class<?>, Field> fieldCache = new ConcurrentHashMap<>();
 
     private static final ItemRequirement HAS_SPADE = new AnyRequirementCollection(
@@ -30,42 +30,71 @@ public class ClueHelperV2 {
             new SingleItemRequirement(ItemID.OIL_LAMP_4524),
             new SingleItemRequirement(ItemID.BULLSEYE_LANTERN_4550));
 
-    // Retrieves and caches fields from the class hierarchy
-    private Field getCachedField(Class<?> clazz, String fieldName) {
-        return fieldCache.computeIfAbsent(clazz, c -> getFieldFromClassHierarchy(c, fieldName));
-    }
-
-    // A generic helper method to retrieve field values using reflection
-    private <T> T getFieldValue(Object obj, String fieldName, Class<T> fieldType) {
-        try {
-            Field field = obj.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return fieldType.cast(field.get(obj));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            log.error("Error accessing field '{}' in '{}'", fieldName, obj.getClass().getSimpleName(), e);
+    @Inject
+    public ClueHelperV2(Client client) {
+        this.client = client;
+        if (this.client == null) {
+            log.error("Client instance was not injected correctly!");
+        } else {
+            log.debug("Client instance successfully injected.");
         }
-        return null;
     }
 
+    /**
+     * Generic method to retrieve the value of a specified field with an optional default value.
+     * Adds detailed logging for tracing.
+     */
     private <T> T getFieldValue(Object obj, String fieldName, Class<T> fieldType, T defaultValue) {
         try {
-            Field field = obj.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            T value = fieldType.cast(field.get(obj));
-            return value != null ? value : defaultValue;
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            Field field = getCachedField(obj.getClass(), fieldName);
+            if (field != null) {
+                T value = fieldType.cast(field.get(obj));
+                if (value != null) {
+                    log.debug("Retrieved field '{}' with value: {}", fieldName, value);
+                    return value;
+                } else {
+                    log.warn("Field '{}' in '{}' is null, using default value.", fieldName, obj.getClass().getSimpleName());
+                }
+            } else {
+                log.warn("Field '{}' not found in class '{}'", fieldName, obj.getClass().getSimpleName());
+            }
+        } catch (IllegalAccessException e) {
             log.error("Error accessing field '{}' in '{}'", fieldName, obj.getClass().getSimpleName(), e);
+        } catch (ClassCastException e) {
+            log.error("Type mismatch when casting field '{}' in '{}'", fieldName, obj.getClass().getSimpleName(), e);
         }
         return defaultValue;
     }
 
+    /**
+     * Retrieves the clue location from a ClueScroll.
+     */
+    public WorldPoint getClueLocation(ClueScroll clue) {
+        WorldPoint location = getFieldValue(clue, "location", WorldPoint.class, null);
+        if (location == null) {
+            log.warn("Clue location is null for clue: {}", clue.getClass().getSimpleName());
+        } else {
+            log.debug("Clue location retrieved: {}", location);
+        }
+        return location;
+    }
 
+    /**
+     * Caches and retrieves a Field object from a class.
+     */
+    private Field getCachedField(Class<?> clazz, String fieldName) {
+        return fieldCache.computeIfAbsent(clazz, c -> getFieldFromClassHierarchy(c, fieldName));
+    }
 
+    /**
+     * Traverses the class hierarchy to find a declared field.
+     */
     private Field getFieldFromClassHierarchy(Class<?> clazz, String fieldName) {
         while (clazz != null) {
             try {
                 Field field = clazz.getDeclaredField(fieldName);
                 field.setAccessible(true);
+                log.debug("Cached field '{}' from class '{}'", fieldName, clazz.getSimpleName());
                 return field;
             } catch (NoSuchFieldException e) {
                 clazz = clazz.getSuperclass();
@@ -74,20 +103,9 @@ public class ClueHelperV2 {
         return null;
     }
 
-    // Retrieve a field value using reflection
-    public Object getFieldValue(ClueScroll clue, String fieldName) {
-        Field field = getCachedField(clue.getClass(), fieldName);
-        if (field != null) {
-            try {
-                return field.get(clue);
-            } catch (IllegalAccessException e) {
-                log.error("Error accessing field {} on clue {}", fieldName, clue.getClass().getSimpleName(), e);
-            }
-        }
-        return null;
-    }
-
-    // Determine required items for a given clue, including specific logic for spades and light sources
+    /**
+     * Determines the required items for a given clue.
+     */
     public List<ItemRequirement> determineRequiredItems(ClueScroll clue) {
         List<ItemRequirement> requiredItems = new ArrayList<>();
 
@@ -101,159 +119,170 @@ public class ClueHelperV2 {
             requiredItems.add(HAS_LIGHT);
         }
 
-        try {
-            Object itemRequirements = getFieldValue(clue, "itemRequirements");
-            if (itemRequirements != null) {
-                log.info("Unpacking item requirements for clue type: {}", clue.getClass().getSimpleName());
-                unpackItemRequirements(itemRequirements, requiredItems);
-            } else {
-                log.info("No 'itemRequirements' field found for clue type: {}", clue.getClass().getSimpleName());
+        Object itemRequirements = getFieldValue(clue, "itemRequirements", Object.class, null);
+        if (itemRequirements != null) {
+            log.info("Unpacking item requirements for clue type: {}", clue.getClass().getSimpleName());
+            unpackItemRequirements(itemRequirements, requiredItems);
+        } else {
+            log.info("No 'itemRequirements' field found for clue type: {}", clue.getClass().getSimpleName());
+        }
+
+        log.info("Total required items determined: {}", requiredItems.size());
+        for (ItemRequirement req : requiredItems) {
+            try {
+                String name = req.getCollectiveName(client);
+                log.info("Required Item: {}", name);
+            } catch (Exception e) {
+                log.error("Error retrieving name for ItemRequirement: {}", req.getClass().getSimpleName(), e);
+                log.info("Required Item: Unknown Item");
             }
-        } catch (Exception e) {
-            log.error("Error determining required items for clue: {}", clue.getClass().getSimpleName(), e);
         }
 
         return requiredItems;
     }
 
-    // Unpack item requirements, handling various collection types
+    /**
+     * Unpacks item requirements from various collection types.
+     */
     private void unpackItemRequirements(Object requirement, List<ItemRequirement> requiredItems) {
-        if (requirement instanceof ItemRequirement) {
-            requiredItems.add((ItemRequirement) requirement);
-            handleItemRequirement((ItemRequirement) requirement);
-        } else if (requirement instanceof ItemRequirement[]) {
-            for (ItemRequirement req : (ItemRequirement[]) requirement) {
-                unpackItemRequirements(req, requiredItems);
+        try {
+            log.info("Entering unpackItemRequirements with requirement type: {}", requirement.getClass().getSimpleName());
+            if (requirement instanceof ItemRequirement) {
+                log.debug("Processing ItemRequirement of type: {}", requirement.getClass().getSimpleName());
+                requiredItems.add((ItemRequirement) requirement);
+                logRequirementDetails((ItemRequirement) requirement);
+            } else if (requirement instanceof ItemRequirement[]) {
+                log.info("Processing ItemRequirement array.");
+                for (ItemRequirement req : (ItemRequirement[]) requirement) {
+                    log.debug("Processing ItemRequirement array element of type: {}", req.getClass().getSimpleName());
+                    unpackItemRequirements(req, requiredItems);
+                }
+            } else if (requirement instanceof List) {
+                for (Object req : (List<?>) requirement) {
+                    log.debug("Processing List element of type: {}", req.getClass().getSimpleName());
+                    if (req instanceof ItemRequirement) {
+                        log.debug("Processing ItemRequirement list element of type: {}", req.getClass().getSimpleName());
+                        unpackItemRequirements(req, requiredItems);
+                    } else {
+                        log.warn("List contains non-ItemRequirement element of type: {}", req.getClass().getSimpleName());
+                    }
+                }
+            } else {
+                log.warn("Unexpected item requirement type: {}", requirement.getClass().getSimpleName());
             }
-        } else if (requirement instanceof List) {
-            for (Object req : (List<?>) requirement) {
-                unpackItemRequirements(req, requiredItems);
-            }
-        } else {
-            log.warn("Unexpected item requirement type: {}", requirement.getClass().getSimpleName());
-        }
-    }
-
-    // Check if required items are available in inventory or equipment
-    public List<ItemRequirement> getMissingItems(List<ItemRequirement> requirements) {
-        ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
-        ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
-        log.info("Checking for missing items in inventory and equipment.");
-        log.info("Inventory: {}", inventory);
-        log.info("Equipment: {}", equipment);
-
-        List<Item> allItems = new ArrayList<>();
-        if (inventory != null) {
-            allItems.addAll(List.of(inventory.getItems()));
-            log.info("Inventory items: {}", allItems);
-        }
-        if (equipment != null) {
-            allItems.addAll(List.of(equipment.getItems()));
-            log.info("Equipment items: {}", allItems);
-        }
-
-        return requirements.stream()
-                .filter(req -> !req.fulfilledBy(allItems.toArray(new Item[0])))
-                .collect(Collectors.toList());
-    }
-
-    // Handle different item requirement types
-    private void handleItemRequirement(ItemRequirement req) {
-        if (req instanceof SingleItemRequirement) {
-            handleSingleItemRequirement((SingleItemRequirement) req);
-        } else if (req instanceof AnyRequirementCollection) {
-            handleAnyRequirementCollection((AnyRequirementCollection) req);
-        } else if (req instanceof MultipleOfItemRequirement) {
-            handleMultipleOfItemRequirement((MultipleOfItemRequirement) req);
-        } else if (req instanceof RangeItemRequirement) {
-            handleRangeItemRequirement((RangeItemRequirement) req);
-        } else if (req instanceof AllRequirementsCollection) {
-            handleAllRequirementsCollection((AllRequirementsCollection) req);
-        } else if (req instanceof SlotLimitationRequirement) {
-            handleSlotLimitationRequirement((SlotLimitationRequirement) req);
-        } else {
-            log.warn("Unknown ItemRequirement type: {}", req.getClass().getSimpleName());
-        }
-    }
-
-    private void handleSingleItemRequirement(SingleItemRequirement singleReq) {
-        int itemId = getFieldValue(singleReq, "itemId", Integer.class, -1);
-        if (itemId != -1) {
-            log.info("SingleItemRequirement - Item ID: {}", itemId);
-        } else {
-            log.warn("Failed to retrieve item ID for SingleItemRequirement.");
-        }
-    }
-
-    private void handleAnyRequirementCollection(AnyRequirementCollection anyReq) {
-        log.info("AnyRequirementCollection - Name: {}", anyReq.getCollectiveName(client));
-        ItemRequirement[] requirements = getFieldValue(anyReq, "requirements", ItemRequirement[].class);
-        if (requirements != null) {
-            for (ItemRequirement req : requirements) {
-                handleItemRequirement(req);
-            }
-        }
-    }
-
-    private void handleMultipleOfItemRequirement(MultipleOfItemRequirement multipleReq) {
-        int itemId = getFieldValue(multipleReq, "itemId", Integer.class, -1);
-        int quantity = getFieldValue(multipleReq, "quantity", Integer.class, -1);
-
-        if (itemId != -1 && quantity != -1) {
-            log.info("MultipleOfItemRequirement - Item ID: {}, Quantity: {}", itemId, quantity);
-        } else {
-            log.warn("Failed to retrieve item ID or quantity for MultipleOfItemRequirement.");
-        }
-    }
-
-    private void handleRangeItemRequirement(RangeItemRequirement rangeReq) {
-        int startItemId = getFieldValue(rangeReq, "startItemId", Integer.class, -1);
-        int endItemId = getFieldValue(rangeReq, "endItemId", Integer.class, -1);
-
-        if (startItemId != -1 && endItemId != -1) {
-            log.info("RangeItemRequirement - Start Item ID: {}, End Item ID: {}", startItemId, endItemId);
-        } else {
-            log.warn("Failed to retrieve start or end item ID for RangeItemRequirement.");
-        }
-    }
-
-    private void handleAllRequirementsCollection(AllRequirementsCollection allReq) {
-        log.info("AllRequirementsCollection - Name: {}", allReq.getCollectiveName(client));
-        ItemRequirement[] requirements = getFieldValue(allReq, "requirements", ItemRequirement[].class);
-        if (requirements != null) {
-            for (ItemRequirement req : requirements) {
-                handleItemRequirement(req);
-            }
-        }
-    }
-
-    private void handleSlotLimitationRequirement(SlotLimitationRequirement slotReq) {
-        log.info("SlotLimitationRequirement - Description: {}", slotReq.getCollectiveName(client));
-        EquipmentInventorySlot[] slots = getFieldValue(slotReq, "slots", EquipmentInventorySlot[].class);
-        if (slots != null) {
-            for (EquipmentInventorySlot slot : slots) {
-                log.info("SlotLimitationRequirement - Slot: {}", slot.name());
-            }
+            log.info("Exiting unpackItemRequirements with requirement type: {}", requirement.getClass().getSimpleName());
+        } catch (Exception e) {
+            log.error("Exception in unpackItemRequirements with requirement type: {}", requirement.getClass().getSimpleName(), e);
         }
     }
 
     /**
-     * Retrieves the collective names of the given item requirements.
-     *
-     * @param requirements the list of ItemRequirement objects
-     * @return a list of item names as Strings
+     * Logs the details of an ItemRequirement.
+     */
+    private void logRequirementDetails(ItemRequirement requirement) {
+        log.info("Logging details for ItemRequirement of type: {}", requirement.getClass().getSimpleName());
+        try {
+            String collectiveName;
+            log.info("Processing ItemRequirement of type: {}", requirement.getClass().getSimpleName());
+
+            // Log before calling getCollectiveName
+            log.debug("About to call getCollectiveName(client) for requirement: {}", requirement.getClass().getSimpleName());
+            try {
+                collectiveName = requirement.getCollectiveName(client);
+                log.info("Processing requirement: {}", collectiveName);
+            } catch (Exception e) {
+                log.error("Error retrieving collective name for requirement: {}", requirement.getClass().getSimpleName(), e);
+                collectiveName = "Unknown Item";
+            }
+
+            // Log whether client is null
+            if (client == null) {
+                log.error("Client instance is null!");
+            } else {
+                log.debug("Client instance is active.");
+            }
+
+            if (requirement instanceof SingleItemRequirement) {
+                log.debug("Handling SingleItemRequirement.");
+                int itemId = getFieldValue(requirement, "itemId", Integer.class, -1);
+                log.info("SingleItemRequirement - Item ID: {} (Name: {})", itemId, collectiveName);
+            } else if (requirement instanceof MultipleOfItemRequirement) {
+                log.debug("Handling MultipleOfItemRequirement.");
+                int itemId = getFieldValue(requirement, "itemId", Integer.class, -1);
+                int quantity = getFieldValue(requirement, "quantity", Integer.class, -1);
+                log.info("MultipleOfItemRequirement - Item ID: {}, Quantity: {}, Name: {}", itemId, quantity, collectiveName);
+            } else if (requirement instanceof RangeItemRequirement) {
+                log.debug("Handling RangeItemRequirement.");
+                int startItemId = getFieldValue(requirement, "startItemId", Integer.class, -1);
+                int endItemId = getFieldValue(requirement, "endItemId", Integer.class, -1);
+                log.info("RangeItemRequirement - Start Item ID: {}, End Item ID: {}", startItemId, endItemId);
+            } else if (requirement instanceof AnyRequirementCollection || requirement instanceof AllRequirementsCollection) {
+                log.debug("Handling Requirement Collection.");
+                ItemRequirement[] subRequirements = getFieldValue(requirement, "requirements", ItemRequirement[].class, new ItemRequirement[0]);
+                logCollectionRequirementDetails(subRequirements);
+            } else if (requirement instanceof SlotLimitationRequirement) {
+                log.debug("Handling SlotLimitationRequirement.");
+                String description = getFieldValue(requirement, "description", String.class, "Unknown Slot Requirement");
+                log.info("SlotLimitationRequirement - Description: {}", description);
+            } else {
+                log.warn("Unknown ItemRequirement type: {}", requirement.getClass().getSimpleName());
+            }
+        } catch (Exception e) {
+            log.error("Exception while processing ItemRequirement of type: {}", requirement.getClass().getSimpleName(), e);
+        }
+    }
+
+    /**
+     * Logs details of a collection of ItemRequirements.
+     */
+    private void logCollectionRequirementDetails(ItemRequirement[] requirements) {
+        for (ItemRequirement req : requirements) {
+            logRequirementDetails(req);
+        }
+    }
+
+    /**
+     * Retrieves a list of missing items based on the current inventory and equipment.
+     */
+    public List<ItemRequirement> getMissingItems(List<ItemRequirement> requirements) {
+        ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
+        ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
+
+        List<Item> allItems = new ArrayList<>();
+        if (inventory != null) allItems.addAll(Arrays.asList(inventory.getItems()));
+        if (equipment != null) allItems.addAll(Arrays.asList(equipment.getItems()));
+
+        List<ItemRequirement> missingItems = requirements.stream()
+                .filter(req -> !req.fulfilledBy(allItems.toArray(new Item[0])))
+                .collect(Collectors.toList());
+
+        log.info("Missing items count: {}", missingItems.size());
+        for (ItemRequirement req : missingItems) {
+            try {
+                String name = req.getCollectiveName(client);
+                log.info("Missing Item: {}", name);
+            } catch (Exception e) {
+                log.error("Error retrieving name for missing ItemRequirement: {}", req.getClass().getSimpleName(), e);
+                log.info("Missing Item: Unknown Item");
+            }
+        }
+
+        return missingItems;
+    }
+
+    /**
+     * Retrieves the names of the required items.
      */
     public List<String> getItemNames(List<ItemRequirement> requirements) {
         return requirements.stream()
                 .map(req -> {
                     try {
-                        return req.getCollectiveName(client); // Get the readable name of the item
+                        return req.getCollectiveName(client);
                     } catch (Exception e) {
-                        log.error("Error retrieving name for item requirement: {}", req, e);
-                        return "Unknown Item"; // Default in case of error
+                        log.error("Error retrieving name for item requirement: {}", req.getClass().getSimpleName(), e);
+                        return "Unknown Item";
                     }
                 })
                 .collect(Collectors.toList());
     }
-
 }
