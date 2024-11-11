@@ -110,6 +110,21 @@ public class Rs2Dialogue {
     }
 
     /**
+     * Retrieves the question text from the dialogue, which is usually the first widget in the dialogue options.
+     *
+     * @return the text of the question widget, or null if no question is present.
+     */
+    public static String getQuestion() {
+        if (!hasSelectAnOption()) return null;
+
+        Widget[] dynamicWidgetOptions = Rs2Widget.getWidget(InterfaceID.DIALOG_OPTION, 1).getDynamicChildren();
+        if (dynamicWidgetOptions != null && dynamicWidgetOptions.length > 0) {
+            return dynamicWidgetOptions[0].getText();
+        }
+        return null;
+    }
+
+    /**
      * Retrieves a list of dialogue option widgets currently visible to the player.
      * It skips the first dynamic child widget, as it is typically not an option.
      *
