@@ -24,231 +24,222 @@
  */
 package net.runelite.client.plugins.questhelper.playerquests.cookshelper;
 
-import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.PlayerMadeQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.runelite.PlayerQuestStateRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
-import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import net.runelite.client.plugins.questhelper.steps.TileStep;
-import net.runelite.client.plugins.questhelper.runeliteobjects.RuneliteConfigSetter;
-import net.runelite.client.plugins.questhelper.runeliteobjects.dialog.RuneliteDialogStep;
-import net.runelite.client.plugins.questhelper.runeliteobjects.dialog.RuneliteObjectDialogStep;
-import net.runelite.client.plugins.questhelper.steps.playermadesteps.RuneliteObjectStep;
-import net.runelite.client.plugins.questhelper.runeliteobjects.dialog.RunelitePlayerDialogStep;
-import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.FaceAnimationIDs;
-import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.FakeItem;
-import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.FakeNpc;
-import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.ReplacedObject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.PlayerMadeQuestHelper;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.requirements.runelite.PlayerQuestStateRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
+import net.runelite.client.plugins.questhelper.runeliteobjects.RuneliteConfigSetter;
+import net.runelite.client.plugins.questhelper.runeliteobjects.dialog.RuneliteDialogStep;
+import net.runelite.client.plugins.questhelper.runeliteobjects.dialog.RuneliteObjectDialogStep;
+import net.runelite.client.plugins.questhelper.runeliteobjects.dialog.RunelitePlayerDialogStep;
+import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.FaceAnimationIDs;
+import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.FakeItem;
+import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.FakeNpc;
+import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.ReplacedObject;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.steps.TileStep;
+import net.runelite.client.plugins.questhelper.steps.playermadesteps.RuneliteObjectStep;
 
-public class CooksHelper extends PlayerMadeQuestHelper
-{
-	private RuneliteObjectStep talkToCook, talkToHopleez, grabCabbage, returnToHopleez;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-	private DetailedQuestStep standNextToCook, standNextToHopleez, standNextToHopleez2;
+public class CooksHelper extends PlayerMadeQuestHelper {
+    private RuneliteObjectStep talkToCook, talkToHopleez, grabCabbage, returnToHopleez;
 
-	private Requirement nearCook, nearHopleez;
+    private DetailedQuestStep standNextToCook, standNextToHopleez, standNextToHopleez2;
 
-	private FakeNpc cooksCousin, hopleez;
+    private Requirement nearCook, nearHopleez;
 
-	private FakeItem cabbage;
+    private FakeNpc cooksCousin, hopleez;
 
-	private PlayerQuestStateRequirement talkedToCooksCousin, talkedToHopleez, displayCabbage, pickedCabbage;
+    private FakeItem cabbage;
 
-	@Override
-	public QuestStep loadStep()
-	{
-		itemWidget = ItemID.TOP_HAT;
-		rotationX = 100;
-		zoom = 200;
+    private PlayerQuestStateRequirement talkedToCooksCousin, talkedToHopleez, displayCabbage, pickedCabbage;
 
-		setupRequirements();
-		createRuneliteObjects();
-		setupSteps();
+    @Override
+    public QuestStep loadStep() {
+        itemWidget = ItemID.TOP_HAT;
+        rotationX = 100;
+        zoom = 200;
 
-		PlayerQuestStateRequirement req = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 0);
+        setupRequirements();
+        createRuneliteObjects();
+        setupSteps();
 
-		ConditionalStep questSteps = new ConditionalStep(this, standNextToCook);
-		questSteps.addStep(req.getNewState(4), new DetailedQuestStep(this, "Quest completed!"));
-		questSteps.addStep(new Conditions(req.getNewState(3), nearHopleez), returnToHopleez);
-		questSteps.addStep(req.getNewState(3), standNextToHopleez2);
-		questSteps.addStep(req.getNewState(2), grabCabbage);
-		questSteps.addStep(new Conditions(req.getNewState(1), nearHopleez), talkToHopleez);
-		questSteps.addStep(req.getNewState(1), standNextToHopleez);
-		questSteps.addStep(nearCook, talkToCook);
+        PlayerQuestStateRequirement req = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 0);
 
-		// We want something which can be added to a requirement, which
+        ConditionalStep questSteps = new ConditionalStep(this, standNextToCook);
+        questSteps.addStep(req.getNewState(4), new DetailedQuestStep(this, "Quest completed!"));
+        questSteps.addStep(new Conditions(req.getNewState(3), nearHopleez), returnToHopleez);
+        questSteps.addStep(req.getNewState(3), standNextToHopleez2);
+        questSteps.addStep(req.getNewState(2), grabCabbage);
+        questSteps.addStep(new Conditions(req.getNewState(1), nearHopleez), talkToHopleez);
+        questSteps.addStep(req.getNewState(1), standNextToHopleez);
+        questSteps.addStep(nearCook, talkToCook);
 
-		// Don't save to config until helper closes/client closing?
+        // We want something which can be added to a requirement, which
 
-		return questSteps;
-	}
+        // Don't save to config until helper closes/client closing?
 
-	@Override
-	protected void setupRequirements()
-	{
-		// NPCs should persist through quest steps unless actively removed? Dialog should be conditional on step (sometimes)
-		// Hide/show NPCs/the runelite character when NPCs go on it/you go over it
-		// Handle cancelling dialog boxes (even just moving a tile away should remove for example)
-		// Properly handle removing NPC from screen when changing floors and such
-		// Work out how to do proper priority on the npcs being clicked
-		// Wandering NPCs?
-		// Objects + items (basically same as NPCs)
-		talkedToCooksCousin = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 1, Operation.GREATER_EQUAL);
-		talkedToHopleez = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 2, Operation.GREATER_EQUAL);
-		pickedCabbage = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 3, Operation.GREATER_EQUAL);
-		displayCabbage = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 2);
-		nearCook = new ZoneRequirement(new Zone(new WorldPoint(3206, 3212, 0), new WorldPoint(3212, 3218, 0)));
-		nearHopleez = new ZoneRequirement(new Zone(new WorldPoint(3232, 3212, 0), new WorldPoint(3238, 3218, 0)));
-	}
+        return questSteps;
+    }
 
-	public void setupSteps()
-	{
-		// TODO: Need a way to define the groupID of a runelite object to be a quest step without it being stuck
-		// Add each step's groupID as a sub-group
+    @Override
+    protected void setupRequirements() {
+        // NPCs should persist through quest steps unless actively removed? Dialog should be conditional on step (sometimes)
+        // Hide/show NPCs/the runelite character when NPCs go on it/you go over it
+        // Handle cancelling dialog boxes (even just moving a tile away should remove for example)
+        // Properly handle removing NPC from screen when changing floors and such
+        // Work out how to do proper priority on the npcs being clicked
+        // Wandering NPCs?
+        // Objects + items (basically same as NPCs)
+        talkedToCooksCousin = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 1, Operation.GREATER_EQUAL);
+        talkedToHopleez = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 2, Operation.GREATER_EQUAL);
+        pickedCabbage = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 3, Operation.GREATER_EQUAL);
+        displayCabbage = new PlayerQuestStateRequirement(configManager, getQuest().getPlayerQuests(), 2);
+        nearCook = new ZoneRequirement(new Zone(new WorldPoint(3206, 3212, 0), new WorldPoint(3212, 3218, 0)));
+        nearHopleez = new ZoneRequirement(new Zone(new WorldPoint(3232, 3212, 0), new WorldPoint(3238, 3218, 0)));
+    }
 
-		talkToCook = new RuneliteObjectStep(this, cooksCousin, "Talk to the Lumbridge Cook's Cousin.");
-		standNextToCook = new TileStep(this, new WorldPoint(3210, 3215, 0), "Talk to the Lumbridge Cook's Cousin.");
-		talkToCook.addSubSteps(standNextToCook);
+    public void setupSteps() {
+        // TODO: Need a way to define the groupID of a runelite object to be a quest step without it being stuck
+        // Add each step's groupID as a sub-group
 
-		talkToHopleez = new RuneliteObjectStep(this, hopleez, "Talk to Hopleez east of Lumbridge Castle.");
-		standNextToHopleez = new TileStep(this, new WorldPoint(3236, 3215, 0), "Talk to Hopleez east of Lumbridge Castle.");
-		talkToHopleez.addSubSteps(standNextToHopleez);
+        talkToCook = new RuneliteObjectStep(this, cooksCousin, "Talk to the Lumbridge Cook's Cousin.");
+        standNextToCook = new TileStep(this, new WorldPoint(3210, 3215, 0), "Talk to the Lumbridge Cook's Cousin.");
+        talkToCook.addSubSteps(standNextToCook);
 
-		grabCabbage = new RuneliteObjectStep(this, cabbage, "Get the cabbage to the north of Hopleez, outside the Sheared Ram.");
+        talkToHopleez = new RuneliteObjectStep(this, hopleez, "Talk to Hopleez east of Lumbridge Castle.");
+        standNextToHopleez = new TileStep(this, new WorldPoint(3236, 3215, 0), "Talk to Hopleez east of Lumbridge Castle.");
+        talkToHopleez.addSubSteps(standNextToHopleez);
 
-		returnToHopleez = new RuneliteObjectStep(this, hopleez, "Return to Hopleez east of Lumbridge Castle.");
-		standNextToHopleez2 = new DetailedQuestStep(this, new WorldPoint(3235, 3216, 0), "Return to Hopleez east of Lumbridge Castle.");
-		returnToHopleez.addSubSteps(standNextToHopleez2);
-	}
+        grabCabbage = new RuneliteObjectStep(this, cabbage, "Get the cabbage to the north of Hopleez, outside the Sheared Ram.");
 
-	private void setupCooksCousin()
-	{
-		// Cook's Cousin
-		cooksCousin = runeliteObjectManager.createFakeNpc(this.toString(), client.getNpcDefinition(NpcID.COOK_4626).getModels(), new WorldPoint(3209, 3215, 0), 808);
-		cooksCousin.setName("Cook's Cousin");
-		cooksCousin.setFace(4626);
-		cooksCousin.setExamine("The Cook's cousin.");
-		cooksCousin.addTalkAction(runeliteObjectManager);
-		cooksCousin.addExamineAction(runeliteObjectManager);
+        returnToHopleez = new RuneliteObjectStep(this, hopleez, "Return to Hopleez east of Lumbridge Castle.");
+        standNextToHopleez2 = new DetailedQuestStep(this, new WorldPoint(3235, 3216, 0), "Return to Hopleez east of Lumbridge Castle.");
+        returnToHopleez.addSubSteps(standNextToHopleez2);
+    }
 
-		QuestRequirement hasDoneCooksAssistant = new QuestRequirement(QuestHelperQuest.COOKS_ASSISTANT, QuestState.FINISHED);
+    private void setupCooksCousin() {
+        // Cook's Cousin
+        cooksCousin = runeliteObjectManager.createFakeNpc(this.toString(), client.getNpcDefinition(NpcID.COOK_4626).getModels(), new WorldPoint(3209, 3215, 0), 808);
+        cooksCousin.setName("Cook's Cousin");
+        cooksCousin.setFace(4626);
+        cooksCousin.setExamine("The Cook's cousin.");
+        cooksCousin.addTalkAction(runeliteObjectManager);
+        cooksCousin.addExamineAction(runeliteObjectManager);
 
-		RuneliteObjectDialogStep dontMeetReqDialog = cooksCousin.createDialogStepForNpc("Come talk to me once you've helped my cousin out.");
-		cooksCousin.addDialogTree(null, dontMeetReqDialog);
+        QuestRequirement hasDoneCooksAssistant = new QuestRequirement(QuestHelperQuest.COOKS_ASSISTANT, QuestState.FINISHED);
 
-		RuneliteDialogStep dialog = cooksCousin.createDialogStepForNpc("Hey, you there! You helped out my cousin before right?");
-		dialog.addContinueDialog(new RunelitePlayerDialogStep(client, "I have yeah, what's wrong? Does he need some more eggs? Maybe I can just get him a chicken instead?"))
-			.addContinueDialog(cooksCousin.createDialogStepForNpc("No no, nothing like that. Have you seen that terribly dressed person outside the courtyard?", FaceAnimationIDs.FRIENDLY_QUESTIONING))
-			.addContinueDialog(cooksCousin.createDialogStepForNpc("I don't know who they are, but can you please get them to move along please?", FaceAnimationIDs.FRIENDLY_QUESTIONING))
-			.addContinueDialog(cooksCousin.createDialogStepForNpc("They seem to be attracting more troublemakers...."))
-			.addContinueDialog(new RunelitePlayerDialogStep(client, "You mean Hatius? If so it'd be my pleasure.").setStateProgression(talkedToCooksCousin.getSetter()));
-		cooksCousin.addDialogTree(hasDoneCooksAssistant, dialog);
+        RuneliteObjectDialogStep dontMeetReqDialog = cooksCousin.createDialogStepForNpc("Come talk to me once you've helped my cousin out.");
+        cooksCousin.addDialogTree(null, dontMeetReqDialog);
 
-		RuneliteObjectDialogStep dialogV2 = cooksCousin.createDialogStepForNpc("That terribly dressed person is still outside the castle, go talk to them!");
-		cooksCousin.addDialogTree(talkedToCooksCousin, dialogV2);
-	}
+        RuneliteDialogStep dialog = cooksCousin.createDialogStepForNpc("Hey, you there! You helped out my cousin before right?");
+        dialog.addContinueDialog(new RunelitePlayerDialogStep(client, "I have yeah, what's wrong? Does he need some more eggs? Maybe I can just get him a chicken instead?"))
+                .addContinueDialog(cooksCousin.createDialogStepForNpc("No no, nothing like that. Have you seen that terribly dressed person outside the courtyard?", FaceAnimationIDs.FRIENDLY_QUESTIONING))
+                .addContinueDialog(cooksCousin.createDialogStepForNpc("I don't know who they are, but can you please get them to move along please?", FaceAnimationIDs.FRIENDLY_QUESTIONING))
+                .addContinueDialog(cooksCousin.createDialogStepForNpc("They seem to be attracting more troublemakers...."))
+                .addContinueDialog(new RunelitePlayerDialogStep(client, "You mean Hatius? If so it'd be my pleasure.").setStateProgression(talkedToCooksCousin.getSetter()));
+        cooksCousin.addDialogTree(hasDoneCooksAssistant, dialog);
 
-	private void setupHopleez()
-	{
-		// Hopleez
-		hopleez = runeliteObjectManager.createFakeNpc(this.toString(), client.getNpcDefinition(NpcID.HOPLEEZ).getModels(), new WorldPoint(3235, 3215, 0), 808);
-		hopleez.setName("Hopleez");
-		hopleez.setFace(7481);
-		hopleez.setExamine("He was here first.");
-		hopleez.addTalkAction(runeliteObjectManager);
-		hopleez.addExamineAction(runeliteObjectManager);
+        RuneliteObjectDialogStep dialogV2 = cooksCousin.createDialogStepForNpc("That terribly dressed person is still outside the castle, go talk to them!");
+        cooksCousin.addDialogTree(talkedToCooksCousin, dialogV2);
+    }
 
-		// Dialog
-		RuneliteDialogStep hopleezDialogPreQuest = hopleez.createDialogStepForNpc("Hop noob.");
-		hopleezDialogPreQuest.addContinueDialog(new RunelitePlayerDialogStep(client, "What? Also, what are you wearing?"))
-			.addContinueDialog(hopleez.createDialogStepForNpc("Hop NOOB."));
-		hopleez.addDialogTree(null, hopleezDialogPreQuest);
+    private void setupHopleez() {
+        // Hopleez
+        hopleez = runeliteObjectManager.createFakeNpc(this.toString(), client.getNpcDefinition(NpcID.HOPLEEZ).getModels(), new WorldPoint(3235, 3215, 0), 808);
+        hopleez.setName("Hopleez");
+        hopleez.setFace(7481);
+        hopleez.setExamine("He was here first.");
+        hopleez.addTalkAction(runeliteObjectManager);
+        hopleez.addExamineAction(runeliteObjectManager);
 
-		RuneliteDialogStep hopleezDialog1 = hopleez.createDialogStepForNpc("Hop noob.", FaceAnimationIDs.ANNOYED);
-		hopleezDialog1.addContinueDialog(new RunelitePlayerDialogStep(client, "What? The Cook's Cousin sent me to see what you were doing here.", FaceAnimationIDs.QUIZZICAL))
-			.addContinueDialog(hopleez.createDialogStepForNpc("One moment I was relaxing in Zeah killing some crabs. I closed my eyes for a second, and suddenly I'm here."))
-			.addContinueDialog(hopleez.createDialogStepForNpc("People would always try to steal my spot in Zeah, and it seems it's no different here!", FaceAnimationIDs.ANNOYED))
-			.addContinueDialog(hopleez.createDialogStepForNpc("Not only is this guy crashing me, but he's trying to outdress me too!", FaceAnimationIDs.ANNOYED_2))
-			.addContinueDialog(new RunelitePlayerDialogStep(client, "Hatius? I'm pretty sure he's been here much longer than you....", FaceAnimationIDs.QUESTIONING))
-			.addContinueDialog(hopleez.createDialogStepForNpc("I swear he wasn't here when I first arrived, I went away for a second and suddenly he's here!", FaceAnimationIDs.ANNOYED_2))
-			.addContinueDialog(hopleez.createDialogStepForNpc("Help me teach him a lesson, get me that old cabbage from outside the The Sheared Ram."))
-			.addContinueDialog(new RunelitePlayerDialogStep(client, "Umm, sure....", talkedToHopleez.getSetter()));
-		hopleez.addDialogTree(talkedToCooksCousin, hopleezDialog1);
+        // Dialog
+        RuneliteDialogStep hopleezDialogPreQuest = hopleez.createDialogStepForNpc("Hop noob.");
+        hopleezDialogPreQuest.addContinueDialog(new RunelitePlayerDialogStep(client, "What? Also, what are you wearing?"))
+                .addContinueDialog(hopleez.createDialogStepForNpc("Hop NOOB."));
+        hopleez.addDialogTree(null, hopleezDialogPreQuest);
+
+        RuneliteDialogStep hopleezDialog1 = hopleez.createDialogStepForNpc("Hop noob.", FaceAnimationIDs.ANNOYED);
+        hopleezDialog1.addContinueDialog(new RunelitePlayerDialogStep(client, "What? The Cook's Cousin sent me to see what you were doing here.", FaceAnimationIDs.QUIZZICAL))
+                .addContinueDialog(hopleez.createDialogStepForNpc("One moment I was relaxing in Zeah killing some crabs. I closed my eyes for a second, and suddenly I'm here."))
+                .addContinueDialog(hopleez.createDialogStepForNpc("People would always try to steal my spot in Zeah, and it seems it's no different here!", FaceAnimationIDs.ANNOYED))
+                .addContinueDialog(hopleez.createDialogStepForNpc("Not only is this guy crashing me, but he's trying to outdress me too!", FaceAnimationIDs.ANNOYED_2))
+                .addContinueDialog(new RunelitePlayerDialogStep(client, "Hatius? I'm pretty sure he's been here much longer than you....", FaceAnimationIDs.QUESTIONING))
+                .addContinueDialog(hopleez.createDialogStepForNpc("I swear he wasn't here when I first arrived, I went away for a second and suddenly he's here!", FaceAnimationIDs.ANNOYED_2))
+                .addContinueDialog(hopleez.createDialogStepForNpc("Help me teach him a lesson, get me that old cabbage from outside the The Sheared Ram."))
+                .addContinueDialog(new RunelitePlayerDialogStep(client, "Umm, sure....", talkedToHopleez.getSetter()));
+        hopleez.addDialogTree(talkedToCooksCousin, hopleezDialog1);
 
 
-		RuneliteDialogStep hopleezWaitingForCabbageDialog = hopleez.createDialogStepForNpc("Get me that cabbage!");
-		hopleez.addDialogTree(talkedToHopleez, hopleezWaitingForCabbageDialog);
+        RuneliteDialogStep hopleezWaitingForCabbageDialog = hopleez.createDialogStepForNpc("Get me that cabbage!");
+        hopleez.addDialogTree(talkedToHopleez, hopleezWaitingForCabbageDialog);
 
-		RuneliteConfigSetter endQuest = new RuneliteConfigSetter(configManager, getQuest().getPlayerQuests().getConfigValue(), "4");
-		RuneliteDialogStep hopleezGiveCabbageDialog = hopleez.createDialogStepForNpc("Have you got the cabbage?");
-		hopleezGiveCabbageDialog
-			.addContinueDialog(new RunelitePlayerDialogStep(client, "I have! Here you go, why do you need it?"))
-			.addContinueDialog(hopleez.createDialogStepForNpc("Nice! Now let's sort out this crasher..."))
-			.addContinueDialog(hopleez.createDialogStepForNpc("Oi noob, take this!"))
-			.addContinueDialog(new RuneliteObjectDialogStep("Hatius Cosaintus", "What on earth?", NpcID.HATIUS_COSAINTUS).setStateProgression(endQuest));
-		hopleez.addDialogTree(pickedCabbage, hopleezGiveCabbageDialog);
-	}
+        RuneliteConfigSetter endQuest = new RuneliteConfigSetter(configManager, getQuest().getPlayerQuests().getConfigValue(), "4");
+        RuneliteDialogStep hopleezGiveCabbageDialog = hopleez.createDialogStepForNpc("Have you got the cabbage?");
+        hopleezGiveCabbageDialog
+                .addContinueDialog(new RunelitePlayerDialogStep(client, "I have! Here you go, why do you need it?"))
+                .addContinueDialog(hopleez.createDialogStepForNpc("Nice! Now let's sort out this crasher..."))
+                .addContinueDialog(hopleez.createDialogStepForNpc("Oi noob, take this!"))
+                .addContinueDialog(new RuneliteObjectDialogStep("Hatius Cosaintus", "What on earth?", NpcID.HATIUS_COSAINTUS).setStateProgression(endQuest));
+        hopleez.addDialogTree(pickedCabbage, hopleezGiveCabbageDialog);
+    }
 
-	private void setupCabbage()
-	{
-		// Old cabbage
-		cabbage = runeliteObjectManager.createFakeItem(this.toString(), new int[]{ 8196 }, new WorldPoint(3231, 3235, 0), -1);
-		cabbage.setName("Old cabbage");
-		cabbage.setExamine("A mouldy looking cabbage.");
-		cabbage.addExamineAction(runeliteObjectManager);
-		cabbage.setDisplayRequirement(displayCabbage);
-		cabbage.addTakeAction(runeliteObjectManager, new RuneliteConfigSetter(configManager, getQuest().getPlayerQuests().getConfigValue(), "3"),
-			"You pick up the old cabbage.");
+    private void setupCabbage() {
+        // Old cabbage
+        cabbage = runeliteObjectManager.createFakeItem(this.toString(), new int[]{8196}, new WorldPoint(3231, 3235, 0), -1);
+        cabbage.setName("Old cabbage");
+        cabbage.setExamine("A mouldy looking cabbage.");
+        cabbage.addExamineAction(runeliteObjectManager);
+        cabbage.setDisplayRequirement(displayCabbage);
+        cabbage.addTakeAction(runeliteObjectManager, new RuneliteConfigSetter(configManager, getQuest().getPlayerQuests().getConfigValue(), "3"),
+                "You pick up the old cabbage.");
 
-		cabbage.setObjectToRemove(new ReplacedObject(NullObjectID.NULL_37348, new WorldPoint(3231, 3235, 0)));
-	}
+        cabbage.setObjectToRemove(new ReplacedObject(NullObjectID.NULL_37348, new WorldPoint(3231, 3235, 0)));
+    }
 
-	private void createRuneliteObjects()
-	{
-		setupCooksCousin();
-		setupHopleez();
-		setupCabbage();
-	}
+    private void createRuneliteObjects() {
+        setupCooksCousin();
+        setupHopleez();
+        setupCabbage();
+    }
 
-	@Override
-	public List<Requirement> getGeneralRequirements()
-	{
-		return Collections.singletonList(new QuestRequirement(QuestHelperQuest.COOKS_ASSISTANT, QuestState.FINISHED));
-	}
+    @Override
+    public List<Requirement> getGeneralRequirements() {
+        return Collections.singletonList(new QuestRequirement(QuestHelperQuest.COOKS_ASSISTANT, QuestState.FINISHED));
+    }
 
-	@Override
-	public List<UnlockReward> getUnlockRewards()
-	{
-		return Collections.singletonList(
-			new UnlockReward("A replacement for Hatius Cosaintus")
-		);
-	}
+    @Override
+    public List<UnlockReward> getUnlockRewards() {
+        return Collections.singletonList(
+                new UnlockReward("A replacement for Hatius Cosaintus")
+        );
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		PanelDetails helpingTheCousinSteps = new PanelDetails("Helping the Cook's Cousin", Arrays.asList(talkToCook, talkToHopleez, grabCabbage, returnToHopleez));
-		allSteps.add(helpingTheCousinSteps);
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        PanelDetails helpingTheCousinSteps = new PanelDetails("Helping the Cook's Cousin", Arrays.asList(talkToCook, talkToHopleez, grabCabbage, returnToHopleez));
+        allSteps.add(helpingTheCousinSteps);
 
-		return allSteps;
-	}
+        return allSteps;
+    }
 }

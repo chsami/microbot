@@ -27,28 +27,25 @@ package net.runelite.client.plugins.questhelper.helpers.mischelpers.herbrun;
 import lombok.Value;
 import net.runelite.client.plugins.timetracking.farming.CropState;
 import net.runelite.client.plugins.timetracking.farming.Produce;
+
 @Value
-class PatchState
-{
-	Produce produce;
-	CropState cropState;
-	int stage;
+class PatchState {
+    Produce produce;
+    CropState cropState;
+    int stage;
 
-	int getStages()
-	{
-		return cropState == CropState.HARVESTABLE || cropState == CropState.FILLING ? produce.getHarvestStages() : produce.getStages();
-	}
+    int getStages() {
+        return cropState == CropState.HARVESTABLE || cropState == CropState.FILLING ? produce.getHarvestStages() : produce.getStages();
+    }
 
-	int getTickRate()
-	{
-		switch (cropState)
-		{
-			case HARVESTABLE:
-				return produce.getRegrowTickrate();
-			case GROWING:
-				return produce.getTickrate();
-			default:
-				return 0;
-		}
-	}
+    int getTickRate() {
+        switch (cropState) {
+            case HARVESTABLE:
+                return produce.getRegrowTickrate();
+            case GROWING:
+                return produce.getTickrate();
+            default:
+                return 0;
+        }
+    }
 }

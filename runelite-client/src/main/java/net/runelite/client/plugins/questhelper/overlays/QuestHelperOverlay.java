@@ -28,43 +28,37 @@
 package net.runelite.client.plugins.questhelper.overlays;
 
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-import javax.inject.Inject;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPriority;
 
-public class QuestHelperOverlay extends OverlayPanel
-{
-	public static final Color TITLED_CONTENT_COLOR = new Color(190, 190, 190);
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.ArrayList;
 
-	private final QuestHelperPlugin plugin;
+public class QuestHelperOverlay extends OverlayPanel {
+    public static final Color TITLED_CONTENT_COLOR = new Color(190, 190, 190);
 
-	@Inject
-	public QuestHelperOverlay(QuestHelperPlugin plugin)
-	{
-		this.plugin = plugin;
-		setPriority(OverlayPriority.HIGHEST);
-	}
+    private final QuestHelperPlugin plugin;
 
-	@Override
-	public Dimension render(Graphics2D graphics)
-	{
-		if (!plugin.getConfig().showOverlay())
-		{
-			return super.render(graphics);
-		}
-		QuestHelper questHelper = plugin.getSelectedQuest();
+    @Inject
+    public QuestHelperOverlay(QuestHelperPlugin plugin) {
+        this.plugin = plugin;
+        setPriority(OverlayPriority.HIGHEST);
+    }
 
-		if (questHelper == null || questHelper.getCurrentStep() == null)
-		{
-			return null;
-		}
-		questHelper.getCurrentStep().makeOverlayHint(panelComponent, plugin, new ArrayList<>(), new ArrayList<>());
+    @Override
+    public Dimension render(Graphics2D graphics) {
+        if (!plugin.getConfig().showOverlay()) {
+            return super.render(graphics);
+        }
+        QuestHelper questHelper = plugin.getSelectedQuest();
 
-		return super.render(graphics);
-	}
+        if (questHelper == null || questHelper.getCurrentStep() == null) {
+            return null;
+        }
+        questHelper.getCurrentStep().makeOverlayHint(panelComponent, plugin, new ArrayList<>(), new ArrayList<>());
+
+        return super.render(graphics);
+    }
 }

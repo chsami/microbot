@@ -24,116 +24,106 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.miniquests.skippyandthemogres;
 
+
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.runelite.api.ItemID;
-import net.runelite.api.NpcID;
-import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldPoint;
 
-public class SkippyAndTheMogres extends BasicQuestHelper
-{
-	//Items Required
-	ItemRequirement bucketOfWater, nettleTea, chocolateDust, bucketOfMilk, snapeGrass, chocolateMilk, hangoverCure;
+import java.util.*;
 
-	QuestStep soberSkippy, useTeaOnSkippy, useChocolateDustOnMilk, useSnapeGrassOnMilk, useHangoverCure;
+public class SkippyAndTheMogres extends BasicQuestHelper {
+    //Items Required
+    ItemRequirement bucketOfWater, nettleTea, chocolateDust, bucketOfMilk, snapeGrass, chocolateMilk, hangoverCure;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    QuestStep soberSkippy, useTeaOnSkippy, useChocolateDustOnMilk, useSnapeGrassOnMilk, useHangoverCure;
 
-		steps.put(0, soberSkippy);
-		steps.put(1, useTeaOnSkippy);
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupSteps();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		ConditionalStep makeAndUseCure = new ConditionalStep(this, useChocolateDustOnMilk);
-		makeAndUseCure.addStep(hangoverCure, useHangoverCure);
-		makeAndUseCure.addStep(chocolateMilk, useSnapeGrassOnMilk);
+        steps.put(0, soberSkippy);
+        steps.put(1, useTeaOnSkippy);
 
-		steps.put(2, makeAndUseCure);
+        ConditionalStep makeAndUseCure = new ConditionalStep(this, useChocolateDustOnMilk);
+        makeAndUseCure.addStep(hangoverCure, useHangoverCure);
+        makeAndUseCure.addStep(chocolateMilk, useSnapeGrassOnMilk);
 
-		return steps;
-	}
+        steps.put(2, makeAndUseCure);
 
-	@Override
-	protected void setupRequirements()
-	{
-		bucketOfMilk = new ItemRequirement("Bucket of milk", ItemID.BUCKET_OF_MILK);
-		bucketOfMilk.setHighlightInInventory(true);
-		bucketOfWater = new ItemRequirement("Bucket of water", ItemID.BUCKET_OF_WATER);
-		bucketOfWater.setHighlightInInventory(true);
-		hangoverCure = new ItemRequirement("Hangover cure", ItemID.HANGOVER_CURE);
-		hangoverCure.setHighlightInInventory(true);
-		chocolateDust = new ItemRequirement("Chocolate dust", ItemID.CHOCOLATE_DUST);
-		chocolateDust.setHighlightInInventory(true);
-		nettleTea = new ItemRequirement("Nettle tea", ItemID.NETTLE_TEA);
-		nettleTea.setTooltip("You can make this by using nettles on a bowl of water, then cooking it");
-		snapeGrass = new ItemRequirement("Snape grass", ItemID.SNAPE_GRASS);
-		snapeGrass.setHighlightInInventory(true);
-		chocolateMilk = new ItemRequirement("Chocolatey milk", ItemID.CHOCOLATEY_MILK);
-		chocolateMilk.setHighlightInInventory(true);
-	}
+        return steps;
+    }
 
-	public void setupSteps()
-	{
-		soberSkippy = new NpcStep(this, NpcID.SKIPPY, new WorldPoint(2982, 3194, 0), "Right-click 'sober-up' on Skippy south west of Port Sarim.", bucketOfWater);
-		soberSkippy.addIcon(ItemID.BUCKET_OF_WATER);
-		soberSkippy.addDialogStep("Throw the water!");
-		useTeaOnSkippy = new NpcStep(this, NpcID.SKIPPY_2588, new WorldPoint(2982, 3194, 0), "Talk to Skippy.", nettleTea);
-		useChocolateDustOnMilk = new DetailedQuestStep(this, "Use some chocolate dust on a bucket of milk.", chocolateDust, bucketOfMilk);
-		useSnapeGrassOnMilk = new DetailedQuestStep(this, "Use some snape grass on the chocolatey milk.", snapeGrass, chocolateMilk);
-		useHangoverCure = new NpcStep(this, NpcID.SKIPPY_2589, new WorldPoint(2982, 3194, 0), "Use the hangover cure on Skippy.", hangoverCure);
-		useHangoverCure.addIcon(ItemID.HANGOVER_CURE);
-	}
+    @Override
+    protected void setupRequirements() {
+        bucketOfMilk = new ItemRequirement("Bucket of milk", ItemID.BUCKET_OF_MILK);
+        bucketOfMilk.setHighlightInInventory(true);
+        bucketOfWater = new ItemRequirement("Bucket of water", ItemID.BUCKET_OF_WATER);
+        bucketOfWater.setHighlightInInventory(true);
+        hangoverCure = new ItemRequirement("Hangover cure", ItemID.HANGOVER_CURE);
+        hangoverCure.setHighlightInInventory(true);
+        chocolateDust = new ItemRequirement("Chocolate dust", ItemID.CHOCOLATE_DUST);
+        chocolateDust.setHighlightInInventory(true);
+        nettleTea = new ItemRequirement("Nettle tea", ItemID.NETTLE_TEA);
+        nettleTea.setTooltip("You can make this by using nettles on a bowl of water, then cooking it");
+        snapeGrass = new ItemRequirement("Snape grass", ItemID.SNAPE_GRASS);
+        snapeGrass.setHighlightInInventory(true);
+        chocolateMilk = new ItemRequirement("Chocolatey milk", ItemID.CHOCOLATEY_MILK);
+        chocolateMilk.setHighlightInInventory(true);
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(bucketOfWater);
-		reqs.add(nettleTea);
-		reqs.add(bucketOfMilk);
-		reqs.add(chocolateDust);
-		reqs.add(snapeGrass);
-		return reqs;
-	}
+    public void setupSteps() {
+        soberSkippy = new NpcStep(this, NpcID.SKIPPY, new WorldPoint(2982, 3194, 0), "Right-click 'sober-up' on Skippy south west of Port Sarim.", bucketOfWater);
+        soberSkippy.addIcon(ItemID.BUCKET_OF_WATER);
+        soberSkippy.addDialogStep("Throw the water!");
+        useTeaOnSkippy = new NpcStep(this, NpcID.SKIPPY_2588, new WorldPoint(2982, 3194, 0), "Talk to Skippy.", nettleTea);
+        useChocolateDustOnMilk = new DetailedQuestStep(this, "Use some chocolate dust on a bucket of milk.", chocolateDust, bucketOfMilk);
+        useSnapeGrassOnMilk = new DetailedQuestStep(this, "Use some snape grass on the chocolatey milk.", snapeGrass, chocolateMilk);
+        useHangoverCure = new NpcStep(this, NpcID.SKIPPY_2589, new WorldPoint(2982, 3194, 0), "Use the hangover cure on Skippy.", hangoverCure);
+        useHangoverCure.addIcon(ItemID.HANGOVER_CURE);
+    }
 
-	@Override
-	public List<Requirement> getGeneralRequirements()
-	{
-		ArrayList<Requirement> req = new ArrayList<>();
-		req.add(new SkillRequirement(Skill.COOKING, 20));
-		return req;
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(bucketOfWater);
+        reqs.add(nettleTea);
+        reqs.add(bucketOfMilk);
+        reqs.add(chocolateDust);
+        reqs.add(snapeGrass);
+        return reqs;
+    }
 
-	@Override
-	public List<UnlockReward> getUnlockRewards()
-	{
-		return Arrays.asList(
-				new UnlockReward("Ability to kill Mogres"),
-				new UnlockReward("Ability to recieve Mogres as a Slayer task"));
-	}
+    @Override
+    public List<Requirement> getGeneralRequirements() {
+        ArrayList<Requirement> req = new ArrayList<>();
+        req.add(new SkillRequirement(Skill.COOKING, 20));
+        return req;
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Help Skippy", Arrays.asList(soberSkippy, useTeaOnSkippy, useChocolateDustOnMilk, useSnapeGrassOnMilk, useHangoverCure), bucketOfWater, nettleTea, bucketOfMilk, chocolateDust, snapeGrass));
-		return allSteps;
-	}
+    @Override
+    public List<UnlockReward> getUnlockRewards() {
+        return Arrays.asList(
+                new UnlockReward("Ability to kill Mogres"),
+                new UnlockReward("Ability to recieve Mogres as a Slayer task"));
+    }
+
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Help Skippy", Arrays.asList(soberSkippy, useTeaOnSkippy, useChocolateDustOnMilk, useSnapeGrassOnMilk, useHangoverCure), bucketOfWater, nettleTea, bucketOfMilk, chocolateDust, snapeGrass));
+        return allSteps;
+    }
 }

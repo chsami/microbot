@@ -24,54 +24,49 @@
  */
 package net.runelite.client.plugins.questhelper.questhelpers;
 
+
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import java.util.ArrayList;
-import java.util.Collections;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public abstract class ComplexStateQuestHelper extends QuestHelper
-{
-	protected QuestStep step;
-	protected int var;
+public abstract class ComplexStateQuestHelper extends QuestHelper {
+    protected QuestStep step;
+    protected int var;
 
-	@Override
-	public void init()
-	{
-		if (step == null)
-		{
-			step = loadStep();
-		}
-	}
+    @Override
+    public void init() {
+        if (step == null) {
+            step = loadStep();
+        }
+    }
 
-	@Override
-	public void startUp(QuestHelperConfig config)
-	{
-		step = loadStep();
-		this.config = config;
-		instantiateSteps(Collections.singletonList(step));
-		var = getVar();
-		startUpStep(step);
-	}
+    @Override
+    public void startUp(QuestHelperConfig config) {
+        step = loadStep();
+        this.config = config;
+        instantiateSteps(Collections.singletonList(step));
+        var = getVar();
+        startUpStep(step);
+    }
 
-	@Override
-	public void shutDown()
-	{
-		super.shutDown();
-		shutDownStep();
-	}
+    @Override
+    public void shutDown() {
+        super.shutDown();
+        shutDownStep();
+    }
 
-	@Override
-	public boolean updateQuest()
-	{
-		return true;
-	}
+    @Override
+    public boolean updateQuest() {
+        return true;
+    }
 
-	public List<PanelDetails> getPanels()
-	{
-		return new ArrayList<>();
-	}
+    public List<PanelDetails> getPanels() {
+        return new ArrayList<>();
+    }
 
-	public abstract QuestStep loadStep();
+    public abstract QuestStep loadStep();
 }

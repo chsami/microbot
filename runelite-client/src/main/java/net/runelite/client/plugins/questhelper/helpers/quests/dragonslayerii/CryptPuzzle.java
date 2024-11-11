@@ -25,22 +25,6 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.dragonslayerii;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NullObjectID;
@@ -50,256 +34,220 @@ import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-public class CryptPuzzle extends DetailedOwnerStep
-{
-	@Inject
-	protected EventBus eventBus;
+import java.util.*;
 
-	@Inject
-	protected Client client;
+public class CryptPuzzle extends DetailedOwnerStep {
+    private final int TRISTAN = 1;
+    private final int CAMORRA = 2;
+    private final int AIVAS = 3;
+    private final int ROBERT = 4;
+    private final HashMap<String, Integer> locations = new HashMap<>();
+    private final HashMap<String, Integer> weaponsSouth = new HashMap<>();
+    private final HashMap<String, Integer> weaponsWest = new HashMap<>();
+    private final HashMap<Integer, QuestStep> getBustSteps = new HashMap<>();
+    private final HashMap<Integer, ItemRequirement> items = new HashMap<>();
+    private final HashMap<Integer, ItemRequirement> bustsConditions = new HashMap<>();
+    @Inject
+    protected EventBus eventBus;
+    @Inject
+    protected Client client;
+    Integer northBust, eastBust, southBust, westBust;
+    ItemRequirement aivasBust, camorraBust, robertBust, tristanBust;
+    Requirement hasAivasBust, hasRobertBust, hasCamorraBust, hasTristanBust;
+    DetailedQuestStep takeCamorraBust, takeAivasBust, takeRobertBust, takeTristanBust, placeBustNorth, placeBustSouth, placeBustEast, placeBustWest, inspectTomb;
+    Zone firstFloor, basement, secondFloor;
+    private boolean solutionFound;
 
-	private final int TRISTAN = 1;
-	private final int CAMORRA = 2;
-	private final int AIVAS = 3;
-	private final int ROBERT = 4;
+    // Find match, set bust to take to correct step, set bust to use to correct ItemRequirement
+    public CryptPuzzle(QuestHelper questHelper) {
+        super(questHelper, "Solve the bust puzzle.");
 
-	Integer northBust, eastBust, southBust, westBust;
+        locations.put("Zartharim sat at the north of the table", AIVAS);
+        locations.put("Saranthium sat at the north of the table", CAMORRA);
+        locations.put("Arkney sat at the north of the table", ROBERT);
+        locations.put("Karville sat at the north of the table", TRISTAN);
 
-	private final HashMap<String, Integer> locations = new HashMap<>();
-	private final HashMap<String, Integer> weaponsSouth = new HashMap<>();
-	private final HashMap<String, Integer> weaponsWest = new HashMap<>();
+        weaponsSouth.put("opposite the one with the crossbow", AIVAS);
+        weaponsSouth.put("opposite the one with the axe", CAMORRA);
+        weaponsSouth.put("opposite the one with the bow", ROBERT);
+        weaponsSouth.put("opposite the one with the sword", TRISTAN);
 
-	private final HashMap<Integer, QuestStep> getBustSteps = new HashMap<>();
-	private final HashMap<Integer, ItemRequirement> items = new HashMap<>();
-	private final HashMap<Integer, ItemRequirement> bustsConditions = new HashMap<>();
+        weaponsWest.put("The one with a crossbow asked the", AIVAS);
+        weaponsWest.put("The one with an axe asked the", CAMORRA);
+        weaponsWest.put("The one with a bow asked the", ROBERT);
+        weaponsWest.put("The one with a sword asked the", TRISTAN);
 
+        getBustSteps.put(AIVAS, takeAivasBust);
+        getBustSteps.put(CAMORRA, takeCamorraBust);
+        getBustSteps.put(ROBERT, takeRobertBust);
+        getBustSteps.put(TRISTAN, takeTristanBust);
 
-	private boolean solutionFound;
+        bustsConditions.put(AIVAS, aivasBust);
+        bustsConditions.put(CAMORRA, camorraBust);
+        bustsConditions.put(ROBERT, robertBust);
+        bustsConditions.put(TRISTAN, tristanBust);
 
-	ItemRequirement aivasBust, camorraBust, robertBust, tristanBust;
+        items.put(AIVAS, aivasBust);
+        items.put(CAMORRA, camorraBust);
+        items.put(ROBERT, robertBust);
+        items.put(TRISTAN, tristanBust);
+    }
 
-	Requirement hasAivasBust, hasRobertBust, hasCamorraBust, hasTristanBust;
+    @Override
+    public void startUp() {
+        updateSteps();
+    }
 
-	DetailedQuestStep takeCamorraBust, takeAivasBust, takeRobertBust, takeTristanBust, placeBustNorth, placeBustSouth, placeBustEast, placeBustWest, inspectTomb;
+    @Override
+    public void shutDown() {
+        shutDownStep();
+        currentStep = null;
+    }
 
-	Zone firstFloor, basement, secondFloor;
+    @Subscribe
+    public void onGameTick(GameTick ignoredEvent) {
+        updateSteps();
+    }
 
-	// Find match, set bust to take to correct step, set bust to use to correct ItemRequirement
-	public CryptPuzzle(QuestHelper questHelper)
-	{
-		super(questHelper, "Solve the bust puzzle.");
+    protected void updateSteps() {
+        if (!solutionFound) {
+            startUpStep(inspectTomb);
+            return;
+        }
+        int currentNorthBust = client.getVarbitValue(6152);
+        int currentEastBust = client.getVarbitValue(6154);
+        int currentSouthBust = client.getVarbitValue(6153);
+        int currentWestBust = client.getVarbitValue(6155);
 
-		locations.put("Zartharim sat at the north of the table", AIVAS);
-		locations.put("Saranthium sat at the north of the table", CAMORRA);
-		locations.put("Arkney sat at the north of the table", ROBERT);
-		locations.put("Karville sat at the north of the table", TRISTAN);
+        if (currentNorthBust != northBust) {
+            if (!bustsConditions.get(northBust).check(client)) {
+                startUpStep(getBustSteps.get(northBust));
+            } else {
+                startUpStep(placeBustNorth);
+            }
+        } else if (currentEastBust != eastBust) {
+            if (!bustsConditions.get(eastBust).check(client)) {
+                startUpStep(getBustSteps.get(eastBust));
+            } else {
+                startUpStep(placeBustEast);
+            }
+        } else if (currentSouthBust != southBust) {
+            if (!bustsConditions.get(southBust).check(client)) {
+                startUpStep(getBustSteps.get(southBust));
+            } else {
+                startUpStep(placeBustSouth);
+            }
+        } else if (currentWestBust != westBust) {
+            if (!bustsConditions.get(westBust).check(client)) {
+                startUpStep(getBustSteps.get(westBust));
+            } else {
+                startUpStep(placeBustWest);
+            }
+        } else {
+            startUpStep(inspectTomb);
+        }
+    }
 
-		weaponsSouth.put("opposite the one with the crossbow", AIVAS);
-		weaponsSouth.put("opposite the one with the axe", CAMORRA);
-		weaponsSouth.put("opposite the one with the bow", ROBERT);
-		weaponsSouth.put("opposite the one with the sword", TRISTAN);
+    private void setupItemRequirements() {
+        aivasBust = new ItemRequirement("Aivas bust", ItemID.AIVAS_BUST);
+        aivasBust.setHighlightInInventory(true);
+        robertBust = new ItemRequirement("Robert bust", ItemID.ROBERT_BUST);
+        robertBust.setHighlightInInventory(true);
+        tristanBust = new ItemRequirement("Trisan bust", ItemID.TRISTAN_BUST);
+        tristanBust.setHighlightInInventory(true);
+        camorraBust = new ItemRequirement("Camorra bust", ItemID.CAMORRA_BUST);
+        camorraBust.setHighlightInInventory(true);
+    }
 
-		weaponsWest.put("The one with a crossbow asked the", AIVAS);
-		weaponsWest.put("The one with an axe asked the", CAMORRA);
-		weaponsWest.put("The one with a bow asked the", ROBERT);
-		weaponsWest.put("The one with a sword asked the", TRISTAN);
+    private void setupConditions() {
+        hasAivasBust = aivasBust;
+        hasRobertBust = robertBust;
+        hasCamorraBust = camorraBust;
+        hasTristanBust = tristanBust;
+    }
 
-		getBustSteps.put(AIVAS, takeAivasBust);
-		getBustSteps.put(CAMORRA, takeCamorraBust);
-		getBustSteps.put(ROBERT, takeRobertBust);
-		getBustSteps.put(TRISTAN, takeTristanBust);
-
-		bustsConditions.put(AIVAS, aivasBust);
-		bustsConditions.put(CAMORRA, camorraBust);
-		bustsConditions.put(ROBERT, robertBust);
-		bustsConditions.put(TRISTAN, tristanBust);
-
-		items.put(AIVAS, aivasBust);
-		items.put(CAMORRA, camorraBust);
-		items.put(ROBERT, robertBust);
-		items.put(TRISTAN, tristanBust);
-	}
-
-	@Override
-	public void startUp()
-	{
-		updateSteps();
-	}
-
-	@Override
-	public void shutDown()
-	{
-		shutDownStep();
-		currentStep = null;
-	}
-
-	@Subscribe
-	public void onGameTick(GameTick ignoredEvent)
-	{
-		updateSteps();
-	}
-
-	protected void updateSteps()
-	{
-		if (!solutionFound)
-		{
-			startUpStep(inspectTomb);
-			return;
-		}
-		int currentNorthBust = client.getVarbitValue(6152);
-		int currentEastBust = client.getVarbitValue(6154);
-		int currentSouthBust = client.getVarbitValue(6153);
-		int currentWestBust = client.getVarbitValue(6155);
-
-		if (currentNorthBust != northBust)
-		{
-			if (!bustsConditions.get(northBust).check(client))
-			{
-				startUpStep(getBustSteps.get(northBust));
-			}
-			else
-			{
-				startUpStep(placeBustNorth);
-			}
-		}
-		else if (currentEastBust != eastBust)
-		{
-			if (!bustsConditions.get(eastBust).check(client))
-			{
-				startUpStep(getBustSteps.get(eastBust));
-			}
-			else
-			{
-				startUpStep(placeBustEast);
-			}
-		}
-		else if (currentSouthBust != southBust)
-		{
-			if (!bustsConditions.get(southBust).check(client))
-			{
-				startUpStep(getBustSteps.get(southBust));
-			}
-			else
-			{
-				startUpStep(placeBustSouth);
-			}
-		}
-		else if (currentWestBust != westBust)
-		{
-			if (!bustsConditions.get(westBust).check(client))
-			{
-				startUpStep(getBustSteps.get(westBust));
-			}
-			else
-			{
-				startUpStep(placeBustWest);
-			}
-		}
-		else
-		{
-			startUpStep(inspectTomb);
-		}
-	}
-
-	private void setupItemRequirements()
-	{
-		aivasBust = new ItemRequirement("Aivas bust", ItemID.AIVAS_BUST);
-		aivasBust.setHighlightInInventory(true);
-		robertBust = new ItemRequirement("Robert bust", ItemID.ROBERT_BUST);
-		robertBust.setHighlightInInventory(true);
-		tristanBust = new ItemRequirement("Trisan bust", ItemID.TRISTAN_BUST);
-		tristanBust.setHighlightInInventory(true);
-		camorraBust = new ItemRequirement("Camorra bust", ItemID.CAMORRA_BUST);
-		camorraBust.setHighlightInInventory(true);
-	}
-
-	private void setupConditions()
-	{
-		hasAivasBust = aivasBust;
-		hasRobertBust = robertBust;
-		hasCamorraBust = camorraBust;
-		hasTristanBust = tristanBust;
-	}
-
-	@Override
-	protected void setupSteps()
-	{
-		inspectTomb = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29901, new WorldPoint(1504, 9939, 1), "Inspect the tomb in the south room.");
+    @Override
+    protected void setupSteps() {
+        inspectTomb = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29901, new WorldPoint(1504, 9939, 1), "Inspect the tomb in the south room.");
 
 
-		takeTristanBust = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29904, new WorldPoint(1507, 9941, 1), "Take Tristan's Bust.");
-		takeAivasBust = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29905, new WorldPoint(1500, 9941, 1), "Take Aivas' Bust.");
-		takeRobertBust = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29902, new WorldPoint(1500, 9936, 1), "Take Robert's Bust.");
-		takeCamorraBust = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29903, new WorldPoint(1507, 9936, 1), "Take Camorra's Bust.");
-		placeBustNorth = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29906, new WorldPoint(1504, 9941, 1), "Place the bust on the north plinth.");
-		placeBustEast = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29908, new WorldPoint(1506, 9939, 1), "Place the bust on the east plinth.");
-		placeBustSouth = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29907, new WorldPoint(1504, 9936, 1), "Place the bust on the south plinth.");
-		placeBustWest = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29909, new WorldPoint(1501, 9939, 1), "Place the bust on the west plinth.");
+        takeTristanBust = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29904, new WorldPoint(1507, 9941, 1), "Take Tristan's Bust.");
+        takeAivasBust = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29905, new WorldPoint(1500, 9941, 1), "Take Aivas' Bust.");
+        takeRobertBust = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29902, new WorldPoint(1500, 9936, 1), "Take Robert's Bust.");
+        takeCamorraBust = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29903, new WorldPoint(1507, 9936, 1), "Take Camorra's Bust.");
+        placeBustNorth = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29906, new WorldPoint(1504, 9941, 1), "Place the bust on the north plinth.");
+        placeBustEast = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29908, new WorldPoint(1506, 9939, 1), "Place the bust on the east plinth.");
+        placeBustSouth = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29907, new WorldPoint(1504, 9936, 1), "Place the bust on the south plinth.");
+        placeBustWest = new ObjectStep(getQuestHelper(), NullObjectID.NULL_29909, new WorldPoint(1501, 9939, 1), "Place the bust on the west plinth.");
 
-		setupItemRequirements();
-		setupConditions();
-	}
+        setupItemRequirements();
+        setupConditions();
+    }
 
-	@Override
-	public Collection<QuestStep> getSteps()
-	{
-		return Arrays.asList(inspectTomb, takeAivasBust, takeCamorraBust, takeRobertBust, takeTristanBust, placeBustEast, placeBustWest, placeBustNorth, placeBustSouth);
-	}
+    @Override
+    public Collection<QuestStep> getSteps() {
+        return Arrays.asList(inspectTomb, takeAivasBust, takeCamorraBust, takeRobertBust, takeTristanBust, placeBustEast, placeBustWest, placeBustNorth, placeBustSouth);
+    }
 
-	@Subscribe
-	public void onWidgetLoaded(WidgetLoaded widgetLoaded)
-	{
-		if (!solutionFound && widgetLoaded.getGroupId() == 748)
-		{
-			List<Integer> potentialBusts = QuestUtil.toArrayList(AIVAS, CAMORRA, ROBERT, TRISTAN);
-			Widget parentWidget = client.getWidget(748, 2);
-			if (parentWidget == null || parentWidget.getStaticChildren() == null) return;
+    @Subscribe
+    public void onWidgetLoaded(WidgetLoaded widgetLoaded) {
+        if (!solutionFound && widgetLoaded.getGroupId() == 748) {
+            List<Integer> potentialBusts = QuestUtil.toArrayList(AIVAS, CAMORRA, ROBERT, TRISTAN);
+            Widget parentWidget = client.getWidget(748, 2);
+            if (parentWidget == null || parentWidget.getStaticChildren() == null) return;
 
-			StringBuilder storyString = new StringBuilder();
+            StringBuilder storyString = new StringBuilder();
 
-			for (Widget child : parentWidget.getStaticChildren())
-			{
-				storyString.append(child.getText()).append(" ");
-			}
+            for (Widget child : parentWidget.getStaticChildren()) {
+                storyString.append(child.getText()).append(" ");
+            }
 
-			String fullStory = storyString.toString();
+            String fullStory = storyString.toString();
 
-			northBust = locations.entrySet().stream()
-				.filter(e -> fullStory.contains(e.getKey()))
-				.map(Map.Entry::getValue).findFirst()
-				.orElse(null);
+            northBust = locations.entrySet().stream()
+                    .filter(e -> fullStory.contains(e.getKey()))
+                    .map(Map.Entry::getValue).findFirst()
+                    .orElse(null);
 
-			southBust = weaponsSouth.entrySet().stream()
-				.filter(e -> fullStory.contains(e.getKey()))
-				.map(Map.Entry::getValue).findFirst()
-				.orElse(null);
+            southBust = weaponsSouth.entrySet().stream()
+                    .filter(e -> fullStory.contains(e.getKey()))
+                    .map(Map.Entry::getValue).findFirst()
+                    .orElse(null);
 
-			westBust = weaponsWest.entrySet().stream()
-				.filter(e -> fullStory.contains(e.getKey()))
-				.map(Map.Entry::getValue).findFirst()
-				.orElse(null);
+            westBust = weaponsWest.entrySet().stream()
+                    .filter(e -> fullStory.contains(e.getKey()))
+                    .map(Map.Entry::getValue).findFirst()
+                    .orElse(null);
 
-			if (northBust == null || southBust == null || westBust == null)
-			{
-				return;
-			}
+            if (northBust == null || southBust == null || westBust == null) {
+                return;
+            }
 
-			potentialBusts.remove(northBust);
-			potentialBusts.remove(southBust);
-			potentialBusts.remove(westBust);
+            potentialBusts.remove(northBust);
+            potentialBusts.remove(southBust);
+            potentialBusts.remove(westBust);
 
-			eastBust = potentialBusts.iterator().next();
+            eastBust = potentialBusts.iterator().next();
 
-			placeBustNorth.addItemRequirements(Collections.singletonList(items.get(northBust)));
-			placeBustNorth.addIcon(items.get(northBust).getId());
-			placeBustEast.addItemRequirements(Collections.singletonList(items.get(eastBust)));
-			placeBustEast.addIcon(items.get(eastBust).getId());
-			placeBustSouth.addItemRequirements(Collections.singletonList(items.get(southBust)));
-			placeBustSouth.addIcon(items.get(southBust).getId());
-			placeBustWest.addItemRequirements(Collections.singletonList(items.get(westBust)));
-			placeBustWest.addIcon(items.get(westBust).getId());
-			solutionFound = true;
-		}
-	}
+            placeBustNorth.addItemRequirements(Collections.singletonList(items.get(northBust)));
+            placeBustNorth.addIcon(items.get(northBust).getId());
+            placeBustEast.addItemRequirements(Collections.singletonList(items.get(eastBust)));
+            placeBustEast.addIcon(items.get(eastBust).getId());
+            placeBustSouth.addItemRequirements(Collections.singletonList(items.get(southBust)));
+            placeBustSouth.addIcon(items.get(southBust).getId());
+            placeBustWest.addItemRequirements(Collections.singletonList(items.get(westBust)));
+            placeBustWest.addIcon(items.get(westBust).getId());
+            solutionFound = true;
+        }
+    }
 }

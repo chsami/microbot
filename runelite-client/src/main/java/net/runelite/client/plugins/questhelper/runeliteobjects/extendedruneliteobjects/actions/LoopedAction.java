@@ -24,27 +24,25 @@
  */
 package net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.actions;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import lombok.Getter;
 import net.runelite.api.MenuEntry;
 
-public class LoopedAction extends Action
-{
-	@Getter
-	AtomicInteger ticksBetweenActions;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+
+public class LoopedAction extends Action {
+    @Getter
+    AtomicInteger ticksBetweenActions;
 
 
-	public LoopedAction(Consumer<MenuEntry> action, AtomicInteger ticksBetweenActions)
-	{
-		super(action);
-		this.ticksBetweenActions = ticksBetweenActions;
-	}
+    public LoopedAction(Consumer<MenuEntry> action, AtomicInteger ticksBetweenActions) {
+        super(action);
+        this.ticksBetweenActions = ticksBetweenActions;
+    }
 
-	@Override
-	protected Consumer<MenuEntry> createEndAction()
-	{
-		return (menuEntry -> {
-		});
-	}
+    @Override
+    protected Consumer<MenuEntry> createEndAction() {
+        return (menuEntry -> {
+        });
+    }
 }

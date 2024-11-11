@@ -24,24 +24,23 @@
  */
 package net.runelite.client.plugins.questhelper.steps.widget;
 
-import net.runelite.client.plugins.questhelper.util.Utils;
+
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import net.runelite.api.annotations.Component;
+import net.runelite.client.plugins.questhelper.util.Utils;
 
 @Value
 @AllArgsConstructor
-public class WidgetDetails
-{
-	public int groupID;
-	public int childID;
-	public int childChildID;
+public class WidgetDetails {
+    public int groupID;
+    public int childID;
+    public int childChildID;
 
-	public WidgetDetails(@Component int componentId)
-	{
-		var pair = Utils.unpackWidget(componentId);
-		groupID = pair.getLeft();
-		childID = pair.getRight();
-		childChildID = -1;
-	}
+    public WidgetDetails(@Component int componentId) {
+        var pair = Utils.unpackWidget(componentId);
+        groupID = pair.getLeft();
+        childID = pair.getRight();
+        childChildID = -1;
+    }
 }

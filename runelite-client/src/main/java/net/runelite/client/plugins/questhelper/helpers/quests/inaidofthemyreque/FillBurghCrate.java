@@ -24,70 +24,63 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.inaidofthemyreque;
 
-import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import java.util.Arrays;
+
 import net.runelite.api.ItemID;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 
-public class FillBurghCrate extends DetailedQuestStep
-{
-	static ItemRequirement crate;
-	static ItemRequirement tinderbox3;
-	static ItemRequirement bronzeAxe10;
-	static ItemRequirement rawSnailsOrMackerel;
+import java.util.Arrays;
 
-	static
-	{
-		crate = new ItemRequirement("Crate", ItemID.CRATE);
-		tinderbox3 = new ItemRequirement("Tinderbox", ItemID.TINDERBOX, 3);
-		bronzeAxe10 = new ItemRequirement("Bronze axe", ItemID.BRONZE_AXE, 10);
-		rawSnailsOrMackerel = new ItemRequirement("Raw mackerel or raw snail meat (random for each player)", ItemID.RAW_MACKEREL, 10);
-		rawSnailsOrMackerel.addAlternates(ItemID.THIN_SNAIL_MEAT, ItemID.LEAN_SNAIL_MEAT, ItemID.FAT_SNAIL_MEAT);
-		rawSnailsOrMackerel.setDisplayMatchedItemName(true);
-	}
+public class FillBurghCrate extends DetailedQuestStep {
+    static ItemRequirement crate;
+    static ItemRequirement tinderbox3;
+    static ItemRequirement bronzeAxe10;
+    static ItemRequirement rawSnailsOrMackerel;
 
-	boolean decidedOnSnailOrMackerel;
+    static {
+        crate = new ItemRequirement("Crate", ItemID.CRATE);
+        tinderbox3 = new ItemRequirement("Tinderbox", ItemID.TINDERBOX, 3);
+        bronzeAxe10 = new ItemRequirement("Bronze axe", ItemID.BRONZE_AXE, 10);
+        rawSnailsOrMackerel = new ItemRequirement("Raw mackerel or raw snail meat (random for each player)", ItemID.RAW_MACKEREL, 10);
+        rawSnailsOrMackerel.addAlternates(ItemID.THIN_SNAIL_MEAT, ItemID.LEAN_SNAIL_MEAT, ItemID.FAT_SNAIL_MEAT);
+        rawSnailsOrMackerel.setDisplayMatchedItemName(true);
+    }
 
-	public FillBurghCrate(QuestHelper questHelper)
-	{
-		super(questHelper, "Fill the crate with 3 tinderboxes, 10 bronze axes, and either 10 raw snails or 10 raw mackerel.", tinderbox3, bronzeAxe10, rawSnailsOrMackerel);
-	}
+    boolean decidedOnSnailOrMackerel;
 
-	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		updateSteps();
-	}
+    public FillBurghCrate(QuestHelper questHelper) {
+        super(questHelper, "Fill the crate with 3 tinderboxes, 10 bronze axes, and either 10 raw snails or 10 raw mackerel.", tinderbox3, bronzeAxe10, rawSnailsOrMackerel);
+    }
 
-	protected void updateSteps()
-	{
-		int numBronzeAxeNeeded = 10 - client.getVarbitValue(1991);
-		int numSnailOrMackerelNeeded =  10 - client.getVarbitValue(1992);
-		int numTinderboxNeeded =  3 - client.getVarbitValue(1993);
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        updateSteps();
+    }
 
-		tinderbox3.setQuantity(numTinderboxNeeded);
-		bronzeAxe10.setQuantity(numBronzeAxeNeeded);
-		rawSnailsOrMackerel.setQuantity(numSnailOrMackerelNeeded);
+    protected void updateSteps() {
+        int numBronzeAxeNeeded = 10 - client.getVarbitValue(1991);
+        int numSnailOrMackerelNeeded = 10 - client.getVarbitValue(1992);
+        int numTinderboxNeeded = 3 - client.getVarbitValue(1993);
 
-		if (!decidedOnSnailOrMackerel && QuestHelperQuest.IN_AID_OF_THE_MYREQUE.getVar(client) >= 165)
-		{
-			decidedOnSnailOrMackerel = true;
-			if (client.getVarbitValue(1976) == 1)
-			{
-				this.setText("Fill the crate with 3 tinderboxes, 10 bronze axes, and 10 raw mackerel.");
-				rawSnailsOrMackerel.setDisplayItemId(ItemID.RAW_MACKEREL);
-				this.setRequirements(Arrays.asList(crate, tinderbox3, bronzeAxe10, rawSnailsOrMackerel));
-			}
-			else
-			{
-				this.setText("Fill the crate with 3 tinderboxes, 10 bronze axes, and 10 raw snails (can be lean, thin or fat).");
-				rawSnailsOrMackerel.setDisplayItemId(ItemID.FAT_SNAIL_MEAT);
-				this.setRequirements(Arrays.asList(crate, tinderbox3, bronzeAxe10, rawSnailsOrMackerel));
-			}
-		}
-	}
+        tinderbox3.setQuantity(numTinderboxNeeded);
+        bronzeAxe10.setQuantity(numBronzeAxeNeeded);
+        rawSnailsOrMackerel.setQuantity(numSnailOrMackerelNeeded);
+
+        if (!decidedOnSnailOrMackerel && QuestHelperQuest.IN_AID_OF_THE_MYREQUE.getVar(client) >= 165) {
+            decidedOnSnailOrMackerel = true;
+            if (client.getVarbitValue(1976) == 1) {
+                this.setText("Fill the crate with 3 tinderboxes, 10 bronze axes, and 10 raw mackerel.");
+                rawSnailsOrMackerel.setDisplayItemId(ItemID.RAW_MACKEREL);
+                this.setRequirements(Arrays.asList(crate, tinderbox3, bronzeAxe10, rawSnailsOrMackerel));
+            } else {
+                this.setText("Fill the crate with 3 tinderboxes, 10 bronze axes, and 10 raw snails (can be lean, thin or fat).");
+                rawSnailsOrMackerel.setDisplayItemId(ItemID.FAT_SNAIL_MEAT);
+                this.setRequirements(Arrays.asList(crate, tinderbox3, bronzeAxe10, rawSnailsOrMackerel));
+            }
+        }
+    }
 }

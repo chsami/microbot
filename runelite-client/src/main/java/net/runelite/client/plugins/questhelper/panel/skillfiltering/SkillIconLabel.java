@@ -24,87 +24,73 @@
  */
 package net.runelite.client.plugins.questhelper.panel.skillfiltering;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import java.awt.Color;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.ui.ColorScheme;
 
-public class SkillIconLabel extends JLabel
-{
-	private static final Border ICON_BORDER = BorderFactory
-		.createEmptyBorder(5, 10, 5, 10);
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-	final Color FILTERED_COLOR = Color.RED.darker();
-	final Color NOT_FILTERED_COLOR = ColorScheme.DARKER_GRAY_COLOR;
-	public SkillIconLabel(ImageIcon icon, ConfigManager configManager, String skillName)
-	{
-		super();
-		setIcon(icon);
-		setOpaque(true);
-		setVerticalAlignment(SwingConstants.CENTER);
-		setHorizontalAlignment(SwingConstants.CENTER);
-		setBorder(ICON_BORDER);
-		setToolTipText("Hide quests that'd require or reward experience in " + skillName);
+public class SkillIconLabel extends JLabel {
+    private static final Border ICON_BORDER = BorderFactory
+            .createEmptyBorder(5, 10, 5, 10);
 
-		if (isFiltered(configManager, skillName))
-		{
-			setToolTipText("Show quests that'd require or reward experience in " + skillName);
-			setBackground(FILTERED_COLOR);
-		}
-		else
-		{
-			setToolTipText("Hide quests that'd require or reward experience in " + skillName);
-			setBackground(NOT_FILTERED_COLOR);
-		}
+    final Color FILTERED_COLOR = Color.RED.darker();
+    final Color NOT_FILTERED_COLOR = ColorScheme.DARKER_GRAY_COLOR;
 
-		addMouseListener(new MouseAdapter()
-		{
-			private Color currentColor = getBackground();
+    public SkillIconLabel(ImageIcon icon, ConfigManager configManager, String skillName) {
+        super();
+        setIcon(icon);
+        setOpaque(true);
+        setVerticalAlignment(SwingConstants.CENTER);
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setBorder(ICON_BORDER);
+        setToolTipText("Hide quests that'd require or reward experience in " + skillName);
 
-			@Override
-			public void mousePressed(MouseEvent mouseEvent)
-			{
+        if (isFiltered(configManager, skillName)) {
+            setToolTipText("Show quests that'd require or reward experience in " + skillName);
+            setBackground(FILTERED_COLOR);
+        } else {
+            setToolTipText("Hide quests that'd require or reward experience in " + skillName);
+            setBackground(NOT_FILTERED_COLOR);
+        }
 
-				if (isFiltered(configManager, skillName))
-				{
-					currentColor = NOT_FILTERED_COLOR;
-					setBackground(currentColor);
-					configManager.setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, "skillfilter" + skillName, "false");
-					setToolTipText("Hide quests that'd require or reward experience in " + skillName);
-				}
-				else
-				{
-					currentColor = FILTERED_COLOR;
-					setBackground(currentColor);
-					configManager.setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, "skillfilter" + skillName, "true");
-					setToolTipText("Show quests that'd require or reward experience in " + skillName);
-				}
-			}
+        addMouseListener(new MouseAdapter() {
+            private Color currentColor = getBackground();
 
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-				setBackground(currentColor.brighter());
-			}
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
 
-			@Override
-			public void mouseExited(MouseEvent e)
-			{
-				setBackground(currentColor);
-			}
-		});
-	}
+                if (isFiltered(configManager, skillName)) {
+                    currentColor = NOT_FILTERED_COLOR;
+                    setBackground(currentColor);
+                    configManager.setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, "skillfilter" + skillName, "false");
+                    setToolTipText("Hide quests that'd require or reward experience in " + skillName);
+                } else {
+                    currentColor = FILTERED_COLOR;
+                    setBackground(currentColor);
+                    configManager.setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, "skillfilter" + skillName, "true");
+                    setToolTipText("Show quests that'd require or reward experience in " + skillName);
+                }
+            }
 
-	public boolean isFiltered(ConfigManager configManager, String skillName)
-	{
-		String isFiltered = configManager.getConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, "skillfilter" + skillName);
-		return "true".equals(isFiltered);
-	}
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                setBackground(currentColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                setBackground(currentColor);
+            }
+        });
+    }
+
+    public boolean isFiltered(ConfigManager configManager, String skillName) {
+        String isFiltered = configManager.getConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, "skillfilter" + skillName);
+        return "true".equals(isFiltered);
+    }
 }

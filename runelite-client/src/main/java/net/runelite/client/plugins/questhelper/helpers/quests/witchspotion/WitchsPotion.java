@@ -24,6 +24,12 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.witchspotion;
 
+
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
@@ -33,100 +39,89 @@ import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.runelite.api.ItemID;
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldPoint;
 
-public class WitchsPotion extends BasicQuestHelper
-{
-	//Items Required
-	ItemRequirement ratTail, onion, burntMeat, eyeOfNewt;
+import java.util.*;
 
-	QuestStep talkToWitch, killRat, returnToWitch, drinkPotion;
+public class WitchsPotion extends BasicQuestHelper {
+    //Items Required
+    ItemRequirement ratTail, onion, burntMeat, eyeOfNewt;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    QuestStep talkToWitch, killRat, returnToWitch, drinkPotion;
 
-		steps.put(0, talkToWitch);
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupSteps();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		ConditionalStep getIngredients = new ConditionalStep(this, killRat);
-		getIngredients.addStep(ratTail.alsoCheckBank(questBank), returnToWitch);
+        steps.put(0, talkToWitch);
 
-		steps.put(1, getIngredients);
+        ConditionalStep getIngredients = new ConditionalStep(this, killRat);
+        getIngredients.addStep(ratTail.alsoCheckBank(questBank), returnToWitch);
 
-		steps.put(2, drinkPotion);
+        steps.put(1, getIngredients);
 
-		return steps;
-	}
+        steps.put(2, drinkPotion);
 
-	@Override
-	protected void setupRequirements()
-	{
-		ratTail = new ItemRequirement("Rat's tail", ItemID.RATS_TAIL);
-		onion = new ItemRequirement("Onion", ItemID.ONION);
-		onion.setTooltip("You can pick one from the field north of Rimmington");
-		burntMeat = new ItemRequirement("Burnt meat", ItemID.BURNT_MEAT);
-		burntMeat.setTooltip("You can use cooked meat on a fire/range to burn it");
-		eyeOfNewt = new ItemRequirement("Eye of newt", ItemID.EYE_OF_NEWT);
-		eyeOfNewt.setTooltip("You can buy one from Betty in Port Sarim for 3gp");
-	}
+        return steps;
+    }
 
-	public void setupSteps()
-	{
-		talkToWitch = new NpcStep(this, NpcID.HETTY, new WorldPoint(2968, 3205, 0),
-			"Talk to Hetty in Rimmington.", onion, eyeOfNewt, burntMeat);
-		talkToWitch.addDialogStep("I am in search of a quest.");
-		talkToWitch.addDialogStep("Yes, help me become one with my darker side.");
+    @Override
+    protected void setupRequirements() {
+        ratTail = new ItemRequirement("Rat's tail", ItemID.RATS_TAIL);
+        onion = new ItemRequirement("Onion", ItemID.ONION);
+        onion.setTooltip("You can pick one from the field north of Rimmington");
+        burntMeat = new ItemRequirement("Burnt meat", ItemID.BURNT_MEAT);
+        burntMeat.setTooltip("You can use cooked meat on a fire/range to burn it");
+        eyeOfNewt = new ItemRequirement("Eye of newt", ItemID.EYE_OF_NEWT);
+        eyeOfNewt.setTooltip("You can buy one from Betty in Port Sarim for 3gp");
+    }
 
-		killRat = new NpcStep(this, NpcID.RAT_2855, new WorldPoint(2956, 3203, 0), "Kill a rat in the house to the west for a rat tail.", ratTail);
-		returnToWitch = new NpcStep(this, NpcID.HETTY, new WorldPoint(2968, 3205, 0),
-			"Bring the ingredients to Hetty.", onion, eyeOfNewt, burntMeat, ratTail);
+    public void setupSteps() {
+        talkToWitch = new NpcStep(this, NpcID.HETTY, new WorldPoint(2968, 3205, 0),
+                "Talk to Hetty in Rimmington.", onion, eyeOfNewt, burntMeat);
+        talkToWitch.addDialogStep("I am in search of a quest.");
+        talkToWitch.addDialogStep("Yes, help me become one with my darker side.");
 
-		drinkPotion = new ObjectStep(this, ObjectID.CAULDRON_2024, new WorldPoint(2967, 3205, 0), "Drink from the cauldron to finish off the quest.");
+        killRat = new NpcStep(this, NpcID.RAT_2855, new WorldPoint(2956, 3203, 0), "Kill a rat in the house to the west for a rat tail.", ratTail);
+        returnToWitch = new NpcStep(this, NpcID.HETTY, new WorldPoint(2968, 3205, 0),
+                "Bring the ingredients to Hetty.", onion, eyeOfNewt, burntMeat, ratTail);
 
-	}
+        drinkPotion = new ObjectStep(this, ObjectID.CAULDRON_2024, new WorldPoint(2967, 3205, 0), "Drink from the cauldron to finish off the quest.");
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(onion);
-		reqs.add(burntMeat);
-		reqs.add(eyeOfNewt);
-		return reqs;
-	}
+    }
 
-	@Override
-	public QuestPointReward getQuestPointReward()
-	{
-		return new QuestPointReward(1);
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(onion);
+        reqs.add(burntMeat);
+        reqs.add(eyeOfNewt);
+        return reqs;
+    }
 
-	@Override
-	public List<ExperienceReward> getExperienceRewards()
-	{
-		return Collections.singletonList(new ExperienceReward(Skill.MAGIC, 325));
-	}
+    @Override
+    public List<String> getCombatRequirements() {
+        return List.of("Rat (level 1)");
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
+    @Override
+    public QuestPointReward getQuestPointReward() {
+        return new QuestPointReward(1);
+    }
 
-		allSteps.add(new PanelDetails("Starting off", Collections.singletonList(talkToWitch)));
-		allSteps.add(new PanelDetails("Make the potion", Arrays.asList(killRat, returnToWitch)));
-		return allSteps;
-	}
+    @Override
+    public List<ExperienceReward> getExperienceRewards() {
+        return Collections.singletonList(new ExperienceReward(Skill.MAGIC, 325));
+    }
+
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+
+        allSteps.add(new PanelDetails("Starting off", Collections.singletonList(talkToWitch)));
+        allSteps.add(new PanelDetails("Getting a rat's tail", Collections.singletonList(killRat)));
+        allSteps.add(new PanelDetails("Make the potion", Collections.singletonList(returnToWitch), ratTail, onion, burntMeat, eyeOfNewt));
+        return allSteps;
+    }
 }

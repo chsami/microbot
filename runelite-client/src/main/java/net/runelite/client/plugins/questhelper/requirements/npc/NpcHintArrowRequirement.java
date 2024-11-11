@@ -24,57 +24,50 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.npc;
 
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
-import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
-import java.util.Arrays;
-import java.util.List;
+
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
+import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 
-public class NpcHintArrowRequirement extends SimpleRequirement
-{
-	private final List<Integer> npcIDs;
+import java.util.Arrays;
+import java.util.List;
 
-	private final Zone zone;
+public class NpcHintArrowRequirement extends SimpleRequirement {
+    private final List<Integer> npcIDs;
 
-	public NpcHintArrowRequirement(int... npcIDs) {
-		this.npcIDs = Arrays.stream(npcIDs).boxed().collect(QuestUtil.collectToArrayList());
-		this.zone = null;
-	}
+    private final Zone zone;
 
-	public NpcHintArrowRequirement(WorldPoint worldPoint, int... npcIDs) {
-		assert(worldPoint != null);
-		this.npcIDs = Arrays.stream(npcIDs).boxed().collect(QuestUtil.collectToArrayList());
-		this.zone = new Zone(worldPoint, worldPoint);
-	}
+    public NpcHintArrowRequirement(int... npcIDs) {
+        this.npcIDs = Arrays.stream(npcIDs).boxed().collect(QuestUtil.collectToArrayList());
+        this.zone = null;
+    }
 
-	public NpcHintArrowRequirement(Zone zone, int... npcIDs) {
-		assert(zone != null);
-		this.npcIDs = Arrays.stream(npcIDs).boxed().collect(QuestUtil.collectToArrayList());
-		this.zone = zone;
-	}
+    public NpcHintArrowRequirement(WorldPoint worldPoint, int... npcIDs) {
+        assert (worldPoint != null);
+        this.npcIDs = Arrays.stream(npcIDs).boxed().collect(QuestUtil.collectToArrayList());
+        this.zone = new Zone(worldPoint, worldPoint);
+    }
 
-	public boolean check(Client client)
-	{
-		NPC currentNPC = client.getHintArrowNpc();
-		if (currentNPC == null)
-		{
-			return false;
-		}
-		WorldPoint wp = WorldPoint.fromLocalInstance(client, currentNPC.getLocalLocation());
+    public NpcHintArrowRequirement(Zone zone, int... npcIDs) {
+        assert (zone != null);
+        this.npcIDs = Arrays.stream(npcIDs).boxed().collect(QuestUtil.collectToArrayList());
+        this.zone = zone;
+    }
 
-		if (zone != null && !zone.contains(wp))
-		{
-			return false;
-		}
+    public boolean check(Client client) {
+        NPC currentNPC = client.getHintArrowNpc();
+        if (currentNPC == null) {
+            return false;
+        }
+        WorldPoint wp = WorldPoint.fromLocalInstance(client, currentNPC.getLocalLocation());
 
-		if (npcIDs.contains(currentNPC.getId()))
-		{
-			return true;
-		}
+        if (zone != null && !zone.contains(wp)) {
+            return false;
+        }
 
-		return false;
-	}
+        return npcIDs.contains(currentNPC.getId());
+    }
 }

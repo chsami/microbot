@@ -24,42 +24,39 @@
  */
 package net.runelite.client.plugins.questhelper.managers;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+
 import net.runelite.api.ChatMessageType;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class NewVersionManager
-{
-	@Inject
-	private ChatMessageManager chatMessageManager;
+public class NewVersionManager {
+    private final String LAST_VERSION_SEEN_CONFIG_KEY = "lastversionchecked";
+    private final String UPDATE_CHAT_TEXT = "Quest Helper has been updated to 4.7.0! This adds the new Varlamore quests! This also adds an " +
+            "integration with the Shortest Path plugin, which can be enabled in the config settings.";
+    @Inject
+    private ChatMessageManager chatMessageManager;
+    @Inject
+    private ConfigManager configManager;
 
-	@Inject
-	private ConfigManager configManager;
+    public void updateChatWithNotificationIfNewVersion() {
+        if (hasLoggedInThisVersion()) return;
 
-	private final String LAST_VERSION_SEEN_CONFIG_KEY = "lastversionchecked";
+        configManager.setConfiguration(QuestHelperConfig.QUEST_HELPER_GROUP, LAST_VERSION_SEEN_CONFIG_KEY, UPDATE_CHAT_TEXT);
 
-	private final String UPDATE_CHAT_TEXT = "Quest Helper has been updated to 4.3.0! This adds Defender of Varrock.";
+        chatMessageManager.queue(QueuedMessage.builder()
+                .type(ChatMessageType.GAMEMESSAGE)
+                .runeLiteFormattedMessage(UPDATE_CHAT_TEXT)
+                .build());
+    }
 
-	public void updateChatWithNotificationIfNewVersion()
-	{
-		if (hasLoggedInThisVersion()) return;
-
-		configManager.setConfiguration(QuestHelperConfig.QUEST_HELPER_GROUP, LAST_VERSION_SEEN_CONFIG_KEY, UPDATE_CHAT_TEXT);
-
-		chatMessageManager.queue(QueuedMessage.builder()
-			.type(ChatMessageType.GAMEMESSAGE)
-			.runeLiteFormattedMessage(UPDATE_CHAT_TEXT)
-			.build());
-	}
-
-	private boolean hasLoggedInThisVersion()
-	{
-		String lastVersionChecked = configManager.getConfiguration(QuestHelperConfig.QUEST_HELPER_GROUP, LAST_VERSION_SEEN_CONFIG_KEY);
-		return lastVersionChecked != null && lastVersionChecked.equals(UPDATE_CHAT_TEXT);
-	}
+    private boolean hasLoggedInThisVersion() {
+        String lastVersionChecked = configManager.getConfiguration(QuestHelperConfig.QUEST_HELPER_GROUP, LAST_VERSION_SEEN_CONFIG_KEY);
+        return lastVersionChecked != null && lastVersionChecked.equals(UPDATE_CHAT_TEXT);
+    }
 }

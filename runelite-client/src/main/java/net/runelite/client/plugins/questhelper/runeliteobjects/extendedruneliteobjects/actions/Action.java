@@ -24,48 +24,43 @@
  */
 package net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.actions;
 
-import java.util.function.Consumer;
 import lombok.Getter;
 import net.runelite.api.MenuEntry;
 
-public class Action
-{
-	protected Consumer<MenuEntry> action;
+import java.util.function.Consumer;
 
-	protected boolean isActive = false;
+public class Action {
+    protected Consumer<MenuEntry> action;
 
-	@Getter
-	MenuEntry menuEntry;
+    protected boolean isActive = false;
 
-	public Action(Consumer<MenuEntry> action)
-	{
-		this.action = action.andThen(createEndAction());
-	}
+    @Getter
+    MenuEntry menuEntry;
 
-	protected Consumer<MenuEntry> createEndAction()
-	{
-		return (menuEntry -> {
-			isActive = false;
-		});
-	}
+    public Action(Consumer<MenuEntry> action) {
+        this.action = action.andThen(createEndAction());
+    }
 
-	public void activate(MenuEntry menuEntry)
-	{
-		isActive = true;
-		this.menuEntry = menuEntry;
-		action.accept(menuEntry);
-	}
+    protected Consumer<MenuEntry> createEndAction() {
+        return (menuEntry -> {
+            isActive = false;
+        });
+    }
 
-	public void activate()
-	{
-		isActive = true;
-		this.menuEntry = null;
-		action.accept(null);
-	}
+    public void activate(MenuEntry menuEntry) {
+        isActive = true;
+        this.menuEntry = menuEntry;
+        action.accept(menuEntry);
+    }
 
-	public void deactivate()
-	{
-		this.menuEntry = null;
-		isActive = false;
-	}
+    public void activate() {
+        isActive = true;
+        this.menuEntry = null;
+        action.accept(null);
+    }
+
+    public void deactivate() {
+        this.menuEntry = null;
+        isActive = false;
+    }
 }

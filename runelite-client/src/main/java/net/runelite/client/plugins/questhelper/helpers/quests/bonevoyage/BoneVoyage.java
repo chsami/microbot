@@ -24,302 +24,277 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.bonevoyage;
 
+
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.item.TeleportItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import net.runelite.api.GameState;
-import net.runelite.api.ItemID;
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.QuestState;
-import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-public class BoneVoyage extends BasicQuestHelper
-{
-	//Items Required
-	ItemRequirement vodka2, marrentillPotionUnf;
+import java.util.*;
 
-	//Items Recommended
-	ItemRequirement digsiteTeleport, woodcuttingGuildTeleport, varrockTeleport, sarimTeleport, lumberyardTeleport,
-		hammer, ironBar, oakPlanks, nails;
+public class BoneVoyage extends BasicQuestHelper {
+    //Items Required
+    ItemRequirement vodka2, marrentillPotionUnf;
 
-	ItemRequirement sawmillAgreement, boneCharm, potionOfSealegs, sawmillProposal;
+    //Items Recommended
+    ItemRequirement digsiteTeleport, woodcuttingGuildTeleport, varrockTeleport, sarimTeleport, lumberyardTeleport,
+            hammer, ironBar, oakPlanks, nails;
 
-	Requirement canEnterGuild, onBoat, gottenCharm, givenCharm, talkedToApoth, gottenPotion, givenPotion;
+    ItemRequirement sawmillAgreement, boneCharm, potionOfSealegs, sawmillProposal;
 
-	QuestStep talkToHaig, talkToForeman, talkToSawmillOperator, talkToOperatorInGuild, talkToOperatorInGuildFromGate,
-		talkToOperatorInGuildGeneric, returnWithAgreement;
+    Requirement canEnterGuild, onBoat, gottenCharm, givenCharm, talkedToApoth, gottenPotion, givenPotion;
 
-	QuestStep talkToForemanAgain, boardBarge, talkToNavigator, talkToJack, boardBargeAfterJack, talkToNavigatorAgain,
-		talkToOddOldMan, talkToApoth, talkToApothAgain, boardBargeWithPotionAndCharm, giveLeadPotion, giveJuniorBone,
-		boardBargeWithCharm, boardBargeWithPotion;
+    QuestStep talkToHaig, talkToForeman, talkToSawmillOperator, talkToOperatorInGuild, talkToOperatorInGuildFromGate,
+            talkToOperatorInGuildGeneric, returnWithAgreement;
 
-	QuestStep boardBargeToSail, navigateShip;
+    QuestStep talkToForemanAgain, boardBarge, talkToNavigator, talkToJack, boardBargeAfterJack, talkToNavigatorAgain,
+            talkToOddOldMan, talkToApoth, talkToApothAgain, boardBargeWithPotionAndCharm, giveLeadPotion, giveJuniorBone,
+            boardBargeWithCharm, boardBargeWithPotion;
 
-	//Zones
-	Zone boat, boatSailing;
+    QuestStep boardBargeToSail, navigateShip;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    //Zones
+    Zone boat, boatSailing;
 
-		steps.put(0, talkToHaig);
-		steps.put(5, talkToForeman);
-		steps.put(10, talkToSawmillOperator);
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupSteps();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		ConditionalStep goTalkToOperatorInGuild = new ConditionalStep(this, talkToOperatorInGuildFromGate);
-		goTalkToOperatorInGuild.addStep(canEnterGuild, talkToOperatorInGuild);
-		steps.put(11, goTalkToOperatorInGuild);
+        steps.put(0, talkToHaig);
+        steps.put(5, talkToForeman);
+        steps.put(10, talkToSawmillOperator);
 
-		steps.put(15, returnWithAgreement);
-		steps.put(20, talkToForemanAgain);
+        ConditionalStep goTalkToOperatorInGuild = new ConditionalStep(this, talkToOperatorInGuildFromGate);
+        goTalkToOperatorInGuild.addStep(canEnterGuild, talkToOperatorInGuild);
+        steps.put(11, goTalkToOperatorInGuild);
 
-		ConditionalStep goTalkToLead = new ConditionalStep(this, boardBarge);
-		goTalkToLead.addStep(onBoat, talkToNavigator);
-		steps.put(21, goTalkToLead);
+        steps.put(15, returnWithAgreement);
+        steps.put(20, talkToForemanAgain);
 
-		steps.put(22, talkToJack);
+        ConditionalStep goTalkToLead = new ConditionalStep(this, boardBarge);
+        goTalkToLead.addStep(onBoat, talkToNavigator);
+        steps.put(21, goTalkToLead);
 
-		ConditionalStep goReturnToLead = new ConditionalStep(this, boardBargeAfterJack);
-		goReturnToLead.addStep(onBoat, talkToNavigatorAgain);
-		steps.put(23, goReturnToLead);
+        steps.put(22, talkToJack);
 
-		ConditionalStep goGetItems = new ConditionalStep(this, talkToOddOldMan);
-		goGetItems.addStep(new Conditions(onBoat, givenCharm, gottenPotion), giveLeadPotion);
-		goGetItems.addStep(new Conditions(onBoat, gottenCharm, gottenPotion), giveJuniorBone);
-		goGetItems.addStep(new Conditions(gottenCharm, givenPotion), boardBargeWithCharm);
-		goGetItems.addStep(new Conditions(givenCharm, gottenPotion), boardBargeWithPotion);
-		goGetItems.addStep(new Conditions(gottenCharm, gottenPotion), boardBargeWithPotionAndCharm);
-		goGetItems.addStep(new Conditions(gottenCharm, talkedToApoth), talkToApothAgain);
-		goGetItems.addStep(gottenCharm, talkToApoth);
-		steps.put(25, goGetItems);
+        ConditionalStep goReturnToLead = new ConditionalStep(this, boardBargeAfterJack);
+        goReturnToLead.addStep(onBoat, talkToNavigatorAgain);
+        steps.put(23, goReturnToLead);
 
-		ConditionalStep goSail = new ConditionalStep(this, boardBargeToSail);
-		goSail.addStep(onBoat, navigateShip);
-		steps.put(30, goSail);
-		steps.put(35, goSail);
+        ConditionalStep goGetItems = new ConditionalStep(this, talkToOddOldMan);
+        goGetItems.addStep(new Conditions(onBoat, givenCharm, gottenPotion), giveLeadPotion);
+        goGetItems.addStep(new Conditions(onBoat, gottenCharm, gottenPotion), giveJuniorBone);
+        goGetItems.addStep(new Conditions(gottenCharm, givenPotion), boardBargeWithCharm);
+        goGetItems.addStep(new Conditions(givenCharm, gottenPotion), boardBargeWithPotion);
+        goGetItems.addStep(new Conditions(gottenCharm, gottenPotion), boardBargeWithPotionAndCharm);
+        goGetItems.addStep(new Conditions(gottenCharm, talkedToApoth), talkToApothAgain);
+        goGetItems.addStep(gottenCharm, talkToApoth);
+        steps.put(25, goGetItems);
 
-		return steps;
-	}
+        ConditionalStep goSail = new ConditionalStep(this, boardBargeToSail);
+        goSail.addStep(onBoat, navigateShip);
+        steps.put(30, goSail);
+        steps.put(35, goSail);
 
-	@Override
-	protected void setupRequirements()
-	{
-		canEnterGuild = new Conditions(
-			new SkillRequirement(Skill.WOODCUTTING, 60, true)
-		);
+        return steps;
+    }
 
-		onBoat = new ZoneRequirement(boat, boatSailing);
+    @Override
+    protected void setupRequirements() {
+        canEnterGuild = new Conditions(
+                new SkillRequirement(Skill.WOODCUTTING, 60, true)
+        );
 
-		gottenCharm = new VarbitRequirement(5796, 1, Operation.GREATER_EQUAL);
-		givenCharm = new VarbitRequirement(5796, 2, Operation.GREATER_EQUAL);
+        onBoat = new ZoneRequirement(boat, boatSailing);
 
-		talkedToApoth = new VarbitRequirement(5797, 1, Operation.GREATER_EQUAL);
-		gottenPotion = new VarbitRequirement(5797, 2, Operation.GREATER_EQUAL);
-		givenPotion = new VarbitRequirement(5797, 3, Operation.GREATER_EQUAL);
+        gottenCharm = new VarbitRequirement(5796, 1, Operation.GREATER_EQUAL);
+        givenCharm = new VarbitRequirement(5796, 2, Operation.GREATER_EQUAL);
 
-		vodka2 = new ItemRequirement("Vodka", ItemID.VODKA, 2);
-		marrentillPotionUnf = new ItemRequirement("Marrentill potion (unf)", ItemID.MARRENTILL_POTION_UNF);
+        talkedToApoth = new VarbitRequirement(5797, 1, Operation.GREATER_EQUAL);
+        gottenPotion = new VarbitRequirement(5797, 2, Operation.GREATER_EQUAL);
+        givenPotion = new VarbitRequirement(5797, 3, Operation.GREATER_EQUAL);
 
-		digsiteTeleport = new TeleportItemRequirement("Teleports to the Digsite", ItemID.DIGSITE_PENDANT_4);
-		digsiteTeleport.addAlternates(ItemID.DIGSITE_PENDANT_5, ItemID.DIGSITE_TELEPORT);
-		woodcuttingGuildTeleport = new TeleportItemRequirement("Teleport to the Woodcutting Guild", ItemCollections.SKILLS_NECKLACES);
-		woodcuttingGuildTeleport.addAlternates(ItemID.XERICS_TALISMAN, ItemID.KHAREDSTS_MEMOIRS);
-		varrockTeleport = new TeleportItemRequirement("Varrock teleport", ItemID.VARROCK_TELEPORT);
-		sarimTeleport = new TeleportItemRequirement("Port Sarim teleport", ItemCollections.AMULET_OF_GLORIES);
-		sarimTeleport.addAlternates(ItemID.DRAYNOR_MANOR_TELEPORT);
-		lumberyardTeleport = new TeleportItemRequirement("Lumberyard teleport", ItemID.LUMBERYARD_TELEPORT);
-		
-		hammer = new ItemRequirement("Hammer", ItemCollections.HAMMER);
-		ironBar = new ItemRequirement("Iron bar", ItemID.IRON_BAR);
-		oakPlanks = new ItemRequirement("Oak plank", ItemID.OAK_PLANK, 2);
-		nails = new ItemRequirement("Nails", ItemCollections.NAILS, 5);
+        vodka2 = new ItemRequirement("Vodka", ItemID.VODKA, 2);
+        marrentillPotionUnf = new ItemRequirement("Marrentill potion (unf)", ItemID.MARRENTILL_POTION_UNF);
 
-		sawmillProposal = new ItemRequirement("Sawmill proposal", ItemID.SAWMILL_PROPOSAL);
-		sawmillProposal.setTooltip("You can get another from the sawmill operator near Varrock");
-		sawmillAgreement = new ItemRequirement("Sawmill agreement", ItemID.SAWMILL_AGREEMENT);
-		if (client.getGameState() == GameState.LOGGED_IN && canEnterGuild.check(client))
-		{
-			sawmillAgreement.setTooltip("You can get another from the sawmill operator in the Woodcutting Guild");
-		}
-		else
-		{
-			sawmillAgreement.setTooltip("You can get another by trying to enter the Woodcutting Guild");
-		}
-		boneCharm = new ItemRequirement("Bone charm", ItemID.BONE_CHARM);
-		boneCharm.setTooltip("You can get another from the Odd Old Man north of the Dig Site");
-		potionOfSealegs = new ItemRequirement("Potion of sealegs", ItemID.POTION_OF_SEALEGS);
-		potionOfSealegs.setTooltip("You can get another from the Apothecary in Varrock");
-	}
+        digsiteTeleport = new TeleportItemRequirement("Teleports to the Digsite", ItemID.DIGSITE_PENDANT_4);
+        digsiteTeleport.addAlternates(ItemID.DIGSITE_PENDANT_5, ItemID.DIGSITE_TELEPORT);
+        woodcuttingGuildTeleport = new TeleportItemRequirement("Teleport to the Woodcutting Guild", ItemCollections.SKILLS_NECKLACES);
+        woodcuttingGuildTeleport.addAlternates(ItemID.XERICS_TALISMAN, ItemID.KHAREDSTS_MEMOIRS);
+        varrockTeleport = new TeleportItemRequirement("Varrock teleport", ItemID.VARROCK_TELEPORT);
+        sarimTeleport = new TeleportItemRequirement("Port Sarim teleport", ItemCollections.AMULET_OF_GLORIES);
+        sarimTeleport.addAlternates(ItemID.DRAYNOR_MANOR_TELEPORT);
+        lumberyardTeleport = new TeleportItemRequirement("Lumberyard teleport", ItemID.LUMBERYARD_TELEPORT);
 
-	@Override
-	protected void setupZones()
-	{
-		boat = new Zone(new WorldPoint(3355, 3451, 1), new WorldPoint(3366, 3455, 1));
-		boatSailing = new Zone(new WorldPoint(1812, 4750, 0), new WorldPoint(1840, 4774, 2));
-	}
+        hammer = new ItemRequirement("Hammer", ItemCollections.HAMMER);
+        ironBar = new ItemRequirement("Iron bar", ItemID.IRON_BAR);
+        oakPlanks = new ItemRequirement("Oak plank", ItemID.OAK_PLANK, 2);
+        nails = new ItemRequirement("Nails", ItemCollections.NAILS, 5);
 
-	public void setupSteps()
-	{
-		talkToHaig = new NpcStep(this, NpcID.CURATOR_HAIG_HALEN, new WorldPoint(3257, 3448, 0),
-			"Talk to Curator Haig in the Varrock Museum.");
-		talkToHaig.addDialogSteps("Have you any interesting news?", "Sign me up!", "Yes.");
+        sawmillProposal = new ItemRequirement("Sawmill proposal", ItemID.SAWMILL_PROPOSAL);
+        sawmillProposal.setTooltip("You can get another from the sawmill operator near Varrock");
+        sawmillAgreement = new ItemRequirement("Sawmill agreement", ItemID.SAWMILL_AGREEMENT);
+        if (client.getGameState() == GameState.LOGGED_IN && canEnterGuild.check(client)) {
+            sawmillAgreement.setTooltip("You can get another from the sawmill operator in the Woodcutting Guild");
+        } else {
+            sawmillAgreement.setTooltip("You can get another by trying to enter the Woodcutting Guild");
+        }
+        boneCharm = new ItemRequirement("Bone charm", ItemID.BONE_CHARM);
+        boneCharm.setTooltip("You can get another from the Odd Old Man north of the Dig Site");
+        potionOfSealegs = new ItemRequirement("Potion of sealegs", ItemID.POTION_OF_SEALEGS);
+        potionOfSealegs.setTooltip("You can get another from the Apothecary in Varrock");
+    }
 
-		talkToForeman = new NpcStep(this, NpcID.BARGE_FOREMAN, new WorldPoint(3364, 3445, 0),
-			"Talk to the Barge Foreman north of the Dig Site.");
+    @Override
+    protected void setupZones() {
+        boat = new Zone(new WorldPoint(3355, 3451, 1), new WorldPoint(3366, 3455, 1));
+        boatSailing = new Zone(new WorldPoint(1812, 4750, 0), new WorldPoint(1840, 4774, 2));
+    }
 
-		talkToSawmillOperator = new NpcStep(this, NpcID.SAWMILL_OPERATOR, new WorldPoint(3302, 3492, 0),
-			"Talk to the Sawmill Operator north east of Varrock.");
-		talkToSawmillOperator.addDialogStep("I'm here on behalf of the museum archaeological team.");
+    public void setupSteps() {
+        talkToHaig = new NpcStep(this, NpcID.CURATOR_HAIG_HALEN, new WorldPoint(3257, 3448, 0),
+                "Talk to Curator Haig in the Varrock Museum.");
+        talkToHaig.addDialogSteps("Have you any interesting news?", "Sign me up!", "Yes.");
 
-		talkToOperatorInGuild = new NpcStep(this, NpcID.SAWMILL_OPERATOR_9140, new WorldPoint(1620, 3499, 0),
-			"Talk to the Sawmill Operator in the Woodcutting Guild on Zeah.", sawmillProposal);
-		talkToOperatorInGuild.addDialogStep("I'm here on behalf of the museum archaeological team.");
-		talkToOperatorInGuildFromGate = new ObjectStep(this, ObjectID.GATE_28852, new WorldPoint(1657, 3504, 0),
-			"Attempt to enter the Woodcutting Guild on Zeah to talk to the guild's sawmill operator.", sawmillProposal);
+        talkToForeman = new NpcStep(this, NpcID.BARGE_FOREMAN, new WorldPoint(3364, 3445, 0),
+                "Talk to the Barge Foreman north of the Dig Site.");
 
-		talkToOperatorInGuildGeneric = talkToOperatorInGuildFromGate;
-		if (canEnterGuild.check(client))
-		{
-			talkToOperatorInGuildGeneric = talkToOperatorInGuild;
-		}
+        talkToSawmillOperator = new NpcStep(this, NpcID.SAWMILL_OPERATOR, new WorldPoint(3302, 3492, 0),
+                "Talk to the Sawmill Operator north east of Varrock.");
+        talkToSawmillOperator.addDialogStep("I'm here on behalf of the museum archaeological team.");
 
-		returnWithAgreement = new NpcStep(this, NpcID.SAWMILL_OPERATOR, new WorldPoint(3302, 3492, 0),
-		"Return to the Sawmill Operator north east of Varrock.", sawmillAgreement);
-		returnWithAgreement.addDialogStep("I'm here on behalf of the museum archaeological team.");
+        talkToOperatorInGuild = new NpcStep(this, NpcID.SAWMILL_OPERATOR_9140, new WorldPoint(1620, 3499, 0),
+                "Talk to the Sawmill Operator in the Woodcutting Guild on Zeah.", sawmillProposal);
+        talkToOperatorInGuild.addDialogStep("I'm here on behalf of the museum archaeological team.");
+        talkToOperatorInGuildFromGate = new ObjectStep(this, ObjectID.GATE_28852, new WorldPoint(1657, 3504, 0),
+                "Attempt to enter the Woodcutting Guild on Zeah to talk to the guild's sawmill operator.", sawmillProposal);
 
-		talkToForemanAgain = new NpcStep(this, NpcID.BARGE_FOREMAN, new WorldPoint(3364, 3445, 0),
-			"Return to the Barge Foreman north of the Dig Site.");
-		boardBarge = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
-			"Board the barge.");
-		boardBarge.addDialogStep("Can I go onto the barge?");
-		talkToNavigator = new NpcStep(this, NpcID.LEAD_NAVIGATOR, new WorldPoint(3363, 3453, 1),
-			"Talk to the Lead Navigator.");
-		talkToNavigator.addDialogStep("Yep, that would be me.");
-		talkToNavigator.addDialogStep("No, what happened?");
-		talkToJack = new NpcStep(this, NpcID.JACK_SEAGULL, new WorldPoint(3050, 3257, 0),
-			"Talk to Jack Seagull in the Port Sarim Pub.");
-		talkToJack.addDialogStep("Ever made any cursed voyages?");
-		boardBargeAfterJack = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
-		"Return to the barge.");
-		boardBargeAfterJack.addDialogStep("Can I go onto the barge?");
-		talkToNavigatorAgain = new NpcStep(this, NpcID.LEAD_NAVIGATOR, new WorldPoint(3363, 3453, 1),
-			"Talk to the Lead Navigator again.");
-		talkToOddOldMan = new NpcStep(this, NpcID.ODD_OLD_MAN, new WorldPoint(3360, 3505, 0),
-			"Talk to the Odd Old Man north of the Dig Site.");
-		talkToOddOldMan.addDialogSteps("Talk about lucky charms.", "I'm making a cursed voyage.");
-		talkToApoth = new NpcStep(this, NpcID.APOTHECARY, new WorldPoint(3195, 3405, 0),
-			"Talk to the Apothecary in south west Varrock.", marrentillPotionUnf, vodka2);
-		talkToApoth.addDialogSteps("Talk about something else.", "Talk about Bone Voyage.");
-		talkToApothAgain = new NpcStep(this, NpcID.APOTHECARY, new WorldPoint(3195, 3405, 0),
-			"Talk to the Apothecary again.", marrentillPotionUnf, vodka2);
-		talkToApothAgain.addDialogSteps("Talk about something else.", "Talk about Bone Voyage.");
-		boardBargeWithPotionAndCharm = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
-			"Board the barge.", boneCharm, potionOfSealegs);
-		boardBargeWithPotionAndCharm.addDialogStep("Can I go onto the barge?");
-		boardBargeWithPotion = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
-			"Board the barge.", potionOfSealegs);
-		boardBargeWithPotion.addDialogStep("Can I go onto the barge?");
-		boardBargeWithCharm = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
-			"Board the barge.", boneCharm);
-		boardBargeWithCharm.addDialogStep("Can I go onto the barge?");
-		boardBargeWithPotionAndCharm.addSubSteps(boardBargeWithCharm, boardBargeWithPotion);
-		giveLeadPotion  = new NpcStep(this, NpcID.LEAD_NAVIGATOR, new WorldPoint(3363, 3453, 1),
-			"Give the Lead Navigator the potion.", potionOfSealegs);
-		giveJuniorBone = new NpcStep(this, NpcID.JUNIOR_NAVIGATOR, new WorldPoint(3363, 3453, 1),
-			"Give the Junior Navigator the bone charm.", boneCharm);
+        talkToOperatorInGuildGeneric = talkToOperatorInGuildFromGate;
+        if (canEnterGuild.check(client)) {
+            talkToOperatorInGuildGeneric = talkToOperatorInGuild;
+        }
 
-		boardBargeToSail = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
-			"Board the barge.");
-		boardBargeToSail.addDialogStep("Can I go onto the barge?");
-		navigateShip = new NpcStep(this, NpcID.LEAD_NAVIGATOR, new WorldPoint(3363, 3453, 1),
-			"Talk to the Lead Navigator to set sail. Navigate the ship by keeping the arrow in the middle. Raise the " +
-				"sails to go faster.");
-		navigateShip.addDialogStep("I'm ready, let's go.");
-		navigateShip.addSubSteps(boardBargeToSail);
-	}
+        returnWithAgreement = new NpcStep(this, NpcID.SAWMILL_OPERATOR, new WorldPoint(3302, 3492, 0),
+                "Return to the Sawmill Operator north east of Varrock.", sawmillAgreement);
+        returnWithAgreement.addDialogStep("I'm here on behalf of the museum archaeological team.");
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		return Arrays.asList(vodka2, marrentillPotionUnf);
-	}
+        talkToForemanAgain = new NpcStep(this, NpcID.BARGE_FOREMAN, new WorldPoint(3364, 3445, 0),
+                "Return to the Barge Foreman north of the Dig Site.");
+        boardBarge = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
+                "Board the barge.");
+        boardBarge.addDialogStep("Can I go onto the barge?");
+        talkToNavigator = new NpcStep(this, NpcID.LEAD_NAVIGATOR, new WorldPoint(3363, 3453, 1),
+                "Talk to the Lead Navigator.");
+        talkToNavigator.addDialogStep("Yep, that would be me.");
+        talkToNavigator.addDialogStep("No, what happened?");
+        talkToJack = new NpcStep(this, NpcID.JACK_SEAGULL, new WorldPoint(3050, 3257, 0),
+                "Talk to Jack Seagull in the Port Sarim Pub.");
+        talkToJack.addDialogStep("Ever made any cursed voyages?");
+        boardBargeAfterJack = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
+                "Return to the barge.");
+        boardBargeAfterJack.addDialogStep("Can I go onto the barge?");
+        talkToNavigatorAgain = new NpcStep(this, NpcID.LEAD_NAVIGATOR, new WorldPoint(3363, 3453, 1),
+                "Talk to the Lead Navigator again.");
+        talkToOddOldMan = new NpcStep(this, NpcID.ODD_OLD_MAN, new WorldPoint(3360, 3505, 0),
+                "Talk to the Odd Old Man north of the Dig Site.");
+        talkToOddOldMan.addDialogSteps("Talk about lucky charms.", "I'm making a cursed voyage.");
+        talkToApoth = new NpcStep(this, NpcID.APOTHECARY, new WorldPoint(3195, 3405, 0),
+                "Talk to the Apothecary in south west Varrock.", marrentillPotionUnf, vodka2);
+        talkToApoth.addDialogSteps("Talk about something else.", "Talk about Bone Voyage.");
+        talkToApothAgain = new NpcStep(this, NpcID.APOTHECARY, new WorldPoint(3195, 3405, 0),
+                "Talk to the Apothecary again.", marrentillPotionUnf, vodka2);
+        talkToApothAgain.addDialogSteps("Talk about something else.", "Talk about Bone Voyage.");
+        boardBargeWithPotionAndCharm = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
+                "Board the barge.", boneCharm, potionOfSealegs);
+        boardBargeWithPotionAndCharm.addDialogStep("Can I go onto the barge?");
+        boardBargeWithPotion = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
+                "Board the barge.", potionOfSealegs);
+        boardBargeWithPotion.addDialogStep("Can I go onto the barge?");
+        boardBargeWithCharm = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
+                "Board the barge.", boneCharm);
+        boardBargeWithCharm.addDialogStep("Can I go onto the barge?");
+        boardBargeWithPotionAndCharm.addSubSteps(boardBargeWithCharm, boardBargeWithPotion);
+        giveLeadPotion = new NpcStep(this, NpcID.LEAD_NAVIGATOR, new WorldPoint(3363, 3453, 1),
+                "Give the Lead Navigator the potion.", potionOfSealegs);
+        giveJuniorBone = new NpcStep(this, NpcID.JUNIOR_NAVIGATOR, new WorldPoint(3363, 3453, 1),
+                "Give the Junior Navigator the bone charm.", boneCharm);
 
-	@Override
-	public List<ItemRequirement> getItemRecommended()
-	{
-		return Arrays.asList(digsiteTeleport.quantity(4), woodcuttingGuildTeleport, varrockTeleport, sarimTeleport,
-			lumberyardTeleport.quantity(2), hammer, ironBar, oakPlanks, nails);
-	}
+        boardBargeToSail = new NpcStep(this, NpcID.BARGE_GUARD_8013, new WorldPoint(3362, 3446, 0),
+                "Board the barge.");
+        boardBargeToSail.addDialogStep("Can I go onto the barge?");
+        navigateShip = new NpcStep(this, NpcID.LEAD_NAVIGATOR, new WorldPoint(3363, 3453, 1),
+                "Talk to the Lead Navigator to set sail. Navigate the ship by keeping the arrow in the middle. Raise the " +
+                        "sails to go faster.");
+        navigateShip.addDialogStep("I'm ready, let's go.");
+        navigateShip.addSubSteps(boardBargeToSail);
+    }
 
-	@Override
-	public List<Requirement> getGeneralRequirements()
-	{
-		final int KUDOS_VARBIT = 3637;
-		ArrayList<Requirement> req = new ArrayList<>();
-		req.add(new VarbitRequirement(KUDOS_VARBIT, Operation.GREATER_EQUAL, 100, "100 Kudos"));
-		req.add(new QuestRequirement(QuestHelperQuest.THE_DIG_SITE, QuestState.FINISHED));
-		return req;
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        return Arrays.asList(vodka2, marrentillPotionUnf);
+    }
 
-	@Override
-	public QuestPointReward getQuestPointReward()
-	{
-		return new QuestPointReward(1);
-	}
+    @Override
+    public List<ItemRequirement> getItemRecommended() {
+        return Arrays.asList(digsiteTeleport.quantity(4), woodcuttingGuildTeleport, varrockTeleport, sarimTeleport,
+                lumberyardTeleport.quantity(2), hammer, ironBar, oakPlanks, nails);
+    }
 
-	@Override
-	public List<UnlockReward> getUnlockRewards()
-	{
-		return Collections.singletonList(new UnlockReward("Access to Fossil Island"));
-	}
+    @Override
+    public List<Requirement> getGeneralRequirements() {
+        final int KUDOS_VARBIT = 3637;
+        ArrayList<Requirement> req = new ArrayList<>();
+        req.add(new VarbitRequirement(KUDOS_VARBIT, Operation.GREATER_EQUAL, 100, "100 Kudos"));
+        req.add(new QuestRequirement(QuestHelperQuest.THE_DIG_SITE, QuestState.FINISHED));
+        return req;
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off", Collections.singletonList(talkToHaig)));
-		allSteps.add(new PanelDetails("Securing materials", Arrays.asList(talkToForeman, talkToSawmillOperator,
-			talkToOperatorInGuildGeneric, returnWithAgreement, talkToForemanAgain)));
-		allSteps.add(new PanelDetails("Lucky charms", Arrays.asList(boardBarge, talkToNavigator, talkToJack,
-			boardBargeAfterJack, talkToNavigatorAgain, talkToOddOldMan, talkToApoth, talkToApothAgain,
-			boardBargeWithPotionAndCharm, giveJuniorBone, giveLeadPotion), marrentillPotionUnf, vodka2));
-		allSteps.add(new PanelDetails("The voyage", Collections.singletonList(navigateShip)));
-		return allSteps;
-	}
-	
-	@Override
-	public List<String> getNotes()
-	{
-		return Collections.singletonList("After quest completion you can use the iron bar, oak planks, nails and hammer" +
-				" to build a bank chest on Fossil Island (requires 21 Construction).");
-	}
+    @Override
+    public QuestPointReward getQuestPointReward() {
+        return new QuestPointReward(1);
+    }
+
+    @Override
+    public List<UnlockReward> getUnlockRewards() {
+        return Collections.singletonList(new UnlockReward("Access to Fossil Island"));
+    }
+
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Starting off", Collections.singletonList(talkToHaig)));
+        allSteps.add(new PanelDetails("Securing materials", Arrays.asList(talkToForeman, talkToSawmillOperator,
+                talkToOperatorInGuildGeneric, returnWithAgreement, talkToForemanAgain)));
+        allSteps.add(new PanelDetails("Lucky charms", Arrays.asList(boardBarge, talkToNavigator, talkToJack,
+                boardBargeAfterJack, talkToNavigatorAgain, talkToOddOldMan, talkToApoth, talkToApothAgain,
+                boardBargeWithPotionAndCharm, giveJuniorBone, giveLeadPotion), marrentillPotionUnf, vodka2));
+        allSteps.add(new PanelDetails("The voyage", Collections.singletonList(navigateShip)));
+        return allSteps;
+    }
+
+    @Override
+    public List<String> getNotes() {
+        return Collections.singletonList("After quest completion you can use the iron bar, oak planks, nails and hammer" +
+                " to build a bank chest on Fossil Island (requires 21 Construction).");
+    }
 }

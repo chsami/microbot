@@ -24,8 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.rewards;
 
-public enum RewardType
-{
+public enum RewardType {
     EXPERIENCE,
     UNLOCK,
     QUEST_POINT,

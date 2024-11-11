@@ -24,138 +24,121 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.impcatcher;
 
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
-import net.runelite.client.plugins.questhelper.rewards.ItemReward;
-import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
+import net.runelite.client.plugins.questhelper.rewards.ItemReward;
+import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
+import net.runelite.client.plugins.questhelper.steps.*;
 
-public class ImpCatcher extends BasicQuestHelper
-{
-	//Items Required
-	ItemRequirement blackBead, whiteBead, redBead, yellowBead;
+import java.util.*;
 
-	QuestStep moveToTower, climbTower, turnInQuest, collectBeads;
+public class ImpCatcher extends BasicQuestHelper {
+    //Items Required
+    ItemRequirement blackBead, whiteBead, redBead, yellowBead;
 
-	Zone towerSecond, towerThird;
+    QuestStep moveToTower, climbTower, turnInQuest, collectBeads;
 
-	ZoneRequirement inTowerSecond, inTowerThird;
+    Zone towerSecond, towerThird;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupSteps();
+    ZoneRequirement inTowerSecond, inTowerThird;
 
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupSteps();
 
-		ConditionalStep doQuest = new ConditionalStep(this, collectBeads);
-		doQuest.addStep(new Conditions(blackBead,whiteBead,redBead,yellowBead, inTowerThird), turnInQuest);
-		doQuest.addStep(new Conditions(blackBead,whiteBead,redBead,yellowBead, inTowerSecond), climbTower);
-		doQuest.addStep(new Conditions(blackBead,whiteBead,redBead,yellowBead), moveToTower);
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		steps.put(0, doQuest);
+        ConditionalStep doQuest = new ConditionalStep(this, collectBeads);
+        doQuest.addStep(new Conditions(blackBead, whiteBead, redBead, yellowBead, inTowerThird), turnInQuest);
+        doQuest.addStep(new Conditions(blackBead, whiteBead, redBead, yellowBead, inTowerSecond), climbTower);
+        doQuest.addStep(new Conditions(blackBead, whiteBead, redBead, yellowBead), moveToTower);
 
-		steps.put(1, doQuest);
+        steps.put(0, doQuest);
 
-		return steps;
-	}
+        steps.put(1, doQuest);
+
+        return steps;
+    }
 
 
+    @Override
+    protected void setupRequirements() {
+        blackBead = new ItemRequirement("Black bead", ItemID.BLACK_BEAD);
+        whiteBead = new ItemRequirement("White bead", ItemID.WHITE_BEAD);
+        redBead = new ItemRequirement("Red bead", ItemID.RED_BEAD);
+        yellowBead = new ItemRequirement("Yellow bead", ItemID.YELLOW_BEAD);
 
-	@Override
-	protected void setupRequirements() {
-		blackBead = new ItemRequirement("Black bead", ItemID.BLACK_BEAD);
-		whiteBead = new ItemRequirement("White bead", ItemID.WHITE_BEAD);
-		redBead = new ItemRequirement("Red bead", ItemID.RED_BEAD);
-		yellowBead = new ItemRequirement("Yellow bead", ItemID.YELLOW_BEAD);
+        inTowerSecond = new ZoneRequirement(towerSecond);
+        inTowerThird = new ZoneRequirement(towerThird);
+    }
 
-		inTowerSecond = new ZoneRequirement(towerSecond);
-		inTowerThird = new ZoneRequirement(towerThird);
-	}
+    public void setupSteps() {
+        collectBeads = new DetailedQuestStep(this, "Collect one of each bead. You can kill imps for these beads, or buy them on the Grand Exchange.",
+                blackBead, whiteBead, redBead, yellowBead);
+        moveToTower = new ObjectStep(this, ObjectID.STAIRCASE_12536, new WorldPoint(3103, 3159, 0),
+                "Head to the Wizards' Tower and climb up the staircase with the required beads.", blackBead, whiteBead, redBead, yellowBead);
+        climbTower = new ObjectStep(this, ObjectID.STAIRCASE_12537, new WorldPoint(3103, 3159, 1),
+                "Climb the staircase again.", blackBead, whiteBead, redBead, yellowBead);
+        turnInQuest = new NpcStep(this, NpcID.WIZARD_MIZGOG, new WorldPoint(3103, 3163, 2),
+                "Talk to Wizard Mizgog with the required beads to finish the quest.",
+                blackBead, whiteBead, redBead, yellowBead);
+        turnInQuest.addDialogSteps("Give me a quest please.", "Yes.");
+    }
 
-	public void setupSteps(){
-		collectBeads = new DetailedQuestStep(this, "Collect one of each bead. You can kill imps for these beads, or buy them on the Grand Exchange.",
-			blackBead, whiteBead, redBead, yellowBead);
-		moveToTower = new ObjectStep(this, ObjectID.STAIRCASE_12536, new WorldPoint(3103, 3159, 0),
-			"Head to the Wizards' Tower and climb up the staircase with the required beads.", blackBead, whiteBead, redBead, yellowBead);
-		climbTower = new ObjectStep(this, ObjectID.STAIRCASE_12537, new WorldPoint(3103, 3159, 1),
-			"Climb the staircase again.", blackBead, whiteBead, redBead, yellowBead);
-		turnInQuest = new NpcStep(this, NpcID.WIZARD_MIZGOG, new WorldPoint(3103, 3163, 2),
-			"Talk to Wizard Mizgog with the required beads to finish the quest.",
-			blackBead, whiteBead, redBead, yellowBead);
-		turnInQuest.addDialogSteps("Give me a quest please.", "Yes.");
-	}
+    @Override
+    protected void setupZones() {
+        towerSecond = new Zone(new WorldPoint(3089, 3176, 1), new WorldPoint(3126, 3146, 1));
+        towerThird = new Zone(new WorldPoint(3089, 3176, 2), new WorldPoint(3126, 3146, 2));
+    }
 
-	@Override
-	protected void setupZones(){
-		towerSecond = new Zone(new WorldPoint(3089, 3176, 1), new WorldPoint(3126, 3146, 1));
-		towerThird = new Zone(new WorldPoint(3089, 3176, 2), new WorldPoint(3126, 3146, 2));
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(blackBead);
+        reqs.add(whiteBead);
+        reqs.add(redBead);
+        reqs.add(yellowBead);
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(blackBead);
-		reqs.add(whiteBead);
-		reqs.add(redBead);
-		reqs.add(yellowBead);
+        return reqs;
+    }
 
-		return reqs;
-	}
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Bring Mizgog his beads", Arrays.asList(collectBeads, moveToTower, climbTower, turnInQuest),
+                blackBead, whiteBead, redBead, yellowBead));
+        return allSteps;
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Bring Mizgog his beads", Arrays.asList(collectBeads, moveToTower, climbTower, turnInQuest),
-			blackBead, whiteBead, redBead, yellowBead));
-		return allSteps;
-	}
+    @Override
+    public QuestPointReward getQuestPointReward() {
+        return new QuestPointReward(1);
+    }
 
-	@Override
-	public QuestPointReward getQuestPointReward()
-	{
-		return new QuestPointReward(1);
-	}
+    @Override
+    public List<ExperienceReward> getExperienceRewards() {
+        return Collections.singletonList(new ExperienceReward(Skill.MAGIC, 875));
+    }
 
-	@Override
-	public List<ExperienceReward> getExperienceRewards()
-	{
-		return Collections.singletonList(new ExperienceReward(Skill.MAGIC, 875));
-	}
+    @Override
+    public List<ItemReward> getItemRewards() {
+        return Collections.singletonList(new ItemReward("An Amulet of Accuracy", ItemID.AMULET_OF_ACCURACY, 1));
+    }
 
-	@Override
-	public List<ItemReward> getItemRewards()
-	{
-		return Collections.singletonList(new ItemReward("An Amulet of Accuracy", ItemID.AMULET_OF_ACCURACY, 1));
-	}
-
-	@Override
-	public List<String> getCombatRequirements()
-	{
-		return Collections.singletonList("Imps (level 2) if you plan on collecting the beads yourself");
-	}
+    @Override
+    public List<String> getCombatRequirements() {
+        return Collections.singletonList("Imps (level 2) if you plan on collecting the beads yourself");
+    }
 }

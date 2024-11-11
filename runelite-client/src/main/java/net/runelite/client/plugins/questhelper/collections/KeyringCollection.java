@@ -24,61 +24,56 @@
  */
 package net.runelite.client.plugins.questhelper.collections;
 
+import lombok.Getter;
+import net.runelite.api.ItemID;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import lombok.Getter;
-import net.runelite.api.ItemID;
-import net.runelite.client.config.ConfigManager;
 
-public enum KeyringCollection
-{
-	SHINY_KEY(ItemID.SHINY_KEY),
-	BRASS_KEY(ItemID.BRASS_KEY),
-	METAL_KEY(ItemID.METAL_KEY),
-	WROUGHT_IRON_KEY(ItemID.WROUGHT_IRON_KEY),
-	DUSTY_KEY(ItemID.DUSTY_KEY),
-	BATTERED_KEY(ItemID.BATTERED_KEY),
-	CRYSTAL_MINE_KEY(ItemID.CRYSTALMINE_KEY),
-	KEY(ItemID.ANCESTRAL_KEY),
-	MAZE_KEY(ItemID.MAZE_KEY),
-	WEAPON_STORE_KEY(ItemID.WEAPON_STORE_KEY),
-	BONE_KEY(ItemID.BONE_KEY),
-	ENCHANTED_KEY(ItemID.ENCHANTED_KEY),
-	NEW_KEY(ItemID.NEW_KEY);
+public enum KeyringCollection {
+    SHINY_KEY(ItemID.SHINY_KEY),
+    BRASS_KEY(ItemID.BRASS_KEY),
+    METAL_KEY(ItemID.METAL_KEY),
+    WROUGHT_IRON_KEY(ItemID.WROUGHT_IRON_KEY),
+    DUSTY_KEY(ItemID.DUSTY_KEY),
+    BATTERED_KEY(ItemID.BATTERED_KEY),
+    CRYSTAL_MINE_KEY(ItemID.CRYSTALMINE_KEY),
+    KEY(ItemID.ANCESTRAL_KEY),
+    MAZE_KEY(ItemID.MAZE_KEY),
+    WEAPON_STORE_KEY(ItemID.WEAPON_STORE_KEY),
+    BONE_KEY(ItemID.BONE_KEY),
+    ENCHANTED_KEY(ItemID.ENCHANTED_KEY),
+    NEW_KEY(ItemID.NEW_KEY);
 
-	@Getter
-	private final int itemID;
-	KeyringCollection(int itemID)
-	{
-		this.itemID = itemID;
-	}
+    @Getter
+    private final int itemID;
 
-	public String toChatText()
-	{
-		return name().toLowerCase().replaceAll("_", " ");
-	}
+    KeyringCollection(int itemID) {
+        this.itemID = itemID;
+    }
 
-	public String runeliteName()
-	{
-		return name().toLowerCase().replaceAll("_", "");
-	}
+    public String toChatText() {
+        return name().toLowerCase().replaceAll("_", " ");
+    }
 
-	public static List<KeyringRequirement> allKeyRequirements(ConfigManager configManager)
-	{
-		List<KeyringRequirement> keys = new ArrayList<>();
-		for (KeyringCollection keyringCollection : Collections.unmodifiableList(Arrays.asList(values())))
-		{
-			keys.add(new KeyringRequirement(configManager, keyringCollection));
-		}
+    public String runeliteName() {
+        return name().toLowerCase().replaceAll("_", "");
+    }
 
-		return keys;
-	}
+    public static List<KeyringRequirement> allKeyRequirements(ConfigManager configManager) {
+        List<KeyringRequirement> keys = new ArrayList<>();
+        for (KeyringCollection keyringCollection : Collections.unmodifiableList(Arrays.asList(values()))) {
+            keys.add(new KeyringRequirement(configManager, keyringCollection));
+        }
 
-	public KeyringRequirement getRequirement(ConfigManager configManager)
-	{
-		return new KeyringRequirement(configManager, this);
-	}
+        return keys;
+    }
+
+    public KeyringRequirement getRequirement(ConfigManager configManager) {
+        return new KeyringRequirement(configManager, this);
+    }
 }

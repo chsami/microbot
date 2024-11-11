@@ -24,9 +24,13 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.enlightenedjourney;
 
-import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+
+import net.runelite.api.ItemID;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
@@ -34,82 +38,68 @@ import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequireme
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import net.runelite.api.ItemID;
-import net.runelite.api.QuestState;
-import net.runelite.api.Skill;
 
-public class GrandTreeBalloonFlight extends ComplexStateQuestHelper
-{
-	BalloonFlightStep fly;
+import java.util.*;
 
-	ItemRequirement magicLogs;
+public class GrandTreeBalloonFlight extends ComplexStateQuestHelper {
+    BalloonFlightStep fly;
 
-	@Override
-	public QuestStep loadStep()
-	{
-		initializeRequirements();
+    ItemRequirement magicLogs;
 
-		HashMap<Integer, List<Integer>> sections = new HashMap<>();
-		List<Integer> section1 = Arrays.asList(8, 8, 8,  8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-		List<Integer> section2 = Arrays.asList(7, 7, 8, 7, 8, 7, 8, 8, 8, 9, 8, 8, 8, 10, 10, 10, 8, 8, 7, 7);
-		List<Integer> section3 = Arrays.asList(7, 7, 8, 9, 10, 10, 10, 9, 10, 10, 10, 10, 10, 10, 8, 8, 6, 5, 5, 5);
-		sections.put(7, section1);
-		sections.put(8, section2);
-		sections.put(9, section3);
+    @Override
+    public QuestStep loadStep() {
+        initializeRequirements();
 
-		fly = new BalloonFlightStep(this, "Navigate the balloon on Entrana to the Grand Tree.", sections, magicLogs);
-		return fly;
-	}
+        HashMap<Integer, List<Integer>> sections = new HashMap<>();
+        List<Integer> section1 = Arrays.asList(8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+        List<Integer> section2 = Arrays.asList(7, 7, 8, 7, 8, 7, 8, 8, 8, 9, 8, 8, 8, 10, 10, 10, 8, 8, 7, 7);
+        List<Integer> section3 = Arrays.asList(7, 7, 8, 9, 10, 10, 10, 9, 10, 10, 10, 10, 10, 10, 8, 8, 6, 5, 5, 5);
+        sections.put(7, section1);
+        sections.put(8, section2);
+        sections.put(9, section3);
 
-	@Override
-	protected void setupRequirements()
-	{
-		magicLogs = new ItemRequirement("Magic logs", ItemID.MAGIC_LOGS, 3);
-	}
+        fly = new BalloonFlightStep(this, "Navigate the balloon on Entrana to the Grand Tree.", sections, magicLogs);
+        return fly;
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		return Collections.singletonList(magicLogs);
-	}
+    @Override
+    protected void setupRequirements() {
+        magicLogs = new ItemRequirement("Magic logs", ItemID.MAGIC_LOGS, 3);
+    }
+
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        return Collections.singletonList(magicLogs);
+    }
 
 
-	@Override
-	public List<Requirement> getGeneralRequirements()
-	{
-		List<Requirement> reqs = new ArrayList<>();
-		reqs.add(new QuestRequirement(QuestHelperQuest.ENLIGHTENED_JOURNEY, QuestState.FINISHED));
-		reqs.add(new SkillRequirement(Skill.FIREMAKING, 60));
-		return reqs;
-	}
+    @Override
+    public List<Requirement> getGeneralRequirements() {
+        List<Requirement> reqs = new ArrayList<>();
+        reqs.add(new QuestRequirement(QuestHelperQuest.ENLIGHTENED_JOURNEY, QuestState.FINISHED));
+        reqs.add(new SkillRequirement(Skill.FIREMAKING, 60));
+        return reqs;
+    }
 
-	@Override
-	public List<ExperienceReward> getExperienceRewards()
-	{
-		return Collections.singletonList(new ExperienceReward(Skill.FIREMAKING, 2000));
-	}
+    @Override
+    public List<ExperienceReward> getExperienceRewards() {
+        return Collections.singletonList(new ExperienceReward(Skill.FIREMAKING, 2000));
+    }
 
-	@Override
-	public List<UnlockReward> getUnlockRewards()
-	{
-		return Collections.singletonList(
-			new UnlockReward("Ability to fly via balloon to the Grand Tree with 1 magic log")
-		);
-	}
+    @Override
+    public List<UnlockReward> getUnlockRewards() {
+        return Collections.singletonList(
+                new UnlockReward("Ability to fly via balloon to the Grand Tree with 1 magic log")
+        );
+    }
 
 
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+    @Override
+    public ArrayList<PanelDetails> getPanels() {
+        ArrayList<PanelDetails> allSteps = new ArrayList<>();
 
-		allSteps.add(new PanelDetails("Flying to the Grand Tree", Collections.singletonList(fly), magicLogs));
+        allSteps.add(new PanelDetails("Flying to the Grand Tree", Collections.singletonList(fly), magicLogs));
 
-		return allSteps;
-	}
+        return allSteps;
+    }
 }

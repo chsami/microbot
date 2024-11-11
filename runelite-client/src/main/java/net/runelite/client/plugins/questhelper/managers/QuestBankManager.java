@@ -25,108 +25,92 @@
 package net.runelite.client.plugins.questhelper.managers;
 
 import com.google.inject.Injector;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.bank.QuestBank;
-import net.runelite.client.plugins.questhelper.bank.banktab.QuestBankTab;
-import net.runelite.client.plugins.questhelper.bank.banktab.QuestHelperBankTagService;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.Player;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.plugins.questhelper.bank.QuestBank;
+import net.runelite.client.plugins.questhelper.bank.banktab.QuestBankTab;
+import net.runelite.client.plugins.questhelper.bank.banktab.QuestHelperBankTagService;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
 
 @Singleton
-public class QuestBankManager
-{
-	@Inject
-	private QuestBank questBank;
+public class QuestBankManager {
+    @Inject
+    private QuestBank questBank;
 
-	@Getter
-	@Inject
-	private QuestHelperBankTagService bankTagService;
+    @Getter
+    @Inject
+    private QuestHelperBankTagService bankTagService;
 
-	@Inject
-	private QuestBankTab questBankTab;
+    @Inject
+    private QuestBankTab questBankTab;
 
-	private boolean loggedInStateKnown;
+    private boolean loggedInStateKnown;
 
-	public void startUp(Injector injector, EventBus eventBus)
-	{
-		questBankTab.startUp();
-		injector.injectMembers(questBankTab);
-		eventBus.register(questBankTab);
-	}
+    public void startUp(Injector injector, EventBus eventBus) {
+        questBankTab.startUp();
+        injector.injectMembers(questBankTab);
+        eventBus.register(questBankTab);
+    }
 
-	public void shutDown(EventBus eventBus)
-	{
-		eventBus.unregister(questBankTab);
-		questBankTab.shutDown();
-	}
+    public void shutDown(EventBus eventBus) {
+        eventBus.unregister(questBankTab);
+        questBankTab.shutDown();
+    }
 
-	public void loadInitialStateFromConfig(Client client)
-	{
-		if (!loggedInStateKnown)
-		{
-			Player localPlayer = client.getLocalPlayer();
-			if (localPlayer != null && localPlayer.getName() != null)
-			{
-				loggedInStateKnown = true;
-				loadState();
-			}
-		}
-	}
+    public void loadInitialStateFromConfig(Client client) {
+        if (!loggedInStateKnown) {
+            Player localPlayer = client.getLocalPlayer();
+            if (localPlayer != null && localPlayer.getName() != null) {
+                loggedInStateKnown = true;
+                loadState();
+            }
+        }
+    }
 
-	public void setUnknownInitialState()
-	{
-		loggedInStateKnown = false;
-	}
+    public void setUnknownInitialState() {
+        loggedInStateKnown = false;
+    }
 
-	public void loadState()
-	{
-		questBank.loadState();
-	}
+    public void loadState() {
+        questBank.loadState();
+    }
 
-	public void startUpQuest()
-	{
-		questBankTab.startUp();
-	}
+    public void startUpQuest() {
+        questBankTab.startUp();
+    }
 
-	public void shutDownQuest()
-	{
-		questBankTab.shutDown();
-	}
+    public void shutDownQuest() {
+        questBankTab.shutDown();
+    }
 
-	public List<Item> getBankItems()
-	{
-		return questBank.getBankItems();
-	}
+    public List<Item> getBankItems() {
+        return questBank.getBankItems();
+    }
 
-	public void refreshBankTab()
-	{
-		questBankTab.refreshBankTab();
-	}
+    public void refreshBankTab() {
+        questBankTab.refreshBankTab();
+    }
 
-	public void updateLocalBank(ItemContainer itemContainer)
-	{
-		questBank.updateLocalBank(itemContainer.getItems());
-	}
+    public void updateLocalBank(ItemContainer itemContainer) {
+        questBank.updateLocalBank(itemContainer.getItems());
+    }
 
-	public void updateBankForQuestSpeedrunningWorld()
-	{
-		questBank.updateLocalBank(new Item[]{ });
-	}
+    public void updateBankForQuestSpeedrunningWorld() {
+        questBank.updateLocalBank(new Item[]{});
+    }
 
-	public void saveBankToConfig()
-	{
-		questBank.saveBankToConfig();
-	}
+    public void saveBankToConfig() {
+        questBank.saveBankToConfig();
+    }
 
-	public void emptyState()
-	{
-		questBank.emptyState();
-	}
+    public void emptyState() {
+        questBank.emptyState();
+    }
 }

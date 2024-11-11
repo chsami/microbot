@@ -24,139 +24,126 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.xmarksthespot;
 
-import net.runelite.client.plugins.questhelper.collections.ItemCollections;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import net.runelite.client.plugins.questhelper.rewards.ItemReward;
-import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.rewards.ItemReward;
+import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.steps.DigStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-public class XMarksTheSpot extends BasicQuestHelper
-{
-	//Items Required
-	ItemRequirement spade;
+import java.util.*;
 
-	// Items recommended
-	ItemRequirement glory;
+public class XMarksTheSpot extends BasicQuestHelper {
+    //Items Required
+    ItemRequirement spade;
 
-	QuestStep speakVeosLumbridge, digOutsideBob, digCastle, digDraynor, digMartin, speakVeosSarim, speakVeosSarimWithoutCasket;
+    // Items recommended
+    ItemRequirement glory;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupSteps();
+    QuestStep speakVeosLumbridge, digOutsideBob, digCastle, digDraynor, digMartin, speakVeosSarim, speakVeosSarimWithoutCasket;
 
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupSteps();
 
-		steps.put(0, speakVeosLumbridge);
-		steps.put(1, steps.get(0));
-		steps.put(2, digOutsideBob);
-		steps.put(3, digCastle);
-		steps.put(4, digDraynor);
-		steps.put(5, digMartin);
-		steps.put(6, speakVeosSarim);
-		steps.put(7, speakVeosSarimWithoutCasket);
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		return steps;
-	}
+        steps.put(0, speakVeosLumbridge);
+        steps.put(1, steps.get(0));
+        steps.put(2, digOutsideBob);
+        steps.put(3, digCastle);
+        steps.put(4, digDraynor);
+        steps.put(5, digMartin);
+        steps.put(6, speakVeosSarim);
+        steps.put(7, speakVeosSarimWithoutCasket);
 
-	@Override
-	protected void setupRequirements()
-	{
-		spade = new ItemRequirement("Spade", ItemID.SPADE).isNotConsumed();
-		glory = new ItemRequirement("Amulet of Glory for faster teleport to Draynor Village.", ItemCollections.AMULET_OF_GLORIES).isNotConsumed();
-	}
+        return steps;
+    }
 
-	private void setupSteps()
-	{
-		// TODO: Worth adding PuzzleWrapperStep at all given the Clue Plugin also does this?
-		speakVeosLumbridge = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3228, 3242, 0),
-			"Talk to Veos in The Sheared Ram pub in Lumbridge to start the quest.");
-		speakVeosLumbridge.addDialogStep("I'm looking for a quest.");
-		speakVeosLumbridge.addDialogStep("Sounds good, what should I do?");
-		speakVeosLumbridge.addDialogSteps("Can I help?", "Yes.");
+    @Override
+    protected void setupRequirements() {
+        spade = new ItemRequirement("Spade", ItemID.SPADE).isNotConsumed();
+        glory = new ItemRequirement("Amulet of Glory for faster teleport to Draynor Village.", ItemCollections.AMULET_OF_GLORIES).isNotConsumed();
+    }
 
-		digOutsideBob = new DigStep(this, new WorldPoint(3230, 3209, 0),
-			"Dig north of Bob's Brilliant Axes, on the west side of the plant against the wall of his house.");
-		digOutsideBob.addDialogStep("Okay, thanks Veos.");
+    private void setupSteps() {
+        // TODO: Worth adding PuzzleWrapperStep at all given the Clue Plugin also does this?
+        speakVeosLumbridge = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3228, 3242, 0),
+                "Talk to Veos in The Sheared Ram pub in Lumbridge to start the quest.");
+        speakVeosLumbridge.addDialogStep("I'm looking for a quest.");
+        speakVeosLumbridge.addDialogStep("Sounds good, what should I do?");
+        speakVeosLumbridge.addDialogSteps("Can I help?", "Yes.");
 
-		digCastle = new DigStep(this, new WorldPoint(3203, 3212, 0),
-			"Dig behind Lumbridge Castle, just outside the kitchen door.");
+        digOutsideBob = new DigStep(this, new WorldPoint(3230, 3209, 0),
+                "Dig north of Bob's Brilliant Axes, on the west side of the plant against the wall of his house.");
+        digOutsideBob.addDialogStep("Okay, thanks Veos.");
 
-		digDraynor = new DigStep(this, new WorldPoint(3109, 3264, 0),
-			"Dig north-west of the Draynor Village jail, just by the wheat farm.");
+        digCastle = new DigStep(this, new WorldPoint(3203, 3212, 0),
+                "Dig behind Lumbridge Castle, just outside the kitchen door.");
 
-		digMartin = new DigStep(this, new WorldPoint(3078, 3259, 0),
-			"Dig in the pig pen just west where Martin the Master Gardener is.",
-			new ItemRequirement("Treasure scroll", ItemID.TREASURE_SCROLL_23070));
+        digDraynor = new DigStep(this, new WorldPoint(3109, 3264, 0),
+                "Dig north-west of the Draynor Village jail, just by the wheat farm.");
 
-		ItemRequirement ancientCasket = new ItemRequirement("Ancient casket", ItemID.ANCIENT_CASKET);
-		ancientCasket.setTooltip("If you've lost this you can get another by digging in the pig pen in Draynor Village.");
+        digMartin = new DigStep(this, new WorldPoint(3078, 3259, 0),
+                "Dig in the pig pen just west where Martin the Master Gardener is.",
+                new ItemRequirement("Treasure scroll", ItemID.TREASURE_SCROLL_23070));
 
-		speakVeosSarim = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3054, 3245, 0),
-			"Talk to Veos directly south of the Rusty Anchor Inn in Port Sarim to finish the quest.",
-			ancientCasket);
-		((NpcStep) speakVeosSarim).addAlternateNpcs(NpcID.VEOS_8630);
+        ItemRequirement ancientCasket = new ItemRequirement("Ancient casket", ItemID.ANCIENT_CASKET);
+        ancientCasket.setTooltip("If you've lost this you can get another by digging in the pig pen in Draynor Village.");
 
-		speakVeosSarimWithoutCasket = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3054, 3245, 0),
-			"Talk to Veos directly south of the Rusty Anchor Inn in Port Sarim to finish the quest.");
-		((NpcStep) speakVeosSarimWithoutCasket).addAlternateNpcs(NpcID.VEOS_8630);
+        speakVeosSarim = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3054, 3245, 0),
+                "Talk to Veos directly south of the Rusty Anchor Inn in Port Sarim to finish the quest.",
+                ancientCasket);
+        ((NpcStep) speakVeosSarim).addAlternateNpcs(NpcID.VEOS_8630);
 
-		speakVeosSarim.addSubSteps(speakVeosSarimWithoutCasket);
-	}
+        speakVeosSarimWithoutCasket = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3054, 3245, 0),
+                "Talk to Veos directly south of the Rusty Anchor Inn in Port Sarim to finish the quest.");
+        ((NpcStep) speakVeosSarimWithoutCasket).addAlternateNpcs(NpcID.VEOS_8630);
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(spade);
-		return reqs;
-	}
+        speakVeosSarim.addSubSteps(speakVeosSarimWithoutCasket);
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRecommended()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(glory);
-		return reqs;
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(spade);
+        return reqs;
+    }
 
-	@Override
-	public QuestPointReward getQuestPointReward()
-	{
-		return new QuestPointReward(1);
-	}
+    @Override
+    public List<ItemRequirement> getItemRecommended() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(glory);
+        return reqs;
+    }
 
-	@Override
-	public List<ItemReward> getItemRewards()
-	{
-		return Arrays.asList(
-			new ItemReward("300 Exp. Lamp (Any Skill)", ItemID.ANTIQUE_LAMP, 1),
-			new ItemReward("Coins", ItemID.COINS_995, 200),
-			new ItemReward("A Beginner Clue Scroll", ItemID.CLUE_SCROLL_BEGINNER, 1));
-	}
+    @Override
+    public QuestPointReward getQuestPointReward() {
+        return new QuestPointReward(1);
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Speak to Veos", Collections.singletonList(speakVeosLumbridge), spade));
-		allSteps.add(new PanelDetails("Solve the clue scroll", Arrays.asList(digOutsideBob, digCastle, digDraynor, digMartin)));
-		allSteps.add(new PanelDetails("Bring the casket to Veos", Collections.singletonList(speakVeosSarim)));
-		return allSteps;
-	}
+    @Override
+    public List<ItemReward> getItemRewards() {
+        return Arrays.asList(
+                new ItemReward("300 Exp. Lamp (Any Skill)", ItemID.ANTIQUE_LAMP, 1),
+                new ItemReward("Coins", ItemID.COINS_995, 200),
+                new ItemReward("A Beginner Clue Scroll", ItemID.CLUE_SCROLL_BEGINNER, 1));
+    }
+
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Speak to Veos", Collections.singletonList(speakVeosLumbridge), spade));
+        allSteps.add(new PanelDetails("Solve the clue scroll", Arrays.asList(digOutsideBob, digCastle, digDraynor, digMartin)));
+        allSteps.add(new PanelDetails("Bring the casket to Veos", Collections.singletonList(speakVeosSarim)));
+        return allSteps;
+    }
 }

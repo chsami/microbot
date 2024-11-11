@@ -26,30 +26,27 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.npc;
 
-import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 import net.runelite.api.Client;
+import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
 
-public class NoFollowerRequirement extends AbstractRequirement
-{
-	String text;
+import javax.annotation.Nonnull;
 
-	public NoFollowerRequirement(String text)
-	{
-		this.text = text;
-	}
+public class NoFollowerRequirement extends AbstractRequirement {
+    String text;
 
-	@Override
-	public boolean check(Client client)
-	{
-		return client.getVarpValue(447) == -1;
-	}
+    public NoFollowerRequirement(String text) {
+        this.text = text;
+    }
 
-	@Override
-	public String getDisplayText()
-	{
-		return text;
-	}
+    @Override
+    public boolean check(Client client) {
+        return client.getVarpValue(447) == -1;
+    }
+
+    @Nonnull
+    @Override
+    public String getDisplayText() {
+        return text;
+    }
 }

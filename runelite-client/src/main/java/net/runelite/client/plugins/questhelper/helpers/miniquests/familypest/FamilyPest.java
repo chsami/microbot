@@ -25,151 +25,137 @@
 
 package net.runelite.client.plugins.questhelper.helpers.miniquests.familypest;
 
+
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.QuestState;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.collections.ItemCollections;
-import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.QuestState;
-import net.runelite.api.coords.WorldPoint;
 
-public class FamilyPest extends BasicQuestHelper
-{
-	//Item Requirements
-	ItemRequirement coins;
+import java.util.*;
 
-	//Item Recommended
-	ItemRequirement dueling, camelotTele, varrockTele, lumberTele;
+public class FamilyPest extends BasicQuestHelper {
+    //Item Requirements
+    ItemRequirement coins;
 
-	//Quest Steps
-	QuestStep talkToDimintheis, talkToAvan, talkToCaleb, talkToJohnathon, talkToDimintheis2, goUpstairs;
+    //Item Recommended
+    ItemRequirement dueling, camelotTele, varrockTele, lumberTele;
 
-	//Zone
-	Zone upstairsJollyBoar;
+    //Quest Steps
+    QuestStep talkToDimintheis, talkToAvan, talkToCaleb, talkToJohnathon, talkToDimintheis2, goUpstairs;
 
-	//Conditions
-	Requirement upJollyBoar, talkedToAvan, talkedToCaleb, talkedToJohnathon;
+    //Zone
+    Zone upstairsJollyBoar;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    //Conditions
+    Requirement upJollyBoar, talkedToAvan, talkedToCaleb, talkedToJohnathon;
 
-		steps.put(0, talkToDimintheis);
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupConditions();
+        setupSteps();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		ConditionalStep talkToBrothers = new ConditionalStep(this, talkToAvan);
-		talkToBrothers.addStep(new Conditions(talkedToCaleb, talkedToAvan, talkedToJohnathon), talkToDimintheis2);
-		talkToBrothers.addStep(new Conditions(upJollyBoar, talkedToCaleb), talkToJohnathon);
-		talkToBrothers.addStep(talkedToCaleb, goUpstairs);
-		talkToBrothers.addStep(talkedToAvan, talkToCaleb);
-		steps.put(1, talkToBrothers);
-		steps.put(2, talkToBrothers);
+        steps.put(0, talkToDimintheis);
 
-		return steps;
-	}
+        ConditionalStep talkToBrothers = new ConditionalStep(this, talkToAvan);
+        talkToBrothers.addStep(new Conditions(talkedToCaleb, talkedToAvan, talkedToJohnathon), talkToDimintheis2);
+        talkToBrothers.addStep(new Conditions(upJollyBoar, talkedToCaleb), talkToJohnathon);
+        talkToBrothers.addStep(talkedToCaleb, goUpstairs);
+        talkToBrothers.addStep(talkedToAvan, talkToCaleb);
+        steps.put(1, talkToBrothers);
+        steps.put(2, talkToBrothers);
 
-	@Override
-	protected void setupRequirements()
-	{
-		//Recommended
-		dueling = new ItemRequirement("Ring of Dueling", -1, -1);
-		camelotTele = new ItemRequirement("Camelot Teleports", -1, -1);
-		varrockTele = new ItemRequirement("Varrock Teleports", -1, -1);
-		lumberTele = new ItemRequirement("Lumberyard Teleport", -1, -1);
+        return steps;
+    }
 
-		//Required
-		coins = new ItemRequirement("Coins", ItemCollections.COINS, 500000);
-	}
+    @Override
+    protected void setupRequirements() {
+        //Recommended
+        dueling = new ItemRequirement("Ring of Dueling", -1, -1);
+        camelotTele = new ItemRequirement("Camelot Teleports", -1, -1);
+        varrockTele = new ItemRequirement("Varrock Teleports", -1, -1);
+        lumberTele = new ItemRequirement("Lumberyard Teleport", -1, -1);
 
-	public void setupSteps()
-	{
-		talkToDimintheis = new NpcStep(this, NpcID.DIMINTHEIS, new WorldPoint(3280, 3404, 0), "Talk to Dimintheis (south-east of Varrock).");
-		talkToDimintheis.addDialogSteps("Have you got any quests for me?", "Oh come on, however menial, I want to help!");
+        //Required
+        coins = new ItemRequirement("Coins", ItemCollections.COINS, 500000);
+    }
 
-		talkToAvan = new NpcStep(this, NpcID.AVAN_387, new WorldPoint(3294, 3282, 0), "Talk to Avan (Entrance to the Al Kharid Mine).");
-		talkToAvan.addDialogStep("Family Pest");
+    public void setupSteps() {
+        talkToDimintheis = new NpcStep(this, NpcID.DIMINTHEIS, new WorldPoint(3280, 3404, 0), "Talk to Dimintheis (south-east of Varrock).");
+        talkToDimintheis.addDialogSteps("Have you got any quests for me?", "Oh come on, however menial, I want to help!");
 
-		talkToCaleb = new NpcStep(this, NpcID.CALEB_5433, new WorldPoint(2819, 3453, 0), "Talk to Caleb (Northeast of Catherby bank).");
-		talkToCaleb.addDialogStep("Family Pest");
+        talkToAvan = new NpcStep(this, NpcID.AVAN_387, new WorldPoint(3294, 3282, 0), "Talk to Avan (Entrance to the Al Kharid Mine).");
+        talkToAvan.addDialogStep("Family Pest");
 
-		talkToJohnathon = new NpcStep(this, NpcID.JOHNATHON_5445, new WorldPoint(3281, 3505, 1), "Talk to Johnathon.");
-		talkToJohnathon.addDialogStep("Family Pest");
-		goUpstairs = new ObjectStep(this, ObjectID.STAIRCASE_11797, new WorldPoint(3286, 3494, 0), "Go upstairs in the Jolly Boar Inn (Northeast of Varrock) and talk to Johnathon.");
-		goUpstairs.addSubSteps(talkToJohnathon);
+        talkToCaleb = new NpcStep(this, NpcID.CALEB_5433, new WorldPoint(2819, 3453, 0), "Talk to Caleb (Northeast of Catherby bank).");
+        talkToCaleb.addDialogStep("Family Pest");
 
-		talkToDimintheis2 = new NpcStep(this, NpcID.DIMINTHEIS, new WorldPoint(3280, 3404, 0), "Return to Dimintheis and pay him 500k.");
-		talkToDimintheis2.addDialogSteps("Family Pest", "Yes");
-	}
+        talkToJohnathon = new NpcStep(this, NpcID.JOHNATHON_5445, new WorldPoint(3281, 3505, 1), "Talk to Johnathon.");
+        talkToJohnathon.addDialogStep("Family Pest");
+        goUpstairs = new ObjectStep(this, ObjectID.STAIRCASE_11797, new WorldPoint(3286, 3494, 0), "Go upstairs in the Jolly Boar Inn (Northeast of Varrock) and talk to Johnathon.");
+        goUpstairs.addSubSteps(talkToJohnathon);
 
-	public void setupConditions()
-	{
-		upJollyBoar = new ZoneRequirement(upstairsJollyBoar);
+        talkToDimintheis2 = new NpcStep(this, NpcID.DIMINTHEIS, new WorldPoint(3280, 3404, 0), "Return to Dimintheis and pay him 500k.");
+        talkToDimintheis2.addDialogSteps("Family Pest", "Yes");
+    }
 
-		talkedToCaleb = new VarbitRequirement(5348, 1);
-		talkedToAvan = new VarbitRequirement(5349, 1);
-		talkedToJohnathon = new VarbitRequirement(5350, 1);
-	}
+    public void setupConditions() {
+        upJollyBoar = new ZoneRequirement(upstairsJollyBoar);
 
-	@Override
-	protected void setupZones()
-	{
-		upstairsJollyBoar = new Zone(new WorldPoint(3273, 3485, 1), new WorldPoint(3287, 3509, 1));
-	}
+        talkedToCaleb = new VarbitRequirement(5348, 1);
+        talkedToAvan = new VarbitRequirement(5349, 1);
+        talkedToJohnathon = new VarbitRequirement(5350, 1);
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		return Collections.singletonList(coins);
-	}
+    @Override
+    protected void setupZones() {
+        upstairsJollyBoar = new Zone(new WorldPoint(3273, 3485, 1), new WorldPoint(3287, 3509, 1));
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRecommended()
-	{
-		return Arrays.asList(dueling, camelotTele, varrockTele, lumberTele);
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        return Collections.singletonList(coins);
+    }
 
-	@Override
-	public List<UnlockReward> getUnlockRewards()
-	{
-		return Collections.singletonList(new UnlockReward("Ability to own all three Steel Gauntlets simultaneously"));
-	}
+    @Override
+    public List<ItemRequirement> getItemRecommended() {
+        return Arrays.asList(dueling, camelotTele, varrockTele, lumberTele);
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Talk to the Brothers", Arrays.asList(talkToDimintheis,
-			talkToAvan, talkToCaleb, goUpstairs, talkToDimintheis2), coins));
-		return allSteps;
-	}
+    @Override
+    public List<UnlockReward> getUnlockRewards() {
+        return Collections.singletonList(new UnlockReward("Ability to own all three Steel Gauntlets simultaneously"));
+    }
 
-	@Override
-	public List<Requirement> getGeneralRequirements()
-	{
-		ArrayList<Requirement> req = new ArrayList<>();
-		req.add(new QuestRequirement(QuestHelperQuest.FAMILY_CREST, QuestState.FINISHED));
-		return req;
-	}
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Talk to the Brothers", Arrays.asList(talkToDimintheis,
+                talkToAvan, talkToCaleb, goUpstairs, talkToDimintheis2), coins));
+        return allSteps;
+    }
+
+    @Override
+    public List<Requirement> getGeneralRequirements() {
+        ArrayList<Requirement> req = new ArrayList<>();
+        req.add(new QuestRequirement(QuestHelperQuest.FAMILY_CREST, QuestState.FINISHED));
+        return req;
+    }
 }

@@ -24,155 +24,130 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.piratestreasure;
 
-import net.runelite.client.plugins.questhelper.collections.ItemCollections;
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.rewards.ItemReward;
-import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.DigStep;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.rewards.ItemReward;
+import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
+import net.runelite.client.plugins.questhelper.steps.*;
 
-public class PiratesTreasure extends BasicQuestHelper
-{
-	//ItemRequirements
-	ItemRequirement sixtyCoins, spade, pirateMessage, chestKey;
+import java.util.*;
 
-	private NpcStep speakToRedbeard;
+public class PiratesTreasure extends BasicQuestHelper {
+    //ItemRequirements
+    ItemRequirement sixtyCoins, spade, pirateMessage, chestKey;
+    Zone blueMoonFirst;
+    ZoneRequirement inBlueMoonFirst;
+    private NpcStep speakToRedbeard;
+    private RumSmugglingStep smuggleRum;
+    private QuestStep readPirateMessage;
+    private ObjectStep openChest, climbStairs;
+    private QuestStep digUpTreasure;
 
-	private RumSmugglingStep smuggleRum;
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
 
-	private QuestStep readPirateMessage;
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-	private ObjectStep openChest, climbStairs;
+        speakToRedbeard = new NpcStep(this, NpcID.REDBEARD_FRANK, new WorldPoint(3053, 3251, 0),
+                "Talk to Redbeard Frank in Port Sarim.");
+        speakToRedbeard.addDialogSteps("I'm in search of treasure.", "Yes.");
 
-	private QuestStep digUpTreasure;
+        steps.put(0, speakToRedbeard);
 
-	Zone blueMoonFirst;
+        smuggleRum = new RumSmugglingStep(this);
 
-	ZoneRequirement inBlueMoonFirst;
+        steps.put(1, smuggleRum);
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
+        readPirateMessage = new DetailedQuestStep(this, "Read the Pirate message.", pirateMessage.highlighted());
+        climbStairs = new ObjectStep(this, ObjectID.STAIRCASE_11796, new WorldPoint(3228, 3393, 0),
+                "Climb up the stairs in The Blue Moon Inn in Varrock.");
+        openChest = new ObjectStep(this, ObjectID.CHEST_2079, new WorldPoint(3219, 3396, 1),
+                "Open the chest by using the key on it.", chestKey.highlighted());
+        openChest.addDialogStep("Ok thanks, I'll go and get it.");
+        openChest.addIcon(ItemID.CHEST_KEY);
 
-		Map<Integer, QuestStep> steps = new HashMap<>();
+        blueMoonFirst = new Zone(new WorldPoint(3213, 3405, 1), new WorldPoint(3234, 3391, 1));
+        inBlueMoonFirst = new ZoneRequirement(blueMoonFirst);
 
-		speakToRedbeard = new NpcStep(this, NpcID.REDBEARD_FRANK, new WorldPoint(3053, 3251, 0),
-			"Talk to Redbeard Frank in Port Sarim.");
-		speakToRedbeard.addDialogStep("I'm in search of treasure.");
-		speakToRedbeard.addDialogStep("Ok, I will bring you some rum");
+        ConditionalStep getTreasureMap = new ConditionalStep(this, climbStairs);
+        getTreasureMap.addStep(new Conditions(chestKey, inBlueMoonFirst), openChest);
+        getTreasureMap.addStep(pirateMessage, readPirateMessage);
 
-		steps.put(0, speakToRedbeard);
+        steps.put(2, getTreasureMap);
 
-		smuggleRum = new RumSmugglingStep(this);
+        digUpTreasure = new DigStep(this, new WorldPoint(2999, 3383, 0),
+                "Dig in the middle of the cross in Falador Park, and kill the Gardener (level 4) who appears. Once killed, dig again.");
 
-		steps.put(1, smuggleRum);
+        steps.put(3, digUpTreasure);
+        return steps;
+    }
 
-		readPirateMessage = new DetailedQuestStep(this, "Read the Pirate message.", pirateMessage.highlighted());
-		climbStairs = new ObjectStep(this, ObjectID.STAIRCASE_11796, new WorldPoint(3228, 3393, 0),
-			"Climb up the stairs in The Blue Moon Inn in Varrock.");
-		openChest = new ObjectStep(this, ObjectID.CHEST_2079, new WorldPoint(3219, 3396, 1),
-			"Open the chest by using the key on it.", chestKey.highlighted());
-		openChest.addDialogStep("Ok thanks, I'll go and get it.");
-		openChest.addIcon(ItemID.CHEST_KEY);
+    @Override
+    protected void setupRequirements() {
+        sixtyCoins = new ItemRequirement("Coins", ItemCollections.COINS, 60);
+        spade = new ItemRequirement("Spade", ItemID.SPADE).isNotConsumed();
+        pirateMessage = new ItemRequirement("Pirate message", ItemID.PIRATE_MESSAGE);
+        chestKey = new ItemRequirement("Chest key", ItemID.CHEST_KEY);
+        chestKey.setTooltip("You can get another one from Redbeard Frank");
+    }
 
-		blueMoonFirst = new Zone(new WorldPoint(3213, 3405, 1), new WorldPoint(3234, 3391, 1));
-		inBlueMoonFirst = new ZoneRequirement(blueMoonFirst);
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(sixtyCoins);
+        reqs.add(spade);
 
-		ConditionalStep getTreasureMap = new ConditionalStep(this, climbStairs);
-		getTreasureMap.addStep(new Conditions(chestKey, inBlueMoonFirst), openChest);
-		getTreasureMap.addStep(pirateMessage, readPirateMessage);
+        return reqs;
+    }
 
-		steps.put(2, getTreasureMap);
+    @Override
+    public List<ItemRequirement> getItemRecommended() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(new ItemRequirement("A teleport to Varrock", ItemID.VARROCK_TELEPORT));
+        reqs.add(new ItemRequirement("A teleport to Falador", ItemID.FALADOR_TELEPORT));
+        reqs.add(new ItemRequirement("Bananas (obtainable in quest)", ItemID.BANANA, 10));
 
-		digUpTreasure = new DigStep(this, new WorldPoint(2999, 3383, 0),
-			"Dig in the middle of the cross in Falador Park, and kill the Gardener (level 4) who appears. Once killed, dig again.");
+        return reqs;
+    }
 
-		steps.put(3, digUpTreasure);
-		return steps;
-	}
+    @Override
+    public List<String> getCombatRequirements() {
+        return Collections.singletonList("Gardener (level 4)");
+    }
 
-	@Override
-	protected void setupRequirements()
-	{
-		sixtyCoins = new ItemRequirement("Coins", ItemCollections.COINS, 60);
-		spade = new ItemRequirement("Spade", ItemID.SPADE).isNotConsumed();
-		pirateMessage = new ItemRequirement("Pirate message", ItemID.PIRATE_MESSAGE);
-		chestKey = new ItemRequirement("Chest key", ItemID.CHEST_KEY);
-		chestKey.setTooltip("You can get another one from Redbeard Frank");
-	}
+    @Override
+    public QuestPointReward getQuestPointReward() {
+        return new QuestPointReward(2);
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(sixtyCoins);
-		reqs.add(spade);
+    @Override
+    public List<ItemReward> getItemRewards() {
+        return Arrays.asList(
+                new ItemReward("A Gold Ring", ItemID.GOLD_RING, 1),
+                new ItemReward("An Emerald", ItemID.EMERALD, 1),
+                new ItemReward("Coins", ItemID.COINS_995, 450));
+    }
 
-		return reqs;
-	}
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
 
-	@Override
-	public List<ItemRequirement> getItemRecommended()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(new ItemRequirement("A teleport to Varrock", ItemID.VARROCK_TELEPORT));
-		reqs.add(new ItemRequirement("A teleport to Falador", ItemID.FALADOR_TELEPORT));
-		reqs.add(new ItemRequirement("Bananas (obtainable in quest)", ItemID.BANANA, 10));
+        allSteps.add(new PanelDetails("Talk to Redbeard Frank", Collections.singletonList(speakToRedbeard), sixtyCoins));
+        allSteps.addAll(smuggleRum.panelDetails());
+        allSteps.add(new PanelDetails("Discover the treasure", Arrays.asList(climbStairs, openChest, readPirateMessage,
+                digUpTreasure), spade));
 
-		return reqs;
-	}
-
-	@Override
-	public List<String> getCombatRequirements()
-	{
-		return Collections.singletonList("Gardener (level 4)");
-	}
-
-	@Override
-	public QuestPointReward getQuestPointReward()
-	{
-		return new QuestPointReward(2);
-	}
-
-	@Override
-	public List<ItemReward> getItemRewards()
-	{
-		return Arrays.asList(
-				new ItemReward("A Gold Ring", ItemID.GOLD_RING, 1),
-				new ItemReward("An Emerald", ItemID.EMERALD, 1),
-				new ItemReward("Coins", ItemID.COINS_995, 450));
-	}
-
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-
-		allSteps.add(new PanelDetails("Talk to Redbeard Frank", Collections.singletonList(speakToRedbeard), sixtyCoins));
-		allSteps.addAll(smuggleRum.panelDetails());
-		allSteps.add(new PanelDetails("Discover the treasure", Arrays.asList(climbStairs, openChest, readPirateMessage,
-			digUpTreasure), spade));
-
-		return allSteps;
-	}
+        return allSteps;
+    }
 }

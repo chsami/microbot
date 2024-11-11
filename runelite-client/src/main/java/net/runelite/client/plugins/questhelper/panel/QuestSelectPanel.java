@@ -24,77 +24,63 @@
  */
 package net.runelite.client.plugins.questhelper.panel;
 
-import net.runelite.client.plugins.questhelper.managers.QuestManager;
-import net.runelite.client.plugins.questhelper.tools.Icon;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+
 import lombok.Getter;
 import net.runelite.api.QuestState;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.tools.Icon;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
-public class QuestSelectPanel extends JPanel
-{
-	@Getter
-	private final List<String> keywords = new ArrayList<>();
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
-	@Getter
-	private final QuestHelper questHelper;
+public class QuestSelectPanel extends JPanel {
+    private static final ImageIcon START_ICON = Icon.START.getIcon();
+    @Getter
+    private final List<String> keywords = new ArrayList<>();
+    @Getter
+    private final QuestHelper questHelper;
 
-	private final QuestManager questManager;
+    public QuestSelectPanel(QuestHelperPlugin questHelperPlugin, QuestHelperPanel questHelperPanel, QuestHelper questHelper, QuestState questState) {
+        this.questHelper = questHelper;
 
-	private static final ImageIcon START_ICON = Icon.START.getIcon();
+        keywords.addAll(questHelper.getQuest().getKeywords());
 
-	public QuestSelectPanel(QuestHelperPlugin questHelperPlugin, QuestManager questManager, QuestHelperPanel questHelperPanel, QuestHelper questHelper, QuestState questState)
-	{
-		this.questHelper = questHelper;
-		this.questManager = questManager;
+        setLayout(new BorderLayout(3, 0));
+        setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 20));
 
-		keywords.addAll(questHelper.getQuest().getKeywords());
+        JLabel nameLabel = JGenerator.makeJLabel(questHelper.getQuest().getName());
+        Color color = questState == QuestState.FINISHED ? questHelperPlugin.getConfig().passColour() : (questState == QuestState.IN_PROGRESS ?
+                new Color(240, 207, 123) : Color.WHITE);
+        nameLabel.setForeground(color);
+        add(nameLabel, BorderLayout.CENTER);
 
-		setLayout(new BorderLayout(3, 0));
-		setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 20));
+        if (questState != QuestState.FINISHED) {
+            JButton startButton = new JButton();
+            startButton.setIcon(START_ICON);
+            startButton.addActionListener(e ->
+            {
+                questHelperPanel.setSelectedQuest(questHelper);
+                questHelperPanel.emptyBar();
+            });
+            add(startButton, BorderLayout.LINE_END);
+        }
+    }
 
-		JLabel nameLabel = new JLabel(questHelper.getQuest().getName());
-		Color color = questState == QuestState.FINISHED ? questHelperPlugin.getConfig().passColour() : (questState == QuestState.IN_PROGRESS ?
-			new Color(240,207, 123) : Color.WHITE);
-		nameLabel.setForeground(color);
-		add(nameLabel, BorderLayout.CENTER);
+    public QuestSelectPanel(String text) {
+        this.questHelper = null;
 
-		if (questState != QuestState.FINISHED)
-		{
-			JButton startButton = new JButton();
-			startButton.setIcon(START_ICON);
-			startButton.addActionListener(e ->
-			{
-				questManager.setSidebarSelectedQuest(questHelper);
-				questHelperPanel.emptyBar();
-			});
-			add(startButton, BorderLayout.LINE_END);
-		}
-	}
+        setLayout(new BorderLayout(3, 3));
+        setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
+        setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-	public QuestSelectPanel(String text)
-	{
-		this.questHelper = null;
-		this.questManager = null;
-
-		setLayout(new BorderLayout(3, 3));
-		setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
-		setBackground(ColorScheme.DARKER_GRAY_COLOR);
-
-		JLabel nameLabel = new JLabel(text);
-		Color color = Color.WHITE;
-		nameLabel.setForeground(color);
-		add(nameLabel, BorderLayout.CENTER);
-	}
+        JLabel nameLabel = JGenerator.makeJLabel(text);
+        Color color = Color.WHITE;
+        nameLabel.setForeground(color);
+        add(nameLabel, BorderLayout.CENTER);
+    }
 }

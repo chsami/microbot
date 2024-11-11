@@ -24,8 +24,6 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.mischelpers.herbrun;
 
-import java.time.Instant;
-import javax.annotation.Nullable;
 import net.runelite.api.Client;
 import net.runelite.api.Varbits;
 import net.runelite.client.config.ConfigManager;
@@ -33,106 +31,95 @@ import net.runelite.client.plugins.timetracking.TimeTrackingConfig;
 import net.runelite.client.plugins.timetracking.farming.CropState;
 import net.runelite.client.plugins.timetracking.farming.Produce;
 
-public class FarmingHandler
-{
-	private final Client client;
-	private final ConfigManager configManager;
+import javax.annotation.Nullable;
+import java.time.Instant;
 
-	public FarmingHandler(Client client, ConfigManager configManager)
-	{
-		this.client = client;
-		this.configManager = configManager;
-	}
+public class FarmingHandler {
+    private final Client client;
+    private final ConfigManager configManager;
 
-	public CropState predictPatch(FarmingPatch patch)
-	{
-		return predictPatch(patch, configManager.getRSProfileKey());
-	}
+    public FarmingHandler(Client client, ConfigManager configManager) {
+        this.client = client;
+        this.configManager = configManager;
+    }
 
-	@Nullable
-	public CropState predictPatch(FarmingPatch patch, String profile)
-	{
-		long unixNow = Instant.now().getEpochSecond();
+    public CropState predictPatch(FarmingPatch patch) {
+        return predictPatch(patch, configManager.getRSProfileKey());
+    }
 
-		String key = patch.configKey();
-		String storedValue = configManager.getConfiguration("timetracking", profile, key);
+    @Nullable
+    public CropState predictPatch(FarmingPatch patch, String profile) {
+        long unixNow = Instant.now().getEpochSecond();
 
-		if (storedValue == null)
-		{
-			return null;
-		}
+        String key = patch.configKey();
+        String storedValue = configManager.getConfiguration("timetracking", profile, key);
 
-		long unixTime = 0;
-		int value = 0;
-		{
-			String[] parts = storedValue.split(":");
-			if (parts.length == 2)
-			{
-				try
-				{
-					value = Integer.parseInt(parts[0]);
-					unixTime = Long.parseLong(parts[1]);
-				}
-				catch (NumberFormatException ignored)
-				{
-				}
-			}
-		}
+        if (storedValue == null) {
+            return null;
+        }
 
-		PatchState state = patch.getImplementation().forVarbitValue(value);
-		if (state == null) return null;
-		if (state.getCropState() == CropState.EMPTY) return CropState.EMPTY;
-		if (state.getProduce() == Produce.WEEDS) return CropState.EMPTY;
-		if (state.getCropState() == CropState.DEAD) return CropState.DEAD;
+        long unixTime = 0;
+        int value = 0;
+        {
+            String[] parts = storedValue.split(":");
+            if (parts.length == 2) {
+                try {
+                    value = Integer.parseInt(parts[0]);
+                    unixTime = Long.parseLong(parts[1]);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
 
-		if (unixTime <= 0)
-		{
-			return null;
-		}
+        PatchState state = patch.getImplementation().forVarbitValue(value);
+        if (state == null) return null;
+        if (state.getCropState() == CropState.EMPTY) return CropState.EMPTY;
+        if (state.getProduce() == Produce.WEEDS) return CropState.EMPTY;
+        if (state.getCropState() == CropState.DEAD) return CropState.DEAD;
 
-		int stage = state.getStage();
-		int stages = state.getStages();
-		int tickrate = state.getTickRate();
+        if (unixTime <= 0) {
+            return null;
+        }
 
-		boolean botanist = client.getVarbitValue(Varbits.LEAGUE_RELIC_5) == 1;
+        int stage = state.getStage();
+        int stages = state.getStages();
+        int tickrate = state.getTickRate();
 
-		if (botanist)
-		{
-			tickrate /= 5;
-		}
+        boolean botanist = client.getVarbitValue(Varbits.LEAGUE_RELIC_5) == 1;
 
-		long doneEstimate = 0;
-		if (tickrate > 0)
-		{
-			long tickTime = getTickTime(tickrate, 0, unixTime, profile);
-			doneEstimate = getTickTime(tickrate, stages - 1 - stage, tickTime, profile);
-		}
+        if (botanist) {
+            tickrate /= 5;
+        }
 
-		if (unixNow >= doneEstimate) return CropState.HARVESTABLE;
+        long doneEstimate = 0;
+        if (tickrate > 0) {
+            long tickTime = getTickTime(tickrate, 0, unixTime, profile);
+            doneEstimate = getTickTime(tickrate, stages - 1 - stage, tickTime, profile);
+        }
 
-		return CropState.GROWING;
-	}
+        if (unixNow >= doneEstimate) return CropState.HARVESTABLE;
 
-	public long getTickTime(int tickRate, int ticks, long requestedTime, String profile)
-	{
-		Integer offsetPrecisionMins = configManager.getConfiguration(TimeTrackingConfig.CONFIG_GROUP, profile, TimeTrackingConfig.FARM_TICK_OFFSET_PRECISION, int.class);
-		Integer offsetTimeMins = configManager.getConfiguration(TimeTrackingConfig.CONFIG_GROUP, profile, TimeTrackingConfig.FARM_TICK_OFFSET, int.class);
+        return CropState.GROWING;
+    }
 
-		//All offsets are negative but are stored as positive
-		long calculatedOffsetTime = 0L;
-		if (offsetPrecisionMins != null && offsetTimeMins != null && (offsetPrecisionMins >= tickRate || offsetPrecisionMins >= 40))
-		{
-			calculatedOffsetTime = (offsetTimeMins % tickRate) * 60L;
-		}
+    public long getTickTime(int tickRate, int ticks, long requestedTime, String profile) {
+        Integer offsetPrecisionMins = configManager.getConfiguration(TimeTrackingConfig.CONFIG_GROUP, profile, TimeTrackingConfig.FARM_TICK_OFFSET_PRECISION, int.class);
+        Integer offsetTimeMins = configManager.getConfiguration(TimeTrackingConfig.CONFIG_GROUP, profile, TimeTrackingConfig.FARM_TICK_OFFSET, int.class);
 
-		//Calculate "now" as +offset seconds in the future so we calculate the correct ticks
-		long unixNow = requestedTime + calculatedOffsetTime;
+        //All offsets are negative but are stored as positive
+        long calculatedOffsetTime = 0L;
+        if (offsetPrecisionMins != null && offsetTimeMins != null && (offsetPrecisionMins >= tickRate || offsetPrecisionMins >= 40)) {
+            calculatedOffsetTime = (offsetTimeMins % tickRate) * 60L;
+        }
 
-		//The time that the tick requested will happen
-		long timeOfCurrentTick = (unixNow - (unixNow % (tickRate * 60L)));
-		long timeOfGoalTick = timeOfCurrentTick + ((long) ticks * tickRate * 60);
+        //Calculate "now" as +offset seconds in the future so we calculate the correct ticks
+        long unixNow = requestedTime + calculatedOffsetTime;
 
-		//Move ourselves back to real time
-		return timeOfGoalTick - calculatedOffsetTime;
-	}
+        //The time that the tick requested will happen
+        long timeOfCurrentTick = (unixNow - (unixNow % (tickRate * 60L)));
+        long timeOfGoalTick = timeOfCurrentTick + ((long) ticks * tickRate * 60);
+
+        //Move ourselves back to real time
+        return timeOfGoalTick - calculatedOffsetTime;
+    }
 }

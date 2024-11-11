@@ -24,35 +24,33 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.skills.agility;
 
+
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-public abstract class AgilityCourse extends QuestStep
-{
-	ItemRequirement[] recommendedItems;
+public abstract class AgilityCourse extends QuestStep {
+    ItemRequirement[] recommendedItems;
 
-	public AgilityCourse(QuestHelper questHelper)
-	{
-		super(questHelper);
-	}
+    public AgilityCourse(QuestHelper questHelper) {
+        super(questHelper);
+    }
 
-	protected abstract ConditionalStep loadStep();
+    protected abstract ConditionalStep loadStep();
 
-	protected abstract void setupConditions();
+    protected abstract void setupConditions();
 
-	protected abstract void setupZones();
+    protected abstract void setupZones();
 
-	protected abstract void setupSteps();
+    protected abstract void setupSteps();
 
-	protected abstract void addSteps();
+    protected abstract void addSteps();
 
-	protected abstract PanelDetails getPanelDetails();
+    protected abstract PanelDetails getPanelDetails();
 
-	protected void setRecommended(ItemRequirement... items)
-	{
-		this.recommendedItems = items;
-	}
+    protected void setRecommended(ItemRequirement... items) {
+        this.recommendedItems = items;
+    }
 }

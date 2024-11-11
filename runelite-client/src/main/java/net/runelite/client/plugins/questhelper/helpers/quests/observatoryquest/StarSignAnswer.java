@@ -24,69 +24,63 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.observatoryquest;
 
-import net.runelite.client.plugins.questhelper.questinfo.QuestVarPlayer;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import java.util.HashMap;
+
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.questinfo.QuestVarPlayer;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
 
-public class StarSignAnswer extends NpcStep
-{
-	HashMap<Integer, String> starSign = new HashMap<>();
-	int currentValue = -1;
+import java.util.HashMap;
 
-	public StarSignAnswer(QuestHelper questHelper)
-	{
-		super(questHelper, NpcID.OBSERVATORY_PROFESSOR, new WorldPoint(2440, 3159,
-			1), "Tell the professor the constellation you observed.");
-		starSign.put(0, "Aquarius");
-		starSign.put(1, "Capricorn");
-		starSign.put(2, "Sagittarius");
-		starSign.put(3, "Scorpio");
-		starSign.put(4, "Libra");
-		starSign.put(5, "Virgo");
-		starSign.put(6, "Leo");
-		starSign.put(7, "Cancer");
-		starSign.put(8, "Gemini");
-		starSign.put(9, "Taurus");
-		starSign.put(10, "Aries");
-		starSign.put(11, "Pisces");
-	}
+public class StarSignAnswer extends NpcStep {
+    HashMap<Integer, String> starSign = new HashMap<>();
+    int currentValue = -1;
 
-	@Override
-	public void startUp()
-	{
-		super.startUp();
-		updateCorrectChoice();
-	}
+    public StarSignAnswer(QuestHelper questHelper) {
+        super(questHelper, NpcID.OBSERVATORY_PROFESSOR, new WorldPoint(2440, 3159,
+                1), "Tell the professor the constellation you observed.");
+        starSign.put(0, "Aquarius");
+        starSign.put(1, "Capricorn");
+        starSign.put(2, "Sagittarius");
+        starSign.put(3, "Scorpio");
+        starSign.put(4, "Libra");
+        starSign.put(5, "Virgo");
+        starSign.put(6, "Leo");
+        starSign.put(7, "Cancer");
+        starSign.put(8, "Gemini");
+        starSign.put(9, "Taurus");
+        starSign.put(10, "Aries");
+        starSign.put(11, "Pisces");
+    }
 
-	@Override
-	public void onVarbitChanged(VarbitChanged varbitChanged)
-	{
-		super.onVarbitChanged(varbitChanged);
-		updateCorrectChoice();
-	}
+    @Override
+    public void startUp() {
+        super.startUp();
+        updateCorrectChoice();
+    }
 
-	private void updateCorrectChoice()
-	{
-		addDialogSteps("Talk about the Observatory quest.");
-		int currentStep = client.getVarpValue(QuestVarPlayer.QUEST_OBSERVATORY_QUEST.getId());
-		if (currentStep < 2)
-		{
-			return;
-		}
+    @Override
+    public void onVarbitChanged(VarbitChanged varbitChanged) {
+        super.onVarbitChanged(varbitChanged);
+        updateCorrectChoice();
+    }
 
-		int newValue = client.getVarbitValue(3828);
-		if (currentValue != newValue)
-		{
-			currentValue = newValue;
-			String constellation = starSign.get(newValue);
-			setText("Tell the professor you observed " + constellation + ".");
-			addDialogStep(constellation);
-		}
+    private void updateCorrectChoice() {
+        addDialogSteps("Talk about the Observatory quest.");
+        int currentStep = client.getVarpValue(QuestVarPlayer.QUEST_OBSERVATORY_QUEST.getId());
+        if (currentStep < 2) {
+            return;
+        }
 
-	}
+        int newValue = client.getVarbitValue(3828);
+        if (currentValue != newValue) {
+            currentValue = newValue;
+            String constellation = starSign.get(newValue);
+            setText("Tell the professor you observed " + constellation + ".");
+            addDialogStep(constellation);
+        }
+
+    }
 }

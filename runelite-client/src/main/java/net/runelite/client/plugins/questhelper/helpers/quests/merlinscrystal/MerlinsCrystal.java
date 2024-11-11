@@ -24,335 +24,316 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.merlinscrystal;
 
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
-import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
-import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import net.runelite.client.plugins.questhelper.rewards.ItemReward;
-import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.conditional.NpcCondition;
+import net.runelite.client.plugins.questhelper.requirements.conditional.ObjectCondition;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.rewards.ItemReward;
+import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
+import net.runelite.client.plugins.questhelper.steps.*;
 
-public class MerlinsCrystal extends BasicQuestHelper
-{
-	//Items Required
-	ItemRequirement bread, tinderbox, bucketOfWax, batBones, combatGear, bucket, repellent, blackCandle,
-		litBlackCandle, excalibur, batBonesOptional, bucketOfWaxOptional, equippedExcalibur;
+import java.util.*;
 
-	//Items Recommended
-	ItemRequirement varrockTeleport, camelotTeleport, twoFaladorTeleports;
+public class MerlinsCrystal extends BasicQuestHelper {
+    //Items Required
+    ItemRequirement bread, tinderbox, bucketOfWax, batBones, combatGear, bucket, repellent, blackCandle,
+            litBlackCandle, excalibur, batBonesOptional, bucketOfWaxOptional, equippedExcalibur;
 
-	Requirement inFaye, inFayeGround, inFaye1, inFaye2, inCamelot1, inCamelot2, morganNearby, clearedHive,
-		hasAnyBlackCandle, beggarNearby, talkedToLady, hasReadSpell, inCamelot, inStar, thrantaxNearby, inCamelotTower1, inCamelotTower2;
+    //Items Recommended
+    ItemRequirement varrockTeleport, camelotTeleport, twoFaladorTeleports;
 
-	QuestStep startQuest, talkToGawain, goUpstairsInCamelot, talkToLancelot, goBackDownStairsCamelot, hideInArheinCrate, goToFirstFloor, goToSecondFloor,
-		attackMordred, talkToMorgan, goToCatherbyAfterFortress, optionalGetRepellent, optionalGetBucket, optionalUseRepellent, talkToCandleMaker, talkToLadyOfLake,
-		enterSarimShopAndTalk, talkToBeggar, goReadMagicWords, returnToCamelot, returnToCamelotLit, goStandInStar, lightCandle, dropBatBones, sayWords,
-		goUpLadder1Camelot, goUpLadder2Camelot, smashCrystal, goDownLadder1Camelot, goDownLadder2Camelot, finishQuest;
+    Requirement inFaye, inFayeGround, inFaye1, inFaye2, inCamelot1, inCamelot2, morganNearby, clearedHive,
+            hasAnyBlackCandle, beggarNearby, talkedToLady, hasReadSpell, inCamelot, inStar, thrantaxNearby, inCamelotTower1, inCamelotTower2;
 
-	ConditionalStep getBlackCandle, getExcalibur;
+    QuestStep startQuest, talkToGawain, goUpstairsInCamelot, talkToLancelot, goBackDownStairsCamelot, hideInArheinCrate, goToFirstFloor, goToSecondFloor,
+            attackMordred, talkToMorgan, goToCatherbyAfterFortress, optionalGetRepellent, optionalGetBucket, optionalUseRepellent, talkToCandleMaker, talkToLadyOfLake,
+            enterSarimShopAndTalk, talkToBeggar, goReadMagicWords, returnToCamelot, returnToCamelotLit, goStandInStar, lightCandle, dropBatBones, sayWords,
+            goUpLadder1Camelot, goUpLadder2Camelot, smashCrystal, goDownLadder1Camelot, goDownLadder2Camelot, finishQuest;
 
-	//Zones
-	Zone fayeGround, faye1, faye2, camelotGround1, camelotGround2, camelotGround3, camelot1, camelot2, star, camelotTower1, camelotTower2;
+    ConditionalStep getBlackCandle, getExcalibur;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    //Zones
+    Zone fayeGround, faye1, faye2, camelotGround1, camelotGround2, camelotGround3, camelot1, camelot2, star, camelotTower1, camelotTower2;
 
-		steps.put(0, startQuest);
-		steps.put(1, talkToGawain);
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupConditions();
+        setupSteps();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		ConditionalStep findLancelot = new ConditionalStep(this, goUpstairsInCamelot);
-		findLancelot.addStep(inCamelot1, talkToLancelot);
+        steps.put(0, startQuest);
+        steps.put(1, talkToGawain);
 
-		steps.put(2, findLancelot);
+        ConditionalStep findLancelot = new ConditionalStep(this, goUpstairsInCamelot);
+        findLancelot.addStep(inCamelot1, talkToLancelot);
 
-		ConditionalStep discoverHowToFreeMerlin = new ConditionalStep(this, hideInArheinCrate);
-		discoverHowToFreeMerlin.addStep(new Conditions(inFaye2, morganNearby), talkToMorgan);
-		discoverHowToFreeMerlin.addStep(inFaye2, attackMordred);
-		discoverHowToFreeMerlin.addStep(inFaye1, goToSecondFloor);
-		discoverHowToFreeMerlin.addStep(inFayeGround, goToFirstFloor);
-		discoverHowToFreeMerlin.addStep(inCamelot1, goBackDownStairsCamelot);
+        steps.put(2, findLancelot);
 
-		steps.put(3, discoverHowToFreeMerlin);
+        ConditionalStep discoverHowToFreeMerlin = new ConditionalStep(this, hideInArheinCrate);
+        discoverHowToFreeMerlin.addStep(new Conditions(inFaye2, morganNearby), talkToMorgan);
+        discoverHowToFreeMerlin.addStep(inFaye2, attackMordred);
+        discoverHowToFreeMerlin.addStep(inFaye1, goToSecondFloor);
+        discoverHowToFreeMerlin.addStep(inFayeGround, goToFirstFloor);
+        discoverHowToFreeMerlin.addStep(inCamelot1, goBackDownStairsCamelot);
 
-		getBlackCandle = new ConditionalStep(this, optionalGetRepellent);
-		getBlackCandle.addStep(inFaye, goToCatherbyAfterFortress);
-		getBlackCandle.addStep(bucketOfWax, talkToCandleMaker);
-		getBlackCandle.addStep(new Conditions(repellent, bucket), optionalUseRepellent);
-		getBlackCandle.addStep(repellent, optionalGetBucket);
-		getBlackCandle.setLockingCondition(hasAnyBlackCandle);
+        steps.put(3, discoverHowToFreeMerlin);
 
-		getExcalibur = new ConditionalStep(this, talkToLadyOfLake);
-		getExcalibur.addStep(beggarNearby, talkToBeggar);
-		getExcalibur.addStep(talkedToLady, enterSarimShopAndTalk);
-		getExcalibur.setLockingCondition(excalibur);
+        getBlackCandle = new ConditionalStep(this, optionalGetRepellent);
+        getBlackCandle.addStep(inFaye, goToCatherbyAfterFortress);
+        getBlackCandle.addStep(bucketOfWax, talkToCandleMaker);
+        getBlackCandle.addStep(new Conditions(repellent, bucket), optionalUseRepellent);
+        getBlackCandle.addStep(repellent, optionalGetBucket);
+        getBlackCandle.setLockingCondition(hasAnyBlackCandle);
 
-		ConditionalStep performSpell = new ConditionalStep(this, returnToCamelot);
-		performSpell.addStep(thrantaxNearby, sayWords);
-		performSpell.addStep(new Conditions(inStar, litBlackCandle), dropBatBones);
-		performSpell.addStep(inStar, lightCandle);
-		performSpell.addStep(inCamelot, goStandInStar);
-		performSpell.addStep(litBlackCandle, returnToCamelotLit);
+        getExcalibur = new ConditionalStep(this, talkToLadyOfLake);
+        getExcalibur.addStep(beggarNearby, talkToBeggar);
+        getExcalibur.addStep(talkedToLady, enterSarimShopAndTalk);
+        getExcalibur.setLockingCondition(excalibur);
 
-		ConditionalStep completeAllTasks = new ConditionalStep(this, getBlackCandle);
-		completeAllTasks.addStep(new Conditions(hasAnyBlackCandle, excalibur, hasReadSpell), performSpell);
-		completeAllTasks.addStep(new Conditions(hasAnyBlackCandle, excalibur), goReadMagicWords);
-		completeAllTasks.addStep(hasAnyBlackCandle, getExcalibur);
+        ConditionalStep performSpell = new ConditionalStep(this, returnToCamelot);
+        performSpell.addStep(thrantaxNearby, sayWords);
+        performSpell.addStep(new Conditions(inStar, litBlackCandle), dropBatBones);
+        performSpell.addStep(inStar, lightCandle);
+        performSpell.addStep(inCamelot, goStandInStar);
+        performSpell.addStep(litBlackCandle, returnToCamelotLit);
 
-		steps.put(4, completeAllTasks);
+        ConditionalStep completeAllTasks = new ConditionalStep(this, getBlackCandle);
+        completeAllTasks.addStep(new Conditions(hasAnyBlackCandle, excalibur, hasReadSpell), performSpell);
+        completeAllTasks.addStep(new Conditions(hasAnyBlackCandle, excalibur), goReadMagicWords);
+        completeAllTasks.addStep(hasAnyBlackCandle, getExcalibur);
 
-		ConditionalStep goFreeMerlin = new ConditionalStep(this, goUpLadder1Camelot);
-		goFreeMerlin.addStep(inCamelotTower2, smashCrystal);
-		goFreeMerlin.addStep(inCamelotTower1, goUpLadder2Camelot);
+        steps.put(4, completeAllTasks);
 
-		steps.put(5, goFreeMerlin);
+        ConditionalStep goFreeMerlin = new ConditionalStep(this, goUpLadder1Camelot);
+        goFreeMerlin.addStep(inCamelotTower2, smashCrystal);
+        goFreeMerlin.addStep(inCamelotTower1, goUpLadder2Camelot);
 
-		ConditionalStep goTellArthur = new ConditionalStep(this, finishQuest);
-		goTellArthur.addStep(inCamelotTower1, goDownLadder1Camelot);
-		goTellArthur.addStep(inCamelotTower2, goDownLadder2Camelot);
+        steps.put(5, goFreeMerlin);
 
-		steps.put(6, goTellArthur);
+        ConditionalStep goTellArthur = new ConditionalStep(this, finishQuest);
+        goTellArthur.addStep(inCamelotTower1, goDownLadder1Camelot);
+        goTellArthur.addStep(inCamelotTower2, goDownLadder2Camelot);
 
-		return steps;
-	}
+        steps.put(6, goTellArthur);
 
-	@Override
-	protected void setupRequirements()
-	{
-		bread = new ItemRequirement("Bread", ItemID.BREAD);
-		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).isNotConsumed();
-		bucketOfWaxOptional = new ItemRequirement("Bucket of wax", ItemID.BUCKET_OF_WAX);
-		bucketOfWaxOptional.canBeObtainedDuringQuest();
-		bucketOfWax = new ItemRequirement("Bucket of wax", ItemID.BUCKET_OF_WAX);
-		batBones = new ItemRequirement("Bat bones", ItemID.BAT_BONES);
-		batBonesOptional = new ItemRequirement("Bat bones", ItemID.BAT_BONES);
-		batBonesOptional.canBeObtainedDuringQuest();
-		varrockTeleport = new ItemRequirement("Teleport to Varrock", ItemID.VARROCK_TELEPORT);
-		camelotTeleport = new ItemRequirement("Teleport to Camelot", ItemID.CAMELOT_TELEPORT);
-		twoFaladorTeleports = new ItemRequirement("Teleports to Falador", ItemID.FALADOR_TELEPORT, 2);
-		combatGear = new ItemRequirement("Combat gear + food for Sir Mordred (level 39)", -1, -1).isNotConsumed();
-		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
-		bucket = new ItemRequirement("Bucket", ItemID.BUCKET);
-		repellent = new ItemRequirement("Insect repellent", ItemID.INSECT_REPELLENT).isNotConsumed();
-		blackCandle = new ItemRequirement("Black candle", ItemID.BLACK_CANDLE);
-		litBlackCandle = new ItemRequirement("Lit black candle", ItemID.LIT_BLACK_CANDLE);
-		excalibur = new ItemRequirement("Excalibur", ItemID.EXCALIBUR).isNotConsumed();
-		equippedExcalibur = excalibur.equipped();
-	}
+        return steps;
+    }
 
-	@Override
-	protected void setupZones()
-	{
-		fayeGround = new Zone(new WorldPoint(2764, 3395, 0), new WorldPoint(2781, 3410, 0));
-		faye1 = new Zone(new WorldPoint(2764, 3395, 1), new WorldPoint(2781, 3410, 1));
-		faye2 = new Zone(new WorldPoint(2764, 3395, 2), new WorldPoint(2781, 3410, 2));
-		camelot1 = new Zone(new WorldPoint(2744, 3483, 1), new WorldPoint(2769, 3517, 1));
-		camelot2 = new Zone(new WorldPoint(2744, 3483, 2), new WorldPoint(2769, 3517, 2));
-		camelotGround1 = new Zone(new WorldPoint(2744, 3483, 0), new WorldPoint(2774, 3517, 0));
-		camelotGround2 = new Zone(new WorldPoint(2775, 3511, 0), new WorldPoint(2783, 3517, 0));
-		camelotGround3 = new Zone(new WorldPoint(2774, 3505, 0), new WorldPoint(2776, 3511, 0));
-		star = new Zone(new WorldPoint(2780, 3515, 0), new WorldPoint(2780, 3515, 0));
-		camelotTower1 = new Zone(new WorldPoint(2765, 3490, 1), new WorldPoint(2770, 3495, 1));
-		camelotTower2 = new Zone(new WorldPoint(2765, 3490, 2), new WorldPoint(2770, 3494, 2));
-	}
+    @Override
+    protected void setupRequirements() {
+        bread = new ItemRequirement("Bread", ItemID.BREAD);
+        tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).isNotConsumed();
+        bucketOfWaxOptional = new ItemRequirement("Bucket of wax", ItemID.BUCKET_OF_WAX);
+        bucketOfWaxOptional.canBeObtainedDuringQuest();
+        bucketOfWax = new ItemRequirement("Bucket of wax", ItemID.BUCKET_OF_WAX);
+        batBones = new ItemRequirement("Bat bones", ItemID.BAT_BONES);
+        batBonesOptional = new ItemRequirement("Bat bones", ItemID.BAT_BONES);
+        batBonesOptional.canBeObtainedDuringQuest();
+        varrockTeleport = new ItemRequirement("Teleport to Varrock", ItemID.VARROCK_TELEPORT);
+        camelotTeleport = new ItemRequirement("Teleport to Camelot", ItemID.CAMELOT_TELEPORT);
+        twoFaladorTeleports = new ItemRequirement("Teleports to Falador", ItemID.FALADOR_TELEPORT, 2);
+        combatGear = new ItemRequirement("Combat gear + food for Sir Mordred (level 39)", -1, -1).isNotConsumed();
+        combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
+        bucket = new ItemRequirement("Bucket", ItemID.BUCKET);
+        repellent = new ItemRequirement("Insect repellent", ItemID.INSECT_REPELLENT).isNotConsumed();
+        blackCandle = new ItemRequirement("Black candle", ItemID.BLACK_CANDLE);
+        litBlackCandle = new ItemRequirement("Lit black candle", ItemID.LIT_BLACK_CANDLE);
+        excalibur = new ItemRequirement("Excalibur", ItemID.EXCALIBUR).isNotConsumed();
+        equippedExcalibur = excalibur.equipped();
+    }
 
-	public void setupConditions()
-	{
-		inFaye = new ZoneRequirement(faye1, fayeGround, faye2);
-		inFayeGround = new ZoneRequirement(fayeGround);
-		inFaye1 = new ZoneRequirement(faye1);
-		inFaye2 = new ZoneRequirement(faye2);
-		inCamelot = new ZoneRequirement(camelotGround1, camelotGround2, camelotGround3);
-		inCamelot1 = new ZoneRequirement(camelot1);
-		inCamelot2 = new ZoneRequirement(camelot2);
-		morganNearby = new NpcCondition(NpcID.MORGAN_LE_FAYE);
-		clearedHive = new ObjectCondition(ObjectID.BEEHIVE_305);
-		hasAnyBlackCandle = new Conditions(LogicType.OR, blackCandle, litBlackCandle);
-		beggarNearby = new NpcCondition(NpcID.BEGGAR);
-		talkedToLady = new Conditions(true, new DialogRequirement(questHelperPlugin.getPlayerStateManager().getPlayerName(), "Ok. That seems easy enough.", false));
-		hasReadSpell = new Conditions(true, LogicType.AND, new WidgetTextRequirement(229, 1, "You find a small inscription"));
-		inStar = new ZoneRequirement(star);
-		thrantaxNearby = new NpcCondition(NpcID.THRANTAX_THE_MIGHTY);
-		inCamelotTower1 = new ZoneRequirement(camelotTower1);
-		inCamelotTower2 = new ZoneRequirement(camelotTower2);
-	}
+    @Override
+    protected void setupZones() {
+        fayeGround = new Zone(new WorldPoint(2764, 3395, 0), new WorldPoint(2781, 3410, 0));
+        faye1 = new Zone(new WorldPoint(2764, 3395, 1), new WorldPoint(2781, 3410, 1));
+        faye2 = new Zone(new WorldPoint(2764, 3395, 2), new WorldPoint(2781, 3410, 2));
+        camelot1 = new Zone(new WorldPoint(2744, 3483, 1), new WorldPoint(2769, 3517, 1));
+        camelot2 = new Zone(new WorldPoint(2744, 3483, 2), new WorldPoint(2769, 3517, 2));
+        camelotGround1 = new Zone(new WorldPoint(2744, 3483, 0), new WorldPoint(2774, 3517, 0));
+        camelotGround2 = new Zone(new WorldPoint(2775, 3511, 0), new WorldPoint(2783, 3517, 0));
+        camelotGround3 = new Zone(new WorldPoint(2774, 3505, 0), new WorldPoint(2776, 3511, 0));
+        star = new Zone(new WorldPoint(2780, 3515, 0), new WorldPoint(2780, 3515, 0));
+        camelotTower1 = new Zone(new WorldPoint(2765, 3490, 1), new WorldPoint(2770, 3495, 1));
+        camelotTower2 = new Zone(new WorldPoint(2765, 3490, 2), new WorldPoint(2770, 3494, 2));
+    }
 
-	public void setupSteps()
-	{
-		startQuest = new NpcStep(this, NpcID.KING_ARTHUR, new WorldPoint(2763, 3513, 0), "Talk to King Arthur in Camelot Castle to start.");
-		startQuest.addDialogStep("Yes.");
-		startQuest.addDialogStep("I want to become a Knight of the Round Table!");
-		talkToGawain = new NpcStep(this, NpcID.SIR_GAWAIN, new WorldPoint(2758, 3504, 0), "Talk to Sir Gawain about how Merlin got trapped.");
-		talkToGawain.addDialogStep("Do you know how Merlin got trapped?");
+    public void setupConditions() {
+        inFaye = new ZoneRequirement(faye1, fayeGround, faye2);
+        inFayeGround = new ZoneRequirement(fayeGround);
+        inFaye1 = new ZoneRequirement(faye1);
+        inFaye2 = new ZoneRequirement(faye2);
+        inCamelot = new ZoneRequirement(camelotGround1, camelotGround2, camelotGround3);
+        inCamelot1 = new ZoneRequirement(camelot1);
+        inCamelot2 = new ZoneRequirement(camelot2);
+        morganNearby = new NpcCondition(NpcID.MORGAN_LE_FAYE);
+        clearedHive = new ObjectCondition(ObjectID.BEEHIVE_305);
+        hasAnyBlackCandle = new Conditions(LogicType.OR, blackCandle, litBlackCandle);
+        beggarNearby = new NpcCondition(NpcID.BEGGAR);
+        talkedToLady = new Conditions(true, new DialogRequirement(questHelperPlugin.getPlayerStateManager().getPlayerName(), "Ok. That seems easy enough.", false));
+        hasReadSpell = new Conditions(true, LogicType.AND, new WidgetTextRequirement(229, 1, "You find a small inscription"));
+        inStar = new ZoneRequirement(star);
+        thrantaxNearby = new NpcCondition(NpcID.THRANTAX_THE_MIGHTY);
+        inCamelotTower1 = new ZoneRequirement(camelotTower1);
+        inCamelotTower2 = new ZoneRequirement(camelotTower2);
+    }
 
-		goUpstairsInCamelot = new ObjectStep(this, ObjectID.STAIRCASE_26106, new WorldPoint(2751, 3511, 0), "Go upstairs to talk to Lancelot.");
+    public void setupSteps() {
+        startQuest = new NpcStep(this, NpcID.KING_ARTHUR, new WorldPoint(2763, 3513, 0), "Talk to King Arthur in Camelot Castle to start.");
+        startQuest.addDialogStep("Yes.");
+        startQuest.addDialogStep("I want to become a Knight of the Round Table!");
+        talkToGawain = new NpcStep(this, NpcID.SIR_GAWAIN, new WorldPoint(2758, 3504, 0), "Talk to Sir Gawain about how Merlin got trapped.");
+        talkToGawain.addDialogStep("Do you know how Merlin got trapped?");
 
-		talkToLancelot = new NpcStep(this, NpcID.SIR_LANCELOT, new WorldPoint(2760, 3511, 1), "Talk to Sir Lancelot about getting into Morgan Le Faye's stronghold.");
-		talkToLancelot.addDialogStep("Any ideas on how to get into Morgan Le Faye's stronghold?");
-		talkToLancelot.addDialogStep("Thank you for the information.");
+        goUpstairsInCamelot = new ObjectStep(this, ObjectID.STAIRCASE_26106, new WorldPoint(2751, 3511, 0), "Go upstairs to talk to Lancelot.");
 
-		goBackDownStairsCamelot = new ObjectStep(this, ObjectID.STAIRCASE_25604, new WorldPoint(2751, 3512, 1), "Hide in Arhein's crate behind the Candle Maker's shop in Catherby.");
+        talkToLancelot = new NpcStep(this, NpcID.SIR_LANCELOT, new WorldPoint(2760, 3511, 1), "Talk to Sir Lancelot about getting into Morgan Le Faye's stronghold.");
+        talkToLancelot.addDialogStep("Any ideas on how to get into Morgan Le Faye's stronghold?");
+        talkToLancelot.addDialogStep("Thank you for the information.");
 
-		hideInArheinCrate = new ObjectStep(this, ObjectID.CRATE_63, new WorldPoint(2801, 3442, 0), "Hide in Arhein's crate behind the Candle Maker's shop in Catherby.");
-		hideInArheinCrate.addSubSteps(goBackDownStairsCamelot);
-		hideInArheinCrate.addDialogStep("Yes.");
+        goBackDownStairsCamelot = new ObjectStep(this, ObjectID.STAIRCASE_25604, new WorldPoint(2751, 3512, 1), "Hide in Arhein's crate behind the Candle Maker's shop in Catherby.");
 
-		goToFirstFloor = new ObjectStep(this, ObjectID.STAIRCASE_15645, new WorldPoint(2770, 3405, 0), "Go up the stairs in the fortress.");
-		goToSecondFloor = new ObjectStep(this, ObjectID.STAIRCASE_15645, new WorldPoint(2770, 3399, 1), "Go up another floor.");
-		attackMordred = new NpcStep(this, NpcID.SIR_MORDRED, new WorldPoint(2770, 3403, 2), "Attack Sir Mordred down to 0hp to cause Morgan Le Faye to spawn.");
-		attackMordred.addDialogStep("Tell me how to untrap Merlin and I might.");
-		attackMordred.addDialogStep("Ok I will do all that.");
-		talkToMorgan = new DetailedQuestStep(this, "Go through Morgan le Faye's dialog. IF YOU EXIT FROM THIS DIALOG YOU WILL HAVE TO FIGHT MORDRED AGAIN.");
-		talkToMorgan.addDialogStep("Tell me how to untrap Merlin and I might.");
-		talkToMorgan.addDialogStep("Ok I will do all that.");
+        hideInArheinCrate = new ObjectStep(this, ObjectID.CRATE_63, new WorldPoint(2801, 3442, 0), "Hide in Arhein's crate behind the Candle Maker's shop in Catherby.");
+        hideInArheinCrate.addSubSteps(goBackDownStairsCamelot);
+        hideInArheinCrate.addDialogStep("Yes.");
 
-		goToCatherbyAfterFortress = new DetailedQuestStep(this, "Return to Catherby. If you still need bat bones, you can kill one of the bats just outside the fortress.");
-		optionalGetRepellent = new DetailedQuestStep(this, new WorldPoint(2807, 3450, 0), "If you still need wax, go grab the insect repellent in a house in north Catherby. Otherwise, get your wax out.", repellent);
-		optionalGetBucket = new DetailedQuestStep(this, new WorldPoint(2766, 3441, 0), "Go grab the bucket in the bee field west of Catherby.", bucket);
+        goToFirstFloor = new ObjectStep(this, ObjectID.STAIRCASE_15645, new WorldPoint(2770, 3405, 0), "Go up the stairs in the fortress.");
+        goToSecondFloor = new ObjectStep(this, ObjectID.STAIRCASE_15645, new WorldPoint(2770, 3399, 1), "Go up another floor.");
+        attackMordred = new NpcStep(this, NpcID.SIR_MORDRED, new WorldPoint(2770, 3403, 2), "Attack Sir Mordred down to 0hp to cause Morgan Le Faye to spawn.");
+        attackMordred.addDialogStep("Tell me how to untrap Merlin and I might.");
+        attackMordred.addDialogStep("Ok I will do all that.");
+        talkToMorgan = new DetailedQuestStep(this, "Go through Morgan le Faye's dialog. IF YOU EXIT FROM THIS DIALOG YOU WILL HAVE TO FIGHT MORDRED AGAIN.");
+        talkToMorgan.addDialogStep("Tell me how to untrap Merlin and I might.");
+        talkToMorgan.addDialogStep("Ok I will do all that.");
 
-		optionalUseRepellent = new ObjectStep(this, ObjectID.BEEHIVE, new WorldPoint(2762, 3443, 0), "Use the insect repellent on a bee hive, then try to take some wax.", bucket, repellent.highlighted());
-		talkToCandleMaker = new NpcStep(this, NpcID.CANDLE_MAKER, new WorldPoint(2797, 3440, 0), "Talk to the Candle Maker in Catherby twice until he gives you a black candle.", bucketOfWax);
-		talkToCandleMaker.addDialogStep("Have you got any black candles?");
+        goToCatherbyAfterFortress = new DetailedQuestStep(this, "Return to Catherby. If you still need bat bones, you can kill one of the bats just outside the fortress.");
+        optionalGetRepellent = new DetailedQuestStep(this, new WorldPoint(2807, 3450, 0), "If you still need wax, go grab the insect repellent in a house in north Catherby. Otherwise, get your wax out.", repellent);
+        optionalGetBucket = new DetailedQuestStep(this, new WorldPoint(2766, 3441, 0), "Go grab the bucket in the bee field west of Catherby.", bucket);
 
-		talkToLadyOfLake = new NpcStep(this, NpcID.THE_LADY_OF_THE_LAKE, new WorldPoint(2924, 3404, 0), "Talk to the Lady of the Lake in Taverley.");
-		talkToLadyOfLake.addDialogStep("I seek the sword Excalibur.");
-		talkToLadyOfLake.setLockingCondition(talkedToLady);
+        optionalUseRepellent = new ObjectStep(this, ObjectID.BEEHIVE, new WorldPoint(2762, 3443, 0), "Use the insect repellent on a bee hive, then try to take some wax.", bucket, repellent.highlighted());
+        talkToCandleMaker = new NpcStep(this, NpcID.CANDLE_MAKER, new WorldPoint(2797, 3440, 0), "Talk to the Candle Maker in Catherby twice until he gives you a black candle.", bucketOfWax);
+        talkToCandleMaker.addDialogStep("Have you got any black candles?");
 
-		enterSarimShopAndTalk = new ObjectStep(this, ObjectID.DOOR_59, new WorldPoint(3016, 3246, 0), "Attempt to enter the jewelery store in Port Sarim.", bread);
-		enterSarimShopAndTalk.addDialogStep("Yes certainly.");
-		talkToBeggar = new ObjectStep(this, ObjectID.DOOR_59, new WorldPoint(3016, 3246, 0), "Talk to the beggar who appears and give him some bread.", bread);
-		talkToBeggar.addDialogStep("Yes certainly.");
+        talkToLadyOfLake = new NpcStep(this, NpcID.THE_LADY_OF_THE_LAKE, new WorldPoint(2924, 3404, 0), "Talk to the Lady of the Lake in Taverley.");
+        talkToLadyOfLake.addDialogStep("I seek the sword Excalibur.");
+        talkToLadyOfLake.setLockingCondition(talkedToLady);
 
-		goReadMagicWords = new ObjectStep(this, ObjectID.CHAOS_ALTAR, new WorldPoint(3260, 3381, 0), "Check the altar in the Zamorak Temple in south east Varrock. If you've already learnt the spell, just mark this step complete in the Quest Helper sidebar.");
-		goReadMagicWords.setLockingCondition(hasReadSpell);
+        enterSarimShopAndTalk = new ObjectStep(this, ObjectID.DOOR_59, new WorldPoint(3016, 3246, 0), "Attempt to enter the jewelery store in Port Sarim.", bread);
+        enterSarimShopAndTalk.addDialogStep("Yes certainly.");
+        talkToBeggar = new ObjectStep(this, ObjectID.DOOR_59, new WorldPoint(3016, 3246, 0), "Talk to the beggar who appears and give him some bread.", bread);
+        talkToBeggar.addDialogStep("Yes certainly.");
 
-		returnToCamelot = new ObjectStep(this, ObjectID.GATE_26082, new WorldPoint(2758, 3482, 0), "Return to Camelot", excalibur, blackCandle, batBones, tinderbox);
-		returnToCamelotLit = new ObjectStep(this, ObjectID.GATE_26082, new WorldPoint(2758, 3482, 0), "Return to Camelot", excalibur, litBlackCandle, batBones);
+        goReadMagicWords = new ObjectStep(this, ObjectID.CHAOS_ALTAR, new WorldPoint(3260, 3381, 0), "Check the altar in the Zamorak Temple in south east Varrock. If you've already learnt the spell, just mark this step complete in the Quest Helper sidebar.");
+        goReadMagicWords.setLockingCondition(hasReadSpell);
 
-		goStandInStar = new DetailedQuestStep(this, new WorldPoint(2780, 3515, 0), "Go stand in the star symbol north east of Camelot Castle.");
-		goStandInStar.addDialogStep("Snarthon Candtrick Termanto");
+        returnToCamelot = new ObjectStep(this, ObjectID.GATE_26082, new WorldPoint(2758, 3482, 0), "Return to Camelot", excalibur, blackCandle, batBones, tinderbox);
+        returnToCamelotLit = new ObjectStep(this, ObjectID.GATE_26082, new WorldPoint(2758, 3482, 0), "Return to Camelot", excalibur, litBlackCandle, batBones);
 
-		lightCandle = new DetailedQuestStep(this, "Light the Black candle with your tinderbox.", blackCandle.highlighted(), tinderbox.highlighted());
-		dropBatBones = new DetailedQuestStep(this, "Right-click drop the bat bones in the star.", batBones.highlighted(), excalibur, litBlackCandle);
-		dropBatBones.addDialogStep("Snarthon Candtrick Termanto");
-		sayWords = new DetailedQuestStep(this, "Say the spell 'Snarthon Candtrick Termanto'. Be careful not to click the wrong option or you'll have to get another Black Candle.", excalibur);
-		sayWords.addDialogStep("Snarthon Candtrick Termanto");
+        goStandInStar = new DetailedQuestStep(this, new WorldPoint(2780, 3515, 0), "Go stand in the star symbol north east of Camelot Castle.");
+        goStandInStar.addDialogStep("Snarthon Candtrick Termanto");
 
-		goUpLadder1Camelot = new ObjectStep(this, ObjectID.LADDER_26107, new WorldPoint(2769, 3493, 0), "Go up the ladder in the south east of Camelot castle.", equippedExcalibur);
-		goUpLadder2Camelot = new ObjectStep(this, ObjectID.LADDER_26107, new WorldPoint(2767, 3491, 1), "Go up the next ladder.", equippedExcalibur);
+        lightCandle = new DetailedQuestStep(this, "Light the Black candle with your tinderbox.", blackCandle.highlighted(), tinderbox.highlighted());
+        dropBatBones = new DetailedQuestStep(this, "Right-click drop the bat bones in the star.", batBones.highlighted(), excalibur, litBlackCandle);
+        dropBatBones.addDialogStep("Snarthon Candtrick Termanto");
+        sayWords = new DetailedQuestStep(this, "Say the spell 'Snarthon Candtrick Termanto'. Be careful not to click the wrong option or you'll have to get another Black Candle.", excalibur);
+        sayWords.addDialogStep("Snarthon Candtrick Termanto");
 
-		smashCrystal = new ObjectStep(this, ObjectID.GIANT_CRYSTAL, new WorldPoint(2768, 3494, 2), "Smash the Giant Crystal with Excalibur equipped.", equippedExcalibur);
+        goUpLadder1Camelot = new ObjectStep(this, ObjectID.LADDER_26107, new WorldPoint(2769, 3493, 0), "Go up the ladder in the south east of Camelot castle.", equippedExcalibur);
+        goUpLadder2Camelot = new ObjectStep(this, ObjectID.LADDER_26107, new WorldPoint(2767, 3491, 1), "Go up the next ladder.", equippedExcalibur);
 
-		goDownLadder1Camelot = new ObjectStep(this, ObjectID.LADDER_25606, new WorldPoint(2769, 3493, 1), "Tell King Arthur you've freed Merlin.");
-		goDownLadder2Camelot = new ObjectStep(this, ObjectID.LADDER_25606, new WorldPoint(2767, 3491, 2), "Tell King Arthur you've freed Merlin.");
+        smashCrystal = new ObjectStep(this, ObjectID.GIANT_CRYSTAL, new WorldPoint(2768, 3494, 2), "Smash the Giant Crystal with Excalibur equipped.", equippedExcalibur);
 
-		finishQuest = new NpcStep(this, NpcID.KING_ARTHUR, new WorldPoint(2763, 3513, 0), "Tell King Arthur you've freed Merlin.");
-		finishQuest.addSubSteps(goDownLadder1Camelot, goDownLadder2Camelot);
-	}
+        goDownLadder1Camelot = new ObjectStep(this, ObjectID.LADDER_25606, new WorldPoint(2769, 3493, 1), "Tell King Arthur you've freed Merlin.");
+        goDownLadder2Camelot = new ObjectStep(this, ObjectID.LADDER_25606, new WorldPoint(2767, 3491, 2), "Tell King Arthur you've freed Merlin.");
 
-	@Override
-	public List<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Sir Mordred (level 39)");
-		return reqs;
-	}
+        finishQuest = new NpcStep(this, NpcID.KING_ARTHUR, new WorldPoint(2763, 3513, 0), "Tell King Arthur you've freed Merlin.");
+        finishQuest.addSubSteps(goDownLadder1Camelot, goDownLadder2Camelot);
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(combatGear);
-		reqs.add(bread);
-		reqs.add(tinderbox);
-		reqs.add(bucketOfWaxOptional);
-		reqs.add(batBonesOptional);
-		return reqs;
-	}
+    @Override
+    public List<String> getCombatRequirements() {
+        ArrayList<String> reqs = new ArrayList<>();
+        reqs.add("Sir Mordred (level 39)");
+        return reqs;
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRecommended()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(varrockTeleport);
-		reqs.add(camelotTeleport);
-		reqs.add(twoFaladorTeleports);
-		return reqs;
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(combatGear);
+        reqs.add(bread);
+        reqs.add(tinderbox);
+        reqs.add(bucketOfWaxOptional);
+        reqs.add(batBonesOptional);
+        return reqs;
+    }
 
-	@Override
-	public QuestPointReward getQuestPointReward()
-	{
-		return new QuestPointReward(6);
-	}
+    @Override
+    public List<ItemRequirement> getItemRecommended() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(varrockTeleport);
+        reqs.add(camelotTeleport);
+        reqs.add(twoFaladorTeleports);
+        return reqs;
+    }
 
-	@Override
-	public List<ItemReward> getItemRewards()
-	{
-		return Collections.singletonList(new ItemReward("Excalibur", ItemID.EXCALIBUR, 1));
-	}
+    @Override
+    public QuestPointReward getQuestPointReward() {
+        return new QuestPointReward(6);
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off", Arrays.asList(startQuest, talkToGawain, goUpstairsInCamelot, talkToLancelot)));
-		allSteps.add(new PanelDetails("Infiltrate the fortress", Arrays.asList(hideInArheinCrate, goToFirstFloor, goToSecondFloor, attackMordred, talkToMorgan), combatGear));
-		PanelDetails getBlackCandlePanel = new PanelDetails("Get a Black Candle",
-			Arrays.asList(goToCatherbyAfterFortress, optionalGetRepellent, optionalGetBucket, optionalUseRepellent, talkToCandleMaker));
-		getBlackCandlePanel.setLockingStep(getBlackCandle);
-		getBlackCandlePanel.setVars(4);
+    @Override
+    public List<ItemReward> getItemRewards() {
+        return Collections.singletonList(new ItemReward("Excalibur", ItemID.EXCALIBUR, 1));
+    }
 
-		allSteps.add(getBlackCandlePanel);
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Starting off", Arrays.asList(startQuest, talkToGawain, goUpstairsInCamelot, talkToLancelot)));
+        allSteps.add(new PanelDetails("Infiltrate the fortress", Arrays.asList(hideInArheinCrate, goToFirstFloor, goToSecondFloor, attackMordred, talkToMorgan), combatGear));
+        PanelDetails getBlackCandlePanel = new PanelDetails("Get a Black Candle",
+                Arrays.asList(goToCatherbyAfterFortress, optionalGetRepellent, optionalGetBucket, optionalUseRepellent, talkToCandleMaker));
+        getBlackCandlePanel.setLockingStep(getBlackCandle);
+        getBlackCandlePanel.setVars(4);
 
-		PanelDetails getExcaliburPanel = new PanelDetails("Get Excalibur",
-			Arrays.asList(talkToLadyOfLake, enterSarimShopAndTalk, talkToBeggar), bread);
-		getExcaliburPanel.setLockingStep(getExcalibur);
-		getExcaliburPanel.setVars(4);
+        allSteps.add(getBlackCandlePanel);
 
-		allSteps.add(getExcaliburPanel);
+        PanelDetails getExcaliburPanel = new PanelDetails("Get Excalibur",
+                Arrays.asList(talkToLadyOfLake, enterSarimShopAndTalk, talkToBeggar), bread);
+        getExcaliburPanel.setLockingStep(getExcalibur);
+        getExcaliburPanel.setVars(4);
 
-		PanelDetails readMagicWordsPanel = new PanelDetails("Learn magic words",
-			Collections.singletonList(goReadMagicWords));
-		readMagicWordsPanel.setLockingStep(goReadMagicWords);
-		readMagicWordsPanel.setVars(4);
+        allSteps.add(getExcaliburPanel);
 
-		allSteps.add(readMagicWordsPanel);
+        PanelDetails readMagicWordsPanel = new PanelDetails("Learn magic words",
+                Collections.singletonList(goReadMagicWords));
+        readMagicWordsPanel.setLockingStep(goReadMagicWords);
+        readMagicWordsPanel.setVars(4);
 
-		PanelDetails performMagicPanel = new PanelDetails("Perform the spell",
-			Arrays.asList(returnToCamelot, goStandInStar, lightCandle, dropBatBones, sayWords), blackCandle, batBones, excalibur, tinderbox);
+        allSteps.add(readMagicWordsPanel);
 
-		allSteps.add(performMagicPanel);
+        PanelDetails performMagicPanel = new PanelDetails("Perform the spell",
+                Arrays.asList(returnToCamelot, goStandInStar, lightCandle, dropBatBones, sayWords), blackCandle, batBones, excalibur, tinderbox);
 
-		allSteps.add(new PanelDetails("Free Merlin", Arrays.asList(goUpLadder1Camelot, goUpLadder2Camelot, smashCrystal, finishQuest)));
+        allSteps.add(performMagicPanel);
 
-		return allSteps;
-	}
+        allSteps.add(new PanelDetails("Free Merlin", Arrays.asList(goUpLadder1Camelot, goUpLadder2Camelot, smashCrystal, finishQuest)));
+
+        return allSteps;
+    }
 }

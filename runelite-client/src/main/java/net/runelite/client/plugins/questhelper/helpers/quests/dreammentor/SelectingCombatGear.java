@@ -24,78 +24,66 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.dreammentor;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.ArrayList;
+
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-public class SelectingCombatGear extends QuestStep
-{
-	ArrayList<Widget> itemsToHighlight;
+import java.awt.*;
+import java.util.ArrayList;
 
-	public SelectingCombatGear(QuestHelper questHelper)
-	{
-		super(questHelper, "Take the marked items out of the bank.");
-	}
+public class SelectingCombatGear extends QuestStep {
+    ArrayList<Widget> itemsToHighlight;
 
-	@Override
-	public void startUp()
-	{
-		updateItems();
-	}
+    public SelectingCombatGear(QuestHelper questHelper) {
+        super(questHelper, "Take the marked items out of the bank.");
+    }
 
-	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		updateItems();
-	}
+    @Override
+    public void startUp() {
+        updateItems();
+    }
 
-	protected void updateItems()
-	{
-		ArrayList<Widget> newItemsToHighlight = new ArrayList<>();
-		Widget bankWidget = client.getWidget(260, 42);
-		if (bankWidget != null)
-		{
-			Widget[] bankItems = bankWidget.getChildren();
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        updateItems();
+    }
 
-			if (bankItems != null && bankItems.length > 0)
-			{
-				for (Widget bankItem : bankItems)
-				{
-					for (CyrisusBankItem item : CyrisusArmourSet.getCorrectSet(client).getItems())
-					{
-						if (item.getWidgetID() == bankItem.getItemId())
-						{
-							newItemsToHighlight.add(bankItem);
-						}
-					}
-				}
-				itemsToHighlight = newItemsToHighlight;
-			}
-		}
-	}
+    protected void updateItems() {
+        ArrayList<Widget> newItemsToHighlight = new ArrayList<>();
+        Widget bankWidget = client.getWidget(260, 42);
+        if (bankWidget != null) {
+            Widget[] bankItems = bankWidget.getChildren();
 
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
+            if (bankItems != null && bankItems.length > 0) {
+                for (Widget bankItem : bankItems) {
+                    for (CyrisusBankItem item : CyrisusArmourSet.getCorrectSet(client).getItems()) {
+                        if (item.getWidgetID() == bankItem.getItemId()) {
+                            newItemsToHighlight.add(bankItem);
+                        }
+                    }
+                }
+                itemsToHighlight = newItemsToHighlight;
+            }
+        }
+    }
 
-		if (itemsToHighlight.size() > 0)
-		{
-			for (Widget widget : itemsToHighlight)
-			{
-				graphics.setColor(new Color(questHelper.getConfig().targetOverlayColor().getRed(),
-					questHelper.getConfig().targetOverlayColor().getGreen(),
-					questHelper.getConfig().targetOverlayColor().getBlue(), 65));
-				graphics.fill(widget.getBounds());
-				graphics.setColor(questHelper.getConfig().targetOverlayColor());
-				graphics.draw(widget.getBounds());
-			}
-		}
-	}
+    @Override
+    public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin) {
+        super.makeWidgetOverlayHint(graphics, plugin);
+
+        if (itemsToHighlight.size() > 0) {
+            for (Widget widget : itemsToHighlight) {
+                graphics.setColor(new Color(questHelper.getConfig().targetOverlayColor().getRed(),
+                        questHelper.getConfig().targetOverlayColor().getGreen(),
+                        questHelper.getConfig().targetOverlayColor().getBlue(), 65));
+                graphics.fill(widget.getBounds());
+                graphics.setColor(questHelper.getConfig().targetOverlayColor());
+                graphics.draw(widget.getBounds());
+            }
+        }
+    }
 }

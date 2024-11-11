@@ -24,66 +24,57 @@
  */
 package net.runelite.client.plugins.questhelper.questhelpers;
 
+
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
 
-public abstract class BasicQuestHelper extends QuestHelper
-{
-	protected Map<Integer, QuestStep> steps;
-	protected int var;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-	@Override
-	public void init()
-	{
-		if (steps == null)
-		{
-			steps = loadSteps();
-		}
-	}
+public abstract class BasicQuestHelper extends QuestHelper {
+    protected Map<Integer, QuestStep> steps;
+    protected int var;
 
-	@Override
-	public void startUp(QuestHelperConfig config)
-	{
-		steps = loadSteps();
-		this.config = config;
-		instantiateSteps(steps.values());
-		var = getVar();
-		startUpStep(steps.get(var));
-	}
+    @Override
+    public void init() {
+        if (steps == null) {
+            steps = loadSteps();
+        }
+    }
 
-	@Override
-	public void shutDown()
-	{
-		super.shutDown();
-		shutDownStep();
-	}
+    @Override
+    public void startUp(QuestHelperConfig config) {
+        steps = loadSteps();
+        this.config = config;
+        instantiateSteps(steps.values());
+        var = getVar();
+        startUpStep(steps.get(var));
+    }
 
-	@Override
-	public boolean updateQuest()
-	{
-		if (var != getVar())
-		{
-			var = getVar();
-			shutDownStep();
-			startUpStep(steps.get(var));
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public void shutDown() {
+        super.shutDown();
+        shutDownStep();
+    }
 
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> panelSteps = new ArrayList<>();
-		steps.forEach((id, step) -> panelSteps.add(new PanelDetails("", step)));
-		return panelSteps;
-	}
+    @Override
+    public boolean updateQuest() {
+        if (var != getVar()) {
+            var = getVar();
+            shutDownStep();
+            startUpStep(steps.get(var));
+            return true;
+        }
+        return false;
+    }
 
-	public abstract Map<Integer, QuestStep> loadSteps();
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> panelSteps = new ArrayList<>();
+        steps.forEach((id, step) -> panelSteps.add(new PanelDetails("", step)));
+        return panelSteps;
+    }
+
+    public abstract Map<Integer, QuestStep> loadSteps();
 }

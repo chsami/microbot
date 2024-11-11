@@ -26,67 +26,58 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.widget;
 
-import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
-import javax.annotation.Nullable;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
 
-public class WidgetPresenceRequirement extends SimpleRequirement
-{
-	@Setter
-	@Getter
-	protected boolean hasPassed;
-	protected boolean onlyNeedToPassOnce;
+import javax.annotation.Nullable;
 
-	@Getter
-	protected final int groupId;
+public class WidgetPresenceRequirement extends SimpleRequirement {
+    @Getter
+    protected final int groupId;
+    protected final int childId;
+    @Setter
+    @Getter
+    protected boolean hasPassed;
+    protected boolean onlyNeedToPassOnce;
+    protected int childChildId = -1;
 
-	protected final int childId;
-	protected int childChildId = -1;
+    public WidgetPresenceRequirement(int groupId, int childId, int childChildId) {
+        this.groupId = groupId;
+        this.childId = childId;
+        this.childChildId = childChildId;
+    }
 
-	public WidgetPresenceRequirement(int groupId, int childId, int childChildId)
-	{
-		this.groupId = groupId;
-		this.childId = childId;
-		this.childChildId = childChildId;
-	}
+    public WidgetPresenceRequirement(int groupId, int childId) {
+        this.groupId = groupId;
+        this.childId = childId;
+    }
 
-	public WidgetPresenceRequirement(int groupId, int childId)
-	{
-		this.groupId = groupId;
-		this.childId = childId;
-	}
+    @Override
+    public boolean check(Client client) {
+        if (onlyNeedToPassOnce && hasPassed) {
+            return true;
+        }
+        return checkWidget(client);
+    }
 
-	@Override
-	public boolean check(Client client)
-	{
-		if (onlyNeedToPassOnce && hasPassed)
-		{
-			return true;
-		}
-		return checkWidget(client);
-	}
+    @Nullable
+    protected Widget getWidget(Client client) {
+        Widget widget = client.getWidget(groupId, childId);
+        if (widget == null) {
+            return null;
+        }
+        if (childChildId != -1) {
+            return widget.getChild(childChildId);
+        }
+        return widget;
+    }
 
-	@Nullable
-	protected Widget getWidget(Client client)
-	{
-		Widget widget = client.getWidget(groupId, childId);
-		if (widget == null)
-		{
-			return null;
-		}
-		if (childChildId != -1)
-		{
-			return widget.getChild(childChildId);
-		}
-		return widget;
-	}
-
-	public boolean checkWidget(Client client)
-	{
-		return getWidget(client) != null;
-	}
+    public boolean checkWidget(Client client) {
+        return getWidget(client) != null;
+    }
 }
 

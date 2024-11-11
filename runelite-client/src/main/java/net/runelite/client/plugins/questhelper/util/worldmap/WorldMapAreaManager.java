@@ -25,8 +25,6 @@
  */
 package net.runelite.client.plugins.questhelper.util.worldmap;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.ScriptID;
@@ -37,47 +35,43 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 @Singleton
-public class WorldMapAreaManager
-{
-	@Getter
-	private WorldMapArea worldMapArea = WorldMapArea.ANY;
+public class WorldMapAreaManager {
+    @Getter
+    private WorldMapArea worldMapArea = WorldMapArea.ANY;
 
-	@Inject
-	private Client client;
+    @Inject
+    private Client client;
 
-	@Inject
-	private EventBus eventBus;
+    @Inject
+    private EventBus eventBus;
 
-	@Subscribe
-	public void onScriptPostFired(ScriptPostFired scriptPostFired)
-	{
-		if (scriptPostFired.getScriptId() == ScriptID.WORLDMAP_LOADMAP)
-		{
-			Widget worldMapSearch = client.getWidget(ComponentID.WORLD_MAP_SEARCH);
-			if (worldMapSearch == null)
-			{
-				return;
-			}
-			Widget currentMapWidget = worldMapSearch.getChild(4);
-			if (currentMapWidget == null)
-			{
-				return;
-			}
+    @Subscribe
+    public void onScriptPostFired(ScriptPostFired scriptPostFired) {
+        if (scriptPostFired.getScriptId() == ScriptID.WORLDMAP_LOADMAP) {
+            Widget worldMapSearch = client.getWidget(ComponentID.WORLD_MAP_SEARCH);
+            if (worldMapSearch == null) {
+                return;
+            }
+            Widget currentMapWidget = worldMapSearch.getChild(4);
+            if (currentMapWidget == null) {
+                return;
+            }
 
-			worldMapArea = WorldMapArea.fromName(currentMapWidget.getText());
-			eventBus.post(new WorldMapAreaChanged(worldMapArea));
-		}
-	}
+            worldMapArea = WorldMapArea.fromName(currentMapWidget.getText());
+            eventBus.post(new WorldMapAreaChanged(worldMapArea));
+        }
+    }
 
-	@Subscribe
-	public void onScriptPreFired(ScriptPreFired event)
-	{
-		final int WORLD_MAP_NEW_MAP_SELECTED = 1711;
-		if (event.getScriptId() == WORLD_MAP_NEW_MAP_SELECTED)
-		{
-			worldMapArea = WorldMapArea.fromId(event.getScriptEvent().getSource().getIndex());
-			eventBus.post(new WorldMapAreaChanged(worldMapArea));
-		}
-	}
+    @Subscribe
+    public void onScriptPreFired(ScriptPreFired event) {
+        final int WORLD_MAP_NEW_MAP_SELECTED = 1711;
+        if (event.getScriptId() == WORLD_MAP_NEW_MAP_SELECTED) {
+            worldMapArea = WorldMapArea.fromId(event.getScriptEvent().getSource().getIndex());
+            eventBus.post(new WorldMapAreaChanged(worldMapArea));
+        }
+    }
 }

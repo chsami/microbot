@@ -24,21 +24,20 @@
  */
 package net.runelite.client.plugins.questhelper.panel;
 
-import java.awt.BorderLayout;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 
-public class QuestRewardWrapperPanel extends JPanel
-{
-	@Getter
-	private final QuestRewardPanel questRewardPanel;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
-	public QuestRewardWrapperPanel(QuestRewardPanel questRewardPanel)
-	{
-		setLayout(new BorderLayout());
-		setBorder(new EmptyBorder(0, 0, 0, 0));
-		add(questRewardPanel, BorderLayout.CENTER);
-		this.questRewardPanel = questRewardPanel;
-	}
+public class QuestRewardWrapperPanel extends JPanel {
+    @Getter
+    private final QuestRewardPanel questRewardPanel;
+
+    public QuestRewardWrapperPanel(QuestRewardPanel questRewardPanel) {
+        setLayout(new BorderLayout());
+        setBorder(new EmptyBorder(0, 0, 0, 0));
+        add(questRewardPanel, BorderLayout.CENTER);
+        this.questRewardPanel = questRewardPanel;
+    }
 }

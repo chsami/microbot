@@ -24,33 +24,27 @@
  */
 package net.runelite.client.plugins.questhelper.steps.choice;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 
-public class DialogChoiceChange extends DialogChoiceStep
-{
-	private final String textChange;
+public class DialogChoiceChange extends DialogChoiceStep {
+    private final String textChange;
 
-	public DialogChoiceChange(QuestHelperConfig config, String choice, String textChange)
-	{
-		super(config, choice);
-		this.textChange = textChange;
-	}
+    public DialogChoiceChange(QuestHelperConfig config, String choice, String textChange) {
+        super(config, choice);
+        this.textChange = textChange;
+    }
 
-	@Override
-	protected void highlightText(Widget text, int option)
-	{
-		if (!config.showTextHighlight())
-		{
-			return;
-		}
-		if (shouldNumber)
-		{
-			text.setText("[" + option + "] " + textChange);
-		}
-		else
-		{
-			text.setText(textChange);
-		}
-	}
+    @Override
+    protected void highlightText(Widget text, int option) {
+        if (!config.showTextHighlight()) {
+            return;
+        }
+        if (shouldNumber) {
+            text.setText("[" + option + "] " + textChange);
+        } else {
+            text.setText(textChange);
+        }
+    }
 }

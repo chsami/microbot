@@ -27,20 +27,6 @@
 package net.runelite.client.plugins.questhelper.helpers.miniquests.themagearenaii;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.ItemID;
@@ -50,230 +36,211 @@ import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 
-public class MageArenaBossStep extends DetailedQuestStep
-{
-	@Inject
-	ItemManager itemManager;
+import javax.annotation.Nullable;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-	static String originalTextStart = "Use the Enchanted Symbol to locate the ";
-	static String originalTextEnd = " boss. Only bring food and the symbol for this bit." +
-		"Make sure to only click to locate the current boss, or the locating " +
-		"functionality won't work.";
+public class MageArenaBossStep extends DetailedQuestStep {
+    @Inject
+    ItemManager itemManager;
 
-	String goFightTextStart = "Gear up with your staff, food, potions and gear you're willing to " +
-		"risk. Go to the location and use the device to spawn the boss. Protect from Magic and " +
-		"defeat it. ";
+    static String originalTextStart = "Use the Enchanted Symbol to locate the ";
+    static String originalTextEnd = " boss. Only bring food and the symbol for this bit." +
+            "Make sure to only click to locate the current boss, or the locating " +
+            "functionality won't work.";
 
-	final String bossName;
-	final String abilityDetail;
+    String goFightTextStart = "Gear up with your staff, food, potions and gear you're willing to " +
+            "risk. Go to the location and use the device to spawn the boss. Protect from Magic and " +
+            "defeat it. ";
 
-	final ItemRequirement staff;
+    final String bossName;
+    final String abilityDetail;
 
-	ItemRequirement[] baseRequirements;
+    final ItemRequirement staff;
 
-	@Nullable
-	private MageArenaSolver mageArenaSolver;
+    ItemRequirement[] baseRequirements;
 
-	boolean foundLocation = false;
+    @Nullable
+    private MageArenaSolver mageArenaSolver;
 
-	int currentVar = 0;
+    boolean foundLocation = false;
 
-	final int BOSS_MOVING_TIMER_VARBIT = 6062;
+    int currentVar = 0;
 
-	public MageArenaBossStep(QuestHelper questHelper, ItemRequirement staff, String bossName,
-							 String abilityDetail, ItemRequirement... requirements)
-	{
-		super(questHelper, originalTextStart + bossName + originalTextEnd, requirements);
-		this.bossName = bossName;
-		this.abilityDetail = abilityDetail;
-		this.staff = staff;
-		this.baseRequirements = requirements;
-	}
+    final int BOSS_MOVING_TIMER_VARBIT = 6062;
 
-	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
-	{
-		super.makeOverlayHint(panelComponent, plugin, additionalText, additionalRequirements);
-		if (mageArenaSolver == null)
-		{
-			return;
-		}
+    public MageArenaBossStep(QuestHelper questHelper, ItemRequirement staff, String bossName,
+                             String abilityDetail, ItemRequirement... requirements) {
+        super(questHelper, originalTextStart + bossName + originalTextEnd, requirements);
+        this.bossName = bossName;
+        this.abilityDetail = abilityDetail;
+        this.staff = staff;
+        this.baseRequirements = requirements;
+    }
 
-		final Collection<MageArenaSpawnLocation> digLocations = mageArenaSolver.getPossibleLocations();
-		List<String> locations = digLocations.stream()
-			.map(MageArenaSpawnLocation::getArea)
-			.distinct()
-			.collect(Collectors.toList());
+    @Override
+    public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements) {
+        super.makeOverlayHint(panelComponent, plugin, additionalText, additionalRequirements);
+        if (mageArenaSolver == null) {
+            return;
+        }
 
-		if (digLocations.size() > 1)
-		{
-			panelComponent.getChildren().add(LineComponent.builder()
-				.left("Possible locations:")
-				.build());
-		}
-		else if (digLocations.size() < 1)
-		{
-			if (!foundLocation)
-			{
-				addRequirement(staff);
-				setText(goFightTextStart + abilityDetail);
-			}
-			foundLocation = true;
-			panelComponent.getChildren().add(LineComponent.builder()
-				.left("Unable to establish spawn location. Let the Quest Helper team know the location in Discord so " +
-					"we can add it in")
-				.build());
-		}
-		else
-		{
-			if (!foundLocation)
-			{
-				addRequirement(staff);
-				setText(goFightTextStart + abilityDetail);
-			}
-			foundLocation = true;
-			panelComponent.getChildren().add(LineComponent.builder()
-				.left("Spawn location:")
-				.build());
-		}
+        final Collection<MageArenaSpawnLocation> digLocations = mageArenaSolver.getPossibleLocations();
+        List<String> locations = digLocations.stream()
+                .map(MageArenaSpawnLocation::getArea)
+                .distinct()
+                .collect(Collectors.toList());
 
-		locations.forEach((location -> panelComponent.getChildren().add(LineComponent.builder()
-			.left("- " + location)
-			.leftColor(Color.LIGHT_GRAY)
-			.build())));
-	}
+        if (digLocations.size() > 1) {
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Possible locations:")
+                    .build());
+        } else if (digLocations.size() < 1) {
+            if (!foundLocation) {
+                addRequirement(staff);
+                setText(goFightTextStart + abilityDetail);
+            }
+            foundLocation = true;
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Unable to establish spawn location. Let the Quest Helper team know the location in Discord so " +
+                            "we can add it in")
+                    .build());
+        } else {
+            if (!foundLocation) {
+                addRequirement(staff);
+                setText(goFightTextStart + abilityDetail);
+            }
+            foundLocation = true;
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Spawn location:")
+                    .build());
+        }
 
-	@Override
-	public void onVarbitChanged(VarbitChanged varbitChanged)
-	{
-		super.onVarbitChanged(varbitChanged);
-		int newState = client.getVarbitValue(BOSS_MOVING_TIMER_VARBIT);
+        locations.forEach((location -> panelComponent.getChildren().add(LineComponent.builder()
+                .left("- " + location)
+                .leftColor(Color.LIGHT_GRAY)
+                .build())));
+    }
 
-		// If the position of the bosses changes, reset
-		if (newState > currentVar)
-		{
-			foundLocation = false;
-			setText("The bosses have changed locations. " + originalTextStart + bossName + originalTextEnd);
-			setRequirements(Arrays.asList(baseRequirements));
-			resetState();
-		}
-		currentVar = newState;
-	}
+    @Override
+    public void onVarbitChanged(VarbitChanged varbitChanged) {
+        super.onVarbitChanged(varbitChanged);
+        int newState = client.getVarbitValue(BOSS_MOVING_TIMER_VARBIT);
 
-	public void resetState()
-	{
-		setWorldPoint(null);
-		Set<MageArenaSpawnLocation> locations =
-			Arrays.stream(MageArenaSpawnLocation.values())
-			.collect(Collectors.toSet());
+        // If the position of the bosses changes, reset
+        if (newState > currentVar) {
+            foundLocation = false;
+            setText("The bosses have changed locations. " + originalTextStart + bossName + originalTextEnd);
+            setRequirements(Arrays.asList(baseRequirements));
+            resetState();
+        }
+        currentVar = newState;
+    }
 
-		if (mageArenaSolver != null)
-		{
-			mageArenaSolver.resetSolver(locations);
-		}
-		if (mageArenaSolver.getPossibleLocations().size() == 1)
-		{
-			this.setWorldPoint(mageArenaSolver.getPossibleLocations().iterator().next().getWorldPoint());
-		}
-	}
+    public void resetState() {
+        setWorldPoint(null);
+        Set<MageArenaSpawnLocation> locations =
+                Arrays.stream(MageArenaSpawnLocation.values())
+                        .collect(Collectors.toSet());
 
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWorldOverlayHint(graphics, plugin);
+        if (mageArenaSolver != null) {
+            mageArenaSolver.resetSolver(locations);
+        }
+        if (mageArenaSolver.getPossibleLocations().size() == 1) {
+            this.setWorldPoint(mageArenaSolver.getPossibleLocations().iterator().next().getWorldPoint());
+        }
+    }
 
-		if (worldPoint == null)
-		{
-			return;
-		}
+    @Override
+    public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin) {
+        super.makeWorldOverlayHint(graphics, plugin);
 
-		LocalPoint localLocation = LocalPoint.fromWorld(client, worldPoint);
+        if (worldPoint == null) {
+            return;
+        }
 
-		if (localLocation == null)
-		{
-			return;
-		}
+        LocalPoint localLocation = LocalPoint.fromWorld(client, worldPoint);
 
-		OverlayUtil.renderTileOverlay(client, graphics, localLocation, getSymbolLocation(), questHelper.getConfig().targetOverlayColor());
-	}
+        if (localLocation == null) {
+            return;
+        }
 
-	@Subscribe
-	public void onChatMessage(ChatMessage chatMessage)
-	{
-		if (chatMessage.getType() == ChatMessageType.GAMEMESSAGE)
-		{
-			update(chatMessage.getMessage());
-		}
-	}
+        OverlayUtil.renderTileOverlay(client, graphics, localLocation, getSymbolLocation(), questHelper.getConfig().targetOverlayColor());
+    }
 
-	public void update(final String message)
-	{
-		if (mageArenaSolver == null)
-		{
-			return;
-		}
+    @Subscribe
+    public void onChatMessage(ChatMessage chatMessage) {
+        if (chatMessage.getType() == ChatMessageType.GAMEMESSAGE) {
+            update(chatMessage.getMessage());
+        }
+    }
 
-		final MageArenaTemperature temperature = MageArenaTemperature.getFromTemperatureSet(message);
+    public void update(final String message) {
+        if (mageArenaSolver == null) {
+            return;
+        }
 
-		if (temperature == null)
-		{
-			return;
-		}
+        final MageArenaTemperature temperature = MageArenaTemperature.getFromTemperatureSet(message);
 
-		if (client.getLocalPlayer() == null)
-		{
-			return;
-		}
-		final WorldPoint localWorld = client.getLocalPlayer().getWorldLocation();
+        if (temperature == null) {
+            return;
+        }
 
-		if (localWorld == null)
-		{
-			return;
-		}
+        if (client.getLocalPlayer() == null) {
+            return;
+        }
+        final WorldPoint localWorld = client.getLocalPlayer().getWorldLocation();
 
-		final MageArenaTemperatureChange temperatureChange = MageArenaTemperatureChange.of(message);
+        if (localWorld == null) {
+            return;
+        }
 
-		mageArenaSolver.signal(localWorld, temperature, temperatureChange);
+        final MageArenaTemperatureChange temperatureChange = MageArenaTemperatureChange.of(message);
 
-		if (mageArenaSolver.getPossibleLocations().size() == 1)
-		{
-			this.setWorldPoint(mageArenaSolver.getPossibleLocations().iterator().next().getWorldPoint());
-		}
-		else
-		{
-			this.setWorldPoint(null);
-		}
+        mageArenaSolver.signal(localWorld, temperature, temperatureChange);
 
-	}
+        if (mageArenaSolver.getPossibleLocations().size() == 1) {
+            this.setWorldPoint(mageArenaSolver.getPossibleLocations().iterator().next().getWorldPoint());
+        } else {
+            this.setWorldPoint(null);
+        }
 
-	@Override
-	public void startUp()
-	{
-		super.startUp();
-		currentVar = client.getVarbitValue(BOSS_MOVING_TIMER_VARBIT);
-		Set<MageArenaSpawnLocation> locations =
-			Arrays.stream(MageArenaSpawnLocation.values())
-			.collect(Collectors.toSet());
-		mageArenaSolver = new MageArenaSolver(locations);
-		if (locations.size() == 1)
-		{
-			this.setWorldPoint(locations.iterator().next().getWorldPoint());
-		}
-	}
+    }
 
-	@Override
-	public void shutDown()
-	{
-		super.shutDown();
-		this.setWorldPoint(null);
-	}
+    @Override
+    public void startUp() {
+        super.startUp();
+        currentVar = client.getVarbitValue(BOSS_MOVING_TIMER_VARBIT);
+        Set<MageArenaSpawnLocation> locations =
+                Arrays.stream(MageArenaSpawnLocation.values())
+                        .collect(Collectors.toSet());
+        mageArenaSolver = new MageArenaSolver(locations);
+        if (locations.size() == 1) {
+            this.setWorldPoint(locations.iterator().next().getWorldPoint());
+        }
+    }
 
-	private BufferedImage getSymbolLocation()
-	{
-		return itemManager.getImage(ItemID.ENCHANTED_SYMBOL);
-	}
+    @Override
+    public void shutDown() {
+        super.shutDown();
+        this.setWorldPoint(null);
+    }
+
+    private BufferedImage getSymbolLocation() {
+        return itemManager.getImage(ItemID.ENCHANTED_SYMBOL);
+    }
 }

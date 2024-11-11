@@ -24,161 +24,142 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.monksfriend;
 
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
-import net.runelite.client.plugins.questhelper.rewards.ItemReward;
-import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
-import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
+import net.runelite.client.plugins.questhelper.rewards.ItemReward;
+import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
+import net.runelite.client.plugins.questhelper.steps.*;
 
-public class MonksFriend extends BasicQuestHelper
-{
-	//Items Required
-	ItemRequirement jugOfWater, log, blanket;
+import java.util.*;
 
-	//Items Recommended
-	ItemRequirement ardougneCloak;
+public class MonksFriend extends BasicQuestHelper {
+    //Items Required
+    ItemRequirement jugOfWater, log, blanket;
 
-	Requirement inDungeon;
+    //Items Recommended
+    ItemRequirement ardougneCloak;
 
-	QuestStep talkToOmad, goDownLadder, grabBlanket, goUpLadder, returnToOmadWithBlanket, talkToOmadAgain, talkToCedric, talkToCedricWithJug,
-		continueTalkingToCedric, talkToCedricWithLog, finishQuest;
+    Requirement inDungeon;
 
-	//Zones
-	Zone dungeon;
+    QuestStep talkToOmad, goDownLadder, grabBlanket, goUpLadder, returnToOmadWithBlanket, talkToOmadAgain, talkToCedric, talkToCedricWithJug,
+            continueTalkingToCedric, talkToCedricWithLog, finishQuest;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    //Zones
+    Zone dungeon;
 
-		steps.put(0, talkToOmad);
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupConditions();
+        setupSteps();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		ConditionalStep getBlanket = new ConditionalStep(this, goDownLadder);
-		getBlanket.addStep(new Conditions(inDungeon, blanket.alsoCheckBank(questBank)), goUpLadder);
-		getBlanket.addStep(blanket.alsoCheckBank(questBank), returnToOmadWithBlanket);
-		getBlanket.addStep(inDungeon, grabBlanket);
+        steps.put(0, talkToOmad);
 
-		steps.put(10, getBlanket);
+        ConditionalStep getBlanket = new ConditionalStep(this, goDownLadder);
+        getBlanket.addStep(new Conditions(inDungeon, blanket.alsoCheckBank(questBank)), goUpLadder);
+        getBlanket.addStep(blanket.alsoCheckBank(questBank), returnToOmadWithBlanket);
+        getBlanket.addStep(inDungeon, grabBlanket);
 
-		steps.put(20, talkToOmadAgain);
-		steps.put(30, talkToCedric);
-		steps.put(40, talkToCedricWithJug);
-		steps.put(50, continueTalkingToCedric);
-		steps.put(60, talkToCedricWithLog);
-		steps.put(70, finishQuest);
+        steps.put(10, getBlanket);
 
-		return steps;
-	}
+        steps.put(20, talkToOmadAgain);
+        steps.put(30, talkToCedric);
+        steps.put(40, talkToCedricWithJug);
+        steps.put(50, continueTalkingToCedric);
+        steps.put(60, talkToCedricWithLog);
+        steps.put(70, finishQuest);
 
-	@Override
-	protected void setupRequirements()
-	{
-		log = new ItemRequirement("Logs", ItemID.LOGS);
-		jugOfWater = new ItemRequirement("Jug of Water", ItemID.JUG_OF_WATER);
-		blanket = new ItemRequirement("Child's blanket", ItemID.CHILDS_BLANKET);
-		ardougneCloak = new ItemRequirement("Ardougne cloak 1 or higher for teleports to the monastery", ItemID.ARDOUGNE_CLOAK).isNotConsumed();
-	}
+        return steps;
+    }
 
-	@Override
-	protected void setupZones()
-	{
-		dungeon = new Zone(new WorldPoint(2559, 9597, 0), new WorldPoint(2582, 9623, 0));
-	}
+    @Override
+    protected void setupRequirements() {
+        log = new ItemRequirement("Logs", ItemID.LOGS);
+        jugOfWater = new ItemRequirement("Jug of Water", ItemID.JUG_OF_WATER);
+        blanket = new ItemRequirement("Child's blanket", ItemID.CHILDS_BLANKET);
+        ardougneCloak = new ItemRequirement("Ardougne cloak 1 or higher for teleports to the monastery", ItemID.ARDOUGNE_CLOAK).isNotConsumed();
+    }
 
-	public void setupConditions()
-	{
-		inDungeon = new ZoneRequirement(dungeon);
-	}
+    @Override
+    protected void setupZones() {
+        dungeon = new Zone(new WorldPoint(2559, 9597, 0), new WorldPoint(2582, 9623, 0));
+    }
 
-	public void setupSteps()
-	{
-		talkToOmad = new NpcStep(this, NpcID.BROTHER_OMAD, new WorldPoint(2607, 3211, 0), "Talk to Brother Omad in the monastery south of West Ardougne.");
-		talkToOmad.addDialogStep("Why can't you sleep, what's wrong?");
-		talkToOmad.addDialogStep("Can I help at all?");
-		goDownLadder = new ObjectStep(this, ObjectID.LADDER_16680, new WorldPoint(2561, 3222, 0), "Go down the ladder in a circle of stones west of the monastery.");
-		grabBlanket = new DetailedQuestStep(this, new WorldPoint(2570, 9604, 0), "Pick up the Child's blanket in the room to the south.", blanket);
-		goUpLadder = new ObjectStep(this, ObjectID.LADDER_17385, new WorldPoint(2561, 9622, 0), "Go back up the ladder.");
-		returnToOmadWithBlanket = new NpcStep(this, NpcID.BROTHER_OMAD, new WorldPoint(2607, 3211, 0), "Bring the blanket back to Brother Omad.", blanket);
-		talkToOmadAgain = new NpcStep(this, NpcID.BROTHER_OMAD, new WorldPoint(2607, 3211, 0), "Talk to Brother Omad again.");
-		talkToOmadAgain.addDialogStep("Is there anything else I can help with?");
-		talkToOmadAgain.addDialogStep("Who's Brother Cedric?");
-		talkToOmadAgain.addDialogStep("Where should I look?");
-		talkToCedric = new NpcStep(this, NpcID.BROTHER_CEDRIC, new WorldPoint(2614, 3258, 0), "Talk to Brother Cedric north of the monastery.");
-		talkToCedricWithJug = new NpcStep(this, NpcID.BROTHER_CEDRIC, new WorldPoint(2614, 3258, 0), "Talk to Brother Cedric again.", jugOfWater);
-		talkToCedricWithJug.addDialogStep("Yes, I'd be happy to!");
-		continueTalkingToCedric = new NpcStep(this, NpcID.BROTHER_CEDRIC, new WorldPoint(2614, 3258, 0), "Talk to Brother Cedric again.");
-		talkToCedricWithJug.addSubSteps(continueTalkingToCedric);
-		talkToCedricWithLog = new NpcStep(this, NpcID.BROTHER_CEDRIC, new WorldPoint(2614, 3258, 0), "Talk to Brother Cedric once again with logs.", log);
-		finishQuest = new NpcStep(this, NpcID.BROTHER_OMAD, new WorldPoint(2607, 3211, 0), "Return to Brother Omad to finish the quest.");
-	}
+    public void setupConditions() {
+        inDungeon = new ZoneRequirement(dungeon);
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(jugOfWater);
-		reqs.add(log);
-		return reqs;
-	}
+    public void setupSteps() {
+        talkToOmad = new NpcStep(this, NpcID.BROTHER_OMAD, new WorldPoint(2607, 3211, 0), "Talk to Brother Omad in the monastery south of West Ardougne.");
+        talkToOmad.addDialogStep("Why can't you sleep, what's wrong?");
+        talkToOmad.addDialogStep("Can I help at all?");
+        goDownLadder = new ObjectStep(this, ObjectID.LADDER_16680, new WorldPoint(2561, 3222, 0), "Go down the ladder in a circle of stones west of the monastery.");
+        grabBlanket = new DetailedQuestStep(this, new WorldPoint(2570, 9604, 0), "Pick up the Child's blanket in the room to the south.", blanket);
+        goUpLadder = new ObjectStep(this, ObjectID.LADDER_17385, new WorldPoint(2561, 9622, 0), "Go back up the ladder.");
+        returnToOmadWithBlanket = new NpcStep(this, NpcID.BROTHER_OMAD, new WorldPoint(2607, 3211, 0), "Bring the blanket back to Brother Omad.", blanket);
+        talkToOmadAgain = new NpcStep(this, NpcID.BROTHER_OMAD, new WorldPoint(2607, 3211, 0), "Talk to Brother Omad again.");
+        talkToOmadAgain.addDialogStep("Is there anything else I can help with?");
+        talkToOmadAgain.addDialogStep("Who's Brother Cedric?");
+        talkToOmadAgain.addDialogStep("Where should I look?");
+        talkToCedric = new NpcStep(this, NpcID.BROTHER_CEDRIC, new WorldPoint(2614, 3258, 0), "Talk to Brother Cedric north of the monastery.");
+        talkToCedricWithJug = new NpcStep(this, NpcID.BROTHER_CEDRIC, new WorldPoint(2614, 3258, 0), "Talk to Brother Cedric again.", jugOfWater);
+        talkToCedricWithJug.addDialogStep("Yes, I'd be happy to!");
+        continueTalkingToCedric = new NpcStep(this, NpcID.BROTHER_CEDRIC, new WorldPoint(2614, 3258, 0), "Talk to Brother Cedric again.");
+        talkToCedricWithJug.addSubSteps(continueTalkingToCedric);
+        talkToCedricWithLog = new NpcStep(this, NpcID.BROTHER_CEDRIC, new WorldPoint(2614, 3258, 0), "Talk to Brother Cedric once again with logs.", log);
+        finishQuest = new NpcStep(this, NpcID.BROTHER_OMAD, new WorldPoint(2607, 3211, 0), "Return to Brother Omad to finish the quest.");
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRecommended()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(ardougneCloak);
-		return reqs;
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(jugOfWater);
+        reqs.add(log);
+        return reqs;
+    }
 
-	@Override
-	public QuestPointReward getQuestPointReward()
-	{
-		return new QuestPointReward(1);
-	}
+    @Override
+    public List<ItemRequirement> getItemRecommended() {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(ardougneCloak);
+        return reqs;
+    }
 
-	@Override
-	public List<ExperienceReward> getExperienceRewards()
-	{
-		return Collections.singletonList(new ExperienceReward(Skill.WOODCUTTING, 2000));
-	}
+    @Override
+    public QuestPointReward getQuestPointReward() {
+        return new QuestPointReward(1);
+    }
 
-	@Override
-	public List<ItemReward> getItemRewards()
-	{
-		return Collections.singletonList(new ItemReward("Law Runes", ItemID.LAW_RUNE, 8));
-	}
+    @Override
+    public List<ExperienceReward> getExperienceRewards() {
+        return Collections.singletonList(new ExperienceReward(Skill.WOODCUTTING, 2000));
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off", Collections.singletonList(talkToOmad), jugOfWater, log));
-		allSteps.add(new PanelDetails("Finding the blanket", Arrays.asList(goDownLadder, grabBlanket, goUpLadder, returnToOmadWithBlanket)));
-		allSteps.add(new PanelDetails("Help Cedric", Arrays.asList(talkToOmadAgain, talkToCedric, talkToCedricWithJug, talkToCedricWithLog, finishQuest)));
+    @Override
+    public List<ItemReward> getItemRewards() {
+        return Collections.singletonList(new ItemReward("Law Runes", ItemID.LAW_RUNE, 8));
+    }
 
-		return allSteps;
-	}
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Starting off", Collections.singletonList(talkToOmad), jugOfWater, log));
+        allSteps.add(new PanelDetails("Finding the blanket", Arrays.asList(goDownLadder, grabBlanket, goUpLadder, returnToOmadWithBlanket)));
+        allSteps.add(new PanelDetails("Help Cedric", Arrays.asList(talkToOmadAgain, talkToCedric, talkToCedricWithJug, talkToCedricWithLog, finishQuest)));
+
+        return allSteps;
+    }
 }

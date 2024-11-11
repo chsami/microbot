@@ -24,62 +24,55 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
+
 import lombok.Getter;
-import net.runelite.client.plugins.questhelper.steps.widget.WidgetDetails;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import lombok.Setter;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.steps.widget.WidgetDetails;
 
-public class WidgetStep extends DetailedQuestStep
-{
-	@Getter
-	@Setter
-	protected List<WidgetDetails> widgetDetails = new ArrayList<>();
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-	public WidgetStep(QuestHelper questHelper, String text, int groupID, int childID)
-	{
-		super(questHelper, text);
-		widgetDetails.add(new WidgetDetails(groupID, childID, -1));
-	}
+public class WidgetStep extends DetailedQuestStep {
+    @Setter
+    @Getter
+    protected List<WidgetDetails> widgetDetails = new ArrayList<>();
 
-	public WidgetStep(QuestHelper questHelper, String text, WidgetDetails... widgetDetails)
-	{
-		super(questHelper, text);
-		this.widgetDetails.addAll(Arrays.asList(widgetDetails));
-	}
+    public WidgetStep(QuestHelper questHelper, String text, int groupID, int childID) {
+        super(questHelper, text);
+        widgetDetails.add(new WidgetDetails(groupID, childID, -1));
+    }
 
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		for (WidgetDetails widgetDetail : widgetDetails)
-		{
-			Widget widget = client.getWidget(widgetDetail.groupID, widgetDetail.childID);
-			if (widget == null || widget.isHidden())
-			{
-				continue;
-			}
+    public WidgetStep(QuestHelper questHelper, String text, WidgetDetails... widgetDetails) {
+        super(questHelper, text);
+        this.widgetDetails.addAll(Arrays.asList(widgetDetails));
+    }
 
-			if (widgetDetail.childChildID != -1)
-			{
-				Widget tmpWidget = widget.getChild(widgetDetail.childChildID);
-				if (tmpWidget != null)
-				{
-					widget = tmpWidget;
-				}
-			}
-			graphics.setColor(new Color(questHelper.getConfig().targetOverlayColor().getRed(),
-				questHelper.getConfig().targetOverlayColor().getGreen(),
-				questHelper.getConfig().targetOverlayColor().getBlue(), 65));
-			graphics.fill(widget.getBounds());
-			graphics.setColor(questHelper.getConfig().targetOverlayColor());
-			graphics.draw(widget.getBounds());
-		}
-	}
+    @Override
+    public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin) {
+        super.makeWidgetOverlayHint(graphics, plugin);
+        for (WidgetDetails widgetDetail : widgetDetails) {
+            Widget widget = client.getWidget(widgetDetail.groupID, widgetDetail.childID);
+            if (widget == null || widget.isHidden()) {
+                continue;
+            }
+
+            if (widgetDetail.childChildID != -1) {
+                Widget tmpWidget = widget.getChild(widgetDetail.childChildID);
+                if (tmpWidget != null) {
+                    widget = tmpWidget;
+                }
+            }
+            graphics.setColor(new Color(questHelper.getConfig().targetOverlayColor().getRed(),
+                    questHelper.getConfig().targetOverlayColor().getGreen(),
+                    questHelper.getConfig().targetOverlayColor().getBlue(), 65));
+            graphics.fill(widget.getBounds());
+            graphics.setColor(questHelper.getConfig().targetOverlayColor());
+            graphics.draw(widget.getBounds());
+        }
+    }
 }

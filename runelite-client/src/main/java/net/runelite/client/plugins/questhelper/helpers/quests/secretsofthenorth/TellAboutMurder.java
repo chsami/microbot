@@ -24,48 +24,42 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.secretsofthenorth;
 
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.choice.DialogChoiceSteps;
+
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.choice.DialogChoiceSteps;
 
-public class TellAboutMurder extends NpcStep
-{
+public class TellAboutMurder extends NpcStep {
 
-	public TellAboutMurder(QuestHelper questHelper)
-	{
-		super(questHelper, NpcID.GUARD_12045, new WorldPoint(2571, 3267, 1),
-			"Tell the guard about what you found.");
-	}
+    public TellAboutMurder(QuestHelper questHelper) {
+        super(questHelper, NpcID.GUARD_12045, new WorldPoint(2571, 3267, 1),
+                "Tell the guard about what you found.");
+    }
 
-	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		updateCorrectChoice();
-	}
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        updateCorrectChoice();
+    }
 
-	private void updateCorrectChoice()
-	{
-		boolean saidAboutWindow = client.getVarbitValue(14731) == 1;
-		boolean saidAboutCeril = client.getVarbitValue(14730) == 1;
-		boolean saidAboutWall = client.getVarbitValue(14732) == 1;
+    private void updateCorrectChoice() {
+        boolean saidAboutWindow = client.getVarbitValue(14731) == 1;
+        boolean saidAboutCeril = client.getVarbitValue(14730) == 1;
+        boolean saidAboutWall = client.getVarbitValue(14732) == 1;
 
-		choices = new DialogChoiceSteps();
+        choices = new DialogChoiceSteps();
 
-		if (!saidAboutWindow)
-		{
-			addDialogStep("The window was broken from the outside.");
-		}
-		if (!saidAboutCeril)
-		{
-			addDialogStep("Ceril was stabbed from behind.");
-		}
-		if (!saidAboutWall)
-		{
-			addDialogStep("A hidden room above us was broken into.");
-		}
-	}
+        if (!saidAboutWindow) {
+            addDialogStep("The window was broken from the outside.");
+        }
+        if (!saidAboutCeril) {
+            addDialogStep("Ceril was stabbed from behind.");
+        }
+        if (!saidAboutWall) {
+            addDialogStep("A hidden room above us was broken into.");
+        }
+    }
 }

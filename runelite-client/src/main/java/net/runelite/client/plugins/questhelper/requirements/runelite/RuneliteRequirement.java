@@ -24,148 +24,135 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.runelite;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 
-public class RuneliteRequirement extends AbstractRequirement
-{
-	@Getter
-	protected final String CONFIG_GROUP = QuestHelperConfig.QUEST_BACKGROUND_GROUP;
+import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-	protected final String displayText;
-	protected final String runeliteIdentifier;
+public class RuneliteRequirement extends AbstractRequirement {
+    @Getter
+    protected final String CONFIG_GROUP = QuestHelperConfig.QUEST_BACKGROUND_GROUP;
 
-	@Getter
-	protected final String expectedValue;
-	protected final ConfigManager configManager;
+    protected final String displayText;
+    protected final String runeliteIdentifier;
 
-	@Getter
-	protected final Map<String, Requirement> requirements;
+    @Getter
+    protected final String expectedValue;
+    protected final ConfigManager configManager;
 
-	protected String initValue;
+    @Getter
+    protected final Map<String, Requirement> requirements;
 
-	public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue, String text, Map<String, Requirement> requirements)
-	{
-		this(configManager, id, "false", expectedValue, text, requirements);
-	}
+    protected String initValue;
 
-	public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue)
-	{
-		this(configManager, id, expectedValue, new HashMap<>());
-	}
+    public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue, String text, Map<String, Requirement> requirements) {
+        this(configManager, id, "false", expectedValue, text, requirements);
+    }
 
-	public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue,
-							   Map<String, Requirement> requirements)
-	{
-		this(configManager, id, expectedValue, "Expecting " + expectedValue, requirements);
-	}
+    public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue) {
+        this(configManager, id, expectedValue, new HashMap<>());
+    }
 
-	public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue,
-							  Requirement requirement)
-	{
-		this(configManager, id, expectedValue, Collections.singletonMap(expectedValue, requirement));
-	}
+    public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue,
+                               Map<String, Requirement> requirements) {
+        this(configManager, id, expectedValue, "Expecting " + expectedValue, requirements);
+    }
 
-	public RuneliteRequirement(ConfigManager configManager, String id, Requirement requirement)
-	{
-		this(configManager, id, "true", Collections.singletonMap("true", requirement));
-	}
+    public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue,
+                               Requirement requirement) {
+        this(configManager, id, expectedValue, Collections.singletonMap(expectedValue, requirement));
+    }
 
-	public RuneliteRequirement(ConfigManager configManager, String id, String initValue, String expectedValue,
-							   String text, Map<String, Requirement> requirements)
-	{
-		this.configManager = configManager;
-		this.runeliteIdentifier = id;
-		this.displayText = text;
-		this.expectedValue = expectedValue;
-		this.requirements = requirements;
-		this.initValue = initValue;
-		initWithValue(initValue);
-	}
+    public RuneliteRequirement(ConfigManager configManager, String id, Requirement requirement) {
+        this(configManager, id, "true", Collections.singletonMap("true", requirement));
+    }
 
-	// Used for the KeyringRequirement
-	public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue, String text)
-	{
-		this.configManager = configManager;
-		this.runeliteIdentifier = id;
-		this.displayText = text;
-		this.expectedValue = expectedValue;
-		this.requirements = new HashMap<>();
-	}
+    public RuneliteRequirement(ConfigManager configManager, String id, Requirement requirement, String displayText) {
+        this(configManager, id, "true", displayText, Collections.singletonMap("true", requirement));
+    }
 
-	@Override
-	public boolean check(Client client)
-	{
-		String value = getConfigValue();
-		return expectedValue.equals(value);
-	}
+    public RuneliteRequirement(ConfigManager configManager, String id, String initValue, String expectedValue,
+                               String text, Map<String, Requirement> requirements) {
+        this.configManager = configManager;
+        this.runeliteIdentifier = id;
+        this.displayText = text;
+        this.expectedValue = expectedValue;
+        this.requirements = requirements;
+        this.initValue = initValue;
+        initWithValue(initValue);
+    }
 
-	// This is a bit undefined in terms of expected behaviour for multiple requirements.
-	// Currently the last requirement to pass should effectively determine the configValue.
-	// This is an OR, if we assume that all the passes are the same output.
-	// It'd be possible to put in some which force a "false" and some which have a "true" as their value.
+    // Used for the KeyringRequirement
+    public RuneliteRequirement(ConfigManager configManager, String id, String expectedValue, String text) {
+        this.configManager = configManager;
+        this.runeliteIdentifier = id;
+        this.displayText = text;
+        this.expectedValue = expectedValue;
+        this.requirements = new HashMap<>();
+    }
 
-	/* TODO: Needs to be adjusted to at least make sense. Possibly just remove the Hash and only allow one Requirement,
-	** seeing as requirements can be nested anyways.
-	 */
-	public void validateCondition(Client client)
-	{
-		requirements.forEach((value, req) -> {
-			if (req.check(client)) setConfigValue(value);
-		});
-	}
+    @Override
+    public boolean check(Client client) {
+        String value = getConfigValue();
+        return expectedValue.equals(value);
+    }
 
-	@Override
-	public String getDisplayText()
-	{
-		String returnText;
-		if (displayText != null)
-		{
-			returnText = displayText;
-		}
-		else
-		{
-			returnText = "You need " + runeliteIdentifier;
-		}
+    // This is a bit undefined in terms of expected behaviour for multiple requirements.
+    // Currently the last requirement to pass should effectively determine the configValue.
+    // This is an OR, if we assume that all the passes are the same output.
+    // It'd be possible to put in some which force a "false" and some which have a "true" as their value.
 
-		return returnText;
-	}
+    /* TODO: Needs to be adjusted to at least make sense. Possibly just remove the Hash and only allow one Requirement,
+     ** seeing as requirements can be nested anyways.
+     */
+    public void validateCondition(Client client) {
+        requirements.forEach((value, req) -> {
+            if (req.check(client)) setConfigValue(value);
+        });
+    }
 
-	public String getConfigValue()
-	{
-		String value = configManager.getRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier);
-		if (initValue != null && value == null)
-		{
-			setConfigValue(initValue);
-			return initValue;
-		}
-		return configManager.getRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier);
-	}
+    @Nonnull
+    @Override
+    public String getDisplayText() {
+        String returnText;
+        if (displayText != null) {
+            returnText = displayText;
+        } else {
+            returnText = "You need " + runeliteIdentifier;
+        }
 
-	public void setConfigValue(String obj)
-	{
-		if (configManager.getRSProfileKey() == null) return;
-		configManager.setRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier, obj);
-	}
+        return returnText;
+    }
 
-	public boolean configExists()
-	{
-		return configManager.getRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier) != null;
-	}
+    public String getConfigValue() {
+        String value = configManager.getRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier);
+        if (initValue != null && value == null) {
+            setConfigValue(initValue);
+            return initValue;
+        }
+        return configManager.getRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier);
+    }
 
-	public void initWithValue(String value)
-	{
-		if (!configExists())
-		{
-			setConfigValue(value);
-		}
-	}
+    public void setConfigValue(String obj) {
+        if (configManager.getRSProfileKey() == null) return;
+        configManager.setRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier, obj);
+    }
+
+    public boolean configExists() {
+        return configManager.getRSProfileConfiguration(CONFIG_GROUP, runeliteIdentifier) != null;
+    }
+
+    public void initWithValue(String value) {
+        if (!configExists()) {
+            setConfigValue(value);
+        }
+    }
 }
 

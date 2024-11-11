@@ -26,53 +26,50 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
+
+import net.runelite.api.Client;
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.requirements.util.ItemSlots;
-import java.awt.Color;
-import java.util.Objects;
+
 import javax.annotation.Nonnull;
-import net.runelite.api.Client;
+import java.awt.*;
+import java.util.Objects;
 
 /**
  * Requirement that checks if a player has no item in a specified {@link ItemSlots}.
  */
-public class NoItemRequirement extends ItemRequirement
-{
-	private final ItemSlots slot;
+public class NoItemRequirement extends ItemRequirement {
+    private final ItemSlots slot;
 
-	/**
-	 * Checks if a player has no items in a given {@link ItemSlots}
-	 *
-	 * @param text display text
-	 * @param slot the slot to check
-	 */
-	public NoItemRequirement(String text, @Nonnull ItemSlots slot)
-	{
-		super(text, -1, -1);
-		this.slot = slot;
-	}
+    /**
+     * Checks if a player has no items in a given {@link ItemSlots}
+     *
+     * @param text display text
+     * @param slot the slot to check
+     */
+    public NoItemRequirement(String text, @Nonnull ItemSlots slot) {
+        super(text, -1, -1);
+        this.slot = slot;
+    }
 
-	@Override
-	public boolean check(Client client)
-	{
-		return slot.checkInventory(client, Objects::isNull);
-	}
+    @Override
+    public boolean check(Client client) {
+        return slot.checkInventory(client, Objects::isNull);
+    }
 
-	@Override
-	public Color getColor(Client client, QuestHelperConfig config)
-	{
-		return check(client) ? config.passColour() : config.failColour();
-	}
+    @Override
+    public Color getColor(Client client, QuestHelperConfig config) {
+        return check(client) ? config.passColour() : config.failColour();
+    }
 
-	@Override
-	public String getDisplayText()
-	{
-		return "Nothing in your " + slot.getName();
-	}
+    @Nonnull
+    @Override
+    public String getDisplayText() {
+        return "Nothing in your " + slot.getName();
+    }
 
-	@Override
-	protected NoItemRequirement copyOfClass()
-	{
-		return new NoItemRequirement(getName(), slot);
-	}
+    @Override
+    protected NoItemRequirement copyOfClass() {
+        return new NoItemRequirement(getName(), slot);
+    }
 }
