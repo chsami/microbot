@@ -307,6 +307,17 @@ public interface QoLConfig extends Config {
         return 50;
     }
 
+    @ConfigItem(
+            keyName = "refillCannopn",
+            name = "Refill cannon",
+            description = "Refill & Repair cannon",
+            position = 10,
+            section = upkeepSection
+    )
+    default boolean refillCannon() {
+        return false;
+    }
+
 
     // boolean to display Inventory setups as a menu option in the bank
     @ConfigItem(
