@@ -50,7 +50,7 @@ class MicrobotTopLevelConfigPanel extends PluginPanel {
         add(content, BorderLayout.CENTER);
 
         this.pluginListPanel = pluginListPanel;
-        pluginListPanelTab = addTab(pluginListPanel.getMuxer(), "config_icon_lg.png", "Configuration");
+        pluginListPanelTab = addTab(pluginListPanel.getMuxer(), "microbot_config_icon_lg.png", "Microbot Plugins");
 
         tabGroup.select(pluginListPanelTab);
 

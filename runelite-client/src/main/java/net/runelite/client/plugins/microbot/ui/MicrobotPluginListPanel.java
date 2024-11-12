@@ -184,7 +184,7 @@ class MicrobotPluginListPanel extends PluginPanel
 		pluginList = Stream.concat(
 			fakePlugins.stream(),
 			pluginManager.getPlugins().stream()
-				.filter(plugin -> !plugin.getClass().getAnnotation(PluginDescriptor.class).hidden())
+				.filter(plugin -> !plugin.getClass().getAnnotation(PluginDescriptor.class).hidden() && plugin.getClass().getPackage().getName().toLowerCase().contains("microbot"))
 				.map(plugin ->
 				{
 					PluginDescriptor descriptor = plugin.getClass().getAnnotation(PluginDescriptor.class);

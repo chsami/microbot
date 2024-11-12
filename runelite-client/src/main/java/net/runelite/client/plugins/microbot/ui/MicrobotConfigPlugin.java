@@ -87,12 +87,12 @@ public class MicrobotConfigPlugin extends Plugin {
 
         topLevelConfigPanel = topLevelConfigPanelProvider.get();
 
-        final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "mdi_alert.png");
+        final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "microbot_config_icon.png");
 
         navButton = NavigationButton.builder()
-                .tooltip("Configuration")
+                .tooltip("Community Plugins")
                 .icon(icon)
-                .priority(12)
+                .priority(0)
                 .panel(topLevelConfigPanel)
                 .build();
 
