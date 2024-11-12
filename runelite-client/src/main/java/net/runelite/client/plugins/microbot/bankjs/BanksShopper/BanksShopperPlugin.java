@@ -44,7 +44,7 @@ public class BanksShopperPlugin extends Plugin {
     private BanksShopperOverlay banksShopperOverlay;
 
     @Inject
-    BanksShopperScript banksShopperScript;
+    private BanksShopperScript banksShopperScript;
     
     @Getter
     private String npcName;
@@ -75,6 +75,7 @@ public class BanksShopperPlugin extends Plugin {
             overlayManager.add(banksShopperOverlay);
         }
         
+        banksShopperScript = new BanksShopperScript(this);
         banksShopperScript.run(config);
     }
 
